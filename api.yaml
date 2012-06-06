@@ -9,7 +9,7 @@
 -
   name:  'Experimental Select PMC'
   note:  'The Select PMC is experimental until its interface gets some exercise.  See ticket for more information.'
-  tags: 
+  tags:
     - 'PMC'
     - 'experimental'
   ticket:  'https://github.com/parrot/parrot/issues/651'
@@ -555,7 +555,7 @@
 -
   name : '"constant" PObj'
   eligible : '3.1'
-  note: 
+  note:
     "constant" PObj (which is never collected) are deprecated. All PMCs and STRINGs
     should be properly marked during GC.
 
@@ -571,7 +571,7 @@
 -
   name : 'Non-const STRING* arguments'
   eligible : '3.1'
-  note : 
+  note :
     Due to the immutable nature of STRINGs we are changing the internal handling to use only
     const STRING pointers. This will improve optimizations possibilities for compilers,
     and make parrot const-correct.
@@ -592,7 +592,7 @@
     The PMC returned by C<compreg "PIR"> is not going to be an NCI PMC any longer,
     it will be a new type of PMC which conforms to PDD31 and will be similar to
     HLLCompiler.
-    
+
     There will not be a PASM compreg anymore.
   ticket : 'http://trac.parrot.org/parrot/ticket/1967'
 -
@@ -618,3 +618,27 @@
     - completed
   ticket: 'http://trac.parrot.org/parrot/ticket/443'
 
+  name : 'Introspection methods for Key PMC'
+  note :
+    Several methods for introspection and creation of register-reference Key
+    PMCs have been added for testing. These methods are : make_register_key,
+    is_register_reference, get_register_idx and get_register_contents.
+  tags:
+    - experimental
+  ticket: 'https://github.com/parrot/parrot/issues/717'
+
+  name : 'rindex opcode'
+  note :
+    The new rindex_i_s_s and rindex_i_s_s_i opcodes are experimental. They
+    duplicate functionality found in the String PMC reverse_index method.
+  tags :
+    - experimental
+  ticket : 'https://github.com/parrot/parrot/issues/767'
+
+  name : 'write_bytes and read_bytes methods'
+  note :
+    The .write_bytes and .read_bytes methods for the Handle PMC (inherited
+    by FileHandle and Socket, currently) are new and experimental.
+  tags :
+    - experimental
+  ticket : 'https://github.com/parrot/parrot/issues/610'

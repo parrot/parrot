@@ -418,10 +418,8 @@ Mark the stuff.
         it = (PMC_List_Item*) tmp;
 
         while (it != NULL) {
-            if (!PObj_is_PMC_TEST(it->data)) {
-                fprintf(stderr, "not a pmc\n");
-                exit(1);
-            }
+            if (!PObj_is_PMC_TEST(it->data))
+                PANIC(INTERP, "PMCList: Pointer is not a valid PMC");
 
             Parrot_gc_mark_PMC_alive(INTERP, it->data);
             it = it->next;

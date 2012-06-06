@@ -1,0 +1,19 @@
+# Copyright (C) 2003-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+t/src/README.pod - Readme file for the 't/src/' directory. 
+
+=head1 DESCRIPTION
+
+This directory contains test code in C.
+
+I<See also> the documentation in F<../../docs/tests.pod>.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2003-2012, Parrot Foundation.
+
+=cut

@@ -205,7 +205,11 @@ main(int argc, const char *argv[])
         const char * const filename = argv[nextarg];
         const char * const ext      = strrchr(filename, '.');
 
-        if (ext && STREQ(ext, ".pbc")) {
+        if (*filename == '-') {
+            fprintf(stderr, "parrot_debugger takes no -x or --xxxx flag arguments");
+            exit(1);
+        }
+        else {
             STRING *   const filename_str = Parrot_str_new(interp, filename, 0);
             PackFile * const pfraw        = Parrot_pf_read_pbc_file(interp, filename_str);
             Parrot_PackFile pf;
@@ -218,23 +222,6 @@ main(int argc, const char *argv[])
                 return 1;
 
             Parrot_pf_set_current_packfile(interp, pf);
-            Parrot_pf_prepare_packfile_init(interp, pf);
-        }
-        else {
-            STRING * const str = Parrot_str_new(interp, filename, 0);
-            Parrot_PackFile  pf  = Parrot_pf_get_packfile_pmc(interp, PackFile_new(interp, 0), str);
-            STRING * const compiler_s = Parrot_str_new(interp, "PIR", 0);
-            PMC * const compiler = Parrot_interp_get_compiler(interp, compiler_s);
-
-            Parrot_pf_set_current_packfile(interp, pf);
-
-            Parrot_interp_compile_file(interp, compiler, str);
-            /*if (errmsg)
-                Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not compile file");*/
-
-            /* load the source for debugger list */
-            PDB_load_source(interp, filename);
-
             Parrot_pf_prepare_packfile_init(interp, pf);
         }
     }

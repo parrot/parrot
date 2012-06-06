@@ -82,7 +82,8 @@ Parrot_setenv(PARROT_INTERP, STRING *str_name, STRING *str_value)
             }
             else {
                 mem_sys_free(envstring);
-                exit_fatal(1, "Unable to set environment variable %s=%s",
+                Parrot_x_force_error_exit(interp, 1,
+                    "Unable to set environment variable %s=%s",
                     name, value);
             }
         }

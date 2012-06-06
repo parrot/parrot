@@ -762,7 +762,7 @@ TEST:
   is( $I0, -1, "far far away -1" )
 
   $I0 = $P0.'reverse_index'('l', 0)
-  is( $I0, 9, "search1 9" )
+  is( $I0, -1, "reverse_index starting from 0 is -1" )
 
   $I0 = $P0.'reverse_index'('l', 8)
   is( $I0, 3, "search2 3" )
@@ -775,7 +775,7 @@ TEST:
   is( $I0, -1, "negative start -1 unicode" )
 
   $I0 = $P0.'reverse_index'('o', 24)
-  is( $I0, -1, "out of bounds -1 unicode" )
+  is( $I0, 20, "start = strlen works" )
 
   $I0 = $P0.'reverse_index'('string', 23)
   is( $I0, 0, "search1 unicode" )

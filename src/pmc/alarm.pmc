@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
-$Id$
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -48,7 +47,9 @@ Initializes the alarm.
 */
 
     VTABLE void init() {
-        Parrot_Alarm_attributes *data = PARROT_ALARM(SELF);
+        Parrot_Alarm_attributes * const data = PARROT_ALARM(SELF);
+        UNUSED(INTERP);
+
         data->alarm_time = 0.0;
         data->alarm_task = PMCNULL;
 
@@ -66,10 +67,10 @@ Create a copy of the alarm.
 */
 
     VTABLE PMC *clone() {
-        PMC *copy = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
+        PMC * const copy = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
-        Parrot_Alarm_attributes *new_struct = PARROT_ALARM(copy);
-        Parrot_Alarm_attributes *old_struct = PARROT_ALARM(SELF);
+        Parrot_Alarm_attributes * const new_struct = PARROT_ALARM(copy);
+        const Parrot_Alarm_attributes * const old_struct = PARROT_ALARM(SELF);
 
         new_struct->alarm_time = old_struct->alarm_time;
         new_struct->alarm_task  = old_struct->alarm_task;
@@ -88,6 +89,7 @@ Returns the PMC associated with C<key>.
 */
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
+        UNUSED(INTERP);
         if (key == PARROT_ALARM_TASK) {
             const Parrot_Alarm_attributes * const data = PARROT_ALARM(SELF);
             return data->alarm_task;
@@ -107,6 +109,7 @@ Returns the number associated with C<key>.
 */
 
     VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
+        UNUSED(INTERP);
         if (key == PARROT_ALARM_TIME) {
             const Parrot_Alarm_attributes * const data = PARROT_ALARM(SELF);
             return data->alarm_time;
@@ -127,6 +130,7 @@ Having the alarm numify to the time is convienient for sorting.
 
     VTABLE FLOATVAL get_number() {
         const Parrot_Alarm_attributes * const data = PARROT_ALARM(SELF);
+        UNUSED(INTERP);
         return data->alarm_time;
     }
 

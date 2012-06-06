@@ -112,9 +112,10 @@ D: typo squisher
 E: yDNA@cpan.org
 
 N: Andrew Whitworth
+D: Product Manager (2.9.0 - current)
 D: Internals development
 D: Documentation
-D: Release manager for 0.8.2, 1.3.0, 1.5.0, 2.4.0, 2.11.0, 3.3.0, 3.10.0 and 4.0.0
+D: Release manager for 0.8.2, 1.3.0, 1.5.0, 2.4.0, 2.11.0, 3.3.0, 3.10.0, 4.0.0 and 4.4.0
 E: wknight8111@gmail.com
 U: Whiteknight
 
@@ -516,6 +517,7 @@ D: various Pynie patches
 N: James E Keenan
 E: jkeenan@cpan.org
 U: jkeenan
+A: kid51
 D: Testing of configuration and build tools; release manager
 W: http://thenceforward.net/parrot/
 S: Brooklyn, NY, USA
@@ -696,7 +698,7 @@ D: clean-ups of compilers/imcc and its documentation.
 D: compilers/pirc and languages/PIR.
 D: various updates to PCT-based languages (C99,Punie,Cardinal,Ecmascript)
 D: languages/json, languages/squaak
-U: kj, kjs
+U: kjs
 E: parrotcode@gmail.com
 
 N: Klāvs Priedītis
@@ -1212,5 +1214,10 @@ E: cvs@perl.org
 N: svn
 U: svn
 E: svn@perl.org
+
+N: Bart Wiegmans
+E: bartwiegmans@gmail.com
+D: mod_parrot
+
 
 =cut

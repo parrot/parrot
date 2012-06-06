@@ -961,7 +961,7 @@ void PackFile_pack(PARROT_INTERP,
         FUNC_MODIFIES(*cursor);
 
 PARROT_EXPORT
-opcode_t PackFile_pack_size(PARROT_INTERP, ARGMOD(PackFile *self))
+size_t PackFile_pack_size(PARROT_INTERP, ARGMOD(PackFile *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*self);

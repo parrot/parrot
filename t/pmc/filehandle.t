@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 30;
+use Parrot::Test tests => 32;
 use Parrot::Test::Util 'create_tempfile';
 
 =head1 NAME
@@ -40,7 +40,7 @@ pir_output_is( <<"CODE", <<'OUT', 'open and close - synchronous' );
 .sub 'test' :main
     .local int i
     \$P1 = new ['FileHandle']
-    \$P1.'open'('README')
+    \$P1.'open'('README.pod')
     say 'ok 1 - \$P1.open(\$S1)'
 
     \$P1.'close'()
@@ -127,10 +127,10 @@ pir_output_is( <<'CODE', <<'OUT', 'wrong open' );
 
     i = 0
     set_label eh, catchreopen
-    fh.'open'('README')
+    fh.'open'('README.pod')
     i = 1
     # Open already opened
-    fh.'open'('README')
+    fh.'open'('README.pod')
     i = 0
     goto reportreopen
   catchreopen:
@@ -152,7 +152,7 @@ pir_output_is( <<'CODE', <<'OUT', 'isatty' );
     i = fh.'isatty'()
     print i
     say ' unopened FileHandle is not a tty'
-    fh.'open'('README')
+    fh.'open'('README.pod')
     i = fh.'isatty'()
     print i
     say ' regular file is not a tty'
@@ -170,13 +170,13 @@ SKIP: {
     $P1 = # GH #535 create a callback here
     $P0 = new ['FileHandle']
 
-    $P0.'open'('README')
+    $P0.'open'('README.pod')
     say 'ok 1 - $P0.open($S1)'
 
     $P0.'close'()
     say 'ok 2 - $P0.close($P1)'
 
-    $P0.'open'('README', 'rw')
+    $P0.'open'('README.pod', 'rw')
     say 'ok 3 - $P0.open($S1, $S2)'
 
     $P0.'close'()
@@ -199,16 +199,17 @@ pir_output_is(
     <<'CODE', <<'OUT', 'read - synchronous' );
 .sub 'test' :main
     $P0 = new ['FileHandle']
-    $P0.'open'('README')
+    $P0.'open'('README.pod')
 
-    $S0 = $P0.'read'(14) # bytes
-    if $S0 == 'This is Parrot' goto ok_1
+    $S0 = $P0.'read'(15) # bytes
+    if $S0 == '# Copyright (C)' goto ok_1
     print 'not '
   ok_1:
     say 'ok 1 - $S0 = $P1.read($I2)'
 
-    $S0 = $P0.'read'(9)  # bytes
-    if $S0 == ', version' goto ok_2
+    $S0 = $P0.'read'(12)  # throw away bytes
+    $S0 = $P0.'read'(17)  # bytes
+    if $S0 == 'Parrot Foundation' goto ok_2
     print 'not '
   ok_2:
     say 'ok 2 - $S0 = $P1.read($I2) # again on same stream'
@@ -224,18 +225,19 @@ pir_output_is(
     .local pmc fh, bb
 
     fh = new ['FileHandle']
-    fh.'open'('README')
+    fh.'open'('README.pod')
 
-    bb = fh.'read_bytes'(14)
+    bb = fh.'read_bytes'(15)
     $S0 = bb.'get_string'('ascii')
-    if $S0 == 'This is Parrot' goto ok_1
+    if $S0 == '# Copyright (C)' goto ok_1
     print 'not '
   ok_1:
     say 'ok 1 - read_bytes'
 
-    bb = fh.'read_bytes'(9)  # bytes
+    bb = fh.'read_bytes'(12)  # throw away bytes
+    bb = fh.'read_bytes'(17)  # bytes
     $S0 = bb.'get_string'('utf8')
-    if $S0 == ', version' goto ok_2
+    if $S0 == 'Parrot Foundation' goto ok_2
     print 'not '
   ok_2:
     say 'ok 2 - read_bytes # again on same stream'
@@ -618,7 +620,7 @@ pir_output_is( <<'CODE', <<'OUT', 'mode' );
 .sub 'test' :main
     $P0 = new ['FileHandle']
 
-    $P0.'open'('README')
+    $P0.'open'('README.pod')
     $S0 = $P0.'mode'()
 
     if $S0 == 'r' goto ok_1
@@ -639,7 +641,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "clone preserves all attributes of filehand
     .local string line1, line2
 
     fh = new ['FileHandle']
-    fh.'open'('README')
+    fh.'open'('README.pod')
 
     line1 = fh.'readline'()
 
@@ -726,9 +728,9 @@ pir_output_is( <<'CODE', <<'OUTPUT', "readall - failure conditions" );
     say 'caught unopened'
   test2:
     set_label eh, catch2
-    fh.'open'('README')
+    fh.'open'('README.pod')
     # Using opened FileHandle with the filepath option
-    fh.'readall'('README')
+    fh.'readall'('README.pod')
     say 'should never happen'
     goto end
   catch2:
@@ -1069,6 +1071,34 @@ CODE
 0
 1
 OUT
+
+pir_output_is( <<'CODE', "This is a", ".write_bytes" );
+.const string temp_file = '%s'
+.sub main :main
+    $P0 = getinterp
+    $P1 = $P0.'stdout_handle'()
+
+    $P2 = new ['ByteBuffer']
+    $P2 = "This is a test"
+    $P1.'write_bytes'($P2, 9)
+.end
+
+CODE
+
+pir_output_is( <<'CODE', <<'OUTPUT', ".read_bytes" );
+.const string temp_file = '%s'
+.sub main :main
+    $P0 = new ['FileHandle']
+    $P0.'open'('README.pod')
+
+    $P1 = $P0.'read_bytes'(15) # bytes
+    $S0 = $P1.'get_string_as'('ascii')
+    say $S0
+.end
+
+CODE
+# Copyright (C)
+OUTPUT
 
 # GH #465
 # L<PDD22/I\/O PMC API/=item get_fd>

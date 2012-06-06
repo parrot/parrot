@@ -234,7 +234,9 @@ int cotorra_main(Parrot_Interp interp, int argc, const char **argv)
         if (i < argc) {
             int pos;
             Parrot_PMC arg = Parrot_pmc_new(interp,
-                    Parrot_PMC_typenum(interp, "FixedStringArray"));
+                    Parrot_pmc_get_type_str(interp,
+                        Parrot_str_new(interp, "FixedStringArray", 0)));
+
             Parrot_PMC_set_integer_native(interp, arg, argc - i);
             for (pos = 0; i < argc; ++i, ++pos) {
                 Parrot_PMC_set_string_keyed_int(interp, arg, pos, create_string(interp, argv[i]));

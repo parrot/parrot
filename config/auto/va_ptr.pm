@@ -35,9 +35,9 @@ sub runstep {
     $conf->cc_gen('config/auto/va_ptr/test_c.in');
     eval { $conf->cc_build('-DVA_TYPE_STACK'); };
 
-    if ( $@ || $conf->cc_run() !~ /^ok/ ) {
+    if ( $@ || $conf->cc_run_capture() !~ /^ok/ ) {
         eval { $conf->cc_build('-DVA_TYPE_REGISTER'); };
-        if ( $@ || $conf->cc_run() !~ /^ok/ ) {
+        if ( $@ || $conf->cc_run_capture() !~ /^ok/ ) {
             die "Unknown va_ptr type";
         }
         $va_type = 'register';

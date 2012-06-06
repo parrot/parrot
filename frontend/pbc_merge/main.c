@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2011, Parrot Foundation.
+Copyright (C) 2005-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -65,8 +65,13 @@ typedef struct pbc_merge_input {
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void ensure_libdep(PARROT_INTERP, PackFile_ByteCode *bc, STRING *lib)
-        __attribute__nonnull__(1);
+static void ensure_libdep(PARROT_INTERP,
+    ARGMOD(PackFile_ByteCode *bc),
+    ARGIN(STRING *lib))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*bc);
 
 PARROT_DOES_NOT_RETURN
 static void help(void);
@@ -155,7 +160,9 @@ static void pbc_merge_write(PARROT_INTERP,
         FUNC_MODIFIES(*pf);
 
 #define ASSERT_ARGS_ensure_libdep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(bc) \
+    , PARROT_ASSERT_ARG(lib))
 #define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_pbc_fixup_bytecode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -223,7 +230,7 @@ Ensures that the libdep C<lib> is in the libdeps list for C<bc>.
 */
 
 static void
-ensure_libdep(PARROT_INTERP, PackFile_ByteCode *bc, STRING *lib)
+ensure_libdep(PARROT_INTERP, ARGMOD(PackFile_ByteCode *bc), ARGIN(STRING *lib))
 {
     ASSERT_ARGS(ensure_libdep)
     size_t i;
@@ -352,14 +359,13 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
     FLOATVAL  *num_constants = mem_gc_allocate_typed(interp, FLOATVAL);
     STRING   **str_constants = mem_gc_allocate_typed(interp, STRING *);
     PMC      **pmc_constants = mem_gc_allocate_typed(interp, PMC *);
-    PackFile_ConstTagPair *tags = mem_gc_allocate_typed(interp, PackFile_ConstTagPair);
 
     opcode_t num_cursor = 0;
     opcode_t str_cursor = 0;
     opcode_t pmc_cursor = 0;
     opcode_t tag_cursor = 0;
 
-    int i, j;
+    int i;
 
     /* Add a constant table segment. */
     PackFile_ConstTable * const const_seg = (PackFile_ConstTable *)
@@ -374,8 +380,8 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 
     /* Loop over input files. */
     for (i = 0; i < num_inputs; ++i) {
-        opcode_t str_cursor_start = str_cursor;
         opcode_t pmc_cursor_start = pmc_cursor;
+        int j;
 
         /* Get the constant table segment from the input file. */
         PackFile_ConstTable * const in_seg = inputs[i]->pf->cur_cs->const_table;
@@ -487,8 +493,7 @@ pbc_merge_annotations(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
         int num_inputs, ARGMOD(PackFile *pf), ARGMOD(PackFile_ByteCode *bc))
 {
     ASSERT_ARGS(pbc_merge_annotations)
-    int i, j, k;
-    int num_anns = 0;
+    int i;
     PackFile_Annotations * const merged = Parrot_pf_get_annotations_segment(interp, pf, bc);
     int key_cursor = 0;
 
@@ -496,13 +501,14 @@ pbc_merge_annotations(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
         PackFile_ByteCode * const in_bc = inputs[i]->pf->cur_cs;
         PackFile_Annotations * const in_ann =
             Parrot_pf_get_annotations_segment(interp, inputs[i]->pf, in_bc);
+        int j;
 
         for (j = 0; j < in_ann->num_keys; j++) {
             const opcode_t old_name_idx = in_ann->keys[j].name;
-            const opcode_t new_name_idx = inputs[i]->str.const_map[old_name_idx];
             const opcode_t old_len = in_ann->keys[j].len;
             const opcode_t old_start = in_ann->keys[j].start;
             const opcode_t new_key = inputs[i]->str.const_map[old_name_idx];
+            int k;
 
             for (k = 0; k < old_len; k++) {
                 const opcode_t idx = (old_start + k) * 2;
@@ -691,8 +697,6 @@ pbc_fixup_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                      int num_inputs, ARGMOD(PackFile_ByteCode *bc))
 {
     ASSERT_ARGS(pbc_fixup_bytecode)
-    int        cur_arg;
-    opcode_t  *op_ptr;
     opcode_t  *ops       = bc->base.data;
     opcode_t   cur_op    = 0;
     int        cur_input = 0;
@@ -703,6 +707,8 @@ pbc_fixup_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
         op_info_t *op;
         opcode_t   op_num;
         op_func_t  op_func;
+        opcode_t  *op_ptr;
+        int        cur_arg;
 
         /* Keep track of the current input file. */
         if (cur_input + 1 < num_inputs &&
@@ -838,7 +844,6 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
     ASSERT_ARGS(pbc_merge_begin)
     PackFile_ByteCode    *bc;
     PackFile_ConstTable  *ct;
-    PackFile_Annotations *an;
     int                   i;
 
     /* Create a new empty packfile. */
@@ -855,7 +860,7 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
         for (j = 0; j < pf_dir->num_segments; ++j) {
             const PackFile_Segment * const seg = pf_dir->segments[j];
             if (seg->type == PF_CONST_SEG) {
-                const PackFile_ConstTable * const ct = (PackFile_ConstTable *)seg;
+                const PackFile_ConstTable * const ct = (const PackFile_ConstTable *)seg;
                 inputs[i]->num.const_map = mem_gc_allocate_n_typed(interp, ct->num.const_count,
                                                                     opcode_t);
                 inputs[i]->str.const_map = mem_gc_allocate_n_typed(interp, ct->str.const_count,
@@ -869,7 +874,6 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
     /* Merge the various stuff. */
     ct = pbc_merge_constants(interp, inputs, num_inputs, merged);
     bc = pbc_merge_bytecode(interp, inputs, num_inputs, merged);
-    an = pbc_merge_annotations(interp, inputs, num_inputs, merged, bc);
     bc->const_table = ct;
     ct->code        = bc;
     interp->code    = bc;

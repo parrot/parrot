@@ -1,4 +1,6 @@
 # THIS IS A GENERATED FILE! DO NOT EDIT!
+# Compiled with Winxed 1.8.1
+# Source file: frontend/parrot2/prt0.winxed
 # Begin generated code
 
 .namespace [ ]
@@ -248,7 +250,7 @@
 
 .sub '__show_runtime_prefix_and_exit' :subid('WSubId_1') :anon
     null $S1
-    interpinfo $S1, 24
+    interpinfo $S1, 23
     say $S1
     exit 0
 
@@ -258,7 +260,7 @@
 .sub '__show_version_and_exit' :subid('WSubId_2') :anon
     getinterp $P3
     $P1 = $P3[8]
-    set $S1, "This is Parrot version %s%s built for %s-%s\nCopyright (C) 2001-2011, Parrot Foundation.\n\nThis code is distributed under the terms of the Artistic License 2.0.\nFor more details, see the full text of the license in the LICENSE file\nincluded in the Parrot source tree\n"
+    set $S1, "This is Parrot version %s%s built for %s-%s\nCopyright (C) 2001-2012, Parrot Foundation.\n\nThis code is distributed under the terms of the Artistic License 2.0.\nFor more details, see the full text of the license in the LICENSE file\nincluded in the Parrot source tree\n"
     root_new $P3, ['parrot';'ResizablePMCArray']
     assign $P3, 4
     $P4 = $P1["VERSION"]

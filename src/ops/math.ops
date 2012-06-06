@@ -45,27 +45,27 @@ Set $1 to absolute value of $2.
 
 =cut
 
-inline op abs(inout INT) :base_core {
+inline op abs(inout INT)  {
     $1 = abs($1);
 }
 
-inline op abs(inout NUM) :base_core {
+inline op abs(inout NUM)  {
     $1 = fabs($1);
 }
 
-inline op abs(out INT, in INT) :base_core {
+inline op abs(out INT, in INT)  {
     $1 = abs($2);
 }
 
-inline op abs(out NUM, in NUM) :base_core {
+inline op abs(out NUM, in NUM)  {
     $1 = fabs($2);
 }
 
-inline op abs(invar PMC) :base_core {
+inline op abs(invar PMC)  {
     VTABLE_i_absolute(interp, $1);
 }
 
-inline op abs(out PMC, invar PMC) :base_core {
+inline op abs(out PMC, invar PMC)  {
     $1 = VTABLE_absolute(interp, $2, $1);
 }
 
@@ -97,43 +97,43 @@ Set $1 to the sum of $2 and $3.
 
 =cut
 
-inline op add(inout INT, in INT) :base_core {
+inline op add(inout INT, in INT)  {
     $1 += $2;
 }
 
-inline op add(inout NUM, in NUM) :base_core {
+inline op add(inout NUM, in NUM)  {
     $1 += $2;
 }
 
-inline op add(invar PMC, invar PMC) :base_core {
+inline op add(invar PMC, invar PMC)  {
     VTABLE_i_add(interp, $1, $2);
 }
 
-inline op add(invar PMC, in INT) :base_core {
+inline op add(invar PMC, in INT)  {
     VTABLE_i_add_int(interp, $1, $2);
 }
 
-inline op add(invar PMC, in NUM) :base_core {
+inline op add(invar PMC, in NUM)  {
     VTABLE_i_add_float(interp, $1, $2);
 }
 
-inline op add(out INT, in INT, in INT) :base_core {
+inline op add(out INT, in INT, in INT)  {
     $1 = $2 + $3;
 }
 
-inline op add(out NUM, in NUM, in NUM) :base_core {
+inline op add(out NUM, in NUM, in NUM)  {
     $1 = $2 + $3;
 }
 
-inline op add(invar PMC, invar PMC, invar PMC) :base_core {
+inline op add(invar PMC, invar PMC, invar PMC)  {
     $1 = VTABLE_add(interp, $2, $3, $1);
 }
 
-inline op add(invar PMC, invar PMC, in INT) :base_core {
+inline op add(invar PMC, invar PMC, in INT)  {
     $1 = VTABLE_add_int(interp, $2, $3, $1);
 }
 
-inline op add(invar PMC, invar PMC, in NUM) :base_core {
+inline op add(invar PMC, invar PMC, in NUM)  {
     $1 = VTABLE_add_float(interp, $2, $3, $1);
 }
 
@@ -149,15 +149,15 @@ Decrease $1 by one.
 
 =cut
 
-inline op dec(inout INT) :base_core {
+inline op dec(inout INT)  {
     $1--;
 }
 
-inline op dec(inout NUM) :base_core {
+inline op dec(inout NUM)  {
     $1--;
 }
 
-inline op dec(invar PMC) :base_core {
+inline op dec(invar PMC)  {
     VTABLE_decrement(interp, $1);
 }
 
@@ -191,7 +191,7 @@ If the denominator is zero, a 'Divide by zero' exception is thrown.
 
 =cut
 
-inline op div(inout INT, in INT) :base_core {
+inline op div(inout INT, in INT)  {
     const INTVAL den = $2;
     if (den == 0) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
@@ -202,7 +202,7 @@ inline op div(inout INT, in INT) :base_core {
     $1 /= den;
 }
 
-inline op div(inout NUM, in NUM) :base_core {
+inline op div(inout NUM, in NUM)  {
     const FLOATVAL den = $2;
     if (FLOAT_IS_ZERO(den)) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
@@ -213,18 +213,18 @@ inline op div(inout NUM, in NUM) :base_core {
     $1 /= den;
 }
 
-inline op div(invar PMC, invar PMC) :base_core {
+inline op div(invar PMC, invar PMC)  {
     VTABLE_i_divide(interp, $1, $2);
 }
 
-inline op div(invar PMC, in INT) :base_core {
+inline op div(invar PMC, in INT)  {
     VTABLE_i_divide_int(interp, $1, $2);
 }
 
-inline op div(invar PMC, in NUM) :base_core {
+inline op div(invar PMC, in NUM)  {
     VTABLE_i_divide_float(interp, $1, $2);
 }
-inline op div(out INT, in INT, in INT) :base_core {
+inline op div(out INT, in INT, in INT)  {
     const INTVAL den = $3;
     if (den == 0) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
@@ -235,7 +235,7 @@ inline op div(out INT, in INT, in INT) :base_core {
     $1 = $2 / den;
 }
 
-inline op div(out NUM, in NUM, in NUM) :base_core {
+inline op div(out NUM, in NUM, in NUM)  {
     const FLOATVAL den = $3;
     if (FLOAT_IS_ZERO(den)) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
@@ -246,15 +246,15 @@ inline op div(out NUM, in NUM, in NUM) :base_core {
     $1 = $2 / den;
 }
 
-inline op div(invar PMC, invar PMC, invar PMC) :base_core {
+inline op div(invar PMC, invar PMC, invar PMC)  {
     $1 = VTABLE_divide(interp, $2, $3, $1);
 }
 
-inline op div(invar PMC, invar PMC, in INT) :base_core {
+inline op div(invar PMC, invar PMC, in INT)  {
     $1 = VTABLE_divide_int(interp, $2, $3, $1);
 }
 
-inline op div(invar PMC, invar PMC, in NUM) :base_core {
+inline op div(invar PMC, invar PMC, in NUM)  {
     $1 = VTABLE_divide_float(interp, $2, $3, $1);
 }
 
@@ -287,7 +287,7 @@ If the denominator is zero, a 'Divide by zero' exception is thrown.
 
 =cut
 
-inline op fdiv(inout INT, in INT) :base_core {
+inline op fdiv(inout INT, in INT)  {
     const INTVAL den = $2;
     FLOATVAL f;
 
@@ -302,7 +302,7 @@ inline op fdiv(inout INT, in INT) :base_core {
     $1 = (INTVAL)f;
 }
 
-inline op fdiv(inout NUM, in NUM) :base_core {
+inline op fdiv(inout NUM, in NUM)  {
     const FLOATVAL den = $2;
 
     if (FLOAT_IS_ZERO(den)) {
@@ -314,19 +314,19 @@ inline op fdiv(inout NUM, in NUM) :base_core {
     $1 = floor($1 / den);
 }
 
-inline op fdiv(invar PMC, invar PMC) :base_core {
+inline op fdiv(invar PMC, invar PMC)  {
     VTABLE_i_floor_divide(interp, $1, $2);
 }
 
-inline op fdiv(invar PMC, in INT) :base_core {
+inline op fdiv(invar PMC, in INT)  {
     VTABLE_i_floor_divide_int(interp, $1, $2);
 }
 
-inline op fdiv(invar PMC, in NUM) :base_core {
+inline op fdiv(invar PMC, in NUM)  {
     VTABLE_i_floor_divide_float(interp, $1, $2);
 }
 
-inline op fdiv(out INT, in INT, in INT) :base_core {
+inline op fdiv(out INT, in INT, in INT)  {
     const INTVAL den = $3;
     FLOATVAL f;
 
@@ -341,7 +341,7 @@ inline op fdiv(out INT, in INT, in INT) :base_core {
     $1 = (INTVAL)f;
 }
 
-inline op fdiv(out NUM, in NUM, in NUM) :base_core {
+inline op fdiv(out NUM, in NUM, in NUM)  {
     const FLOATVAL den = $3;
     if (FLOAT_IS_ZERO(den)) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
@@ -352,15 +352,15 @@ inline op fdiv(out NUM, in NUM, in NUM) :base_core {
     $1 = floor($2 / den);
 }
 
-inline op fdiv(invar PMC, invar PMC, invar PMC) :base_core {
+inline op fdiv(invar PMC, invar PMC, invar PMC)  {
     $1 = VTABLE_floor_divide(interp, $2, $3, $1);
 }
 
-inline op fdiv(invar PMC, invar PMC, in INT) :base_core {
+inline op fdiv(invar PMC, invar PMC, in INT)  {
     $1 = VTABLE_floor_divide_int(interp, $2, $3, $1);
 }
 
-inline op fdiv(invar PMC, invar PMC, in NUM) :base_core {
+inline op fdiv(invar PMC, invar PMC, in NUM)  {
     $1 = VTABLE_floor_divide_float(interp, $2, $3, $1);
 }
 
@@ -378,16 +378,16 @@ Set $1 to the smallest integral value greater than or equal to $2.
 
 =cut
 
-inline op ceil(inout NUM) :base_core {
+inline op ceil(inout NUM)  {
     $1 = ceil($1);
 }
 
-inline op ceil(out INT, in NUM) :base_core {
+inline op ceil(out INT, in NUM)  {
     const FLOATVAL f = ceil($2);
     $1 = (INTVAL)f;
 }
 
-inline op ceil(out NUM, in NUM) :base_core {
+inline op ceil(out NUM, in NUM)  {
     $1 = ceil($2);
 }
 
@@ -405,16 +405,16 @@ Set $1 to the largest integral value less than or equal to $2.
 
 =cut
 
-inline op floor(inout NUM) :base_core {
+inline op floor(inout NUM)  {
     $1 = floor($1);
 }
 
-inline op floor(out INT, in NUM) :base_core {
+inline op floor(out INT, in NUM)  {
     const FLOATVAL f = floor($2);
     $1 = (INTVAL)f;
 }
 
-inline op floor(out NUM, in NUM) :base_core {
+inline op floor(out NUM, in NUM)  {
     $1 = floor($2);
 }
 
@@ -430,15 +430,15 @@ Increase $1 by one.
 
 =cut
 
-inline op inc(inout INT) :base_core {
+inline op inc(inout INT)  {
     $1++;
 }
 
-inline op inc(inout NUM) :base_core {
+inline op inc(inout NUM)  {
     $1++;
 }
 
-inline op inc(invar PMC) :base_core {
+inline op inc(invar PMC)  {
     VTABLE_increment(interp, $1);
 }
 
@@ -490,43 +490,43 @@ References:
 
 =cut
 
-op mod(inout INT, in INT) :base_core {
+op mod(inout INT, in INT)  {
     $1 = Parrot_util_intval_mod($1, $2);
 }
 
-op mod(inout NUM, in NUM) :base_core {
+op mod(inout NUM, in NUM)  {
     $1 = Parrot_util_floatval_mod($1, $2);
 }
 
-inline op mod(invar PMC, invar PMC) :base_core {
+inline op mod(invar PMC, invar PMC)  {
     VTABLE_i_modulus(interp, $1, $2);
 }
 
-inline op mod(invar PMC, in INT) :base_core {
+inline op mod(invar PMC, in INT)  {
     VTABLE_i_modulus_int(interp, $1, $2);
 }
 
-inline op mod(invar PMC, in NUM) :base_core {
+inline op mod(invar PMC, in NUM)  {
     VTABLE_i_modulus_float(interp, $1, $2);
 }
 
-op mod(out INT, in INT, in INT) :base_core {
+op mod(out INT, in INT, in INT)  {
     $1 = Parrot_util_intval_mod($2, $3);
 }
 
-op mod(out NUM, in NUM, in NUM) :base_core {
+op mod(out NUM, in NUM, in NUM)  {
     $1 = Parrot_util_floatval_mod($2, $3);
 }
 
-inline op mod(invar PMC, invar PMC, invar PMC) :base_core {
+inline op mod(invar PMC, invar PMC, invar PMC)  {
     $1 = VTABLE_modulus(interp, $2, $3, $1);
 }
 
-inline op mod(invar PMC, invar PMC, in INT) :base_core {
+inline op mod(invar PMC, invar PMC, in INT)  {
     $1 = VTABLE_modulus_int(interp, $2, $3, $1);
 }
 
-inline op mod(invar PMC, invar PMC, in NUM) :base_core {
+inline op mod(invar PMC, invar PMC, in NUM)  {
     $1 = VTABLE_modulus_float(interp, $2, $3, $1);
 }
 
@@ -558,43 +558,43 @@ Set $1 to the product of $2 and $3.
 
 =cut
 
-inline op mul(inout INT, in INT) :base_core {
+inline op mul(inout INT, in INT)  {
     $1 *= $2;
 }
 
-inline op mul(inout NUM, in NUM) :base_core {
+inline op mul(inout NUM, in NUM)  {
     $1 *= $2;
 }
 
-inline op mul(invar PMC, invar PMC) :base_core {
+inline op mul(invar PMC, invar PMC)  {
     VTABLE_i_multiply(interp, $1, $2);
 }
 
-inline op mul(invar PMC, in INT) :base_core {
+inline op mul(invar PMC, in INT)  {
     VTABLE_i_multiply_int(interp, $1, $2);
 }
 
-inline op mul(invar PMC, in NUM) :base_core {
+inline op mul(invar PMC, in NUM)  {
     VTABLE_i_multiply_float(interp, $1, $2);
 }
 
-inline op mul(out INT, in INT, in INT) :base_core {
+inline op mul(out INT, in INT, in INT)  {
     $1 = $2 * $3;
 }
 
-inline op mul(out NUM, in NUM, in NUM) :base_core {
+inline op mul(out NUM, in NUM, in NUM)  {
     $1 = $2 * $3;
 }
 
-inline op mul(invar PMC, invar PMC, invar PMC) :base_core {
+inline op mul(invar PMC, invar PMC, invar PMC)  {
     $1 = VTABLE_multiply(interp, $2, $3, $1);
 }
 
-inline op mul(invar PMC, invar PMC, in INT) :base_core {
+inline op mul(invar PMC, invar PMC, in INT)  {
     $1 = VTABLE_multiply_int(interp, $2, $3, $1);
 }
 
-inline op mul(invar PMC, invar PMC, in NUM) :base_core {
+inline op mul(invar PMC, invar PMC, in NUM)  {
     $1 = VTABLE_multiply_float(interp, $2, $3, $1);
 }
 
@@ -618,27 +618,27 @@ Set $1 to the negative of $2.
 
 =cut
 
-inline op neg(inout INT) :base_core {
+inline op neg(inout INT)  {
     $1 = - $1;
 }
 
-inline op neg(inout NUM) :base_core {
+inline op neg(inout NUM)  {
     $1 = - $1;
 }
 
-inline op neg(invar PMC) :base_core {
+inline op neg(invar PMC)  {
     VTABLE_i_neg(interp, $1);
 }
 
-inline op neg(out INT, in INT) :base_core {
+inline op neg(out INT, in INT)  {
     $1 = - $2;
 }
 
-inline op neg(out NUM, in NUM) :base_core {
+inline op neg(out NUM, in NUM)  {
     $1 = - $2;
 }
 
-inline op neg(out PMC, invar PMC) :base_core {
+inline op neg(out PMC, invar PMC)  {
     $1 = VTABLE_neg(interp, $2, $1);
 }
 
@@ -670,43 +670,43 @@ Set $1 to $2 minus $3.
 
 =cut
 
-inline op sub(inout INT, in INT) :base_core {
+inline op sub(inout INT, in INT)  {
     $1 -= $2;
 }
 
-inline op sub(inout NUM, in NUM) :base_core {
+inline op sub(inout NUM, in NUM)  {
     $1 -= $2;
 }
 
-inline op sub(invar PMC, invar PMC) :base_core {
+inline op sub(invar PMC, invar PMC)  {
     VTABLE_i_subtract(interp, $1, $2);
 }
 
-inline op sub(invar PMC, in INT) :base_core {
+inline op sub(invar PMC, in INT)  {
     VTABLE_i_subtract_int(interp, $1, $2);
 }
 
-inline op sub(invar PMC, in NUM) :base_core {
+inline op sub(invar PMC, in NUM)  {
     VTABLE_i_subtract_float(interp, $1, $2);
 }
 
-inline op sub(out INT, in INT, in INT) :base_core {
+inline op sub(out INT, in INT, in INT)  {
     $1 = $2 - $3;
 }
 
-inline op sub(out NUM, in NUM, in NUM) :base_core {
+inline op sub(out NUM, in NUM, in NUM)  {
     $1 = $2 - $3;
 }
 
-inline op sub(invar PMC, invar PMC, invar PMC) :base_core {
+inline op sub(invar PMC, invar PMC, invar PMC)  {
     $1 = VTABLE_subtract(interp, $2, $3, $1);
 }
 
-inline op sub(invar PMC, invar PMC, in INT) :base_core {
+inline op sub(invar PMC, invar PMC, in INT)  {
     $1 = VTABLE_subtract_int(interp, $2, $3, $1);
 }
 
-inline op sub(invar PMC, invar PMC, in NUM) :base_core {
+inline op sub(invar PMC, invar PMC, in NUM)  {
     $1 = VTABLE_subtract_float(interp, $2, $3, $1);
 }
 
@@ -718,7 +718,7 @@ Set $1 to the square root of $2.
 
 =cut
 
-inline op sqrt(out NUM, in NUM) :base_core {
+inline op sqrt(out NUM, in NUM)  {
     $1 = sqrt((FLOATVAL)$2);
 }
 
@@ -728,7 +728,7 @@ Set $1 to 1 if $2 is Inf, -Inf or NaN, and 0 otherwise
 
 =cut
 
-inline op is_inf_or_nan(out INT, in NUM) :base_core {
+inline op is_inf_or_nan(out INT, in NUM)  {
     $1 = PARROT_FLOATVAL_IS_INF_OR_NAN($2)
 }
 

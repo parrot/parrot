@@ -1,0 +1,20 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+runtime/README.pod - Readme file for the 'runtime/' top-level directory. 
+
+=head1 DESCRIPTION
+
+This directory contains the PASM and PIR source files and the PBC executable
+files which make-up the Parrot runtime library.
+
+In addition, it also contains dynamic extensions.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2012, Parrot Foundation.
+
+=cut

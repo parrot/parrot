@@ -1,0 +1,18 @@
+# Copyright (C) 2005-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+t/run/README.pod - Readme file for the 't/run/' directory. 
+
+=head1 DESCRIPTION
+
+This directory contains tests for the options of the 'parrot' executable,
+as documented in F<docs/running.pod>.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2005-2012, Parrot Foundation.
+
+=cut

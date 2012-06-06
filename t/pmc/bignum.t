@@ -41,19 +41,19 @@ my $vers_check = <<'EOP';
     ma = ar[0]
     mi = ar[1]
     pa = ar[2]
-    if ma >= 4 goto ge_4
+
+    # GMP < 4.1.4 is bad
+    if ma > 4 goto ok
+    if ma < 4 goto warn
+
+    if mi >= 2 goto ok
+    if mi == 0 goto warn
+
+    if pa >= 4 goto ok
 warn:
     print 'GMP version '
     print v
     say " is buggy with huge digit multiply - please upgrade"
-    end
-ge_4:
-   if mi >= 2 goto ok
-   if mi == 0 goto warn
-   # test 4.1.x
-   if pa >= 4 goto ok
-   goto warn
-   end
 ok:
 .end
 EOP

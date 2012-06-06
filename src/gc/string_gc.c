@@ -44,14 +44,15 @@ static char * aligned_mem(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void alloc_new_block(
-     ARGMOD(GC_Statistics *stats),
+static void alloc_new_block(PARROT_INTERP,
+    ARGMOD(GC_Statistics *stats),
     size_t size,
     ARGMOD(Variable_Size_Pool *pool),
     ARGIN(const char *why))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
+        __attribute__nonnull__(2)
         __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
         FUNC_MODIFIES(*stats)
         FUNC_MODIFIES(*pool);
 
@@ -133,7 +134,8 @@ static UINTVAL pad_pool_size(ARGIN(const Variable_Size_Pool *pool))
        PARROT_ASSERT_ARG(buffer_unused) \
     , PARROT_ASSERT_ARG(mem))
 #define ASSERT_ARGS_alloc_new_block __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(stats) \
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(stats) \
     , PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(why))
 #define ASSERT_ARGS_buffer_location __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -190,11 +192,11 @@ Parrot_gc_str_initialize(PARROT_INTERP, ARGMOD(String_GC *gc))
     ASSERT_ARGS(Parrot_gc_str_initialize)
 
     gc->memory_pool   = new_memory_pool(POOL_SIZE, &compact_pool);
-    alloc_new_block(&interp->gc_sys->stats, POOL_SIZE, gc->memory_pool, "init");
+    alloc_new_block(interp, &interp->gc_sys->stats, POOL_SIZE, gc->memory_pool, "init");
 
     /* Constant strings - not compacted */
     gc->constant_string_pool = new_memory_pool(POOL_SIZE, NULL);
-    alloc_new_block(&interp->gc_sys->stats, POOL_SIZE, gc->constant_string_pool, "init");
+    alloc_new_block(interp, &interp->gc_sys->stats, POOL_SIZE, gc->constant_string_pool, "init");
 }
 
 /*
@@ -523,8 +525,8 @@ new_memory_pool(size_t min_block, NULLOK(compact_f compact))
 
 /*
 
-=item C<static void alloc_new_block( GC_Statistics *stats, size_t size,
-Variable_Size_Pool *pool, const char *why)>
+=item C<static void alloc_new_block(PARROT_INTERP, GC_Statistics *stats, size_t
+size, Variable_Size_Pool *pool, const char *why)>
 
 Allocate a new memory block. We allocate either the requested size or the
 default size, whichever is larger. Add the new block to the given memory
@@ -535,11 +537,8 @@ pool. The given C<char *why> text is used for debugging.
 */
 
 static void
-alloc_new_block(
-        ARGMOD(GC_Statistics *stats),
-        size_t size,
-        ARGMOD(Variable_Size_Pool *pool),
-        ARGIN(const char *why))
+alloc_new_block(PARROT_INTERP, ARGMOD(GC_Statistics *stats),
+        size_t size, ARGMOD(Variable_Size_Pool *pool), ARGIN(const char *why))
 {
     ASSERT_ARGS(alloc_new_block)
     Memory_Block *new_block;
@@ -560,7 +559,7 @@ alloc_new_block(
 
     if (!new_block) {
         fprintf(stderr, "out of mem allocsize = %d\n", (int)alloc_size);
-        exit(EXIT_FAILURE);
+        PANIC(interp, "out of memory");
     }
 
     new_block->free  = alloc_size;
@@ -638,11 +637,10 @@ mem_allocate(PARROT_INTERP,
              * Mark the block as big block (it has just one item)
              * And don't set big blocks as the top_block.
              */
-            alloc_new_block(stats, size, pool, "compact failed");
+            alloc_new_block(interp, stats, size, pool, "compact failed");
 
             if (pool->top_block->free < size) {
-                fprintf(stderr, "out of mem\n");
-                exit(EXIT_FAILURE);
+                PANIC(interp, "out of mem\n");
             }
         }
     }
@@ -674,8 +672,7 @@ aligned_mem(ARGIN(SHIM(const Parrot_Buffer *buffer)), ARGIN(char *mem))
 {
     ASSERT_ARGS(aligned_mem)
     mem += sizeof (void *);
-    /* FIXME: issue #378 */
-    mem  = (char *)(((UINTVAL)(mem + WORD_ALIGN_1)) & WORD_ALIGN_MASK);
+    mem  = (char *)(((ptrcast_t)(mem + WORD_ALIGN_1)) & WORD_ALIGN_MASK);
 
     return mem;
 }
@@ -780,7 +777,7 @@ compact_pool(PARROT_INTERP,
         return;
     }
 
-    alloc_new_block(stats, total_size, pool, "inside compact");
+    alloc_new_block(interp, stats, total_size, pool, "inside compact");
     new_block = pool->top_block;
 
     /* Run through all the Parrot_Buffer header pools and copy */

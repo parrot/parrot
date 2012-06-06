@@ -71,7 +71,6 @@ GC and stackwalking, and the presence of an exception-handling infrastructure.
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
 
-/* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
@@ -94,6 +93,8 @@ static void restore_context(PARROT_INTERP,
 
 Returns the internal identifier that represents the named class.
 
+DEPRECATED. Use Parrot_pmc_get_type_str instead.
+
 =cut
 
 */
@@ -105,24 +106,6 @@ Parrot_PMC_typenum(PARROT_INTERP, ARGIN_NULLOK(const char *_class))
     ASSERT_ARGS(Parrot_PMC_typenum)
     Parrot_Int retval = Parrot_pmc_get_type_str(interp, Parrot_str_new(interp, _class, 0));
     return retval;
-}
-
-/*
-
-=item C<void Parrot_free_cstring(char *string)>
-
-Deallocate a C string that the interpreter has handed to you.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_free_cstring(ARGFREE(char *string))
-{
-    ASSERT_ARGS(Parrot_free_cstring)
-    Parrot_str_free_cstring(string);
 }
 
 /*
@@ -203,8 +186,7 @@ restore_context(PARROT_INTERP, ARGIN(Parrot_Context * const initialctx))
             Parrot_pop_context(interp);
             curctx = CONTEXT(interp);
             if (curctx == NULL)
-                do_panic((interp), "cannot restore context",
-                    __FILE__, __LINE__);
+                PANIC(interp, "cannot restore context");
         } while (curctx != initialctx);
     }
 }

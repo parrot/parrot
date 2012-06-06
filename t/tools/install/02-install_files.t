@@ -73,8 +73,8 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
     create_directories($tdir, { map { $_ => 1 } @dirs });
 
     my $files_ref = [ {
-        Source => "$testsourcedir/README",
-        Dest => "$dirs[0]/README",
+        Source => "$testsourcedir/README.pod",
+        Dest => "$dirs[0]/README.pod",
     } ];
 
     {
@@ -93,9 +93,9 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
         }
         is( $files_created, 0, 'Dry run, so no files created' );
 
-        like( $stdout, qr/Installing.*README.*README/s,
+        like( $stdout, qr/Installing.*README\.pod.*README\.pod/s,
             'Got expected installation message' );
-        $stdout =~ qr/Installing.*README.*README/s or print "Warning was: $stderr";
+        $stdout =~ qr/Installing.*README\.pod.*README\.pod/s or print "Warning was: $stderr";
     }
 
     {
@@ -113,7 +113,7 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
         }
         is( $files_created, 1, 'Production, so 1 file created' );
 
-        like( $stdout, qr/Installing.*README/s,
+        like( $stdout, qr/Installing.*README\.pod/s,
             'Got expected installation message' );
     }
 }
@@ -127,15 +127,15 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
     my @dirs = qw(foo/bar foo/bar/baz);
     create_directories($tdir, { map { $_ => 1 } @dirs });
 
-    my @testingfiles = qw( README phony );
+    my @testingfiles = qw( README.pod phony );
     foreach my $f ( @testingfiles ) {
         copy "$testsourcedir/$f", "$tdir/$f"
             or die "Unable to copy $f prior to testing: $!";
     }
     my $files_ref = [
         {
-            Source => "$tdir/README",
-            Dest => "$dirs[0]/README",
+            Source => "$tdir/README.pod",
+            Dest => "$dirs[0]/README.pod",
         },
         {
             Source => "$tdir/phony",
@@ -158,7 +158,7 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
         }
         is( $files_created, 2, 'Production, so 2 files created' );
 
-        like( $stdout, qr/Installing.*README.*phony/s,
+        like( $stdout, qr/Installing.*README\.pod.*phony/s,
             'Got expected installation message' );
     }
     chdir $cwd or die "Unable to change back to starting directory: $!";
@@ -173,15 +173,15 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
     my @dirs = qw(foo/bar foo/bar/baz);
     create_directories($tdir, { map { $_ => 1 } @dirs });
 
-    my @testingfiles = qw( README phony phony.exe );
+    my @testingfiles = qw( README.pod phony phony.exe );
     foreach my $f ( @testingfiles ) {
         copy "$testsourcedir/$f", "$tdir/$f"
             or die "Unable to copy $f prior to testing: $!";
     }
     my $files_ref = [
         {
-            Source => "$tdir/README",
-            Dest => "$dirs[0]/README"
+            Source => "$tdir/README.pod",
+            Dest => "$dirs[0]/README.pod"
         },
         {
             Source => "$tdir/phony",
@@ -209,7 +209,7 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
         is( $files_created, 2,
             'Production, so 2 files created; 1 file passed over' );
 
-        like( $stdout, qr/Installing.*README.*phony/s,
+        like( $stdout, qr/Installing.*README\.pod.*phony/s,
             'Got expected installation message' );
     }
     chdir $cwd or die "Unable to change back to starting directory: $!";

@@ -129,7 +129,7 @@ main(int argc, const char *argv[])
     }
 
     /* Check for parse errors */
-    if (status == -1) {
+    if (argc == 1 || status == -1) {
         help();
     }
 

@@ -1,0 +1,32 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+frontend/README.pod - Readme file for the 'frontend/' top-level directory. 
+
+=head1 DESCRIPTION
+
+This top-level directory contains two Parrot frontends, with 'parrot2' the
+primary implementation at this time.
+
+In addition, the directory also contains the frontends to,
+
+=over 4
+
+=item F<parrot_debugger> - The Parrot Debugger.
+
+=item F<pbc_disassemble> - The Parrot Bytecode Disassembler.
+
+=item F<pbc_dump> - The Parrot Bytecode dumper.
+
+=item F<pbc_merge> - The Parrot Bytecode merger.
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright (C) 2012, Parrot Foundation.
+
+=cut

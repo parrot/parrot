@@ -61,7 +61,7 @@ typedef enum {
             VTABLE_push_pmc((interp), (visit), (pmc)); \
             break; \
           default: \
-            do_panic((interp), "Bad VISIT_HOW in VISIT_PMC", __FILE__, __LINE__); \
+            Parrot_x_panic_and_exit((interp), "Bad VISIT_HOW in VISIT_PMC", __FILE__, __LINE__); \
         } \
     } \
 } while (0)
@@ -92,7 +92,7 @@ typedef enum {
             VTABLE_push_pmc((interp), (visit), _visit_pmc_attr); \
             break; \
           default: \
-            do_panic((interp), "Bad VISIT_HOW in VISIT_PMC_ATTR", __FILE__, __LINE__); \
+            Parrot_x_panic_and_exit((interp), "Bad VISIT_HOW in VISIT_PMC_ATTR", __FILE__, __LINE__); \
         } \
     } \
 } while (0)

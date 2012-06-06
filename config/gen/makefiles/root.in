@@ -485,7 +485,7 @@ INTERP_O_FILES = \
 	src/library$(O) \
 	src/list$(O) \
 	src/pointer_array$(O) \
-	src/misc$(O) \
+	src/string/sprintf$(O) \
 	src/multidispatch$(O) \
 	src/namespace$(O) \
 	src/nci/api$(O) \
@@ -502,8 +502,8 @@ INTERP_O_FILES = \
 	src/runcore/subprof$(O) \
 	src/scheduler$(O) \
 	src/events$(O) \
-	src/spf_render$(O) \
-	src/spf_vtable$(O) \
+	src/string/spf_render$(O) \
+	src/string/spf_vtable$(O) \
 	src/sub$(O) \
 	src/runcore/trace$(O) \
 	src/utils$(O) \
@@ -715,8 +715,8 @@ STR_FILES = \
 	src/runcore/subprof.str \
 	src/scheduler.str \
 	src/events.str \
-	src/spf_render.str \
-	src/spf_vtable.str \
+	src/string/spf_render.str \
+	src/string/spf_vtable.str \
 	src/string/api.str \
 	src/string/encoding.str \
 	src/sub.str \
@@ -1602,6 +1602,7 @@ src/io/api$(O) : \
 	$(INC_PMC_DIR)/pmc_filehandle.h \
 	$(INC_PMC_DIR)/pmc_stringhandle.h \
 	$(INC_PMC_DIR)/pmc_socket.h \
+    $(INC_PMC_DIR)/pmc_bytebuffer.h \
 	$(EXTEND_HEADERS)
 
 src/io/buffer$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/buffer.c \
@@ -1861,7 +1862,7 @@ src/gc/malloc$(O) : src/gc/malloc.c
 
 src/warnings$(O) : $(PARROT_H_HEADERS) src/warnings.c
 
-src/misc$(O) : $(PARROT_H_HEADERS) src/misc.c
+src/string/sprintf$(O) : $(PARROT_H_HEADERS) src/string/sprintf.c src/string/spf_private.h
 
 src/utils$(O) : \
 	$(PARROT_H_HEADERS) \
@@ -1870,10 +1871,10 @@ src/utils$(O) : \
 	$(EXTEND_HEADERS)
 
 ## SUFFIX OVERRIDE
-src/spf_render$(O) : $(PARROT_H_HEADERS) src/spf_render.str src/spf_render.c
-	$(CC) $(CFLAGS) @optimize::src/spf_render.c@ @ccwarn::src/spf_render.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/spf_render.c
+src/string/spf_render$(O) : $(PARROT_H_HEADERS) src/string/spf_render.str src/string/spf_render.c src/string/spf_private.h
+	$(CC) $(CFLAGS) @optimize::src/string/spf_render.c@ @ccwarn::src/string/spf_render.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/string/spf_render.c
 
-src/spf_vtable$(O) : $(PARROT_H_HEADERS) src/spf_vtable.str src/spf_vtable.c
+src/string/spf_vtable$(O) : $(PARROT_H_HEADERS) src/string/spf_vtable.str src/string/spf_vtable.c src/string/spf_private.h
 
 src/string/encoding$(O) : \
 	$(PARROT_H_HEADERS) \
@@ -2304,6 +2305,7 @@ clean : \
 	$(RM_F) $(FLUID_FILES_2)
 	$(RM_RF) lib/Parrot/OpLib
 	$(RM_RF) runtime/parrot/languages/data_json
+	$(RM_F) runtime/parrot/languages/JSON/JSON.pir
 	$(RM_F) $(NQP_CLEANUPS) $(PGE_CLEANUPS) $(TGE_CLEANUPS)
 	$(RM_F) $(PCT_CLEANUPS) $(DATA_JSON_CLEANUPS)
 	$(RM_F) $(DYNOPLIBS_CLEANUPS) $(DYNPMC_CLEANUPS)
@@ -2342,6 +2344,7 @@ prog-clean :
 	$(PBC_MERGE) $(FR_DIR)/pbc_merge/main$(O) \
 	$(DIS) $(FR_DIR)/pbc_disassemble/main$(O)
 	$(RM_F) \
+	$(FRP_DIR)/main$(O) \
 	$(FRPTWO_DIR)/main$(O) \
 	parrot_old \
 	src/null_config$(O) \
@@ -2416,8 +2419,8 @@ dynext-clean :
 # or is there an automatic xargs?
 test-clean :
 	$(RM_F) t/compilers/data_json/*.pir
-	$(RM_F) t/compilers/imcc/syn/*.pir t/compilers/imcc/syn/*.pasm
-	$(RM_F) t/compilers/imcc/reg/*.pir t/compilers/imcc/reg/*.pasm
+	$(RM_F) t/compilers/imcc/syn/*.pir t/compilers/imcc/syn/*.pasm t/compilers/imcc/syn/*.pbc
+	$(RM_F) t/compilers/imcc/reg/*.pir t/compilers/imcc/reg/*.pasm t/compilers/imcc/reg/*.pbc
 	$(RM_F) t/compilers/pct/*.pir
 	$(RM_F) t/compilers/pge/perl6regex/*.pir
 	$(RM_F) t/compilers/pge/*.pir
