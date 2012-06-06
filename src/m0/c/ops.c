@@ -1,15 +1,8 @@
-/*
-Copyright (C) 2011-2012, Parrot Foundation.
-*/
+#include "m0.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "include/m0_ops.h"
-#include "include/m0_mob_structures.h"
-#include "include/m0_interp_structures.h"
-#include "include/m0_compiler_defines.h"
 
 #define M0_DEBUG 0
 #define M0_ARG(n) (unsigned char)(ops[(4*pc)*(n)])

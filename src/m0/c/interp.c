@@ -1,12 +1,8 @@
+#include "m0.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
-#include "include/m0.h"
-#include "include/m0_mob.h"
-#include "include/m0_ops.h"
-#include "include/m0_constants.h"
-#include "include/m0_compiler_defines.h"
 
 static M0_Interp *
 new_interp();

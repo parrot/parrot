@@ -519,9 +519,14 @@ cachegrind.out.*
 /src/string/encoding/*.gcov
 /winxed
 /winxed.*
+
+# ignore m0 binaries
+/src/m0/c/m0
+/src/m0/c/m0-debug
+/src/m0/c/m0.exe
+/src/m0/c/m0-debug.exe
+
 # Local variables:
 #   mode: text
 #   buffer-read-only: t
 # End:
-src/m0/c/m0
-src/m0/c/m0-debug
