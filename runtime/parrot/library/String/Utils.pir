@@ -18,8 +18,8 @@ String;Utils - Utilities for string processing
 
 =head1 DESCRIPTION
 
-A PIR program with utilities for string processing.    
-    
+A PIR program with utilities for string processing.
+
 =head1 FUNCTIONS
 
 =over
