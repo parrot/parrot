@@ -45,6 +45,12 @@ m0_opcheck.pl adds a reference to the m0 op function that should exist.  Its
 name will be in the form "m0_opfunc_x", where x is the name of the new op.  Add
 a sub with that name and the implementation of the function.
 
+=item * Update the basic assembler tests.
+
+t/m0/m0_assembler.t checks that the assembler has the right number of tests.
+Look for "correct number of ops" and update that number.  Making the test and
+assembler less brittle is also welcome.
+
 =item * Add a test.
 
 Add a test for the new op to t/m0/integraton/.  Cover basic functionality and
@@ -59,6 +65,13 @@ makefile target.
 =item * Make the test pass.
 
 Run make m0_tests to test the Perl 5 implementation.
+
+=item * Update the canonical m0b.
+
+The test suite includes a canonical m0b file.  This needs to be updated when
+there's a bytecode-level change in M0.  Use the assembler to re-generate
+t/m0/basic/hello_canon.m0b from t/m0/basic/hello.m0.  Make sure that this file
+gets committed as part of the same push that includes the new ops.
 
 =item * Update C-m0.
 
