@@ -385,9 +385,9 @@ sub m0_opfunc_mod_i {
     $$cf->[$a1] = i( i($$cf,$a2) % i($$cf,$a3) );
 }
 
-sub m0_opfunc_mod_i {
+sub m0_opfunc_modu_i {
     my ($cf, $a1, $a2, $a3) = @_;
-    m0_say "mod_i $a1, $a2, $a3";
+    m0_say "modu_i $a1, $a2, $a3";
 
     die 'modu_i not implemented';
 }
