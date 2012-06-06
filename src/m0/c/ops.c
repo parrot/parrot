@@ -465,7 +465,7 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
                 break;
 
                 case (M0_DIVU_I):
-                    M0_EXEC_OP(div_i, cf, ops, pc);
+                    M0_EXEC_OP(divu_i, cf, ops, pc);
                 break;
 
                 case (M0_DIV_N):
@@ -477,7 +477,7 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
                 break;
 
                 case (M0_MODU_I):
-                    M0_EXEC_OP(mod_i, cf, ops, pc);
+                    M0_EXEC_OP(modu_i, cf, ops, pc);
                 break;
 
                 case (M0_MOD_N):

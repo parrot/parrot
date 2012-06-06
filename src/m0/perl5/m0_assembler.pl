@@ -661,8 +661,10 @@ sub_n
 mult_i
 mult_n
 div_i
+divu_i
 div_n
 mod_i
+modu_i
 mod_n
 isgt_i
 isgt_n
