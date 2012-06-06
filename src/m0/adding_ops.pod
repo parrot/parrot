@@ -1,0 +1,74 @@
+# Copyright (C) 2012, Parrot Foundation.
+
+=head1 NAME
+
+src/m0/adding_ops.pod - how to add ops to M0
+
+=head1 When to add ops
+
+M0 is designed to be a minimal VM.  It's not generally out of the question to
+add a new op, but think carefully before doing so.  Ops can be added under one
+or more of the following circumstancxes:
+
+=over
+
+=item * The M0 VM is not capable of performing an operation with a new op with reasonable efficiency.
+
+=item * Probably some other reasons.
+
+=back
+
+=head1 How to add ops
+
+The canonical list of M0 ops lives in src/m0/m0.ops.  Wherever possible, m0
+assemblers and interpreters should use the ops and ordering of that file.
+Currently some do and some don't.  Patches are welcome.  In the meantime, not
+that not everything is consistent.
+
+=over
+
+=item * Add your op to the spec in docs/pdd/drafts/pdd32_m0.pod.
+
+If you have questions as to whether the op is a good idea, ask cotto or
+dukeleto.  If they're not available, ask someone else or add it anyway.
+
+=item * Add your op to src/m0/m0.ops.
+
+=item * Run tools/dev/m0_opcheck.pl
+
+This currently updates the Perl 5 assembler and interpreter to ensure that op
+ordering is consistent.  The Perl 5 assembler needs no further changes.
+
+=item * Add op functions to the Perl 5 interpreter.
+
+m0_opcheck.pl adds a reference to the m0 op function that should exist.  Its
+name will be in the form "m0_opfunc_x", where x is the name of the new op.  Add
+a sub with that name and the implementation of the function.
+
+=item * Add a test.
+
+Add a test for the new op to t/m0/integraton/.  Cover basic functionality and
+any edge cases you can think of.  Register name aliases can be used to make the
+test more readable and easier to write.
+
+t/m0_integration.t will test all .m0 files in t/m0/integration.  If your test
+doesn't require any special invocation (e.g. passing arguments), adding it to
+t/m0_integration is sufficient to get it tested as part of the m0_tests
+makefile target.
+
+=item * Make the test pass.
+
+Run make m0_tests to test the Perl 5 implementation.
+
+=item * Update C-m0.
+
+The c-m0 ops enum is in src/m0/c/m0.h .  The op functions and runloop live in
+src/m0/c/ops.c.  The C-m0 runloop is switch-based, so look for a switch to see
+where to add the new op.  The runloop uses the M0_EXEC_OP macro, so looking for
+the op function name won't be of much help.
+
+=item * Make the C-m0 tests pass.
+
+Run make m0_c_tests to run the m0 test suite against C-m0.
+
+=cut
