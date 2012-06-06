@@ -11,18 +11,18 @@ include/m0_mob.h: include/m0_interp_structures.h include/m0_mob_structures.h
 
 include/m0_ops.h: include/m0_interp_structures.h
 
-m0_interp.c: include/m0.h include/m0_mob.h include/m0_constants.h \
+interp.c: include/m0.h include/m0_mob.h include/m0_constants.h \
    			 include/m0_compiler_defines.h
 
-m0_mob.c: include/m0_mob.h include/m0_constants.h include/m0_compiler_defines.h
+mob.c: include/m0_mob.h include/m0_constants.h include/m0_compiler_defines.h
 
-m0_ops.c: include/m0_ops.h include/m0_mob_structures.h
+ops.c: include/m0_ops.h include/m0_mob_structures.h
 
-m0 : include/m0.h m0_interp.c m0_mob.c m0_ops.c
-	$(CC) -O3 -W -Wall -g -Iinclude -o m0 m0_mob.c m0_interp.c m0_ops.c
+m0 : include/m0.h interp.c mob.c ops.c
+	$(CC) -O3 -W -Wall -g -Iinclude -o m0 mob.c interp.c ops.c
 
-m0-debug : include/m0.h m0_interp.c m0_mob.c m0_ops.c
-	$(CC) -O0 -W -Wall -g -Iinclude -o m0-debug m0_mob.c m0_interp.c m0_ops.c
+m0-debug : include/m0.h interp.c mob.c ops.c
+	$(CC) -O0 -W -Wall -g -Iinclude -o m0-debug mob.c interp.c ops.c
 
 clean:
 	rm -f *.o m0
