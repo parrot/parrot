@@ -14,17 +14,14 @@ files and directories.
 
 From PIR code:
 
-    loadlib "os"
     $P0 = new 'OS'
 
 From NQP:
 
-    pir::loadlib__s("os");
     my $os := pir::new__ps("OS");
 
 From Winxed:
 
-    loadlib("os");
     var os = new 'OS';
 
 =head2 Methods
@@ -88,7 +85,7 @@ stat_buf_to_array(PARROT_INTERP, ARGIN(const Parrot_Stat_Buf *buf))
     return array;
 }
 
-pmclass OS dynpmc {
+pmclass OS pmc {
 
 /*
 

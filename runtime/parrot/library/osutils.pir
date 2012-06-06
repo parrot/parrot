@@ -33,7 +33,7 @@ utilities. Think of it as a watered down version of GNU coreutils for Parrot.
 .loadlib 'math_ops'
 
 .sub '' :init :load :anon
-    $P0 = loadlib 'os'
+
 .end
 
 =item B<system(string cmd, int :verbose(), int :ignore_error())>

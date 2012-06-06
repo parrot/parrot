@@ -42,7 +42,6 @@ if (File::Spec->case_tolerant(substr($cwd,0,2))) {
     $cwd = lc($cwd);
     pir_output_is( <<'CODE', <<"OUT", 'Test cwd' );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
         $S1 = $P1."cwd"()
         # Unicode downcase needs ICU
@@ -60,7 +59,6 @@ OUT
 else {
     pir_output_is( <<'CODE', <<"OUT", 'Test cwd' );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
         $S1 = $P1."cwd"()
         print $S1
@@ -81,7 +79,6 @@ SKIP:
 
     pir_error_output_like( <<'CODE', <<"OUT", 'Test bad cwd' );
     .sub main :main
-            $P0 = loadlib 'os'
             $P1 = new ['OS']
 
             $P1.'chdir'('test-bad-cwd')
@@ -104,7 +101,6 @@ if (File::Spec->case_tolerant(substr($cwd,0,2))) {
 
     pir_output_is( <<'CODE', <<"OUT", 'Test chdir' );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = "src"
@@ -137,7 +133,6 @@ OUT
 else {
     pir_output_is( <<'CODE', <<"OUT", 'Test chdir' );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = "src"
@@ -164,7 +159,6 @@ OUT
 
 pir_error_output_like( <<'CODE', <<"OUT", 'Test bad chdir' );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = repeat "-!", 10
@@ -183,7 +177,6 @@ if (File::Spec->case_tolerant(substr($cwd,0,2))) {
 
     pir_output_is( <<'CODE', <<"OUT", 'Test mkdir' );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = "xpto"
@@ -218,7 +211,6 @@ OUT
 else {
     pir_output_is( <<'CODE', <<"OUT", 'Test mkdir' );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = "xpto"
@@ -245,7 +237,6 @@ OUT
 
 pir_error_output_like( <<'CODE', <<"OUT", 'Test bad mkdir' );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $P1."mkdir"(".", 0)
@@ -259,7 +250,6 @@ mkdir "xpto" unless -d "xpto";
 
 pir_output_is( <<'CODE', <<'OUT', 'Test rm call in a directory' );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = "xpto"
@@ -282,7 +272,6 @@ close $testfile;
 
 pir_output_like( <<'CODE', <<'OUT', 'Test bad rm calls' );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         push_eh eh1
@@ -339,7 +328,6 @@ if ( $MSWin32 ) {
     $stat = sprintf("0x%08x\n" x 11, @s);
     pir_output_is( <<'CODE', $stat, 'Test OS.stat' );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
         $S1 = "xpto"
         $P2 = $P1."stat"($S1)
@@ -360,7 +348,6 @@ else {
     $stat = sprintf("0x%08x\n" x 13, @s);
     pir_output_is( <<'CODE', $stat, 'Test OS.stat' );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
         $S1 = "xpto"
         $P2 = $P1."stat"($S1)
@@ -377,7 +364,6 @@ CODE
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', 'test bad stat');
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
         $P2 = $P1."stat"("non-existent something")
 .end
@@ -391,7 +377,6 @@ closedir $IN;
 my $entries = join( ' ', @entries ) . "\n";
 pir_output_is( <<'CODE', $entries, 'Test OS.readdir' );
 .sub main :main
-    $P0 = loadlib 'os'
     $P1 = new ['OS']
     $P2 = $P1.'readdir'('docs')
 
@@ -417,7 +402,6 @@ SKIP: {
 
     pir_output_is( <<'CODE', $entries2, 'Test OS.readdir with ord >127' );
 .sub main :main
-    $P0 = loadlib 'os'
     $P1 = new ['OS']
     $P2 = $P1.'readdir'('silly-dir-with-silly-names')
 
@@ -433,7 +417,6 @@ CODE
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', 'Test bad OS.readdir' );
 .sub main :main
-    $P0 = loadlib 'os'
     $P1 = new ['OS']
     $P2 = $P1.'readdir'('non-existent directory')
 .end
@@ -447,7 +430,6 @@ open my $FILE, ">", "____some_test_file";
 close $FILE;
 pir_output_is( <<'CODE', <<"OUT", 'Test OS.rename' );
 .sub main :main
-    $P0 = loadlib 'os'
     $P1 = new ['OS']
     $P1.'rename'('____some_test_file', '___some_other_file')
     say "ok"
@@ -467,7 +449,6 @@ else {
 
 pir_error_output_like( <<'CODE', <<"OUT", 'Test bad OS.rename' );
 .sub main :main
-    $P0 = loadlib 'os'
     $P1 = new ['OS']
     $P1.'rename'('some silly non-existent file name', 'arglblargl')
 .end
@@ -492,7 +473,6 @@ SKIP: {
     $lstat = sprintf( "0x%08x\n" x 13, @s );
     pir_error_output_like( <<'CODE', <<"OUTPUT", "Test OS.lstat" );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
         $S1 = "xpto"
         $P2 = $P1."lstat"($S1)
@@ -513,7 +493,6 @@ OUTPUT
 # Test remove on a file
 pir_output_is( <<'CODE', <<"OUT", "Test rm call in a file" );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = "xpto"
@@ -536,7 +515,6 @@ SKIP: {
 
     pir_error_output_like( <<'CODE', <<"OUT", "Test symlink" );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = "xpto"
@@ -561,7 +539,6 @@ OUT
 # Test link to file. May require root permissions
 pir_output_is( <<'CODE', <<"OUT", "Test link" );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = "xpto"
@@ -585,7 +562,6 @@ pir_output_like( <<"CODE", <<"OUT", "Test dirlink" );
 .sub main :main
     .local pmc os
     .local string xpto, tools
-    \$P0 = loadlib 'os'
     os    = new ['OS']
     xpto  = "xpto"
     tools = "tools"
@@ -628,7 +604,6 @@ SKIP: {
     my $umask = umask;
     pir_output_like( <<'CODE', <<"OUT", "Test umask" );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $I0 = $P1.'umask'(0)
@@ -658,7 +633,6 @@ SKIP: {
 
     pir_error_output_like( <<'CODE', <<'OUT', "Test chroot" );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $P1.'chdir'('my-super-chroot')
@@ -679,7 +653,6 @@ OUT
 # test get_user_id
 pir_output_is( <<'CODE', $UID, 'Test get_user_id' );
 .sub main :main
-    $P0 = loadlib 'os'
     $P1 = new ['OS']
 
     $I0 = $P1."get_user_id"()
@@ -707,7 +680,6 @@ SKIP: {
     # test chmod
     pir_output_is( <<'CODE', <<"OUT", 'Test chmod' );
     .sub main :main
-            $P0 = loadlib 'os'
             $P1 = new ['OS']
 
             $P1."chmod"("test_f_c", 420)
@@ -726,7 +698,6 @@ OUT
     # test chmod
     pir_error_output_like( <<'CODE', <<"OUT", 'Test chmod' );
     .sub main :main
-            $P0 = loadlib 'os'
             $P1 = new ['OS']
 
             $P1."chmod"("this is another non-existent directory", 420)
@@ -746,7 +717,6 @@ my ($ra, $rb, $wa, $wb, $xa, $xb);
 $ra = -r "README" ? 1 : 0;
 pir_output_is( <<'CODE', <<"OUT", 'Test can_read' );
 .sub main :main
-    $P0 = loadlib 'os'
     $P1 = new ['OS']
 
     $I0 = $P1."can_read"("README")
@@ -763,7 +733,6 @@ $wa = -w "test_f_a" ? 1 : 0;
 $wb = -w "test_f_b" ? 1 : 0;
 pir_output_is( <<'CODE', <<"OUT", 'Test can_write' );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $I0 = $P1."can_write"("test_f_a")
@@ -786,7 +755,6 @@ my $parrot_exe_name = $MSWin32 ? "parrot.exe" : "parrot";
 $xb = -x $parrot_exe_name ? 1 : 0;
 pir_output_is( <<"CODE", <<"OUT", 'Test can_execute' );
 .sub main :main
-        \$P0 = loadlib 'os'
         \$P1 = new ['OS']
 
         \$I0 = \$P1."can_execute"("README")
