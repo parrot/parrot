@@ -904,7 +904,7 @@ $(PARROT) : $(FRPTWO_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 
-$(DEV_TOOLS_DIR)/pbc_to_exe.pir: $(DEV_TOOLS_DIR)/pbc_to_exe.winxed $(PARROT) $(WINXED_LANG)
+$(DEV_TOOLS_DIR)/pbc_to_exe.pir: $(DEV_TOOLS_DIR)/pbc_to_exe.winxed $(PARROT) $(WINXED_LANG) winxed.pbc
 	$(PARROT) winxed.pbc -c --noan $(DEV_TOOLS_DIR)/pbc_to_exe.winxed
 
 $(PBC_TO_EXE) : $(DEV_TOOLS_DIR)/pbc_to_exe.pir $(LIBRARY_DIR)/config.pir $(PARROT) $(DYNEXT_DIR)/os$(LOAD_EXT) $(DYNEXT_DIR)/file$(LOAD_EXT)
