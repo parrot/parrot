@@ -180,11 +180,15 @@ M0_CallFrame *new_call_frame( M0_Interp *interp );
 void call_frame_free( M0_Interp *interp, M0_CallFrame *cf );
 
 #ifdef M0_SOURCE
+
+#include <assert.h>
+
 # ifdef __clang__
 # define UNUSED(a) (void)(a);
 # else
 # define UNUSED(a) /*@-noeffect*/if (0) (void)(a)/*@=noeffect*/;
 # endif
+
 #endif
 
 #endif
