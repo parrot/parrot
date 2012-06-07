@@ -145,7 +145,7 @@ m0_interp_parse_cargs( M0_Interp *interp, int argc, char **argv )
     --argc, ++argv;
 
     // no parsing for now: just convert to m0 strings
-    uint64_t *interp_argv = malloc((argc-1) * sizeof *interp_argv);
+    uint64_t *interp_argv = malloc(argc * sizeof *interp_argv);
     if (!interp_argv)
         return 0;
 
@@ -158,7 +158,7 @@ m0_interp_parse_cargs( M0_Interp *interp, int argc, char **argv )
         interp_argv[i] = (uint64_t)(uintptr_t)arg_string;
     }
 
-    (*interp)[ARGC] = argc - 1;
+    (*interp)[ARGC] = argc;
     (*interp)[ARGV] = (uint64_t)(uintptr_t)interp_argv;
 
     return 1;
