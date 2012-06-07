@@ -101,22 +101,12 @@ enum m0_config_data_ {
     M0_CONFIG_SIZE_
 };
 
-enum m0_register_type_ {
-    INVALID,
-    NAMED,
-    INTEGER,
-    NUMBER,
-    STRING,
-    POINTER
-};
-
 enum m0_encoding_ {
     M0_ENC_UNKNOWN = -1,
     M0_ENC_SPECIAL = 0,
     M0_ENC_UTF8    = 1
 };
 
-typedef enum m0_register_type_ M0_RegisterType;
 
 typedef uint64_t M0_Config[M0_CONFIG_SIZE_];
 
