@@ -107,6 +107,19 @@ enum m0_encoding_ {
     M0_ENC_UTF8    = 1
 };
 
+// TODO: make this configurable
+typedef int64_t M0_Int;
+typedef uint64_t M0_UInt;
+typedef double M0_Num;
+
+typedef union m0_value_ M0_Value;
+union m0_value_ {
+    M0_Int as_int;
+    M0_UInt as_uint;
+    M0_Num as_num;
+    void *as_ptr;
+    const void *as_cptr;
+};
 
 typedef uint64_t M0_Config[M0_CONFIG_SIZE_];
 
