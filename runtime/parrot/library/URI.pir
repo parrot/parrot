@@ -1,10 +1,10 @@
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2012, Parrot Foundation.
 
 =head1 NAME
 
 URI- Uniform Resource Identifiers
 
-=head2 DESCRIPTION
+=head1 DESCRIPTION
 
 Simplified port of URI (version 1.54)
 see L<http://search.cpan.org/~gaas/URI/>

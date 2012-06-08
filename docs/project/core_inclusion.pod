@@ -1,4 +1,4 @@
-# Copyright (c) 2010, The Parrot Foundation
+# Copyright (C) 2010-2012, Parrot Foundation.
 
 =pod
 
@@ -6,16 +6,18 @@
 
 docs/project/core_inclusion.pod - Core Inclusion
 
-Questions we'll consider when deciding if a
-piece of code should be moved into core.
+=head1 DESCRIPTION
 
-=head1 Abstract
+This document address questions we will consider when deciding whether or not
+to move a piece of code into core.
+
+=head1 ABSTRACT
 
 Occasionally useful bits of code will arise that someone thinks should be made
 core components of Parrot.  This document lists some of the questions we'll
 consider when deciding whether this is a good idea.
 
-=head1 Introduction
+=head1 INTRODUCTION
 
 When considering whether to add code to Parrot, we'll ask ourselves and the
 developer(s) the following questions, in approximate order of importance.  This

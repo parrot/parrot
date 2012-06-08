@@ -2,9 +2,11 @@
 
 =head1 NAME
 
-Branch - a sample branch node for Language::AttributeGrammar
+Branch
 
 =head1 DESCRIPTION
+
+A sample branch node for Language::AtributeGrammar.
 
 =cut
 

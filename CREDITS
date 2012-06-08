@@ -1,5 +1,3 @@
-=pod
-
 
     Following in the steps of other open source projects that
     eventually take over the world, here is the partial list
@@ -1218,6 +1216,3 @@ E: svn@perl.org
 N: Bart Wiegmans
 E: bartwiegmans@gmail.com
 D: mod_parrot
-
-
-=cut

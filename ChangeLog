@@ -8,7 +8,10 @@
     - IMCC
         + Removed .line, .file, setline and setfile directives from IMCC
     - Documentation
+	+ Fixed up Pod in 240 files to pass 't/codingstd/pod_description.t'.
     - Tests
+	+ Added 'docs/pdds' and 'docs/pdds/draft' as files for
+	  'Parrot::Test::Pod.pm' to exclude.
     - Community
 
 2012-05-15    release 4.4.0

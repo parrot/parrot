@@ -1,8 +1,12 @@
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
 docs/faq.pod - Parrot FAQ
+
+=head1 DESCRIPTION
+
+This document is the main Parrot FAQ.
 
 =head1 GENERAL QUESTIONS
 

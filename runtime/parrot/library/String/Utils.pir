@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
 .namespace ['String';'Utils']
 
@@ -16,7 +16,11 @@ String;Utils - Utilities for string processing
     $S0 = chomp($S0)      # use default record separator ("\n")
     $S0 = chomp($S0, $S1) # use custom record separator
 
-=head1 Functions
+=head1 DESCRIPTION
+
+A PIR program with utilities for string processing.
+
+=head1 FUNCTIONS
 
 =over
 

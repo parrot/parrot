@@ -1,12 +1,14 @@
 # Copyright (C) 2008, Parrot Foundation.
 
-=head1 TITLE
+=head1 NAME
 
 xlib.pir - Test NCI with libX11
 
 =head1 SYNOPSIS
 
 Testing...
+
+=head1 DESCRIPTION
 
 This is an initial version, be careful and not expect too much.
 

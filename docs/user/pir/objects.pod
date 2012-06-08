@@ -1,5 +1,16 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
 
-=head1 Programming Parrot -- Using objects
+=pod
+
+=head1 NAME
+
+docs/user/pir/objects.pod - Using Objects in Parrot. 
+
+=head1 DESCRIPTION
+
+This document covers object oriented programming in PIR.
+
+=head1 PROGRAMMING PARROT -- USING OBJECTS
 
 Yes, you've read correctly. Parrot has the ability to create
 and manipulate objects (aka, object oriented programming).

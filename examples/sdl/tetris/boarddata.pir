@@ -1,5 +1,5 @@
 
-=head1 TITLE
+=head1 DESCRIPTION
 
 boarddata.pir - a tetris board data class
 

@@ -1,11 +1,20 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+docs/project/ubuntu_packaging_guide.pod - The Ubuntu Packaging Guide.
+
+=head1 DESCRIPTION
+
+This is a quick set of instructions for packaging Parrot for Ubuntu.
 
 =head1 Ubuntu Packaging Guide
 
-This is a quick set of instructions for packaging Parrot for Ubuntu. See the
-Ubuntu Packaging Guide (https://wiki.ubuntu.com/PackagingGuide) and the guide
-to the Person Package Archive (PPA) (https://help.launchpad.net/Packaging/PPA)
-for more details.
+See the Ubuntu Packaging Guide (https://wiki.ubuntu.com/PackagingGuide) and
+the guide to the Person Package Archive (PPA)
+(https://help.launchpad.net/Packaging/PPA) for more details.
 
 This guide assumes that you're running in a chroot environment set up as in:
 L<https://trac.parrot.org/parrot/wiki/ChrootSetup>, and also assumes that

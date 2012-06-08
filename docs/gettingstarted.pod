@@ -1,8 +1,12 @@
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
 docs/gettingstarted.pod - Parrot Developer FAQ
+
+=head1 DESCRIPTION
+
+This document is the Developer FAQ for Parrot.
 
 =head1 DEVELOPER FAQ
 
@@ -195,3 +199,5 @@ See F<docs/submissions.pod> for details.
 
 A number of other useful resources that can be found via on the Parrot
 wiki, located at L<https://github.com/parrot/parrot/wiki>
+
+=cut

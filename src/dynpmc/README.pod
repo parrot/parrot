@@ -1,6 +1,6 @@
 =pod
 
-=head1 OVERVIEW
+=head1 DESCRIPTION
 
 This is a build directory for custom PMCs with a sample foo.pmc
 providing the Foo PMC class.
