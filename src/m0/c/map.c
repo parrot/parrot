@@ -3,6 +3,7 @@
 
 #include <limits.h>
 #include <stdlib.h>
+#include <string.h>
 
 enum {
     EMPTY,
@@ -16,11 +17,12 @@ enum {
 };
 
 struct m0_bucket_ {
-    M0_Value value;
     union {
         M0_String *as_string;
         size_t as_size;
+        M0_Value dummy_; // padding
     } header;
+    M0_Value value;
 };
 
 static inline bool is_pow2(size_t size)
@@ -75,19 +77,25 @@ static inline unsigned bucket_state(M0_Map *map, uint32_t slot)
     return (map->index[block_index] >> offset) & (BITS_PER_BUCKET - 1);
 }
 
-bool m0_map_contains(M0_Map *map, M0_String *string)
+bool m0_map_contains(M0_Map *map, const M0_String *string)
 {
     uint32_t slot = string->hash & map->mask;
 
     unsigned state = bucket_state(map, slot);
     if(state == EMPTY) return 0;
 
-    // TODO
-
-    if(state == FULL) {
-    }
+    if(state == FULL)
+        return m0_string_eq(string, map->buckets[slot].header.as_string);
 
     if(state == OVERFLOW) {
+        size_t size = map->buckets[slot].header.as_size;
+        struct m0_bucket_ *buckets = map->buckets[slot].value.as_ptr;
+        for(size_t i = 0; i < size; ++i) {
+            if(m0_string_eq(string, buckets[i].header.as_string))
+                return 1;
+        }
+
+        return 0;
     }
 
     assert(!"PANIC: illegal map state");

@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static uint32_t hash_string(M0_String *string, uint32_t seed)
+static uint32_t hash_string(const M0_String *string, uint32_t seed)
 {
     return murmur3_32(string->bytes, string->size, seed);
 }
@@ -29,4 +29,14 @@ M0_String *m0_string_from_cstring(
     memcpy(string->bytes, cstring, size);
 
     return string;
+}
+
+bool m0_string_eq(const M0_String *a, const M0_String *b)
+{
+	if(a == b) return 1;
+
+	size_t size = a->size;
+	if(b->size != size) return 0;
+
+	return a->hash == b->hash && memcmp(a->bytes, b->bytes, size) == 0;
 }

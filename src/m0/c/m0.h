@@ -196,10 +196,12 @@ void call_frame_free( M0_Interp *interp, M0_CallFrame *cf );
 
 M0_Map *m0_map_create(size_t size, uint32_t seed);
 
-bool m0_map_contains(M0_Map *map, M0_String *string);
+bool m0_map_contains(M0_Map *map, const M0_String *string);
 
 M0_String *m0_string_from_cstring(
 	M0_Interp *interp, const char *cstring, int32_t encoding);
+
+bool m0_string_eq(const M0_String *a, const M0_String *b);
 
 #ifdef M0_SOURCE
 
