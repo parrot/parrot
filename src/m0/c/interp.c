@@ -17,23 +17,6 @@ m0_chunk_free_metadata( M0_Metadata_Segment *metadata );
 void
 m0_chunk_free_bytecode( M0_Bytecode_Segment *bytecode );
 
-static M0_String *string_from_cstring(const char *cstring, int32_t encoding)
-{
-    size_t size = strlen(cstring) + 1;
-    if(size > (uint32_t)-1)
-        return NULL;
-
-    M0_String *string = malloc(sizeof *string + size);
-    if(!string) return NULL;
-
-    string->size = (uint32_t)size;
-    string->encoding = encoding;
-    memcpy(string->bytes, cstring, size);
-
-    return string;
-}
-
-
 M0_Interp *
 new_interp() {
     M0_Interp *interp      = calloc( 1, sizeof (M0_Interp) );
@@ -150,7 +133,9 @@ m0_interp_parse_cargs( M0_Interp *interp, int argc, char **argv )
 
     int i = 0;
     for (; i < argc; ++i) {
-        M0_String *arg_string = string_from_cstring(argv[i], M0_ENC_UNKNOWN);
+        M0_String *arg_string = m0_string_from_cstring(
+            interp, argv[i], M0_ENC_UNKNOWN);
+
         if (!arg_string)
             goto FAIL;
 

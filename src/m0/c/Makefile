@@ -1,7 +1,8 @@
 CFLAGS := -std=c99 -pedantic -Wall -Wextra -Wpadded
 MAKE += --no-print-directory
 
-LIB_SOURCES := interp.c mob.c ops.c
+HEADERS := m0.h murmur3.h
+LIB_SOURCES := interp.c mob.c ops.c map.c string.c
 BIN_SOURCES := main.c
 
 SOURCES := $(LIB_SOURCES) $(BIN_SOURCES)
@@ -20,7 +21,7 @@ test:
 m0: CFLAGS += -O3 -g
 m0-debug: CFlAGS += -O0 -g
 
-m0 m0-debug: m0.h $(SOURCES)
+m0 m0-debug: $(HEADERS) $(SOURCES)
 	$(CC) $(CFLAGS) -o $@ $(SOURCES)
 
 include tags.mk

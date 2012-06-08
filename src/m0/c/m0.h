@@ -2,6 +2,7 @@
 #define M0_H_
 
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 enum m0_segment_ {
@@ -98,6 +99,7 @@ enum m0_config_data_ {
     CFG_OPCODESZ,
     CFG_PTRSZ,
     CFG_ENDIANNESS,
+    CFG_SEED,
     M0_CONFIG_SIZE_
 };
 
@@ -165,7 +167,17 @@ typedef struct m0_string_ M0_String;
 struct m0_string_ {
     uint32_t size;
     int32_t  encoding;
+    uint32_t hash;
     uint8_t  bytes[];
+};
+
+typedef struct m0_map_ M0_Map;
+struct m0_map_ {
+	struct m0_bucket_ *buckets;
+	unsigned *index;
+	uint32_t load;
+	uint32_t mask;
+	uint32_t seed;
 };
 
 int run_ops( M0_Interp *interp, M0_CallFrame *cf );
@@ -181,6 +193,13 @@ bool m0_interp_parse_cargs( M0_Interp *interp, int argc, char *argv[] );
 M0_CallFrame *new_call_frame( M0_Interp *interp );
 
 void call_frame_free( M0_Interp *interp, M0_CallFrame *cf );
+
+M0_Map *m0_map_create(size_t size, uint32_t seed);
+
+bool m0_map_contains(M0_Map *map, M0_String *string);
+
+M0_String *m0_string_from_cstring(
+	M0_Interp *interp, const char *cstring, int32_t encoding);
 
 #ifdef M0_SOURCE
 
