@@ -57,12 +57,14 @@ main( int argc, const char *argv[]) {
     if (argc < 2) {
         fprintf( stderr, "Usage: m0 <filename.mob>\n" );
         interp_free( interp );
+        interp = NULL;
         exit(1);
     }
 
     if (!load_mob_file( interp, argv[1] )) {
         fprintf( stderr, "Could not load m0b file: '%s'\n", argv[1] );
         interp_free( interp );
+        interp = NULL;
         exit( 1 );
     }
     else {
@@ -71,6 +73,7 @@ main( int argc, const char *argv[]) {
 
         call_frame_free( interp, cf );
         interp_free( interp );
+        interp = NULL;
 
         exit( 0 );
     }
@@ -108,6 +111,7 @@ void
 call_frame_free( M0_Interp *interp, M0_CallFrame *cf ) {
     UNUSED(interp);
     free( cf );
+    cf = NULL;
 }
 
 void
@@ -119,8 +123,10 @@ interp_free( M0_Interp *interp ) {
         m0_chunk_free( chunk );
         chunk = next;
     }
-    free( ((void *)(*interp)[CONFIG]) );
+    free( (void *)(*interp)[CONFIG] );
+    (*interp)[CONFIG] = NULL;
     free( interp );
+    interp = NULL;
 }
 
 void
@@ -135,7 +141,10 @@ m0_chunk_free( M0_Chunk *chunk ) {
         m0_chunk_free_bytecode( chunk->bytecode );
 
     free( (char *)chunk->name );
+    chunk->name = NULL;
+
     free( chunk );
+    chunk = NULL;
 }
 
 void
@@ -147,10 +156,14 @@ m0_chunk_free_constants( M0_Constants_Segment *constants )
     for (i = 0; i < count; i++) {
         if ( constants->consts[i] && constants->pointers[i])
             free( (void *)constants->consts[i] );
+            constants->consts[i] = NULL;
     }
 
     free( constants->consts );
+    constants->consts = NULL;
+
     free( constants );
+    constants = NULL;
 }
 
 void
@@ -162,19 +175,26 @@ m0_chunk_free_metadata( M0_Metadata_Segment *metadata )
     for (i = 0; i < count; i++) {
         if ( metadata->entries[i] )
             free( (void *)metadata->entries[i] );
+            metadata->entries[i] = NULL;
     }
 
     free( metadata->entries );
+    metadata->entries = NULL;
+
     free( metadata );
+    metadata = NULL;
 }
 
 void
 m0_chunk_free_bytecode( M0_Bytecode_Segment *bytecode )
 {
-    if (bytecode->ops)
+    if (bytecode->ops) {
         free( bytecode->ops );
+        bytecode->ops = NULL;
+    }
 
     free( bytecode );
+    bytecode = NULL;
 }
 
 /* vim: expandtab shiftwidth=4 cinoptions='\:2=2' :

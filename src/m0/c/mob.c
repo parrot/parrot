@@ -102,10 +102,12 @@ verify_mob_magic_number( M0_Interp *interp, FILE *stream ) {
     if (strncmp( magic, header, 8 ) != 0) {
         fprintf( stderr, "Invalid M0B header\n" );
         free( magic );
+        magic = NULL;
         return 0;
     }
 
     free( magic );
+    magic = NULL;
 
     return 1;
 }
@@ -229,7 +231,7 @@ parse_mob_constants_segment( M0_Interp *interp, FILE *stream ) {
                     const unsigned long str_length = length - 9;
                     char *p = malloc(str_length);
                     memcpy(p, &constant[8], str_length);
-                    free(constant);
+                    free((void *)constant);
                     constant = p;
                 }
                 if (constant) {
@@ -239,7 +241,9 @@ parse_mob_constants_segment( M0_Interp *interp, FILE *stream ) {
             } else {
                 if (constant)
                     segment->consts[i] = *(uint64_t *)constant;
+                    segment->pointers[i] = 0;
                     free((void *)constant);
+                    constant = NULL;
             }
 
         }

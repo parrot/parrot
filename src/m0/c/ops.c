@@ -339,7 +339,7 @@ static void
 m0_op_gc_alloc( M0_CallFrame *frame, const unsigned char *ops )
 {
     const int  bytes = frame->registers[ops[2]];
-    void *ptr    = malloc( sizeof(char) * bytes );
+    void *ptr    = malloc( sizeof(uint64_t) * bytes );
     frame->registers[ops[1]] = (uint64_t) ptr;
 }
 
