@@ -1,22 +1,17 @@
 #ifndef M0_H_
 #define M0_H_
 
+#include <stdbool.h>
 #include <stdint.h>
 
-# ifdef __clang__
-# define UNUSED(a) (void)(a);
-# else
-# define UNUSED(a) /*@-noeffect*/if (0) (void)(a)/*@=noeffect*/;
-# endif
-
-enum {
+enum m0_segment_ {
     M0_DIR_SEG   = 0x01,
     M0_CONST_SEG = 0x02,
     M0_META_SEG  = 0x03,
     M0_BC_SEG    = 0x04
 };
 
-enum M0_OPS {
+enum m0_op_ {
     M0_NOOP,
     M0_GOTO,
     M0_GOTO_IF,
@@ -28,8 +23,10 @@ enum M0_OPS {
     M0_MULT_I,
     M0_MULT_N,
     M0_DIV_I,
+    M0_DIVU_I,
     M0_DIV_N,
     M0_MOD_I,
+    M0_MODU_I,
     M0_MOD_N,
     M0_ISGT_I,
     M0_ISGT_N,
@@ -65,15 +62,7 @@ enum M0_OPS {
     M0_EXIT
 };
 
-typedef uint64_t M0_Config[8];
-
-typedef struct {
-    uint64_t registers[256];
-} M0_CallFrame;
-
-typedef uint64_t M0_Interp[8];
-
-enum CF_NAMED_REGS {
+enum m0_cf_named_reg_ {
     CF,
     PCF,
     PC,
@@ -88,7 +77,7 @@ enum CF_NAMED_REGS {
     SPILLCF
 };
 
-enum M0_INTERP_DATA {
+enum m0_interp_data_ {
     OP_FUNCS,
     CHUNKS,
     CHUNK_INFO,
@@ -96,10 +85,11 @@ enum M0_INTERP_DATA {
     CALL_FRAMES,
     CONFIG,
     ARGC,
-    ARGV
+    ARGV,
+    M0_INTERP_SIZE_
 };
 
-enum M0_CONFIG_DATA {
+enum m0_config_data_ {
     CFG_M0V,
     CFG_REGSZ,
     CFG_CFSZ,
@@ -107,17 +97,34 @@ enum M0_CONFIG_DATA {
     CFG_NREGSZ,
     CFG_OPCODESZ,
     CFG_PTRSZ,
-    CFG_ENDIANNESS
+    CFG_ENDIANNESS,
+    M0_CONFIG_SIZE_
 };
 
-typedef enum {
+enum m0_register_type_ {
     INVALID,
     NAMED,
     INTEGER,
     NUMBER,
     STRING,
     POINTER
-} M0_RegisterType;
+};
+
+enum m0_encoding_ {
+    M0_ENC_UNKNOWN = -1,
+    M0_ENC_SPECIAL = 0,
+    M0_ENC_UTF8    = 1
+};
+
+typedef enum m0_register_type_ M0_RegisterType;
+
+typedef uint64_t M0_Config[M0_CONFIG_SIZE_];
+
+typedef struct {
+    uint64_t registers[256];
+} M0_CallFrame;
+
+typedef uint64_t M0_Interp[M0_INTERP_SIZE_];
 
 typedef struct M0_Constants_Segment {
     uint64_t       *consts;
@@ -151,8 +158,34 @@ typedef struct M0_Chunk {
     M0_Bytecode_Segment  *bytecode;
 } M0_Chunk;
 
+typedef struct m0_string_ M0_String;
+struct m0_string_ {
+    uint32_t size;
+    int32_t  encoding;
+    uint8_t  bytes[];
+};
+
 int run_ops( M0_Interp *interp, M0_CallFrame *cf );
-int load_mob_file( M0_Interp *interp, const char *filename );
+
+int m0_mob_load_file( M0_Interp *interp, const char *filename );
+
+M0_Interp *new_interp( void );
+
+void interp_free( M0_Interp *interp );
+
+bool m0_interp_parse_cargs( M0_Interp *interp, int argc, char *argv[] );
+
+M0_CallFrame *new_call_frame( M0_Interp *interp );
+
+void call_frame_free( M0_Interp *interp, M0_CallFrame *cf );
+
+#ifdef M0_SOURCE
+# ifdef __clang__
+# define UNUSED(a) (void)(a);
+# else
+# define UNUSED(a) /*@-noeffect*/if (0) (void)(a)/*@=noeffect*/;
+# endif
+#endif
 
 #endif
 

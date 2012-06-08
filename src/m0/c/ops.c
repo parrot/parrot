@@ -1,3 +1,4 @@
+#define M0_SOURCE
 #include "m0.h"
 
 #include <stdio.h>
@@ -28,7 +29,7 @@ m0_op_deref( M0_CallFrame *frame, const unsigned char *ops )
         case CONSTS:
         {
             M0_Constants_Segment *consts =
-                (M0_Constants_Segment *)frame->registers[ ref ];
+                (M0_Constants_Segment *)(uintptr_t)frame->registers[ ref ];
             unsigned long         offset = frame->registers[ ops[3] ];
             frame->registers[ ops[1] ] = (uint64_t)consts->consts[offset];
             break;
@@ -36,7 +37,7 @@ m0_op_deref( M0_CallFrame *frame, const unsigned char *ops )
         default:
         {
             unsigned long         offset = frame->registers[ ops[3] ];
-            uint64_t * src = (uint64_t*)(frame->registers[ ops[2] ]);
+            uint64_t * src = (uint64_t*)(uintptr_t)(frame->registers[ ops[2] ]);
             frame->registers[ ops[1] ] = src[offset];
             /* XXX: the rest of the system has non-uniform array handling */
             break;
@@ -48,7 +49,7 @@ static void
 m0_op_print_s( M0_CallFrame *frame, const unsigned char *ops )
 {
     /* note the lack of filehandle selection (ops[1]) for output */
-    fprintf( stdout, "%s", (char *)(frame->registers[ ops[2] ] + 8 ));
+    fprintf( stdout, "%s", (char *)(uintptr_t)(frame->registers[ ops[2] ] + 8 ));
 }
 
 static void
@@ -189,6 +190,15 @@ m0_op_mult_n( M0_CallFrame *frame, const unsigned char *ops )
 static void
 m0_op_div_i( M0_CallFrame *frame, const unsigned char *ops )
 {
+    int r2 = *(int*)&frame->registers[ops[2]];
+    int r3 = *(int*)&frame->registers[ops[3]];
+    int *result = (int*) &(frame->registers[ops[1]]);
+    *result = r2 / r3;
+}
+
+static void
+m0_op_divu_i( M0_CallFrame *frame, const unsigned char *ops )
+{
     unsigned int r2 = *(unsigned int*)&frame->registers[ops[2]];
     unsigned int r3 = *(unsigned int*)&frame->registers[ops[3]];
     unsigned int *result = (unsigned int*) &(frame->registers[ops[1]]);
@@ -206,6 +216,15 @@ m0_op_div_n( M0_CallFrame *frame, const unsigned char *ops )
 
 static void
 m0_op_mod_i( M0_CallFrame *frame, const unsigned char *ops )
+{
+    int r2 = *(int*)&frame->registers[ops[2]];
+    int r3 = *(int*)&frame->registers[ops[3]];
+    int *result = (int*) &(frame->registers[ops[1]]);
+    *result = r2 % r3;
+}
+
+static void
+m0_op_modu_i( M0_CallFrame *frame, const unsigned char *ops )
 {
     unsigned int r2 = *(unsigned int*)&frame->registers[ops[2]];
     unsigned int r3 = *(unsigned int*)&frame->registers[ops[3]];
@@ -261,14 +280,14 @@ static void
 m0_op_goto_chunk(M0_CallFrame *frame, const unsigned char *ops )
 {
     uint64_t new_pc = frame->registers[ops[2]];
-    M0_Interp *interp = (M0_Interp *)frame->registers[INTERP];
-    M0_Chunk *chunk = (M0_Chunk*)((*interp)[CHUNKS]);
+    M0_Interp *interp = (M0_Interp *)(uintptr_t)frame->registers[INTERP];
+    M0_Chunk *chunk = (M0_Chunk*)(uintptr_t)((*interp)[CHUNKS]);
     while(chunk) {
-        if(    strncmp( chunk->name, (char *)frame->registers[ops[1]], chunk->name_length) == 0) {
-            frame->registers[CHUNK]  = (uint64_t)chunk;
-            frame->registers[CONSTS] = (uint64_t)chunk->constants;
-            frame->registers[MDS]    = (uint64_t)chunk->metadata;
-            frame->registers[BCS]    = (uint64_t)chunk->bytecode;
+        if(    strncmp( chunk->name, (char *)(uintptr_t)frame->registers[ops[1]], chunk->name_length) == 0) {
+            frame->registers[CHUNK]  = (uint64_t)(uintptr_t)chunk;
+            frame->registers[CONSTS] = (uint64_t)(uintptr_t)chunk->constants;
+            frame->registers[MDS]    = (uint64_t)(uintptr_t)chunk->metadata;
+            frame->registers[BCS]    = (uint64_t)(uintptr_t)chunk->bytecode;
             frame->registers[PC]     = (uint64_t)new_pc;
             break;
         }
@@ -297,7 +316,7 @@ m0_op_set_byte( M0_CallFrame *frame, const unsigned char *ops )
 {
     const char value  = frame->registers[ops[3]];
     const int  offset = frame->registers[ops[2]];
-    char      *target = (char*) frame->registers[ops[1]];
+    char      *target = (char*)(uintptr_t) frame->registers[ops[1]];
     target[offset] = value;
 }
 
@@ -306,7 +325,7 @@ m0_op_set_word( M0_CallFrame *frame, const unsigned char *ops )
 {
     const char* value  = (char*)&frame->registers[ops[3]];
     const int  offset = frame->registers[ops[2]];
-    char      *target = (char*) frame->registers[ops[1]];
+    char      *target = (char*)(uintptr_t) frame->registers[ops[1]];
     memcpy(&target[4*offset],value,4*sizeof(char));
 }
 
@@ -319,7 +338,7 @@ m0_op_set( M0_CallFrame *frame, const unsigned char *ops )
 static void
 m0_op_get_byte( M0_CallFrame *frame, const unsigned char *ops )
 {
-    const char *src   = (char*)frame->registers[ops[2]];
+    const char *src   = (char*)(uintptr_t)frame->registers[ops[2]];
     const int  offset = frame->registers[ops[3]];
     char      *target = (char*)&frame->registers[ops[1]];
     *target = (char)src[offset];
@@ -328,7 +347,7 @@ m0_op_get_byte( M0_CallFrame *frame, const unsigned char *ops )
 static void
 m0_op_get_word( M0_CallFrame *frame, const unsigned char *ops )
 {
-    const char *src   = (char*)frame->registers[ops[2]];
+    const char *src   = (char*)(uintptr_t)frame->registers[ops[2]];
     const int  offset = frame->registers[ops[3]];
     char      *target = (char*)&frame->registers[ops[1]];
     frame->registers[ops[1]] = (uint64_t)0;
@@ -340,13 +359,13 @@ m0_op_gc_alloc( M0_CallFrame *frame, const unsigned char *ops )
 {
     const int  bytes = frame->registers[ops[2]];
     void *ptr    = malloc( sizeof(char) * bytes );
-    frame->registers[ops[1]] = (uint64_t) ptr;
+    frame->registers[ops[1]] = (uint64_t)(uintptr_t) ptr;
 }
 
 static void
 m0_op_set_ref( M0_CallFrame *frame, const unsigned char *ops )
 {
-    uint64_t *ptr    = (uint64_t *)frame->registers[ops[1]];
+    uint64_t *ptr    = (uint64_t *)(uintptr_t)frame->registers[ops[1]];
     const int  offset = frame->registers[ops[2]];
     ptr[offset] = frame->registers[ops[3]];
 }
@@ -358,7 +377,7 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
     while (1) {
         const M0_Bytecode_Segment *bytecode =
             (const M0_Bytecode_Segment *)
-                ((M0_Chunk *)cf->registers[CHUNK])->bytecode;
+                ((M0_Chunk *)(uintptr_t)cf->registers[CHUNK])->bytecode;
         const unsigned char       *ops      = bytecode->ops;
         const unsigned long        pc       =
             (const unsigned long)cf->registers[PC];
@@ -445,12 +464,20 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
                     M0_EXEC_OP(div_i, cf, ops, pc);
                 break;
 
+                case (M0_DIVU_I):
+                    M0_EXEC_OP(divu_i, cf, ops, pc);
+                break;
+
                 case (M0_DIV_N):
                     M0_EXEC_OP(div_n, cf, ops, pc);
                 break;
 
                 case (M0_MOD_I):
                     M0_EXEC_OP(mod_i, cf, ops, pc);
+                break;
+
+                case (M0_MODU_I):
+                    M0_EXEC_OP(modu_i, cf, ops, pc);
                 break;
 
                 case (M0_MOD_N):
@@ -531,7 +558,7 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
                 break;
             }
         }
-        cf = (M0_CallFrame*)cf->registers[CF];
+        cf = (M0_CallFrame*)(uintptr_t)cf->registers[CF];
         /* only branching ops definitely change the pc */
         if (pc == (const unsigned long)cf->registers[PC])
             cf->registers[PC]++;

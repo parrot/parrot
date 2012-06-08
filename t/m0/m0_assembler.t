@@ -74,7 +74,7 @@ output_like(
 
 output_like(
     $hello_m0,
-    qr/Parsed data for 46 ops/,
+    qr/Parsed data for 48 ops/,
     'Parse data for the correct number of ops'
 );
 
