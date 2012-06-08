@@ -520,11 +520,12 @@ cachegrind.out.*
 /winxed
 /winxed.*
 
-# ignore m0 binaries
+# ignore m0 binaries and objects
 /src/m0/c/m0
 /src/m0/c/m0-debug
 /src/m0/c/m0.exe
 /src/m0/c/m0-debug.exe
+/src/m0/c/*.o
 
 # Local variables:
 #   mode: text

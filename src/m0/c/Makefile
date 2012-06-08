@@ -13,15 +13,22 @@ BINARIES := m0 m0-debug
 all: $(BINARIES)
 
 clean:
-	$(RM) $(BINARIES)
+	$(RM) $(BINARIES) $(SOURCES:%.c=%-dbg.o)
 
 test:
 	@$(MAKE) -C ../../.. m0_c_tests
 
 m0: CFLAGS += -O3 -g
-m0-debug: CFlAGS += -O0 -g
-
-m0 m0-debug: $(HEADERS) $(SOURCES)
+m0: $(HEADERS) $(SOURCES)
 	$(CC) $(CFLAGS) -o $@ $(SOURCES)
+
+m0-debug: CFlAGS += -O0 -g
+m0-debug: $(SOURCES:%.c=%-dbg.o)
+	$(CC) -o $@ $^
+
+string.o: murmur3.h
+
+$(SOURCES:%.c=%-dbg.o): %-dbg.o : %.c
+	$(CC) $(CFLAGS) -c -o $@ $<
 
 include tags.mk
