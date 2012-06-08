@@ -1,6 +1,7 @@
 #ifndef MURMUR3_H_
 #define MURMUR3_H_
 
+#include <assert.h>
 #include <stddef.h>
 #include <stdint.h>
 
