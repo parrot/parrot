@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 defined
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's defined opcode.
+
+=head1 DEFINED
 
 The C<defined> opcode tells you if the contents of a PMC is defined or not.
 Using C<defined> on a C<int>, C<num>, or C<string> register may generate

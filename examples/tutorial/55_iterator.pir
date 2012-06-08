@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 iterators
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's iterators.
+
+=head1 ITERATORS
 
 An iterator is a type of PMC that helps with looping operations
 involving arrays. The C<shift> and C<pop> operations on the iterator

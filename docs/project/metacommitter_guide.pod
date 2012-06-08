@@ -1,8 +1,17 @@
-# Copyright (C) 2007-2011, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 Metacommitter Guide
+=pod
 
-The procedure below describes how to manage the list of Parrot committers.
+=head1 NAME
+
+docs/project/metacommitter_guide.pod - Metacommitter Guide.
+
+=head1 DESCRIPTION
+
+This document sets out the procedure on how to manage the list of Parrot
+committers.
+
+=head1 METACOMMITTER GUIDE
 
 See F<docs/project/roles_responsibilities.pod> for more details on the
 various roles in the Parrot project, including the Metacommitter role.
@@ -40,7 +49,7 @@ Github user that you want to give commit access, and press "Add".
 =back
 
 Congratulate the new member publicly by sending an email to
-parrot-dev@lists.parrot.org, and copying the new committer.
+parrot-dev@lists.parrot.org and copying the new committer.
 
 Note that commit messages from the new member will be automatically held
 pending list-admin approval.

@@ -9,6 +9,10 @@ t/pmc/opcode.t - Opcode PMC
 
     % prove t/pmc/opcode.t
 
+=head1 DESCRIPTION
+
+This PIR file implements various tests of PMC opcodes.
+
 =cut
 
 .include 'except_types.pasm'

@@ -1,5 +1,12 @@
 # Copyright (C) 2008-2012, Parrot Foundation.
 
+=pod
+
+=head1 DESCRIPTION
+
+This is the fourth episode in a tutorial series on building a compiler with
+the Parrot Compiler Tools.
+
 =head1 Episode 4: PAST Nodes and More Statements
 
 =head2 Introduction

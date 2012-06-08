@@ -1,4 +1,4 @@
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
 =pod
 
@@ -6,11 +6,7 @@
 
 The Headerizer
 
-=head1 AUTHOR
-
-Andy Lester C<< andy@petdance.com >>
-
-=head1 INTRODUCTION
+=head1 DESCRIPTION
 
 The Headerizer (F<tools/build/headerizer.pl>) is a tool that generates
 chunks of F<.h> header files based on C source code.
@@ -38,3 +34,9 @@ here's what you do:
 =back
 
 The .h file should now have PARROT_EXPORT for the function in question.
+
+=head1 AUTHOR
+
+Andy Lester C<< andy@petdance.com >>
+
+=cut

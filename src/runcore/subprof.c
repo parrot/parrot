@@ -1,9 +1,13 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
 src/runcore/subprof.c - Parrot's subroutine-level profiler
+
+=head1 DESCRIPTION
+
+This compilation unit implements Parrot's subroutine-level profiler.
 
 =head2 Functions
 

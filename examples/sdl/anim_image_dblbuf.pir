@@ -1,5 +1,6 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
 
-=head1 TITLE
+=head1 NAME
 
 anim_image_dblbuf.pir - animate an image in a doublebuffered Parrot SDL window
 
@@ -10,6 +11,11 @@ To run this file, run the following command from the Parrot root directory:
     $ ./parrot examples/sdl/anim_image_dblbuf.pir
     Drew 540 frames in 2.200484 seconds (245.400580 fps)
     $
+
+=head1 DESCRIPTION
+
+This program demonstrates on to animate an image in a doublebuffered Parrot
+SDL window.
 
 =cut
 

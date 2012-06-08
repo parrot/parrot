@@ -1,10 +1,10 @@
-# Copyright (C) 2009-2011, Parrot Foundation.
+# Copyright (C) 2009-2012, Parrot Foundation.
 
 =head1 NAME
 
 distutils - Parrot Distribution Utilities
 
-=head2 DESCRIPTION
+=head1 DESCRIPTION
 
 This module is greatly inspired by Python Distribution Utilities
 (L<http://docs.python.org/distutils/>).

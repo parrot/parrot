@@ -1,18 +1,18 @@
 # Copyright (C) 2001-2011, Parrot Foundation.
 
-=head1 Name
+=head1 NAME
 
 parrot-prove - Prove is a PIR-based TAP (Test Anything Protocol) Harness
 
-=head1 Description
+=head1 SYNOPSIS
+
+parrot-prove [option] [files]
+
+=head1 DESCRIPTION
 
 It eats test output (i.e. is a TAP consumer) and tells humans if the
 test suite passed, and if not, which kind of pretty colors of smoke
 came out. It is mostly equivalent to 'prove' from Perl 5.
-
-=head1 Usage
-
-parrot-prove [option] [files]
 
 =head2 Command line boolean options
 
@@ -89,7 +89,7 @@ To store the resulting TAP in an archive file use :
     -a
     --archive
 
-=head1 Help
+=head1 HELP
 
 For more help or any other question you go to L<http://parrot.org> or
 L<http://github.com/parrot/parrot>.Or you can send email to 'parrot-dev@parrot.org'.

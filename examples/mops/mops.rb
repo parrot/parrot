@@ -1,6 +1,6 @@
 #! ruby
 
-=begin RUBY_COMMENT
+=pod
 
 Copyright (C) 2001-2003, Parrot Foundation.
 
@@ -35,8 +35,6 @@ Prints out:
 =back
 
 =cut
-
-=end RUBY_COMMENT
 
 i2 = 0                       # set    I2, 0
 i3 = 1                       # set    I3, 1
@@ -79,7 +77,7 @@ puts "M op/s:        #{n1}"  # print  "M op/s:        "
                              #
 exit(0)                      # end
 
-=begin RUBY_COMMENT
+=pod
 
 =head1 SEE ALSO
 
@@ -94,5 +92,3 @@ F<examples/mops/mops.py>,
 F<examples/mops/mops.scheme>.
 
 =cut
-
-=end RUBY_COMMENT

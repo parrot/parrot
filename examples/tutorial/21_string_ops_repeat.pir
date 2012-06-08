@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 String Operations (continued)
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's string operations (continued).
+
+=head1 STRING OPERATIONS
 
 PIR has a string repeat opcode, that concatenates a string with
 itself N times.

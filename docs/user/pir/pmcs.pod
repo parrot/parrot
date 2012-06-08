@@ -1,5 +1,17 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
 
-=head1 Programming Parrot -- PMCs
+=pod
+
+=head1 NAME
+
+docs/user/pir/pmcs.pod - Programming Parrot PMCs. 
+
+=head1 DESCRIPTION
+
+This document covers programming with Parrot's PMCs from the user's
+perspective.
+
+=head1 PROGRAMMING PARROT -- PMCs
 
 =head2 Preliminaries
 

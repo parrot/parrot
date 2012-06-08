@@ -1,10 +1,10 @@
-# Copyright (C) 2010-2011, Parrot Foundation.
+# Copyright (C) 2010-2012, Parrot Foundation.
 
 =head1 NAME
 
 TAP/Harness
 
-=head2 DESCRIPTION
+=head1 DESCRIPTION
 
 Simplified port of TAP::Harness (version 3.21)
 and TAP::Harness::Archive (version 0.14)

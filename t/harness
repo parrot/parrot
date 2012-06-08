@@ -127,6 +127,8 @@ t/harness - Parrot Test Harness
 
 =head1 DESCRIPTION
 
+This is the Parrot Test Harness.
+
 =head2 Command-line Options - Short:
 
 The short command line options are:
