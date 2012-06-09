@@ -1,3 +1,19 @@
+2012-06-19    release 4.5.0
+    - Core
+        + Added .write_bytes and .read_bytes methods to FileHandle and Socket
+          PMCs.
+        + Added Parrot_api_set_stdhandle, Parrot_api_new_call_object and
+          Parrot_api_setup_signature functions to the embedding API
+        + Removed the "can" VTABLE
+    - IMCC
+        + Removed .line, .file, setline and setfile directives from IMCC
+    - Documentation
+	+ Fixed up Pod in 240 files to pass 't/codingstd/pod_description.t'.
+    - Tests
+	+ Added 'docs/pdds' and 'docs/pdds/draft' as files for
+	  'Parrot::Test::Pod.pm' to exclude.
+    - Community
+
 2012-05-15    release 4.4.0
     - Core
         + Most internal calls to libc exit(x) have been replaced with

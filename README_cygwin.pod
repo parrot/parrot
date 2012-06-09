@@ -4,10 +4,10 @@ This file is best viewed with "perldoc README.cygwin".
 
 README.cygwin - Parrot under Cygwin
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
-Parrot builds out of the box under Cygwin,
-when no other parrot is installed. See below at PROBLEMS.
+Parrot builds out of the box under Cygwin, when no other parrot is installed.
+I<See> PROBLEMS below.
 
 There are official cygwin parrot packages available via
 L<http://cygwin.com/setup.exe>.
@@ -127,6 +127,11 @@ This is a known cygwin problem with dll's, esp. perl on non-XP 32bit platforms.
 You need to install the C<rebase> package and run C<rebaseall> from an C<ash>
 shell.
 
+For more information regarding this problem, I<see>
+http://www.cygwin.com/ml/cygwin/2009-05/msg00413.html;
+http://www.heikkitoivonen.net/blog/2008/11/26/cygwin-upgrades-and-rebaseall/;
+I<and see> http://code.google.com/p/chromium/wiki/CygwinDllRemappingFailure.
+
 =item Crash at miniparrot.exe config_lib.pasm
 
 Invoking Parrot to generate runtime/parrot/include/config.fpmc --cross your
@@ -151,6 +156,22 @@ F</usr/lib/libparrot.dll.a>, F</usr/local/lib/libparrot.dll.a>
   #   at t/pmc/os.t line 312.
 
 This is a known Windows limitation with NTFS junctions on files.
+
+=item Exception: STATUS_ACCESS_VIOLATION ....
+
+If this exception results, ensure there is only one version of the
+C<cygwin1.dll> present on your system or, alternatively, ensure no other
+application interferes with Cygwin. For more information on this problem,
+I<see> the Cygwin/X FAQ at
+http://x.cygwin.com/docs/faq/cygwin-x-faq.html#q-status-access-violation
+I<and see> the main Cygwin FAQ at
+http://cygwin.com/faq-nochunks.html#faq.using.bloda
+
+=item build aborts
+
+If the build aborts, it may be necessary to include already built DLLs in the
+rebase. For instructions on how to accomplish this, I<see> the "PROBLEMS"
+section at http://cpansearch.perl.org/src/BFREE/OpenGL-0.57/README.cygwin
 
 =back
 

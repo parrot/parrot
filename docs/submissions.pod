@@ -1,14 +1,16 @@
-# Copyright (C) 2004-2008, Parrot Foundation.
+# Copyright (C) 2004-2012, Parrot Foundation.
+
+=pod
 
 =head1 NAME
 
 docs/submissions.pod - Parrot Submission Instructions
 
-=head1 ABSTRACT
+=head1 DESCRIPTION
 
 How to submit bug reports, patches and new files to Parrot.
 
-=head1 How To Submit A Bug Report
+=head1 HOW TO SUBMIT A BUG REPORT
 
 If you encounter an error while working with Parrot and don't understand what
 is causing it, create a bug report using the F<parrotbug> utility. The
@@ -21,7 +23,7 @@ in the distribution's root directory, and follow the prompts.
 If you know how to fix the problem you encountered, then think about
 submitting a patch, or (see below) getting commit privileges.
 
-=head1 A Note on Random Failures
+=head1 A NOTE ON RANDOM FAILURES
 
 If you encounter errors that appear intermittently, it may be difficult or
 impossible for Parrot developers to diagnose and solve the problem. It is
@@ -55,7 +57,7 @@ invocation.
 
 =back
 
-=head1 How To Create A Patch
+=head1 HOW TO CREATE A PATCH
 
 Try to keep your patches specific to a single change, and ensure that your
 change does not break any tests.  Do this by running C<make test>.  If there is
@@ -121,13 +123,13 @@ The format for entries in F<CREDITS> is defined at the top of the file.
 
 =back
 
-=head1 How To Submit A Patch
+=head1 HOW TO SUBMIT A PATCH
 
 The preferrred method to submit matches to Parrot is as pull requests via
 github. Please follow the instructions at
 L<http://help.github.com/send-pull-requests/>.
 
-=head1 Applying Patches
+=head1 APPLYING PATCHES
 
 You may wish to apply a patch submitted by someone else before the patch is
 incorporated into git
@@ -162,8 +164,7 @@ the MANIFEST and MANIFEST.SKIP file should be regenerated with:
 
     perl tools/dev/mk_manifest_and_skip.pl
 
-
-=head1 What Happens Next?
+=head1 WHAT HAPPENS NEXT?
 
 If you created a new issue, you will be taken to the issue page and can
 check on the progress of discussion there.  The issue number should be
@@ -179,12 +180,12 @@ changes are large or complex, as we need time for peer review.
 A list of open issues can be found here:
 L<https://github.com/parrot/parrot/issues?state=open>
 
-=head1 Patches for the Parrot website
+=head1 PATCHES FOR THE PARROT WEBSITE
 
 The L<http://www.parrot.org> website is hosted in a Drupal CMS. Submit
 changes through the usual ticket interface in Trac.
 
-=head1 Getting Commit Privileges
+=head1 GETTING COMMIT PRIVILEGES
 
 If you are interested in getting commit privileges to Parrot, here is
 the procedure:

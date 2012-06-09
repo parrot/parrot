@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 Continuations
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's continuations.
+
+=head1 CONTINUATIONS
 
 Continuations are tricky and amazing things. Parrot uses continuations for
 all sorts of things internally and you can use them too if you want. A

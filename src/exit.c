@@ -111,6 +111,7 @@ the interpreter is destroyed.
 */
 
 PARROT_COLD
+PARROT_NO_ADDRESS_SAFETY_ANALYSIS
 void
 Parrot_x_execute_on_exit_handlers(PARROT_INTERP, int status)
 {
@@ -134,6 +135,7 @@ Parrot_x_execute_on_exit_handlers(PARROT_INTERP, int status)
         node = next;
     }
 
+    /* It could be that the interpreter already is destroyed. See issue 765 */
     interp->exit_handler_list = NULL;
 
     /* Re-enable GC, which we will want if GC finalizes */
@@ -184,9 +186,9 @@ developers. Perform a full core dump and force exit back to the system.
 
 */
 
+PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
-PARROT_EXPORT
 void
 Parrot_x_panic_and_exit(NULLOK_INTERP, ARGIN_NULLOK(const char *message),
          ARGIN_NULLOK(const char *file), unsigned int line)

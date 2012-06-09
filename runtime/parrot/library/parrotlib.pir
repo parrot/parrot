@@ -1,5 +1,5 @@
 
-=head1 INFORMATION
+=head1 DESCRIPTION
 
 This is the parrot bytecode library.
 

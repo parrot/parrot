@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 if and unless
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's control flow (continued).
+
+=head1 IF AND UNLESS
 
 Both the if and unless conditionals are supported in PIR.  When the
 tested condition matches the sense of the conditional (true for if,

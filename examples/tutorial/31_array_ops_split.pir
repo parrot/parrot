@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's arrays (continued).
+
+=head1 USING SPLIT TO CREATE AN ARRAY
 
 C<split> is an operation that breaks up a string at certain marker
 characters, and puts the resulting parts into an array. The first

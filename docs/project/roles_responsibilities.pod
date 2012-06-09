@@ -1,12 +1,22 @@
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 Parrot Roles and Responsibilities
+=pod
+
+=head1 NAME
+
+docs/project/roles_responsibilities.pod - Parrot Roles and Responsibilities.
+
+=head1 DESCRIPTION
 
 This document describes the roles and responsibilities of parties involved in
-the Parrot project. Roles are divided into three categories (Project Team,
+the Parrot project.
+
+=head1 PARROT ROLES AND RESPONSIBILITIES
+
+Roles are divided into three categories (Project Team,
 Committers, Contributors) and may be further subdivided.
 
-=head1 Project Team
+=head1 PROJECT TEAM
 
 Members of the Project Team set the overall direction of the project, track
 project progress, oversee the project source (and access to that source), and
@@ -43,7 +53,7 @@ members also hold this role.
 
 See F<docs/project/metacommitter_guide.pod> for more information.
 
-=head1 Committers
+=head1 COMMITTERS
 
 Contributors who submit numerous, high-quality patches may be considered to
 become a Committer. Committers have commit access to the full Parrot
@@ -85,7 +95,7 @@ portability fixes or creating installation packages.
 Reviews and applies patches submitted by general contributors, keeping an eye
 on conformance with coding standards and desirability of features.
 
-=head1 Contributors
+=head1 CONTRIBUTORS
 
 Contributors are volunteers who write code or documentation patches, take
 part in email or online conversations, or contribute to the project in other

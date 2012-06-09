@@ -661,23 +661,6 @@ Get the namespace PMC associated with the class that this object is an instance 
 
 /*
 
-=item C<INTVAL can(STRING *method_name)>
-
-Returns 0 if the class does not have a method with the given name and a
-non-zero value if it does.
-
-=cut
-
-*/
-
-    VTABLE INTVAL can(STRING *method_name) {
-        PMC * const m = VTABLE_find_method(INTERP, SELF, method_name);
-        return !PMC_IS_NULL(m);
-    }
-
-
-/*
-
 =item C<INTVAL isa_pmc(PMC *lookup)>
 
 Returns whether the object's class is or inherits from C<lookup>.

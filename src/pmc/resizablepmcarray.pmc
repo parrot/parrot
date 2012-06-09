@@ -361,7 +361,7 @@ Delete the element at index C<key>.
 
 =item C<INTVAL exists_keyed_int(INTVAL key)>
 
-=item C<INTVAL exists_keyed_int(PMC *key)>
+=item C<INTVAL exists_keyed(PMC *key)>
 
 Returns TRUE is the element at C<key> exists; otherwise returns false.
 

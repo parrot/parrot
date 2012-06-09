@@ -1,6 +1,6 @@
-# Copyright (C) 2005-2009, Parrot Foundation.
+# Copyright (C) 2005-2012, Parrot Foundation.
 
-=head1 TITLE
+=head1 DESCRIPTION
 
 JSON.pir - PIR implementation of JSON data interchange format.
 

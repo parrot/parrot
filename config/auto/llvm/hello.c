@@ -2,15 +2,15 @@
  *
 Copyright (C) 2009, Parrot Foundation.
 
-=head1
+=head1 DESCRIPTION
 
-Test file only.
+A test file only.
 
 =over 4
 
 =item C<int main()>
 
-Test file only.
+A test file only.
 
 =cut
 

@@ -1,13 +1,11 @@
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2012, Parrot Foundation.
 # $Id$
 
-=head1 Cooperative threads in pure PIR
+=head1 DESCRIPTION
 
-This file demonstrates cooperative concurrency using continuations
-on Parrot.
+This file demonstrates cooperative concurrency using continuations on Parrot.
 
-See also
-http://www.parrot.org/content/threads-are-continuations
+See also http://www.parrot.org/content/threads-are-continuations
 
 =cut
 
@@ -146,7 +144,7 @@ That's it. All we need now is some test threads and a main function to run them.
     say "All done"
 .end
 
-=head1 Expected Output
+=head1 EXPECTED OUTPUT
 
 The program should (and does) produce this output:
 

@@ -1,15 +1,10 @@
-# -*- cperl -*-
-#
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
 
 =head1 NAME
 
-Array base class
-
-=head1 ABSTRACT
-
-This pod file documents the Array base class usage. For implementation details
-you should look inside the class file, found at F<src/pmc/array.pmc> in the
-parrot source code.
+docs/pmc/array.pod - Array base class.
 
 =head1 SYNOPSIS
 
@@ -30,6 +25,10 @@ parrot source code.
 =end PIR_FRAGMENT
 
 =head1 DESCRIPTION
+
+This pod file documents the Array base class usage. For implementation details
+you should look inside the class file, found at F<src/pmc/array.pmc> in the
+parrot source code.
 
 =head2 Creation
 
@@ -146,7 +145,7 @@ the C<exists> op instead:
 
 =end PIR_FRAGMENT
 
-=head2 TODO
+=head1 TODO
 
 Explain a little more which exception will be raised in case you access a
 out-of-bounds index on the array (as soon we have exceptions).

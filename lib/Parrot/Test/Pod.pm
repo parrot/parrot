@@ -1,4 +1,4 @@
-# Copyright (C) 2009, Parrot Foundation.
+# Copyright (C) 2009-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -49,6 +49,19 @@ our %second_analysis_subs = (
 
                 # Skip the book, because it uses extended O'Reilly-specific POD
                 if ($full_file =~ m{docs/book/}) {
+                    delete $files_needing_analysis->{ $file };
+                    next SECOND_FILE;
+                }
+
+                # skip 'docs/pdds' and 'docs/pdds/draft' for two reasons:
+                #
+                # (1) 'pdds' have their own, specific format requirements and
+                #     (See 'docs/pdds/pdd00_pdd.pod' and see
+                #      'docs/pdds/pdd_template.pod'.)
+                # (2) we already test the POD in 'pdds' in
+                #     't/codingstd/pdd_format.t'
+                if ($full_file =~ m{docs/pdds/} or
+                    $full_file =~ m{docs/pdds/draft}) {
                     delete $files_needing_analysis->{ $file };
                     next SECOND_FILE;
                 }
@@ -130,7 +143,7 @@ our %second_analysis_subs = (
 
 B<Purpose:>  Parrot::Test::Pod constructor.
 
-B<Arguments:>  Hash reference holding, at a minimum, one elemente keyed by
+B<Arguments:>  Hash reference holding, at a minimum, one element keyed by
 C<argv>, whose value is typically a reference to C<@ARGV>.
 
 B<Return Value:>  Parrot::Test::Pod object.
@@ -308,11 +321,13 @@ Path to build directory (currently, the top-level Parrot directory).
 B<Return Value:> Reference to hash of files meriting analysis, I<i.e.,> the
 results of the first pass minus the results of the second pass.
 
-=cut
-
 =head1 AUTHOR
 
 James E Keenan, refactored from earlier code
+
+=head1 HISTORY
+
+* [2012-06-05] Updated by Alvis Yardley <ac.yardley@gmail.com>
 
 =cut
 

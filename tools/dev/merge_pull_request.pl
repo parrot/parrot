@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2011, Parrot Foundation.
+# Copyright (C) 2011-2012, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -11,13 +11,18 @@ tools/dev/merge_pull_request.pl - Merge Github Pull Requests
 
 =head1 SYNOPSIS
 
-
-Here is a typical workflow to merge a pull request into parrot.git
+The typical workflow to merge a pull request into parrot.git
 
   # merge pull request #123 into current branch
   perl tools/dev/merge_pull_request.pl 123
   # this creates the branch pull_request_123
   make test # etc...
+
+=head1 DESCRIPTION
+
+This script implements Parrot's merge of github pull requests.
+
+=head1 SQUASHING COMMITS
 
 If the pull request has lots of extraneous commits, you may want
 to "squash" them into one commit. If you want to squash the last

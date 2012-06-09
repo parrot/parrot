@@ -1,15 +1,20 @@
-# Copyright (C) 2005-2007, Parrot Foundation.
+# Copyright (C) 2005-2012, Parrot Foundation.
+
+=pod
 
 =head1 NAME
 
 docs/req/model_users.pod - Model Users For Parrot Design Decisions
 
+=head1 DESCRIPTION
+
+This document exists to give Parrot design a direction.  
+
 =head1 RATIONALE
 
-This document exists to give Parrot design a direction.  Before we can make
-design decisions, we need a metric to evaluate them.  The best metrics are
-based on I<informed> intuition.  This document is designed to inform the
-intuition.
+Before we can make design decisions, we need a metric to evaluate them.  The
+best metrics are based on I<informed> intuition.  This document is designed to
+inform the intuition.
 
 Below are listed some model users with random (or, in some cases,
 not-so-random) names.
@@ -146,3 +151,5 @@ tech
 to something even more shiny
 
 =back
+
+=cut

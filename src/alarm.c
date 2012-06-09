@@ -5,6 +5,10 @@ Copyright (C) 2010-2012, Parrot Foundation.
 
 src/alarm.c - Implements a mechanism for alarms, setting a flag after a delay.
 
+=head1 DESCRIPTION
+
+This program implements a mechanism for alarms, setting a flag after a delay.
+
 =cut
 
 */
