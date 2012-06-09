@@ -518,11 +518,11 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
                     M0_EXEC_OP(get_word, cf, ops, pc);
                 break;
 
-                case (M0_ITON):
+                case (M0_CONVERT_I_N):
                     M0_EXEC_OP(convert_i_n, cf, ops, pc);
                 break;
 
-                case (M0_NTOI):
+                case (M0_CONVERT_N_I):
                     M0_EXEC_OP(convert_n_i, cf, ops, pc);
                 break;
 
