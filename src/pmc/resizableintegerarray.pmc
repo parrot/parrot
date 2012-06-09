@@ -224,7 +224,7 @@ Removes and returns an item from the start of the array.
         value = int_array[0];
 
         --size;
-        mem_sys_memmove(int_array, int_array + 1, size * sizeof (INTVAL));
+        memmove(int_array, int_array + 1, size * sizeof (INTVAL));
         SELF.set_integer_native(size);
         return value;
     }
@@ -245,7 +245,7 @@ Add an integer to the start of the array.
 
         SELF.set_integer_native(size + 1);
         GET_ATTR_int_array(INTERP, SELF, int_array);
-        mem_sys_memmove(int_array + 1, int_array, size * sizeof (INTVAL));
+        memmove(int_array + 1, int_array, size * sizeof (INTVAL));
         int_array[0] = value;
     }
 
@@ -270,7 +270,7 @@ Removes the element at C<key>.
             INTVAL *int_array;
             GET_ATTR_int_array(INTERP, SELF, int_array);
             --size;
-            mem_sys_memmove(int_array + key, int_array + key + 1, (size - key) * sizeof (INTVAL));
+            memmove(int_array + key, int_array + key + 1, (size - key) * sizeof (INTVAL));
             SELF.set_integer_native(size);
         }
     }

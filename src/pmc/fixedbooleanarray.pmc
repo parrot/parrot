@@ -143,7 +143,7 @@ Creates and returns a copy of the array.
             SET_ATTR_resize_threshold(INTERP, dest, resize_threshold);
 
             clone_bit_array = mem_gc_allocate_n_typed(INTERP, size_in_bytes, unsigned char);
-            mem_sys_memcopy(clone_bit_array, my_bit_array, size_in_bytes);
+            memcpy(clone_bit_array, my_bit_array, size_in_bytes);
 
             SET_ATTR_bit_array(INTERP, dest, clone_bit_array);
         }

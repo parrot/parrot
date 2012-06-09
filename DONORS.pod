@@ -4,10 +4,10 @@
 
 DONORS
 
-=head1 DONORS
+=head1 DESCRIPTION
 
-We would like to thank the following people and institutions,
-whose financial contributions help support the development of Parrot.
+We want to thank the following people and institutions, whose financial
+contributions help to support the development of Parrot.
 
 =over 4
 

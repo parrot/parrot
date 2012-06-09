@@ -16,7 +16,7 @@ package gen::config_pm;
 
 use strict;
 use warnings;
-
+use Data::Dumper;$Data::Dumper::Indent=1;
 use base qw(Parrot::Configure::Step);
 use Parrot::Configure::Utils ':gen';
 

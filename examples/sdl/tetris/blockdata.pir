@@ -1,5 +1,5 @@
 
-=head1 TITLE
+=head1 DESCRIPTION
 
 blockdata.pir - a tetris block data class
 
@@ -29,7 +29,7 @@ END:
 
 =item blockdata."rotate"( dir )
 
-Changes the the C<block data> in a way to make
+Changes the C<block data> in a way to make
 the block look rotated.
 
 =over 4

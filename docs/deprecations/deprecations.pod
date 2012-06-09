@@ -1,10 +1,10 @@
-# Copyright (C) 2011, Parrot Foundation.
+# Copyright (C) 2011-2012, Parrot Foundation.
 
 =head1 NAME
 
 docs/deprecations/deprecations.pod - Parrot Deprecations
 
-=head1 Parrot Deprecations
+=head1 DESCRIPTION
 
 This page exists to systematically document all deprecations that apply to core
 Parrot code.
@@ -66,7 +66,7 @@ notice here and F<deprecations_3_0.pod>, so the list should
 be exhaustive.
 
 If you find a deprecation that should be listed here, file a ticket
- L<http://trac.parrot.org/parrot/newticket>
+ L<https://github.com/parrot/parrot/issues/new>
 or hop on #parrot on irc.parrot.org and let us know.
 
 =over 4
@@ -146,7 +146,7 @@ This list is a summary.  A more complete description and migration path for
 each change is at F<deprecations_2_9.pod>.
 
 If you find a deprecation that should be listed here, file a ticket
- L<http://trac.parrot.org/parrot/newticket>
+ L<https://github.com/parrot/parrot/issues/new>
 or hop on #parrot on irc.parrot.org and let us know.
 
 =over 4

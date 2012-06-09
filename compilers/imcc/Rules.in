@@ -87,7 +87,6 @@ compilers/imcc/parser_util$(O) : \
     include/imcc/yyscanner.h \
     include/imcc/embed.h \
     $(INC_DIR)/dynext.h \
-    $(INC_DIR)/embed.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS) \
     include/pmc/pmc_sub.h
@@ -192,7 +191,6 @@ compilers/imcc/main$(O) : \
     compilers/imcc/symreg.h \
     compilers/imcc/unit.h \
     include/imcc/yyscanner.h \
-    $(INC_DIR)/embed.h \
     $(INC_DIR)/oplib/ops.h \
     $(INC_DIR)/runcore_api.h \
     $(INC_DIR)/api.h \

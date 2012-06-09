@@ -728,18 +728,6 @@ characters, other digit representations aren't allowed.
         }
     }
 
-    VTABLE PMC *share_ro() {
-        STRING       *str_val;
-        PMC   * const ret    = SUPER();
-
-        GET_ATTR_str_val(INTERP, SELF, str_val);
-        if (!STRING_IS_NULL(str_val)) {
-            /* prevent wrong garbage collection */
-            PObj_is_shared_SET(str_val);
-        }
-        return ret;
-    }
-
     VTABLE STRING* get_repr() {
         return VTABLE_get_string(INTERP, SELF);
     }
@@ -754,26 +742,15 @@ Find last occurrence of C<substring>, but not after the C<start> position.
 
 */
 
-    METHOD reverse_index(STRING *substring, INTVAL start) {
+    METHOD reverse_index(STRING *substring,
+            INTVAL start :optional, INTVAL has_start :opt_flag) {
         const STRING * const src = VTABLE_get_string(INTERP, SELF);
-        INTVAL         res = -1;
+        INTVAL         res;
         UINTVAL        len;
 
-        if (start < 0)
-            RETURN(INTVAL res);
-
-        len = Parrot_str_length(INTERP, src);
-
-        if (!len)
-            RETURN(INTVAL res);
-
-        if (start >= (INTVAL)len)
-            RETURN(INTVAL res);
-
-        if (!Parrot_str_length(INTERP, substring))
-            RETURN(INTVAL res);
-
-        res = STRING_rindex(INTERP, src, substring, (UINTVAL)start);
+        if (!has_start)
+            start = STRING_length(src);
+        res = Parrot_str_find_reverse_index(INTERP, src, substring, start);
         RETURN(INTVAL res);
     }
 

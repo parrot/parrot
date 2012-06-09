@@ -53,16 +53,16 @@ typedef enum Parrot_runcore_flags {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-void disable_event_checking(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-PARROT_EXPORT
 void dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void enable_event_checking(PARROT_INTERP)
+void Parrot_runcore_disable_event_checking(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+void Parrot_runcore_enable_event_checking(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -92,12 +92,14 @@ void prepare_for_run(PARROT_INTERP)
 void runops_int(PARROT_INTERP, size_t offset)
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_disable_event_checking __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_dynop_register __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(lib_pmc))
-#define ASSERT_ARGS_enable_event_checking __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_runcore_disable_event_checking \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_runcore_enable_event_checking \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_runcore_register __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

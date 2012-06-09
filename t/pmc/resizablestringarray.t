@@ -22,7 +22,7 @@ out-of-bounds test. Checks INT and PMC keys.
     .include 'test_more.pir'
 
     # set a test plan
-    plan(263)
+    plan(271)
 
     'size/resize'()
     'clone'()
@@ -86,6 +86,7 @@ out-of-bounds test. Checks INT and PMC keys.
     method_unshift_string()
     method_unshift_integer()
     method_unshift_float()
+    method_reverse()
 .end
 
 #
@@ -1816,6 +1817,42 @@ exception:
     $S0 = array[0]
     is($I0, 2,     "method_unshift_float (shrink, grow) - elements")
     is($S0, "3.3", "method_unshift_float (shrink, grow) - value")
+.end
+
+.sub method_reverse
+    .local pmc array
+    array = new ['ResizableStringArray']
+    array."reverse"()
+    $I0 = elements array
+    is($I0, 0, "method_reverse - reverse of empty array")
+    push array, "3"
+    array."reverse"()
+    $S0 = array[0]
+    is($S0, "3", "method_reverse - reverse of array with one element")
+    push array, "1"
+    array."reverse"()
+    array."reverse"()
+    array."reverse"()
+    $S0 = array[0]
+    is($S0, "1", "method_reverse - reverse of array with two elements")
+    $S0 = array[1]
+    is($S0, "3", "method_reverse - reverse of array with two elements second element")
+    push array, "4"
+    array."reverse"()
+    push array, "5"
+    array."reverse"()
+    $S0 = join "", array
+    is($S0, "5134", "method_reverse - four elements")
+    array."reverse"()
+    $S0 = join "", array
+    is($S0, "4315", "method_reverse - four elements second reverse")
+    push array, "6"
+    array."reverse"()
+    $S0 = join "", array
+    is($S0, "65134", "method_reverse - five elements")
+    array."reverse"()
+    $S0 = join "", array
+    is($S0, "43156", "method_reverse - five elements second reverse")
 .end
 
 # Local Variables:

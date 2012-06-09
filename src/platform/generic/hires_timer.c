@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2009, Parrot Foundation.
+ * Copyright (C) 2009-2011, Parrot Foundation.
  */
 
 /*
@@ -78,6 +78,7 @@ Return the number of ns that each time unit from Parrot_hires_get_time represent
 
 */
 
+PARROT_CONST_FUNCTION
 UINTVAL
 Parrot_hires_get_tick_duration(void)
 {

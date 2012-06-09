@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2009, Parrot Foundation.
+# Copyright (C) 2009-2012, Parrot Foundation.
 
 =head1 TITLE
 
@@ -56,7 +56,7 @@ my $exe = $lang eq 'rakudo'
             ? qq{Source: ".\\parrot-*.exe"; DestDir: "{app}\\bin"; Flags:}
             : '; no .exe'
         );
-my $pbc = <*.pbc> && ! -d $lang
+my $pbc = <*.pbc> && ! -d $lang && $lang ne 'rakudo'
         ? qq{Source: ".\\*.pbc"; DestDir: "{app}\\lib\\parrot\\languages\\$lang"; Flags:}
         : '; no .pbc';
 my $lng = -d $lang
@@ -83,6 +83,30 @@ my $readme = -f 'README'
            ? qq{Source: ".\\README"; DestDir: "{app}\\share\\doc\\parrot\\languages\\$lang"; Flags:}
            : '; no README';
 
+my $rakudo = $lang eq 'rakudo'
+        ? <<'RAKUDO' : '';
+; nqp is required by rakudo
+Source: ".\nqp\nqp.exe"; DestDir: "{app}\bin"; Flags:
+Source: ".\nqp\src\pmc\*.dll"; DestDir: "{app}\lib\parrot\dynext"; Flags:
+Source: ".\nqp\src\ops\*.dll"; DestDir: "{app}\lib\parrot\dynext"; Flags:
+Source: ".\nqp\ModuleLoader.pbc"; DestDir: "{app}\lib\parrot\library"; Flags:
+Source: ".\nqp\PASTRegex.pbc"; DestDir: "{app}\lib\parrot\library"; Flags:
+Source: ".\nqp\QAST.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
+Source: ".\nqp\NQPP6QRegex.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
+Source: ".\nqp\NQPHLL.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
+Source: ".\nqp\NQPCORE.setting.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
+Source: ".\nqp\nqpmo.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
+Source: ".\nqp\nqp.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
+Source: ".\nqp\QRegex.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
+
+Source: ".\blib\Perl6\*.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib\Perl6"; Flags:
+Source: ".\perl6.pbc"; DestDir: "{app}\lib\parrot\languages\perl6"; Flags:
+Source: ".\*.setting.pbc"; DestDir: "{app}\lib\parrot\languages\perl6\lib"; Flags:
+Source: ".\lib\Test.pm"; DestDir: "{app}\lib\parrot\languages\perl6\lib"; Flags:
+Source: ".\lib\lib.pm"; DestDir: "{app}\lib\parrot\languages\perl6\lib"; Flags:
+Source: ".\lib\Pod\To\Text.pm"; DestDir: "{app}\lib\parrot\languages\perl6\lib\Pod\To"; Flags:
+RAKUDO
+
 my $filename = 'parrot-' . $lclang . '.iss';
 open my $OUT, '>', $filename
     or die "Can't open $filename ($!)";
@@ -106,6 +130,7 @@ SolidCompression=yes
 Uninstallable=no
 
 [Files]
+$rakudo
 $exe
 $pbc
 $lng

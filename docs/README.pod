@@ -1,0 +1,230 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+docs/README.pod - Readme file for the 'docs/' directory. 
+
+=head1 DESCRIPTION
+
+This README sets out the documents and directories in the 'docs/' top-level
+directory.[1]
+
+=head2 Documentation
+
+=over 4
+
+=item F<binaries/>
+
+The pod files for Parrot's installable executables.
+
+=item F<book/>
+
+The pod files for the "PCT Book," the "PIR Book," and a draft of the "Parrot
+Developer's Guide: PIR Book".
+
+=item F<compiler_faq.pod>
+
+A Parrot FAQ for compiler writers in PIR.[2]
+
+=item F<configuration.pod>
+
+A document on Parrot's Configuration System.
+
+=item F<debugger.pod>
+
+Documentation for C<parrot_debugger>, the Parrot debugger.
+
+=item F<debug.pod>
+
+A beginner's guide to debugging the Parrot executable.
+
+=item F<deprecations/>
+
+Documentation on Parrot's deprecation policy and documents on various Parrot
+deprecations.
+
+=item F<dev/>
+
+This subdirectory contains a number of files discussing various implementation
+decisions made during the course of the development of Parrot. The intent is
+to keep discussion of implementation-specific issues separate from the basic
+design issues discussed in the PDDs.
+
+=item F<embed_new.pod>
+
+An overview of Parrot's embedding system.
+
+=item F<embed.pod>
+
+Describes the embedding subsystem in excruciating detail.
+
+=item F<extend.pod>
+
+A (mostly empty) description of Parrot's extension system.
+
+=item F<faq.pod>
+
+The Parrot FAQ.
+
+=item F<gettingstarted.pod>
+
+The Parrot Developer FAQ.[3]
+
+=item F<glossary.pod>
+
+A guide to some of the jargon which crops up repeatedly in Parrot development
+and throughout the documentation.
+
+=item F<html/>
+
+This subdirectory contains an html version of Parrot's Documentation Set.
+
+=item F<imcc/>
+
+This subdirectory contains documentation on Parrot's Intermediate Code
+Compiler (IMCC).
+
+=item F<index/>
+
+This subdirectory contains the json formatted files with which to generate
+Parrot's html Documentation Set.
+
+=item F<intro.pod>
+
+An introductory article on what Parrot is and how to do some interesting
+things with it.
+
+=item F<memory_internals.pod>
+
+An introduction to the Parrot GC subsystem
+
+=item F<multidispatch.pod>
+
+An (outdated document) on Parrot's multimethod dispatch for binary opcode
+functions.
+
+=item F<optable.pod>
+
+An ALPHA pod, describing the PGE operator precedence table and parser.
+
+=item F<overview.pod>
+
+An overview of Parrot's architecture and design.
+
+=item F<parrotbyte.pod>
+
+The Parrot bytecode format.
+
+=item F<parrothist.pod>
+
+A document which records Parrot source code releases, and their release
+managers.
+
+=item F<parrot.pod>
+
+A general document for the uninitiated which points to several "good starting
+points" throughout Parrot's Documentation Set.
+
+=item F<pct/>
+
+This subdirectory contains documentation on the Parrot Compiler Toolkit.
+
+=item F<pdds/>
+
+This subdirectory contains all of the current Parrot Design Documents (PDDs).
+PDDs are detailed guides to the design of the various Parrot subsystems,
+I<e.g.,> F<pdd03_calling_conventions.pod> specifies Parrot's inter-routine
+calling conventions.
+
+=item F<pmc/>
+
+This subdirectory contains documentation on several of the PMC types available
+to Parrot.
+
+
+=item F<pmc2c.pod>
+
+A document on the F<tools/build/pmc2c.pl> and how to use the tool to generate
+C code files from PMC definition files.
+
+=item F<pmc.pod>
+
+A general overview of PMC.
+
+=item F<porting_intro.pod>
+
+"This document is an introduction to porting the optional subsystems of Parrot
+onto a new architecture once the core successfully builds."
+
+=item F<project/>
+
+This subdirectory contains documentation important to Parrot Developers and
+administrators, I<e.g.,> F<docs/projects/release_manager_guide.pod>.
+
+=item F<req/>
+
+This subdirectory contains a document on "Model Users For Parrot Design
+Decisions."[4]
+
+=item F<resources/>
+
+This subdirectory contains various "resource" files, I<e.g.,>
+F<parrot_logo.png>, F<parrot.css>, etc.
+
+=item F<running.pod>
+
+Brief descriptions of the different executables and how to run them.
+
+=item F<stability.pod>
+
+"This document classifies Parrot components and interfaces based on their
+stability."
+
+=item F<submissions.pod>
+
+This is a document on "[h]ow to submit bug reports, patches and new files to
+Parrot."
+
+=item F<tests.pod>
+
+Hints on writing tests for the Parrot interpreter.
+
+=item F<translations/>
+
+This subdirectory contains multiple translations of Parrot's plaintext
+'README', I<e.g.,> F<README.deutsch>, F<README.espanol>, etc.
+
+=item F<user/>
+
+This subdirectory contains various documents of general interest to users,
+wanting to target Parrot. 
+
+=item F<vtables.pod>
+
+A brief introduction to the vtable at the heart of all PMCs, and how to
+implement your own PMC type.
+
+=back
+
+=head1 NOTES
+
+[1] The contents of this 'README.pod' are, at present, tentative and,
+therefore, are subject to change.
+
+[2] We should change the name of this FAQ to better conform with the purpose
+of the FAQ. F<compiler_faq.pod> is far too ambiguous to be helpful.
+
+[3] We should change the name of this FAQ to better conform with the purpose
+of the FAQ. F<getttingstarted.pod> is far too general and implies something
+other than the Parrot Developer FAQ.
+
+[4] Is there any reason to retain this document? It seems, ten years later,
+more of a curiousity than an actual guide.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2012, Parrot Foundation.
+
+=cut

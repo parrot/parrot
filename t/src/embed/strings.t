@@ -31,7 +31,6 @@ plan tests => 1;
 c_output_is( <<'CODE', <<'OUTPUT', "wchar import / export" );
 
 #include <parrot/parrot.h>
-#include <parrot/embed.h>
 #include <parrot/api.h>
 #include <stdio.h>
 
@@ -40,7 +39,7 @@ c_output_is( <<'CODE', <<'OUTPUT', "wchar import / export" );
 
 int main(int argc, char* argv[])
 {
-    Parrot_Interp interp = Parrot_new(NULL);
+    Parrot_Interp interp = Parrot_interp_new(NULL);
     Parrot_PMC pmc = Parrot_pmc_new(interp, enum_class_ParrotInterpreter);
 
     Parrot_String str = NULL;

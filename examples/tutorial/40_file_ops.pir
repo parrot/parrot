@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 File Operations
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's file operations.
+
+=head1 FILE OPERATIONS
 
 This example demonstrates basic file operations.
 

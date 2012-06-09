@@ -19,7 +19,7 @@ out-of-bounds test. Checks INT and PMC keys.
 .sub main :main
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
-    plan(30)
+    plan(32)
 
     array_size_tests()
     element_set_tests()
@@ -31,6 +31,7 @@ out-of-bounds test. Checks INT and PMC keys.
     get_iter_test()
     test_new_style_init()
     test_invalid_init_tt1509()
+    test_get_string()
 .end
 
 .sub array_size_tests
@@ -270,6 +271,17 @@ CODE
         $P0 = new 'FixedFloatArray', -10
     .end
 CODE
+.end
+
+.sub test_get_string
+    $P0 = new 'FixedFloatArray', 3
+    $P0[0] = -1.5
+    $P0[1] = 0
+    $P0[2] = 3.14
+    $S0 = $P0
+    is($S0, '[ -1.5, 0, 3.14 ]', 'converts to string')
+    $S0 = get_repr $P0
+    is($S0, '[ -1.5, 0, 3.14 ]', 'has string representation')
 .end
 
 # Local Variables:

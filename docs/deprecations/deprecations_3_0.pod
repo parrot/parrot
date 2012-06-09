@@ -1,10 +1,12 @@
-# Copyright (C) 2011, Parrot Foundation.
+# Copyright (C) 2011-2012, Parrot Foundation.
 
 =head1 NAME
 
 docs/deprecations/deprecations_3_0.pod - Parrot Deprecations for 3.0
 
-=head1 Parrot Deprecations for 3.0
+=head1 DESCRIPTION
+
+Parrot Deprecations for 3.0.
 
 =head2 PARROT_ERRORS_GLOBALS_FLAG
 
@@ -92,7 +94,7 @@ magic of virtual dispatch.
 
 =head3 Rational
 
-They're old, crufty, and don't do anything that cannot be acheived by .call.
+They're old, crufty, and don't do anything that cannot be achieved by .call.
 
 Except obfuscasion of course.
 

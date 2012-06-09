@@ -457,10 +457,27 @@ given .pbc bytecode file.
     METHOD read_from_file(STRING * filename) {
         PackFile * const pf = Parrot_pf_read_pbc_file(INTERP, filename);
         VTABLE_set_pointer(INTERP, SELF, pf);
+        pf->view = SELF;
+        VTABLE_set_string_native(INTERP, SELF, filename);
     }
 
     METHOD write_to_file(STRING *filename) {
         Parrot_pf_write_pbc_file(INTERP, SELF, filename);
+    }
+
+/*
+
+=item C<METHOD get_version()>
+
+Return a stringified version number of the packfile
+
+=cut
+
+*/
+
+    METHOD get_version() {
+        STRING * const version = Parrot_pf_get_version_string(INTERP, SELF);
+        RETURN(STRING * version);
     }
 }
 

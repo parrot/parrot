@@ -54,8 +54,9 @@
     $P0 = fn(args :flat)
 
     $P1 = null
-    $P1 = dlfunc $P1, "Parrot_str_new", "Spi"
-    $S0 = $P1($P0, 0)
+    $P1 = dlfunc $P1, "Parrot_str_new", "Sppi"
+    $P2 = getinterp
+    $S0 = $P1($P2, $P0, 0)
 
     .return ($S0)
 .end

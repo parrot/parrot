@@ -1,12 +1,10 @@
 # Copyright (C) 2008, Parrot Foundation.
 
-=head1 TITLE
+=head1 NAME
 
 xlibtest.pl - A test of Xlib.pir usage from nqp
 
-=head1 SYNOPSYS
-
-This is an initial version, be careful and not expect too much.
+=head1 SYNOPSIS
 
 Compile Xlib.pir to Xlib.pbc before usage:
 
@@ -18,6 +16,10 @@ current directory:
     ../../parrot ../../compilers/nqp/nqp.pbc xlibtest.nqp
 
 Press any key to exit.
+
+=head1 DESCRIPTION
+
+This is an initial version, be careful and not expect too much.
 
 =cut
 

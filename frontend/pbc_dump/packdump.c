@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 This program is free software. It is subject to the same license as
 Parrot itself.
 
@@ -22,6 +22,10 @@ This is only used by the PBC dumper C<pbc_dump>.
 #include "parrot/parrot.h"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_key.h"
+#ifdef WIN32
+PMC *PMCNULL;
+#endif
+
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
 
@@ -161,7 +165,7 @@ pobj_flag_dump(PARROT_INTERP, long flags)
             if (printed_flag_p)
                 Parrot_io_printf(interp, ",");
             Parrot_io_printf(interp, "%s", flag_bit_names[idx]);
-            ++printed_flag_p;
+            printed_flag_p = 1;
         }
         ++idx;
         flags >>= 1;
@@ -224,6 +228,8 @@ PackFile_Constant_dump_pmc(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
         /* and now type / value per component */
         for (key = self; key;) {
             opcode_t type = PObj_get_FLAGS(key);
+            INTVAL int_key;
+            GETATTR_Key_int_key(interp, key, int_key);
 
             Parrot_io_printf(interp, "       {\n");
 
@@ -254,19 +260,19 @@ PackFile_Constant_dump_pmc(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
               case KEY_integer_FLAG | KEY_register_FLAG:
                 Parrot_io_printf(interp, "        TYPE        => I REGISTER\n");
                 Parrot_io_printf(interp, "        DATA        => %ld\n",
-                            VTABLE_get_integer(interp, key));
+                            int_key);
                 Parrot_io_printf(interp, "       },\n");
                 break;
               case KEY_string_FLAG | KEY_register_FLAG:
                 Parrot_io_printf(interp, "        TYPE        => S REGISTER\n");
                 Parrot_io_printf(interp, "        DATA        => %ld\n",
-                            VTABLE_get_integer(interp, key));
+                            int_key);
                 Parrot_io_printf(interp, "       },\n");
                 break;
               case KEY_pmc_FLAG | KEY_register_FLAG:
                 Parrot_io_printf(interp, "        TYPE        => P REGISTER\n");
                 Parrot_io_printf(interp, "        DATA        => %ld\n",
-                            VTABLE_get_integer(interp, key));
+                            int_key);
                 Parrot_io_printf(interp, "       },\n");
                 break;
               default:

@@ -1343,7 +1343,7 @@ Protofunctions define operators in the optable in the same way that rules and
 tokens make up the grammar. A proto declares a rule, defined elsewhere, which
 other code may override dynamically.  In this case, PCT takes information from
 the proto declaration and fills in the details. The "dynamic overriding"
-implies that a high-level language itself itself can modify its own grammar at
+implies that a high-level language itself can modify its own grammar at
 run time, by overriding the proto definitions for its operator table. Some
 languages call this process X<operator overloading> I<operator overloading>.
 

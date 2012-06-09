@@ -22,7 +22,7 @@ STR_VTABLE *Parrot_default_encoding_ptr  = NULL;
 STR_VTABLE *Parrot_platform_encoding_ptr = NULL;
 
 static STR_VTABLE **encodings;
-static int          n_encodings;
+static int          n_encodings = 0;
 static STRING      *platform_str;
 /* for backwards compatibility */
 static STRING      *unicode_str;

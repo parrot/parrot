@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 String Operations
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's string operations.
+
+=head1 STRING OPERATIONS
 
 Some operations are specifically for strings. Concatenation
 is an example of this type of operation; it joins two

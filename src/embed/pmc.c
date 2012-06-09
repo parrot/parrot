@@ -433,7 +433,7 @@ Parrot_api_pmc_box_string(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String str)
 =item C<Parrot_Int Parrot_api_pmc_box_integer(Parrot_PMC interp_pmc, Parrot_Int
 value, Parrot_PMC * int_pmc)>
 
-Wraps the integer C<str> into a PMC and stores the results in C<int_pmc>. This
+Wraps the integer C<value> into a PMC and stores the results in C<int_pmc>. This
 function returns a true value if this call is successful and false value
 otherwise.
 
@@ -448,12 +448,33 @@ Parrot_api_pmc_box_integer(Parrot_PMC interp_pmc, Parrot_Int value,
 {
     ASSERT_ARGS(Parrot_api_pmc_box_integer)
     EMBED_API_CALLIN(interp_pmc, interp)
-    *int_pmc = Parrot_pmc_new(interp, enum_class_Integer);
-    VTABLE_set_integer_native(interp, *int_pmc, value);
+    *int_pmc = Parrot_pmc_box_integer(interp, value);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 
-/* TODO: Box float */
+/*
+
+=item C<Parrot_Int Parrot_api_pmc_box_float(Parrot_PMC interp_pmc, Parrot_Float
+value, Parrot_PMC * float_pmc)>
+
+Wraps the float C<value> into a PMC and stores the results in C<float_pmc>. This
+function returns a true value if this call is successful and false value
+otherwise.
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_pmc_box_float(Parrot_PMC interp_pmc, Parrot_Float value,
+        ARGOUT(Parrot_PMC * float_pmc))
+{
+    ASSERT_ARGS(Parrot_api_pmc_box_float)
+    EMBED_API_CALLIN(interp_pmc, interp)
+    *float_pmc = Parrot_pmc_box_number(interp, value);
+    EMBED_API_CALLOUT(interp_pmc, interp)
+}
 
 /*
 
@@ -642,6 +663,64 @@ Parrot_api_pmc_keep_alive(Parrot_PMC interp_pmc, Parrot_PMC pmc, Parrot_Int aliv
         Parrot_pmc_gc_register(interp, pmc);
     else
         Parrot_pmc_gc_unregister(interp, pmc);
+    EMBED_API_CALLOUT(interp_pmc, interp);
+}
+
+/*
+
+=item C<Parrot_Int Parrot_api_pmc_new_call_object(Parrot_PMC interp_pmc,
+Parrot_PMC *cc)>
+
+Convenience API to create a new CallContext PMC, suitable for invoking a Sub.
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_pmc_new_call_object(Parrot_PMC interp_pmc, ARGOUT(Parrot_PMC *cc))
+{
+    ASSERT_ARGS(Parrot_api_pmc_new_call_object)
+    EMBED_API_CALLIN(interp_pmc, interp);
+    *cc = Parrot_pcc_new_call_object(interp);
+    EMBED_API_CALLOUT(interp_pmc, interp);
+}
+
+/*
+
+=item C<Parrot_Int Parrot_api_pmc_setup_signature(Parrot_PMC interp_pmc,
+Parrot_PMC callcontext, const char * const signature, ...)>
+
+Convenience API to setup a CallContext with a signature and arguments as a
+single variadic argument list.
+
+=cut
+
+*/
+
+PARROT_API
+Parrot_Int
+Parrot_api_pmc_setup_signature(Parrot_PMC interp_pmc, Parrot_PMC callcontext,
+        ARGIN(const char * const signature), ...)
+{
+    ASSERT_ARGS(Parrot_api_pmc_setup_signature)
+    va_list args;
+
+    EMBED_API_CALLIN(interp_pmc, interp);
+
+    if (PMC_IS_NULL(callcontext))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "You must provide a CallContext to Parrot_api_pmc_setup_signature");
+    if (!signature)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "You must provide a signature to Parrot_api_pmc_setup_signature");
+
+    va_start(args, signature);
+    callcontext = Parrot_pcc_build_call_from_varargs(interp, callcontext,
+            signature, &args);
+    va_end(args);
+
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 

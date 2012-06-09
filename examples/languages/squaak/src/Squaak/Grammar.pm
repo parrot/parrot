@@ -77,7 +77,7 @@ rule statement:sym<if> {
 }
 
 rule statement:sym<sub_call> {
-    <primary> <arguments>
+    <primary>
 }
 
 rule arguments {
@@ -107,6 +107,10 @@ rule statement:sym<while> {
     <sym> <EXPR> 'do' <block> 'end'
 }
 
+rule statement:sym<return> {
+    <sym> <EXPR>
+}
+
 token begin_block {
     <?>
 }
@@ -130,13 +134,15 @@ rule postfix_expression:sym<key> { '{' <EXPR> '}' }
 
 rule postfix_expression:sym<member> { '.' <identifier> }
 
+rule postfix_expression:sym<call> { <arguments> }
+
 token identifier {
     <!keyword> <ident>
 }
 
 token keyword {
-    ['and'|'catch'|'do'   |'else' |'end' |'for' |'if'
-    |'not'|'or'   |'sub'  |'throw'|'try' |'var'|'while']>>
+    ['and'|'catch' |'do' |'else' |'end'|'for'|'if'   |'not'
+    |'or' |'return'|'sub'|'throw'|'try'|'var'|'while']>>
 }
 
 token term:sym<integer_constant> { <integer> }

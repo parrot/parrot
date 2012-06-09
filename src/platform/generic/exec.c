@@ -65,7 +65,7 @@ Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)
         Parrot_str_free_cstring(cmd);
 
         if (status)
-            exit(status);
+            PARROT_FORCE_EXIT(status);
     }
 
     /* make gcc happy */
@@ -125,7 +125,7 @@ Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)
         status  = execvp(cmd, argv);
         /* if we get here, something's horribly wrong... */
         if (status) {
-            exit(status);
+            PARROT_FORCE_EXIT(status);
         }
     }
     return 1;    /* make gcc happy */
@@ -224,7 +224,7 @@ Parrot_proc_exec(PARROT_INTERP, ARGIN(STRING *command), INTVAL flags,
             close(STDIN_FILENO);
 
             if (dup(in_fds[0]) != STDIN_FILENO)
-                exit(EXIT_FAILURE);
+                PARROT_FORCE_EXIT(EXIT_FAILURE);
         }
 
         if (flags & PARROT_EXEC_STDOUT) {
@@ -233,13 +233,13 @@ Parrot_proc_exec(PARROT_INTERP, ARGIN(STRING *command), INTVAL flags,
             close(STDOUT_FILENO);
 
             if (dup(out_fds[1]) != STDOUT_FILENO)
-                exit(EXIT_FAILURE);
+                PARROT_FORCE_EXIT(EXIT_FAILURE);
 
             if (!(flags & PARROT_EXEC_STDERR)) {
                 close(STDERR_FILENO);
 
                 if (dup(out_fds[1]) != STDERR_FILENO)
-                    exit(EXIT_FAILURE);
+                    PARROT_FORCE_EXIT(EXIT_FAILURE);
             }
         }
 
@@ -249,7 +249,7 @@ Parrot_proc_exec(PARROT_INTERP, ARGIN(STRING *command), INTVAL flags,
             close(STDERR_FILENO);
 
             if (dup(err_fds[1]) != STDERR_FILENO)
-                exit(EXIT_FAILURE);
+                PARROT_FORCE_EXIT(EXIT_FAILURE);
         }
 
         argv [0] = auxarg0;
@@ -261,7 +261,7 @@ Parrot_proc_exec(PARROT_INTERP, ARGIN(STRING *command), INTVAL flags,
         /* Will never reach this unless exec fails.
          * No need to clean up, we're just going to exit */
         perror("execvp");
-        exit(EXIT_FAILURE);
+        PARROT_FORCE_EXIT(EXIT_FAILURE);
     }
 
     return pid;

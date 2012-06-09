@@ -3,16 +3,14 @@
 # This is the start to rewrite JSON. It starts with rewriting data_json only.
 # data_json depends on the PGE. The rewrite use parrot-nqp.
 
-
 =head1 NAME
 
 JSON, a lightweight data-interchange format.
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
-The C<from_json> method return a PMC that containing the data structure
-for a given valid JSON (JavaScript Object Notation) string.
-For example:
+The C<from_json> method return a PMC that contains the data structure for
+a given valid JSON (JavaScript Object Notation) string. For example:
 
     .sub 'main' :main
          .local pmc result

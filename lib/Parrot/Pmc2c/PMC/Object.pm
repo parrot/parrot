@@ -67,7 +67,13 @@ EOC
         PMC * const meth = Parrot_oo_find_vtable_override_for_class(interp, cur_class, meth_name);
         if (!PMC_IS_NULL(meth)) {
 EOC
+
         $method_body_text .= "            $pcc_result_decl\n" if $pcc_result_decl ne '';
+
+        # Dereference any Key contents
+        $method_body_text .= "            key = clone_key_arg(interp, key);\n"
+            if $vt_method_name =~ /_keyed$/;
+
         $method_body_text .= <<"EOC";
             Parrot_ext_call(interp, meth, "Pi$pcc_sig", _self$pcc_args);
             $pcc_return_stmt

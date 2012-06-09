@@ -49,7 +49,7 @@ appropriate type.
         }
         else {
             PMC * const clone   = VTABLE_clone(INTERP, other);
-            void       *attrs   = PMC_data(clone);
+            void * const attrs  = PMC_data(clone);
             PMC * const meta    = PMC_metadata(clone);
 
             /* now swap memory without leaking it */
@@ -63,7 +63,7 @@ appropriate type.
                 while (VTABLE_get_bool(INTERP, iter)) {
                     STRING * const key = VTABLE_shift_string(INTERP, iter);
                     PMC * const value  = VTABLE_get_pmc_keyed_str(INTERP, meta, key);
-                    VTABLE_setprop(INTERP, SELF, key, value);
+                    Parrot_pmc_setprop(INTERP, SELF, key, value);
                 }
             }
             PMC_data(clone) = NULL;

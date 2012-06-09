@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 Comparison Branching
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's control flow (continued).
+
+=head1 COMPARISON BRANCHING
 
 A simple C<goto> is the most simple version of flow control, but its
 usefulness is very limited. In most cases, branches should be

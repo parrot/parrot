@@ -1423,13 +1423,40 @@ convert_case_buf(PARROT_INTERP, ARGMOD_NULLOK(char *dest_buf), size_t dest_len,
 
     return res * 2;
 #else
-    UNUSED(dest_buf);
+    if (mode == ENCODING_TITLECASE)
+        Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_LIBRARY_ERROR, "no ICU lib loaded");
+    else if (dest_buf) {
+        const Parrot_UInt2 *s = (const Parrot_UInt2 *)src_buf;
+        Parrot_UInt2       *d = (Parrot_UInt2 *)dest_buf;
+        UINTVAL len = src_len / 2;
+        UINTVAL i;
+
+        for (i = 0; i < len; ++i) {
+            unsigned int c = s[i];
+            if (c > 255) {
+                Parrot_ex_throw_from_c_args(interp, NULL,
+                     EXCEPTION_LIBRARY_ERROR, "no ICU lib loaded");
+            }
+            switch (mode) {
+              case ENCODING_UPCASE:
+                d[i] = (c >= 0xe0 && c != 0xf7)
+                         ? c & ~0x20
+                         : toupper((unsigned char)c);
+                break;
+              case ENCODING_DOWNCASE:
+                d[i] = (c >= 0xc0 && c != 0xd7 && c <= 0xde)
+                         ? c | 0x20
+                         : tolower((unsigned char)c);
+                break;
+              default:
+                d[i] = s[i];
+            }
+        }
+    }
+
     UNUSED(dest_len);
-    UNUSED(src_buf);
-    UNUSED(src_len);
-    UNUSED(mode);
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no ICU lib loaded");
+    return src_len;
 #endif
 }
 

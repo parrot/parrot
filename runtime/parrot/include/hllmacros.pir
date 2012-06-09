@@ -1,10 +1,10 @@
-# Copyright (C) 2006-2009, Parrot Foundation.
+# Copyright (C) 2006-2012, Parrot Foundation.
 
-=head1 High Level Language Macros
+=head1 DESCRIPTION
 
-These macros are to make it easier to write readable and maintainable PIR by
-preprocessing common HLL forms into their low level PIR forms.  These are
-B<not> actually high level constructs, but merely preprocessor directives.
+High-level language macros make it easier to write readable and maintainable
+PIR by preprocessing common HLL forms into their low level PIR forms. These
+are B<not> actually high level constructs, but merely preprocessor directives.
 
 =head2 Conditionals
 
@@ -22,7 +22,7 @@ code that contains commas or right parenthesis, C<)>, without causing an error.
 This allows for nesting macros to near infinite depths.  And macro parameter
 that uses a comma or right parenthesis must be enclosed in braces.
 
-=head1 Macros
+=head1 MACROS
 
 =over 4
 
@@ -148,7 +148,7 @@ work with in C<code>.
 
 =cut
 
-# TT #911 - the unlikely to conflict variable names here must be
+# GH #174 - the unlikely to conflict variable names here must be
 # replaced with the .macro_local syntax.
 .macro Foreach(name, array, code)
     .local int __Foreach__local__i
@@ -237,7 +237,7 @@ Using C<.NL()>
     })
 
 
-=head1 Caveats
+=head1 CAVEATS
 
 The .Foreach macro is not nestable within itself currently.  You can use other macros inside a .Foreach loop, and the .Foreach loop can be nested inside other macros.
 

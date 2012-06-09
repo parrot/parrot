@@ -151,7 +151,7 @@ Testing Perl 6 objects.
     $I0 = $P0.'can'(rpaobj, 'foo')
     ok($I0, '< ResizablePMCArray_obj.^can("foo") >')
     $I0 = $P0.'isa'(rpaobj, listproto)
-    todo($I0, '< ResizablePMCArray_obj.^isa(List) >', 'unimplemented: TT #1617')
+    todo($I0, '< ResizablePMCArray_obj.^isa(List) >', 'unimplemented: GH #403')
 
     ##  create class with a different proto name
     .local pmc myobjectproto
@@ -253,7 +253,7 @@ The available options include:
 
     msg = 'concat'(classname, '.WHERE')
     $P0 = proto.'WHERE'()
-    $I0 = get_addr proto
+    $I0 = get_id proto
     is($I0, $P0, msg)
 
     if null who goto proto_who_done
@@ -289,7 +289,7 @@ The available options include:
 
     msg = 'concat'(objname, '.WHERE')
     $P0 = obj.'WHERE'()
-    $I0 = get_addr obj
+    $I0 = get_id obj
     is($I0, $P0, msg)
 
     if null who goto obj_who_done

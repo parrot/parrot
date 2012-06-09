@@ -1,6 +1,6 @@
 /*
 Copyright (C) 2002-2009, Parrot Foundation.
-License:  Artistic 2.0, see README and LICENSE for details
+License:  Artistic 2.0, see README.pod and LICENSE for details
 
 =head1 NAME
 

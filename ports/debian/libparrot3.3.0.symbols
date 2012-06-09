@@ -474,7 +474,6 @@ libparrot.so.3.3.0 libparrot3.3.0 #MINVER#
  Parrot_PMC_name@Base 3.3.0
  Parrot_PMC_neg@Base 3.3.0
  Parrot_PMC_new@Base 3.3.0
- Parrot_PMC_newclass@Base 3.3.0
  Parrot_PMC_null@Base 3.3.0
  Parrot_PMC_pop_float@Base 3.3.0
  Parrot_PMC_pop_integer@Base 3.3.0
@@ -1166,6 +1165,7 @@ libparrot.so.3.3.0 libparrot3.3.0 #MINVER#
  Parrot_oo_find_vtable_override_for_class@Base 3.3.0
  Parrot_oo_get_class@Base 3.3.0
  Parrot_oo_get_class_str@Base 3.3.0
+ Parrot_oo_new_class_pmc@Base 3.3.0
  Parrot_pa_destroy@Base 3.3.0
  Parrot_pa_is_owned@Base 3.3.0
  Parrot_pa_new@Base 3.3.0
@@ -1365,7 +1365,6 @@ libparrot.so.3.3.0 libparrot3.3.0 #MINVER#
  Parrot_sub_context_get_info@Base 3.3.0
  Parrot_sub_full_sub_name@Base 3.3.0
  Parrot_sub_new_closure@Base 3.3.0
- Parrot_sub_new_from_c_func@Base 3.3.0
  Parrot_switch_to_cs@Base 3.3.0
  Parrot_sysmem_amount@Base 3.3.0
  Parrot_test_debug@Base 3.3.0

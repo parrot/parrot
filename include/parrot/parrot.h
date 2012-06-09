@@ -53,6 +53,11 @@
 #  include <unistd.h>
 #endif /* PARROT_HAS_HEADER_UNISTD */
 
+#ifdef PARROT_HAS_HEADER_PROCESS
+#  include <process.h>
+#  define getpid _getpid
+#endif /* PARROT_HAS_HEADER_PROCESS */
+
 #ifdef PARROT_HAS_HEADER_SYSMMAN
 #  include <sys/mman.h>
 #  ifndef MAP_FAILED
@@ -257,7 +262,6 @@ typedef struct PackFile_ByteCode PackFile_ByteCode;
 #include "parrot/key.h"
 #include "parrot/exit.h"
 #include "parrot/nci.h"
-#include "parrot/thread.h"
 #include "parrot/scheduler.h"
 #include "parrot/oo.h"
 #include "parrot/vtables.h"
@@ -266,6 +270,7 @@ typedef struct PackFile_ByteCode PackFile_ByteCode;
 #include "parrot/namespace.h"
 #include "parrot/hll.h"
 #include "parrot/pbcversion.h"
+#include "parrot/disassemble.h"
 
 #endif /* PARROT_PARROT_H_GUARD */
 

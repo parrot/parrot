@@ -21,8 +21,6 @@ the Parrot debugger, and the C<debug> ops.
 #include <stdio.h>
 #include <stdlib.h>
 #include "parrot/parrot.h"
-#include "parrot/extend.h"
-#include "parrot/embed.h"
 #include "parrot/oplib.h"
 #include "parrot/debugger.h"
 #include "parrot/oplib/ops.h"
@@ -32,6 +30,7 @@ the Parrot debugger, and the C<debug> ops.
 #include "debug.str"
 #include "pmc/pmc_continuation.h"
 #include "pmc/pmc_callcontext.h"
+#include "pmc/pmc_sub.h"
 #include "parrot/oplib/core_ops.h"
 
 /* Hand switched debugger tracing
@@ -229,12 +228,9 @@ static int nomoreargs(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING * PDB_get_continuation_backtrace(PARROT_INTERP,
-    ARGMOD_NULLOK(PMC * sub),
-    ARGMOD(PMC * ctx))
+    ARGIN(PMC *ctx))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(* sub)
-        FUNC_MODIFIES(* ctx);
+        __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -1110,7 +1106,7 @@ Parrot_debugger_init(PARROT_INTERP)
 
     if (! interp->pdb) {
         PDB_t          *pdb      = mem_gc_allocate_zeroed_typed(interp, PDB_t);
-        Parrot_Interp   debugger = Parrot_new(interp);
+        Parrot_Interp   debugger = Parrot_interp_new(interp);
         interp->pdb              = pdb;
         debugger->pdb            = pdb;
         pdb->debugee             = interp;
@@ -1756,7 +1752,7 @@ PDB_cond(PARROT_INTERP, ARGIN(const char *command))
             condition->type |= PDB_cond_const;
         }
         else if (condition->type & PDB_cond_pmc) {
-            /* TT #1259: Need to figure out what to do in this case.
+            /* GH #671: Need to figure out what to do in this case.
              * For the time being, we just bail. */
             Parrot_io_eprintf(interp->pdb->debugger, "Can't compare PMC with constant\n");
             mem_gc_free(interp, condition);
@@ -2508,7 +2504,7 @@ PDB_escape(PARROT_INTERP, ARGIN(const char *string), UINTVAL length)
           default:
             /* Hide non-ascii chars that may come from utf8 or latin-1
              * strings in constant strings.
-             * Workaround for TT #1557
+             * Workaround for GH #326
              */
             if ((unsigned char)*string > 127)
                 *(fill++) = '?';
@@ -3377,7 +3373,7 @@ PDB_list(PARROT_INTERP, ARGIN(const char *command))
     }
 
     start_line = get_ulong(&command, 1);
-    pdb->file->list_line = (unsigned long) start_line;
+    pdb->file->list_line = start_line;
 
     line_count = get_ulong(&command, 20);
 
@@ -3492,29 +3488,29 @@ PDB_info(PARROT_INTERP)
     Parrot_Interp itp = interp->pdb ? interp->pdb->debugee : interp;
 
     Parrot_io_eprintf(itdeb, "Total memory allocated: %ld\n",
-            interpinfo(itp, TOTAL_MEM_ALLOC));
+            Parrot_interp_info(itp, TOTAL_MEM_ALLOC));
     Parrot_io_eprintf(itdeb, "GC mark runs: %ld\n",
-            interpinfo(itp, GC_MARK_RUNS));
+            Parrot_interp_info(itp, GC_MARK_RUNS));
     Parrot_io_eprintf(itdeb, "Lazy gc mark runs: %ld\n",
-            interpinfo(itp, GC_LAZY_MARK_RUNS));
+            Parrot_interp_info(itp, GC_LAZY_MARK_RUNS));
     Parrot_io_eprintf(itdeb, "GC collect runs: %ld\n",
-            interpinfo(itp, GC_COLLECT_RUNS));
+            Parrot_interp_info(itp, GC_COLLECT_RUNS));
     Parrot_io_eprintf(itdeb, "Collect memory: %ld\n",
-            interpinfo(itp, TOTAL_COPIED));
+            Parrot_interp_info(itp, TOTAL_COPIED));
     Parrot_io_eprintf(itdeb, "Active PMCs: %ld\n",
-            interpinfo(itp, ACTIVE_PMCS));
+            Parrot_interp_info(itp, ACTIVE_PMCS));
     Parrot_io_eprintf(itdeb, "Timely GC PMCs: %ld\n",
-            interpinfo(itp, IMPATIENT_PMCS));
+            Parrot_interp_info(itp, IMPATIENT_PMCS));
     Parrot_io_eprintf(itdeb, "Total PMCs: %ld\n",
-            interpinfo(itp, TOTAL_PMCS));
+            Parrot_interp_info(itp, TOTAL_PMCS));
     Parrot_io_eprintf(itdeb, "Active buffers: %ld\n",
-            interpinfo(itp, ACTIVE_BUFFERS));
+            Parrot_interp_info(itp, ACTIVE_BUFFERS));
     Parrot_io_eprintf(itdeb, "Total buffers: %ld\n",
-            interpinfo(itp, TOTAL_BUFFERS));
+            Parrot_interp_info(itp, TOTAL_BUFFERS));
     Parrot_io_eprintf(itdeb, "Header allocations since last collect: %ld\n",
-            interpinfo(itp, HEADER_ALLOCS_SINCE_COLLECT));
+            Parrot_interp_info(itp, HEADER_ALLOCS_SINCE_COLLECT));
     Parrot_io_eprintf(itdeb, "Memory allocations since last collect: %ld\n",
-            interpinfo(itp, MEM_ALLOCS_SINCE_COLLECT));
+            Parrot_interp_info(itp, MEM_ALLOCS_SINCE_COLLECT));
 }
 
 /*
@@ -3583,9 +3579,7 @@ Parrot_dbg_get_exception_backtrace(PARROT_INTERP, ARGMOD(PMC * exception))
     if (PMC_IS_NULL(ctx))
         return STRINGNULL;
     else {
-        const Parrot_CallContext_attributes * const cattrs = PARROT_CALLCONTEXT(ctx);
-        PMC * const sub = cattrs->current_sub;
-        STRING * const bt = PDB_get_continuation_backtrace(interp, sub, ctx);
+        STRING * const bt = PDB_get_continuation_backtrace(interp, ctx);
         return bt;
     }
 }
@@ -3636,19 +3630,15 @@ PDB_backtrace(PARROT_INTERP)
 {
     ASSERT_ARGS(PDB_backtrace)
     /* information about the current sub */
-    PMC * const sub = interpinfo_p(interp, CURRENT_SUB);
-    PMC * const ctx = CURRENT_CONTEXT(interp);
-    STRING * const bt = PDB_get_continuation_backtrace(interp, sub, ctx);
+    STRING * const bt = PDB_get_continuation_backtrace(interp, CURRENT_CONTEXT(interp));
     Parrot_io_eprintf(interp, "%Ss", bt);
 }
 
 /*
 
-=item C<static STRING * PDB_get_continuation_backtrace(PARROT_INTERP, PMC * sub,
-PMC * ctx)>
+=item C<static STRING * PDB_get_continuation_backtrace(PARROT_INTERP, PMC *ctx)>
 
-Returns an string with the backtrace of interpreter's call chain for the given sub including
-context information.
+Returns an string with the backtrace of interpreter's call chain for the given context information.
 
 =cut
 
@@ -3657,77 +3647,29 @@ context information.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-PDB_get_continuation_backtrace(PARROT_INTERP, ARGMOD_NULLOK(PMC * sub), ARGMOD(PMC * ctx))
+PDB_get_continuation_backtrace(PARROT_INTERP, ARGIN(PMC *ctx))
 {
     ASSERT_ARGS(PDB_get_continuation_backtrace)
-    STRING *str;
-    PMC    *old         = PMCNULL;
-    PMC    *output      = Parrot_pmc_new(interp, enum_class_StringBuilder);
-    int     rec_level   = 0;
-    int     limit_count = 0;
-
-    if (!PMC_IS_NULL(sub)) {
-        str = Parrot_sub_Context_infostr(interp, ctx);
-        if (str) {
-            VTABLE_push_string(interp, output, str);
-            if (interp->code->annotations) {
-                PMC *annot = PackFile_Annotations_lookup(interp, interp->code->annotations,
-                        Parrot_pcc_get_pc(interp, ctx) - interp->code->base.data + 1, NULL);
-                if (!PMC_IS_NULL(annot)) {
-                    PMC *pfile = VTABLE_get_pmc_keyed_str(interp, annot,
-                            Parrot_str_new_constant(interp, "file"));
-                    PMC *pline = VTABLE_get_pmc_keyed_str(interp, annot,
-                            Parrot_str_new_constant(interp, "line"));
-                    if ((!PMC_IS_NULL(pfile)) && (!PMC_IS_NULL(pline))) {
-                        STRING * const file = VTABLE_get_string(interp, pfile);
-                        INTVAL line = VTABLE_get_integer(interp, pline);
-                        STRING * const fmt =
-                            Parrot_sprintf_c(interp, " (%Ss:%li)", file, (long)line);
-                        VTABLE_push_string(interp, output, fmt);
-                    }
-                }
-            }
-            VTABLE_push_string(interp, output, CONST_STRING(interp, "\n"));
-        }
-    }
+    PMC * const output = Parrot_pmc_new(interp, enum_class_StringBuilder);
+    UINTVAL rec_level  = 0;
+    UINTVAL loop_count = 0;
+    PMC    *prev_ctx   = PMCNULL;
+    int     is_top     = 1;
 
     /* backtrace: follow the continuation chain */
-    while (1) {
-        Parrot_Continuation_attributes *sub_cont;
-
-        /* Limit the levels dumped, no segfault on infinite recursion */
-        if (++limit_count > RECURSION_LIMIT)
+    while (ctx && (loop_count < RECURSION_LIMIT)) {
+        STRING * const info_str = Parrot_sub_Context_infostr(interp, ctx, is_top);
+        if (!info_str)
             break;
-
-        sub = Parrot_pcc_get_continuation(interp, ctx);
-
-        if (PMC_IS_NULL(sub))
-            break;
-
-
-        sub_cont = PARROT_CONTINUATION(sub);
-
-        if (!sub_cont)
-            break;
-
-
-        str = Parrot_sub_Context_infostr(interp, Parrot_pcc_get_caller_ctx(interp, ctx));
-
-
-        if (!str)
-            break;
-
 
         /* recursion detection */
-        if (ctx == sub_cont->to_ctx) {
+        if (ctx == prev_ctx) {
             ++rec_level;
         }
-        else if (!PMC_IS_NULL(old) && PMC_cont(old) &&
-            Parrot_pcc_get_pc(interp, PMC_cont(old)->to_ctx) ==
-            Parrot_pcc_get_pc(interp, PMC_cont(sub)->to_ctx) &&
-            Parrot_pcc_get_sub(interp, PMC_cont(old)->to_ctx) ==
-            Parrot_pcc_get_sub(interp, PMC_cont(sub)->to_ctx)) {
-                ++rec_level;
+        else if (!PMC_IS_NULL(prev_ctx)
+        &&       Parrot_pcc_get_pc(interp,  ctx) == Parrot_pcc_get_pc(interp,  prev_ctx)
+        &&       Parrot_pcc_get_sub(interp, ctx) == Parrot_pcc_get_sub(interp, prev_ctx)) {
+            ++rec_level;
         }
         else if (rec_level != 0) {
             STRING * const fmt =
@@ -3738,21 +3680,22 @@ PDB_get_continuation_backtrace(PARROT_INTERP, ARGMOD_NULLOK(PMC * sub), ARGMOD(P
 
         /* print the context description */
         if (rec_level == 0) {
-            PackFile_ByteCode *seg = sub_cont->seg;
-            VTABLE_push_string(interp, output, str);
+            const PMC * const sub               = Parrot_pcc_get_sub(interp, ctx);
+            const PackFile_ByteCode * const seg = PARROT_SUB(sub)->seg;
+            VTABLE_push_string(interp, output, info_str);
             if (seg->annotations) {
-                PMC *annot = PackFile_Annotations_lookup(interp, seg->annotations,
-                        Parrot_pcc_get_pc(interp, sub_cont->to_ctx) - seg->base.data,
+                PMC * const annot = PackFile_Annotations_lookup(interp, seg->annotations,
+                        Parrot_pcc_get_pc(interp, ctx) - seg->base.data,
                         NULL);
 
                 if (!PMC_IS_NULL(annot)) {
-                    PMC *pfile = VTABLE_get_pmc_keyed_str(interp, annot,
+                    PMC * const pfile = VTABLE_get_pmc_keyed_str(interp, annot,
                             Parrot_str_new_constant(interp, "file"));
-                    PMC *pline = VTABLE_get_pmc_keyed_str(interp, annot,
+                    PMC * const pline = VTABLE_get_pmc_keyed_str(interp, annot,
                             Parrot_str_new_constant(interp, "line"));
                     if ((!PMC_IS_NULL(pfile)) && (!PMC_IS_NULL(pline))) {
-                        STRING *file = VTABLE_get_string(interp, pfile);
-                        INTVAL line = VTABLE_get_integer(interp, pline);
+                        STRING * const file = VTABLE_get_string(interp, pfile);
+                        const INTVAL line   = VTABLE_get_integer(interp, pline);
                         STRING * const fmt =
                             Parrot_sprintf_c(interp, " (%Ss:%li)", file, (long)line);
                         VTABLE_push_string(interp, output, fmt);
@@ -3761,13 +3704,10 @@ PDB_get_continuation_backtrace(PARROT_INTERP, ARGMOD_NULLOK(PMC * sub), ARGMOD(P
             }
             VTABLE_push_string(interp, output, CONST_STRING(interp, "\n"));
         }
-
-        /* get the next Continuation */
-        ctx = Parrot_pcc_get_caller_ctx(interp, ctx);
-        old = sub;
-
-        if (!ctx)
-            break;
+        ++loop_count;
+        is_top   = 0;
+        prev_ctx = ctx;
+        ctx      = Parrot_pcc_get_caller_ctx(interp, ctx);
     }
 
     if (rec_level != 0) {
@@ -3821,7 +3761,7 @@ GDB_print_reg(PARROT_INTERP, int t, int n)
                that we have string registers when we actually don't */
             string = (char *) SREG(n);
 
-            if (string == '\0')
+            if (string == NULL)
                 return Parrot_str_new(interp, "", 0);
             else
                 return SREG(n);

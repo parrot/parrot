@@ -32,12 +32,13 @@ enum VARTYPE {              /* variable type can be */
 #define REG_NEEDS_ALLOC(r) ((r)->type & VTREGISTER)
 
 enum USAGE {
-    U_KEYED         = 1 << 0,       /* array, hash, keyed */
-    U_NEW           = 1 << 1,       /* PMC was inited */
-    U_GLOBAL        = 1 << 3,       /* symbol is global (fixup) */
-    U_LEXICAL       = 1 << 4,       /* symbol is lexical */
-    U_FIXUP         = 1 << 5,       /* maybe not global, force fixup */
-    U_SUBID_LOOKUP  = 1 << 6        /* .const 'Sub' lookup is done by subid */
+    U_KEYED          = 1 << 0,       /* array, hash, keyed */
+    U_NEW            = 1 << 1,       /* PMC was inited */
+    U_GLOBAL         = 1 << 3,       /* symbol is global (fixup) */
+    U_LEXICAL        = 1 << 4,       /* symbol is lexical */
+    U_FIXUP          = 1 << 5,       /* maybe not global, force fixup */
+    U_SUBID_LOOKUP   = 1 << 6,       /* .const 'Sub' lookup is done by subid */
+    U_LEXINFO_LOOKUP = 1 << 7        /* .const 'LexInfo' lookup is done by subid */
 };
 
 typedef struct _SymReg {

@@ -1,6 +1,6 @@
 =pod
 
-=head1 OVERVIEW
+=head1 DESCRIPTION
 
 This is a build directory for custom PMCs with a sample foo.pmc
 providing the Foo PMC class.
@@ -18,7 +18,7 @@ There are some differences you have to be aware of when creating dynamic PMCs.
 
 When declaring the dynamic PMC, you must specify  the C<dynpmc> flag, as in:
 
-	pmclass TclString extends TclObject dynpmc ... { ... }
+    pmclass TclString extends TclObject dynpmc ... { ... }
 
 Note that regular (non-dynamic) PMCs have a type id
 C<enum_class_PMCNAME>, but dynamic PMCs obviously cannot use the same
@@ -28,7 +28,7 @@ determine the PMC type. So, while C<scalar> (a builtin) has the
 luxury of knowing at compile time what the class number of its child
 C<String> is -- for example:
 
-	if (type == enum_class_String) { ...
+    if (type == enum_class_String) { ...
 
 a dynamic PMC such as C<TclInt> must instead perform a runtime lookup
 of its corresponding C<TclString> PMC, resulting in the more complicated:
@@ -39,7 +39,8 @@ of its corresponding C<TclString> PMC, resulting in the more complicated:
 
     void class_init() {
       if (pass) {
-	dynpmc_TclString = Parrot_PMC_typenum(interp,"TclString");
+        dynpmc_TclString = Parrot_pmc_get_type_str(interp,
+          Parrot_str_new(interp, "TclString", 0));
       }
     }
   }
@@ -61,14 +62,14 @@ Edit C<src/dynpmc/Defines.in> and C<src/dynpmc/Rules.in>, appending your PMC(s)
 to the build target. These files are processed by Configure.pl to create the
 real makefile fragments.
 Next invoke the configure script, then make:
-		
-	$ perl Configure.pl
-	$ make
+
+    $ perl Configure.pl
+    $ make
 
 =item 3
 
 If anything changes inside parrot, be sure to:
 
-	$ make dynpmc-clean
+    $ make dynpmc-clean
 
 =back

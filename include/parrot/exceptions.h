@@ -22,7 +22,7 @@
 
 /* &gen_from_enum(except_types.pasm) */
 typedef enum {
-    EXCEPTION_BAD_BUFFER_SIZE,
+    EXCEPTION_BAD_BUFFER_SIZE = 0x00000,
     EXCEPTION_MISSING_ENCODING_NAME,
     EXCEPTION_INVALID_STRING_REPRESENTATION,
     EXCEPTION_ICU_ERROR,
@@ -80,8 +80,10 @@ typedef enum {
     EXCEPTION_LIBRARY_NOT_LOADED,
     EXCEPTION_SYNTAX_ERROR,
     EXCEPTION_MALFORMED_PACKFILE,
+    EXCEPTION_DIE,
+    EXCEPTION_ALL = 0x0ffff,
 
-    CONTROL_RETURN,
+    CONTROL_RETURN = 0x10000,
     CONTROL_OK,
     CONTROL_BREAK,
     CONTROL_CONTINUE,
@@ -89,10 +91,12 @@ typedef enum {
     CONTROL_TAKE,
     CONTROL_LEAVE,
     CONTROL_EXIT,
-
     CONTROL_LOOP_NEXT,
     CONTROL_LOOP_LAST,
-    CONTROL_LOOP_REDO
+    CONTROL_LOOP_REDO,
+    CONTROL_ALL = 0x1ffff,
+
+    EXCEPTION_TYPE_ALL_MASK = 0xffff
 } exception_type_enum;
 
 /* &end_gen */
@@ -113,21 +117,6 @@ typedef enum {
 
 /* HEADERIZER BEGIN: src/exceptions.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-PARROT_EXPORT
-PARROT_DOES_NOT_RETURN
-PARROT_COLD
-void do_panic(
-    NULLOK_INTERP,
-    ARGIN_NULLOK(const char *message),
-    ARGIN_NULLOK(const char *file),
-    unsigned int line);
-
-PARROT_EXPORT
-PARROT_DOES_NOT_RETURN
-PARROT_COLD
-void exit_fatal(int exitcode, ARGIN(const char *format), ...)
-        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_DOES_NOT_RETURN_WHEN_FALSE
@@ -160,6 +149,12 @@ PMC * Parrot_ex_build_exception(PARROT_INTERP,
     INTVAL severity,
     long error,
     ARGIN_NULLOK(STRING *msg))
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+PMC * Parrot_ex_get_current_handler(PARROT_INTERP, ARGIN_NULLOK(PMC *expmc))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -230,9 +225,6 @@ STRING * Parrot_ex_build_complete_backtrace_string(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 void Parrot_print_backtrace(void);
-#define ASSERT_ARGS_do_panic __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_exit_fatal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(format))
 #define ASSERT_ARGS_Parrot_assert __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(condition_string) \
     , PARROT_ASSERT_ARG(file))
@@ -243,6 +235,8 @@ void Parrot_print_backtrace(void);
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(jp))
 #define ASSERT_ARGS_Parrot_ex_build_exception __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_ex_get_current_handler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_ex_mark_unhandled __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -275,8 +269,6 @@ void Parrot_print_backtrace(void);
 #define ASSERT_ARGS_Parrot_print_backtrace __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/exceptions.c */
-
-#define PANIC(interp, message) do_panic((interp), (message), __FILE__, __LINE__)
 
 /* having a modified version of PARROT_ASSERT which resolves as an integer
  * rvalue lets us put ASSERT_ARGS() at the top of the list of local variables.

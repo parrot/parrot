@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2011, Parrot Foundation.
+Copyright (C) 2010-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -19,7 +19,6 @@ This file implements functions of the Parrot embedding interface.
 
 #include "parrot/parrot.h"
 #include "parrot/runcore_api.h"
-#include "parrot/embed.h"
 #include "parrot/api.h"
 #include "embed_private.h"
 
@@ -29,22 +28,23 @@ This file implements functions of the Parrot embedding interface.
 /*
 
 =item C<Parrot_Int Parrot_api_get_result(Parrot_PMC interp_pmc, Parrot_Int
-*is_error, Parrot_PMC * exception, Parrot_Int *exit_code, Parrot_String *
-errmsg)>
+*is_error, Parrot_PMC *exception, Parrot_Int *exit_code, Parrot_String *errmsg)>
 
 Gets the results of the last API function call and stores the results in
 C<is_error>, C<exception>, C<exit_code> and C<errmsg>. This function returns
 a true value if this call is successful and false value otherwise. The stored
-information is as follow:
+information is as follows:
 
 C<is_error> a true value if an unhandled exception was thrown or the program
 terminated with an error condition and a false value otherwise.
 
-C<exception> the last exception thrown.
+C<exception> the last exception thrown, PMCNULL if none.
 
-C<exit_code> the exit code of the running program.
+C<exit_code> the exit code of the running program, if it expected to exit
+now. C<0> for no error.
 
-C<errmsg> contains an string with the last error message.
+C<errmsg> contains an string with the last error message if any,
+C<STRINGNULL> if none.
 
 =cut
 
@@ -53,8 +53,8 @@ C<errmsg> contains an string with the last error message.
 PARROT_API
 Parrot_Int
 Parrot_api_get_result(Parrot_PMC interp_pmc, ARGOUT(Parrot_Int *is_error),
-        ARGOUT(Parrot_PMC * exception), ARGOUT(Parrot_Int *exit_code),
-        ARGOUT(Parrot_String * errmsg))
+        ARGOUT(Parrot_PMC *exception), ARGOUT(Parrot_Int *exit_code),
+        ARGOUT(Parrot_String *errmsg))
 {
     ASSERT_ARGS(Parrot_api_get_result)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -66,7 +66,7 @@ Parrot_api_get_result(Parrot_PMC interp_pmc, ARGOUT(Parrot_Int *is_error),
     }
     else {
         STRING * const severity_str = Parrot_str_new(interp, "severity", 0);
-        INTVAL severity = VTABLE_get_integer_keyed_str(interp, *exception, severity_str);
+        const INTVAL severity = VTABLE_get_integer_keyed_str(interp, *exception, severity_str);
         *is_error = (severity != EXCEPT_exit);
         *errmsg = VTABLE_get_string(interp, *exception);
     }
@@ -78,10 +78,10 @@ Parrot_api_get_result(Parrot_PMC interp_pmc, ARGOUT(Parrot_Int *is_error),
 /*
 
 =item C<Parrot_Int Parrot_api_get_exception_backtrace(Parrot_PMC interp_pmc,
-Parrot_PMC exception, Parrot_String * bt)>
+Parrot_PMC exception, Parrot_String *bt)>
 
 Gets the backtrace of the interpreter's call chain for the given exception
-C<expcetion> and stores the results in string C<bt>. This function returns a
+C<exception> and stores the results in string C<bt>. This function returns a
 true value if this call is successful and false value otherwise.
 
 =cut
@@ -91,7 +91,7 @@ true value if this call is successful and false value otherwise.
 PARROT_API
 Parrot_Int
 Parrot_api_get_exception_backtrace(Parrot_PMC interp_pmc,
-        Parrot_PMC exception, ARGOUT(Parrot_String * bt))
+        Parrot_PMC exception, ARGOUT(Parrot_String *bt))
 {
     ASSERT_ARGS(Parrot_api_get_exception_backtrace)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -128,7 +128,7 @@ Parrot_api_make_interpreter(Parrot_PMC parent, Parrot_Int flags,
     Parrot_GC_Init_Args gc_args;
     const Parrot_Interp parent_raw = PMC_IS_NULL(parent) ? NULL : GET_RAW_INTERP(parent);
     Parrot_jump_buff env;
-    interp_raw = allocate_interpreter(parent_raw, flags);
+    interp_raw = Parrot_interp_allocate_interpreter(parent_raw, flags);
     if (setjmp(env)) {
         interp_raw->api_jmp_buf = NULL;
         *interp = NULL;
@@ -151,7 +151,7 @@ Parrot_api_make_interpreter(Parrot_PMC parent, Parrot_Int flags,
             memset(&gc_args, 0, sizeof (Parrot_GC_Init_Args));
             gc_args.stacktop = &alt_stacktop;
         }
-        initialize_interpreter(interp_raw, &gc_args);
+        Parrot_interp_initialize_interpreter(interp_raw, &gc_args);
         *interp = VTABLE_get_pmc_keyed_int(
                 interp_raw, interp_raw->iglobals, (Parrot_Int)IGLOBALS_INTERPRETER);
     }
@@ -188,6 +188,12 @@ Parrot_api_set_runcore(Parrot_PMC interp_pmc, ARGIN(const char * corename),
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
         else if (STREQ(corename, "fast") || STREQ(corename, "jit") || STREQ(corename, "function"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "fast"));
+        else if (STREQ(corename, "subprof_sub"))
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "subprof_sub"));
+        else if (STREQ(corename, "subprof_hll") || STREQ(corename, "subprof"))
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "subprof_hll"));
+        else if (STREQ(corename, "subprof_ops"))
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "subprof_ops"));
         else if (STREQ(corename, "exec"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "exec"));
         else if (STREQ(corename, "trace"))
@@ -260,7 +266,7 @@ Parrot_api_flag(Parrot_PMC interp_pmc, Parrot_Int flags, Parrot_Int set)
 /*
 
 =item C<Parrot_Int Parrot_api_set_executable_name(Parrot_PMC interp_pmc, const
-char * name)>
+char *name)>
 
 Sets the executable name for the C<interp_pmc> interpreter. This function returns
 a true value if this call is successful and false value otherwise.
@@ -271,7 +277,7 @@ a true value if this call is successful and false value otherwise.
 
 PARROT_API
 Parrot_Int
-Parrot_api_set_executable_name(Parrot_PMC interp_pmc, ARGIN(const char * name))
+Parrot_api_set_executable_name(Parrot_PMC interp_pmc, ARGIN(const char *name))
 {
     ASSERT_ARGS(Parrot_api_set_executable_name)
     EMBED_API_CALLIN(interp_pmc, interp)
@@ -312,9 +318,8 @@ Parrot_api_destroy_interpreter(Parrot_PMC interp_pmc)
         if (_oldtop == NULL)
             interp->lo_var_ptr = &_oldtop;
         interp->api_jmp_buf = &env;
-        Parrot_destroy(interp);
-        Parrot_x_exit(interp, 0);
-        /* Never reached, x_exit calls longjmp */
+        Parrot_x_execute_on_exit_handlers(interp, 0);
+        Parrot_interp_destroy(interp);
         return 1;
     }
 }
@@ -418,49 +423,42 @@ Parrot_api_add_dynext_search_path(Parrot_PMC interp_pmc,
 
 /*
 
-=item C<Parrot_Int Parrot_api_set_stdhandles(Parrot_PMC interp_pmc, Parrot_Int
-in, Parrot_Int out, Parrot_Int err)>
+=item C<Parrot_Int Parrot_api_set_stdhandle(Parrot_PMC interp_pmc, Parrot_PMC
+handle, Parrot_Int fileno, Parrot_PMC *old_handle)>
 
-Set the C<interp_pmc>'s standard file descriptors STDIN, STDOUT, STDERR. Any
-file descriptor set to C<PIO_INVALID_HANDLE> is ignored. This function returns
-a true value if this call is successful and false value otherwise.
+Set one of the C<interp_pmc>'s standard IO PMCs. The handle PMC C<handle> is
+an IO-type PMC (such as FileHandle or StringHandle). The fileno is one of
+C<0> for stdin, C<1> for stdout and C<2> for stderr. Other values are not
+(currently) allowed. The previous PMC for that handle is returned as
+C<old_handle>. This function returns a true value if this call is successful
+and false value otherwise.
 
 =cut
 
 */
-/* Whiteknight told me that theres no way to test this for now, so it should be
-commented out, for now.
+
 
 PARROT_API
 Parrot_Int
-Parrot_api_set_stdhandles(Parrot_PMC interp_pmc, Parrot_Int in,
-    Parrot_Int out, Parrot_Int err)
+Parrot_api_set_stdhandle(Parrot_PMC interp_pmc, Parrot_PMC handle,
+        Parrot_Int fileno, ARGOUT(Parrot_PMC *old_handle))
 {
-    ASSERT_ARGS(Parrot_api_set_stdhandles)
+    ASSERT_ARGS(Parrot_api_set_stdhandle)
     EMBED_API_CALLIN(interp_pmc, interp)
-    void *dummy;
 
-    if (PIO_INVALID_HANDLE != (PIOHANDLE)in) {
-        PMC * const pmc = Parrot_pmc_new(interp, enum_class_FileHandle);
-        Parrot_io_set_os_handle(interp, pmc, (PIOHANDLE)in);
-        dummy = (void *)Parrot_io_stdhandle(interp, PIO_STDIN_FILENO, pmc);
+    switch (fileno) {
+        case PIO_STDIN_FILENO:
+        case PIO_STDOUT_FILENO:
+        case PIO_STDERR_FILENO:
+            *old_handle = Parrot_io_stdhandle(interp, fileno, handle);
+            break;
+        default:
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Cannot set new handle %d. Must be one of 0, 1 or 2", fileno);
     }
-
-    if (PIO_INVALID_HANDLE != (PIOHANDLE)out) {
-        PMC * const pmc = Parrot_pmc_new(interp, enum_class_FileHandle);
-        Parrot_io_set_os_handle(interp, pmc, (PIOHANDLE)out);
-        dummy = (void *)Parrot_io_stdhandle(interp, PIO_STDOUT_FILENO, pmc);
-    }
-
-    if (PIO_INVALID_HANDLE != (PIOHANDLE)err) {
-        PMC * const pmc = Parrot_pmc_new(interp, enum_class_FileHandle);
-        Parrot_io_set_os_handle(interp, pmc, (PIOHANDLE)err);
-        dummy = (void *)Parrot_io_stdhandle(interp, PIO_STDERR_FILENO, pmc);
-    }
-    UNUSED(dummy);
 
     EMBED_API_CALLOUT(interp_pmc, interp)
-}*/
+}
 
 /*
 
@@ -551,7 +549,10 @@ Parrot_api_get_compiler(Parrot_PMC interp_pmc, ARGIN(Parrot_String type),
 {
     ASSERT_ARGS(Parrot_api_get_compiler)
     EMBED_API_CALLIN(interp_pmc, interp)
-    *compiler = Parrot_get_compiler(interp, type);
+    *compiler = Parrot_interp_get_compiler(interp, type);
+    if (PMC_IS_NULL(*compiler))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Cannot find compiler '%Ss'", type);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
 
@@ -574,7 +575,7 @@ Parrot_api_set_compiler(Parrot_PMC interp_pmc, ARGIN(Parrot_String type),
 {
     ASSERT_ARGS(Parrot_api_set_compiler)
     EMBED_API_CALLIN(interp_pmc, interp)
-    Parrot_set_compiler(interp, type, compiler);
+    Parrot_interp_set_compiler(interp, type, compiler);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 

@@ -244,7 +244,7 @@ method read_ops($file, $nolines) {
 
     self<quiet> || say("# Parsing $file...");
     my $start_time := pir::time__N();
-    my $buffer     := slurp($file);
+    my $buffer     := transcode_slurp($file);
     my $start_ops  := +self<ops>;
     self.compile_ops($buffer, :experimental( $file ~~ /experimental\.ops/));
     my $end_ops  := +self<ops>;
@@ -258,7 +258,8 @@ method compile_ops($str, :$experimental? = 0) {
     my $past     := $compiler.compile($str, :target('past'));
 
     for @($past<ops>) {
-        $_<experimental> := $experimental;
+        $_.experimental($experimental);
+        $_.deprecated($_.flags<deprecated> ?? 1 !! 0);
         self<ops>.push($_);
         #say($_.full_name ~ " is number " ~ self<op_order>);
         self<op_order>++;

@@ -149,7 +149,7 @@ STRING *
 Parrot_io_recv_handle(PARROT_INTERP, ARGMOD(PMC *pmc), size_t len)
 {
     ASSERT_ARGS(Parrot_io_recv_handle)
-    Parrot_Socket_attributes *io = PARROT_SOCKET(pmc);
+    Parrot_Socket_attributes * const io = PARROT_SOCKET(pmc);
     STRING *res;
     INTVAL  received;
 
@@ -165,6 +165,51 @@ Parrot_io_recv_handle(PARROT_INTERP, ARGMOD(PMC *pmc), size_t len)
     res->strlen  = received;
 
     return res;
+}
+
+/*
+
+=item C<INTVAL Parrot_io_socket_recv_to_buffer(PARROT_INTERP, PMC *socket, char
+* buffer, size_t len)>
+
+Read C<len> bytes from C<socket> and add them to the C<buffer>.
+
+=item C<INTVAL Parrot_io_socket_send_from_buffer(PARROT_INTERP, PMC *socket,
+const char *buffer, size_t len)>
+
+Write C<len> bytes from C<buffer> to C<socket>.
+
+=cut
+
+*/
+
+INTVAL
+Parrot_io_socket_recv_to_buffer(PARROT_INTERP, ARGMOD(PMC *socket),
+        ARGOUT(char * buffer), size_t len)
+{
+    ASSERT_ARGS(Parrot_io_socket_recv_to_buffer)
+
+    if (Parrot_io_socket_is_closed(interp, socket))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Can't recv from closed socket");
+    else {
+        Parrot_Socket_attributes * const io = PARROT_SOCKET(socket);
+        return Parrot_io_recv(interp, io->os_handle, buffer, len);
+    }
+}
+
+INTVAL
+Parrot_io_socket_send_from_buffer(PARROT_INTERP, ARGMOD(PMC *socket),
+        ARGIN(const char *buffer), size_t len)
+{
+    ASSERT_ARGS(Parrot_io_socket_send_from_buffer)
+    if (Parrot_io_socket_is_closed(interp, socket))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Can't send to closed socket");
+    else {
+        Parrot_Socket_attributes * const io = PARROT_SOCKET(socket);
+        return Parrot_io_send(interp, io->os_handle, buffer, len);
+    }
 }
 
 /*

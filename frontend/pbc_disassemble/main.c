@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -63,12 +63,6 @@ Writes output to C<filename>.
  * which in turn uses the C<PDB_disassemble()> function from F<src/debug.c>.
  */
 
-/* Flags indicating the presence of the -b and -h command-line switches */
-typedef enum {
-    enum_DIS_BARE      = 1,    /* -b switch */
-    enum_DIS_HEADER    = 2     /* -h switch */
-} Parrot_disassemble_options;
-
 /* Longopts option table */
 static struct longopt_opt_decl options[] = {
     { '?', '?', OPTION_optional_FLAG, { "--help"        } },
@@ -78,8 +72,16 @@ static struct longopt_opt_decl options[] = {
     {  0 ,  0,  OPTION_optional_FLAG, { NULL            } }
 };
 
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
 static void help(void);
 static void show_last_error_and_exit(Parrot_PMC interp);
+#define ASSERT_ARGS_help __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_show_last_error_and_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
 
 /*
 
@@ -127,7 +129,7 @@ main(int argc, const char *argv[])
     }
 
     /* Check for parse errors */
-    if (status == -1) {
+    if (argc == 1 || status == -1) {
         help();
     }
 

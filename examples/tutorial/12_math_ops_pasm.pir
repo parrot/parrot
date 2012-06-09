@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 Math Operations (continued)
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's math operations (continued).
+
+=head1 MATH OPERATIONS
 
 Some math operations have an opcode name, but no simple operator syntax in
 PIR. In these cases you can use the opcode name directly.

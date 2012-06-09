@@ -26,32 +26,26 @@ our @EXPORT_OK = qw(
 sub handle_long_options {
     my @argv = @_;
 
+    my %cl_to_longopt = (
+        'gc-debug'          => 'gc_debug',
+        'core-tests'        => 'core_tests_only',
+        'runcore-tests'     => 'runcore_tests_only',
+        'html'              => 'html',
+        'code-tests'        => 'code',
+        'run-exec'          => 'run_exec',
+        'help'              => 'help',
+        'archive'           => 'archive',
+        'html'              => 'html',
+    );
+
     my %longopts;
-    $longopts{gc_debug} = grep { $_ eq '--gc-debug' } @argv;
-    @argv = grep { $_ ne '--gc-debug' } @argv;
+    foreach my $k (keys %cl_to_longopt) {
+        my $cl_opt = '--' . $k;
+        $longopts{$cl_to_longopt{$k}} = grep { $_ eq $cl_opt } @argv;
+        @argv = grep { $_ ne $cl_opt } @argv;
+    }
 
-    $longopts{core_tests_only} = grep { $_ eq '--core-tests' } @argv;
-    @argv = grep { $_ ne '--core-tests' } @argv;
-
-    $longopts{runcore_tests_only} = grep { $_ eq '--runcore-tests' } @argv;
-    @argv = grep { $_ ne '--runcore-tests' } @argv;
-
-    $longopts{html} = grep { $_ eq '--html' } @argv;
-    @argv = grep { $_ ne '--html' } @argv;
-
-    $longopts{code} = grep { $_ eq '--code-tests' } @argv;
-    @argv = grep { $_ ne '--code-tests' } @argv;
-
-    $longopts{run_exec} = grep { $_ eq '--run-exec' } @argv;
-    @argv = grep { $_ ne '--run-exec' } @argv;
-
-    $longopts{help} = grep { $_ eq '--help' } @argv;
-    @argv = grep { $_ ne '--help' } @argv;
-
-    $longopts{archive} = grep { $_ eq '--archive' } @argv;
-    @argv = grep { $_ ne '--archive' } @argv;
-
-    if( $longopts{archive} ) {
+    if ( $longopts{archive} ) {
         $longopts{send_to_smolder} = grep { $_ eq '--send-to-smolder' } @argv;
         @argv = grep { $_ ne '--send-to-smolder' } @argv;
     }

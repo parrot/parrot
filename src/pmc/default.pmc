@@ -41,68 +41,12 @@ static void cant_do_write_method(PARROT_INTERP,
     int index)
         __attribute__nonnull__(1);
 
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PMC* check_get_std_props(PARROT_INTERP,
-    ARGIN(const PMC *self),
-    ARGIN(const STRING *key))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
-PARROT_WARN_UNUSED_RESULT
-static INTVAL check_set_std_props(PARROT_INTERP,
-    ARGMOD(PMC *pmc),
-    ARGIN(const STRING *key),
-    ARGIN(PMC *value))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        FUNC_MODIFIES(*pmc);
-
-PARROT_WARN_UNUSED_RESULT
-static INTVAL has_pending_std_props(ARGIN(const PMC *self))
-        __attribute__nonnull__(1);
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC* make_prop_hash(PARROT_INTERP, ARGMOD(PMC *self))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*self);
-
-static void propagate_std_props(PARROT_INTERP,
-    ARGIN(PMC *self),
-    ARGIN(PMC *prop_hash))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
 #define ASSERT_ARGS_caller __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_cant_do_method __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_cant_do_write_method __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_check_get_std_props __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self) \
-    , PARROT_ASSERT_ARG(key))
-#define ASSERT_ARGS_check_set_std_props __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc) \
-    , PARROT_ASSERT_ARG(key) \
-    , PARROT_ASSERT_ARG(value))
-#define ASSERT_ARGS_has_pending_std_props __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(self))
-#define ASSERT_ARGS_make_prop_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
-#define ASSERT_ARGS_propagate_std_props __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self) \
-    , PARROT_ASSERT_ARG(prop_hash))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -175,154 +119,6 @@ cant_do_write_method(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), int index)
             caller(interp, pmc));
 }
 
-/*
-
-=item C<static INTVAL check_set_std_props(PARROT_INTERP, PMC *pmc, const STRING
-*key, PMC *value)>
-
-Called from C<setprop()>.
-
-Returns a true value if C<setprop()> can avoid actually setting a property
-in the prophash. If it returns true, the property setting will be reflected
-in a future call to C<propagate_std_props()>
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-static INTVAL
-check_set_std_props(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const STRING *key), ARGIN(PMC *value))
-{
-    ASSERT_ARGS(check_set_std_props)
-
-    /*
-     * s2 in STRING_equal is freed here
-     */
-    if (STRING_equal(interp, key, CONST_STRING(interp, "_ro"))) {
-        /* pmc should set/clear readonly */
-        const INTVAL on = VTABLE_get_bool(interp, value);
-
-        /* morph to Const/normal class or readonly class */
-        if (on && (pmc->vtable->flags & VTABLE_HAS_CONST_TOO))
-            pmc->vtable = interp->vtables[pmc->vtable->base_type + 1];
-        else if (!on && (pmc->vtable->flags & (VTABLE_IS_CONST_FLAG)))
-            VTABLE_morph(interp, pmc, interp->vtables[pmc->vtable->base_type - 1]->pmc_class);
-        else if (on && (pmc->vtable->flags & VTABLE_HAS_READONLY_FLAG))
-            pmc->vtable = pmc->vtable->ro_variant_vtable;
-        else if (!on && (pmc->vtable->flags & VTABLE_IS_READONLY_FLAG)
-                && pmc->vtable->ro_variant_vtable)
-            pmc->vtable = pmc->vtable->ro_variant_vtable;
-        else
-            return 0;
-
-        return 1;
-    }
-
-    return 0;
-}
-
-/*
-
-=item C<static void propagate_std_props(PARROT_INTERP, PMC *self, PMC
-*prop_hash)>
-
-Set pending standard properties in C<prop_hash>.
-
-=cut
-
-*/
-
-static void
-propagate_std_props(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *prop_hash))
-{
-    ASSERT_ARGS(propagate_std_props)
-
-    if (self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG)){
-        PMC * const pmc_true  = Parrot_pmc_new_init_int(interp,
-                enum_class_Integer, 1);
-        VTABLE_set_pmc_keyed_str(interp, prop_hash, CONST_STRING(interp, "_ro"), pmc_true);
-    }
-}
-
-/*
-
-=item C<static INTVAL has_pending_std_props(const PMC *self)>
-
-Returns true if propagate_std_props() would create a non-empty prophash.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-static INTVAL
-has_pending_std_props(ARGIN(const PMC *self))
-{
-    ASSERT_ARGS(has_pending_std_props)
-
-    if (self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG))
-        return 1;
-    else
-        return 0;
-}
-
-
-/*
-
-=item C<static PMC* check_get_std_props(PARROT_INTERP, const PMC *self, const
-STRING *key)>
-
-Checks if we can infer the value of C<key> property from C<self> without
-looking at its prophash. Returns C<PMCNULL> if not, returns the value otherwise.
-
-=cut
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-static PMC*
-check_get_std_props(PARROT_INTERP, ARGIN(const PMC *self), ARGIN(const STRING *key))
-{
-    ASSERT_ARGS(check_get_std_props)
-
-    if ((self->vtable->flags & (VTABLE_IS_CONST_FLAG | VTABLE_IS_READONLY_FLAG))
-       && STRING_equal(interp, key, CONST_STRING(interp, "_ro"))) {
-        PMC * const ret_val = Parrot_pmc_new_init_int(interp,
-                enum_class_Integer, 1);
-        return ret_val;
-    }
-    else
-        return PMCNULL;
-}
-
-/*
-
-=item C<static PMC* make_prop_hash(PARROT_INTERP, PMC *self)>
-
-Create a property hash for C<self>. Returns the created hash. Inferred
-properties will be added to the hash.
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static PMC*
-make_prop_hash(PARROT_INTERP, ARGMOD(PMC *self))
-{
-    ASSERT_ARGS(make_prop_hash)
-
-    PMC * const prop = PObj_constant_TEST(self)
-                       ? Parrot_pmc_new_constant(interp, enum_class_Hash)
-                       : Parrot_pmc_new(interp, enum_class_Hash);
-
-    propagate_std_props(interp, self, prop);
-    PARROT_GC_WRITE_BARRIER(interp, self);
-    return prop;
-}
-
 pmclass default abstract {
 
 /*
@@ -342,6 +138,8 @@ Does nothing.
 */
 
     VTABLE void init() {
+        UNUSED(INTERP);
+        UNUSED(SELF);
     }
 
 /*
@@ -391,6 +189,8 @@ Does nothing.
 */
 
     VTABLE void destroy() {
+        UNUSED(INTERP);
+        UNUSED(SELF);
     }
 
 /*
@@ -430,81 +230,8 @@ Panics with a "no custom mark routine defined" error message.
 */
 
     VTABLE void mark() {
+        UNUSED(SELF);
         PANIC(INTERP, "custom_mark flag set but no custom mark routine defined");
-    }
-
-/*
-
-=item C<PMC *getprop(STRING *key)>
-
-Returns the property for C<*key>. If no property is defined then the
-NULL PMC is returned.
-
-=cut
-
-*/
-
-    VTABLE PMC *getprop(STRING *key) {
-        if (PMC_IS_NULL(PMC_metadata(SELF)))
-            return check_get_std_props(INTERP, SELF, key);
-        else
-            return VTABLE_get_pmc_keyed_str(INTERP, PMC_metadata(SELF), key);
-    }
-
-/*
-
-=item C<void setprop(STRING *key, PMC *value)>
-
-Sets the property for C<*key> to C<*value>.
-
-=cut
-
-*/
-
-    VTABLE void setprop(STRING *key, PMC *value) {
-        if (check_set_std_props(INTERP, SELF, key, value))
-            return;
-
-        if (PMC_IS_NULL(PMC_metadata(SELF)))
-            PMC_metadata(SELF) = make_prop_hash(INTERP, SELF);
-
-        VTABLE_set_pmc_keyed_str(INTERP, PMC_metadata(SELF), key, value);
-    }
-
-/*
-
-=item C<void delprop(STRING *key)>
-
-Deletes the property for C<*key>.
-
-=cut
-
-*/
-
-    VTABLE void delprop(STRING *key) {
-        if (!PMC_IS_NULL(PMC_metadata(SELF)))
-            VTABLE_delete_keyed_str(INTERP, PMC_metadata(SELF), key);
-    }
-
-/*
-
-=item C<PMC *getprops()>
-
-Returns the PMC's properties or the NULL PMC if no properties exist.
-
-=cut
-
-*/
-
-    VTABLE PMC *getprops() {
-        if (PMC_IS_NULL(PMC_metadata(SELF))) {
-            if (has_pending_std_props(SELF))
-                PMC_metadata(SELF) = make_prop_hash(INTERP, SELF);
-            else
-                return PMCNULL;
-        }
-
-        return PMC_metadata(SELF);
     }
 
 /*
@@ -518,6 +245,7 @@ Returns the PMC's type.
 */
 
     VTABLE INTVAL type() {
+        UNUSED(INTERP);
         return SELF->vtable->base_type;
     }
 
@@ -532,6 +260,7 @@ Returns the name of the PMC.
 */
 
     VTABLE STRING *name() {
+        UNUSED(INTERP);
         return SELF->vtable->whoami;
     }
 
@@ -548,6 +277,9 @@ Role-y.
 */
 
     VTABLE void add_attribute(STRING *name, PMC *type) {
+        UNUSED(SELF);
+        UNUSED(name);
+        UNUSED(type);
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Cannot add attribute to non-class");
     }
@@ -660,20 +392,6 @@ C<get_pmc_keyed()> with it.
 
 /*
 
-=item C<void *get_pointer()>
-
-Returns the address of the PMC.
-
-=cut
-
-*/
-
-    VTABLE void *get_pointer() {
-        return SELF;
-    }
-
-/*
-
 =item C<INTVAL is_same(PMC *value)>
 
 Returns whether the PMC is the same PMC as C<value> (whether they're the
@@ -684,6 +402,7 @@ same pointer).
 */
 
     VTABLE INTVAL is_same(PMC *value) {
+        UNUSED(INTERP);
         return SELF == value;
     }
 
@@ -886,6 +605,8 @@ Returns true.
 */
 
     VTABLE INTVAL defined() {
+        UNUSED(INTERP);
+        UNUSED(SELF);
         return 1;
     }
 
@@ -922,22 +643,6 @@ Converts C<key> to a PMC key and calls C<delete_keyed()> with it.
 
 /*
 
-=item C<INTVAL can(STRING *method)>
-
-Reports whether the PMC "can" perform C<method>.
-If the PMC implements the vtable function C<method>,
-true (1) is returned; otherwise, false (0) is returned.
-
-=cut
-
-*/
-
-    VTABLE INTVAL can(STRING *method) {
-        return !PMC_IS_NULL(VTABLE_find_method(INTERP, SELF, method));
-    }
-
-/*
-
 =item C<INTVAL does(STRING *interface_name)>
 
 Reports whether the PMC "does" perform C<interface_name>.
@@ -963,7 +668,9 @@ Reports whether the PMC "does" the C<role>.
 */
 
     VTABLE INTVAL does_pmc(PMC *role) {
-        UNUSED(role)
+        UNUSED(INTERP);
+        UNUSED(SELF);
+        UNUSED(role);
         /* No C-level roles yet. */
         return 0;
     }
@@ -1062,7 +769,7 @@ inspect_str.
 
 =item C<PMC *get_class()>
 
-Returns SELF. A PMC is its own class.
+Returns the class or PMCProxy of the type of the PMC.
 
 =cut
 
@@ -1119,7 +826,7 @@ Add class C<parent> to the list of our parents.
 */
 
     VTABLE void add_parent(PMC *parent) {
-        UNUSED(parent)
+        UNUSED(parent);
         if (!PObj_is_class_TEST(SELF))
             Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
                 "Only classes can be subclassed");
@@ -1139,6 +846,9 @@ Used by GC to mark the PMC.
 */
 
     VTABLE void visit(PMC *info) {
+        UNUSED(INTERP);
+        UNUSED(SELF);
+        UNUSED(info);
     }
 
 /*
@@ -1166,7 +876,9 @@ Does nothing.
 */
 
     VTABLE void freeze(PMC *info) {
-        UNUSED(info)
+        UNUSED(INTERP);
+        UNUSED(SELF);
+        UNUSED(info);
         /* default - no action */
     }
 
@@ -1181,6 +893,8 @@ Initializes the PMC during unarchiving.
 */
 
     VTABLE void thaw(PMC *info) {
+        UNUSED(INTERP);
+        UNUSED(info);
         /* default - initialize the PMC */
         SELF.init();
     }
@@ -1196,7 +910,9 @@ Does nothing.
 */
 
     VTABLE void thawfinish(PMC *info) {
-        UNUSED(info)
+        UNUSED(INTERP);
+        UNUSED(SELF);
+        UNUSED(info);
         /* default - no action */
     }
 

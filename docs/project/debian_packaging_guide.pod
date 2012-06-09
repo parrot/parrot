@@ -1,10 +1,19 @@
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 Debian Packaging Guide
+=pod
 
-This is a quick set of instructions for packaging Parrot for Debian. See the
-Debian New Maintainer's Guide (http://www.debian.org/doc/maint-guide) for more
-information. The Ubuntu Packaging Guide is also a good resource
+=head1 NAME
+
+docs/project/debian_packaging_guide.pod - Debian Packaging Guide.
+
+=head1 DESCRIPTION
+
+This is a quick set of instructions for packaging Parrot for Debian.
+
+=head1 DEBIAN PACKAGING GUIDE
+
+See the Debian New Maintainer's Guide (http://www.debian.org/doc/maint-guide)
+for more information. The Ubuntu Packaging Guide is also a good resource
 (http://doc.ubuntu.com/ubuntu/packagingguide/C/).
 
 This guide assumes that you're running in a chroot environment set up as in:
@@ -136,9 +145,9 @@ Also check "Preserve my pre-formatted text".
 
 =head1 SEE ALSO
 
-F<README>, F<RESPONSIBLE_PARTIES>.
+F<README.pod>, F<RESPONSIBLE_PARTIES>.
 
-=head1 Appendix 1
+=head1 APPENDIX 1
 
 Parrot Debian Release Managers
 
@@ -152,7 +161,7 @@ Parrot Debian Sponsors
  - Jeff Bailey
  - Benjamin Mako Hill
 
-=head1 Appendix 2
+=head1 APPENDIX 2
 
 Set up instructions for new Debian Parrot release managers.
 

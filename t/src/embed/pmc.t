@@ -24,12 +24,13 @@ Tests PMC API support.
 
 =cut
 
-plan tests => 7;
+plan tests => 9;
 
 c_output_is( <<'CODE', <<'OUTPUT', "get/set_keyed_int" );
 
 #include "parrot/api.h"
 #include <stdio.h>
+
 
 int main(int argc, char* argv[])
 {
@@ -265,7 +266,7 @@ int main(int argc, char* argv[])
     GET_INIT_STRUCT(initargs);
     Parrot_api_make_interpreter(NULL, 0, initargs, &interpmc);
 
-    Parrot_api_string_import_ascii(interpmc, "I love Microsoft!", &s_teststr);
+    Parrot_api_string_import_ascii(interpmc, "I love Vanilla!", &s_teststr);
     Parrot_api_pmc_box_string(interpmc, s_teststr, &p_pmc);
 
     Parrot_api_string_import_ascii(interpmc, "replace", &s_teststr);
@@ -280,11 +281,11 @@ int main(int argc, char* argv[])
         Parrot_api_pmc_set_string(interpmc, p_signature, s_signstring);
         Parrot_api_pmc_set_keyed_int(interpmc, p_signature, 0, p_pmc);
 
-        Parrot_api_string_import_ascii(interpmc, "Microsoft", &s_toreplace);
+        Parrot_api_string_import_ascii(interpmc, "Vanilla", &s_toreplace);
         Parrot_api_pmc_box_string(interpmc, s_toreplace, &p_toreplace);
         Parrot_api_pmc_set_keyed_int(interpmc, p_signature, 1, p_toreplace);
 
-        Parrot_api_string_import_ascii(interpmc, "the Open Source community", &s_replacestring);
+        Parrot_api_string_import_ascii(interpmc, "Chocolate", &s_replacestring);
         Parrot_api_pmc_box_string(interpmc, s_replacestring, &p_replacestring);
         Parrot_api_pmc_set_keyed_int(interpmc, p_signature, 2, p_replacestring);
 
@@ -299,7 +300,91 @@ int main(int argc, char* argv[])
 }
 
 CODE
-I love the Open Source community!
+I love Chocolate!
+OUTPUT
+
+c_output_is( <<'CODE', <<'OUTPUT', "Parrot_api_pmc_new_call_object and _setup_signature" );
+
+#include <parrot/api.h>
+#include <stdio.h>
+
+static void
+print_parrot_string(Parrot_PMC interp, ARGMOD(FILE *vector), Parrot_String str,
+        int newline)
+{
+    char * msg_raw;
+    if (!str)
+        return;
+    Parrot_api_string_export_ascii(interp, str, &msg_raw);
+    if (msg_raw) {
+        fprintf(vector, "%s%s", msg_raw, newline ? "\n" : "");
+        Parrot_api_string_free_exported_ascii(interp, msg_raw);
+    }
+}
+
+static void
+show_last_error_and_exit(Parrot_PMC interp)
+{
+    Parrot_String errmsg, backtrace;
+    Parrot_Int exit_code, is_error;
+    Parrot_PMC exception;
+
+    if (!Parrot_api_get_result(interp, &is_error, &exception, &exit_code, &errmsg)) {
+        Parrot_api_destroy_interpreter(interp);
+        exit(EXIT_FAILURE);
+    }
+    if (is_error) {
+        if (!Parrot_api_get_exception_backtrace(interp, exception, &backtrace)) {
+            Parrot_api_destroy_interpreter(interp);
+            exit(EXIT_FAILURE);
+        }
+        print_parrot_string(interp, stderr, errmsg, 1);
+        print_parrot_string(interp, stderr, backtrace, 0);
+    }
+
+    Parrot_api_destroy_interpreter(interp);
+    exit(exit_code);
+}
+
+int main(int argc, char* argv[])
+{
+    Parrot_Init_Args *initargs = NULL;
+    Parrot_PMC interpmc = NULL;
+    Parrot_PMC p_pmc = NULL, p_method = NULL, p_signature = NULL;
+    Parrot_String s_teststr = NULL, s_outstr = NULL, s_method = NULL;
+    Parrot_String s_toreplace = NULL, s_replacestring = NULL;
+    char * c_out = NULL;
+
+    GET_INIT_STRUCT(initargs);
+    Parrot_api_make_interpreter(NULL, 0, initargs, &interpmc);
+
+    Parrot_api_string_import_ascii(interpmc, "I love Vanilla!", &s_teststr);
+    Parrot_api_pmc_box_string(interpmc, s_teststr, &p_pmc);
+
+    Parrot_api_string_import_ascii(interpmc, "replace", &s_teststr);
+    Parrot_api_pmc_find_method(interpmc, p_pmc, s_teststr, &p_method);
+    if(p_method != NULL) {
+        Parrot_api_pmc_new_call_object(interpmc, &p_signature);
+
+        Parrot_api_string_import_ascii(interpmc, "Vanilla", &s_toreplace);
+        Parrot_api_string_import_ascii(interpmc, "Strawberry", &s_replacestring);
+
+        if (!Parrot_api_pmc_setup_signature(interpmc, p_signature, "PiSS->", p_pmc, s_toreplace, s_replacestring)) {
+            show_last_error_and_exit(interpmc);
+        }
+
+        Parrot_api_pmc_invoke(interpmc, p_method, p_signature);
+        Parrot_api_pmc_get_string(interpmc, p_pmc, &s_outstr);
+        Parrot_api_string_export_ascii(interpmc, s_outstr, &c_out);
+        printf("%s\n", c_out);
+    }
+    else printf("error\n");
+
+    return 0;
+}
+
+CODE
+I love Strawberry!
 OUTPUT
 
 
@@ -342,6 +427,47 @@ int main(int argc, char* argv[])
 CODE
 Frozen and thawed: I am a string.
 I am a string.
+OUTPUT
+
+c_output_is( <<'CODE', <<'OUTPUT', "Test pmc_box and pmc_get" );
+
+#include <parrot/api.h>
+#include <stdio.h>
+
+int main(int argc, char* argv[])
+{
+    Parrot_Init_Args *initargs = NULL;
+    Parrot_PMC interpmc = NULL;
+    Parrot_PMC p_str = NULL, p_float = NULL, p_int = NULL;
+    Parrot_String s_teststr = NULL, s_outstr = NULL;
+    Parrot_Float outfloat = 0.0;
+    Parrot_Int outint = 0;
+    char *c_outstr = NULL;
+    int answer = 0;
+
+    GET_INIT_STRUCT(initargs);
+    Parrot_api_make_interpreter(NULL, 0, initargs, &interpmc);
+
+    Parrot_api_string_import_ascii(interpmc, "The answer is", &s_teststr);
+    Parrot_api_pmc_box_string(interpmc, s_teststr, &p_str);
+    Parrot_api_pmc_get_string(interpmc, p_str, &s_outstr);
+    Parrot_api_string_export_ascii(interpmc, s_outstr, &c_outstr);
+    printf("%s ", c_outstr);
+
+    Parrot_api_pmc_box_float(interpmc, 10.5, &p_float);
+    Parrot_api_pmc_get_float(interpmc, p_float, &outfloat);
+
+    Parrot_api_pmc_box_integer(interpmc, 21, &p_int);
+    Parrot_api_pmc_get_integer(interpmc, p_int, &outint);
+
+    answer = (int)(2 * outfloat) + (int)outint;
+    printf("%i.\n", answer);
+
+    return 0;
+}
+
+CODE
+The answer is 42.
 OUTPUT
 
 # Local Variables:

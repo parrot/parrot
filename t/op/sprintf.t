@@ -249,7 +249,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
     .local string message
     get_results '0', exception
     message = exception
-    $I0 = index message, 'is not a valid sprintf format'
+    $I0 = index message, 'is not valid in sprintf format sequence'
     if $I0 == -1 goto other_error
     $I0 = index expected, ' INVALID'
     if $I0 == -1 goto bad_error
@@ -350,7 +350,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
     local_branch jmpstack,  set_skip_loop
 
     skip_info[114] = 'harness needs support for * modifier'
-    skip_info[144] = 'perl5 expresssion as test value'
+    skip_info[144] = 'perl5 expression as test value'
     skip_info[131] = 'harness needs support for * modifier'
     skip_info[141] = 'harness needs support for * modifier'
     skip_info[161] = 'harness needs support for * modifier'

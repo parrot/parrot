@@ -65,17 +65,18 @@ END_HELP
     .local string buf, news, start
 
     newsfile = new ['FileHandle']
-    newsfile.'open'('NEWS', 'r')
+    newsfile.'open'('ChangeLog', 'r')
+    newsfile.'encoding'('utf8')
 
     ## find the start of the news item for this version
-    start    = concat 'New in ', version
+    start    = concat ' release ', version
 
   before:
     $I0 = newsfile.'eof'()
     if $I0 goto err_news
     buf      = newsfile.'readline'()
     $I0      = index buf, start
-    if  $I0 != 0 goto before
+    if  $I0 < 0 goto before
 
   blank:
     buf      = newsfile.'readline'()
@@ -100,7 +101,7 @@ END_HELP
   err_news:
     $P0 = new 'Exception'
     $S0 = concat "error: can't find news on version ", version
-    $S0 .= " in 'NEWS'\n"
+    $S0 .= " in 'ChangeLog'\n"
     $P0 = $S0
     throw $P0
 .end

@@ -1,0 +1,165 @@
+#!perl
+# Copyright (C) 2012, Parrot Foundation.
+
+use strict;
+use warnings;
+use Carp;
+use Getopt::Long;
+use lib qw( ./lib );
+use TAP::Harness;
+use Parrot::Harness::TestSets qw(
+    %test_groups
+    @major_test_group
+    @near_core_test_group
+);
+use Parrot::Harness::Options qw(
+    get_test_prog_args
+);
+use Parrot::Harness::Smoke qw(
+    collect_test_environment_data
+    send_archive_to_smolder
+);
+
+my ($archive, $smolder, $IN_TESTING);
+GetOptions(
+    'archive'           => \$archive,
+    'send-to-smolder'   => \$smolder,
+    'in-testing'        => \$IN_TESTING,
+);
+
+my @runcore_test_files = glob("@{ $test_groups{runcore} }");
+my @testing_runcore_test_files = glob("@{ $test_groups{testing_runcore} }");
+
+my @targets = ();
+my @alternate_runcore_targets = ( qw| b f r | );
+foreach my $t (@alternate_runcore_targets) {
+    push @targets, set_alternate_runcore_target($t);
+}
+
+my @other_targets = ( qw|
+    src run buildtools perl
+    compilers dynoplibs dynpmc
+    library miscellaneous
+    codingstd benchmark manifest
+    examples distro headerizer
+| );
+foreach my $t ( @other_targets ) {
+  push @targets, set_usual_target($t);
+} 
+if ($IN_TESTING) {
+    @targets = (
+        ( map { set_alternate_runcore_target($_, $IN_TESTING) }
+            ( qw| b f | ) ),
+        ( map { set_usual_target($_) } ( qw| run manifest headerizer | ) ),
+    );
+}
+
+if ($archive) {
+    eval {
+        require TAP::Harness::Archive;
+        require TAP::Harness::Archive::MultipleHarnesses;
+        require TAP::Harness::ReportByDescription;
+    };
+    if ($@) {
+        my $msg = "To run make smolder_fulltest, please install \n";
+        $msg .= "  TAP::Harness::Archive and TAP::Harness::ReportByDescription from CPAN.\n";
+        $msg .= "  From the cpan shell: 'install TAP::Harness::ReportByDescription'.\n";
+        $msg .= "  With cpanminus     : cpanm TAP::Harness::ReportByDescription \n";
+        croak $msg;
+    }
+    my %env_data = collect_test_environment_data();
+    my $archive = TAP::Harness::Archive::MultipleHarnesses->new( {
+        verbosity        => $ENV{HARNESS_VERBOSE},
+        archive          => 't/archive/parrot_test_run.tar.gz',
+        merge            => 1,
+        jobs             => $ENV{TEST_JOBS} || 1,
+        extra_properties => \%env_data,
+        extra_files      => [ 'myconfig', 'config_lib.pir' ],
+    } );
+    my $overall_aggregator = $archive->runtests(\@targets);
+    $archive->summary($overall_aggregator);
+    send_archive_to_smolder(%env_data) if $smolder;
+}
+else {
+    require TAP::Formatter::Console;
+    require TAP::Parser::Aggregator;
+
+    my ($formatter, $aggregator);
+    $formatter   = TAP::Formatter::Console->new( {
+        verbosity  => $ENV{HARNESS_VERBOSE},
+        jobs       => $ENV{TEST_JOBS} || 1,
+        directives => 1,
+        timer      => $ENV{HARNESS_TIMER} || 0,
+    } );
+    $aggregator = TAP::Parser::Aggregator->new;
+    
+    $aggregator->start();
+    foreach my $set (@targets) {
+        # rewrite environment
+        &{$set->{rule}} if defined $set->{rule};
+        print STDERR "$set->{label}: running with: $ENV{TEST_PROG_ARGS}\n";
+        my $harness = TAP::Harness->new( {
+            formatter => $formatter,
+            jobs      => $ENV{TEST_JOBS} || 1,
+        } );
+        $harness->aggregate_tests($aggregator, @{$set->{tests}});
+    }
+    $aggregator->stop();
+    $formatter->summary($aggregator);
+    # We'll treat both FAIL and NOTESTS as failures.
+    my $exit_value = ($aggregator->get_status() eq 'PASS') ? 0 : 1;
+    exit($exit_value);
+}
+
+##### SUBROUTINES #####
+
+sub set_usual_env_args {
+    my %opts = ();
+    _handle_opts(\%opts);
+}
+
+sub set_alternate_runcore_env_args {
+    my $runcore = shift;
+    my %opts = ( $runcore => 1 );
+    _handle_opts(\%opts);
+}
+
+sub _handle_opts {
+    my $optsref = shift;
+    $optsref->{D} =
+        sprintf( '%x', hex(40) | (exists $optsref->{D} ? hex($optsref->{D}) : 0));
+    my $args = get_test_prog_args( $optsref, 1, 0 );
+    $ENV{TEST_PROG_ARGS} = $args;
+}
+
+sub set_alternate_runcore_target {
+    my ($alt, $in_testing)  = @_;
+    return {
+        label           => "test$alt",
+        rule            => sub { set_alternate_runcore_env_args($alt) },
+        tests           => [ map { [ $_, "test${alt}__$_", ] } 
+                            ( $in_testing
+                                ? @testing_runcore_test_files
+                                : @runcore_test_files
+                            ) ],
+    };
+}
+
+sub set_usual_target {
+    my $label = shift;
+    return {
+        label           => $label,
+        rule            => \&set_usual_env_args,
+        tests           => [ map { [ $_, "${label}__$_" ] }
+                                glob("@{$test_groups{$label}}")
+                            ],
+    };
+}
+
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:

@@ -57,6 +57,7 @@ static size_t get_min_pmc_address(PARROT_INTERP,
     ARGIN_NULLOK(const Memory_Pools *mem_pools))
         __attribute__nonnull__(1);
 
+PARROT_NO_ADDRESS_SAFETY_ANALYSIS
 static void trace_mem_block(PARROT_INTERP,
     ARGIN_NULLOK(const Memory_Pools *mem_pools),
     size_t lo_var_ptr,
@@ -110,7 +111,7 @@ trace_system_areas(PARROT_INTERP, ARGIN_NULLOK(const Memory_Pools *mem_pools))
            register windows. Store the code in a union with a double to
            ensure proper memory alignment. */
         /* TT #271: This needs to be fixed in a variety of ways */
-/* Using inline assember if available instead of the hand-coded version. */
+/* Using inline assembler if available instead of the hand-coded version. */
 #  if defined(__GNUC__) && (defined(__sparcv9) || defined(__sparcv9__) || defined(__arch64__))
         asm("flushw");
 #  else
@@ -144,11 +145,7 @@ trace_system_areas(PARROT_INTERP, ARGIN_NULLOK(const Memory_Pools *mem_pools))
         getcontext(&ucp);
         _Asm_flushrs();
 
-#    if defined(_LP64)
-        current_regstore_top = (void*)(uint64_t)_Asm_mov_from_ar(_AREG_BSP);
-#    else
-        current_regstore_top = (void*)(uint32_t)_Asm_mov_from_ar(_AREG_BSP);
-#    endif
+        current_regstore_top = (void*)(ptrcast_t)_Asm_mov_from_ar(_AREG_BSP);
 
         size_t base = 0;
         struct pst_vm_status buf;
@@ -435,6 +432,7 @@ areas.
 
 */
 
+PARROT_NO_ADDRESS_SAFETY_ANALYSIS
 static void
 trace_mem_block(PARROT_INTERP,
         ARGIN_NULLOK(const Memory_Pools *mem_pools),

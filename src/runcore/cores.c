@@ -242,7 +242,6 @@ next opcode, or examine and manipulate data from the executing program.
 */
 
 #include "parrot/runcore_api.h"
-#include "parrot/embed.h"
 #include "parrot/runcore_trace.h"
 #include "cores.str"
 
@@ -252,10 +251,6 @@ next opcode, or examine and manipulate data from the executing program.
 
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
-
-#ifdef WIN32
-#  define getpid _getpid
-#endif
 
 /* HEADERIZER HFILE: include/parrot/runcore_api.h */
 
@@ -561,7 +556,8 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 
         /* set the top of the stack so GC can trace it for GC-able pointers
          * see trace_system_areas() in src/gc/system.c */
-        debugger->lo_var_ptr = interp->lo_var_ptr;
+        /* Chandon FIXME: debugger */
+        /* debugger->lo_var_ptr = interp->lo_var_ptr; */
 
         pio = Parrot_io_STDERR(debugger);
 

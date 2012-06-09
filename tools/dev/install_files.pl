@@ -50,8 +50,6 @@ The header directory. Defaults to '/usr/include'.
 See F<lib/Parrot/Manifest.pm> for a detailed description of the MANIFEST
 format.
 
-F<tools/dev/mk_manifests.pl>
-
 =cut
 
 ################################################################################

@@ -1,0 +1,246 @@
+$include_const "iglobals.pasm";
+$include_const "interpinfo.pasm";
+$include_const "except_severity.pasm";
+
+const int NO_FILE = 0;
+const int PASM_FILE = 1;
+const int PIR_FILE = 2;
+const int PBC_FILE = 3;
+const int MODE_NORMAL = 0;
+const int MODE_PREPROCESS = 1;
+const int MODE_RUNFILE = 2;
+
+function __PARROT_ENTRY_MAIN__args[anon](var args)
+{
+    string exe_name;
+    ${ shift exe_name, args };
+    string prog_name;
+    int input_file_type = NO_FILE;
+    string output_file = null;
+    var packfile_pmc = null;
+    string dummy;
+    int mode = MODE_NORMAL;
+
+    while (elements(args) > 0) {
+        string sys_arg = args[0];
+        switch (sys_arg) {
+            case "-o":
+                ${ shift dummy, args };
+                ${ shift output_file, args };
+                break;
+            case "-c":
+                ${ shift dummy, args };
+                input_file_type = PBC_FILE;
+                break;
+            case "-r":
+                ${ shift dummy, args };
+                mode = MODE_RUNFILE;
+                break;
+            case "-E":
+                ${ shift dummy, args };
+                mode = MODE_PREPROCESS;
+                break;
+            case "--runtime-prefix":
+                __show_runtime_prefix_and_exit();
+            case "-V":
+                __show_version_and_exit();
+            case "-h":
+                __show_help_and_exit();
+            default:
+                prog_name = sys_arg;
+                goto done_args;
+        }
+    }
+  done_args:
+    if (prog_name == null || prog_name == "")
+        __usage_and_exit("Missing program name");
+    if (mode == MODE_PREPROCESS) {
+        compreg("PIR").preprocess(prog_name);
+        exit(0);
+    }
+    if (input_file_type == NO_FILE) {
+        input_file_type = __get_input_file_type(prog_name);
+        if (input_file_type == NO_FILE)
+            __usage_and_exit("Invalid file type " + prog_name);
+    }
+    if (mode == MODE_RUNFILE) {
+        string temp_outfile = __get_temporary_output_file(prog_name);
+        packfile_pmc = compreg("PIR").compile_file(prog_name);
+        packfile_pmc.write_to_file(temp_outfile);
+        packfile_pmc = new 'PackfileView';
+        packfile_pmc.read_from_file(temp_outfile);
+    }
+    if (packfile_pmc == null)
+        packfile_pmc = __default_get_packfile(prog_name, input_file_type);
+    if (output_file != null) {
+        packfile_pmc.write_to_file(output_file);
+        exit(0);
+    }
+    for (var init_sub in packfile_pmc.subs_by_tag("init"))
+        init_sub();
+    return packfile_pmc;
+}
+
+function __PARROT_ENTRY_MAIN__[anon,main](var args)
+{
+    try [allowtailcall] {
+        var packfile_pmc = __PARROT_ENTRY_MAIN__args(args);
+        var main_sub = packfile_pmc.main_sub();
+        return main_sub(args);
+    } catch (e) {
+        __handle_error_and_exit(e);
+    }
+}
+
+function __default_get_packfile[anon](string file_name, int file_type)
+{
+    switch (file_type) {
+        case PIR_FILE:
+            var pir_compiler = compreg("PIR");
+            var pf = pir_compiler.compile_file(file_name);
+            return pf;
+        case PASM_FILE:
+            var pasm_compiler = compreg("PASM");
+            return pasm_compiler.compile_file(file_name);
+        case PBC_FILE:
+            var packfile_pmc = new 'PackfileView';
+            packfile_pmc.read_from_file(file_name);
+            return packfile_pmc;
+        default:
+            return null;
+    }
+}
+
+function __get_input_file_type[anon](string file_name)
+{
+    int len = length(file_name) - 4;
+    string ext = len >= 0 ? substr(file_name, len) : '';
+    if (ext == ".pir") return PIR_FILE;
+    if (ext == ".pbc") return PBC_FILE;
+    if (len > 0) {
+        ext = substr(file_name, len - 1);
+        if (ext == ".pasm") return PASM_FILE;
+    }
+    return PIR_FILE;
+}
+
+function __handle_error_and_exit[anon](var exception)
+{
+    int severity = exception.severity;
+    if (severity == EXCEPT_EXIT)
+        exit(exception.exit_code);
+    var stderr_pmc = getstderr();
+    string message = exception.message;
+    if (message == null || message == "")
+        message = "No exception handler and no message";
+    stderr_pmc.print(sprintf("%s\n", [message]));
+
+    string line_sep = "";
+    var bts = exception.backtrace_strings();
+    for (int i = elements(bts) - 1; i >= 0; i--) {
+        string bt = bts[i];
+        var lines = split("\n", bt);
+        for (string line in lines) {
+            if (indexof(line, "__PARROT_ENTRY_MAIN__") != -1)
+                continue;
+            stderr_pmc.print(sprintf("%s%s", [line_sep, line]));
+            line_sep = "\n";
+        }
+        line_sep = "\nthrown from\n";
+    }
+
+    int exit_code = exception.exit_code;
+    if (exit_code == 0)
+        exit_code = 1;
+    exit(exit_code);
+}
+
+function __show_runtime_prefix_and_exit[anon]()
+{
+    string runtime_prefix;
+    ${ interpinfo runtime_prefix, INTERPINFO_RUNTIME_PREFIX };
+    say(runtime_prefix);
+    exit(0);
+}
+
+function __show_version_and_exit[anon]()
+{
+    var config = getinterp()[IGLOBALS_CONFIG_HASH];
+    string msg_fmt = <<:
+This is Parrot version %s%s built for %s-%s
+Copyright (C) 2001-2011, Parrot Foundation.
+
+This code is distributed under the terms of the Artistic License 2.0.
+For more details, see the full text of the license in the LICENSE file
+included in the Parrot source tree
+:>>
+;
+    var msg = sprintf(msg_fmt, [config["VERSION"], config["DEVEL"], config["cpuarch"], config["platform"]]);
+    say(msg);
+    exit(0);
+}
+
+function __show_help_and_exit[anon]()
+{
+    string msg = <<:
+parrot [Options] <file> [<program options...>]
+  Options:
+    -h --help
+    -V --version
+    -I --include add path to include search
+    -L --library add path to library search
+       --hash-seed F00F  specify hex value to use as hash seed
+    -X --dynext add path to dynamic extension search
+   <Run core options>
+    -R --runcore slow|bounds|fast|subprof
+    -R --runcore trace|profiling|gcdebug
+    -t --trace [flags]
+   <VM options>
+    -D --parrot-debug[=HEXFLAGS]
+       --help-debug
+    -w --warnings
+    -G --no-gc
+    -g --gc ms2|gms|ms|inf set GC type
+       <GC MS2 options>
+       --gc-dynamic-threshold=percentage    maximum memory wasted by GC
+       --gc-min-threshold=KB
+       <GC GMS options>
+       --gc-nursery-size=percent of sysmem  size of gen0 (default 2)
+       --gc-debug
+       --leak-test|--destroy-at-end
+    -. --wait    Read a keystroke before starting
+       --runtime-prefix
+   <Compiler options>
+    -d --imcc-debug[=HEXFLAGS]
+    -v --verbose
+    -E --pre-process-only
+    -o --output=FILE
+       --output-pbc
+    -O --optimize[=LEVEL]
+    -a --pasm
+    -c --pbc
+    -r --run-pbc
+    -y --yydebug
+   <Language options>
+see docs/running.pod for more
+:>>
+;
+    say(msg);
+    exit(0);
+}
+
+function __get_temporary_output_file[anon](string infile)
+{
+    # TODO: Do we need anything else?
+    return infile + ".pbc";
+}
+
+function __usage_and_exit[anon](string msg [optional], int has_msg [opt_flag])
+{
+    var stderr = getstderr();
+    if (has_msg)
+        stderr.print(msg + "\n");
+    stderr.print("parrot -[acEGhrtvVwy.] [-d [FLAGS]] [-D [FLAGS]] ");
+    stderr.print("[-O [level]] [-[LIX] path] [-R runcore] [-o FILE] <file> <args>\n");
+    exit(1);
+}

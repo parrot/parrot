@@ -1,15 +1,15 @@
-# Copyright (C) 2001-2006, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
 docs/dev/pmc_freeze.pod - Freeze/Thaw Design Notes
 
-=head1 VERSION
+=head1 DESCRIPTION
 
-This document describes freeze/thaw internals version 0.1. This is not the
-final implementation.
+This document describes freeze/thaw internals version 0.1. Please note: This
+is not the final implementation.
 
-=head1 Overview
+=head1 OVERVIEW
 
 Freezing or serializing arbitrary PMCs is an interesting problem.  Aggregates
 can hold other aggregates and can be deeply nested, so so a recursive approach
@@ -17,7 +17,7 @@ could easily blow the stack, especially on embedded systems. Also, aggregates
 can be self-referential -- they can hold pointers to themselves -- so that
 working on such structures could create infinite loops.
 
-=head1 Coverage
+=head1 COVERAGE
 
 Although the file is named F<pmc_freeze.c> it ultimately will deal with every
 kind of operation that deeply traverses an arbitrary data structures.  For
@@ -227,7 +227,7 @@ B<EXTRA_IS_PROP_HASH>.
 
 F<src/pmc_freeze.c>, F<pf/pf_items.c>
 
-=head1 Author
+=head1 AUTHOR
 
 Leopold Toetsch C<lt@toetsch.at>
 

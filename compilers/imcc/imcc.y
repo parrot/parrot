@@ -12,6 +12,22 @@
  *
  */
 
+/*
+
+=pod
+
+=head1 NAME
+
+compilers/imcc/imcc.y - Intermediate Code Compiler for Parrot.
+
+=head1 DESCRIPTION
+
+This file contains the grammar of the PIR language parser.
+
+=cut
+
+*/
+
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -487,6 +503,12 @@ mk_pmc_const_named(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
             rhs->type |= VT_ENCODED;
 
         rhs->usage    |= U_FIXUP | U_SUBID_LOOKUP;
+    }
+    else if (strncmp(unquoted_name, "LexInfo", name_length) == 0) {
+        rhs = mk_const(imcc, const_name, 'l');
+        if (!ascii)
+            rhs->type |= VT_ENCODED;
+        rhs->usage    |= U_FIXUP | U_LEXINFO_LOOKUP;
     }
     else {
         rhs = mk_const(imcc, const_name, 'P');
@@ -1013,7 +1035,7 @@ do_loadlib(ARGMOD(imc_info_t *imcc), ARGIN(const char *lib))
     /* TODO: This is very ugly and heavily nested. Can we avoid this? */
     if (!STRING_equal(imcc->interp,
             VTABLE_get_string(imcc->interp,
-                VTABLE_getprop(imcc->interp, lib_pmc,
+                Parrot_pmc_getprop(imcc->interp, lib_pmc,
                     Parrot_str_new_constant(imcc->interp, "_type"))),
             Parrot_str_new_constant(imcc->interp, "Ops")))
         imcc_pbc_add_libdep(imcc, s);
@@ -1036,7 +1058,7 @@ do_loadlib(ARGMOD(imc_info_t *imcc), ARGIN(const char *lib))
 %nonassoc '\n'
 %nonassoc <t> PARAM
 
-%token <t> SOL HLL TK_LINE TK_FILE
+%token <t> SOL HLL
 %token <t> GOTO ARG IF UNLESS PNULL SET_RETURN SET_YIELD
 %token <t> ADV_FLAT ADV_SLURPY ADV_OPTIONAL ADV_OPT_FLAG ADV_NAMED ADV_ARROW
 %token <t> ADV_INVOCANT ADV_CALL_SIG
@@ -1139,7 +1161,6 @@ compilation_unit:
          }
    | MACRO '\n'                { $$ = 0; }
    | pragma                    { $$ = 0; }
-   | location_directive        { $$ = 0; }
    | '\n'                      { $$ = 0; }
    ;
 
@@ -1150,20 +1171,6 @@ pragma:
            $$ = 0;
            do_loadlib(imcc, $2);
            mem_sys_free($2);
-         }
-   ;
-
-location_directive:
-     TK_LINE INTC COMMA STRINGC '\n'
-         {
-           imcc->line = atoi($2);
-           /* set_filename() frees the STRINGC */
-           set_filename(imcc, $4);
-         }
-   | TK_FILE STRINGC '\n'
-         {
-           /* set_filename() frees the STRINGC */
-           set_filename(imcc, $2);
          }
    ;
 
@@ -1844,7 +1851,6 @@ statement:
    | MACRO '\n'                { $$ = 0; }
    | FILECOMMENT               { $$ = 0; }
    | LINECOMMENT               { $$ = 0; }
-   | location_directive        { $$ = 0; }
    | annotate_directive        { $$ = $1; }
    ;
 

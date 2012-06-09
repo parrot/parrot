@@ -36,6 +36,14 @@ This file implements a native call frame (thunk) factory using libffi.
 #  define ffi_type_parrot_numval ffi_type_double
 #elif(NUMVAL_SIZE == 12)
 #  define ffi_type_parrot_numval ffi_type_longdouble
+#elif(NUMVAL_SIZE == 16)
+#  if PARROT_HAS_LONGLONG
+#    if (LONGLONG_SIZE == 8)
+#      define ffi_type_parrot_numval ffi_type_sint64
+#    else
+#      error "unhandled long long size"
+#    endif
+#  endif
 #else
 #  error "unhandled NUMVAL_SIZE value"
 #endif
@@ -652,7 +660,7 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
         call_arg[1] = &call_object;
         call_arg[2] = &pcc_ret_sig;
 
-        /* populate return slot (non-existant if void) */
+        /* populate return slot (non-existent if void) */
         if (enum_type_void !=
             (arg_t = (PARROT_DATA_TYPE)VTABLE_get_integer_keyed_int(interp, nci->signature, 0))) {
             prep_pcc_ret_arg(interp, arg_t, &pcc_retv[i], &call_arg[i + 3], return_data);

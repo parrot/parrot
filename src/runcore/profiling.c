@@ -19,7 +19,6 @@ Functions controlling Parrot's profiling runcore.
 
 #include "parrot/runcore_api.h"
 #include "parrot/extend.h"
-#include "parrot/embed.h"
 #include "parrot/runcore_profiling.h"
 #include "parrot/oplib/core_ops.h"
 
@@ -28,10 +27,6 @@ Functions controlling Parrot's profiling runcore.
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
 #include "pmc/pmc_namespace.h"
-
-#ifdef WIN32
-#  define getpid _getpid
-#endif
 
 #define PPROF_VERSION 2
 
@@ -304,7 +299,7 @@ init_profiling_core(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore), A
         else {
             Parrot_eprintf(interp, "'%Ss' is not a valid profiling output format.\n", output_str);
             Parrot_eprintf(interp, "Valid values are pprof and none.  The default is pprof.\n");
-            exit(1);
+            Parrot_x_jump_out(interp, 1);
         }
     }
     else {
@@ -921,7 +916,7 @@ init_basic_output(PARROT_INTERP, ARGIN(Parrot_profiling_runcore_t *runcore))
     if (!runcore->profile_fd) {
         fprintf(stderr, "unable to open %s for writing", profile_filename_cstr);
         Parrot_str_free_cstring(profile_filename_cstr);
-        exit(1);
+        Parrot_x_jump_out(interp, 1);
     }
 
     Parrot_str_free_cstring(profile_filename_cstr);

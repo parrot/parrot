@@ -139,7 +139,7 @@ the --force flag:
     git add --force ports/foo
 
 NOTE: Make sure these files should actually be added. Most files in .gitignore
-should never be added, but some, such as some files in "ports/" will need need
+should never be added, but some, such as some files in "ports/" will need
 the --force flag.
 
 Now for actually creating your commit! Since Git is a distributed version

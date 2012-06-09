@@ -1,6 +1,6 @@
 # Copyright (C) 2005-2009, Parrot Foundation.
 
-=head1 TITLE
+=head1 DESCRIPTION
 
 PGE::Exp - base class for expressions
 
@@ -1272,6 +1272,7 @@ tree as a PIR code object that can be compiled.
           dec rep
           goto %L_2
         CODE
+    .return (1)
 
 .end
 

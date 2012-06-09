@@ -3,7 +3,7 @@ Copyright (C) 2007-2011, Parrot Foundation.
 
 =head1 NAME
 
-src/main.c - The PIR/PASM compiler frontend to libparrot
+frontend/parrot/main.c - The PIR/PASM compiler frontend to libparrot
 
 =head1 DESCRIPTION
 
@@ -833,7 +833,6 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
           case OPT_GC_DEBUG:
           /*
 #if DISABLE_GC_DEBUG
-            // Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG,
             Parrot_warn(interp, 0xFFFF,
                 "PARROT_GC_DEBUG is set but the binary was compiled "
                 "with DISABLE_GC_DEBUG.");

@@ -677,7 +677,7 @@ JSON
 ]
 OUT
 
-# TT #1226 Need many more tests, exercising all aspects of http://www.json.org/
+# GH #570 Need many more tests, exercising all aspects of http://www.json.org/
 
 sub json_dump_is {
     my ( $code, $dumped, $reason, %args ) = @_;

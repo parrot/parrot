@@ -160,10 +160,7 @@ method statement:sym<if>($/) {
 }
 
 method statement:sym<sub_call>($/) {
-    my $invocant := $<primary>.ast;
-    my $past     := $<arguments>.ast;
-    $past.unshift($invocant);
-    make $past;
+    make $<primary>.ast;
 }
 
 method arguments($/) {
@@ -258,6 +255,10 @@ method statement:sym<while>($/) {
     make PAST::Op.new( $cond, $body, :pasttype('while'), :node($/) );
 }
 
+method statement:sym<return>($/) {
+	make PAST::Op.new( :pirop<return>, $<EXPR>.ast, :node($/) );
+}
+
 method begin_block($/) {
     our $?BLOCK;
     our @?BLOCK;
@@ -325,6 +326,8 @@ method postfix_expression:sym<member>($/) {
                         :viviself('Undef'),
                         :node($/) );
 }
+
+method postfix_expression:sym<call>($/) { make $<arguments>.ast }
 
 method identifier($/) {
      our @?BLOCK;

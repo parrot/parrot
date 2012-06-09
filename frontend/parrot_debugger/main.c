@@ -1,5 +1,6 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -142,14 +143,29 @@ and C<debug_break> ops in F<ops/debug.ops>.
 #include <string.h>
 #include <ctype.h>
 #include "parrot/parrot.h"
-#include "parrot/embed.h"
 #include "parrot/debugger.h"
 #include "parrot/runcore_api.h"
 
-static void PDB_printwelcome(void);
-static void PDB_run_code(PARROT_INTERP, int argc, const char *argv[]);
 const unsigned char * Parrot_get_config_hash_bytes(void);
 int Parrot_get_config_hash_length(void);
+
+/* HEADERIZER HFILE: none */
+
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static void PDB_printwelcome(void);
+static void PDB_run_code(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+#define ASSERT_ARGS_PDB_printwelcome __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_PDB_run_code __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(argv))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 
 /*
 
@@ -169,14 +185,8 @@ main(int argc, const char *argv[])
     Parrot_Interp     interp;
     PDB_t *pdb;
     const char       *scriptname = NULL;
-    const unsigned char * configbytes = Parrot_get_config_hash_bytes();
-    const int configlength = Parrot_get_config_hash_length();
 
-    interp = Parrot_new(NULL);
-
-    Parrot_set_executable_name(interp, Parrot_str_new(interp, argv[0], 0));
-
-    Parrot_set_configuration_hash_legacy(interp, configlength, configbytes);
+    interp = Parrot_interp_new(NULL);
 
     Parrot_debugger_init(interp);
     pdb = interp->pdb;
@@ -186,55 +196,45 @@ main(int argc, const char *argv[])
     Parrot_block_GC_sweep(interp);
 
     nextarg = 1;
-    if (argv[nextarg] && strcmp(argv[nextarg], "--script") == 0)
-    {
+    if (argv[nextarg] && strcmp(argv[nextarg], "--script") == 0) {
         scriptname = argv [++nextarg];
         ++nextarg;
     }
 
     if (argv[nextarg]) {
-        const char *filename = argv[nextarg];
-        const char *ext      = strrchr(filename, '.');
+        const char * const filename = argv[nextarg];
+        const char * const ext      = strrchr(filename, '.');
 
-        if (ext && STREQ(ext, ".pbc")) {
-            Parrot_PackFile pf = Parrot_pbc_read(interp, filename, 0);
-
-            if (!pf)
-                return 1;
-
-            Parrot_pbc_load(interp, pf);
-            PackFile_fixup_subs(interp, PBC_MAIN, NULL);
+        if (*filename == '-') {
+            fprintf(stderr, "parrot_debugger takes no -x or --xxxx flag arguments");
+            exit(1);
         }
         else {
-            STRING          *str    = Parrot_str_new(interp, filename, 0);
-            Parrot_PackFile  pf     = Parrot_pf_get_packfile_pmc(interp, PackFile_new(interp, 0));
+            STRING *   const filename_str = Parrot_str_new(interp, filename, 0);
+            PackFile * const pfraw        = Parrot_pf_read_pbc_file(interp, filename_str);
+            Parrot_PackFile pf;
 
-            Parrot_pbc_load(interp, pf);
-            Parrot_compile_file(interp, str, 0);
-            /*if (errmsg)
-                Parrot_ex_throw_from_c_args(interp, NULL, 1, "Could not compile file");*/
+            if (pfraw == NULL)
+                return 1;
 
-            /* load the source for debugger list */
-            PDB_load_source(interp, filename);
+            pf = Parrot_pf_get_packfile_pmc(interp, pfraw, filename_str);
+            if (pf == NULL)
+                return 1;
 
-            PackFile_fixup_subs(interp, PBC_MAIN, NULL);
+            Parrot_pf_set_current_packfile(interp, pf);
+            Parrot_pf_prepare_packfile_init(interp, pf);
         }
-
     }
     else {
         /* Generate some code to be able to enter into runloop */
+        STRING * const compiler_s = Parrot_str_new_constant(interp, "PIR");
+        PMC * const compiler = Parrot_interp_get_compiler(interp, compiler_s);
+        STRING * const source = Parrot_str_new_constant(interp, ".sub aux :main\nexit 0\n.end\n");
+        PMC * const code = Parrot_interp_compile_string(interp, compiler, source);
 
-        STRING *compiler = Parrot_str_new_constant(interp, "PIR");
-        STRING *errstr = NULL;
-        const char source []= ".sub aux :main\nexit 0\n.end\n";
-        PMC *code = Parrot_compile_string(interp, compiler, source, &errstr);
-
-        if (!STRING_IS_NULL(errstr))
-            Parrot_io_eprintf(interp, "%Ss\n", errstr);
-        else
-            if (PMC_IS_NULL(code))
-                Parrot_warn(interp, PARROT_WARNINGS_NONE_FLAG,
-                    "Unexpected compiler problem at debugger start");
+        if (PMC_IS_NULL(code))
+            Parrot_warn(interp, PARROT_WARNINGS_NONE_FLAG,
+                "Unexpected compiler problem at debugger start");
     }
 
     Parrot_unblock_GC_mark(interp);
@@ -263,8 +263,11 @@ Runs the code, catching exceptions if they are left unhandled.
 */
 
 static void
-PDB_run_code(PARROT_INTERP, int argc, const char *argv[])
+PDB_run_code(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
 {
+    ASSERT_ARGS(PDB_run_code)
+    UNUSED(argc);
+
     new_runloop_jump_point(interp);
     if (setjmp(interp->current_runloop->resume)) {
         free_runloop_jump_point(interp);
@@ -274,7 +277,8 @@ PDB_run_code(PARROT_INTERP, int argc, const char *argv[])
 
     /* Loop to avoid exiting at program end */
     do {
-        Parrot_runcode(interp, argc, argv);
+        /* TODO: Replace this with Parrot_pf_execute_bytecode_program */
+        /*Parrot_runcode(interp, argc, argv);*/
         interp->pdb->state |= PDB_STOPPED;
     } while (! (interp->pdb->state & PDB_EXIT));
     free_runloop_jump_point(interp);
@@ -294,6 +298,7 @@ Prints out the welcome string.
 static void
 PDB_printwelcome(void)
 {
+    ASSERT_ARGS(PDB_printwelcome)
     fprintf(stderr,
         "Parrot " PARROT_VERSION " Debugger\n"
         "(Please note: the debugger is currently under reconstruction)\n");

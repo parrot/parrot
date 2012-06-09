@@ -24,6 +24,8 @@ Win32 System Programming, 2nd Edition.
 #include "parrot/parrot.h"
 #include "../../io/io_private.h"
 
+#include<Windows.h>
+
 /* HEADERIZER HFILE: none */
 
 /* HEADERIZER BEGIN: static */
@@ -47,10 +49,6 @@ static void convert_flags_to_win32(
     , PARROT_ASSERT_ARG(fdwCreate))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
-
-#include <tchar.h>
-
-#define PIO_TRACE 0
 
 /*
 
@@ -145,6 +143,7 @@ Returns C<PIO_BLKSIZE>.
 
 */
 
+PARROT_CONST_FUNCTION
 INTVAL
 Parrot_io_getblksize(SHIM(PIOHANDLE fd))
 {
@@ -549,7 +548,7 @@ Parrot_io_open_pipe(PARROT_INTERP, ARGIN(STRING *command), INTVAL flags,
         /* Redirect input to NULL. This is to avoid
          * interferences in case both the child and
          * the parent tries to read from stdin.
-         * May be unneccessary or even interfere
+         * May be unnecessary or even interfere
          * with valid usages, need more feedback. */
         hnull = CreateFile("NUL", GENERIC_READ|GENERIC_WRITE,
                 0, &sec, OPEN_EXISTING,

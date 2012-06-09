@@ -36,7 +36,7 @@ OUT
 pir_output_is( <<"CODE", <<'OUT', 'open and close - synchronous' );
 .sub 'test' :main
     \$P1 = new ['StringHandle']
-    \$P1.'open'('README')
+    \$P1.'open'('README.pod')
     say 'ok 1 - \$P1.open(\$S1)'
 
     \$P1.'close'()
@@ -115,16 +115,16 @@ SKIP: {
 
     pir_output_is( <<'CODE', <<'OUT', 'open and close - asynchronous' );
 .sub 'test' :main
-    $P1 = # TT #1204 create a callback here
+    $P1 = # GH #535 create a callback here
     $P0 = new ['StringHandle']
 
-    $P0.'open'('README')
+    $P0.'open'('README.pod')
     say 'ok 1 - $P0.open($S1)'
 
     $P0.'close'()
     say 'ok 2 - $P0.close($P1)'
 
-    $P0.'open'('README', 'rw')
+    $P0.'open'('README.pod', 'rw')
     say 'ok 3 - $P0.open($S1, $S2)'
 
     $P0.'close'()
@@ -147,22 +147,23 @@ pir_output_is(
     <<'CODE', <<'OUT', 'read - synchronous' );
 .sub 'test' :main
     $P0 = new ['StringHandle']
-    $P0.'open'('README', 'w')
+    $P0.'open'('README.pod', 'w')
 
-    $P0.'print'("This is Parrot, version")
+    $P0.'print'("# Copyright (C) 2001-2012, Parrot Foundation.")
 
     $P0.'close'()
 
-    $P0.'open'('README')
+    $P0.'open'('README.pod')
 
-    $S0 = $P0.'read'(14) # bytes
-    if $S0 == 'This is Parrot' goto ok_1
+    $S0 = $P0.'read'(15) # bytes
+    if $S0 == '# Copyright (C)' goto ok_1
     print 'not '
   ok_1:
     say 'ok 1 - $S0 = $P1.read($I2)'
 
-    $S0 = $P0.'read'(9)  # bytes
-    if $S0 == ', version' goto ok_2
+    $S0 = $P0.'read'(12)  # throw away bytes
+    $S0 = $P0.'read'(17)  # bytes
+    if $S0 == 'Parrot Foundation' goto ok_2
     print 'not '
   ok_2:
     say 'ok 2 - $S0 = $P1.read($I2) # again on same stream'
@@ -176,21 +177,22 @@ pir_output_is(
     <<'CODE', <<'OUT', 'read opcode' );
 .sub 'test' :main
     $P0 = new ['StringHandle']
-    $P0.'open'('README', 'w')
+    $P0.'open'('README.pod', 'w')
 
-    print $P0, "This is Parrot, version"
+    print $P0, "# Copyright (C) 2001-2012, Parrot Foundation."
     $P0.'close'()
 
-    $P0.'open'('README')
+    $P0.'open'('README.pod')
 
-    $S0 = $P0.'read'(14) # bytes
-    if $S0 == 'This is Parrot' goto ok_1
+    $S0 = $P0.'read'(15) # bytes
+    if $S0 == '# Copyright (C)' goto ok_1
     print 'not '
   ok_1:
     say 'ok 1 - $S0 = $P1.read($I2)'
 
-    $S0 = $P0.'read'(9)  # bytes
-    if $S0 == ', version' goto ok_2
+    $S0 = $P0.'read'(12)  # throw away bytes
+    $S0 = $P0.'read'(17)  # bytes
+    if $S0 == 'Parrot Foundation' goto ok_2
     print 'not '
   ok_2:
     say 'ok 2 - $S0 = $P1.read($I2) # again on same stream'
@@ -247,7 +249,7 @@ ok 5 - read integer back from file
 ok 6 - read string back from file
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'puts' );
+pir_output_is( <<'CODE', <<'OUT', 'print' );
 .include 'except_types.pasm'
 .sub 'test' :main
     .local pmc sh, eh
@@ -257,10 +259,10 @@ pir_output_is( <<'CODE', <<'OUT', 'puts' );
     eh.'handle_types'(.EXCEPTION_PIO_ERROR)
     push_eh eh
 
-    # puts to SH not opened
+    # print to SH not opened
     result = 0
     set_label eh, handle1
-    sh.'puts'('something')
+    sh.'print'('something')
     result = 1
     goto done1
 handle1:
@@ -268,11 +270,11 @@ handle1:
 done1:
     say result
 
-    # puts to SH opened for reading
+    # print to SH opened for reading
     result = 0
     set_label eh, handle2
     sh.'open'('mockname', 'r')
-    sh.'puts'('something')
+    sh.'print'('something')
     result = 1
     goto done2
 handle2:
@@ -379,9 +381,9 @@ ok 1 - read 10,000 lines
 OUT
 
 
-# TT #1204 test reading long chunks, eof, and across newlines
+# GH #535 test reading long chunks, eof, and across newlines
 
-# TT #1204 pir_output_is( <<'CODE', <<'OUT', 'print, read, and readline - asynchronous', todo => 'not yet implemented' );
+# GH #535 pir_output_is( <<'CODE', <<'OUT', 'print, read, and readline - asynchronous', todo => 'not yet implemented' );
 
 # L<PDD22/I\/O PMC API/=item record_separator>
 pir_output_is( <<'CODE', <<'OUT', 'record_separator', todo => 'not yet implemented' );
@@ -452,9 +454,9 @@ ok 2 - $S0 = $P1.buffer_type() # line-buffered
 ok 3 - $S0 = $P1.buffer_type() # full-buffered
 OUT
 
-# TT #1204 test effects of buffer_type, not just set/get
+# GH #535 test effects of buffer_type, not just set/get
 
-# TT #1177
+# GH #458
 # L<PDD22/I\/O PMC API/=item buffer_size>
 # NOTES: try setting positive, zero, negative int
 # perform print and read ops
@@ -561,7 +563,7 @@ pir_output_is( <<'CODE', <<'OUT', 'mode' );
 .sub 'test' :main
     $P0 = new ['StringHandle']
 
-    $P0.'open'('README')
+    $P0.'open'('README.pod')
     $S0 = $P0.'mode'()
 
     if $S0 == 'r' goto ok_1
@@ -716,7 +718,7 @@ CODE
 ok
 OUTPUT
 
-# TT #1178
+# GH #465
 # L<PDD22/I\/O PMC API/=item get_fd>
 # NOTES: this is going to be platform dependent
 

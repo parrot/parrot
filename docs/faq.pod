@@ -1,8 +1,12 @@
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
 docs/faq.pod - Parrot FAQ
+
+=head1 DESCRIPTION
+
+This document is the main Parrot FAQ.
 
 =head1 GENERAL QUESTIONS
 
@@ -39,7 +43,7 @@ PIR is a high-level assembly language. See the L<examples> directory.
 
 While the languages that are shipped with our pre-release versions of
 parrot are in varying states of development, many of them are quite
-functional. See L<https://trac.parrot.org/parrot/wiki/Languages>
+functional. See L<https://github.com/parrot/parrot/wiki/Languages>
 for information about the various languages that are targeting parrot.
 
 =head2 What language is Parrot written in?

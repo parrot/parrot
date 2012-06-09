@@ -118,7 +118,7 @@ advance_to_next(ARGMOD(PMC *self))
     return;
 }
 
-pmclass HashIterator extends Iterator no_ro auto_attrs {
+pmclass HashIterator extends Iterator provides iterator no_ro auto_attrs {
     ATTR PMC        *pmc_hash;      /* the Hash which this Iterator iterates */
     ATTR Hash       *parrot_hash;   /* Underlying implementation of hash */
     ATTR HashBucket *bucket;        /* Current bucket */
@@ -293,7 +293,22 @@ the next one.
 
         return Parrot_hash_key_to_string(INTERP, attrs->parrot_hash, attrs->bucket->key);
     }
+/*
 
+*/
+
+    VTABLE INTVAL shift_integer() {
+        Parrot_HashIterator_attributes * const attrs = PARROT_HASHITERATOR(SELF);
+
+        /* Move to next bucket */
+        advance_to_next(SELF);
+
+        if (attrs->elements < 0)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "StopIteration");
+
+        return Parrot_hash_key_to_int(INTERP, attrs->parrot_hash, attrs->bucket->key);
+    }
 }
 
 /*

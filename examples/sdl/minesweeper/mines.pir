@@ -1,5 +1,6 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
 
-=head1 TITLE
+=head1 NAME
 
 mines.pir - a minesweeper clone for parrot (with parrot's SDL bindings)
 
@@ -9,6 +10,10 @@ To run this game, be in the Parrot directory and run the following command:
 
         $ parrot examples/sdl/minesweeper/mines.pir
         $
+
+=head1 DESCRIPTION
+
+This is a PIR program of a minesweeper clone for Parrot.
 
 =head1 FUNCTIONS
 

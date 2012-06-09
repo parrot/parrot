@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 Named Variables
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's named variables.
+
+=head1 NAMED VARIABLES
 
 The other kind of variables in PIR are named variables.
 You declare these with the .local directive, with the type

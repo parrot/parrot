@@ -53,7 +53,7 @@ build-stamp: configure-stamp
 clean: debian-control-stamp
 	dh_testdir
 	dh_testroot
-	rm -f build-stamp configure-stamp debian-control-stamp debian/parrot.1 debian/parrot_config.1 debian/pbc_dump.1 debian/pbc_disassemble.1 debian/parrot-debugger.1 debian/pbc_merge.1 debian/libparrot$(SOVERSION).install src/main.o installable_pbc_to_exe ext/Parrot-Embed/Makefile.PL test.c test.ldo
+	rm -f build-stamp configure-stamp debian-control-stamp debian/parrot.1 debian/parrot_config.1 debian/pbc_dump.1 debian/pbc_disassemble.1 debian/parrot-debugger.1 debian/pbc_merge.1 debian/libparrot$(SOVERSION).install src/main.o installable_pbc_to_exe test.c test.ldo
 	[ ! -f Makefile ] || $(MAKE) distclean
 	dh_clean 
 

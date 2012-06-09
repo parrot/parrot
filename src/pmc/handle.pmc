@@ -120,6 +120,27 @@ Read a line from the handle and return it in a string.
         RETURN(STRING *string_result);
     }
 
+/*
+
+=item C<METHOD read_bytes(INTVAL bytes)>
+
+Read the given number of bytes from the handle and return them in a
+ByteBuffer.
+
+=cut
+
+*/
+
+    METHOD read_bytes(INTVAL length) {
+        PMC * const bb = Parrot_io_read_byte_buffer_pmc(INTERP, SELF, PMCNULL, length);
+        RETURN(PMC *bb);
+    }
+
+    METHOD write_bytes(PMC *bytebuffer, INTVAL length) {
+        const INTVAL written = Parrot_io_write_byte_buffer_pmc(INTERP, SELF, bytebuffer, length);
+        RETURN(INTVAL written);
+    }
+
 
 /*
 

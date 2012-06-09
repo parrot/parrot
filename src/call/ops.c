@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -91,7 +91,7 @@ runops(PARROT_INTERP, size_t offs)
   reenter:
         interp->current_runloop->handler_start = NULL;
         switch (setjmp(interp->current_runloop->resume)) {
-          case 1:
+          case PARROT_JMP_EXCEPTION_HANDLED:
             /* an exception was handled */
             if (STACKED_EXCEPTIONS)
                 free_runloop_jump_point(interp);
@@ -104,7 +104,7 @@ runops(PARROT_INTERP, size_t offs)
                         interp->current_runloop_id, interp->current_runloop_level);
 #endif
             return;
-          case 2:
+          case PARROT_JMP_EXCEPTION_FROM_C:
             /* Reenter the runloop from a exception thrown from C
              * with a pir handler */
             free_runloops_until(interp, our_runloop_id);
@@ -112,7 +112,7 @@ runops(PARROT_INTERP, size_t offs)
             offset = interp->current_runloop->handler_start - interp->code->base.data;
             /* Prevent incorrect reuse */
             goto reenter;
-          case 3:
+          case PARROT_JMP_EXCEPTION_FINALIZED:
             /* Reenter the runloop when finished the handling of a
              * exception */
             free_runloops_until(interp, our_runloop_id);
@@ -134,6 +134,25 @@ runops(PARROT_INTERP, size_t offs)
     fprintf(stderr, "[exiting loop %d, level %d]\n",
             our_runloop_id, our_runloop_level);
 #endif
+}
+
+/*
+
+=item C<void reset_runloop_id_counter(PARROT_INTERP)>
+
+Reset runloop_id_counter to 0.
+For use in outer_runloop
+
+=cut
+
+*/
+
+void
+reset_runloop_id_counter(PARROT_INTERP)
+{
+    ASSERT_ARGS(reset_runloop_id_counter)
+    UNUSED(interp);
+    runloop_id_counter = 0;
 }
 
 

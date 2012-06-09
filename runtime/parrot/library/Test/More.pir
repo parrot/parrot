@@ -686,11 +686,11 @@ This handles comparisons of array-like and hash-like structures.
     goto report_result
 
   compare_array:
-    ( result, diagnosis ) = compare_array( left, right, position )
+    result = compare_array( left, right, position )
     goto report_result
 
   compare_hash:
-    (result, diagnosis ) = compare_hash( left, right, position )
+    result = compare_hash( left, right, position )
     goto report_result
 
   report_result:

@@ -87,11 +87,8 @@ foreach my $path (@files) {
 }
 
 foreach my $path (sort keys %all_files) {
-    TODO: {
-        local $TODO = 'Missing function docs' if $todos{$path};
-        ok( $all_files{$path}{overall}, $path )
-            or diag( diagnosis( \%all_files, $path ) );
-    }
+    ok( $all_files{$path}{overall}, $path )
+        or diag( diagnosis( \%all_files, $path ) );
 }
 
 sub diagnosis {

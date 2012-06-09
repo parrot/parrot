@@ -1,5 +1,3 @@
-=pod
-
 
     Following in the steps of other open source projects that
     eventually take over the world, here is the partial list
@@ -76,6 +74,13 @@ D: Architect (0.4.6 - 2.8.0) & Lead Developer
 E: allison@parrot.org
 U: allison
 
+N: Alvis Yardley
+D: Documentation Shepherd (3.9.0 - Present)
+D: Release manger for 4.1.0
+E: ac.yardley@gmail.com
+U: alvis
+S: Ft. Worth, Texas
+
 N: Amir Karger
 U: amirkarger
 D: editor bugfixes
@@ -105,9 +110,10 @@ D: typo squisher
 E: yDNA@cpan.org
 
 N: Andrew Whitworth
+D: Product Manager (2.9.0 - current)
 D: Internals development
 D: Documentation
-D: Release manager for 0.8.2, 1.3.0, 1.5.0, 2.4.0, 2.11.0 and 3.3.0
+D: Release manager for 0.8.2, 1.3.0, 1.5.0, 2.4.0, 2.11.0, 3.3.0, 3.10.0, 4.0.0 and 4.4.0
 E: wknight8111@gmail.com
 U: Whiteknight
 
@@ -509,6 +515,7 @@ D: various Pynie patches
 N: James E Keenan
 E: jkeenan@cpan.org
 U: jkeenan
+A: kid51
 D: Testing of configuration and build tools; release manager
 W: http://thenceforward.net/parrot/
 S: Brooklyn, NY, USA
@@ -521,7 +528,7 @@ D: lot of general hints and patches to improve portability
 
 N: Jason Gloudon
 
-N: Jay Emmerson
+N: Jay Emerson
 E: john.emerson@yale.edu
 U: jay
 
@@ -593,8 +600,8 @@ S: Ohio, USA
 
 N: Jonathan "Duke" Leto
 E: jonathan@leto.net
-W: http://leto.net
-D: Release manager for 1.7.0
+W: http://dukeleto.pl
+D: Release manager for 1.7.0, 3.9.0,4.2.0 GCI/GSoC Org Admin/Mentor
 U: dukeleto
 A: leto
 A: Duke Leto
@@ -674,7 +681,7 @@ N: Kevin Falcone
 N: Kevin Polulak
 U: soh_cah_toa
 E: kpolulak@gmail.com
-D: HBDB debugger
+D: HBDB debugger, release manager for 3.8.0
 S: New Jersey, USA
 
 N: Kevin Tew
@@ -689,7 +696,7 @@ D: clean-ups of compilers/imcc and its documentation.
 D: compilers/pirc and languages/PIR.
 D: various updates to PCT-based languages (C99,Punie,Cardinal,Ecmascript)
 D: languages/json, languages/squaak
-U: kj, kjs
+U: kjs
 E: parrotcode@gmail.com
 
 N: Klāvs Priedītis
@@ -814,6 +821,11 @@ D: adding function documentation
 D: tracwiki additions
 D: Release manager for 2.7.0, 3.1.0
 E: mike.hind@gmail.com
+
+N: Michael Schroeder
+U: mls
+D: subprof profiling runcore
+E: mls@suse.de
 
 N: Michael G. Schwern
 
@@ -948,6 +960,9 @@ D: The Second Perl 6 Summarizer after Bryan C. Warnock
 E: pdcawley@bofh.org.uk
 W: http://www.bofh.org.uk:8080/
 
+N: Piotr Fusik
+D: Fixed typos
+
 N: Reini Urban
 U: rurban
 E: rurban@cpan.org
@@ -1049,6 +1064,13 @@ N: Stefan O'Rear
 E: stefanor@cox.net
 D: Perl 5 interoperability, Blizkost
 U: sorear
+
+N: Stefan Seifert
+U: nine
+E: nine@detonation.org
+D: Continuation of Chandler's work on tasks
+S: Linz, Austria
+W: http://niner.name
 
 N: Stéphane Payrard
 D: Various code fixes and improvements
@@ -1191,4 +1213,6 @@ N: svn
 U: svn
 E: svn@perl.org
 
-=cut
+N: Bart Wiegmans
+E: bartwiegmans@gmail.com
+D: mod_parrot

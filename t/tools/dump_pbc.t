@@ -46,7 +46,7 @@ sub dump_pbc_output_like {
 
 dump_pbc_output_like(
     File::Spec->catfile( 'examples', 'tutorial', '01_temp_var.pir' ),
-    qr!\Q=head1 Simple Variables\E!,
+    qr!\Q=head1 SIMPLE VARIABLES\E!,
     '01_temp_var.pir'
 );
 

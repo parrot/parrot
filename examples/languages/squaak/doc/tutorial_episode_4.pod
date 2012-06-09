@@ -1,4 +1,11 @@
-# Copyright (C) 2008, Parrot Foundation.
+# Copyright (C) 2008-2012, Parrot Foundation.
+
+=pod
+
+=head1 DESCRIPTION
+
+This is the fourth episode in a tutorial series on building a compiler with
+the Parrot Compiler Tools.
 
 =head1 Episode 4: PAST Nodes and More Statements
 
@@ -306,8 +313,8 @@ action methods.
      ## generate instruction to retrieve the exception object (and the
      ## exception message, that is passed automatically in PIR, this is stored
      ## into $S0 (but not used).
-     my $pir := "    .get_results (%r, $S0)\n"
-              ~ "    store_lex '" ~ $exc.name()
+     my $pir := '    .get_results (%r, $S0)\n'
+              ~ "\n     store_lex '" ~ $exc.name()
               ~ "', %r";
 
      $catch.unshift( PAST::Op.new( :inline($pir), :node($/) ) );

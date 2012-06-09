@@ -280,7 +280,7 @@ Tests the Class PMC.
 
     is(test_string_val, 'bar', 'add_method() invoking method added to class works')
 t_class_meth:
-    todo( 0, 'add_method() invoking method added to class works', "classes don't seem to call methods yet:  TT #1615")
+    todo( 0, 'add_method() invoking method added to class works', "classes don't seem to call methods yet:  GH #396")
 
     obj_inst = class.'new'()
     test_string_val = obj_inst.'foo'()

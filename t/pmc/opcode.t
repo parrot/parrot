@@ -9,6 +9,10 @@ t/pmc/opcode.t - Opcode PMC
 
     % prove t/pmc/opcode.t
 
+=head1 DESCRIPTION
+
+This PIR file implements various tests of PMC opcodes.
+
 =cut
 
 .include 'except_types.pasm'
@@ -52,7 +56,7 @@ CODE
     set $I1, op[100]
 
     is($I0, 2, 'get_integer_keyed_int returns valid type enum.')
-    is($I1, -1, 'get_integer_keyed_int nonexistant parameter type')
+    is($I1, -1, 'get_integer_keyed_int nonexistent parameter type')
 .end
 
 .sub get_data

@@ -108,7 +108,7 @@ unescaped newlines.
 
 	.local pmc output
 	output = self.'output'()
-	output.'puts'( message )
+	output.'print'( message )
 .end
 
 .sub escape_newlines :method
@@ -192,7 +192,7 @@ unescaped newlines.
   WRITE_MESSAGE:
 	.local pmc diag_output
 	diag_output = self.'diag_output'()
-	.tailcall diag_output.'puts'( message )
+	.tailcall diag_output.'print'( message )
 .end
 
 =back

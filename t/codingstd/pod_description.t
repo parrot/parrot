@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -46,15 +46,11 @@ foreach my $file ( @{ $need_testing_ref } ) {
 my $empty_description_files = join( "\n", sort @empty_description);
 my $nempty_description      = scalar( @empty_description );
 
-TODO: {
-    local $TODO = 'POD requirements in flux: TT #292';
-
 is(
     $empty_description_files,
     q{},
     'All Pod files have non-empty DESCRIPTION sections'
 );
-}
 
 diag("\nFound $nempty_description files without DESCRIPTION sections.\n")
     if $nempty_description;
@@ -72,6 +68,9 @@ t/codingstd/pod_description.t - Identify files lacking 'DESCRIPTION' in POD
 
     # test specific files
     % perl t/codingstd/pod_description.t perl_module.pm perl_file.pl
+
+    # test and obtain a list of those files which fail to pass the test
+    % prove -v t/codingstd/pod_description.t
 
 =head1 DESCRIPTION
 

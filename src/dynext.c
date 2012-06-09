@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -150,10 +150,10 @@ set_cstring_prop(PARROT_INTERP, ARGMOD(PMC *lib_pmc), ARGIN(const char *what),
 {
     ASSERT_ARGS(set_cstring_prop)
     STRING * const key  = Parrot_str_new_constant(interp, what);
-    PMC    * const prop = Parrot_pmc_new_constant(interp, enum_class_String);
+    PMC    * const prop = Parrot_pmc_new(interp, enum_class_String);
 
     VTABLE_set_string_native(interp, prop, name);
-    VTABLE_setprop(interp, lib_pmc, key, prop);
+    Parrot_pmc_setprop(interp, lib_pmc, key, prop);
 }
 
 
@@ -412,7 +412,7 @@ Parrot_dyn_init_lib(PARROT_INTERP,
 
     /* seems to be a native/NCI lib */
     if (!load_func || !lib_pmc)
-        lib_pmc = Parrot_pmc_new_constant(interp, enum_class_ParrotLibrary);
+        lib_pmc = Parrot_pmc_new(interp, enum_class_ParrotLibrary);
 
     /*  Call init, if it exists */
     if (init_func)
@@ -446,8 +446,8 @@ Parrot_dyn_dlsym_str(PARROT_INTERP,
         return NULL;
 
     else {
-        char *const symbol_cs = Parrot_str_to_cstring(interp, symbol);
-        void       *ptr       = Parrot_dlsym(handle, symbol_cs);
+        char * const symbol_cs = Parrot_str_to_cstring(interp, symbol);
+        void * const ptr       = Parrot_dlsym(handle, symbol_cs);
         Parrot_str_free_cstring(symbol_cs);
         return ptr;
     }
@@ -571,12 +571,12 @@ Parrot_dyn_clone_lib_into(ARGMOD(Interp *d), ARGMOD(Interp *s), ARGIN(PMC *lib_p
     STRING * const ops      = CONST_STRING(s, "Ops");
 
     STRING * const wo_ext = clone_string_into(d, s,
-        VTABLE_getprop(s, lib_pmc, filename));
+        Parrot_pmc_getprop(s, lib_pmc, filename));
     STRING * const lib_name = clone_string_into(d, s,
-        VTABLE_getprop(s, lib_pmc, libname));
+        Parrot_pmc_getprop(s, lib_pmc, libname));
     void * const handle = VTABLE_get_pointer(s, lib_pmc);
     STRING * const type =
-        VTABLE_get_string(s, VTABLE_getprop(s, lib_pmc, type_str));
+        VTABLE_get_string(s, Parrot_pmc_getprop(s, lib_pmc, type_str));
 
     if (STRING_equal(s, type, ops)) {
         /* we can't clone oplibs in the normal way, since they're actually
@@ -585,13 +585,12 @@ Parrot_dyn_clone_lib_into(ARGMOD(Interp *d), ARGMOD(Interp *s), ARGIN(PMC *lib_p
          * Anyways, if we hope to share bytecode at runtime, we need to have
          * them have identical opcodes anyways.
          */
-         PMC * const new_lib_pmc = Parrot_pmc_new_constant(d,
-                                        enum_class_ParrotLibrary);
+        PMC * const new_lib_pmc = Parrot_pmc_new(d, enum_class_ParrotLibrary);
 
         PMC_data(new_lib_pmc) = handle;
-        VTABLE_setprop(d, new_lib_pmc, CONST_STRING(s, "_filename"), Parrot_pmc_box_string(d, wo_ext));
-        VTABLE_setprop(d, new_lib_pmc, CONST_STRING(s, "_lib_name"), Parrot_pmc_box_string(d, lib_name));
-        VTABLE_setprop(d, new_lib_pmc, CONST_STRING(s, "_type"), Parrot_pmc_box_string(d, ops));
+        Parrot_pmc_setprop(d, new_lib_pmc, CONST_STRING(s, "_filename"), Parrot_pmc_box_string(d, wo_ext));
+        Parrot_pmc_setprop(d, new_lib_pmc, CONST_STRING(s, "_lib_name"), Parrot_pmc_box_string(d, lib_name));
+        Parrot_pmc_setprop(d, new_lib_pmc, CONST_STRING(s, "_type"), Parrot_pmc_box_string(d, ops));
 
         /* fixup d->all_op_libs, if necessary */
         if (d->n_libs != s->n_libs) {

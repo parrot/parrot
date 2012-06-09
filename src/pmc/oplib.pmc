@@ -3,11 +3,11 @@ Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/oplib.pmc
+src/pmc/oplib.pmc - Information about an opcode library
 
 =head1 DESCRIPTION
 
-Implements oplib VTABLEs.
+The PMC provides introspection on the opcodes contained in a library.
 
 =cut
 
@@ -23,10 +23,34 @@ Implements oplib VTABLEs.
 pmclass OpLib auto_attrs {
     ATTR op_lib_t *oplib;
 
+/*
+
+=head2 Vtable functions
+
+=over 4
+
+=item C<void init()>
+
+Throws an error.  OpLib requires an argument to init.  See C<init_pmc>.
+
+=cut
+
+*/
+
     VTABLE void init() {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "OpLib must be initialized with an oplib name");
     }
+
+/*
+
+=item C<void init_pmc(PMC *name_pmc)>
+
+Initializes the OpLib with information about an oplib.
+
+=cut
+
+*/
 
     VTABLE void init_pmc(PMC *name_pmc) {
         STRING   * const name      = VTABLE_get_string(INTERP, name_pmc);
@@ -55,8 +79,27 @@ pmclass OpLib auto_attrs {
         SET_ATTR_oplib(INTERP, SELF, oplib);
     }
 
-    /* Look up an opnumber given the name of the op. First we look for the
-       specific name, then the more general short name. */
+
+/*
+
+=item C<INTVAL get_integer_keyed_str(STRING *name)>
+
+=item C<INTVAL get_integer_keyed(PMC *key)>
+
+=item C<PMC* get_pmc_keyed_str(STRING *name)>
+
+=item C<PMC* get_pmc_keyed(PMC *key)>
+
+Look up an op number given the name of the op. First we look for the
+specific name, then the more general short name.
+
+The VTABLEs that return integers return -1 when an opcode could not be found.
+The VTABLEs that return PMCs throw exceptions instead.
+
+=cut
+
+*/
+
     VTABLE INTVAL get_integer_keyed_str(STRING *name) {
         const op_lib_t *oplib;
         char * const  cstr = Parrot_str_to_cstring(INTERP, name);
@@ -87,6 +130,17 @@ pmclass OpLib auto_attrs {
         return VTABLE_get_pmc_keyed_str(INTERP, SELF, strkey);
     }
 
+/*
+
+=item C<PMC* get_pmc_keyed_int(INTVAL value)>
+
+Returns an C<Opcode> PMC for a given opcode number.  To find an opcode number
+from a name, see C<get_integer_keyed_str()> above.
+
+=cut
+
+*/
+
     VTABLE PMC* get_pmc_keyed_int(INTVAL value) {
         op_lib_t *oplib;
         GET_ATTR_oplib(INTERP, SELF, oplib);
@@ -103,6 +157,18 @@ pmclass OpLib auto_attrs {
         }
     }
 
+/*
+
+=item C<INTVAL elements()>
+
+=item C<INTVAL get_integer()>
+
+Returns the number of opcodes in the library.
+
+=cut
+
+*/
+
     VTABLE INTVAL elements() {
         const op_lib_t *oplib;
         GET_ATTR_oplib(INTERP, SELF, oplib);
@@ -113,11 +179,38 @@ pmclass OpLib auto_attrs {
         return STATICSELF.elements();
     }
 
+/*
+
+=item C<void* get_pointer()>
+
+Returns the C<op_lib_t> pointer for the opcode library.
+
+=cut
+
+*/
+
     VTABLE void* get_pointer() {
         op_lib_t *oplib;
         GET_ATTR_oplib(INTERP, SELF, oplib);
         return oplib;
     }
+
+/*
+
+=back
+
+=head2 Methods
+
+=over 4
+
+=item C<PMC *op_family(STRING *shortname)>
+
+Returns an array of C<Opcode> PMCs for all the opcodes in the library that
+share the given short name.
+
+=cut
+
+*/
 
     METHOD op_family(STRING *shortname) {
         char * const sname = Parrot_str_to_cstring(INTERP, shortname);
@@ -139,16 +232,43 @@ pmclass OpLib auto_attrs {
         RETURN(PMC *result);
     }
 
+/*
+
+=item C<PMC *version()>
+
+Returns an array containing the three version numbers (major, minor, patch) of
+the library.
+
+=cut
+
+*/
+
     METHOD version() {
         const op_lib_t *oplib;
-        PMC * const version_array = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
+        PMC * const version_array = Parrot_pmc_new_init_int(INTERP,
+                enum_class_FixedIntegerArray, 3);
         GET_ATTR_oplib(INTERP, SELF, oplib);
-        VTABLE_push_integer(INTERP, version_array, oplib->major_version);
-        VTABLE_push_integer(INTERP, version_array, oplib->minor_version);
-        VTABLE_push_integer(INTERP, version_array, oplib->patch_version);
+        VTABLE_set_integer_keyed_int(INTERP, version_array,
+                0, oplib->major_version);
+        VTABLE_set_integer_keyed_int(INTERP, version_array,
+                1, oplib->minor_version);
+        VTABLE_set_integer_keyed_int(INTERP, version_array,
+                2, oplib->patch_version);
         RETURN(PMC *version_array);
     }
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<src/pmc/opcode.pmc>
+
+=cut
+
+*/
 
 /*
  * Local variables:

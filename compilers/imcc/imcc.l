@@ -223,10 +223,6 @@ SP              [ ]
         yy_push_state(cmt4, yyscanner);
     }
 
-<*>setfile{SP}+["] { yy_push_state(cmt2, yyscanner); }
-
-<*>setline{SP}+ { yy_push_state(cmt1, yyscanner);  }
-
 <cmt1>{DIGITS} {
         yylineno = imcc->line = atoi(yytext);
         yy_pop_state(yyscanner);
@@ -284,12 +280,10 @@ SP              [ ]
 
 <pod>{EOL}      { /* ignore */ }
 
-<*>".line"               return TK_LINE;
-<*>".file"               return TK_FILE;
 <INITIAL,emit>".annotate" return ANNOTATE;
 <INITIAL,emit>".lex"     return LEXICAL;
 ".set_arg"               return ARG;
-".sub"                   return SUB;
+".sub"                   { SET_LINE_NUMBER; return SUB; }
 ".end"                   return ESUB;
 ".begin_call"            return PCC_BEGIN;
 ".end_call"              return PCC_END;
@@ -738,11 +732,10 @@ int yywrap(void* yyscanner) {
 
 static macro_frame_t *
 new_frame(ARGMOD(imc_info_t *imcc)) {
-    /* XXX non-reentrant */
-    static int label   = 0;
     macro_frame_t * const tmp = mem_gc_allocate_zeroed_typed(imcc->interp, macro_frame_t);
 
-    tmp->label         = ++label;
+    tmp->label         = imcc->unique_count;
+    imcc->unique_count++;
     tmp->s.line        = imcc->line;
     tmp->s.handle      = PIO_INVALID_HANDLE;
 
@@ -788,8 +781,10 @@ destroy_frame(struct macro_frame_t *frame, void *yyscanner)
     if (frame->heredoc_rest) {
         mem_sys_free(frame->heredoc_rest);
         frame->heredoc_rest = NULL;
-    } else
+    }
+    else {
         ret = frame->s.line;
+    }
 
     mem_sys_free(frame);
 

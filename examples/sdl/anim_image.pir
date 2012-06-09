@@ -1,5 +1,6 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
 
-=head1 TITLE
+=head1 NAME
 
 anim_image.pir - animate an image in a Parrot SDL window
 
@@ -10,6 +11,10 @@ To run this file, run the following command from the Parrot directory:
     $ ./parrot examples/sdl/anim_image.pir
     Drew 1080 frames in 0.948230 seconds (1138.964142 fps)
     $
+
+=head1 DESCRIPTION
+
+This program demonstrates how to animate an image in a Parrot SDL window.
 
 =cut
 

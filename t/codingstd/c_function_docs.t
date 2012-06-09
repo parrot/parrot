@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2010, Parrot Foundation.
+# Copyright (C) 2006-2012, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -36,7 +36,7 @@ my $headerizer = Parrot::Headerizer->new;
 my @files = grep {/\.(c|h)$/ } @ARGV ? @ARGV :
     map {s/^$PConfig{build_dir}\///; $_} map {s/\\/\//g; $_} map {$_->path} $DIST->get_c_language_files();
 
-plan tests => scalar @files;
+plan tests => (scalar @files) * 2;
 
 my %todos;
 while (<DATA>) {
@@ -50,11 +50,16 @@ foreach my $path (@files) {
 
     my $buf = $DIST->slurp($path);
     my @missing_docs;
+    my @bad_order;
 
     my @function_decls = $headerizer->extract_function_declarations($buf);
 
     for my $function_decl (@function_decls) {
 
+        if ($function_decl =~ m/^(\S+)\s+PARROT_EXPORT/s and
+            $1 !~ /^PARROT_CAN(?:NOT)?_RETURN_NULL/) {
+            push @bad_order, $function_decl;
+        }
         my $escaped_decl = $headerizer->generate_documentation_signature($function_decl);
 
         my $missing = '';
@@ -82,11 +87,15 @@ foreach my $path (@files) {
     TODO: {
         local $TODO = 'Missing function docs' if $todos{$path};
 
-    ok ( ! @missing_docs, $path)
-        or diag( @missing_docs
-            . " function(s) lacking documentation:\n"
-            . join ("\n", @missing_docs, "\n"));
+        is( @missing_docs, 0, "$path: C functions documented")
+            or diag( @missing_docs
+                . " function(s) lacking documentation:\n"
+                . join ("\n", @missing_docs, "\n"));
     }
+    is( @bad_order, 0, "$path: PARROT_EXPORT, if present, is in correct position")
+        or diag( @bad_order
+            . " function(s) have PARROT_EXPORT in position other than first:\n"
+            . join ("\n", @bad_order, "\n"));
 }
 
 __DATA__

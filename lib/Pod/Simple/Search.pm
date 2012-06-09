@@ -4,7 +4,7 @@ package Pod::Simple::Search;
 use strict;
 
 use vars qw($VERSION $MAX_VERSION_WITHIN $SLEEPY);
-$VERSION = 3.04;   ## Current version of this package
+$VERSION = '3.19';   ## Current version of this package
 
 BEGIN { *DEBUG = sub () {0} unless defined &DEBUG; }   # set DEBUG level
 use Carp ();
@@ -25,7 +25,7 @@ use Cwd qw( cwd );
 #==========================================================================
 __PACKAGE__->_accessorize(  # Make my dumb accessor methods
  'callback', 'progress', 'dir_prefix', 'inc', 'laborious', 'limit_glob',
- 'limit_re', 'shadows', 'verbose', 'name2path', 'path2name', 
+ 'limit_re', 'shadows', 'verbose', 'name2path', 'path2name', 'recurse',
 );
 #==========================================================================
 
@@ -39,6 +39,7 @@ sub new {
 sub init {
   my $self = shift;
   $self->inc(1);
+  $self->recurse(1);
   $self->verbose(DEBUG);
   return $self;
 }
@@ -127,15 +128,22 @@ sub _make_search_callback {
   my $self = $_[0];
 
   # Put the options in variables, for easy access
-  my(  $laborious, $verbose, $shadows, $limit_re, $callback, $progress,$path2name,$name2path) =
+  my( $laborious, $verbose, $shadows, $limit_re, $callback, $progress,
+      $path2name, $name2path, $recurse) =
     map scalar($self->$_()),
-     qw(laborious   verbose   shadows   limit_re   callback   progress  path2name  name2path);
+     qw(laborious verbose shadows limit_re callback progress
+        path2name name2path recurse);
 
   my($file, $shortname, $isdir, $modname_bits);
   return sub {
     ($file, $shortname, $isdir, $modname_bits) = @_;
 
     if($isdir) { # this never gets called on the startdir itself, just subdirs
+
+      unless( $recurse ) {
+        $verbose and print "Not recursing into '$file' as per requested.\n";
+        return 'PRUNE';
+      }
 
       if( $self->{'_dirs_visited'}{$file} ) {
         $verbose and print "Directory '$file' already seen, skipping.\n";
@@ -258,7 +266,7 @@ sub _path2modname {
   # filenames, so try to extract them from the "=head1 NAME" tag in the
   # file instead.
   if ($^O eq 'VMS' && ($name eq lc($name) || $name eq uc($name))) {
-      open PODFILE, "<" ,"$file" or die "_path2modname: Can't open $file: $!";
+      open PODFILE, "<$file" or die "_path2modname: Can't open $file: $!";
       my $in_pod = 0;
       my $in_name = 0;
       my $line;
@@ -353,7 +361,7 @@ sub _recurse_dir {
     }
     pop @$modname_bits;
     return;
-  };
+  };;
 
   local $_;
   $recursor->($startdir, '');
@@ -382,7 +390,7 @@ sub run {
     if($file =~ m/\.pod$/i) {
       # Don't bother looking for $VERSION in .pod files
       DEBUG and print "Not looking for \$VERSION in .pod $file\n";
-    } elsif( !open(INPOD, "<", $file) ) {
+    } elsif( !open(INPOD, $file) ) {
       DEBUG and print "Couldn't open $file: $!\n";
       close(INPOD);
     } else {
@@ -401,7 +409,7 @@ sub run {
             if m{^v?["']?([0-9_]+(\.[0-9_]+)*)["']?$}s
              # like in $VERSION = "3.14159";
              or m{\$Revision:\s*([0-9_]+(?:\.[0-9_]+)*)\s*\$}s
-             # like in sprintf("%d.%02d", q$Revision$ =~ /(\d+)\.(\d+)/);
+             # like in sprintf("%d.%02d", q$Revision: 4.13 $ =~ /(\d+)\.(\d+)/);
           ;
            
           # Like in sprintf("%d.%s", map {s/_//g; $_} q$Name: release-0_55-public $ =~ /-(\d+)_([\d_]+)/)
@@ -597,7 +605,7 @@ sub contains_pod {
 
   # check for one line of POD
   $verbose > 1 and print " Scanning $file for pod...\n";
-  unless( open(MAYBEPOD,"<", "$file") ) {
+  unless( open(MAYBEPOD,"<$file") ) {
     print "Error: $file is unreadable: $!\n";
     return undef;
   }
@@ -996,21 +1004,48 @@ with default attribute values is used.
 
 Returns true if the supplied filename (not POD module) contains some Pod
 documentation.
+=head1 SUPPORT
 
+Questions or discussion about POD and Pod::Simple should be sent to the
+pod-people@perl.org mail list. Send an empty email to
+pod-people-subscribe@perl.org to subscribe.
+
+This module is managed in an open GitHub repository,
+L<http://github.com/theory/pod-simple/>. Feel free to fork and contribute, or
+to clone L<git://github.com/theory/pod-simple.git> and send patches!
+
+Patches against Pod::Simple are welcome. Please send bug reports to
+<bug-pod-simple@rt.cpan.org>.
+
+=head1 COPYRIGHT AND DISCLAIMERS
+
+Copyright (c) 2002 Sean M. Burke.
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
 
 =head1 AUTHOR
 
-Sean M. Burke E<lt>sburke@cpan.orgE<gt>
-borrowed code from
-Marek Rouchal's Pod::Find, which in turn
-heavily borrowed code from Nick Ing-Simmons' PodToHtml.
+Pod::Simple was created by Sean M. Burke <sburke@cpan.org> with code borrowed
+from Marek Rouchal's L<Pod::Find>, which in turn heavily borrowed code from
+Nick Ing-Simmons' C<PodToHtml>.
 
-Tim Jenness E<lt>t.jenness@jach.hawaii.eduE<gt> provided
-C<find> and C<contains_pod> to Pod::Find.
+But don't bother him, he's retired.
 
-=head1 SEE ALSO
+Pod::Simple is maintained by:
 
-L<Pod::Simple>, L<Pod::Perldoc>
+=over
+
+=item * Allison Randal C<allison@perl.org>
+
+=item * Hans Dieter Pearcey C<hdp@cpan.org>
+
+=item * David E. Wheeler C<dwheeler@cpan.org>
+
+=back
 
 =cut
-

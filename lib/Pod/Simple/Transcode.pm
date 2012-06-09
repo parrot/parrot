@@ -1,6 +1,8 @@
 
 require 5;
 package Pod::Simple::Transcode;
+use vars qw($VERSION );
+$VERSION = '3.19';
 
 BEGIN {
   if(defined &DEBUG) {;} # Okay
