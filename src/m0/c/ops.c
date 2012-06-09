@@ -265,7 +265,13 @@ m0_op_goto_chunk(M0_CallFrame *frame, const unsigned char *ops )
     M0_Chunk *chunk = (M0_Chunk*)((*interp)[CHUNKS]);
     while(chunk) {
         if(strncmp( chunk->name, (char *)frame->registers[ops[1]], chunk->name_length) == 0
-            /* XXX: temporary fix, so t/fun.m1 runs fine. */
+            /* XXX: temporary fix, so t/fun.m1 runs fine. Per spec, when an m0b library is 
+               loaded, the interpreter must store the index of the named chunk in the 
+               constants segment slot for that constant. see:
+               1) https://github.com/parrot/parrot/blob/m0/docs/pdds/draft/pdd32_m0.pod#Chunk_Name_Constants_and_Bytecode_Loading
+               2) http://lists.parrot.org/pipermail/parrot-dev/2012-June/006961.html
+               3) https://github.com/parrot/parrot/blob/m0/src/m0/perl5/m0_interp.pl
+             */
             || ( ((M0_Chunk *)(frame->registers[ops[1]]))->name
                 && strncmp( chunk->name, ((M0_Chunk *)(frame->registers[ops[1]]))->name, chunk->name_length ) == 0 ))  {
             frame->registers[CHUNK]  = (uint64_t)chunk;
