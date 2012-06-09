@@ -11,14 +11,36 @@ Parrot::Pmc2c::Attribute
 
 =head1 DESCRIPTION
 
-Methods for attribute struct.  Called by
-C<Parrot::Pmc2c::Parser::find_attrs()>.
+Methods for attribute struct.
 
 =head1 METHODS
 
 =head2 C<new>
 
+=over 4
+
+=item * Purpose
+
 Parrot::Pmc2c::Attribute constructor.
+
+=item * Arguments
+
+Single hash reference with four key-value pairs:
+
+    name       => $name,
+    type       => $type,
+    array_size => $array_size,
+    modifiers  => \@modifiers,
+
+=item * Return Value
+
+Parrot::Pmc2c::Attribute object.
+
+=item * Comment
+
+Called by C<Parrot::Pmc2c::Parser::find_attrs()>.
+
+=back
 
 =cut
 
@@ -48,6 +70,11 @@ sub name {
     $self->{name}        = $value if $value;
     return $self->{name};
 }
+
+=head2 C<generate_*> methods
+
+The four following methods appear to be called only within
+C<Parrot::Pmc2c::PMC::gen_attributes()>.
 
 =head2 C<generate_declaration>
 
