@@ -17,6 +17,7 @@ enum {
 };
 
 enum M0_OPS {
+    /* gen_c_opnames_from(m0.ops) template('    M0_UC_OP,') */
     M0_NOOP,
     M0_GOTO,
     M0_GOTO_IF,
@@ -35,8 +36,8 @@ enum M0_OPS {
     M0_ISGT_N,
     M0_ISGE_I,
     M0_ISGE_N,
-    M0_ITON,
-    M0_NTOI,
+    M0_CONVERT_I_N,
+    M0_CONVERT_N_I,
     M0_ASHR,
     M0_LSHR,
     M0_SHL,
@@ -63,6 +64,7 @@ enum M0_OPS {
     M0_PRINT_I,
     M0_PRINT_N,
     M0_EXIT
+    /* end_gen */
 };
 
 typedef uint64_t M0_Config[8];
