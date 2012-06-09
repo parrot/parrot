@@ -1,5 +1,5 @@
 # THIS IS A GENERATED FILE! DO NOT EDIT!
-# Compiled with Winxed 1.9.0
+# Compiled with Winxed 1.9.1
 # Source file: winxedst2.winxed
 # Begin generated code
 
@@ -9,7 +9,7 @@
     new $P1, ['FixedIntegerArray'], 3
     $P1[0] = 1
     $P1[1] = 9
-    $P1[2] = 0
+    $P1[2] = 1
     .return($P1)
 
 .end # getVersion
@@ -1620,11 +1620,14 @@
   __label_4: # while
     set $S3, $S1
     iseq $I2, $S3, " "
-    if $I2 goto __label_7
+    if $I2 goto __label_8
     iseq $I2, $S3, "\n"
+  __label_8:
+    if $I2 goto __label_7
+    iseq $I2, $S3, "\t"
   __label_7:
     if $I2 goto __label_6
-    iseq $I2, $S3, "\t"
+    iseq $I2, $S3, "\r"
   __label_6:
   __label_5:
     unless $I2 goto __label_3
@@ -1634,54 +1637,54 @@
   __label_3: # endwhile
     getattribute $P3, self, 'line'
     set $I1, $P3
-    ne $S1, "", __label_8
+    ne $S1, "", __label_9
     new $P4, [ 'Winxed'; 'Compiler'; 'TokenEof' ]
     getattribute $P5, self, 'filename'
     $P4.'TokenEof'($P5)
     set $P3, $P4
     .return($P3)
-  __label_8: # endif
+  __label_9: # endif
     set $S4, $S1
     index $I4, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_", $S4
     isgt $I3, $I4, -1
-  __label_10:
-    unless $I3 goto __label_9
+  __label_11:
+    unless $I3 goto __label_10
     .tailcall WSubId_38(self, $S1, $I1)
-  __label_9: # endif
+  __label_10: # endif
     set $S5, $S1
     index $I4, "0123456789", $S5
     isgt $I5, $I4, -1
-  __label_12:
-    unless $I5 goto __label_11
+  __label_13:
+    unless $I5 goto __label_12
     .tailcall WSubId_46(self, $S1, $I1)
-  __label_11: # endif
+  __label_12: # endif
     set $S2, $S1
     getattribute $P1, self, 'select'
     $P2 = $P1[$S1]
-  __label_14: # while
-    if_null $P2, __label_13
+  __label_15: # while
+    if_null $P2, __label_14
     isa $I4, $P2, "Hash"
-    unless $I4 goto __label_13
+    unless $I4 goto __label_14
     $P3 = self.'getchar'()
     set $S1, $P3
     set $P1, $P2
     $P2 = $P1[$S1]
-    unless_null $P2, __label_15
+    unless_null $P2, __label_16
     self.'ungetchar'($S1)
     $P2 = $P1[""]
-    goto __label_16
-  __label_15: # else
-    concat $S2, $S2, $S1
-  __label_16: # endif
-    goto __label_14
-  __label_13: # endwhile
-    if_null $P2, __label_18
-    $P3 = $P2(self, $S2, $I1)
     goto __label_17
-  __label_18:
+  __label_16: # else
+    concat $S2, $S2, $S1
+  __label_17: # endif
+    goto __label_15
+  __label_14: # endwhile
+    if_null $P2, __label_19
+    $P3 = $P2(self, $S2, $I1)
+    goto __label_18
+  __label_19:
     $P4 = WSubId_39(self, $S2, $I1)
     set $P3, $P4
-  __label_17:
+  __label_18:
     .return($P3)
 
 .end # get_token
