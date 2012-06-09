@@ -434,6 +434,7 @@ static STR_VTABLE Parrot_ucs2_encoding = {
     unicode_upcase,
     unicode_downcase,
     unicode_titlecase,
+    unicode_foldcase,
     unicode_upcase_first,
     unicode_downcase_first,
     unicode_titlecase_first,

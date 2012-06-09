@@ -168,6 +168,7 @@ static STR_VTABLE Parrot_null_encoding = {
     (str_vtable_upcase_t)null_error,
     (str_vtable_downcase_t)null_error,
     (str_vtable_titlecase_t)null_error,
+    (str_vtable_foldcase_t)null_error,
     (str_vtable_upcase_first_t)null_error,
     (str_vtable_downcase_first_t)null_error,
     (str_vtable_titlecase_first_t)null_error,

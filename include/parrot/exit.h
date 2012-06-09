@@ -71,6 +71,7 @@ void Parrot_x_panic_and_exit(
     unsigned int line);
 
 PARROT_COLD
+PARROT_NO_ADDRESS_SAFETY_ANALYSIS
 void Parrot_x_execute_on_exit_handlers(PARROT_INTERP, int status)
         __attribute__nonnull__(1);
 

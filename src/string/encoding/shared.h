@@ -257,6 +257,11 @@ STRING* unicode_downcase_first(PARROT_INTERP, const STRING *src)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
+STRING * unicode_foldcase(PARROT_INTERP, ARGIN(const STRING *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_CANNOT_RETURN_NULL
 STRING* unicode_titlecase(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -377,6 +382,9 @@ STRING* unicode_upcase_first(PARROT_INTERP, const STRING *src)
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_unicode_downcase_first __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_unicode_foldcase __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_unicode_titlecase __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
