@@ -1180,13 +1180,16 @@
   __label_3: # for condition
     eq $S2, "\n", __label_2
     if $S2 == "" goto __label_6
-    if $S2 == "\"" goto __label_7
-    if $S2 == "\\" goto __label_8
+    if $S2 == "\r" goto __label_7
+    if $S2 == "\"" goto __label_8
+    if $S2 == "\\" goto __label_9
     goto __label_4
   __label_6: # case
     WSubId_36(__ARG_1, __ARG_3)
   __label_7: # case
+    goto __label_5 # break
   __label_8: # case
+  __label_9: # case
     concat $S6, "\\", $S2
     set $S2, $S6
     goto __label_5 # break
@@ -1203,38 +1206,41 @@
     set $S1, $S5
     set $S3, ""
     null $S4
-  __label_9: # do
+  __label_10: # do
     set $S4, ""
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
-  __label_14: # for condition
-    eq $S2, "\n", __label_13
-    if $S2 == "" goto __label_17
-    if $S2 == "\"" goto __label_18
-    if $S2 == "\\" goto __label_19
-    goto __label_15
-  __label_17: # case
-    WSubId_36(__ARG_1, __ARG_3)
+  __label_15: # for condition
+    eq $S2, "\n", __label_14
+    if $S2 == "" goto __label_18
+    if $S2 == "\r" goto __label_19
+    if $S2 == "\"" goto __label_20
+    if $S2 == "\\" goto __label_21
+    goto __label_16
   __label_18: # case
+    WSubId_36(__ARG_1, __ARG_3)
   __label_19: # case
+    goto __label_17 # break
+  __label_20: # case
+  __label_21: # case
     concat $S6, "\\", $S2
     set $S2, $S6
-    goto __label_16 # break
-  __label_15: # default
-  __label_16: # switch end
+    goto __label_17 # break
+  __label_16: # default
+  __label_17: # switch end
     concat $S4, $S4, $S2
-  __label_12: # for iteration
+  __label_13: # for iteration
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
-    goto __label_14
-  __label_13: # for end
-    eq $S4, $S1, __label_20
+    goto __label_15
+  __label_14: # for end
+    eq $S4, $S1, __label_22
     concat $S3, $S3, $S4
     concat $S3, $S3, "\\n"
-  __label_20: # endif
-  __label_11: # continue
-    ne $S4, $S1, __label_9
-  __label_10: # enddo
+  __label_22: # endif
+  __label_12: # continue
+    ne $S4, $S1, __label_10
+  __label_11: # enddo
     new $P2, [ 'Winxed'; 'Compiler'; 'TokenQuoted' ]
     getattribute $P3, __ARG_1, 'filename'
     $P2.'TokenQuoted'($P3, __ARG_3, $S3)
