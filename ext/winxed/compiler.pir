@@ -1190,13 +1190,12 @@
     goto __label_5 # break
   __label_8: # case
   __label_9: # case
-    concat $S6, "\\", $S2
-    set $S2, $S6
+    concat $S1, $S1, "\\"
+    concat $S1, $S1, $S2
     goto __label_5 # break
   __label_4: # default
+    concat $S1, $S1, $S2
   __label_5: # switch end
-    concat $S5, $S1, $S2
-    set $S1, $S5
   __label_1: # for iteration
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
@@ -1223,12 +1222,12 @@
     goto __label_17 # break
   __label_20: # case
   __label_21: # case
-    concat $S6, "\\", $S2
-    set $S2, $S6
+    concat $S4, $S4, "\\"
+    concat $S4, $S4, $S2
     goto __label_17 # break
   __label_16: # default
-  __label_17: # switch end
     concat $S4, $S4, $S2
+  __label_17: # switch end
   __label_13: # for iteration
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
