@@ -55,6 +55,7 @@
 #define STRING_upcase(interp, src) ((src)->encoding)->upcase((interp), (src))
 #define STRING_downcase(interp, src) ((src)->encoding)->downcase((interp), (src))
 #define STRING_titlecase(interp, src) ((src)->encoding)->titlecase((interp), (src))
+#define STRING_foldcase(interp, src) ((src)->encoding)->foldcase((interp), (src))
 #define STRING_upcase_first(interp, src) ((src)->encoding)->upcase_first((interp), (src))
 #define STRING_downcase_first(interp, src) ((src)->encoding)->downcase_first((interp), (src))
 #define STRING_titlecase_first(interp, src) ((src)->encoding)->titlecase_first((interp), (src))
@@ -137,6 +138,7 @@ typedef STRING * (*str_vtable_decompose_t)(PARROT_INTERP, ARGIN(const STRING *sr
 typedef STRING * (*str_vtable_upcase_t)(PARROT_INTERP, ARGIN(const STRING *src));
 typedef STRING * (*str_vtable_downcase_t)(PARROT_INTERP, ARGIN(const STRING *src));
 typedef STRING * (*str_vtable_titlecase_t)(PARROT_INTERP, ARGIN(const STRING *src));
+typedef STRING * (*str_vtable_foldcase_t)(PARROT_INTERP, ARGIN(const STRING *src));
 typedef STRING * (*str_vtable_upcase_first_t)(PARROT_INTERP, ARGIN(const STRING *src));
 typedef STRING * (*str_vtable_downcase_first_t)(PARROT_INTERP, ARGIN(const STRING *src));
 typedef STRING * (*str_vtable_titlecase_first_t)(PARROT_INTERP, ARGIN(const STRING *src));
@@ -183,6 +185,7 @@ struct _str_vtable {
     str_vtable_upcase_t                 upcase;
     str_vtable_downcase_t               downcase;
     str_vtable_titlecase_t              titlecase;
+    str_vtable_foldcase_t               foldcase;
     str_vtable_upcase_first_t           upcase_first;
     str_vtable_downcase_first_t         downcase_first;
     str_vtable_titlecase_first_t        titlecase_first;

@@ -1436,6 +1436,7 @@ unicode_compose(PARROT_INTERP, ARGIN(const STRING *src))
 #define ENCODING_UPCASE     1
 #define ENCODING_DOWNCASE   2
 #define ENCODING_TITLECASE  3
+#define ENCODING_FOLDCASE   4
 
 /*
 
@@ -1473,6 +1474,11 @@ convert_case_buf(PARROT_INTERP, ARGMOD_NULLOK(char *dest_buf), size_t dest_len,
         res = u_strToTitle((UChar *)dest_buf, dest_len / 2,
                            (const UChar *)src_buf, src_len / 2,
                            NULL, NULL, &err);
+        break;
+      case ENCODING_FOLDCASE:
+        res = u_strFoldCase((UChar *)dest_buf, dest_len / 2,
+                            (const UChar *)src_buf, src_len / 2,
+                            U_FOLD_CASE_DEFAULT, &err);
         break;
       default:
         res = 0; /* Should never happen, just to avoid a warning */
@@ -1637,6 +1643,25 @@ unicode_titlecase(PARROT_INTERP, ARGIN(const STRING *src))
     return unicode_convert_case(interp, src, ENCODING_TITLECASE);
 }
 
+/*
+
+=item C<STRING * unicode_foldcase(PARROT_INTERP, const STRING *src)>
+
+Perform a Fold-Case on the string
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+STRING *
+unicode_foldcase(PARROT_INTERP, ARGIN(const STRING *src))
+{
+    ASSERT_ARGS(unicode_foldcase)
+    /* This forces an up-convertion to utf16, which might not be desirable
+       in all cases */
+    return unicode_convert_case(interp, src, ENCODING_FOLDCASE);
+}
 
 /*
 

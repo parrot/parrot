@@ -460,6 +460,7 @@ static STR_VTABLE Parrot_latin1_encoding = {
     latin1_upcase,
     latin1_downcase,
     latin1_titlecase,
+    (str_vtable_foldcase_t)latin1_downcase,
     latin1_upcase_first,
     latin1_downcase_first,
     latin1_titlecase_first,

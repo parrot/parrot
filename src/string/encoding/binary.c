@@ -230,6 +230,7 @@ static STR_VTABLE Parrot_binary_encoding = {
     (str_vtable_upcase_t)binary_error,
     (str_vtable_downcase_t)binary_error,
     (str_vtable_titlecase_t)binary_error,
+    (str_vtable_foldcase_t)binary_error,
     (str_vtable_upcase_first_t)binary_error,
     (str_vtable_downcase_first_t)binary_error,
     (str_vtable_titlecase_first_t)binary_error,

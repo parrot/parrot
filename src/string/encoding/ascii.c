@@ -432,6 +432,7 @@ static STR_VTABLE Parrot_ascii_encoding = {
     ascii_upcase,
     ascii_downcase,
     ascii_titlecase,
+    (str_vtable_foldcase_t)ascii_downcase,
     ascii_upcase_first,
     ascii_downcase_first,
     ascii_titlecase_first,
