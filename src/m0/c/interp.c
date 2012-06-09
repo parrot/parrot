@@ -101,7 +101,7 @@ new_call_frame( M0_Interp *interp ) {
     frame->registers[CHUNK]  = (uint64_t)(*interp)[CHUNKS];
     frame->registers[PC]     = (uint64_t)0;
     frame->registers[CONSTS] = (uint64_t)((M0_Chunk*) ((*interp)[CHUNKS]))->constants;
-    frame->registers[CF]	 = (uint64_t)frame;
+    frame->registers[CF]     = (uint64_t)frame;
     frame->registers[INTERP] = (uint64_t)interp;
 
     return frame;

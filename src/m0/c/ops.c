@@ -264,7 +264,10 @@ m0_op_goto_chunk(M0_CallFrame *frame, const unsigned char *ops )
     M0_Interp *interp = (M0_Interp *)frame->registers[INTERP];
     M0_Chunk *chunk = (M0_Chunk*)((*interp)[CHUNKS]);
     while(chunk) {
-        if(    strncmp( chunk->name, (char *)frame->registers[ops[1]], chunk->name_length) == 0) {
+        if(strncmp( chunk->name, (char *)frame->registers[ops[1]], chunk->name_length) == 0
+            /* XXX: temporary fix, so t/fun.m1 runs fine. */
+            || ( ((M0_Chunk *)(frame->registers[ops[1]]))->name
+                && strncmp( chunk->name, ((M0_Chunk *)(frame->registers[ops[1]]))->name, chunk->name_length ) == 0 ))  {
             frame->registers[CHUNK]  = (uint64_t)chunk;
             frame->registers[CONSTS] = (uint64_t)chunk->constants;
             frame->registers[MDS]    = (uint64_t)chunk->metadata;
