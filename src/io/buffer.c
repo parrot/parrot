@@ -431,6 +431,20 @@ Parrot_io_buffer_content_size(SHIM_INTERP, ARGIN(IO_BUFFER *buffer))
     return BUFFER_USED_SIZE(buffer);
 }
 
+void
+Parrot_io_buffer_advance_position(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer), size_t len)
+{
+    ASSERT_ARGS(Parrot_io_buffer_advance_position)
+    if (!buffer || BUFFER_IS_EMPTY(buffer))
+        return;
+    if (BUFFER_USED_SIZE(buffer) <= len) {
+        Parrot_io_buffer_clear(interp, buffer);
+        return;
+    }
+    buffer->buffer_start += len;
+    io_buffer_normalize(interp, buffer);
+}
+
 /*
 
 =item C<size_t io_buffer_find_string_marker(PARROT_INTERP, IO_BUFFER *buffer,
@@ -523,11 +537,32 @@ Parrot_io_buffer_seek(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
         INTVAL w)
 {
     ASSERT_ARGS(Parrot_io_buffer_seek)
+    PIOOFF_T cur_pos = vtable->get_position(interp, handle);
+    PIOOFF_T pos_diff;
 
-    /* TODO: Try to seek inside the read buffer */
-    offset -= BUFFER_USED_SIZE(buffer);
-    Parrot_io_buffer_clear(interp, buffer);
-    return vtable->seek(interp, handle, offset, w);
+    PARROT_ASSERT(w == SEEK_SET);
+
+    if (cur_pos == offset)
+        return;
+    if (offset < cur_pos) {
+        /* write buffers are flushed before seeking, so this is a read buffer.
+           if we're not seeking to a position inside the buffer just clear it.
+        */
+        Parrot_io_buffer_clear(interp, buffer);
+        return vtable->seek(interp, handle, offset, w);
+    }
+    pos_diff = offset - cur_pos;
+    PARROT_ASSERT(pos_diff > 0);
+
+    if (pos_diff > BUFFER_USED_SIZE(buffer)) {
+        Parrot_io_buffer_clear(interp, buffer);
+        return vtable->seek(interp, handle, offset, w);
+    }
+
+    /* If we're here, we can seek inside this buffer */
+    buffer->buffer_start += (size_t)pos_diff;
+    io_buffer_normalize(interp, buffer);
+    return offset;
 }
 
 /*

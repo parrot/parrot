@@ -134,7 +134,7 @@ struct _ParrotIOData {
 #define PIO_UNKNOWN_SIZE (size_t)-1
 
 /* Buffer Macros */
-#define BUFFER_IS_EMPTY(b) (b->buffer_start == b->buffer_end)
+#define BUFFER_IS_EMPTY(b) (b->buffer_start >= b->buffer_end)
 #define BUFFER_IS_FULL(b)  ((size_t)(b->buffer_end - b->buffer_start) == b->buffer_size)
 #define BUFFER_USED_SIZE(b) ((size_t)(b->buffer_end - b->buffer_start))
 #define BUFFER_AVAILABLE_SIZE(b) (b->buffer_size - ((size_t)(b->buffer_end - b->buffer_start)))
@@ -184,13 +184,12 @@ void io_read_chars_append_string(PARROT_INTERP,
     ARGMOD(STRING * s),
     ARGMOD(PMC *handle),
     ARGIN(IO_VTABLE *vtable),
-    ARGMOD(IO_BUFFER *buffer),
+    ARGMOD_NULLOK(IO_BUFFER *buffer),
     size_t byte_length)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
         FUNC_MODIFIES(* s)
         FUNC_MODIFIES(*handle)
         FUNC_MODIFIES(*buffer);
@@ -225,6 +224,32 @@ STRING * io_readline_encoded_string(PARROT_INTERP,
         FUNC_MODIFIES(*handle)
         FUNC_MODIFIES(*buffer);
 
+void io_sync_buffers_for_read(PARROT_INTERP,
+    ARGMOD(PMC *handle),
+    ARGIN(IO_VTABLE *vtable),
+    ARGMOD_NULLOK(IO_BUFFER *read_buffer),
+    ARGMOD_NULLOK(IO_BUFFER * write_buffer))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*handle)
+        FUNC_MODIFIES(*read_buffer)
+        FUNC_MODIFIES(* write_buffer);
+
+void io_sync_buffers_for_write(PARROT_INTERP,
+    ARGMOD(PMC *handle),
+    ARGIN(IO_VTABLE *vtable),
+    ARGMOD_NULLOK(IO_BUFFER *read_buffer),
+    ARGMOD_NULLOK(IO_BUFFER * write_buffer))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*handle)
+        FUNC_MODIFIES(*read_buffer)
+        FUNC_MODIFIES(* write_buffer);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 IO_BUFFER * io_verify_has_read_buffer(PARROT_INTERP,
     ARGIN(PMC *handle),
     ARGIN(IO_VTABLE *vtable),
@@ -270,8 +295,7 @@ STRING * io_verify_string_encoding(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s) \
     , PARROT_ASSERT_ARG(handle) \
-    , PARROT_ASSERT_ARG(vtable) \
-    , PARROT_ASSERT_ARG(buffer))
+    , PARROT_ASSERT_ARG(vtable))
 #define ASSERT_ARGS_io_read_encoded_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \
@@ -282,6 +306,14 @@ STRING * io_verify_string_encoding(PARROT_INTERP,
     , PARROT_ASSERT_ARG(handle) \
     , PARROT_ASSERT_ARG(vtable) \
     , PARROT_ASSERT_ARG(buffer))
+#define ASSERT_ARGS_io_sync_buffers_for_read __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle) \
+    , PARROT_ASSERT_ARG(vtable))
+#define ASSERT_ARGS_io_sync_buffers_for_write __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle) \
+    , PARROT_ASSERT_ARG(vtable))
 #define ASSERT_ARGS_io_verify_has_read_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \
@@ -324,9 +356,10 @@ void io_filehandle_set_os_handle(PARROT_INTERP,
         FUNC_MODIFIES(*filehandle);
 
 void io_filehandle_setup_vtable(PARROT_INTERP,
-    IO_VTABLE *vtable,
+    ARGMOD_NULLOK(IO_VTABLE *vtable),
     INTVAL idx)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*vtable);
 
 #define ASSERT_ARGS_io_filehandle_get_file_position \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -346,8 +379,11 @@ void io_filehandle_setup_vtable(PARROT_INTERP,
 /* HEADERIZER BEGIN: src/io/pipe.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void io_pipe_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable, INTVAL idx)
-        __attribute__nonnull__(1);
+void io_pipe_setup_vtable(PARROT_INTERP,
+    ARGMOD_NULLOK(IO_VTABLE *vtable),
+    INTVAL idx)
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*vtable);
 
 #define ASSERT_ARGS_io_pipe_setup_vtable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -358,9 +394,10 @@ void io_pipe_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable, INTVAL idx)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 void io_socket_setup_vtable(PARROT_INTERP,
-    ARGIN_NULLOK(IO_VTABLE *vtable),
+    ARGMOD_NULLOK(IO_VTABLE *vtable),
     INTVAL idx)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*vtable);
 
 #define ASSERT_ARGS_io_socket_setup_vtable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -371,9 +408,10 @@ void io_socket_setup_vtable(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 void io_stringhandle_setup_vtable(PARROT_INTERP,
-    IO_VTABLE *vtable,
+    ARGMOD_NULLOK(IO_VTABLE *vtable),
     INTVAL idx)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*vtable);
 
 #define ASSERT_ARGS_io_stringhandle_setup_vtable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -384,9 +422,10 @@ void io_stringhandle_setup_vtable(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 void io_userhandle_setup_vtable(PARROT_INTERP,
-    IO_VTABLE *vtable,
+    ARGMOD_NULLOK(IO_VTABLE *vtable),
     INTVAL idx)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*vtable);
 
 #define ASSERT_ARGS_io_userhandle_setup_vtable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))

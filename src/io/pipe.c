@@ -8,6 +8,13 @@
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void io_pipe_adv_position(PARROT_INTERP,
+    ARGMOD(PMC *handle),
+    PIOOFF_T offset)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*handle);
+
 static INTVAL io_pipe_close(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -32,6 +39,11 @@ static INTVAL io_pipe_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
 static PIOHANDLE io_pipe_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+static PIOOFF_T io_pipe_get_position(PARROT_INTERP, ARGMOD(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*handle);
 
 static INTVAL io_pipe_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(1)
@@ -78,6 +90,13 @@ static void io_pipe_set_flags(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static PIOOFF_T io_pipe_set_position(PARROT_INTERP,
+    ARGMOD(PMC *handle),
+    PIOOFF_T pos)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*handle);
+
 static PIOOFF_T io_pipe_tell(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -96,6 +115,9 @@ static INTVAL io_pipe_write_b(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*handle);
 
+#define ASSERT_ARGS_io_pipe_adv_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_pipe_close __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -109,6 +131,9 @@ static INTVAL io_pipe_write_b(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_pipe_get_piohandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_pipe_get_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_pipe_is_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -132,6 +157,9 @@ static INTVAL io_pipe_write_b(PARROT_INTERP,
 #define ASSERT_ARGS_io_pipe_set_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_pipe_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_pipe_tell __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -146,7 +174,7 @@ static INTVAL io_pipe_write_b(PARROT_INTERP,
 /* HEADERIZER END: static */
 
 void
-io_pipe_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable, INTVAL idx)
+io_pipe_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), INTVAL idx)
 {
     ASSERT_ARGS(io_pipe_setup_vtable)
     if (vtable == NULL)
@@ -160,6 +188,9 @@ io_pipe_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable, INTVAL idx)
     vtable->is_eof = io_pipe_is_eof;
     vtable->tell = io_pipe_tell;
     vtable->seek = io_pipe_seek;
+    vtable->adv_position = io_pipe_adv_position;
+    vtable->set_position = io_pipe_set_position;
+    vtable->get_position = io_pipe_get_position;
     vtable->open = io_pipe_open;
     vtable->is_open = io_pipe_is_open;
     vtable->close = io_pipe_close;
@@ -233,6 +264,28 @@ io_pipe_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL whence)
     return 0;
 }
 
+static void
+io_pipe_adv_position(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset)
+{
+    ASSERT_ARGS(io_pipe_adv_position)
+    /* Pipes don't keep track of file position internally. Ignore this. */
+}
+
+static PIOOFF_T
+io_pipe_set_position(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T pos)
+{
+    ASSERT_ARGS(io_pipe_set_position)
+    /* Pipes don't keep track of file position internally. Ignore. */
+}
+
+static PIOOFF_T
+io_pipe_get_position(PARROT_INTERP, ARGMOD(PMC *handle))
+{
+    ASSERT_ARGS(io_pipe_get_position)
+    /* Pipes don't keep track of file position internally. Return 0 */
+    return (PIOOFF_T)0;
+}
+
 static INTVAL
 io_pipe_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTVAL flags, ARGIN(STRING *mode))
 {
@@ -268,6 +321,7 @@ io_pipe_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTVAL fla
     SETATTR_FileHandle_flags(interp, handle, flags);
     SETATTR_FileHandle_filename(interp, handle, path);
     SETATTR_FileHandle_mode(interp, handle, mode);
+    SETATTR_FileHandle_file_pos(interp, handle, 0);
 
     return 1;
 }

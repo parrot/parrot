@@ -130,36 +130,40 @@ typedef INTVAL      (*io_vtable_write_b)      (PARROT_INTERP, PMC *handle, ARGIN
 typedef INTVAL      (*io_vtable_flush)        (PARROT_INTERP, PMC *handle);
 typedef INTVAL      (*io_vtable_is_eof)       (PARROT_INTERP, PMC *handle);
 typedef PIOOFF_T    (*io_vtable_tell)         (PARROT_INTERP, PMC *handle);
-typedef INTVAL      (*io_vtable_seek)         (PARROT_INTERP, PMC *handle, PIOOFF_T offset, INTVAL whence);
+typedef PIOOFF_T    (*io_vtable_seek)         (PARROT_INTERP, PMC *handle, PIOOFF_T offset, INTVAL whence);
+typedef void        (*io_vtable_adv_position) (PARROT_INTERP, PMC *handle, size_t len);
+typedef void        (*io_vtable_set_position) (PARROT_INTERP, PMC *handle, PIOOFF_T pos);
+typedef PIOOFF_T    (*io_vtable_get_position) (PARROT_INTERP, PMC *handle);
 typedef INTVAL      (*io_vtable_open)         (PARROT_INTERP, PMC *handle, ARGIN(STRING *path), INTVAL flags, ARGIN(STRING *mode));
 typedef INTVAL      (*io_vtable_is_open)      (PARROT_INTERP, PMC *handle);
 typedef INTVAL      (*io_vtable_close)        (PARROT_INTERP, PMC *handle);
 typedef void        (*io_vtable_set_flags)    (PARROT_INTERP, PMC *handle, INTVAL flags);
 typedef INTVAL      (*io_vtable_get_flags)    (PARROT_INTERP, PMC *handle);
-typedef void        (*io_vtable_ensure_buffer)(PARROT_INTERP, PMC *handle, INTVAL buffer_no, size_t size, INTVAL flags);
 typedef size_t      (*io_vtable_total_size)   (PARROT_INTERP, PMC *handle);
 typedef PIOHANDLE   (*io_vtable_get_piohandle)(PARROT_INTERP, PMC *handle);
 typedef const STR_VTABLE *(*io_vtable_get_encoding) (PARROT_INTERP, PMC *handle);
 
 typedef struct _io_vtable {
-    const char            * name;
-    INTVAL                  number;
-    INTVAL                  flags;
-    io_vtable_read_b        read_b;
-    io_vtable_write_b       write_b;
-    io_vtable_flush         flush;
-    io_vtable_is_eof        is_eof;
-    io_vtable_open          open;
-    io_vtable_is_open       is_open;
-    io_vtable_close         close;
-    io_vtable_tell          tell;
-    io_vtable_seek          seek;
-    io_vtable_get_flags     get_flags;
-    io_vtable_set_flags     set_flags;
-    io_vtable_get_encoding  get_encoding;
-    io_vtable_ensure_buffer ensure_buffer;
-    io_vtable_total_size    total_size;
-    io_vtable_get_piohandle get_piohandle;
+    const char            * name;           /* Name of this vtable type */
+    INTVAL                  number;         /* Index number of this vtable */
+    INTVAL                  flags;          /* Flags for this type */
+    io_vtable_read_b        read_b;         /* Read bytes from the handle */
+    io_vtable_write_b       write_b;        /* Write bytes to the handle */
+    io_vtable_flush         flush;          /* Flush the handle */
+    io_vtable_is_eof        is_eof;         /* Determine if at end-of-file */
+    io_vtable_open          open;           /* Open the handle */
+    io_vtable_is_open       is_open;        /* Determine if the handle is open */
+    io_vtable_close         close;          /* Close the handle */
+    io_vtable_tell          tell;           /* Get on-disk file position */
+    io_vtable_seek          seek;           /* Seek to new position */
+    io_vtable_adv_position  adv_position;   /* Advance handle (in-mem) position */
+    io_vtable_set_position  set_position;   /* Set handle (in-mem) position */
+    io_vtable_get_position  get_position;   /* Get handle (in-mem) position */
+    io_vtable_get_flags     get_flags;      /* Get the flags */
+    io_vtable_set_flags     set_flags;      /* Set the flags */
+    io_vtable_get_encoding  get_encoding;   /* Get the handle encoding */
+    io_vtable_total_size    total_size;     /* Get the total size, if possible */
+    io_vtable_get_piohandle get_piohandle;  /* Get the raw file PIOHANDLE */
 } IO_VTABLE;
 
 #define IO_VTABLE_FILEHANDLE        0
@@ -561,7 +565,7 @@ PIOOFF_T Parrot_io_tell_handle(PARROT_INTERP, ARGMOD(PMC *handle))
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_io_write_b(PARROT_INTERP,
+size_t Parrot_io_write_b(PARROT_INTERP,
     ARGMOD(PMC *handle),
     ARGIN(const void *buffer),
     size_t byte_length)
@@ -601,6 +605,7 @@ PIOHANDLE Parrot_io_get_os_handle(PARROT_INTERP, ARGIN(PMC *handle))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
 IO_VTABLE * Parrot_io_get_vtable(PARROT_INTERP,
     INTVAL idx,
     ARGIN_NULLOK(const char * name))
@@ -851,6 +856,12 @@ void Parrot_io_buffer_add_to_handle(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
+void Parrot_io_buffer_advance_position(PARROT_INTERP,
+    ARGMOD_NULLOK(IO_BUFFER *buffer),
+    size_t len)
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*buffer);
+
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 IO_BUFFER * Parrot_io_buffer_allocate(PARROT_INTERP,
@@ -972,6 +983,9 @@ size_t Parrot_io_buffer_write_b(PARROT_INTERP,
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_Parrot_io_buffer_advance_position \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_buffer_allocate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(owner))

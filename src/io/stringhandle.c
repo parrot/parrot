@@ -21,6 +21,13 @@ src/io/stringhandle.c - StringHandle vtables and helper routines
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void io_stringhandle_adv_position(PARROT_INTERP,
+    ARGMOD(PMC *handle),
+    PIOOFF_T offset)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*handle);
+
 static INTVAL io_stringhandle_close(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -46,6 +53,12 @@ static PIOHANDLE io_stringhandle_get_piohandle(PARROT_INTERP,
     ARGIN(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
+
+static PIOOFF_T io_stringhandle_get_position(PARROT_INTERP,
+    ARGMOD(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*handle);
 
 static INTVAL io_stringhandle_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(1)
@@ -92,6 +105,13 @@ static void io_stringhandle_set_flags(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static PIOOFF_T io_stringhandle_set_position(PARROT_INTERP,
+    ARGMOD(PMC *handle),
+    PIOOFF_T pos)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*handle);
+
 static PIOOFF_T io_stringhandle_tell(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -110,6 +130,9 @@ static INTVAL io_stringhandle_write_b(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*handle);
 
+#define ASSERT_ARGS_io_stringhandle_adv_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_stringhandle_close __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -123,6 +146,9 @@ static INTVAL io_stringhandle_write_b(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_stringhandle_get_piohandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_stringhandle_get_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_stringhandle_is_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -146,6 +172,9 @@ static INTVAL io_stringhandle_write_b(PARROT_INTERP,
 #define ASSERT_ARGS_io_stringhandle_set_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_stringhandle_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_stringhandle_tell __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -161,7 +190,7 @@ static INTVAL io_stringhandle_write_b(PARROT_INTERP,
 
 
 void
-io_stringhandle_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable, INTVAL idx)
+io_stringhandle_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), INTVAL idx)
 {
     ASSERT_ARGS(io_stringhandle_setup_vtable)
     // TODO: readline and other operations requiring a buffer should be able to be
@@ -178,6 +207,9 @@ io_stringhandle_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable, INTVAL idx)
     vtable->is_eof = io_stringhandle_is_eof;
     vtable->tell = io_stringhandle_tell;
     vtable->seek = io_stringhandle_seek;
+    vtable->adv_position = io_stringhandle_adv_position;
+    vtable->set_position = io_stringhandle_set_position;
+    vtable->get_position = io_stringhandle_get_position;
     vtable->open = io_stringhandle_open;
     vtable->is_open = io_stringhandle_is_open;
     vtable->close = io_stringhandle_close;
@@ -280,6 +312,27 @@ io_stringhandle_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL
     }
     SETATTR_StringHandle_read_offset(interp, handle, read_offs);
     return 0; /* TODO: What should this be? */
+}
+
+static void
+io_stringhandle_adv_position(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset)
+{
+    ASSERT_ARGS(io_stringhandle_adv_position)
+    /* StringHandle keeps track of position directly. Ignore this. */
+}
+
+static PIOOFF_T
+io_stringhandle_set_position(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T pos)
+{
+    ASSERT_ARGS(io_stringhandle_set_position)
+    /* StringHandle keeps track of position directly. Ignore this. */
+}
+
+static PIOOFF_T
+io_stringhandle_get_position(PARROT_INTERP, ARGMOD(PMC *handle))
+{
+    ASSERT_ARGS(io_stringhandle_get_position)
+    return io_stringhandle_tell(interp, handle);
 }
 
 static INTVAL

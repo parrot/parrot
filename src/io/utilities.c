@@ -140,6 +140,8 @@ io_verify_is_open_for(PARROT_INTERP, ARGIN(PMC *handle),
                 "IO PMC %s is not in mode %d", vtable->name, flags);
 }
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 IO_BUFFER *
 io_verify_has_read_buffer(PARROT_INTERP, ARGIN(PMC *handle),
         ARGIN(IO_VTABLE *vtable), INTVAL flags)
@@ -201,6 +203,8 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
 {
     ASSERT_ARGS(io_read_encoded_string)
     STRING * const s = Parrot_gc_new_string_header(interp, 0);
+    size_t total_bytes_read = 0;
+
     s->bufused  = 0;
     s->strlen   = 0;
 
@@ -222,10 +226,12 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
 
         /* Append buffer to result */
         io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read);
+        total_bytes_read += bytes_to_read;
 
         if (bounds.chars == char_length)
             break;
     }
+    vtable->adv_position(interp, handle, total_bytes_read);
     return s;
 }
 
@@ -248,9 +254,11 @@ reading.
 void
 io_read_chars_append_string(PARROT_INTERP, ARGMOD(STRING * s),
         ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable),
-        ARGMOD(IO_BUFFER *buffer), size_t byte_length)
+        ARGMOD_NULLOK(IO_BUFFER *buffer), size_t byte_length)
 {
+    ASSERT_ARGS(io_read_chars_append_string)
     const size_t alloc_size = s->bufused + byte_length;
+    size_t bytes_read = 0;
     PARROT_ASSERT(s->encoding);
 
     if (alloc_size > s->_buflen) {
@@ -260,10 +268,16 @@ io_read_chars_append_string(PARROT_INTERP, ARGMOD(STRING * s),
             Parrot_gc_allocate_string_storage(interp, s, alloc_size);
     }
 
-    Parrot_io_buffer_read_b(interp, buffer, handle, vtable,
-                            s->strstart + s->bufused, byte_length);
+    if (buffer)
+        bytes_read = Parrot_io_buffer_read_b(interp, buffer, handle, vtable,
+                                       s->strstart + s->bufused, byte_length);
+    else
+        bytes_read = vtable->read_b(interp, handle, s->strstart + s->bufused,
+                                    byte_length);
 
+    PARROT_ASSERT(bytes_read == byte_length);
     s->bufused += byte_length;
+    vtable->adv_position(interp, handle, byte_length);
     STRING_scan(interp, s);
 }
 
@@ -288,6 +302,8 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
 {
     ASSERT_ARGS(io_readline_encoded_string)
     STRING * const s = Parrot_gc_new_string_header(interp, 0);
+    size_t total_bytes_read = 0;
+
     s->bufused  = 0;
     s->strlen   = 0;
 
@@ -307,13 +323,14 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
 
         /* Append buffer to result */
         io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read);
+        total_bytes_read += bytes_to_read;
 
-        /* If we've found the delimiter, we're at the end of line. Return
-           it */
+        /* If we've found the delimiter, we're at the end of line. Return it */
         if (bounds.delim == rs)
             break;
     }
 
+    vtable->adv_position(interp, handle, total_bytes_read);
     return s;
 }
 
@@ -322,6 +339,7 @@ PARROT_WARN_UNUSED_RESULT
 const STR_VTABLE *
 io_get_encoding(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable), INTVAL flags)
 {
+    ASSERT_ARGS(io_get_encoding)
     const STR_VTABLE * const encoding = vtable->get_encoding(interp, handle);
     if (encoding != NULL)
         return encoding;
@@ -330,6 +348,37 @@ io_get_encoding(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable), IN
     if (flags & PIO_F_READ)
         return Parrot_default_encoding_ptr;
     return Parrot_default_encoding_ptr;
+}
+
+void
+io_sync_buffers_for_read(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable), ARGMOD_NULLOK(IO_BUFFER *read_buffer), ARGMOD_NULLOK(IO_BUFFER * write_buffer))
+{
+    ASSERT_ARGS(io_sync_buffers_for_read)
+
+    /* If we have a non-empty write buffer, we have to flush it first
+       and advance the cursor before we attempt to read. Otherwise we'll be
+       reading data from the buffer that has already been overwritten, from a
+       position several bytes before where we're supposed to be. */
+    if (write_buffer && !BUFFER_IS_EMPTY(write_buffer)) {
+        size_t bytes_written = Parrot_io_buffer_flush(interp, write_buffer, handle, vtable);
+        Parrot_io_buffer_advance_position(interp, read_buffer, bytes_written);
+    }
+}
+
+void
+io_sync_buffers_for_write(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable), ARGMOD_NULLOK(IO_BUFFER *read_buffer), ARGMOD_NULLOK(IO_BUFFER * write_buffer))
+{
+    ASSERT_ARGS(io_sync_buffers_for_write)
+
+    /* If we have a read buffer, the on-disk file position is ahead of the
+       current cursor. We need to clear the read buffer and reset the on-disk
+       position to match what we expect it to be, so the written data goes
+       to the correct place */
+    if (read_buffer && !BUFFER_IS_EMPTY(read_buffer)) {
+        size_t buffer_size = BUFFER_USED_SIZE(read_buffer);
+        Parrot_io_buffer_clear(interp, read_buffer);
+        vtable->seek(interp, handle, -buffer_size, SEEK_CUR);
+    }
 }
 
 /*

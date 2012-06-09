@@ -145,7 +145,7 @@ static INTVAL io_userhandle_write_b(PARROT_INTERP,
 /* HEADERIZER END: static */
 
 void
-io_userhandle_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable, INTVAL idx)
+io_userhandle_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), INTVAL idx)
 {
     ASSERT_ARGS(io_userhandle_setup_vtable)
     if (vtable == NULL)
