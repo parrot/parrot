@@ -182,6 +182,12 @@ void Parrot_str_finish(PARROT_INTERP)
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
+STRING * Parrot_str_foldcase(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_str_format_data(PARROT_INTERP,
     ARGIN(const char *format),
     ...)
@@ -555,6 +561,8 @@ STRING * Parrot_str_new_from_cstring(PARROT_INTERP,
     , PARROT_ASSERT_ARG(src) \
     , PARROT_ASSERT_ARG(search))
 #define ASSERT_ARGS_Parrot_str_finish __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_str_foldcase __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_str_format_data __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

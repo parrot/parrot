@@ -917,6 +917,8 @@ op_lib_t *Parrot_DynOp_core_4_4_0(PARROT_INTERP, long init);
  opcode_t * Parrot_downcase_s_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_titlecase_s_s(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_titlecase_s_sc(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_foldcase_s_s(opcode_t *, PARROT_INTERP);
+ opcode_t * Parrot_foldcase_s_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_join_s_s_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_join_s_sc_p(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_split_p_s_s(opcode_t *, PARROT_INTERP);
