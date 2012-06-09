@@ -2974,6 +2974,34 @@ Parrot_str_titlecase(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
     }
 }
 
+/*
+
+=item C<STRING * Parrot_str_foldcase(PARROT_INTERP, const STRING *s)>
+
+Returns a copy of the specified Parrot string case-folded. Non caseable
+characters are left unchanged. The encoding of the string may be modified.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
+STRING *
+Parrot_str_foldcase(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
+{
+    ASSERT_ARGS(Parrot_str_foldcase)
+
+    if (STRING_IS_NULL(s))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "Can't foldcase NULL string");
+    else {
+        STRING * const res = STRING_foldcase(interp, s);
+        res->hashval = 0;
+        return res;
+    }
+}
 
 /*
 

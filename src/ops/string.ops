@@ -441,6 +441,16 @@ inline op titlecase(out STR, in STR)  {
     $1 = Parrot_str_titlecase(interp, $2);
 }
 
+=item B<foldcase>(out STR, in STR)
+
+Foldcase $2 and put the result in $1
+
+=cut
+
+inline op foldcase(out STR, in STR) {
+    $1 = Parrot_str_foldcase(interp, $2);
+}
+
 
 =item B<join>(out STR, in STR, invar PMC)
 
