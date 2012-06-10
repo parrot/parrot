@@ -48,13 +48,13 @@ Current Method Body
 =cut
 
 sub rewrite_multi_sub {
-    my ( $self, $pmc ) = @_;
+    my ( $method, $pmc ) = @_;
     my @param_types = ();
     my @new_params = ();
 
     # Fixup the parameters, standardizing PMC types and extracting type names
     # for the multi name.
-    for my $param ( split /,/, $self->parameters ) {
+    for my $param ( split /,/, $method->parameters ) {
         my ( $type, $name, $rest ) = split /\s+/, &Parrot::Pmc2c::PCCMETHOD::trim($param), 3;
 
         die "Invalid MULTI parameter '$param': missing type or name\n"
@@ -84,11 +84,11 @@ sub rewrite_multi_sub {
         }
     }
 
-    $self->parameters(join (",", @new_params));
+    $method->parameters(join (",", @new_params));
 
-    $self->{MULTI_sig}      = [@param_types];
-    $self->{MULTI_full_sig} = join(',', @param_types);
-    $self->{MULTI}          = 1;
+    $method->{MULTI_sig}      = [@param_types];
+    $method->{MULTI_full_sig} = join(',', @param_types);
+    $method->{MULTI}          = 1;
 
     return 1;
 }

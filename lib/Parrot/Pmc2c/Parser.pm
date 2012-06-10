@@ -274,6 +274,7 @@ sub find_methods {
             $pmc->set_flag('need_fia_header');
         }
         elsif ( $method->type eq Parrot::Pmc2c::Method::MULTI ) {
+            # rewrite_multi_sub() modifies $method in-place
             Parrot::Pmc2c::MULTI::rewrite_multi_sub( $method, $pmc );
         }
 
