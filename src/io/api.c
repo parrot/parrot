@@ -1694,12 +1694,13 @@ Parrot_io_get_os_handle(PARROT_INTERP, ARGIN(PMC *handle))
 void
 Parrot_io_set_buffer_mode(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *mode))
 {
+    ASSERT_ARGS(Parrot_io_set_buffer_mode)
+
     /* This is a compatibility function for old-style buffer setting by mode
        name. A newer interface will need to be used with the new buffering
        system to take advantage of all its power. Notice that the new system
        uses separate read/write buffers, so we have to act on them separately.
     */
-    ASSERT_ARGS(Parrot_io_set_buffer_mode)
     if (STRING_equal(interp, mode, CONST_STRING(interp, "unbuffered"))) {
         Parrot_io_buffer_remove_from_handle(interp, handle, IO_PTR_IDX_READ_BUFFER);
         Parrot_io_buffer_remove_from_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER);

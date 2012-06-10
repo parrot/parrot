@@ -372,8 +372,15 @@ Returns the current size of the stringhandle.
 
         GET_ATTR_stringhandle(INTERP, SELF, stringhandle);
 
-        if (STRING_IS_NULL(stringhandle))
-            RETURN(INTVAL 0);
+        if (STRING_IS_NULL(stringhandle)) {
+            if (got_size) {
+                stringhandle = Parrot_str_new(interp, "", new_size);
+                SET_ATTR_stringhandle(INTERP, SELF, stringhandle);
+            }
+            else {
+                RETURN(INTVAL 0);
+            }
+        }
         buffer_size = Parrot_str_byte_length(INTERP, stringhandle);
 
         RETURN(INTVAL buffer_size);
