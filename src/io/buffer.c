@@ -507,7 +507,7 @@ io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
        last few bytes off the end of the found sequence, so we only read
        complete codepoints out into the STRING. */
     bytes_needed = encoding->partial_scan(interp, buffer->buffer_start, bounds);
-    return bounds->bytes - bytes_needed;
+    return bounds->bytes;
 }
 
 /*

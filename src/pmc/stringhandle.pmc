@@ -374,14 +374,14 @@ Returns the current size of the stringhandle.
 
         if (STRING_IS_NULL(stringhandle)) {
             if (got_size) {
-                stringhandle = Parrot_str_new(interp, "", new_size);
+                stringhandle = Parrot_str_new_noinit(interp, new_size);
                 SET_ATTR_stringhandle(INTERP, SELF, stringhandle);
             }
             else {
                 RETURN(INTVAL 0);
             }
         }
-        buffer_size = Parrot_str_byte_length(INTERP, stringhandle);
+        buffer_size = stringhandle->_buflen;
 
         RETURN(INTVAL buffer_size);
 

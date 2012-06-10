@@ -124,6 +124,7 @@ io_get_new_empty_string(PARROT_INTERP, ARGIN_NULLOK(const STR_VTABLE *encoding),
 
     result = Parrot_str_new_noinit(interp, byte_length);
     result->encoding = encoding;
+    result->hashval = 0;
     return result;
 }
 
