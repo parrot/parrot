@@ -278,8 +278,8 @@ sub _try_icuconfig {
         $arg->{icuconfig}
     ) {
         # ldflags
-        $conf->debug("Trying $arg->{icuconfig} with '--ldflags'\n");
-        $icushared = capture_output("$arg->{icuconfig} --ldflags");
+        $conf->debug("Trying $arg->{icuconfig} with '--ldflags-libsonly'\n");
+        $icushared = capture_output("$arg->{icuconfig} --ldflags-libsonly");
         chomp $icushared;
         $conf->debug("icushared:  captured $icushared\n");
         ($icushared, $arg->{without}) =
