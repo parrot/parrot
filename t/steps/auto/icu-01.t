@@ -665,7 +665,7 @@ $conf->replenish($serialized);
                 \$stdout,
                 \$stderr,
             );
-            like($stdout, qr/Trying $icuconfig with '--ldflags'/s,
+            like($stdout, qr/Trying $icuconfig with '--ldflags/s,
                 "Got expected verbose output re --ldflags");
             like($stdout, qr/icushared:  captured/s,
                 "Got expected verbose output re icushared");
