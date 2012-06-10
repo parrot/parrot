@@ -15,7 +15,7 @@
 
 =head1 NAME
 
-include/parrot/atomic/gcc_pcc.h 
+include/parrot/atomic/gcc_pcc.h
 
 =head1 DESCRIPTION
 
