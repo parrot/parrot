@@ -525,8 +525,12 @@ Full buffering, bytes are sent when the buffer is full.
 */
 
     METHOD buffer_type(STRING *new_type :optional, INTVAL got_type :opt_flag) {
-        STRING * nobuffer_string = NULL;
-        RETURN(STRING *nobuffer_string);
+        if (got_type)
+            Parrot_io_set_buffer_mode(INTERP, SELF, new_type);
+        else {
+            STRING * type_str = Parrot_io_get_buffer_mode(INTERP, SELF);
+            RETURN(STRING *type_str);
+        }
     }
 
 

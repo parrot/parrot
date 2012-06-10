@@ -1691,6 +1691,57 @@ Parrot_io_get_os_handle(PARROT_INTERP, ARGIN(PMC *handle))
     }
 }
 
+
+void
+Parrot_io_set_buffer_mode(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *mode))
+{
+    /* This is a compatibility function for old-style buffer setting by mode
+       name. A newer interface will need to be used with the new buffering
+       system to take advantage of all its power. Notice that the new system
+       uses separate read/write buffers, so we have to act on them separately.
+    */
+    ASSERT_ARGS(Parrot_io_set_buffer_mode)
+    if (STRING_equal(interp, mode, CONST_STRING(interp, "unbuffered"))) {
+        Parrot_io_buffer_remove_from_handle(interp, handle, IO_PTR_IDX_READ_BUFFER);
+        Parrot_io_buffer_remove_from_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER);
+    }
+    else if (STRING_equal(interp, mode, CONST_STRING(interp, "line-buffered"))) {
+        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_READ_BUFFER, BUFFER_SIZE_ANY, PIO_BF_LINEBUF);
+        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY, PIO_BF_LINEBUF);
+    }
+    else if (STRING_equal(interp, mode, CONST_STRING(interp, "full-buffered"))) {
+        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_READ_BUFFER, BUFFER_SIZE_ANY, PIO_BF_BLKBUF);
+        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY, PIO_BF_BLKBUF);
+    }
+    else
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Unknown buffering type %Ss", mode);
+}
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+STRING *
+Parrot_io_get_buffer_mode(PARROT_INTERP, ARGMOD(PMC *handle))
+{
+    ASSERT_ARGS(Parrot_io_get_buffer_mode)
+    /* This is a compatibility function for old style buffer mode names. This
+       is a hack, because the current system is much more flexible than the
+       old system and the buffer configuration on a handle cannot really be
+       described in a one-word string like it could previously. Do whatever it
+       takes to replicate the old behavior (even if it doesn't make sense). */
+
+    IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
+    IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
+
+    if (!read_buffer && !write_buffer)
+        return CONST_STRING(interp, "unbuffered");
+
+    if (write_buffer->flags & PIO_BF_LINEBUF)
+        return CONST_STRING(interp, "line-buffered");
+
+    return CONST_STRING(interp, "full-buffered");
+}
+
 /*
 
 =back

@@ -128,6 +128,22 @@ Parrot_io_buffer_add_to_handle(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL idx,
 }
 
 void
+Parrot_io_buffer_remove_from_handle(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL idx)
+{
+    ASSERT_ARGS(Parrot_io_buffer_remove_from_handle)
+    if (idx != IO_PTR_IDX_READ_BUFFER && idx != IO_PTR_IDX_WRITE_BUFFER)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Unknown buffer number %d", idx);
+    {
+        IO_BUFFER * const buffer = (IO_BUFFER *)VTABLE_get_pointer_keyed_int(interp, handle, idx);
+        if (!buffer)
+            return;
+        Parrot_io_buffer_free(interp, buffer);
+        VTABLE_set_pointer_keyed_int(interp, handle, idx, NULL);
+    }
+}
+
+void
 Parrot_io_buffer_free(PARROT_INTERP, ARGFREE(IO_BUFFER *buffer))
 {
     ASSERT_ARGS(Parrot_io_buffer_free)
