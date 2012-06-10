@@ -139,7 +139,7 @@ sub runstep {
         # -shared for GNU ld.
         ld_load_flags => '',
 
-        libs => '',
+        libs => '-ldl -lm',
 
         cc_inc     => "-I./include -I./include/pmc",
         cc_debug   => '-g',
