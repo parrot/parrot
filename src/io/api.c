@@ -614,6 +614,7 @@ Parrot_io_read_s(PARROT_INTERP, ARGMOD(PMC *handle), size_t length)
         IO_BUFFER * read_buffer = IO_GET_READ_BUFFER(interp, handle);
         IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
         const STR_VTABLE * encoding = vtable->get_encoding(interp, handle);
+        STRING * s;
 
         /* read_s requires us to read in a whole number of characters, which
            might be multi-byte. This requires a read buffer. */
@@ -623,10 +624,11 @@ Parrot_io_read_s(PARROT_INTERP, ARGMOD(PMC *handle), size_t length)
         if (read_buffer == NULL)
             read_buffer = io_verify_has_read_buffer(interp, handle, vtable, BUFFER_SIZE_ANY);
         io_verify_is_open_for(interp, handle, vtable, PIO_F_READ);
-
         io_sync_buffers_for_read(interp, handle, vtable, read_buffer, write_buffer);
 
-        return io_read_encoded_string(interp, handle, vtable, read_buffer, encoding, length);
+        s = io_read_encoded_string(interp, handle, vtable, read_buffer, encoding, length);
+        PARROT_ASSERT(s->strlen <= length);
+        return s;
     }
 }
 
@@ -931,9 +933,11 @@ Parrot_io_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL w)
         IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
         IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
 
+        /* Because of buffering we cannot really seek from the current file
+           position. Take the current file position and turn it into an
+           offset relative to the beginning of the file. */
         if (w == SEEK_CUR) {
-            PIOOFF_T file_pos = vtable->tell(interp, handle);
-            /* Don't use SEEK_CUR, filehandle may be ahead of file_pos */
+            PIOOFF_T file_pos = vtable->get_position(interp, handle);
             offset += file_pos;
             w  = SEEK_SET;
         }
@@ -943,6 +947,7 @@ Parrot_io_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL w)
            seek. */
         if (write_buffer)
             Parrot_io_buffer_flush(interp, write_buffer, handle, vtable);
+
 
         if (read_buffer && w != SEEK_END) {
             PIOOFF_T new_offset = Parrot_io_buffer_seek(interp, read_buffer, handle, vtable, offset, w);

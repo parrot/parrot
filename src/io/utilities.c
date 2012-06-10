@@ -203,7 +203,6 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
 {
     ASSERT_ARGS(io_read_encoded_string)
     STRING * const s = Parrot_gc_new_string_header(interp, 0);
-    size_t total_bytes_read = 0;
 
     s->bufused  = 0;
     s->strlen   = 0;
@@ -226,12 +225,14 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
 
         /* Append buffer to result */
         io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read);
-        total_bytes_read += bytes_to_read;
 
         if (bounds.chars == char_length)
             break;
+
+        /* We weren't able to read so many characters at once. Count the ones
+           we've already gotten and continue */
+        char_length -= bounds.chars;
     }
-    vtable->adv_position(interp, handle, total_bytes_read);
     return s;
 }
 
@@ -330,7 +331,6 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
             break;
     }
 
-    vtable->adv_position(interp, handle, total_bytes_read);
     return s;
 }
 
