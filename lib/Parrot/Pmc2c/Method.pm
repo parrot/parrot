@@ -3,7 +3,6 @@ package Parrot::Pmc2c::Method;
 use strict;
 use warnings;
 use Parrot::Pmc2c::UtilFunctions qw( args_from_parameter_list passable_args_from_parameter_list );
-use Parrot::Pmc2c::Emitter ();
 use Parrot::Pmc2c::PCCMETHOD ();
 
 =head1 NAME
