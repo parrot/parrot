@@ -455,6 +455,7 @@ cachegrind.out.*
 /t/tools/pmc2c.*.h
 /t/tools/pmc2c.*.pmc
 /tools/dev/mk_language_shell.pl
+/tools/dev/pbc_to_exe.pir
 /*.gcda
 /*.gcno
 /*.gcov
