@@ -7,12 +7,54 @@ use Parrot::Pmc2c::Pmc2cMain ();
 use overload '""'   => \&stringify;
 use overload 'bool' => \&boolify;
 
+=head1 NAME
+
+Parrot::Pmc2c::Emitter
+
+=head1 SYNOPSIS
+
+=head1 DESCRIPTION
+
+=head1 PUBLIC METHODS
+
+=head2 C<new()>
+
+=over 4
+
+=item * Purpose
+
+=item * Arguments
+
+=item * Return Value
+
+=item * Comment
+
+=back
+
+=cut
+
 sub new {
     my ( $class, $filename ) = @_;
     my $self = { filename => $filename, };
     bless $self, ( ref($class) || $class );
     $self;
 }
+
+=head2 C<text()>
+
+=over 4
+
+=item * Purpose
+
+=item * Arguments
+
+=item * Return Value
+
+=item * Comment
+
+=back
+
+=cut
 
 sub text {
     my ( $class, $data, $filename, $bline ) = @_;
