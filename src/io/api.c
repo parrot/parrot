@@ -389,7 +389,6 @@ Parrot_io_fdopen(PARROT_INTERP, ARGIN(PMC *pmc), PIOHANDLE fd, ARGIN(STRING *sfl
     return Parrot_io_fdopen_flags(interp, pmc, fd, flags);
 }
 
-
 /*
 
 =item C<PMC * Parrot_io_fdopen_flags(PARROT_INTERP, PMC *filehandle, PIOHANDLE
@@ -428,7 +427,7 @@ Parrot_io_fdopen_flags(PARROT_INTERP, ARGMOD(PMC *filehandle), PIOHANDLE fd,
 
     {
         IO_VTABLE * const vtable = IO_GET_VTABLE(interp, filehandle);
-        if (vtable->number != IO_VTABLE_FILEHANDLE)
+        if (vtable->number != IO_VTABLE_FILEHANDLE && vtable->number != IO_VTABLE_PIPE)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                     "Cannot set an OS file descriptor to a %s PMC", vtable->name);
         vtable->set_flags(interp, filehandle, flags);
@@ -678,7 +677,7 @@ Parrot_io_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
             io_sync_buffers_for_read(interp, handle, vtable, read_buffer, write_buffer);
             size_t available_bytes = Parrot_io_buffer_fill(interp, read_buffer, handle, vtable);
             STRING * const s = io_get_new_empty_string(interp, encoding, -1, PIO_STRING_BUFFER_MINSIZE);
-            while (available_bytes > 0) {
+            while (available_bytes > 0 && !Parrot_io_eof(interp, handle)) {
                 io_read_chars_append_string(interp, s, handle, vtable, read_buffer, available_bytes);
                 available_bytes = Parrot_io_buffer_fill(interp, read_buffer, handle, vtable);
             }

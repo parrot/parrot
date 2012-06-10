@@ -56,6 +56,7 @@
 #define PIO_VF_FLUSH_ON_CLOSE       0x0002  /* Flush before closing              */
 #define PIO_VF_PATH_NOT_REQUIRED    0x0004  /* This handle does not require a path
                                                for .open()                       */
+#define PIO_VF_AWAYS_READABLE       0x0008  /* Handle can always be read         */
 
 /*
  * pioctl argument constants. These don't have to
@@ -594,6 +595,8 @@ IO_VTABLE * Parrot_io_allocate_new_vtable(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 STRING * Parrot_io_get_buffer_mode(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

@@ -199,7 +199,10 @@ io_stringhandle_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), IN
     if (vtable == NULL)
         vtable = &(interp->piodata->vtables[idx]);
     vtable->number = idx;
-    vtable->flags = PIO_VF_PATH_NOT_REQUIRED;
+    vtable->flags =
+        PIO_VF_PATH_NOT_REQUIRED |  /* StringHandle does not require a path to open */
+        PIO_VF_AWAYS_READABLE;      /* StringHandle can be read when closed or not in
+                                       read mode */
     vtable->name = "StringHandle";
     vtable->read_b = io_stringhandle_read_b;
     vtable->write_b = io_stringhandle_write_b;

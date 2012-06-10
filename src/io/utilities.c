@@ -132,6 +132,17 @@ io_verify_is_open_for(PARROT_INTERP, ARGIN(PMC *handle),
         ARGIN(IO_VTABLE *vtable), INTVAL flags)
 {
     ASSERT_ARGS(io_verify_is_open_for)
+
+    /* Some types like StringHandle are always readable, even if only opened
+       in 'w' mode or when closed. Several parts of the build, test suite and
+       libraries depend on this. */
+    if (vtable->flags & PIO_VF_AWAYS_READABLE) {
+        if (flags == PIO_F_READ)
+            return;
+        else
+            flags &= ~PIO_F_READ;
+    }
+
     if (Parrot_io_is_closed(interp, handle))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "IO PMC %s is not open", vtable->name);

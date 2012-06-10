@@ -317,9 +317,7 @@ io_filehandle_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTV
     /* Hack! If we're opening in pipe mode, turn this FileHandle into a pipe
        and use that vtable instead. */
     if (flags & PIO_F_PIPE) {
-        IO_VTABLE * const vtable = Parrot_io_get_vtable(interp,
-                                    IO_VTABLE_PIPE, NULL);
-        VTABLE_set_pointer_keyed_int(interp, handle, IO_PTR_IDX_VTABLE, vtable);
+        IO_VTABLE * const vtable = io_filehandle_convert_to_pipe(interp, handle);
         return vtable->open(interp, handle, path, flags, mode);
     }
 
@@ -415,10 +413,17 @@ static size_t
 io_filehandle_total_size(PARROT_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_filehandle_total_size)
-    STRING *name;
-    GETATTR_FileHandle_filename(interp, handle, name);
-    return (size_t)(Parrot_file_stat_intval(interp, name, STAT_FILESIZE));
+    INTVAL flags;
+    GETATTR_FileHandle_flags(interp, handle, flags);
+    if ((flags & PIO_F_CONSOLE) == 0) {
+        STRING *name;
+        GETATTR_FileHandle_filename(interp, handle, name);
+        if (!STRING_IS_NULL(name))
+            return (size_t)(Parrot_file_stat_intval(interp, name, STAT_FILESIZE));
+    }
+    return PIO_UNKNOWN_SIZE;
 }
+
 
 static PIOHANDLE
 io_filehandle_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
@@ -534,6 +539,15 @@ io_filehandle_set_file_position(SHIM_INTERP, ARGMOD(PMC *filehandle), PIOOFF_T f
     Parrot_FileHandle_attributes * const handle_struct = PARROT_FILEHANDLE(filehandle);
     handle_struct->last_pos = handle_struct->file_pos;
     handle_struct->file_pos = file_pos;
+}
+
+IO_VTABLE *
+io_filehandle_convert_to_pipe(PARROT_INTERP, ARGMOD(PMC *handle))
+{
+    ASSERT_ARGS(io_filehandle_convert_to_pipe)
+    IO_VTABLE * const vtable = Parrot_io_get_vtable(interp, IO_VTABLE_PIPE, NULL);
+    VTABLE_set_pointer_keyed_int(interp, handle, IO_PTR_IDX_VTABLE, vtable);
+    return vtable;
 }
 
 /*

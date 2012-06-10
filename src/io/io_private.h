@@ -333,6 +333,12 @@ STRING * io_verify_string_encoding(PARROT_INTERP,
 /* HEADERIZER BEGIN: src/io/filehandle.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+IO_VTABLE * io_filehandle_convert_to_pipe(PARROT_INTERP,
+    ARGMOD(PMC *handle))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*handle);
+
 PARROT_WARN_UNUSED_RESULT
 PIOOFF_T io_filehandle_get_file_position(PARROT_INTERP,
     ARGIN(const PMC *filehandle))
@@ -361,6 +367,9 @@ void io_filehandle_setup_vtable(PARROT_INTERP,
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*vtable);
 
+#define ASSERT_ARGS_io_filehandle_convert_to_pipe __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_filehandle_get_file_position \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(filehandle))
