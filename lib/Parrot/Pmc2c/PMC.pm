@@ -794,6 +794,7 @@ EOC
         $self->add_method($new_method);
     }
 }
+
 =item C<gen_methods()>
 
 Returns the C code for the pmc methods.
