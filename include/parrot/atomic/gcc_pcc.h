@@ -9,6 +9,22 @@
  *  Notes:
  *  References:
  */
+/*
+
+=pod
+
+=head1 NAME
+
+include/parrot/atomic/gcc_pcc.h 
+
+=head1 DESCRIPTION
+
+This header provides an implementation of atomic operations on PowerPC
+platforms with GCC-style inline assembly support
+
+=cut
+
+*/
 
 #ifndef PARROT_ATOMIC_GCC_PCC_H_GUARD
 #define PARROT_ATOMIC_GCC_PCC_H_GUARD
