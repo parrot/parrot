@@ -544,6 +544,74 @@ sub process_parameter {
     return ($type, @arg_names);
 }
 
+=head3 C<rewrite_multi_sub($method, $pmc)>
+
+B<Purpose:>  Parse and Build PMC multiple dispatch subs.
+
+B<Arguments:>
+
+=over 4
+
+=item * C<self>
+
+=item * C<method>
+
+Current Method Object
+
+=item * C<body>
+
+Current Method Body
+
+=back
+
+=cut
+
+sub rewrite_multi_sub {
+    my ( $method, $pmc ) = @_;
+    my @param_types = ();
+    my @new_params = ();
+
+    # Fixup the parameters, standardizing PMC types and extracting type names
+    # for the multi name.
+    for my $param ( split /,/, $method->parameters ) {
+        my ( $type, $name, $rest ) = split /\s+/, &Parrot::Pmc2c::PCCMETHOD::trim($param), 3;
+
+        die "Invalid MULTI parameter '$param': missing type or name\n"
+             unless defined $name;
+        die "Invalid MULTI parameter '$param': attributes not allowed on multis\n"
+             if defined $rest;
+
+        # Clean any '*' out of the name or type.
+        if ($name =~ /[\**]?(\"?\w+\"?)/) {
+            $name = $1;
+        }
+        $type =~ s/\*+//;
+
+        # Capture the actual type for the sub name
+        push @param_types, $type;
+
+        # Pass standard parameter types unmodified.
+        # All other param types are rewritten as PMCs.
+        if ($type eq 'STRING' or $type eq 'PMC' or $type eq 'INTVAL') {
+            push @new_params, $param;
+        }
+        elsif ($type eq 'FLOATVAL') {
+            push @new_params, $param;
+        }
+        else {
+            push @new_params, "PMC *$name";
+        }
+    }
+
+    $method->parameters(join (",", @new_params));
+
+    $method->{MULTI_sig}      = [@param_types];
+    $method->{MULTI_full_sig} = join(',', @param_types);
+    $method->{MULTI}          = 1;
+
+    return 1;
+}
+
 sub mangle_name {
     my ( $method ) = @_;
     $method->symbol( $method->name );

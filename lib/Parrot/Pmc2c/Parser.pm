@@ -276,7 +276,7 @@ sub find_methods {
         }
         elsif ( $method->type eq Parrot::Pmc2c::Method::MULTI ) {
             # rewrite_multi_sub() modifies $method in-place
-            Parrot::Pmc2c::MULTI::rewrite_multi_sub( $method, $pmc );
+            Parrot::Pmc2c::PCCMETHOD::rewrite_multi_sub( $method, $pmc );
         }
 
         if ( $method->type eq Parrot::Pmc2c::Method::NON_VTABLE
