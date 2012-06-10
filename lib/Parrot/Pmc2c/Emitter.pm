@@ -13,14 +13,7 @@ Parrot::Pmc2c::Emitter
 
 =head1 SYNOPSIS
 
-    use Parrot::Pmc2c::Emitter ();
-
 =head1 DESCRIPTION
-
-This package provides various methods for composing parts of files created by
-parsing PMCs.  Its methods are called by several other packages under
-F<lib/Parrot/Pmc2c/>, all of which are ultimately run during the many
-instances of F<tools/dev/pmc2c.pl> invoked during the F<make> build process.
 
 =head1 PUBLIC METHODS
 
@@ -30,29 +23,11 @@ instances of F<tools/dev/pmc2c.pl> invoked during the F<make> build process.
 
 =item * Purpose
 
-Parrot::Pmc2c::Emitter constructor.
-
 =item * Arguments
-
-    Parrot::Pmc2c::Emitter->new( 'path/to/file' );
-
-String holding relative path to file to be written.
 
 =item * Return Value
 
-Parrot::Pmc2c::Emitter object.
-
 =item * Comment
-
-The method's argument is, in practice, the return value of a method call.
-Examples:
-
-    # lib/Parrot/Pmc2c/PMC.pm
-    my $c_emitter = Parrot::Pmc2c::Emitter->new( $self->filename(".c") );
-    my $h_emitter = Parrot::Pmc2c::Emitter->new( $self->filename(".h", $self->is_dynamic) );
-
-    # lib/Parrot/Pmc2c/PCCMETHOD.pm
-    my $e = Parrot::Pmc2c::Emitter->new( $pmc->filename );
 
 =back
 
@@ -60,8 +35,9 @@ Examples:
 
 sub new {
     my ( $class, $filename ) = @_;
-    my %data = ( filename => $filename, );
-    return bless \%data, $class;
+    my $self = { filename => $filename, };
+    bless $self, ( ref($class) || $class );
+    $self;
 }
 
 =head2 C<text()>
@@ -70,61 +46,28 @@ sub new {
 
 =item * Purpose
 
-This, in effect, is a different type of constructor from C<new()>.  It takes
-up to three arguments and returns an object with a more complex structure.
-
 =item * Arguments
-
-List of one to three strings:
-
-=over 4
-
-=item 1 body
-
-=item 2 filename
-
-=item 3 bline
-
-=back
-
-Examples:
-
-    # lib/Parrot/Pmc2c/PMC.pm
-    body => Parrot::Pmc2c::Emitter->text($body),
-
-    # lib/Parrot/Pmc2c/Parser.pm
-    $pmc->preamble( Parrot::Pmc2c::Emitter->text( $preamble, $filename, 1 ) );
-
-    $pmc->postamble( Parrot::Pmc2c::Emitter->text( $post, $filename, $lineno ) );
-
-    body => Parrot::Pmc2c::Emitter->text( $methodblock, $filename, $lineno ),
 
 =item * Return Value
 
-Parrot::Pmc2c::Emitter object, apparently suitable for using as value for a
-C<body> key in a Parrot::Pmc2c::Method object.  B<MUST VERIFY>.
-
 =item * Comment
-
-Also currently (June 2012) used in F<lib/Parrot/Pmc2c/PMC/Null.pm>,
-F<lib/Parrot/Pmc2c/PMC/Object.pm>, F<lib/Parrot/Pmc2c/PMC/RO.pm> and
-F<lib/Parrot/Pmc2c/PMC/default.pm>.
 
 =back
 
 =cut
 
 sub text {
-    my ( $class, $body, $filename, $bline ) = @_;
+    my ( $class, $data, $filename, $bline ) = @_;
     $filename ||= "";
     $bline    ||= -1;
-    my %data = (
-        data     => $body,
+    my $self = {
+        data     => $data,
         filename => $filename,
         bline    => $bline,
-        eline    => $bline + count_newlines($body),
-    );
-    return bless \%data, $class;
+        eline    => $bline + count_newlines($data),
+    };
+    bless $self, ref($class) || $class;
+    $self;
 }
 
 sub find {
