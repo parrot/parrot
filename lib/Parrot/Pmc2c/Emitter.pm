@@ -122,7 +122,7 @@ sub annotate_worker {
         my $filename = $it->{filename} || $self->filename;
         my $line = $it->{bline};
 
-        #no need to emit uneccessary #line directive
+        #no need to emit unnecessary #line directive
         if ( $line == -1 and $self->filename eq $self->{current_file} ) {
             $data = $it->{data};
         }
