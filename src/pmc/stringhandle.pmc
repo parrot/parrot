@@ -93,6 +93,7 @@ Initializes a newly created StringHandle object.
                                         IO_VTABLE_STRINGHANDLE, NULL);
         data_struct->read_buffer  = NULL;
         data_struct->write_buffer = NULL;
+        data_struct->record_separator = '\n';
 
         PObj_custom_mark_SET(SELF);
     }
