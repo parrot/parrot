@@ -328,13 +328,13 @@ sub process_pccmethod_args {
 =cut
 
 sub rewrite_pccmethod {
-    my ( $self, $pmc ) = @_;
+    my ( $method, $pmc ) = @_;
 
     my $e      = Parrot::Pmc2c::Emitter->new( $pmc->filename );
     my $e_post = Parrot::Pmc2c::Emitter->new( $pmc->filename );
 
     # parse pccmethod parameters, then unshift the PMC arg for the invocant
-    my $linear_args = parse_p_args_string( $self->parameters );
+    my $linear_args = parse_p_args_string( $method->parameters );
     unshift @$linear_args,
         {
             type             => convert_type_string_to_reg_type('PMC'),
@@ -348,12 +348,12 @@ sub rewrite_pccmethod {
     my ( $params_signature, $params_varargs, $params_declarations ) =
         process_pccmethod_args( $linear_args, 'arg' );
 
-    my $wb             = $self->attrs->{manual_wb}
+    my $wb             = $method->attrs->{manual_wb}
                          ? ''
                          : 'PARROT_GC_WRITE_BARRIER(interp, _self);';
 
-    rewrite_RETURNs( $self, $pmc );
-    rewrite_pccinvoke( $self, $pmc );
+    rewrite_RETURNs( $method, $pmc );
+    rewrite_pccinvoke( $method, $pmc );
 
     $e->emit( <<"END", __FILE__, __LINE__ + 1 );
     PMC * const _ctx         = CURRENT_CONTEXT(interp);
@@ -383,14 +383,14 @@ END
     } /* END PARAMS SCOPE */
     return;
 END
-    $self->return_type('void');
-    $self->parameters('');
+    $method->return_type('void');
+    $method->parameters('');
     my $e_body = Parrot::Pmc2c::Emitter->new( $pmc->filename );
     $e_body->emit($e);
-    $e_body->emit( $self->body );
+    $e_body->emit( $method->body );
     $e_body->emit($e_post);
-    $self->body($e_body);
-    $self->{PCCMETHOD} = 1;
+    $method->body($e_body);
+    $method->{PCCMETHOD} = 1;
 
     return 1;
 }
@@ -545,11 +545,11 @@ sub process_parameter {
 }
 
 sub mangle_name {
-    my ( $self, $pmc ) = @_;
-    $self->symbol( $self->name );
-    $self->name( $self->type eq Parrot::Pmc2c::Method::MULTI()   ?
-                    (join '_', 'multi', $self->name, @{ $self->{MULTI_sig} }) :
-                    "nci_@{[$self->name]}" );
+    my ( $method ) = @_;
+    $method->symbol( $method->name );
+    $method->name( $method->type eq Parrot::Pmc2c::Method::MULTI()
+        ?  (join '_', 'multi', $method->name, @{ $method->{MULTI_sig} })
+        : "nci_@{[$method->name]}" );
 }
 
 1;

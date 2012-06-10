@@ -270,6 +270,7 @@ sub find_methods {
 
         # METHOD needs FixedIntegerArray header
         if ( $method->type eq Parrot::Pmc2c::Method::NON_VTABLE ) {
+            # rewrite_pccmethod() modifies $method in-place
             Parrot::Pmc2c::PCCMETHOD::rewrite_pccmethod( $method, $pmc );
             $pmc->set_flag('need_fia_header');
         }
@@ -281,7 +282,8 @@ sub find_methods {
         if ( $method->type eq Parrot::Pmc2c::Method::NON_VTABLE
         ||   $method->type eq Parrot::Pmc2c::Method::MULTI ) {
             # Name-mangle NCI and multi methods to avoid conflict with vtables
-            Parrot::Pmc2c::PCCMETHOD::mangle_name( $method, $pmc );
+            # mangle_name() modifies $method in-place
+            Parrot::Pmc2c::PCCMETHOD::mangle_name( $method );
         }
 
         # PCCINVOKE needs FixedIntegerArray header
