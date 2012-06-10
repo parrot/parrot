@@ -452,22 +452,15 @@ filehandle when finished.
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
                     "Cannot readall on a new file from an already open filehandle");
 
-            filehandle  = Parrot_io_open(INTERP, PMCNULL, name, STRINGNULL);
-            PARROT_ASSERT(filehandle->vtable->base_type == enum_class_FileHandle);
+            filehandle = Parrot_io_open(INTERP, PMCNULL, name, STRINGNULL);
 
             SET_ATTR_encoding(INTERP, filehandle, encoding);
             result = Parrot_io_readall_s(INTERP, filehandle);
 
             Parrot_io_close(INTERP, filehandle, 1);
         }
-        else {
-            /* slurp open file */
-            if (Parrot_io_is_closed(INTERP, SELF))
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
-                    "Cannot readall without a file name or open filehandle");
-
+        else
             result = Parrot_io_readall_s(INTERP, SELF);
-        }
 
         RETURN(STRING *result);
     }

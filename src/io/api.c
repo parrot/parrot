@@ -658,11 +658,15 @@ STRING *
 Parrot_io_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(Parrot_io_readall_s)
+    IO_VTABLE * vtable;
     if (PMC_IS_NULL(handle))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "Attempt to read from null or invalid PMC");
+
+    vtable = IO_GET_VTABLE(interp, handle);
+    io_verify_is_open_for(interp, handle, vtable, PIO_F_READ);
+
     {
-        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
         IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
 
         const STR_VTABLE * const encoding = io_get_encoding(interp, handle, vtable, PIO_F_READ);
