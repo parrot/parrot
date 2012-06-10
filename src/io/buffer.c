@@ -547,7 +547,7 @@ io_buffer_find_num_characters(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
     bounds->delim = -1;
 
     bytes_needed = encoding->partial_scan(interp, buffer->buffer_start, bounds);
-    return bounds->bytes - bytes_needed;
+    return bounds->bytes;
 }
 
 PIOOFF_T
