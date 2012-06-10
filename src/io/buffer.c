@@ -146,6 +146,9 @@ size_t
 Parrot_io_buffer_resize(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), size_t new_size)
 {
     ASSERT_ARGS(Parrot_io_buffer_resize)
+    if (new_size == BUFFER_SIZE_ANY)
+        return buffer->buffer_size;
+
     if (new_size < PIO_BUFFER_MIN_SIZE)
         new_size = PIO_BUFFER_MIN_SIZE;
 

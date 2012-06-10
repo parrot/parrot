@@ -148,9 +148,7 @@ io_verify_has_read_buffer(PARROT_INTERP, ARGIN(PMC *handle),
 {
     ASSERT_ARGS(io_verify_has_read_buffer)
     IO_BUFFER * buffer = IO_GET_READ_BUFFER(interp, handle);
-    if (buffer)
-        Parrot_io_buffer_resize(interp, buffer, BUFFER_SIZE_ANY);
-    else {
+    if (!buffer) {
         const STR_VTABLE * encoding = vtable->get_encoding(interp, handle);
         if (encoding == NULL)
             encoding = Parrot_platform_encoding_ptr;
