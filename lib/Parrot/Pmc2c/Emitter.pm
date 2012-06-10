@@ -115,17 +115,16 @@ F<lib/Parrot/Pmc2c/PMC/default.pm>.
 =cut
 
 sub text {
-    my ( $class, $data, $filename, $bline ) = @_;
+    my ( $class, $body, $filename, $bline ) = @_;
     $filename ||= "";
     $bline    ||= -1;
-    my $self = {
-        data     => $data,
+    my %data = (
+        data     => $body,
         filename => $filename,
         bline    => $bline,
-        eline    => $bline + count_newlines($data),
-    };
-    bless $self, ref($class) || $class;
-    $self;
+        eline    => $bline + count_newlines($body),
+    );
+    return bless \%data, ref($class) || $class;
 }
 
 sub find {
