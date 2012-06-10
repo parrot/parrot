@@ -11,7 +11,6 @@ use Parrot::Pmc2c::Attribute ();
 use Parrot::Pmc2c::Method ();
 use Parrot::Pmc2c::Emitter ();
 use Parrot::Pmc2c::PCCMETHOD ();
-use Parrot::Pmc2c::MULTI ();
 use Parrot::Pmc2c::UtilFunctions qw(count_newlines filename slurp);
 use File::Basename qw(basename);
 
