@@ -60,9 +60,8 @@ Examples:
 
 sub new {
     my ( $class, $filename ) = @_;
-    my $self = { filename => $filename, };
-    bless $self, ( ref($class) || $class );
-    $self;
+    my $data = { filename => $filename, };
+    return bless $data, $class;
 }
 
 =head2 C<text()>
