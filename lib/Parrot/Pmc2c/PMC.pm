@@ -472,17 +472,17 @@ sub prep_for_emit {
 
 sub generate {
     my ($self) = @_;
-    my $emitter = $self->{emitter} =
+    my $c_emitter = $self->{emitter} =
         Parrot::Pmc2c::Emitter->new( $self->filename(".c") );
 
     $self->generate_c_file;
-    $emitter->write_to_file;
+    $c_emitter->write_to_file;
 
-    $emitter = $self->{emitter} =
+    my $h_emitter = $self->{emitter} =
         Parrot::Pmc2c::Emitter->new( $self->filename(".h", $self->is_dynamic) );
 
     $self->generate_h_file;
-    $emitter->write_to_file;
+    $h_emitter->write_to_file;
 }
 
 =over 4
