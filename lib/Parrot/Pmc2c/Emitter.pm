@@ -20,7 +20,7 @@ Parrot::Pmc2c::Emitter
 This package provides various methods for composing parts of files created by
 parsing PMCs.  Its methods are called by several other packages under
 F<lib/Parrot/Pmc2c/>, all of which are ultimately run during the many
-instances of F<tools/dev/pmc2c.pl> invoked during the F<make> build process.
+instances of F<tools/build/pmc2c.pl> invoked during the F<make> build process.
 
 =head1 PUBLIC METHODS
 
