@@ -1044,7 +1044,7 @@ M0 registers will not have innate types; they'll be nothing more than a
 collection of bits which are assumed to have a certain type by M0's ops.  The
 types that ops attribute to register values will be based on the position of
 the register in an M0 call frame's register set.  The proposed structure uses the
-first 8 registers for information specific to the call frame and has 60 of each primitive
+first 8 registers for information specific to the call frame and has 61 of each primitive
 type:
 
     number  type
