@@ -127,6 +127,34 @@ sub text {
     return bless \%data, ref($class) || $class;
 }
 
+=head2 C<find()>
+
+=over 4
+
+=item * Purpose
+
+Recursively returns strings captured from pattern matches.
+
+=item * Arguments
+
+Single argument:  compiled regular expression.
+
+=item * Return Value
+
+If a pattern is matched within a list of items, return the matching string.
+Return the object itself it the match is against the C<data> element.  Return
+a false value otherwise.
+
+=item * Comment
+
+Used in Parrot::Pmc2c::PCCMETHOD.  Example:
+
+    $matched = $body->find($signature_re);
+
+=back
+
+=cut
+
 sub find {
     my ( $self, $regex ) = @_;
     if ( $self->{items} ) {
@@ -140,6 +168,62 @@ sub find {
     }
     return 0;
 }
+
+=head2 C<subst()>
+
+=over 4
+
+=item * Purpose
+
+Recursively perform substitutions.
+
+=item * Arguments
+
+List of two arguments:
+
+=over 4
+
+=item *
+
+Compiled regular expression.
+
+=item *
+
+Reference to a subroutine which performs a substitution on the string
+matched by the first argument's pattern.
+
+=back
+
+=item * Return Value
+
+True value.
+
+=item * Comment
+
+Used in Parrot::Pmc2c::Method.  Some of these substitutions can be quite
+simple:
+
+    $body->subst( qr{\bSELF\b},   sub { '_self' } );
+
+Others are more complex:
+
+    # Rewrite STATICSELF.other_method(args...)
+    $body->subst(
+        qr{
+      \bSTATICSELF\b    # Macro STATICSELF
+      \.(\w+)           # other_method
+      \(\s*(.*?)\)      # capture argument list
+      }x,
+        sub {
+            "Parrot_${pmcname}"
+                . ( $pmc->is_vtable_method($1) ? "" : "_nci" ) . "_$1("
+                . full_arguments($2) . ")";
+        }
+    );
+
+=back
+
+=cut
 
 sub subst {
     my ( $self, $regex, $replacement ) = @_;
@@ -156,6 +240,42 @@ sub subst {
     }
     return 1;
 }
+
+=head2 C<replace()>
+
+=over 4
+
+=item * Purpose
+
+=item * Arguments
+
+List of two arguments:
+
+=over 4
+
+=item *
+
+Compiled regular expression.
+
+=item *
+
+Another Parrot::Pmc2c::Emitter object.
+
+=back
+
+=item * Return Value
+
+True value upon success.
+
+=item * Comment
+
+Used in C<Parrot::Pmc2c::PCCMETHOD::rewrite_RETURNs()>.  Example:
+
+    $matched->replace( $match, $e );
+
+=back
+
+=cut
 
 sub replace {
     my ( $self, $regex, $replacement ) = @_;
