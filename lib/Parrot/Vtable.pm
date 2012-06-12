@@ -161,11 +161,15 @@ C<parse_vtable> method.
 =item * Return Value
 
 Returns string holding the C C<typedef> definitions for the elements in the
-referenced vtable array.
+referenced vtable array.  Example:
 
-Used in F<tools/build/vtable_h.pl>.
+    typedef PMC* (*absolute_method_t)(PARROT_INTERP, ARGMOD(PMC *pmc), PMC* dest);
+    typedef PMC* (*add_method_t)(PARROT_INTERP, ARGMOD(PMC *pmc), PMC* value, PMC* dest);
+    typedef void (*add_attribute_method_t)(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(STRING* name), PMC* type);
 
 =item * Comment
+
+Used in F<tools/build/vtable_h.pl>.
 
 =back
 
@@ -212,12 +216,27 @@ C<parse_vtable> method.
 
 =item * Return Value
 
-Returns a string holding the C C<struct> definitions for the elements in the
-referenced vtable array.
+Returns a string holding the C C<enum> and C<struct> definitions for the
+elements in the referenced vtable array.  Example:
 
-Used in F<tools/build/vtable_h.pl>.
+    typedef enum {
+        VTABLE_IS_CONST_FLAG     = 0x001,
+        VTABLE_HAS_CONST_TOO     = 0x002,
+    ...
+        VTABLE_IS_READONLY_FLAG  = 0x100
+    } vtable_flags_t;
+    
+    typedef struct _vtable {
+        PMC    *_namespace;     /* Pointer to namespace for this class */
+        INTVAL  base_type;      /* 'type' value for MMD */
+        STRING *whoami;         /* Name of class this vtable is for */
+    ...
+        UINTVAL attr_size;      /* Size of the attributes struct */
+    } _vtable;
 
 =item * Comment
+
+Used in F<tools/build/vtable_h.pl>.
 
 =back
 
@@ -290,9 +309,19 @@ C<parse_vtable> method.
 String holding the C C<#define> definitions for the elements in the referenced
 vtable array.
 
-Used in F<tools/build/vtable_h.pl>.
+    #define VTABLE_absolute(interp, pmc, dest) \
+        (pmc)->vtable->absolute(interp, pmc, dest)
+    #define VTABLE_add(interp, pmc, value, dest) \
+        (pmc)->vtable->add(interp, pmc, value, dest)
+    ...
+    #define PARROT_VTABLE_SLOT_ABSOLUTE 9
+    #define PARROT_VTABLE_SLOT_ADD 10
+    #define PARROT_VTABLE_SLOT_ADD_ATTRIBUTE 11
+    ...
 
 =item * Comment
+
+Used in F<tools/build/vtable_h.pl>.
 
 =back
 
@@ -388,9 +417,9 @@ C<parse_vtable> method.
 
 List of two strings holding the C function definitions to call the vtable functions on a PMC for the elements in the referenced vtable array.
 
-Used in F<tools/build/vtable_extend.pl>.
-
 =item * Comment
+
+Used in F<tools/build/vtable_extend.pl>.
 
 =back
 
