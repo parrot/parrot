@@ -21,7 +21,7 @@ Miscellaneous helper functions.
 #include "parrot/parrot.h"
 
 #ifdef PARROT_HAS_HEADER_SYSUTSNAME
-#   include <sys/utsname.h>
+#  include <sys/utsname.h>
 #endif
 
 /* HEADERIZER HFILE: none */
