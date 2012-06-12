@@ -61,7 +61,46 @@ Parrot_platform_init_code(void)
 
 =cut
 
+=item C<STRING *Parrot_get_cpu_type(Parrot_Interp)>
+
+Fetch CPU type for win32 systems
+
+=cut
+
 */
+
+STRING
+*Parrot_get_cpu_type(Parrot_Interp interp) {
+    SYSTEM_INFO sys_info;
+    WORD proc_arch;
+    STRING arch_type;
+
+    GetSystemInfo(&sys_info);
+
+    proc_arch = sys_info.wProcessorArchitecture;
+    switch (proc_arch) {
+      case PROCESSOR_ARCHITECTURE_AMD64:
+        arch_type = "x64";
+        break;
+      case PROCESSOR_ARCHITECTURE_IA64:
+        arch_type="IA64";
+        break;
+      case PROCESSOR_ARCHITECTURE_INTEL:
+        arch_type="x86";
+        break;
+      case PROCESSOR_ARCHITECTURE_UNKNOWN:
+        arch_type="unknown";
+        break;
+      default:
+        arch_type="unknown";
+        break;
+    }
+
+    return Parrot_str_new_init(interp, proc_arch, strlen(proc_arch),
+            Parrot_ascii_encoding_ptr, 0);
+
+}
+
 
 /*
  * Local variables:
