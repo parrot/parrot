@@ -296,19 +296,23 @@ PARROT_DATA PMC *PMCNULL;    /* Holds single null PMC */
 
 #define STRING_IS_EMPTY(s) ((s)->strlen == 0)
 
+/**
+ * WARN:
+ * Remove all of these attributes when we wipe out sysinfo. 
+ * I have kept these here for consistency in parameters between
+ * sysinfo and interpinfo.
+ */
 /* &gen_from_def(sysinfo.pasm) prefix(SYSINFO_) */
-
-#define PARROT_INTSIZE               1
-#define PARROT_FLOATSIZE             2
-#define PARROT_POINTERSIZE           3
-#define PARROT_OS                    4
-#define PARROT_OS_VERSION            5
-#define PARROT_OS_VERSION_NUMBER     6
-#define CPU_ARCH                     7
-#define CPU_TYPE                     8
-#define PARROT_INTMAX                9
-#define PARROT_INTMIN               10
-
+#define PARROT_INTSIZE               16
+#define PARROT_FLOATSIZE             17
+#define PARROT_POINTERSIZE           18
+#define PARROT_OS                    30
+#define PARROT_OS_VERSION            31
+#define PARROT_OS_VERSION_NUMBER     32
+#define CPU_ARCH                     33
+#define CPU_TYPE                     34
+#define PARROT_INTMAX                19
+#define PARROT_INTMIN                20
 /* &end_gen */
 
 typedef opcode_t *(*native_func_t)(PARROT_INTERP,
