@@ -69,30 +69,30 @@ Fetch CPU type for win32 systems
 
 */
 
-STRING
-*Parrot_get_cpu_type(Parrot_Interp interp) {
+STRING *
+Parrot_get_cpu_type(Parrot_Interp interp) {
     SYSTEM_INFO sys_info;
-    WORD proc_arch;
-    STRING arch_type;
+    WORD arch_type;
+    char *proc_arch;
 
     GetSystemInfo(&sys_info);
 
-    proc_arch = sys_info.wProcessorArchitecture;
-    switch (proc_arch) {
+    arch_type = sys_info.wProcessorArchitecture;
+    switch (arch_type) {
       case PROCESSOR_ARCHITECTURE_AMD64:
-        arch_type = "x64";
+        proc_arch = "x64";
         break;
       case PROCESSOR_ARCHITECTURE_IA64:
-        arch_type="IA64";
+        proc_arch ="IA64";
         break;
       case PROCESSOR_ARCHITECTURE_INTEL:
-        arch_type="x86";
+        proc_arch ="x86";
         break;
       case PROCESSOR_ARCHITECTURE_UNKNOWN:
-        arch_type="unknown";
+        proc_arch ="unknown";
         break;
       default:
-        arch_type="unknown";
+        proc_arch ="unknown";
         break;
     }
 

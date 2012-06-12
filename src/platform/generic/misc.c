@@ -58,8 +58,8 @@ For win32, look in platform/win32/misc.c
 
 */
 
-STRING
-*Parrot_get_cpu_type(Parrot_Interp interp) {
+STRING *
+Parrot_get_cpu_type(Parrot_Interp interp) {
     struct utsname uname_info;
     char  *proc_arch = "";
 
