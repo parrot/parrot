@@ -29,7 +29,7 @@ Functions related to managing the Parrot interpreter
 #include "imcc/embed.h"
 
 #ifdef PARROT_HAS_HEADER_SYSUTSNAME
-#   include <sys/utsname.h>
+#  include <sys/utsname.h>
 #endif
 
 static Interp* emergency_interp = NULL;
@@ -984,7 +984,7 @@ Parrot_interp_info_s(PARROT_INTERP, INTVAL what)
                 }
             }
             break;
-        case PARROT_OS_VERSION_NUMBER:
+          case PARROT_OS_VERSION_NUMBER:
             {
                 struct utsname info;
                 if (uname(&info) == 0) {
