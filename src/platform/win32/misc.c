@@ -57,13 +57,11 @@ Parrot_platform_init_code(void)
 
 /*
 
-=back
-
-=cut
-
 =item C<STRING *Parrot_get_cpu_type(Parrot_Interp)>
 
 Fetch CPU type for win32 systems
+
+=back
 
 =cut
 

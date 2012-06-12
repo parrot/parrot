@@ -14,8 +14,6 @@ Miscellaneous helper functions.
 
 =head2 Functions
 
-=over 4
-
 =cut
 
 */
@@ -29,6 +27,8 @@ Miscellaneous helper functions.
 /* HEADERIZER HFILE: none */
 
 /*
+
+=over 4
 
 =item C<void Parrot_platform_init_code(void)>
 
@@ -45,14 +45,12 @@ Parrot_platform_init_code(void)
 
 /*
 
-=back
-
-=cut
-
 =item C<STRING *Parrot_get_cpu_type(Parrot_Interp)>
 
 Fetch CPU type for non-win32 systems
 For win32, look in platform/win32/misc.c
+
+=back
 
 =cut
 
