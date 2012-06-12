@@ -826,9 +826,9 @@ Parrot_interp_info(PARROT_INTERP, INTVAL what)
         ret = interp->run_core->id;
         break;
         /*
-         * sysinfo attributes go here. 
-         * We may deprecate sysinfo dynop in favour of interpinfo in future, 
-         * or retain both. 
+         * sysinfo attributes go here.
+         * We may deprecate sysinfo dynop in favour of interpinfo in future,
+         * or retain both.
          */
       case PARROT_INTSIZE:
         ret = sizeof (INTVAL);
@@ -962,20 +962,20 @@ Parrot_interp_info_s(PARROT_INTERP, INTVAL what)
         }
         case CURRENT_RUNCORE:
             return interp->run_core->name;
-            /* 
+            /*
              * sysinfo attributes go here. we may deprecate these in favour of interpinfo ops
              * in future.
              */
         case PARROT_OS:
             return Parrot_str_new_constant(interp, BUILD_OS_NAME);
         case CPU_ARCH:
-            return Parrot_str_new_init(interp, PARROT_CPU_ARCH, 
+            return Parrot_str_new_init(interp, PARROT_CPU_ARCH,
                     sizeof (PARROT_CPU_ARCH) - 1, Parrot_ascii_encoding_ptr, 0);
-        case CPU_TYPE: 
+        case CPU_TYPE:
             return Parrot_get_cpu_type(interp);
 
 #ifdef PARROT_HAS_HEADER_SYSUTSNAME
-        case PARROT_OS_VERSION: 
+        case PARROT_OS_VERSION:
             {
                 struct utsname info;
                 if (uname(&info) == 0) {

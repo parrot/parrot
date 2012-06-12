@@ -298,7 +298,7 @@ PARROT_DATA PMC *PMCNULL;    /* Holds single null PMC */
 
 /**
  * WARN:
- * Remove all of these attributes when we wipe out sysinfo. 
+ * Remove all of these attributes when we wipe out sysinfo.
  * I have kept these here for consistency in parameters between
  * sysinfo and interpinfo.
  */
