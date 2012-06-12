@@ -119,7 +119,7 @@ Parrot_io_buffer_add_to_handle(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL idx,
         IO_BUFFER * buffer = (IO_BUFFER *)VTABLE_get_pointer_keyed_int(interp, handle, idx);
         if (buffer) {
             Parrot_io_buffer_resize(interp, buffer, length);
-            PARROT_ASSERT(buffer->buffer_size >= length);
+            PARROT_ASSERT(length == BUFFER_SIZE_ANY || buffer->buffer_size >= length);
         }
         else {
             buffer = Parrot_io_buffer_allocate(interp, handle, flags, NULL, length);
@@ -174,13 +174,8 @@ Parrot_io_buffer_resize(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), size_t new_siz
     if (new_size < PIO_BUFFER_MIN_SIZE)
         new_size = PIO_BUFFER_MIN_SIZE;
 
-    if (buffer->buffer_size == new_size)
+    if (buffer->buffer_size >= new_size)
         return new_size;
-
-    /* Cannot shrink a buffer with data in it, because we do not ever want to
-       lose data */
-    if (!BUFFER_IS_EMPTY(buffer) && new_size < buffer->buffer_size)
-        return buffer->buffer_size;
 
     buffer->buffer_ptr = mem_sys_realloc(buffer->buffer_ptr, new_size);
     buffer->buffer_size = new_size;
@@ -216,9 +211,11 @@ Parrot_io_buffer_read_b(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
         return vtable->read_b(interp, handle, s, length);
     {
         size_t bytes_read = io_buffer_transfer_to_mem(interp, buffer, s, length);
-        length = length - bytes_read;
 
         PARROT_ASSERT(bytes_read <= length);
+
+        length = length - bytes_read;
+
         PARROT_ASSERT(length >= 0);
 
         /* If we still need more data than the buffer can hold, just read it
@@ -261,9 +258,11 @@ io_buffer_transfer_to_mem(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
     PARROT_ASSERT(length > 0);
 
     {
-        size_t length_left = length;
-        size_t used_length = BUFFER_USED_SIZE(buffer);
-        size_t copy_length = used_length <= length ? used_length : length;
+        const size_t length_left = length;
+        const size_t used_length = BUFFER_USED_SIZE(buffer);
+        const size_t copy_length = used_length <= length ? used_length : length;
+
+        PARROT_ASSERT(copy_length <= length);
 
         memcpy(s, buffer->buffer_start, copy_length);
         buffer->buffer_start += copy_length;
@@ -287,6 +286,9 @@ static void
 io_buffer_normalize(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
 {
     ASSERT_ARGS(io_buffer_normalize)
+
+    BUFFER_ASSERT_SANITY(buffer);
+
     if (!buffer)
         return;
 
@@ -295,16 +297,14 @@ io_buffer_normalize(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
         return;
     }
 
-    if (!BUFFER_CAN_BE_NORMALIZED(buffer))
-        return;
-
+    if (BUFFER_CAN_BE_NORMALIZED(buffer))
     {
         const size_t used_size = BUFFER_USED_SIZE(buffer);
 
         /* Make sure that we need to normalize, and that the memory regions
            are non-overlapping. */
         PARROT_ASSERT(used_size > 0);
-        PARROT_ASSERT(buffer->buffer_start >= buffer->buffer_ptr + used_size);
+        PARROT_ASSERT(buffer->buffer_start >= (buffer->buffer_ptr + used_size));
 
         /* Copy the data */
         memmove(buffer->buffer_ptr, buffer->buffer_start, used_size);
