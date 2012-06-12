@@ -1,4 +1,15 @@
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
+package Parrot::Vtable;
+use strict;
+use base qw( Exporter );
+use FileHandle;
+our @EXPORT = qw(
+    parse_vtable
+    vtbl_defs
+    vtbl_struct
+    vtbl_macros
+    vtbl_embed
+);
 
 =head1 NAME
 
@@ -14,24 +25,7 @@ C<Parrot::Vtable> provides a collection of functions for manipulating PMC
 vtables. It is used by F<tools/build/pmc2c.pl>, F<tools/build/vtable_h.pl>,
 F<tools/build/vtable_extend.pl> and F<tools/dev/gen_class.pl>.
 
-=head2 Functions
-
-The following functions are exported:
-
-=over 4
-
 =cut
-
-package Parrot::Vtable;
-
-use strict;
-use warnings;
-
-use base qw( Exporter );
-
-use FileHandle;
-
-our @EXPORT = qw(parse_vtable vtbl_defs vtbl_struct vtbl_macros vtbl_embed);
 
 sub make_re {
     my $re      = shift;
@@ -61,14 +55,43 @@ sub parse_attrs {
     return $result;
 }
 
-=item C<parse_vtable($file)>
+=head1 FUNCTIONS
 
-Returns a reference to an array containing
+The following functions are exported:
 
-  [ return_type method_name parameters section MMD_type attributes ]
+=head2 C<parse_vtable<()>
+
+=over 4
+
+=item * Purpose
+
+Parse vtable.
+
+=item * Arguments
+
+String holding path to vtable file.
+
+=item * Return Value
+
+Reference to an array containing:
+
+  [
+    return_type
+    method_name
+    parameters
+    section
+    MMD_type
+    attributes
+  ]
 
 for each vtable function defined in C<$file>.  If it is not an MMD method,
 C<MMD_type> is -1.
+
+=item * Comment
+
+Used in C<Parrot::Pmc2c::VTable::build()>.
+
+=back
 
 =cut
 
@@ -119,10 +142,32 @@ sub parse_vtable {
     return [ @{$mmd}, sort { $a->[1] cmp $b->[1] } @{$vtable} ];
 }
 
-=item C<vtbl_defs($vtable)>
+# all encapsulated below here
 
-Returns the C C<typedef> definitions for the elements in the referenced
-vtable array.
+=head2 C<vtbl_defs()>
+
+=over 4
+
+=item * Purpose
+
+Compose the C C<typedef> definitions for the elements in the referenced vtable
+array.
+
+=item * Arguments
+
+Reference to an array.  This array ref is the output of this package's
+C<parse_vtable> method.
+
+=item * Return Value
+
+Returns string holding the C C<typedef> definitions for the elements in the
+referenced vtable array.
+
+Used in F<tools/build/vtable_h.pl>.
+
+=item * Comment
+
+=back
 
 =cut
 
@@ -151,10 +196,30 @@ sub vtbl_defs {
     return $defs;
 }
 
-=item C<vtbl_struct($vtable)>
+=head2 C<vtbl_struct()>
 
-Returns the C C<struct> definitions for the elements in the referenced
-vtable array.
+=over 4
+
+=item * Purpose
+
+Compose the C C<struct> definitions for the elements in the referenced vtable
+array.
+
+=item * Arguments
+
+Reference to an array.  This array ref is the output of this package's
+C<parse_vtable> method.
+
+=item * Return Value
+
+Returns a string holding the C C<struct> definitions for the elements in the
+referenced vtable array.
+
+Used in F<tools/build/vtable_h.pl>.
+
+=item * Comment
+
+=back
 
 =cut
 
@@ -206,10 +271,30 @@ EOF
     return $struct;
 }
 
-=item C<vtbl_macros($vtable)>
+=head2 C<vtbl_macros()>
 
-Returns the C C<#define> definitions for the elements in the referenced
+=over 4
+
+=item * Purpose
+
+Compose the C C<#define> definitions for the elements in the referenced vtable
+array.
+
+=item * Arguments
+
+Reference to an array.  This array ref is the output of this package's
+C<parse_vtable> method.
+
+=item * Return Value
+
+String holding the C C<#define> definitions for the elements in the referenced
 vtable array.
+
+Used in F<tools/build/vtable_h.pl>.
+
+=item * Comment
+
+=back
 
 =cut
 
@@ -288,10 +373,26 @@ EOM
     $macros;
 }
 
-=item C<vtbl_embed($vtable)>
+=head2 C<vtbl_embed()>
 
-Returns the C function definitions to call the vtable functions on a PMC for the
-elements in the referenced vtable array.
+=over 4
+
+=item * Purpose
+
+=item * Arguments
+
+Reference to an array.  This array ref is the output of this package's
+C<parse_vtable> method.
+
+=item * Return Value
+
+List of two strings holding the C function definitions to call the vtable functions on a PMC for the elements in the referenced vtable array.
+
+Used in F<tools/build/vtable_extend.pl>.
+
+=item * Comment
+
+=back
 
 =cut
 
@@ -391,19 +492,19 @@ sub parse_params {
     return @params;
 }
 
-=back
-
 =head1 SEE ALSO
 
 =over 4
 
 =item F<tools/build/vtable_extend.pl>
 
-=item F<tools/build/pmc2c.pl>
-
 =item F<tools/build/vtable_h.pl>
 
+=item F<tools/build/pmc2c.pl>
+
 =item F<tools/dev/gen_class.pl>
+
+=back
 
 =cut
 
