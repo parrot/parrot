@@ -891,7 +891,7 @@ Parrot_interp_info_p(PARROT_INTERP, INTVAL what)
         break;
       default:        /* or a warning only? */
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-                "illegal argument in Parrot_interp_info");
+                "illegal argument in Parrot_interp_info_p");
     }
 
     /* Don't send NULL values to P registers */
@@ -996,7 +996,7 @@ Parrot_interp_info_s(PARROT_INTERP, INTVAL what)
 #endif
       default:
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-                "illegal argument in Parrot_interp_info");
+                "illegal argument in Parrot_interp_info_s");
     }
 }
 
