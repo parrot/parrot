@@ -1004,7 +1004,6 @@ lib/Parrot/IO/File.pm                                       [devel]lib
 lib/Parrot/IO/Path.pm                                       [devel]lib
 lib/Parrot/Install.pm                                       [devel]lib
 lib/Parrot/Manifest.pm                                      [devel]lib
-lib/Parrot/Pmc2c/Attribute.pm                               [devel]lib
 lib/Parrot/Pmc2c/Dumper.pm                                  [devel]lib
 lib/Parrot/Pmc2c/Emitter.pm                                 [devel]lib
 lib/Parrot/Pmc2c/Library.pm                                 [devel]lib

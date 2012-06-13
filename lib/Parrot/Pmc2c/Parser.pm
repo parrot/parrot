@@ -7,7 +7,6 @@ use warnings;
 use base qw( Exporter );
 our @EXPORT_OK = qw( parse_pmc extract_balanced );
 use Parrot::Pmc2c::PMC ();
-use Parrot::Pmc2c::Attribute ();
 use Parrot::Pmc2c::Method ();
 use Parrot::Pmc2c::Emitter ();
 use Parrot::Pmc2c::PCCMETHOD ();
@@ -168,22 +167,21 @@ sub find_attrs {
 
     while ($pmcbody =~ s/($attr_re)//o) {
         my ($type, $name, $array_size, @modifiers, $comment);
-        $type = $2;
-        $name = $3;
+        $type = $2 || '';
+        $name = $3 || '';
         $array_size = $4 || '';
+        @modifiers = ();
         @modifiers = split /\s/, $5;
         $comment = $6;
 
         $lineno += count_newlines($1);
 
-        $pmc->add_attribute(Parrot::Pmc2c::Attribute->new(
-            {
+        $pmc->add_attribute( {
                 name       => $name,
                 type       => $type,
                 array_size => $array_size,
                 modifiers  => \@modifiers,
-            }
-        ));
+        } );
     }
 
     return ($lineno, $pmcbody);
