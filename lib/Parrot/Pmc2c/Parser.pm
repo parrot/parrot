@@ -10,7 +10,6 @@ use Parrot::Pmc2c::PMC ();
 use Parrot::Pmc2c::Method ();
 use Parrot::Pmc2c::Emitter ();
 use Parrot::Pmc2c::PCCMETHOD ();
-use Parrot::Pmc2c::MULTI ();
 use Parrot::Pmc2c::UtilFunctions qw(count_newlines filename slurp);
 use File::Basename qw(basename);
 
@@ -268,17 +267,20 @@ sub find_methods {
 
         # METHOD needs FixedIntegerArray header
         if ( $method->type eq Parrot::Pmc2c::Method::NON_VTABLE ) {
+            # rewrite_pccmethod() modifies $method in-place
             Parrot::Pmc2c::PCCMETHOD::rewrite_pccmethod( $method, $pmc );
             $pmc->set_flag('need_fia_header');
         }
         elsif ( $method->type eq Parrot::Pmc2c::Method::MULTI ) {
-            Parrot::Pmc2c::MULTI::rewrite_multi_sub( $method, $pmc );
+            # rewrite_multi_sub() modifies $method in-place
+            Parrot::Pmc2c::PCCMETHOD::rewrite_multi_sub( $method, $pmc );
         }
 
         if ( $method->type eq Parrot::Pmc2c::Method::NON_VTABLE
         ||   $method->type eq Parrot::Pmc2c::Method::MULTI ) {
             # Name-mangle NCI and multi methods to avoid conflict with vtables
-            Parrot::Pmc2c::PCCMETHOD::mangle_name( $method, $pmc );
+            # mangle_name() modifies $method in-place
+            Parrot::Pmc2c::PCCMETHOD::mangle_name( $method );
         }
 
         # PCCINVOKE needs FixedIntegerArray header
