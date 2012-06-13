@@ -293,6 +293,7 @@ Parrot_io_open(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *path),
         handle = io_get_new_filehandle(interp);
     else
         handle = pmc;
+    PARROT_ASSERT(!PMC_IS_NULL(handle));
     vtable = IO_GET_VTABLE(interp, handle);
 
     /* Unless flagged otherwise, a path is required for open */
@@ -315,9 +316,9 @@ Parrot_io_open(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *path),
 
         /* If this type uses buffers by default, set them up, and if we're
            in an acceptable mode, set up buffers. */
-        if (flags & PIO_F_READ)
+        if (vtable->flags & PIO_VF_DEFAULT_BUFFERS && flags & PIO_F_READ)
             Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_READ_BUFFER, BUFFER_SIZE_ANY, PIO_BF_BLKBUF);
-        if (flags & PIO_F_WRITE)
+        if (vtable->flags & PIO_VF_DEFAULT_BUFFERS && flags & PIO_F_WRITE)
             Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY, PIO_BF_BLKBUF);
     }
 
@@ -352,6 +353,8 @@ Parrot_io_socket(PARROT_INTERP, ARGMOD_NULLOK(PMC *socket), INTVAL fam,
         new_socket = io_get_new_socket(interp);
     else
         new_socket = socket;
+
+    /* TODO: Move this logic into src/io/socket.c */
 
     os_handle = Parrot_io_internal_socket(interp, fam, type, proto);
 
@@ -452,6 +455,7 @@ void
 Parrot_io_socket_initialize(SHIM_INTERP, ARGMOD(PMC *socket))
 {
     ASSERT_ARGS(Parrot_io_socket_initialize)
+    /* TODO: Move this logic into src/io/socket.c */
     PARROT_SOCKET(socket)->os_handle = (PIOHANDLE)PIO_INVALID_HANDLE;
 }
 
@@ -496,6 +500,8 @@ Parrot_io_close(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL autoflush)
         if (read_buffer)
             Parrot_io_buffer_clear(interp, read_buffer);
 
+        /* TODO: We need to better-document the autoflush values, and maybe
+           turn it into an enum or a series of typedefs */
         if (autoflush == -1)
             autoflush == (vtable->flags && PIO_VF_FLUSH_ON_CLOSE) ? 1 : 0;
         if (autoflush == 1)
@@ -666,17 +672,21 @@ Parrot_io_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
     io_verify_is_open_for(interp, handle, vtable, PIO_F_READ);
 
     {
+        /* TODO: Refactor this stuff out into helper methods to be less
+           confusing and verbose here. */
         IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
-
         const STR_VTABLE * const encoding = io_get_encoding(interp, handle, vtable, PIO_F_READ);
         size_t total_size = vtable->total_size(interp, handle);
+
         if (total_size == 0)
             return Parrot_str_new_init(interp, "", 0, encoding, 0);
+
         if (total_size == PIO_UNKNOWN_SIZE) {
             IO_BUFFER * const read_buffer = io_verify_has_read_buffer(interp, handle, vtable, BUFFER_FLAGS_ANY);
-            io_sync_buffers_for_read(interp, handle, vtable, read_buffer, write_buffer);
             size_t available_bytes = Parrot_io_buffer_fill(interp, read_buffer, handle, vtable);
             STRING * const s = io_get_new_empty_string(interp, encoding, -1, PIO_STRING_BUFFER_MINSIZE);
+
+            io_sync_buffers_for_read(interp, handle, vtable, read_buffer, write_buffer);
             while (available_bytes > 0 && !Parrot_io_eof(interp, handle)) {
                 io_read_chars_append_string(interp, s, handle, vtable, read_buffer, available_bytes);
                 available_bytes = Parrot_io_buffer_fill(interp, read_buffer, handle, vtable);
@@ -684,8 +694,9 @@ Parrot_io_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
             return s;
         } else {
             IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
-            io_sync_buffers_for_read(interp, handle, vtable, read_buffer, write_buffer);
             STRING * const s = io_get_new_empty_string(interp, encoding, -1, total_size);
+
+            io_sync_buffers_for_read(interp, handle, vtable, read_buffer, write_buffer);
             io_read_chars_append_string(interp, s, handle, vtable, read_buffer, total_size);
             return s;
         }
@@ -738,7 +749,6 @@ Parrot_io_read_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC *handle),
         size_t bytes_read;
 
         io_verify_is_open_for(interp, handle, vtable, PIO_F_READ);
-
         io_sync_buffers_for_read(interp, handle, vtable, read_buffer, write_buffer);
 
         bytes_read = Parrot_io_buffer_read_b(interp, read_buffer, handle, vtable, content, byte_length);
@@ -765,6 +775,7 @@ Parrot_io_write_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC * handle),
     {
         char *content = (char *)VTABLE_get_pointer(interp, buffer);
         size_t real_length = (size_t)VTABLE_elements(interp, buffer);
+
         if (real_length < byte_length)
             byte_length = real_length;
 
@@ -813,10 +824,11 @@ Parrot_io_readline_s(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL terminator)
         STRING *result;
 
         io_sync_buffers_for_read(interp, handle, vtable, read_buffer, write_buffer);
-
         io_verify_is_open_for(interp, handle, vtable, PIO_F_READ);
+
         if (read_buffer == NULL)
             read_buffer = io_verify_has_read_buffer(interp, handle, vtable, BUFFER_SIZE_ANY);
+
         return io_readline_encoded_string(interp, handle, vtable, read_buffer, NULL, terminator);
     }
 }
@@ -858,6 +870,7 @@ Parrot_io_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(const void *buffer),
         bytes_written = Parrot_io_buffer_write_b(interp, write_buffer, handle, vtable,
                                                  (char *)buffer, byte_length);
         vtable->adv_position(interp, handle, bytes_written);
+
         /* If we are writing to a r/w handle, advance the pointer in the
            associated read-buffer since we're overwriting those characters. */
         Parrot_io_buffer_advance_position(interp, read_buffer, bytes_written);
@@ -893,6 +906,7 @@ Parrot_io_write_s(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *s))
         bytes_written = Parrot_io_buffer_write_b(interp, write_buffer, handle,
                                     vtable, out_s->strstart, out_s->bufused);
         vtable->adv_position(interp, handle, bytes_written);
+
         /* If we are writing to a r/w handle, advance the pointer in the
            associated read-buffer since we're overwriting those characters. */
         Parrot_io_buffer_advance_position(interp, read_buffer, bytes_written);
@@ -940,7 +954,7 @@ Parrot_io_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL w)
            position. Take the current file position and turn it into an
            offset relative to the beginning of the file. */
         if (w == SEEK_CUR) {
-            PIOOFF_T file_pos = vtable->get_position(interp, handle);
+            const PIOOFF_T file_pos = vtable->get_position(interp, handle);
             offset += file_pos;
             w  = SEEK_SET;
         }
@@ -951,9 +965,9 @@ Parrot_io_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL w)
         if (write_buffer)
             Parrot_io_buffer_flush(interp, write_buffer, handle, vtable);
 
-
         if (read_buffer && w != SEEK_END) {
-            PIOOFF_T new_offset = Parrot_io_buffer_seek(interp, read_buffer, handle, vtable, offset, w);
+            const PIOOFF_T new_offset = Parrot_io_buffer_seek(interp, read_buffer,
+                                                handle, vtable, offset, w);
             vtable->set_position(interp, handle, new_offset);
             return new_offset;
         }
@@ -991,6 +1005,7 @@ Parrot_io_tell(PARROT_INTERP, ARGMOD(PMC *handle))
         return -1;
     {
         IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+
         /* TODO: We may have data in the read buffer, so this might not be
            accurate. However, this is what the old system was doing so we
            can stick with the same semantic until we come up with something
@@ -1063,7 +1078,13 @@ Parrot_io_eof(PARROT_INTERP, ARGMOD(PMC *handle))
         return 1;
     if (Parrot_io_is_closed(interp, handle))
         return 1;
-    return IO_GET_VTABLE(interp, handle)->is_eof(interp, handle);
+    {
+        IO_BUFFER * const buffer = IO_GET_READ_BUFFER(interp, handle);
+        IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+        if (buffer)
+            return BUFFER_IS_EMPTY(buffer) && vtable->is_eof(interp, handle);
+        return vtable->is_eof(interp, handle);
+    }
 }
 
 /*
@@ -1469,6 +1490,8 @@ Parrot_io_socket_connect(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
     Parrot_Socket_attributes * const io = PARROT_SOCKET(pmc);
     int i;
 
+    /* TODO: Move most of this logic to src/io/socket.c */
+
     if (Parrot_io_is_closed(interp, pmc))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Can't connect closed socket");
@@ -1526,6 +1549,8 @@ Parrot_io_socket_bind(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
     ASSERT_ARGS(Parrot_io_socket_bind)
     Parrot_Socket_attributes * const io = PARROT_SOCKET(pmc);
     int i;
+
+    /* TODO: Move most of this logic to src/io/socket.c */
 
     if (Parrot_io_is_closed(interp, pmc))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
@@ -1608,6 +1633,9 @@ PMC *
 Parrot_io_socket_accept(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_socket_accept)
+
+    /* TODO: Move most of this logic to src/io/socket.c */
+
     Parrot_Socket_attributes *io = PARROT_SOCKET(pmc);
     Parrot_Socket_attributes *new_io;
     PMC       *new_pmc;

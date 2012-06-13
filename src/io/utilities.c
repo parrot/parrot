@@ -167,6 +167,7 @@ io_verify_has_read_buffer(PARROT_INTERP, ARGIN(PMC *handle),
         buffer = Parrot_io_buffer_allocate(interp, handle, flags, encoding, BUFFER_SIZE_ANY);
         VTABLE_set_pointer_keyed_int(interp, handle, IO_PTR_IDX_READ_BUFFER, buffer);
     }
+    PARROT_ASSERT(buffer);
     if (flags != BUFFER_FLAGS_ANY)
         buffer->flags = flags;
     return buffer;
@@ -242,6 +243,7 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
         /* We weren't able to read so many characters at once. Count the ones
            we've already gotten and continue */
         char_length -= bounds.chars;
+        PARROT_ASSERT(char_length > 0);
     }
     return s;
 }
@@ -286,7 +288,7 @@ io_read_chars_append_string(PARROT_INTERP, ARGMOD(STRING * s),
         bytes_read = vtable->read_b(interp, handle, s->strstart + s->bufused,
                                     byte_length);
 
-    PARROT_ASSERT(bytes_read == byte_length);
+    PARROT_ASSERT(bytes_read <= byte_length);
     s->bufused += byte_length;
     vtable->adv_position(interp, handle, byte_length);
     STRING_scan(interp, s);
@@ -361,7 +363,9 @@ io_get_encoding(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable), IN
 }
 
 void
-io_sync_buffers_for_read(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable), ARGMOD_NULLOK(IO_BUFFER *read_buffer), ARGMOD_NULLOK(IO_BUFFER * write_buffer))
+io_sync_buffers_for_read(PARROT_INTERP, ARGMOD(PMC *handle),
+        ARGIN(IO_VTABLE *vtable), ARGMOD_NULLOK(IO_BUFFER *read_buffer),
+        ARGMOD_NULLOK(IO_BUFFER * write_buffer))
 {
     ASSERT_ARGS(io_sync_buffers_for_read)
 
@@ -370,13 +374,17 @@ io_sync_buffers_for_read(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vt
        reading data from the buffer that has already been overwritten, from a
        position several bytes before where we're supposed to be. */
     if (write_buffer && !BUFFER_IS_EMPTY(write_buffer)) {
-        size_t bytes_written = Parrot_io_buffer_flush(interp, write_buffer, handle, vtable);
+        const size_t bytes_written = Parrot_io_buffer_flush(interp, write_buffer,
+                                        handle, vtable);
+        PARROT_ASSERT(BUFFER_IS_EMPTY(write_buffer));
         Parrot_io_buffer_advance_position(interp, read_buffer, bytes_written);
     }
 }
 
 void
-io_sync_buffers_for_write(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable), ARGMOD_NULLOK(IO_BUFFER *read_buffer), ARGMOD_NULLOK(IO_BUFFER * write_buffer))
+io_sync_buffers_for_write(PARROT_INTERP, ARGMOD(PMC *handle),
+        ARGIN(IO_VTABLE *vtable), ARGMOD_NULLOK(IO_BUFFER *read_buffer),
+        ARGMOD_NULLOK(IO_BUFFER * write_buffer))
 {
     ASSERT_ARGS(io_sync_buffers_for_write)
 
@@ -385,7 +393,7 @@ io_sync_buffers_for_write(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(IO_VTABLE *v
        position to match what we expect it to be, so the written data goes
        to the correct place */
     if (read_buffer && !BUFFER_IS_EMPTY(read_buffer)) {
-        size_t buffer_size = BUFFER_USED_SIZE(read_buffer);
+        const size_t buffer_size = BUFFER_USED_SIZE(read_buffer);
         Parrot_io_buffer_clear(interp, read_buffer);
         vtable->seek(interp, handle, -buffer_size, SEEK_CUR);
     }
@@ -394,7 +402,6 @@ io_sync_buffers_for_write(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(IO_VTABLE *v
 /*
 
 =back
-
 
 =cut
 

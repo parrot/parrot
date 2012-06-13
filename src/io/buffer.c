@@ -398,11 +398,14 @@ io_buffer_add_bytes(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), ARGIN(char *s),
 {
     ASSERT_ARGS(io_buffer_add_bytes)
 
+    BUFFER_ASSERT_SANITY(buffer);
+
     /* Assert that we aren't going to over-fill the buffer, and then fill it. */
     PARROT_ASSERT(BUFFER_USED_SIZE(buffer) + length <= buffer->buffer_size);
     memcpy(buffer->buffer_end, s, length);
     buffer->buffer_end += length;
     PARROT_ASSERT(BUFFER_USED_SIZE(buffer) <= buffer->buffer_size);
+    BUFFER_ASSERT_SANITY(buffer);
 }
 
 size_t
