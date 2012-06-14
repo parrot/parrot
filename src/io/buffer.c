@@ -100,7 +100,6 @@ Parrot_io_buffer_allocate(PARROT_INTERP, ARGMOD(PMC *owner), INTVAL flags,
 
     buffer->buffer_start = buffer->buffer_ptr;
     buffer->buffer_end = buffer->buffer_ptr;
-
     PARROT_ASSERT(BUFFER_IS_EMPTY(buffer));
 
     buffer->flags = flags;
@@ -199,6 +198,7 @@ Parrot_io_buffer_clear(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
         return;
     buffer->buffer_start = buffer->buffer_ptr;
     buffer->buffer_end = buffer->buffer_ptr;
+    BUFFER_ASSERT_SANITY(buffer);
 }
 
 size_t
@@ -286,7 +286,7 @@ static void
 io_buffer_normalize(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
 {
     ASSERT_ARGS(io_buffer_normalize)
-
+    /* BUFFER_DBG_PRINT(buffer); */
     BUFFER_ASSERT_SANITY(buffer);
 
     if (!buffer)
@@ -310,6 +310,7 @@ io_buffer_normalize(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
         memmove(buffer->buffer_ptr, buffer->buffer_start, used_size);
         buffer->buffer_start = buffer->buffer_ptr;
         buffer->buffer_end = buffer->buffer_start + used_size;
+        BUFFER_ASSERT_SANITY(buffer);
 
         /* Assert that we have the same amount of data in the buffer */
         PARROT_ASSERT(used_size == BUFFER_USED_SIZE(buffer));
@@ -349,7 +350,7 @@ Parrot_io_buffer_write_b(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
         size_t written = 0;
         const size_t total_size  = buffer->buffer_size;
         const size_t used_size   = BUFFER_USED_SIZE(buffer);
-        const size_t avail_size  = BUFFER_AVAILABLE_SIZE(buffer);
+        const size_t avail_size  = BUFFER_FREE_END_SPACE(buffer);
         const INTVAL needs_flush = io_buffer_requires_flush(interp, buffer, s, length);
 
         /* If the data fits in the buffer, copy it there and move on. */
@@ -463,17 +464,18 @@ Parrot_io_buffer_fill(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
 
     /* Normalize to make sure we have a maximum amount of free space */
     io_buffer_normalize(interp, buffer);
-    if (BUFFER_AVAILABLE_SIZE(buffer) == 0)
+    if (BUFFER_FREE_END_SPACE(buffer) == 0)
         return BUFFER_USED_SIZE(buffer);
     else
     {
-        size_t available_size = BUFFER_AVAILABLE_SIZE(buffer);
+        size_t available_size = BUFFER_FREE_END_SPACE(buffer);
         size_t read_bytes;
         if (available_size == 0)
             return BUFFER_USED_SIZE(buffer);
         read_bytes = vtable->read_b(interp, handle, buffer->buffer_end,
                                     available_size);
         buffer->buffer_end += read_bytes;
+        BUFFER_ASSERT_SANITY(buffer);
         return BUFFER_USED_SIZE(buffer);
     }
 }
