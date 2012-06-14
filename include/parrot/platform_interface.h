@@ -412,6 +412,12 @@ size_t Parrot_sysmem_amount(Interp*);
 PARROT_EXPORT
 INTVAL Parrot_get_entropy(PARROT_INTERP);
 
+/*
+ * CPU Type
+ */
+PARROT_EXPORT
+STRING *Parrot_get_cpu_type(PARROT_INTERP);
+
 #endif /* PARROT_PLATFORM_INTERFACE_H_GUARD */
 
 /*

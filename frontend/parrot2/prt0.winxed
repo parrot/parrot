@@ -168,7 +168,7 @@ function __show_version_and_exit[anon]()
     var config = getinterp()[IGLOBALS_CONFIG_HASH];
     string msg_fmt = <<:
 This is Parrot version %s%s built for %s-%s
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 This code is distributed under the terms of the Artistic License 2.0.
 For more details, see the full text of the license in the LICENSE file

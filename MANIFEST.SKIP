@@ -1018,6 +1018,8 @@
 ^/test\.pdb/
 ^/tools/dev/mk_language_shell\.pl$
 ^/tools/dev/mk_language_shell\.pl/
+^/tools/dev/pbc_to_exe\.pir$
+^/tools/dev/pbc_to_exe\.pir/
 ^/vc60\.pdb$
 ^/vc60\.pdb/
 ^/vc70\.pdb$
