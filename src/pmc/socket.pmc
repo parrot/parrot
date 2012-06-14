@@ -129,7 +129,7 @@ Returns whether the Socket is currently open.
 */
 
     VTABLE INTVAL get_bool() {
-        return Parrot_io_is_closed(INTERP, SELF);
+        return !Parrot_io_is_closed(INTERP, SELF);
     }
 
     VTABLE void *get_pointer_keyed_int(INTVAL key)
