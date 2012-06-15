@@ -52,11 +52,12 @@
 #define PIO_F_BINARY    02000000        /* Open in binary mode          */
 
 /* IO VTABLE Flags */
-#define PIO_VF_DEFAULT_BUFFERS      0x0001  /* This type uses buffers by default */
-#define PIO_VF_FLUSH_ON_CLOSE       0x0002  /* Flush before closing              */
-#define PIO_VF_PATH_NOT_REQUIRED    0x0004  /* This handle does not require a path
+#define PIO_VF_DEFAULT_READ_BUF     0x0001  /* This type uses read buffers by default */
+#define PIO_VF_DEFAULT_WRITE_BUF    0x0002  /* This type uses write buffers by default */
+#define PIO_VF_FLUSH_ON_CLOSE       0x0004  /* Flush before closing              */
+#define PIO_VF_PATH_NOT_REQUIRED    0x0008  /* This handle does not require a path
                                                for .open()                       */
-#define PIO_VF_AWAYS_READABLE       0x0008  /* Handle can always be read         */
+#define PIO_VF_AWAYS_READABLE       0x0010  /* Handle can always be read         */
 
 /*
  * pioctl argument constants. These don't have to

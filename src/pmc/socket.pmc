@@ -32,7 +32,6 @@ pmclass Socket extends Handle provides socket auto_attrs {
     ATTR INTVAL  family;
     ATTR INTVAL  type;
     ATTR INTVAL  protocol;
-    ATTR STRING *buf;
     ATTR STRING *encoding;
 
 /*
@@ -51,7 +50,6 @@ Initializes a newly created Socket object.
 
         data_struct->local  = PMCNULL;
         data_struct->remote = PMCNULL;
-        data_struct->buf    = STRINGNULL;
         data_struct->io_vtable = Parrot_io_get_vtable(interp,
                                         IO_VTABLE_SOCKET, NULL);
 
@@ -99,7 +97,6 @@ Mark active socket handle data as live.
         if (data) {
             Parrot_gc_mark_PMC_alive(INTERP, data->local);
             Parrot_gc_mark_PMC_alive(INTERP, data->remote);
-            Parrot_gc_mark_STRING_alive(INTERP, data->buf);
             Parrot_io_buffer_mark(interp, data->read_buffer);
             Parrot_io_buffer_mark(interp, data->write_buffer);
         }
@@ -340,15 +337,7 @@ string containing the received message.
 */
 
     METHOD recv() {
-        STRING * result;
-        GET_ATTR_buf(INTERP, SELF, result);
-
-        if (result != STRINGNULL && Parrot_str_length(INTERP, result) > 0) {
-            SET_ATTR_buf(INTERP, SELF, STRINGNULL);
-        }
-        else {
-            result = Parrot_io_read_s(INTERP, SELF, CHUNK_SIZE);
-        }
+        STRING * const result = Parrot_io_read_s(INTERP, SELF, CHUNK_SIZE);
         RETURN(STRING * result);
     }
 
@@ -449,29 +438,14 @@ Read the given number of bytes from the socket and return them in a string.
 */
 
     METHOD read(INTVAL nb) {
-        STRING *result;
         STRING *buf;
-        GET_ATTR_buf(INTERP, SELF, buf);
 
         if (Parrot_io_is_closed(INTERP, SELF))
             RETURN(STRING * STRINGNULL);
 
-        if (buf == STRINGNULL)
-            buf = Parrot_io_read_s(INTERP, SELF, CHUNK_SIZE);
+        buf = Parrot_io_read_s(INTERP, SELF, nb);
 
-        while (Parrot_str_length(INTERP, buf) < nb) {
-            STRING * const more = Parrot_io_read_s(INTERP, SELF, CHUNK_SIZE);
-            if (Parrot_str_length(INTERP, more) == 0) {
-                SET_ATTR_buf(INTERP, SELF, STRINGNULL);
-                RETURN(STRING *buf);
-            }
-            buf = Parrot_str_concat(INTERP, buf, more);
-        }
-
-        result = Parrot_str_substr(INTERP, buf, 0, nb);
-        buf = Parrot_str_substr(INTERP, buf, nb, Parrot_str_length(INTERP, buf) - nb);
-        SET_ATTR_buf(INTERP, SELF, buf);
-        RETURN(STRING *result);
+        RETURN(STRING *buf);
     }
 
 

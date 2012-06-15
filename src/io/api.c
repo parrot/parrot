@@ -316,9 +316,9 @@ Parrot_io_open(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *path),
 
         /* If this type uses buffers by default, set them up, and if we're
            in an acceptable mode, set up buffers. */
-        if (vtable->flags & PIO_VF_DEFAULT_BUFFERS && flags & PIO_F_READ)
+        if (vtable->flags & PIO_VF_DEFAULT_READ_BUF && flags & PIO_F_READ)
             Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_READ_BUFFER, BUFFER_SIZE_ANY, PIO_BF_BLKBUF);
-        if (vtable->flags & PIO_VF_DEFAULT_BUFFERS && flags & PIO_F_WRITE)
+        if (vtable->flags & PIO_VF_DEFAULT_WRITE_BUF && flags & PIO_F_WRITE)
             Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY, PIO_BF_BLKBUF);
     }
 

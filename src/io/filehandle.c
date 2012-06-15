@@ -198,7 +198,9 @@ io_filehandle_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), INTV
     if (vtable == NULL)
         vtable = &(interp->piodata->vtables[idx]);
     vtable->number = idx;
-    vtable->flags = PIO_VF_DEFAULT_BUFFERS | PIO_VF_FLUSH_ON_CLOSE;
+    vtable->flags = PIO_VF_DEFAULT_READ_BUF
+                  | PIO_VF_DEFAULT_WRITE_BUF
+                  | PIO_VF_FLUSH_ON_CLOSE;
     vtable->name = "FileHandle";
     vtable->read_b = io_filehandle_read_b;
     vtable->write_b = io_filehandle_write_b;
