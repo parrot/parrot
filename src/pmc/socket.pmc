@@ -186,8 +186,9 @@ Returns whether the Socket is currently open.
 
 
     METHOD socket(INTVAL fam, INTVAL type, INTVAL proto) {
-        // TODO: What to do here?
-        RETURN(PMC * SELF);
+        if (Parrot_io_socket(INTERP, SELF, fam, type, proto))
+            RETURN(PMC * SELF);
+        RETURN(PMC * PMCNULL);
     }
 
 /*

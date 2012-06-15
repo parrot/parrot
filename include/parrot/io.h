@@ -506,6 +506,17 @@ void Parrot_io_socket_connect(PARROT_INTERP,
         FUNC_MODIFIES(*address);
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+INTVAL Parrot_io_socket_handle(PARROT_INTERP,
+    ARGMOD_NULLOK(PMC *socket),
+    INTVAL fam,
+    INTVAL type,
+    INTVAL proto)
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*socket);
+
+PARROT_EXPORT
 void Parrot_io_socket_initialize(PARROT_INTERP, ARGMOD(PMC *socket))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*socket);
@@ -767,6 +778,8 @@ INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc) \
     , PARROT_ASSERT_ARG(address))
+#define ASSERT_ARGS_Parrot_io_socket_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_socket_initialize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(socket))
 #define ASSERT_ARGS_Parrot_io_socket_listen __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

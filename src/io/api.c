@@ -342,6 +342,20 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 INTVAL
+Parrot_io_socket_handle(PARROT_INTERP, ARGMOD_NULLOK(PMC *socket), INTVAL fam,
+            INTVAL type, INTVAL proto)
+{
+    ASSERT_ARGS(Parrot_io_socket_handle)
+    Parrot_io_socket(interp, socket, fam, type, proto);
+    /* For historical reasons, this function always returns 0 to signal
+       unconditional success */
+    return 0;
+}
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+INTVAL
 Parrot_io_socket(PARROT_INTERP, ARGMOD_NULLOK(PMC *socket), INTVAL fam,
             INTVAL type, INTVAL proto)
 {
@@ -363,7 +377,9 @@ Parrot_io_socket(PARROT_INTERP, ARGMOD_NULLOK(PMC *socket), INTVAL fam,
     SETATTR_Socket_type(interp, new_socket, type);
     SETATTR_Socket_protocol(interp, new_socket, proto);
 
-    return 0;
+    /* TODO: How do we signal errors here? */
+
+    return 1;
 }
 
 /*
