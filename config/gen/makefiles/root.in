@@ -681,7 +681,9 @@ $(LIBRARY_DIR)/Config/JSON.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT) $(DYNEXT_DIR)/sy
 $(LIBRARY_DIR)/LWP/UserAgent.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
 
 # constant string support
-.c.str : # suffix rule (limited support)
+# To accommodate 'nmake', we're stuck with suffix rules rather than pattern
+# rule.
+.c.str :
 	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl $< > $@
 
 STR_FILES = \
