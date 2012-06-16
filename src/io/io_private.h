@@ -172,7 +172,7 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 const STR_VTABLE * io_get_encoding(PARROT_INTERP,
     ARGMOD(PMC *handle),
-    ARGIN(IO_VTABLE *vtable),
+    ARGIN(const IO_VTABLE *vtable),
     INTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -200,7 +200,7 @@ PMC * io_get_new_socket(PARROT_INTERP)
 void io_read_chars_append_string(PARROT_INTERP,
     ARGMOD(STRING * s),
     ARGMOD(PMC *handle),
-    ARGIN(IO_VTABLE *vtable),
+    ARGIN(const IO_VTABLE *vtable),
     ARGMOD_NULLOK(IO_BUFFER *buffer),
     size_t byte_length)
         __attribute__nonnull__(1)
@@ -215,7 +215,7 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING * io_read_encoded_string(PARROT_INTERP,
     ARGMOD(PMC *handle),
-    ARGIN(IO_VTABLE *vtable),
+    ARGIN(const IO_VTABLE *vtable),
     ARGMOD(IO_BUFFER *buffer),
     ARGIN_NULLOK(const STR_VTABLE *encoding),
     INTVAL char_length)
@@ -230,7 +230,7 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING * io_readline_encoded_string(PARROT_INTERP,
     ARGMOD(PMC *handle),
-    ARGIN(IO_VTABLE *vtable),
+    ARGIN(const IO_VTABLE *vtable),
     ARGMOD(IO_BUFFER *buffer),
     ARGIN_NULLOK(const STR_VTABLE *encoding),
     INTVAL rs)
@@ -243,7 +243,7 @@ STRING * io_readline_encoded_string(PARROT_INTERP,
 
 void io_sync_buffers_for_read(PARROT_INTERP,
     ARGMOD(PMC *handle),
-    ARGIN(IO_VTABLE *vtable),
+    ARGIN(const IO_VTABLE *vtable),
     ARGMOD_NULLOK(IO_BUFFER *read_buffer),
     ARGMOD_NULLOK(IO_BUFFER * write_buffer))
         __attribute__nonnull__(1)
@@ -255,7 +255,7 @@ void io_sync_buffers_for_read(PARROT_INTERP,
 
 void io_sync_buffers_for_write(PARROT_INTERP,
     ARGMOD(PMC *handle),
-    ARGIN(IO_VTABLE *vtable),
+    ARGIN(const IO_VTABLE *vtable),
     ARGMOD_NULLOK(IO_BUFFER *read_buffer),
     ARGMOD_NULLOK(IO_BUFFER * write_buffer))
         __attribute__nonnull__(1)
@@ -269,7 +269,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 IO_BUFFER * io_verify_has_read_buffer(PARROT_INTERP,
     ARGIN(PMC *handle),
-    ARGIN(IO_VTABLE *vtable),
+    ARGIN(const IO_VTABLE *vtable),
     INTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -277,7 +277,7 @@ IO_BUFFER * io_verify_has_read_buffer(PARROT_INTERP,
 
 void io_verify_is_open_for(PARROT_INTERP,
     ARGIN(PMC *handle),
-    ARGIN(IO_VTABLE *vtable),
+    ARGIN(const IO_VTABLE *vtable),
     INTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -287,7 +287,7 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING * io_verify_string_encoding(PARROT_INTERP,
     ARGIN(PMC *handle),
-    ARGIN(IO_VTABLE *vtable),
+    ARGIN(const IO_VTABLE *vtable),
     ARGIN(STRING *s),
     INTVAL flags)
         __attribute__nonnull__(1)

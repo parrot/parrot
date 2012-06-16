@@ -3,14 +3,15 @@ Copyright (C) 2001-2008, Parrot Foundation.
 
 =head1 NAME
 
-src/io/core.c - I/O subsystem core functions
+src/io/utilities.c - Utility and helper functions for the IO subsystem.
 
 =head1 DESCRIPTION
 
-Core functions for initializing and destroying the I/O subsystem within an
-interpreter.
+Various helper and utility functions for the IO subsystem. Routines in this
+file specifically help with common or shared operations and help add a layer
+of intelligence between the IO API and the buffering API.
 
-=head2 Resource Functions
+=head2 Functions
 
 =over 4
 
@@ -83,6 +84,26 @@ Parrot_io_parse_open_flags(PARROT_INTERP, ARGIN(const STRING *mode_str))
     return flags;
 }
 
+/*
+
+=item C<PMC * io_get_new_filehandle(PARROT_INTERP)>
+
+Get a new FileHandle PMC, or whatever is the HLL-mapped alternative.
+
+=item C<PMC * io_get_new_socket(PARROT_INTERP)>
+
+Get a new Socket PMC, or whatever is the HLL-mapped alternative.
+
+=item C<STRING * io_get_new_empty_string(PARROT_INTERP, const STR_VTABLE
+*encoding, INTVAL char_length, INTVAL byte_length)>
+
+Allocate a new, empty STRING header with some space pre-allocated to hold
+incoming data.
+
+=cut
+
+*/
+
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
@@ -128,9 +149,26 @@ io_get_new_empty_string(PARROT_INTERP, ARGIN_NULLOK(const STR_VTABLE *encoding),
     return result;
 }
 
+/*
+
+=item C<void io_verify_is_open_for(PARROT_INTERP, PMC *handle, const IO_VTABLE
+*vtable, INTVAL flags)>
+
+Verify that the given C<handle> is open for the operation(s) specified in
+C<flags>. C<flags> can be one of C<PIO_F_READ> or C<PIO_F_WRITE>. This
+function throws an exception if this handle is closed or if it is not open
+for the specified mode.
+
+There is an exception that certain types are flagged C<PIO_VF_ALWAYS_READABLE>
+on the vtable. Those types are always readable, so take that into account.
+
+=cut
+
+*/
+
 void
 io_verify_is_open_for(PARROT_INTERP, ARGIN(PMC *handle),
-        ARGIN(IO_VTABLE *vtable), INTVAL flags)
+        ARGIN(const IO_VTABLE *vtable), INTVAL flags)
 {
     ASSERT_ARGS(io_verify_is_open_for)
 
@@ -152,11 +190,23 @@ io_verify_is_open_for(PARROT_INTERP, ARGIN(PMC *handle),
                 "IO PMC %s is not in mode %d", vtable->name, flags);
 }
 
+/*
+
+=item C<IO_BUFFER * io_verify_has_read_buffer(PARROT_INTERP, PMC *handle, const
+IO_VTABLE *vtable, INTVAL flags)>
+
+Verify that the given C<handle> has a read buffer attached. If not, allocate
+one.
+
+=cut
+
+*/
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 IO_BUFFER *
 io_verify_has_read_buffer(PARROT_INTERP, ARGIN(PMC *handle),
-        ARGIN(IO_VTABLE *vtable), INTVAL flags)
+        ARGIN(const IO_VTABLE *vtable), INTVAL flags)
 {
     ASSERT_ARGS(io_verify_has_read_buffer)
     IO_BUFFER * buffer = IO_GET_READ_BUFFER(interp, handle);
@@ -173,11 +223,24 @@ io_verify_has_read_buffer(PARROT_INTERP, ARGIN(PMC *handle),
     return buffer;
 }
 
+/*
+
+=item C<STRING * io_verify_string_encoding(PARROT_INTERP, PMC *handle, const
+IO_VTABLE *vtable, STRING *s, INTVAL flags)>
+
+Verify that the given string C<s> has a suitable encoding for use with
+C<handle>. If not, re-encode the string to be compatible. Return a string that
+is compatible with C<handle>.
+
+=cut
+
+*/
+
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
 io_verify_string_encoding(PARROT_INTERP, ARGIN(PMC *handle),
-        ARGIN(IO_VTABLE *vtable), ARGIN(STRING *s), INTVAL flags)
+        ARGIN(const IO_VTABLE *vtable), ARGIN(STRING *s), INTVAL flags)
 {
     ASSERT_ARGS(io_verify_string_encoding)
     const STR_VTABLE * const encoding = io_get_encoding(interp, handle, vtable, flags);
@@ -193,8 +256,9 @@ io_verify_string_encoding(PARROT_INTERP, ARGIN(PMC *handle),
 
 /*
 
-=item C<STRING * io_read_encoded_string(PARROT_INTERP, PMC *handle, IO_VTABLE
-*vtable, IO_BUFFER *buffer, const STR_VTABLE *encoding, INTVAL char_length)>
+=item C<STRING * io_read_encoded_string(PARROT_INTERP, PMC *handle, const
+IO_VTABLE *vtable, IO_BUFFER *buffer, const STR_VTABLE *encoding, INTVAL
+char_length)>
 
 Read a STRING from the handle with the given number of bytes, assuming the
 handle is open and flagged PIO_F_READ. Perform the necessary shenanigans to
@@ -209,7 +273,7 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
 io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
-        ARGIN(IO_VTABLE *vtable), ARGMOD(IO_BUFFER *buffer),
+        ARGIN(const IO_VTABLE *vtable), ARGMOD(IO_BUFFER *buffer),
         ARGIN_NULLOK(const STR_VTABLE *encoding), INTVAL char_length)
 {
     ASSERT_ARGS(io_read_encoded_string)
@@ -258,7 +322,7 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
 /*
 
 =item C<void io_read_chars_append_string(PARROT_INTERP, STRING * s, PMC *handle,
-IO_VTABLE *vtable, IO_BUFFER *buffer, size_t byte_length)>
+const IO_VTABLE *vtable, IO_BUFFER *buffer, size_t byte_length)>
 
 Read characters out of the buffer and append them to the end of the existing
 STRING. The STRING should be in "edit" mode and should not be referenced
@@ -273,7 +337,7 @@ reading.
 
 void
 io_read_chars_append_string(PARROT_INTERP, ARGMOD(STRING * s),
-        ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable),
+        ARGMOD(PMC *handle), ARGIN(const IO_VTABLE *vtable),
         ARGMOD_NULLOK(IO_BUFFER *buffer), size_t byte_length)
 {
     ASSERT_ARGS(io_read_chars_append_string)
@@ -303,7 +367,7 @@ io_read_chars_append_string(PARROT_INTERP, ARGMOD(STRING * s),
 
 /*
 
-=item C<STRING * io_readline_encoded_string(PARROT_INTERP, PMC *handle,
+=item C<STRING * io_readline_encoded_string(PARROT_INTERP, PMC *handle, const
 IO_VTABLE *vtable, IO_BUFFER *buffer, const STR_VTABLE *encoding, INTVAL rs)>
 
 Read a line, up to and including the terminator character rs, from the
@@ -317,7 +381,7 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
 io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
-        ARGIN(IO_VTABLE *vtable), ARGMOD(IO_BUFFER *buffer),
+        ARGIN(const IO_VTABLE *vtable), ARGMOD(IO_BUFFER *buffer),
         ARGIN_NULLOK(const STR_VTABLE *encoding), INTVAL rs)
 {
     ASSERT_ARGS(io_readline_encoded_string)
@@ -360,10 +424,24 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
     return s;
 }
 
+/*
+
+=item C<const STR_VTABLE * io_get_encoding(PARROT_INTERP, PMC *handle, const
+IO_VTABLE *vtable, INTVAL flags)>
+
+Get the encoding of C<handle>. If C<handle> doesn't have an encoding specified
+pick one that this suitable for the operation described in C<flags>. If
+C<flags> is PIO_F_WRITE, return a binary encoding for general-purpose writes.
+If C<flags> is PIO_F_READ, return the platform default encoding.
+
+=cut
+
+*/
+
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 const STR_VTABLE *
-io_get_encoding(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable), INTVAL flags)
+io_get_encoding(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(const IO_VTABLE *vtable), INTVAL flags)
 {
     ASSERT_ARGS(io_get_encoding)
     const STR_VTABLE * const encoding = vtable->get_encoding(interp, handle);
@@ -376,9 +454,22 @@ io_get_encoding(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable), IN
     return Parrot_default_encoding_ptr;
 }
 
+/*
+
+=item C<void io_sync_buffers_for_read(PARROT_INTERP, PMC *handle, const
+IO_VTABLE *vtable, IO_BUFFER *read_buffer, IO_BUFFER * write_buffer)>
+
+Synchronize buffers for a read operation on a "rw" handle.  In order to read
+data from the handle, we must first flush the data in the write buffer (if
+any) and update the read pointer to the correct location.
+
+=cut
+
+*/
+
 void
 io_sync_buffers_for_read(PARROT_INTERP, ARGMOD(PMC *handle),
-        ARGIN(IO_VTABLE *vtable), ARGMOD_NULLOK(IO_BUFFER *read_buffer),
+        ARGIN(const IO_VTABLE *vtable), ARGMOD_NULLOK(IO_BUFFER *read_buffer),
         ARGMOD_NULLOK(IO_BUFFER * write_buffer))
 {
     ASSERT_ARGS(io_sync_buffers_for_read)
@@ -395,9 +486,23 @@ io_sync_buffers_for_read(PARROT_INTERP, ARGMOD(PMC *handle),
     }
 }
 
+/*
+
+=item C<void io_sync_buffers_for_write(PARROT_INTERP, PMC *handle, const
+IO_VTABLE *vtable, IO_BUFFER *read_buffer, IO_BUFFER * write_buffer)>
+
+Synchronize buffers for a write operation on a "rw" handle. In order to write
+data to the handle we need to reset the on-disk pointer by calculating how
+far ahead the read_buffer has moved and resetting the pointer to the correct
+location using C<seek>.
+
+=cut
+
+*/
+
 void
 io_sync_buffers_for_write(PARROT_INTERP, ARGMOD(PMC *handle),
-        ARGIN(IO_VTABLE *vtable), ARGMOD_NULLOK(IO_BUFFER *read_buffer),
+        ARGIN(const IO_VTABLE *vtable), ARGMOD_NULLOK(IO_BUFFER *read_buffer),
         ARGMOD_NULLOK(IO_BUFFER * write_buffer))
 {
     ASSERT_ARGS(io_sync_buffers_for_write)
