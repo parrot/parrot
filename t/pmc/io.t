@@ -690,7 +690,7 @@ pir_output_is( sprintf(<<'CODE', $temp_file), <<"OUTPUT", "utf16 io" );
 
     pio.'open'(temp_file, 'r')
     pio.'encoding'("utf16")
-    $S0 = pio.'read'(9)
+    $S0 = pio.'read'(5)
     $I0 = iseq $S0, ucs4:"abc \x{1d004}"
     say $I0
     $S1 = pio.'read'(1)
