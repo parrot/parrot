@@ -181,6 +181,7 @@ io_pipe_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), INTVAL idx
         vtable = &(interp->piodata->vtables[idx]);
     vtable->number = idx;
     vtable->flags = PIO_VF_DEFAULT_READ_BUF
+                  | PIO_VF_MULTI_READABLE
                   | PIO_VF_FLUSH_ON_CLOSE;
     vtable->name = "Pipe";
     vtable->read_b = io_pipe_read_b;

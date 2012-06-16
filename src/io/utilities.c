@@ -214,6 +214,7 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
 {
     ASSERT_ARGS(io_read_encoded_string)
     STRING * const s = Parrot_gc_new_string_header(interp, 0);
+    const size_t raw_reads = buffer->raw_reads;
 
     s->bufused  = 0;
     s->strlen   = 0;
@@ -244,6 +245,12 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
            we've already gotten and continue */
         char_length -= bounds.chars;
         PARROT_ASSERT(char_length > 0);
+
+        /* Some types, like Socket, don't want to be read more than once in a
+           single request because recv can hang waiting for data. In those
+           cases, break out of the loop early. */
+        if ((vtable->flags & PIO_VF_MULTI_READABLE) == 0 && buffer->raw_reads > raw_reads)
+            break;
     }
     return s;
 }
@@ -316,6 +323,7 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
     ASSERT_ARGS(io_readline_encoded_string)
     STRING * const s = Parrot_gc_new_string_header(interp, 0);
     size_t total_bytes_read = 0;
+    const size_t raw_reads = buffer->raw_reads;
 
     s->bufused  = 0;
     s->strlen   = 0;
@@ -340,6 +348,12 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
 
         /* If we've found the delimiter, we're at the end of line. Return it */
         if (bounds.delim == rs)
+            break;
+
+        /* Some types, like Socket, don't want to be read more than once in a
+           single request because recv can hang waiting for data. In those
+           cases, break out of the loop early. */
+        if ((vtable->flags & PIO_VF_MULTI_READABLE) == 0 && buffer->raw_reads > raw_reads)
             break;
     }
 

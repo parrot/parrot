@@ -102,6 +102,8 @@ Parrot_io_buffer_allocate(PARROT_INTERP, ARGMOD(PMC *owner), INTVAL flags,
     buffer->buffer_end = buffer->buffer_ptr;
     PARROT_ASSERT(BUFFER_IS_EMPTY(buffer));
 
+    buffer->raw_reads = 0;
+
     buffer->flags = flags;
     return buffer;
 }
@@ -220,8 +222,10 @@ Parrot_io_buffer_read_b(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
 
         /* If we still need more data than the buffer can hold, just read it
            directly. */
-        if (length > buffer->buffer_size)
+        if (length > buffer->buffer_size) {
             bytes_read += vtable->read_b(interp, handle, s + bytes_read, length);
+            buffer->raw_reads++;
+        }
 
         /* Else, if we need to read an amount that the buffer can handle, fill
            the buffer. */
@@ -474,6 +478,7 @@ Parrot_io_buffer_fill(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
             return BUFFER_USED_SIZE(buffer);
         read_bytes = vtable->read_b(interp, handle, buffer->buffer_end,
                                     available_size);
+        buffer->raw_reads++;
         buffer->buffer_end += read_bytes;
         BUFFER_ASSERT_SANITY(buffer);
         return BUFFER_USED_SIZE(buffer);
