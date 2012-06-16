@@ -655,7 +655,7 @@ pir_output_is( sprintf(<<'CODE', $temp_file), <<"OUTPUT", "utf8 read enabled, re
     pio.'encoding'("utf8")
     $S0 = pio.'read'(2)
     say $S0
-    $S1 = pio.'read'(7)
+    $S1 = pio.'read'(6)
     say $S1
     $S0 .= $S1
     $S1 = pio.'read'(1024) # read the rest of the file (much shorter than 1K)
