@@ -350,7 +350,9 @@ STRING * io_verify_string_encoding(PARROT_INTERP,
 /* HEADERIZER BEGIN: src/io/filehandle.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-IO_VTABLE * io_filehandle_convert_to_pipe(PARROT_INTERP,
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+const IO_VTABLE * io_filehandle_convert_to_pipe(PARROT_INTERP,
     ARGMOD(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
