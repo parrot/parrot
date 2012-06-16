@@ -60,11 +60,11 @@ Read up to N bytes from IO PMC stream.
 =cut
 
 op read(out STR, in INT) :base_io {
-    $1 = Parrot_io_reads(interp, _PIO_STDIN(interp), (size_t)$2);
+    $1 = Parrot_io_read_s(interp, _PIO_STDIN(interp), (size_t)$2);
 }
 
 op read(out STR, invar PMC, in INT) :base_io {
-    $1 = Parrot_io_reads(interp, $2, (size_t)$3);
+    $1 = Parrot_io_read_s(interp, $2, (size_t)$3);
 }
 
 =item B<readline>(out STR, invar PMC)
@@ -103,14 +103,14 @@ op printerr(in NUM) :base_io {
 op printerr(in STR) :base_io {
     STRING * const s = $1;
     if (s && Parrot_str_byte_length(interp, s))
-        Parrot_io_putps(interp, _PIO_STDERR(interp), s);
+        Parrot_io_write_s(interp, _PIO_STDERR(interp), s);
 }
 
 op printerr(invar PMC) :base_io {
     PMC * const p = $1;
     STRING * const s = (VTABLE_get_string(interp, p));
     if (s)
-        Parrot_io_putps(interp, _PIO_STDERR(interp), s);
+        Parrot_io_write_s(interp, _PIO_STDERR(interp), s);
 }
 
 ##########################################
@@ -242,7 +242,7 @@ inline op open(out PMC, in STR, in STR) :filesys_open {
         goto ADDRESS(handler);
     }
     else {
-        $1 = Parrot_io_open_handle(interp, PMCNULL, $2, $3);
+        $1 = Parrot_io_open(interp, PMCNULL, $2, $3);
         PARROT_ASSERT(! PMC_IS_NULL($1));
     }
 }
@@ -254,7 +254,7 @@ inline op open(out PMC, in STR) :filesys_open {
         goto ADDRESS(handler);
     }
     else {
-        $1 = Parrot_io_open_handle(interp, PMCNULL, $2, STRINGNULL);
+        $1 = Parrot_io_open(interp, PMCNULL, $2, STRINGNULL);
         PARROT_ASSERT(! PMC_IS_NULL($1));
     }
 }

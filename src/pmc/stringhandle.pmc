@@ -229,7 +229,6 @@ stored for mocking.
         if (got_filename && !STRING_IS_NULL(filename))
             SET_ATTR_filename(INTERP, SELF, filename);
 
-
         handle = Parrot_io_open(INTERP, SELF, filename, mode);
 
         RETURN(PMC *handle);
