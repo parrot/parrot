@@ -181,9 +181,9 @@ typedef struct _io_vtable {
 #define BUFFER_SIZE_ANY     (size_t)-1
 #define BUFFER_FLAGS_ANY    (INTVAL)0
 
-#define IO_GET_VTABLE(i, p) ((IO_VTABLE*)VTABLE_get_pointer_keyed_int((i), (p), IO_PTR_IDX_VTABLE))
-#define IO_GET_READ_BUFFER(i, p) ((IO_BUFFER*)VTABLE_get_pointer_keyed_int((i), (p), IO_PTR_IDX_READ_BUFFER))
-#define IO_GET_WRITE_BUFFER(i, p) ((IO_BUFFER*)VTABLE_get_pointer_keyed_int((i), (p), IO_PTR_IDX_WRITE_BUFFER))
+#define IO_GET_VTABLE(i, p) ((const IO_VTABLE *)VTABLE_get_pointer_keyed_int((i), (p), IO_PTR_IDX_VTABLE))
+#define IO_GET_READ_BUFFER(i, p) ((IO_BUFFER *)VTABLE_get_pointer_keyed_int((i), (p), IO_PTR_IDX_READ_BUFFER))
+#define IO_GET_WRITE_BUFFER(i, p) ((IO_BUFFER *)VTABLE_get_pointer_keyed_int((i), (p), IO_PTR_IDX_WRITE_BUFFER))
 
 
 /* io/api.c - Public API functions */
@@ -304,11 +304,6 @@ PIOOFF_T Parrot_io_make_offset(INTVAL offset);
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PIOOFF_T Parrot_io_make_offset32(INTVAL hi, INTVAL lo);
-
-PARROT_EXPORT
-void Parrot_io_mark(PARROT_INTERP, ARGIN(ParrotIOData *piodata))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -469,7 +464,7 @@ PIOOFF_T Parrot_io_seek_handle(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-INTVAL Parrot_io_socket(PARROT_INTERP,
+PMC * Parrot_io_socket(PARROT_INTERP,
     ARGMOD_NULLOK(PMC *socket),
     INTVAL fam,
     INTVAL type,
@@ -601,7 +596,7 @@ void io_setup_vtables(PARROT_INTERP)
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PARROT_MALLOC
-IO_VTABLE * Parrot_io_allocate_new_vtable(PARROT_INTERP,
+const IO_VTABLE * Parrot_io_allocate_new_vtable(PARROT_INTERP,
     ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -625,7 +620,7 @@ PIOHANDLE Parrot_io_get_os_handle(PARROT_INTERP, ARGIN(PMC *handle))
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-IO_VTABLE * Parrot_io_get_vtable(PARROT_INTERP,
+const IO_VTABLE * Parrot_io_get_vtable(PARROT_INTERP,
     INTVAL idx,
     ARGIN_NULLOK(const char * name))
         __attribute__nonnull__(1);
@@ -635,6 +630,10 @@ PIOOFF_T Parrot_io_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
+
+void Parrot_io_mark(PARROT_INTERP, ARGIN(ParrotIOData *piodata))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void Parrot_io_set_buffer_mode(PARROT_INTERP,
     ARGMOD(PMC *handle),
@@ -704,9 +703,6 @@ INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP,
     , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_io_make_offset __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_io_make_offset32 __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_io_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(piodata))
 #define ASSERT_ARGS_Parrot_io_open __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc) \
@@ -828,6 +824,9 @@ INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_io_make_offset_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_Parrot_io_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(piodata))
 #define ASSERT_ARGS_Parrot_io_set_buffer_mode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \

@@ -113,9 +113,9 @@ DIAGRAM
 #define PIO_BUFFER_LINEBUF_SIZE   256   /* Smallest size for a line buffer */
 
 struct _ParrotIOData {
-    PMC ** table;           /* Standard IO Streams (STDIN, STDOUT, STDERR) */
-    INTVAL num_vtables;     /* Number of vtables */
-    IO_VTABLE * vtables;    /* Array of VTABLES */
+    PMC ** table;               /* Standard IO Streams (STDIN, STDOUT, STDERR) */
+    INTVAL num_vtables;         /* Number of vtables */
+    const IO_VTABLE * vtables;  /* Array of VTABLES */
 };
 
 /* redefine PIO_STD* for internal use */
