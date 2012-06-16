@@ -850,7 +850,7 @@ PARROT_WARN_UNUSED_RESULT
 size_t io_buffer_find_num_characters(PARROT_INTERP,
     ARGMOD(IO_BUFFER *buffer),
     ARGMOD(PMC *handle),
-    ARGIN(IO_VTABLE *vtable),
+    ARGIN(const IO_VTABLE *vtable),
     ARGIN(const STR_VTABLE *encoding),
     ARGMOD(Parrot_String_Bounds *bounds),
     size_t num_chars)
@@ -868,7 +868,7 @@ PARROT_WARN_UNUSED_RESULT
 size_t io_buffer_find_string_marker(PARROT_INTERP,
     ARGMOD(IO_BUFFER *buffer),
     ARGMOD(PMC *handle),
-    ARGIN(IO_VTABLE *vtable),
+    ARGIN(const IO_VTABLE *vtable),
     ARGIN(const STR_VTABLE *encoding),
     ARGMOD(Parrot_String_Bounds *bounds),
     INTVAL delim)
@@ -920,7 +920,7 @@ size_t Parrot_io_buffer_content_size(PARROT_INTERP,
 size_t Parrot_io_buffer_fill(PARROT_INTERP,
     ARGMOD_NULLOK(IO_BUFFER *buffer),
     ARGMOD(PMC * handle),
-    ARGIN(IO_VTABLE *vtable))
+    ARGIN(const IO_VTABLE *vtable))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
@@ -930,7 +930,7 @@ size_t Parrot_io_buffer_fill(PARROT_INTERP,
 size_t Parrot_io_buffer_flush(PARROT_INTERP,
     ARGMOD_NULLOK(IO_BUFFER *buffer),
     ARGMOD(PMC * handle),
-    ARGIN(IO_VTABLE *vtable))
+    ARGIN(const IO_VTABLE *vtable))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
@@ -946,7 +946,7 @@ void Parrot_io_buffer_mark(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
 UINTVAL Parrot_io_buffer_peek(PARROT_INTERP,
     ARGMOD(IO_BUFFER *buffer),
     ARGMOD(PMC * handle),
-    ARGIN(IO_VTABLE *vtable))
+    ARGIN(const IO_VTABLE *vtable))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -957,7 +957,7 @@ UINTVAL Parrot_io_buffer_peek(PARROT_INTERP,
 size_t Parrot_io_buffer_read_b(PARROT_INTERP,
     ARGMOD_NULLOK(IO_BUFFER *buffer),
     ARGIN(PMC *handle),
-    ARGIN(IO_VTABLE *vtable),
+    ARGIN(const IO_VTABLE *vtable),
     ARGOUT(char *s),
     size_t length)
         __attribute__nonnull__(1)
@@ -984,7 +984,7 @@ size_t Parrot_io_buffer_resize(PARROT_INTERP,
 PIOOFF_T Parrot_io_buffer_seek(PARROT_INTERP,
     ARGMOD(IO_BUFFER *buffer),
     ARGMOD(PMC *handle),
-    ARGIN(IO_VTABLE *vtable),
+    ARGIN(const IO_VTABLE *vtable),
     PIOOFF_T offset,
     INTVAL w)
         __attribute__nonnull__(1)
@@ -997,7 +997,7 @@ PIOOFF_T Parrot_io_buffer_seek(PARROT_INTERP,
 size_t Parrot_io_buffer_write_b(PARROT_INTERP,
     ARGMOD_NULLOK(IO_BUFFER *buffer),
     ARGMOD(PMC * handle),
-    ARGIN(IO_VTABLE *vtable),
+    ARGIN(const IO_VTABLE *vtable),
     ARGIN(char *s),
     size_t length)
         __attribute__nonnull__(1)

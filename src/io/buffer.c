@@ -72,6 +72,22 @@ static size_t io_buffer_transfer_to_mem(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+/*
+
+=item C<IO_BUFFER * Parrot_io_buffer_allocate(PARROT_INTERP, PMC *owner, INTVAL
+flags, const STR_VTABLE *encoding, size_t init_size)>
+
+Allocate a new buffer for PMC C<owner> with the given flags and settings.
+
+=item C<void Parrot_io_buffer_free(PARROT_INTERP, IO_BUFFER *buffer)>
+
+Free the C<buffer> memory.
+
+=cut
+
+*/
+
+
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 IO_BUFFER *
@@ -107,6 +123,42 @@ Parrot_io_buffer_allocate(PARROT_INTERP, ARGMOD(PMC *owner), INTVAL flags,
     buffer->flags = flags;
     return buffer;
 }
+
+void
+Parrot_io_buffer_free(PARROT_INTERP, ARGFREE(IO_BUFFER *buffer))
+{
+    ASSERT_ARGS(Parrot_io_buffer_free)
+    if (buffer->buffer_size) {
+        if (buffer->flags & PIO_BF_MALLOC)  {
+            mem_sys_free(buffer->buffer_start);
+        }
+        else if(buffer->flags & PIO_BF_MMAP) {
+            /* TODO */
+        }
+    }
+    Parrot_gc_free_fixed_size_storage(interp, sizeof (IO_BUFFER), buffer);
+}
+
+
+/*
+
+=item C<void Parrot_io_buffer_add_to_handle(PARROT_INTERP, PMC *handle, INTVAL
+idx, size_t length, INTVAL flags)>
+
+Allocate a new C<IO_BUFFER*> and attach it to PMC C<handle> at position
+C<idx>. Valid positions are C<IO_PTR_IDX_READ_BUFFER> and
+C<IO_PTR_IDX_WRITE_BUFFER>. If the buffer already exists, resize it to match
+the specifications.
+
+=item C<void Parrot_io_buffer_remove_from_handle(PARROT_INTERP, PMC *handle,
+INTVAL idx)>
+
+Remove the buffer from C<handle> at position C<idx>. Valid positions are
+C<IO_PTR_IDX_READ_BUFFER> and  C<IO_PTR_IDX_WRITE_BUFFER>.
+
+=cut
+
+*/
 
 void
 Parrot_io_buffer_add_to_handle(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL idx,
@@ -150,20 +202,18 @@ Parrot_io_buffer_remove_from_handle(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL i
     }
 }
 
-void
-Parrot_io_buffer_free(PARROT_INTERP, ARGFREE(IO_BUFFER *buffer))
-{
-    ASSERT_ARGS(Parrot_io_buffer_free)
-    if (buffer->buffer_size) {
-        if (buffer->flags & PIO_BF_MALLOC)  {
-            mem_sys_free(buffer->buffer_start);
-        }
-        else if(buffer->flags & PIO_BF_MMAP) {
-            /* TODO */
-        }
-    }
-    Parrot_gc_free_fixed_size_storage(interp, sizeof (IO_BUFFER), buffer);
-}
+/*
+
+=item C<size_t Parrot_io_buffer_resize(PARROT_INTERP, IO_BUFFER *buffer, size_t
+new_size)>
+
+Resize the C<buffer> to be able to accomodate the C<new_size>. The buffer may
+grow but probably will not shrink to avoid data loss. Return the new size of
+the buffer.
+
+=cut
+
+*/
 
 size_t
 Parrot_io_buffer_resize(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), size_t new_size)
@@ -183,6 +233,16 @@ Parrot_io_buffer_resize(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), size_t new_siz
     return new_size;
 }
 
+/*
+
+=item C<void Parrot_io_buffer_mark(PARROT_INTERP, IO_BUFFER *buffer)>
+
+Mark any GCable data attached to the buffer, if any.
+
+=cut
+
+*/
+
 void
 Parrot_io_buffer_mark(SHIM_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
 {
@@ -191,6 +251,16 @@ Parrot_io_buffer_mark(SHIM_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
     /*if (!PMC_IS_NULL(buffer->owner_pmc))
         Parrot_gc_mark_PMC_alive(interp, buffer->owner_pmc);*/
 }
+
+/*
+
+=item C<void Parrot_io_buffer_clear(PARROT_INTERP, IO_BUFFER *buffer)>
+
+Clear the buffer, erasing all data and normalizing all pointers.
+
+=cut
+
+*/
 
 void
 Parrot_io_buffer_clear(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
@@ -203,9 +273,23 @@ Parrot_io_buffer_clear(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
     BUFFER_ASSERT_SANITY(buffer);
 }
 
+/*
+
+=item C<size_t Parrot_io_buffer_read_b(PARROT_INTERP, IO_BUFFER *buffer, PMC
+*handle, const IO_VTABLE *vtable, char *s, size_t length)>
+
+Attempt to read C<length> bytes from C<handle>, possibly using C<buffer>. If
+C<buffer> is null, read from C<handle> directly. Otherwise, attempt to read
+data out of the buffer and fill it up again. Data is read into the chunk of
+memory pointed to by C<s>. The number of bytes actually read is returned.
+
+=cut
+
+*/
+
 size_t
 Parrot_io_buffer_read_b(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
-        ARGIN(PMC *handle), ARGIN(IO_VTABLE *vtable), ARGOUT(char *s),
+        ARGIN(PMC *handle), ARGIN(const IO_VTABLE *vtable), ARGOUT(char *s),
         size_t length)
 {
     ASSERT_ARGS(Parrot_io_buffer_read_b)
@@ -244,8 +328,9 @@ Parrot_io_buffer_read_b(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
 =item C<static size_t io_buffer_transfer_to_mem(PARROT_INTERP, IO_BUFFER
 *buffer, char * s, size_t length)>
 
-Transfer length bytes from the buffer to the char*s, removing those bytes
-from the buffer. Return the number of bytes actually copied.
+Transfer C<length> bytes from the C<buffer> to the memory chunk pointed to by
+C<s>, removing those bytes from the buffer. Return the number of bytes
+actually copied.
 
 =cut
 
@@ -321,6 +406,21 @@ io_buffer_normalize(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
     }
 }
 
+/*
+
+=item C<static INTVAL io_buffer_requires_flush(PARROT_INTERP, IO_BUFFER *buffer,
+char * s, size_t length)>
+
+HACK. Determine if the buffer needs a special flush. This is only required if
+the buffer is marked as C<PIO_BF_LINEBUF> and if the input sequence contains
+a literal newline '\n'. This is for backwards compatibility with the old
+system and will probably be deleted soon. Return C<1> if the buffer needs to
+be flushed, C<0> otherwise.
+
+=cut
+
+*/
+
 static INTVAL
 io_buffer_requires_flush(SHIM_INTERP, ARGIN(IO_BUFFER *buffer),
         ARGIN(char * s), size_t length)
@@ -338,9 +438,23 @@ io_buffer_requires_flush(SHIM_INTERP, ARGIN(IO_BUFFER *buffer),
     return 0;
 }
 
+/*
+
+=item C<size_t Parrot_io_buffer_write_b(PARROT_INTERP, IO_BUFFER *buffer, PMC *
+handle, const IO_VTABLE *vtable, char *s, size_t length)>
+
+Write C<length> bytes from C<s> into the C<buffer>. If the buffer fills or
+needs to be flushed, the data will be written through to C<handle>. If
+C<buffer> is null, data is written directly to C<handle>. Return the number of
+bytes added, probably C<length>.
+
+=cut
+
+*/
+
 size_t
 Parrot_io_buffer_write_b(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
-        ARGMOD(PMC * handle), ARGIN(IO_VTABLE *vtable), ARGIN(char *s),
+        ARGMOD(PMC * handle), ARGIN(const IO_VTABLE *vtable), ARGIN(char *s),
         size_t length)
 {
     ASSERT_ARGS(Parrot_io_buffer_write_b)
@@ -390,8 +504,9 @@ Parrot_io_buffer_write_b(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
 =item C<static void io_buffer_add_bytes(PARROT_INTERP, IO_BUFFER *buffer, char
 *s, size_t length)>
 
-Add the bytes to the buffer. Assume that the number of bytes to add is
-less than or equal to the amount of available space for writing.
+Add C<length> bytes from C<s> to the C<buffer>. Assume that the number of
+bytes to add is less than or equal to the amount of available space for
+writing.
 
 =cut
 
@@ -413,9 +528,22 @@ io_buffer_add_bytes(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), ARGIN(char *s),
     BUFFER_ASSERT_SANITY(buffer);
 }
 
+/*
+
+=item C<size_t Parrot_io_buffer_flush(PARROT_INTERP, IO_BUFFER *buffer, PMC *
+handle, const IO_VTABLE *vtable)>
+
+Flush the buffer, writing all data out to C<handle>. If the buffer is null
+or empty, do nothing. Return the number of bytes written through to the
+handle.
+
+=cut
+
+*/
+
 size_t
 Parrot_io_buffer_flush(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
-        ARGMOD(PMC * handle), ARGIN(IO_VTABLE *vtable))
+        ARGMOD(PMC * handle), ARGIN(const IO_VTABLE *vtable))
 {
     ASSERT_ARGS(Parrot_io_buffer_flush)
     size_t bytes_written = 0;
@@ -428,9 +556,23 @@ Parrot_io_buffer_flush(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
     return bytes_written;
 }
 
+/*
+
+=item C<UINTVAL Parrot_io_buffer_peek(PARROT_INTERP, IO_BUFFER *buffer, PMC *
+handle, const IO_VTABLE *vtable)>
+
+Peek the next byte from the buffer. Notice that this is the next byte, not
+the next codepoint. This is to preserve backwards compatibility with the old
+system. An updated peek operation will try to read the first codepoint
+instead.
+
+=cut.
+
+*/
+
 UINTVAL
 Parrot_io_buffer_peek(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
-        ARGMOD(PMC * handle), ARGIN(IO_VTABLE *vtable))
+        ARGMOD(PMC * handle), ARGIN(const IO_VTABLE *vtable))
 {
     ASSERT_ARGS(Parrot_io_buffer_peek)
 
@@ -449,7 +591,7 @@ Parrot_io_buffer_peek(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
 /*
 
 =item C<size_t Parrot_io_buffer_fill(PARROT_INTERP, IO_BUFFER *buffer, PMC *
-handle, IO_VTABLE *vtable)>
+handle, const IO_VTABLE *vtable)>
 
 Reads data into the buffer, trying to fill if possible. Returns the total
 number of bytes in the buffer.
@@ -460,7 +602,7 @@ number of bytes in the buffer.
 
 size_t
 Parrot_io_buffer_fill(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
-        ARGMOD(PMC * handle), ARGIN(IO_VTABLE *vtable))
+        ARGMOD(PMC * handle), ARGIN(const IO_VTABLE *vtable))
 {
     ASSERT_ARGS(Parrot_io_buffer_fill)
     if (!buffer)
@@ -484,6 +626,25 @@ Parrot_io_buffer_fill(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
         return BUFFER_USED_SIZE(buffer);
     }
 }
+
+/*
+
+=item C<size_t Parrot_io_buffer_content_size(PARROT_INTERP, IO_BUFFER *buffer)>
+
+Return the number of bytes contained in C<buffer>.
+
+=item C<void Parrot_io_buffer_advance_position(PARROT_INTERP, IO_BUFFER *buffer,
+size_t len)>
+
+Advance the buffer content pointer by C<len> bytes. This is required in
+certain cases, such as a "rw" handle. When we write bytes to the handle, we
+need to advance the read buffer pointer by the same number of bytes. If the
+Buffer is null or empty, do nothing. If the buffer has less data than the
+number of bytes to advance, clear and reset the buffer.
+
+=cut
+
+*/
 
 PARROT_WARN_UNUSED_RESULT
 size_t
@@ -510,8 +671,8 @@ Parrot_io_buffer_advance_position(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer
 /*
 
 =item C<size_t io_buffer_find_string_marker(PARROT_INTERP, IO_BUFFER *buffer,
-PMC *handle, IO_VTABLE *vtable, const STR_VTABLE *encoding, Parrot_String_Bounds
-*bounds, INTVAL delim)>
+PMC *handle, const IO_VTABLE *vtable, const STR_VTABLE *encoding,
+Parrot_String_Bounds *bounds, INTVAL delim)>
 
 Search the buffer for the given delimiter character or end-of-buffer,
 whichever comes first. Return a count of the number of bytes to be
@@ -525,7 +686,7 @@ amount of bytes to read which would create an incomplete codepoint
 PARROT_WARN_UNUSED_RESULT
 size_t
 io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
-        ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable),
+        ARGMOD(PMC *handle), ARGIN(const IO_VTABLE *vtable),
         ARGIN(const STR_VTABLE *encoding), ARGMOD(Parrot_String_Bounds *bounds),
         INTVAL delim)
 {
@@ -563,8 +724,8 @@ io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
 /*
 
 =item C<size_t io_buffer_find_num_characters(PARROT_INTERP, IO_BUFFER *buffer,
-PMC *handle, IO_VTABLE *vtable, const STR_VTABLE *encoding, Parrot_String_Bounds
-*bounds, size_t num_chars)>
+PMC *handle, const IO_VTABLE *vtable, const STR_VTABLE *encoding,
+Parrot_String_Bounds *bounds, size_t num_chars)>
 
 Attempt to read from the buffer the given number of characters in the
 given encoding. Returns the number of bytes to be read from the buffer to
@@ -578,7 +739,7 @@ the buffer and continue on a later read.
 PARROT_WARN_UNUSED_RESULT
 size_t
 io_buffer_find_num_characters(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
-        ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable),
+        ARGMOD(PMC *handle), ARGIN(const IO_VTABLE *vtable),
         ARGIN(const STR_VTABLE *encoding), ARGMOD(Parrot_String_Bounds *bounds),
         size_t num_chars)
 {
@@ -600,9 +761,23 @@ io_buffer_find_num_characters(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
     return bounds->bytes;
 }
 
+/*
+
+=item C<PIOOFF_T Parrot_io_buffer_seek(PARROT_INTERP, IO_BUFFER *buffer, PMC
+*handle, const IO_VTABLE *vtable, PIOOFF_T offset, INTVAL w)>
+
+Perform a seek in the buffer. C<w> must be C<SEEK_SET>, currently. This must
+be a read buffer. If the buffer contains enough data to satisfy the seek,
+adjust the pointer accordingly and continue. Otherwise, clear the buffer and
+perform a seek on the underlying handle.
+
+=cut
+
+*/
+
 PIOOFF_T
 Parrot_io_buffer_seek(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
-        ARGMOD(PMC *handle), ARGIN(IO_VTABLE *vtable), PIOOFF_T offset,
+        ARGMOD(PMC *handle), ARGIN(const IO_VTABLE *vtable), PIOOFF_T offset,
         INTVAL w)
 {
     ASSERT_ARGS(Parrot_io_buffer_seek)
