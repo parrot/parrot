@@ -794,6 +794,7 @@ EOC
         $self->add_method($new_method);
     }
 }
+
 =item C<gen_methods()>
 
 Returns the C code for the pmc methods.
@@ -1571,7 +1572,7 @@ sub generate_single_case {
     if ($type eq 'DEFAULT' || $type eq 'PMC') {
         # For default case we have to handle return manually.
         my ($pcc_signature, $retval, $call_tail, $pcc_return)
-                = gen_defaul_case_wrapping($impl);
+                = gen_default_case_wrapping($impl);
         my $dispatch = "Parrot_mmd_multi_dispatch_from_c_args(INTERP, \"$vt_method_name\", \"$pcc_signature\", SELF, $parameters$call_tail);";
 
         $case = <<"CASE";
@@ -1611,7 +1612,7 @@ CASE
 
 # Generate (pcc_signature, retval holder, pcc_call_tail, return statement)
 # for default case in switch.
-sub gen_defaul_case_wrapping {
+sub gen_default_case_wrapping {
     my $method = shift;
 
     local $_ = $method->return_type;

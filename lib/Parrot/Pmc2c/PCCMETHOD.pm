@@ -154,10 +154,10 @@ Rewrites the method body performing the various macro substitutions for RETURNs.
 =cut
 
 sub rewrite_RETURNs {
-    my ( $self, $pmc ) = @_;
-    my $method_name    = $self->name;
-    my $body           = $self->body;
-    my $wb             = $self->attrs->{manual_wb}
+    my ( $method, $pmc ) = @_;
+    my $method_name    = $method->name;
+    my $body           = $method->body;
+    my $wb             = $method->attrs->{manual_wb}
                          ? ''
                          : 'PARROT_GC_WRITE_BARRIER(interp, _self);';
 
