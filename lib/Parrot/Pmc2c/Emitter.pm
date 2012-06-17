@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2006, Parrot Foundation.
+# Copyright (C) 2004-2012, Parrot Foundation.
 package Parrot::Pmc2c::Emitter;
 use strict;
 use warnings;

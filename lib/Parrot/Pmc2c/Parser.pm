@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2011, Parrot Foundation.
+# Copyright (C) 2004-2012, Parrot Foundation.
 
 package Parrot::Pmc2c::Parser;
 
