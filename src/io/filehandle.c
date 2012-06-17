@@ -729,6 +729,20 @@ io_filehandle_set_file_position(SHIM_INTERP, ARGMOD(PMC *filehandle), PIOOFF_T f
     handle_struct->file_pos = file_pos;
 }
 
+/*
+
+=item C<const IO_VTABLE *io_filehandle_convert_to_pipe(PARROT_INTERP, PMC *handle)>
+
+Convert FileHandle C<handle> from file mode to pipe mode by swapping vtables.
+Return the Pipe vtable.
+
+Notice that this function may go away when FileHandle and Pipe are separate
+PMC types.
+
+=cut
+
+*/
+
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 const IO_VTABLE *
