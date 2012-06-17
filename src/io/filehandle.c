@@ -618,8 +618,8 @@ io_filehandle_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
 
 /*
 
-=item C<void Parrot_io_set_os_handle(PARROT_INTERP, PMC *filehandle, PIOHANDLE
-file_descriptor)>
+=item C<void io_filehandle_set_os_handle(PARROT_INTERP, PMC *filehandle,
+PIOHANDLE file_descriptor)>
 
 Sets the C<os_handle> attribute of the FileHandle object, which stores the
 low-level filehandle for the OS.
@@ -645,7 +645,8 @@ io_filehandle_set_os_handle(SHIM_INTERP, ARGMOD(PMC *filehandle), PIOHANDLE file
 
 /*
 
-=item C<PIOHANDLE Parrot_io_get_os_handle(PARROT_INTERP, const PMC *filehandle)>
+=item C<PIOHANDLE io_filehandle_get_os_handle(PARROT_INTERP, const PMC
+*filehandle)>
 
 Retrieve the C<os_handle> attribute of the FileHandle object, which stores the
 low-level filehandle for the OS.
@@ -679,7 +680,7 @@ io_filehandle_get_os_handle(SHIM_INTERP, ARGIN(const PMC *filehandle))
 
 /*
 
-=item C<PIOOFF_T Parrot_io_get_file_position(PARROT_INTERP, const PMC
+=item C<PIOOFF_T io_filehandle_get_file_position(PARROT_INTERP, const PMC
 *filehandle)>
 
 Get the C<file_pos> attribute of the FileHandle object, which stores
@@ -704,7 +705,7 @@ io_filehandle_get_file_position(SHIM_INTERP, ARGIN(const PMC *filehandle))
 
 /*
 
-=item C<void Parrot_io_set_file_position(PARROT_INTERP, PMC *filehandle,
+=item C<void io_filehandle_set_file_position(PARROT_INTERP, PMC *filehandle,
 PIOOFF_T file_pos)>
 
 Get the C<file_pos> attribute of the FileHandle object, which stores the
