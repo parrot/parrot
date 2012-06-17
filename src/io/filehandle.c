@@ -13,7 +13,7 @@ L<src/platform/xxx/io.c>.
 
 =cut
 
-=head2 Functions
+=head2 IO_VTABLE Functions
 
 =over 4
 
@@ -731,7 +731,8 @@ io_filehandle_set_file_position(SHIM_INTERP, ARGMOD(PMC *filehandle), PIOOFF_T f
 
 /*
 
-=item C<const IO_VTABLE *io_filehandle_convert_to_pipe(PARROT_INTERP, PMC *handle)>
+=item C<const IO_VTABLE * io_filehandle_convert_to_pipe(PARROT_INTERP, PMC
+*handle)>
 
 Convert FileHandle C<handle> from file mode to pipe mode by swapping vtables.
 Return the Pipe vtable.

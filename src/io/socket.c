@@ -3,13 +3,13 @@ Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
-src/io/socket.c - Socket I/O API
+src/io/socket.c - Socket IO_VTABLE
 
 =head1 DESCRIPTION
 
-These are the primary interface functions for working with socket objects.
+This file implements the Socket IO_VTABLE and some helper routines.
 
-=head2 Networking Functions
+=head2 IO_VTABLE Functions
 
 =over 4
 
@@ -32,7 +32,7 @@ These are the primary interface functions for working with socket objects.
 
 static void io_socket_adv_position(PARROT_INTERP,
     ARGMOD(PMC *handle),
-    PIOOFF_T offset)
+    size_t offset)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
@@ -98,7 +98,7 @@ static INTVAL io_socket_read_b(PARROT_INTERP,
         FUNC_MODIFIES(*handle)
         FUNC_MODIFIES(*buffer);
 
-static INTVAL io_socket_seek(PARROT_INTERP,
+static PIOOFF_T io_socket_seek(PARROT_INTERP,
     ARGMOD(PMC *handle),
     PIOOFF_T offset,
     INTVAL whence)
@@ -112,7 +112,7 @@ static void io_socket_set_flags(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static PIOOFF_T io_socket_set_position(PARROT_INTERP,
+static void io_socket_set_position(PARROT_INTERP,
     ARGMOD(PMC *handle),
     PIOOFF_T pos)
         __attribute__nonnull__(1)
@@ -195,15 +195,26 @@ static INTVAL io_socket_write_b(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+/*
+
+=item C<void io_socket_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable, INTVAL
+idx)>
+
+Setup the Socket IO_VTABLE.
+
+=cut
+
+*/
+
 void
 io_socket_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), INTVAL idx)
 {
     ASSERT_ARGS(io_socket_setup_vtable)
     if (vtable == NULL)
-        vtable = &(interp->piodata->vtables[idx]);
+        vtable = (IO_VTABLE *)(&(interp->piodata->vtables[idx]));
     vtable->number = idx;
-    vtable->flags = PIO_VF_DEFAULT_READ_BUF
-                  | PIO_VF_FLUSH_ON_CLOSE;
+    vtable->flags = PIO_VF_DEFAULT_READ_BUF     /* Use a read buffer by default */
+                  | PIO_VF_FLUSH_ON_CLOSE;      /* Flush the socket on close    */
     vtable->name = "Socket";
     vtable->read_b = io_socket_read_b;
     vtable->write_b = io_socket_write_b;
@@ -223,6 +234,18 @@ io_socket_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), INTVAL i
     vtable->total_size = io_socket_total_size;
 }
 
+/*
+
+=item C<static INTVAL io_socket_read_b(PARROT_INTERP, PMC *handle, char *buffer,
+size_t byte_length)>
+
+Read a number of bytes from the socket with C<recv>. Notice that C<recv> may
+hang if there is no data to read, so don't call it too often.
+
+=cut
+
+*/
+
 static INTVAL
 io_socket_read_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGOUT(char *buffer), size_t byte_length)
 {
@@ -231,6 +254,17 @@ io_socket_read_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGOUT(char *buffer), size_
     GETATTR_Socket_os_handle(interp, handle, os_handle);
     return Parrot_io_internal_recv(interp, os_handle, buffer, byte_length);
 }
+
+/*
+
+=item C<static INTVAL io_socket_write_b(PARROT_INTERP, PMC *handle, char
+*buffer, size_t byte_length)>
+
+Write a number of bytes to the socket with C<send>.
+
+=cut
+
+*/
 
 static INTVAL
 io_socket_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(char *buffer), size_t byte_length)
@@ -241,6 +275,16 @@ io_socket_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(char *buffer), size_
     return Parrot_io_internal_send(interp, os_handle, buffer, byte_length);
 }
 
+/*
+
+=item C<static INTVAL io_socket_flush(PARROT_INTERP, PMC *handle)>
+
+Flush the socket. Currently this does nothing.
+
+=cut
+
+*/
+
 static INTVAL
 io_socket_flush(PARROT_INTERP, ARGMOD(PMC *handle))
 {
@@ -249,43 +293,94 @@ io_socket_flush(PARROT_INTERP, ARGMOD(PMC *handle))
     return 0;
 }
 
+/*
+
+=item C<static INTVAL io_socket_is_eof(PARROT_INTERP, PMC *handle)>
+
+Sockets do not have a concept of EOF. This throws an exception.
+
+=cut
+
+*/
+
 static INTVAL
 io_socket_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_socket_is_eof)
-    IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+    const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
     IO_VTABLE_UNIMPLEMENTED(interp, vtable, "eof");
     return 0;
 }
+
+/*
+
+=item C<static PIOOFF_T io_socket_tell(PARROT_INTERP, PMC *handle)>
+
+Sockets do not have tell. Throw an exception.
+
+=cut
+
+*/
 
 static PIOOFF_T
 io_socket_tell(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_socket_tell)
-    IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+    const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
     IO_VTABLE_UNIMPLEMENTED(interp, vtable, "tell");
     return (PIOOFF_T)0;
 }
 
-static INTVAL
+/*
+
+=item C<static PIOOFF_T io_socket_seek(PARROT_INTERP, PMC *handle, PIOOFF_T
+offset, INTVAL whence)>
+
+Sockets do not have a concept of seek. Throw an exception.
+
+=cut
+
+*/
+
+static PIOOFF_T
 io_socket_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL whence)
 {
     ASSERT_ARGS(io_socket_seek)
     UNUSED(offset);
     UNUSED(whence);
-    IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+    const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
     IO_VTABLE_UNIMPLEMENTED(interp, vtable, "seek");
     return 0;
 }
 
+/*
+
+=item C<static void io_socket_adv_position(PARROT_INTERP, PMC *handle, size_t
+offset)>
+
+Do nothing. Sockets don't keep track of position.
+
+=item C<static void io_socket_set_position(PARROT_INTERP, PMC *handle, PIOOFF_T
+pos)>
+
+Do nothing. Sockets don't keep track of position.
+
+=item C<static PIOOFF_T io_socket_get_position(PARROT_INTERP, PMC *handle)>
+
+Do nothing. Sockets don't keep track of position.
+
+=cut
+
+*/
+
 static void
-io_socket_adv_position(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset)
+io_socket_adv_position(PARROT_INTERP, ARGMOD(PMC *handle), size_t offset)
 {
     ASSERT_ARGS(io_socket_adv_position)
     /* Socket doesn't keep track of position internally. Ignore this. */
 }
 
-static PIOOFF_T
+static void
 io_socket_set_position(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T pos)
 {
     ASSERT_ARGS(io_socket_set_position)
@@ -300,6 +395,17 @@ io_socket_get_position(PARROT_INTERP, ARGMOD(PMC *handle))
     return (PIOOFF_T)0;
 }
 
+/*
+
+=item C<static INTVAL io_socket_open(PARROT_INTERP, PMC *handle, STRING *path,
+INTVAL flags, STRING * mode)>
+
+Do nothing. Sockets use connect and accept instead of open.
+
+=cut
+
+*/
+
 static INTVAL
 io_socket_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path),
         INTVAL flags, ARGIN(STRING * mode))
@@ -312,6 +418,16 @@ io_socket_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path),
     return Parrot_io_internal_flush(interp, os_handle);
 }
 
+/*
+
+=item C<static INTVAL io_socket_is_open(PARROT_INTERP, PMC *handle)>
+
+Determine if the socket is currently connected and open.
+
+=cut
+
+*/
+
 static INTVAL
 io_socket_is_open(PARROT_INTERP, ARGMOD(PMC *handle))
 {
@@ -320,6 +436,16 @@ io_socket_is_open(PARROT_INTERP, ARGMOD(PMC *handle))
     GETATTR_Socket_os_handle(interp, handle, os_handle);
     return os_handle != PIO_INVALID_HANDLE;
 }
+
+/*
+
+=item C<static INTVAL io_socket_close(PARROT_INTERP, PMC *handle)>
+
+Disconnect the socket.
+
+=cut
+
+*/
 
 static INTVAL
 io_socket_close(PARROT_INTERP, ARGMOD(PMC *handle))
@@ -334,6 +460,21 @@ io_socket_close(PARROT_INTERP, ARGMOD(PMC *handle))
     SETATTR_Socket_os_handle(interp, handle, PIO_INVALID_HANDLE);
     return result;
 }
+
+/*
+
+=item C<static void io_socket_set_flags(PARROT_INTERP, PMC *handle, INTVAL
+flags)>
+
+Do nothing.
+
+=item C<static INTVAL io_socket_get_flags(PARROT_INTERP, PMC *handle)>
+
+Return C<PIO_F_WRITE | PIO_F_READ>. Sockets are always flagged r/w.
+
+=cut
+
+*/
 
 static void
 io_socket_set_flags(PARROT_INTERP, ARGIN(PMC *handle), INTVAL flags)
@@ -351,14 +492,34 @@ io_socket_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
     return PIO_F_WRITE | PIO_F_READ;
 }
 
+/*
+
+=item C<static size_t io_socket_total_size(PARROT_INTERP, PMC *handle)>
+
+Return C<0>. Sockets do not have a concept of total size.
+
+=cut
+
+*/
+
 static size_t
 io_socket_total_size(PARROT_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_socket_total_size)
-    IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+    const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
     IO_VTABLE_UNIMPLEMENTED(interp, vtable, "total_size");
     return (size_t)0;
 }
+
+/*
+
+=item C<static PIOHANDLE io_socket_get_piohandle(PARROT_INTERP, PMC *handle)>
+
+Get the OS-level C<socket> object.
+
+=cut
+
+*/
 
 static PIOHANDLE
 io_socket_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
@@ -368,6 +529,17 @@ io_socket_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
     GETATTR_Socket_os_handle(interp, handle, os_handle);
     return os_handle;
 }
+
+/*
+
+=item C<static const STR_VTABLE * io_socket_get_encoding(PARROT_INTERP, PMC
+*handle)>
+
+Get the encoding of this socket, if one is set.
+
+=cut
+
+*/
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
