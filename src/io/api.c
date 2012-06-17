@@ -211,7 +211,7 @@ Parrot_io_finish(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_io_marl(PARROT_INTERP, ParrotIOData *piodata)>
+=item C<void Parrot_io_mark(PARROT_INTERP, ParrotIOData *piodata)>
 
 Called from C<Parrot_gc_trace_root()> to mark the standard IO handles
 (C<stdin>, C<stdout> and C<stderr>) and other global data for the IO
@@ -1833,7 +1833,7 @@ Parrot_io_socket_new(PARROT_INTERP, INTVAL flags)
 
 Gets the current handle flags.
 
-=item C<void Parrot_io_get_flags(PARROT_INTERP, PMC *handle, INTVAL flags)>
+=item C<void Parrot_io_set_flags(PARROT_INTERP, PMC *handle, INTVAL flags)>
 
 Sets the current handle flags.
 
