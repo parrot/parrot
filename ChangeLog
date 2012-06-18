@@ -5,6 +5,11 @@
         + Added Parrot_api_set_stdhandle, Parrot_api_new_call_object and
           Parrot_api_setup_signature functions to the embedding API
         + Removed the "can" VTABLE
+    - Languages
+      + Winxed snapshot updated to 1.9.1
+        - New syntax for parameters in multi
+        - New syntax for initalization with new
+        - Cast to var improved
     - IMCC
         + Removed .line, .file, setline and setfile directives from IMCC
     - Documentation
