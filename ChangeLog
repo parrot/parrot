@@ -8,14 +8,22 @@
     - IMCC
         + Removed .line, .file, setline and setfile directives from IMCC
     - Documentation
-	+ Fixed up Pod in 240 files to pass 't/codingstd/pod_description.t'.
+        + Fixed up Pod in 240 files to pass 't/codingstd/pod_description.t'.
     - Tests
-	+ Added 'docs/pdds' and 'docs/pdds/draft' as files for
-	  'Parrot::Test::Pod.pm' to exclude.
+        + Added 'docs/pdds' and 'docs/pdds/draft' as files for
+      'Parrot::Test::Pod.pm' to exclude.
     - Build
-	+ Reduced number of packages under 'lib/Parrot/Pmc2c/'.
-	+ Added method-level documentation to several of the remaining packages.
+        + Reduced number of packages under 'lib/Parrot/Pmc2c/'.
+        + Added method-level documentation to several of the remaining packages.
+        + Added 'docs/pdds' and 'docs/pdds/draft' as files for
+          'Parrot::Test::Pod.pm' to exclude.
     - Community
+        + M1, a C-like language that targets M0 had a burst of development
+          and now has many working examples such as recursive Fibonacci and
+          recursive factorial : https://github.com/parrot/m1
+        + Parrot bindings to LAPACK are being worked on as part of Google
+          Summer of Code: https://github.com/leto/parrot-lapack
+
 
 2012-05-15    release 4.4.0
     - Core
