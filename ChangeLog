@@ -1,3 +1,9 @@
+2012-07-XX    release 4.6.0
+    - Core
+    - Documentation
+    - Tests
+    - Community
+
 2012-06-19    release 4.5.0
     - Core
         + Added .write_bytes and .read_bytes methods to FileHandle and Socket
@@ -16,7 +22,7 @@
         + Fixed up Pod in 240 files to pass 't/codingstd/pod_description.t'.
     - Tests
         + Added 'docs/pdds' and 'docs/pdds/draft' as files for
-      'Parrot::Test::Pod.pm' to exclude.
+          'Parrot::Test::Pod.pm' to exclude.
     - Build
         + Reduced number of packages under 'lib/Parrot/Pmc2c/'.
         + Added method-level documentation to several of the remaining packages.

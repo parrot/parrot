@@ -1,8 +1,8 @@
 {
-    "release.version"  : "4.4.0",
-    "release.name"     : "Banana Fanna Fo Ferret",
+    "release.version"  : "4.5.0",
+    "release.name"     : "Buff-faced Pygmy Parrot",
     "release.day"      : "Tuesday",
-    "release.nextdate" : "19 June 2012",
+    "release.nextdate" : "17 July 2012",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -11,10 +11,10 @@
     "web.org_root"    :  "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "16 June 2012",
+    "bugday.date"      : "14 July 2012",
 
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
-    "wiki.bugday"      : "bug_day_2012_06_16",
+    "wiki.bugday"      : "bug_day_2012_07_14",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/stable/4.4.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/4.5.0/"
 }
