@@ -246,6 +246,7 @@ Mark any GCable data attached to the buffer, if any.
 void
 Parrot_io_buffer_mark(SHIM_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
 {
+    ASSERT_ARGS(Parrot_io_buffer_mark)
     if (!buffer)
         return;
     /*if (!PMC_IS_NULL(buffer->owner_pmc))
