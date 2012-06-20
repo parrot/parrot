@@ -25759,7 +25759,7 @@
     goto __label_7
   __label_6: # else
     $P1.'close'()
-    $P5 = $P1.'read'(0)
+    $P5 = $P1.'readall'()
     null $S1
     if_null $P5, __label_8
     set $S1, $P5
@@ -25811,7 +25811,7 @@
     goto __label_4
   __label_3: # else
     $P1.'close'()
-    .tailcall $P1.'read'(0)
+    .tailcall $P1.'readall'()
   __label_4: # endif
 
 .end # __private_geninclude
