@@ -1,23 +1,23 @@
 # THIS IS A GENERATED FILE! DO NOT EDIT!
-# Compiled with Winxed 1.8.2
+# Compiled with Winxed 1.9.1
 # Source file: winxedst2.winxed
 # Begin generated code
 
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'getVersion' :subid('WSubId_29') :anon
+.sub 'getVersion' :subid('WSubId_27') :anon
     new $P1, ['FixedIntegerArray'], 3
     $P1[0] = 1
-    $P1[1] = 8
-    $P1[2] = 2
+    $P1[1] = 9
+    $P1[2] = 1
     .return($P1)
 
 .end # getVersion
 
 
-.sub 'getVersionString' :subid('WSubId_159') :anon
-.const 'Sub' WSubId_29 = "WSubId_29"
-    $P1 = WSubId_29()
+.sub 'getVersionString' :subid('WSubId_157') :anon
+.const 'Sub' WSubId_27 = "WSubId_27"
+    $P1 = WSubId_27()
     join $S1, ".", $P1
     concat $S2, "Winxed ", $S1
     .return($S2)
@@ -25,7 +25,7 @@
 .end # getVersionString
 
 
-.sub 'sformat' :subid('WSubId_52')
+.sub 'sformat' :subid('WSubId_48')
         .param string __ARG_1
         .param pmc __ARG_2 :slurpy
     new $P1, [ 'StringBuilder' ]
@@ -166,14 +166,14 @@
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'Warn' :subid('WSubId_47')
+.sub 'Warn' :subid('WSubId_45')
         .param string __ARG_1
         .param pmc __ARG_2 :optional
     getstderr $P1
-    $P1.'print'('WARNING: ')
+    $P1.'print'("WARNING: ")
     $P1.'print'(__ARG_1)
     if_null __ARG_2, __label_1
-    $P1.'print'(' near ')
+    $P1.'print'(" near ")
     $P2 = __ARG_2.'show'()
     $P1.'print'($P2)
   __label_1: # endif
@@ -182,7 +182,7 @@
 .end # Warn
 
 
-.sub 'InternalError' :subid('WSubId_35')
+.sub 'InternalError' :subid('WSubId_33')
         .param string __ARG_1
         .param pmc __ARG_2 :optional
         .param int __ARG_3 :opt_flag
@@ -193,7 +193,7 @@
     if_null $P2, __label_2
     set $S1, $P2
   __label_2:
-    concat $S2, __ARG_1, ' near '
+    concat $S2, __ARG_1, " near "
     concat $S2, $S2, $S1
     set __ARG_1, $S2
   __label_1: # endif
@@ -201,26 +201,26 @@
     new $P2, [ 'Winxed'; 'Compiler'; 'WinxedCompilerError' ]
     $P3 = __ARG_2.'filename'()
     $P4 = __ARG_2.'linenum'()
-    $P2.'WinxedCompilerError'('internal', __ARG_1, $P3, $P4)
+    $P2.'WinxedCompilerError'("internal", __ARG_1, $P3, $P4)
     set $P1, $P2
     goto __label_3
   __label_4:
     new $P6, [ 'Winxed'; 'Compiler'; 'WinxedCompilerError' ]
-    $P6.'WinxedCompilerError'('internal', __ARG_1)
+    $P6.'WinxedCompilerError'("internal", __ARG_1)
     set $P5, $P6
     set $P1, $P5
   __label_3:
-    root_new $P2, ['parrot';'Exception']
-    $P2['message'] = __ARG_1
-    $P2['severity'] = 2
-    $P2['type'] = 567
-    $P2['payload'] = $P1
+    root_new $P2, ["parrot";"Exception"]
+    $P2["message"] = __ARG_1
+    $P2["severity"] = 2
+    $P2["type"] = 567
+    $P2["payload"] = $P1
     throw $P2
 
 .end # InternalError
 
 
-.sub 'SyntaxError' :subid('WSubId_30')
+.sub 'SyntaxError' :subid('WSubId_28')
         .param string __ARG_1
         .param pmc __ARG_2
     if_null __ARG_2, __label_1
@@ -244,22 +244,22 @@
     set $S1, $P1
   __label_6:
     $S3 = __ARG_2.'viewable'()
-    concat $S2, ' near ', $S3
+    concat $S2, " near ", $S3
     set $S3, $I1
-    concat $S4, __ARG_1, ' in '
+    concat $S4, __ARG_1, " in "
     concat $S4, $S4, $S1
-    concat $S4, $S4, ' line '
+    concat $S4, $S4, " line "
     concat $S4, $S4, $S3
     concat $S4, $S4, $S2
     new $P3, [ 'Winxed'; 'Compiler'; 'WinxedCompilerError' ]
     concat $S5, __ARG_1, $S2
-    $P3.'WinxedCompilerError'('parser', $S5, $S1, $I1)
+    $P3.'WinxedCompilerError'("parser", $S5, $S1, $I1)
     set $P2, $P3
-    root_new $P1, ['parrot';'Exception']
-    $P1['message'] = $S4
-    $P1['severity'] = 2
-    $P1['type'] = 567
-    $P1['payload'] = $P2
+    root_new $P1, ["parrot";"Exception"]
+    $P1["message"] = $S4
+    $P1["severity"] = 2
+    $P1["type"] = 567
+    $P1["payload"] = $P2
     throw $P1
 
 .end # SyntaxError
@@ -267,115 +267,126 @@
 
 .sub 'NoLeftSide' :subid('WSubId_99')
         .param pmc __ARG_1
-.const 'Sub' WSubId_30 = "WSubId_30"
-    WSubId_30('Not a left-side expression', __ARG_1)
+.const 'Sub' WSubId_28 = "WSubId_28"
+    WSubId_28("Not a left-side expression", __ARG_1)
 
 .end # NoLeftSide
 
 
-.sub 'Expected' :subid('WSubId_79')
+.sub 'Expected' :subid('WSubId_76')
         .param string __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     concat $S1, "Expected ", __ARG_1
-    WSubId_30($S1, __ARG_2)
+    WSubId_28($S1, __ARG_2)
 
 .end # Expected
 
 
-.sub 'Unexpected' :subid('WSubId_80')
+.sub 'Unexpected' :subid('WSubId_79')
         .param string __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     concat $S1, "Unexpected ", __ARG_1
-    WSubId_30($S1, __ARG_2)
+    WSubId_28($S1, __ARG_2)
 
 .end # Unexpected
 
 
-.sub 'ExpectedIdentifier' :subid('WSubId_32')
+.sub 'ExpectedIdentifier' :subid('WSubId_30')
         .param pmc __ARG_1
-.const 'Sub' WSubId_30 = "WSubId_30"
-    WSubId_30("Expected identifier", __ARG_1)
+.const 'Sub' WSubId_28 = "WSubId_28"
+    WSubId_28("Expected identifier", __ARG_1)
 
 .end # ExpectedIdentifier
 
 
-.sub 'ExpectedOp' :subid('WSubId_31')
+.sub 'ExpectedOp' :subid('WSubId_29')
         .param string __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     concat $S1, "Expected '", __ARG_1
     concat $S1, $S1, "'"
-    WSubId_30($S1, __ARG_2)
+    WSubId_28($S1, __ARG_2)
 
 .end # ExpectedOp
 
 
-.sub 'RequireOp' :subid('WSubId_33')
+.sub 'RequireOp' :subid('WSubId_31')
         .param string __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_31 = "WSubId_31"
+.const 'Sub' WSubId_29 = "WSubId_29"
     $P1 = __ARG_2.'isop'(__ARG_1)
     if $P1 goto __label_1
-    WSubId_31(__ARG_1, __ARG_2)
+    WSubId_29(__ARG_1, __ARG_2)
   __label_1: # endif
 
 .end # RequireOp
 
 
-.sub 'RequireKeyword' :subid('WSubId_34')
+.sub 'RequireKeyword' :subid('WSubId_32')
         .param string __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_31 = "WSubId_31"
+.const 'Sub' WSubId_29 = "WSubId_29"
     $P1 = __ARG_2.'iskeyword'(__ARG_1)
     if $P1 goto __label_1
-    WSubId_31(__ARG_1, __ARG_2)
+    WSubId_29(__ARG_1, __ARG_2)
   __label_1: # endif
 
 .end # RequireKeyword
 
 
-.sub 'RequireIdentifier' :subid('WSubId_134')
+.sub 'RequireIdentifier' :subid('WSubId_78')
         .param pmc __ARG_1
-.const 'Sub' WSubId_32 = "WSubId_32"
+.const 'Sub' WSubId_30 = "WSubId_30"
     $P1 = __ARG_1.'isidentifier'()
     if $P1 goto __label_1
-    WSubId_32(__ARG_1)
+    WSubId_30(__ARG_1)
   __label_1: # endif
 
 .end # RequireIdentifier
 
 
-.sub 'ExpectOp' :subid('WSubId_94')
+.sub 'ExpectOp' :subid('WSubId_93')
         .param string __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_33 = "WSubId_33"
+.const 'Sub' WSubId_31 = "WSubId_31"
     $P1 = __ARG_2.'get'()
-    WSubId_33(__ARG_1, $P1)
+    WSubId_31(__ARG_1, $P1)
 
 .end # ExpectOp
 
 
-.sub 'ExpectKeyword' :subid('WSubId_136')
+.sub 'ExpectKeyword' :subid('WSubId_135')
         .param string __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_34 = "WSubId_34"
+.const 'Sub' WSubId_32 = "WSubId_32"
     $P1 = __ARG_2.'get'()
-    WSubId_34(__ARG_1, $P1)
+    WSubId_32(__ARG_1, $P1)
 
 .end # ExpectKeyword
 
 
-.sub 'UndefinedVariable' :subid('WSubId_101')
+.sub 'UndefinedVariable' :subid('WSubId_102')
         .param string __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     concat $S1, "Variable '", __ARG_1
     concat $S1, $S1, "' is not defined"
-    WSubId_30($S1, __ARG_2)
+    WSubId_28($S1, __ARG_2)
 
 .end # UndefinedVariable
+
+
+.sub 'Redeclared' :subid('WSubId_98')
+        .param pmc __ARG_1
+.const 'Sub' WSubId_28 = "WSubId_28"
+    $S1 = __ARG_1.'getidentifier'()
+    concat $S2, "Redeclared '", $S1
+    concat $S2, $S2, "'"
+    WSubId_28($S2, __ARG_1)
+
+.end # Redeclared
 
 .namespace [ 'Winxed'; 'Compiler'; 'Token' ]
 
@@ -439,22 +450,22 @@
 
 
 .sub 'getintvalue' :method
-.const 'Sub' WSubId_35 = "WSubId_35"
-    WSubId_35('Not a literal int', self)
+.const 'Sub' WSubId_33 = "WSubId_33"
+    WSubId_33("Not a literal int", self)
 
 .end # getintvalue
 
 
 .sub 'rawstring' :method
-.const 'Sub' WSubId_35 = "WSubId_35"
-    WSubId_35('Not a literal string', self)
+.const 'Sub' WSubId_33 = "WSubId_33"
+    WSubId_33("Not a literal string", self)
 
 .end # rawstring
 
 
 .sub 'getidentifier' :method
-.const 'Sub' WSubId_32 = "WSubId_32"
-    WSubId_32(self)
+.const 'Sub' WSubId_30 = "WSubId_30"
+    WSubId_30(self)
 
 .end # getidentifier
 
@@ -480,13 +491,13 @@
 
 
 .sub 'checkop' :method
-    .return('')
+    .return("")
 
 .end # checkop
 
 
 .sub 'viewable' :method
-    .return('(unknown)')
+    .return("(unknown)")
 
 .end # viewable
 
@@ -515,9 +526,9 @@
     set $S2, $P1
     getattribute $P2, self, 'line'
     set $S3, $P2
-    concat $S4, $S1, ' at '
+    concat $S4, $S1, " at "
     concat $S4, $S4, $S2
-    concat $S4, $S4, ' line '
+    concat $S4, $S4, " line "
     concat $S4, $S4, $S3
     .return($S4)
 
@@ -544,7 +555,7 @@
 
 
 .sub 'viewable' :method
-    .return('(End of file)')
+    .return("(End of file)")
 
 .end # viewable
 
@@ -590,8 +601,7 @@
 .sub 'TokenComment' :method
         .param string __ARG_1
         .param int __ARG_2
-        .param string __ARG_3
-    self.'TokenWithVal'(__ARG_1, __ARG_2, __ARG_3)
+    self.'Token'(__ARG_1, __ARG_2)
 
 .end # TokenComment
 
@@ -601,9 +611,15 @@
 
 .end # iscomment
 
+
+.sub 'viewable' :method
+    .return("(comment)")
+
+.end # viewable
+
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'TokenComment' ]
-    get_class $P1, [ 'Winxed'; 'Compiler'; 'TokenWithVal' ]
+    get_class $P1, [ 'Winxed'; 'Compiler'; 'Token' ]
     addparent $P0, $P1
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'TokenOp' ]
@@ -718,8 +734,10 @@
 .sub 'get_string' :method :vtable
     getattribute $P1, self, 'str'
     set $S1, $P1
-    concat $S2, '"', $S1
-    concat $S2, $S2, '"'
+    concat $S3, "\"", $S1
+    concat $S3, $S3, "\""
+    set $S2, $S3
+  __label_1:
     .return($S2)
 
 .end # get_string
@@ -728,8 +746,10 @@
 .sub 'viewable' :method
     getattribute $P1, self, 'str'
     set $S1, $P1
-    concat $S2, '"', $S1
-    concat $S2, $S2, '"'
+    concat $S3, "\"", $S1
+    concat $S3, $S3, "\""
+    set $S2, $S3
+  __label_1:
     .return($S2)
 
 .end # viewable
@@ -743,7 +763,7 @@
 
 
 .sub 'getPirString' :method
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     getattribute $P1, self, 'str'
     null $S1
     if_null $P1, __label_1
@@ -753,16 +773,16 @@
     new $P1, 'ExceptionHandler'
     set_label $P1, __label_2
     push_eh $P1
-    $P0 = new ['String']
+    $P0 = new ["String"]
     $P0 = $S1
-    $S2 = $P0.'unescape'('utf8')
+    $S2 = $P0."unescape"("utf8")
     pop_eh
     goto __label_3
   __label_2:
     .get_results($P2)
     finalize $P2
     pop_eh
-    WSubId_30("Invalid escape sequence in literal string", self)
+    WSubId_28("Invalid escape sequence in literal string", self)
   __label_3:
     null $I1
     box $P1, $S2
@@ -778,17 +798,19 @@
   __label_6: # endif
     goto __label_4
   __label_5: # endfor
-    escape $S1, $S2
-    unless $I1 goto __label_8
-    set $S3, "utf8:"
-    goto __label_7
-  __label_8:
-    set $S3, ""
+    escape $S4, $S2
+    concat $S5, "\"", $S4
+    concat $S5, $S5, "\""
+    set $S1, $S5
   __label_7:
-    concat $S4, $S3, '"'
-    concat $S4, $S4, $S1
-    concat $S4, $S4, '"'
-    .return($S4)
+    unless $I1 goto __label_9
+    set $S3, "utf8:"
+    goto __label_8
+  __label_9:
+    set $S3, ""
+  __label_8:
+    concat $S5, $S3, $S1
+    .return($S5)
 
 .end # getPirString
 
@@ -835,7 +857,7 @@
 
 
 .sub 'getasquoted' :method
-    set $S1, ''
+    set $S1, ""
     getattribute $P1, self, 'str'
     if_null $P1, __label_2
     iter $P2, $P1
@@ -854,7 +876,7 @@
   __label_5: # case
   __label_6: # case
   __label_7: # case
-    concat $S3, '\', $S2
+    concat $S3, "\\", $S2
     set $S2, $S3
     goto __label_4 # break
   __label_3: # default
@@ -894,8 +916,8 @@
   __label_3: # endfor
     null $I3
     unless $I1 goto __label_6
-    set $S2, '"'
-    set $S3, ''
+    set $S2, "\""
+    set $S3, ""
     box $P1, $S1
     if_null $P1, __label_8
     iter $P3, $P1
@@ -903,8 +925,8 @@
   __label_7: # for iteration
     unless $P3 goto __label_8
     shift $S4, $P3
-    ne $S4, '\', __label_9
-    concat $S3, $S3, '\\'
+    ne $S4, "\\", __label_9
+    concat $S3, $S3, "\\\\"
     goto __label_10
   __label_9: # else
     ord $I4, $S4
@@ -922,9 +944,9 @@
     if_null $P1, __label_15
     set $S5, $P1
   __label_15:
-    concat $S3, $S3, '\x{'
+    concat $S3, $S3, "\\x{"
     concat $S3, $S3, $S5
-    concat $S3, $S3, '}'
+    concat $S3, $S3, "}"
     goto __label_12
   __label_11: # else
     concat $S3, $S3, $S4
@@ -938,7 +960,7 @@
     concat $S6, $S6, $S2
     set $S1, $S6
     unless $I3 goto __label_16
-    concat $S6, 'utf8:', $S1
+    concat $S6, "utf8:", $S1
     set $S1, $S6
   __label_16: # endif
     .return($S1)
@@ -1010,88 +1032,88 @@
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'TokenError' :subid('WSubId_36')
+.sub 'TokenError' :subid('WSubId_34')
         .param string __ARG_1
         .param pmc __ARG_2
         .param int __ARG_3
     getattribute $P2, __ARG_2, 'filename'
     set $S1, $P2
     set $S2, __ARG_3
-    concat $S3, __ARG_1, ' in '
+    concat $S3, __ARG_1, " in "
     concat $S3, $S3, $S1
-    concat $S3, $S3, ' line '
+    concat $S3, $S3, " line "
     concat $S3, $S3, $S2
     new $P4, [ 'Winxed'; 'Compiler'; 'WinxedCompilerError' ]
     getattribute $P5, __ARG_2, 'filename'
-    $P4.'WinxedCompilerError'('tokenizer', __ARG_1, $P5, __ARG_3)
+    $P4.'WinxedCompilerError'("tokenizer", __ARG_1, $P5, __ARG_3)
     set $P3, $P4
-    root_new $P1, ['parrot';'Exception']
-    $P1['message'] = $S3
-    $P1['severity'] = 2
-    $P1['type'] = 567
-    $P1['payload'] = $P3
+    root_new $P1, ["parrot";"Exception"]
+    $P1["message"] = $S3
+    $P1["severity"] = 2
+    $P1["type"] = 567
+    $P1["payload"] = $P3
     throw $P1
 
 .end # TokenError
 
 
-.sub 'UnterminatedString' :subid('WSubId_37')
+.sub 'UnterminatedString' :subid('WSubId_35')
         .param pmc __ARG_1
         .param int __ARG_2
-.const 'Sub' WSubId_36 = "WSubId_36"
-    WSubId_36('Unterminated string', __ARG_1, __ARG_2)
+.const 'Sub' WSubId_34 = "WSubId_34"
+    WSubId_34("Unterminated string", __ARG_1, __ARG_2)
 
 .end # UnterminatedString
 
 
-.sub 'UnterminatedHeredoc' :subid('WSubId_38')
+.sub 'UnterminatedHeredoc' :subid('WSubId_36')
         .param pmc __ARG_1
         .param int __ARG_2
-.const 'Sub' WSubId_36 = "WSubId_36"
-    WSubId_36('Unterminated heredoc', __ARG_1, __ARG_2)
+.const 'Sub' WSubId_34 = "WSubId_34"
+    WSubId_34("Unterminated heredoc", __ARG_1, __ARG_2)
 
 .end # UnterminatedHeredoc
 
 
-.sub 'UnclosedComment' :subid('WSubId_39')
+.sub 'UnclosedComment' :subid('WSubId_37')
         .param pmc __ARG_1
         .param int __ARG_2
-.const 'Sub' WSubId_36 = "WSubId_36"
-    WSubId_36("Unclosed comment", __ARG_1, __ARG_2)
+.const 'Sub' WSubId_34 = "WSubId_34"
+    WSubId_34("Unclosed comment", __ARG_1, __ARG_2)
 
 .end # UnclosedComment
 
 
-.sub 'getquoted' :subid('WSubId_42')
+.sub 'getquoted' :subid('WSubId_40')
         .param pmc __ARG_1
         .param string __ARG_2
         .param int __ARG_3
-.const 'Sub' WSubId_37 = "WSubId_37"
-    set $S1, ''
+.const 'Sub' WSubId_35 = "WSubId_35"
+    set $S1, ""
     null $S2
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
   __label_3: # for condition
-    eq $S2, '"', __label_2
+    eq $S2, "\"", __label_2
     if $S2 == "" goto __label_6
     if $S2 == "\n" goto __label_7
-    if $S2 == '\' goto __label_8
+    if $S2 == "\\" goto __label_8
     goto __label_4
   __label_6: # case
   __label_7: # case
-    WSubId_37(__ARG_1, __ARG_3)
+    WSubId_35(__ARG_1, __ARG_3)
   __label_8: # case
     $P2 = __ARG_1.'getchar'()
     null $S3
     if_null $P2, __label_9
     set $S3, $P2
   __label_9:
-    iseq $I1, $S3, ''
+    iseq $I1, $S3, ""
     if $I1 goto __label_11
     iseq $I1, $S3, "\n"
   __label_11:
     unless $I1 goto __label_10
-    WSubId_37(__ARG_1, __ARG_3)
+    WSubId_35(__ARG_1, __ARG_3)
   __label_10: # endif
     concat $S1, $S1, $S2
     concat $S1, $S1, $S3
@@ -1113,12 +1135,12 @@
 .end # getquoted
 
 
-.sub 'getsinglequoted' :subid('WSubId_43')
+.sub 'getsinglequoted' :subid('WSubId_41')
         .param pmc __ARG_1
         .param string __ARG_2
         .param int __ARG_3
-.const 'Sub' WSubId_37 = "WSubId_37"
-    set $S1, ''
+.const 'Sub' WSubId_35 = "WSubId_35"
+    set $S1, ""
     null $S2
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
@@ -1129,7 +1151,7 @@
     iseq $I1, $S2, "\n"
   __label_5:
     unless $I1 goto __label_4
-    WSubId_37(__ARG_1, __ARG_3)
+    WSubId_35(__ARG_1, __ARG_3)
   __label_4: # endif
     concat $S1, $S1, $S2
   __label_1: # for iteration
@@ -1146,73 +1168,78 @@
 .end # getsinglequoted
 
 
-.sub 'getheredoc' :subid('WSubId_44')
+.sub 'getheredoc' :subid('WSubId_42')
         .param pmc __ARG_1
         .param string __ARG_2
         .param int __ARG_3
-.const 'Sub' WSubId_38 = "WSubId_38"
-    set $S1, ''
+.const 'Sub' WSubId_36 = "WSubId_36"
+    set $S1, ""
     null $S2
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
   __label_3: # for condition
     eq $S2, "\n", __label_2
-    if $S2 == '' goto __label_6
-    if $S2 == '"' goto __label_7
-    if $S2 == '\' goto __label_8
+    if $S2 == "" goto __label_6
+    if $S2 == "\r" goto __label_7
+    if $S2 == "\"" goto __label_8
+    if $S2 == "\\" goto __label_9
     goto __label_4
   __label_6: # case
-    WSubId_38(__ARG_1, __ARG_3)
+    WSubId_36(__ARG_1, __ARG_3)
   __label_7: # case
+    goto __label_5 # break
   __label_8: # case
-    concat $S6, '\', $S2
-    set $S2, $S6
+  __label_9: # case
+    concat $S1, $S1, "\\"
+    concat $S1, $S1, $S2
     goto __label_5 # break
   __label_4: # default
+    concat $S1, $S1, $S2
   __label_5: # switch end
-    concat $S5, $S1, $S2
-    set $S1, $S5
   __label_1: # for iteration
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
     goto __label_3
   __label_2: # for end
-    concat $S5, $S1, ':>>'
+    concat $S5, $S1, ":>>"
     set $S1, $S5
-    set $S3, ''
+    set $S3, ""
     null $S4
-  __label_9: # do
-    set $S4, ''
+  __label_10: # do
+    set $S4, ""
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
-  __label_14: # for condition
-    eq $S2, "\n", __label_13
-    if $S2 == '' goto __label_17
-    if $S2 == '"' goto __label_18
-    if $S2 == '\' goto __label_19
-    goto __label_15
-  __label_17: # case
-    WSubId_38(__ARG_1, __ARG_3)
+  __label_15: # for condition
+    eq $S2, "\n", __label_14
+    if $S2 == "" goto __label_18
+    if $S2 == "\r" goto __label_19
+    if $S2 == "\"" goto __label_20
+    if $S2 == "\\" goto __label_21
+    goto __label_16
   __label_18: # case
+    WSubId_36(__ARG_1, __ARG_3)
   __label_19: # case
-    concat $S6, '\', $S2
-    set $S2, $S6
-    goto __label_16 # break
-  __label_15: # default
-  __label_16: # switch end
+    goto __label_17 # break
+  __label_20: # case
+  __label_21: # case
+    concat $S4, $S4, "\\"
     concat $S4, $S4, $S2
-  __label_12: # for iteration
+    goto __label_17 # break
+  __label_16: # default
+    concat $S4, $S4, $S2
+  __label_17: # switch end
+  __label_13: # for iteration
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
-    goto __label_14
-  __label_13: # for end
-    eq $S4, $S1, __label_20
+    goto __label_15
+  __label_14: # for end
+    eq $S4, $S1, __label_22
     concat $S3, $S3, $S4
-    concat $S3, $S3, '\n'
-  __label_20: # endif
-  __label_11: # continue
-    ne $S4, $S1, __label_9
-  __label_10: # enddo
+    concat $S3, $S3, "\\n"
+  __label_22: # endif
+  __label_12: # continue
+    ne $S4, $S1, __label_10
+  __label_11: # enddo
     new $P2, [ 'Winxed'; 'Compiler'; 'TokenQuoted' ]
     getattribute $P3, __ARG_1, 'filename'
     $P2.'TokenQuoted'($P3, __ARG_3, $S3)
@@ -1222,7 +1249,7 @@
 .end # getheredoc
 
 
-.sub 'getident' :subid('WSubId_40')
+.sub 'getident' :subid('WSubId_38')
         .param pmc __ARG_1
         .param string __ARG_2
         .param int __ARG_3
@@ -1232,7 +1259,7 @@
     set $S2, $P1
   __label_3: # for condition
     set $S3, $S2
-    index $I2, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_$0123456789', $S3
+    index $I2, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_$0123456789", $S3
     isgt $I1, $I2, -1
   __label_4:
     unless $I1 goto __label_2
@@ -1252,229 +1279,187 @@
 .end # getident
 
 
-.sub 'getnumber' :subid('WSubId_48')
+.sub 'getnumber' :subid('WSubId_46')
         .param pmc __ARG_1
         .param string __ARG_2
         .param int __ARG_3
+    getattribute $P1, __ARG_1, 'filename'
+    $P2 = __ARG_1.'getchar'()
     null $S1
-    set $S2, __ARG_2
-  __label_1: # do
-    concat $S1, $S1, $S2
-    $P1 = __ARG_1.'getchar'()
-    set $S2, $P1
-  __label_3: # continue
-    set $S3, $S2
-    index $I5, '0123456789', $S3
-    isgt $I4, $I5, -1
-  __label_4:
-    if $I4 goto __label_1
-  __label_2: # enddo
-    ne $S1, '0', __label_5
-    iseq $I5, $S2, 'x'
-    if $I5 goto __label_6
-    iseq $I5, $S2, 'X'
-  __label_6:
-    unless $I5 goto __label_5
+    if_null $P2, __label_1
+    set $S1, $P2
+  __label_1:
+    ne __ARG_2, "0", __label_2
+    iseq $I5, $S1, "x"
+    if $I5 goto __label_3
+    iseq $I5, $S1, "X"
+  __label_3:
+    unless $I5 goto __label_2
     null $I1
     null $I2
-    $P1 = __ARG_1.'getchar'()
-    set $S2, $P1
-  __label_9: # for condition
-    set $S4, $S2
-    index $I3, '0123456789abcdef0123456789ABCDEF', $S4
-    lt $I3, 0, __label_11
-    mod $I3, $I3, 16
-  __label_11: # endif
-    set $I2, $I3
-  __label_10:
-    lt $I2, 0, __label_8
+    $P2 = __ARG_1.'getchar'()
+    set $S1, $P2
+  __label_6: # for condition
+    set $S3, $S1
+    index $I4, "0123456789abcdef0123456789ABCDEF", $S3
+    lt $I4, 0, __label_8
+    mod $I4, $I4, 16
+  __label_8: # endif
+    set $I2, $I4
+  __label_7:
+    lt $I2, 0, __label_5
     mul $I5, $I1, 16
     add $I1, $I5, $I2
-    concat $S1, $S1, $S2
-  __label_7: # for iteration
-    $P1 = __ARG_1.'getchar'()
-    set $S2, $P1
-    goto __label_9
-  __label_8: # for end
-    __ARG_1.'ungetchar'($S2)
-    set $S1, $I1
-    new $P2, [ 'Winxed'; 'Compiler'; 'TokenInteger' ]
-    getattribute $P3, __ARG_1, 'filename'
-    $P2.'TokenInteger'($P3, __ARG_3, $S1)
-    set $P1, $P2
-    .return($P1)
-  __label_5: # endif
-    ne $S2, '.', __label_12
-  __label_14: # do
-    concat $S1, $S1, $S2
-    $P1 = __ARG_1.'getchar'()
-    set $S2, $P1
-  __label_16: # continue
-    set $S5, $S2
-    index $I5, '0123456789', $S5
+  __label_4: # for iteration
+    $P2 = __ARG_1.'getchar'()
+    set $S1, $P2
+    goto __label_6
+  __label_5: # for end
+    __ARG_1.'ungetchar'($S1)
+    new $P3, [ 'Winxed'; 'Compiler'; 'TokenInteger' ]
+    $P3.'TokenInteger'($P1, __ARG_3, $I1)
+    set $P2, $P3
+    .return($P2)
+  __label_2: # endif
+    set $S2, __ARG_2
+  __label_11: # for condition
+    set $S4, $S1
+    index $I5, "0123456789", $S4
     isgt $I6, $I5, -1
+  __label_12:
+    unless $I6 goto __label_10
+    concat $S2, $S2, $S1
+  __label_9: # for iteration
+    $P2 = __ARG_1.'getchar'()
+    set $S1, $P2
+    goto __label_11
+  __label_10: # for end
+    null $I3
+    ne $S1, ".", __label_13
+    set $I3, 1
+  __label_14: # do
+    concat $S2, $S2, $S1
+    $P2 = __ARG_1.'getchar'()
+    set $S1, $P2
+  __label_16: # continue
+    set $S5, $S1
+    index $I5, "0123456789", $S5
+    isgt $I7, $I5, -1
   __label_17:
-    if $I6 goto __label_14
+    if $I7 goto __label_14
   __label_15: # enddo
-    iseq $I5, $S2, 'e'
+  __label_13: # endif
+    iseq $I5, $S1, "e"
     if $I5 goto __label_19
-    iseq $I5, $S2, 'E'
+    iseq $I5, $S1, "E"
   __label_19:
     unless $I5 goto __label_18
-    concat $S1, $S1, 'E'
-    $P1 = __ARG_1.'getchar'()
-    set $S2, $P1
-    iseq $I5, $S2, '+'
+    set $I3, 1
+    concat $S2, $S2, "E"
+    $P2 = __ARG_1.'getchar'()
+    set $S1, $P2
+    iseq $I5, $S1, "+"
     if $I5 goto __label_21
-    iseq $I5, $S2, '-'
+    iseq $I5, $S1, "-"
   __label_21:
     unless $I5 goto __label_20
-    concat $S1, $S1, $S2
-    $P1 = __ARG_1.'getchar'()
-    set $S2, $P1
+    concat $S2, $S2, $S1
+    $P2 = __ARG_1.'getchar'()
+    set $S1, $P2
   __label_20: # endif
   __label_24: # for condition
-    set $S6, $S2
-    index $I5, '0123456789', $S6
-    isgt $I7, $I5, -1
+    set $S6, $S1
+    index $I5, "0123456789", $S6
+    isgt $I8, $I5, -1
   __label_25:
-    unless $I7 goto __label_23
-    concat $S1, $S1, $S2
+    unless $I8 goto __label_23
+    concat $S2, $S2, $S1
   __label_22: # for iteration
-    $P1 = __ARG_1.'getchar'()
-    set $S2, $P1
+    $P2 = __ARG_1.'getchar'()
+    set $S1, $P2
     goto __label_24
   __label_23: # for end
   __label_18: # endif
-    __ARG_1.'ungetchar'($S2)
-    new $P2, [ 'Winxed'; 'Compiler'; 'TokenFloat' ]
-    getattribute $P3, __ARG_1, 'filename'
-    $P2.'TokenFloat'($P3, __ARG_3, $S1)
-    set $P1, $P2
-    .return($P1)
-    goto __label_13
-  __label_12: # else
-    iseq $I5, $S2, 'e'
-    if $I5 goto __label_28
-    iseq $I5, $S2, 'E'
-  __label_28:
-    unless $I5 goto __label_26
-    concat $S1, $S1, 'E'
-    $P1 = __ARG_1.'getchar'()
-    set $S2, $P1
-    iseq $I5, $S2, '+'
-    if $I5 goto __label_30
-    iseq $I5, $S2, '-'
-  __label_30:
-    unless $I5 goto __label_29
-    concat $S1, $S1, $S2
-    $P1 = __ARG_1.'getchar'()
-    set $S2, $P1
-  __label_29: # endif
-  __label_33: # for condition
-    set $S7, $S2
-    index $I5, '0123456789', $S7
-    isgt $I8, $I5, -1
-  __label_34:
-    unless $I8 goto __label_32
-    concat $S1, $S1, $S2
-  __label_31: # for iteration
-    $P1 = __ARG_1.'getchar'()
-    set $S2, $P1
-    goto __label_33
-  __label_32: # for end
-    __ARG_1.'ungetchar'($S2)
-    new $P2, [ 'Winxed'; 'Compiler'; 'TokenFloat' ]
-    getattribute $P3, __ARG_1, 'filename'
-    $P2.'TokenFloat'($P3, __ARG_3, $S1)
-    set $P1, $P2
-    .return($P1)
+    __ARG_1.'ungetchar'($S1)
+    unless $I3 goto __label_26
+    new $P3, [ 'Winxed'; 'Compiler'; 'TokenFloat' ]
+    $P3.'TokenFloat'($P1, __ARG_3, $S2)
+    set $P2, $P3
+    .return($P2)
     goto __label_27
   __label_26: # else
-    __ARG_1.'ungetchar'($S2)
-    new $P2, [ 'Winxed'; 'Compiler'; 'TokenInteger' ]
-    getattribute $P3, __ARG_1, 'filename'
-    $P2.'TokenInteger'($P3, __ARG_3, $S1)
-    set $P1, $P2
-    .return($P1)
+    new $P5, [ 'Winxed'; 'Compiler'; 'TokenInteger' ]
+    $P5.'TokenInteger'($P1, __ARG_3, $S2)
+    set $P4, $P5
+    .return($P4)
   __label_27: # endif
-  __label_13: # endif
 
 .end # getnumber
 
 
-.sub 'getlinecomment' :subid('WSubId_45')
+.sub 'getlinecomment' :subid('WSubId_43')
         .param pmc __ARG_1
         .param string __ARG_2
         .param int __ARG_3
-    set $S1, __ARG_2
+    null $S1
+  __label_1: # do
     $P1 = __ARG_1.'getchar'()
-    null $S2
-    if_null $P1, __label_4
-    set $S2, $P1
+    set $S1, $P1
+  __label_3: # continue
+    isne $I1, $S1, ""
+    unless $I1 goto __label_4
+    isne $I1, $S1, "\n"
   __label_4:
-  __label_3: # for condition
-    eq $S2, '', __label_2
-    eq $S2, "\n", __label_2
-    concat $S1, $S1, $S2
-  __label_1: # for iteration
-    $P2 = __ARG_1.'getchar'()
-    set $S2, $P2
-    goto __label_3
-  __label_2: # for end
+    if $I1 goto __label_1
+  __label_2: # enddo
     new $P2, [ 'Winxed'; 'Compiler'; 'TokenComment' ]
     getattribute $P3, __ARG_1, 'filename'
-    $P2.'TokenComment'($P3, __ARG_3, $S1)
+    $P2.'TokenComment'($P3, __ARG_3)
     set $P1, $P2
     .return($P1)
 
 .end # getlinecomment
 
 
-.sub 'getcomment' :subid('WSubId_46')
+.sub 'getcomment' :subid('WSubId_44')
         .param pmc __ARG_1
         .param string __ARG_2
         .param int __ARG_3
-.const 'Sub' WSubId_39 = "WSubId_39"
-    set $S1, __ARG_2
+.const 'Sub' WSubId_37 = "WSubId_37"
     $P1 = __ARG_1.'getchar'()
-    null $S2
+    null $S1
     if_null $P1, __label_1
-    set $S2, $P1
+    set $S1, $P1
   __label_1:
   __label_2: # do
-  __label_7: # for condition
-    eq $S2, '', __label_6
-    eq $S2, '*', __label_6
-    concat $S1, $S1, $S2
-  __label_5: # for iteration
+  __label_6: # while
+    eq $S1, "", __label_5
+    eq $S1, "*", __label_5
     $P1 = __ARG_1.'getchar'()
-    set $S2, $P1
-    goto __label_7
-  __label_6: # for end
-    ne $S2, '', __label_8
-    WSubId_39(__ARG_1, __ARG_3)
+    set $S1, $P1
+    goto __label_6
+  __label_5: # endwhile
+    ne $S1, "", __label_7
+    WSubId_37(__ARG_1, __ARG_3)
+  __label_7: # endif
+    $P1 = __ARG_1.'getchar'()
+    set $S1, $P1
+    ne $S1, "", __label_8
+    WSubId_37(__ARG_1, __ARG_3)
   __label_8: # endif
-    concat $S1, $S1, $S2
-    $P1 = __ARG_1.'getchar'()
-    set $S2, $P1
-    ne $S2, '', __label_9
-    WSubId_39(__ARG_1, __ARG_3)
-  __label_9: # endif
   __label_4: # continue
-    ne $S2, '/', __label_2
+    ne $S1, "/", __label_2
   __label_3: # enddo
-    concat $S1, $S1, '/'
     new $P2, [ 'Winxed'; 'Compiler'; 'TokenComment' ]
     getattribute $P3, __ARG_1, 'filename'
-    $P2.'TokenComment'($P3, __ARG_3, $S1)
+    $P2.'TokenComment'($P3, __ARG_3)
     set $P1, $P2
     .return($P1)
 
 .end # getcomment
 
 
-.sub 'getop' :subid('WSubId_41')
+.sub 'getop' :subid('WSubId_39')
         .param pmc __ARG_1
         .param string __ARG_2
         .param int __ARG_3
@@ -1493,18 +1478,18 @@
         .param pmc __ARG_1
         .param string __ARG_2
         .param int __ARG_3
+.const 'Sub' WSubId_38 = "WSubId_38"
+.const 'Sub' WSubId_39 = "WSubId_39"
 .const 'Sub' WSubId_40 = "WSubId_40"
 .const 'Sub' WSubId_41 = "WSubId_41"
 .const 'Sub' WSubId_42 = "WSubId_42"
 .const 'Sub' WSubId_43 = "WSubId_43"
 .const 'Sub' WSubId_44 = "WSubId_44"
-.const 'Sub' WSubId_45 = "WSubId_45"
-.const 'Sub' WSubId_46 = "WSubId_46"
     not $I1, __ARG_3
     new $P3, [ 'Boolean' ], $I1
     setattribute self, 'warnings', $P3
     setattribute self, 'h', __ARG_1
-    box $P2, ''
+    box $P2, ""
     setattribute self, 'pending', $P2
     root_new $P3, ['parrot';'ResizablePMCArray']
     setattribute self, 'stacked', $P3
@@ -1514,65 +1499,65 @@
     setattribute self, 'line', $P2
     root_new $P1, ['parrot';'Hash']
     root_new $P2, ['parrot';'Hash']
-    $P2[''] = WSubId_40
-    $P2['{'] = WSubId_41
-    $P1['$'] = $P2
-    $P1['"'] = WSubId_42
-    $P1["'"] = WSubId_43
+    $P2[""] = WSubId_38
+    $P2["{"] = WSubId_39
+    $P1["$"] = $P2
+    $P1["\""] = WSubId_40
+    $P1["'"] = WSubId_41
     root_new $P3, ['parrot';'Hash']
     root_new $P4, ['parrot';'Hash']
-    $P4[''] = WSubId_41
-    $P4['='] = WSubId_41
-    $P3['='] = $P4
-    $P3[':'] = WSubId_41
-    $P1['='] = $P3
+    $P4[""] = WSubId_39
+    $P4["="] = WSubId_39
+    $P3["="] = $P4
+    $P3[":"] = WSubId_39
+    $P1["="] = $P3
     root_new $P5, ['parrot';'Hash']
-    $P5['+'] = WSubId_41
-    $P5['='] = WSubId_41
-    $P1['+'] = $P5
+    $P5["+"] = WSubId_39
+    $P5["="] = WSubId_39
+    $P1["+"] = $P5
     root_new $P6, ['parrot';'Hash']
-    $P6['-'] = WSubId_41
-    $P6['='] = WSubId_41
-    $P1['-'] = $P6
+    $P6["-"] = WSubId_39
+    $P6["="] = WSubId_39
+    $P1["-"] = $P6
     root_new $P7, ['parrot';'Hash']
-    $P7['='] = WSubId_41
-    $P1['*'] = $P7
+    $P7["="] = WSubId_39
+    $P1["*"] = $P7
     root_new $P8, ['parrot';'Hash']
-    $P8['|'] = WSubId_41
-    $P1['|'] = $P8
+    $P8["|"] = WSubId_39
+    $P1["|"] = $P8
     root_new $P9, ['parrot';'Hash']
-    $P9['&'] = WSubId_41
-    $P1['&'] = $P9
+    $P9["&"] = WSubId_39
+    $P1["&"] = $P9
     root_new $P10, ['parrot';'Hash']
     root_new $P11, ['parrot';'Hash']
-    $P11[''] = WSubId_41
-    $P11[':'] = WSubId_44
-    $P10['<'] = $P11
-    $P10['='] = WSubId_41
-    $P1['<'] = $P10
+    $P11[""] = WSubId_39
+    $P11[":"] = WSubId_42
+    $P10["<"] = $P11
+    $P10["="] = WSubId_39
+    $P1["<"] = $P10
     root_new $P12, ['parrot';'Hash']
     root_new $P13, ['parrot';'Hash']
-    $P13[''] = WSubId_41
-    $P13['>'] = WSubId_41
-    $P12['>'] = $P13
-    $P12['='] = WSubId_41
-    $P1['>'] = $P12
+    $P13[""] = WSubId_39
+    $P13[">"] = WSubId_39
+    $P12[">"] = $P13
+    $P12["="] = WSubId_39
+    $P1[">"] = $P12
     root_new $P14, ['parrot';'Hash']
     root_new $P15, ['parrot';'Hash']
-    $P15[''] = WSubId_41
-    $P15['='] = WSubId_41
-    $P14['='] = $P15
-    $P1['!'] = $P14
+    $P15[""] = WSubId_39
+    $P15["="] = WSubId_39
+    $P14["="] = $P15
+    $P1["!"] = $P14
     root_new $P16, ['parrot';'Hash']
-    $P16['%'] = WSubId_41
-    $P16['='] = WSubId_41
-    $P1['%'] = $P16
+    $P16["%"] = WSubId_39
+    $P16["="] = WSubId_39
+    $P1["%"] = $P16
     root_new $P17, ['parrot';'Hash']
-    $P17['='] = WSubId_41
-    $P17['/'] = WSubId_45
-    $P17['*'] = WSubId_46
-    $P1['/'] = $P17
-    $P1['#'] = WSubId_45
+    $P17["="] = WSubId_39
+    $P17["/"] = WSubId_43
+    $P17["*"] = WSubId_44
+    $P1["/"] = $P17
+    $P1["#"] = WSubId_43
     setattribute self, 'select', $P1
 
 .end # Tokenizer
@@ -1581,11 +1566,11 @@
 .sub 'warn' :method
         .param string __ARG_1
         .param pmc __ARG_2 :optional
-.const 'Sub' WSubId_47 = "WSubId_47"
+.const 'Sub' WSubId_45 = "WSubId_45"
     getattribute $P1, self, 'warnings'
     if_null $P1, __label_1
     unless $P1 goto __label_1
-    WSubId_47(__ARG_1, __ARG_2)
+    WSubId_45(__ARG_1, __ARG_2)
   __label_1: # endif
 
 .end # warn
@@ -1597,8 +1582,8 @@
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-    eq $S1, '', __label_2
-    assign $P1, ''
+    eq $S1, "", __label_2
+    assign $P1, ""
     goto __label_3
   __label_2: # else
     getattribute $P2, self, 'h'
@@ -1623,9 +1608,9 @@
 
 
 .sub 'get_token' :method
-.const 'Sub' WSubId_40 = "WSubId_40"
-.const 'Sub' WSubId_48 = "WSubId_48"
-.const 'Sub' WSubId_41 = "WSubId_41"
+.const 'Sub' WSubId_38 = "WSubId_38"
+.const 'Sub' WSubId_46 = "WSubId_46"
+.const 'Sub' WSubId_39 = "WSubId_39"
     getattribute $P3, self, 'stacked'
     if_null $P3, __label_1
     unless $P3 goto __label_1
@@ -1639,12 +1624,15 @@
   __label_2:
   __label_4: # while
     set $S3, $S1
-    iseq $I2, $S3, ' '
-    if $I2 goto __label_7
+    iseq $I2, $S3, " "
+    if $I2 goto __label_8
     iseq $I2, $S3, "\n"
+  __label_8:
+    if $I2 goto __label_7
+    iseq $I2, $S3, "\t"
   __label_7:
     if $I2 goto __label_6
-    iseq $I2, $S3, "\t"
+    iseq $I2, $S3, "\r"
   __label_6:
   __label_5:
     unless $I2 goto __label_3
@@ -1654,54 +1642,54 @@
   __label_3: # endwhile
     getattribute $P3, self, 'line'
     set $I1, $P3
-    ne $S1, '', __label_8
+    ne $S1, "", __label_9
     new $P4, [ 'Winxed'; 'Compiler'; 'TokenEof' ]
     getattribute $P5, self, 'filename'
     $P4.'TokenEof'($P5)
     set $P3, $P4
     .return($P3)
-  __label_8: # endif
-    set $S4, $S1
-    index $I4, 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_', $S4
-    isgt $I3, $I4, -1
-  __label_10:
-    unless $I3 goto __label_9
-    .tailcall WSubId_40(self, $S1, $I1)
   __label_9: # endif
+    set $S4, $S1
+    index $I4, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_", $S4
+    isgt $I3, $I4, -1
+  __label_11:
+    unless $I3 goto __label_10
+    .tailcall WSubId_38(self, $S1, $I1)
+  __label_10: # endif
     set $S5, $S1
-    index $I4, '0123456789', $S5
+    index $I4, "0123456789", $S5
     isgt $I5, $I4, -1
-  __label_12:
-    unless $I5 goto __label_11
-    .tailcall WSubId_48(self, $S1, $I1)
-  __label_11: # endif
+  __label_13:
+    unless $I5 goto __label_12
+    .tailcall WSubId_46(self, $S1, $I1)
+  __label_12: # endif
     set $S2, $S1
     getattribute $P1, self, 'select'
     $P2 = $P1[$S1]
-  __label_14: # while
-    if_null $P2, __label_13
-    isa $I4, $P2, 'Hash'
-    unless $I4 goto __label_13
+  __label_15: # while
+    if_null $P2, __label_14
+    isa $I4, $P2, "Hash"
+    unless $I4 goto __label_14
     $P3 = self.'getchar'()
     set $S1, $P3
     set $P1, $P2
     $P2 = $P1[$S1]
-    unless_null $P2, __label_15
+    unless_null $P2, __label_16
     self.'ungetchar'($S1)
-    $P2 = $P1['']
-    goto __label_16
-  __label_15: # else
-    concat $S2, $S2, $S1
-  __label_16: # endif
-    goto __label_14
-  __label_13: # endwhile
-    if_null $P2, __label_18
-    $P3 = $P2(self, $S2, $I1)
+    $P2 = $P1[""]
     goto __label_17
-  __label_18:
-    $P4 = WSubId_41(self, $S2, $I1)
+  __label_16: # else
+    concat $S2, $S2, $S1
+  __label_17: # endif
+    goto __label_15
+  __label_14: # endwhile
+    if_null $P2, __label_19
+    $P3 = $P2(self, $S2, $I1)
+    goto __label_18
+  __label_19:
+    $P4 = WSubId_39(self, $S2, $I1)
     set $P3, $P4
-  __label_17:
+  __label_18:
     .return($P3)
 
 .end # get_token
@@ -1743,31 +1731,31 @@
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'typetoregcheck' :subid('WSubId_137')
+.sub 'typetoregcheck' :subid('WSubId_136')
         .param string __ARG_1
-    if __ARG_1 == 'int' goto __label_3
-    if __ARG_1 == 'float' goto __label_4
-    if __ARG_1 == 'string' goto __label_5
-    if __ARG_1 == 'var' goto __label_6
+    if __ARG_1 == "int" goto __label_3
+    if __ARG_1 == "float" goto __label_4
+    if __ARG_1 == "string" goto __label_5
+    if __ARG_1 == "var" goto __label_6
     goto __label_1
   __label_3: # case
-    .return('I')
+    .return("I")
   __label_4: # case
-    .return('N')
+    .return("N")
   __label_5: # case
-    .return('S')
+    .return("S")
   __label_6: # case
-    .return('P')
+    .return("P")
   __label_1: # default
-    .return('')
+    .return("")
   __label_2: # switch end
 
 .end # typetoregcheck
 
 
-.sub 'typetopirname' :subid('WSubId_146')
+.sub 'typetopirname' :subid('WSubId_144')
         .param string __ARG_1
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     if_null __ARG_1, __label_1
     length $I1, __ARG_1
     ne $I1, 1, __label_1
@@ -1778,15 +1766,15 @@
     if $I1 == 80 goto __label_6
     goto __label_1
   __label_3: # case
-    .return('int')
+    .return("int")
   __label_4: # case
-    .return('num')
+    .return("num")
   __label_5: # case
-    .return('string')
+    .return("string")
   __label_6: # case
-    .return('pmc')
+    .return("pmc")
   __label_1: # default
-    WSubId_35('Invalid reg type')
+    WSubId_33("Invalid reg type")
   __label_2: # switch end
 
 .end # typetopirname
@@ -1845,11 +1833,11 @@
 .sub 'warn' :method
         .param string __ARG_1
         .param pmc __ARG_2 :optional
-.const 'Sub' WSubId_47 = "WSubId_47"
+.const 'Sub' WSubId_45 = "WSubId_45"
     getattribute $P1, self, 'warnings'
     if_null $P1, __label_1
     unless $P1 goto __label_1
-    WSubId_47(__ARG_1, __ARG_2)
+    WSubId_45(__ARG_1, __ARG_2)
   __label_1: # endif
 
 .end # warn
@@ -1975,7 +1963,7 @@
         .param string __ARG_1
         .param string __ARG_2 :optional
     getattribute $P1, self, 'handle'
-    $P1.'print'('  ')
+    $P1.'print'("  ")
     $P1.'print'(__ARG_1)
     $P1.'print'(":")
     if_null __ARG_2, __label_1
@@ -2005,7 +1993,7 @@
 .sub 'emitarg1' :method
         .param string __ARG_1
         .param string __ARG_2
-    self.'say'('    ', __ARG_1, " ", __ARG_2)
+    self.'say'("    ", __ARG_1, " ", __ARG_2)
 
 .end # emitarg1
 
@@ -2014,7 +2002,7 @@
         .param string __ARG_1
         .param string __ARG_2
         .param string __ARG_3
-    self.'say'('    ', __ARG_1, " ", __ARG_2, ", ", __ARG_3)
+    self.'say'("    ", __ARG_1, " ", __ARG_2, ", ", __ARG_3)
 
 .end # emitarg2
 
@@ -2024,7 +2012,7 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-    self.'say'('    ', __ARG_1, " ", __ARG_2, ", ", __ARG_3, ", ", __ARG_4)
+    self.'say'("    ", __ARG_1, " ", __ARG_2, ", ", __ARG_3, ", ", __ARG_4)
 
 .end # emitarg3
 
@@ -2034,7 +2022,7 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-    self.'say'('    ', __ARG_1, " ", __ARG_2, ", ", __ARG_3, ", ", __ARG_4)
+    self.'say'("    ", __ARG_1, " ", __ARG_2, ", ", __ARG_3, ", ", __ARG_4)
 
 .end # emitcompare
 
@@ -2129,7 +2117,7 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-    self.'say'('    ', __ARG_1, " ", __ARG_2, ", ", __ARG_3, ", ", __ARG_4)
+    self.'say'("    ", __ARG_1, " ", __ARG_2, ", ", __ARG_3, ", ", __ARG_4)
 
 .end # emitbinop
 
@@ -2201,15 +2189,6 @@
     self.'say'("    concat ", __ARG_1, ", ", __ARG_2, ", ", __ARG_3)
 
 .end # emitconcat
-
-
-.sub 'emitrepeat' :method
-        .param string __ARG_1
-        .param string __ARG_2
-        .param string __ARG_3
-    self.'say'("    repeat ", __ARG_1, ", ", __ARG_2, ", ", __ARG_3)
-
-.end # emitrepeat
 
 
 .sub 'emitprint' :method
@@ -2285,6 +2264,15 @@
 
 .end # emitstore_lex
 
+
+.sub 'emitrepeat' :method
+        .param string __ARG_1
+        .param string __ARG_2
+        .param string __ARG_3
+    self.'say'("    repeat ", __ARG_1, ", ", __ARG_2, ", ", __ARG_3)
+
+.end # emitrepeat
+
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'Emit' ]
     addattribute $P0, 'handle'
@@ -2298,7 +2286,7 @@
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'integerValue' :subid('WSubId_49')
+.sub 'integerValue' :subid('WSubId_47')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param int __ARG_3
@@ -2310,7 +2298,7 @@
 .end # integerValue
 
 
-.sub 'floatValue' :subid('WSubId_103')
+.sub 'floatValue' :subid('WSubId_100')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param num __ARG_3
@@ -2327,7 +2315,7 @@
 .end # floatValue
 
 
-.sub 'stringQuotedValue' :subid('WSubId_53')
+.sub 'stringQuotedValue' :subid('WSubId_50')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param string __ARG_3
@@ -2344,22 +2332,36 @@
 .end # stringQuotedValue
 
 
+.sub 'floatAsString' :subid('WSubId_101')
+        .param num __ARG_1
+    set $S1, __ARG_1
+    box $P2, $S1
+    $P1 = $P2.'is_integer'($S1)
+    if_null $P1, __label_1
+    unless $P1 goto __label_1
+    concat $S1, $S1, ".0"
+  __label_1: # endif
+    .return($S1)
+
+.end # floatAsString
+
+
 .sub 'floatresult' :subid('WSubId_105')
         .param string __ARG_1
         .param string __ARG_2
-    iseq $I1, __ARG_1, 'N'
+    iseq $I1, __ARG_1, "N"
     unless $I1 goto __label_2
-    iseq $I1, __ARG_2, 'N'
+    iseq $I1, __ARG_2, "N"
     if $I1 goto __label_3
-    iseq $I1, __ARG_2, 'I'
+    iseq $I1, __ARG_2, "I"
   __label_3:
   __label_2:
     if $I1 goto __label_1
-    iseq $I1, __ARG_2, 'N'
+    iseq $I1, __ARG_2, "N"
     unless $I1 goto __label_4
-    iseq $I1, __ARG_1, 'N'
+    iseq $I1, __ARG_1, "N"
     if $I1 goto __label_5
-    iseq $I1, __ARG_1, 'I'
+    iseq $I1, __ARG_1, "I"
   __label_5:
   __label_4:
   __label_1:
@@ -2368,46 +2370,32 @@
 .end # floatresult
 
 
-.sub 'floatAsString' :subid('WSubId_100')
-        .param num __ARG_1
-    set $S1, __ARG_1
-    box $P2, $S1
-    $P1 = $P2.'is_integer'($S1)
-    if_null $P1, __label_1
-    unless $P1 goto __label_1
-    concat $S1, $S1, '.0'
-  __label_1: # endif
-    .return($S1)
-
-.end # floatAsString
-
-
-.sub 'createPredefConstInt' :subid('WSubId_157')
+.sub 'createPredefConstInt' :subid('WSubId_155')
         .param pmc __ARG_1
         .param string __ARG_2
         .param int __ARG_3
-.const 'Sub' WSubId_49 = "WSubId_49"
+.const 'Sub' WSubId_47 = "WSubId_47"
     new $P3, [ 'Winxed'; 'Compiler'; 'TokenIdentifier' ]
-    $P3.'TokenIdentifier'('__predefconst__', 0, __ARG_2)
+    $P3.'TokenIdentifier'("__predefconst__", 0, __ARG_2)
     set $P1, $P3
-    $P2 = __ARG_1.'createconst'($P1, 'I', 4)
-    $P3 = WSubId_49(__ARG_1, $P1, __ARG_3)
+    $P2 = __ARG_1.'createconst'($P1, "I", 4)
+    $P3 = WSubId_47(__ARG_1, $P1, __ARG_3)
     $P2.'setvalue'($P3)
 
 .end # createPredefConstInt
 
 
-.sub 'createPredefConstString' :subid('WSubId_150')
+.sub 'createPredefConstString' :subid('WSubId_148')
         .param pmc __ARG_1
         .param string __ARG_2
         .param string __ARG_3
     new $P3, [ 'Winxed'; 'Compiler'; 'TokenIdentifier' ]
-    $P3.'TokenIdentifier'('__predefconst__', 0, __ARG_2)
+    $P3.'TokenIdentifier'("__predefconst__", 0, __ARG_2)
     set $P1, $P3
-    $P2 = __ARG_1.'createconst'($P1, 'S', 4)
+    $P2 = __ARG_1.'createconst'($P1, "S", 4)
     new $P4, [ 'Winxed'; 'Compiler'; 'StringLiteral' ]
     new $P6, [ 'Winxed'; 'Compiler'; 'TokenQuoted' ]
-    $P6.'TokenQuoted'('__predefconst__', 0, __ARG_3)
+    $P6.'TokenQuoted'("__predefconst__", 0, __ARG_3)
     set $P5, $P6
     $P4.'StringLiteral'(__ARG_1, $P5)
     set $P3, $P4
@@ -2416,123 +2404,33 @@
 .end # createPredefConstString
 
 
-.sub 'string_from_literal' :subid('WSubId_51')
+.sub 'int_from_literal_arg1' :subid('WSubId_51')
         .param pmc __ARG_1
-.const 'Sub' WSubId_35 = "WSubId_35"
-    null $S1
-    $P1 = __ARG_1.'isintegerliteral'()
-    set $I1, $P1
-    if $I1 goto __label_3
-    $P2 = __ARG_1.'isfloatliteral'()
-    set $I1, $P2
-    if $I1 goto __label_4
-    $P3 = __ARG_1.'isstringliteral'()
-    set $I1, $P3
-    if $I1 goto __label_5
-    goto __label_2
-  __label_3: # case
-    getattribute $P4, __ARG_1, 'numval'
-    set $S1, $P4
-    goto __label_1 # break
-  __label_4: # case
-    $P5 = __ARG_1.'getFloatValue'()
-    set $S1, $P5
-    goto __label_1 # break
-  __label_5: # case
-    $P6 = __ARG_1.'get_value'()
-    set $S1, $P6
-    goto __label_1 # break
-  __label_2: # default
-    WSubId_35('wrong call to string_from_literal', __ARG_1)
-  __label_1: # switch end
-    .return($S1)
-
-.end # string_from_literal
-
-
-.sub 'int_from_literal' :subid('WSubId_50')
-        .param pmc __ARG_1
-.const 'Sub' WSubId_35 = "WSubId_35"
-    null $I1
-    $P1 = __ARG_1.'isintegerliteral'()
-    set $I2, $P1
-    if $I2 goto __label_3
-    $P2 = __ARG_1.'isfloatliteral'()
-    set $I2, $P2
-    if $I2 goto __label_4
-    $P3 = __ARG_1.'isstringliteral'()
-    set $I2, $P3
-    if $I2 goto __label_5
-    goto __label_2
-  __label_3: # case
-    getattribute $P4, __ARG_1, 'numval'
-    set $I1, $P4
-    goto __label_1 # break
-  __label_4: # case
-    $P5 = __ARG_1.'getFloatValue'()
-    set $I1, $P5
-    goto __label_1 # break
-  __label_5: # case
-    $P6 = __ARG_1.'get_value'()
-    set $I1, $P6
-    goto __label_1 # break
-  __label_2: # default
-    WSubId_35('wrong call to int_from_literal', __ARG_1)
-  __label_1: # switch end
-    .return($I1)
-
-.end # int_from_literal
-
-
-.sub 'float_from_literal' :subid('WSubId_138')
-        .param pmc __ARG_1
-.const 'Sub' WSubId_35 = "WSubId_35"
-    null $N1
-    $P1 = __ARG_1.'isintegerliteral'()
-    set $I1, $P1
-    if $I1 goto __label_3
-    $P2 = __ARG_1.'isfloatliteral'()
-    set $I1, $P2
-    if $I1 goto __label_4
-    $P3 = __ARG_1.'isstringliteral'()
-    set $I1, $P3
-    if $I1 goto __label_5
-    goto __label_2
-  __label_3: # case
-  __label_4: # case
-    $P4 = __ARG_1.'getFloatValue'()
-    set $N1, $P4
-    goto __label_1 # break
-  __label_5: # case
-    $P5 = __ARG_1.'get_value'()
-    set $N1, $P5
-    goto __label_1 # break
-  __label_2: # default
-    WSubId_35('wrong call to float_from_literal', __ARG_1)
-  __label_1: # switch end
-    .return($N1)
-
-.end # float_from_literal
-
-
-.sub 'int_from_literal_arg1' :subid('WSubId_55')
-        .param pmc __ARG_1
-.const 'Sub' WSubId_35 = "WSubId_35"
-.const 'Sub' WSubId_50 = "WSubId_50"
+.const 'Sub' WSubId_33 = "WSubId_33"
     $P2 = __ARG_1[0]
     getattribute $P1, $P2, 'arg'
-    .tailcall WSubId_50($P1)
+    $P2 = $P1.'getIntegerValue'()
+    set $I1, $P2
+    set $I2, $I1
+  __label_1:
+    .return($I2)
 
 .end # int_from_literal_arg1
 
 
-.sub 'string_from_literal_arg1' :subid('WSubId_54')
+.sub 'string_from_literal_arg1' :subid('WSubId_49')
         .param pmc __ARG_1
-.const 'Sub' WSubId_35 = "WSubId_35"
-.const 'Sub' WSubId_51 = "WSubId_51"
+.const 'Sub' WSubId_33 = "WSubId_33"
     $P2 = __ARG_1[0]
     getattribute $P1, $P2, 'arg'
-    .tailcall WSubId_51($P1)
+    $P2 = $P1.'getStringValue'()
+    null $S1
+    if_null $P2, __label_2
+    set $S1, $P2
+  __label_2:
+    set $S2, $S1
+  __label_1:
+    .return($S2)
 
 .end # string_from_literal_arg1
 
@@ -2541,7 +2439,7 @@
 .sub 'Builtin_frombody' :method
         .param string __ARG_1
         .param string __ARG_2
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     length $I3, __ARG_2
     sub $I2, $I3, 1
     substr $S1, __ARG_2, $I2, 1
@@ -2550,7 +2448,7 @@
   __label_1: # endif
     split $P1, "\n", __ARG_2
     join $S1, "\n    ", $P1
-    concat $S2, '    ', $S1
+    concat $S2, "    ", $S1
     set __ARG_2, $S2
     box $P1, __ARG_2
     setattribute self, 'body', $P1
@@ -2566,32 +2464,32 @@
         .param pmc __ARG_3
         .param string __ARG_4
         .param pmc __ARG_5
-.const 'Sub' WSubId_30 = "WSubId_30"
-.const 'Sub' WSubId_35 = "WSubId_35"
-.const 'Sub' WSubId_52 = "WSubId_52"
+.const 'Sub' WSubId_28 = "WSubId_28"
+.const 'Sub' WSubId_33 = "WSubId_33"
+.const 'Sub' WSubId_48 = "WSubId_48"
     getattribute $P1, self, 'typeresult'
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-    ne $S1, 'v', __label_2
+    ne $S1, "v", __label_2
     if_null __ARG_4, __label_4
-    eq __ARG_4, '', __label_4
-    WSubId_30('using return value from void builtin', __ARG_3)
+    eq __ARG_4, "", __label_4
+    WSubId_28("using return value from void builtin", __ARG_3)
   __label_4: # endif
     goto __label_3
   __label_2: # else
     isnull $I1, __ARG_4
     if $I1 goto __label_6
-    iseq $I1, __ARG_4, ''
+    iseq $I1, __ARG_4, ""
   __label_6:
     unless $I1 goto __label_5
-    WSubId_35('Bad result in non void builtin')
+    WSubId_33("Bad result in non void builtin")
   __label_5: # endif
   __label_3: # endif
     __ARG_1.'annotate'(__ARG_3)
     getattribute $P2, self, 'body'
-    $P1 = WSubId_52($P2, __ARG_4, __ARG_5 :flat)
+    $P1 = WSubId_48($P2, __ARG_4, __ARG_5 :flat)
     __ARG_1.'say'($P1)
 
 .end # invoke
@@ -2611,10 +2509,11 @@
         .param string __ARG_5
         .param string __ARG_6
         .param string __ARG_7
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     box $P1, __ARG_1
     setattribute self, 'name', $P1
-    isa $I2, __ARG_2, 'String'
+    if_null __ARG_2, __label_1
+    isa $I2, __ARG_2, "String"
     unless $I2 goto __label_1
     new $P3, [ 'Winxed'; 'Compiler'; 'Builtin_frombody' ]
     $P3.'Builtin_frombody'(__ARG_3, __ARG_2)
@@ -2644,8 +2543,8 @@
     set $I1, -2
     if_null __ARG_5, __label_8
     concat $S1, "Invalid builtin '", __ARG_1
-    concat $S1, $S1, '"'
-    WSubId_35($S1)
+    concat $S1, $S1, "'"
+    WSubId_33($S1)
   __label_8: # endif
     goto __label_5 # break
   __label_4: # default
@@ -2673,6 +2572,12 @@
 .end # BuiltinBase
 
 
+.sub 'isreplaceexpr' :method
+    .return(0)
+
+.end # isreplaceexpr
+
+
 .sub 'iscompileevaluable' :method
     .return(0)
 
@@ -2681,10 +2586,7 @@
 
 .sub 'name' :method
     getattribute $P1, self, 'name'
-    null $S1
-    if_null $P1, __label_1
     set $S1, $P1
-  __label_1:
     .return($S1)
 
 .end # name
@@ -2706,7 +2608,7 @@
 
 .sub 'paramtype' :method
         .param int __ARG_1
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     null $S1
     if __ARG_1 == 0 goto __label_3
     if __ARG_1 == 1 goto __label_4
@@ -2730,7 +2632,7 @@
     set $S1, $P4
     goto __label_2 # break
   __label_1: # default
-    WSubId_35('Invalid builtin arg')
+    WSubId_33("Invalid builtin arg")
   __label_2: # switch end
     .return($S1)
 
@@ -2751,8 +2653,8 @@
     $P2 = __ARG_1.'getDebug'()
     if_null $P2, __label_2
     unless $P2 goto __label_2
-    eq $S1, '__ASSERT__', __label_3
-    __ARG_1.'comment'('builtin ', $S1)
+    eq $S1, "__ASSERT__", __label_3
+    __ARG_1.'comment'("builtin ", $S1)
   __label_3: # endif
   __label_2: # endif
     getattribute $P2, self, 'typeresult'
@@ -2760,8 +2662,8 @@
     if_null $P2, __label_4
     set $S2, $P2
   __label_4:
-    eq $S2, 'v', __label_5
-    ne __ARG_4, '', __label_5
+    eq $S2, "v", __label_5
+    ne __ARG_4, "", __label_5
     $P2 = __ARG_2.'tempreg'($S2)
     set __ARG_4, $P2
   __label_5: # endif
@@ -2828,225 +2730,47 @@
     addparent $P0, $P1
     addattribute $P0, 'evalfun'
 .end
-.namespace [ 'Winxed'; 'Compiler'; 'Builtin_typecast' ]
+.namespace [ 'Winxed'; 'Compiler'; 'BuiltinExpr' ]
 
-.sub 'Builtin_typecast' :method
+.sub 'BuiltinExpr' :method
         .param string __ARG_1
-    box $P1, __ARG_1
-    setattribute self, 'type', $P1
+        .param pmc __ARG_2
+        .param string __ARG_3
+        .param string __ARG_4 :optional
+        .param string __ARG_5 :optional
+        .param string __ARG_6 :optional
+        .param string __ARG_7 :optional
+    null $P1
+    self.'BuiltinBase'(__ARG_1, $P1, __ARG_3, __ARG_4, __ARG_5, __ARG_6, __ARG_7)
+    setattribute self, 'exprfun', __ARG_2
 
-.end # Builtin_typecast
+.end # BuiltinExpr
 
 
-.sub 'invoke' :method :vtable
+.sub 'isreplaceexpr' :method
+    .return(1)
+
+.end # isreplaceexpr
+
+
+.sub 'replaceexpr' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-        .param string __ARG_4
-        .param pmc __ARG_5
-.const 'Sub' WSubId_35 = "WSubId_35"
-    getattribute $P2, self, 'type'
-    null $S1
-    if_null $P2, __label_1
-    set $S1, $P2
-  __label_1:
-    elements $I1, __ARG_5
-    eq $I1, 1, __label_2
-    WSubId_35("Invalid Builtin_typecast.invoke call")
-  __label_2: # endif
-    $P1 = __ARG_5[0]
-    $P2 = $P1.'checkresult'()
-    null $S2
-    if_null $P2, __label_3
-    set $S2, $P2
-  __label_3:
-    eq $S2, $S1, __label_6
-    isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'IndexExpr' ]
-    if $I1 goto __label_7
-    isa $I2, $P1, [ 'Winxed'; 'Compiler'; 'CallExpr' ]
-    if $I2 goto __label_8
-    goto __label_5
-  __label_6: # case
-  __label_7: # case
-  __label_8: # case
-    $P1.'emit'(__ARG_1, __ARG_4)
-    goto __label_4 # break
-  __label_5: # default
-    $P2 = $P1.'emit_get'(__ARG_1)
-    null $S3
-    if_null $P2, __label_9
-    set $S3, $P2
-  __label_9:
-    __ARG_1.'annotate'(__ARG_3)
-    ne $S3, 'null', __label_10
-    __ARG_1.'emitnull'(__ARG_4)
-    goto __label_11
-  __label_10: # else
-    __ARG_1.'emitset'(__ARG_4, $S3)
-  __label_11: # endif
-  __label_4: # switch end
+    getattribute $P1, self, 'exprfun'
+    .tailcall $P1(__ARG_1, __ARG_2, __ARG_3)
 
-.end # invoke
+.end # replaceexpr
 
 .sub Winxed_class_init :anon :load :init
-    newclass $P0, [ 'Winxed'; 'Compiler'; 'Builtin_typecast' ]
-    addattribute $P0, 'type'
+    newclass $P0, [ 'Winxed'; 'Compiler'; 'BuiltinExpr' ]
+    get_class $P1, [ 'Winxed'; 'Compiler'; 'BuiltinBase' ]
+    addparent $P0, $P1
+    addattribute $P0, 'exprfun'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'builtineval_stringcast' :subid('WSubId_57')
-        .param pmc __ARG_1
-        .param pmc __ARG_2
-        .param pmc __ARG_3
-.const 'Sub' WSubId_53 = "WSubId_53"
-.const 'Sub' WSubId_54 = "WSubId_54"
-    $P1 = WSubId_54(__ARG_3)
-    .tailcall WSubId_53(__ARG_1, __ARG_2, $P1)
-
-.end # builtineval_stringcast
-
-
-.sub 'builtineval_intcast' :subid('WSubId_56')
-        .param pmc __ARG_1
-        .param pmc __ARG_2
-        .param pmc __ARG_3
-.const 'Sub' WSubId_55 = "WSubId_55"
-.const 'Sub' WSubId_49 = "WSubId_49"
-    $P1 = WSubId_55(__ARG_3)
-    set $I1, $P1
-    .tailcall WSubId_49(__ARG_1, __ARG_2, $I1)
-
-.end # builtineval_intcast
-
-
-.sub 'Builtin_varcast' :subid('WSubId_58')
-        .param pmc __ARG_1
-        .param pmc __ARG_2
-        .param pmc __ARG_3
-        .param string __ARG_4
-        .param pmc __ARG_5
-.const 'Sub' WSubId_35 = "WSubId_35"
-    elements $I1, __ARG_5
-    eq $I1, 1, __label_1
-    WSubId_35("Invalid var cast")
-  __label_1: # endif
-    $P1 = __ARG_5[0]
-    $P10 = $P1.'checkresult'()
-    null $S1
-    if_null $P10, __label_2
-    set $S1, $P10
-  __label_2:
-    ne $S1, 'P', __label_3
-    null $S2
-    null $P2
-    isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'IdentifierExpr' ]
-    if $I1 goto __label_7
-    isa $I2, $P1, [ 'Winxed'; 'Compiler'; 'MemberExpr' ]
-    if $I2 goto __label_8
-    goto __label_6
-  __label_7: # case
-    $P10 = $P1.'getName'()
-    set $S2, $P10
-    $P11 = $P1.'checkIdentifier'()
-    null $S3
-    if_null $P11, __label_9
-    set $S3, $P11
-  __label_9:
-    $P3 = $P1.'checkVar'()
-    eq $S3, '', __label_10
-    if_null $P3, __label_10
-    $P12 = $P3.'issubid'()
-    if $P12 goto __label_10
-    $P1.'emit'(__ARG_1, __ARG_4)
-    goto __label_11
-  __label_10: # else
-    root_new $P10, ['parrot';'ResizablePMCArray']
-    assign $P10, 1
-    $P10[0] = $S2
-    $P2 = $P1.'scopesearch'($P10, 0)
-    if_null $P2, __label_12
-    isa $I1, $P2, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
-    unless $I1 goto __label_12
-    getattribute $P10, $P2, 'owner'
-    $P4 = $P10.'getpath'()
-    set $P7, $P4
-    null $S5
-    elements $I1, $P7
-    unless $I1 goto __label_14
-    join $S9, "'; '", $P7
-    concat $S10, "[ '", $S9
-    concat $S10, $S10, "' ]"
-    set $S5, $S10
-  __label_14: # endif
-    set $S8, $S5
-  __label_13:
-    __ARG_1.'emitget_hll_global'(__ARG_4, $S2, $S8)
-  __label_12: # endif
-  __label_11: # endif
-    goto __label_5 # break
-  __label_8: # case
-    new $P5, ['ResizableStringArray']
-    $P1.'buildkey'($P5)
-    $P2 = __ARG_2.'scopesearch'($P5, 0)
-    if_null $P2, __label_15
-    isa $I1, $P2, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
-    unless $I1 goto __label_15
-    getattribute $P10, $P2, 'owner'
-    $P6 = $P10.'getpath'()
-    __ARG_1.'annotate'(__ARG_3)
-    set $P8, $P6
-    null $S6
-    elements $I1, $P8
-    unless $I1 goto __label_17
-    join $S9, "'; '", $P8
-    concat $S10, "[ '", $S9
-    concat $S10, $S10, "' ]"
-    set $S6, $S10
-  __label_17: # endif
-    set $S11, $S6
-  __label_16:
-    __ARG_1.'emitget_hll_global'(__ARG_4, $S2, $S11)
-  __label_15: # endif
-    $P10 = $P5.'pop'()
-    set $S2, $P10
-    __ARG_1.'annotate'(__ARG_3)
-    set $P9, $P5
-    null $S7
-    elements $I1, $P9
-    unless $I1 goto __label_19
-    join $S9, "'; '", $P9
-    concat $S10, "[ '", $S9
-    concat $S10, $S10, "' ]"
-    set $S7, $S10
-  __label_19: # endif
-    set $S12, $S7
-  __label_18:
-    __ARG_1.'emitget_hll_global'(__ARG_4, $S2, $S12)
-    goto __label_5 # break
-  __label_6: # default
-    __ARG_1.'annotate'(__ARG_3)
-    $P1.'emit'(__ARG_1, __ARG_4)
-  __label_5: # switch end
-    goto __label_4
-  __label_3: # else
-    $P10 = $P1.'emit_get'(__ARG_1)
-    null $S4
-    if_null $P10, __label_20
-    set $S4, $P10
-  __label_20:
-    __ARG_1.'annotate'(__ARG_3)
-    ne $S4, 'null', __label_21
-    __ARG_1.'emitnull'(__ARG_4)
-    goto __label_22
-  __label_21: # else
-    __ARG_1.'emitbox'(__ARG_4, $S4)
-  __label_22: # endif
-  __label_4: # endif
-
-.end # Builtin_varcast
-
-
-.sub 'Builtin_say' :subid('WSubId_72')
+.sub 'Builtin_say' :subid('WSubId_69')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
@@ -3075,13 +2799,13 @@
 .end # Builtin_say
 
 
-.sub 'Builtin_cry' :subid('WSubId_73')
+.sub 'Builtin_cry' :subid('WSubId_70')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param string __ARG_4
         .param pmc __ARG_5
-.const 'Sub' WSubId_52 = "WSubId_52"
+.const 'Sub' WSubId_48 = "WSubId_48"
 .const 'Sub' WSubId_9 = "WSubId_9"
     __ARG_1.'annotate'(__ARG_3)
     set $P1, __ARG_5
@@ -3101,13 +2825,13 @@
   __label_1:
     set $P5, $P6
     join $S1, "\n", $P5
-    $P5 = WSubId_52("    getstderr $P0\n%0\n    print $P0, \"\\n\"\n", $S1)
+    $P5 = WSubId_48("    getstderr $P0\n%0\n    print $P0, \"\\n\"\n", $S1)
     __ARG_1.'say'($P5)
 
 .end # Builtin_cry
 
 
-.sub 'Builtin_print' :subid('WSubId_71')
+.sub 'Builtin_print' :subid('WSubId_68')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
@@ -3131,7 +2855,7 @@
 .end # Builtin_print
 
 
-.sub 'Builtin_abs' :subid('WSubId_70')
+.sub 'Builtin_abs' :subid('WSubId_67')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
@@ -3145,32 +2869,32 @@
   __label_1:
     $P2 = $P1.'checkresult'()
     set $S3, $P2
-    ne $S3, 'S', __label_2
-    $P3 = __ARG_2.'tempreg'('N')
+    ne $S3, "S", __label_2
+    $P3 = __ARG_2.'tempreg'("N")
     null $S2
     if_null $P3, __label_4
     set $S2, $P3
   __label_4:
     __ARG_1.'annotate'(__ARG_3)
     __ARG_1.'emitset'($S2, $S1)
-    __ARG_1.'emitarg2'('abs', $S2, $S2)
+    __ARG_1.'emitarg2'("abs", $S2, $S2)
     __ARG_1.'emitset'(__ARG_4, $S2)
     goto __label_3
   __label_2: # else
     __ARG_1.'annotate'(__ARG_3)
-    __ARG_1.'emitarg2'('abs', __ARG_4, $S1)
+    __ARG_1.'emitarg2'("abs", __ARG_4, $S1)
   __label_3: # endif
 
 .end # Builtin_abs
 
 
-.sub 'Builtin_ASSERT' :subid('WSubId_74')
+.sub 'Builtin_ASSERT' :subid('WSubId_71')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param string __ARG_4
         .param pmc __ARG_5
-.const 'Sub' WSubId_52 = "WSubId_52"
+.const 'Sub' WSubId_48 = "WSubId_48"
     $P3 = __ARG_1.'getDebug'()
     if_null $P3, __label_1
     unless $P3 goto __label_1
@@ -3185,7 +2909,7 @@
     __ARG_1.'emitif'($P2, $S1)
     $P4 = __ARG_3.'filename'()
     $P5 = __ARG_3.'linenum'()
-    $P3 = WSubId_52("    getstderr $P0\n    print $P0, \"Assertion failed at '%0' line \"\n    print $P0, %1\n    print $P0, \"\\n\"\n    exit 1\n", $P4, $P5)
+    $P3 = WSubId_48("    getstderr $P0\n    print $P0, \"Assertion failed at '%0' line \"\n    print $P0, %1\n    print $P0, \"\\n\"\n    exit 1\n", $P4, $P5)
     __ARG_1.'print'($P3)
     __ARG_1.'emitlabel'($S1)
   __label_1: # endif
@@ -3193,17 +2917,17 @@
 .end # Builtin_ASSERT
 
 
-.sub 'Builtin_invoke' :subid('WSubId_75')
+.sub 'Builtin_invoke' :subid('WSubId_72')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param string __ARG_4
         .param pmc __ARG_5
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     $P1 = __ARG_5[0]
     isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'CallExpr' ]
     if $I1 goto __label_1
-    WSubId_30("invoke argument must be callable", __ARG_3)
+    WSubId_28("invoke argument must be callable", __ARG_3)
   __label_1: # endif
     concat $S1, "(", __ARG_4
     concat $S1, $S1, " :call_sig)"
@@ -3212,227 +2936,248 @@
 .end # Builtin_invoke
 
 
-.sub 'builtineval_length' :subid('WSubId_60')
+.sub 'builtineval_length' :subid('WSubId_57')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_54 = "WSubId_54"
 .const 'Sub' WSubId_49 = "WSubId_49"
-    $P1 = WSubId_54(__ARG_3)
+.const 'Sub' WSubId_47 = "WSubId_47"
+    $P1 = WSubId_49(__ARG_3)
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
     length $I1, $S1
-    .tailcall WSubId_49(__ARG_1, __ARG_2, $I1)
+    .tailcall WSubId_47(__ARG_1, __ARG_2, $I1)
 
 .end # builtineval_length
 
 
-.sub 'builtineval_bytelength' :subid('WSubId_61')
+.sub 'builtineval_bytelength' :subid('WSubId_58')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_54 = "WSubId_54"
 .const 'Sub' WSubId_49 = "WSubId_49"
-    $P1 = WSubId_54(__ARG_3)
+.const 'Sub' WSubId_47 = "WSubId_47"
+    $P1 = WSubId_49(__ARG_3)
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
     bytelength $I1, $S1
-    .tailcall WSubId_49(__ARG_1, __ARG_2, $I1)
+    .tailcall WSubId_47(__ARG_1, __ARG_2, $I1)
 
 .end # builtineval_bytelength
 
 
-.sub 'builtineval_ord' :subid('WSubId_63')
+.sub 'builtineval_ord' :subid('WSubId_60')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_51 = "WSubId_51"
-.const 'Sub' WSubId_50 = "WSubId_50"
-.const 'Sub' WSubId_49 = "WSubId_49"
+.const 'Sub' WSubId_47 = "WSubId_47"
     elements $I1, __ARG_3
-    $P3 = __ARG_3[0]
-    getattribute $P1, $P3, 'arg'
-    $P3 = WSubId_51($P1)
-    null $S1
-    if_null $P3, __label_1
-    set $S1, $P3
+    $P5 = __ARG_3[0]
+    getattribute $P1, $P5, 'arg'
+    set $P3, $P1
+    $P5 = $P3.'getStringValue'()
+    null $S2
+    if_null $P5, __label_2
+    set $S2, $P5
+  __label_2:
+    set $S1, $S2
   __label_1:
     null $I2
-    le $I1, 1, __label_2
-    $P3 = __ARG_3[1]
-    getattribute $P2, $P3, 'arg'
-    $P3 = WSubId_50($P2)
-    set $I2, $P3
-  __label_2: # endif
-    ord $I3, $S1, $I2
-    .tailcall WSubId_49(__ARG_1, __ARG_2, $I3)
+    le $I1, 1, __label_3
+    $P5 = __ARG_3[1]
+    getattribute $P2, $P5, 'arg'
+    set $P4, $P2
+    $P5 = $P4.'getIntegerValue'()
+    set $I3, $P5
+    set $I2, $I3
+  __label_4:
+  __label_3: # endif
+    ord $I4, $S1, $I2
+    .tailcall WSubId_47(__ARG_1, __ARG_2, $I4)
 
 .end # builtineval_ord
 
 
-.sub 'builtineval_chr' :subid('WSubId_62')
+.sub 'builtineval_chr' :subid('WSubId_59')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_53 = "WSubId_53"
-.const 'Sub' WSubId_55 = "WSubId_55"
-    $P1 = WSubId_55(__ARG_3)
+.const 'Sub' WSubId_50 = "WSubId_50"
+.const 'Sub' WSubId_51 = "WSubId_51"
+    $P1 = WSubId_51(__ARG_3)
     set $I1, $P1
     chr $S0, $I1
-    find_encoding $I0, 'utf8'
+    find_encoding $I0, "utf8"
     trans_encoding $S1, $S0, $I0
-    .tailcall WSubId_53(__ARG_1, __ARG_2, $S1)
+    .tailcall WSubId_50(__ARG_1, __ARG_2, $S1)
 
 .end # builtineval_chr
 
 
-.sub 'builtineval_substr' :subid('WSubId_64')
+.sub 'builtineval_substr' :subid('WSubId_61')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_51 = "WSubId_51"
 .const 'Sub' WSubId_50 = "WSubId_50"
-.const 'Sub' WSubId_53 = "WSubId_53"
     elements $I1, __ARG_3
-    $P4 = __ARG_3[0]
-    getattribute $P1, $P4, 'arg'
-    $P4 = __ARG_3[1]
-    getattribute $P2, $P4, 'arg'
-    $P4 = WSubId_51($P1)
-    null $S1
-    if_null $P4, __label_1
-    set $S1, $P4
+    $P7 = __ARG_3[0]
+    getattribute $P1, $P7, 'arg'
+    $P7 = __ARG_3[1]
+    getattribute $P2, $P7, 'arg'
+    set $P4, $P1
+    $P7 = $P4.'getStringValue'()
+    null $S3
+    if_null $P7, __label_2
+    set $S3, $P7
+  __label_2:
+    set $S1, $S3
   __label_1:
-    $P4 = WSubId_50($P2)
-    set $I2, $P4
+    set $P5, $P2
+    $P7 = $P5.'getIntegerValue'()
+    set $I4, $P7
+    set $I2, $I4
+  __label_3:
     null $S2
-    set $I4, __ARG_3
-    le $I4, 2, __label_2
-    $P4 = __ARG_3[2]
-    getattribute $P3, $P4, 'arg'
-    $P4 = WSubId_50($P3)
-    set $I3, $P4
+    le $I1, 2, __label_4
+    $P7 = __ARG_3[2]
+    getattribute $P3, $P7, 'arg'
+    set $P6, $P3
+    $P7 = $P6.'getIntegerValue'()
+    set $I5, $P7
+    set $I3, $I5
+  __label_6:
     substr $S2, $S1, $I2, $I3
-    goto __label_3
-  __label_2: # else
+    goto __label_5
+  __label_4: # else
     substr $S2, $S1, $I2
-  __label_3: # endif
-    .tailcall WSubId_53(__ARG_1, __ARG_2, $S2)
+  __label_5: # endif
+    .tailcall WSubId_50(__ARG_1, __ARG_2, $S2)
 
 .end # builtineval_substr
 
 
-.sub 'builtineval_indexof' :subid('WSubId_65')
+.sub 'builtineval_indexof' :subid('WSubId_62')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_51 = "WSubId_51"
-.const 'Sub' WSubId_49 = "WSubId_49"
-    $P3 = __ARG_3[0]
-    getattribute $P1, $P3, 'arg'
-    $P3 = __ARG_3[1]
-    getattribute $P2, $P3, 'arg'
-    $P3 = WSubId_51($P1)
-    null $S1
-    if_null $P3, __label_1
-    set $S1, $P3
-  __label_1:
-    $P3 = WSubId_51($P2)
-    null $S2
-    if_null $P3, __label_2
-    set $S2, $P3
+.const 'Sub' WSubId_47 = "WSubId_47"
+    $P5 = __ARG_3[0]
+    getattribute $P1, $P5, 'arg'
+    $P5 = __ARG_3[1]
+    getattribute $P2, $P5, 'arg'
+    set $P3, $P1
+    $P5 = $P3.'getStringValue'()
+    null $S3
+    if_null $P5, __label_2
+    set $S3, $P5
   __label_2:
+    set $S1, $S3
+  __label_1:
+    set $P4, $P2
+    $P5 = $P4.'getStringValue'()
+    null $S4
+    if_null $P5, __label_4
+    set $S4, $P5
+  __label_4:
+    set $S2, $S4
+  __label_3:
     index $I1, $S1, $S2
-    .tailcall WSubId_49(__ARG_1, __ARG_2, $I1)
+    .tailcall WSubId_47(__ARG_1, __ARG_2, $I1)
 
 .end # builtineval_indexof
 
 
-.sub 'builtineval_indexof_pos' :subid('WSubId_66')
+.sub 'builtineval_indexof_pos' :subid('WSubId_63')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_51 = "WSubId_51"
-.const 'Sub' WSubId_50 = "WSubId_50"
-.const 'Sub' WSubId_49 = "WSubId_49"
-    $P4 = __ARG_3[0]
-    getattribute $P1, $P4, 'arg'
-    $P4 = __ARG_3[1]
-    getattribute $P2, $P4, 'arg'
-    $P4 = __ARG_3[2]
-    getattribute $P3, $P4, 'arg'
-    $P4 = WSubId_51($P1)
-    null $S1
-    if_null $P4, __label_1
-    set $S1, $P4
-  __label_1:
-    $P4 = WSubId_51($P2)
-    null $S2
-    if_null $P4, __label_2
-    set $S2, $P4
+.const 'Sub' WSubId_47 = "WSubId_47"
+    $P7 = __ARG_3[0]
+    getattribute $P1, $P7, 'arg'
+    $P7 = __ARG_3[1]
+    getattribute $P2, $P7, 'arg'
+    $P7 = __ARG_3[2]
+    getattribute $P3, $P7, 'arg'
+    set $P4, $P1
+    $P7 = $P4.'getStringValue'()
+    null $S3
+    if_null $P7, __label_2
+    set $S3, $P7
   __label_2:
-    $P6 = __ARG_3[2]
-    getattribute $P5, $P6, 'arg'
-    $P4 = WSubId_50($P5)
-    set $I1, $P4
-    index $I2, $S1, $S2, $I1
-    .tailcall WSubId_49(__ARG_1, __ARG_2, $I2)
+    set $S1, $S3
+  __label_1:
+    set $P5, $P2
+    $P7 = $P5.'getStringValue'()
+    null $S4
+    if_null $P7, __label_4
+    set $S4, $P7
+  __label_4:
+    set $S2, $S4
+  __label_3:
+    $P7 = __ARG_3[2]
+    getattribute $P6, $P7, 'arg'
+    $P7 = $P6.'getIntegerValue'()
+    set $I2, $P7
+    set $I1, $I2
+  __label_5:
+    index $I3, $S1, $S2, $I1
+    .tailcall WSubId_47(__ARG_1, __ARG_2, $I3)
 
 .end # builtineval_indexof_pos
 
 
-.sub 'builtineval_upcase' :subid('WSubId_68')
+.sub 'builtineval_upcase' :subid('WSubId_65')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_53 = "WSubId_53"
-.const 'Sub' WSubId_54 = "WSubId_54"
-    $P1 = WSubId_54(__ARG_3)
+.const 'Sub' WSubId_50 = "WSubId_50"
+.const 'Sub' WSubId_49 = "WSubId_49"
+    $P1 = WSubId_49(__ARG_3)
     set $S2, $P1
     upcase $S1, $S2
-    .tailcall WSubId_53(__ARG_1, __ARG_2, $S1)
+    .tailcall WSubId_50(__ARG_1, __ARG_2, $S1)
 
 .end # builtineval_upcase
 
 
-.sub 'builtineval_downcase' :subid('WSubId_69')
+.sub 'builtineval_downcase' :subid('WSubId_66')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_53 = "WSubId_53"
-.const 'Sub' WSubId_54 = "WSubId_54"
-    $P1 = WSubId_54(__ARG_3)
+.const 'Sub' WSubId_50 = "WSubId_50"
+.const 'Sub' WSubId_49 = "WSubId_49"
+    $P1 = WSubId_49(__ARG_3)
     set $S2, $P1
     downcase $S1, $S2
-    .tailcall WSubId_53(__ARG_1, __ARG_2, $S1)
+    .tailcall WSubId_50(__ARG_1, __ARG_2, $S1)
 
 .end # builtineval_downcase
 
 
-.sub 'builtineval_escape' :subid('WSubId_67')
+.sub 'builtineval_escape' :subid('WSubId_64')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_53 = "WSubId_53"
-.const 'Sub' WSubId_54 = "WSubId_54"
-    $P1 = WSubId_54(__ARG_3)
+.const 'Sub' WSubId_50 = "WSubId_50"
+.const 'Sub' WSubId_49 = "WSubId_49"
+    $P1 = WSubId_49(__ARG_3)
     set $S3, $P1
     escape $S2, $S3
     escape $S1, $S2
-    .tailcall WSubId_53(__ARG_1, __ARG_2, $S1)
+    .tailcall WSubId_50(__ARG_1, __ARG_2, $S1)
 
 .end # builtineval_escape
 
 
-.sub 'builtin_sleep' :subid('WSubId_59')
+.sub 'builtin_sleep' :subid('WSubId_56')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-        .param pmc __ARG_4
+        .param string __ARG_4
         .param pmc __ARG_5
     $P1 = __ARG_5[0]
     null $S1
@@ -3474,13 +3219,17 @@
   __label_7: # endif
   __label_3: # switch end
     __ARG_1.'annotate'(__ARG_3)
-    __ARG_1.'emitarg1'('sleep', $S1)
+    __ARG_1.'emitarg1'("sleep", $S1)
 
 .end # builtin_sleep
 
 
-.sub 'getbuiltins' :subid('WSubId_158')
+.sub 'getbuiltins' :subid('WSubId_156')
         .param pmc __ARG_1
+.const 'Sub' WSubId_52 = "WSubId_52"
+.const 'Sub' WSubId_53 = "WSubId_53"
+.const 'Sub' WSubId_54 = "WSubId_54"
+.const 'Sub' WSubId_55 = "WSubId_55"
 .const 'Sub' WSubId_56 = "WSubId_56"
 .const 'Sub' WSubId_57 = "WSubId_57"
 .const 'Sub' WSubId_58 = "WSubId_58"
@@ -3498,391 +3247,379 @@
 .const 'Sub' WSubId_70 = "WSubId_70"
 .const 'Sub' WSubId_71 = "WSubId_71"
 .const 'Sub' WSubId_72 = "WSubId_72"
-.const 'Sub' WSubId_73 = "WSubId_73"
-.const 'Sub' WSubId_74 = "WSubId_74"
-.const 'Sub' WSubId_75 = "WSubId_75"
-    new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-    new $P4, [ 'Winxed'; 'Compiler'; 'Builtin_typecast' ]
-    $P4.'Builtin_typecast'('I')
-    set $P3, $P4
-    $P2.'BuiltinFunctionEval'('int', WSubId_56, $P3, 'I', '!')
+    new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinExpr' ]
+    $P2.'BuiltinExpr'("int", WSubId_52, "S", "!")
+    set $P1, $P2
+    __ARG_1.'add'($P1)
+    new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinExpr' ]
+    $P2.'BuiltinExpr'("float", WSubId_53, "S", "!")
+    set $P1, $P2
+    __ARG_1.'add'($P1)
+    new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinExpr' ]
+    $P2.'BuiltinExpr'("string", WSubId_54, "S", "!")
+    set $P1, $P2
+    __ARG_1.'add'($P1)
+    new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinExpr' ]
+    $P2.'BuiltinExpr'("var", WSubId_55, "P", "!")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    new $P4, [ 'Winxed'; 'Compiler'; 'Builtin_typecast' ]
-    $P4.'Builtin_typecast'('N')
-    set $P3, $P4
-    $P2.'BuiltinFunction'('float', $P3, 'N', '!')
-    set $P1, $P2
-    __ARG_1.'add'($P1)
-    new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-    new $P4, [ 'Winxed'; 'Compiler'; 'Builtin_typecast' ]
-    $P4.'Builtin_typecast'('S')
-    set $P3, $P4
-    $P2.'BuiltinFunctionEval'('string', WSubId_57, $P3, 'S', '!')
+    $P2.'BuiltinFunction'("die", "die %1", "v", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('var', WSubId_58, 'P', '!')
+    $P2.'BuiltinFunction'("exit", "exit %1", "v", "I")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('die', 'die %1', 'v', 'S')
+    $P2.'BuiltinFunction'("time", "time %0", "I")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('exit', 'exit %1', 'v', 'I')
+    $P2.'BuiltinFunction'("floattime", "time %0", "N")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('time', 'time %0', 'I')
+    $P2.'BuiltinFunction'("sleep", WSubId_56, "v", "!")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('floattime', 'time %0', 'N')
+    $P2.'BuiltinFunction'("spawnw", "spawnw %0, %1", "I", "P")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('sleep', WSubId_59, 'v', '!')
+    $P2.'BuiltinFunction'("getstdin", "getstdin %0", "P")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('spawnw', 'spawnw %0, %1', 'I', 'P')
+    $P2.'BuiltinFunction'("getstdout", "getstdout %0", "P")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('getstdin', 'getstdin %0', 'P')
+    $P2.'BuiltinFunction'("getstderr", "getstderr %0", "P")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('getstdout', 'getstdout %0', 'P')
+    $P2.'BuiltinFunction'("open", "root_new %0, [\"parrot\";\"FileHandle\"]\n%0.\"open\"(%1)\n", "P", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('getstderr', 'getstderr %0', 'P')
+    $P2.'BuiltinFunction'("open", "root_new %0, [\"parrot\";\"FileHandle\"]\n%0.\"open\"(%1,%2)\n", "P", "S", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('open', "root_new %0, ['parrot';'FileHandle']\n%0.'open'(%1)\n", 'P', 'S')
+    $P2.'BuiltinFunction'("Error", "root_new %0, [\"parrot\";\"Exception\"]\n%0[\"message\"] = %1\n", "P", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('open', "root_new %0, ['parrot';'FileHandle']\n%0.'open'(%1,%2)\n", 'P', 'S', 'S')
+    $P2.'BuiltinFunction'("Error", "root_new %0, [\"parrot\";\"Exception\"]\n%0[\"message\"] = %1\n%0[\"severity\"] = %2\n", "P", "S", "I")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('Error', "root_new %0, ['parrot';'Exception']\n%0['message'] = %1\n", 'P', 'S')
+    $P2.'BuiltinFunction'("Error", "root_new %0, [\"parrot\";\"Exception\"]\n%0[\"message\"] = %1\n%0[\"severity\"] = %2\n%0[\"type\"] = %3\n", "P", "S", "I", "I")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('Error', "root_new %0, ['parrot';'Exception']\n%0['message'] = %1\n%0['severity'] = %2\n", 'P', 'S', 'I')
+    $P2.'BuiltinFunction'("Error", "root_new %0, [\"parrot\";\"Exception\"]\n%0[\"message\"] = %1\n%0[\"severity\"] = %2\n%0[\"type\"] = %3\n%0[\"payload\"] = %4\n", "P", "S", "I", "I", "P")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('Error', "root_new %0, ['parrot';'Exception']\n%0['message'] = %1\n%0['severity'] = %2\n%0['type'] = %3\n", 'P', 'S', 'I', 'I')
-    set $P1, $P2
-    __ARG_1.'add'($P1)
-    new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('Error', "root_new %0, ['parrot';'Exception']\n%0['message'] = %1\n%0['severity'] = %2\n%0['type'] = %3\n%0['payload'] = %4\n", 'P', 'S', 'I', 'I', 'P')
-    set $P1, $P2
-    __ARG_1.'add'($P1)
-    new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('elements', 'elements %0, %1', 'I', 'P')
+    $P2.'BuiltinFunction'("elements", "elements %0, %1", "I", "P")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-    $P2.'BuiltinFunctionEval'('length', WSubId_60, 'length %0, %1', 'I', 'S')
+    $P2.'BuiltinFunctionEval'("length", WSubId_57, "length %0, %1", "I", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-    $P2.'BuiltinFunctionEval'('bytelength', WSubId_61, 'bytelength %0, %1', 'I', 'S')
+    $P2.'BuiltinFunctionEval'("bytelength", WSubId_58, "bytelength %0, %1", "I", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-    $P2.'BuiltinFunctionEval'('chr', WSubId_62, "chr $S0, %1\nfind_encoding $I0, 'utf8'\ntrans_encoding %0, $S0, $I0\n", 'S', 'I')
+    $P2.'BuiltinFunctionEval'("chr", WSubId_59, "chr $S0, %1\nfind_encoding $I0, \"utf8\"\ntrans_encoding %0, $S0, $I0\n", "S", "I")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-    $P2.'BuiltinFunctionEval'('ord', WSubId_63, 'ord %0, %1', 'I', 'S')
+    $P2.'BuiltinFunctionEval'("ord", WSubId_60, "ord %0, %1", "I", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-    $P2.'BuiltinFunctionEval'('ord', WSubId_63, 'ord %0, %1, %2', 'I', 'S', 'I')
+    $P2.'BuiltinFunctionEval'("ord", WSubId_60, "ord %0, %1, %2", "I", "S", "I")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-    $P2.'BuiltinFunctionEval'('substr', WSubId_64, 'substr %0, %1, %2', 'S', 'S', 'I')
+    $P2.'BuiltinFunctionEval'("substr", WSubId_61, "substr %0, %1, %2", "S", "S", "I")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-    $P2.'BuiltinFunctionEval'('substr', WSubId_64, 'substr %0, %1, %2, %3', 'S', 'S', 'I', 'I')
+    $P2.'BuiltinFunctionEval'("substr", WSubId_61, "substr %0, %1, %2, %3", "S", "S", "I", "I")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('replace', 'replace %0, %1, %2, %3, %4', 'S', 'S', 'I', 'I', 'S')
+    $P2.'BuiltinFunction'("replace", "replace %0, %1, %2, %3, %4", "S", "S", "I", "I", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-    $P2.'BuiltinFunctionEval'('indexof', WSubId_65, 'index %0, %1, %2', 'I', 'S', 'S')
+    $P2.'BuiltinFunctionEval'("indexof", WSubId_62, "index %0, %1, %2", "I", "S", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-    $P2.'BuiltinFunctionEval'('indexof', WSubId_66, 'index %0, %1, %2, %3', 'I', 'S', 'S', 'I')
+    $P2.'BuiltinFunctionEval'("indexof", WSubId_63, "index %0, %1, %2, %3", "I", "S", "S", "I")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('join', 'join %0, %1, %2', 'S', 'S', 'P')
+    $P2.'BuiltinFunction'("join", "join %0, %1, %2", "S", "S", "P")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-    $P2.'BuiltinFunctionEval'('escape', WSubId_67, 'escape %0, %1', 'S', 'S')
+    $P2.'BuiltinFunctionEval'("escape", WSubId_64, "escape %0, %1", "S", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('unescape', "$P0 = new ['String']\n$P0 = %1\n%0 = $P0.'unescape'('utf8')\n", 'S', 'S')
+    $P2.'BuiltinFunction'("unescape", "$P0 = new [\"String\"]\n$P0 = %1\n%0 = $P0.\"unescape\"(\"utf8\")\n", "S", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('unescape', "$P0 = new ['String']\n$P0 = %1\n%0 = $P0.'unescape'(%2)\n", 'S', 'S', 'S')
+    $P2.'BuiltinFunction'("unescape", "$P0 = new [\"String\"]\n$P0 = %1\n%0 = $P0.\"unescape\"(%2)\n", "S", "S", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('trans_encoding', "find_encoding $I0, %2\ntrans_encoding %0, %1, $I0\n", 'S', 'S', 'S')
+    $P2.'BuiltinFunction'("trans_encoding", "find_encoding $I0, %2\ntrans_encoding %0, %1, $I0\n", "S", "S", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('encoding_name', "encoding $I0, %1\nencodingname %0, $I0\n", 'S', 'S')
+    $P2.'BuiltinFunction'("encoding_name", "encoding $I0, %1\nencodingname %0, $I0\n", "S", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-    $P2.'BuiltinFunctionEval'('upcase', WSubId_68, 'upcase %0, %1', 'S', 'S')
+    $P2.'BuiltinFunctionEval'("upcase", WSubId_65, "upcase %0, %1", "S", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunctionEval' ]
-    $P2.'BuiltinFunctionEval'('downcase', WSubId_69, 'downcase %0, %1', 'S', 'S')
+    $P2.'BuiltinFunctionEval'("downcase", WSubId_66, "downcase %0, %1", "S", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('titlecase', 'titlecase %0, %1', 'S', 'S')
+    $P2.'BuiltinFunction'("titlecase", "titlecase %0, %1", "S", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('split', 'split %0, %1, %2', 'P', 'S', 'S')
+    $P2.'BuiltinFunction'("split", "split %0, %1, %2", "P", "S", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('chomp', "$P0 = get_root_global ['parrot';'String';'Utils'], 'chomp'\n%0 = $P0(%1)\n", 'S', 'S')
+    $P2.'BuiltinFunction'("chomp", "$P0 = get_root_global [\"parrot\";\"String\";\"Utils\"], \"chomp\"\n%0 = $P0(%1)\n", "S", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('chomp', "$P0 = get_root_global ['parrot';'String';'Utils'], 'chomp'\n%0 = $P0(%1, %2)\n", 'S', 'S', 'S')
+    $P2.'BuiltinFunction'("chomp", "$P0 = get_root_global [\"parrot\";\"String\";\"Utils\"], \"chomp\"\n%0 = $P0(%1, %2)\n", "S", "S", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('push', 'push %1, %2', 'v', 'P', '?')
+    $P2.'BuiltinFunction'("push", "push %1, %2", "v", "P", "?")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('unshift', 'unshift %1, %2', 'v', 'P', '?')
+    $P2.'BuiltinFunction'("unshift", "unshift %1, %2", "v", "P", "?")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('pop_var', 'pop %0, %1', 'P', 'P')
+    $P2.'BuiltinFunction'("pop_var", "pop %0, %1", "P", "P")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('shift_var', 'shift %0, %1', 'P', 'P')
+    $P2.'BuiltinFunction'("shift_var", "shift %0, %1", "P", "P")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('pop_int', 'pop %0, %1', 'I', 'P')
+    $P2.'BuiltinFunction'("pop_int", "pop %0, %1", "I", "P")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('shift_int', 'shift %0, %1', 'I', 'P')
+    $P2.'BuiltinFunction'("shift_int", "shift %0, %1", "I", "P")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('pop_float', 'pop %0, %1', 'N', 'P')
+    $P2.'BuiltinFunction'("pop_float", "pop %0, %1", "N", "P")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('shift_float', 'shift %0, %1', 'N', 'P')
+    $P2.'BuiltinFunction'("shift_float", "shift %0, %1", "N", "P")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('pop_string', 'pop %0, %1', 'S', 'P')
+    $P2.'BuiltinFunction'("pop_string", "pop %0, %1", "S", "P")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('shift_string', 'shift %0, %1', 'S', 'P')
+    $P2.'BuiltinFunction'("shift_string", "shift %0, %1", "S", "P")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('abs', WSubId_70, ':', '!')
+    $P2.'BuiltinFunction'("abs", WSubId_67, ":", "!")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('sqrt', 'sqrt %0, %1', 'N', 'N')
+    $P2.'BuiltinFunction'("sqrt", "sqrt %0, %1", "N", "N")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('pow', 'pow %0, %1, %2', 'N', 'N', 'N')
+    $P2.'BuiltinFunction'("pow", "pow %0, %1, %2", "N", "N", "N")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('exp', 'exp %0, %1', 'N', 'N')
+    $P2.'BuiltinFunction'("exp", "exp %0, %1", "N", "N")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('ln', 'ln %0, %1', 'N', 'N')
+    $P2.'BuiltinFunction'("ln", "ln %0, %1", "N", "N")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('sin', 'sin %0, %1', 'N', 'N')
+    $P2.'BuiltinFunction'("sin", "sin %0, %1", "N", "N")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('cos', 'cos %0, %1', 'N', 'N')
+    $P2.'BuiltinFunction'("cos", "cos %0, %1", "N", "N")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('tan', 'tan %0, %1', 'N', 'N')
+    $P2.'BuiltinFunction'("tan", "tan %0, %1", "N", "N")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('asin', 'asin %0, %1', 'N', 'N')
+    $P2.'BuiltinFunction'("asin", "asin %0, %1", "N", "N")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('acos', 'acos %0, %1', 'N', 'N')
+    $P2.'BuiltinFunction'("acos", "acos %0, %1", "N", "N")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('atan', 'atan %0, %1', 'N', 'N')
+    $P2.'BuiltinFunction'("atan", "atan %0, %1", "N", "N")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('atan', 'atan %0, %1, %2', 'N', 'N', 'N')
+    $P2.'BuiltinFunction'("atan", "atan %0, %1, %2", "N", "N", "N")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('sinh', 'sinh %0, %1', 'N', 'N')
+    $P2.'BuiltinFunction'("sinh", "sinh %0, %1", "N", "N")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('cosh', 'cosh %0, %1', 'N', 'N')
+    $P2.'BuiltinFunction'("cosh", "cosh %0, %1", "N", "N")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('tanh', 'tanh %0, %1', 'N', 'N')
+    $P2.'BuiltinFunction'("tanh", "tanh %0, %1", "N", "N")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('getinterp', 'getinterp %0', 'P')
+    $P2.'BuiltinFunction'("getinterp", "getinterp %0", "P")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('getcontext', 'get_context %0', 'P')
+    $P2.'BuiltinFunction'("getcontext", "get_context %0", "P")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('get_context', 'get_context %0', 'P')
+    $P2.'BuiltinFunction'("get_context", "get_context %0", "P")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('get_class', 'get_class %0, %1', 'P', 'p')
+    $P2.'BuiltinFunction'("get_class", "get_class %0, %1", "P", "p")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('typeof', 'typeof %0, %1', 'P', 'P')
+    $P2.'BuiltinFunction'("typeof", "typeof %0, %1", "P", "P")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('getattribute', 'getattribute %0, %1, %2', 'P', 'P', 'S')
+    $P2.'BuiltinFunction'("getattribute", "getattribute %0, %1, %2", "P", "P", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('getattribute', 'getattribute %0, %1, %2, %3', 'P', 'P', 'P', 'S')
+    $P2.'BuiltinFunction'("getattribute", "getattribute %0, %1, %2, %3", "P", "P", "P", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('setattribute', 'setattribute %1, %2, %3, %4', 'v', 'P', 'P', 'S', 'P')
+    $P2.'BuiltinFunction'("setattribute", "setattribute %1, %2, %3, %4", "v", "P", "P", "S", "P")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('find_method', 'find_method %0, %1, %2', 'P', 'P', 'S')
+    $P2.'BuiltinFunction'("find_method", "find_method %0, %1, %2", "P", "P", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('callmethodwithargs', '%0 = %1.%2(%3 :flat)', 'P', 'P', 'P', 'P')
+    $P2.'BuiltinFunction'("callmethodwithargs", "%0 = %1.%2(%3 :flat)", "P", "P", "P", "P")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('clone', 'clone %0, %1', 'P', 'P')
+    $P2.'BuiltinFunction'("clone", "clone %0, %1", "P", "P")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('compreg', 'compreg %0, %1', 'P', 'S')
+    $P2.'BuiltinFunction'("compreg", "compreg %0, %1", "P", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('compreg', 'compreg %1, %2', 'v', 'S', 'P')
+    $P2.'BuiltinFunction'("compreg", "compreg %1, %2", "v", "S", "P")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('load_language', "load_language %1\ncompreg %0, %1\n", 'P', 'S')
+    $P2.'BuiltinFunction'("load_language", "load_language %1\ncompreg %0, %1\n", "P", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('load_language', "load_language %1\ncompreg %0, %2\n", 'P', 'S', 'S')
+    $P2.'BuiltinFunction'("load_language", "load_language %1\ncompreg %0, %2\n", "P", "S", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('loadlib', 'loadlib %0, %1', 'P', 'S')
+    $P2.'BuiltinFunction'("loadlib", "loadlib %0, %1", "P", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('load_bytecode', 'load_bytecode %1', 'v', 'S')
+    $P2.'BuiltinFunction'("load_bytecode", "load_bytecode %1", "v", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('load_packfile', 'load_bytecode %0, %1', 'P', 'S')
+    $P2.'BuiltinFunction'("load_packfile", "load_bytecode %0, %1", "P", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('dlfunc', 'dlfunc %0, %1, %2, %3', 'P', 'P', 'S', 'S')
+    $P2.'BuiltinFunction'("dlfunc", "dlfunc %0, %1, %2, %3", "P", "P", "S", "S")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('sprintf', 'sprintf %0, %1, %2', 'S', 'S', 'P')
+    $P2.'BuiltinFunction'("sprintf", "sprintf %0, %1, %2", "S", "S", "P")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('print', WSubId_71, 'v', '*')
+    $P2.'BuiltinFunction'("print", WSubId_68, "v", "*")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('say', WSubId_72, 'v', '*')
+    $P2.'BuiltinFunction'("say", WSubId_69, "v", "*")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('cry', WSubId_73, 'v', '*')
+    $P2.'BuiltinFunction'("cry", WSubId_70, "v", "*")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('__ASSERT__', WSubId_74, 'v', '!')
+    $P2.'BuiltinFunction'("__ASSERT__", WSubId_71, "v", "!")
     set $P1, $P2
     __ARG_1.'add'($P1)
     new $P2, [ 'Winxed'; 'Compiler'; 'BuiltinFunction' ]
-    $P2.'BuiltinFunction'('invoke', WSubId_75, 'P', '!')
+    $P2.'BuiltinFunction'("invoke", WSubId_72, "P", "!")
     set $P1, $P2
     __ARG_1.'add'($P1)
 
 .end # getbuiltins
 
 
-.sub 'parseDotted' :subid('WSubId_95')
+.sub 'parseDotted' :subid('WSubId_94')
         .param pmc __ARG_1
     root_new $P1, ['parrot';'ResizablePMCArray']
     $P2 = __ARG_1.'get'()
@@ -3892,7 +3629,7 @@
     push $P1, $P2
   __label_3: # while
     $P2 = __ARG_1.'get'()
-    $P3 = $P2.'isop'('.')
+    $P3 = $P2.'isop'(".")
     if_null $P3, __label_2
     unless $P3 goto __label_2
     $P2 = __ARG_1.'get'()
@@ -3906,12 +3643,12 @@
 .end # parseDotted
 
 
-.sub 'parseList' :subid('WSubId_76')
+.sub 'parseList' :subid('WSubId_73')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param string __ARG_4 :optional
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     root_new $P1, ['parrot';'ResizablePMCArray']
     null $P2
   __label_1: # do
@@ -3919,7 +3656,7 @@
     push $P1, $P3
   __label_3: # continue
     $P2 = __ARG_1.'get'()
-    $P4 = $P2.'isop'(',')
+    $P4 = $P2.'isop'(",")
     if_null $P4, __label_2
     if $P4 goto __label_1
   __label_2: # enddo
@@ -3929,7 +3666,7 @@
   __label_4: # else
     $P4 = $P2.'isop'(__ARG_4)
     if $P4 goto __label_6
-    WSubId_30("Unfinished argument list", $P2)
+    WSubId_28("Unfinished argument list", $P2)
   __label_6: # endif
   __label_5: # endif
     .return($P1)
@@ -3937,21 +3674,54 @@
 .end # parseList
 
 
-.sub 'parseIdentifier' :subid('WSubId_97')
+.sub 'parseListOrEmpty' :subid('WSubId_91')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_32 = "WSubId_32"
+        .param pmc __ARG_3
+        .param string __ARG_4
+.const 'Sub' WSubId_28 = "WSubId_28"
+    $P1 = __ARG_1.'get'()
+    $P4 = $P1.'isop'(__ARG_4)
+    if_null $P4, __label_1
+    unless $P4 goto __label_1
+    null $P5
+    .return($P5)
+  __label_1: # endif
+    __ARG_1.'unget'($P1)
+    root_new $P2, ['parrot';'ResizablePMCArray']
+  __label_2: # do
+    $P3 = __ARG_3(__ARG_1, __ARG_2)
+    push $P2, $P3
+  __label_4: # continue
+    $P1 = __ARG_1.'get'()
+    $P4 = $P1.'isop'(",")
+    if_null $P4, __label_3
+    if $P4 goto __label_2
+  __label_3: # enddo
+    $P4 = $P1.'isop'(__ARG_4)
+    if $P4 goto __label_5
+    WSubId_28("Unfinished argument list", $P1)
+  __label_5: # endif
+    .return($P2)
+
+.end # parseListOrEmpty
+
+
+.sub 'parseIdentifier' :subid('WSubId_96')
+        .param pmc __ARG_1
+        .param pmc __ARG_2
+.const 'Sub' WSubId_30 = "WSubId_30"
     $P1 = __ARG_1.'get'()
     $P2 = $P1.'isidentifier'()
     if $P2 goto __label_1
-    WSubId_32($P1)
+    WSubId_30($P1)
   __label_1: # endif
     .return($P1)
 
 .end # parseIdentifier
 
 
-.sub 'toIdentifierList' :subid('WSubId_96')
+.sub 'toIdentifierList' :subid('WSubId_95')
         .param pmc __ARG_1
 .const 'Sub' WSubId_5 = "WSubId_5"
     new $P1, ['ResizableStringArray']
@@ -3986,12 +3756,12 @@
 
 .sub 'clone' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     typeof $P1, self
     set $S1, $P1
     concat $S2, "Cannot use ", $S1
     concat $S2, $S2, " in inline (yet)"
-    WSubId_30($S2, self)
+    WSubId_28($S2, self)
 
 .end # clone
 
@@ -4103,7 +3873,7 @@
     getattribute $P2, self, 'pnull'
     unless_null $P2, __label_3
     getattribute $P4, self, 'owner'
-    $P3 = $P4.'tempreg'('P')
+    $P3 = $P4.'tempreg'("P")
     null $S2
     if_null $P3, __label_4
     set $S2, $P3
@@ -4134,9 +3904,9 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param string __ARG_3
-.const 'Sub' WSubId_76 = "WSubId_76"
-.const 'Sub' WSubId_77 = "WSubId_77"
-    $P2 = WSubId_76(__ARG_1, __ARG_2, WSubId_77, __ARG_3)
+.const 'Sub' WSubId_73 = "WSubId_73"
+.const 'Sub' WSubId_74 = "WSubId_74"
+    $P2 = WSubId_73(__ARG_1, __ARG_2, WSubId_74, __ARG_3)
     setattribute self, 'args', $P2
 
 .end # SimpleArgList
@@ -4242,7 +4012,7 @@
 .sub 'emitargs' :method
         .param pmc __ARG_1
     $P1 = self.'getargvalues'(__ARG_1)
-    join $S1, ', ', $P1
+    join $S1, ", ", $P1
     __ARG_1.'print'($S1)
 
 .end # emitargs
@@ -4294,12 +4064,12 @@
 
 .sub 'getarg' :method
         .param int __ARG_1
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     getattribute $P1, self, 'args'
     $P2 = $P1.'numargs'()
     set $I1, $P2
     lt __ARG_1, $I1, __label_1
-    WSubId_35('Wrong modifier arg number')
+    WSubId_33("Wrong modifier arg number")
   __label_1: # endif
     .tailcall $P1.'getarg'(__ARG_1)
 
@@ -4335,7 +4105,7 @@
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'parseModifier' :subid('WSubId_78')
+.sub 'parseModifier' :subid('WSubId_75')
         .param pmc __ARG_1
         .param pmc __ARG_2
     $P1 = __ARG_1.'get'()
@@ -4346,11 +4116,11 @@
   __label_1:
     $P1 = __ARG_1.'get'()
     null $P2
-    $P3 = $P1.'isop'('(')
+    $P3 = $P1.'isop'("(")
     if_null $P3, __label_2
     unless $P3 goto __label_2
     new $P4, [ 'Winxed'; 'Compiler'; 'SimpleArgList' ]
-    $P4.'SimpleArgList'(__ARG_1, __ARG_2, ')')
+    $P4.'SimpleArgList'(__ARG_1, __ARG_2, ")")
     set $P2, $P4
     goto __label_3
   __label_2: # else
@@ -4368,9 +4138,9 @@
 .sub 'ModifierList' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_76 = "WSubId_76"
-.const 'Sub' WSubId_78 = "WSubId_78"
-    $P2 = WSubId_76(__ARG_1, __ARG_2, WSubId_78, ']')
+.const 'Sub' WSubId_73 = "WSubId_73"
+.const 'Sub' WSubId_75 = "WSubId_75"
+    $P2 = WSubId_73(__ARG_1, __ARG_2, WSubId_75, "]")
     setattribute self, 'list', $P2
 
 .end # ModifierList
@@ -4480,18 +4250,18 @@
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'parseUsing' :subid('WSubId_82')
+.sub 'parseUsing' :subid('WSubId_80')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
     $P1 = __ARG_2.'get'()
-    $P2 = $P1.'iskeyword'('extern')
+    $P2 = $P1.'iskeyword'("extern")
     set $I1, $P2
     if $I1 goto __label_3
-    $P3 = $P1.'iskeyword'('static')
+    $P3 = $P1.'iskeyword'("static")
     set $I1, $P3
     if $I1 goto __label_4
-    $P4 = $P1.'iskeyword'('namespace')
+    $P4 = $P1.'iskeyword'("namespace")
     set $I1, $P4
     if $I1 goto __label_5
     goto __label_2
@@ -4521,21 +4291,21 @@
 .end # parseUsing
 
 
-.sub 'parseSig' :subid('WSubId_81')
+.sub 'parseSig' :subid('WSubId_77')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_79 = "WSubId_79"
-.const 'Sub' WSubId_77 = "WSubId_77"
+.const 'Sub' WSubId_76 = "WSubId_76"
+.const 'Sub' WSubId_74 = "WSubId_74"
     new $P4, [ 'Winxed'; 'Compiler'; 'SigParameterList' ]
     $P4.'SigParameterList'(__ARG_2, __ARG_3)
     set $P1, $P4
     $P2 = __ARG_2.'get'()
-    $P4 = $P2.'isop'('=')
+    $P4 = $P2.'isop'("=")
     if $P4 goto __label_1
-    WSubId_79("'='", $P2)
+    WSubId_76("'='", $P2)
   __label_1: # endif
-    $P3 = WSubId_77(__ARG_2, __ARG_3)
+    $P3 = WSubId_74(__ARG_2, __ARG_3)
     new $P5, [ 'Winxed'; 'Compiler'; 'MultiAssignStatement' ]
     $P5.'MultiAssignStatement'(__ARG_1, __ARG_3, $P1, $P3)
     set $P4, $P5
@@ -4544,10 +4314,10 @@
 .end # parseSig
 
 
-.sub 'parseClassSpecifier' :subid('WSubId_102')
+.sub 'parseClassSpecifier' :subid('WSubId_103')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     $P1 = __ARG_1.'get'()
     $P2 = $P1.'isstring'()
     if_null $P2, __label_1
@@ -4557,7 +4327,7 @@
     set $P3, $P4
     .return($P3)
   __label_1: # endif
-    $P2 = $P1.'isop'('[')
+    $P2 = $P1.'isop'("[")
     if_null $P2, __label_2
     unless $P2 goto __label_2
     new $P4, [ 'Winxed'; 'Compiler'; 'ClassSpecifierParrotKey' ]
@@ -4573,14 +4343,18 @@
     set $P3, $P4
     .return($P3)
   __label_3: # endif
-    WSubId_30('Invalid class', $P1)
+    WSubId_28("Invalid class", $P1)
 
 .end # parseClassSpecifier
 
 
-.sub 'parseStatement' :subid('WSubId_135')
+.sub 'parseStatement' :subid('WSubId_134')
         .param pmc __ARG_1
         .param pmc __ARG_2
+.const 'Sub' WSubId_77 = "WSubId_77"
+.const 'Sub' WSubId_78 = "WSubId_78"
+.const 'Sub' WSubId_31 = "WSubId_31"
+.const 'Sub' WSubId_79 = "WSubId_79"
 .const 'Sub' WSubId_80 = "WSubId_80"
 .const 'Sub' WSubId_81 = "WSubId_81"
 .const 'Sub' WSubId_82 = "WSubId_82"
@@ -4592,181 +4366,207 @@
 .const 'Sub' WSubId_88 = "WSubId_88"
 .const 'Sub' WSubId_89 = "WSubId_89"
 .const 'Sub' WSubId_90 = "WSubId_90"
-.const 'Sub' WSubId_91 = "WSubId_91"
-.const 'Sub' WSubId_92 = "WSubId_92"
     $P1 = __ARG_1.'get'()
     null $P2
-    $P6 = $P1.'isop'(';')
-    if_null $P6, __label_1
-    unless $P6 goto __label_1
-    new $P7, [ 'Winxed'; 'Compiler'; 'EmptyStatement' ]
-    .return($P7)
+    $P10 = $P1.'isop'(";")
+    if_null $P10, __label_1
+    unless $P10 goto __label_1
+    new $P11, [ 'Winxed'; 'Compiler'; 'EmptyStatement' ]
+    .return($P11)
   __label_1: # endif
-    $P6 = $P1.'isop'('{')
-    if_null $P6, __label_2
-    unless $P6 goto __label_2
-    new $P8, [ 'Winxed'; 'Compiler'; 'CompoundStatement' ]
-    $P8.'CompoundStatement'($P1, __ARG_1, __ARG_2)
-    set $P7, $P8
-    .return($P7)
-  __label_2: # endif
-    $P6 = $P1.'isop'('${')
-    if_null $P6, __label_3
-    unless $P6 goto __label_3
-    new $P8, [ 'Winxed'; 'Compiler'; 'PiropStatement' ]
-    $P8.'PiropStatement'($P1, __ARG_1, __ARG_2)
-    set $P7, $P8
-    .return($P7)
-  __label_3: # endif
-    $P6 = $P1.'isop'(':')
-    if_null $P6, __label_4
-    unless $P6 goto __label_4
-    $P3 = __ARG_1.'get'()
-    $P6 = $P3.'isop'('(')
-    if $P6 goto __label_5
-    WSubId_80("':'", $P1)
-  __label_5: # endif
-    .tailcall WSubId_81($P1, __ARG_1, __ARG_2)
-  __label_4: # endif
-    $P6 = $P1.'checkkeyword'()
-    set $S1, $P6
-    if $S1 == 'using' goto __label_8
-    if $S1 == 'const' goto __label_9
-    if $S1 == 'volatile' goto __label_10
-    if $S1 == 'var' goto __label_11
-    if $S1 == 'string' goto __label_12
-    if $S1 == 'int' goto __label_13
-    if $S1 == 'float' goto __label_14
-    if $S1 == 'return' goto __label_15
-    if $S1 == 'yield' goto __label_16
-    if $S1 == 'goto' goto __label_17
-    if $S1 == 'if' goto __label_18
-    if $S1 == 'while' goto __label_19
-    if $S1 == 'do' goto __label_20
-    if $S1 == 'continue' goto __label_21
-    if $S1 == 'break' goto __label_22
-    if $S1 == 'switch' goto __label_23
-    if $S1 == 'for' goto __label_24
-    if $S1 == 'throw' goto __label_25
-    if $S1 == 'try' goto __label_26
-    if $S1 == 'inline' goto __label_27
-    goto __label_6
-  __label_8: # case
-    .tailcall WSubId_82($P1, __ARG_1, __ARG_2)
-  __label_9: # case
-    .tailcall WSubId_83($P1, __ARG_1, __ARG_2)
-    goto __label_7 # break
-  __label_10: # case
-    .tailcall WSubId_84($P1, __ARG_1, __ARG_2)
-    goto __label_7 # break
-  __label_11: # case
-    $P2 = __ARG_1.'get'()
-    __ARG_1.'unget'($P2)
-    $P7 = $P2.'isop'("(")
-    if $P7 goto __label_28
-    .tailcall WSubId_85($P1, __ARG_1, __ARG_2)
-  __label_28: # endif
-    goto __label_7 # break
-  __label_12: # case
-    $P2 = __ARG_1.'get'()
-    __ARG_1.'unget'($P2)
-    $P8 = $P2.'isop'("(")
-    if $P8 goto __label_29
-    .tailcall WSubId_86($P1, __ARG_1, __ARG_2)
-  __label_29: # endif
-    goto __label_7 # break
-  __label_13: # case
-    $P2 = __ARG_1.'get'()
-    __ARG_1.'unget'($P2)
-    $P9 = $P2.'isop'("(")
-    if $P9 goto __label_30
-    .tailcall WSubId_87($P1, __ARG_1, __ARG_2)
-  __label_30: # endif
-    goto __label_7 # break
-  __label_14: # case
-    $P2 = __ARG_1.'get'()
-    __ARG_1.'unget'($P2)
-    $P10 = $P2.'isop'("(")
-    if $P10 goto __label_31
-    .tailcall WSubId_88($P1, __ARG_1, __ARG_2)
-  __label_31: # endif
-    goto __label_7 # break
-  __label_15: # case
-    .tailcall WSubId_89($P1, __ARG_1, __ARG_2)
-  __label_16: # case
-    new $P12, [ 'Winxed'; 'Compiler'; 'YieldStatement' ]
-    $P12.'YieldStatement'($P1, __ARG_1, __ARG_2)
+    $P10 = $P1.'isop'("{")
+    if_null $P10, __label_2
+    unless $P10 goto __label_2
+    new $P12, [ 'Winxed'; 'Compiler'; 'CompoundStatement' ]
+    $P12.'CompoundStatement'($P1, __ARG_1, __ARG_2)
     set $P11, $P12
     .return($P11)
+  __label_2: # endif
+    $P10 = $P1.'isop'("${")
+    if_null $P10, __label_3
+    unless $P10 goto __label_3
+    new $P12, [ 'Winxed'; 'Compiler'; 'PiropStatement' ]
+    $P12.'PiropStatement'($P1, __ARG_1, __ARG_2)
+    set $P11, $P12
+    .return($P11)
+  __label_3: # endif
+    $P10 = $P1.'isop'(":")
+    if_null $P10, __label_4
+    unless $P10 goto __label_4
+    $P3 = __ARG_1.'get'()
+    $P10 = $P3.'isop'("(")
+    set $I1, $P10
+    if $I1 goto __label_7
+    $P11 = $P3.'isidentifier'()
+    set $I1, $P11
+    if $I1 goto __label_8
+    goto __label_6
+  __label_7: # case
+    .tailcall WSubId_77($P1, __ARG_1, __ARG_2)
+  __label_8: # case
+    new $P12, [ 'Winxed'; 'Compiler'; 'ClassSpecifierId' ]
+    $P12.'ClassSpecifierId'(__ARG_1, __ARG_2, $P3)
+    set $P4, $P12
+    $P5 = __ARG_1.'get'()
+    WSubId_78($P5)
+    new $P6, [ 'Winxed'; 'Compiler'; 'VarStatement' ]
+    $P6.'initvarbase'($P5, __ARG_2, $P5, 0)
+    new $P7, [ 'Winxed'; 'Compiler'; 'NewQualifiedExpr' ]
+    $P7.'Expr'($P6, $P5)
+    setattribute $P7, 'nskey', $P4
+    $P1 = __ARG_1.'get'()
+    $P14 = $P1.'isop'("(")
+    if_null $P14, __label_9
+    unless $P14 goto __label_9
+    $P7.'parseinitializer'(__ARG_1)
+    $P1 = __ARG_1.'get'()
+  __label_9: # endif
+    WSubId_31(";", $P1)
+    setattribute $P6, 'init', $P7
+    .return($P6)
+  __label_6: # default
+    WSubId_79("':'", $P1)
+  __label_5: # switch end
+  __label_4: # endif
+    $P10 = $P1.'checkkeyword'()
+    set $S1, $P10
+    if $S1 == "using" goto __label_12
+    if $S1 == "const" goto __label_13
+    if $S1 == "volatile" goto __label_14
+    if $S1 == "var" goto __label_15
+    if $S1 == "string" goto __label_16
+    if $S1 == "int" goto __label_17
+    if $S1 == "float" goto __label_18
+    if $S1 == "return" goto __label_19
+    if $S1 == "yield" goto __label_20
+    if $S1 == "goto" goto __label_21
+    if $S1 == "if" goto __label_22
+    if $S1 == "while" goto __label_23
+    if $S1 == "do" goto __label_24
+    if $S1 == "continue" goto __label_25
+    if $S1 == "break" goto __label_26
+    if $S1 == "switch" goto __label_27
+    if $S1 == "for" goto __label_28
+    if $S1 == "throw" goto __label_29
+    if $S1 == "try" goto __label_30
+    if $S1 == "inline" goto __label_31
+    goto __label_10
+  __label_12: # case
+    .tailcall WSubId_80($P1, __ARG_1, __ARG_2)
+  __label_13: # case
+    .tailcall WSubId_81($P1, __ARG_1, __ARG_2)
+    goto __label_11 # break
+  __label_14: # case
+    .tailcall WSubId_82($P1, __ARG_1, __ARG_2)
+    goto __label_11 # break
+  __label_15: # case
+    $P2 = __ARG_1.'get'()
+    __ARG_1.'unget'($P2)
+    $P11 = $P2.'isop'("(")
+    if $P11 goto __label_32
+    .tailcall WSubId_83($P1, __ARG_1, __ARG_2)
+  __label_32: # endif
+    goto __label_11 # break
+  __label_16: # case
+    $P2 = __ARG_1.'get'()
+    __ARG_1.'unget'($P2)
+    $P12 = $P2.'isop'("(")
+    if $P12 goto __label_33
+    .tailcall WSubId_84($P1, __ARG_1, __ARG_2)
+  __label_33: # endif
+    goto __label_11 # break
   __label_17: # case
-    .tailcall WSubId_90($P1, __ARG_1, __ARG_2)
+    $P2 = __ARG_1.'get'()
+    __ARG_1.'unget'($P2)
+    $P13 = $P2.'isop'("(")
+    if $P13 goto __label_34
+    .tailcall WSubId_85($P1, __ARG_1, __ARG_2)
+  __label_34: # endif
+    goto __label_11 # break
   __label_18: # case
-    new $P14, [ 'Winxed'; 'Compiler'; 'IfStatement' ]
-    $P14.'IfStatement'($P1, __ARG_1, __ARG_2)
-    set $P13, $P14
-    .return($P13)
+    $P2 = __ARG_1.'get'()
+    __ARG_1.'unget'($P2)
+    $P14 = $P2.'isop'("(")
+    if $P14 goto __label_35
+    .tailcall WSubId_86($P1, __ARG_1, __ARG_2)
+  __label_35: # endif
+    goto __label_11 # break
   __label_19: # case
-    new $P16, [ 'Winxed'; 'Compiler'; 'WhileStatement' ]
-    $P16.'WhileStatement'($P1, __ARG_1, __ARG_2)
+    .tailcall WSubId_87($P1, __ARG_1, __ARG_2)
+  __label_20: # case
+    new $P16, [ 'Winxed'; 'Compiler'; 'YieldStatement' ]
+    $P16.'YieldStatement'($P1, __ARG_1, __ARG_2)
     set $P15, $P16
     .return($P15)
-  __label_20: # case
-    new $P18, [ 'Winxed'; 'Compiler'; 'DoStatement' ]
-    $P18.'DoStatement'($P1, __ARG_1, __ARG_2)
+  __label_21: # case
+    .tailcall WSubId_88($P1, __ARG_1, __ARG_2)
+  __label_22: # case
+    new $P18, [ 'Winxed'; 'Compiler'; 'IfStatement' ]
+    $P18.'IfStatement'($P1, __ARG_1, __ARG_2)
     set $P17, $P18
     .return($P17)
-  __label_21: # case
-    new $P20, [ 'Winxed'; 'Compiler'; 'ContinueStatement' ]
-    $P20.'ContinueStatement'($P1, __ARG_1, __ARG_2)
+  __label_23: # case
+    new $P20, [ 'Winxed'; 'Compiler'; 'WhileStatement' ]
+    $P20.'WhileStatement'($P1, __ARG_1, __ARG_2)
     set $P19, $P20
     .return($P19)
-  __label_22: # case
-    new $P22, [ 'Winxed'; 'Compiler'; 'BreakStatement' ]
-    $P22.'BreakStatement'($P1, __ARG_1, __ARG_2)
+  __label_24: # case
+    new $P22, [ 'Winxed'; 'Compiler'; 'DoStatement' ]
+    $P22.'DoStatement'($P1, __ARG_1, __ARG_2)
     set $P21, $P22
     .return($P21)
-  __label_23: # case
-    .tailcall WSubId_91($P1, __ARG_1, __ARG_2)
-  __label_24: # case
-    .tailcall WSubId_92($P1, __ARG_1, __ARG_2)
   __label_25: # case
-    new $P24, [ 'Winxed'; 'Compiler'; 'ThrowStatement' ]
-    $P24.'ThrowStatement'($P1, __ARG_1, __ARG_2)
+    new $P24, [ 'Winxed'; 'Compiler'; 'ContinueStatement' ]
+    $P24.'ContinueStatement'($P1, __ARG_1, __ARG_2)
     set $P23, $P24
     .return($P23)
   __label_26: # case
-    new $P26, [ 'Winxed'; 'Compiler'; 'TryStatement' ]
-    $P26.'TryStatement'($P1, __ARG_1, __ARG_2)
+    new $P26, [ 'Winxed'; 'Compiler'; 'BreakStatement' ]
+    $P26.'BreakStatement'($P1, __ARG_1, __ARG_2)
     set $P25, $P26
     .return($P25)
   __label_27: # case
-    new $P27, [ 'Winxed'; 'Compiler'; 'InlineStatement' ]
-    $P27.'InlineStatement'($P1, __ARG_1, __ARG_2)
-    set $P4, $P27
-    __ARG_2.'addinline'($P4)
-    new $P28, [ 'Winxed'; 'Compiler'; 'EmptyStatement' ]
-    .return($P28)
-  __label_6: # default
-  __label_7: # switch end
-    $P6 = $P1.'isidentifier'()
-    if_null $P6, __label_32
-    unless $P6 goto __label_32
-    $P5 = __ARG_1.'get'()
-    $P6 = $P5.'isop'(':')
-    if_null $P6, __label_33
-    unless $P6 goto __label_33
-    new $P8, [ 'Winxed'; 'Compiler'; 'LabelStatement' ]
-    $P8.'LabelStatement'($P1, __ARG_2)
-    set $P7, $P8
-    .return($P7)
-  __label_33: # endif
-    __ARG_1.'unget'($P5)
-  __label_32: # endif
+    .tailcall WSubId_89($P1, __ARG_1, __ARG_2)
+  __label_28: # case
+    .tailcall WSubId_90($P1, __ARG_1, __ARG_2)
+  __label_29: # case
+    new $P28, [ 'Winxed'; 'Compiler'; 'ThrowStatement' ]
+    $P28.'ThrowStatement'($P1, __ARG_1, __ARG_2)
+    set $P27, $P28
+    .return($P27)
+  __label_30: # case
+    new $P30, [ 'Winxed'; 'Compiler'; 'TryStatement' ]
+    $P30.'TryStatement'($P1, __ARG_1, __ARG_2)
+    set $P29, $P30
+    .return($P29)
+  __label_31: # case
+    new $P31, [ 'Winxed'; 'Compiler'; 'InlineStatement' ]
+    $P31.'InlineStatement'($P1, __ARG_1, __ARG_2)
+    set $P8, $P31
+    __ARG_2.'addinline'($P8)
+    new $P32, [ 'Winxed'; 'Compiler'; 'EmptyStatement' ]
+    .return($P32)
+  __label_10: # default
+  __label_11: # switch end
+    $P10 = $P1.'isidentifier'()
+    if_null $P10, __label_36
+    unless $P10 goto __label_36
+    $P9 = __ARG_1.'get'()
+    $P10 = $P9.'isop'(":")
+    if_null $P10, __label_37
+    unless $P10 goto __label_37
+    new $P12, [ 'Winxed'; 'Compiler'; 'LabelStatement' ]
+    $P12.'LabelStatement'($P1, __ARG_2)
+    set $P11, $P12
+    .return($P11)
+  __label_37: # endif
+    __ARG_1.'unget'($P9)
+  __label_36: # endif
     __ARG_1.'unget'($P1)
-    new $P7, [ 'Winxed'; 'Compiler'; 'ExprStatement' ]
-    $P7.'ExprStatement'($P1, __ARG_1, __ARG_2)
-    set $P6, $P7
-    .return($P6)
+    new $P11, [ 'Winxed'; 'Compiler'; 'ExprStatement' ]
+    $P11.'ExprStatement'($P1, __ARG_1, __ARG_2)
+    set $P10, $P11
+    .return($P10)
 
 .end # parseStatement
 
@@ -4933,9 +4733,9 @@
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     getattribute $P1, self, 'start'
-    WSubId_35('**checking**', $P1)
+    WSubId_33("**checking**", $P1)
     .return(self)
 
 .end # optimize
@@ -4962,8 +4762,8 @@
 
 .sub 'annotate' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_35 = "WSubId_35"
-    WSubId_35('Attempt to annotate empty statement')
+.const 'Sub' WSubId_33 = "WSubId_33"
+    WSubId_33("Attempt to annotate empty statement")
 
 .end # annotate
 
@@ -5109,20 +4909,20 @@
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'parsePiropArg' :subid('WSubId_93')
+.sub 'parsePiropArg' :subid('WSubId_92')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_30 = "WSubId_30"
-.const 'Sub' WSubId_77 = "WSubId_77"
+.const 'Sub' WSubId_28 = "WSubId_28"
+.const 'Sub' WSubId_74 = "WSubId_74"
     null $P1
     $P2 = __ARG_1.'get'()
-    $P3 = $P2.'isop'(':')
+    $P3 = $P2.'isop'(":")
     if_null $P3, __label_1
     unless $P3 goto __label_1
     $P2 = __ARG_1.'get'()
     $P3 = $P2.'isidentifier'()
     if $P3 goto __label_3
-    WSubId_30("Label expected", $P2)
+    WSubId_28("Label expected", $P2)
   __label_3: # endif
     new $P3, [ 'Winxed'; 'Compiler'; 'Reflabel' ]
     $P3.'Reflabel'(__ARG_2, $P2)
@@ -5130,7 +4930,7 @@
     goto __label_2
   __label_1: # else
     __ARG_1.'unget'($P2)
-    $P1 = WSubId_77(__ARG_1, __ARG_2)
+    $P1 = WSubId_74(__ARG_1, __ARG_2)
   __label_2: # endif
     .return($P1)
 
@@ -5142,12 +4942,12 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_76 = "WSubId_76"
+.const 'Sub' WSubId_91 = "WSubId_91"
+.const 'Sub' WSubId_92 = "WSubId_92"
 .const 'Sub' WSubId_93 = "WSubId_93"
-.const 'Sub' WSubId_94 = "WSubId_94"
     self.'Statement'(__ARG_1, __ARG_3)
     $P1 = __ARG_2.'get'()
-    $P2 = $P1.'isop'('.')
+    $P2 = $P1.'isop'(".")
     set $I1, $P2
     unless $I1 goto __label_1
     $P1 = __ARG_2.'get'()
@@ -5158,22 +4958,17 @@
     set $S1, $P2
   __label_2:
     unless $I1 goto __label_4
-    set $S2, '.'
+    set $S2, "."
     goto __label_3
   __label_4:
-    set $S2, ''
+    set $S2, ""
   __label_3:
     concat $S3, $S2, $S1
     box $P2, $S3
     setattribute self, 'opname', $P2
-    $P1 = __ARG_2.'get'()
-    $P2 = $P1.'isop'('}')
-    if $P2 goto __label_5
-    __ARG_2.'unget'($P1)
-    $P3 = WSubId_76(__ARG_2, __ARG_3, WSubId_93, '}')
+    $P3 = WSubId_91(__ARG_2, __ARG_3, WSubId_92, "}")
     setattribute self, 'args', $P3
-  __label_5: # endif
-    WSubId_94(';', __ARG_2)
+    WSubId_93(";", __ARG_2)
 
 .end # PiropStatement
 
@@ -5250,10 +5045,10 @@
     $P6 = __ARG_1.'getDebug'()
     if_null $P6, __label_2
     unless $P6 goto __label_2
-    __ARG_1.'comment'('pirop ', $S1)
+    __ARG_1.'comment'("pirop ", $S1)
   __label_2: # endif
     getattribute $P1, self, 'args'
-    __ARG_1.'print'('    ')
+    __ARG_1.'print'("    ")
     unless_null $P1, __label_3
     __ARG_1.'say'($S1)
     goto __label_4
@@ -5275,8 +5070,8 @@
     set $P7, $P3
   __label_5:
     set $P6, $P7
-    join $S2, ', ', $P6
-    __ARG_1.'say'($S1, ' ', $S2)
+    join $S2, ", ", $P6
+    __ARG_1.'say'($S1, " ", $S2)
   __label_4: # endif
 
 .end # emit
@@ -5294,19 +5089,19 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_95 = "WSubId_95"
-.const 'Sub' WSubId_32 = "WSubId_32"
 .const 'Sub' WSubId_94 = "WSubId_94"
-.const 'Sub' WSubId_96 = "WSubId_96"
+.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_93 = "WSubId_93"
+.const 'Sub' WSubId_95 = "WSubId_95"
     self.'Statement'(__ARG_1, __ARG_3)
-    $P1 = WSubId_95(__ARG_2)
+    $P1 = WSubId_94(__ARG_2)
     elements $I1, $P1
     if $I1 goto __label_1
     $P2 = __ARG_2.'get'()
-    WSubId_32($P2)
+    WSubId_30($P2)
   __label_1: # endif
-    WSubId_94(';', __ARG_2)
-    $P3 = WSubId_96($P1)
+    WSubId_93(";", __ARG_2)
+    $P3 = WSubId_95($P1)
     setattribute self, 'path', $P3
     .return(self)
 
@@ -5323,8 +5118,8 @@
         .param pmc __ARG_1
     self.'annotate'(__ARG_1)
     getattribute $P1, self, 'path'
-    join $S1, '/', $P1
-    __ARG_1.'say'('    ', "load_bytecode '", $S1, ".pbc'")
+    join $S1, "/", $P1
+    __ARG_1.'say'("    ", "load_bytecode '", $S1, ".pbc'")
 
 .end # emit
 
@@ -5340,11 +5135,11 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_76 = "WSubId_76"
-.const 'Sub' WSubId_97 = "WSubId_97"
+.const 'Sub' WSubId_73 = "WSubId_73"
+.const 'Sub' WSubId_96 = "WSubId_96"
     self.'Statement'(__ARG_1, __ARG_3)
     null $P3
-    $P1 = WSubId_76(__ARG_2, $P3, WSubId_97, ';')
+    $P1 = WSubId_73(__ARG_2, $P3, WSubId_96, ";")
     if_null $P1, __label_2
     iter $P4, $P1
     set $P4, 0
@@ -5356,7 +5151,7 @@
     if_null $P3, __label_3
     set $S1, $P3
   __label_3:
-    self.'createvarnamed'($P2, 'P', $S1)
+    self.'createvarnamed'($P2, "P", $S1)
     goto __label_1
   __label_2: # endfor
     setattribute self, 'names', $P1
@@ -5400,17 +5195,17 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_95 = "WSubId_95"
-.const 'Sub' WSubId_32 = "WSubId_32"
 .const 'Sub' WSubId_94 = "WSubId_94"
+.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_93 = "WSubId_93"
     self.'Statement'(__ARG_1, __ARG_3)
-    $P1 = WSubId_95(__ARG_2)
+    $P1 = WSubId_94(__ARG_2)
     elements $I1, $P1
     if $I1 goto __label_1
     $P2 = __ARG_2.'get'()
-    WSubId_32($P2)
+    WSubId_30($P2)
   __label_1: # endif
-    WSubId_94(';', __ARG_2)
+    WSubId_93(";", __ARG_2)
     setattribute self, 'path', $P1
 
 .end # UsingStatement
@@ -5446,14 +5241,14 @@
     if_null $P6, __label_8
     set $S1, $P6
   __label_8:
-    self.'createvarnamed'($P2, 'P', $S1)
+    self.'createvarnamed'($P2, "P", $S1)
     box $P7, $S1
     setattribute self, 'subid', $P7
     self.'usesubid'($S1)
     .return(self)
   __label_2: # default
   __label_1: # switch end
-    self.'createvar'($P2, 'P')
+    self.'createvar'($P2, "P")
     .return(self)
 
 .end # optimize
@@ -5462,29 +5257,30 @@
 .sub 'emit' :method
         .param pmc __ARG_1
     getattribute $P1, self, 'path'
-    $S1 = $P1[-1]
-    $P2 = self.'getvar'($S1)
-    getattribute $P4, self, 'subid'
-    unless_null $P4, __label_1
+    $P2 = $P1[-1]
+    $P3 = self.'getvar'($P2)
+    getattribute $P5, self, 'subid'
+    unless_null $P5, __label_1
     self.'annotate'(__ARG_1)
-    null $S2
+    null $S1
     elements $I1, $P1
     le $I1, 1, __label_2
     $P1.'pop'()
-    set $P3, $P1
-    null $S3
-    elements $I1, $P3
+    set $P4, $P1
+    null $S2
+    elements $I1, $P4
     unless $I1 goto __label_4
-    join $S4, "'; '", $P3
-    concat $S5, "[ '", $S4
-    concat $S5, $S5, "' ]"
-    set $S3, $S5
+    join $S3, "'; '", $P4
+    concat $S4, "[ '", $S3
+    concat $S4, $S4, "' ]"
+    set $S2, $S4
   __label_4: # endif
-    set $S2, $S3
+    set $S1, $S2
   __label_3:
   __label_2: # endif
-    $P4 = $P2.'getreg'()
-    __ARG_1.'emitget_hll_global'($P4, $S1, $S2)
+    $P5 = $P3.'getreg'()
+    $P6 = $P2.'getidentifier'()
+    __ARG_1.'emitget_hll_global'($P5, $P6, $S1)
   __label_1: # endif
 
 .end # emit
@@ -5498,21 +5294,21 @@
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'usingNamespace' :subid('WSubId_98')
+.sub 'usingNamespace' :subid('WSubId_97')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_95 = "WSubId_95"
-.const 'Sub' WSubId_79 = "WSubId_79"
-.const 'Sub' WSubId_30 = "WSubId_30"
-    $P1 = WSubId_95(__ARG_2)
+.const 'Sub' WSubId_94 = "WSubId_94"
+.const 'Sub' WSubId_76 = "WSubId_76"
+.const 'Sub' WSubId_28 = "WSubId_28"
+    $P1 = WSubId_94(__ARG_2)
     elements $I1, $P1
     if $I1 goto __label_1
-    WSubId_79('namespace identifier', __ARG_1)
+    WSubId_76("namespace identifier", __ARG_1)
   __label_1: # endif
     $P2 = __ARG_3.'scopesearch'($P1, 1)
     unless_null $P2, __label_2
-    WSubId_30('unknow namespace', __ARG_1)
+    WSubId_28("unknow namespace", __ARG_1)
   __label_2: # endif
     __ARG_3.'usenamespace'($P2)
 
@@ -5524,11 +5320,11 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_98 = "WSubId_98"
-.const 'Sub' WSubId_94 = "WSubId_94"
-    self.'Statement'(__ARG_2, __ARG_3)
-    WSubId_98(__ARG_1, __ARG_2, __ARG_3)
-    WSubId_94(';', __ARG_2)
+.const 'Sub' WSubId_97 = "WSubId_97"
+.const 'Sub' WSubId_93 = "WSubId_93"
+    self.'Statement'(__ARG_1, __ARG_3)
+    WSubId_97(__ARG_1, __ARG_2, __ARG_3)
+    WSubId_93(";", __ARG_2)
 
 .end # UsingNamespaceStatement
 
@@ -5555,10 +5351,10 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_76 = "WSubId_76"
-.const 'Sub' WSubId_77 = "WSubId_77"
+.const 'Sub' WSubId_73 = "WSubId_73"
+.const 'Sub' WSubId_74 = "WSubId_74"
     self.'Statement'(__ARG_1, __ARG_3)
-    $P2 = WSubId_76(__ARG_2, self, WSubId_77, ';')
+    $P2 = WSubId_73(__ARG_2, self, WSubId_74, ";")
     setattribute self, 'expr', $P2
 
 .end # ExprStatement
@@ -5744,7 +5540,7 @@
     unless $I1 goto __label_1
     set $S2, $P1
     substr $S1, $S2, 0, 7
-    iseq $I1, $S1, 'WSubId_'
+    iseq $I1, $S1, "WSubId_"
   __label_1:
     .return($I1)
 
@@ -5768,9 +5564,9 @@
 
 
 .sub 'get_string' :method :vtable
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     getattribute $P1, self, 'name'
-    WSubId_35('Attempt to use unexpanded constant!!!', $P1)
+    WSubId_33("Attempt to use unexpanded constant!!!", $P1)
 
 .end # get_string
 
@@ -5801,10 +5597,10 @@
 
 .sub 'setvalue' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     getattribute $P1, self, 'value'
     if_null $P1, __label_1
-    WSubId_35('Attempt change value of constant!!!')
+    WSubId_33("Attempt change value of constant!!!")
   __label_1: # endif
     setattribute self, 'value', __ARG_1
 
@@ -5829,7 +5625,7 @@
         .param pmc __ARG_1
         .param string __ARG_2
         .param int __ARG_3 :optional
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_98 = "WSubId_98"
     getattribute $P1, self, 'locals'
     null $S1
     if_null __ARG_1, __label_1
@@ -5837,9 +5633,7 @@
   __label_1:
     $P2 = $P1[$S1]
     if_null $P2, __label_2
-    concat $S3, "Redeclared '", $S1
-    concat $S3, $S3, "'"
-    WSubId_30($S3, __ARG_1)
+    WSubId_98(__ARG_1)
   __label_2: # endif
     $P4 = self.'createreg'(__ARG_2)
     null $S2
@@ -5858,7 +5652,7 @@
 .sub 'createvarused' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_98 = "WSubId_98"
     getattribute $P1, self, 'locals'
     null $S1
     if_null __ARG_1, __label_1
@@ -5866,9 +5660,7 @@
   __label_1:
     $P2 = $P1[$S1]
     if_null $P2, __label_2
-    concat $S2, "Redeclared '", $S1
-    concat $S2, $S2, "'"
-    WSubId_30($S2, __ARG_1)
+    WSubId_98(__ARG_1)
   __label_2: # endif
     $P1[$S1] = __ARG_2
 
@@ -5879,7 +5671,7 @@
         .param pmc __ARG_1
         .param string __ARG_2
         .param string __ARG_3
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_98 = "WSubId_98"
     getattribute $P1, self, 'locals'
     null $S1
     if_null __ARG_1, __label_1
@@ -5887,9 +5679,7 @@
   __label_1:
     $P2 = $P1[$S1]
     if_null $P2, __label_2
-    concat $S2, "Redeclared '", $S1
-    concat $S2, $S2, "'"
-    WSubId_30($S2, __ARG_1)
+    WSubId_98(__ARG_1)
   __label_2: # endif
     new $P4, [ 'Winxed'; 'Compiler'; 'VarData' ]
     $P4.'VarData'(__ARG_2, __ARG_3, self, 0)
@@ -5903,7 +5693,7 @@
         .param pmc __ARG_1
         .param string __ARG_2
         .param int __ARG_3 :optional
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_98 = "WSubId_98"
     getattribute $P1, self, 'locals'
     null $S1
     if_null __ARG_1, __label_1
@@ -5911,9 +5701,7 @@
   __label_1:
     $P2 = $P1[$S1]
     if_null $P2, __label_2
-    concat $S2, "Redeclared '", $S1
-    concat $S2, $S2, "'"
-    WSubId_30($S2, __ARG_1)
+    WSubId_98(__ARG_1)
   __label_2: # endif
     new $P4, [ 'Winxed'; 'Compiler'; 'VarData_const' ]
     $P4.'VarData_const'(__ARG_2, __ARG_1, self, __ARG_3)
@@ -5991,7 +5779,7 @@
 
 
 .sub 'makelexicalself' :method
-    self.'setlex'("'__WLEX_self'", 'self')
+    self.'setlex'("'__WLEX_self'", "self")
     .return("'__WLEX_self'")
 
 .end # makelexicalself
@@ -6131,7 +5919,7 @@
 
 
 .sub 'tempreg' :method
-        .param pmc __ARG_1
+        .param string __ARG_1
     getattribute $P1, self, 'owner'
     .tailcall $P1.'tempreg'(__ARG_1)
 
@@ -6181,7 +5969,7 @@
 
 .sub 'emit_void' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     $P1 = self.'checkresult'()
     null $S1
     if_null $P1, __label_1
@@ -6213,7 +6001,7 @@
     concat $S3, "Unexcpected emit_void with type '", $S1
     concat $S3, $S3, "'"
     getattribute $P1, self, 'start'
-    WSubId_35($S3, $P1)
+    WSubId_33($S3, $P1)
   __label_3: # switch end
     self.'emit'(__ARG_1, $S2)
 
@@ -6236,8 +6024,8 @@
   __label_1:
     $P1 = self.'checkresult'()
     set $S3, $P1
-    eq $S3, 'I', __label_2
-    $P2 = self.'tempreg'('I')
+    eq $S3, "I", __label_2
+    $P2 = self.'tempreg'("I")
     null $S2
     if_null $P2, __label_3
     set $S2, $P2
@@ -6263,9 +6051,9 @@
     if_null $P1, __label_2
     set $S2, $P1
   __label_2:
-    eq $S1, 'P', __label_3
+    eq $S1, "P", __label_3
     set $S3, $S2
-    $P1 = self.'tempreg'('P')
+    $P1 = self.'tempreg'("P")
     set $S2, $P1
     __ARG_1.'emitbox'($S2, $S3)
   __label_3: # endif
@@ -6302,11 +6090,11 @@
 .namespace [ 'Winxed'; 'Compiler'; 'FinalExpr' ]
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     typeof $P1, self
     set $S1, $P1
     concat $S2, "misuse of ", $S1
-    WSubId_35($S2, self)
+    WSubId_33($S2, self)
 
 .end # optimize
 
@@ -6321,12 +6109,12 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_79 = "WSubId_79"
+.const 'Sub' WSubId_76 = "WSubId_76"
     self.'Expr'(__ARG_2, __ARG_3)
     $P1 = __ARG_1.'get'()
-    $P2 = $P1.'isop'('(')
+    $P2 = $P1.'isop'("(")
     if $P2 goto __label_1
-    WSubId_79('anonymous function', $P1)
+    WSubId_76("anonymous function", $P1)
   __label_1: # endif
     new $P4, [ 'Winxed'; 'Compiler'; 'LocalFunctionStatement' ]
     $P4.'LocalFunctionStatement'(__ARG_3, __ARG_1, __ARG_2)
@@ -6350,7 +6138,7 @@
 
 
 .sub 'checkresult' :method
-    .return('P')
+    .return("P")
 
 .end # checkresult
 
@@ -6380,7 +6168,7 @@
     $P2 = $P1.'needclosure'()
     if_null $P2, __label_2
     unless $P2 goto __label_2
-    __ARG_1.'emitarg2'('newclosure', __ARG_2, $S1)
+    __ARG_1.'emitarg2'("newclosure", __ARG_2, $S1)
     goto __label_3
   __label_2: # else
     __ARG_1.'emitset'(__ARG_2, $S1)
@@ -6406,8 +6194,8 @@
 .sub 'emit_if' :method
         .param pmc __ARG_1
         .param string __ARG_2
-.const 'Sub' WSubId_35 = "WSubId_35"
-    WSubId_35("Winxed.Compiler.ConditionFriendlyIf.emit_if not overriden", self)
+.const 'Sub' WSubId_33 = "WSubId_33"
+    WSubId_33("Winxed.Compiler.ConditionFriendlyIf.emit_if not overriden", self)
 
 .end # emit_if
 
@@ -6419,8 +6207,8 @@
 .sub 'emit_else' :method
         .param pmc __ARG_1
         .param string __ARG_2
-.const 'Sub' WSubId_35 = "WSubId_35"
-    WSubId_35("Winxed.Compiler.ConditionFriendlyElse.emit_else not overriden", self)
+.const 'Sub' WSubId_33 = "WSubId_33"
+    WSubId_33("Winxed.Compiler.ConditionFriendlyElse.emit_else not overriden", self)
 
 .end # emit_else
 
@@ -6486,7 +6274,7 @@
         .param pmc __ARG_1
         .param string __ARG_2
         .param string __ARG_3
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     getattribute $P1, self, 'condexpr'
     isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'ConditionFriendlyIf' ]
     unless $I1 goto __label_1
@@ -6517,7 +6305,7 @@
     __ARG_1.'emitif'($S1, __ARG_2)
     goto __label_5 # break
   __label_4: # default
-    WSubId_35('Invalid if condition')
+    WSubId_33("Invalid if condition")
   __label_5: # switch end
   __label_2: # endif
 
@@ -6527,7 +6315,7 @@
 .sub 'emit_else' :method
         .param pmc __ARG_1
         .param string __ARG_2
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     getattribute $P1, self, 'condexpr'
     isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'ConditionFriendlyElse' ]
     unless $I1 goto __label_1
@@ -6558,7 +6346,7 @@
     __ARG_1.'emitunless'($S1, __ARG_2)
     goto __label_5 # break
   __label_4: # default
-    WSubId_35('Invalid if condition')
+    WSubId_33("Invalid if condition")
   __label_5: # switch end
   __label_2: # endif
 
@@ -6592,102 +6380,15 @@
     get_class $P1, [ 'Winxed'; 'Compiler'; 'SimpleExpr' ]
     addparent $P0, $P1
 .end
-.namespace [ 'Winxed'; 'Compiler'; 'StringLiteral' ]
-
-.sub 'StringLiteral' :method
-        .param pmc __ARG_1
-        .param pmc __ARG_2
-    self.'Expr'(__ARG_1, __ARG_2)
-    setattribute self, 'strval', __ARG_2
-
-.end # StringLiteral
-
-
-.sub 'clone' :method
-        .param pmc __ARG_1
-    new $P2, [ 'Winxed'; 'Compiler'; 'StringLiteral' ]
-    getattribute $P3, self, 'strval'
-    $P2.'StringLiteral'(__ARG_1, $P3)
-    set $P1, $P2
-    .return($P1)
-
-.end # clone
-
-
-.sub 'isstringliteral' :method
-    .return(1)
-
-.end # isstringliteral
-
-
-.sub 'checkresult' :method
-    .return('S')
-
-.end # checkresult
-
-
-.sub 'getPirString' :method
-    getattribute $P1, self, 'strval'
-    $P2 = $P1.'getPirString'()
-    null $S1
-    if_null $P2, __label_1
-    set $S1, $P2
-  __label_1:
-    .return($S1)
-
-.end # getPirString
-
-
-.sub 'get_value' :method
-    getattribute $P1, self, 'strval'
-    getattribute $P2, $P1, 'str'
-    null $S1
-    if_null $P2, __label_1
-    set $S1, $P2
-  __label_1:
-    isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'TokenQuoted' ]
-    unless $I1 goto __label_2
-    $P0 = new ['String']
-    $P0 = $S1
-    $S1 = $P0.'unescape'('utf8')
-  __label_2: # endif
-    .return($S1)
-
-.end # get_value
-
-
-.sub 'emit' :method
-        .param pmc __ARG_1
-        .param string __ARG_2
-    $P1 = self.'getPirString'()
-    __ARG_1.'emitset'(__ARG_2, $P1)
-
-.end # emit
-
-
-.sub 'emit_get' :method
-        .param pmc __ARG_1
-    .tailcall self.'getPirString'()
-
-.end # emit_get
-
-.sub Winxed_class_init :anon :load :init
-    newclass $P0, [ 'Winxed'; 'Compiler'; 'StringLiteral' ]
-    get_class $P1, [ 'Winxed'; 'Compiler'; 'Literal' ]
-    addparent $P0, $P1
-    addattribute $P0, 'strval'
-.end
 .namespace [ 'Winxed'; 'Compiler'; 'IntegerLiteral' ]
 
 .sub 'IntegerLiteral' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-        .param pmc __ARG_3
+        .param int __ARG_3
     self.'Expr'(__ARG_1, __ARG_2)
-    setattribute self, 'pos', __ARG_2
-    set $I1, __ARG_3
-    box $P1, $I1
-    setattribute self, 'numval', $P1
+    box $P1, __ARG_3
+    setattribute self, 'intval', $P1
 
 .end # IntegerLiteral
 
@@ -6695,8 +6396,8 @@
 .sub 'clone' :method
         .param pmc __ARG_1
     new $P2, [ 'Winxed'; 'Compiler'; 'IntegerLiteral' ]
-    getattribute $P3, self, 'pos'
-    getattribute $P4, self, 'numval'
+    getattribute $P3, self, 'start'
+    getattribute $P4, self, 'intval'
     $P2.'IntegerLiteral'(__ARG_1, $P3, $P4)
     set $P1, $P2
     .return($P1)
@@ -6711,7 +6412,7 @@
 
 
 .sub 'isintegerzero' :method
-    getattribute $P1, self, 'numval'
+    getattribute $P1, self, 'intval'
     set $I2, $P1
     iseq $I1, $I2, 0
     .return($I1)
@@ -6720,24 +6421,59 @@
 
 
 .sub 'checkresult' :method
-    .return('I')
+    .return("I")
 
 .end # checkresult
 
 
 .sub 'getIntegerValue' :method
-    getattribute $P1, self, 'numval'
-    .return($P1)
+    getattribute $P1, self, 'intval'
+    set $I1, $P1
+    .return($I1)
 
 .end # getIntegerValue
 
 
 .sub 'getFloatValue' :method
-    $P1 = self.'getIntegerValue'()
+    getattribute $P1, self, 'intval'
     set $N1, $P1
     .return($N1)
 
 .end # getFloatValue
+
+
+.sub 'getStringValue' :method
+    getattribute $P1, self, 'intval'
+    set $S1, $P1
+    .return($S1)
+
+.end # getStringValue
+
+
+.sub 'getLiteralInteger' :method
+    .return(self)
+
+.end # getLiteralInteger
+
+
+.sub 'getLiteralFloat' :method
+.const 'Sub' WSubId_100 = "WSubId_100"
+    getattribute $P1, self, 'owner'
+    getattribute $P2, self, 'start'
+    getattribute $P3, self, 'intval'
+    .tailcall WSubId_100($P1, $P2, $P3)
+
+.end # getLiteralFloat
+
+
+.sub 'getLiteralString' :method
+.const 'Sub' WSubId_50 = "WSubId_50"
+    getattribute $P1, self, 'owner'
+    getattribute $P2, self, 'start'
+    getattribute $P3, self, 'intval'
+    .tailcall WSubId_50($P1, $P2, $P3)
+
+.end # getLiteralString
 
 
 .sub 'emit' :method
@@ -6772,8 +6508,7 @@
     newclass $P0, [ 'Winxed'; 'Compiler'; 'IntegerLiteral' ]
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Literal' ]
     addparent $P0, $P1
-    addattribute $P0, 'pos'
-    addattribute $P0, 'numval'
+    addattribute $P0, 'intval'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'FloatLiteral' ]
 
@@ -6804,9 +6539,17 @@
 
 
 .sub 'checkresult' :method
-    .return('N')
+    .return("N")
 
 .end # checkresult
+
+
+.sub 'getIntegerValue' :method
+    $P1 = self.'getFloatValue'()
+    set $I1, $P1
+    .return($I1)
+
+.end # getIntegerValue
 
 
 .sub 'getFloatValue' :method
@@ -6816,6 +6559,43 @@
     .return($N1)
 
 .end # getFloatValue
+
+
+.sub 'getStringValue' :method
+    $P1 = self.'getFloatValue'()
+    null $S1
+    if_null $P1, __label_1
+    set $S1, $P1
+  __label_1:
+    .return($S1)
+
+.end # getStringValue
+
+
+.sub 'getLiteralInteger' :method
+.const 'Sub' WSubId_47 = "WSubId_47"
+    getattribute $P1, self, 'owner'
+    getattribute $P2, self, 'start'
+    $P3 = self.'getFloatValue'()
+    .tailcall WSubId_47($P1, $P2, $P3)
+
+.end # getLiteralInteger
+
+
+.sub 'getLiteralFloat' :method
+    .return(self)
+
+.end # getLiteralFloat
+
+
+.sub 'getLiteralString' :method
+.const 'Sub' WSubId_50 = "WSubId_50"
+    getattribute $P1, self, 'owner'
+    getattribute $P2, self, 'start'
+    $P3 = self.'getFloatValue'()
+    .tailcall WSubId_50($P1, $P2, $P3)
+
+.end # getLiteralString
 
 
 .sub 'emit' :method
@@ -6833,10 +6613,10 @@
 
 .sub 'emit_get' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_100 = "WSubId_100"
+.const 'Sub' WSubId_101 = "WSubId_101"
     $P1 = self.'getFloatValue'()
     set $N1, $P1
-    .tailcall WSubId_100($N1)
+    .tailcall WSubId_101($N1)
 
 .end # emit_get
 
@@ -6845,6 +6625,133 @@
     get_class $P1, [ 'Winxed'; 'Compiler'; 'Literal' ]
     addparent $P0, $P1
     addattribute $P0, 'numval'
+.end
+.namespace [ 'Winxed'; 'Compiler'; 'StringLiteral' ]
+
+.sub 'StringLiteral' :method
+        .param pmc __ARG_1
+        .param pmc __ARG_2
+    self.'Expr'(__ARG_1, __ARG_2)
+    setattribute self, 'strval', __ARG_2
+
+.end # StringLiteral
+
+
+.sub 'clone' :method
+        .param pmc __ARG_1
+    new $P2, [ 'Winxed'; 'Compiler'; 'StringLiteral' ]
+    getattribute $P3, self, 'strval'
+    $P2.'StringLiteral'(__ARG_1, $P3)
+    set $P1, $P2
+    .return($P1)
+
+.end # clone
+
+
+.sub 'isstringliteral' :method
+    .return(1)
+
+.end # isstringliteral
+
+
+.sub 'checkresult' :method
+    .return("S")
+
+.end # checkresult
+
+
+.sub 'getPirString' :method
+    getattribute $P1, self, 'strval'
+    $P2 = $P1.'getPirString'()
+    null $S1
+    if_null $P2, __label_1
+    set $S1, $P2
+  __label_1:
+    .return($S1)
+
+.end # getPirString
+
+
+.sub 'getIntegerValue' :method
+    $P1 = self.'getStringValue'()
+    set $I1, $P1
+    .return($I1)
+
+.end # getIntegerValue
+
+
+.sub 'getFloatValue' :method
+    $P1 = self.'getStringValue'()
+    set $N1, $P1
+    .return($N1)
+
+.end # getFloatValue
+
+
+.sub 'getStringValue' :method
+    getattribute $P1, self, 'strval'
+    getattribute $P2, $P1, 'str'
+    null $S1
+    if_null $P2, __label_1
+    set $S1, $P2
+  __label_1:
+    isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'TokenQuoted' ]
+    unless $I1 goto __label_2
+    $P0 = new ["String"]
+    $P0 = $S1
+    $S1 = $P0."unescape"("utf8")
+  __label_2: # endif
+    .return($S1)
+
+.end # getStringValue
+
+
+.sub 'getLiteralInteger' :method
+.const 'Sub' WSubId_47 = "WSubId_47"
+    getattribute $P1, self, 'owner'
+    getattribute $P2, self, 'start'
+    $P3 = self.'getStringValue'()
+    .tailcall WSubId_47($P1, $P2, $P3)
+
+.end # getLiteralInteger
+
+
+.sub 'getLiteralFloat' :method
+.const 'Sub' WSubId_100 = "WSubId_100"
+    getattribute $P1, self, 'owner'
+    getattribute $P2, self, 'start'
+    $P3 = self.'getStringValue'()
+    .tailcall WSubId_100($P1, $P2, $P3)
+
+.end # getLiteralFloat
+
+
+.sub 'getLiteralString' :method
+    .return(self)
+
+.end # getLiteralString
+
+
+.sub 'emit' :method
+        .param pmc __ARG_1
+        .param string __ARG_2
+    $P1 = self.'getPirString'()
+    __ARG_1.'emitset'(__ARG_2, $P1)
+
+.end # emit
+
+
+.sub 'emit_get' :method
+        .param pmc __ARG_1
+    .tailcall self.'getPirString'()
+
+.end # emit_get
+
+.sub Winxed_class_init :anon :load :init
+    newclass $P0, [ 'Winxed'; 'Compiler'; 'StringLiteral' ]
+    get_class $P1, [ 'Winxed'; 'Compiler'; 'Literal' ]
+    addparent $P0, $P1
+    addattribute $P0, 'strval'
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
@@ -6892,19 +6799,35 @@
 .sub 'FunctionId' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-        .param pmc __ARG_3
-        .param string __ARG_4
+        .param string __ARG_3
     self.'Expr'(__ARG_1, __ARG_2)
-    box $P1, __ARG_4
+    box $P1, __ARG_3
     setattribute self, 'subid', $P1
 
 .end # FunctionId
 
 
 .sub 'checkresult' :method
-    .return('P')
+    .return("P")
 
 .end # checkresult
+
+
+.sub 'emitvar' :method
+        .param pmc __ARG_1
+        .param string __ARG_2
+    getattribute $P1, self, 'start'
+    root_new $P4, ['parrot';'ResizablePMCArray']
+    assign $P4, 1
+    $P4[0] = $P1
+    $P2 = self.'scopesearch'($P4, 0)
+    getattribute $P4, $P2, 'owner'
+    $P3 = $P4.'getpath'()
+    self.'annotate'(__ARG_1)
+    $P4 = $P3.'getparrotkey'()
+    __ARG_1.'emitget_hll_global'(__ARG_2, $P1, $P4)
+
+.end # emitvar
 
 
 .sub 'emit_get' :method
@@ -6918,6 +6841,7 @@
 .sub 'emit' :method
         .param pmc __ARG_1
         .param string __ARG_2
+    self.'annotate'(__ARG_1)
     getattribute $P1, self, 'subid'
     __ARG_1.'emitset'(__ARG_2, $P1)
 
@@ -6942,7 +6866,7 @@
 
 
 .sub 'checkresult' :method
-    .return('P')
+    .return("P")
 
 .end # checkresult
 
@@ -6966,6 +6890,55 @@
     addparent $P0, $P1
     addattribute $P0, 'sym'
 .end
+.namespace [ 'Winxed'; 'Compiler'; 'NullExpr' ]
+
+.sub 'NullExpr' :method
+        .param pmc __ARG_1
+        .param pmc __ARG_2
+    self.'Expr'(__ARG_1, __ARG_2)
+
+.end # NullExpr
+
+
+.sub 'isnull' :method
+    .return(1)
+
+.end # isnull
+
+
+.sub 'emit_get_nonull' :method
+        .param pmc __ARG_1
+.const 'Sub' WSubId_28 = "WSubId_28"
+    WSubId_28("Invalid 'null' usage", self)
+
+.end # emit_get_nonull
+
+
+.sub 'checkresult' :method
+    .return("P")
+
+.end # checkresult
+
+
+.sub 'emit_void' :method
+        .param pmc __ARG_1
+
+.end # emit_void
+
+
+.sub 'emit' :method
+        .param pmc __ARG_1
+        .param string __ARG_2
+    self.'annotate'(__ARG_1)
+    __ARG_1.'emitnull'(__ARG_2)
+
+.end # emit
+
+.sub Winxed_class_init :anon :load :init
+    newclass $P0, [ 'Winxed'; 'Compiler'; 'NullExpr' ]
+    get_class $P1, [ 'Winxed'; 'Compiler'; 'FinalExpr' ]
+    addparent $P0, $P1
+.end
 .namespace [ 'Winxed'; 'Compiler'; 'IdentifierExpr' ]
 
 .sub 'isidentifier' :method
@@ -6985,11 +6958,10 @@
 
 .sub 'clone' :method
         .param pmc __ARG_1
-    new $P1, [ 'Winxed'; 'Compiler'; 'IdentifierExpr' ]
-    getattribute $P2, self, 'start'
-    $P1.'Expr'(__ARG_1, $P2)
+    new $P2, [ 'Winxed'; 'Compiler'; 'IdentifierExpr' ]
     getattribute $P3, self, 'name'
-    setattribute $P1, 'name', $P3
+    $P2.'IdentifierExpr'(__ARG_1, $P3)
+    set $P1, $P2
     .return($P1)
 
 .end # clone
@@ -7002,18 +6974,18 @@
     if_null $P2, __label_1
     .return(0)
   __label_1: # endif
-    .tailcall $P1.'iskeyword'('null')
+    .tailcall $P1.'iskeyword'("null")
 
 .end # isnull
 
 
 .sub 'emit_get_nonull' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     $P1 = self.'isnull'()
     if_null $P1, __label_1
     unless $P1 goto __label_1
-    WSubId_30("Invalid 'null' usage", self)
+    WSubId_28("Invalid 'null' usage", self)
   __label_1: # endif
     .tailcall self.'emit_get'(__ARG_1)
 
@@ -7029,14 +7001,14 @@
     goto __label_2
   __label_1: # else
     set $S1, $P1
-    if $S1 == 'self' goto __label_5
-    if $S1 == 'null' goto __label_6
+    if $S1 == "self" goto __label_5
+    if $S1 == "null" goto __label_6
     goto __label_3
   __label_5: # case
   __label_6: # case
-    .return('P')
+    .return("P")
   __label_3: # default
-    .return('')
+    .return("")
   __label_4: # switch end
   __label_2: # endif
 
@@ -7064,25 +7036,25 @@
 
 
 .sub 'checkIdentifier' :method
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     getattribute $P1, self, 'name'
     unless_null $P1, __label_1
-    WSubId_35('Bad thing')
+    WSubId_33("Bad thing")
   __label_1: # endif
     getattribute $P3, self, 'owner'
     $P2 = $P3.'getvar'($P1)
     null $S1
     unless_null $P2, __label_2
     set $S2, $P1
-    if $S2 == 'self' goto __label_6
-    if $S2 == 'null' goto __label_7
+    if $S2 == "self" goto __label_6
+    if $S2 == "null" goto __label_7
     goto __label_4
   __label_6: # case
   __label_7: # case
     set $S1, $P1
     goto __label_5 # break
   __label_4: # default
-    set $S1, ''
+    set $S1, ""
   __label_5: # switch end
     goto __label_3
   __label_2: # else
@@ -7095,12 +7067,12 @@
 
 
 .sub 'getIdentifier' :method
-.const 'Sub' WSubId_101 = "WSubId_101"
+.const 'Sub' WSubId_102 = "WSubId_102"
     $P1 = self.'checkIdentifier'()
     set $S1, $P1
-    ne $S1, '', __label_1
+    ne $S1, "", __label_1
     getattribute $P2, self, 'name'
-    WSubId_101($P2, self)
+    WSubId_102($P2, self)
   __label_1: # endif
     .return($P1)
 
@@ -7109,97 +7081,95 @@
 
 .sub 'optimize' :method
     getattribute $P1, self, 'name'
-    getattribute $P5, self, 'owner'
-    $P2 = $P5.'getvar'($P1)
-    if_null $P2, __label_1
-    $P5 = $P2.'isconst'()
-    if_null $P5, __label_3
-    unless $P5 goto __label_3
-    .tailcall $P2.'getvalue'()
+    getattribute $P2, self, 'owner'
+    $P3 = $P2.'getvar'($P1)
+    if_null $P3, __label_1
+    $P6 = $P3.'isconst'()
+    if_null $P6, __label_3
+    unless $P6 goto __label_3
+    .tailcall $P3.'getvalue'()
   __label_3: # endif
-    $P5 = $P2.'getflags'()
-    set $I1, $P5
+    $P6 = $P3.'getflags'()
+    set $I1, $P6
     band $I2, $I1, 1
     unless $I2 goto __label_4
     band $I3, $I1, 2
     unless $I3 goto __label_6
-    new $P6, [ 'Winxed'; 'Compiler'; 'LexicalVolatileExpr' ]
-    $P6.'LexicalVolatileExpr'(self, $P2)
-    set $P5, $P6
-    .return($P5)
+    new $P7, [ 'Winxed'; 'Compiler'; 'LexicalVolatileExpr' ]
+    $P7.'LexicalVolatileExpr'(self, $P3)
+    set $P6, $P7
+    .return($P6)
   __label_6: # endif
     goto __label_5
   __label_4: # else
-    $P3 = $P2.'getreg'()
-    if_null $P3, __label_7
-    set $S3, $P3
+    $P4 = $P3.'getreg'()
+    if_null $P4, __label_7
+    set $S3, $P4
     substr $S2, $S3, 0, 7
-    ne $S2, 'WSubId_', __label_7
-    new $P6, [ 'Winxed'; 'Compiler'; 'FunctionId' ]
-    getattribute $P7, self, 'owner'
-    getattribute $P8, self, 'start'
-    $P6.'FunctionId'($P7, $P8, $P1, $P3)
-    set $P5, $P6
-    .return($P5)
+    ne $S2, "WSubId_", __label_7
+    new $P7, [ 'Winxed'; 'Compiler'; 'FunctionId' ]
+    $P7.'FunctionId'($P2, $P1, $P4)
+    set $P6, $P7
+    .return($P6)
   __label_7: # endif
   __label_5: # endif
     goto __label_2
   __label_1: # else
-    root_new $P5, ['parrot';'ResizablePMCArray']
-    assign $P5, 1
-    $P5[0] = $P1
-    $P4 = self.'scopesearch'($P5, 0)
-    if_null $P4, __label_10
-    isa $I2, $P4, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
+    root_new $P6, ['parrot';'ResizablePMCArray']
+    assign $P6, 1
+    $P6[0] = $P1
+    $P5 = self.'scopesearch'($P6, 0)
+    if_null $P5, __label_10
+    isa $I2, $P5, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
     if $I2 goto __label_11
-    isa $I3, $P4, [ 'Winxed'; 'Compiler'; 'FunctionExtern' ]
+    isa $I3, $P5, [ 'Winxed'; 'Compiler'; 'FunctionExtern' ]
     if $I3 goto __label_12
-    isa $I4, $P4, [ 'Winxed'; 'Compiler'; 'InlineStatement' ]
+    isa $I4, $P5, [ 'Winxed'; 'Compiler'; 'InlineStatement' ]
     if $I4 goto __label_13
     goto __label_9
   __label_10: # case
+    $P6 = $P1.'iskeyword'("null")
+    if_null $P6, __label_14
+    unless $P6 goto __label_14
+    new $P8, [ 'Winxed'; 'Compiler'; 'NullExpr' ]
+    getattribute $P9, self, 'owner'
+    $P8.'NullExpr'($P9, $P1)
+    set $P7, $P8
+    .return($P7)
+  __label_14: # endif
     goto __label_8 # break
   __label_11: # case
-    $P5 = $P4.'ismulti'()
-    if $P5 goto __label_14
-    $P6 = $P4.'makesubid'()
+    $P10 = $P5.'ismulti'()
+    if $P10 goto __label_15
+    $P11 = $P5.'makesubid'()
     null $S1
-    if_null $P6, __label_16
-    set $S1, $P6
-  __label_16:
+    if_null $P11, __label_17
+    set $S1, $P11
+  __label_17:
     self.'usesubid'($S1)
-    getattribute $P5, self, 'owner'
-    $P5.'createvarnamed'($P1, 'P', $S1)
-    new $P6, [ 'Winxed'; 'Compiler'; 'FunctionId' ]
-    getattribute $P7, self, 'owner'
-    getattribute $P8, self, 'start'
-    $P6.'FunctionId'($P7, $P8, $P1, $S1)
-    set $P5, $P6
-    .return($P5)
-    goto __label_15
-  __label_14: # else
-    new $P6, [ 'Winxed'; 'Compiler'; 'FunctionRef' ]
-    getattribute $P7, self, 'owner'
-    getattribute $P8, self, 'start'
-    $P6.'FunctionRef'($P7, $P8, $P4)
-    set $P5, $P6
-    .return($P5)
-  __label_15: # endif
+    $P2.'createvarnamed'($P1, "P", $S1)
+    new $P7, [ 'Winxed'; 'Compiler'; 'FunctionId' ]
+    $P7.'FunctionId'($P2, $P1, $S1)
+    set $P6, $P7
+    .return($P6)
+    goto __label_16
+  __label_15: # else
+    new $P7, [ 'Winxed'; 'Compiler'; 'FunctionRef' ]
+    $P7.'FunctionRef'($P2, $P1, $P5)
+    set $P6, $P7
+    .return($P6)
+  __label_16: # endif
     goto __label_8 # break
   __label_12: # case
-    new $P10, [ 'Winxed'; 'Compiler'; 'FunctionRef' ]
-    getattribute $P11, self, 'owner'
-    getattribute $P12, self, 'start'
-    $P10.'FunctionRef'($P11, $P12, $P4)
-    set $P9, $P10
-    .return($P9)
+    new $P9, [ 'Winxed'; 'Compiler'; 'FunctionRef' ]
+    $P9.'FunctionRef'($P2, $P1, $P5)
+    set $P8, $P9
+    .return($P8)
   __label_13: # case
-    new $P14, [ 'Winxed'; 'Compiler'; 'InlineRef' ]
-    getattribute $P15, self, 'owner'
-    getattribute $P16, self, 'start'
-    $P14.'InlineRef'($P15, $P16, $P4)
-    set $P13, $P14
-    .return($P13)
+    new $P11, [ 'Winxed'; 'Compiler'; 'InlineRef' ]
+    $P11.'InlineRef'($P2, $P1, $P5)
+    set $P10, $P11
+    .return($P10)
   __label_9: # default
   __label_8: # switch end
   __label_2: # endif
@@ -7266,12 +7236,12 @@
 .sub 'emit_assign_get' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     self.'annotate'(__ARG_1)
     $P1 = self.'isnull'()
     if_null $P1, __label_1
     unless $P1 goto __label_1
-    WSubId_30("Cannot assign to null", self)
+    WSubId_28("Cannot assign to null", self)
   __label_1: # endif
     $P1 = self.'checkresult'()
     null $S1
@@ -7298,7 +7268,7 @@
     __ARG_1.'emitnull'($S2)
     goto __label_7 # break
   __label_6: # default
-    WSubId_30("Can't assign null to that type", self)
+    WSubId_28("Can't assign null to that type", self)
   __label_7: # switch end
     goto __label_5
   __label_4: # else
@@ -7312,8 +7282,8 @@
     if_null $P1, __label_12
     set $S3, $P1
   __label_12:
-    ne $S3, 'v', __label_13
-    WSubId_30("Can't assign from void expression", self)
+    ne $S3, "v", __label_13
+    WSubId_28("Can't assign from void expression", self)
   __label_13: # endif
     ne $S1, $S3, __label_14
     __ARG_2.'emit'(__ARG_1, $S2)
@@ -7325,8 +7295,8 @@
     set $S4, $P1
   __label_16:
     self.'annotate'(__ARG_1)
-    ne $S1, 'P', __label_17
-    eq $S3, 'P', __label_17
+    ne $S1, "P", __label_17
+    eq $S3, "P", __label_17
     __ARG_1.'emitbox'($S2, $S4)
     goto __label_18
   __label_17: # else
@@ -7428,7 +7398,7 @@
     __ARG_2.'emit'(__ARG_1, $S2)
     goto __label_2 # break
   __label_3: # default
-    ne $S1, 'P', __label_6
+    ne $S1, "P", __label_6
     $P6 = __ARG_2.'emit_getvar'(__ARG_1)
     set $S2, $P6
     goto __label_7
@@ -7455,7 +7425,7 @@
 
 .sub 'emit_store' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
+        .param string __ARG_2
     getattribute $P2, self, 'desc'
     $P1 = $P2.'getlex'()
     __ARG_1.'emitstore_lex'($P1, __ARG_2)
@@ -7488,22 +7458,22 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_95 = "WSubId_95"
-.const 'Sub' WSubId_79 = "WSubId_79"
+.const 'Sub' WSubId_94 = "WSubId_94"
+.const 'Sub' WSubId_76 = "WSubId_76"
     self.'initop'(__ARG_2, __ARG_3)
-    $P2 = WSubId_95(__ARG_1)
+    $P2 = WSubId_94(__ARG_1)
     setattribute self, 'key', $P2
     getattribute $P1, self, 'key'
     elements $I1, $P1
     if $I1 goto __label_1
-    WSubId_79('namespace identifier', __ARG_3)
+    WSubId_76("namespace identifier", __ARG_3)
   __label_1: # endif
 
 .end # OpNamespaceExpr
 
 
 .sub 'checkresult' :method
-    .return('P')
+    .return("P")
 
 .end # checkresult
 
@@ -7511,12 +7481,12 @@
 .sub 'emit' :method
         .param pmc __ARG_1
         .param string __ARG_2
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     getattribute $P1, self, 'owner'
     getattribute $P4, self, 'key'
     $P2 = $P1.'scopesearch'($P4, 1)
     unless_null $P2, __label_1
-    WSubId_30('unknown namespace', self)
+    WSubId_28("unknown namespace", self)
   __label_1: # endif
     $P3 = $P2.'getpath'()
     $P3.'emit_get_namespace'(__ARG_1, $P1, __ARG_2)
@@ -7535,23 +7505,23 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_102 = "WSubId_102"
+.const 'Sub' WSubId_103 = "WSubId_103"
     self.'initop'(__ARG_2, __ARG_3)
-    $P2 = WSubId_102(__ARG_1, __ARG_2)
+    $P2 = WSubId_103(__ARG_1, __ARG_2)
     setattribute self, 'clspec', $P2
 
 .end # OpClassExpr
 
 
 .sub 'checkresult' :method
-    .return('P')
+    .return("P")
 
 .end # checkresult
 
 
 .sub 'get_class_raw_key' :method
-.const 'Sub' WSubId_30 = "WSubId_30"
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_28 = "WSubId_28"
+.const 'Sub' WSubId_33 = "WSubId_33"
     getattribute $P1, self, 'owner'
     getattribute $P2, self, 'clspec'
     null $P3
@@ -7585,11 +7555,11 @@
     set $S1, $P6
     concat $S2, $S1, " not supported yet here"
     getattribute $P7, $P2, 'start'
-    WSubId_30($S2, $P7)
+    WSubId_28($S2, $P7)
   __label_2: # default
   __label_1: # switch end
     getattribute $P4, $P2, 'start'
-    WSubId_35("Unexpected class key", $P4)
+    WSubId_33("Unexpected class key", $P4)
 
 .end # get_class_raw_key
 
@@ -7611,7 +7581,7 @@
     goto __label_1 # break
   __label_2: # default
   __label_1: # switch end
-    __ARG_1.'print'('    get_class ', __ARG_2, ', ')
+    __ARG_1.'print'("    get_class ", __ARG_2, ", ")
     getattribute $P4, self, 'owner'
     $P2.'emit'(__ARG_1, $P4)
     __ARG_1.'say'()
@@ -7761,13 +7731,13 @@
 .namespace [ 'Winxed'; 'Compiler'; 'OpBinaryIntExpr' ]
 
 .sub 'checkresult' :method
-    .return('I')
+    .return("I")
 
 .end # checkresult
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_49 = "WSubId_49"
+.const 'Sub' WSubId_47 = "WSubId_47"
     self.'optimizearg'()
     getattribute $P1, self, 'lexpr'
     getattribute $P2, self, 'rexpr'
@@ -7782,7 +7752,7 @@
     getattribute $P3, self, 'owner'
     getattribute $P4, self, 'start'
     $P5 = self.'do_op'($I1, $I2)
-    .tailcall WSubId_49($P3, $P4, $P5)
+    .tailcall WSubId_47($P3, $P4, $P5)
   __label_1: # endif
     .return(self)
 
@@ -7796,13 +7766,13 @@
 .namespace [ 'Winxed'; 'Compiler'; 'OpDelExBase' ]
 
 .sub 'checkresult' :method
-    .return('I')
+    .return("I")
 
 .end # checkresult
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     self.'optimizearg'()
     getattribute $P1, self, 'subexpr'
     isa $I2, $P1, [ 'Winxed'; 'Compiler'; 'IndexExpr' ]
@@ -7810,10 +7780,10 @@
     if $I1 goto __label_2
     $P2 = $P1.'checkresult'()
     set $S1, $P2
-    iseq $I1, $S1, 'S'
+    iseq $I1, $S1, "S"
   __label_2:
     unless $I1 goto __label_1
-    WSubId_30("invalid operand", self)
+    WSubId_28("invalid operand", self)
   __label_1: # endif
     .return(self)
 
@@ -7840,7 +7810,7 @@
     getattribute $P1, self, 'subexpr'
     $P1.'emit_prep'(__ARG_1)
     self.'annotate'(__ARG_1)
-    __ARG_1.'print'('    delete ')
+    __ARG_1.'print'("    delete ")
     $P1.'emit_aux'(__ARG_1)
     __ARG_1.'say'()
 
@@ -7851,7 +7821,7 @@
         .param pmc __ARG_1
         .param string __ARG_2
     self.'emit_void'(__ARG_1)
-    __ARG_1.'emitset'(__ARG_2, '1')
+    __ARG_1.'emitset'(__ARG_2, "1")
 
 .end # emit
 
@@ -7877,7 +7847,7 @@
     getattribute $P1, self, 'subexpr'
     $P1.'emit_prep'(__ARG_1)
     self.'annotate'(__ARG_1)
-    __ARG_1.'print'('    exists ', __ARG_2, ', ')
+    __ARG_1.'print'("    exists ", __ARG_2, ", ")
     $P1.'emit_aux'(__ARG_1)
     __ARG_1.'say'()
 
@@ -7900,19 +7870,19 @@
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     self.'optimizearg'()
     getattribute $P1, self, 'subexpr'
     $P3 = $P1.'checkresult'()
     set $S1, $P3
-    isne $I1, $S1, 'P'
+    isne $I1, $S1, "P"
     box $P2, $I1
     if $P2 goto __label_2
     $P2 = $P1.'isnull'()
   __label_2:
     if_null $P2, __label_1
     unless $P2 goto __label_1
-    WSubId_30("invalid operand", self)
+    WSubId_28("invalid operand", self)
   __label_1: # endif
     .return(self)
 
@@ -7927,7 +7897,7 @@
     unless $I1 goto __label_1
     $P1.'emit_prep'(__ARG_1)
     self.'annotate'(__ARG_1)
-    __ARG_1.'print'('    defined ', __ARG_2, ', ')
+    __ARG_1.'print'("    defined ", __ARG_2, ", ")
     $P1.'emit_aux'(__ARG_1)
     __ARG_1.'say'()
     goto __label_2
@@ -7937,7 +7907,7 @@
     if_null $P2, __label_3
     set $S1, $P2
   __label_3:
-    __ARG_1.'say'('     defined ', __ARG_2, ', ', $S1)
+    __ARG_1.'say'("     defined ", __ARG_2, ", ", $S1)
   __label_2: # endif
 
 .end # emit
@@ -7984,8 +7954,8 @@
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_49 = "WSubId_49"
-.const 'Sub' WSubId_103 = "WSubId_103"
+.const 'Sub' WSubId_47 = "WSubId_47"
+.const 'Sub' WSubId_100 = "WSubId_100"
     getattribute $P1, self, 'subexpr'
     self.'optimizearg'()
     $P2 = $P1.'isintegerliteral'()
@@ -7996,7 +7966,7 @@
     getattribute $P2, self, 'owner'
     getattribute $P3, $P1, 'start'
     neg $I2, $I1
-    .tailcall WSubId_49($P2, $P3, $I2)
+    .tailcall WSubId_47($P2, $P3, $I2)
   __label_1: # endif
     $P2 = $P1.'isfloatliteral'()
     if_null $P2, __label_2
@@ -8006,7 +7976,7 @@
     getattribute $P2, self, 'owner'
     getattribute $P3, $P1, 'start'
     neg $N2, $N1
-    .tailcall WSubId_103($P2, $P3, $N2)
+    .tailcall WSubId_100($P2, $P3, $N2)
   __label_2: # endif
     .return(self)
 
@@ -8023,7 +7993,7 @@
     set $S1, $P1
   __label_1:
     self.'annotate'(__ARG_1)
-    __ARG_1.'emitarg2'('neg', __ARG_2, $S1)
+    __ARG_1.'emitarg2'("neg", __ARG_2, $S1)
 
 .end # emit
 
@@ -8058,7 +8028,7 @@
 
 
 .sub 'checkresult' :method
-    .return('I')
+    .return("I")
 
 .end # checkresult
 
@@ -8074,7 +8044,7 @@
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_49 = "WSubId_49"
+.const 'Sub' WSubId_47 = "WSubId_47"
     self.'optimizearg'()
     getattribute $P1, self, 'subexpr'
     $P2 = $P1.'isintegerliteral'()
@@ -8085,7 +8055,7 @@
     getattribute $P2, self, 'owner'
     getattribute $P3, $P1, 'start'
     not $I2, $I1
-    .tailcall WSubId_49($P2, $P3, $I2)
+    .tailcall WSubId_47($P2, $P3, $I2)
   __label_1: # endif
     $P2 = $P1.'isnegable'()
     if_null $P2, __label_2
@@ -8125,7 +8095,7 @@
     if $I1 == 80 goto __label_6
     goto __label_2
   __label_4: # case
-    __ARG_1.'emitarg2'('not', __ARG_2, $S1)
+    __ARG_1.'emitarg2'("not", __ARG_2, $S1)
     goto __label_3 # break
   __label_5: # case
     __ARG_1.'emitset'(__ARG_2, 0)
@@ -8139,10 +8109,10 @@
     __ARG_1.'emitlabel'($S2)
     goto __label_3 # break
   __label_6: # case
-    __ARG_1.'emitarg2'('isfalse', __ARG_2, $S1)
+    __ARG_1.'emitarg2'("isfalse", __ARG_2, $S1)
     goto __label_3 # break
   __label_2: # default
-    __ARG_1.'emitarg2'('isfalse', __ARG_2, $S1)
+    __ARG_1.'emitarg2'("isfalse", __ARG_2, $S1)
   __label_3: # switch end
 
 .end # emit
@@ -8204,7 +8174,7 @@
 
 
 .sub 'checkresult' :method
-    .return('I')
+    .return("I")
 
 .end # checkresult
 
@@ -8220,7 +8190,7 @@
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_49 = "WSubId_49"
+.const 'Sub' WSubId_47 = "WSubId_47"
     self.'optimizearg'()
     getattribute $P1, self, 'subexpr'
     $P2 = $P1.'isintegerliteral'()
@@ -8231,13 +8201,8 @@
     getattribute $P2, self, 'owner'
     getattribute $P3, $P1, 'start'
     bxor $I2, $I1, -1
-    .tailcall WSubId_49($P2, $P3, $I2)
+    .tailcall WSubId_47($P2, $P3, $I2)
   __label_1: # endif
-    $P2 = $P1.'isnegable'()
-    if_null $P2, __label_2
-    unless $P2 goto __label_2
-    .tailcall $P1.'negated'()
-  __label_2: # endif
     .return(self)
 
 .end # optimize
@@ -8253,7 +8218,7 @@
     set $S1, $P2
   __label_1:
     self.'annotate'(__ARG_1)
-    __ARG_1.'emitarg3'('bxor', __ARG_2, $S1, -1)
+    __ARG_1.'emitarg3'("bxor", __ARG_2, $S1, -1)
 
 .end # emit
 
@@ -8273,7 +8238,7 @@
 
 .sub 'iflexical' :method
         .param pmc __ARG_1
-        .param pmc __ARG_2
+        .param string __ARG_2
     getattribute $P1, self, 'subexpr'
     isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'LexicalVolatileExpr' ]
     unless $I1 goto __label_1
@@ -8422,13 +8387,13 @@
     self.'annotate'(__ARG_1)
     $P1 = self.'checkresult'()
     set $S3, $P1
-    ne $S3, 'P', __label_2
-    $P2 = self.'tempreg'('P')
+    ne $S3, "P", __label_2
+    $P2 = self.'tempreg'("P")
     null $S2
     if_null $P2, __label_4
     set $S2, $P2
   __label_4:
-    __ARG_1.'emitarg2'('clone', $S2, $S1)
+    __ARG_1.'emitarg2'("clone", $S2, $S1)
     __ARG_1.'emitset'(__ARG_2, $S2)
     goto __label_3
   __label_2: # else
@@ -8457,8 +8422,8 @@
   __label_2:
     $P1 = self.'checkresult'()
     set $S3, $P1
-    ne $S3, 'P', __label_3
-    __ARG_1.'emitarg2'('clone', $S2, $S1)
+    ne $S3, "P", __label_3
+    __ARG_1.'emitarg2'("clone", $S2, $S1)
     goto __label_4
   __label_3: # else
     __ARG_1.'emitset'($S2, $S1)
@@ -8520,13 +8485,13 @@
     self.'annotate'(__ARG_1)
     $P1 = self.'checkresult'()
     set $S3, $P1
-    ne $S3, 'P', __label_2
-    $P2 = self.'tempreg'('P')
+    ne $S3, "P", __label_2
+    $P2 = self.'tempreg'("P")
     null $S2
     if_null $P2, __label_4
     set $S2, $P2
   __label_4:
-    __ARG_1.'emitarg2'('clone', $S2, $S1)
+    __ARG_1.'emitarg2'("clone", $S2, $S1)
     __ARG_1.'emitset'(__ARG_2, $S2)
     goto __label_3
   __label_2: # else
@@ -8556,8 +8521,8 @@
   __label_2:
     $P1 = self.'checkresult'()
     set $S3, $P1
-    ne $S3, 'P', __label_3
-    __ARG_1.'emitarg2'('clone', $S2, $S1)
+    ne $S3, "P", __label_3
+    __ARG_1.'emitarg2'("clone", $S2, $S1)
     goto __label_4
   __label_3: # else
     __ARG_1.'emitset'($S2, $S1)
@@ -8743,13 +8708,13 @@
 
 .sub 'emit_get' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     self.'checkleft'()
     getattribute $P1, self, 'lexpr'
     $P2 = $P1.'checkresult'()
     set $S3, $P2
-    eq $S3, 'P', __label_1
-    WSubId_30("Wrong dest type in =:", $P1)
+    eq $S3, "P", __label_1
+    WSubId_28("Wrong dest type in =:", $P1)
   __label_1: # endif
     $P2 = $P1.'emit_get'(__ARG_1)
     null $S1
@@ -8815,7 +8780,7 @@
     if_null $P3, __label_3
     set $S3, $P3
   __label_3:
-    ne $S1, 'S', __label_4
+    ne $S1, "S", __label_4
     isa $I1, $P2, [ 'Winxed'; 'Compiler'; 'ConcatString' ]
     unless $I1 goto __label_4
     $P2.'emit_concat_to'(__ARG_1, $S3)
@@ -8837,8 +8802,8 @@
     if $I1 == 78 goto __label_11
     goto __label_7
   __label_9: # case
-    eq $S2, 'S', __label_12
-    $P3 = self.'tempreg'('S')
+    eq $S2, "S", __label_12
+    $P3 = self.'tempreg'("S")
     set $S5, $P3
     __ARG_1.'emitset'($S5, $S4)
     set $S4, $S5
@@ -8884,7 +8849,7 @@
 
 .sub 'emit_get' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     self.'checkleft'()
     getattribute $P1, self, 'lexpr'
     getattribute $P2, self, 'rexpr'
@@ -8919,7 +8884,7 @@
     if $I1 == 78 goto __label_9
     goto __label_5
   __label_7: # case
-    WSubId_30("-= can't be applied to string", self)
+    WSubId_28("-= can't be applied to string", self)
   __label_8: # case
   __label_9: # case
     eq $S1, $S2, __label_10
@@ -8985,7 +8950,7 @@
     $P5 = $P2.'emit_get'(__ARG_1)
     set $S2, $P5
     self.'annotate'(__ARG_1)
-    __ARG_1.'emitarg2'('mul', $S1, $S2)
+    __ARG_1.'emitarg2'("mul", $S1, $S2)
   __label_3: # switch end
     isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'LexicalVolatileExpr' ]
     unless $I1 goto __label_5
@@ -9026,7 +8991,7 @@
     set $S2, $P2
   __label_2:
     self.'annotate'(__ARG_1)
-    __ARG_1.'emitarg2'('div', $S1, $S2)
+    __ARG_1.'emitarg2'("div", $S1, $S2)
     isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'LexicalVolatileExpr' ]
     unless $I1 goto __label_3
     $P1.'emit_store'(__ARG_1, $S1)
@@ -9066,7 +9031,7 @@
     set $S2, $P2
   __label_2:
     self.'annotate'(__ARG_1)
-    __ARG_1.'emitarg2'('mod', $S1, $S2)
+    __ARG_1.'emitarg2'("mod", $S1, $S2)
     isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'LexicalVolatileExpr' ]
     unless $I1 goto __label_3
     $P1.'emit_store'(__ARG_1, $S1)
@@ -9084,13 +9049,13 @@
 .namespace [ 'Winxed'; 'Compiler'; 'ComparatorBaseExpr' ]
 
 .sub 'checkresult' :method
-    .return('I')
+    .return("I")
 
 .end # checkresult
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_49 = "WSubId_49"
+.const 'Sub' WSubId_47 = "WSubId_47"
     self.'optimizearg'()
     getattribute $P1, self, 'lexpr'
     getattribute $P2, self, 'rexpr'
@@ -9105,7 +9070,7 @@
     getattribute $P3, self, 'owner'
     getattribute $P4, self, 'start'
     $P5 = self.'int_op'($I1, $I2)
-    .tailcall WSubId_49($P3, $P4, $P5)
+    .tailcall WSubId_47($P3, $P4, $P5)
   __label_1: # endif
     .return(self)
 
@@ -9142,69 +9107,69 @@
   __label_4:
     self.'annotate'(__ARG_1)
     null $S5
-    iseq $I1, $S1, 'I'
+    iseq $I1, $S1, "I"
     unless $I1 goto __label_8
-    iseq $I1, $S2, 'N'
+    iseq $I1, $S2, "N"
   __label_8:
     if $I1 goto __label_7
-    iseq $I2, $S1, 'N'
+    iseq $I2, $S1, "N"
     unless $I2 goto __label_10
-    iseq $I2, $S2, 'I'
+    iseq $I2, $S2, "I"
   __label_10:
     if $I2 goto __label_9
-    iseq $I3, $S2, 'I'
+    iseq $I3, $S2, "I"
     unless $I3 goto __label_12
-    iseq $I3, $S1, 'P'
+    iseq $I3, $S1, "P"
   __label_12:
     if $I3 goto __label_11
-    iseq $I4, $S2, 'P'
+    iseq $I4, $S2, "P"
     unless $I4 goto __label_14
-    iseq $I4, $S1, 'I'
+    iseq $I4, $S1, "I"
   __label_14:
     if $I4 goto __label_13
-    iseq $I5, $S2, 'S'
+    iseq $I5, $S2, "S"
     unless $I5 goto __label_16
-    iseq $I5, $S1, 'P'
+    iseq $I5, $S1, "P"
   __label_16:
     if $I5 goto __label_15
-    iseq $I6, $S2, 'P'
+    iseq $I6, $S2, "P"
     unless $I6 goto __label_18
-    iseq $I6, $S1, 'S'
+    iseq $I6, $S1, "S"
   __label_18:
     if $I6 goto __label_17
     goto __label_6
   __label_7: # case
-    $P1 = self.'tempreg'('N')
+    $P1 = self.'tempreg'("N")
     set $S5, $P1
     __ARG_1.'emitset'($S5, $S3)
     set $S3, $S5
     goto __label_5 # break
   __label_9: # case
-    $P2 = self.'tempreg'('N')
+    $P2 = self.'tempreg'("N")
     set $S5, $P2
     __ARG_1.'emitset'($S5, $S4)
     set $S4, $S5
     goto __label_5 # break
   __label_11: # case
-    $P3 = self.'tempreg'('I')
+    $P3 = self.'tempreg'("I")
     set $S5, $P3
     __ARG_1.'emitset'($S5, $S3)
     set $S3, $S5
     goto __label_5 # break
   __label_13: # case
-    $P4 = self.'tempreg'('I')
+    $P4 = self.'tempreg'("I")
     set $S5, $P4
     __ARG_1.'emitset'($S5, $S4)
     set $S4, $S5
     goto __label_5 # break
   __label_15: # case
-    $P5 = self.'tempreg'('S')
+    $P5 = self.'tempreg'("S")
     set $S5, $P5
     __ARG_1.'emitset'($S5, $S3)
     set $S3, $S5
     goto __label_5 # break
   __label_17: # case
-    $P6 = self.'tempreg'('S')
+    $P6 = self.'tempreg'("S")
     set $S5, $P6
     __ARG_1.'emitset'($S5, $S4)
     set $S4, $S5
@@ -9311,7 +9276,7 @@
 
 
 .sub 'checkresult' :method
-    .return('I')
+    .return("I")
 
 .end # checkresult
 
@@ -9346,10 +9311,10 @@
     set $S1, $P1
   __label_1:
     self.'annotate'(__ARG_1)
-    __ARG_1.'emitarg2'('isnull', __ARG_2, $S1)
+    __ARG_1.'emitarg2'("isnull", __ARG_2, $S1)
     getattribute $P1, self, 'positive'
     if $P1 goto __label_2
-    __ARG_1.'emitarg1'('not', __ARG_2)
+    __ARG_1.'emitarg1'("not", __ARG_2)
   __label_2: # endif
 
 .end # emit
@@ -9427,10 +9392,10 @@
     getattribute $P2, self, 'positive'
     if_null $P2, __label_2
     unless $P2 goto __label_2
-    __ARG_1.'emitarg3'('iseq', __ARG_2, $S1, 0)
+    __ARG_1.'emitarg3'("iseq", __ARG_2, $S1, 0)
     goto __label_3
   __label_2: # else
-    __ARG_1.'emitarg3'('isne', __ARG_2, $S1, 0)
+    __ARG_1.'emitarg3'("isne", __ARG_2, $S1, 0)
   __label_3: # endif
 
 .end # emit
@@ -9516,7 +9481,7 @@
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_49 = "WSubId_49"
+.const 'Sub' WSubId_47 = "WSubId_47"
     self.'optimizearg'()
     getattribute $P1, self, 'lexpr'
     getattribute $P2, self, 'rexpr'
@@ -9524,112 +9489,149 @@
     set $I1, $P3
     $P3 = $P2.'isnull'()
     set $I2, $P3
-    unless $I1 goto __label_1
-    unless $I2 goto __label_2
+    and $I8, $I1, $I2
+    if $I8 goto __label_3
+    if $I1 goto __label_4
+    if $I2 goto __label_5
+    goto __label_2
+  __label_3: # case
     getattribute $P3, self, 'owner'
     getattribute $P4, self, 'start'
     getattribute $P5, self, 'positive'
-    .tailcall WSubId_49($P3, $P4, $P5)
-    goto __label_3
-  __label_2: # else
+    .tailcall WSubId_47($P3, $P4, $P5)
+  __label_4: # case
     new $P7, [ 'Winxed'; 'Compiler'; 'NullCheckerExpr' ]
     getattribute $P8, self, 'positive'
     $P7.'NullCheckerExpr'(self, $P2, $P8)
     set $P6, $P7
     .return($P6)
-  __label_3: # endif
-  __label_1: # endif
-    unless $I2 goto __label_4
-    new $P4, [ 'Winxed'; 'Compiler'; 'NullCheckerExpr' ]
-    getattribute $P5, self, 'positive'
-    $P4.'NullCheckerExpr'(self, $P1, $P5)
-    set $P3, $P4
-    .return($P3)
-  __label_4: # endif
-    $P3 = $P1.'checkresult'()
+  __label_5: # case
+    new $P10, [ 'Winxed'; 'Compiler'; 'NullCheckerExpr' ]
+    getattribute $P11, self, 'positive'
+    $P10.'NullCheckerExpr'(self, $P1, $P11)
+    set $P9, $P10
+    .return($P9)
+  __label_2: # default
+  __label_1: # switch end
+    $P3 = $P1.'isliteral'()
+    unless $P3 goto __label_6
+    $P4 = $P2.'isliteral'()
+    unless $P4 goto __label_6
+    $P5 = $P1.'checkresult'()
     null $S1
-    if_null $P3, __label_5
-    set $S1, $P3
-  __label_5:
+    if_null $P5, __label_7
+    set $S1, $P5
+  __label_7:
     $P3 = $P2.'checkresult'()
     null $S2
-    if_null $P3, __label_6
+    if_null $P3, __label_8
     set $S2, $P3
-  __label_6:
-    $P3 = $P1.'isliteral'()
-    unless $P3 goto __label_7
-    $P4 = $P2.'isliteral'()
-    unless $P4 goto __label_7
-    ne $S1, $S2, __label_8
-    if_null $S1, __label_9
-    length $I7, $S1
-    ne $I7, 1, __label_9
-    ord $I7, $S1
-    if $I7 == 73 goto __label_11
-    if $I7 == 83 goto __label_12
-    goto __label_9
-  __label_11: # case
-    $P5 = $P1.'getIntegerValue'()
-    set $I3, $P5
-    $P6 = $P2.'getIntegerValue'()
-    set $I4, $P6
-    getattribute $P7, self, 'positive'
-    if_null $P7, __label_14
-    unless $P7 goto __label_14
-    iseq $I5, $I3, $I4
-    goto __label_13
+  __label_8:
+    iseq $I8, $S1, "I"
+    unless $I8 goto __label_12
+    iseq $I8, $S2, "I"
+  __label_12:
+    if $I8 goto __label_11
+    iseq $I9, $S1, "N"
+    unless $I9 goto __label_14
+    iseq $I9, $S2, "N"
   __label_14:
-    isne $I5, $I3, $I4
-  __label_13:
-    getattribute $P8, self, 'owner'
-    getattribute $P9, self, 'start'
-    .tailcall WSubId_49($P8, $P9, $I5)
-  __label_12: # case
-    getattribute $P11, $P1, 'strval'
-    getattribute $P10, $P11, 'str'
-    null $S3
-    if_null $P10, __label_15
-    set $S3, $P10
-  __label_15:
-    getattribute $P13, $P2, 'strval'
-    getattribute $P12, $P13, 'str'
-    null $S4
-    if_null $P12, __label_16
-    set $S4, $P12
+    if $I9 goto __label_13
+    iseq $I10, $S1, "N"
+    unless $I10 goto __label_16
+    iseq $I10, $S2, "I"
   __label_16:
-    getattribute $P14, self, 'positive'
-    if_null $P14, __label_18
-    unless $P14 goto __label_18
-    iseq $I6, $S3, $S4
-    goto __label_17
+    if $I10 goto __label_15
+    iseq $I11, $S1, "I"
+    unless $I11 goto __label_18
+    iseq $I11, $S2, "N"
   __label_18:
-    isne $I6, $S3, $S4
-  __label_17:
-    getattribute $P15, self, 'owner'
-    getattribute $P16, self, 'start'
-    .tailcall WSubId_49($P15, $P16, $I6)
-  __label_9: # default
-  __label_10: # switch end
-  __label_8: # endif
-  __label_7: # endif
+    if $I11 goto __label_17
+    iseq $I12, $S1, "S"
+    unless $I12 goto __label_20
+    iseq $I12, $S2, "S"
+  __label_20:
+    if $I12 goto __label_19
+    goto __label_10
+  __label_11: # case
+    $P3 = $P1.'getIntegerValue'()
+    set $I3, $P3
+    $P4 = $P2.'getIntegerValue'()
+    set $I4, $P4
+    getattribute $P5, self, 'positive'
+    if_null $P5, __label_22
+    unless $P5 goto __label_22
+    iseq $I5, $I3, $I4
+    goto __label_21
+  __label_22:
+    isne $I5, $I3, $I4
+  __label_21:
+    getattribute $P6, self, 'owner'
+    getattribute $P7, self, 'start'
+    .tailcall WSubId_47($P6, $P7, $I5)
+  __label_13: # case
+  __label_15: # case
+  __label_17: # case
+    $P8 = $P1.'getFloatValue'()
+    set $N1, $P8
+    $P9 = $P2.'getFloatValue'()
+    set $N2, $P9
+    getattribute $P10, self, 'positive'
+    if_null $P10, __label_24
+    unless $P10 goto __label_24
+    iseq $I6, $N1, $N2
+    goto __label_23
+  __label_24:
+    isne $I6, $N1, $N2
+  __label_23:
+    getattribute $P11, self, 'owner'
+    getattribute $P12, self, 'start'
+    .tailcall WSubId_47($P11, $P12, $I6)
+  __label_19: # case
+    getattribute $P14, $P1, 'strval'
+    getattribute $P13, $P14, 'str'
+    null $S3
+    if_null $P13, __label_25
+    set $S3, $P13
+  __label_25:
+    getattribute $P16, $P2, 'strval'
+    getattribute $P15, $P16, 'str'
+    null $S4
+    if_null $P15, __label_26
+    set $S4, $P15
+  __label_26:
+    getattribute $P17, self, 'positive'
+    if_null $P17, __label_28
+    unless $P17 goto __label_28
+    iseq $I7, $S3, $S4
+    goto __label_27
+  __label_28:
+    isne $I7, $S3, $S4
+  __label_27:
+    getattribute $P18, self, 'owner'
+    getattribute $P19, self, 'start'
+    .tailcall WSubId_47($P18, $P19, $I7)
+  __label_10: # default
+  __label_9: # switch end
+  __label_6: # endif
     $P3 = $P2.'isintegerzero'()
-    if_null $P3, __label_19
-    unless $P3 goto __label_19
+    if_null $P3, __label_29
+    unless $P3 goto __label_29
     new $P5, [ 'Winxed'; 'Compiler'; 'ZeroCheckerExpr' ]
     getattribute $P6, self, 'positive'
     $P5.'ZeroCheckerExpr'(self, $P1, $P6)
     set $P4, $P5
     .return($P4)
-  __label_19: # endif
+  __label_29: # endif
     $P3 = $P1.'isintegerzero'()
-    if_null $P3, __label_20
-    unless $P3 goto __label_20
+    if_null $P3, __label_30
+    unless $P3 goto __label_30
     new $P5, [ 'Winxed'; 'Compiler'; 'ZeroCheckerExpr' ]
     getattribute $P6, self, 'positive'
     $P5.'ZeroCheckerExpr'(self, $P2, $P6)
     set $P4, $P5
     .return($P4)
-  __label_20: # endif
+  __label_30: # endif
     .return(self)
 
 .end # optimize
@@ -9644,10 +9646,10 @@
     getattribute $P1, self, 'positive'
     if_null $P1, __label_2
     unless $P1 goto __label_2
-    set $S1, 'iseq'
+    set $S1, "iseq"
     goto __label_1
   __label_2:
-    set $S1, 'isne'
+    set $S1, "isne"
   __label_1:
     __ARG_1.'emitbinop'($S1, __ARG_2, __ARG_3, __ARG_4)
 
@@ -9672,10 +9674,10 @@
     getattribute $P1, self, 'positive'
     if_null $P1, __label_2
     unless $P1 goto __label_2
-    set $S1, 'eq'
+    set $S1, "eq"
     goto __label_1
   __label_2:
-    set $S1, 'ne'
+    set $S1, "ne"
   __label_1:
     __ARG_1.'emitcompare'($S1, __ARG_3, __ARG_4, __ARG_2)
 
@@ -9691,10 +9693,10 @@
     getattribute $P1, self, 'positive'
     if_null $P1, __label_2
     unless $P1 goto __label_2
-    set $S1, 'ne'
+    set $S1, "ne"
     goto __label_1
   __label_2:
-    set $S1, 'eq'
+    set $S1, "eq"
   __label_1:
     __ARG_1.'emitcompare'($S1, __ARG_3, __ARG_4, __ARG_2)
 
@@ -9763,10 +9765,10 @@
     getattribute $P1, self, 'positive'
     set $I1, $P1
     unless $I1 goto __label_2
-    set $S1, 'issame'
+    set $S1, "issame"
     goto __label_1
   __label_2:
-    set $S1, 'isntsame'
+    set $S1, "isntsame"
   __label_1:
     __ARG_1.'emitbinop'($S1, __ARG_2, __ARG_3, __ARG_4)
 
@@ -9790,10 +9792,10 @@
     getattribute $P1, self, 'positive'
     set $I1, $P1
     unless $I1 goto __label_2
-    set $S1, 'eq_addr'
+    set $S1, "eq_addr"
     goto __label_1
   __label_2:
-    set $S1, 'ne_addr'
+    set $S1, "ne_addr"
   __label_1:
     __ARG_1.'emitcompare'($S1, __ARG_3, __ARG_4, __ARG_2)
 
@@ -9809,10 +9811,10 @@
     getattribute $P1, self, 'positive'
     set $I1, $P1
     unless $I1 goto __label_2
-    set $S1, 'ne_addr'
+    set $S1, "ne_addr"
     goto __label_1
   __label_2:
-    set $S1, 'eq_addr'
+    set $S1, "eq_addr"
   __label_1:
     __ARG_1.'emitcompare'($S1, __ARG_3, __ARG_4, __ARG_2)
 
@@ -9863,7 +9865,7 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-    __ARG_1.'emitbinop'('islt', __ARG_2, __ARG_3, __ARG_4)
+    __ARG_1.'emitbinop'("islt", __ARG_2, __ARG_3, __ARG_4)
 
 .end # emitop
 
@@ -9873,7 +9875,7 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-    __ARG_1.'emitcompare'('lt', __ARG_3, __ARG_4, __ARG_2)
+    __ARG_1.'emitcompare'("lt", __ARG_3, __ARG_4, __ARG_2)
 
 .end # emitop_if
 
@@ -9883,7 +9885,7 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-    __ARG_1.'emitcompare'('ge', __ARG_3, __ARG_4, __ARG_2)
+    __ARG_1.'emitcompare'("ge", __ARG_3, __ARG_4, __ARG_2)
 
 .end # emitop_else
 
@@ -9929,7 +9931,7 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-    __ARG_1.'emitbinop'('isgt', __ARG_2, __ARG_3, __ARG_4)
+    __ARG_1.'emitbinop'("isgt", __ARG_2, __ARG_3, __ARG_4)
 
 .end # emitop
 
@@ -9939,7 +9941,7 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-    __ARG_1.'emitcompare'('gt', __ARG_3, __ARG_4, __ARG_2)
+    __ARG_1.'emitcompare'("gt", __ARG_3, __ARG_4, __ARG_2)
 
 .end # emitop_if
 
@@ -9949,7 +9951,7 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-    __ARG_1.'emitcompare'('le', __ARG_3, __ARG_4, __ARG_2)
+    __ARG_1.'emitcompare'("le", __ARG_3, __ARG_4, __ARG_2)
 
 .end # emitop_else
 
@@ -9995,7 +9997,7 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-    __ARG_1.'emitbinop'('isle', __ARG_2, __ARG_3, __ARG_4)
+    __ARG_1.'emitbinop'("isle", __ARG_2, __ARG_3, __ARG_4)
 
 .end # emitop
 
@@ -10005,7 +10007,7 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-    __ARG_1.'emitcompare'('le', __ARG_3, __ARG_4, __ARG_2)
+    __ARG_1.'emitcompare'("le", __ARG_3, __ARG_4, __ARG_2)
 
 .end # emitop_if
 
@@ -10015,7 +10017,7 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-    __ARG_1.'emitcompare'('gt', __ARG_3, __ARG_4, __ARG_2)
+    __ARG_1.'emitcompare'("gt", __ARG_3, __ARG_4, __ARG_2)
 
 .end # emitop_else
 
@@ -10061,7 +10063,7 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-    __ARG_1.'emitbinop'('isge', __ARG_2, __ARG_3, __ARG_4)
+    __ARG_1.'emitbinop'("isge", __ARG_2, __ARG_3, __ARG_4)
 
 .end # emitop
 
@@ -10071,7 +10073,7 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-    __ARG_1.'emitcompare'('ge', __ARG_3, __ARG_4, __ARG_2)
+    __ARG_1.'emitcompare'("ge", __ARG_3, __ARG_4, __ARG_2)
 
 .end # emitop_if
 
@@ -10081,7 +10083,7 @@
         .param string __ARG_2
         .param string __ARG_3
         .param string __ARG_4
-    __ARG_1.'emitcompare'('lt', __ARG_3, __ARG_4, __ARG_2)
+    __ARG_1.'emitcompare'("lt", __ARG_3, __ARG_4, __ARG_2)
 
 .end # emitop_else
 
@@ -10096,15 +10098,15 @@
     getattribute $P2, self, 'lexpr'
     $P1 = $P2.'checkresult'()
     set $S2, $P1
-    ne $S2, 'I', __label_2
+    ne $S2, "I", __label_2
     getattribute $P4, self, 'rexpr'
     $P3 = $P4.'checkresult'()
     set $S3, $P3
-    ne $S3, 'I', __label_2
-    set $S1, 'I'
+    ne $S3, "I", __label_2
+    set $S1, "I"
     goto __label_1
   __label_2:
-    set $S1, 'P'
+    set $S1, "P"
   __label_1:
     .return($S1)
 
@@ -10136,7 +10138,7 @@
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_49 = "WSubId_49"
+.const 'Sub' WSubId_47 = "WSubId_47"
     self.'optimizearg'()
     getattribute $P2, self, 'lexpr'
     $P1 = $P2.'isintegerliteral'()
@@ -10151,7 +10153,7 @@
   __label_3:
     getattribute $P3, self, 'owner'
     getattribute $P4, self, 'start'
-    $P2 = WSubId_49($P3, $P4, $I1)
+    $P2 = WSubId_47($P3, $P4, $I1)
     set $P1, $P2
   __label_2:
     .return($P1)
@@ -10171,7 +10173,7 @@
     if_null $P3, __label_1
     set $S1, $P3
   __label_1:
-    ne $S1, 'I', __label_2
+    ne $S1, "I", __label_2
     $P3 = $P1.'issimple'()
     unless $P3 goto __label_2
     $P4 = $P2.'issimple'()
@@ -10186,7 +10188,7 @@
     if_null $P3, __label_5
     set $S3, $P3
   __label_5:
-    __ARG_1.'emitbinop'('and', __ARG_2, $S2, $S3)
+    __ARG_1.'emitbinop'("and", __ARG_2, $S2, $S3)
     goto __label_3
   __label_2: # else
     $P3 = self.'genlabel'()
@@ -10194,10 +10196,10 @@
     if_null $P3, __label_6
     set $S4, $P3
   __label_6:
-    ne $S1, 'P', __label_7
+    ne $S1, "P", __label_7
     $P3 = $P1.'checkresult'()
     set $S7, $P3
-    eq $S7, 'P', __label_7
+    eq $S7, "P", __label_7
     $P4 = $P1.'emit_get'(__ARG_1)
     null $S5
     if_null $P4, __label_9
@@ -10209,10 +10211,10 @@
     $P1.'emit'(__ARG_1, __ARG_2)
   __label_8: # endif
     __ARG_1.'emitunless'(__ARG_2, $S4)
-    ne $S1, 'P', __label_10
+    ne $S1, "P", __label_10
     $P3 = $P2.'checkresult'()
     set $S7, $P3
-    eq $S7, 'P', __label_10
+    eq $S7, "P", __label_10
     $P4 = $P2.'emit_get'(__ARG_1)
     null $S6
     if_null $P4, __label_12
@@ -10238,7 +10240,7 @@
     if_null $P3, __label_1
     set $S1, $P3
   __label_1:
-    ne $S1, 'I', __label_2
+    ne $S1, "I", __label_2
     $P3 = $P1.'issimple'()
     unless $P3 goto __label_2
     $P4 = $P2.'issimple'()
@@ -10253,7 +10255,7 @@
     if_null $P3, __label_5
     set $S3, $P3
   __label_5:
-    __ARG_1.'emitbinop'('and', "$I0", $S2, $S3)
+    __ARG_1.'emitbinop'("and", "$I0", $S2, $S3)
     goto __label_3
   __label_2: # else
     $P3 = self.'genlabel'()
@@ -10334,7 +10336,7 @@
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_49 = "WSubId_49"
+.const 'Sub' WSubId_47 = "WSubId_47"
     self.'optimizearg'()
     getattribute $P2, self, 'lexpr'
     $P1 = $P2.'isintegerliteral'()
@@ -10349,7 +10351,7 @@
   __label_3:
     getattribute $P3, self, 'owner'
     getattribute $P4, self, 'start'
-    $P2 = WSubId_49($P3, $P4, $I1)
+    $P2 = WSubId_47($P3, $P4, $I1)
     set $P1, $P2
   __label_2:
     .return($P1)
@@ -10369,7 +10371,7 @@
     if_null $P3, __label_1
     set $S1, $P3
   __label_1:
-    ne $S1, 'I', __label_2
+    ne $S1, "I", __label_2
     $P3 = $P1.'issimple'()
     unless $P3 goto __label_2
     $P4 = $P2.'issimple'()
@@ -10384,7 +10386,7 @@
     if_null $P3, __label_5
     set $S3, $P3
   __label_5:
-    __ARG_1.'emitbinop'('or', __ARG_2, $S2, $S3)
+    __ARG_1.'emitbinop'("or", __ARG_2, $S2, $S3)
     goto __label_3
   __label_2: # else
     $P3 = self.'genlabel'()
@@ -10392,10 +10394,10 @@
     if_null $P3, __label_6
     set $S4, $P3
   __label_6:
-    ne $S1, 'P', __label_7
+    ne $S1, "P", __label_7
     $P3 = $P1.'checkresult'()
     set $S7, $P3
-    eq $S7, 'P', __label_7
+    eq $S7, "P", __label_7
     $P4 = $P1.'emit_get'(__ARG_1)
     null $S5
     if_null $P4, __label_9
@@ -10407,10 +10409,10 @@
     $P1.'emit'(__ARG_1, __ARG_2)
   __label_8: # endif
     __ARG_1.'emitif'(__ARG_2, $S4)
-    ne $S1, 'P', __label_10
+    ne $S1, "P", __label_10
     $P3 = $P2.'checkresult'()
     set $S7, $P3
-    eq $S7, 'P', __label_10
+    eq $S7, "P", __label_10
     $P4 = $P2.'emit_get'(__ARG_1)
     null $S6
     if_null $P4, __label_12
@@ -10436,7 +10438,7 @@
     if_null $P3, __label_1
     set $S1, $P3
   __label_1:
-    ne $S1, 'I', __label_2
+    ne $S1, "I", __label_2
     $P3 = $P1.'issimple'()
     unless $P3 goto __label_2
     $P4 = $P2.'issimple'()
@@ -10451,7 +10453,7 @@
     if_null $P3, __label_5
     set $S3, $P3
   __label_5:
-    __ARG_1.'emitbinop'('or', "$I0", $S2, $S3)
+    __ARG_1.'emitbinop'("or", "$I0", $S2, $S3)
     goto __label_3
   __label_2: # else
     $P3 = self.'genlabel'()
@@ -10516,7 +10518,7 @@
     set $S2, $P1
   __label_2:
     self.'annotate'(__ARG_1)
-    __ARG_1.'emitbinop'('band', __ARG_2, $S1, $S2)
+    __ARG_1.'emitbinop'("band", __ARG_2, $S1, $S2)
 
 .end # emit
 
@@ -10568,7 +10570,7 @@
     set $S2, $P1
   __label_2:
     self.'annotate'(__ARG_1)
-    __ARG_1.'emitbinop'('bor', __ARG_2, $S1, $S2)
+    __ARG_1.'emitbinop'("bor", __ARG_2, $S1, $S2)
 
 .end # emit
 
@@ -10620,7 +10622,7 @@
     set $S2, $P1
   __label_2:
     self.'annotate'(__ARG_1)
-    __ARG_1.'emitbinop'('bxor', __ARG_2, $S1, $S2)
+    __ARG_1.'emitbinop'("bxor", __ARG_2, $S1, $S2)
 
 .end # emit
 
@@ -10740,7 +10742,7 @@
 
 
 .sub 'checkresult' :method
-    .return('S')
+    .return("S")
 
 .end # checkresult
 
@@ -10782,7 +10784,7 @@
         .param pmc __ARG_1
     $P1 = self.'getregs'(__ARG_1)
     elements $I1, $P1
-    $P2 = self.'tempreg'('S')
+    $P2 = self.'tempreg'("S")
     null $S1
     if_null $P2, __label_1
     set $S1, $P2
@@ -10865,7 +10867,7 @@
 
 
 .sub 'checkresult' :method
-    .return('S')
+    .return("S")
 
 .end # checkresult
 
@@ -10917,9 +10919,9 @@
 
 .sub 'optimize' :method
 .const 'Sub' WSubId_104 = "WSubId_104"
-.const 'Sub' WSubId_49 = "WSubId_49"
+.const 'Sub' WSubId_47 = "WSubId_47"
 .const 'Sub' WSubId_105 = "WSubId_105"
-.const 'Sub' WSubId_103 = "WSubId_103"
+.const 'Sub' WSubId_100 = "WSubId_100"
     self.'optimizearg'()
     getattribute $P1, self, 'lexpr'
     getattribute $P2, self, 'rexpr'
@@ -10937,12 +10939,12 @@
     unless $P3 goto __label_3
     $P4 = $P2.'isliteral'()
     unless $P4 goto __label_3
-    ne $S1, 'S', __label_4
-    ne $S2, 'S', __label_4
+    ne $S1, "S", __label_4
+    ne $S2, "S", __label_4
     .tailcall WSubId_104($P1, $P2)
   __label_4: # endif
-    ne $S1, 'I', __label_5
-    ne $S2, 'I', __label_5
+    ne $S1, "I", __label_5
+    ne $S2, "I", __label_5
     $P3 = $P1.'getIntegerValue'()
     set $I1, $P3
     $P3 = $P2.'getIntegerValue'()
@@ -10950,7 +10952,7 @@
     getattribute $P3, self, 'owner'
     getattribute $P4, self, 'start'
     add $I3, $I1, $I2
-    .tailcall WSubId_49($P3, $P4, $I3)
+    .tailcall WSubId_47($P3, $P4, $I3)
   __label_5: # endif
     $P3 = WSubId_105($S1, $S2)
     if_null $P3, __label_6
@@ -10962,11 +10964,11 @@
     getattribute $P3, self, 'owner'
     getattribute $P4, self, 'start'
     add $N3, $N1, $N2
-    .tailcall WSubId_103($P3, $P4, $N3)
+    .tailcall WSubId_100($P3, $P4, $N3)
   __label_6: # endif
   __label_3: # endif
-    ne $S1, 'S', __label_7
-    ne $S2, 'S', __label_7
+    ne $S1, "S", __label_7
+    ne $S2, "S", __label_7
     new $P4, [ 'Winxed'; 'Compiler'; 'ConcatString' ]
     getattribute $P5, self, 'owner'
     getattribute $P6, self, 'start'
@@ -10996,20 +10998,20 @@
     ne $S1, $S2, __label_3
     .return($S1)
   __label_3: # endif
-    ne $S1, 'I', __label_4
-    ne $S2, 'S', __label_4
-    .return('S')
+    ne $S1, "I", __label_4
+    ne $S2, "S", __label_4
+    .return("S")
   __label_4: # endif
-    ne $S1, 'S', __label_5
-    ne $S2, 'I', __label_5
-    .return('S')
+    ne $S1, "S", __label_5
+    ne $S2, "I", __label_5
+    .return("S")
   __label_5: # endif
     $P1 = WSubId_105($S1, $S2)
     if_null $P1, __label_6
     unless $P1 goto __label_6
-    .return('N')
+    .return("N")
   __label_6: # endif
-    .return('I')
+    .return("I")
 
 .end # checkresult
 
@@ -11044,18 +11046,18 @@
     if_null $P3, __label_5
     set $S5, $P3
   __label_5:
-    ne $S1, 'S', __label_6
-    isne $I1, $S2, 'S'
+    ne $S1, "S", __label_6
+    isne $I1, $S2, "S"
     if $I1 goto __label_9
-    isne $I1, $S3, 'S'
+    isne $I1, $S3, "S"
   __label_9:
     unless $I1 goto __label_8
-    $P3 = self.'tempreg'('S')
+    $P3 = self.'tempreg'("S")
     null $S6
     if_null $P3, __label_10
     set $S6, $P3
   __label_10:
-    eq $S2, 'S', __label_11
+    eq $S2, "S", __label_11
     __ARG_1.'emitset'($S6, $S4)
     set $S4, $S6
     goto __label_12
@@ -11067,27 +11069,27 @@
     __ARG_1.'emitconcat'(__ARG_2, $S4, $S5)
     goto __label_7
   __label_6: # else
-    ne $S1, 'I', __label_13
-    isne $I1, $S2, 'I'
+    ne $S1, "I", __label_13
+    isne $I1, $S2, "I"
     if $I1 goto __label_15
-    isne $I1, $S3, 'I'
+    isne $I1, $S3, "I"
   __label_15:
     unless $I1 goto __label_13
     null $S7
-    ne $S2, 'I', __label_16
+    ne $S2, "I", __label_16
     set $S7, $S4
     goto __label_17
   __label_16: # else
-    $P3 = self.'tempreg'('I')
+    $P3 = self.'tempreg'("I")
     set $S7, $P3
     __ARG_1.'emitset'($S7, $S4)
   __label_17: # endif
     null $S8
-    ne $S3, 'I', __label_18
+    ne $S3, "I", __label_18
     set $S8, $S5
     goto __label_19
   __label_18: # else
-    $P3 = self.'tempreg'('I')
+    $P3 = self.'tempreg'("I")
     set $S8, $P3
     __ARG_1.'emitset'($S8, $S5)
   __label_19: # endif
@@ -11126,7 +11128,7 @@
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_49 = "WSubId_49"
+.const 'Sub' WSubId_47 = "WSubId_47"
     self.'optimizearg'()
     getattribute $P1, self, 'lexpr'
     getattribute $P2, self, 'rexpr'
@@ -11144,8 +11146,8 @@
     if_null $P3, __label_3
     set $S2, $P3
   __label_3:
-    ne $S1, 'I', __label_4
-    ne $S2, 'I', __label_4
+    ne $S1, "I", __label_4
+    ne $S2, "I", __label_4
     $P3 = $P1.'getIntegerValue'()
     set $I1, $P3
     $P3 = $P2.'getIntegerValue'()
@@ -11153,7 +11155,7 @@
     getattribute $P3, self, 'owner'
     getattribute $P4, self, 'start'
     sub $I3, $I1, $I2
-    .tailcall WSubId_49($P3, $P4, $I3)
+    .tailcall WSubId_47($P3, $P4, $I3)
   __label_4: # endif
   __label_1: # endif
     .return(self)
@@ -11175,32 +11177,32 @@
     set $S2, $P1
   __label_2:
     eq $S1, $S2, __label_5
-    iseq $I1, $S1, 'P'
+    iseq $I1, $S1, "P"
     if $I1 goto __label_7
-    iseq $I1, $S2, 'P'
+    iseq $I1, $S2, "P"
   __label_7:
     if $I1 goto __label_6
-    iseq $I2, $S1, 'I'
+    iseq $I2, $S1, "I"
     unless $I2 goto __label_9
-    iseq $I2, $S2, 'N'
+    iseq $I2, $S2, "N"
   __label_9:
     if $I2 goto __label_8
-    iseq $I3, $S1, 'N'
+    iseq $I3, $S1, "N"
     unless $I3 goto __label_11
-    iseq $I3, $S2, 'I'
+    iseq $I3, $S2, "I"
   __label_11:
     if $I3 goto __label_10
     goto __label_4
   __label_5: # case
     .return($S1)
   __label_6: # case
-    .return('P')
+    .return("P")
   __label_8: # case
-    .return('N')
+    .return("N")
   __label_10: # case
-    .return('N')
+    .return("N")
   __label_4: # default
-    .return('I')
+    .return("I")
   __label_3: # switch end
 
 .end # checkresult
@@ -11240,7 +11242,7 @@
     eq $S2, $S1, __label_6
     $P3 = self.'tempreg'($S1)
     set $S6, $P3
-    ne $S1, 'P', __label_7
+    ne $S1, "P", __label_7
     __ARG_1.'emitbox'($S6, $S4)
     goto __label_8
   __label_7: # else
@@ -11251,7 +11253,7 @@
     eq $S3, $S1, __label_9
     $P3 = self.'tempreg'($S1)
     set $S6, $P3
-    ne $S1, 'P', __label_10
+    ne $S1, "P", __label_10
     __ARG_1.'emitbox'($S6, $S5)
     goto __label_11
   __label_10: # else
@@ -11289,9 +11291,9 @@
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_49 = "WSubId_49"
+.const 'Sub' WSubId_47 = "WSubId_47"
 .const 'Sub' WSubId_105 = "WSubId_105"
-.const 'Sub' WSubId_103 = "WSubId_103"
+.const 'Sub' WSubId_100 = "WSubId_100"
     self.'optimizearg'()
     getattribute $P1, self, 'lexpr'
     getattribute $P2, self, 'rexpr'
@@ -11309,8 +11311,8 @@
     unless $P3 goto __label_3
     $P4 = $P2.'isliteral'()
     unless $P4 goto __label_3
-    ne $S1, 'I', __label_4
-    ne $S2, 'I', __label_4
+    ne $S1, "I", __label_4
+    ne $S2, "I", __label_4
     $P5 = $P1.'getIntegerValue'()
     set $I1, $P5
     $P3 = $P2.'getIntegerValue'()
@@ -11318,7 +11320,7 @@
     getattribute $P3, self, 'owner'
     getattribute $P4, self, 'start'
     mul $I3, $I1, $I2
-    .tailcall WSubId_49($P3, $P4, $I3)
+    .tailcall WSubId_47($P3, $P4, $I3)
   __label_4: # endif
     $P3 = WSubId_105($S1, $S2)
     if_null $P3, __label_5
@@ -11330,10 +11332,10 @@
     getattribute $P3, self, 'owner'
     getattribute $P4, self, 'start'
     mul $N3, $N1, $N2
-    .tailcall WSubId_103($P3, $P4, $N3)
+    .tailcall WSubId_100($P3, $P4, $N3)
   __label_5: # endif
   __label_3: # endif
-    ne $S1, 'S', __label_6
+    ne $S1, "S", __label_6
     new $P4, [ 'Winxed'; 'Compiler'; 'RepeatString' ]
     $P4.'RepeatString'(self)
     set $P3, $P4
@@ -11361,11 +11363,11 @@
     ne $S1, $S2, __label_3
     .return($S1)
   __label_3: # endif
-    ne $S1, 'S', __label_4
-    .return('S')
+    ne $S1, "S", __label_4
+    .return("S")
     goto __label_5
   __label_4: # else
-    .return('N')
+    .return("N")
   __label_5: # endif
 
 .end # checkresult
@@ -11389,12 +11391,12 @@
     null $S3
     null $S4
     ne $S1, $S2, __label_3
-    iseq $I3, $S1, 'I'
+    iseq $I3, $S1, "I"
     if $I3 goto __label_5
-    iseq $I3, $S1, 'N'
+    iseq $I3, $S1, "N"
   __label_5:
     if $I3 goto __label_4
-    iseq $I3, $S1, 'P'
+    iseq $I3, $S1, "P"
   __label_4:
     unless $I3 goto __label_3
     $P3 = $P1.'emit_get'(__ARG_1)
@@ -11404,7 +11406,7 @@
     __ARG_1.'emitmul'(__ARG_2, $S3, $S4)
     .return()
   __label_3: # endif
-    ne $S1, 'N', __label_6
+    ne $S1, "N", __label_6
     $P3 = $P1.'emit_get'(__ARG_1)
     set $S3, $P3
     $P3 = $P2.'emit_get'(__ARG_1)
@@ -11418,7 +11420,7 @@
     if $I3 == 78 goto __label_10
     goto __label_7
   __label_9: # case
-    $P3 = self.'tempreg'('N')
+    $P3 = self.'tempreg'("N")
     set $S5, $P3
     __ARG_1.'emitset'($S5, $S4)
     set $S5, $S4
@@ -11427,7 +11429,7 @@
     set $S5, $S4
     goto __label_8 # break
   __label_7: # default
-    $P4 = self.'tempreg'('N')
+    $P4 = self.'tempreg'("N")
     set $S5, $P4
     __ARG_1.'emitset'($S5, $S4)
   __label_8: # switch end
@@ -11526,7 +11528,7 @@
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_103 = "WSubId_103"
+.const 'Sub' WSubId_100 = "WSubId_100"
 .const 'Sub' WSubId_105 = "WSubId_105"
     self.'optimizearg'()
     getattribute $P1, self, 'lexpr'
@@ -11547,8 +11549,8 @@
   __label_3:
     null $P3
     null $P4
-    ne $S1, 'I', __label_4
-    ne $S2, 'I', __label_4
+    ne $S1, "I", __label_4
+    ne $S2, "I", __label_4
     $P5 = $P1.'getIntegerValue'()
     set $I1, $P5
     $P5 = $P2.'getIntegerValue'()
@@ -11559,7 +11561,7 @@
     set $N4, $I1
     set $N5, $I2
     div $N3, $N4, $N5
-    .tailcall WSubId_103($P5, $P6, $N3)
+    .tailcall WSubId_100($P5, $P6, $N3)
   __label_5: # endif
   __label_4: # endif
     $P5 = WSubId_105($S1, $S2)
@@ -11574,7 +11576,7 @@
     getattribute $P5, self, 'owner'
     getattribute $P6, self, 'start'
     div $N3, $N1, $N2
-    .tailcall WSubId_103($P5, $P6, $N3)
+    .tailcall WSubId_100($P5, $P6, $N3)
   __label_7: # endif
   __label_6: # endif
   __label_1: # endif
@@ -11584,7 +11586,7 @@
 
 
 .sub 'checkresult' :method
-    .return('N')
+    .return("N")
 
 .end # checkresult
 
@@ -11597,8 +11599,8 @@
     $P3 = $P1.'emit_get'(__ARG_1)
     $P6 = $P1.'checkresult'()
     set $S1, $P6
-    eq $S1, 'N', __label_1
-    $P2 = self.'tempreg'('N')
+    eq $S1, "N", __label_1
+    $P2 = self.'tempreg'("N")
     __ARG_1.'emitset'($P2, $P3)
     set $P3, $P2
   __label_1: # endif
@@ -11606,8 +11608,8 @@
     $P5 = $P4.'emit_get'(__ARG_1)
     $P6 = $P4.'checkresult'()
     set $S1, $P6
-    eq $S1, 'N', __label_2
-    $P2 = self.'tempreg'('N')
+    eq $S1, "N", __label_2
+    $P2 = self.'tempreg'("N")
     __ARG_1.'emitset'($P2, $P5)
     set $P5, $P2
   __label_2: # endif
@@ -11655,7 +11657,7 @@
     set $S2, $P1
   __label_2:
     self.'annotate'(__ARG_1)
-    __ARG_1.'emitbinop'('mod', __ARG_2, $S1, $S2)
+    __ARG_1.'emitbinop'("mod", __ARG_2, $S1, $S2)
 
 .end # emit
 
@@ -11694,7 +11696,7 @@
 
 
 .sub 'checkresult' :method
-    .return('I')
+    .return("I")
 
 .end # checkresult
 
@@ -11713,7 +11715,7 @@
     set $S2, $P1
   __label_2:
     self.'annotate'(__ARG_1)
-    __ARG_1.'emitbinop'('mod', __ARG_2, $S1, $S2)
+    __ARG_1.'emitbinop'("mod", __ARG_2, $S1, $S2)
 
 .end # emit
 
@@ -11756,7 +11758,7 @@
     set $S2, $P1
   __label_2:
     self.'annotate'(__ARG_1)
-    __ARG_1.'emitbinop'('shl', __ARG_2, $S1, $S2)
+    __ARG_1.'emitbinop'("shl", __ARG_2, $S1, $S2)
 
 .end # emit
 
@@ -11808,7 +11810,7 @@
     set $S2, $P1
   __label_2:
     self.'annotate'(__ARG_1)
-    __ARG_1.'emitbinop'('shr', __ARG_2, $S1, $S2)
+    __ARG_1.'emitbinop'("shr", __ARG_2, $S1, $S2)
 
 .end # emit
 
@@ -11860,7 +11862,7 @@
     set $S2, $P1
   __label_2:
     self.'annotate'(__ARG_1)
-    __ARG_1.'emitbinop'('lsr', __ARG_2, $S1, $S2)
+    __ARG_1.'emitbinop'("lsr", __ARG_2, $S1, $S2)
 
 .end # emit
 
@@ -11900,10 +11902,10 @@
 
 .sub 'emitmodifiers' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     null $I1
     null $I2
-    set $S1, ''
+    set $S1, ""
     $P3 = self.'getlist'()
     if_null $P3, __label_2
     iter $P4, $P3
@@ -11913,8 +11915,8 @@
     shift $P1, $P4
     $P5 = $P1.'getname'()
     set $S2, $P5
-    if $S2 == 'flat' goto __label_5
-    if $S2 == 'named' goto __label_6
+    if $S2 == "flat" goto __label_5
+    if $S2 == "named" goto __label_6
     goto __label_3
   __label_5: # case
     set $I1, 1
@@ -11932,13 +11934,13 @@
     $P2 = $P1.'getarg'(0)
     $P7 = $P2.'isstringliteral'()
     if $P7 goto __label_11
-    WSubId_30('Invalid modifier', $P2)
+    WSubId_28("Invalid modifier", $P2)
   __label_11: # endif
     $P8 = $P2.'getPirString'()
     set $S1, $P8
     goto __label_8 # break
   __label_7: # default
-    WSubId_30('Invalid modifier', $P2)
+    WSubId_28("Invalid modifier", $P2)
   __label_8: # switch end
   __label_3: # default
   __label_4: # switch end
@@ -11950,14 +11952,14 @@
     if $I2 goto __label_16
     goto __label_13
   __label_14: # case
-    __ARG_1.'print'(' :flat :named')
+    __ARG_1.'print'(" :flat :named")
     goto __label_12 # break
   __label_15: # case
-    __ARG_1.'print'(' :flat')
+    __ARG_1.'print'(" :flat")
     goto __label_12 # break
   __label_16: # case
-    __ARG_1.'print'(' :named')
-    eq $S1, '', __label_17
+    __ARG_1.'print'(" :named")
+    eq $S1, "", __label_17
     __ARG_1.'print'("(", $S1, ")")
   __label_17: # endif
     goto __label_12 # break
@@ -12029,16 +12031,16 @@
 .sub 'parseArgument' :subid('WSubId_106')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_77 = "WSubId_77"
-.const 'Sub' WSubId_79 = "WSubId_79"
+.const 'Sub' WSubId_74 = "WSubId_74"
+.const 'Sub' WSubId_76 = "WSubId_76"
     null $P1
-    $P2 = WSubId_77(__ARG_1, __ARG_2)
+    $P2 = WSubId_74(__ARG_1, __ARG_2)
     $P3 = __ARG_1.'get'()
-    $P4 = $P3.'isop'(':')
+    $P4 = $P3.'isop'(":")
     if_null $P4, __label_1
     unless $P4 goto __label_1
     $P3 = __ARG_1.'get'()
-    $P4 = $P3.'isop'('[')
+    $P4 = $P3.'isop'("[")
     if_null $P4, __label_3
     unless $P4 goto __label_3
     new $P5, [ 'Winxed'; 'Compiler'; 'ArgumentModifierList' ]
@@ -12046,7 +12048,7 @@
     set $P1, $P5
     goto __label_4
   __label_3: # else
-    WSubId_79('modifier list', $P3)
+    WSubId_76("modifier list", $P3)
   __label_4: # endif
     goto __label_2
   __label_1: # else
@@ -12066,17 +12068,12 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param string __ARG_4
-.const 'Sub' WSubId_76 = "WSubId_76"
+.const 'Sub' WSubId_91 = "WSubId_91"
 .const 'Sub' WSubId_106 = "WSubId_106"
     setattribute self, 'owner', __ARG_1
     setattribute self, 'start', __ARG_2
-    $P1 = __ARG_3.'get'()
-    $P2 = $P1.'isop'(__ARG_4)
-    if $P2 goto __label_1
-    __ARG_3.'unget'($P1)
-    $P3 = WSubId_76(__ARG_3, __ARG_1, WSubId_106, __ARG_4)
-    setattribute self, 'args', $P3
-  __label_1: # endif
+    $P2 = WSubId_91(__ARG_3, __ARG_1, WSubId_106, __ARG_4)
+    setattribute self, 'args', $P2
 
 .end # ArgumentList
 
@@ -12217,7 +12214,7 @@
         .param pmc __ARG_1
     getattribute $P1, self, 'args'
     $P2 = self.'getargvalues'(__ARG_1)
-    set $S1, ''
+    set $S1, ""
     $P4 = self.'numargs'()
     set $I1, $P4
     null $I2
@@ -12230,7 +12227,7 @@
     if_null $P3, __label_4
     $P3.'emitmodifiers'(__ARG_1)
   __label_4: # endif
-    set $S1, ', '
+    set $S1, ", "
   __label_1: # for iteration
     inc $I2
     goto __label_3
@@ -12265,6 +12262,439 @@
 
 .end # arglist_hascompilevalue
 
+.namespace [ 'Winxed'; 'Compiler'; 'CastExpr' ]
+
+.sub 'CastExpr' :method
+        .param pmc __ARG_1
+        .param pmc __ARG_2
+        .param pmc __ARG_3
+        .param string __ARG_4
+    self.'Expr'(__ARG_1, __ARG_2)
+    setattribute self, 'arg', __ARG_3
+    box $P1, __ARG_4
+    setattribute self, 'type', $P1
+
+.end # CastExpr
+
+
+.sub 'emit' :method
+        .param pmc __ARG_1
+        .param string __ARG_2
+    getattribute $P1, self, 'arg'
+    getattribute $P2, self, 'type'
+    null $S1
+    if_null $P2, __label_1
+    set $S1, $P2
+  __label_1:
+    $P2 = $P1.'checkresult'()
+    null $S2
+    if_null $P2, __label_2
+    set $S2, $P2
+  __label_2:
+    isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'IndexExpr' ]
+    if $I1 goto __label_5
+    isa $I2, $P1, [ 'Winxed'; 'Compiler'; 'CallExpr' ]
+    if $I2 goto __label_6
+    eq $S2, $S1, __label_7
+    $P2 = $P1.'isnull'()
+    set $I3, $P2
+    if $I3 goto __label_8
+    goto __label_4
+  __label_5: # case
+  __label_6: # case
+  __label_7: # case
+    $P1.'emit'(__ARG_1, __ARG_2)
+    goto __label_3 # break
+  __label_8: # case
+    __ARG_1.'emitnull'(__ARG_2)
+    goto __label_3 # break
+  __label_4: # default
+    $P3 = $P1.'emit_get'(__ARG_1)
+    null $S3
+    if_null $P3, __label_9
+    set $S3, $P3
+  __label_9:
+    __ARG_1.'emitset'(__ARG_2, $S3)
+  __label_3: # switch end
+
+.end # emit
+
+.sub Winxed_class_init :anon :load :init
+    newclass $P0, [ 'Winxed'; 'Compiler'; 'CastExpr' ]
+    get_class $P1, [ 'Winxed'; 'Compiler'; 'FinalExpr' ]
+    addparent $P0, $P1
+    addattribute $P0, 'arg'
+    addattribute $P0, 'type'
+.end
+.namespace [ 'Winxed'; 'Compiler'; 'IntCastExpr' ]
+
+.sub 'IntCastExpr' :method
+        .param pmc __ARG_1
+        .param pmc __ARG_2
+        .param pmc __ARG_3
+    self.'CastExpr'(__ARG_1, __ARG_2, __ARG_3, "I")
+
+.end # IntCastExpr
+
+
+.sub 'checkresult' :method
+    .return("I")
+
+.end # checkresult
+
+.sub Winxed_class_init :anon :load :init
+    newclass $P0, [ 'Winxed'; 'Compiler'; 'IntCastExpr' ]
+    get_class $P1, [ 'Winxed'; 'Compiler'; 'CastExpr' ]
+    addparent $P0, $P1
+.end
+.namespace [ 'Winxed'; 'Compiler'; 'FloatCastExpr' ]
+
+.sub 'FloatCastExpr' :method
+        .param pmc __ARG_1
+        .param pmc __ARG_2
+        .param pmc __ARG_3
+    self.'CastExpr'(__ARG_1, __ARG_2, __ARG_3, "N")
+
+.end # FloatCastExpr
+
+
+.sub 'checkresult' :method
+    .return("N")
+
+.end # checkresult
+
+.sub Winxed_class_init :anon :load :init
+    newclass $P0, [ 'Winxed'; 'Compiler'; 'FloatCastExpr' ]
+    get_class $P1, [ 'Winxed'; 'Compiler'; 'CastExpr' ]
+    addparent $P0, $P1
+.end
+.namespace [ 'Winxed'; 'Compiler'; 'StringCastExpr' ]
+
+.sub 'StringCastExpr' :method
+        .param pmc __ARG_1
+        .param pmc __ARG_2
+        .param pmc __ARG_3
+    self.'CastExpr'(__ARG_1, __ARG_2, __ARG_3, "S")
+
+.end # StringCastExpr
+
+
+.sub 'checkresult' :method
+    .return("S")
+
+.end # checkresult
+
+.sub Winxed_class_init :anon :load :init
+    newclass $P0, [ 'Winxed'; 'Compiler'; 'StringCastExpr' ]
+    get_class $P1, [ 'Winxed'; 'Compiler'; 'CastExpr' ]
+    addparent $P0, $P1
+.end
+.namespace [ 'Winxed'; 'Compiler'; 'BoxExpr' ]
+
+.sub 'BoxExpr' :method
+        .param pmc __ARG_1
+        .param pmc __ARG_2
+        .param pmc __ARG_3
+    self.'Expr'(__ARG_1, __ARG_2)
+    setattribute self, 'arg', __ARG_3
+
+.end # BoxExpr
+
+
+.sub 'checkresult' :method
+    .return("P")
+
+.end # checkresult
+
+
+.sub 'emit' :method
+        .param pmc __ARG_1
+        .param string __ARG_2
+    getattribute $P1, self, 'arg'
+    $P2 = $P1.'emit_get'(__ARG_1)
+    null $S1
+    if_null $P2, __label_1
+    set $S1, $P2
+  __label_1:
+    self.'annotate'(__ARG_1)
+    __ARG_1.'emitbox'(__ARG_2, $S1)
+
+.end # emit
+
+.sub Winxed_class_init :anon :load :init
+    newclass $P0, [ 'Winxed'; 'Compiler'; 'BoxExpr' ]
+    get_class $P1, [ 'Winxed'; 'Compiler'; 'FinalExpr' ]
+    addparent $P0, $P1
+    addattribute $P0, 'arg'
+.end
+.namespace [ 'Winxed'; 'Compiler'; 'VarCastExpr' ]
+
+.sub 'VarCastExpr' :method
+        .param pmc __ARG_1
+        .param pmc __ARG_2
+        .param pmc __ARG_3
+    self.'Expr'(__ARG_1, __ARG_2)
+    setattribute self, 'arg', __ARG_3
+
+.end # VarCastExpr
+
+
+.sub 'checkresult' :method
+    .return("P")
+
+.end # checkresult
+
+
+.sub 'emit' :method
+        .param pmc __ARG_1
+        .param string __ARG_2
+    getattribute $P1, self, 'arg'
+    $P9 = $P1.'checkresult'()
+    null $S1
+    if_null $P9, __label_1
+    set $S1, $P9
+  __label_1:
+    null $P2
+    isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'FunctionId' ]
+    if $I1 goto __label_4
+    isa $I2, $P1, [ 'Winxed'; 'Compiler'; 'IdentifierExpr' ]
+    if $I2 goto __label_5
+    isa $I3, $P1, [ 'Winxed'; 'Compiler'; 'MemberExpr' ]
+    if $I3 goto __label_6
+    goto __label_3
+  __label_4: # case
+    $P1.'emitvar'(__ARG_1, __ARG_2)
+    goto __label_2 # break
+  __label_5: # case
+    $P9 = $P1.'getName'()
+    null $S2
+    if_null $P9, __label_7
+    set $S2, $P9
+  __label_7:
+    $P10 = $P1.'checkIdentifier'()
+    null $S3
+    if_null $P10, __label_8
+    set $S3, $P10
+  __label_8:
+    $P3 = $P1.'checkVar'()
+    eq $S3, "", __label_9
+    if_null $P3, __label_9
+    $P11 = $P3.'issubid'()
+    if $P11 goto __label_9
+    $P1.'emit'(__ARG_1, __ARG_2)
+    goto __label_10
+  __label_9: # else
+    root_new $P9, ['parrot';'ResizablePMCArray']
+    assign $P9, 1
+    $P9[0] = $S2
+    $P2 = $P1.'scopesearch'($P9, 0)
+    if_null $P2, __label_11
+    isa $I1, $P2, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
+    unless $I1 goto __label_11
+    getattribute $P9, $P2, 'owner'
+    $P4 = $P9.'getpath'()
+    self.'annotate'(__ARG_1)
+    set $P7, $P4
+    null $S6
+    elements $I1, $P7
+    unless $I1 goto __label_13
+    join $S9, "'; '", $P7
+    concat $S10, "[ '", $S9
+    concat $S10, $S10, "' ]"
+    set $S6, $S10
+  __label_13: # endif
+    set $S8, $S6
+  __label_12:
+    __ARG_1.'emitget_hll_global'(__ARG_2, $S2, $S8)
+  __label_11: # endif
+  __label_10: # endif
+    goto __label_2 # break
+  __label_6: # case
+    new $P5, ['ResizableStringArray']
+    $P1.'buildkey'($P5)
+    getattribute $P9, self, 'owner'
+    $P2 = $P9.'scopesearch'($P5, 0)
+    if_null $P2, __label_14
+    isa $I1, $P2, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
+    unless $I1 goto __label_14
+    getattribute $P10, $P2, 'owner'
+    $P6 = $P10.'getpath'()
+    getattribute $P10, $P2, 'name'
+    $P9 = $P10.'getidentifier'()
+    null $S4
+    if_null $P9, __label_16
+    set $S4, $P9
+  __label_16:
+    self.'annotate'(__ARG_1)
+    $P9 = $P6.'getparrotkey'()
+    __ARG_1.'emitget_hll_global'(__ARG_2, $S4, $P9)
+    goto __label_15
+  __label_14: # else
+    $P9 = $P5[0]
+    set $S9, $P9
+    ne $S9, "self", __label_17
+    getattribute $P12, self, 'owner'
+    $P11 = $P12.'getouter'()
+    $P10 = $P11.'ismethod'()
+    unless $P10 goto __label_17
+    $P1.'emit'(__ARG_1, __ARG_2)
+    goto __label_18
+  __label_17: # else
+    $P9 = $P5.'pop'()
+    null $S5
+    if_null $P9, __label_19
+    set $S5, $P9
+  __label_19:
+    self.'annotate'(__ARG_1)
+    set $P8, $P5
+    null $S7
+    elements $I1, $P8
+    unless $I1 goto __label_21
+    join $S9, "'; '", $P8
+    concat $S10, "[ '", $S9
+    concat $S10, $S10, "' ]"
+    set $S7, $S10
+  __label_21: # endif
+    set $S11, $S7
+  __label_20:
+    __ARG_1.'emitget_hll_global'(__ARG_2, $S5, $S11)
+  __label_18: # endif
+  __label_15: # endif
+    goto __label_2 # break
+  __label_3: # default
+    self.'annotate'(__ARG_1)
+    $P1.'emit'(__ARG_1, __ARG_2)
+  __label_2: # switch end
+
+.end # emit
+
+.sub Winxed_class_init :anon :load :init
+    newclass $P0, [ 'Winxed'; 'Compiler'; 'VarCastExpr' ]
+    get_class $P1, [ 'Winxed'; 'Compiler'; 'FinalExpr' ]
+    addparent $P0, $P1
+    addattribute $P0, 'arg'
+.end
+.namespace [ 'Winxed'; 'Compiler' ]
+
+.sub 'builtinexpr_intcast' :subid('WSubId_52')
+        .param pmc __ARG_1
+        .param pmc __ARG_2
+        .param pmc __ARG_3
+.const 'Sub' WSubId_47 = "WSubId_47"
+    $P3 = __ARG_3.'getarg'(0)
+    getattribute $P1, $P3, 'arg'
+    $P3 = $P1.'hascompilevalue'()
+    if_null $P3, __label_1
+    unless $P3 goto __label_1
+    set $P2, $P1
+    $P3 = $P2.'getIntegerValue'()
+    set $I1, $P3
+    set $I2, $I1
+  __label_3:
+    .tailcall WSubId_47(__ARG_1, __ARG_2, $I2)
+    goto __label_2
+  __label_1: # else
+    new $P4, [ 'Winxed'; 'Compiler'; 'IntCastExpr' ]
+    $P4.'IntCastExpr'(__ARG_1, __ARG_2, $P1)
+    set $P3, $P4
+    .return($P3)
+  __label_2: # endif
+
+.end # builtinexpr_intcast
+
+
+.sub 'builtinexpr_floatcast' :subid('WSubId_53')
+        .param pmc __ARG_1
+        .param pmc __ARG_2
+        .param pmc __ARG_3
+.const 'Sub' WSubId_100 = "WSubId_100"
+    $P3 = __ARG_3.'getarg'(0)
+    getattribute $P1, $P3, 'arg'
+    $P3 = $P1.'hascompilevalue'()
+    if_null $P3, __label_1
+    unless $P3 goto __label_1
+    set $P2, $P1
+    $P3 = $P2.'getFloatValue'()
+    set $N1, $P3
+    set $N2, $N1
+  __label_3:
+    .tailcall WSubId_100(__ARG_1, __ARG_2, $N2)
+    goto __label_2
+  __label_1: # else
+    new $P4, [ 'Winxed'; 'Compiler'; 'FloatCastExpr' ]
+    $P4.'FloatCastExpr'(__ARG_1, __ARG_2, $P1)
+    set $P3, $P4
+    .return($P3)
+  __label_2: # endif
+
+.end # builtinexpr_floatcast
+
+
+.sub 'builtinexpr_stringcast' :subid('WSubId_54')
+        .param pmc __ARG_1
+        .param pmc __ARG_2
+        .param pmc __ARG_3
+.const 'Sub' WSubId_50 = "WSubId_50"
+    $P3 = __ARG_3.'getarg'(0)
+    getattribute $P1, $P3, 'arg'
+    $P3 = $P1.'hascompilevalue'()
+    if_null $P3, __label_1
+    unless $P3 goto __label_1
+    set $P2, $P1
+    $P3 = $P2.'getStringValue'()
+    null $S1
+    if_null $P3, __label_4
+    set $S1, $P3
+  __label_4:
+    set $S2, $S1
+  __label_3:
+    .tailcall WSubId_50(__ARG_1, __ARG_2, $S2)
+    goto __label_2
+  __label_1: # else
+    new $P4, [ 'Winxed'; 'Compiler'; 'StringCastExpr' ]
+    $P4.'StringCastExpr'(__ARG_1, __ARG_2, $P1)
+    set $P3, $P4
+    .return($P3)
+  __label_2: # endif
+
+.end # builtinexpr_stringcast
+
+
+.sub 'builtinexpr_varcast' :subid('WSubId_55')
+        .param pmc __ARG_1
+        .param pmc __ARG_2
+        .param pmc __ARG_3
+    $P2 = __ARG_3.'getarg'(0)
+    getattribute $P1, $P2, 'arg'
+    $P2 = $P1.'checkresult'()
+    null $S1
+    if_null $P2, __label_1
+    set $S1, $P2
+  __label_1:
+    if_null $S1, __label_2
+    length $I1, $S1
+    ne $I1, 1, __label_2
+    ord $I1, $S1
+    if $I1 == 73 goto __label_4
+    if $I1 == 78 goto __label_5
+    if $I1 == 83 goto __label_6
+    goto __label_2
+  __label_4: # case
+  __label_5: # case
+  __label_6: # case
+    new $P3, [ 'Winxed'; 'Compiler'; 'BoxExpr' ]
+    $P3.'BoxExpr'(__ARG_1, __ARG_2, $P1)
+    set $P2, $P3
+    .return($P2)
+  __label_2: # default
+    new $P5, [ 'Winxed'; 'Compiler'; 'VarCastExpr' ]
+    $P5.'VarCastExpr'(__ARG_1, __ARG_2, $P1)
+    set $P4, $P5
+    .return($P4)
+  __label_3: # switch end
+
+.end # builtinexpr_varcast
+
 .namespace [ 'Winxed'; 'Compiler'; 'CallBuiltinExpr' ]
 
 .sub 'CallBuiltinExpr' :method
@@ -12286,7 +12716,7 @@
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-    ne $S1, ':', __label_2
+    ne $S1, ":", __label_2
     getattribute $P4, self, 'args'
     $P3 = $P4[0]
     getattribute $P2, $P3, 'arg'
@@ -12307,8 +12737,8 @@
 
 .sub 'emit_get' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_30 = "WSubId_30"
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_28 = "WSubId_28"
+.const 'Sub' WSubId_33 = "WSubId_33"
     $P1 = self.'checkresult'()
     null $S1
     if_null $P1, __label_1
@@ -12330,11 +12760,11 @@
   __label_7: # case
     goto __label_3 # break
   __label_8: # case
-    WSubId_30("Can't use result of a void builtin", self)
+    WSubId_28("Can't use result of a void builtin", self)
   __label_2: # default
     concat $S3, "Unexpected result type '", $S1
     concat $S3, $S3, "'"
-    WSubId_35($S3, self)
+    WSubId_33($S3, self)
   __label_3: # switch end
     $P1 = self.'tempreg'($S1)
     null $S2
@@ -12350,74 +12780,71 @@
 .sub 'emit' :method
         .param pmc __ARG_1
         .param string __ARG_2
-    getattribute $P1, self, 'builtin'
-    getattribute $P2, self, 'args'
-    new $P3, ['ResizableStringArray']
-    null $P4
-    $P8 = $P1.'params'()
-    set $I3, $P8
+    getattribute $P1, self, 'owner'
+    getattribute $P2, self, 'start'
+    getattribute $P3, self, 'builtin'
+    getattribute $P4, self, 'args'
+    new $P5, ['ResizableStringArray']
+    null $P6
+    $P10 = $P3.'params'()
+    set $I3, $P10
     if $I3 == -1 goto __label_3
     if $I3 == -2 goto __label_4
     goto __label_1
   __label_3: # case
-    new $P9, [ 'Winxed'; 'Compiler'; 'CollectValues' ]
-    getattribute $P10, self, 'owner'
-    $P9.'CollectValues'($P10, __ARG_1)
-    set $P5, $P9
-    if_null $P2, __label_6
-    iter $P11, $P2
-    set $P11, 0
+    new $P11, [ 'Winxed'; 'Compiler'; 'CollectValues' ]
+    $P11.'CollectValues'($P1, __ARG_1)
+    set $P7, $P11
+    if_null $P4, __label_6
+    iter $P12, $P4
+    set $P12, 0
   __label_5: # for iteration
-    unless $P11 goto __label_6
-    shift $P4, $P11
-    getattribute $P13, $P4, 'arg'
-    $P12 = $P5.'add'($P13)
-    push $P3, $P12
+    unless $P12 goto __label_6
+    shift $P6, $P12
+    getattribute $P14, $P6, 'arg'
+    $P13 = $P7.'add'($P14)
+    push $P5, $P13
     goto __label_5
   __label_6: # endfor
     goto __label_2 # break
   __label_4: # case
-    root_new $P6, ['parrot';'ResizablePMCArray']
-    if_null $P2, __label_8
-    iter $P14, $P2
-    set $P14, 0
+    root_new $P8, ['parrot';'ResizablePMCArray']
+    if_null $P4, __label_8
+    iter $P15, $P4
+    set $P15, 0
   __label_7: # for iteration
-    unless $P14 goto __label_8
-    shift $P4, $P14
-    getattribute $P15, $P4, 'arg'
-    push $P6, $P15
+    unless $P15 goto __label_8
+    shift $P6, $P15
+    getattribute $P16, $P6, 'arg'
+    push $P8, $P16
     goto __label_7
   __label_8: # endfor
-    getattribute $P16, self, 'builtin'
-    getattribute $P17, self, 'start'
-    $P16.'expand'(__ARG_1, self, $P17, __ARG_2, $P6)
+    $P3.'expand'(__ARG_1, $P1, $P2, __ARG_2, $P8)
     .return()
   __label_1: # default
-    getattribute $P18, self, 'args'
-    set $I1, $P18
-    new $P19, [ 'Winxed'; 'Compiler'; 'CollectValues' ]
-    getattribute $P20, self, 'owner'
-    $P19.'CollectValues'($P20, __ARG_1)
-    set $P7, $P19
+    elements $I1, $P4
+    new $P17, [ 'Winxed'; 'Compiler'; 'CollectValues' ]
+    $P17.'CollectValues'($P1, __ARG_1)
+    set $P9, $P17
     null $I2
   __label_11: # for condition
     ge $I2, $I1, __label_10
-    $P21 = $P2[$I2]
-    getattribute $P4, $P21, 'arg'
-    $P8 = $P4.'checkresult'()
+    $P18 = $P4[$I2]
+    getattribute $P6, $P18, 'arg'
+    $P10 = $P6.'checkresult'()
     null $S1
-    if_null $P8, __label_12
-    set $S1, $P8
+    if_null $P10, __label_12
+    set $S1, $P10
   __label_12:
-    $P8 = $P1.'paramtype'($I2)
+    $P10 = $P3.'paramtype'($I2)
     null $S2
-    if_null $P8, __label_13
-    set $S2, $P8
+    if_null $P10, __label_13
+    set $S2, $P10
   __label_13:
     null $S3
-    $P8 = $P4.'isnull'()
-    if_null $P8, __label_14
-    unless $P8 goto __label_14
+    $P10 = $P6.'isnull'()
+    if_null $P10, __label_14
+    unless $P10 goto __label_14
     if_null $S2, __label_16
     length $I3, $S2
     ne $I3, 1, __label_16
@@ -12429,41 +12856,41 @@
   __label_18: # case
   __label_19: # case
   __label_20: # case
-    $P9 = self.'tempreg'($S2)
-    set $S3, $P9
+    $P11 = self.'tempreg'($S2)
+    set $S3, $P11
     __ARG_1.'emitnull'($S3)
     goto __label_17 # break
   __label_16: # default
-    $P10 = $P7.'add'($P4)
-    set $S3, $P10
+    $P13 = $P9.'add'($P6)
+    set $S3, $P13
   __label_17: # switch end
     goto __label_15
   __label_14: # else
     iseq $I3, $S1, $S2
     if $I3 goto __label_24
-    iseq $I3, $S2, '?'
+    iseq $I3, $S2, "?"
   __label_24:
     if $I3 goto __label_23
-    iseq $I3, $S2, 'p'
+    iseq $I3, $S2, "p"
     unless $I3 goto __label_25
-    iseq $I3, $S1, 'S'
+    iseq $I3, $S1, "S"
     if $I3 goto __label_26
-    iseq $I3, $S1, 'P'
+    iseq $I3, $S1, "P"
   __label_26:
   __label_25:
   __label_23:
     unless $I3 goto __label_21
-    $P8 = $P4.'emit_get'(__ARG_1)
-    set $S3, $P8
+    $P10 = $P6.'emit_get'(__ARG_1)
+    set $S3, $P10
     goto __label_22
   __label_21: # else
-    ne $S2, 'p', __label_27
-    set $S2, 'P'
+    ne $S2, "p", __label_27
+    set $S2, "P"
   __label_27: # endif
-    $P8 = $P4.'emit_get'(__ARG_1)
+    $P10 = $P6.'emit_get'(__ARG_1)
     null $S4
-    if_null $P8, __label_28
-    set $S4, $P8
+    if_null $P10, __label_28
+    set $S4, $P10
   __label_28:
     if_null $S2, __label_29
     length $I3, $S2
@@ -12486,8 +12913,8 @@
   __label_37: # case
   __label_38: # case
   __label_39: # case
-    $P8 = self.'tempreg'($S2)
-    set $S3, $P8
+    $P10 = self.'tempreg'($S2)
+    set $S3, $P10
     __ARG_1.'emitbox'($S3, $S4)
     goto __label_36 # break
   __label_35: # default
@@ -12497,8 +12924,8 @@
   __label_32: # case
   __label_33: # case
   __label_34: # case
-    $P9 = self.'tempreg'($S2)
-    set $S3, $P9
+    $P11 = self.'tempreg'($S2)
+    set $S3, $P11
     __ARG_1.'emitset'($S3, $S4)
     goto __label_30 # break
   __label_29: # default
@@ -12506,15 +12933,13 @@
   __label_30: # switch end
   __label_22: # endif
   __label_15: # endif
-    push $P3, $S3
+    push $P5, $S3
   __label_9: # for iteration
     inc $I2
     goto __label_11
   __label_10: # for end
   __label_2: # switch end
-    getattribute $P8, self, 'builtin'
-    getattribute $P9, self, 'start'
-    $P8.'expand'(__ARG_1, self, $P9, __ARG_2, $P3)
+    $P3.'expand'(__ARG_1, $P1, $P2, __ARG_2, $P5)
 
 .end # emit
 
@@ -12532,7 +12957,7 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
 .const 'Sub' WSubId_107 = "WSubId_107"
     $P7 = __ARG_3.'getname'()
     null $S1
@@ -12581,25 +13006,30 @@
     goto __label_6
   __label_7: # endfor
     unless_null $P3, __label_12
-    WSubId_30("Wrong arguments for builtin", __ARG_2)
+    WSubId_28("Wrong arguments for builtin", __ARG_2)
   __label_12: # endif
-    $P7 = $P3.'iscompileevaluable'()
+    $P7 = $P3.'isreplaceexpr'()
     if_null $P7, __label_13
     unless $P7 goto __label_13
+    .tailcall $P3.'replaceexpr'(__ARG_1, __ARG_2, __ARG_4)
+  __label_13: # endif
+    $P7 = $P3.'iscompileevaluable'()
+    if_null $P7, __label_14
+    unless $P7 goto __label_14
     $P8 = WSubId_107($P1)
-    if_null $P8, __label_14
-    unless $P8 goto __label_14
+    if_null $P8, __label_15
+    unless $P8 goto __label_15
     getattribute $P5, $P3, 'evalfun'
     new $P7, 'ExceptionHandler'
-    set_label $P7, __label_15
+    set_label $P7, __label_16
     push_eh $P7
     getattribute $P10, __ARG_1, 'owner'
     getattribute $P11, __ARG_1, 'start'
     $P8 = $P5($P10, $P11, $P1)
     .return($P8)
     pop_eh
-    goto __label_16
-  __label_15:
+    goto __label_17
+  __label_16:
     .get_results($P6)
     finalize $P6
     pop_eh
@@ -12608,10 +13038,10 @@
     concat $S3, $S3, " failed: '"
     concat $S3, $S3, $S2
     concat $S3, $S3, "'"
-    WSubId_30($S3, __ARG_2)
-  __label_16:
+    WSubId_28($S3, __ARG_2)
+  __label_17:
+  __label_15: # endif
   __label_14: # endif
-  __label_13: # endif
     new $P8, [ 'Winxed'; 'Compiler'; 'CallBuiltinExpr' ]
     $P8.'CallBuiltinExpr'(__ARG_1, __ARG_2, $P3, $P1)
     set $P7, $P8
@@ -12629,11 +13059,11 @@
     self.'Expr'(__ARG_2, __ARG_3)
     setattribute self, 'funref', __ARG_4
     $P1 = __ARG_1.'get'()
-    $P2 = $P1.'isop'(')')
+    $P2 = $P1.'isop'(")")
     if $P2 goto __label_1
     __ARG_1.'unget'($P1)
     new $P4, [ 'Winxed'; 'Compiler'; 'ArgumentList' ]
-    $P4.'ArgumentList'(__ARG_2, __ARG_3, __ARG_1, ')')
+    $P4.'ArgumentList'(__ARG_2, __ARG_3, __ARG_1, ")")
     set $P3, $P4
     setattribute self, 'args', $P3
   __label_1: # endif
@@ -12660,110 +13090,109 @@
 
 
 .sub 'checkresult' :method
-    .return('P')
+    .return("P")
 
 .end # checkresult
 
 
 .sub 'optimize' :method
 .const 'Sub' WSubId_108 = "WSubId_108"
-.const 'Sub' WSubId_35 = "WSubId_35"
-    getattribute $P6, self, 'funref'
-    $P1 = $P6.'optimize'()
+.const 'Sub' WSubId_33 = "WSubId_33"
+    getattribute $P7, self, 'funref'
+    $P1 = $P7.'optimize'()
     setattribute self, 'funref', $P1
     getattribute $P2, self, 'args'
     if_null $P2, __label_1
     $P2 = $P2.'optimize'()
     setattribute self, 'args', $P2
   __label_1: # endif
+    getattribute $P3, self, 'owner'
     isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'MemberExpr' ]
     unless $I1 goto __label_2
-    $P3 = $P1.'search_nonmember'()
-    if_null $P3, __label_5
-    isa $I1, $P3, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
+    $P4 = $P1.'search_nonmember'()
+    getattribute $P5, self, 'start'
+    if_null $P4, __label_5
+    isa $I1, $P4, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
     if $I1 goto __label_6
-    isa $I2, $P3, [ 'Winxed'; 'Compiler'; 'FunctionExtern' ]
+    isa $I2, $P4, [ 'Winxed'; 'Compiler'; 'FunctionExtern' ]
     if $I2 goto __label_7
-    isa $I3, $P3, [ 'Winxed'; 'Compiler'; 'Builtin' ]
+    isa $I3, $P4, [ 'Winxed'; 'Compiler'; 'Builtin' ]
     if $I3 goto __label_8
     goto __label_4
   __label_5: # case
-    new $P7, [ 'Winxed'; 'Compiler'; 'CallMemberExpr' ]
-    $P7.'CallMemberExpr'(self, $P1, $P2)
-    set $P6, $P7
-    .return($P6)
+    new $P8, [ 'Winxed'; 'Compiler'; 'CallMemberExpr' ]
+    $P8.'CallMemberExpr'(self, $P1, $P2)
+    set $P7, $P8
+    .return($P7)
   __label_6: # case
-    $P8 = $P3.'ismulti'()
-    if $P8 goto __label_9
-    $P4 = $P3.'makesubid'()
-    self.'usesubid'($P4)
-    new $P7, [ 'Winxed'; 'Compiler'; 'CallSubid' ]
-    $P7.'CallSubid'(self, $P1, $P2, $P4)
-    set $P6, $P7
-    .return($P6)
+    $P9 = $P4.'ismulti'()
+    if $P9 goto __label_9
+    $P10 = $P4.'makesubid'()
+    null $S1
+    if_null $P10, __label_11
+    set $S1, $P10
+  __label_11:
+    self.'usesubid'($S1)
+    new $P8, [ 'Winxed'; 'Compiler'; 'CallSubid' ]
+    $P8.'CallSubid'(self, $P1, $P2, $S1)
+    set $P7, $P8
+    .return($P7)
     goto __label_10
   __label_9: # else
-    new $P8, [ 'Winxed'; 'Compiler'; 'FunctionRef' ]
-    getattribute $P9, self, 'owner'
-    getattribute $P10, self, 'start'
-    $P8.'FunctionRef'($P9, $P10, $P3)
-    set $P7, $P8
-    setattribute self, 'funref', $P7
+    new $P9, [ 'Winxed'; 'Compiler'; 'FunctionRef' ]
+    $P9.'FunctionRef'($P3, $P5, $P4)
+    set $P8, $P9
+    setattribute self, 'funref', $P8
     .return(self)
   __label_10: # endif
     goto __label_3 # break
   __label_7: # case
-    new $P8, [ 'Winxed'; 'Compiler'; 'FunctionRef' ]
-    getattribute $P9, self, 'owner'
-    getattribute $P10, self, 'start'
-    $P8.'FunctionRef'($P9, $P10, $P3)
-    set $P7, $P8
-    setattribute self, 'funref', $P7
+    new $P9, [ 'Winxed'; 'Compiler'; 'FunctionRef' ]
+    $P9.'FunctionRef'($P3, $P5, $P4)
+    set $P8, $P9
+    setattribute self, 'funref', $P8
     .return(self)
   __label_8: # case
-    getattribute $P11, self, 'owner'
-    getattribute $P12, $P1, 'start'
-    .tailcall WSubId_108($P11, $P12, $P3, $P2)
+    getattribute $P10, $P1, 'start'
+    .tailcall WSubId_108($P3, $P10, $P4, $P2)
     goto __label_3 # break
   __label_4: # default
-    getattribute $P13, self, 'start'
-    WSubId_35("unexpected type found in scope", $P13)
+    WSubId_33("unexpected type found in scope", $P5)
   __label_3: # switch end
   __label_2: # endif
     isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'MemberRefExpr' ]
-    unless $I1 goto __label_11
-    new $P7, [ 'Winxed'; 'Compiler'; 'CallMemberRefExpr' ]
-    $P7.'CallMemberRefExpr'(self, $P1, $P2)
-    set $P6, $P7
-    .return($P6)
-  __label_11: # endif
-    isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'InlineRef' ]
     unless $I1 goto __label_12
-    new $P7, [ 'Winxed'; 'Compiler'; 'CallInlineExpr' ]
-    $P7.'CallInlineExpr'(self, $P1, $P2)
-    set $P6, $P7
-    .return($P6)
+    new $P8, [ 'Winxed'; 'Compiler'; 'CallMemberRefExpr' ]
+    $P8.'CallMemberRefExpr'(self, $P1, $P2)
+    set $P7, $P8
+    .return($P7)
   __label_12: # endif
-    $P6 = $P1.'isidentifier'()
-    if_null $P6, __label_13
-    unless $P6 goto __label_13
-    $P7 = $P1.'checkIdentifier'()
-    set $S1, $P7
-    ne $S1, '', __label_14
-    root_new $P8, ['parrot';'ResizablePMCArray']
-    assign $P8, 1
-    $P9 = $P1.'getName'()
-    $P8[0] = $P9
-    $P5 = self.'scopesearch'($P8, 0)
-    if_null $P5, __label_15
-    isa $I1, $P5, [ 'Winxed'; 'Compiler'; 'Builtin' ]
-    unless $I1 goto __label_15
-    getattribute $P6, self, 'owner'
+    isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'InlineRef' ]
+    unless $I1 goto __label_13
+    new $P8, [ 'Winxed'; 'Compiler'; 'CallInlineExpr' ]
+    $P8.'CallInlineExpr'($P3, $P1, $P2)
+    set $P7, $P8
+    .return($P7)
+  __label_13: # endif
+    $P7 = $P1.'isidentifier'()
+    if_null $P7, __label_14
+    unless $P7 goto __label_14
+    $P8 = $P1.'checkIdentifier'()
+    set $S2, $P8
+    ne $S2, "", __label_15
+    root_new $P9, ['parrot';'ResizablePMCArray']
+    assign $P9, 1
+    $P10 = $P1.'getName'()
+    $P9[0] = $P10
+    $P6 = self.'scopesearch'($P9, 0)
+    if_null $P6, __label_16
+    isa $I1, $P6, [ 'Winxed'; 'Compiler'; 'Builtin' ]
+    unless $I1 goto __label_16
     getattribute $P7, $P1, 'start'
-    .tailcall WSubId_108($P6, $P7, $P5, $P2)
+    .tailcall WSubId_108($P3, $P7, $P6, $P2)
+  __label_16: # endif
   __label_15: # endif
   __label_14: # endif
-  __label_13: # endif
     .return(self)
 
 .end # optimize
@@ -12777,7 +13206,7 @@
 
 .sub 'emitcall' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     getattribute $P1, self, 'funref'
     null $S1
     $P3 = $P1.'isidentifier'()
@@ -12785,7 +13214,7 @@
     unless $P3 goto __label_1
     $P4 = $P1.'checkIdentifier'()
     set $S1, $P4
-    ne $S1, '', __label_3
+    ne $S1, "", __label_3
     root_new $P3, ['parrot';'ResizablePMCArray']
     assign $P3, 1
     $P4 = $P1.'getName'()
@@ -12811,7 +13240,7 @@
     set $S1, $P5
     goto __label_4 # break
   __label_8: # case
-    WSubId_35("Builtin unexpected here", self)
+    WSubId_33("Builtin unexpected here", self)
   __label_5: # default
     root_new $P6, ['parrot';'ResizablePMCArray']
     assign $P6, 3
@@ -12844,12 +13273,12 @@
 
 .sub 'emitargs' :method
         .param pmc __ARG_1
-    __ARG_1.'print'('(')
+    __ARG_1.'print'("(")
     getattribute $P1, self, 'args'
     if_null $P1, __label_1
     $P1.'emitargs'(__ARG_1)
   __label_1: # endif
-    __ARG_1.'say'(')')
+    __ARG_1.'say'(")")
 
 .end # emitargs
 
@@ -12864,12 +13293,12 @@
   __label_1:
     self.'prepareargs'(__ARG_1)
     self.'annotate'(__ARG_1)
-    __ARG_1.'print'('    ')
-    ne __ARG_2, '.tailcall', __label_2
-    __ARG_1.'print'('.tailcall ')
+    __ARG_1.'print'("    ")
+    ne __ARG_2, ".tailcall", __label_2
+    __ARG_1.'print'(".tailcall ")
     goto __label_3
   __label_2: # else
-    __ARG_1.'print'(__ARG_2, ' = ')
+    __ARG_1.'print'(__ARG_2, " = ")
   __label_3: # endif
     __ARG_1.'print'($S1)
     self.'emitargs'(__ARG_1)
@@ -12886,7 +13315,7 @@
   __label_1:
     self.'prepareargs'(__ARG_1)
     self.'annotate'(__ARG_1)
-    __ARG_1.'print'('    ')
+    __ARG_1.'print'("    ")
     __ARG_1.'print'($S1)
     self.'emitargs'(__ARG_1)
 
@@ -12905,13 +13334,14 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-        .param pmc __ARG_4
+        .param string __ARG_4
     getattribute $P1, __ARG_1, 'owner'
     getattribute $P2, __ARG_1, 'start'
     self.'Expr'($P1, $P2)
     setattribute self, 'funref', __ARG_2
     setattribute self, 'args', __ARG_3
-    setattribute self, 'subid', __ARG_4
+    box $P1, __ARG_4
+    setattribute self, 'subid', $P1
 
 .end # CallSubid
 
@@ -12964,7 +13394,7 @@
   __label_4:
     isnull $I1, $S1
     if $I1 goto __label_6
-    iseq $I1, $S1, ''
+    iseq $I1, $S1, ""
   __label_6:
     unless $I1 goto __label_5
     new $P3, ['ResizableStringArray']
@@ -12974,7 +13404,7 @@
     if_null $P6, __label_7
     set $S2, $P6
   __label_7:
-    $P4 = self.'tempreg'('P')
+    $P4 = self.'tempreg'("P")
     self.'annotate'(__ARG_1)
     set $P5, $P3
     null $S3
@@ -13026,15 +13456,15 @@
 
 .sub 'emitcall' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     getattribute $P1, self, 'funref'
     getattribute $P2, $P1, 'right'
     $P3 = $P2.'checkresult'()
     set $S3, $P3
-    eq $S3, 'P', __label_1
+    eq $S3, "P", __label_1
     set $S4, $P3
-    eq $S4, 'S', __label_1
-    WSubId_30("Invalid expression type in '.*'", $P1)
+    eq $S4, "S", __label_1
+    WSubId_28("Invalid expression type in '.*'", $P1)
   __label_1: # endif
     $P4 = $P1.'emit_left_get'(__ARG_1)
     null $S1
@@ -13046,7 +13476,7 @@
     if_null $P4, __label_3
     set $S2, $P4
   __label_3:
-    concat $S3, $S1, '.'
+    concat $S3, $S1, "."
     concat $S3, $S3, $S2
     .return($S3)
 
@@ -13110,7 +13540,7 @@
 
 
 .sub 'checkresult' :method
-    .return('P')
+    .return("P")
 
 .end # checkresult
 
@@ -13130,7 +13560,7 @@
     isnull $I1, $P3
     if $I1 goto __label_5
     set $S1, $P3
-    iseq $I1, $S1, ''
+    iseq $I1, $S1, ""
   __label_5:
     unless $I1 goto __label_4
     root_new $P4, ['parrot';'ResizablePMCArray']
@@ -13219,12 +13649,12 @@
 
 .sub '__emit_get_left' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     getattribute $P1, self, 'left'
     $P2 = $P1.'checkresult'()
     set $S1, $P2
-    eq $S1, 'P', __label_1
-    WSubId_30("non-var at left of '.'", self)
+    eq $S1, "P", __label_1
+    WSubId_28("non-var at left of '.'", self)
   __label_1: # endif
     .tailcall $P1.'emit_get_nonull'(__ARG_1)
 
@@ -13233,7 +13663,7 @@
 
 .sub 'emit_get' :method
         .param pmc __ARG_1
-    $P1 = self.'tempreg'('P')
+    $P1 = self.'tempreg'("P")
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
@@ -13259,7 +13689,7 @@
     set $S2, $P1
   __label_2:
     self.'annotate'(__ARG_1)
-    __ARG_1.'say'('    ', 'getattribute ', __ARG_2, ', ', $S1, ", '", $S2, "'")
+    __ARG_1.'say'("    ", "getattribute ", __ARG_2, ", ", $S1, ", '", $S2, "'")
 
 .end # emit
 
@@ -13272,7 +13702,7 @@
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-    $P1 = self.'tempreg'('P')
+    $P1 = self.'tempreg'("P")
     null $S2
     if_null $P1, __label_2
     set $S2, $P1
@@ -13290,7 +13720,7 @@
   __label_5:
     $P1 = __ARG_2.'checkresult'()
     set $S5, $P1
-    eq $S5, 'P', __label_6
+    eq $S5, "P", __label_6
     __ARG_1.'emitbox'($S2, $S3)
     goto __label_7
   __label_6: # else
@@ -13304,7 +13734,7 @@
     set $S4, $P1
   __label_8:
     self.'annotate'(__ARG_1)
-    __ARG_1.'say'('    ', "setattribute ", $S1, ", '", $S4, "', ", $S2)
+    __ARG_1.'say'("    ", "setattribute ", $S1, ", '", $S4, "', ", $S2)
     .return($S2)
 
 .end # emit_assign_get
@@ -13344,7 +13774,7 @@
 
 
 .sub 'checkresult' :method
-    .return('P')
+    .return("P")
 
 .end # checkresult
 
@@ -13364,13 +13794,13 @@
 .sub 'emit' :method
         .param pmc __ARG_1
         .param string __ARG_2
-.const 'Sub' WSubId_79 = "WSubId_79"
+.const 'Sub' WSubId_76 = "WSubId_76"
     getattribute $P1, self, 'left'
     getattribute $P2, self, 'right'
     $P3 = $P2.'checkresult'()
     set $S3, $P3
-    eq $S3, 'S', __label_1
-    WSubId_79("string expression", $P2)
+    eq $S3, "S", __label_1
+    WSubId_76("string expression", $P2)
   __label_1: # endif
     $P3 = $P1.'emit_get_nonull'(__ARG_1)
     null $S1
@@ -13383,7 +13813,7 @@
     set $S2, $P3
   __label_3:
     self.'annotate'(__ARG_1)
-    __ARG_1.'say'('    ', 'getattribute ', __ARG_2, ', ', $S1, ", ", $S2)
+    __ARG_1.'say'("    ", "getattribute ", __ARG_2, ", ", $S1, ", ", $S2)
 
 .end # emit
 
@@ -13391,13 +13821,13 @@
 .sub 'emit_assign_get' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_79 = "WSubId_79"
+.const 'Sub' WSubId_76 = "WSubId_76"
     getattribute $P1, self, 'left'
     getattribute $P2, self, 'right'
     $P3 = $P2.'checkresult'()
     set $S5, $P3
-    eq $S5, 'S', __label_1
-    WSubId_79("string expression", $P2)
+    eq $S5, "S", __label_1
+    WSubId_76("string expression", $P2)
   __label_1: # endif
     $P3 = $P1.'emit_get_nonull'(__ARG_1)
     null $S1
@@ -13410,35 +13840,36 @@
     set $S2, $P3
   __label_3:
     null $S3
-    $P3 = __ARG_2.'checkresult'()
-    set $S5, $P3
-    if_null $S5, __label_4
-    length $I1, $S5
-    ne $I1, 1, __label_4
-    ord $I1, $S5
-    if $I1 == 80 goto __label_6
-    goto __label_4
+    $P3 = __ARG_2.'isnull'()
+    set $I1, $P3
+    if $I1 goto __label_6
+    $P4 = __ARG_2.'checkresult'()
+    set $S5, $P4
+    eq $S5, "P", __label_7
+    goto __label_5
   __label_6: # case
-    $P4 = __ARG_2.'emit_get'(__ARG_1)
-    set $S3, $P4
-    ne $S3, 'null', __label_7
-    $P5 = self.'tempreg'('P')
+    $P5 = self.'tempreg'("P")
     set $S3, $P5
-    __ARG_1.'emitnull'($S3)
-  __label_7: # endif
-    goto __label_5 # break
-  __label_4: # default
-    $P3 = self.'tempreg'('P')
-    set $S3, $P3
-    $P4 = __ARG_2.'emit_get'(__ARG_1)
-    null $S4
-    if_null $P4, __label_8
-    set $S4, $P4
-  __label_8:
-    __ARG_1.'emitbox'($S3, $S4)
-  __label_5: # switch end
     self.'annotate'(__ARG_1)
-    __ARG_1.'say'('    ', "setattribute ", $S1, ", ", $S2, ", ", $S3)
+    __ARG_1.'emitnull'($S3)
+    goto __label_4 # break
+  __label_7: # case
+    $P6 = __ARG_2.'emit_get'(__ARG_1)
+    set $S3, $P6
+    goto __label_4 # break
+  __label_5: # default
+    $P7 = self.'tempreg'("P")
+    set $S3, $P7
+    $P8 = __ARG_2.'emit_get'(__ARG_1)
+    null $S4
+    if_null $P8, __label_8
+    set $S4, $P8
+  __label_8:
+    self.'annotate'(__ARG_1)
+    __ARG_1.'emitbox'($S3, $S4)
+  __label_4: # switch end
+    self.'annotate'(__ARG_1)
+    __ARG_1.'say'("    ", "setattribute ", $S1, ", ", $S2, ", ", $S3)
     .return($S3)
 
 .end # emit_assign_get
@@ -13464,7 +13895,7 @@
 
 
 .sub 'checkresult' :method
-    .return('S')
+    .return("S")
 
 .end # checkresult
 
@@ -13472,7 +13903,7 @@
 .sub 'emit' :method
         .param pmc __ARG_1
         .param string __ARG_2
-.const 'Sub' WSubId_52 = "WSubId_52"
+.const 'Sub' WSubId_48 = "WSubId_48"
     getattribute $P2, self, 'left'
     $P1 = $P2.'emit_get'(__ARG_1)
     null $S1
@@ -13486,7 +13917,7 @@
     set $S2, $P1
   __label_2:
     self.'annotate'(__ARG_1)
-    $P1 = WSubId_52("    substr %0, %1, %2, 1", __ARG_2, $S1, $S2)
+    $P1 = WSubId_48("    substr %0, %1, %2, 1", __ARG_2, $S1, $S2)
     __ARG_1.'say'($P1)
 
 .end # emit
@@ -13508,7 +13939,7 @@
     self.'Expr'(__ARG_2, __ARG_3)
     setattribute self, 'left', __ARG_4
     new $P3, [ 'Winxed'; 'Compiler'; 'SimpleArgList' ]
-    $P3.'SimpleArgList'(__ARG_1, __ARG_2, ']')
+    $P3.'SimpleArgList'(__ARG_1, __ARG_2, "]")
     set $P2, $P3
     setattribute self, 'args', $P2
 
@@ -13532,14 +13963,14 @@
 
 
 .sub 'checkresult' :method
-    .return('P')
+    .return("P")
 
 .end # checkresult
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_30 = "WSubId_30"
-.const 'Sub' WSubId_53 = "WSubId_53"
+.const 'Sub' WSubId_28 = "WSubId_28"
+.const 'Sub' WSubId_50 = "WSubId_50"
     getattribute $P4, self, 'left'
     $P1 = $P4.'optimize'()
     setattribute self, 'left', $P1
@@ -13558,7 +13989,7 @@
     $P5 = $P2.'numargs'()
     set $I3, $P5
     eq $I3, 1, __label_5
-    WSubId_30('Bad string index', self)
+    WSubId_28("Bad string index", self)
   __label_5: # endif
     $P3 = $P2.'getarg'(0)
     $P6 = $P1.'isstringliteral'()
@@ -13567,7 +13998,7 @@
     unless $P7 goto __label_6
     $P8 = $P3.'getIntegerValue'()
     set $I1, $P8
-    $P4 = $P1.'get_value'()
+    $P4 = $P1.'getStringValue'()
     null $S1
     if_null $P4, __label_7
     set $S1, $P4
@@ -13575,7 +14006,7 @@
     getattribute $P4, self, 'owner'
     getattribute $P5, self, 'start'
     substr $S2, $S1, $I1, 1
-    .tailcall WSubId_53($P4, $P5, $S2)
+    .tailcall WSubId_50($P4, $P5, $S2)
   __label_6: # endif
     new $P5, [ 'Winxed'; 'Compiler'; 'StringIndexExpr' ]
     getattribute $P6, self, 'owner'
@@ -13586,7 +14017,7 @@
   __label_4: # case
     goto __label_2 # break
   __label_1: # default
-    WSubId_30("Type not valid for indexing", $P1)
+    WSubId_28("Type not valid for indexing", $P1)
   __label_2: # switch end
     .return(self)
 
@@ -13595,7 +14026,7 @@
 
 .sub 'emit_prep' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     getattribute $P2, self, 'regleft'
     isnull $I1, $P2
     not $I1
@@ -13606,7 +14037,7 @@
   __label_2:
     unless $I1 goto __label_1
     getattribute $P4, self, 'start'
-    WSubId_35('wrong call to IndexExpr.emit_args', $P4)
+    WSubId_33("wrong call to IndexExpr.emit_args", $P4)
   __label_1: # endif
     getattribute $P1, self, 'left'
     $P4 = $P1.'isidentifier'()
@@ -13628,7 +14059,7 @@
 
 .sub 'emit_aux' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     getattribute $P1, self, 'regleft'
     getattribute $P2, self, 'argregs'
     isnull $I1, $P1
@@ -13637,13 +14068,13 @@
   __label_2:
     unless $I1 goto __label_1
     getattribute $P3, self, 'start'
-    WSubId_35('wrong call to IndexExpr.emit_aux', $P3)
+    WSubId_33("wrong call to IndexExpr.emit_aux", $P3)
   __label_1: # endif
     getattribute $P3, self, 'regleft'
-    __ARG_1.'print'($P3, '[')
-    join $S1, '; ', $P2
+    __ARG_1.'print'($P3, "[")
+    join $S1, "; ", $P2
     __ARG_1.'print'($S1)
-    __ARG_1.'print'(']')
+    __ARG_1.'print'("]")
 
 .end # emit_aux
 
@@ -13653,16 +14084,16 @@
         .param string __ARG_2
     self.'emit_prep'(__ARG_1)
     self.'annotate'(__ARG_1)
-    __ARG_1.'print'('    ', __ARG_2, ' = ')
+    __ARG_1.'print'("    ", __ARG_2, " = ")
     self.'emit_aux'(__ARG_1)
-    __ARG_1.'say'('')
+    __ARG_1.'say'("")
 
 .end # emit
 
 
 .sub 'emit_getint' :method
         .param pmc __ARG_1
-    $P1 = self.'tempreg'('I')
+    $P1 = self.'tempreg'("I")
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
@@ -13681,7 +14112,7 @@
     $P1 = __ARG_2.'isnull'()
     if_null $P1, __label_1
     unless $P1 goto __label_1
-    $P2 = self.'tempreg'('P')
+    $P2 = self.'tempreg'("P")
     set $S1, $P2
     __ARG_1.'emitnull'($S1)
     goto __label_2
@@ -13690,9 +14121,9 @@
     set $S1, $P1
   __label_2: # endif
     self.'annotate'(__ARG_1)
-    __ARG_1.'print'('    ')
+    __ARG_1.'print'("    ")
     self.'emit_aux'(__ARG_1)
-    __ARG_1.'say'(' = ', $S1)
+    __ARG_1.'say'(" = ", $S1)
     .return($S1)
 
 .end # emit_assign_get
@@ -13712,16 +14143,11 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_76 = "WSubId_76"
-.const 'Sub' WSubId_77 = "WSubId_77"
+.const 'Sub' WSubId_91 = "WSubId_91"
+.const 'Sub' WSubId_74 = "WSubId_74"
     self.'Expr'(__ARG_2, __ARG_3)
-    $P1 = __ARG_1.'get'()
-    $P2 = $P1.'isop'(']')
-    if $P2 goto __label_1
-    __ARG_1.'unget'($P1)
-    $P3 = WSubId_76(__ARG_1, __ARG_2, WSubId_77, ']')
-    setattribute self, 'values', $P3
-  __label_1: # endif
+    $P2 = WSubId_91(__ARG_1, __ARG_2, WSubId_74, "]")
+    setattribute self, 'values', $P2
 
 .end # ArrayExpr
 
@@ -13763,7 +14189,7 @@
 
 
 .sub 'checkresult' :method
-    .return('P')
+    .return("P")
 
 .end # checkresult
 
@@ -13807,14 +14233,14 @@
 
 .sub 'emit_void' :method
         .param pmc __ARG_1
-    self.'emit_init'(__ARG_1, '')
+    self.'emit_init'(__ARG_1, "")
 
 .end # emit_void
 
 
 .sub 'emit_get' :method
         .param pmc __ARG_1
-    $P1 = self.'tempreg'('P')
+    $P1 = self.'tempreg'("P")
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
@@ -13828,7 +14254,7 @@
 .sub 'emit_init' :method
         .param pmc __ARG_1
         .param string __ARG_2
-.const 'Sub' WSubId_52 = "WSubId_52"
+.const 'Sub' WSubId_48 = "WSubId_48"
     self.'annotate'(__ARG_1)
     getattribute $P1, self, 'values'
     unless_null $P1, __label_2
@@ -13837,8 +14263,8 @@
   __label_2:
     elements $I1, $P1
   __label_1:
-    eq __ARG_2, '', __label_3
-    __ARG_1.'say'('    ', 'root_new ', __ARG_2, ", ['parrot';'ResizablePMCArray']")
+    eq __ARG_2, "", __label_3
+    __ARG_1.'say'("    ", "root_new ", __ARG_2, ", ['parrot';'ResizablePMCArray']")
     le $I1, 0, __label_4
     __ARG_1.'emitassign'(__ARG_2, $I1)
   __label_4: # endif
@@ -13859,9 +14285,9 @@
     if_null $P4, __label_7
     set $S1, $P4
   __label_7:
-    eq __ARG_2, '', __label_8
+    eq __ARG_2, "", __label_8
     self.'annotate'(__ARG_1)
-    $P4 = WSubId_52("    %0[%1] = %2", __ARG_2, $I2, $S1)
+    $P4 = WSubId_48("    %0[%1] = %2", __ARG_2, $I2, $S1)
     __ARG_1.'say'($P4)
     inc $I2
   __label_8: # endif
@@ -13882,31 +14308,31 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_77 = "WSubId_77"
-.const 'Sub' WSubId_94 = "WSubId_94"
-.const 'Sub' WSubId_79 = "WSubId_79"
+.const 'Sub' WSubId_74 = "WSubId_74"
+.const 'Sub' WSubId_93 = "WSubId_93"
+.const 'Sub' WSubId_76 = "WSubId_76"
     self.'Expr'(__ARG_2, __ARG_3)
     $P1 = __ARG_1.'get'()
     root_new $P2, ['parrot';'ResizablePMCArray']
     root_new $P3, ['parrot';'ResizablePMCArray']
-    $P6 = $P1.'isop'('}')
+    $P6 = $P1.'isop'("}")
     if $P6 goto __label_1
     __ARG_1.'unget'($P1)
   __label_2: # do
-    $P4 = WSubId_77(__ARG_1, __ARG_2)
-    WSubId_94(':', __ARG_1)
-    $P5 = WSubId_77(__ARG_1, __ARG_2)
+    $P4 = WSubId_74(__ARG_1, __ARG_2)
+    WSubId_93(":", __ARG_1)
+    $P5 = WSubId_74(__ARG_1, __ARG_2)
     push $P2, $P4
     push $P3, $P5
   __label_4: # continue
     $P1 = __ARG_1.'get'()
-    $P6 = $P1.'isop'(',')
+    $P6 = $P1.'isop'(",")
     if_null $P6, __label_3
     if $P6 goto __label_2
   __label_3: # enddo
-    $P6 = $P1.'isop'('}')
+    $P6 = $P1.'isop'("}")
     if $P6 goto __label_5
-    WSubId_79("',' or '}'", $P1)
+    WSubId_76("',' or '}'", $P1)
   __label_5: # endif
   __label_1: # endif
     setattribute self, 'keys', $P2
@@ -13972,7 +14398,7 @@
 
 
 .sub 'checkresult' :method
-    .return('P')
+    .return("P")
 
 .end # checkresult
 
@@ -14023,8 +14449,8 @@
         .param pmc __ARG_1
         .param string __ARG_2
     self.'annotate'(__ARG_1)
-    eq __ARG_2, '', __label_1
-    __ARG_1.'say'('    ', 'root_new ', __ARG_2, ", ['parrot';'Hash']")
+    eq __ARG_2, "", __label_1
+    __ARG_1.'say'("    ", "root_new ", __ARG_2, ", ['parrot';'Hash']")
   __label_1: # endif
     getattribute $P1, self, 'keys'
     getattribute $P2, self, 'values'
@@ -14042,13 +14468,13 @@
     unless $P5 goto __label_5
     $P6 = $P4.'checkIdentifier'()
     set $S4, $P6
-    ne $S4, '', __label_5
+    ne $S4, "", __label_5
     $P7 = $P4.'getName'()
     null $S2
     if_null $P7, __label_7
     set $S2, $P7
   __label_7:
-    $P5 = self.'tempreg'('P')
+    $P5 = self.'tempreg'("P")
     set $S1, $P5
     __ARG_1.'emitget_hll_global'($S1, $S2)
     goto __label_6
@@ -14062,8 +14488,8 @@
     if_null $P5, __label_8
     set $S3, $P5
   __label_8:
-    eq __ARG_2, '', __label_9
-    __ARG_1.'say'('    ', __ARG_2, '[', $S1, '] = ', $S3)
+    eq __ARG_2, "", __label_9
+    __ARG_1.'say'("    ", __ARG_2, "[", $S1, "] = ", $S3)
   __label_9: # endif
   __label_2: # for iteration
     inc $I2
@@ -14075,14 +14501,14 @@
 
 .sub 'emit_void' :method
         .param pmc __ARG_1
-    self.'emit'(__ARG_1, '')
+    self.'emit'(__ARG_1, "")
 
 .end # emit_void
 
 
 .sub 'emit_get' :method
         .param pmc __ARG_1
-    $P1 = self.'tempreg'('P')
+    $P1 = self.'tempreg'("P")
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
@@ -14102,7 +14528,7 @@
 .namespace [ 'Winxed'; 'Compiler'; 'NewBaseExpr' ]
 
 .sub 'checkresult' :method
-    .return('P')
+    .return("P")
 
 .end # checkresult
 
@@ -14112,7 +14538,7 @@
     new $P3, [ 'Winxed'; 'Compiler'; 'ArgumentList' ]
     getattribute $P4, self, 'owner'
     getattribute $P5, self, 'start'
-    $P3.'ArgumentList'($P4, $P5, __ARG_1, ')')
+    $P3.'ArgumentList'($P4, $P5, __ARG_1, ")")
     set $P2, $P3
     setattribute self, 'initializer', $P2
 
@@ -14157,7 +14583,7 @@
     if_null $P1, __label_1
     $P1.'getargvalues'(__ARG_1)
   __label_1: # endif
-    __ARG_1.'print'('    ', __ARG_2, ".'", __ARG_3, "'(")
+    __ARG_1.'print'("    ", __ARG_2, ".'", __ARG_3, "'(")
     if_null $P1, __label_2
     $P1.'emitargs'(__ARG_1)
   __label_2: # endif
@@ -14190,18 +14616,18 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     self.'Expr'(__ARG_2, __ARG_3)
     $P2 = __ARG_4.'isstring'()
     if $P2 goto __label_2
     $P2 = __ARG_4.'isidentifier'()
   __label_2:
     if $P2 goto __label_1
-    WSubId_30("Unimplemented", __ARG_4)
+    WSubId_28("Unimplemented", __ARG_4)
   __label_1: # endif
     setattribute self, 'value', __ARG_4
     $P1 = __ARG_1.'get'()
-    $P2 = $P1.'isop'('(')
+    $P2 = $P1.'isop'("(")
     if_null $P2, __label_3
     unless $P2 goto __label_3
     self.'parseinitializer'(__ARG_1)
@@ -14232,21 +14658,20 @@
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     getattribute $P1, self, 'value'
     $P3 = $P1.'isidentifier'()
     if_null $P3, __label_1
     unless $P3 goto __label_1
     getattribute $P4, self, 'owner'
-    $P5 = $P1.'getidentifier'()
-    $P2 = $P4.'getvar'($P5)
+    $P2 = $P4.'getvar'($P1)
     if_null $P2, __label_2
     $P3 = $P2.'isconst'()
     unless $P3 goto __label_2
     $P1 = $P2.'getvalue'()
     isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'StringLiteral' ]
     if $I1 goto __label_3
-    WSubId_30('Constant value must evaluate to a string', $P1)
+    WSubId_28("Constant value must evaluate to a string", $P1)
   __label_3: # endif
     getattribute $P4, $P1, 'strval'
     setattribute self, 'value', $P4
@@ -14262,9 +14687,9 @@
         .param pmc __ARG_1
         .param string __ARG_2
         .param int __ARG_3 :optional
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
 .const 'Sub' WSubId_109 = "WSubId_109"
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     self.'annotate'(__ARG_1)
     getattribute $P1, self, 'initializer'
     getattribute $P2, self, 'value'
@@ -14285,7 +14710,7 @@
     set $I2, -1
   __label_3:
   __label_1:
-    set $S1, ''
+    set $S1, ""
     set $S2, __ARG_2
     null $S3
     if $I1 == -1 goto __label_7
@@ -14298,7 +14723,7 @@
   __label_9: # case
     ne $I2, 1, __label_10
     if __ARG_3 goto __label_12
-    $P8 = self.'tempreg'('P')
+    $P8 = self.'tempreg'("P")
     set $S2, $P8
   __label_12: # endif
     goto __label_11
@@ -14306,21 +14731,21 @@
     $P3 = $P1.'getfreearg'(0)
     $P8 = $P3.'emit_get'(__ARG_1)
     set $S1, $P8
-    concat $S5, ', ', $S1
+    concat $S5, ", ", $S1
     set $S1, $S5
   __label_11: # endif
     goto __label_6 # break
   __label_5: # default
     eq $I2, 1, __label_13
-    WSubId_30('Multiple init arguments not allowed here', self)
+    WSubId_28("Multiple init arguments not allowed here", self)
   __label_13: # endif
     if __ARG_3 goto __label_14
-    $P8 = self.'tempreg'('P')
+    $P8 = self.'tempreg'("P")
     set $S2, $P8
   __label_14: # endif
   __label_6: # switch end
-    ne $S2, '', __label_15
-    $P8 = self.'tempreg'('P')
+    ne $S2, "", __label_15
+    $P8 = self.'tempreg'("P")
     set $S2, $P8
   __label_15: # endif
     if $I2 == 0 goto __label_18
@@ -14336,7 +14761,7 @@
     unless_null $P4, __label_21
     WSubId_109(__ARG_1, $S4, $P2)
   __label_21: # endif
-    __ARG_1.'say'('    ', 'new ', $S2, ", [ ", $P2, " ]", $S1)
+    __ARG_1.'say'("    ", "new ", $S2, ", [ ", $P2, " ]", $S1)
     le $I1, 1, __label_22
     __ARG_1.'say'($S2, ".'", $P2, "'()")
   __label_22: # endif
@@ -14358,23 +14783,23 @@
     $P5 = self.'scopesearch'($P8, 2)
     if_null $P5, __label_27
     $P8 = $P5.'getclasskey'()
-    __ARG_1.'say'('    ', 'new ', $S2, ", ", $P8, $S1)
+    __ARG_1.'say'("    ", "new ", $S2, ", ", $P8, $S1)
     goto __label_28
   __label_27: # else
     $P9 = $P2.'getidentifier'()
     WSubId_109(__ARG_1, $P9, $P2)
-    __ARG_1.'say'('    ', 'new ', $S2, ", ['", $P2, "']", $S1)
+    __ARG_1.'say'("    ", "new ", $S2, ", ['", $P2, "']", $S1)
   __label_28: # endif
   __label_26: # endif
     set $S3, $P2
     goto __label_24
   __label_23: # else
     $P8 = $P5.'getreg'()
-    __ARG_1.'say'('    ', 'new ', $S2, ", ", $P8, "", $S1)
+    __ARG_1.'say'("    ", "new ", $S2, ", ", $P8, "", $S1)
   __label_24: # endif
     goto __label_17 # break
   __label_16: # default
-    WSubId_35('Unexpected type in new')
+    WSubId_33("Unexpected type in new")
   __label_17: # switch end
     isgt $I3, $I1, 1
     if $I3 goto __label_30
@@ -14411,7 +14836,7 @@
     set $P1, $P3
     setattribute self, 'nskey', $P1
     $P2 = __ARG_1.'get'()
-    $P3 = $P2.'isop'('(')
+    $P3 = $P2.'isop'("(")
     if_null $P3, __label_1
     unless $P3 goto __label_1
     self.'parseinitializer'(__ARG_1)
@@ -14426,7 +14851,7 @@
 .sub 'emit' :method
         .param pmc __ARG_1
         .param string __ARG_2
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     null $S1
     $P3 = self.'numargs'()
     set $I1, $P3
@@ -14444,10 +14869,10 @@
     set $S1, $P5
     goto __label_2 # break
   __label_1: # default
-    WSubId_30('Multiple init arguments not allowed here', self)
+    WSubId_28("Multiple init arguments not allowed here", self)
   __label_2: # switch end
     getattribute $P2, self, 'nskey'
-    __ARG_1.'print'('    ')
+    __ARG_1.'print'("    ")
     $P3 = $P2.'hasHLL'()
     if_null $P3, __label_6
     unless $P3 goto __label_6
@@ -14457,7 +14882,7 @@
     null $P3
     $P2.'emit'(__ARG_1, $P3)
     if_null $S1, __label_7
-    __ARG_1.'print'(', ', $S1)
+    __ARG_1.'print'(", ", $S1)
   __label_7: # endif
     __ARG_1.'say'()
 
@@ -14482,7 +14907,7 @@
     set $P1, $P3
     setattribute self, 'nskey', $P1
     $P2 = __ARG_1.'get'()
-    $P3 = $P2.'isop'('(')
+    $P3 = $P2.'isop'("(")
     if_null $P3, __label_1
     unless $P3 goto __label_1
     self.'parseinitializer'(__ARG_1)
@@ -14501,12 +14926,12 @@
     set $I1, $P2
     set $S1, __ARG_2
     le $I1, 0, __label_1
-    $P2 = self.'tempreg'('P')
+    $P2 = self.'tempreg'("P")
     set $S1, $P2
   __label_1: # endif
     getattribute $P1, self, 'nskey'
-    ne $S1, '', __label_2
-    $P2 = self.'tempreg'('P')
+    ne $S1, "", __label_2
+    $P2 = self.'tempreg'("P")
     set $S1, $P2
   __label_2: # endif
     $P1.'emit_new'(__ARG_1, self, $S1)
@@ -14535,10 +14960,10 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
     $P1 = __ARG_1.'get'()
-    $P3 = $P1.'isop'('(')
+    $P3 = $P1.'isop'("(")
     set $I1, $P3
     if $I1 goto __label_3
-    $P4 = $P1.'isop'('[')
+    $P4 = $P1.'isop'("[")
     set $I1, $P4
     if $I1 goto __label_4
     $P5 = $P1.'isidentifier'()
@@ -14561,7 +14986,7 @@
   __label_5: # case
     $P2 = __ARG_1.'get'()
     __ARG_1.'unget'($P2)
-    $P12 = $P2.'isop'('.')
+    $P12 = $P2.'isop'(".")
     if_null $P12, __label_6
     unless $P12 goto __label_6
     new $P14, [ 'Winxed'; 'Compiler'; 'NewQualifiedExpr' ]
@@ -14585,10 +15010,10 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-.const 'Sub' WSubId_102 = "WSubId_102"
+.const 'Sub' WSubId_103 = "WSubId_103"
     self.'Expr'(__ARG_1, __ARG_2)
     setattribute self, 'lexpr', __ARG_3
-    $P2 = WSubId_102(__ARG_4, self)
+    $P2 = WSubId_103(__ARG_4, __ARG_1)
     setattribute self, 'checked', $P2
 
 .end # OpInstanceOfExpr
@@ -14603,7 +15028,7 @@
     $P3 = $P4.'clone'(__ARG_1)
     setattribute $P1, 'lexpr', $P3
     getattribute $P4, self, 'checked'
-    $P3 = $P4.'clone'(self)
+    $P3 = $P4.'clone'(__ARG_1)
     setattribute $P1, 'checked', $P3
     .return($P1)
 
@@ -14620,7 +15045,7 @@
 
 
 .sub 'checkresult' :method
-    .return('I')
+    .return("I")
 
 .end # checkresult
 
@@ -14628,15 +15053,15 @@
 .sub 'emit' :method
         .param pmc __ARG_1
         .param string __ARG_2
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     getattribute $P1, self, 'lexpr'
     $P3 = $P1.'checkresult'()
     null $S1
     if_null $P3, __label_1
     set $S1, $P3
   __label_1:
-    eq $S1, 'P', __label_2
-    WSubId_30('Invalid instanceof left operand', $P1)
+    eq $S1, "P", __label_2
+    WSubId_28("Invalid instanceof left operand", $P1)
   __label_2: # endif
     getattribute $P2, self, 'checked'
     $P3 = $P1.'emit_get'(__ARG_1)
@@ -14645,7 +15070,7 @@
     set $S2, $P3
   __label_3:
     self.'annotate'(__ARG_1)
-    __ARG_1.'print'('    isa ', __ARG_2, ', ', $S2, ', ')
+    __ARG_1.'print'("    isa ", __ARG_2, ", ", $S2, ", ")
     getattribute $P3, self, 'owner'
     $P2.'emit'(__ARG_1, $P3)
     __ARG_1.'say'()
@@ -14787,8 +15212,8 @@
     if_null $P5, __label_8
     set $S4, $P5
   __label_8:
-    ne $S3, 'P', __label_9
-    eq $S4, 'P', __label_9
+    ne $S3, "P", __label_9
+    eq $S4, "P", __label_9
     $P4 = $P2.'emit_get'(__ARG_1)
     null $S5
     if_null $P4, __label_11
@@ -14797,7 +15222,7 @@
     __ARG_1.'emitbox'(__ARG_2, $S5)
     goto __label_10
   __label_9: # else
-    ne $S4, 'P', __label_12
+    ne $S4, "P", __label_12
     $P3 = $P2.'emit_get'(__ARG_1)
     __ARG_1.'emitset'(__ARG_2, $P3)
     goto __label_13
@@ -14874,11 +15299,11 @@
         .param pmc __ARG_1
     $P1 = __ARG_1.'checkop'()
     set $S1, $P1
-    if $S1 == '-' goto __label_3
-    if $S1 == '!' goto __label_4
-    if $S1 == '~' goto __label_5
-    if $S1 == '++' goto __label_6
-    if $S1 == '--' goto __label_7
+    if $S1 == "-" goto __label_3
+    if $S1 == "!" goto __label_4
+    if $S1 == "~" goto __label_5
+    if $S1 == "++" goto __label_6
+    if $S1 == "--" goto __label_7
     goto __label_1
   __label_3: # case
     .return(8)
@@ -14891,19 +15316,19 @@
   __label_7: # case
     .return(10)
   __label_1: # default
-    $P2 = __ARG_1.'iskeyword'('delete')
+    $P2 = __ARG_1.'iskeyword'("delete")
     if_null $P2, __label_8
     unless $P2 goto __label_8
     .return(32)
     goto __label_9
   __label_8: # else
-    $P3 = __ARG_1.'iskeyword'('exists')
+    $P3 = __ARG_1.'iskeyword'("exists")
     if_null $P3, __label_10
     unless $P3 goto __label_10
     .return(33)
     goto __label_11
   __label_10: # else
-    $P4 = __ARG_1.'iskeyword'('defined')
+    $P4 = __ARG_1.'iskeyword'("defined")
     if_null $P4, __label_12
     unless $P4 goto __label_12
     .return(35)
@@ -14922,10 +15347,10 @@
         .param pmc __ARG_1
     $P1 = __ARG_1.'checkop'()
     set $S1, $P1
-    if $S1 == '*' goto __label_3
-    if $S1 == '/' goto __label_4
-    if $S1 == '%' goto __label_5
-    if $S1 == '%%' goto __label_6
+    if $S1 == "*" goto __label_3
+    if $S1 == "/" goto __label_4
+    if $S1 == "%" goto __label_5
+    if $S1 == "%%" goto __label_6
     goto __label_1
   __label_3: # case
     .return(19)
@@ -14946,9 +15371,9 @@
         .param pmc __ARG_1
     $P1 = __ARG_1.'checkop'()
     set $S1, $P1
-    if $S1 == '<<' goto __label_3
-    if $S1 == '>>' goto __label_4
-    if $S1 == '>>>' goto __label_5
+    if $S1 == "<<" goto __label_3
+    if $S1 == ">>" goto __label_4
+    if $S1 == ">>>" goto __label_5
     goto __label_1
   __label_3: # case
     .return(28)
@@ -14967,10 +15392,10 @@
         .param pmc __ARG_1
     $P1 = __ARG_1.'checkop'()
     set $S1, $P1
-    if $S1 == '<' goto __label_3
-    if $S1 == '>' goto __label_4
-    if $S1 == '<=' goto __label_5
-    if $S1 == '>=' goto __label_6
+    if $S1 == "<" goto __label_3
+    if $S1 == ">" goto __label_4
+    if $S1 == "<=" goto __label_5
+    if $S1 == ">=" goto __label_6
     goto __label_1
   __label_3: # case
     .return(14)
@@ -14981,7 +15406,7 @@
   __label_6: # case
     .return(17)
   __label_1: # default
-    $P2 = __ARG_1.'iskeyword'('instanceof')
+    $P2 = __ARG_1.'iskeyword'("instanceof")
     if_null $P2, __label_7
     unless $P2 goto __label_7
     .return(27)
@@ -14998,10 +15423,10 @@
         .param pmc __ARG_1
     $P1 = __ARG_1.'checkop'()
     set $S1, $P1
-    if $S1 == '==' goto __label_3
-    if $S1 == '!=' goto __label_4
-    if $S1 == '===' goto __label_5
-    if $S1 == '!==' goto __label_6
+    if $S1 == "==" goto __label_3
+    if $S1 == "!=" goto __label_4
+    if $S1 == "===" goto __label_5
+    if $S1 == "!==" goto __label_6
     goto __label_1
   __label_3: # case
     .return(12)
@@ -15022,13 +15447,13 @@
         .param pmc __ARG_1
     $P1 = __ARG_1.'checkop'()
     set $S1, $P1
-    if $S1 == '=' goto __label_3
-    if $S1 == '=:' goto __label_4
-    if $S1 == '+=' goto __label_5
-    if $S1 == '-=' goto __label_6
-    if $S1 == '*=' goto __label_7
-    if $S1 == '/=' goto __label_8
-    if $S1 == '%=' goto __label_9
+    if $S1 == "=" goto __label_3
+    if $S1 == "=:" goto __label_4
+    if $S1 == "+=" goto __label_5
+    if $S1 == "-=" goto __label_6
+    if $S1 == "*=" goto __label_7
+    if $S1 == "/=" goto __label_8
+    if $S1 == "%=" goto __label_9
     goto __label_1
   __label_3: # case
     .return(4)
@@ -15054,20 +15479,20 @@
 .sub 'parseExpr_0' :subid('WSubId_111')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_77 = "WSubId_77"
-.const 'Sub' WSubId_94 = "WSubId_94"
-.const 'Sub' WSubId_49 = "WSubId_49"
+.const 'Sub' WSubId_74 = "WSubId_74"
+.const 'Sub' WSubId_93 = "WSubId_93"
+.const 'Sub' WSubId_47 = "WSubId_47"
 .const 'Sub' WSubId_110 = "WSubId_110"
-.const 'Sub' WSubId_79 = "WSubId_79"
+.const 'Sub' WSubId_76 = "WSubId_76"
     $P1 = __ARG_1.'get'()
     null $P2
-    $P3 = $P1.'isop'('(')
+    $P3 = $P1.'isop'("(")
     set $I1, $P3
     if $I1 goto __label_3
-    $P4 = $P1.'isop'('[')
+    $P4 = $P1.'isop'("[")
     set $I1, $P4
     if $I1 goto __label_4
-    $P5 = $P1.'isop'('{')
+    $P5 = $P1.'isop'("{")
     set $I1, $P5
     if $I1 goto __label_5
     $P6 = $P1.'isstring'()
@@ -15079,16 +15504,16 @@
     $P8 = $P1.'isfloat'()
     set $I1, $P8
     if $I1 goto __label_8
-    $P9 = $P1.'iskeyword'('new')
+    $P9 = $P1.'iskeyword'("new")
     set $I1, $P9
     if $I1 goto __label_9
-    $P10 = $P1.'iskeyword'('function')
+    $P10 = $P1.'iskeyword'("function")
     set $I1, $P10
     if $I1 goto __label_10
-    $P11 = $P1.'iskeyword'('class')
+    $P11 = $P1.'iskeyword'("class")
     set $I1, $P11
     if $I1 goto __label_11
-    $P12 = $P1.'iskeyword'('namespace')
+    $P12 = $P1.'iskeyword'("namespace")
     set $I1, $P12
     if $I1 goto __label_12
     $P13 = $P1.'isidentifier'()
@@ -15096,8 +15521,8 @@
     if $I1 goto __label_13
     goto __label_2
   __label_3: # case
-    $P2 = WSubId_77(__ARG_1, __ARG_2)
-    WSubId_94(')', __ARG_1)
+    $P2 = WSubId_74(__ARG_1, __ARG_2)
+    WSubId_93(")", __ARG_1)
     .return($P2)
   __label_4: # case
     new $P15, [ 'Winxed'; 'Compiler'; 'ArrayExpr' ]
@@ -15116,7 +15541,7 @@
     .return($P18)
   __label_7: # case
     $P20 = $P1.'getintvalue'()
-    .tailcall WSubId_49(__ARG_2, $P1, $P20)
+    .tailcall WSubId_47(__ARG_2, $P1, $P20)
   __label_8: # case
     new $P22, [ 'Winxed'; 'Compiler'; 'FloatLiteral' ]
     $P22.'FloatLiteral'(__ARG_2, $P1)
@@ -15145,7 +15570,7 @@
     set $P29, $P30
     .return($P29)
   __label_2: # default
-    WSubId_79('expression', $P1)
+    WSubId_76("expression", $P1)
   __label_1: # switch end
 
 .end # parseExpr_0
@@ -15156,7 +15581,7 @@
         .param pmc __ARG_2
 .const 'Sub' WSubId_111 = "WSubId_111"
 .const 'Sub' WSubId_112 = "WSubId_112"
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     $P1 = WSubId_111(__ARG_1, __ARG_2)
     null $P2
     null $P3
@@ -15183,7 +15608,7 @@
   __label_7: # case
     set $P3, $P2
     $P2 = __ARG_1.'get'()
-    $P8 = $P2.'isop'('*')
+    $P8 = $P2.'isop'("*")
     if_null $P8, __label_8
     unless $P8 goto __label_8
     $P4 = WSubId_111(__ARG_1, __ARG_2)
@@ -15198,7 +15623,7 @@
   __label_9: # endif
     goto __label_4 # break
   __label_3: # default
-    WSubId_35('Unexpected code in parseExpr_2')
+    WSubId_33("Unexpected code in parseExpr_2")
   __label_4: # switch end
     goto __label_2
   __label_1: # endwhile
@@ -15214,10 +15639,10 @@
 .const 'Sub' WSubId_113 = "WSubId_113"
     $P1 = WSubId_113(__ARG_1, __ARG_2)
     $P2 = __ARG_1.'get'()
-    $P3 = $P2.'isop'('++')
+    $P3 = $P2.'isop'("++")
     set $I1, $P3
     if $I1 goto __label_3
-    $P4 = $P2.'isop'('--')
+    $P4 = $P2.'isop'("--")
     set $I1, $P4
     if $I1 goto __label_4
     goto __label_2
@@ -15244,7 +15669,7 @@
         .param pmc __ARG_2
 .const 'Sub' WSubId_114 = "WSubId_114"
 .const 'Sub' WSubId_115 = "WSubId_115"
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
 .const 'Sub' WSubId_116 = "WSubId_116"
     $P1 = __ARG_1.'get'()
     $P3 = WSubId_114($P1)
@@ -15301,7 +15726,7 @@
     set $P17, $P18
     .return($P17)
   __label_3: # default
-    WSubId_35('Invalid code in parseExpr_4', $P1)
+    WSubId_33("Invalid code in parseExpr_4", $P1)
   __label_4: # switch end
     goto __label_2
   __label_1: # else
@@ -15317,7 +15742,7 @@
         .param pmc __ARG_2
 .const 'Sub' WSubId_115 = "WSubId_115"
 .const 'Sub' WSubId_117 = "WSubId_117"
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     $P1 = WSubId_115(__ARG_1, __ARG_2)
     null $P2
     null $I1
@@ -15353,7 +15778,7 @@
     set $P1, $P7
     goto __label_4 # break
   __label_3: # default
-    WSubId_35('Invalid code in parseExpr_5', $P2)
+    WSubId_33("Invalid code in parseExpr_5", $P2)
   __label_4: # switch end
     goto __label_2
   __label_1: # endwhile
@@ -15371,15 +15796,15 @@
     null $P2
   __label_2: # while
     $P2 = __ARG_1.'get'()
-    $P5 = $P2.'isop'('+')
+    $P5 = $P2.'isop'("+")
     if $P5 goto __label_3
-    $P5 = $P2.'isop'('-')
+    $P5 = $P2.'isop'("-")
   __label_3:
     if_null $P5, __label_1
     unless $P5 goto __label_1
     $P3 = WSubId_118(__ARG_1, __ARG_2)
     null $P4
-    $P5 = $P2.'isop'('+')
+    $P5 = $P2.'isop'("+")
     if_null $P5, __label_4
     unless $P5 goto __label_4
     new $P6, [ 'Winxed'; 'Compiler'; 'OpAddExpr' ]
@@ -15405,7 +15830,7 @@
         .param pmc __ARG_2
 .const 'Sub' WSubId_119 = "WSubId_119"
 .const 'Sub' WSubId_120 = "WSubId_120"
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     $P1 = WSubId_119(__ARG_1, __ARG_2)
     null $P2
     null $P3
@@ -15438,7 +15863,7 @@
     set $P1, $P7
     goto __label_4 # break
   __label_3: # default
-    WSubId_35('Invalid code in parseExpr_7', $P3)
+    WSubId_33("Invalid code in parseExpr_7", $P3)
   __label_4: # switch end
     goto __label_2
   __label_1: # endwhile
@@ -15453,7 +15878,7 @@
         .param pmc __ARG_2
 .const 'Sub' WSubId_121 = "WSubId_121"
 .const 'Sub' WSubId_122 = "WSubId_122"
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     $P1 = WSubId_121(__ARG_1, __ARG_2)
     null $P2
     null $P3
@@ -15495,7 +15920,7 @@
     set $P1, $P9
     goto __label_4 # break
   __label_3: # default
-    WSubId_35('Invalid code in parseExpr_9', $P3)
+    WSubId_33("Invalid code in parseExpr_9", $P3)
   __label_4: # switch end
     goto __label_2
   __label_1: # endwhile
@@ -15510,7 +15935,7 @@
         .param pmc __ARG_2
 .const 'Sub' WSubId_123 = "WSubId_123"
 .const 'Sub' WSubId_124 = "WSubId_124"
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     $P1 = WSubId_123(__ARG_1, __ARG_2)
     null $P2
     null $P3
@@ -15550,7 +15975,7 @@
     set $P1, $P8
     goto __label_4 # break
   __label_3: # default
-    WSubId_35('Invalid code in parseExpr_8', $P3)
+    WSubId_33("Invalid code in parseExpr_8", $P3)
   __label_4: # switch end
     goto __label_2
   __label_1: # endwhile
@@ -15568,7 +15993,7 @@
     null $P2
   __label_2: # while
     $P2 = __ARG_1.'get'()
-    $P4 = $P2.'isop'('&')
+    $P4 = $P2.'isop'("&")
     if_null $P4, __label_1
     unless $P4 goto __label_1
     $P3 = WSubId_125(__ARG_1, __ARG_2)
@@ -15591,7 +16016,7 @@
     null $P2
   __label_2: # while
     $P2 = __ARG_1.'get'()
-    $P4 = $P2.'isop'('^')
+    $P4 = $P2.'isop'("^")
     if_null $P4, __label_1
     unless $P4 goto __label_1
     $P3 = WSubId_126(__ARG_1, __ARG_2)
@@ -15614,7 +16039,7 @@
     null $P2
   __label_2: # while
     $P2 = __ARG_1.'get'()
-    $P4 = $P2.'isop'('|')
+    $P4 = $P2.'isop'("|")
     if_null $P4, __label_1
     unless $P4 goto __label_1
     $P3 = WSubId_127(__ARG_1, __ARG_2)
@@ -15637,7 +16062,7 @@
     null $P2
   __label_2: # while
     $P2 = __ARG_1.'get'()
-    $P4 = $P2.'isop'('&&')
+    $P4 = $P2.'isop'("&&")
     if_null $P4, __label_1
     unless $P4 goto __label_1
     $P3 = WSubId_128(__ARG_1, __ARG_2)
@@ -15661,7 +16086,7 @@
     null $P2
   __label_2: # while
     $P2 = __ARG_1.'get'()
-    $P4 = $P2.'isop'('||')
+    $P4 = $P2.'isop'("||")
     if_null $P4, __label_1
     unless $P4 goto __label_1
     $P3 = WSubId_128(__ARG_1, __ARG_2)
@@ -15681,14 +16106,14 @@
         .param pmc __ARG_2
 .const 'Sub' WSubId_130 = "WSubId_130"
 .const 'Sub' WSubId_131 = "WSubId_131"
-.const 'Sub' WSubId_94 = "WSubId_94"
+.const 'Sub' WSubId_93 = "WSubId_93"
     $P1 = WSubId_130(__ARG_1, __ARG_2)
     $P2 = __ARG_1.'get'()
-    $P5 = $P2.'isop'('?')
+    $P5 = $P2.'isop'("?")
     if_null $P5, __label_1
     unless $P5 goto __label_1
     $P3 = WSubId_131(__ARG_1, __ARG_2)
-    WSubId_94(':', __ARG_1)
+    WSubId_93(":", __ARG_1)
     $P4 = WSubId_131(__ARG_1, __ARG_2)
     new $P6, [ 'Winxed'; 'Compiler'; 'OpConditionalExpr' ]
     $P6.'OpConditionalExpr'(__ARG_2, $P2, $P1, $P3, $P4)
@@ -15709,7 +16134,7 @@
 .const 'Sub' WSubId_132 = "WSubId_132"
 .const 'Sub' WSubId_133 = "WSubId_133"
 .const 'Sub' WSubId_131 = "WSubId_131"
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     $P1 = WSubId_132(__ARG_1, __ARG_2)
     null $P2
     null $I1
@@ -15750,7 +16175,7 @@
     new $P4, [ 'Winxed'; 'Compiler'; 'OpModToExpr' ]
     goto __label_4 # break
   __label_3: # default
-    WSubId_35('Unexpected code in parseExpr_16', $P2)
+    WSubId_33("Unexpected code in parseExpr_16", $P2)
   __label_4: # switch end
     $P4.'set'(__ARG_2, $P2, $P1, $P3)
     set $P1, $P4
@@ -15762,7 +16187,7 @@
 .end # parseExpr_16
 
 
-.sub 'parseExpr' :subid('WSubId_77')
+.sub 'parseExpr' :subid('WSubId_74')
         .param pmc __ARG_1
         .param pmc __ARG_2
 .const 'Sub' WSubId_131 = "WSubId_131"
@@ -15773,10 +16198,10 @@
 .namespace [ 'Winxed'; 'Compiler'; 'Breakable' ]
 
 .sub 'genbreaklabel' :method
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     getattribute $P1, self, 'brlabel'
     if_null $P1, __label_1
-    WSubId_35('attempt to generate break label twice')
+    WSubId_33("attempt to generate break label twice")
   __label_1: # endif
     $P1 = self.'genlabel'()
     null $S1
@@ -15792,10 +16217,10 @@
 
 .sub 'getbreaklabel' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     getattribute $P1, self, 'brlabel'
     unless_null $P1, __label_1
-    WSubId_35('attempt to get break label before creating it')
+    WSubId_33("attempt to get break label before creating it")
   __label_1: # endif
     .return($P1)
 
@@ -15808,10 +16233,10 @@
 .namespace [ 'Winxed'; 'Compiler'; 'Continuable' ]
 
 .sub 'gencontinuelabel' :method
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     getattribute $P1, self, 'cntlabel'
     if_null $P1, __label_1
-    WSubId_35('attempt to generate continue label twice')
+    WSubId_33("attempt to generate continue label twice")
   __label_1: # endif
     $P1 = self.'genlabel'()
     null $S1
@@ -15827,10 +16252,10 @@
 
 .sub 'getcontinuelabel' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     getattribute $P1, self, 'cntlabel'
     unless_null $P1, __label_1
-    WSubId_35('attempt to get continue label before creating it')
+    WSubId_33("attempt to get continue label before creating it")
   __label_1: # endif
     .return($P1)
 
@@ -15850,7 +16275,7 @@
         .param pmc __ARG_3
     self.'Statement'(__ARG_1, __ARG_3)
     $P1 = __ARG_2.'get'()
-    $P2 = $P1.'isop'(';')
+    $P2 = $P1.'isop'(";")
     if $P2 goto __label_1
     __ARG_2.'unget'($P1)
     new $P4, [ 'Winxed'; 'Compiler'; 'ArgumentList' ]
@@ -15891,7 +16316,7 @@
     $P4 = $P5.'allowtailcall'()
     unless $P4 goto __label_4
     self.'annotate'(__ARG_1)
-    .tailcall $P2.'emit'(__ARG_1, '.tailcall')
+    .tailcall $P2.'emit'(__ARG_1, ".tailcall")
   __label_4: # endif
   __label_3: # endif
     le $I1, 0, __label_5
@@ -15902,7 +16327,7 @@
     le $I1, 0, __label_6
     $P1.'emitargs'(__ARG_1)
   __label_6: # endif
-    __ARG_1.'say'(')')
+    __ARG_1.'say'(")")
 
 .end # emit
 
@@ -15941,7 +16366,7 @@
 
 .sub 'emitret' :method
         .param pmc __ARG_1
-    __ARG_1.'print'('    ', '.return(')
+    __ARG_1.'print'("    ", ".return(")
 
 .end # emitret
 
@@ -15963,15 +16388,15 @@
 
 .sub 'clone' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_30 = "WSubId_30"
-    WSubId_30("inlined yield not allowed", self)
+.const 'Sub' WSubId_28 = "WSubId_28"
+    WSubId_28("inlined yield not allowed", self)
 
 .end # clone
 
 
 .sub 'emitret' :method
         .param pmc __ARG_1
-    __ARG_1.'print'('    ', '.yield(')
+    __ARG_1.'print'("    ", ".yield(")
 
 .end # emitret
 
@@ -15986,16 +16411,16 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_77 = "WSubId_77"
-.const 'Sub' WSubId_94 = "WSubId_94"
+.const 'Sub' WSubId_74 = "WSubId_74"
+.const 'Sub' WSubId_93 = "WSubId_93"
     self.'Statement'(__ARG_1, __ARG_3)
     $P1 = __ARG_2.'get'()
     $P2 = $P1.'isop'(";")
     if $P2 goto __label_1
     __ARG_2.'unget'($P1)
-    $P3 = WSubId_77(__ARG_2, __ARG_3)
+    $P3 = WSubId_74(__ARG_2, __ARG_3)
     setattribute self, 'expr', $P3
-    WSubId_94(';', __ARG_2)
+    WSubId_93(";", __ARG_2)
   __label_1: # endif
 
 .end # InlineReturnStatement
@@ -16065,7 +16490,7 @@
     set $S3, $P4
   __label_10:
     self.'annotate'(__ARG_1)
-    ne $S1, 'P', __label_11
+    ne $S1, "P", __label_11
     __ARG_1.'emitbox'($P3, $S3)
     goto __label_12
   __label_11: # else
@@ -16096,7 +16521,7 @@
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'parseReturn' :subid('WSubId_89')
+.sub 'parseReturn' :subid('WSubId_87')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
@@ -16157,7 +16582,7 @@
     getattribute $P1, self, 'value'
     getattribute $P2, self, 'name'
     set $S1, $P2
-    concat $S2, 'label ', $S1
+    concat $S2, "label ", $S1
     __ARG_1.'emitlabel'($P1, $S2)
 
 .end # emit
@@ -16199,7 +16624,7 @@
 
 .sub 'emit_get' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     getattribute $P2, self, 'owner'
     getattribute $P4, self, 'label'
     $P3 = $P4.'getidentifier'()
@@ -16210,7 +16635,7 @@
   __label_1:
     unless_null $S1, __label_2
     getattribute $P1, self, 'label'
-    WSubId_30("No such label", $P1)
+    WSubId_28("No such label", $P1)
   __label_2: # endif
     .return($S1)
 
@@ -16253,7 +16678,7 @@
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     self.'annotate'(__ARG_1)
     getattribute $P1, self, 'label'
     null $S1
@@ -16267,9 +16692,9 @@
   __label_2:
     unless_null $S2, __label_3
     getattribute $P1, self, 'label'
-    WSubId_30("No such label", $P1)
+    WSubId_28("No such label", $P1)
   __label_3: # endif
-    concat $S3, 'goto ', $S1
+    concat $S3, "goto ", $S1
     __ARG_1.'emitgoto'($S2, $S3)
 
 .end # emit
@@ -16282,15 +16707,15 @@
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'parseGoto' :subid('WSubId_90')
+.sub 'parseGoto' :subid('WSubId_88')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_134 = "WSubId_134"
-.const 'Sub' WSubId_94 = "WSubId_94"
+.const 'Sub' WSubId_78 = "WSubId_78"
+.const 'Sub' WSubId_93 = "WSubId_93"
     $P1 = __ARG_2.'get'()
-    WSubId_134($P1)
-    WSubId_94(';', __ARG_2)
+    WSubId_78($P1)
+    WSubId_93(";", __ARG_2)
     new $P3, [ 'Winxed'; 'Compiler'; 'GotoStatement' ]
     $P3.'GotoStatement'(__ARG_1, __ARG_3, $P1)
     set $P2, $P3
@@ -16302,8 +16727,8 @@
 
 .sub 'parseconditionshort' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_77 = "WSubId_77"
-    $P1 = WSubId_77(__ARG_1, self)
+.const 'Sub' WSubId_74 = "WSubId_74"
+    $P1 = WSubId_74(__ARG_1, self)
     self.'set'($P1)
 
 .end # parseconditionshort
@@ -16311,12 +16736,12 @@
 
 .sub 'parsecondition' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_94 = "WSubId_94"
-.const 'Sub' WSubId_77 = "WSubId_77"
-    WSubId_94('(', __ARG_1)
-    $P1 = WSubId_77(__ARG_1, self)
+.const 'Sub' WSubId_93 = "WSubId_93"
+.const 'Sub' WSubId_74 = "WSubId_74"
+    WSubId_93("(", __ARG_1)
+    $P1 = WSubId_74(__ARG_1, self)
     self.'set'($P1)
-    WSubId_94(')', __ARG_1)
+    WSubId_93(")", __ARG_1)
 
 .end # parsecondition
 
@@ -16333,16 +16758,16 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_135 = "WSubId_135"
+.const 'Sub' WSubId_134 = "WSubId_134"
     self.'Statement'(__ARG_1, __ARG_3)
     self.'parsecondition'(__ARG_2)
-    $P3 = WSubId_135(__ARG_2, self)
+    $P3 = WSubId_134(__ARG_2, self)
     setattribute self, 'truebranch', $P3
     $P1 = __ARG_2.'get'()
     $P2 = $P1.'iskeyword'("else")
     if_null $P2, __label_1
     unless $P2 goto __label_1
-    $P4 = WSubId_135(__ARG_2, self)
+    $P4 = WSubId_134(__ARG_2, self)
     setattribute self, 'falsebranch', $P4
     goto __label_2
   __label_1: # else
@@ -16407,7 +16832,7 @@
     set $I1, $P3
     $P3 = $P2.'isempty'()
     set $I2, $P3
-    set $S1, ''
+    set $S1, ""
     if $I2 goto __label_1
     $P3 = self.'genlabel'()
     set $S1, $P3
@@ -16428,10 +16853,10 @@
     $P1.'emit'(__ARG_1)
     if $I2 goto __label_5
     __ARG_1.'emitgoto'($S2)
-    __ARG_1.'emitlabel'($S1, 'else')
+    __ARG_1.'emitlabel'($S1, "else")
     $P2.'emit'(__ARG_1)
   __label_5: # endif
-    __ARG_1.'emitlabel'($S2, 'endif')
+    __ARG_1.'emitlabel'($S2, "endif")
 
 .end # emit
 
@@ -16446,8 +16871,8 @@
 
 .sub 'parsebody' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_135 = "WSubId_135"
-    $P2 = WSubId_135(__ARG_1, self)
+.const 'Sub' WSubId_134 = "WSubId_134"
+    $P2 = WSubId_134(__ARG_1, self)
     setattribute self, 'body', $P2
 
 .end # parsebody
@@ -16466,11 +16891,11 @@
     set $S2, $P1
   __label_2:
     self.'annotate'(__ARG_1)
-    __ARG_1.'emitlabel'($S2, 'Infinite loop')
+    __ARG_1.'emitlabel'($S2, "Infinite loop")
     getattribute $P1, self, 'body'
     $P1.'emit'(__ARG_1)
     __ARG_1.'emitgoto'($S2)
-    __ARG_1.'emitlabel'($S1, 'Infinite loop end')
+    __ARG_1.'emitlabel'($S1, "Infinite loop end")
 
 .end # emit_infinite
 
@@ -16533,7 +16958,7 @@
     $P2 = __ARG_1.'getDebug'()
     if_null $P2, __label_5
     unless $P2 goto __label_5
-    __ARG_1.'comment'('while(false) optimized out')
+    __ARG_1.'comment'("while(false) optimized out")
   __label_5: # endif
     goto __label_2 # break
   __label_1: # default
@@ -16548,12 +16973,12 @@
     set $S2, $P4
   __label_7:
     self.'annotate'(__ARG_1)
-    __ARG_1.'emitlabel'($S2, 'while')
+    __ARG_1.'emitlabel'($S2, "while")
     self.'emit_else'(__ARG_1, $S1)
     getattribute $P5, self, 'body'
     $P5.'emit'(__ARG_1)
     __ARG_1.'emitgoto'($S2)
-    __ARG_1.'emitlabel'($S1, 'endwhile')
+    __ARG_1.'emitlabel'($S1, "endwhile")
   __label_2: # switch end
 
 .end # emit
@@ -16571,10 +16996,10 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_136 = "WSubId_136"
+.const 'Sub' WSubId_135 = "WSubId_135"
     self.'Statement'(__ARG_1, __ARG_3)
     self.'parsebody'(__ARG_2)
-    WSubId_136('while', __ARG_2)
+    WSubId_135("while", __ARG_2)
     self.'parsecondition'(__ARG_2)
 
 .end # DoStatement
@@ -16641,13 +17066,13 @@
     set $S3, $P4
   __label_6:
     self.'annotate'(__ARG_1)
-    __ARG_1.'emitlabel'($S1, 'do')
+    __ARG_1.'emitlabel'($S1, "do")
     $P1.'emit'(__ARG_1)
-    __ARG_1.'emitlabel'($S3, 'continue')
+    __ARG_1.'emitlabel'($S3, "continue")
     eq $I1, 2, __label_7
     self.'emit_if'(__ARG_1, $S1, $S2)
   __label_7: # endif
-    __ARG_1.'emitlabel'($S2, 'enddo')
+    __ARG_1.'emitlabel'($S2, "enddo")
   __label_2: # switch end
 
 .end # emit
@@ -16665,9 +17090,9 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_94 = "WSubId_94"
+.const 'Sub' WSubId_93 = "WSubId_93"
     self.'Statement'(__ARG_1, __ARG_3)
-    WSubId_94(';', __ARG_2)
+    WSubId_93(";", __ARG_2)
 
 .end # ContinueStatement
 
@@ -16697,7 +17122,7 @@
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-    __ARG_1.'emitgoto'($S1, 'continue')
+    __ARG_1.'emitgoto'($S1, "continue")
 
 .end # emit
 
@@ -16712,9 +17137,9 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_94 = "WSubId_94"
+.const 'Sub' WSubId_93 = "WSubId_93"
     self.'Statement'(__ARG_1, __ARG_3)
-    WSubId_94(';', __ARG_2)
+    WSubId_93(";", __ARG_2)
 
 .end # BreakStatement
 
@@ -16744,7 +17169,7 @@
     if_null $P1, __label_1
     set $S1, $P1
   __label_1:
-    __ARG_1.'emitgoto'($S1, 'break')
+    __ARG_1.'emitgoto'($S1, "break")
 
 .end # emit
 
@@ -16773,11 +17198,11 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
 .const 'Sub' WSubId_14 = "WSubId_14"
-.lex '__WLEX_1', __ARG_2
+.lex '__WLEX_1', __ARG_1
     getattribute $P17, self, 'start'
     __ARG_1.'Statement'($P17, __ARG_2)
     getattribute $P1, self, 'case_value'
-    set $P2, __ARG_2
+    set $P2, __ARG_1
 .const 'Sub' WSubId_3 = "WSubId_3"
 .const 'Sub' WSubId_5 = "WSubId_5"
     set $P3, $P1
@@ -16817,7 +17242,7 @@
     set $P17, $P22
     setattribute __ARG_1, 'case_st', $P17
     getattribute $P11, self, 'default_st'
-    set $P12, __ARG_2
+    set $P12, __ARG_1
 .const 'Sub' WSubId_3 = "WSubId_3"
 .const 'Sub' WSubId_5 = "WSubId_5"
     set $P13, $P11
@@ -16874,83 +17299,114 @@
 .end # WSubId_14
 
 
+.sub 'parse_switchbody' :method
+        .param pmc __ARG_1
+.const 'Sub' WSubId_76 = "WSubId_76"
+    $P1 = __ARG_1.'get'()
+    $P2 = $P1.'isop'("}")
+    set $I1, $P2
+    if $I1 goto __label_3
+    $P3 = $P1.'iskeyword'("default")
+    set $I1, $P3
+    if $I1 goto __label_4
+    $P4 = $P1.'iskeyword'("case")
+    set $I1, $P4
+    if $I1 goto __label_5
+    goto __label_2
+  __label_3: # case
+    goto __label_1 # break
+  __label_4: # case
+    self.'parse_default'(__ARG_1)
+    goto __label_1 # break
+  __label_5: # case
+    self.'parse_cases'(__ARG_1)
+    goto __label_1 # break
+  __label_2: # default
+    WSubId_76("switch cases", $P1)
+  __label_1: # switch end
+
+.end # parse_switchbody
+
+
 .sub 'parse_cases' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_77 = "WSubId_77"
-.const 'Sub' WSubId_79 = "WSubId_79"
-.const 'Sub' WSubId_135 = "WSubId_135"
+.const 'Sub' WSubId_74 = "WSubId_74"
+.const 'Sub' WSubId_76 = "WSubId_76"
+.const 'Sub' WSubId_134 = "WSubId_134"
     null $P1
-  __label_2: # while
+  __label_1: # do
+    getattribute $P3, self, 'case_value'
+    $P4 = WSubId_74(__ARG_1, self)
+    push $P3, $P4
     $P1 = __ARG_1.'get'()
-    $P3 = $P1.'iskeyword'('case')
-    if $P3 goto __label_3
-    $P3 = $P1.'iskeyword'('default')
-  __label_3:
-    if_null $P3, __label_1
-    unless $P3 goto __label_1
-    $P4 = $P1.'iskeyword'('case')
-    if_null $P4, __label_4
-    unless $P4 goto __label_4
-    getattribute $P5, self, 'case_value'
-    $P6 = WSubId_77(__ARG_1, self)
-    push $P5, $P6
-    $P1 = __ARG_1.'get'()
-    $P3 = $P1.'isop'(':')
-    if $P3 goto __label_6
-    WSubId_79("':' in case", $P1)
-  __label_6: # endif
+    $P3 = $P1.'isop'(":")
+    if $P3 goto __label_4
+    WSubId_76("':' in case", $P1)
+  __label_4: # endif
     root_new $P2, ['parrot';'ResizablePMCArray']
-  __label_8: # while
+  __label_6: # while
     $P1 = __ARG_1.'get'()
-    $P3 = $P1.'isop'('}')
-    if $P3 goto __label_10
-    $P3 = $P1.'iskeyword'('case')
-  __label_10:
-    if $P3 goto __label_9
-    $P3 = $P1.'iskeyword'('default')
-  __label_9:
+    $P3 = $P1.'isop'("}")
+    if $P3 goto __label_8
+    $P3 = $P1.'iskeyword'("case")
+  __label_8:
     if $P3 goto __label_7
+    $P3 = $P1.'iskeyword'("default")
+  __label_7:
+    if $P3 goto __label_5
     __ARG_1.'unget'($P1)
-    $P3 = WSubId_135(__ARG_1, self)
+    $P3 = WSubId_134(__ARG_1, self)
     push $P2, $P3
-    goto __label_8
-  __label_7: # endwhile
+    goto __label_6
+  __label_5: # endwhile
     getattribute $P3, self, 'case_st'
     push $P3, $P2
-    __ARG_1.'unget'($P1)
-    goto __label_5
-  __label_4: # else
-    $P1 = __ARG_1.'get'()
-    $P3 = $P1.'isop'(':')
-    if $P3 goto __label_11
-    WSubId_79("':' in default", $P1)
-  __label_11: # endif
-  __label_13: # while
-    $P1 = __ARG_1.'get'()
-    $P3 = $P1.'isop'('}')
-    if $P3 goto __label_15
-    $P3 = $P1.'iskeyword'('case')
-  __label_15:
-    if $P3 goto __label_14
-    $P3 = $P1.'iskeyword'('default')
-  __label_14:
-    if $P3 goto __label_12
-    __ARG_1.'unget'($P1)
-    getattribute $P3, self, 'default_st'
-    $P4 = WSubId_135(__ARG_1, self)
-    push $P3, $P4
-    goto __label_13
-  __label_12: # endwhile
-    __ARG_1.'unget'($P1)
-  __label_5: # endif
-    goto __label_2
-  __label_1: # endwhile
-    $P3 = $P1.'isop'('}')
-    if $P3 goto __label_16
-    WSubId_79("'}' in switch", $P1)
-  __label_16: # endif
+  __label_3: # continue
+    $P3 = $P1.'iskeyword'("case")
+    if_null $P3, __label_2
+    if $P3 goto __label_1
+  __label_2: # enddo
+    $P3 = $P1.'iskeyword'("default")
+    if_null $P3, __label_9
+    unless $P3 goto __label_9
+    self.'parse_default'(__ARG_1)
+  __label_9: # endif
 
 .end # parse_cases
+
+
+.sub 'parse_default' :method
+        .param pmc __ARG_1
+.const 'Sub' WSubId_76 = "WSubId_76"
+.const 'Sub' WSubId_28 = "WSubId_28"
+.const 'Sub' WSubId_134 = "WSubId_134"
+    $P1 = __ARG_1.'get'()
+    $P2 = $P1.'isop'(":")
+    if $P2 goto __label_1
+    WSubId_76("':' in default", $P1)
+  __label_1: # endif
+  __label_3: # while
+    $P1 = __ARG_1.'get'()
+    $P2 = $P1.'isop'("}")
+    if $P2 goto __label_2
+    $P3 = $P1.'iskeyword'("case")
+    if_null $P3, __label_4
+    unless $P3 goto __label_4
+    WSubId_28("case after default", $P1)
+  __label_4: # endif
+    $P2 = $P1.'iskeyword'("default")
+    if_null $P2, __label_5
+    unless $P2 goto __label_5
+    WSubId_28("default after default", $P1)
+  __label_5: # endif
+    __ARG_1.'unget'($P1)
+    getattribute $P2, self, 'default_st'
+    $P3 = WSubId_134(__ARG_1, self)
+    push $P2, $P3
+    goto __label_3
+  __label_2: # endwhile
+
+.end # parse_default
 
 
 .sub 'optimize_cases' :method
@@ -17036,22 +17492,22 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_77 = "WSubId_77"
-.const 'Sub' WSubId_79 = "WSubId_79"
+.const 'Sub' WSubId_74 = "WSubId_74"
+.const 'Sub' WSubId_76 = "WSubId_76"
     self.'SwitchBaseStatement'(__ARG_1, __ARG_3)
-    $P3 = WSubId_77(__ARG_2, self)
+    $P3 = WSubId_74(__ARG_2, self)
     setattribute self, 'condition', $P3
     $P1 = __ARG_2.'get'()
-    $P2 = $P1.'isop'(')')
+    $P2 = $P1.'isop'(")")
     if $P2 goto __label_1
-    WSubId_79("')' in switch", $P1)
+    WSubId_76("')' in switch", $P1)
   __label_1: # endif
     $P1 = __ARG_2.'get'()
-    $P2 = $P1.'isop'('{')
+    $P2 = $P1.'isop'("{")
     if $P2 goto __label_2
-    WSubId_79("'{' in switch", $P1)
+    WSubId_76("'{' in switch", $P1)
   __label_2: # endif
-    self.'parse_cases'(__ARG_2)
+    self.'parse_switchbody'(__ARG_2)
 
 .end # SwitchStatement
 
@@ -17080,228 +17536,239 @@
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_30 = "WSubId_30"
-.const 'Sub' WSubId_51 = "WSubId_51"
-.const 'Sub' WSubId_52 = "WSubId_52"
-    set $S1, ''
-    getattribute $P19, self, 'case_value'
-    if_null $P19, __label_2
-    iter $P20, $P19
-    set $P20, 0
+.const 'Sub' WSubId_28 = "WSubId_28"
+.const 'Sub' WSubId_48 = "WSubId_48"
+    set $S1, ""
+    getattribute $P21, self, 'case_value'
+    if_null $P21, __label_2
+    iter $P22, $P21
+    set $P22, 0
   __label_1: # for iteration
-    unless $P20 goto __label_2
-    shift $P1, $P20
-    $P21 = $P1.'checkresult'()
+    unless $P22 goto __label_2
+    shift $P1, $P22
+    $P23 = $P1.'checkresult'()
     null $S2
-    if_null $P21, __label_3
-    set $S2, $P21
+    if_null $P23, __label_3
+    set $S2, $P23
   __label_3:
-    ne $S2, 'N', __label_4
-    WSubId_30("Invalid type in case", self)
+    ne $S2, "N", __label_4
+    WSubId_28("Invalid type in case", self)
   __label_4: # endif
-    ne $S2, 'S', __label_5
-    iseq $I4, $S1, ''
+    ne $S2, "S", __label_5
+    iseq $I4, $S1, ""
     if $I4 goto __label_7
-    iseq $I4, $S1, 'char'
+    iseq $I4, $S1, "char"
   __label_7:
     unless $I4 goto __label_6
-    $P19 = $P1.'isstringliteral'()
-    unless $P19 goto __label_8
-    $P21 = WSubId_51($P1)
+    $P21 = $P1.'isstringliteral'()
+    unless $P21 goto __label_8
+    set $P9, $P1
+    $P21 = $P9.'getStringValue'()
+    null $S11
+    if_null $P21, __label_11
     set $S11, $P21
-    length $I5, $S11
+  __label_11:
+    set $S13, $S11
+  __label_10:
+    length $I5, $S13
     ne $I5, 1, __label_8
-    set $S2, 'char'
+    set $S2, "char"
     goto __label_9
   __label_8: # else
-    set $S1, 'S'
+    set $S1, "S"
   __label_9: # endif
   __label_6: # endif
   __label_5: # endif
-    ne $S1, '', __label_10
+    ne $S1, "", __label_12
     set $S1, $S2
-    goto __label_11
-  __label_10: # else
-    eq $S1, $S2, __label_12
-    set $S1, 'P'
-  __label_12: # endif
-  __label_11: # endif
+    goto __label_13
+  __label_12: # else
+    eq $S1, $S2, __label_14
+    set $S1, "P"
+  __label_14: # endif
+  __label_13: # endif
     goto __label_1
   __label_2: # endfor
     getattribute $P2, self, 'condition'
     $P3 = $P2.'checkresult'()
-    ne $S1, '', __label_13
+    ne $S1, "", __label_15
     set $S1, $P3
-  __label_13: # endif
-    $P19 = __ARG_1.'getDebug'()
-    if_null $P19, __label_14
-    unless $P19 goto __label_14
-    __ARG_1.'comment'('switch')
-  __label_14: # endif
+  __label_15: # endif
+    $P21 = __ARG_1.'getDebug'()
+    if_null $P21, __label_16
+    unless $P21 goto __label_16
+    __ARG_1.'comment'("switch")
+  __label_16: # endif
     self.'annotate'(__ARG_1)
-    $P19 = self.'genlabel'()
+    $P21 = self.'genlabel'()
     null $S3
-    if_null $P19, __label_15
-    set $S3, $P19
-  __label_15:
+    if_null $P21, __label_17
+    set $S3, $P21
+  __label_17:
     null $S4
-    ne $S1, 'char', __label_16
+    ne $S1, "char", __label_18
     isa $I4, $P2, [ 'Winxed'; 'Compiler'; 'CallBuiltinExpr' ]
-    unless $I4 goto __label_18
-    getattribute $P21, $P2, 'builtin'
-    $P19 = $P21.'name'()
-    set $S11, $P19
-    ne $S11, "chr", __label_18
+    unless $I4 goto __label_20
+    getattribute $P23, $P2, 'builtin'
+    $P21 = $P23.'name'()
+    set $S14, $P21
+    ne $S14, "chr", __label_20
     getattribute $P4, $P2, 'args'
-    $P19 = $P4[0]
-    getattribute $P5, $P19, 'arg'
-    $P19 = $P5.'emit_getint'(__ARG_1)
-    set $S4, $P19
-    goto __label_19
-  __label_18: # else
-    null $S5
-    set $S11, $P3
-    eq $S11, 'S', __label_20
-    $P19 = $P2.'emit_get'(__ARG_1)
-    null $S6
-    if_null $P19, __label_22
-    set $S6, $P19
-  __label_22:
-    $P19 = self.'tempreg'('S')
-    set $S5, $P19
-    __ARG_1.'emitset'($S5, $S6)
+    $P21 = $P4[0]
+    getattribute $P5, $P21, 'arg'
+    $P21 = $P5.'emit_getint'(__ARG_1)
+    set $S4, $P21
     goto __label_21
   __label_20: # else
-    $P19 = $P2.'emit_get'(__ARG_1)
-    set $S5, $P19
-  __label_21: # endif
+    null $S5
+    set $S14, $P3
+    eq $S14, "S", __label_22
+    $P21 = $P2.'emit_get'(__ARG_1)
+    null $S6
+    if_null $P21, __label_24
+    set $S6, $P21
+  __label_24:
+    $P21 = self.'tempreg'("S")
+    set $S5, $P21
+    __ARG_1.'emitset'($S5, $S6)
+    goto __label_23
+  __label_22: # else
+    $P21 = $P2.'emit_get'(__ARG_1)
+    set $S5, $P21
+  __label_23: # endif
     __ARG_1.'emitif_null'($S5, $S3)
-    $P19 = self.'tempreg'('I')
-    set $S4, $P19
-    __ARG_1.'emitarg2'('length', $S4, $S5)
-    __ARG_1.'emitarg3'('ne', $S4, "1", $S3)
-    __ARG_1.'emitarg2'('ord', $S4, $S5)
-  __label_19: # endif
-    goto __label_17
-  __label_16: # else
-    set $S11, $P3
-    ne $S11, $S1, __label_23
-    $P19 = $P2.'emit_get'(__ARG_1)
-    set $S4, $P19
-    goto __label_24
-  __label_23: # else
-    $P21 = self.'tempreg'($S1)
+    $P21 = self.'tempreg'("I")
     set $S4, $P21
-    $P19 = $P2.'emit_get'(__ARG_1)
+    __ARG_1.'emitarg2'("length", $S4, $S5)
+    __ARG_1.'emitarg3'("ne", $S4, "1", $S3)
+    __ARG_1.'emitarg2'("ord", $S4, $S5)
+  __label_21: # endif
+    goto __label_19
+  __label_18: # else
+    set $S14, $P3
+    ne $S14, $S1, __label_25
+    $P21 = $P2.'emit_get'(__ARG_1)
+    set $S4, $P21
+    goto __label_26
+  __label_25: # else
+    $P23 = self.'tempreg'($S1)
+    set $S4, $P23
+    $P21 = $P2.'emit_get'(__ARG_1)
     null $S7
-    if_null $P19, __label_25
-    set $S7, $P19
-  __label_25:
+    if_null $P21, __label_27
+    set $S7, $P21
+  __label_27:
     __ARG_1.'emitset'($S4, $S7)
-  __label_24: # endif
-  __label_17: # endif
+  __label_26: # endif
+  __label_19: # endif
     self.'genbreaklabel'()
     new $P6, ['ResizableStringArray']
     null $S8
-    eq $S1, 'char', __label_26
+    eq $S1, "char", __label_28
     self.'tempreg'($S1)
-  __label_26: # endif
-    getattribute $P19, self, 'case_value'
-    if_null $P19, __label_28
-    iter $P22, $P19
-    set $P22, 0
-  __label_27: # for iteration
-    unless $P22 goto __label_28
-    shift $P7, $P22
-    $P21 = self.'genlabel'()
+  __label_28: # endif
+    getattribute $P21, self, 'case_value'
+    if_null $P21, __label_30
+    iter $P24, $P21
+    set $P24, 0
+  __label_29: # for iteration
+    unless $P24 goto __label_30
+    shift $P7, $P24
+    $P23 = self.'genlabel'()
     null $S9
-    if_null $P21, __label_29
-    set $S9, $P21
-  __label_29:
+    if_null $P23, __label_31
+    set $S9, $P23
+  __label_31:
     push $P6, $S9
     null $S10
-    ne $S1, 'I', __label_30
-    $P19 = $P7.'emit_getint'(__ARG_1)
-    set $S10, $P19
-    goto __label_31
-  __label_30: # else
-    ne $S1, 'char', __label_32
-    $P21 = WSubId_51($P7)
-    set $S11, $P21
-    ord $I1, $S11
-    set $S10, $I1
+    ne $S1, "I", __label_32
+    $P21 = $P7.'emit_getint'(__ARG_1)
+    set $S10, $P21
     goto __label_33
   __label_32: # else
-    $P19 = $P7.'checkresult'()
-    set $S11, $P19
-    ne $S1, $S11, __label_34
-    $P21 = $P7.'emit_get'(__ARG_1)
-    set $S10, $P21
+    ne $S1, "char", __label_34
+    set $P10, $P7
+    $P21 = $P10.'getStringValue'()
+    null $S12
+    if_null $P21, __label_37
+    set $S12, $P21
+  __label_37:
+    set $S15, $S12
+  __label_36:
+    ord $I1, $S15
+    set $S10, $I1
     goto __label_35
   __label_34: # else
+    $P21 = $P7.'checkresult'()
+    set $S14, $P21
+    ne $S1, $S14, __label_38
+    $P23 = $P7.'emit_get'(__ARG_1)
+    set $S10, $P23
+    goto __label_39
+  __label_38: # else
     $P7.'emit'(__ARG_1, $S8)
     set $S10, $S8
+  __label_39: # endif
   __label_35: # endif
   __label_33: # endif
-  __label_31: # endif
     $P7.'annotate'(__ARG_1)
-    $P19 = WSubId_52("    if %0 == %1 goto %2", $S4, $S10, $S9)
-    __ARG_1.'say'($P19)
-    goto __label_27
-  __label_28: # endfor
+    $P21 = WSubId_48("    if %0 == %1 goto %2", $S4, $S10, $S9)
+    __ARG_1.'say'($P21)
+    goto __label_29
+  __label_30: # endfor
     __ARG_1.'emitgoto'($S3)
     self.'annotate'(__ARG_1)
     getattribute $P8, self, 'case_st'
     set $I2, $P8
     null $I3
-  __label_38: # for condition
-    ge $I3, $I2, __label_37
-    $P19 = $P6[$I3]
-    __ARG_1.'emitlabel'($P19, 'case')
-    set $P9, __ARG_1
-    $P10 = $P8[$I3]
+  __label_42: # for condition
+    ge $I3, $I2, __label_41
+    $P21 = $P6[$I3]
+    __ARG_1.'emitlabel'($P21, "case")
+    set $P11, __ARG_1
+    $P12 = $P8[$I3]
 .const 'Sub' WSubId_3 = "WSubId_3"
 .const 'Sub' WSubId_5 = "WSubId_5"
-    set $P11, $P10
-    $P19 = WSubId_5("emit")
-    $P12 = WSubId_3($P19, $P9)
-    if_null $P11, __label_42
-    iter $P23, $P11
-    set $P23, 0
-  __label_41: # for iteration
-    unless $P23 goto __label_42
-    shift $P13, $P23
-    $P12($P13)
-    goto __label_41
-  __label_42: # endfor
-  __label_40:
-  __label_39:
-  __label_36: # for iteration
-    inc $I3
-    goto __label_38
-  __label_37: # for end
-    __ARG_1.'emitlabel'($S3, 'default')
-    set $P14, __ARG_1
-    getattribute $P15, self, 'default_st'
-.const 'Sub' WSubId_3 = "WSubId_3"
-.const 'Sub' WSubId_5 = "WSubId_5"
-    set $P16, $P15
-    $P19 = WSubId_5("emit")
-    $P17 = WSubId_3($P19, $P14)
-    if_null $P16, __label_46
-    iter $P24, $P16
-    set $P24, 0
+    set $P13, $P12
+    $P21 = WSubId_5("emit")
+    $P14 = WSubId_3($P21, $P11)
+    if_null $P13, __label_46
+    iter $P25, $P13
+    set $P25, 0
   __label_45: # for iteration
-    unless $P24 goto __label_46
-    shift $P18, $P24
-    $P17($P18)
+    unless $P25 goto __label_46
+    shift $P15, $P25
+    $P14($P15)
     goto __label_45
   __label_46: # endfor
   __label_44:
   __label_43:
-    getattribute $P21, self, 'start'
-    $P19 = self.'getbreaklabel'($P21)
-    __ARG_1.'emitlabel'($P19, 'switch end')
+  __label_40: # for iteration
+    inc $I3
+    goto __label_42
+  __label_41: # for end
+    __ARG_1.'emitlabel'($S3, "default")
+    set $P16, __ARG_1
+    getattribute $P17, self, 'default_st'
+.const 'Sub' WSubId_3 = "WSubId_3"
+.const 'Sub' WSubId_5 = "WSubId_5"
+    set $P18, $P17
+    $P21 = WSubId_5("emit")
+    $P19 = WSubId_3($P21, $P16)
+    if_null $P18, __label_50
+    iter $P26, $P18
+    set $P26, 0
+  __label_49: # for iteration
+    unless $P26 goto __label_50
+    shift $P20, $P26
+    $P19($P20)
+    goto __label_49
+  __label_50: # endfor
+  __label_48:
+  __label_47:
+    getattribute $P23, self, 'start'
+    $P21 = self.'getbreaklabel'($P23)
+    __ARG_1.'emitlabel'($P21, "switch end")
 
 .end # emit
 
@@ -17318,7 +17785,7 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
     self.'SwitchBaseStatement'(__ARG_1, __ARG_3)
-    self.'parse_cases'(__ARG_2)
+    self.'parse_switchbody'(__ARG_2)
 
 .end # SwitchCaseStatement
 
@@ -17350,7 +17817,7 @@
     $P14 = __ARG_1.'getDebug'()
     if_null $P14, __label_2
     unless $P14 goto __label_2
-    __ARG_1.'comment'('switch-case')
+    __ARG_1.'comment'("switch-case")
   __label_2: # endif
     null $S2
     getattribute $P14, self, 'case_value'
@@ -17374,7 +17841,7 @@
     null $S4
     $P14 = $P2.'checkresult'()
     set $S5, $P14
-    ne $S5, 'I', __label_8
+    ne $S5, "I", __label_8
     $P16 = $P2.'emit_get'(__ARG_1)
     set $S4, $P16
     goto __label_9
@@ -17382,7 +17849,7 @@
     $P17 = $P2.'emit_get'(__ARG_1)
     set $S4, $P17
     unless_null $S2, __label_10
-    $P14 = self.'tempreg'('I')
+    $P14 = self.'tempreg'("I")
     set $S2, $P14
   __label_10: # endif
     __ARG_1.'emitset'($S2, $S4)
@@ -17400,7 +17867,7 @@
   __label_13: # for condition
     ge $I2, $I1, __label_12
     $P14 = $P1[$I2]
-    __ARG_1.'emitlabel'($P14, 'case')
+    __ARG_1.'emitlabel'($P14, "case")
     set $P4, __ARG_1
     $P5 = $P3[$I2]
 .const 'Sub' WSubId_3 = "WSubId_3"
@@ -17423,7 +17890,7 @@
     inc $I2
     goto __label_13
   __label_12: # for end
-    __ARG_1.'emitlabel'($S1, 'default')
+    __ARG_1.'emitlabel'($S1, "default")
     set $P9, __ARG_1
     getattribute $P10, self, 'default_st'
 .const 'Sub' WSubId_3 = "WSubId_3"
@@ -17444,7 +17911,7 @@
   __label_18:
     getattribute $P16, self, 'start'
     $P14 = self.'getbreaklabel'($P16)
-    __ARG_1.'emitlabel'($P14, 'switch end')
+    __ARG_1.'emitlabel'($P14, "switch end")
 
 .end # emit
 
@@ -17455,13 +17922,13 @@
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'parseSwitch' :subid('WSubId_91')
+.sub 'parseSwitch' :subid('WSubId_89')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_79 = "WSubId_79"
+.const 'Sub' WSubId_76 = "WSubId_76"
     $P1 = __ARG_2.'get'()
-    $P2 = $P1.'isop'('(')
+    $P2 = $P1.'isop'("(")
     if_null $P2, __label_1
     unless $P2 goto __label_1
     new $P4, [ 'Winxed'; 'Compiler'; 'SwitchStatement' ]
@@ -17469,7 +17936,7 @@
     set $P3, $P4
     .return($P3)
   __label_1: # endif
-    $P2 = $P1.'isop'('{')
+    $P2 = $P1.'isop'("{")
     if_null $P2, __label_2
     unless $P2 goto __label_2
     new $P4, [ 'Winxed'; 'Compiler'; 'SwitchCaseStatement' ]
@@ -17477,7 +17944,7 @@
     set $P3, $P4
     .return($P3)
   __label_2: # endif
-    WSubId_79("'(' in switch", $P1)
+    WSubId_76("'(' in switch", $P1)
 
 .end # parseSwitch
 
@@ -17487,32 +17954,27 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_135 = "WSubId_135"
-.const 'Sub' WSubId_94 = "WSubId_94"
-.const 'Sub' WSubId_76 = "WSubId_76"
-.const 'Sub' WSubId_77 = "WSubId_77"
+.const 'Sub' WSubId_134 = "WSubId_134"
+.const 'Sub' WSubId_93 = "WSubId_93"
+.const 'Sub' WSubId_91 = "WSubId_91"
+.const 'Sub' WSubId_74 = "WSubId_74"
     self.'BlockStatement'(__ARG_1, __ARG_3)
     $P1 = __ARG_2.'get'()
-    $P2 = $P1.'isop'(';')
+    $P2 = $P1.'isop'(";")
     if $P2 goto __label_1
     __ARG_2.'unget'($P1)
-    $P3 = WSubId_135(__ARG_2, self)
+    $P3 = WSubId_134(__ARG_2, self)
     setattribute self, 'initializer', $P3
   __label_1: # endif
     $P1 = __ARG_2.'get'()
-    $P2 = $P1.'isop'(';')
+    $P2 = $P1.'isop'(";")
     if $P2 goto __label_2
     __ARG_2.'unget'($P1)
     self.'parseconditionshort'(__ARG_2)
-    WSubId_94(';', __ARG_2)
+    WSubId_93(";", __ARG_2)
   __label_2: # endif
-    $P1 = __ARG_2.'get'()
-    $P2 = $P1.'isop'(')')
-    if $P2 goto __label_3
-    __ARG_2.'unget'($P1)
-    $P3 = WSubId_76(__ARG_2, self, WSubId_77, ')')
+    $P3 = WSubId_91(__ARG_2, self, WSubId_74, ")")
     setattribute self, 'iteration', $P3
-  __label_3: # endif
     self.'parsebody'(__ARG_2)
 
 .end # ForStatement
@@ -17632,7 +18094,7 @@
     $P3 = __ARG_1.'getDebug'()
     if_null $P3, __label_2
     unless $P3 goto __label_2
-    __ARG_1.'comment'('for loop')
+    __ARG_1.'comment'("for loop")
   __label_2: # endif
     $P3 = self.'gencontinuelabel'()
     null $S1
@@ -17655,7 +18117,7 @@
     getattribute $P4, self, 'initializer'
     $P4.'emit'(__ARG_1)
   __label_7: # endif
-    __ARG_1.'emitlabel'($S3, 'for condition')
+    __ARG_1.'emitlabel'($S3, "for condition")
     getattribute $P3, self, 'condexpr'
     if_null $P3, __label_8
     self.'emit_else'(__ARG_1, $S2)
@@ -17663,7 +18125,7 @@
     getattribute $P3, self, 'body'
     $P3.'emit'(__ARG_1)
     unless $I1 goto __label_9
-    __ARG_1.'emitlabel'($S1, 'for iteration')
+    __ARG_1.'emitlabel'($S1, "for iteration")
     if_null $P1, __label_11
     iter $P5, $P1
     set $P5, 0
@@ -17675,7 +18137,7 @@
   __label_11: # endfor
   __label_9: # endif
     __ARG_1.'emitgoto'($S3)
-    __ARG_1.'emitlabel'($S2, 'for end')
+    __ARG_1.'emitlabel'($S2, "for end")
 
 .end # emit
 
@@ -17698,12 +18160,12 @@
         .param pmc __ARG_3
         .param pmc __ARG_4
         .param string __ARG_5
-.const 'Sub' WSubId_137 = "WSubId_137"
-.const 'Sub' WSubId_77 = "WSubId_77"
-.const 'Sub' WSubId_94 = "WSubId_94"
+.const 'Sub' WSubId_136 = "WSubId_136"
+.const 'Sub' WSubId_74 = "WSubId_74"
+.const 'Sub' WSubId_93 = "WSubId_93"
     self.'BlockStatement'(__ARG_1, __ARG_3)
-    eq __ARG_5, '', __label_1
-    $P1 = WSubId_137(__ARG_5)
+    eq __ARG_5, "", __label_1
+    $P1 = WSubId_136(__ARG_5)
     null $S1
     if_null $P1, __label_2
     set $S1, $P1
@@ -17713,9 +18175,9 @@
     setattribute self, 'deftype', $P1
   __label_1: # endif
     setattribute self, 'varname', __ARG_4
-    $P2 = WSubId_77(__ARG_2, self)
+    $P2 = WSubId_74(__ARG_2, self)
     setattribute self, 'container', $P2
-    WSubId_94(')', __ARG_2)
+    WSubId_93(")", __ARG_2)
     self.'parsebody'(__ARG_2)
 
 .end # ForeachStatement
@@ -17751,7 +18213,7 @@
     if $P2 goto __label_2
     $P2 = $P1.'isstringliteral'()
     unless $P2 goto __label_3
-    $P3 = $P1.'get_value'()
+    $P3 = $P1.'getStringValue'()
     set $S1, $P3
     length $I2, $S1
     iseq $I1, $I2, 0
@@ -17774,20 +18236,20 @@
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_101 = "WSubId_101"
+.const 'Sub' WSubId_102 = "WSubId_102"
     self.'annotate'(__ARG_1)
     null $S1
     getattribute $P3, self, 'container'
     $P2 = $P3.'checkresult'()
     set $S6, $P2
-    ne $S6, 'S', __label_1
+    ne $S6, "S", __label_1
     getattribute $P5, self, 'container'
     $P4 = $P5.'emit_get'(__ARG_1)
     null $S2
     if_null $P4, __label_3
     set $S2, $P4
   __label_3:
-    $P2 = self.'tempreg'('P')
+    $P2 = self.'tempreg'("P")
     set $S1, $P2
     __ARG_1.'emitbox'($S1, $S2)
     goto __label_2
@@ -17800,9 +18262,9 @@
     $P1 = self.'getvar'($P2)
     unless_null $P1, __label_4
     getattribute $P2, self, 'varname'
-    WSubId_101($P2, self)
+    WSubId_102($P2, self)
   __label_4: # endif
-    $P2 = self.'createreg'('P')
+    $P2 = self.'createreg'("P")
     null $S3
     if_null $P2, __label_5
     set $S3, $P2
@@ -17818,16 +18280,16 @@
     set $S5, $P2
   __label_7:
     __ARG_1.'emitif_null'($S1, $S5)
-    __ARG_1.'emitarg2'('iter', $S3, $S1)
-    __ARG_1.'emitset'($S3, '0')
-    __ARG_1.'emitlabel'($S4, 'for iteration')
+    __ARG_1.'emitarg2'("iter", $S3, $S1)
+    __ARG_1.'emitset'($S3, "0")
+    __ARG_1.'emitlabel'($S4, "for iteration")
     __ARG_1.'emitunless'($S3, $S5)
     $P2 = $P1.'getreg'()
-    __ARG_1.'emitarg2'('shift', $P2, $S3)
+    __ARG_1.'emitarg2'("shift", $P2, $S3)
     getattribute $P2, self, 'body'
     $P2.'emit'(__ARG_1)
     __ARG_1.'emitgoto'($S4)
-    __ARG_1.'emitlabel'($S5, 'endfor')
+    __ARG_1.'emitlabel'($S5, "endfor")
 
 .end # emit
 
@@ -17843,25 +18305,25 @@
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'parseFor' :subid('WSubId_92')
+.sub 'parseFor' :subid('WSubId_90')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_94 = "WSubId_94"
-    WSubId_94('(', __ARG_2)
+.const 'Sub' WSubId_93 = "WSubId_93"
+    WSubId_93("(", __ARG_2)
     $P1 = __ARG_2.'get'()
     $P2 = __ARG_2.'get'()
-    $P4 = $P2.'iskeyword'('in')
+    $P4 = $P2.'iskeyword'("in")
     if_null $P4, __label_1
     unless $P4 goto __label_1
     new $P6, [ 'Winxed'; 'Compiler'; 'ForeachStatement' ]
-    $P6.'ForeachStatement'(__ARG_1, __ARG_2, __ARG_3, $P1, '')
+    $P6.'ForeachStatement'(__ARG_1, __ARG_2, __ARG_3, $P1, "")
     set $P5, $P6
     .return($P5)
     goto __label_2
   __label_1: # else
     $P3 = __ARG_2.'get'()
-    $P4 = $P3.'iskeyword'('in')
+    $P4 = $P3.'iskeyword'("in")
     if_null $P4, __label_3
     unless $P4 goto __label_3
     new $P6, [ 'Winxed'; 'Compiler'; 'ForeachStatement' ]
@@ -17886,9 +18348,9 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_77 = "WSubId_77"
+.const 'Sub' WSubId_74 = "WSubId_74"
     self.'Statement'(__ARG_1, __ARG_3)
-    $P2 = WSubId_77(__ARG_2, self)
+    $P2 = WSubId_74(__ARG_2, self)
     setattribute self, 'excep', $P2
 
 .end # ThrowStatement
@@ -17918,8 +18380,8 @@
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_52 = "WSubId_52"
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_48 = "WSubId_48"
+.const 'Sub' WSubId_28 = "WSubId_28"
     getattribute $P1, self, 'excep'
     $P2 = $P1.'emit_get'(__ARG_1)
     null $S1
@@ -17940,15 +18402,15 @@
     goto __label_3 # break
   __label_5: # case
     set $S2, $S1
-    $P3 = self.'tempreg'('P')
+    $P3 = self.'tempreg'("P")
     set $S1, $P3
-    $P4 = WSubId_52("    root_new %0, ['parrot';'Exception']\n    %0['message'] = %1\n", $S1, $S2)
+    $P4 = WSubId_48("    root_new %0, ['parrot';'Exception']\n    %0['message'] = %1\n", $S1, $S2)
     __ARG_1.'print'($P4)
     goto __label_3 # break
   __label_2: # default
-    WSubId_30("Invalid throw argument", self)
+    WSubId_28("Invalid throw argument", self)
   __label_3: # switch end
-    __ARG_1.'emitarg1'('throw', $S1)
+    __ARG_1.'emitarg1'("throw", $S1)
 
 .end # emit
 
@@ -17983,7 +18445,7 @@
 
 
 .sub 'allowtailcall' :method
-    $P1 = self.'pick'('allowtailcall')
+    $P1 = self.'pick'("allowtailcall")
     isnull $I1, $P1
     not $I1
     .return($I1)
@@ -17994,8 +18456,8 @@
 .sub 'emitmodifiers' :method
         .param pmc __ARG_1
         .param string __ARG_2
-.const 'Sub' WSubId_30 = "WSubId_30"
-.const 'Sub' WSubId_52 = "WSubId_52"
+.const 'Sub' WSubId_28 = "WSubId_28"
+.const 'Sub' WSubId_48 = "WSubId_48"
     $P1 = self.'getlist'()
     if_null $P1, __label_2
     iter $P6, $P1
@@ -18010,20 +18472,20 @@
   __label_3:
     $P7 = $P2.'numargs'()
     set $I1, $P7
-    if $S1 == 'min_severity' goto __label_6
-    if $S1 == 'max_severity' goto __label_7
-    if $S1 == 'handle_types' goto __label_8
-    if $S1 == 'handle_types_except' goto __label_9
-    if $S1 == 'allowtailcall' goto __label_10
+    if $S1 == "min_severity" goto __label_6
+    if $S1 == "max_severity" goto __label_7
+    if $S1 == "handle_types" goto __label_8
+    if $S1 == "handle_types_except" goto __label_9
+    if $S1 == "allowtailcall" goto __label_10
     goto __label_4
   __label_6: # case
   __label_7: # case
     eq $I1, 1, __label_11
-    WSubId_30('Wrong modifier args', self)
+    WSubId_28("Wrong modifier args", self)
   __label_11: # endif
     $P3 = $P2.'getarg'(0)
     $P8 = $P3.'emit_get'(__ARG_1)
-    $P7 = WSubId_52("    %0.'%1'(%2)", __ARG_2, $S1, $P8)
+    $P7 = WSubId_48("    %0.'%1'(%2)", __ARG_2, $S1, $P8)
     __ARG_1.'say'($P7)
     goto __label_5 # break
   __label_8: # case
@@ -18039,8 +18501,8 @@
     inc $I2
     goto __label_14
   __label_13: # for end
-    join $S2, ', ', $P4
-    $P7 = WSubId_52("    %0.'%1'(%2)", __ARG_2, $S1, $S2)
+    join $S2, ", ", $P4
+    $P7 = WSubId_48("    %0.'%1'(%2)", __ARG_2, $S1, $S2)
     __ARG_1.'say'($P7)
     goto __label_5 # break
   __label_10: # case
@@ -18049,7 +18511,7 @@
     concat $S3, "Modifier '", $S1
     concat $S3, $S3, "' not valid for try"
     getattribute $P8, self, 'start'
-    WSubId_30($S3, $P8)
+    WSubId_28($S3, $P8)
   __label_5: # switch end
     goto __label_1
   __label_2: # endfor
@@ -18068,12 +18530,12 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_135 = "WSubId_135"
-.const 'Sub' WSubId_31 = "WSubId_31"
-.const 'Sub' WSubId_79 = "WSubId_79"
+.const 'Sub' WSubId_134 = "WSubId_134"
+.const 'Sub' WSubId_29 = "WSubId_29"
+.const 'Sub' WSubId_76 = "WSubId_76"
     self.'BlockStatement'(__ARG_1, __ARG_3)
     $P1 = __ARG_2.'get'()
-    $P2 = $P1.'isop'('[')
+    $P2 = $P1.'isop'("[")
     if_null $P2, __label_1
     unless $P2 goto __label_1
     new $P5, [ 'Winxed'; 'Compiler'; 'TryModifierList' ]
@@ -18084,20 +18546,20 @@
   __label_1: # else
     __ARG_2.'unget'($P1)
   __label_2: # endif
-    $P3 = WSubId_135(__ARG_2, self)
+    $P3 = WSubId_134(__ARG_2, self)
     setattribute self, 'stry', $P3
     $P1 = __ARG_2.'get'()
-    $P2 = $P1.'iskeyword'('catch')
+    $P2 = $P1.'iskeyword'("catch")
     if $P2 goto __label_3
-    WSubId_31('catch', $P1)
+    WSubId_29("catch", $P1)
   __label_3: # endif
     $P1 = __ARG_2.'get'()
-    $P2 = $P1.'isop'('(')
+    $P2 = $P1.'isop'("(")
     if $P2 goto __label_4
-    WSubId_79("'(' after 'catch'", $P1)
+    WSubId_76("'(' after 'catch'", $P1)
   __label_4: # endif
     $P1 = __ARG_2.'get'()
-    $P2 = $P1.'isop'(')')
+    $P2 = $P1.'isop'(")")
     if $P2 goto __label_5
     $P3 = $P1.'getidentifier'()
     null $S1
@@ -18105,14 +18567,14 @@
     set $S1, $P3
   __label_6:
     setattribute self, 'exname', $P1
-    self.'createvar'($S1, 'P')
+    self.'createvar'($S1, "P")
     $P1 = __ARG_2.'get'()
-    $P2 = $P1.'isop'(')')
+    $P2 = $P1.'isop'(")")
     if $P2 goto __label_7
-    WSubId_79("')' in 'catch'", $P1)
+    WSubId_76("')' in 'catch'", $P1)
   __label_7: # endif
   __label_5: # endif
-    $P3 = WSubId_135(__ARG_2, self)
+    $P3 = WSubId_134(__ARG_2, self)
     setattribute self, 'scatch', $P3
 
 .end # TryStatement
@@ -18134,7 +18596,7 @@
     getattribute $P4, self, 'exname'
     setattribute $P1, 'exname', $P4
     getattribute $P2, self, 'exname'
-    $P1.'createvar'($P2, 'P')
+    $P1.'createvar'($P2, "P")
   __label_2: # endif
     getattribute $P4, self, 'stry'
     $P3 = $P4.'clone'($P1)
@@ -18179,8 +18641,8 @@
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_52 = "WSubId_52"
-    $P1 = self.'tempreg'('P')
+.const 'Sub' WSubId_48 = "WSubId_48"
+    $P1 = self.'tempreg'("P")
     null $S1
     if_null $P1, __label_1
     set $S1, $P1
@@ -18202,7 +18664,7 @@
     $P1 = $P3.'getreg'()
     goto __label_4
   __label_5:
-    $P5 = self.'tempreg'('P')
+    $P5 = self.'tempreg'("P")
     set $P1, $P5
   __label_4:
     null $S4
@@ -18213,38 +18675,38 @@
     set $I1, $P1
     self.'annotate'(__ARG_1)
     unless $I1 goto __label_7
-    __ARG_1.'comment'('try: create handler')
+    __ARG_1.'comment'("try: create handler")
   __label_7: # endif
-    $P1 = WSubId_52("    new %0, 'ExceptionHandler'\n    set_label %0, %1\n", $S1, $S2)
+    $P1 = WSubId_48("    new %0, 'ExceptionHandler'\n    set_label %0, %1\n", $S1, $S2)
     __ARG_1.'print'($P1)
     getattribute $P1, self, 'modifiers'
     if_null $P1, __label_8
     getattribute $P2, self, 'modifiers'
     $P2.'emitmodifiers'(__ARG_1, $S1)
   __label_8: # endif
-    __ARG_1.'emitarg1'('push_eh', $S1)
+    __ARG_1.'emitarg1'("push_eh", $S1)
     unless $I1 goto __label_9
-    __ARG_1.'comment'('try: begin')
+    __ARG_1.'comment'("try: begin")
   __label_9: # endif
     getattribute $P1, self, 'stry'
     $P1.'emit'(__ARG_1)
     unless $I1 goto __label_10
-    __ARG_1.'comment'('try: end')
+    __ARG_1.'comment'("try: end")
   __label_10: # endif
-    __ARG_1.'say'('    ', 'pop_eh')
+    __ARG_1.'say'("    ", "pop_eh")
     self.'annotate'(__ARG_1)
     __ARG_1.'emitgoto'($S3)
     unless $I1 goto __label_11
-    __ARG_1.'comment'('catch')
+    __ARG_1.'comment'("catch")
   __label_11: # endif
     __ARG_1.'emitlabel'($S2)
-    __ARG_1.'say'('    ', '.get_results(', $S4, ')')
-    __ARG_1.'emitarg1'('finalize', $S4)
-    __ARG_1.'say'('    ', 'pop_eh')
+    __ARG_1.'say'("    ", ".get_results(", $S4, ")")
+    __ARG_1.'emitarg1'("finalize", $S4)
+    __ARG_1.'say'("    ", "pop_eh")
     getattribute $P1, self, 'scatch'
     $P1.'emit'(__ARG_1)
     unless $I1 goto __label_12
-    __ARG_1.'comment'('catch end')
+    __ARG_1.'comment'("catch end")
   __label_12: # endif
     __ARG_1.'emitlabel'($S3)
 
@@ -18280,7 +18742,7 @@
 
 
 .sub 'getlexicalname' :method
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     $P1 = self.'pick'("lexical")
     if_null $P1, __label_1
     $P3 = $P1.'numargs'()
@@ -18289,16 +18751,16 @@
     if $I1 == 1 goto __label_5
     goto __label_2
   __label_4: # case
-    .return('')
+    .return("")
   __label_5: # case
     $P2 = $P1.'getarg'(0)
     $P3 = $P2.'isstringliteral'()
     if $P3 goto __label_6
-    WSubId_30('Invalid lexical', self)
+    WSubId_28("Invalid lexical", self)
   __label_6: # endif
     .tailcall $P2.'getPirString'()
   __label_2: # default
-    WSubId_30("invalid arguments in modifier", $P1)
+    WSubId_28("invalid arguments in modifier", $P1)
   __label_3: # switch end
   __label_1: # endif
     null $P3
@@ -18333,8 +18795,8 @@
 .sub 'parsemodifiers' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_94 = "WSubId_94"
-    WSubId_94("[", __ARG_2)
+.const 'Sub' WSubId_93 = "WSubId_93"
+    WSubId_93("[", __ARG_2)
     new $P3, [ 'Winxed'; 'Compiler'; 'DeclarationModifierList' ]
     getattribute $P4, self, 'owner'
     $P3.'DeclarationModifierList'(__ARG_2, $P4)
@@ -18354,7 +18816,7 @@
     set $S1, $P3
   __label_2:
     if_null $S1, __label_3
-    ne $S1, '', __label_4
+    ne $S1, "", __label_4
     getattribute $P3, self, 'name'
     set $S1, $P3
   __label_4: # endif
@@ -18382,7 +18844,7 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param int __ARG_4 :optional
-    self.'DeclareItem'(__ARG_1, __ARG_2, __ARG_3, 'P', __ARG_4)
+    self.'DeclareItem'(__ARG_1, __ARG_2, __ARG_3, "P", __ARG_4)
 
 .end # initvarbase
 
@@ -18393,7 +18855,7 @@
     getattribute $P1, __ARG_1, 'start'
     getattribute $P2, __ARG_1, 'name'
     getattribute $P3, __ARG_1, 'flags'
-    self.'DeclareItem'($P1, __ARG_2, $P2, 'P', $P3)
+    self.'DeclareItem'($P1, __ARG_2, $P2, "P", $P3)
 
 .end # clonevarbase
 
@@ -18433,19 +18895,19 @@
         .param pmc __ARG_3
         .param string __ARG_4
         .param pmc __ARG_5
-.const 'Sub' WSubId_77 = "WSubId_77"
+.const 'Sub' WSubId_74 = "WSubId_74"
     self.'DeclareBase'(__ARG_1, __ARG_2, __ARG_3, __ARG_4, __ARG_4)
     $P1 = __ARG_5.'get'()
-    $P2 = $P1.'isop'(':')
+    $P2 = $P1.'isop'(":")
     if_null $P2, __label_1
     unless $P2 goto __label_1
     self.'parsemodifiers'($P1, __ARG_5)
     $P1 = __ARG_5.'get'()
   __label_1: # endif
-    $P2 = $P1.'isop'('=')
+    $P2 = $P1.'isop'("=")
     if_null $P2, __label_2
     unless $P2 goto __label_2
-    $P4 = WSubId_77(__ARG_5, self)
+    $P4 = WSubId_74(__ARG_5, self)
     setattribute self, 'init', $P4
     goto __label_3
   __label_2: # else
@@ -18488,116 +18950,127 @@
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_50 = "WSubId_50"
-.const 'Sub' WSubId_138 = "WSubId_138"
-.const 'Sub' WSubId_51 = "WSubId_51"
-.const 'Sub' WSubId_35 = "WSubId_35"
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_33 = "WSubId_33"
+.const 'Sub' WSubId_28 = "WSubId_28"
     self.'annotate'(__ARG_1)
-    getattribute $P2, self, 'name'
+    getattribute $P5, self, 'name'
     null $S1
-    if_null $P2, __label_1
-    set $S1, $P2
+    if_null $P5, __label_1
+    set $S1, $P5
   __label_1:
-    getattribute $P2, self, 'reg'
+    getattribute $P5, self, 'reg'
     null $S2
-    if_null $P2, __label_2
-    set $S2, $P2
+    if_null $P5, __label_2
+    set $S2, $P5
   __label_2:
     null $S3
-    getattribute $P2, self, 'basetype'
+    getattribute $P5, self, 'basetype'
     null $S4
-    if_null $P2, __label_3
-    set $S4, $P2
+    if_null $P5, __label_3
+    set $S4, $P5
   __label_3:
     getattribute $P1, self, 'init'
-    $P2 = __ARG_1.'getDebug'()
-    if_null $P2, __label_4
-    unless $P2 goto __label_4
-    __ARG_1.'comment'($S1, ': ', $S2)
+    $P5 = __ARG_1.'getDebug'()
+    if_null $P5, __label_4
+    unless $P5 goto __label_4
+    __ARG_1.'comment'($S1, ": ", $S2)
   __label_4: # endif
-    isnull $I1, $P1
-    box $P2, $I1
-    if $P2 goto __label_7
-    $P2 = $P1.'isnull'()
+    isnull $I2, $P1
+    box $P5, $I2
+    if $P5 goto __label_7
+    $P5 = $P1.'isnull'()
   __label_7:
-    if_null $P2, __label_5
-    unless $P2 goto __label_5
+    if_null $P5, __label_5
+    unless $P5 goto __label_5
     __ARG_1.'emitnull'($S2)
     goto __label_6
   __label_5: # else
-    $P3 = $P1.'checkresult'()
+    $P6 = $P1.'checkresult'()
     null $S5
-    if_null $P3, __label_8
-    set $S5, $P3
+    if_null $P6, __label_8
+    set $S5, $P6
   __label_8:
     ne $S5, $S4, __label_9
     $P1.'emit_init'(__ARG_1, $S2)
     goto __label_10
   __label_9: # else
-    isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'IndexExpr' ]
-    unless $I1 goto __label_11
+    isa $I2, $P1, [ 'Winxed'; 'Compiler'; 'IndexExpr' ]
+    unless $I2 goto __label_11
     $P1.'emit'(__ARG_1, $S2)
     goto __label_12
   __label_11: # else
-    $P2 = $P1.'isliteral'()
-    if_null $P2, __label_13
-    unless $P2 goto __label_13
+    $P5 = $P1.'isliteral'()
+    if_null $P5, __label_13
+    unless $P5 goto __label_13
     if_null $S4, __label_15
-    length $I1, $S4
-    ne $I1, 1, __label_15
-    ord $I1, $S4
-    if $I1 == 73 goto __label_17
-    if $I1 == 78 goto __label_18
-    if $I1 == 83 goto __label_19
+    length $I2, $S4
+    ne $I2, 1, __label_15
+    ord $I2, $S4
+    if $I2 == 73 goto __label_17
+    if $I2 == 78 goto __label_18
+    if $I2 == 83 goto __label_19
     goto __label_15
   __label_17: # case
-    $P3 = WSubId_50($P1)
-    set $S3, $P3
+    set $P2, $P1
+    $P5 = $P2.'getIntegerValue'()
+    set $I1, $P5
+    set $I3, $I1
+  __label_20:
+    set $S3, $I3
     __ARG_1.'emitset'($S2, $S3)
     goto __label_16 # break
   __label_18: # case
-    $P4 = WSubId_138($P1)
-    set $S3, $P4
+    set $P3, $P1
+    $P5 = $P3.'getFloatValue'()
+    set $N1, $P5
+    set $N2, $N1
+  __label_21:
+    set $S3, $N2
     __ARG_1.'emitset'($S2, $S3)
     goto __label_16 # break
   __label_19: # case
-    $P5 = WSubId_51($P1)
-    set $S3, $P5
+    set $P4, $P1
+    $P5 = $P4.'getStringValue'()
+    null $S7
+    if_null $P5, __label_23
+    set $S7, $P5
+  __label_23:
+    set $S3, $S7
+  __label_22:
     __ARG_1.'emitset'($S2, $S3)
     goto __label_16 # break
   __label_15: # default
-    WSubId_35("Wrong type", self)
+    WSubId_33("Wrong type", self)
   __label_16: # switch end
     goto __label_14
   __label_13: # else
-    if_null $S5, __label_20
-    length $I1, $S5
-    ne $I1, 1, __label_20
-    ord $I1, $S5
-    if $I1 == 118 goto __label_22
-    goto __label_20
-  __label_22: # case
-    WSubId_30('Invalid initialization from void value', self)
-  __label_20: # default
-    $P2 = $P1.'emit_get'(__ARG_1)
-    set $S3, $P2
-  __label_21: # switch end
-    ne $S4, 'S', __label_23
-    ne $S5, 'P', __label_23
-    $P2 = self.'genlabel'()
+    if_null $S5, __label_24
+    length $I2, $S5
+    ne $I2, 1, __label_24
+    ord $I2, $S5
+    if $I2 == 118 goto __label_26
+    goto __label_24
+  __label_26: # case
+    WSubId_28("Invalid initialization from void value", self)
+  __label_24: # default
+    $P5 = $P1.'emit_get'(__ARG_1)
+    set $S3, $P5
+  __label_25: # switch end
+    ne $S4, "S", __label_27
+    ne $S5, "P", __label_27
+    $P5 = self.'genlabel'()
     null $S6
-    if_null $P2, __label_25
-    set $S6, $P2
-  __label_25:
+    if_null $P5, __label_29
+    set $S6, $P5
+  __label_29:
     __ARG_1.'emitnull'($S2)
     __ARG_1.'emitif_null'($S3, $S6)
     __ARG_1.'emitset'($S2, $S3)
     __ARG_1.'emitlabel'($S6)
-    goto __label_24
-  __label_23: # else
+    goto __label_28
+  __label_27: # else
     __ARG_1.'emitset'($S2, $S3)
-  __label_24: # endif
+  __label_28: # endif
   __label_14: # endif
   __label_12: # endif
   __label_10: # endif
@@ -18620,43 +19093,38 @@
         .param string __ARG_4
         .param string __ARG_5
         .param pmc __ARG_6
-.const 'Sub' WSubId_77 = "WSubId_77"
-.const 'Sub' WSubId_94 = "WSubId_94"
-.const 'Sub' WSubId_79 = "WSubId_79"
+.const 'Sub' WSubId_74 = "WSubId_74"
+.const 'Sub' WSubId_93 = "WSubId_93"
 .const 'Sub' WSubId_76 = "WSubId_76"
-    self.'DeclareBase'(__ARG_1, __ARG_2, __ARG_3, __ARG_4, 'P')
+.const 'Sub' WSubId_91 = "WSubId_91"
+    self.'DeclareBase'(__ARG_1, __ARG_2, __ARG_3, __ARG_4, "P")
     box $P2, __ARG_5
     setattribute self, 'arraytype', $P2
     $P1 = __ARG_6.'get'()
-    $P2 = $P1.'isop'(']')
+    $P2 = $P1.'isop'("]")
     if $P2 goto __label_1
     __ARG_6.'unget'($P1)
-    $P3 = WSubId_77(__ARG_6, self)
+    $P3 = WSubId_74(__ARG_6, self)
     setattribute self, 'size', $P3
-    WSubId_94(']', __ARG_6)
+    WSubId_93("]", __ARG_6)
   __label_1: # endif
     $P1 = __ARG_6.'get'()
-    $P2 = $P1.'isop'(':')
+    $P2 = $P1.'isop'(":")
     if_null $P2, __label_2
     unless $P2 goto __label_2
     self.'parsemodifiers'($P1, __ARG_6)
     $P1 = __ARG_6.'get'()
   __label_2: # endif
-    $P2 = $P1.'isop'('=')
+    $P2 = $P1.'isop'("=")
     if_null $P2, __label_3
     unless $P2 goto __label_3
     $P1 = __ARG_6.'get'()
-    $P2 = $P1.'isop'('[')
+    $P2 = $P1.'isop'("[")
     if $P2 goto __label_5
-    WSubId_79("array initializer", $P1)
+    WSubId_76("array initializer", $P1)
   __label_5: # endif
-    $P1 = __ARG_6.'get'()
-    $P2 = $P1.'isop'(']')
-    if $P2 goto __label_6
-    __ARG_6.'unget'($P1)
-    $P3 = WSubId_76(__ARG_6, self, WSubId_77, ']')
+    $P3 = WSubId_91(__ARG_6, self, WSubId_74, "]")
     setattribute self, 'initarray', $P3
-  __label_6: # endif
     goto __label_4
   __label_3: # else
     __ARG_6.'unget'($P1)
@@ -18671,7 +19139,7 @@
     getattribute $P7, self, 'start'
     getattribute $P8, self, 'name'
     getattribute $P9, self, 'basetype'
-    __ARG_1.'DeclareBase'($P7, __ARG_2, $P8, $P9, 'P')
+    __ARG_1.'DeclareBase'($P7, __ARG_2, $P8, $P9, "P")
     getattribute $P8, self, 'arraytype'
     setattribute __ARG_1, 'arraytype', $P8
     getattribute $P7, self, 'size'
@@ -18745,7 +19213,7 @@
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_52 = "WSubId_52"
+.const 'Sub' WSubId_48 = "WSubId_48"
     self.'annotate'(__ARG_1)
     getattribute $P6, self, 'reg'
     null $S1
@@ -18758,11 +19226,11 @@
     getattribute $P4, self, 'arraytype'
     if_null $P1, __label_2
     $P7 = $P1.'emit_get'(__ARG_1)
-    $P6 = WSubId_52("    new %0, ['Fixed%1Array'], %2", $S1, $P4, $P7)
+    $P6 = WSubId_48("    new %0, ['Fixed%1Array'], %2", $S1, $P4, $P7)
     __ARG_1.'say'($P6)
     goto __label_3
   __label_2: # else
-    $P6 = WSubId_52("    new %0, ['Resizable%1Array']", $S1, $P4)
+    $P6 = WSubId_48("    new %0, ['Resizable%1Array']", $S1, $P4)
     __ARG_1.'say'($P6)
   __label_3: # endif
     if_null $P2, __label_4
@@ -18786,17 +19254,49 @@
     shift $P5, $P8
     null $S3
     $P6 = $P5.'isliteral'()
+    if_null $P6, __label_10
     unless $P6 goto __label_10
-    $P7 = $P5.'checkresult'()
-    ne $P7, $P3, __label_10
-    $P9 = $P5.'emit_get'(__ARG_1)
+    set $S5, $P3
+    if_null $S5, __label_12
+    length $I3, $S5
+    ne $I3, 1, __label_12
+    ord $I3, $S5
+    if $I3 == 73 goto __label_14
+    if $I3 == 78 goto __label_15
+    if $I3 == 83 goto __label_16
+    goto __label_12
+  __label_14: # case
+    $P7 = $P5.'getIntegerValue'()
+    set $S3, $P7
+    goto __label_13 # break
+  __label_15: # case
+    $P9 = $P5.'getFloatValue'()
     set $S3, $P9
+    goto __label_13 # break
+  __label_16: # case
+    $P10 = $P5.'isstringliteral'()
+    if_null $P10, __label_17
+    unless $P10 goto __label_17
+    $P11 = $P5.'getPirString'()
+    set $S3, $P11
+    goto __label_18
+  __label_17: # else
+    $P12 = $P5.'getStringValue'()
+    set $S4, $P12
+    concat $S6, "\"", $S4
+    concat $S6, $S6, "\""
+    set $S3, $S6
+  __label_19:
+  __label_18: # endif
+    goto __label_13 # break
+  __label_12: # default
+  __label_13: # switch end
     goto __label_11
   __label_10: # else
     $P5.'emit'(__ARG_1, $S2)
     set $S3, $S2
   __label_11: # endif
-    $P6 = WSubId_52("    %0[%1] = %2", $S1, $I2, $S3)
+    $P6 = WSubId_48("    %0[%1] = %2", $S1, $I2, $S3)
     __ARG_1.'say'($P6)
     inc $I2
     goto __label_8
@@ -18815,22 +19315,22 @@
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'parseDeclareHelper' :subid('WSubId_139')
+.sub 'parseDeclareHelper' :subid('WSubId_137')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
         .param pmc __ARG_5
-.const 'Sub' WSubId_134 = "WSubId_134"
-.const 'Sub' WSubId_33 = "WSubId_33"
+.const 'Sub' WSubId_78 = "WSubId_78"
+.const 'Sub' WSubId_31 = "WSubId_31"
     null $P1
     null $P2
   __label_1: # do
     $P3 = __ARG_4.'get'()
-    WSubId_134($P3)
+    WSubId_78($P3)
     $P4 = __ARG_4.'get'()
     null $P5
-    $P8 = $P4.'isop'('[')
+    $P8 = $P4.'isop'("[")
     if_null $P8, __label_4
     unless $P8 goto __label_4
     $P5 = __ARG_2(__ARG_3, __ARG_5, __ARG_4, $P3)
@@ -18860,11 +19360,11 @@
   __label_6:
     $P1 = __ARG_4.'get'()
   __label_3: # continue
-    $P8 = $P1.'isop'(',')
+    $P8 = $P1.'isop'(",")
     if_null $P8, __label_2
     if $P8 goto __label_1
   __label_2: # enddo
-    WSubId_33(';', $P1)
+    WSubId_31(";", $P1)
     .return($P2)
 
 .end # parseDeclareHelper
@@ -18876,7 +19376,7 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-    self.'DeclareSingleStatement'(__ARG_1, __ARG_2, __ARG_3, 'I', __ARG_4)
+    self.'DeclareSingleStatement'(__ARG_1, __ARG_2, __ARG_3, "I", __ARG_4)
 
 .end # IntStatement
 
@@ -18900,7 +19400,7 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-    self.'DeclareArrayStatement'(__ARG_1, __ARG_2, __ARG_3, 'I', 'Integer', __ARG_4)
+    self.'DeclareArrayStatement'(__ARG_1, __ARG_2, __ARG_3, "I", "Integer", __ARG_4)
 
 .end # IntArrayStatement
 
@@ -18919,7 +19419,7 @@
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'newIntSingle' :subid('WSubId_140')
+.sub 'newIntSingle' :subid('WSubId_138')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
@@ -18932,7 +19432,7 @@
 .end # newIntSingle
 
 
-.sub 'newIntArray' :subid('WSubId_141')
+.sub 'newIntArray' :subid('WSubId_139')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
@@ -18945,14 +19445,14 @@
 .end # newIntArray
 
 
-.sub 'parseInt' :subid('WSubId_87')
+.sub 'parseInt' :subid('WSubId_85')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
+.const 'Sub' WSubId_137 = "WSubId_137"
+.const 'Sub' WSubId_138 = "WSubId_138"
 .const 'Sub' WSubId_139 = "WSubId_139"
-.const 'Sub' WSubId_140 = "WSubId_140"
-.const 'Sub' WSubId_141 = "WSubId_141"
-    .tailcall WSubId_139(WSubId_140, WSubId_141, __ARG_1, __ARG_2, __ARG_3)
+    .tailcall WSubId_137(WSubId_138, WSubId_139, __ARG_1, __ARG_2, __ARG_3)
 
 .end # parseInt
 
@@ -18963,7 +19463,7 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-    self.'DeclareSingleStatement'(__ARG_1, __ARG_2, __ARG_3, 'N', __ARG_4)
+    self.'DeclareSingleStatement'(__ARG_1, __ARG_2, __ARG_3, "N", __ARG_4)
 
 .end # FloatStatement
 
@@ -18987,7 +19487,7 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-    self.'DeclareArrayStatement'(__ARG_1, __ARG_2, __ARG_3, 'N', 'Float', __ARG_4)
+    self.'DeclareArrayStatement'(__ARG_1, __ARG_2, __ARG_3, "N", "Float", __ARG_4)
 
 .end # FloatArrayStatement
 
@@ -19006,7 +19506,7 @@
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'newFloatSingle' :subid('WSubId_142')
+.sub 'newFloatSingle' :subid('WSubId_140')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
@@ -19019,7 +19519,7 @@
 .end # newFloatSingle
 
 
-.sub 'newFloatArray' :subid('WSubId_143')
+.sub 'newFloatArray' :subid('WSubId_141')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
@@ -19032,14 +19532,14 @@
 .end # newFloatArray
 
 
-.sub 'parseFloat' :subid('WSubId_88')
+.sub 'parseFloat' :subid('WSubId_86')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_139 = "WSubId_139"
-.const 'Sub' WSubId_142 = "WSubId_142"
-.const 'Sub' WSubId_143 = "WSubId_143"
-    .tailcall WSubId_139(WSubId_142, WSubId_143, __ARG_1, __ARG_2, __ARG_3)
+.const 'Sub' WSubId_137 = "WSubId_137"
+.const 'Sub' WSubId_140 = "WSubId_140"
+.const 'Sub' WSubId_141 = "WSubId_141"
+    .tailcall WSubId_137(WSubId_140, WSubId_141, __ARG_1, __ARG_2, __ARG_3)
 
 .end # parseFloat
 
@@ -19050,7 +19550,7 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-    self.'DeclareSingleStatement'(__ARG_1, __ARG_2, __ARG_3, 'S', __ARG_4)
+    self.'DeclareSingleStatement'(__ARG_1, __ARG_2, __ARG_3, "S", __ARG_4)
 
 .end # StringStatement
 
@@ -19074,7 +19574,7 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-    self.'DeclareArrayStatement'(__ARG_1, __ARG_2, __ARG_3, 'S', 'String', __ARG_4)
+    self.'DeclareArrayStatement'(__ARG_1, __ARG_2, __ARG_3, "S", "String", __ARG_4)
 
 .end # StringArrayStatement
 
@@ -19093,7 +19593,7 @@
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'newStringSingle' :subid('WSubId_144')
+.sub 'newStringSingle' :subid('WSubId_142')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
@@ -19106,7 +19606,7 @@
 .end # newStringSingle
 
 
-.sub 'newStringArray' :subid('WSubId_145')
+.sub 'newStringArray' :subid('WSubId_143')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
@@ -19119,14 +19619,14 @@
 .end # newStringArray
 
 
-.sub 'parseString' :subid('WSubId_86')
+.sub 'parseString' :subid('WSubId_84')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_139 = "WSubId_139"
-.const 'Sub' WSubId_144 = "WSubId_144"
-.const 'Sub' WSubId_145 = "WSubId_145"
-    .tailcall WSubId_139(WSubId_144, WSubId_145, __ARG_1, __ARG_2, __ARG_3)
+.const 'Sub' WSubId_137 = "WSubId_137"
+.const 'Sub' WSubId_142 = "WSubId_142"
+.const 'Sub' WSubId_143 = "WSubId_143"
+    .tailcall WSubId_137(WSubId_142, WSubId_143, __ARG_1, __ARG_2, __ARG_3)
 
 .end # parseString
 
@@ -19137,31 +19637,49 @@
         .param pmc __ARG_2
         .param string __ARG_3
         .param pmc __ARG_4
-        .param pmc __ARG_5
     self.'Statement'(__ARG_1, __ARG_2)
     box $P1, __ARG_3
     setattribute self, 'type', $P1
-    setattribute self, 'name', __ARG_4
-    setattribute self, 'value', __ARG_5
-    $P2 = self.'createconst'(__ARG_4, __ARG_3)
+    setattribute self, 'name', __ARG_1
+    setattribute self, 'value', __ARG_4
+    $P2 = self.'createconst'(__ARG_1, __ARG_3)
     setattribute self, 'data', $P2
 
 .end # ConstStatement
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
+.const 'Sub' WSubId_33 = "WSubId_33"
     getattribute $P1, self, 'value'
-    getattribute $P2, self, 'type'
-    null $S1
-    if_null $P2, __label_1
-    set $S1, $P2
-  __label_1:
     $P1 = $P1.'optimize'()
     $P2 = $P1.'hascompilevalue'()
-    if $P2 goto __label_2
-    WSubId_30('Value for const is not evaluable at compile time', self)
-  __label_2: # endif
+    if $P2 goto __label_1
+    WSubId_28("Value for const is not evaluable at compile time", self)
+  __label_1: # endif
+    getattribute $P2, self, 'type'
+    set $S1, $P2
+    if_null $S1, __label_2
+    length $I1, $S1
+    ne $I1, 1, __label_2
+    ord $I1, $S1
+    if $I1 == 73 goto __label_4
+    if $I1 == 78 goto __label_5
+    if $I1 == 83 goto __label_6
+    goto __label_2
+  __label_4: # case
+    $P1 = $P1.'getLiteralInteger'()
+    goto __label_3 # break
+  __label_5: # case
+    $P1 = $P1.'getLiteralFloat'()
+    goto __label_3 # break
+  __label_6: # case
+    $P1 = $P1.'getLiteralString'()
+    goto __label_3 # break
+  __label_2: # default
+    getattribute $P3, self, 'start'
+    WSubId_33("Wrong const", $P3)
+  __label_3: # switch end
     getattribute $P2, self, 'data'
     $P2.'setvalue'($P1)
     .return(self)
@@ -19170,9 +19688,9 @@
 
 
 .sub 'checkresult' :method
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     getattribute $P1, self, 'start'
-    WSubId_35('Direct use of const', $P1)
+    WSubId_33("Direct use of const", $P1)
 
 .end # checkresult
 
@@ -19226,34 +19744,34 @@
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'parseConst' :subid('WSubId_83')
+.sub 'parseConst' :subid('WSubId_81')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_137 = "WSubId_137"
-.const 'Sub' WSubId_30 = "WSubId_30"
-.const 'Sub' WSubId_94 = "WSubId_94"
-.const 'Sub' WSubId_77 = "WSubId_77"
-.const 'Sub' WSubId_33 = "WSubId_33"
+.const 'Sub' WSubId_136 = "WSubId_136"
+.const 'Sub' WSubId_28 = "WSubId_28"
+.const 'Sub' WSubId_93 = "WSubId_93"
+.const 'Sub' WSubId_74 = "WSubId_74"
+.const 'Sub' WSubId_31 = "WSubId_31"
     $P1 = __ARG_2.'get'()
-    $P7 = WSubId_137($P1)
+    $P7 = WSubId_136($P1)
     null $S1
     if_null $P7, __label_1
     set $S1, $P7
   __label_1:
-    eq $S1, 'I', __label_2
-    eq $S1, 'N', __label_2
-    eq $S1, 'S', __label_2
-    WSubId_30('Invalid type for const', __ARG_1)
+    eq $S1, "I", __label_2
+    eq $S1, "N", __label_2
+    eq $S1, "S", __label_2
+    WSubId_28("Invalid type for const", __ARG_1)
   __label_2: # endif
     null $P2
   __label_3: # do
     $P3 = __ARG_2.'get'()
-    WSubId_94('=', __ARG_2)
-    $P4 = WSubId_77(__ARG_2, __ARG_3)
+    WSubId_93("=", __ARG_2)
+    $P4 = WSubId_74(__ARG_2, __ARG_3)
     set $P5, $P2
     new $P7, [ 'Winxed'; 'Compiler'; 'ConstStatement' ]
-    $P7.'ConstStatement'($P1, __ARG_3, $S1, $P3, $P4)
+    $P7.'ConstStatement'($P3, __ARG_3, $S1, $P4)
     set $P6, $P7
     if_null $P5, __label_9
     isa $I1, $P5, [ 'Winxed'; 'Compiler'; 'MultiStatement' ]
@@ -19274,11 +19792,11 @@
   __label_6:
   __label_5: # continue
     $P1 = __ARG_2.'get'()
-    $P7 = $P1.'isop'(',')
+    $P7 = $P1.'isop'(",")
     if_null $P7, __label_4
     if $P7 goto __label_3
   __label_4: # enddo
-    WSubId_33(';', $P1)
+    WSubId_31(";", $P1)
     .return($P2)
 
 .end # parseConst
@@ -19291,24 +19809,24 @@
         .param pmc __ARG_3
         .param pmc __ARG_4
         .param int __ARG_5
-.const 'Sub' WSubId_77 = "WSubId_77"
-.const 'Sub' WSubId_33 = "WSubId_33"
+.const 'Sub' WSubId_74 = "WSubId_74"
+.const 'Sub' WSubId_31 = "WSubId_31"
     self.'initvarbase'(__ARG_1, __ARG_3, __ARG_4, __ARG_5)
     $P1 = __ARG_2.'get'()
-    $P2 = $P1.'isop'(':')
+    $P2 = $P1.'isop'(":")
     if_null $P2, __label_1
     unless $P2 goto __label_1
     self.'parsemodifiers'($P1, __ARG_2)
     $P1 = __ARG_2.'get'()
   __label_1: # endif
-    $P2 = $P1.'isop'('=')
+    $P2 = $P1.'isop'("=")
     if_null $P2, __label_2
     unless $P2 goto __label_2
-    $P4 = WSubId_77(__ARG_2, self)
+    $P4 = WSubId_74(__ARG_2, self)
     setattribute self, 'init', $P4
     $P1 = __ARG_2.'get'()
   __label_2: # endif
-    WSubId_33(';', $P1)
+    WSubId_31(";", $P1)
 
 .end # VarStatement
 
@@ -19355,7 +19873,7 @@
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     self.'annotate'(__ARG_1)
     getattribute $P2, self, 'name'
     null $S1
@@ -19371,7 +19889,7 @@
     $P2 = __ARG_1.'getDebug'()
     if_null $P2, __label_3
     unless $P2 goto __label_3
-    __ARG_1.'comment'('var ', $S1, ': ', $S2)
+    __ARG_1.'comment'("var ", $S1, ": ", $S2)
   __label_3: # endif
     if_null $P1, __label_4
     $P2 = $P1.'isnull'()
@@ -19407,9 +19925,9 @@
     __ARG_1.'emitbox'($S2, $S3)
     goto __label_9 # break
   __label_14: # case
-    WSubId_30("Can't use void function as initializer", self)
+    WSubId_28("Can't use void function as initializer", self)
   __label_8: # default
-    WSubId_30("Invalid var initializer", self)
+    WSubId_28("Invalid var initializer", self)
   __label_9: # switch end
     goto __label_7
   __label_6: # else
@@ -19431,16 +19949,16 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-.const 'Sub' WSubId_94 = "WSubId_94"
+.const 'Sub' WSubId_93 = "WSubId_93"
     self.'initvarbase'(__ARG_1, __ARG_3, __ARG_4)
-    WSubId_94(';', __ARG_2)
+    WSubId_93(";", __ARG_2)
 
 .end # ResizableVarStatement
 
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_52 = "WSubId_52"
+.const 'Sub' WSubId_48 = "WSubId_48"
     self.'annotate'(__ARG_1)
     getattribute $P1, self, 'reg'
     null $S1
@@ -19451,10 +19969,10 @@
     if_null $P1, __label_2
     unless $P1 goto __label_2
     getattribute $P3, self, 'name'
-    $P2 = WSubId_52("var %0[] : %1", $P3, $S1)
+    $P2 = WSubId_48("var %0[] : %1", $P3, $S1)
     __ARG_1.'comment'($P2)
   __label_2: # endif
-    $P1 = WSubId_52("    new %0, 'ResizablePMCArray'", $S1)
+    $P1 = WSubId_48("    new %0, 'ResizablePMCArray'", $S1)
     __ARG_1.'say'($P1)
 
 .end # emit
@@ -19471,13 +19989,13 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
-.const 'Sub' WSubId_77 = "WSubId_77"
-.const 'Sub' WSubId_94 = "WSubId_94"
+.const 'Sub' WSubId_74 = "WSubId_74"
+.const 'Sub' WSubId_93 = "WSubId_93"
     self.'initvarbase'(__ARG_1, __ARG_3, __ARG_4)
-    $P2 = WSubId_77(__ARG_2, self)
+    $P2 = WSubId_74(__ARG_2, self)
     setattribute self, 'exprsize', $P2
-    WSubId_94(']', __ARG_2)
-    WSubId_94(';', __ARG_2)
+    WSubId_93("]", __ARG_2)
+    WSubId_93(";", __ARG_2)
 
 .end # FixedVarStatement
 
@@ -19493,7 +20011,7 @@
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_52 = "WSubId_52"
+.const 'Sub' WSubId_48 = "WSubId_48"
     getattribute $P2, self, 'exprsize'
     $P1 = $P2.'emit_get'(__ARG_1)
     null $S1
@@ -19510,10 +20028,10 @@
     if_null $P1, __label_3
     unless $P1 goto __label_3
     getattribute $P3, self, 'name'
-    $P2 = WSubId_52("var %0[] : %1", $P3, $S2)
+    $P2 = WSubId_48("var %0[] : %1", $P3, $S2)
     __ARG_1.'comment'($P2)
   __label_3: # endif
-    $P1 = WSubId_52("    new %0, 'FixedPMCArray', %1", $S2, $S1)
+    $P1 = WSubId_48("    new %0, 'FixedPMCArray', %1", $S2, $S1)
     __ARG_1.'say'($P1)
 
 .end # emit
@@ -19526,20 +20044,20 @@
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'parseVar' :subid('WSubId_85')
+.sub 'parseVar' :subid('WSubId_83')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param int __ARG_4 :optional
-.const 'Sub' WSubId_134 = "WSubId_134"
+.const 'Sub' WSubId_78 = "WSubId_78"
     $P1 = __ARG_2.'get'()
-    WSubId_134($P1)
+    WSubId_78($P1)
     $P2 = __ARG_2.'get'()
-    $P3 = $P2.'isop'('[')
+    $P3 = $P2.'isop'("[")
     if_null $P3, __label_1
     unless $P3 goto __label_1
     $P2 = __ARG_2.'get'()
-    $P3 = $P2.'isop'(']')
+    $P3 = $P2.'isop'("]")
     if_null $P3, __label_3
     unless $P3 goto __label_3
     new $P5, [ 'Winxed'; 'Compiler'; 'ResizableVarStatement' ]
@@ -19566,18 +20084,18 @@
 .end # parseVar
 
 
-.sub 'parseVolatile' :subid('WSubId_84')
+.sub 'parseVolatile' :subid('WSubId_82')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_30 = "WSubId_30"
-.const 'Sub' WSubId_85 = "WSubId_85"
+.const 'Sub' WSubId_28 = "WSubId_28"
+.const 'Sub' WSubId_83 = "WSubId_83"
     $P1 = __ARG_2.'get'()
-    $P2 = $P1.'iskeyword'('var')
+    $P2 = $P1.'iskeyword'("var")
     if $P2 goto __label_1
-    WSubId_30("invalid volatile type", $P1)
+    WSubId_28("invalid volatile type", $P1)
   __label_1: # endif
-    .tailcall WSubId_85(__ARG_1, __ARG_2, __ARG_3, 1)
+    .tailcall WSubId_83(__ARG_1, __ARG_2, __ARG_3, 1)
 
 .end # parseVolatile
 
@@ -19587,8 +20105,8 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_135 = "WSubId_135"
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_134 = "WSubId_134"
+.const 'Sub' WSubId_33 = "WSubId_33"
     self.'BlockStatement'(__ARG_1, __ARG_3)
     root_new $P4, ['parrot';'Hash']
     setattribute self, 'labels', $P4
@@ -19597,12 +20115,12 @@
     null $P1
   __label_2: # while
     $P1 = __ARG_2.'get'()
-    $P3 = $P1.'isop'('}')
+    $P3 = $P1.'isop'("}")
     if $P3 goto __label_1
     __ARG_2.'unget'($P1)
-    $P2 = WSubId_135(__ARG_2, self)
+    $P2 = WSubId_134(__ARG_2, self)
     unless_null $P2, __label_3
-    WSubId_35('Unexpected null statement')
+    WSubId_33("Unexpected null statement")
   __label_3: # endif
     getattribute $P3, self, 'statements'
     push $P3, $P2
@@ -19678,7 +20196,7 @@
     $S1 = $P1[__ARG_1]
     isnull $I1, $S1
     if $I1 goto __label_2
-    iseq $I1, $S1, ''
+    iseq $I1, $S1, ""
   __label_2:
     unless $I1 goto __label_1
     getattribute $P3, self, 'owner'
@@ -19692,7 +20210,7 @@
 
 .sub 'createlabel' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     null $S1
     if_null __ARG_1, __label_1
     set $S1, __ARG_1
@@ -19700,8 +20218,8 @@
     getattribute $P1, self, 'labels'
     $S2 = $P1[$S1]
     if_null $S2, __label_2
-    eq $S2, '', __label_2
-    WSubId_30('Label already defined', __ARG_1)
+    eq $S2, "", __label_2
+    WSubId_28("Label already defined", __ARG_1)
   __label_2: # endif
     $P2 = self.'genlabel'()
     null $S3
@@ -19726,7 +20244,7 @@
     $P2 = __ARG_1.'getDebug'()
     set $I1, $P2
     unless $I1 goto __label_1
-    __ARG_1.'comment'('{')
+    __ARG_1.'comment'("{")
   __label_1: # endif
     getattribute $P2, self, 'statements'
     if_null $P2, __label_3
@@ -19740,7 +20258,7 @@
     goto __label_2
   __label_3: # endfor
     unless $I1 goto __label_4
-    __ARG_1.'comment'('}')
+    __ARG_1.'comment'("}")
   __label_4: # endif
 
 .end # emit
@@ -19779,7 +20297,7 @@
     assign $P1, $I1
     getattribute $P2, self, 'type'
     set $S2, $P2
-    concat $S3, '$', $S2
+    concat $S3, "$", $S2
     concat $S3, $S3, $S1
     .return($S3)
 
@@ -19853,7 +20371,7 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param string __ARG_3
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     null $P1
     null $P2
     $P3 = self.'getlist'()
@@ -19868,8 +20386,8 @@
     if_null $P7, __label_3
     set $S1, $P7
   __label_3:
-    if $S1 == 'named' goto __label_6
-    if $S1 == 'slurpy' goto __label_7
+    if $S1 == "named" goto __label_6
+    if $S1 == "slurpy" goto __label_7
     goto __label_4
   __label_6: # case
     set $P1, $P4
@@ -19878,7 +20396,7 @@
     set $P2, $P4
     goto __label_5 # break
   __label_4: # default
-    __ARG_1.'print'(' :', $S1)
+    __ARG_1.'print'(" :", $S1)
   __label_5: # switch end
     goto __label_1
   __label_2: # endfor
@@ -19911,13 +20429,13 @@
     $P5 = $P1.'getarg'(0)
     $P8 = $P5.'isstringliteral'()
     if $P8 goto __label_18
-    WSubId_30('Invalid modifier', __ARG_2)
+    WSubId_28("Invalid modifier", __ARG_2)
   __label_18: # endif
     $P9 = $P5.'getPirString'()
     set $S2, $P9
     goto __label_15 # break
   __label_14: # default
-    WSubId_30('Invalid modifier', __ARG_2)
+    WSubId_28("Invalid modifier", __ARG_2)
   __label_15: # switch end
     __ARG_1.'print'(" :named(", $S2, ")")
     goto __label_8 # break
@@ -19939,46 +20457,65 @@
 .sub 'FunctionParameter' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_137 = "WSubId_137"
+.const 'Sub' WSubId_136 = "WSubId_136"
     setattribute self, 'func', __ARG_1
     $P1 = __ARG_2.'get'()
-    $P3 = $P1.'checkkeyword'()
-    $P2 = WSubId_137($P3)
     null $S1
+    $P2 = $P1.'isop'(":")
     if_null $P2, __label_1
-    set $S1, $P2
-  __label_1:
-    eq $S1, '', __label_2
+    unless $P2 goto __label_1
+    box $P3, 1
+    setattribute self, 'want_multi', $P3
     $P1 = __ARG_2.'get'()
-    goto __label_3
-  __label_2: # else
-    set $S1, 'P'
+    $P3 = $P1.'checkkeyword'()
+    $P2 = WSubId_136($P3)
+    set $S1, $P2
+    ne $S1, "", __label_3
+    set $S1, "P"
+    new $P4, [ 'Winxed'; 'Compiler'; 'ClassSpecifierId' ]
+    getattribute $P5, __ARG_1, 'owner'
+    $P4.'ClassSpecifierId'(__ARG_2, $P5, $P1)
+    set $P3, $P4
+    setattribute self, 'classtype', $P3
   __label_3: # endif
+    $P1 = __ARG_2.'get'()
+    goto __label_2
+  __label_1: # else
+    $P3 = $P1.'checkkeyword'()
+    $P2 = WSubId_136($P3)
+    set $S1, $P2
+    eq $S1, "", __label_4
+    $P1 = __ARG_2.'get'()
+    goto __label_5
+  __label_4: # else
+    set $S1, "P"
+  __label_5: # endif
+  __label_2: # endif
     box $P2, $S1
     setattribute self, 'type', $P2
     setattribute self, 'name', $P1
     $P1 = __ARG_2.'get'()
-    $P2 = $P1.'isop'('[')
-    if_null $P2, __label_4
-    unless $P2 goto __label_4
+    $P2 = $P1.'isop'("[")
+    if_null $P2, __label_6
+    unless $P2 goto __label_6
     new $P5, [ 'Winxed'; 'Compiler'; 'ParameterModifierList' ]
     getattribute $P6, __ARG_1, 'owner'
     $P5.'ParameterModifierList'(__ARG_2, $P6)
     set $P4, $P5
     setattribute self, 'modifiers', $P4
     $P1 = __ARG_2.'get'()
-  __label_4: # endif
-    $P2 = $P1.'isop'('=')
-    if_null $P2, __label_5
-    unless $P2 goto __label_5
+  __label_6: # endif
+    $P2 = $P1.'isop'("=")
+    if_null $P2, __label_7
+    unless $P2 goto __label_7
     new $P5, [ 'Winxed'; 'Compiler'; 'FunctionParameterDefault' ]
     $P5.'FunctionParameterDefault'(__ARG_2, __ARG_1, self)
     set $P4, $P5
     setattribute self, 'defaultexpr', $P4
-    goto __label_6
-  __label_5: # else
+    goto __label_8
+  __label_7: # else
     __ARG_2.'unget'($P1)
-  __label_6: # endif
+  __label_8: # endif
 
 .end # FunctionParameter
 
@@ -20006,7 +20543,7 @@
 .sub 'optimize' :method
     getattribute $P1, self, 'func'
     $S2 = $P1.'generateparamnum'()
-    concat $S1, '__ARG_', $S2
+    concat $S1, "__ARG_", $S2
     getattribute $P3, self, 'name'
     getattribute $P4, self, 'type'
     $P1.'createvarnamed'($P3, $P4, $S1)
@@ -20030,7 +20567,7 @@
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_146 = "WSubId_146"
+.const 'Sub' WSubId_144 = "WSubId_144"
     getattribute $P1, self, 'func'
     getattribute $P5, self, 'name'
     null $S1
@@ -20039,13 +20576,13 @@
   __label_1:
     $P2 = self.'getvar'()
     $P6 = $P2.'gettype'()
-    $P5 = WSubId_146($P6)
+    $P5 = WSubId_144($P6)
     null $S2
     if_null $P5, __label_2
     set $S2, $P5
   __label_2:
     $P5 = $P2.'getreg'()
-    __ARG_1.'print'('        .param ', $S2, ' ', $P5)
+    __ARG_1.'print'("        .param ", $S2, " ", $P5)
     getattribute $P3, self, 'modifiers'
     if_null $P3, __label_3
     getattribute $P5, $P1, 'start'
@@ -20056,7 +20593,7 @@
     $P5 = $P4.'getoptflag'()
     __ARG_1.'print'(" :optional\n        .param int ", $P5, " :opt_flag")
   __label_4: # endif
-    __ARG_1.'say'('')
+    __ARG_1.'say'("")
 
 .end # emit
 
@@ -20078,6 +20615,34 @@
 .end # get_type
 
 
+.sub 'wantMulti' :method
+    getattribute $P1, self, 'want_multi'
+    isnull $I1, $P1
+    not $I1
+    .return($I1)
+
+.end # wantMulti
+
+
+.sub 'get_pir_multi_type' :method
+.const 'Sub' WSubId_144 = "WSubId_144"
+.const 'Sub' WSubId_28 = "WSubId_28"
+    getattribute $P1, self, 'classtype'
+    unless_null $P1, __label_1
+    getattribute $P3, self, 'type'
+    .tailcall WSubId_144($P3)
+  __label_1: # endif
+    getattribute $P4, self, 'func'
+    getattribute $P3, $P4, 'owner'
+    $P2 = $P1.'checknskey'($P3)
+    unless_null $P2, __label_2
+    WSubId_28("class not found", $P1)
+  __label_2: # endif
+    .tailcall $P2.'getparrotkey'()
+
+.end # get_pir_multi_type
+
+
 .sub 'getvar' :method
     getattribute $P1, self, 'func'
     getattribute $P2, self, 'name'
@@ -20091,6 +20656,8 @@
     addattribute $P0, 'name'
     addattribute $P0, 'modifiers'
     addattribute $P0, 'type'
+    addattribute $P0, 'want_multi'
+    addattribute $P0, 'classtype'
     addattribute $P0, 'defaultexpr'
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'FunctionParameterDefault' ]
@@ -20099,10 +20666,10 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_77 = "WSubId_77"
+.const 'Sub' WSubId_74 = "WSubId_74"
     setattribute self, 'owner', __ARG_2
     setattribute self, 'param', __ARG_3
-    $P2 = WSubId_77(__ARG_1, __ARG_2)
+    $P2 = WSubId_74(__ARG_1, __ARG_2)
     setattribute self, 'expr', $P2
 
 .end # FunctionParameterDefault
@@ -20141,11 +20708,11 @@
 
 
 .sub 'getoptflag' :method
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     getattribute $P1, self, 'reg'
     unless_null $P1, __label_1
     getattribute $P2, self, 'param'
-    WSubId_35("Invalid parameter default usage", $P2)
+    WSubId_33("Invalid parameter default usage", $P2)
   __label_1: # endif
     set $S1, $P1
     .return($S1)
@@ -20189,7 +20756,7 @@
     goto __label_7
   __label_6: # else
     $P4 = $P1.'emit_get'(__ARG_1)
-    ne $S4, 'P', __label_8
+    ne $S4, "P", __label_8
     __ARG_1.'emitbox'($S3, $P4)
     goto __label_9
   __label_8: # else
@@ -20210,7 +20777,7 @@
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'parseParameter' :subid('WSubId_147')
+.sub 'parseParameter' :subid('WSubId_145')
         .param pmc __ARG_1
         .param pmc __ARG_2
     new $P2, [ 'Winxed'; 'Compiler'; 'FunctionParameter' ]
@@ -20225,9 +20792,9 @@
 .sub 'FunctionParameterList' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_76 = "WSubId_76"
-.const 'Sub' WSubId_147 = "WSubId_147"
-    $P2 = WSubId_76(__ARG_1, __ARG_2, WSubId_147, ')')
+.const 'Sub' WSubId_73 = "WSubId_73"
+.const 'Sub' WSubId_145 = "WSubId_145"
+    $P2 = WSubId_73(__ARG_1, __ARG_2, WSubId_145, ")")
     setattribute self, 'paramlist', $P2
 
 .end # FunctionParameterList
@@ -20332,12 +20899,32 @@
 .end # emitdefault
 
 
-.sub 'addmultisig' :subid('WSubId_15') :method
+.sub 'wantMulti' :method
+    getattribute $P2, self, 'paramlist'
+    if_null $P2, __label_2
+    iter $P3, $P2
+    set $P3, 0
+  __label_1: # for iteration
+    unless $P3 goto __label_2
+    shift $P1, $P3
+    $P4 = $P1.'wantMulti'()
+    if_null $P4, __label_3
+    unless $P4 goto __label_3
+    .return(1)
+  __label_3: # endif
+    goto __label_1
+  __label_2: # endfor
+    .return(0)
+
+.end # wantMulti
+
+
+.sub 'addmultisig' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_16 = "WSubId_16"
+.const 'Sub' WSubId_5 = "WSubId_5"
     getattribute $P1, self, 'paramlist'
     set $P2, __ARG_1
-    set $P3, WSubId_16
+    $P3 = WSubId_5("get_pir_multi_type")
     if_null $P1, __label_3
     iter $P5, $P1
     set $P5, 0
@@ -20351,15 +20938,6 @@
   __label_1:
 
 .end # addmultisig
-
-
-.sub '' :anon :subid('WSubId_16')
-        .param pmc __ARG_2
-.const 'Sub' WSubId_146 = "WSubId_146"
-    $P1 = __ARG_2.'get_type'()
-    .tailcall WSubId_146($P1)
-
-.end # WSubId_16
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'FunctionParameterList' ]
@@ -20381,7 +20959,7 @@
         .param pmc __ARG_2
     getattribute $P2, self, 'owner'
     $P1 = $P2.'getpath'()
-    $P2 = __ARG_2.'tempreg'('P')
+    $P2 = __ARG_2.'tempreg'("P")
     null $S1
     if_null $P2, __label_1
     set $S1, $P2
@@ -20401,10 +20979,10 @@
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'emit_subid' :subid('WSubId_149')
+.sub 'emit_subid' :subid('WSubId_147')
         .param string __ARG_1
     concat $S1, ".const 'Sub' ", __ARG_1
-    concat $S1, $S1, ' = "'
+    concat $S1, $S1, " = \""
     concat $S1, $S1, __ARG_1
     concat $S1, $S1, "\"\n"
     .return($S1)
@@ -20423,7 +21001,7 @@
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     $P3 = self.'getlist'()
     if_null $P3, __label_2
     iter $P4, $P3
@@ -20436,21 +21014,21 @@
     if_null $P5, __label_3
     set $S1, $P5
   __label_3:
-    ne $S1, 'multi', __label_4
+    ne $S1, "multi", __label_4
     goto __label_1 # continue
   __label_4: # endif
     $P3 = $P1.'numargs'()
     set $I1, $P3
-    __ARG_1.'print'(' :', $S1)
+    __ARG_1.'print'(" :", $S1)
     le $I1, 0, __label_5
-    __ARG_1.'print'('(')
+    __ARG_1.'print'("(")
     null $I2
   __label_8: # for condition
     ge $I2, $I1, __label_7
     $P2 = $P1.'getarg'($I2)
     $P3 = $P2.'isstringliteral'()
     if $P3 goto __label_9
-    WSubId_30('Invalid modifier', $P2)
+    WSubId_28("Invalid modifier", $P2)
   __label_9: # endif
     $P3 = $P2.'getPirString'()
     __ARG_1.'print'($P3)
@@ -20462,7 +21040,7 @@
     inc $I2
     goto __label_8
   __label_7: # for end
-    __ARG_1.'print'(')')
+    __ARG_1.'print'(")")
   __label_5: # endif
     goto __label_1
   __label_2: # endfor
@@ -20476,10 +21054,10 @@
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'multi_sig_from_multi_modifier' :subid('WSubId_148')
+.sub 'multi_sig_from_multi_modifier' :subid('WSubId_146')
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     $P5 = __ARG_2.'numargs'()
     set $I1, $P5
     null $P1
@@ -20500,7 +21078,7 @@
     if $I4 goto __label_9
     goto __label_6
   __label_7: # case
-    $P7 = $P2.'get_value'()
+    $P7 = $P2.'getStringValue'()
     push $P1, $P7
     goto __label_5 # break
   __label_8: # case
@@ -20525,13 +21103,13 @@
     push $P1, "pmc"
     goto __label_12 # break
   __label_11: # default
-    WSubId_30("unsupported multi signature", $P2)
+    WSubId_28("unsupported multi signature", $P2)
   __label_12: # switch end
     goto __label_5 # break
   __label_9: # case
     $P3 = $P2.'get_class_raw_key'()
     unless_null $P3, __label_17
-    WSubId_30("class not found", $P2)
+    WSubId_28("class not found", $P2)
   __label_17: # endif
     set $P4, $P3
     null $S2
@@ -20547,7 +21125,7 @@
     push $P1, $S4
     goto __label_5 # break
   __label_6: # default
-    WSubId_30("unsupported multi signature", $P2)
+    WSubId_28("unsupported multi signature", $P2)
   __label_5: # switch end
   __label_2: # for iteration
     inc $I2
@@ -20567,19 +21145,19 @@
     box $P1, 0
     setattribute self, 'nlabel', $P1
     new $P3, [ 'Winxed'; 'Compiler'; 'RegisterStore' ]
-    $P3.'RegisterStore'('I')
+    $P3.'RegisterStore'("I")
     set $P2, $P3
     setattribute self, 'regstI', $P2
     new $P3, [ 'Winxed'; 'Compiler'; 'RegisterStore' ]
-    $P3.'RegisterStore'('N')
+    $P3.'RegisterStore'("N")
     set $P2, $P3
     setattribute self, 'regstN', $P2
     new $P3, [ 'Winxed'; 'Compiler'; 'RegisterStore' ]
-    $P3.'RegisterStore'('S')
+    $P3.'RegisterStore'("S")
     set $P2, $P3
     setattribute self, 'regstS', $P2
     new $P3, [ 'Winxed'; 'Compiler'; 'RegisterStore' ]
-    $P3.'RegisterStore'('P')
+    $P3.'RegisterStore'("P")
     set $P2, $P3
     setattribute self, 'regstP', $P2
 
@@ -20646,14 +21224,24 @@
 
 .sub 'parse_parameters' :method
         .param pmc __ARG_1
+.const 'Sub' WSubId_28 = "WSubId_28"
     $P1 = __ARG_1.'get'()
-    $P2 = $P1.'isop'(')')
-    if $P2 goto __label_1
+    $P3 = $P1.'isop'(")")
+    if $P3 goto __label_1
     __ARG_1.'unget'($P1)
-    new $P4, [ 'Winxed'; 'Compiler'; 'FunctionParameterList' ]
-    $P4.'FunctionParameterList'(__ARG_1, self)
-    set $P3, $P4
-    setattribute self, 'params', $P3
+    new $P3, [ 'Winxed'; 'Compiler'; 'FunctionParameterList' ]
+    $P3.'FunctionParameterList'(__ARG_1, self)
+    set $P2, $P3
+    setattribute self, 'params', $P2
+    $P3 = $P2.'wantMulti'()
+    if_null $P3, __label_2
+    unless $P3 goto __label_2
+    isa $I1, self, [ 'Winxed'; 'Compiler'; 'FunctionStatement' ]
+    if $I1 goto __label_3
+    WSubId_28("Can't use multi signatures here", self)
+  __label_3: # endif
+    self.'setmulti'()
+  __label_2: # endif
   __label_1: # endif
 
 .end # parse_parameters
@@ -20734,14 +21322,14 @@
 
 
 .sub 'optimize' :method
-.const 'Sub' WSubId_148 = "WSubId_148"
+.const 'Sub' WSubId_146 = "WSubId_146"
 .const 'Sub' WSubId_5 = "WSubId_5"
     getattribute $P1, self, 'modifiers'
     if_null $P1, __label_1
-    $P2 = $P1.'pick'('multi')
+    $P2 = $P1.'pick'("multi")
     if_null $P2, __label_2
     self.'setmulti'()
-    $P7 = WSubId_148(self, $P2)
+    $P7 = WSubId_146(self, $P2)
     setattribute self, 'multi_sig', $P7
   __label_2: # endif
   __label_1: # endif
@@ -20817,7 +21405,7 @@
 
 .sub 'createreg' :method
         .param string __ARG_1
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     null $P1
     if_null __ARG_1, __label_1
     length $I1, __ARG_1
@@ -20842,7 +21430,7 @@
     goto __label_2 # break
   __label_1: # default
     concat $S2, "Invalid type in createreg: ", __ARG_1
-    WSubId_35($S2)
+    WSubId_33($S2)
   __label_2: # switch end
     $P2 = $P1.'createreg'()
     null $S1
@@ -20856,7 +21444,7 @@
 
 .sub 'tempreg' :method
         .param string __ARG_1
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     null $P1
     if_null __ARG_1, __label_1
     length $I1, __ARG_1
@@ -20881,7 +21469,7 @@
     goto __label_2 # break
   __label_1: # default
     concat $S2, "Invalid type in tempreg: ", __ARG_1
-    WSubId_35($S2)
+    WSubId_33($S2)
   __label_2: # switch end
     $P2 = $P1.'tempreg'()
     null $S1
@@ -20925,7 +21513,7 @@
     inc $P1
     set $I1, $P1
     set $S1, $I1
-    concat $S2, '__label_', $S1
+    concat $S2, "__label_", $S1
     .return($S2)
 
 .end # genlabel
@@ -20933,16 +21521,16 @@
 
 .sub 'getbreaklabel' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_30 = "WSubId_30"
-    WSubId_30('break not allowed here', __ARG_1)
+.const 'Sub' WSubId_28 = "WSubId_28"
+    WSubId_28("break not allowed here", __ARG_1)
 
 .end # getbreaklabel
 
 
 .sub 'getcontinuelabel' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_30 = "WSubId_30"
-    WSubId_30('continue not allowed here', __ARG_1)
+.const 'Sub' WSubId_28 = "WSubId_28"
+    WSubId_28("continue not allowed here", __ARG_1)
 
 .end # getcontinuelabel
 
@@ -20955,8 +21543,8 @@
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_149 = "WSubId_149"
-.const 'Sub' WSubId_52 = "WSubId_52"
+.const 'Sub' WSubId_147 = "WSubId_147"
+.const 'Sub' WSubId_48 = "WSubId_48"
 .const 'Sub' WSubId_3 = "WSubId_3"
 .const 'Sub' WSubId_5 = "WSubId_5"
     getattribute $P15, self, 'name'
@@ -20995,15 +21583,15 @@
     $P15 = self.'ismethod'()
     if_null $P15, __label_8
     unless $P15 goto __label_8
-    __ARG_1.'print'(' :method')
+    __ARG_1.'print'(" :method")
   __label_8: # endif
     getattribute $P3, self, 'modifiers'
     if_null $P3, __label_9
     $P3.'emit'(__ARG_1)
     goto __label_10
   __label_9: # else
-    ne $S1, 'main', __label_11
-    __ARG_1.'print'(' :main')
+    ne $S1, "main", __label_11
+    __ARG_1.'print'(" :main")
   __label_11: # endif
   __label_10: # endif
     self.'emit_extra_modifiers'(__ARG_1)
@@ -21014,7 +21602,7 @@
   __label_12: # endif
     getattribute $P8, self, 'usedsubids'
     root_new $P9, ['parrot';'ResizablePMCArray']
-    set $P10, WSubId_149
+    set $P10, WSubId_147
     if_null $P8, __label_15
     iter $P18, $P8
     set $P18, 0
@@ -21051,7 +21639,7 @@
     unless $P19 goto __label_20
     shift $S2, $P19
     $P16 = $P5[$S2]
-    $P15 = WSubId_52(".lex %0, %1", $P16, $S2)
+    $P15 = WSubId_48(".lex %0, %1", $P16, $S2)
     __ARG_1.'say'($P15)
     goto __label_19
   __label_20: # endfor
@@ -21062,7 +21650,7 @@
     unless $P20 goto __label_22
     shift $S3, $P20
     substr $S4, $S3, 0, 1
-    eq $S4, '$', __label_23
+    eq $S4, "$", __label_23
     concat $S5, "    .local pmc ", $S3
     __ARG_1.'say'($S5)
   __label_23: # endif
@@ -21078,12 +21666,12 @@
     if_null $P15, __label_24
     unless $P15 goto __label_24
     unless $I1 goto __label_26
-    __ARG_1.'comment'('Empty body')
+    __ARG_1.'comment'("Empty body")
   __label_26: # endif
     goto __label_25
   __label_24: # else
     unless $I1 goto __label_27
-    __ARG_1.'comment'('Body')
+    __ARG_1.'comment'("Body")
   __label_27: # endif
     $P7.'emit'(__ARG_1)
     $P15 = $P7.'getend'()
@@ -21137,9 +21725,9 @@
     setattribute self, 'paramnum', $P1
     box $P1, 0
     setattribute self, 'lexnum', $P1
-    self.'parse'(__ARG_2)
     new $P2, [ 'Boolean' ]
     setattribute self, 'is_multi', $P2
+    self.'parse'(__ARG_2)
 
 .end # FunctionStatement
 
@@ -21214,13 +21802,13 @@
 
 .sub 'parse' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_33 = "WSubId_33"
-.const 'Sub' WSubId_150 = "WSubId_150"
 .const 'Sub' WSubId_31 = "WSubId_31"
+.const 'Sub' WSubId_148 = "WSubId_148"
+.const 'Sub' WSubId_29 = "WSubId_29"
     $P1 = __ARG_1.'get'()
     setattribute self, 'name', $P1
     $P2 = __ARG_1.'get'()
-    $P4 = $P2.'isop'('[')
+    $P4 = $P2.'isop'("[")
     if_null $P4, __label_1
     unless $P4 goto __label_1
     new $P7, [ 'Winxed'; 'Compiler'; 'FunctionModifierList' ]
@@ -21230,18 +21818,18 @@
     setattribute self, 'modifiers', $P6
     $P2 = __ARG_1.'get'()
   __label_1: # endif
-    WSubId_33('(', $P2)
+    WSubId_31("(", $P2)
     self.'parse_parameters'(__ARG_1)
     getattribute $P5, self, 'owner'
     $P4 = $P5.'getpath'()
     $P6 = $P1.'getidentifier'()
     $P3 = $P4.'createchild'($P6)
     $P4 = $P3.'fullname'()
-    WSubId_150(self, '__FUNCTION__', $P4)
+    WSubId_148(self, "__FUNCTION__", $P4)
     $P2 = __ARG_1.'get'()
-    $P4 = $P2.'isop'('{')
+    $P4 = $P2.'isop'("{")
     if $P4 goto __label_2
-    WSubId_31('{', $P2)
+    WSubId_29("{", $P2)
   __label_2: # endif
     new $P6, [ 'Winxed'; 'Compiler'; 'CompoundStatement' ]
     $P6.'CompoundStatement'($P2, __ARG_1, self)
@@ -21262,7 +21850,7 @@
     $P1 = self.'default_multi_sig'()
   __label_2: # endif
     join $S1, ", ", $P1
-    __ARG_1.'print'(' :multi(', $S1, ')')
+    __ARG_1.'print'(" :multi(", $S1, ")")
   __label_1: # endif
 
 .end # emit_extra_modifiers
@@ -21282,7 +21870,7 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_33 = "WSubId_33"
+.const 'Sub' WSubId_31 = "WSubId_31"
     self.'FunctionBase'(__ARG_1, __ARG_3)
     $P1 = __ARG_3.'getouter'()
     isa $I2, $P1, [ 'Winxed'; 'Compiler'; 'InlineStatement' ]
@@ -21292,7 +21880,7 @@
   __label_1: # endif
     self.'parse_parameters'(__ARG_2)
     $P2 = __ARG_2.'get'()
-    WSubId_33('{', $P2)
+    WSubId_31("{", $P2)
     new $P5, [ 'Winxed'; 'Compiler'; 'CompoundStatement' ]
     $P5.'CompoundStatement'($P2, __ARG_2, self)
     set $P4, $P5
@@ -21421,7 +22009,7 @@
     set $S1, $P5
   __label_2:
     substr $S4, $S1, 0, 6
-    ne $S4, 'WSubId', __label_3
+    ne $S4, "WSubId", __label_3
     self.'usesubid'($S1)
     .return(__ARG_2)
   __label_3: # endif
@@ -21457,7 +22045,7 @@
     if_null $P5, __label_10
     set $S3, $P5
   __label_10:
-    eq $S3, 'P', __label_11
+    eq $S3, "P", __label_11
     bor $I1, $I1, 1
   __label_11: # endif
     $P5 = __ARG_2.'gettype'()
@@ -21475,7 +22063,7 @@
 
 .sub 'getvar' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_35 = "WSubId_35"
+.const 'Sub' WSubId_33 = "WSubId_33"
     $P1 = self.'getlocalvar'(__ARG_1)
     unless_null $P1, __label_1
     $P1 = self.'getusedvar'(__ARG_1)
@@ -21485,7 +22073,7 @@
     $P1 = $P3.'getvar'(__ARG_1)
     unless_null $P1, __label_3
     set $S3, __ARG_1
-    ne $S3, 'self', __label_5
+    ne $S3, "self", __label_5
     getattribute $P2, self, 'outer'
     isa $I1, $P2, [ 'Winxed'; 'Compiler'; 'InlinedBlock' ]
     unless $I1 goto __label_6
@@ -21499,7 +22087,7 @@
     if_null $P4, __label_8
     set $S1, $P4
   __label_8:
-    $P1 = self.'createvar'(__ARG_1, 'P')
+    $P1 = self.'createvar'(__ARG_1, "P")
     $P3 = $P1.'getreg'()
     null $S2
     if_null $P3, __label_9
@@ -21516,7 +22104,7 @@
     if_null $P1, __label_10
     isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'VarData' ]
     if $I1 goto __label_10
-    WSubId_35('Incorrect data for variable in LocalFunction')
+    WSubId_33("Incorrect data for variable in LocalFunction")
   __label_10: # endif
     .return($P1)
 
@@ -21553,7 +22141,7 @@
 .sub 'InlineParam' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_137 = "WSubId_137"
+.const 'Sub' WSubId_136 = "WSubId_136"
     null $I1
     $P1 = __ARG_1.'get'()
     self.'initbase'($P1, __ARG_2)
@@ -21571,12 +22159,12 @@
   __label_4:
     if_null $P3, __label_2
     unless $P3 goto __label_2
-    set $S1, '?'
+    set $S1, "?"
     __ARG_1.'unget'($P2)
     goto __label_3
   __label_2: # else
     $P4 = $P1.'getidentifier'()
-    $P3 = WSubId_137($P4)
+    $P3 = WSubId_136($P4)
     set $S1, $P3
     set $P1, $P2
   __label_3: # endif
@@ -21621,32 +22209,32 @@
 .end
 .namespace [ 'Winxed'; 'Compiler'; 'InlineStatement' ]
 
-.sub 'InlineStatement' :subid('WSubId_17') :method
+.sub 'InlineStatement' :subid('WSubId_15') :method
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_94 = "WSubId_94"
-.const 'Sub' WSubId_76 = "WSubId_76"
-.const 'Sub' WSubId_18 = "WSubId_18"
-.const 'Sub' WSubId_137 = "WSubId_137"
-.const 'Sub' WSubId_30 = "WSubId_30"
-.const 'Sub' WSubId_33 = "WSubId_33"
-.const 'Sub' WSubId_135 = "WSubId_135"
+.const 'Sub' WSubId_93 = "WSubId_93"
+.const 'Sub' WSubId_73 = "WSubId_73"
+.const 'Sub' WSubId_16 = "WSubId_16"
+.const 'Sub' WSubId_136 = "WSubId_136"
+.const 'Sub' WSubId_28 = "WSubId_28"
+.const 'Sub' WSubId_31 = "WSubId_31"
+.const 'Sub' WSubId_134 = "WSubId_134"
 .lex '__WLEX_self', self
     self.'BlockStatement'(__ARG_1, __ARG_3)
     $P1 = __ARG_2.'get'()
-    WSubId_94("(", __ARG_2)
+    WSubId_93("(", __ARG_2)
     $P2 = __ARG_2.'get'()
     $P3 = $P2.'isop'(")")
     if $P3 goto __label_1
     __ARG_2.'unget'($P2)
-    newclosure $P5, WSubId_18
-    $P4 = WSubId_76(__ARG_2, __ARG_3, $P5, ")")
+    newclosure $P5, WSubId_16
+    $P4 = WSubId_73(__ARG_2, __ARG_3, $P5, ")")
     setattribute self, 'params', $P4
   __label_1: # endif
     $P2 = __ARG_2.'get'()
     null $S1
-    $P3 = $P2.'iskeyword'('return')
+    $P3 = $P2.'iskeyword'("return")
     if_null $P3, __label_2
     unless $P3 goto __label_2
     $P2 = __ARG_2.'get'()
@@ -21655,19 +22243,19 @@
     if_null $P3, __label_4
     set $S2, $P3
   __label_4:
-    $P3 = WSubId_137($S2)
+    $P3 = WSubId_136($S2)
     set $S1, $P3
-    ne $S1, '', __label_5
-    WSubId_30("Invalid return type", $P2)
+    ne $S1, "", __label_5
+    WSubId_28("Invalid return type", $P2)
   __label_5: # endif
     $P2 = __ARG_2.'get'()
     goto __label_3
   __label_2: # else
-    set $S1, 'v'
+    set $S1, "v"
   __label_3: # endif
-    WSubId_33("{", $P2)
+    WSubId_31("{", $P2)
     __ARG_2.'unget'($P2)
-    $P4 = WSubId_135(__ARG_2, self)
+    $P4 = WSubId_134(__ARG_2, self)
     setattribute self, 'body', $P4
     setattribute self, 'name', $P1
     box $P3, $S1
@@ -21676,7 +22264,7 @@
 .end # InlineStatement
 
 
-.sub '' :anon :subid('WSubId_18') :outer('WSubId_17')
+.sub '' :anon :subid('WSubId_16') :outer('WSubId_15')
         .param pmc __ARG_4
         .param pmc __ARG_5
     find_lex $P1, '__WLEX_self'
@@ -21685,7 +22273,7 @@
     set $P2, $P3
     .return($P2)
 
-.end # WSubId_18
+.end # WSubId_16
 
 
 .sub 'getouter' :method
@@ -21724,7 +22312,7 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     getattribute $P7, __ARG_2, 'start'
     self.'BlockStatement'($P7, __ARG_1)
     setattribute self, 'inliner', __ARG_2
@@ -21744,7 +22332,7 @@
     set $I2, $P7
   __label_3:
     eq $I1, $I2, __label_5
-    WSubId_30("Wrong arguments in inline expansion", __ARG_2)
+    WSubId_28("Wrong arguments in inline expansion", __ARG_2)
   __label_5: # endif
     null $I3
   __label_8: # for condition
@@ -21757,7 +22345,7 @@
     if_null $P7, __label_9
     set $S1, $P7
   __label_9:
-    ne $S1, '?', __label_10
+    ne $S1, "?", __label_10
     $P7 = $P4.'checkresult'()
     set $S1, $P7
   __label_10: # endif
@@ -21923,7 +22511,7 @@
 
 .sub 'emit_it' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_149 = "WSubId_149"
+.const 'Sub' WSubId_147 = "WSubId_147"
     $P9 = __ARG_1.'getDebug'()
     if_null $P9, __label_1
     unless $P9 goto __label_1
@@ -21967,7 +22555,7 @@
     if_null $P9, __label_10
     set $S3, $P9
   __label_10:
-    iseq $I3, $S1, '?'
+    iseq $I3, $S1, "?"
     if $I3 goto __label_13
     iseq $I3, $S2, $S1
   __label_13:
@@ -21980,7 +22568,7 @@
     if_null $P9, __label_14
     set $S4, $P9
   __label_14:
-    ne $S1, 'P', __label_15
+    ne $S1, "P", __label_15
     __ARG_1.'emitbox'($S3, $S4)
     goto __label_16
   __label_15: # else
@@ -21993,7 +22581,7 @@
   __label_5: # for end
     getattribute $P5, self, 'usedsubids'
     root_new $P6, ['parrot';'ResizablePMCArray']
-    set $P7, WSubId_149
+    set $P7, WSubId_147
     if_null $P5, __label_19
     iter $P13, $P5
     set $P13, 0
@@ -22053,14 +22641,14 @@
 
 .sub 'emit_get' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     $P2 = self.'checkresult'()
     null $S1
     if_null $P2, __label_1
     set $S1, $P2
   __label_1:
-    ne $S1, 'v', __label_2
-    WSubId_30("Cannot get a result from a void inline", self)
+    ne $S1, "v", __label_2
+    WSubId_28("Cannot get a result from a void inline", self)
   __label_2: # endif
     $P2 = self.'createreg'($S1)
     null $S2
@@ -22070,8 +22658,8 @@
     box $P2, $S2
     setattribute self, 'retreg', $P2
     self.'emit_it'(__ARG_1)
-    ne $S1, 'P', __label_4
-    $P1 = self.'tempreg'('P')
+    ne $S1, "P", __label_4
+    $P1 = self.'tempreg'("P")
     __ARG_1.'emitset'($P1, $S2)
     set $S2, $P1
   __label_4: # endif
@@ -22103,22 +22691,22 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-    self.'Expr'(__ARG_2, __ARG_1)
+    self.'Expr'(__ARG_1, __ARG_2)
     setattribute self, 'inlined', __ARG_3
 
 .end # InlineRef
 
 
 .sub 'checkresult' :method
-    .return('v')
+    .return("v")
 
 .end # checkresult
 
 
 .sub 'misused' :method
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     getattribute $P1, self, 'start'
-    WSubId_30("inline used by reference", $P1)
+    WSubId_28("inline used by reference", $P1)
 
 .end # misused
 
@@ -22157,7 +22745,7 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
     getattribute $P1, __ARG_2, 'start'
-    self.'Expr'($P1, __ARG_1)
+    self.'Expr'(__ARG_1, $P1)
     new $P3, [ 'Winxed'; 'Compiler'; 'InlinedBlock' ]
     getattribute $P4, __ARG_2, 'inlined'
     $P3.'InlinedBlock'($P4, __ARG_1, __ARG_3)
@@ -22209,20 +22797,20 @@
 .sub 'SigParameter' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_32 = "WSubId_32"
-.const 'Sub' WSubId_137 = "WSubId_137"
+.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_136 = "WSubId_136"
     setattribute self, 'owner', __ARG_2
     $P1 = __ARG_1.'get'()
     $P3 = $P1.'isidentifier'()
     if $P3 goto __label_1
-    WSubId_32($P1)
+    WSubId_30($P1)
   __label_1: # endif
     $P2 = __ARG_1.'get'()
     $P3 = $P2.'isidentifier'()
     if_null $P3, __label_2
     unless $P3 goto __label_2
     $P5 = $P1.'checkkeyword'()
-    $P4 = WSubId_137($P5)
+    $P4 = WSubId_136($P5)
     null $S1
     if_null $P4, __label_3
     set $S1, $P4
@@ -22234,7 +22822,7 @@
     $P2 = __ARG_1.'get'()
   __label_2: # endif
     setattribute self, 'name', $P1
-    $P3 = $P2.'isop'('[')
+    $P3 = $P2.'isop'("[")
     if_null $P3, __label_4
     unless $P3 goto __label_4
     new $P6, [ 'Winxed'; 'Compiler'; 'ParameterModifierList' ]
@@ -22243,7 +22831,7 @@
     setattribute self, 'modifiers', $P5
     $P2 = __ARG_1.'get'()
   __label_4: # endif
-    $P3 = $P2.'isop'('=')
+    $P3 = $P2.'isop'("=")
     if_null $P3, __label_5
     unless $P3 goto __label_5
     new $P6, [ 'Winxed'; 'Compiler'; 'FunctionParameterDefault' ]
@@ -22288,8 +22876,7 @@
 
 .sub 'getvar' :method
     getattribute $P1, self, 'owner'
-    getattribute $P3, self, 'name'
-    $P2 = $P3.'getidentifier'()
+    getattribute $P2, self, 'name'
     .tailcall $P1.'getvar'($P2)
 
 .end # getvar
@@ -22305,7 +22892,7 @@
     if_null $P1, __label_2
     $P1.'optimize'()
     getattribute $P3, self, 'owner'
-    $P2 = $P3.'createreg'('I')
+    $P2 = $P3.'createreg'("I")
     $P1.'setoptflag'($P2)
   __label_2: # endif
     .return(self)
@@ -22315,12 +22902,12 @@
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_101 = "WSubId_101"
+.const 'Sub' WSubId_102 = "WSubId_102"
     getattribute $P1, self, 'name'
     getattribute $P6, self, 'owner'
     $P2 = $P6.'getvar'($P1)
     unless_null $P2, __label_1
-    WSubId_101($P1, $P1)
+    WSubId_102($P1, $P1)
   __label_1: # endif
     $P3 = $P2.'getreg'()
     __ARG_1.'print'($P3)
@@ -22356,7 +22943,7 @@
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'parseSigParameter' :subid('WSubId_151')
+.sub 'parseSigParameter' :subid('WSubId_149')
         .param pmc __ARG_1
         .param pmc __ARG_2
     new $P2, [ 'Winxed'; 'Compiler'; 'SigParameter' ]
@@ -22371,9 +22958,9 @@
 .sub 'SigParameterList' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_76 = "WSubId_76"
-.const 'Sub' WSubId_151 = "WSubId_151"
-    $P2 = WSubId_76(__ARG_1, __ARG_2, WSubId_151, ')')
+.const 'Sub' WSubId_73 = "WSubId_73"
+.const 'Sub' WSubId_149 = "WSubId_149"
+    $P2 = WSubId_73(__ARG_1, __ARG_2, WSubId_149, ")")
     setattribute self, 'params', $P2
 
 .end # SigParameterList
@@ -22435,8 +23022,8 @@
 
 .sub 'emit' :method
         .param pmc __ARG_1
-    __ARG_1.'print'('(')
-    set $S1, ''
+    __ARG_1.'print'("(")
+    set $S1, ""
     getattribute $P2, self, 'params'
     if_null $P2, __label_2
     iter $P3, $P2
@@ -22446,10 +23033,10 @@
     shift $P1, $P3
     __ARG_1.'print'($S1)
     $P1.'emit'(__ARG_1)
-    set $S1, ', '
+    set $S1, ", "
     goto __label_1
   __label_2: # endfor
-    __ARG_1.'print'(')')
+    __ARG_1.'print'(")")
 
 .end # emit
 
@@ -22520,18 +23107,18 @@
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     getattribute $P1, self, 'expr'
     isa $I1, $P1, [ 'Winxed'; 'Compiler'; 'CallExpr' ]
     if $I1 goto __label_1
-    WSubId_30('multi assignment used with non function call', $P1)
+    WSubId_28("multi assignment used with non function call", $P1)
   __label_1: # endif
     $P2 = $P1.'emitcall'(__ARG_1)
     $P1.'prepareargs'(__ARG_1)
     getattribute $P3, self, 'params'
-    __ARG_1.'print'('    ')
+    __ARG_1.'print'("    ")
     $P3.'emit'(__ARG_1)
-    __ARG_1.'print'(' = ', $P2)
+    __ARG_1.'print'(" = ", $P2)
     $P1.'emitargs'(__ARG_1)
     __ARG_1.'say'()
     $P3.'emitdefaults'(__ARG_1)
@@ -22615,20 +23202,20 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
+.const 'Sub' WSubId_76 = "WSubId_76"
 .const 'Sub' WSubId_79 = "WSubId_79"
-.const 'Sub' WSubId_80 = "WSubId_80"
-.const 'Sub' WSubId_33 = "WSubId_33"
+.const 'Sub' WSubId_31 = "WSubId_31"
     self.'ClassSpecifier'(__ARG_2, __ARG_3)
     root_new $P1, ['parrot';'ResizablePMCArray']
     $P2 = __ARG_1.'get'()
     $P3 = $P2.'isstring'()
     if $P3 goto __label_1
-    WSubId_79('literal string', $P2)
+    WSubId_76("literal string", $P2)
   __label_1: # endif
     $P3 = $P2.'rawstring'()
     push $P1, $P3
     $P2 = __ARG_1.'get'()
-    $P3 = $P2.'isop'(']')
+    $P3 = $P2.'isop'("]")
     if $P3 goto __label_2
     $P4 = $P2.'checkop'()
     set $S1, $P4
@@ -22645,23 +23232,23 @@
   __label_6: # case
     goto __label_4 # break
   __label_3: # default
-    WSubId_80('token in class key', $P2)
+    WSubId_79("token in class key", $P2)
   __label_4: # switch end
   __label_7: # do
     $P2 = __ARG_1.'get'()
     $P3 = $P2.'isstring'()
     if $P3 goto __label_10
-    WSubId_79('literal string', $P2)
+    WSubId_76("literal string", $P2)
   __label_10: # endif
     $P3 = $P2.'rawstring'()
     push $P1, $P3
   __label_9: # continue
     $P2 = __ARG_1.'get'()
-    $P3 = $P2.'isop'(',')
+    $P3 = $P2.'isop'(",")
     if_null $P3, __label_8
     if $P3 goto __label_7
   __label_8: # enddo
-    WSubId_33(']', $P2)
+    WSubId_31("]", $P2)
   __label_2: # endif
     setattribute self, 'key', $P1
 
@@ -22737,7 +23324,7 @@
     null $P2
   __label_2: # while
     $P2 = __ARG_1.'get'()
-    $P3 = $P2.'isop'('.')
+    $P3 = $P2.'isop'(".")
     if_null $P3, __label_1
     unless $P3 goto __label_1
     $P2 = __ARG_1.'get'()
@@ -22949,13 +23536,13 @@
         .param pmc __ARG_2
         .param pmc __ARG_3
         .param pmc __ARG_4
+.const 'Sub' WSubId_73 = "WSubId_73"
+.const 'Sub' WSubId_103 = "WSubId_103"
+.const 'Sub' WSubId_31 = "WSubId_31"
+.const 'Sub' WSubId_148 = "WSubId_148"
 .const 'Sub' WSubId_76 = "WSubId_76"
-.const 'Sub' WSubId_102 = "WSubId_102"
-.const 'Sub' WSubId_33 = "WSubId_33"
-.const 'Sub' WSubId_150 = "WSubId_150"
+.const 'Sub' WSubId_81 = "WSubId_81"
 .const 'Sub' WSubId_79 = "WSubId_79"
-.const 'Sub' WSubId_83 = "WSubId_83"
-.const 'Sub' WSubId_80 = "WSubId_80"
     self.'ClassBase'(__ARG_1, __ARG_2, __ARG_3)
     self.'VarContainer'()
     new $P8, [ 'Winxed'; 'Compiler'; 'FunctionContainer' ]
@@ -22968,26 +23555,26 @@
     root_new $P2, ['parrot';'ResizablePMCArray']
     setattribute self, 'members', $P2
     $P3 = __ARG_4.'get'()
-    $P7 = $P3.'isop'(':')
+    $P7 = $P3.'isop'(":")
     if_null $P7, __label_1
     unless $P7 goto __label_1
-    $P9 = WSubId_76(__ARG_4, self, WSubId_102)
+    $P9 = WSubId_73(__ARG_4, self, WSubId_103)
     setattribute self, 'bases', $P9
     $P3 = __ARG_4.'get'()
   __label_1: # endif
-    WSubId_33('{', $P3)
+    WSubId_31("{", $P3)
     getattribute $P8, self, 'classns'
     $P7 = $P8.'fullname'()
-    WSubId_150(self, '__CLASS__', $P7)
+    WSubId_148(self, "__CLASS__", $P7)
     $P3 = __ARG_4.'get'()
   __label_4: # for condition
-    $P7 = $P3.'isop'('}')
+    $P7 = $P3.'isop'("}")
     if $P7 goto __label_3
     $P8 = $P3.'checkkeyword'()
     set $S1, $P8
-    if $S1 == 'function' goto __label_7
-    if $S1 == 'var' goto __label_8
-    if $S1 == 'const' goto __label_9
+    if $S1 == "function" goto __label_7
+    if $S1 == "var" goto __label_8
+    if $S1 == "const" goto __label_9
     goto __label_5
   __label_7: # case
     new $P9, [ 'Winxed'; 'Compiler'; 'MethodStatement' ]
@@ -23000,21 +23587,21 @@
     $P5 = __ARG_4.'get'()
     $P10 = $P5.'isidentifier'()
     if $P10 goto __label_10
-    WSubId_79("member identifier", $P5)
+    WSubId_76("member identifier", $P5)
   __label_10: # endif
     push $P2, $P5
     $P3 = __ARG_4.'get'()
-    $P11 = $P3.'isop'(';')
+    $P11 = $P3.'isop'(";")
     if $P11 goto __label_11
-    WSubId_79("';' in member declaration", $P3)
+    WSubId_76("';' in member declaration", $P3)
   __label_11: # endif
     goto __label_6 # break
   __label_9: # case
-    $P6 = WSubId_83($P3, __ARG_4, self)
+    $P6 = WSubId_81($P3, __ARG_4, self)
     push $P1, $P6
     goto __label_6 # break
   __label_5: # default
-    WSubId_80("item in class", $P3)
+    WSubId_79("item in class", $P3)
   __label_6: # switch end
   __label_2: # for iteration
     $P3 = __ARG_4.'get'()
@@ -23118,9 +23705,9 @@
   __label_4: # endfor
   __label_2:
   __label_1:
-    __ARG_1.'say'('.sub Winxed_class_init :anon :load :init')
+    __ARG_1.'say'(".sub Winxed_class_init :anon :load :init")
     $P8 = self.'getclasskey'()
-    __ARG_1.'say'('    ', 'newclass $P0, ', $P8)
+    __ARG_1.'say'("    ", "newclass $P0, ", $P8)
     set $I1, 1
     getattribute $P8, self, 'bases'
     if_null $P8, __label_6
@@ -23134,11 +23721,11 @@
     inc $I1
     set $S2, $I2
     concat $S1, "$P", $S2
-    __ARG_1.'print'('    ', 'get_class ', $S1, ', ')
+    __ARG_1.'print'("    ", "get_class ", $S1, ", ")
     getattribute $P8, self, 'parent'
     $P1.'emit'(__ARG_1, $P8)
     __ARG_1.'say'()
-    __ARG_1.'say'('    ', 'addparent $P0, ', $S1)
+    __ARG_1.'say'("    ", "addparent $P0, ", $S1)
     goto __label_5
   __label_6: # endfor
     getattribute $P8, self, 'members'
@@ -23149,10 +23736,10 @@
     unless $P11 goto __label_8
     shift $P2, $P11
     __ARG_1.'annotate'($P2)
-    __ARG_1.'say'('    ', "addattribute $P0, '", $P2, "'")
+    __ARG_1.'say'("    ", "addattribute $P0, '", $P2, "'")
     goto __label_7
   __label_8: # endfor
-    __ARG_1.'say'('.end')
+    __ARG_1.'say'(".end")
 
 .end # emit
 
@@ -23198,7 +23785,7 @@
 .end
 .namespace [ 'Winxed'; 'Compiler' ]
 
-.sub 'parseClass' :subid('WSubId_153')
+.sub 'parseClass' :subid('WSubId_151')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
@@ -23207,7 +23794,7 @@
     root_new $P3, ['parrot';'ResizablePMCArray']
     null $P4
   __label_3: # for condition
-    $P5 = $P2.'isop'('.')
+    $P5 = $P2.'isop'(".")
     if_null $P5, __label_2
     unless $P5 goto __label_2
     $P3.'push'($P1)
@@ -23216,7 +23803,7 @@
     $P2 = __ARG_2.'get'()
     goto __label_3
   __label_2: # for end
-    $P5 = $P2.'isop'(';')
+    $P5 = $P2.'isop'(";")
     if_null $P5, __label_4
     unless $P5 goto __label_4
     if_null $P3, __label_7
@@ -23255,10 +23842,10 @@
 .end # parseClass
 
 
-.sub 'open_include' :subid('WSubId_152')
+.sub 'open_include' :subid('WSubId_150')
         .param string __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     getinterp $P1
     $P2 = $P1[9]
     $P3 = $P2[0]
@@ -23273,8 +23860,8 @@
     new $P6, 'ExceptionHandler'
     set_label $P6, __label_3
     push_eh $P6
-    root_new $P4, ['parrot';'FileHandle']
-    $P4.'open'($S2,'r')
+    root_new $P4, ["parrot";"FileHandle"]
+    $P4."open"($S2,"r")
     if_null $P4, __label_5
     $P6 = $P4.'is_closed'()
     if $P6 goto __label_5
@@ -23296,7 +23883,7 @@
   __label_7:
     if_null $P6, __label_6
     unless $P6 goto __label_6
-    WSubId_30('File not found', __ARG_2)
+    WSubId_28("File not found", __ARG_2)
   __label_6: # endif
     $P4.'encoding'("utf8")
     .return($P4)
@@ -23304,26 +23891,26 @@
 .end # open_include
 
 
-.sub 'include_parrot' :subid('WSubId_155')
+.sub 'include_parrot' :subid('WSubId_153')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_79 = "WSubId_79"
-.const 'Sub' WSubId_94 = "WSubId_94"
-.const 'Sub' WSubId_152 = "WSubId_152"
-.const 'Sub' WSubId_49 = "WSubId_49"
+.const 'Sub' WSubId_76 = "WSubId_76"
+.const 'Sub' WSubId_93 = "WSubId_93"
+.const 'Sub' WSubId_150 = "WSubId_150"
+.const 'Sub' WSubId_47 = "WSubId_47"
     $P1 = __ARG_2.'get'()
     $P4 = $P1.'isstring'()
     if $P4 goto __label_1
-    WSubId_79('literal string', $P1)
+    WSubId_76("literal string", $P1)
   __label_1: # endif
-    WSubId_94(';', __ARG_2)
+    WSubId_93(";", __ARG_2)
     $P4 = $P1.'rawstring'()
     null $S1
     if_null $P4, __label_2
     set $S1, $P4
   __label_2:
-    $P2 = WSubId_152($S1, __ARG_1)
+    $P2 = WSubId_150($S1, __ARG_1)
     $P4 = $P2.'readline'()
     null $S2
     if_null $P4, __label_6
@@ -23333,7 +23920,7 @@
     $P5 = $P2.'eof'()
     if $P5 goto __label_4
     substr $S6, $S2, 0, 12
-    ne $S6, '.macro_const', __label_7
+    ne $S6, ".macro_const", __label_7
     set $I1, 12
     null $S3
   __label_9: # while
@@ -23390,10 +23977,10 @@
     substr $S5, $S2, $I1, $I4
     null $I3
     substr $S6, $S5, 0, 2
-    iseq $I4, $S6, '0x'
+    iseq $I4, $S6, "0x"
     if $I4 goto __label_22
     substr $S7, $S5, 0, 2
-    iseq $I4, $S7, '0X'
+    iseq $I4, $S7, "0X"
   __label_22:
     unless $I4 goto __label_20
     substr $S8, $S5, 2
@@ -23404,13 +23991,13 @@
   __label_20: # else
     set $I3, $S5
   __label_21: # endif
-    $P3 = __ARG_3.'createconst'($S4, 'I', 4)
+    $P3 = __ARG_3.'createconst'($S4, "I", 4)
     new $P6, [ 'Winxed'; 'Compiler'; 'TokenInteger' ]
     getattribute $P7, __ARG_1, 'file'
     getattribute $P8, __ARG_1, 'line'
     $P6.'TokenInteger'($P7, $P8, $S4)
     set $P5, $P6
-    $P4 = WSubId_49(__ARG_3, $P5, $I3)
+    $P4 = WSubId_47(__ARG_3, $P5, $I3)
     $P3.'setvalue'($P4)
   __label_7: # endif
   __label_3: # for iteration
@@ -23423,30 +24010,30 @@
 .end # include_parrot
 
 
-.sub 'include_winxed' :subid('WSubId_156')
+.sub 'include_winxed' :subid('WSubId_154')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_30 = "WSubId_30"
-.const 'Sub' WSubId_79 = "WSubId_79"
-.const 'Sub' WSubId_94 = "WSubId_94"
-.const 'Sub' WSubId_152 = "WSubId_152"
+.const 'Sub' WSubId_28 = "WSubId_28"
+.const 'Sub' WSubId_76 = "WSubId_76"
+.const 'Sub' WSubId_93 = "WSubId_93"
+.const 'Sub' WSubId_150 = "WSubId_150"
     isa $I1, __ARG_3, [ 'Winxed'; 'Compiler'; 'RootNamespace' ]
     if $I1 goto __label_1
-    WSubId_30("Must be used at root namespace level", __ARG_1)
+    WSubId_28("Must be used at root namespace level", __ARG_1)
   __label_1: # endif
     $P1 = __ARG_2.'get'()
     $P4 = $P1.'isstring'()
     if $P4 goto __label_2
-    WSubId_79('literal string', $P1)
+    WSubId_76("literal string", $P1)
   __label_2: # endif
-    WSubId_94(';', __ARG_2)
+    WSubId_93(";", __ARG_2)
     $P4 = $P1.'rawstring'()
     null $S1
     if_null $P4, __label_3
     set $S1, $P4
   __label_3:
-    $P2 = WSubId_152($S1, __ARG_1)
+    $P2 = WSubId_150($S1, __ARG_1)
     new $P4, [ 'Winxed'; 'Compiler'; 'Tokenizer' ]
     $P4.'Tokenizer'($P2, $S1, 0)
     set $P3, $P4
@@ -23456,34 +24043,34 @@
 .end # include_winxed
 
 
-.sub 'parsensUsing' :subid('WSubId_154')
+.sub 'parsensUsing' :subid('WSubId_152')
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param pmc __ARG_3
-.const 'Sub' WSubId_98 = "WSubId_98"
-.const 'Sub' WSubId_94 = "WSubId_94"
-.const 'Sub' WSubId_95 = "WSubId_95"
-.const 'Sub' WSubId_30 = "WSubId_30"
-.const 'Sub' WSubId_76 = "WSubId_76"
 .const 'Sub' WSubId_97 = "WSubId_97"
-.const 'Sub' WSubId_79 = "WSubId_79"
+.const 'Sub' WSubId_93 = "WSubId_93"
+.const 'Sub' WSubId_94 = "WSubId_94"
+.const 'Sub' WSubId_28 = "WSubId_28"
+.const 'Sub' WSubId_91 = "WSubId_91"
+.const 'Sub' WSubId_96 = "WSubId_96"
+.const 'Sub' WSubId_76 = "WSubId_76"
     $P1 = __ARG_2.'get'()
-    $P5 = $P1.'iskeyword'('namespace')
+    $P5 = $P1.'iskeyword'("namespace")
     if_null $P5, __label_1
     unless $P5 goto __label_1
-    WSubId_98(__ARG_1, __ARG_2, __ARG_3)
-    WSubId_94(';', __ARG_2)
+    WSubId_97(__ARG_1, __ARG_2, __ARG_3)
+    WSubId_93(";", __ARG_2)
     .return()
   __label_1: # endif
-    $P5 = $P1.'iskeyword'('extern')
+    $P5 = $P1.'iskeyword'("extern")
     if $P5 goto __label_2
     __ARG_2.'unget'($P1)
-    $P2 = WSubId_95(__ARG_2)
+    $P2 = WSubId_94(__ARG_2)
     elements $I1, $P2
     ge $I1, 1, __label_3
-    WSubId_30('Unsupported at namespace level', $P1)
+    WSubId_28("Unsupported at namespace level", $P1)
   __label_3: # endif
-    WSubId_94(';', __ARG_2)
+    WSubId_93(";", __ARG_2)
     __ARG_3.'use'($P2)
     .return()
   __label_2: # endif
@@ -23502,26 +24089,23 @@
     set $S1, $P1
   __label_8:
     __ARG_3.'addlib'($S1)
-    WSubId_94(';', __ARG_2)
+    WSubId_93(";", __ARG_2)
     goto __label_4 # break
   __label_7: # case
     __ARG_2.'unget'($P1)
-    $P3 = WSubId_95(__ARG_2)
-    $P1 = __ARG_2.'get'()
-    $P7 = $P1.'isop'(';')
-    if $P7 goto __label_9
-    __ARG_2.'unget'($P1)
-    null $P5
-    $P4 = WSubId_76(__ARG_2, $P5, WSubId_97, ';')
+    $P3 = WSubId_94(__ARG_2)
+    null $P7
+    $P4 = WSubId_91(__ARG_2, $P7, WSubId_96, ";")
+    if_null $P4, __label_9
     __ARG_3.'addextern'($P3, $P4)
   __label_9: # endif
-    join $S3, '/', $P3
-    concat $S2, '"', $S3
-    concat $S2, $S2, '.pbc"'
+    join $S3, "/", $P3
+    concat $S2, "\"", $S3
+    concat $S2, $S2, ".pbc\""
     __ARG_3.'addload'($S2)
     goto __label_4 # break
   __label_5: # default
-    WSubId_79('string literal or identifier', $P1)
+    WSubId_76("string literal or identifier", $P1)
   __label_4: # switch end
 
 .end # parsensUsing
@@ -23537,9 +24121,9 @@
 .end # External
 
 
-.sub 'emit' :subid('WSubId_19') :method
+.sub 'emit' :subid('WSubId_17') :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_20 = "WSubId_20"
+.const 'Sub' WSubId_18 = "WSubId_18"
 .lex '__WLEX_1', __ARG_1
     __ARG_1.'say'(".sub 'importextern' :anon :load :init\n    .local pmc ex, curns, srcns, symbols\n    ex = new ['Exporter']\n    curns = get_namespace\n    symbols = new ['ResizableStringArray']\n")
     getattribute $P4, self, 'module'
@@ -23548,7 +24132,7 @@
     concat $S2, $S2, "']"
     __ARG_1.'emitget_root_namespace'("srcns", $S2)
     getattribute $P1, self, 'names'
-    newclosure $P2, WSubId_20
+    newclosure $P2, WSubId_18
     if_null $P1, __label_3
     iter $P5, $P1
     set $P5, 0
@@ -23564,12 +24148,12 @@
 .end # emit
 
 
-.sub '' :anon :subid('WSubId_20') :outer('WSubId_19')
+.sub '' :anon :subid('WSubId_18') :outer('WSubId_17')
         .param string __ARG_2
     find_lex $P1, '__WLEX_1'
     $P1.'say'("    push symbols, '", __ARG_2, "'")
 
-.end # WSubId_20
+.end # WSubId_18
 
 .sub Winxed_class_init :anon :load :init
     newclass $P0, [ 'Winxed'; 'Compiler'; 'External' ]
@@ -23639,12 +24223,12 @@
 
 .sub 'fullname' :method
     getattribute $P1, self, 'path'
-    join $S1, '.', $P1
+    join $S1, ".", $P1
     getattribute $P1, self, 'hll'
     if_null $P1, __label_1
     getattribute $P2, self, 'hll'
     set $S2, $P2
-    concat $S3, $S2, '.'
+    concat $S3, $S2, "."
     concat $S3, $S3, $S1
     .return($S3)
     goto __label_2
@@ -23715,21 +24299,21 @@
         .param pmc __ARG_2
         .param string __ARG_3
         .param string __ARG_4 :optional
-.const 'Sub' WSubId_52 = "WSubId_52"
+.const 'Sub' WSubId_48 = "WSubId_48"
     $P1 = self.'samehllas'(__ARG_2)
     if_null $P1, __label_1
     unless $P1 goto __label_1
     $P3 = self.'getparrotkey'()
-    $P2 = WSubId_52("    new %0, %1", __ARG_3, $P3)
+    $P2 = WSubId_48("    new %0, %1", __ARG_3, $P3)
     __ARG_1.'print'($P2)
     goto __label_2
   __label_1: # else
     $P5 = self.'getparrotrootkey'()
-    $P4 = WSubId_52("    root_new %0, %1", __ARG_3, $P5)
+    $P4 = WSubId_48("    root_new %0, %1", __ARG_3, $P5)
     __ARG_1.'print'($P4)
   __label_2: # endif
     if_null __ARG_4, __label_3
-    eq __ARG_4, '', __label_3
+    eq __ARG_4, "", __label_3
     __ARG_1.'print'(__ARG_4)
   __label_3: # endif
     __ARG_1.'say'()
@@ -23759,12 +24343,12 @@
         .param pmc __ARG_1
         .param pmc __ARG_2
         .param string __ARG_3
-.const 'Sub' WSubId_52 = "WSubId_52"
+.const 'Sub' WSubId_48 = "WSubId_48"
     $P3 = self.'samehllas'(__ARG_2)
     if_null $P3, __label_1
     unless $P3 goto __label_1
     $P5 = self.'getparrotkey'()
-    $P4 = WSubId_52("    get_class %0, %1", __ARG_3, $P5)
+    $P4 = WSubId_48("    get_class %0, %1", __ARG_3, $P5)
     __ARG_1.'say'($P4)
     goto __label_2
   __label_1: # else
@@ -23781,19 +24365,19 @@
     downcase $S2, $S3
     goto __label_4
   __label_5:
-    set $S2, 'parrot'
+    set $S2, "parrot"
   __label_4:
     elements $I1, $P2
     unless $I1 goto __label_6
     join $S3, "'; '", $P2
-    $P3 = WSubId_52("    get_root_global %0, ['%1'; '%2'], '%3'", __ARG_3, $S2, $S3, $S1)
+    $P3 = WSubId_48("    get_root_global %0, ['%1'; '%2'], '%3'", __ARG_3, $S2, $S3, $S1)
     __ARG_1.'say'($P3)
     goto __label_7
   __label_6: # else
-    $P4 = WSubId_52("    get_root_global %0, ['%1'], '%2'", __ARG_3, $S2, $S1)
+    $P4 = WSubId_48("    get_root_global %0, ['%1'], '%2'", __ARG_3, $S2, $S1)
     __ARG_1.'say'($P4)
   __label_7: # endif
-    $P3 = WSubId_52("    get_class %0, %0", __ARG_3)
+    $P3 = WSubId_48("    get_class %0, %0", __ARG_3)
     __ARG_1.'say'($P3)
   __label_2: # endif
 
@@ -23828,7 +24412,7 @@
 .sub 'NamespaceBase' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_150 = "WSubId_150"
+.const 'Sub' WSubId_148 = "WSubId_148"
     self.'VarContainer'()
     setattribute self, 'nspath', __ARG_1
     unless_null __ARG_2, __label_1
@@ -23843,7 +24427,7 @@
     set $P2, $P2
     setattribute self, 'funcont', $P2
     $P1 = __ARG_1.'fullname'()
-    WSubId_150(self, '__NAMESPACE__', $P1)
+    WSubId_148(self, "__NAMESPACE__", $P1)
     goto __label_2
   __label_1: # else
     getattribute $P2, __ARG_2, 'locals'
@@ -23879,10 +24463,10 @@
 .end # addfunction
 
 
-.sub 'fixnamespaces' :subid('WSubId_21') :method
+.sub 'fixnamespaces' :subid('WSubId_19') :method
 .const 'Sub' WSubId_5 = "WSubId_5"
 .const 'Sub' WSubId_7 = "WSubId_7"
-.const 'Sub' WSubId_22 = "WSubId_22"
+.const 'Sub' WSubId_20 = "WSubId_20"
 .lex '__WLEX_1', $P1
     getattribute $P2, self, 'namespaces'
     $P3 = WSubId_5("fixnamespaces")
@@ -23898,7 +24482,7 @@
   __label_1:
     $P1 = WSubId_7(self, "usenamespace")
     getattribute $P5, self, 'usednamespaces'
-    newclosure $P6, WSubId_22
+    newclosure $P6, WSubId_20
     if_null $P5, __label_6
     iter $P9, $P5
     set $P9, 0
@@ -23913,7 +24497,7 @@
 .end # fixnamespaces
 
 
-.sub '' :anon :subid('WSubId_22') :outer('WSubId_21')
+.sub '' :anon :subid('WSubId_20') :outer('WSubId_19')
         .param pmc __ARG_1
     find_lex $P1, '__WLEX_1'
     getattribute $P2, __ARG_1, 'usednamespaces'
@@ -23929,7 +24513,7 @@
   __label_3: # endfor
   __label_1:
 
-.end # WSubId_22
+.end # WSubId_20
 
 
 .sub 'getpath' :method
@@ -23997,12 +24581,12 @@
 .end # use
 
 
-.sub 'getusedns' :subid('WSubId_23') :method
+.sub 'getusedns' :subid('WSubId_21') :method
         .param string __ARG_1
-.const 'Sub' WSubId_24 = "WSubId_24"
+.const 'Sub' WSubId_22 = "WSubId_22"
 .lex '__WLEX_1', __ARG_1
     getattribute $P1, self, 'usednamespaces'
-    newclosure $P2, WSubId_24
+    newclosure $P2, WSubId_22
     if_null $P1, __label_3
     iter $P5, $P1
     set $P5, 0
@@ -24025,7 +24609,7 @@
 .end # getusedns
 
 
-.sub '' :anon :subid('WSubId_24') :outer('WSubId_23')
+.sub '' :anon :subid('WSubId_22') :outer('WSubId_21')
         .param pmc __ARG_2
     find_lex $S1, '__WLEX_1'
     getattribute $P1, __ARG_2, 'name'
@@ -24034,15 +24618,15 @@
     iseq $I1, $S3, $S2
     .return($I1)
 
-.end # WSubId_24
+.end # WSubId_22
 
 
-.sub 'getlocalns' :subid('WSubId_25') :method
+.sub 'getlocalns' :subid('WSubId_23') :method
         .param string __ARG_1
-.const 'Sub' WSubId_26 = "WSubId_26"
+.const 'Sub' WSubId_24 = "WSubId_24"
 .lex '__WLEX_1', __ARG_1
     getattribute $P2, self, 'namespaces'
-    newclosure $P3, WSubId_26
+    newclosure $P3, WSubId_24
     if_null $P2, __label_3
     iter $P5, $P2
     set $P5, 0
@@ -24067,7 +24651,7 @@
 .end # getlocalns
 
 
-.sub '' :anon :subid('WSubId_26') :outer('WSubId_25')
+.sub '' :anon :subid('WSubId_24') :outer('WSubId_23')
         .param pmc __ARG_2
     find_lex $S1, '__WLEX_1'
     getattribute $P1, __ARG_2, 'name'
@@ -24076,7 +24660,7 @@
     iseq $I1, $S3, $S2
     .return($I1)
 
-.end # WSubId_26
+.end # WSubId_24
 
 
 .sub 'addextern' :method
@@ -24100,12 +24684,12 @@
 .end # addextern
 
 
-.sub 'checkclass_base' :subid('WSubId_27') :method
+.sub 'checkclass_base' :subid('WSubId_25') :method
         .param string __ARG_1
-.const 'Sub' WSubId_28 = "WSubId_28"
+.const 'Sub' WSubId_26 = "WSubId_26"
 .lex '__WLEX_1', __ARG_1
     getattribute $P3, self, 'classes'
-    newclosure $P4, WSubId_28
+    newclosure $P4, WSubId_26
     if_null $P3, __label_3
     iter $P6, $P3
     set $P6, 0
@@ -24144,7 +24728,7 @@
 .end # checkclass_base
 
 
-.sub '' :anon :subid('WSubId_28') :outer('WSubId_27')
+.sub '' :anon :subid('WSubId_26') :outer('WSubId_25')
         .param pmc __ARG_2
     find_lex $S1, '__WLEX_1'
     getattribute $P1, __ARG_2, 'name'
@@ -24153,7 +24737,7 @@
     iseq $I1, $S3, $S2
     .return($I1)
 
-.end # WSubId_28
+.end # WSubId_26
 
 
 .sub 'findsymbolbyname' :method
@@ -24292,7 +24876,7 @@
 .sub 'parsenamespace' :method
         .param pmc __ARG_1
         .param pmc __ARG_2
-.const 'Sub' WSubId_33 = "WSubId_33"
+.const 'Sub' WSubId_31 = "WSubId_31"
     $P1 = __ARG_2.'get'()
     null $S1
     if_null $P1, __label_1
@@ -24301,7 +24885,7 @@
     $P1 = __ARG_2.'get'()
     set $P2, self
   __label_4: # for condition
-    $P5 = $P1.'isop'('.')
+    $P5 = $P1.'isop'(".")
     if_null $P5, __label_3
     unless $P5 goto __label_3
     null $P6
@@ -24313,7 +24897,7 @@
     goto __label_4
   __label_3: # for end
     null $P3
-    $P5 = $P1.'isop'('[')
+    $P5 = $P1.'isop'("[")
     if_null $P5, __label_5
     unless $P5 goto __label_5
     new $P6, [ 'Winxed'; 'Compiler'; 'ModifierList' ]
@@ -24321,7 +24905,7 @@
     set $P3, $P6
     $P1 = __ARG_2.'get'()
   __label_5: # endif
-    WSubId_33('{', $P1)
+    WSubId_31("{", $P1)
     $P4 = $P2.'childnamespace'(__ARG_1, $S1, $P3)
     $P4.'parse'(__ARG_2)
 
@@ -24330,17 +24914,17 @@
 
 .sub 'parseextern' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_30 = "WSubId_30"
-.const 'Sub' WSubId_134 = "WSubId_134"
-.const 'Sub' WSubId_94 = "WSubId_94"
+.const 'Sub' WSubId_28 = "WSubId_28"
+.const 'Sub' WSubId_78 = "WSubId_78"
+.const 'Sub' WSubId_93 = "WSubId_93"
     $P1 = __ARG_1.'get'()
-    $P3 = $P1.'iskeyword'('function')
+    $P3 = $P1.'iskeyword'("function")
     if $P3 goto __label_1
-    WSubId_30('Unsupported extern', $P1)
+    WSubId_28("Unsupported extern", $P1)
   __label_1: # endif
     $P1 = __ARG_1.'get'()
-    WSubId_134($P1)
-    WSubId_94(';', __ARG_1)
+    WSubId_78($P1)
+    WSubId_93(";", __ARG_1)
     new $P3, [ 'Winxed'; 'Compiler'; 'FunctionExtern' ]
     $P3.'FunctionExtern'($P1, self)
     set $P2, $P3
@@ -24351,42 +24935,42 @@
 
 .sub 'parse' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_83 = "WSubId_83"
+.const 'Sub' WSubId_81 = "WSubId_81"
+.const 'Sub' WSubId_151 = "WSubId_151"
+.const 'Sub' WSubId_152 = "WSubId_152"
 .const 'Sub' WSubId_153 = "WSubId_153"
 .const 'Sub' WSubId_154 = "WSubId_154"
-.const 'Sub' WSubId_155 = "WSubId_155"
-.const 'Sub' WSubId_156 = "WSubId_156"
+.const 'Sub' WSubId_76 = "WSubId_76"
+.const 'Sub' WSubId_93 = "WSubId_93"
 .const 'Sub' WSubId_79 = "WSubId_79"
-.const 'Sub' WSubId_94 = "WSubId_94"
-.const 'Sub' WSubId_80 = "WSubId_80"
     getattribute $P1, self, 'items'
     null $P2
     $P2 = __ARG_1.'get'()
   __label_3: # for condition
     $P6 = $P2.'iseof'()
     if $P6 goto __label_4
-    $P6 = $P2.'isop'('}')
+    $P6 = $P2.'isop'("}")
   __label_4:
     if $P6 goto __label_2
     $P7 = $P2.'checkkeyword'()
     set $S1, $P7
-    if $S1 == 'namespace' goto __label_7
-    if $S1 == 'const' goto __label_8
-    if $S1 == 'function' goto __label_9
-    if $S1 == 'inline' goto __label_10
-    if $S1 == 'class' goto __label_11
-    if $S1 == 'extern' goto __label_12
-    if $S1 == 'using' goto __label_13
-    if $S1 == '$include_const' goto __label_14
-    if $S1 == '$include' goto __label_15
-    if $S1 == '$load' goto __label_16
-    if $S1 == '$loadlib' goto __label_17
+    if $S1 == "namespace" goto __label_7
+    if $S1 == "const" goto __label_8
+    if $S1 == "function" goto __label_9
+    if $S1 == "inline" goto __label_10
+    if $S1 == "class" goto __label_11
+    if $S1 == "extern" goto __label_12
+    if $S1 == "using" goto __label_13
+    if $S1 == "$include_const" goto __label_14
+    if $S1 == "$include" goto __label_15
+    if $S1 == "$load" goto __label_16
+    if $S1 == "$loadlib" goto __label_17
     goto __label_5
   __label_7: # case
     self.'parsenamespace'($P2, __ARG_1)
     goto __label_6 # break
   __label_8: # case
-    $P3 = WSubId_83($P2, __ARG_1, self)
+    $P3 = WSubId_81($P2, __ARG_1, self)
     push $P1, $P3
     goto __label_6 # break
   __label_9: # case
@@ -24403,27 +24987,27 @@
     self.'addfunction'($P5)
     goto __label_6 # break
   __label_11: # case
-    WSubId_153($P2, __ARG_1, self)
+    WSubId_151($P2, __ARG_1, self)
     goto __label_6 # break
   __label_12: # case
     self.'parseextern'(__ARG_1)
     goto __label_6 # break
   __label_13: # case
-    WSubId_154($P2, __ARG_1, self)
+    WSubId_152($P2, __ARG_1, self)
     goto __label_6 # break
   __label_14: # case
-    WSubId_155($P2, __ARG_1, self)
+    WSubId_153($P2, __ARG_1, self)
     goto __label_6 # break
   __label_15: # case
-    WSubId_156($P2, __ARG_1, self)
+    WSubId_154($P2, __ARG_1, self)
     goto __label_6 # break
   __label_16: # case
     $P2 = __ARG_1.'get'()
     $P10 = $P2.'isstring'()
     if $P10 goto __label_18
-    WSubId_79('string literal', $P2)
+    WSubId_76("string literal", $P2)
   __label_18: # endif
-    WSubId_94(';', __ARG_1)
+    WSubId_93(";", __ARG_1)
     new $P13, [ 'Winxed'; 'Compiler'; 'StringLiteral' ]
     $P13.'StringLiteral'(self, $P2)
     set $P12, $P13
@@ -24434,9 +25018,9 @@
     $P2 = __ARG_1.'get'()
     $P14 = $P2.'isstring'()
     if $P14 goto __label_19
-    WSubId_79('string literal', $P2)
+    WSubId_76("string literal", $P2)
   __label_19: # endif
-    WSubId_94(';', __ARG_1)
+    WSubId_93(";", __ARG_1)
     new $P17, [ 'Winxed'; 'Compiler'; 'StringLiteral' ]
     $P17.'StringLiteral'(self, $P2)
     set $P16, $P17
@@ -24444,7 +25028,7 @@
     self.'addlib'($P15)
     goto __label_6 # break
   __label_5: # default
-    WSubId_80("token", $P2)
+    WSubId_79("token", $P2)
   __label_6: # switch end
   __label_1: # for iteration
     $P2 = __ARG_1.'get'()
@@ -24561,7 +25145,7 @@
     setattribute self, 'modifier', __ARG_5
     null $I1
     if_null __ARG_5, __label_1
-    $P2 = __ARG_5.'pick'('HLL')
+    $P2 = __ARG_5.'pick'("HLL")
     if_null $P2, __label_2
     box $P3, __ARG_4
     setattribute self, 'hll', $P3
@@ -24654,9 +25238,9 @@
 
 
 .sub 'unclosed_ns' :method
-.const 'Sub' WSubId_30 = "WSubId_30"
+.const 'Sub' WSubId_28 = "WSubId_28"
     getattribute $P1, self, 'start'
-    WSubId_30('unclosed namespace', $P1)
+    WSubId_28("unclosed namespace", $P1)
 
 .end # unclosed_ns
 
@@ -24681,10 +25265,10 @@
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_52 = "WSubId_52"
+.const 'Sub' WSubId_48 = "WSubId_48"
     getattribute $P1, self, 'hll'
     if_null $P1, __label_1
-    $P2 = WSubId_52(".HLL '%0'", $P1)
+    $P2 = WSubId_48(".HLL '%0'", $P1)
     __ARG_1.'say'($P2)
   __label_1: # endif
     self.'emit_base'(__ARG_1)
@@ -24735,7 +25319,7 @@
     inc $P1
     set $I1, $P1
     set $S1, $I1
-    concat $S2, 'WSubId_', $S1
+    concat $S2, "WSubId_", $S1
     .return($S2)
 
 .end # generatesubid
@@ -24788,8 +25372,8 @@
 
 .sub 'close_ns' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_30 = "WSubId_30"
-    WSubId_30('Cannot close root namespace', __ARG_1)
+.const 'Sub' WSubId_28 = "WSubId_28"
+    WSubId_28("Cannot close root namespace", __ARG_1)
 
 .end # close_ns
 
@@ -24811,11 +25395,11 @@
 .sub 'emit' :method
         .param pmc __ARG_1
 .const 'Sub' WSubId_9 = "WSubId_9"
-.const 'Sub' WSubId_52 = "WSubId_52"
+.const 'Sub' WSubId_48 = "WSubId_48"
     getattribute $P1, self, 'bultins_used'
-    $P12 = $P1['chomp']
+    $P12 = $P1["chomp"]
     if_null $P12, __label_1
-    self.'addload'('"String/Utils.pbc"')
+    self.'addload'("\"String/Utils.pbc\"")
   __label_1: # endif
     split $P12, " ", "acos asin atan cos exp ln sin tan pow sinh cosh tanh"
     if_null $P12, __label_3
@@ -24856,7 +25440,7 @@
     if_null $P3, __label_9
     set $P8, $P3
     root_new $P9, ['parrot';'ResizablePMCArray']
-    $P10 = WSubId_9('    load_bytecode ')
+    $P10 = WSubId_9("    load_bytecode ")
     if_null $P8, __label_12
     iter $P18, $P8
     set $P18, 0
@@ -24871,7 +25455,7 @@
   __label_10:
     set $P12, $P17
     join $S2, "\n", $P12
-    $P12 = WSubId_52(".sub initial_load_bytecode :anon :load :init\n%0\n.end\n", $S2)
+    $P12 = WSubId_48(".sub initial_load_bytecode :anon :load :init\n%0\n.end\n", $S2)
     __ARG_1.'say'($P12)
   __label_9: # endif
     isnull $I1, $P2
@@ -24881,7 +25465,7 @@
     not $I1
   __label_14:
     unless $I1 goto __label_13
-    __ARG_1.'comment'('end libs')
+    __ARG_1.'comment'("end libs")
   __label_13: # endif
     self.'emit_base'(__ARG_1)
 
@@ -24903,7 +25487,7 @@
     if $I1 goto __label_5
     $P5 = $P2.'gettype'()
     set $S2, $P5
-    isne $I1, $S2, 'I'
+    isne $I1, $S2, "I"
   __label_5:
     if $I1 goto __label_4
     $P6 = $P2.'getflags'()
@@ -24915,7 +25499,7 @@
   __label_3: # endif
     $P3 = $P2.'getvalue'()
     $P5 = $P3.'getIntegerValue'()
-    __ARG_1.'say'('.macro_const ', $S1, ' ', $P5)
+    __ARG_1.'say'(".macro_const ", $S1, " ", $P5)
     goto __label_1
   __label_2: # endfor
 
@@ -25025,9 +25609,9 @@
         .param string __ARG_1
         .param int __ARG_2
         .param int __ARG_3
-.const 'Sub' WSubId_157 = "WSubId_157"
-.const 'Sub' WSubId_150 = "WSubId_150"
-.const 'Sub' WSubId_158 = "WSubId_158"
+.const 'Sub' WSubId_155 = "WSubId_155"
+.const 'Sub' WSubId_148 = "WSubId_148"
+.const 'Sub' WSubId_156 = "WSubId_156"
     box $P4, __ARG_1
     setattribute self, 'sourcefile', $P4
     not $I1, __ARG_2
@@ -25036,20 +25620,20 @@
     new $P4, [ 'Winxed'; 'Compiler'; 'RootNamespace' ]
     $P4.'RootNamespace'(self)
     set $P1, $P4
-    WSubId_157($P1, 'false', 0)
-    WSubId_157($P1, 'true', 1)
-    WSubId_150($P1, '__STAGE__', "4")
-    WSubId_157($P1, '__DEBUG__', __ARG_3)
-    WSubId_157($P1, '__WINXED_ERROR__', 567)
+    WSubId_155($P1, "false", 0)
+    WSubId_155($P1, "true", 1)
+    WSubId_148($P1, "__STAGE__", "4")
+    WSubId_155($P1, "__DEBUG__", __ARG_3)
+    WSubId_155($P1, "__WINXED_ERROR__", 567)
     new $P5, [ 'Winxed'; 'Compiler'; 'TokenEof' ]
-    $P5.'TokenEof'('__builtins__')
+    $P5.'TokenEof'("__builtins__")
     set $P4, $P5
     null $P6
     $P2 = $P1.'childnamespace'($P4, "Winxed_Builtins", $P6)
     new $P3, [ 'Winxed'; 'Compiler'; 'BuiltinBuilder' ]
     $P3.'BuiltinBuilder'()
     set $P3, $P3
-    WSubId_158($P3)
+    WSubId_156($P3)
     $P3.'put'($P2)
     $P1.'usenamespace'($P2)
     setattribute self, 'rootns', $P1
@@ -25085,9 +25669,9 @@
 
 .sub 'emit' :method
         .param pmc __ARG_1
-.const 'Sub' WSubId_159 = "WSubId_159"
-    __ARG_1.'comment'('THIS IS A GENERATED FILE! DO NOT EDIT!')
-    $S2 = WSubId_159()
+.const 'Sub' WSubId_157 = "WSubId_157"
+    __ARG_1.'comment'("THIS IS A GENERATED FILE! DO NOT EDIT!")
+    $S2 = WSubId_157()
     __ARG_1.'comment'("Compiled with ", $S2)
     getattribute $P1, self, 'sourcefile'
     null $S1
@@ -25095,25 +25679,25 @@
     set $S1, $P1
   __label_1:
     if_null $S1, __label_2
-    eq $S1, '', __label_2
+    eq $S1, "", __label_2
     __ARG_1.'comment'("Source file: ", $S1)
   __label_2: # endif
-    __ARG_1.'comment'('Begin generated code')
-    __ARG_1.'say'('')
+    __ARG_1.'comment'("Begin generated code")
+    __ARG_1.'say'("")
     getattribute $P1, self, 'rootns'
     $P1.'emit'(__ARG_1)
-    __ARG_1.'comment'('End generated code')
+    __ARG_1.'comment'("End generated code")
 
 .end # emit
 
 
 .sub 'emitinclude' :method
         .param pmc __ARG_1
-    __ARG_1.'comment'('DO NOT EDIT THIS FILE')
-    __ARG_1.'comment'('Generated automatically from Winxed sources')
+    __ARG_1.'comment'("DO NOT EDIT THIS FILE")
+    __ARG_1.'comment'("Generated automatically from Winxed sources")
     getattribute $P1, self, 'rootns'
     $P1.'emitinclude'(__ARG_1)
-    __ARG_1.'comment'('End')
+    __ARG_1.'comment'("End")
 
 .end # emitinclude
 
@@ -25126,15 +25710,15 @@
 .namespace [ 'Winxed'; 'Compiler'; 'WinxedHLL' ]
 
 .sub 'version' :method
-.const 'Sub' WSubId_29 = "WSubId_29"
-    .tailcall WSubId_29()
+.const 'Sub' WSubId_27 = "WSubId_27"
+    .tailcall WSubId_27()
 
 .end # version
 
 
 .sub 'version_string' :method
-.const 'Sub' WSubId_159 = "WSubId_159"
-    .tailcall WSubId_159()
+.const 'Sub' WSubId_157 = "WSubId_157"
+    .tailcall WSubId_157()
 
 .end # version_string
 
@@ -25148,13 +25732,13 @@
         .param int __ARG_6
         .param int __ARG_7
     set $S2, __ARG_2
-    ne $S2, 'parse', __label_1
+    ne $S2, "parse", __label_1
     .return(__ARG_1)
   __label_1: # endif
     null $P1
     unless_null __ARG_3, __label_2
     new $P1, [ 'StringHandle' ]
-    $P1.'open'('__eval__', 'w')
+    $P1.'open'("__eval__", "w")
     goto __label_3
   __label_2: # else
     set $P1, __ARG_3
@@ -25182,9 +25766,9 @@
   __label_8:
     null $P3
     set $S2, __ARG_2
-    if $S2 == 'pir' goto __label_11
-    if $S2 == 'pbc' goto __label_12
-    if $S2 == '' goto __label_13
+    if $S2 == "pir" goto __label_11
+    if $S2 == "pbc" goto __label_12
+    if $S2 == "" goto __label_13
     goto __label_9
   __label_11: # case
     new $P3, [ 'String' ]
@@ -25192,12 +25776,12 @@
     goto __label_10 # break
   __label_12: # case
   __label_13: # case
-    compreg $P4, 'PIR'
+    compreg $P4, "PIR"
     $P3 = $P4.'compile'($S1)
     goto __label_10 # break
   __label_9: # default
     set $S4, __ARG_2
-    concat $S5, 'Invalid target: ', $S4
+    concat $S5, "Invalid target: ", $S4
     die $S5
   __label_10: # switch end
     .return($P3)
@@ -25212,7 +25796,7 @@
     null $P1
     unless_null __ARG_2, __label_1
     new $P1, [ 'StringHandle' ]
-    $P1.'open'('__eval__', 'w')
+    $P1.'open'("__eval__", "w")
     goto __label_2
   __label_1: # else
     set $P1, __ARG_2
@@ -25241,27 +25825,27 @@
         .param int __ARG_5 :optional :named('noan')
         .param int __ARG_6 :optional :named('nowarn')
     unless_null __ARG_2, __label_1
-    set __ARG_2, ''
+    set __ARG_2, ""
   __label_1: # endif
     new $P1, [ 'StringHandle' ]
-    $P1.'open'('__eval__', 'w')
+    $P1.'open'("__eval__", "w")
     $P1.'puts'(__ARG_1)
     $P1.'close'()
-    $P1.'open'('__eval__', 'r')
+    $P1.'open'("__eval__", "r")
     new $P4, [ 'Winxed'; 'Compiler'; 'Tokenizer' ]
-    $P4.'Tokenizer'($P1, '__eval__', __ARG_6)
+    $P4.'Tokenizer'($P1, "__eval__", __ARG_6)
     set $P2, $P4
     new $P4, [ 'Winxed'; 'Compiler'; 'WinxedCompileUnit' ]
-    $P4.'WinxedCompileUnit'('', __ARG_6, __ARG_4)
+    $P4.'WinxedCompileUnit'("", __ARG_6, __ARG_4)
     set $P3, $P4
     $P3.'parse'($P2)
     $P1.'close'()
     $P3.'optimize'()
-    ne __ARG_2, 'include', __label_2
+    ne __ARG_2, "include", __label_2
     .tailcall self.'__private_geninclude'($P3, __ARG_3)
     goto __label_3
   __label_2: # else
-    .tailcall self.'__private_compile_tail'($P3, __ARG_2, __ARG_3, '__eval__', __ARG_4, __ARG_5, __ARG_6)
+    .tailcall self.'__private_compile_tail'($P3, __ARG_2, __ARG_3, "__eval__", __ARG_4, __ARG_5, __ARG_6)
   __label_3: # endif
 
 .end # compile
@@ -25275,11 +25859,11 @@
         .param int __ARG_5 :optional :named('noan')
         .param int __ARG_6 :optional :named('nowarn')
     unless_null __ARG_2, __label_1
-    set __ARG_2, ''
+    set __ARG_2, ""
   __label_1: # endif
     new $P1, [ 'FileHandle' ]
-    $P1.'open'(__ARG_1, 'r')
-    $P1.'encoding'('utf8')
+    $P1.'open'(__ARG_1, "r")
+    $P1.'encoding'("utf8")
     new $P4, [ 'Winxed'; 'Compiler'; 'Tokenizer' ]
     $P4.'Tokenizer'($P1, __ARG_1, __ARG_6)
     set $P2, $P4
@@ -25289,7 +25873,7 @@
     $P3.'parse'($P2)
     $P1.'close'()
     $P3.'optimize'()
-    ne __ARG_2, 'include', __label_2
+    ne __ARG_2, "include", __label_2
     .tailcall self.'__private_geninclude'($P3, __ARG_3)
     goto __label_3
   __label_2: # else
@@ -25305,7 +25889,7 @@
 
 .sub 'initializer' :init :load
     new $P1, [ 'Winxed'; 'Compiler'; 'WinxedHLL' ]
-    compreg 'winxed', $P1
+    compreg "winxed", $P1
 
 .end # initializer
 

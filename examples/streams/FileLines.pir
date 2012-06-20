@@ -1,4 +1,4 @@
-=head1 Advanced Lines Example
+=head1 DESCRIPTION
 
 This is an advanced example.
 

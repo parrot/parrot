@@ -1004,13 +1004,10 @@ lib/Parrot/IO/File.pm                                       [devel]lib
 lib/Parrot/IO/Path.pm                                       [devel]lib
 lib/Parrot/Install.pm                                       [devel]lib
 lib/Parrot/Manifest.pm                                      [devel]lib
-lib/Parrot/Pmc2c/Attribute.pm                               [devel]lib
 lib/Parrot/Pmc2c/Dumper.pm                                  [devel]lib
 lib/Parrot/Pmc2c/Emitter.pm                                 [devel]lib
 lib/Parrot/Pmc2c/Library.pm                                 [devel]lib
-lib/Parrot/Pmc2c/MULTI.pm                                   [devel]lib
 lib/Parrot/Pmc2c/Method.pm                                  [devel]lib
-lib/Parrot/Pmc2c/Object.pm                                  [devel]lib
 lib/Parrot/Pmc2c/PCCMETHOD.pm                               [devel]lib
 lib/Parrot/Pmc2c/PMC.pm                                     [devel]lib
 lib/Parrot/Pmc2c/PMC/Null.pm                                [devel]lib
@@ -1453,10 +1450,10 @@ src/string/encoding/ucs4.c                                  []
 src/string/encoding/unicode.h                               []
 src/string/encoding/utf16.c                                 []
 src/string/encoding/utf8.c                                  []
-src/string/sprintf.c                                        []
 src/string/spf_private.h                                    []
 src/string/spf_render.c                                     []
 src/string/spf_vtable.c                                     []
+src/string/sprintf.c                                        []
 src/sub.c                                                   []
 src/utils.c                                                 []
 src/vtable.tbl                                              [devel]src
@@ -2184,7 +2181,7 @@ tools/dev/parrot_fuzzer.py                                  []
 tools/dev/parrot_shell.pl                                   []
 tools/dev/parrotbench.pl                                    []
 tools/dev/pbc_header.pl                                     []
-tools/dev/pbc_to_exe.pir                                    [devel]
+tools/dev/pbc_to_exe.winxed                                 []
 tools/dev/perlcritic-cage.conf                              []
 tools/dev/perlcritic.conf                                   []
 tools/dev/perltidy.conf                                     []

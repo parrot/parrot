@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 Subroutines in a Namespace
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's namespaces (continued.
+
+=head1 SUBROUTINES IN A NAMESPACE
 
 Subroutines created in one namespace can be accessed from another
 using the C<get_global> opcode, just like global variables. In fact,

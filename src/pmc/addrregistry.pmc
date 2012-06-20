@@ -184,7 +184,7 @@ reaches 0, delete the entry.
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
         const void *oldval;
-        long        newval = 1;
+        ptrcast_t   newval = 1;
         Hash       *hash;
         UNUSED(value);
 
@@ -193,14 +193,14 @@ reaches 0, delete the entry.
         oldval = Parrot_hash_get(INTERP, hash, key);
 
         if (oldval)
-            newval += (long)oldval;
+            newval += (ptrcast_t)oldval;
 
         Parrot_hash_put(INTERP, hash, key, (void *)newval);
     }
 
     VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
         const void *oldval;
-        long        newval = 1;
+        ptrcast_t   newval = 1;
         Hash       *hash;
         UNUSED(value);
 
@@ -209,7 +209,7 @@ reaches 0, delete the entry.
         oldval = Parrot_hash_get(INTERP, hash, key);
 
         if (oldval)
-            newval += (long)oldval;
+            newval += (ptrcast_t)oldval;
 
         Parrot_hash_put(INTERP, hash, key, (void *)newval);
     }
@@ -229,8 +229,8 @@ reaches 0, delete the entry.
 
         /* these casts look bad, but they avoid type punning warnings with -O */
         if (value) {
-            long val = (long)value;
-            if (val == 1L)
+            ptrcast_t val = (ptrcast_t)value;
+            if (val == 1)
                 Parrot_hash_delete(INTERP, hash, key);
             else {
                 value = (void *)(--val);
@@ -248,8 +248,8 @@ reaches 0, delete the entry.
 
         /* these casts look bad, but they avoid type punning warnings with -O */
         if (value) {
-            long val = (long)value;
-            if (val == 1L)
+            ptrcast_t val = (ptrcast_t)value;
+            if (val == 1)
                 Parrot_hash_delete(INTERP, hash, key);
             else {
                 value = (void *)(--val);

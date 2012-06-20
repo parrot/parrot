@@ -130,7 +130,7 @@ sub add_mixin {
 
 sub add_attribute {
     my ( $self, $attribute ) = @_;
-    $self->{has_attribute}{ $attribute->name } = @{ $self->{attributes} };
+    $self->{has_attribute}{ $attribute->{name} } = @{ $self->{attributes} };
     push @{ $self->{attributes} }, $attribute;
 }
 
@@ -472,17 +472,17 @@ sub prep_for_emit {
 
 sub generate {
     my ($self) = @_;
-    my $emitter = $self->{emitter} =
+    my $c_emitter = $self->{emitter} =
         Parrot::Pmc2c::Emitter->new( $self->filename(".c") );
 
     $self->generate_c_file;
-    $emitter->write_to_file;
+    $c_emitter->write_to_file;
 
-    $emitter = $self->{emitter} =
+    my $h_emitter = $self->{emitter} =
         Parrot::Pmc2c::Emitter->new( $self->filename(".h", $self->is_dynamic) );
 
     $self->generate_h_file;
-    $emitter->write_to_file;
+    $h_emitter->write_to_file;
 }
 
 =over 4
@@ -794,6 +794,7 @@ EOC
         $self->add_method($new_method);
     }
 }
+
 =item C<gen_methods()>
 
 Returns the C code for the pmc methods.
@@ -828,20 +829,19 @@ Returns the C code for the attribute struct definition.
 
 sub gen_attributes {
     my ($self)     = @_;
-    my $attributes = $self->attributes;
 
-    if ( @{$attributes} ) {
+    if ( @{$self->attributes} ) {
 
-        Parrot::Pmc2c::Attribute::generate_start( $attributes->[0], $self );
+        $self->generate_start();
 
-        foreach my $attribute ( @{$attributes} ) {
-            $attribute->generate_declaration($self);
+        foreach my $attr ( @{$self->attributes} ) {
+            $self->generate_declaration($attr);
         }
 
-        Parrot::Pmc2c::Attribute::generate_end( $attributes->[0], $self );
+        $self->generate_end();
 
-        foreach my $attribute ( @{$attributes} ) {
-            $attribute->generate_accessor($self);
+        foreach my $attr ( @{$self->attributes} ) {
+            $self->generate_accessor($attr);
         }
     }
 }
@@ -1572,7 +1572,7 @@ sub generate_single_case {
     if ($type eq 'DEFAULT' || $type eq 'PMC') {
         # For default case we have to handle return manually.
         my ($pcc_signature, $retval, $call_tail, $pcc_return)
-                = gen_defaul_case_wrapping($impl);
+                = gen_default_case_wrapping($impl);
         my $dispatch = "Parrot_mmd_multi_dispatch_from_c_args(INTERP, \"$vt_method_name\", \"$pcc_signature\", SELF, $parameters$call_tail);";
 
         $case = <<"CASE";
@@ -1612,7 +1612,7 @@ CASE
 
 # Generate (pcc_signature, retval holder, pcc_call_tail, return statement)
 # for default case in switch.
-sub gen_defaul_case_wrapping {
+sub gen_default_case_wrapping {
     my $method = shift;
 
     local $_ = $method->return_type;
@@ -1651,6 +1651,210 @@ sub gen_defaul_case_wrapping {
     else {
         die "Can't handle return type `$_'!";
     }
+}
+
+=head2 C<generate_start>
+
+Generate and emit the C code for the start of an attribute struct.
+
+=cut
+
+sub generate_start {
+    my ( $pmc ) = @_;
+
+    $pmc->{emitter}->emit(<<"EOH");
+
+/* $pmc->{name} PMC's underlying struct. */
+typedef struct Parrot_$pmc->{name}_attributes {
+EOH
+
+    return 1;
+}
+
+=head2 C<generate_end>
+
+Generate and emit the C code for the end of an attribute struct.
+
+=cut
+
+sub generate_end {
+    my ( $pmc ) = @_;
+    my $name           = $pmc->{name};
+    my $ucname         = uc($name);
+
+    $pmc->{emitter}->emit(<<"EOH");
+} Parrot_${name}_attributes;
+
+/* Macro to access underlying structure of a $name PMC. */
+#define PARROT_${ucname}(o) ((Parrot_${name}_attributes *) PMC_data(o))
+
+EOH
+
+    return 1;
+}
+
+=head2 C<generate_declaration>
+
+Generate and emit the C code for an attribute declaration.
+
+=cut
+
+sub generate_declaration {
+    my ( $pmc, $attribute ) = @_;
+    my $decl = '    ' . $attribute->{type} . ' ' . $attribute->{name} . $attribute->{array_size} . ";\n";
+
+    $pmc->{emitter}->emit($decl);
+
+    return 1;
+}
+
+=head2 C<generate_accessor>
+
+Generate and emit the C code for an attribute get/set accessor pair.
+
+=cut
+
+sub generate_accessor {
+    my ( $pmc, $attribute ) = @_;
+
+    my $pmcname        = $pmc->{name};
+    my $attrtype       = $attribute->{type};
+    my $attrname       = $attribute->{name};
+    my $isfuncptr      = 0;
+    my $origtype       = $attrtype;
+    if($attrname =~ m/\(\*(\w*)\)\((.*?)\)/) {
+        $isfuncptr = 1;
+        $origtype = $attrtype . " (*)(" . $2 . ")";
+        $attrname = $1;
+    }
+
+    # Store regexes used to check some types to avoid repetitions
+    my $isptrtostring = qr/STRING\s*\*$/;
+    my $isptrtopmc    = qr/PMC\s*\*$/;
+
+    my $inherit        = 1;
+    my $decl           = <<"EOA";
+
+/* Generated macro accessors for '$attrname' attribute of $pmcname PMC. */
+#define GETATTR_${pmcname}_${attrname}(interp, pmc, dest) \\
+    do { \\
+        if (!PObj_is_object_TEST(pmc)) { \\
+            (dest) = ((Parrot_${pmcname}_attributes *)PMC_data(pmc))->$attrname; \\
+        } \\
+        else { \\
+EOA
+
+    if ($isfuncptr == 1) {
+        $decl .= <<"EOA";
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, \\
+                "Attributes of type '$origtype' cannot be " \\
+                "subclassed from a high-level PMC."); \\
+EOA
+    }
+    elsif ($attrtype eq "INTVAL") {
+        $decl .= <<"EOA";
+            PMC * const attr_value = VTABLE_get_attr_str(interp, \\
+                              pmc, Parrot_str_new_constant(interp, "$attrname")); \\
+            (dest) = (PMC_IS_NULL(attr_value) ? (INTVAL) 0: VTABLE_get_integer(interp, attr_value)); \\
+EOA
+    }
+    elsif ($attrtype eq "FLOATVAL") {
+        $decl .= <<"EOA";
+            PMC * const attr_value = VTABLE_get_attr_str(interp, \\
+                              pmc, Parrot_str_new_constant(interp, "$attrname")); \\
+            (dest) =  (PMC_IS_NULL(attr_value) ? (FLOATVAL) 0.0: VTABLE_get_number(interp, attr_value)); \\
+EOA
+    }
+    elsif ($attrtype =~ $isptrtostring) {
+        $decl .= <<"EOA";
+            PMC * const attr_value = VTABLE_get_attr_str(interp, \\
+                              pmc, Parrot_str_new_constant(interp, "$attrname")); \\
+            (dest) =  (PMC_IS_NULL(attr_value) ? (STRING *)NULL : VTABLE_get_string(interp, attr_value)); \\
+EOA
+    }
+    elsif ($attrtype =~ $isptrtopmc) {
+        $decl .= <<"EOA";
+            (dest) = VTABLE_get_attr_str(interp, \\
+                              pmc, Parrot_str_new_constant(interp, "$attrname")); \\
+EOA
+    }
+
+    else {
+        $inherit = 0;
+        $decl .= <<"EOA";
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, \\
+                "Attributes of type '$attrtype' cannot be " \\
+                "subclassed from a high-level PMC."); \\
+EOA
+    }
+
+    $decl .= <<"EOA";
+        } \\
+    } while (0)
+
+#define SETATTR_${pmcname}_${attrname}(interp, pmc, value) \\
+    do { \\
+        if (PObj_is_object_TEST(pmc)) { \\
+EOA
+
+    if ($isfuncptr == 1) {
+        $decl .= <<"EOA";
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, \\
+                "Attributes of type '$origtype' cannot be " \\
+                "subclassed from a high-level PMC."); \\
+EOA
+    }
+    elsif ($attrtype eq "INTVAL") {
+        $decl .= <<"EOA";
+            PMC * const attr_value = Parrot_pmc_new_init_int(interp, enum_class_Integer, value); \\
+            VTABLE_set_attr_str(interp, pmc, \\
+                              Parrot_str_new_constant(interp, "$attrname"), attr_value); \\
+EOA
+    }
+    elsif ($attrtype eq "FLOATVAL") {
+        $decl .= <<"EOA";
+            PMC * const attr_value = Parrot_pmc_new(interp, enum_class_Float); \\
+            VTABLE_set_number_native(interp, attr_value, value); \\
+            VTABLE_set_attr_str(interp, pmc, \\
+                              Parrot_str_new_constant(interp, "$attrname"), attr_value); \\
+EOA
+    }
+    elsif ($attrtype =~ $isptrtostring) {
+        $decl .= <<"EOA";
+            PMC * const attr_value = Parrot_pmc_new(interp, enum_class_String); \\
+            VTABLE_set_string_native(interp, attr_value, value); \\
+            VTABLE_set_attr_str(interp, pmc, \\
+                              Parrot_str_new_constant(interp, "$attrname"), attr_value); \\
+EOA
+    }
+    elsif ($attrtype =~ $isptrtopmc) {
+        $decl .= <<"EOA";
+            VTABLE_set_attr_str(interp, pmc, \\
+                              Parrot_str_new_constant(interp, "$attrname"), value); \\
+EOA
+    }
+
+    else {
+        $decl .= <<"EOA";
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, \\
+                "Attributes of type '$attrtype' cannot be " \\
+                "subclassed from a high-level PMC."); \\
+EOA
+    }
+
+    $decl .= <<"EOA";
+        } \\
+        else \\
+            ((Parrot_${pmcname}_attributes *)PMC_data(pmc))->$attrname = (value); \\
+    } while (0)
+
+EOA
+
+    $attribute->{inherit} = $inherit;
+
+    $pmc->{emitter}->emit($decl);
+
+    return 1;
 }
 
 

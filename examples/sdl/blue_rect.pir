@@ -1,5 +1,6 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
 
-=head1 TITLE
+=head1 NAME
 
 blue_rect.pir - draw a blue rectangle with the SDL Parrot bindings
 
@@ -8,7 +9,10 @@ blue_rect.pir - draw a blue rectangle with the SDL Parrot bindings
 To run this file, run the following command from the Parrot directory:
 
     $ ./parrot examples/sdl/blue_rect.pir
-    $
+
+=head1 DESCRIPTION
+
+This is a PIR program which draws a blue rectangle with SDL Parrot bindings.
 
 =cut
 
@@ -53,7 +57,7 @@ To run this file, run the following command from the Parrot directory:
 
 chromatic, E<lt>chromatic at wgz dot orgE<gt>.
 
-=head1 COPYRIGHt
+=head1 COPYRIGHT
 
 Copyright (C) 2004-2008, Parrot Foundation.
 

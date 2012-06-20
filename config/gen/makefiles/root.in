@@ -684,6 +684,8 @@ $(LIBRARY_DIR)/Config/JSON.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT) $(DYNEXT_DIR)/sy
 $(LIBRARY_DIR)/LWP/UserAgent.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
 
 # constant string support
+# To accommodate 'nmake', we're stuck with suffix rules rather than pattern
+# rule.
 .c.str : # suffix rule (limited support)
 	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl $< > $@
 
@@ -906,6 +908,9 @@ $(PARROT) : $(FRPTWO_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
+
+$(DEV_TOOLS_DIR)/pbc_to_exe.pir: $(DEV_TOOLS_DIR)/pbc_to_exe.winxed $(PARROT) $(WINXED_LANG) winxed.pbc
+	$(PARROT) winxed.pbc -c --noan $(DEV_TOOLS_DIR)/pbc_to_exe.winxed
 
 $(PBC_TO_EXE) : $(DEV_TOOLS_DIR)/pbc_to_exe.pir $(LIBRARY_DIR)/config.pir $(PARROT) $(DYNEXT_DIR)/os$(LOAD_EXT) $(DYNEXT_DIR)/file$(LOAD_EXT)
 	$(PARROT) -o pbc_to_exe.pbc $(DEV_TOOLS_DIR)/pbc_to_exe.pir
@@ -2363,6 +2368,7 @@ clean : \
 	$(RM_F) $(FLUID_FILES_2)
 	$(RM_RF) lib/Parrot/OpLib
 	$(RM_RF) runtime/parrot/languages/data_json
+	$(RM_F) runtime/parrot/languages/JSON/JSON.pir
 	$(RM_F) $(NQP_CLEANUPS) $(PGE_CLEANUPS) $(TGE_CLEANUPS)
 	$(RM_F) $(PCT_CLEANUPS) $(DATA_JSON_CLEANUPS)
 	$(RM_F) $(DYNOPLIBS_CLEANUPS) $(DYNPMC_CLEANUPS)
@@ -2389,6 +2395,7 @@ prog-clean :
 	$(INSTALLABLENCITHUNKGEN) \
 	$(INSTALLABLEPARROT_PROVE) \
 	$(INSTALLABLEWINXED) \
+	$(DEV_TOOLS_DIR)/pbc_to_exe.pir \
 	pbc_to_exe.pbc pbc_to_exe.c pbc_to_exe$(O) pbc_to_exe$(EXE) \
 	$(NCI_THUNK_GEN) parrot_nci_thunk_gen.c parrot_nci_thunk_gen$(O) parrot_nci_thunk_gen.pbc \
 	ops2c.pbc ops2c.c ops2c$(O) ops2c$(EXE) ops2c.pir \
@@ -2401,6 +2408,7 @@ prog-clean :
 	$(PBC_MERGE) $(FR_DIR)/pbc_merge/main$(O) \
 	$(DIS) $(FR_DIR)/pbc_disassemble/main$(O)
 	$(RM_F) \
+	$(FRP_DIR)/main$(O) \
 	$(FRPTWO_DIR)/main$(O) \
 	parrot_old \
 	src/null_config$(O) \
@@ -2475,8 +2483,8 @@ dynext-clean :
 # or is there an automatic xargs?
 test-clean :
 	$(RM_F) t/compilers/data_json/*.pir
-	$(RM_F) t/compilers/imcc/syn/*.pir t/compilers/imcc/syn/*.pasm
-	$(RM_F) t/compilers/imcc/reg/*.pir t/compilers/imcc/reg/*.pasm
+	$(RM_F) t/compilers/imcc/syn/*.pir t/compilers/imcc/syn/*.pasm t/compilers/imcc/syn/*.pbc
+	$(RM_F) t/compilers/imcc/reg/*.pir t/compilers/imcc/reg/*.pasm t/compilers/imcc/reg/*.pbc
 	$(RM_F) t/compilers/pct/*.pir
 	$(RM_F) t/compilers/pge/perl6regex/*.pir
 	$(RM_F) t/compilers/pge/*.pir

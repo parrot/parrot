@@ -1,7 +1,14 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
 
-=head1 Parrot Compiler Toolkit (PCT)
+=pod
 
-This is an implementation of an abstract tree representation
-and compiler for Parrot. 
+=head1 NAME
+
+compiler/pct/README.pod - Readme file for the 'compiler/pct/' directory. 
+
+=head1 DESCRIPTION
+
+This is an implementation of an abstract tree representation and compiler for
+Parrot. 
 
 =cut

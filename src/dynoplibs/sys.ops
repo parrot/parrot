@@ -125,7 +125,7 @@ op decodelocaltime(out PMC, in INT) {
 
 ########################################
 
-=item B<sysinfo>(out STR, in INT)
+=item B<sysinfo>(out INT, in INT)
 
 Return system information. The values it returns depends on what you
 ask. They are:
@@ -144,7 +144,7 @@ ask. They are:
 
 =back
 
-=item B<sysinfo>(out INT, in INT)
+=item B<sysinfo>(out STR, in INT)
 
 Return system information. The values it returns depends on what you
 ask. They are:

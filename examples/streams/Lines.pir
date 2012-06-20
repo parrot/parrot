@@ -1,5 +1,5 @@
 
-=head1 Lines Example
+=head1 DESCRIPTION
 
 This example demonstrates what C<Stream::Lines> does.
 

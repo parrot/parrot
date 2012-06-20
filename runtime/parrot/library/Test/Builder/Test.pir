@@ -7,6 +7,10 @@ Test::Builder::Test - base class for all Test::Builder test objects
 
 See L<Test::Builder>.  You probably don't need to use this directly.
 
+=head1 DESCRIPTION
+
+This PIR program is a base class for all Test::Builder test objects.
+
 =head1 METHODS
 
 This class provides the following methods:

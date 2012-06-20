@@ -511,6 +511,27 @@ Aggregate interface.
         }
 
     }
+
+    /* returns integer, values taken from PCC */
+    METHOD get_type() {
+        INTVAL ret;
+        switch (KEY_get_FLAGS(SELF)) {
+            case KEY_integer_FLAG:
+            case KEY_integer_FLAG | KEY_register_FLAG:
+                ret = 0;
+                break;
+            case KEY_string_FLAG:
+            case KEY_string_FLAG | KEY_register_FLAG:
+                ret = 1;
+                break;
+            case KEY_pmc_FLAG:
+            case KEY_pmc_FLAG | KEY_register_FLAG:
+                ret = 2;
+                break;
+        }
+
+        RETURN(INTVAL ret);
+    }
 }
 
 /*

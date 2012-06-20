@@ -94,6 +94,11 @@ typedef enum {
     GC_LAZY_MARK_RUNS,
     EXTENDED_PMCS,
     CURRENT_RUNCORE,
+    PARROT_INTSIZE,
+    PARROT_FLOATSIZE,
+    PARROT_POINTERSIZE,
+    PARROT_INTMAX,
+    PARROT_INTMIN,
 
     /* interpinfo_p constants */
     CURRENT_CTX,
@@ -106,7 +111,12 @@ typedef enum {
     EXECUTABLE_FULLNAME,
     EXECUTABLE_BASENAME,
     RUNTIME_PREFIX,
-    GC_SYS_NAME
+    GC_SYS_NAME,
+    PARROT_OS,
+    PARROT_OS_VERSION,
+    PARROT_OS_VERSION_NUMBER,
+    CPU_ARCH,
+    CPU_TYPE
 } Interpinfo_enum;
 
 /* &end_gen */

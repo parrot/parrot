@@ -28,6 +28,10 @@ Functions related to managing the Parrot interpreter
 #include "parrot/has_header.h"
 #include "imcc/embed.h"
 
+#ifdef PARROT_HAS_HEADER_SYSUTSNAME
+#  include <sys/utsname.h>
+#endif
+
 static Interp* emergency_interp = NULL;
 
 /* HEADERIZER HFILE: include/parrot/interpreter.h */
@@ -812,6 +816,26 @@ Parrot_interp_info(PARROT_INTERP, INTVAL what)
       case CURRENT_RUNCORE:
         ret = interp->run_core->id;
         break;
+        /*
+         * sysinfo attributes go here.
+         * We may deprecate sysinfo dynop in favour of interpinfo in future,
+         * or retain both.
+         */
+      case PARROT_INTSIZE:
+        ret = sizeof (INTVAL);
+        break;
+      case PARROT_FLOATSIZE:
+        ret = sizeof (FLOATVAL);
+        break;
+      case PARROT_POINTERSIZE:
+        ret = sizeof (void *);
+        break;
+      case PARROT_INTMIN:
+        ret = PARROT_INTVAL_MIN;
+        break;
+      case PARROT_INTMAX:
+        ret = PARROT_INTVAL_MAX;
+        break;
       default:        /* or a warning only? */
         ret = -1;
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
@@ -858,7 +882,7 @@ Parrot_interp_info_p(PARROT_INTERP, INTVAL what)
         break;
       default:        /* or a warning only? */
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-                "illegal argument in Parrot_interp_info");
+                "illegal argument in Parrot_interp_info_p");
     }
 
     /* Don't send NULL values to P registers */
@@ -929,9 +953,41 @@ Parrot_interp_info_s(PARROT_INTERP, INTVAL what)
         }
         case CURRENT_RUNCORE:
             return interp->run_core->name;
+            /*
+             * sysinfo attributes go here. we may deprecate these in favour of interpinfo ops
+             * in future.
+             */
+        case PARROT_OS:
+            return Parrot_str_new_constant(interp, BUILD_OS_NAME);
+        case CPU_ARCH:
+            return Parrot_str_new_init(interp, PARROT_CPU_ARCH,
+                    sizeof (PARROT_CPU_ARCH) - 1, Parrot_ascii_encoding_ptr, 0);
+        case CPU_TYPE:
+            return Parrot_get_cpu_type(interp);
+
+#ifdef PARROT_HAS_HEADER_SYSUTSNAME
+        case PARROT_OS_VERSION:
+            {
+                struct utsname info;
+                if (uname(&info) == 0) {
+                    return Parrot_str_new_init(interp, info.version,
+                        strlen(info.version),  Parrot_ascii_encoding_ptr, 0);
+                }
+            }
+            break;
+          case PARROT_OS_VERSION_NUMBER:
+            {
+                struct utsname info;
+                if (uname(&info) == 0) {
+                    return Parrot_str_new_init(interp, info.release,
+                        strlen(info.release),  Parrot_ascii_encoding_ptr, 0);
+                }
+            }
+            break;
+#endif
       default:
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-                "illegal argument in Parrot_interp_info");
+                "illegal argument in Parrot_interp_info_s");
     }
 }
 

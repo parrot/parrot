@@ -4,11 +4,10 @@
 
 TGE::Grammar - The base class for all tree grammars.
 
-=head1 SYNOPSIS
-
-(To come.)
-
 =head1 DESCRIPTION
+
+TGE::Grammar is the base class for all of the tree grammars for the Tree
+Grammar Engine
 
 =cut
 

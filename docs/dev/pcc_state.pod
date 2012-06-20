@@ -1,8 +1,19 @@
-=head1 parrot calling conventions state table
+# Copyright (C) 2001-2012, Parrot Foundation.
 
-this document expresses the calling conventions as outlined in PDD03 in table
-format. this is a work in progress, which, when finished, should assist in
+=pod
+
+=head1 NAME
+
+docs/dev/pcc_state.pod - Readme file for the Parrot Calling Conventions State
+Table. 
+
+=head1 DESCRIPTION
+
+This document expresses the calling conventions as outlined in PDD03 in table
+format. This is a work in progress, which, when finished, should assist in
 creating an exhaustive test suite for calling conventions.
+
+=head1 PARROT CALLING CONVENTIONS STATE TABLE
 
               1      2      3      4      5      6      7      8      9
 

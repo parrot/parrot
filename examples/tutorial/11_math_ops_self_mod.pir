@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 Math Operations (continued)
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's math operations (continued).
+
+=head1 MATH OPERATIONS
 
 There is a second common form of math operations. This form takes
 one argument and performs the operation on the result, modifying it in

@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 External C Function Call
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's external C function call.
+
+=head1 EXTERNAL C FUNCTION CALL
 
 There is a vast wealth of libraries written for a variety of tasks, and
 Parrot can tap into most of them using an interface called NCI. NCI

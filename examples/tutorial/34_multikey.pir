@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 Multi-Level Keys
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's mult-level keys.
+
+=head1 MULTI-LEVEL KEYS
 
 Hashes and arrays can be combined in a number of ways to
 make interesting and complex data structures. A hash may

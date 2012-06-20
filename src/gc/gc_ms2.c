@@ -7,6 +7,8 @@ src/gc/gc_ms2.c - Non-recursive M&S
 
 =head1 DESCRIPTION
 
+This program implements a non-recursive M&S garbage collection.
+
 =cut
 
 */

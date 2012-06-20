@@ -769,7 +769,7 @@ inspect_str.
 
 =item C<PMC *get_class()>
 
-Returns SELF. A PMC is its own class.
+Returns the class or PMCProxy of the type of the PMC.
 
 =cut
 

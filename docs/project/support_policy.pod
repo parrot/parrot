@@ -6,11 +6,11 @@
 
 docs/project/support_policy.pod - Parrot Release and Support Policy
 
-=head1 ABSTRACT
+=head1 DESCRIPTION
 
 This document describes Parrot's release schedule and support policy.
 
-=head1 Parrot Release and Support Policy
+=head1 PARROT RELEASE AND SUPPORT POLICY
 
 Parrot's support policy -- for bug reporting, patches, and releases -- relies
 strongly on its release schedule.
@@ -237,7 +237,7 @@ C<PARROT_API> are considered opaque.  We do not guarantee backwards
 compatibility between monthly releases for the layout of these pointers;
 dereference them at your own risk.
 
-=head1 Historical Notes
+=head1 HISTORICAL NOTES
 
 Before 1.0, version numbers were ad hoc. Our 1.0 release did not occur in
 January, so no 1.X releases are from the same months as their 2.X 

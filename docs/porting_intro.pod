@@ -1,10 +1,12 @@
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
 
 =head1 NAME
 
 docs/porting_intro.pod - Parrot Subsystem Porting Introduction
 
-=head1 OVERVIEW
+=head1 DESCRIPTION
 
 This document is an introduction to porting the optional subsystems of Parrot
 onto a new architecture once the core successfully builds.  It assumes passing
@@ -12,7 +14,7 @@ familiarity with common VM techniques but relatively little knowledge of Parrot
 internals.  For each feature, a brief description of its purpose, hints on
 helping to port it, and pointers to more information are included.
 
-=head1 Threads
+=head1 THREADS
 
 =head2 What it is
 
@@ -81,7 +83,7 @@ thereof are greatly needed.
 
 =back
 
-=head1 Dynloading
+=head1 DYNLOADING
 
 =head2 What it is
 
@@ -126,7 +128,7 @@ information.  The platform-specific source files implement memory allocation
 wrappers that hide these details, so wading deep into Parrot is probably not a
 prerequisite for this task.
 
-=head2 References
+=head1 REFERENCES
 
 =over 4
 

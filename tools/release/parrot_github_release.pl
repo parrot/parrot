@@ -347,7 +347,7 @@ sub update_releases_html {
     my $ul = '<ul>';
     my $li = '<li><a href="./parrot-docs' . $major . '/' . $major . '.' .
       $minor . '.' . $patch . '/html/index.html">Release ' . $major . '.' .
-      $minor . '.' . $patch . '</a></li>';
+      $minor . '.' . $patch . '</a></li>' . "\n";
 
     open my $FH, '+<', 'releases.html' or stop("Unable to open 'releases.html'");
     while (<$FH>) {

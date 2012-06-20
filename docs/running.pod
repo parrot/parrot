@@ -1,20 +1,22 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
 
 =head1 NAME
 
 docs/running.pod - Running
 
-=head1 VERSION
-
-$Revision$
-
-=head1 OVERVIEW
-
-This document describes Parrot's command line options.
-
 =head1 SYNOPSIS
 
  parrot [-options] <file> [arguments ...]
+
+=head1 DESCRIPTION
+
+This document describes Parrot's command line options.
+
+=head1 VERSION
+
+$Revision$
 
 =head1 ENVIRONMENT
 
@@ -219,9 +221,9 @@ If the C<file> is a single dash, input from C<stdin> is read.
 Optional arguments passed to the running program as ARGV. The program is
 assumed to know what to do with these.
 
-=head1 Generated files
+=head1 GENERATED FILES
 
-=head1 About runcores
+=head1 ABOUT RUNCORES
 
 The runcore (or runloop) tells Parrot how to find the C code that implements
 each instruction.  Parrot provides more than one way to do this, partly because
@@ -253,7 +255,7 @@ for more information.
 The trace and profile cores are also based on the "slow" core, doing
 full bounds checking, and also printing runtime information to stderr.
 
-=head1 Operation table
+=head1 OPERATION TABLE
 
  Command Line          Action         Output
  ---------------------------------------------
