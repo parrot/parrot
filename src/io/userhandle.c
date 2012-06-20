@@ -1,3 +1,21 @@
+/*
+Copyright (C) 2001-2012, Parrot Foundation.
+
+=head1 NAME
+
+src/io/pipe.c - IO_VTABLE and helpers for Pipes
+
+=head1 DESCRIPTION
+
+This file implements the IO_VTABLE for user-defined types
+
+=cut
+
+=head2 IO_VTABLE Functions
+
+=over 4
+
+*/
 
 #include "parrot/parrot.h"
 #include "io_private.h"
@@ -271,3 +289,18 @@ io_userhandle_get_encoding(PARROT_INTERP, ARGIN(PMC *handle))
     IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
     IO_VTABLE_UNIMPLEMENTED(interp, vtable, "get_encoding");
 }
+
+/*
+
+=back
+
+=cut
+
+*/
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */
