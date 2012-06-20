@@ -811,6 +811,33 @@ Parrot_io_buffer_seek(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
 
 /*
 
+=item C<PIOOFF_T Parrot_io_buffer_tell(PARROT_INTERP, IO_BUFFER *buffer, PMC
+*handle, const IO_VTABLE * vtable)>
+
+Find the current position of the file, taking into account the read-ahead
+data in the read buffer. If the handle has a write buffer, it is assumed
+that the write buffer has been flushed prior to calling this routine.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PIOOFF_T
+Parrot_io_buffer_tell(PARROT_INTERP, ARGIN_NULLOK(IO_BUFFER *buffer),
+        ARGMOD(PMC *handle), ARGIN(const IO_VTABLE * vtable))
+{
+    ASSERT_ARGS(Parrot_io_buffer_tell)
+    if (!buffer || BUFFER_IS_EMPTY(buffer))
+        return vtable->tell(interp, handle);
+    {
+        const size_t used_size = BUFFER_USED_SIZE(buffer);
+        return vtable->tell(interp, handle) - used_size;
+    }
+}
+
+/*
+
 =back
 
 =cut

@@ -994,6 +994,16 @@ PIOOFF_T Parrot_io_buffer_seek(PARROT_INTERP,
         FUNC_MODIFIES(*buffer)
         FUNC_MODIFIES(*handle);
 
+PARROT_WARN_UNUSED_RESULT
+PIOOFF_T Parrot_io_buffer_tell(PARROT_INTERP,
+    ARGIN_NULLOK(IO_BUFFER *buffer),
+    ARGMOD(PMC *handle),
+    ARGIN(const IO_VTABLE * vtable))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*handle);
+
 size_t Parrot_io_buffer_write_b(PARROT_INTERP,
     ARGMOD_NULLOK(IO_BUFFER *buffer),
     ARGMOD(PMC * handle),
@@ -1066,6 +1076,10 @@ size_t Parrot_io_buffer_write_b(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_io_buffer_seek __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(buffer) \
+    , PARROT_ASSERT_ARG(handle) \
+    , PARROT_ASSERT_ARG(vtable))
+#define ASSERT_ARGS_Parrot_io_buffer_tell __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \
     , PARROT_ASSERT_ARG(vtable))
 #define ASSERT_ARGS_Parrot_io_buffer_write_b __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

@@ -1139,12 +1139,13 @@ Parrot_io_tell(PARROT_INTERP, ARGMOD(PMC *handle))
         return -1;
     {
         const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+        IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
+        IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
 
-        /* TODO: We may have data in the read buffer, so this might not be
-           accurate. However, this is what the old system was doing so we
-           can stick with the same semantic until we come up with something
-           more sane. */
-        return vtable->tell(interp, handle);
+        if (write_buffer)
+            Parrot_io_buffer_flush(interp, write_buffer, handle, vtable);
+
+        return Parrot_io_buffer_tell(interp, read_buffer, handle, vtable);
     }
 }
 
