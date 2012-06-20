@@ -1,15 +1,11 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
-=head1 PDD 13: Bytecode
+=head1 [DRAFT] PDD 13: Bytecode
 
 =head2 Abstract
 
 This PDD describes the file format for Parrot Bytecode (PBC) files and the
 interface through which they may be manipulated programmatically.
-
-
-
-
 
 =head2 Synopsis
 
