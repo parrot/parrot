@@ -126,7 +126,7 @@ struct _ParrotIOData {
 /* Throw an exception if this vtable is not implemented. */
 #define IO_VTABLE_UNIMPLEMENTED(i, v, s) do { \
         Parrot_ex_throw_from_c_args((i), NULL, EXCEPTION_PIO_ERROR, \
-            "Method '%s' not implemented for type %s", s, v->name); \
+            "Method '%s' not implemented for type %s", (s), (v)->name); \
     } while (0)
 
 /* Return value from IO_VTABLE->total_size if the total size of the stream
@@ -134,11 +134,11 @@ struct _ParrotIOData {
 #define PIO_UNKNOWN_SIZE (size_t)-1
 
 /* Buffer Macros */
-#define BUFFER_IS_EMPTY(b) (b->buffer_start >= b->buffer_end)
-#define BUFFER_IS_FULL(b)  ((size_t)(b->buffer_end - b->buffer_start) == b->buffer_size)
-#define BUFFER_USED_SIZE(b) ((size_t)(b->buffer_end - b->buffer_start))
-#define BUFFER_FREE_HEAD_SPACE(b) (b->buffer_start - b->buffer_ptr)
-#define BUFFER_FREE_END_SPACE(b) (b->buffer_size - ((b)->buffer_end - (b)->buffer_ptr))
+#define BUFFER_IS_EMPTY(b) ((b)->buffer_start >= (b)->buffer_end)
+#define BUFFER_IS_FULL(b)  ((size_t)((b)->buffer_end - (b)->buffer_start) == (b)->buffer_size)
+#define BUFFER_USED_SIZE(b) ((size_t)((b)->buffer_end - (b)->buffer_start))
+#define BUFFER_FREE_HEAD_SPACE(b) ((b)->buffer_start - (b)->buffer_ptr)
+#define BUFFER_FREE_END_SPACE(b) ((b)->buffer_size - ((b)->buffer_end - (b)->buffer_ptr))
 #define BUFFER_CAN_BE_NORMALIZED(b) (BUFFER_FREE_HEAD_SPACE(b) > BUFFER_USED_SIZE(b))
 
 #define BUFFER_ASSERT_SANITY(b) do { \
@@ -152,7 +152,7 @@ struct _ParrotIOData {
     } while (0);
 
 #define BUFFER_DBG_PRINT(b) do { \
-        fprintf(stderr, "\t%x [%x - %x]\n", b->buffer_ptr, b->buffer_start, b->buffer_end); \
+        fprintf(stderr, "\t%x [%x - %x]\n", (b)->buffer_ptr, (b)->buffer_start, (b)->buffer_end); \
         fprintf(stderr, "\t\t(%d + %d + %d)\n", BUFFER_FREE_HEAD_SPACE(b), BUFFER_USED_SIZE(b), BUFFER_FREE_END_SPACE(b)); \
         fprintf(stderr, "\t\t\t = %d\n", BUFFER_FREE_HEAD_SPACE(b) + BUFFER_USED_SIZE(b) + BUFFER_FREE_END_SPACE(b)); \
     } while (0);
