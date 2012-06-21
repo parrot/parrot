@@ -127,7 +127,7 @@ struct _ParrotIOData {
 #define IO_VTABLE_UNIMPLEMENTED(i, v, s) do { \
         Parrot_ex_throw_from_c_args((i), NULL, EXCEPTION_PIO_ERROR, \
             "Method '%s' not implemented for type %s", s, v->name); \
-    } while(0)
+    } while (0)
 
 /* Return value from IO_VTABLE->total_size if the total size of the stream
    cannot be determined ahead of time */

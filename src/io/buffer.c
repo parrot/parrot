@@ -132,7 +132,7 @@ Parrot_io_buffer_free(PARROT_INTERP, ARGFREE(IO_BUFFER *buffer))
         if (buffer->flags & PIO_BF_MALLOC)  {
             mem_sys_free(buffer->buffer_start);
         }
-        else if(buffer->flags & PIO_BF_MMAP) {
+        else if (buffer->flags & PIO_BF_MMAP) {
             /* TODO */
         }
     }
