@@ -34,17 +34,6 @@ PIOOFF_T piooffsetzero;
 
 /* HEADERIZER HFILE: include/parrot/io.h */
 /* HEADERIZER BEGIN: static */
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
-
-PARROT_CANNOT_RETURN_NULL
-static const STR_VTABLE * get_encoding(PARROT_INTERP, ARGIN(PMC *pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-#define ASSERT_ARGS_get_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc))
-/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*
@@ -116,7 +105,7 @@ Parrot_io_init(PARROT_INTERP)
 void
 io_setup_vtables(PARROT_INTERP)
 {
-    ASSERT_ARGS(io_setup_vtables);
+    ASSERT_ARGS(io_setup_vtables)
     const int number_of_vtables = 5;
     interp->piodata->vtables = (const IO_VTABLE*)mem_gc_allocate_n_zeroed_typed(interp,
                                                                 number_of_vtables, const IO_VTABLE);

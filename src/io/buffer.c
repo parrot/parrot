@@ -426,6 +426,7 @@ static INTVAL
 io_buffer_requires_flush(SHIM_INTERP, ARGIN(IO_BUFFER *buffer),
         ARGIN(char * s), size_t length)
 {
+    ASSERT_ARGS(io_buffer_requires_flush)
     /* Something of an ugly hack borrowed from the old system. If we're in
        line buffered mode we need to flush more often. Flush when we see a
        newline character. */
