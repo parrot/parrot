@@ -9,13 +9,15 @@ src/io/filehandle.c - FileHandle IO_VTABLE and helper routines.
 
 This file implements the standard VTABLE for FileHandles and file IO
 operations. It relies on several low-level routines in
-L<src/platform/xxx/io.c>.
+src/platform/xxx/io.c.
 
 =cut
 
 =head2 IO_VTABLE Functions
 
 =over 4
+
+=cut
 
 */
 
@@ -672,9 +674,11 @@ io_filehandle_get_os_handle(SHIM_INTERP, ARGIN(const PMC *filehandle))
 
 =back
 
-=head 2 Helper Functions
+=head2 Helper Functions
 
 =over 4
+
+=cut
 
 */
 

@@ -9,11 +9,11 @@ src/io/pipe.c - IO_VTABLE and helpers for Pipes
 
 This file implements the IO_VTABLE for pipes and helper functions.
 
-=cut
-
 =head2 IO_VTABLE Functions
 
 =over 4
+
+=cut
 
 */
 

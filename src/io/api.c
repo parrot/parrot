@@ -10,6 +10,10 @@ src/io/api.c - Parrot I/O API
 The Parrot I/O subsystem provides the core I/O functionality for all parts of
 Parrot. This file implements the public interface to the I/O subsystem.
 
+=head1 Functions
+
+=over 4
+
 =cut
 
 */
@@ -238,9 +242,13 @@ Parrot_io_mark(PARROT_INTERP, ARGIN(ParrotIOData *piodata))
 
 /*
 
+=back
+
 =head2 Generic I/O interface
 
 =over 4
+
+=cut
 
 */
 

@@ -567,7 +567,7 @@ the next codepoint. This is to preserve backwards compatibility with the old
 system. An updated peek operation will try to read the first codepoint
 instead.
 
-=cut.
+=cut
 
 */
 
