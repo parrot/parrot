@@ -791,7 +791,8 @@ Parrot_io_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
                 available_bytes = Parrot_io_buffer_fill(interp, read_buffer, handle, vtable);
             }
             return s;
-        } else {
+        }
+        else {
             IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
             STRING * const s = io_get_new_empty_string(interp, encoding, -1, total_size);
 
