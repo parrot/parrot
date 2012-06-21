@@ -80,12 +80,14 @@ Parrot_io_init(PARROT_INTERP)
 
         os_handle = Parrot_io_internal_std_os_handle(interp, PIO_STDIN_FILENO);
         handle    = Parrot_io_fdopen_flags(interp, PMCNULL, os_handle, PIO_F_READ);
-        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_READ_BUFFER, BUFFER_SIZE_ANY, PIO_BF_BLKBUF);
+        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_READ_BUFFER, BUFFER_SIZE_ANY,
+                                       PIO_BF_BLKBUF);
         _PIO_STDIN(interp) = handle;
 
         os_handle = Parrot_io_internal_std_os_handle(interp, PIO_STDOUT_FILENO);
         handle    = Parrot_io_fdopen_flags(interp, PMCNULL, os_handle, PIO_F_WRITE);
-        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY, PIO_BF_LINEBUF);
+        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY,
+                                       PIO_BF_LINEBUF);
         _PIO_STDOUT(interp) = handle;
 
         os_handle           = Parrot_io_internal_std_os_handle(interp, PIO_STDERR_FILENO);
@@ -116,7 +118,8 @@ io_setup_vtables(PARROT_INTERP)
 {
     ASSERT_ARGS(io_setup_vtables);
     const int number_of_vtables = 5;
-    interp->piodata->vtables = (const IO_VTABLE*)mem_gc_allocate_n_zeroed_typed(interp, number_of_vtables, const IO_VTABLE);
+    interp->piodata->vtables = (const IO_VTABLE*)mem_gc_allocate_n_zeroed_typed(interp,
+                                                                number_of_vtables, const IO_VTABLE);
     interp->piodata->num_vtables = number_of_vtables;
     io_filehandle_setup_vtable(interp, NULL, IO_VTABLE_FILEHANDLE);
     io_socket_setup_vtable(interp, NULL, IO_VTABLE_SOCKET);
@@ -354,9 +357,11 @@ Parrot_io_open(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *path),
         /* If this type uses buffers by default, set them up, and if we're
            in an acceptable mode, set up buffers. */
         if (vtable->flags & PIO_VF_DEFAULT_READ_BUF && flags & PIO_F_READ)
-            Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_READ_BUFFER, BUFFER_SIZE_ANY, PIO_BF_BLKBUF);
+            Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_READ_BUFFER, BUFFER_SIZE_ANY,
+                                           PIO_BF_BLKBUF);
         if (vtable->flags & PIO_VF_DEFAULT_WRITE_BUF && flags & PIO_F_WRITE)
-            Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY, PIO_BF_BLKBUF);
+            Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY,
+                                           PIO_BF_BLKBUF);
     }
 
     return handle;
@@ -773,13 +778,16 @@ Parrot_io_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
             return Parrot_str_new_init(interp, "", 0, encoding, 0);
 
         if (total_size == PIO_UNKNOWN_SIZE) {
-            IO_BUFFER * const read_buffer = io_verify_has_read_buffer(interp, handle, vtable, BUFFER_FLAGS_ANY);
+            IO_BUFFER * const read_buffer = io_verify_has_read_buffer(interp, handle, vtable,
+                                                                      BUFFER_FLAGS_ANY);
             size_t available_bytes = Parrot_io_buffer_fill(interp, read_buffer, handle, vtable);
-            STRING * const s = io_get_new_empty_string(interp, encoding, -1, PIO_STRING_BUFFER_MINSIZE);
+            STRING * const s = io_get_new_empty_string(interp, encoding, -1,
+                                                       PIO_STRING_BUFFER_MINSIZE);
 
             io_sync_buffers_for_read(interp, handle, vtable, read_buffer, write_buffer);
             while (available_bytes > 0 && !Parrot_io_eof(interp, handle)) {
-                io_read_chars_append_string(interp, s, handle, vtable, read_buffer, available_bytes);
+                io_read_chars_append_string(interp, s, handle, vtable, read_buffer,
+                                            available_bytes);
                 available_bytes = Parrot_io_buffer_fill(interp, read_buffer, handle, vtable);
             }
             return s;
@@ -842,7 +850,8 @@ Parrot_io_read_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC *handle),
         io_verify_is_open_for(interp, handle, vtable, PIO_F_READ);
         io_sync_buffers_for_read(interp, handle, vtable, read_buffer, write_buffer);
 
-        bytes_read = Parrot_io_buffer_read_b(interp, read_buffer, handle, vtable, content, byte_length);
+        bytes_read = Parrot_io_buffer_read_b(interp, read_buffer, handle, vtable, content,
+                                             byte_length);
         if (bytes_read != byte_length)
             VTABLE_set_integer_native(interp, buffer, byte_length);
         vtable->adv_position(interp, handle, bytes_read);
@@ -1934,12 +1943,16 @@ Parrot_io_set_buffer_mode(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *mode
         Parrot_io_buffer_remove_from_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER);
     }
     else if (STRING_equal(interp, mode, CONST_STRING(interp, "line-buffered"))) {
-        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_READ_BUFFER, BUFFER_SIZE_ANY, PIO_BF_LINEBUF);
-        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY, PIO_BF_LINEBUF);
+        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_READ_BUFFER, BUFFER_SIZE_ANY,
+                                       PIO_BF_LINEBUF);
+        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY,
+                                       PIO_BF_LINEBUF);
     }
     else if (STRING_equal(interp, mode, CONST_STRING(interp, "full-buffered"))) {
-        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_READ_BUFFER, BUFFER_SIZE_ANY, PIO_BF_BLKBUF);
-        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY, PIO_BF_BLKBUF);
+        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_READ_BUFFER, BUFFER_SIZE_ANY,
+                                       PIO_BF_BLKBUF);
+        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY,
+                                       PIO_BF_BLKBUF);
     }
     else
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,

@@ -229,7 +229,8 @@ io_userhandle_seek(PARROT_INTERP, ARGMOD(PMC *handle))
 }
 
 static INTVAL
-io_userhandle_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTVAL flags, ARGIN(STRING *mode))
+io_userhandle_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTVAL flags,
+        ARGIN(STRING *mode))
 {
     ASSERT_ARGS(io_userhandle_open)
     return 0; /* TODO */

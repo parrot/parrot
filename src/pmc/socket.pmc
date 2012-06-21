@@ -249,7 +249,8 @@ including family and protocol. It can be passed to C<bind()> or C<connect()>.
 */
     METHOD getaddrinfo(STRING * address,
                        INTVAL port, INTVAL protocol, INTVAL family, INTVAL passive) {
-        PMC * const res = Parrot_io_internal_getaddrinfo(INTERP, address, port, protocol, family, passive);
+        PMC * const res = Parrot_io_internal_getaddrinfo(INTERP, address, port, protocol, family,
+                                                         passive);
         RETURN(PMC * res);
     }
 

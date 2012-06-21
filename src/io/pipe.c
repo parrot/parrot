@@ -423,7 +423,8 @@ Open the pipe with the command in C<path>.
 */
 
 static INTVAL
-io_pipe_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTVAL flags, ARGIN(STRING *mode))
+io_pipe_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTVAL flags,
+        ARGIN(STRING *mode))
 {
     ASSERT_ARGS(io_pipe_open)
 

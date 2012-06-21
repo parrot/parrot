@@ -458,7 +458,8 @@ Open the StringHandle with the given mode and settings.
 */
 
 static INTVAL
-io_stringhandle_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTVAL flags, ARGIN(STRING *mode))
+io_stringhandle_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTVAL flags,
+        ARGIN(STRING *mode))
 {
     ASSERT_ARGS(io_stringhandle_open)
     STRING *old_handle;

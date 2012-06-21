@@ -697,7 +697,8 @@ C<offs_overflow> is optional and is used to handle offsets higher than 2Gb on
                                     offs;
         const INTVAL status = Parrot_io_seek(INTERP, SELF, pio_offs, whence);
         if (0 > status)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR, "seek failed: %d", status);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
+                                        "seek failed: %d", status);
     }
 
 /*

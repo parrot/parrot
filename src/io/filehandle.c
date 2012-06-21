@@ -427,7 +427,8 @@ Open the filehandle for the operation specified by C<flags> and the C<path>.
 */
 
 static INTVAL
-io_filehandle_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTVAL flags, ARGIN(STRING *mode))
+io_filehandle_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTVAL flags,
+        ARGIN(STRING *mode))
 {
     ASSERT_ARGS(io_filehandle_open)
     PIOHANDLE os_handle;
