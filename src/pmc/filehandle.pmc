@@ -124,7 +124,7 @@ Create a copy of the filehandle.
         /* Duplicate the file handle. */
         new_attrs->os_handle = Parrot_io_internal_dup(interp, old_attrs->os_handle);
 
-        // TODO: Clone the buffers and copy flags/data
+        /* TODO: Clone the buffers and copy flags/data */
 
         return copy;
     }
@@ -164,7 +164,7 @@ Free structures.
     VTABLE void destroy() {
         Parrot_io_close(INTERP, SELF, 1);
 
-        // TODO: flush and free the buffers
+        /* TODO: flush and free the buffers */
     }
 
 
@@ -547,7 +547,6 @@ Set or retrieve the buffer size for the filehandle.
     METHOD buffer_size(INTVAL new_size :optional, INTVAL got_size :opt_flag) {
         INTVAL buffer_size;
 
-        // TODO
 
         /*
         if (got_size)
@@ -724,7 +723,7 @@ Returns the next byte from the stream, but does not remove it.
 
 */
     METHOD setasync() {
-        //Parrot_io_async(INTERP, SELF, 1);
+        /* Parrot_io_async(INTERP, SELF, 1); */
     }
 
 /*
@@ -735,7 +734,7 @@ Returns the next byte from the stream, but does not remove it.
 
 */
     METHOD setblocking() {
-        //Parrot_io_async(INTERP, SELF, 0);
+        /* Parrot_io_async(INTERP, SELF, 0); */
     }
 
 /*

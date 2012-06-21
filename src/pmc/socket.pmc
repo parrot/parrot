@@ -111,7 +111,7 @@ Free structures.
 
 */
     VTABLE void destroy() {
-        // TODO: Make sure to free the buffers
+        /* TODO: Make sure to free the buffers */
         Parrot_io_close(INTERP, SELF, 1);
     }
 
