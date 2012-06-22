@@ -1,4 +1,4 @@
-# Copyright (C) 2011, Parrot Foundation
+# Copyright (C) 2011-2012, Parrot Foundation
 
 =pod
 
@@ -61,11 +61,15 @@ is as follows:
 
 =item 7.  Compiling for the Parrot Virtual Machine
 
-=item 8.  The Memory Internals
+=item 8.  High Level Language Interoperability
 
-=item 9.  The Parrot Virtual Machine Threading System
+=item 9.  The Native Call Interface
 
-=item 10. Opcode Mnemonics by Opcode
+=item 10. The Memory Internals
+
+=item 11. The Parrot Virtual Machine Threading System
+
+=item 12. Opcode Mnemonics by Opcode
 
 =item Appendix A. The NQP (Not Quite Perl) Programming Language
 
@@ -109,11 +113,15 @@ The format of this specification shall be in multiple POD files, to wit:
 
 =item ch07_compiling_for_PVM.pod
 
-=item ch08_memory_internals.pod
+=item ch08_hll_interoperability.pod
 
-=item ch09_thread_system.pod
+=item ch09_native_call_inteface.pod
 
-=item ch10_opcode_mnemonics_by_opcode.pod
+=item ch10_memory_internals.pod
+
+=item ch11_thread_system.pod
+
+=item ch12_opcode_mnemonics_by_opcode.pod
 
 =item appa_nqp_programming_language.pod
 
@@ -146,6 +154,6 @@ contained in the Parrot distribution.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =cut

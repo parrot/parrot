@@ -4,7 +4,8 @@
 
 =head1 NAME
 
-docs/mans/vmspec/bibliography.pod - Bibliography.
+docs/mans/vmspec/ch12_opcode_mnemonics_by_opcode.pod - Opcode Mnemonics by
+Opcode.
 
 =head1 DESCRIPTION
 

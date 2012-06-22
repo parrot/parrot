@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-docs/mans/vmspec/bibliography.pod - Bibliography.
+docs/mans/vmspec/ch10_memory_internals.pod - The Memory Internals.
 
 =head1 DESCRIPTION
 

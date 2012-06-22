@@ -4,7 +4,8 @@
 
 =head1 NAME
 
-docs/mans/vmspec/bibliography.pod - Bibliography.
+docs/mans/vmspec/ch08_hll_interoperability.pod - High Level Language
+Interoperability.
 
 =head1 DESCRIPTION
 

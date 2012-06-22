@@ -1,1 +1,19 @@
-# Copyright (C) 2011-2012, Parrot Foundation
+# Copyright (C) 2012, Parrot Foundation
+
+=pod
+
+=head1 NAME
+
+docs/mans/vmspec/glossary.pod - Glossary.
+
+=head1 DESCRIPTION
+
+[....]
+
+=head1 1. OVERVIEW
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2012, Parrot Foundation.
+
+=cut

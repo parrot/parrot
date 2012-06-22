@@ -1,4 +1,4 @@
-# Copyright (C) 2011, Parrot Foundation
+# Copyright (C) 2011-2012, Parrot Foundation
 
 =pod
 
@@ -15,10 +15,10 @@ It is an essential guide for compiler writers wanting to target the PVM.  It
 is also the definitive source of documentation for anyone who wants to 
 understand the PVM implementation.
 
-As with any virtual machine, the Parrot Virtual Machine [hereinafter PVM] is, 
-necessarily, an abstract machine.  But, unlike other specifications, this 
-specification refers exclusively to the concrete implementation of the Parrot 
-Community, a copy of which is available at the main project website.[1]
+As with any virtual machine, the Parrot Virtual Machine is, necessarily, an
+abstract machine.  But, unlike other specifications, this specification refers
+exclusively to the concrete implementation of the Parrot Community, a copy of
+which is available at the main project website.[1]
 
 Please send any comments about this specification or questions about Parrot to 
 'parrot-dev@lists.parrot.org'.  You may subscribe to the mailing list by 
@@ -45,6 +45,6 @@ its github repository. I<See> https://github.com/parrot/parrot.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =cut
