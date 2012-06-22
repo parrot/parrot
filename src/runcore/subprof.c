@@ -1057,8 +1057,8 @@ Returns a high-resolution number representing how long Parrot has been running.
 PARROT_INLINE
 static UHUGEINTVAL
 getticks(void) {
-#if defined(__GNUC__) && (defined(__i386) || defined(__x86_64))
     ASSERT_ARGS(getticks)
+#if defined(__GNUC__) && (defined(__i386) || defined(__x86_64))
 
     unsigned lo, hi;
     __asm__ __volatile__("rdtsc" : "=a" (lo), "=d" (hi));
