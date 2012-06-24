@@ -106,6 +106,9 @@ static PIOOFF_T io_socket_seek(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
+static void io_socket_set_eof(PARROT_INTERP, PMC *handle, INTVAL is_eof)
+        __attribute__nonnull__(1);
+
 static void io_socket_set_flags(PARROT_INTERP,
     ARGIN(PMC *handle),
     INTVAL flags)
@@ -176,6 +179,8 @@ static INTVAL io_socket_write_b(PARROT_INTERP,
 #define ASSERT_ARGS_io_socket_seek __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_socket_set_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_io_socket_set_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -220,6 +225,7 @@ io_socket_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), INTVAL i
     vtable->write_b = io_socket_write_b;
     vtable->flush = io_socket_flush;
     vtable->is_eof = io_socket_is_eof;
+    vtable->set_eof = io_socket_set_eof;
     vtable->tell = io_socket_tell;
     vtable->seek = io_socket_seek;
     vtable->adv_position = io_socket_adv_position;
@@ -297,7 +303,11 @@ io_socket_flush(PARROT_INTERP, ARGMOD(PMC *handle))
 
 =item C<static INTVAL io_socket_is_eof(PARROT_INTERP, PMC *handle)>
 
-Sockets do not have a concept of EOF. This throws an exception.
+Sockets are not "passed-the-end" so long as the connection is open. Return 0.
+
+item C<static void io_socket_set_eof(PARROT_INTERP, PMC *handle, INTVAL is_eof)>
+
+Do nothing.
 
 =cut
 
@@ -307,9 +317,18 @@ static INTVAL
 io_socket_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_socket_is_eof)
-    const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
-    IO_VTABLE_UNIMPLEMENTED(interp, vtable, "eof");
+    UNUSED(interp);
+    UNUSED(handle);
     return 0;
+}
+
+static void
+io_socket_set_eof(PARROT_INTERP, PMC *handle, INTVAL is_eof)
+{
+    ASSERT_ARGS(io_socket_set_eof)
+    UNUSED(interp);
+    UNUSED(handle);
+    UNUSED(is_eof);
 }
 
 /*

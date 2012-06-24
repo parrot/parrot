@@ -102,6 +102,13 @@ static PIOOFF_T io_pipe_seek(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
+static void io_pipe_set_eof(PARROT_INTERP,
+    ARGMOD(PMC *handle),
+    INTVAL is_set)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*handle);
+
 static void io_pipe_set_flags(PARROT_INTERP,
     ARGIN(PMC *handle),
     INTVAL flags)
@@ -172,6 +179,9 @@ static INTVAL io_pipe_write_b(PARROT_INTERP,
 #define ASSERT_ARGS_io_pipe_seek __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_pipe_set_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_pipe_set_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -216,6 +226,7 @@ io_pipe_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), INTVAL idx
     vtable->write_b = io_pipe_write_b;
     vtable->flush = io_pipe_flush;
     vtable->is_eof = io_pipe_is_eof;
+    vtable->set_eof = io_pipe_set_eof;
     vtable->tell = io_pipe_tell;
     vtable->seek = io_pipe_seek;
     vtable->adv_position = io_pipe_adv_position;
@@ -301,6 +312,10 @@ io_pipe_flush(PARROT_INTERP, ARGMOD(PMC *handle))
 
 Determine if the pipe thinks it's at the end of input.
 
+=item C<static void io_pipe_set_eof(PARROT_INTERP, PMC *handle, INTVAL is_set)>
+
+Do nothing.
+
 =cut
 
 */
@@ -314,6 +329,16 @@ io_pipe_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
     if (flags & PIO_F_EOF)
         return 1;
     return 0;
+}
+
+static void
+io_pipe_set_eof(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL is_set)
+{
+    ASSERT_ARGS(io_pipe_set_eof);
+    if (is_set)
+        PARROT_FILEHANDLE(handle)->flags |= PIO_F_EOF;
+    else
+        PARROT_FILEHANDLE(handle)->flags &= ~PIO_F_EOF;
 }
 
 /*

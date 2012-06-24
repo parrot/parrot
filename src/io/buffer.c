@@ -695,19 +695,10 @@ io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
     ASSERT_ARGS(io_buffer_find_string_marker)
     INTVAL bytes_needed = 0;
 
-    /* TODO: This line is needed because sometimes when we loop over this
-       function in io_readline_encoded_string we read all the data from the
-       buffer the first time, but then the buffer isn't empty and we get into
-       trouble. Explore this issue, because it's probably just one symptom of
-       a bigger problem */
-    Parrot_io_buffer_fill(interp, buffer, handle, vtable);
-
-    if (BUFFER_IS_EMPTY(buffer)) {
-        size_t bytes_available = Parrot_io_buffer_fill(interp, buffer, handle,
-                                                       vtable);
-        if (bytes_available == 0)
-            return 0;
-    }
+    size_t bytes_available = Parrot_io_buffer_fill(interp, buffer, handle,
+                                                   vtable);
+    if (bytes_available == 0)
+        return 0;
 
     bounds->bytes = BUFFER_USED_SIZE(buffer);
     bounds->chars = -1;

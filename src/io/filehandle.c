@@ -108,6 +108,13 @@ static PIOOFF_T io_filehandle_seek(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
+static void io_filehandle_set_eof(PARROT_INTERP,
+    ARGMOD(PMC *handle),
+    INTVAL is_set)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*handle);
+
 static void io_filehandle_set_flags(PARROT_INTERP,
     ARGIN(PMC *handle),
     INTVAL flags)
@@ -178,6 +185,9 @@ static INTVAL io_filehandle_write_b(PARROT_INTERP,
 #define ASSERT_ARGS_io_filehandle_seek __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_filehandle_set_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_filehandle_set_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -224,6 +234,7 @@ io_filehandle_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), INTV
     vtable->write_b = io_filehandle_write_b;
     vtable->flush = io_filehandle_flush;
     vtable->is_eof = io_filehandle_is_eof;
+    vtable->set_eof = io_filehandle_set_eof;
     vtable->tell = io_filehandle_tell;
     vtable->seek = io_filehandle_seek;
     vtable->adv_position = io_filehandle_adv_position;
@@ -257,12 +268,6 @@ io_filehandle_read_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGOUT(char *buffer), s
     ASSERT_ARGS(io_filehandle_read_b)
     const PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
     const size_t bytes_read = Parrot_io_internal_read(interp, os_handle, buffer, byte_length);
-    if (bytes_read == 0) {
-        INTVAL flags;
-        GETATTR_FileHandle_flags(interp, handle, flags);
-        flags |= PIO_F_EOF;
-        SETATTR_FileHandle_flags(interp, handle, flags);
-    }
     return bytes_read;
 }
 
@@ -311,6 +316,11 @@ io_filehandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
 
 Determine if this handle as at end-of-file.
 
+=item C<static void io_filehandle_set_eof(PARROT_INTERP, PMC *handle, INTVAL
+is_set)>
+
+Set or clear the EOF flag.
+
 =cut
 
 */
@@ -324,6 +334,16 @@ io_filehandle_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
     if (flags & PIO_F_EOF)
         return 1;
     return 0;
+}
+
+static void
+io_filehandle_set_eof(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL is_set)
+{
+    ASSERT_ARGS(io_filehandle_set_eof)
+    if (is_set)
+        PARROT_FILEHANDLE(handle)->flags |= PIO_F_EOF;
+    else
+        PARROT_FILEHANDLE(handle)->flags &= ~PIO_F_EOF;
 }
 
 /*

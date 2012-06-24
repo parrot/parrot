@@ -279,6 +279,7 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
     ASSERT_ARGS(io_read_encoded_string)
     STRING * const s = Parrot_gc_new_string_header(interp, 0);
     const size_t raw_reads = buffer->raw_reads;
+    size_t total_bytes_read = 0;
 
     s->bufused  = 0;
     s->strlen   = 0;
@@ -301,6 +302,7 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
 
         /* Append buffer to result */
         io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read);
+        total_bytes_read += bytes_to_read;
 
         if (bounds.chars == char_length)
             break;
@@ -316,6 +318,10 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
         if ((vtable->flags & PIO_VF_MULTI_READABLE) == 0 && buffer->raw_reads > raw_reads)
             break;
     }
+
+    if (total_bytes_read == 0)
+        vtable->set_eof(interp, handle, 1);
+
     return s;
 }
 
@@ -344,6 +350,7 @@ io_read_chars_append_string(PARROT_INTERP, ARGMOD(STRING * s),
     const size_t alloc_size = s->bufused + byte_length;
     size_t bytes_read = 0;
     PARROT_ASSERT(s->encoding);
+    PARROT_ASSERT(byte_length > 0);
 
     if (alloc_size > s->_buflen) {
         if (s->strstart)
@@ -420,6 +427,9 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
         if ((vtable->flags & PIO_VF_MULTI_READABLE) == 0 && buffer->raw_reads > raw_reads)
             break;
     }
+
+    if (total_bytes_read == 0)
+        vtable->set_eof(interp, handle, 1);
 
     return s;
 }
