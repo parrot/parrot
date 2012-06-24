@@ -6,10 +6,6 @@
 
 Description and implementation of Parrot namespaces.
 
-
-
-
-
 =head2 Description
 
 =over 4

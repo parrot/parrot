@@ -7,10 +7,6 @@
 This PDD describes the native call interface, and the function signatures used
 to describe those functions.
 
-
-
-
-
 =head2 Description
 
 The NCI is designed to allow Parrot to interface to I<most> of the functions
