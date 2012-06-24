@@ -334,7 +334,7 @@ io_pipe_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
 static void
 io_pipe_set_eof(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL is_set)
 {
-    ASSERT_ARGS(io_pipe_set_eof);
+    ASSERT_ARGS(io_pipe_set_eof)
     if (is_set)
         PARROT_FILEHANDLE(handle)->flags |= PIO_F_EOF;
     else

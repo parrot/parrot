@@ -360,7 +360,7 @@ io_stringhandle_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
 static void
 io_stringhandle_set_eof(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL is_set)
 {
-    ASSERT_ARGS(io_stringhandle_set_eof);
+    ASSERT_ARGS(io_stringhandle_set_eof)
     UNUSED(interp);
     UNUSED(handle);
     UNUSED(is_set);

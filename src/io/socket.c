@@ -106,8 +106,12 @@ static PIOOFF_T io_socket_seek(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
-static void io_socket_set_eof(PARROT_INTERP, PMC *handle, INTVAL is_eof)
-        __attribute__nonnull__(1);
+static void io_socket_set_eof(PARROT_INTERP,
+    ARGMOD(PMC *handle),
+    INTVAL is_eof)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*handle);
 
 static void io_socket_set_flags(PARROT_INTERP,
     ARGIN(PMC *handle),
@@ -180,7 +184,8 @@ static INTVAL io_socket_write_b(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_socket_set_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_socket_set_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -323,7 +328,7 @@ io_socket_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
 }
 
 static void
-io_socket_set_eof(PARROT_INTERP, PMC *handle, INTVAL is_eof)
+io_socket_set_eof(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL is_eof)
 {
     ASSERT_ARGS(io_socket_set_eof)
     UNUSED(interp);
