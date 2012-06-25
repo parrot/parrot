@@ -1536,6 +1536,49 @@ Parrot_io_STDERR(PARROT_INTERP)
 
 /*
 
+=item C<PIOHANDLE Parrot_io_get_standard_piohandle(PARROT_INTERP, INTVAL idx)>
+
+Get the raw PIOHANDLE for one of the standard streams. Notice that this will FAIL in a bad way if
+the standard stream has been overridden with a handle type that isn't backed by a PIOHANDLE
+(StringHandle, etc).
+
+This function is a temporary stopgap solution and SHOULD NOT be used where possible. Instead, use
+the handle PMCs and functions on those directly instead of attempting lower-level accesses on the
+PIOHANDLE directly.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PIOHANDLE
+Parrot_io_get_standard_piohandle(PARROT_INTERP, INTVAL idx)
+{
+    ASSERT_ARGS(Parrot_io_get_standard_piohandle)
+    PMC * handle_pmc;
+    switch (idx) {
+        case PIO_STDIN_FILENO:
+            handle_pmc = _PIO_STDIN(interp);
+            break;
+        case PIO_STDOUT_FILENO:
+            handle_pmc = _PIO_STDOUT(interp);
+            break;
+        case PIO_STDERR_FILENO:
+            handle_pmc = _PIO_STDERR(interp);
+            break;
+        default:
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Unknown standard handle %d", idx);
+    }
+
+    {
+        const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle_pmc);
+        return vtable->get_piohandle(interp, handle_pmc);
+    }
+}
+
+/*
+
 =back
 
 =head2 Offset Functions

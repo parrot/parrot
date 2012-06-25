@@ -2443,7 +2443,7 @@ Parrot_pf_read_pbc_file(PARROT_INTERP, ARGIN_NULLOK(STRING * const fullname))
     INTVAL    program_size;
 
     if (fullname == NULL || STRING_length(fullname) == 0) {
-        PIOHANDLE stdin_h = Parrot_io_STDIN(interp);
+        PIOHANDLE stdin_h = Parrot_io_get_standard_piohandle(interp, PIO_STDIN_FILENO);
         STRING * const hname = CONST_STRING(interp, "standard input");
         pf = read_pbc_file_packfile_handle(interp, hname, stdin_h, 0);
     }
