@@ -159,8 +159,9 @@ Read a line from the handle and return it in a string.
 
     METHOD readline() {
         INTVAL record_separator;
+        STRING * string_result;
         GET_ATTR_record_separator(interp, SELF, record_separator);
-        STRING * const string_result = Parrot_io_readline_s(INTERP, SELF, record_separator);
+        string_result = Parrot_io_readline_s(INTERP, SELF, record_separator);
         RETURN(STRING *string_result);
     }
 

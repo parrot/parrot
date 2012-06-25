@@ -270,9 +270,10 @@ io_stringhandle_read_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGOUT(char *buffer),
     ASSERT_ARGS(io_stringhandle_read_b)
     INTVAL read_offs;
     STRING *stringhandle;
+    size_t available_bytes;
     GETATTR_StringHandle_read_offset(interp, handle, read_offs);
     GETATTR_StringHandle_stringhandle(interp, handle, stringhandle);
-    size_t available_bytes = stringhandle->bufused - read_offs;
+    available_bytes = stringhandle->bufused - read_offs;
     if (byte_length > available_bytes)
         byte_length = available_bytes;
 
@@ -360,7 +361,7 @@ io_stringhandle_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
 static void
 io_stringhandle_set_eof(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL is_set)
 {
-    ASSERT_ARGS(io_stringhandle_set_eof);
+    ASSERT_ARGS(io_stringhandle_set_eof)
     UNUSED(interp);
     UNUSED(handle);
     UNUSED(is_set);
