@@ -100,7 +100,8 @@ convert_flags_to_unix(INTVAL flags)
 
 /*
 
-=item C<PIOHANDLE Parrot_io_std_os_handle(PARROT_INTERP, INTVAL fileno)>
+=item C<PIOHANDLE Parrot_io_internal_std_os_handle(PARROT_INTERP, INTVAL
+fileno)>
 
 Returns a standard file handle.
 
@@ -131,7 +132,8 @@ Parrot_io_internal_std_os_handle(PARROT_INTERP, INTVAL fileno)
 
 /*
 
-=item C<PIOHANDLE Parrot_io_open(PARROT_INTERP, STRING *path, INTVAL flags)>
+=item C<PIOHANDLE Parrot_io_internal_open(PARROT_INTERP, STRING *path, INTVAL
+flags)>
 
 Opens a string C<path>. C<flags> is a bitwise C<or> combination of C<PIO_F_*>
 flag values.

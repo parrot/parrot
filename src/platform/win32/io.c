@@ -104,7 +104,8 @@ convert_flags_to_win32(INTVAL flags, ARGOUT(DWORD * fdwAccess),
 
 /*
 
-=item C<PIOHANDLE Parrot_io_internal_std_os_handle(PARROT_INTERP, INTVAL fileno)>
+=item C<PIOHANDLE Parrot_io_internal_std_os_handle(PARROT_INTERP, INTVAL
+fileno)>
 
 Returns a standard file handle.
 
@@ -153,7 +154,8 @@ Parrot_io_internal_getblksize(SHIM(PIOHANDLE fd))
 
 /*
 
-=item C<PIOHANDLE Parrot_io_internal_open(PARROT_INTERP, STRING *path, INTVAL flags)>
+=item C<PIOHANDLE Parrot_io_internal_open(PARROT_INTERP, STRING *path, INTVAL
+flags)>
 
 Calls C<CreateFile()> to open C<*spath> with the Win32 translation of
 C<flags>.
@@ -333,8 +335,8 @@ Parrot_io_internal_flush(PARROT_INTERP, PIOHANDLE os_handle)
 
 /*
 
-=item C<size_t Parrot_io_internal_read(PARROT_INTERP, PIOHANDLE os_handle, char *buf,
-size_t len)>
+=item C<size_t Parrot_io_internal_read(PARROT_INTERP, PIOHANDLE os_handle, char
+*buf, size_t len)>
 
 Calls C<ReadFile()> to read up to C<len> bytes from C<*io>'s file
 descriptor to the memory starting at C<buffer>.
@@ -364,8 +366,8 @@ Parrot_io_internal_read(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(char *buf), s
 
 /*
 
-=item C<size_t Parrot_io_internal_write(PARROT_INTERP, PIOHANDLE os_handle, const char
-*buf, size_t len)>
+=item C<size_t Parrot_io_internal_write(PARROT_INTERP, PIOHANDLE os_handle,
+const char *buf, size_t len)>
 
 Calls C<WriteFile()> to write C<len> bytes from the memory starting at
 C<buffer> to C<*io>'s file descriptor. Returns C<(size_t)-1> on
@@ -421,8 +423,8 @@ fail:
 
 /*
 
-=item C<PIOOFF_T Parrot_io_internal_seek(PARROT_INTERP, PIOHANDLE os_handle, PIOOFF_T
-off, INTVAL whence)>
+=item C<PIOOFF_T Parrot_io_internal_seek(PARROT_INTERP, PIOHANDLE os_handle,
+PIOOFF_T off, INTVAL whence)>
 
 Hard seek.
 
@@ -489,8 +491,8 @@ Parrot_io_internal_tell(PARROT_INTERP, PIOHANDLE os_handle)
 
 /*
 
-=item C<PIOHANDLE Parrot_io_internal_open_pipe(PARROT_INTERP, STRING *command, INTVAL
-flags, INTVAL *pid)>
+=item C<PIOHANDLE Parrot_io_internal_open_pipe(PARROT_INTERP, STRING *command,
+INTVAL flags, INTVAL *pid)>
 
 Open a pipe. Not implemented for this platform.
 
@@ -606,8 +608,8 @@ fail:
 
 /*
 
-=item C<INTVAL Parrot_io_internal_pipe(PARROT_INTERP, PIOHANDLE *reader, PIOHANDLE
-*writer)>
+=item C<INTVAL Parrot_io_internal_pipe(PARROT_INTERP, PIOHANDLE *reader,
+PIOHANDLE *writer)>
 
 Uses CreatePipe() to create a matched pair of pipe handles.  Returns 0 on
 success, -1 on failure.
