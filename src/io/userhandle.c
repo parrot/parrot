@@ -3,11 +3,12 @@ Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
-src/io/pipe.c - IO_VTABLE and helpers for Pipes
+src/io/userhandle.c - IO_VTABLE and helpers for user-defined types
 
 =head1 DESCRIPTION
 
-This file implements the IO_VTABLE for user-defined types
+This file implements the IO_VTABLE for user-defined types. It is not currently
+used.
 
 =cut
 
