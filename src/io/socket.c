@@ -370,9 +370,9 @@ static PIOOFF_T
 io_socket_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL whence)
 {
     ASSERT_ARGS(io_socket_seek)
+    const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
     UNUSED(offset);
     UNUSED(whence);
-    const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
     IO_VTABLE_UNIMPLEMENTED(interp, vtable, "seek");
     return 0;
 }

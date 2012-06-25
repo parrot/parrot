@@ -270,9 +270,10 @@ io_stringhandle_read_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGOUT(char *buffer),
     ASSERT_ARGS(io_stringhandle_read_b)
     INTVAL read_offs;
     STRING *stringhandle;
+    size_t available_bytes;
     GETATTR_StringHandle_read_offset(interp, handle, read_offs);
     GETATTR_StringHandle_stringhandle(interp, handle, stringhandle);
-    size_t available_bytes = stringhandle->bufused - read_offs;
+    available_bytes = stringhandle->bufused - read_offs;
     if (byte_length > available_bytes)
         byte_length = available_bytes;
 
