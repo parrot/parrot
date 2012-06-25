@@ -777,7 +777,7 @@ io_filehandle_convert_to_pipe(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_filehandle_convert_to_pipe)
     const IO_VTABLE * const vtable = Parrot_io_get_vtable(interp, IO_VTABLE_PIPE, NULL);
-    VTABLE_set_pointer_keyed_int(interp, handle, IO_PTR_IDX_VTABLE, vtable);
+    VTABLE_set_pointer_keyed_int(interp, handle, IO_PTR_IDX_VTABLE, (void *)vtable);
     return vtable;
 }
 

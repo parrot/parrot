@@ -74,8 +74,8 @@ Initializes a newly created FileHandle object.
         attrs->exit_status      = 0;
         attrs->file_pos         = piooffsetzero;
         attrs->last_pos         = piooffsetzero;
-        attrs->io_vtable        = Parrot_io_get_vtable(interp,
-                                        IO_VTABLE_FILEHANDLE, NULL);
+        attrs->io_vtable        = (IO_VTABLE *)Parrot_io_get_vtable(interp,
+                                                                    IO_VTABLE_FILEHANDLE, NULL);
 
         /* Initialize the os_handle to the platform-specific value for closed */
         attrs->os_handle     = (PIOHANDLE) PIO_INVALID_HANDLE;
@@ -231,44 +231,6 @@ in the file.
 
     VTABLE INTVAL get_bool() {
         return !Parrot_io_eof(INTERP, SELF);
-    }
-
-    VTABLE void *get_pointer_keyed_int(INTVAL key)
-    {
-        void * ptr;
-        switch (key) {
-            case IO_PTR_IDX_VTABLE:
-                GET_ATTR_io_vtable(INTERP, SELF, ptr);
-                break;
-            case IO_PTR_IDX_READ_BUFFER:
-                GET_ATTR_read_buffer(INTERP, SELF, ptr);
-                break;
-            case IO_PTR_IDX_WRITE_BUFFER:
-                GET_ATTR_write_buffer(INTERP, SELF, ptr);
-                break;
-            default:
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
-                    "FileHandle: Cannot get pointer %d", key);
-        }
-        return ptr;
-    }
-
-    VTABLE void set_pointer_keyed_int(INTVAL key, void *ptr)
-    {
-        switch (key) {
-            case IO_PTR_IDX_VTABLE:
-                SET_ATTR_io_vtable(INTERP, SELF, ptr);
-                break;
-            case IO_PTR_IDX_READ_BUFFER:
-                SET_ATTR_read_buffer(INTERP, SELF, ptr);
-                break;
-            case IO_PTR_IDX_WRITE_BUFFER:
-                SET_ATTR_write_buffer(INTERP, SELF, ptr);
-                break;
-            default:
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
-                    "FileHandle: Cannot set pointer %d", key);
-        }
     }
 
 

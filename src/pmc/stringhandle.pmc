@@ -89,8 +89,8 @@ Initializes a newly created StringHandle object.
         data_struct->encoding     = NULL;
         data_struct->filename     = NULL;
         data_struct->read_offset  = 0;
-        data_struct->io_vtable    = Parrot_io_get_vtable(interp,
-                                        IO_VTABLE_STRINGHANDLE, NULL);
+        data_struct->io_vtable    = (IO_VTABLE *)Parrot_io_get_vtable(interp,
+                                                                    IO_VTABLE_STRINGHANDLE, NULL);
         data_struct->read_buffer  = NULL;
         data_struct->write_buffer = NULL;
         data_struct->record_separator = '\n';
@@ -159,44 +159,6 @@ Returns whether the StringHandle has reached the end of the file.
             return 0;
 
         return 1;
-    }
-
-    VTABLE void *get_pointer_keyed_int(INTVAL key)
-    {
-        void * ptr;
-        switch (key) {
-            case IO_PTR_IDX_VTABLE:
-                GET_ATTR_io_vtable(INTERP, SELF, ptr);
-                break;
-            case IO_PTR_IDX_READ_BUFFER:
-                GET_ATTR_read_buffer(INTERP, SELF, ptr);
-                break;
-            case IO_PTR_IDX_WRITE_BUFFER:
-                GET_ATTR_write_buffer(INTERP, SELF, ptr);
-                break;
-            default:
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
-                    "StringHandle: Cannot get pointer %d", key);
-        }
-        return ptr;
-    }
-
-    VTABLE void set_pointer_keyed_int(INTVAL key, void *ptr)
-    {
-        switch (key) {
-            case IO_PTR_IDX_VTABLE:
-                SET_ATTR_io_vtable(INTERP, SELF, ptr);
-                break;
-            case IO_PTR_IDX_READ_BUFFER:
-                SET_ATTR_read_buffer(INTERP, SELF, ptr);
-                break;
-            case IO_PTR_IDX_WRITE_BUFFER:
-                SET_ATTR_write_buffer(INTERP, SELF, ptr);
-                break;
-            default:
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
-                    "StringHandle: Cannot set pointer %d", key);
-        }
     }
 
 

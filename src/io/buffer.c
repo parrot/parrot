@@ -228,7 +228,7 @@ Parrot_io_buffer_resize(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), size_t new_siz
     if (buffer->buffer_size >= new_size)
         return new_size;
 
-    buffer->buffer_ptr = mem_sys_realloc(buffer->buffer_ptr, new_size);
+    buffer->buffer_ptr = (char *)mem_sys_realloc(buffer->buffer_ptr, new_size);
     buffer->buffer_size = new_size;
     return new_size;
 }
@@ -780,7 +780,7 @@ Parrot_io_buffer_seek(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
     PARROT_ASSERT(w == SEEK_SET);
 
     if (cur_pos == offset)
-        return;
+        return offset;
     if (offset < cur_pos) {
         /* write buffers are flushed before seeking, so this is a read buffer.
            if we're not seeking to a position inside the buffer just clear it.

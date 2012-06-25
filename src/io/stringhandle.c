@@ -574,7 +574,7 @@ static PIOHANDLE
 io_stringhandle_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_stringhandle_get_piohandle)
-    IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+    const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
     IO_VTABLE_UNIMPLEMENTED(interp, vtable, "get_piohandle");
     return PIO_INVALID_HANDLE;
 }

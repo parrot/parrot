@@ -36,7 +36,7 @@ pmclass Handle provides Handle manual_attrs {
     ATTR PIOHANDLE os_handle;           /* Low level OS descriptor */
     ATTR INTVAL    record_separator;    /* Record separator (only single
                                          * char supported) */
-    ATTR IO_VTABLE *io_vtable;          /* Function dispatch table */
+    ATTR IO_VTABLE *io_vtable;    /* Function dispatch table */
     ATTR IO_BUFFER *read_buffer;        /* Read Buffer */
     ATTR IO_BUFFER *write_buffer;       /* Write Buffer */
 
@@ -49,6 +49,44 @@ pmclass Handle provides Handle manual_attrs {
     VTABLE void init_pmc(PMC * init) {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Handle cannot be instantiated directly.");
+    }
+
+    VTABLE void *get_pointer_keyed_int(INTVAL key)
+    {
+        void * ptr;
+        switch (key) {
+            case IO_PTR_IDX_VTABLE:
+                GET_ATTR_io_vtable(INTERP, SELF, ptr);
+                break;
+            case IO_PTR_IDX_READ_BUFFER:
+                GET_ATTR_read_buffer(INTERP, SELF, ptr);
+                break;
+            case IO_PTR_IDX_WRITE_BUFFER:
+                GET_ATTR_write_buffer(INTERP, SELF, ptr);
+                break;
+            default:
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
+                    "Handle: Cannot get pointer %d", key);
+        }
+        return ptr;
+    }
+
+    VTABLE void set_pointer_keyed_int(INTVAL key, void *ptr)
+    {
+        switch (key) {
+            case IO_PTR_IDX_VTABLE:
+                SET_ATTR_io_vtable(INTERP, SELF, (IO_VTABLE *)ptr);
+                break;
+            case IO_PTR_IDX_READ_BUFFER:
+                SET_ATTR_read_buffer(INTERP, SELF, (IO_BUFFER *)ptr);
+                break;
+            case IO_PTR_IDX_WRITE_BUFFER:
+                SET_ATTR_write_buffer(INTERP, SELF, (IO_BUFFER *)ptr);
+                break;
+            default:
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
+                    "Handle: Cannot set pointer %d", key);
+        }
     }
 
 /*

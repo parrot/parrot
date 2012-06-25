@@ -355,7 +355,7 @@ static PIOOFF_T
 io_pipe_tell(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_pipe_tell)
-    IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+    const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
     IO_VTABLE_UNIMPLEMENTED(interp, vtable, "tell");
     return (PIOOFF_T)0;
 }
@@ -375,7 +375,7 @@ static PIOOFF_T
 io_pipe_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL whence)
 {
     ASSERT_ARGS(io_pipe_seek)
-    IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+    const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
     IO_VTABLE_UNIMPLEMENTED(interp, vtable, "seek");
     UNUSED(offset);
     UNUSED(whence);
@@ -461,9 +461,8 @@ io_pipe_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTVAL fla
     /* Hack! If we're opening in file mode, turn this FileHandle into a file
        and use that vtable instead. */
     if ((flags & PIO_F_PIPE) == 0) {
-        IO_VTABLE * const vtable = Parrot_io_get_vtable(interp,
-                                    IO_VTABLE_FILEHANDLE, NULL);
-        VTABLE_set_pointer_keyed_int(interp, handle, IO_PTR_IDX_VTABLE, vtable);
+        const IO_VTABLE * const vtable = Parrot_io_get_vtable(interp, IO_VTABLE_FILEHANDLE, NULL);
+        VTABLE_set_pointer_keyed_int(interp, handle, IO_PTR_IDX_VTABLE, (void *)vtable);
         return vtable->open(interp, handle, path, flags, mode);
     }
 

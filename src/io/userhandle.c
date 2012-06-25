@@ -25,9 +25,7 @@ This file implements the IO_VTABLE for user-defined types
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static INTVAL io_userhandle_close(PARROT_INTERP,
-    ARGMOD(PMC *handle),
-    INTVAL autoflush)
+static INTVAL io_userhandle_close(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
@@ -39,7 +37,7 @@ static INTVAL io_userhandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static STR_VTABLE * io_userhandle_get_encoding(PARROT_INTERP,
+static const STR_VTABLE * io_userhandle_get_encoding(PARROT_INTERP,
     ARGIN(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -84,7 +82,10 @@ static INTVAL io_userhandle_read_b(PARROT_INTERP,
         FUNC_MODIFIES(*handle)
         FUNC_MODIFIES(*buffer);
 
-static INTVAL io_userhandle_seek(PARROT_INTERP, ARGMOD(PMC *handle))
+static INTVAL io_userhandle_seek(PARROT_INTERP,
+    ARGMOD(PMC *handle),
+    PIOOFF_T offset,
+    INTVAL whence)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
@@ -167,7 +168,7 @@ io_userhandle_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), INTV
 {
     ASSERT_ARGS(io_userhandle_setup_vtable)
     if (vtable == NULL)
-        vtable = &(interp->piodata->vtables[idx]);
+        vtable = ((IO_VTABLE *)(&(interp->piodata->vtables[idx])));
     vtable->number = idx;
     vtable->name = "User Handle Type";
     vtable->read_b = io_userhandle_read_b;
@@ -222,7 +223,7 @@ io_userhandle_tell(PARROT_INTERP, ARGMOD(PMC *handle))
 }
 
 static INTVAL
-io_userhandle_seek(PARROT_INTERP, ARGMOD(PMC *handle))
+io_userhandle_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL whence)
 {
     ASSERT_ARGS(io_userhandle_seek)
     return 0; /* TODO */
@@ -244,7 +245,7 @@ io_userhandle_is_open(PARROT_INTERP, ARGMOD(PMC *handle))
 }
 
 static INTVAL
-io_userhandle_close(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL autoflush)
+io_userhandle_close(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_userhandle_close)
     return 0; /* TODO */
@@ -261,7 +262,7 @@ static PIOHANDLE
 io_userhandle_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_userhandle_get_piohandle)
-    IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+    const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
     IO_VTABLE_UNIMPLEMENTED(interp, vtable, "get_piohandle");
 }
 
@@ -269,7 +270,7 @@ static void
 io_userhandle_set_flags(PARROT_INTERP, ARGIN(PMC *handle), INTVAL flags)
 {
     ASSERT_ARGS(io_userhandle_set_flags)
-    IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+    const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
     IO_VTABLE_UNIMPLEMENTED(interp, vtable, "set_flags");
 }
 
@@ -277,17 +278,17 @@ static INTVAL
 io_userhandle_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_userhandle_get_flags)
-    IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+    const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
     IO_VTABLE_UNIMPLEMENTED(interp, vtable, "get_flags");
 }
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-static STR_VTABLE *
+static const STR_VTABLE *
 io_userhandle_get_encoding(PARROT_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_userhandle_get_encoding)
-    IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+    const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
     IO_VTABLE_UNIMPLEMENTED(interp, vtable, "get_encoding");
 }
 
