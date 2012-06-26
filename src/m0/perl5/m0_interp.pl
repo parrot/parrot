@@ -520,6 +520,7 @@ sub m0_opfunc_deref {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "deref $a1, $a2, $a3";
 
+    no strict 'refs';
     $$cf->[$a1] = $$cf->[$a2][ i($$cf,$a3) ];
 }
 
@@ -527,6 +528,7 @@ sub m0_opfunc_set_ref {
     my ($cf, $a1, $a2, $a3) = @_;
     m0_say "set_ref $a1, $a2, $a3";
 
+    no strict 'refs';
     $$cf->[$a1][ i($$cf,$a2) ] = $$cf->[$a3];
 }
 
