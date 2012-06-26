@@ -605,6 +605,9 @@ the handle is flushed. Notice that read buffers are not modified.
 
 =item C<void Parrot_io_flush_handle(PARROT_INTERP, PMC *pmc)>
 
+Flush the handle. This is a legacy wrapper function and is deprecated. Use
+Parrot_io_flush instead.
+
 =cut
 
 */

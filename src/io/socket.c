@@ -310,7 +310,8 @@ io_socket_flush(PARROT_INTERP, ARGMOD(PMC *handle))
 
 Sockets are not "passed-the-end" so long as the connection is open. Return 0.
 
-item C<static void io_socket_set_eof(PARROT_INTERP, PMC *handle, INTVAL is_eof)>
+=item C<static void io_socket_set_eof(PARROT_INTERP, PMC *handle, INTVAL
+is_eof)>
 
 Do nothing.
 

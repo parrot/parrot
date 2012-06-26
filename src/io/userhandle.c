@@ -164,6 +164,17 @@ static INTVAL io_userhandle_write_b(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+/*
+
+=item C<void io_userhandle_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable, INTVAL
+idx)>
+
+Setup the IO_VTABLE for custom user-defined types.
+
+=cut.
+
+*/
+
 void
 io_userhandle_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), INTVAL idx)
 {
@@ -172,6 +183,7 @@ io_userhandle_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), INTV
         vtable = ((IO_VTABLE *)(&(interp->piodata->vtables[idx])));
     vtable->number = idx;
     vtable->name = "User Handle Type";
+    /*
     vtable->read_b = io_userhandle_read_b;
     vtable->write_b = io_userhandle_write_b;
     vtable->flush = io_userhandle_flush;
@@ -186,112 +198,9 @@ io_userhandle_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), INTV
     vtable->get_flags = io_userhandle_get_flags;
     vtable->total_size = io_userhandle_total_size;
     vtable->get_piohandle = io_userhandle_get_piohandle;
+    */
 }
 
-static INTVAL
-io_userhandle_read_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGOUT(char *buffer), size_t byte_length)
-{
-    ASSERT_ARGS(io_userhandle_read_b)
-    return 0; /* TODO */
-}
-
-static INTVAL
-io_userhandle_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(char *buffer), size_t byte_length)
-{
-    ASSERT_ARGS(io_userhandle_write_b)
-    return 0; /* TODO */
-}
-
-static INTVAL
-io_userhandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
-{
-    ASSERT_ARGS(io_userhandle_flush)
-    return 0; /* TODO */
-}
-
-static INTVAL
-io_userhandle_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
-{
-    ASSERT_ARGS(io_userhandle_is_eof)
-    return 0; /* TODO */
-}
-
-static PIOOFF_T
-io_userhandle_tell(PARROT_INTERP, ARGMOD(PMC *handle))
-{
-    ASSERT_ARGS(io_userhandle_tell)
-    return 0; /* TODO */
-}
-
-static INTVAL
-io_userhandle_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL whence)
-{
-    ASSERT_ARGS(io_userhandle_seek)
-    return 0; /* TODO */
-}
-
-static INTVAL
-io_userhandle_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTVAL flags,
-        ARGIN(STRING *mode))
-{
-    ASSERT_ARGS(io_userhandle_open)
-    return 0; /* TODO */
-}
-
-static INTVAL
-io_userhandle_is_open(PARROT_INTERP, ARGMOD(PMC *handle))
-{
-    ASSERT_ARGS(io_userhandle_is_open)
-    return 0; /* TODO */
-}
-
-static INTVAL
-io_userhandle_close(PARROT_INTERP, ARGMOD(PMC *handle))
-{
-    ASSERT_ARGS(io_userhandle_close)
-    return 0; /* TODO */
-}
-
-static size_t
-io_userhandle_total_size(PARROT_INTERP, ARGIN(PMC *handle))
-{
-    ASSERT_ARGS(io_userhandle_total_size)
-    return 0; /* TODO */
-}
-
-static PIOHANDLE
-io_userhandle_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
-{
-    ASSERT_ARGS(io_userhandle_get_piohandle)
-    const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
-    IO_VTABLE_UNIMPLEMENTED(interp, vtable, "get_piohandle");
-}
-
-static void
-io_userhandle_set_flags(PARROT_INTERP, ARGIN(PMC *handle), INTVAL flags)
-{
-    ASSERT_ARGS(io_userhandle_set_flags)
-    const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
-    IO_VTABLE_UNIMPLEMENTED(interp, vtable, "set_flags");
-}
-
-static INTVAL
-io_userhandle_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
-{
-    ASSERT_ARGS(io_userhandle_get_flags)
-    const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
-    IO_VTABLE_UNIMPLEMENTED(interp, vtable, "get_flags");
-}
-
-PARROT_CAN_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-static const STR_VTABLE *
-io_userhandle_get_encoding(PARROT_INTERP, ARGIN(PMC *handle))
-{
-    ASSERT_ARGS(io_userhandle_get_encoding)
-    const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
-    IO_VTABLE_UNIMPLEMENTED(interp, vtable, "get_encoding");
-}
 
 /*
 

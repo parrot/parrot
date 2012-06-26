@@ -420,7 +420,7 @@ io_pipe_set_position(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T pos)
 
 /*
 
-=item C<PIOOFF_T io_pipe_(PARROT_INTERP, PMC *handle)>
+=item C<static PIOOFF_T io_pipe_get_position(PARROT_INTERP, PMC *handle)>
 
 Pipes don't keep track of position. Return 0.
 
