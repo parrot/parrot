@@ -716,6 +716,14 @@
 ^/src/jit_defs\.c/
 ^/src/jit_emit\.h$
 ^/src/jit_emit\.h/
+^/src/m0/c/m0$
+^/src/m0/c/m0/
+^/src/m0/c/m0-debug$
+^/src/m0/c/m0-debug/
+^/src/m0/c/m0-debug\.exe$
+^/src/m0/c/m0-debug\.exe/
+^/src/m0/c/m0\.exe$
+^/src/m0/c/m0\.exe/
 ^/src/nci/.*\.gcda$
 ^/src/nci/.*\.gcda/
 ^/src/nci/.*\.gcno$
@@ -910,6 +918,10 @@
 ^/t/library/.*\.pir/
 ^/t/library/.*_pbcexe.*$
 ^/t/library/.*_pbcexe.*/
+^/t/m0/.*\.m0b$
+^/t/m0/.*\.m0b/
+^/t/m0/integration/.*\.m0b$
+^/t/m0/integration/.*\.m0b/
 ^/t/native_pbc/.*_pbcexe.*$
 ^/t/native_pbc/.*_pbcexe.*/
 ^/t/oo/.*\.pbc$
