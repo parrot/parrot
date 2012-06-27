@@ -39,6 +39,7 @@ pmclass Handle provides Handle manual_attrs {
     ATTR IO_VTABLE *io_vtable;    /* Function dispatch table */
     ATTR IO_BUFFER *read_buffer;        /* Read Buffer */
     ATTR IO_BUFFER *write_buffer;       /* Write Buffer */
+    ATTR STRING *encoding;            /* The encoding for read/write  */
 
 
     VTABLE void init() {
@@ -232,6 +233,28 @@ Close the handle.
         RETURN(INTVAL status);
     }
 
+    /*
+
+=item C<METHOD encoding(STRING *new_encoding)>
+
+Set or retrieve the encoding attribute (a string name of the selected encoding
+scheme) for the filehandle.
+
+=cut
+
+*/
+
+    METHOD encoding(STRING *new_encoding :optional, INTVAL got_encoding :opt_flag) {
+        STRING *encoding;
+
+        if (got_encoding) {
+            SET_ATTR_encoding(INTERP, SELF, new_encoding);
+            RETURN(STRING *new_encoding);
+        }
+
+        GET_ATTR_encoding(INTERP, SELF, encoding);
+        RETURN(STRING *encoding);
+    }
 }
 
 /*

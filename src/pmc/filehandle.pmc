@@ -39,7 +39,6 @@ pmclass FileHandle extends Handle auto_attrs {
     ATTR INTVAL flags;                /* Filehandle flags             */
     ATTR STRING *filename;            /* The opened path and filename */
     ATTR STRING *mode;                /* The mode string used in open */
-    ATTR STRING *encoding;            /* The encoding for read/write  */
     ATTR INTVAL process_id;           /* Child process on pipes       */
     ATTR INTVAL exit_status;          /* Child exit status on pipes   */
     ATTR PIOOFF_T file_pos;           /* Current real file pointer    */
@@ -536,31 +535,6 @@ Retrieve the read mode string for the filehandle.
         GET_ATTR_mode(INTERP, SELF, mode);
         RETURN(STRING *mode);
     }
-
-
-/*
-
-=item C<METHOD encoding(STRING *new_encoding)>
-
-Set or retrieve the encoding attribute (a string name of the selected encoding
-scheme) for the filehandle.
-
-=cut
-
-*/
-
-    METHOD encoding(STRING *new_encoding :optional, INTVAL got_encoding :opt_flag) {
-        STRING *encoding;
-
-        if (got_encoding) {
-            SET_ATTR_encoding(INTERP, SELF, new_encoding);
-            RETURN(STRING *new_encoding);
-        }
-
-        GET_ATTR_encoding(INTERP, SELF, encoding);
-        RETURN(STRING *encoding);
-    }
-
 
 /*
 

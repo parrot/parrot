@@ -578,7 +578,7 @@ io_socket_get_encoding(PARROT_INTERP, ARGIN(PMC *handle))
     GETATTR_Socket_encoding(interp, handle, encoding_str);
     if (!STRING_IS_NULL(encoding_str))
         return Parrot_find_encoding_by_string(interp, encoding_str);
-    return NULL;
+    return Parrot_default_encoding_ptr;
 }
 
 /*

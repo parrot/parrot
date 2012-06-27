@@ -61,7 +61,6 @@ pmclass StringHandle extends Handle auto_attrs {
     ATTR INTVAL  flags;               /* Filehandle flags             */
     ATTR STRING *stringhandle;        /* The string data              */
     ATTR STRING *mode;                /* The mode string used in open */
-    ATTR STRING *encoding;            /* The encoding for read/write  */
     ATTR STRING *filename;            /* A mock path and filename     */
     ATTR INTVAL  read_offset;         /* Position, for reading bytes  */
 
@@ -86,7 +85,7 @@ Initializes a newly created StringHandle object.
         data_struct->flags        = 0;
         data_struct->stringhandle = NULL;
         data_struct->mode         = NULL;
-        data_struct->encoding     = NULL;
+        data_struct->encoding     = STRINGNULL;
         data_struct->filename     = NULL;
         data_struct->read_offset  = 0;
         data_struct->io_vtable    = (IO_VTABLE *)Parrot_io_get_vtable(interp,
@@ -362,29 +361,6 @@ Retrieve the read mode string for the stringhandle.
         STRING *mode;
         GET_ATTR_mode(INTERP, SELF, mode);
         RETURN(STRING *mode);
-    }
-
-/*
-
-=item C<METHOD encoding(STRING *new_encoding)>
-
-Set or retrieve the encoding attribute (a string name of the selected encoding
-scheme) for the stringhandle.
-
-=cut
-
-*/
-
-    METHOD encoding(STRING *new_encoding :optional, INTVAL got_encoding :opt_flag) {
-        STRING *encoding;
-
-        if (got_encoding) {
-            SET_ATTR_encoding(INTERP, SELF, new_encoding);
-            RETURN(STRING *new_encoding);
-        }
-
-        GET_ATTR_encoding(INTERP, SELF, encoding);
-        RETURN(STRING *encoding);
     }
 
 /*
