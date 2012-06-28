@@ -233,7 +233,7 @@ Close the handle.
         RETURN(INTVAL status);
     }
 
-    /*
+/*
 
 =item C<METHOD encoding(STRING *new_encoding)>
 

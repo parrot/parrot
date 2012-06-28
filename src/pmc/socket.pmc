@@ -298,7 +298,7 @@ string containing the received message.
 */
 
     METHOD recv() {
-        STRING * const result = Parrot_io_read_s(INTERP, SELF, CHUNK_SIZE);
+        STRING * const result = Parrot_io_read_s(INTERP, SELF, PIO_READ_SIZE_ANY);
         RETURN(STRING * result);
     }
 

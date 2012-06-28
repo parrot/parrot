@@ -257,7 +257,7 @@ io_verify_string_encoding(PARROT_INTERP, ARGIN(PMC *handle),
 /*
 
 =item C<STRING * io_read_encoded_string(PARROT_INTERP, PMC *handle, const
-IO_VTABLE *vtable, IO_BUFFER *buffer, const STR_VTABLE *encoding, INTVAL
+IO_VTABLE *vtable, IO_BUFFER *buffer, const STR_VTABLE *encoding, size_t
 char_length)>
 
 Read a STRING from the handle with the given number of bytes, assuming the
@@ -274,12 +274,14 @@ PARROT_WARN_UNUSED_RESULT
 STRING *
 io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
         ARGIN(const IO_VTABLE *vtable), ARGMOD(IO_BUFFER *buffer),
-        ARGIN_NULLOK(const STR_VTABLE *encoding), INTVAL char_length)
+        ARGIN_NULLOK(const STR_VTABLE *encoding), size_t char_length)
 {
     ASSERT_ARGS(io_read_encoded_string)
     STRING * const s = Parrot_gc_new_string_header(interp, 0);
     const size_t raw_reads = buffer->raw_reads;
     size_t total_bytes_read = 0;
+    Parrot_String_Bounds bounds;
+    size_t bytes_to_read = 0;
 
     s->bufused  = 0;
     s->strlen   = 0;
@@ -290,11 +292,23 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
 
     PARROT_ASSERT(s->encoding);
 
+    /* When we have a request with PIO_READ_SIZE_ANY, we just want a big chunk
+       of data. Fill the buffer up as full as it gets and read it out. */
+    if (char_length == PIO_READ_SIZE_ANY) {
+        Parrot_io_buffer_fill(interp, buffer, handle, vtable);
+        bytes_to_read = io_buffer_find_num_characters(interp, buffer,
+                                handle, vtable, encoding, &bounds,
+                                BUFFER_USED_SIZE(buffer));
+        if (bytes_to_read != 0)
+            io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read);
+        return s;
+    }
+
+    /* Otherwise, we have a specific number of characters we're trying to get.
+       Loop until we read them all. */
     while (1) {
-        Parrot_String_Bounds bounds;
-        size_t bytes_to_read = io_buffer_find_num_characters(interp, buffer,
-                                        handle, vtable, encoding, &bounds,
-                                        char_length);
+        bytes_to_read = io_buffer_find_num_characters(interp, buffer, handle,
+                                        vtable, encoding, &bounds, char_length);
 
         /* Buffer is empty, so we're at EOF */
         if (bytes_to_read == 0)

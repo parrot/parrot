@@ -218,7 +218,7 @@ STRING * io_read_encoded_string(PARROT_INTERP,
     ARGIN(const IO_VTABLE *vtable),
     ARGMOD(IO_BUFFER *buffer),
     ARGIN_NULLOK(const STR_VTABLE *encoding),
-    INTVAL char_length)
+    size_t char_length)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)

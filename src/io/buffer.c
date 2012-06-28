@@ -348,7 +348,8 @@ io_buffer_transfer_to_mem(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
     PARROT_ASSERT(length > 0);
 
     {
-        const size_t length_left = length;
+        const size_t length_left = length == PIO_READ_SIZE_ANY ?
+                                             BUFFER_USED_SIZE(buffer) : length;
         const size_t used_length = BUFFER_USED_SIZE(buffer);
         const size_t copy_length = used_length <= length ? used_length : length;
 

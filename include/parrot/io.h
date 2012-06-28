@@ -21,6 +21,9 @@
 
 /* &end_gen */
 
+/* Read whatever is available */
+#define PIO_READ_SIZE_ANY   ((size_t)-1)
+
 /* Block Size. Returned from Parrot_io_internal_getblksize */
 #ifdef BLKSIZE
 #  define PIO_BLKSIZE BLKSIZE
