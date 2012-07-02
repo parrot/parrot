@@ -781,7 +781,17 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 
 }
 
-/* this is manual inlining of Parrot_pmc_destroy() */
+/*
+
+=item C<static void gc_gms_destroy_pmc(PARROT_INTERP, MarkSweep_GC *self, PMC
+*pmc, pmc_alloc_struct *ptr)>
+
+Destroys a PMC as far as the GMS GC and the rest of Parrot understand that. You
+may recognize some of this code as internals of Parrot_pmc_destroy(). This
+manual inlining is no accident; it's a performance tweak.
+
+*/
+
 static void
 gc_gms_destroy_pmc(PARROT_INTERP, ARGMOD(MarkSweep_GC *self), ARGMOD(PMC *pmc),
                                   ARGMOD(pmc_alloc_struct *ptr))
@@ -798,6 +808,19 @@ gc_gms_destroy_pmc(PARROT_INTERP, ARGMOD(MarkSweep_GC *self), ARGMOD(PMC *pmc),
 
     Parrot_gc_pool_free(interp, self->pmc_allocator, ptr);
 }
+
+/*
+
+=item C<static void gc_gms_reclaim_early_gc_pmcs(PARROT_INTERP, MarkSweep_GC
+*self)>
+
+Reclaims all PMCs in the youngest generation which have been marked for early
+GC. This will remove any such PMCs found from the youngest generation. This
+does not perform a full mark and sweep. This only searches the youngest
+generation. This stops after it's reached the end of that generation or it's
+found the number of early GC PMCs it expects.
+
+*/
 
 static void
 gc_gms_reclaim_early_gc_pmcs(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
