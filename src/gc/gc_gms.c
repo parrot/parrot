@@ -755,6 +755,53 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 
 }
 
+/* this is manual inlining of Parrot_pmc_destroy() */
+static void
+gc_gms_destroy_pmc(PARROT_INTERP, ARGMOD(MarkSweep_GC *self), ARGMOD(PMC *pmc),
+                                  ARGMOD(pmc_alloc_struct *ptr))
+{
+    if (PObj_custom_destroy_TEST(pmc))
+        VTABLE_destroy(interp, pmc);
+
+    if (pmc->vtable->attr_size && PMC_data(pmc))
+        Parrot_gc_free_pmc_attributes(interp, pmc);
+    PMC_data(pmc) = NULL;
+
+    PObj_on_free_list_SET(pmc);
+    PObj_gc_CLEAR(pmc);
+
+    Parrot_gc_pool_free(interp, self->pmc_allocator, ptr);
+}
+
+static void
+gc_gms_reclaim_early_gc_pmcs(PARROT_INTERP, MarkSweep_GC * const self)
+{
+    ASSERT_ARGS(gc_gms_reclaim_early_gc_pmcs)
+    /* assumption: early GC PMCs are all in the youngest generation */
+    const Parrot_Pointer_Array *gen = self->objects[ self->youngest_child ];
+
+    POINTER_ARRAY_ITER(gen,
+        pmc_alloc_struct * const item = (pmc_alloc_struct *)ptr;
+        PMC              * const pmc  = &(item->pmc);
+
+        /* remove only early gc objects */
+        if (PObj_needs_early_gc_TEST(pmc)) {
+            /* remove PMC from this generation */
+            Parrot_pa_remove(interp, gen, ptr);
+            gc_gms_destroy_pmc(interp, self, pmc, ptr);
+
+            /* and do some bookkeeping */
+            self->num_early_gc_PMCs--;
+            interp->gc_sys->stats.memory_used -= sizeof (PMC);
+
+            /* and don't do more work than necessary */
+            if (self->num_early_gc_PMCs == 0)
+                return;
+        });
+
+    return;
+}
+
 static void
 gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 {
@@ -783,6 +830,13 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     gc_gms_print_stats(interp, "Before");
 
     gc_gms_check_sanity(interp);
+
+    /* handle PMCs on the early GC list */
+    if (flags & GC_lazy_FLAG) {
+        gc_gms_reclaim_early_gc_pmcs(interp, self);
+        return;
+    }
+
     /*
     2. Choose K - how many collections we want to collect. Collections [0..K]
     will be collected. Remember K in C<self->gen_to_collect>.
@@ -1085,19 +1139,7 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
                 Parrot_pa_remove(interp, self->objects[i], item->ptr);
 
                 interp->gc_sys->stats.memory_used -= sizeof (PMC);
-
-                /* this is manual inlining of Parrot_pmc_destroy() */
-                if (PObj_custom_destroy_TEST(pmc))
-                    VTABLE_destroy(interp, pmc);
-
-                if (pmc->vtable->attr_size && PMC_data(pmc))
-                    Parrot_gc_free_pmc_attributes(interp, pmc);
-                PMC_data(pmc) = NULL;
-
-                PObj_on_free_list_SET(pmc);
-                PObj_gc_CLEAR(pmc);
-
-                Parrot_gc_pool_free(interp, self->pmc_allocator, ptr);
+                gc_gms_destroy_pmc(interp, self, pmc, ptr);
             });
 
         POINTER_ARRAY_ITER(self->strings[i],
@@ -1913,6 +1955,7 @@ gc_gms_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
     ASSERT_ARGS(gc_gms_pmc_needs_early_collection)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     ++self->num_early_gc_PMCs;
+    PObj_needs_early_gc_SET(pmc);
 }
 
 /*

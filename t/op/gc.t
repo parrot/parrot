@@ -86,13 +86,13 @@ GC related bugs.
     $I1 = interpinfo .INTERPINFO_GC_MARK_RUNS   # How many GC mark runs have we done already?
     $P0 = new 'Undef'  #kill object
     sweep 0
-    $I2 = interpinfo .INTERPINFO_GC_MARK_RUNS   # Should be one more now
+    $I2 = interpinfo .INTERPINFO_GC_MARK_RUNS   # Should be no more now
     $I3 = $I2 - $I1
     sweep 0
     $I4 = interpinfo .INTERPINFO_GC_MARK_RUNS   # Should be same as last
     $I5 = $I4 - $I2
-    is($I3,1, "sweep_0_need_destroy_destroy_obj")
-    is($I5,0, "sweep_0_need_destroy_destroy_obj")
+    is($I3, 0, "sweep_0_need_destroy_destroy_obj")
+    is($I5, 0, "sweep_0_need_destroy_destroy_obj")
 .end
 
 
