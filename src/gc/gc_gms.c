@@ -285,6 +285,18 @@ static size_t gc_gms_count_used_string_memory(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void gc_gms_destroy_pmc(PARROT_INTERP,
+    ARGMOD(MarkSweep_GC *self),
+    ARGMOD(PMC *pmc),
+    ARGMOD(pmc_alloc_struct *ptr))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*self)
+        FUNC_MODIFIES(*pmc)
+        FUNC_MODIFIES(*ptr);
+
 static void gc_gms_finalize(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -415,6 +427,12 @@ static void gc_gms_reallocate_string_storage(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void gc_gms_reclaim_early_gc_pmcs(PARROT_INTERP,
+    ARGMOD(MarkSweep_GC *self))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*self);
+
 static void gc_gms_seal_object(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -502,6 +520,11 @@ static int gen2flags(int gen);
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(list))
+#define ASSERT_ARGS_gc_gms_destroy_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(pmc) \
+    , PARROT_ASSERT_ARG(ptr))
 #define ASSERT_ARGS_gc_gms_finalize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_free_buffer_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -577,6 +600,9 @@ static int gen2flags(int gen);
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str))
+#define ASSERT_ARGS_gc_gms_reclaim_early_gc_pmcs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_gc_gms_seal_object __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
@@ -774,7 +800,7 @@ gc_gms_destroy_pmc(PARROT_INTERP, ARGMOD(MarkSweep_GC *self), ARGMOD(PMC *pmc),
 }
 
 static void
-gc_gms_reclaim_early_gc_pmcs(PARROT_INTERP, MarkSweep_GC * const self)
+gc_gms_reclaim_early_gc_pmcs(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
 {
     ASSERT_ARGS(gc_gms_reclaim_early_gc_pmcs)
     /* assumption: early GC PMCs are all in the youngest generation */
