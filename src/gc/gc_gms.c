@@ -796,6 +796,8 @@ static void
 gc_gms_destroy_pmc(PARROT_INTERP, ARGMOD(MarkSweep_GC *self), ARGMOD(PMC *pmc),
                                   ARGMOD(pmc_alloc_struct *ptr))
 {
+    ASSERT_ARGS(gc_gms_destroy_pmc)
+
     if (PObj_custom_destroy_TEST(pmc))
         VTABLE_destroy(interp, pmc);
 
