@@ -72,6 +72,7 @@ GC related bugs.
     $P0 = new 'Undef'
     $I1 = interpinfo .INTERPINFO_GC_MARK_RUNS   # How many GC mark runs have we done already?
     needs_destroy $P0
+    null $P0
     sweep 0
     $I2 = interpinfo .INTERPINFO_GC_MARK_RUNS   # Should be one more now
     $I3 = $I2 - $I1
@@ -310,6 +311,7 @@ lp1:
     $P1[$I0] = $P2
     if $I0, not_0
     needs_destroy $P0
+    null $P0
     # force marking past $P2[0]
     sweep 0
 not_0:

@@ -106,6 +106,7 @@ TBD
 #include "parrot/parrot.h"
 #include "parrot/gc_api.h"
 #include "parrot/pointer_array.h"
+#include "parrot/exceptions.h"
 #include "gc_private.h"
 #include "fixed_allocator.h"
 
@@ -1154,6 +1155,15 @@ gc_gms_mark_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
     PARROT_ASSERT(!PObj_on_free_list_TEST(pmc)
         || !"Resurrecting of dead objects is not supported");
 
+    if (PObj_needs_early_gc_TEST(pmc)) {
+        PMC *exception = Parrot_ex_build_exception(interp, NULL,
+             EXCEPTION_GC_ERROR, Parrot_str_new_constant(interp,
+                "GC_GMS marking a PMC flagged for early collection!" ));
+        VTABLE_set_pmc_keyed_str(interp, exception,
+            Parrot_str_new_constant(interp, "payload"), pmc);
+        Parrot_ex_throw_from_c(interp, exception);
+    }
+
     /* Object was already marked as grey. Or live. Or dead. Skip it */
     if (PObj_live_TEST(pmc))
         return;
@@ -1912,6 +1922,7 @@ gc_gms_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
 {
     ASSERT_ARGS(gc_gms_pmc_needs_early_collection)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    PObj_needs_early_gc_SET(pmc);
     ++self->num_early_gc_PMCs;
 }
 
