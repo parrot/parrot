@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2011, Parrot Foundation.
+# Copyright (C) 2004-2012, Parrot Foundation.
 
 package Parrot::Pmc2c::PCCMETHOD;
 use strict;
@@ -154,10 +154,10 @@ Rewrites the method body performing the various macro substitutions for RETURNs.
 =cut
 
 sub rewrite_RETURNs {
-    my ( $self, $pmc ) = @_;
-    my $method_name    = $self->name;
-    my $body           = $self->body;
-    my $wb             = $self->attrs->{manual_wb}
+    my ( $method, $pmc ) = @_;
+    my $method_name    = $method->name;
+    my $body           = $method->body;
+    my $wb             = $method->attrs->{manual_wb}
                          ? ''
                          : 'PARROT_GC_WRITE_BARRIER(interp, _self);';
 
@@ -328,13 +328,13 @@ sub process_pccmethod_args {
 =cut
 
 sub rewrite_pccmethod {
-    my ( $self, $pmc ) = @_;
+    my ( $method, $pmc ) = @_;
 
     my $e      = Parrot::Pmc2c::Emitter->new( $pmc->filename );
     my $e_post = Parrot::Pmc2c::Emitter->new( $pmc->filename );
 
     # parse pccmethod parameters, then unshift the PMC arg for the invocant
-    my $linear_args = parse_p_args_string( $self->parameters );
+    my $linear_args = parse_p_args_string( $method->parameters );
     unshift @$linear_args,
         {
             type             => convert_type_string_to_reg_type('PMC'),
@@ -348,12 +348,12 @@ sub rewrite_pccmethod {
     my ( $params_signature, $params_varargs, $params_declarations ) =
         process_pccmethod_args( $linear_args, 'arg' );
 
-    my $wb             = $self->attrs->{manual_wb}
+    my $wb             = $method->attrs->{manual_wb}
                          ? ''
                          : 'PARROT_GC_WRITE_BARRIER(interp, _self);';
 
-    rewrite_RETURNs( $self, $pmc );
-    rewrite_pccinvoke( $self, $pmc );
+    rewrite_RETURNs( $method, $pmc );
+    rewrite_pccinvoke( $method, $pmc );
 
     $e->emit( <<"END", __FILE__, __LINE__ + 1 );
     PMC * const _ctx         = CURRENT_CONTEXT(interp);
@@ -383,14 +383,14 @@ END
     } /* END PARAMS SCOPE */
     return;
 END
-    $self->return_type('void');
-    $self->parameters('');
+    $method->return_type('void');
+    $method->parameters('');
     my $e_body = Parrot::Pmc2c::Emitter->new( $pmc->filename );
     $e_body->emit($e);
-    $e_body->emit( $self->body );
+    $e_body->emit( $method->body );
     $e_body->emit($e_post);
-    $self->body($e_body);
-    $self->{PCCMETHOD} = 1;
+    $method->body($e_body);
+    $method->{PCCMETHOD} = 1;
 
     return 1;
 }
@@ -544,12 +544,80 @@ sub process_parameter {
     return ($type, @arg_names);
 }
 
+=head3 C<rewrite_multi_sub($method, $pmc)>
+
+B<Purpose:>  Parse and Build PMC multiple dispatch subs.
+
+B<Arguments:>
+
+=over 4
+
+=item * C<self>
+
+=item * C<method>
+
+Current Method Object
+
+=item * C<body>
+
+Current Method Body
+
+=back
+
+=cut
+
+sub rewrite_multi_sub {
+    my ( $method, $pmc ) = @_;
+    my @param_types = ();
+    my @new_params = ();
+
+    # Fixup the parameters, standardizing PMC types and extracting type names
+    # for the multi name.
+    for my $param ( split /,/, $method->parameters ) {
+        my ( $type, $name, $rest ) = split /\s+/, &Parrot::Pmc2c::PCCMETHOD::trim($param), 3;
+
+        die "Invalid MULTI parameter '$param': missing type or name\n"
+             unless defined $name;
+        die "Invalid MULTI parameter '$param': attributes not allowed on multis\n"
+             if defined $rest;
+
+        # Clean any '*' out of the name or type.
+        if ($name =~ /[\**]?(\"?\w+\"?)/) {
+            $name = $1;
+        }
+        $type =~ s/\*+//;
+
+        # Capture the actual type for the sub name
+        push @param_types, $type;
+
+        # Pass standard parameter types unmodified.
+        # All other param types are rewritten as PMCs.
+        if ($type eq 'STRING' or $type eq 'PMC' or $type eq 'INTVAL') {
+            push @new_params, $param;
+        }
+        elsif ($type eq 'FLOATVAL') {
+            push @new_params, $param;
+        }
+        else {
+            push @new_params, "PMC *$name";
+        }
+    }
+
+    $method->parameters(join (",", @new_params));
+
+    $method->{MULTI_sig}      = [@param_types];
+    $method->{MULTI_full_sig} = join(',', @param_types);
+    $method->{MULTI}          = 1;
+
+    return 1;
+}
+
 sub mangle_name {
-    my ( $self, $pmc ) = @_;
-    $self->symbol( $self->name );
-    $self->name( $self->type eq Parrot::Pmc2c::Method::MULTI()   ?
-                    (join '_', 'multi', $self->name, @{ $self->{MULTI_sig} }) :
-                    "nci_@{[$self->name]}" );
+    my ( $method ) = @_;
+    $method->symbol( $method->name );
+    $method->name( $method->type eq Parrot::Pmc2c::Method::MULTI()
+        ?  (join '_', 'multi', $method->name, @{ $method->{MULTI_sig} })
+        : "nci_@{[$method->name]}" );
 }
 
 1;

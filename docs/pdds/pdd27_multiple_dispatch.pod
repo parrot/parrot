@@ -6,10 +6,6 @@
 
 This PDD defines Parrot's multiple dispatch system.
 
-
-
-
-
 =head2 Definitions
 
 Multiple dispatch allows a single function name to be associated with several

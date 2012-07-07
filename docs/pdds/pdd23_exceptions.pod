@@ -7,10 +7,6 @@
 This document defines the requirements and implementation strategy for
 Parrot's exception system.
 
-
-
-
-
 =head2 Description
 
 I<Exceptions> are indications by running code that something unusual -- an

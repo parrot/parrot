@@ -7,10 +7,6 @@
 This PDD describes the node types and semantics of the Parrot
 Abstract Syntax Tree representation.
 
-
-
-
-
 =head2 Description
 
 The Parrot Abstract Syntax Tree (PAST) is a set of Parrot

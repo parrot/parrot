@@ -50,34 +50,44 @@ Tests for basic system information.
 
 =cut
 
+#define PARROT_INTSIZE               16
+#define PARROT_FLOATSIZE             17
+#define PARROT_POINTERSIZE           18
+#define PARROT_OS                    30
+#define PARROT_OS_VERSION            31
+#define PARROT_OS_VERSION_NUMBER     32
+#define CPU_ARCH                     33
+#define CPU_TYPE                     34
+#define PARROT_INTMAX                19
+#define PARROT_INTMIN                20
 
 my @setup = (
     { pconfig_key => 'intvalsize',
-      pasm_key    => 1,
+      pasm_key    => 16,
       pir_key     => 'SYSINFO_PARROT_INTSIZE',
       desc        => 'integer size',
       reg_type    => 'I',
     },
     { pconfig_key => 'doublesize',
-      pasm_key    => 2,
+      pasm_key    => 17,
       pir_key     => 'SYSINFO_PARROT_FLOATSIZE',
       desc        => 'float size',
       reg_type    => 'I',
     },
     { pconfig_key => 'ptrsize',
-      pasm_key    => 3,
+      pasm_key    => 18,
       pir_key     => 'SYSINFO_PARROT_POINTERSIZE',
       desc        => 'pointer size',
       reg_type    => 'I',
     },
     { pconfig_key => 'osname',
-      pasm_key    => 4,
+      pasm_key    => 30,
       pir_key     => 'SYSINFO_PARROT_OS',
       desc        => 'osname',
       reg_type    => 'S',
     },
     { pconfig_key => 'cpuarch',
-      pasm_key    => 7,
+      pasm_key    => 33,
       pir_key     => 'SYSINFO_CPU_ARCH',
       desc        => 'CPU Arch Family',
       reg_type    => 'S',
