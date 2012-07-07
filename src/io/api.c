@@ -1920,7 +1920,7 @@ Parrot_io_set_flags(PARROT_INTERP, ARGIN(PMC *handle), INTVAL flags)
             "Cannot set flags for null or invalid PMC");
     {
         const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
-        return vtable->set_flags(interp, handle, flags);
+        vtable->set_flags(interp, handle, flags);
     }
 }
 
