@@ -546,7 +546,7 @@ L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.cal
 
     - Jul 17, 2012 - 4.6.0   - reini
     - Aug 21, 2012 - 4.7.0   - whiteknight
-    - Sep 18, 2012 - 4.8.0   - ??
+    - Sep 18, 2012 - 4.8.0   - alvis
     - Oct 16, 2012 - 4.9.0   - dukeleto
     - Nov 20, 2012 - 4.10.0  - ??
     - Dec 18, 2012 - 4.11.0  - ??
