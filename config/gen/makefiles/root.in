@@ -1124,10 +1124,10 @@ $(PDB) : $(FR_DIR)/parrot_debugger/main$(O) src/parrot_config$(O) $(LIBPARROT)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 #IF(cygwin and optimize):$(INSTALLABLEPDB) : LINK += -s
-$(INSTALLABLEPDB) : $(FR_DIR)/parrot_debugger/main$(O) $(LIBPARROT) src/parrot_config$(O)
+$(INSTALLABLEPDB) : $(FR_DIR)/parrot_debugger/main$(O) $(LIBPARROT) src/install_config$(O)
 	$(LINK) @ld_out@$@ \
 	$(FR_DIR)/parrot_debugger/main$(O) \
-	src/parrot_config$(O) \
+	src/install_config$(O) \
 	@rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
