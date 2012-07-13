@@ -905,20 +905,23 @@ STRING *
 Parrot_io_readline(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(Parrot_io_readline)
-    return Parrot_io_readline_s(interp, handle, '\n');
+    return Parrot_io_readline_s(interp, handle, STRINGNULL);
 }
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_io_readline_s(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL terminator)
+Parrot_io_readline_s(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING * terminator))
 {
     ASSERT_ARGS(Parrot_io_readline_s)
 
     if (PMC_IS_NULL(handle))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "Attempt to read bytes from a null or invalid PMC");
+
+    if (STRING_IS_NULL(terminator) || STRING_length(interp, terminator) == 0)
+        terminator = CONST_STRING(interp, "\n");
 
     {
         /* TODO: Try not to automatically allocate a read buffer for fixed8
@@ -928,6 +931,10 @@ Parrot_io_readline_s(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL terminator)
         IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
         size_t bytes_read;
         STRING *result;
+
+        if (terminator->bufused > (read_buffer->buffer_size / 2))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Readline terminator string must be smaller than %d bytes for this buffer");
 
         io_sync_buffers_for_read(interp, handle, vtable, read_buffer, write_buffer);
         io_verify_is_open_for(interp, handle, vtable, PIO_F_READ);

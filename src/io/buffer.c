@@ -677,10 +677,10 @@ Parrot_io_buffer_advance_position(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer
 PMC *handle, const IO_VTABLE *vtable, const STR_VTABLE *encoding,
 Parrot_String_Bounds *bounds, INTVAL delim)>
 
-Search the buffer for the given delimiter character or end-of-buffer,
+Search the buffer for the given delimiter substr or end-of-buffer,
 whichever comes first. Return a count of the number of bytes to be
 read, in addition to scan information in *bounds. Does not return an
-amount of bytes to read which would create an incomplete codepoint
+amount of bytes to read which would create an incomplete codepoint.
 
 =cut
 
@@ -691,19 +691,20 @@ size_t
 io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
         ARGMOD(PMC *handle), ARGIN(const IO_VTABLE *vtable),
         ARGIN(const STR_VTABLE *encoding), ARGMOD(Parrot_String_Bounds *bounds),
-        INTVAL delim)
+        ARGIN(STRING * delim))
 {
     ASSERT_ARGS(io_buffer_find_string_marker)
     INTVAL bytes_needed = 0;
 
     size_t bytes_available = Parrot_io_buffer_fill(interp, buffer, handle,
                                                    vtable);
+    STRING str;
     if (bytes_available == 0)
         return 0;
 
     bounds->bytes = BUFFER_USED_SIZE(buffer);
     bounds->chars = -1;
-    bounds->delim = delim;
+    bounds->delim = -1;
 
     /* Search the buffer. Return either when we find the delimiter or reach
        the end of the available buffer. partial_scan returns the number of

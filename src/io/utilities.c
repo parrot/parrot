@@ -403,7 +403,7 @@ PARROT_WARN_UNUSED_RESULT
 STRING *
 io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
         ARGIN(const IO_VTABLE *vtable), ARGMOD(IO_BUFFER *buffer),
-        ARGIN_NULLOK(const STR_VTABLE *encoding), INTVAL rs)
+        ARGIN_NULLOK(const STR_VTABLE *encoding), ARGIN(STRING * rs))
 {
     ASSERT_ARGS(io_readline_encoded_string)
     STRING * const s = Parrot_gc_new_string_header(interp, 0);
