@@ -25,20 +25,10 @@ Github Guide (F<docs/project/release_parrot_github_guide.pod>).
 
 =over 4
 
-=item B<-d>, B<--docs>=[/path_to/previous/docs/]
+=item B<--docs>=[/path_to/previous/docs/]
 
 The path to the directory which contains the previous documentation release.
 Specifically, the 'docs/' directory of the previous release of parrot.
-
-=item B<-r>, B<--repos>=[/path_to/clone/repos/]
-
-The path on your local file system in which to clone the 'parrot.github.com'
-and the 'parrot-docsx' repositories.
-
-=item B<--delete>
-
-The default is to retain both the 'parrot.github.com' and the 'parrot-docsx'
-repositories. This option deletes the repositories after pushing the updates.
 
 =item B<-h>, B<--help>
 
@@ -50,15 +40,12 @@ Displays the version and copyright information and exits.
 
 =back
 
-=head1 QUERY SYSTEM
-
-If you do not apply the above options on the command-line, the script will
-invoke a rather minimal query system with which to obtain the necessary
-information.
-
 =head1 LIMITATIONS
 
-This script is limited to *nix (and related) systems.
+1. As written, this script will execute only on *nix (and related) systems.
+
+2. You must execute this script from the parrot root directory, I<i.e.>,
+'./parrot'; otherwise, it will fail.
 
 =head1 NOTES
 
@@ -66,12 +53,19 @@ This script is limited to *nix (and related) systems.
 the Release Manger Guide, and have, therefore, already cut the new Parrot
 release.
 
-2. You must use fully qualified paths for both the '-d' and the '-r' options.
-This is true for the query system as well.
+2. You must use a fully qualified path for the '-d' option.
+
+For example, if the path to the previous version of the documentation is
+contained in F</home/user/git-work/parrot/docs/'>, you I<must> specify the
+complete path to the 'docs/' directory and may not use "shell expansion" as
+the name of your home directory, I<i.e.,> you may not use
+C<~/git-work/parrot/docs/>. To do otherwise means the script will fail.
 
 =head1 HISTORY
 
 * [2012-03-21] Initial version written by Alvis Yardley <ac.yardley@gmail.com>
+
+* [2012-07-13] Made the script more robust Alvis Yardley <ac.yardley@gmail.com>
 
 =head1 SEE ALSO
 
@@ -93,16 +87,14 @@ use Cwd;
 
 # Switches
 my $docs;             # Path to the previous docs release
-my $repos;            # Path in which to clone the repos
-my $delete;           # Delete the repos
 my $help;             # Displays help message
 my $version;          # Displays version and copyright information
 
-my $result = GetOptions('d|docs=s'  => \$docs,
-                        'r|repos=s' => \$repos,
-                        'delete'    => \$delete,
+my $result = GetOptions('docs=s'    => \$docs,
                         'h|help'    => \$help,
                         'v|version' => \$version);
+
+my $repos;            # Path to where to store, temporarily, the repositories
 
 # Catch unrecognized switches
 pod2usage() unless $result;
@@ -113,14 +105,14 @@ pod2usage(0) if $help;
 # Display version and copyright information if '-v' was given
 version() && exit(0) if $version;
 
-# Explanatory display if the options are left unspecified
-query_system() unless $docs and $repos and $delete;
+# Get temporary directory defined in 'Parrot::Config::Generated.pm'
+get_repo_directory();
 
 # Get 'docs/' directory if not supplied
 get_docs_directory() unless $docs;
 
-# Get the directory in which to clone the repos if not supplied
-get_repo_directory() unless $repos;
+# Test 'docs/' directory to ensure it's a valid 'docs/' directory.
+tst_docs_directory();
 
 # Get VERSION
 open my $FH, '<', 'VERSION' or stop("Unable to open 'VERSION' file");
@@ -150,34 +142,49 @@ get_parrot_github();
 get_parrot_docsx();
 archive_parrot_docsx();
 update_parrot_github();
-delete_repos() if $delete;
+delete_repos();
 exit(0);
 
 ##########################
 # Subroutine definitions #
 ##########################
 
-# Minimal query system
-sub query_system {
-    my $questions;
-    if ((!defined $docs and !defined $repos) or
-        (!defined $docs and  defined $repos) or
-        ( defined $docs and !defined $repos)) {
-        $questions = "a couple of questions";
-    }
-    else {
-        $questions = "a question";
+# Get the temporary directory, contained in '%PConfig', in which to clone
+# the repos
+sub get_repo_directory {
+    $repos = $PConfig{tempdir};
+    if (!defined $repos) {
+        print "\'\$PConfig{\'tempdir\'}\' is undefined. This variable must ",
+          "be defined and defined with a readable and a writeable directory ",
+            "to execute, successfuly, this script.\n";
+        print "Did you, perhaps, fail to configure parrot?\n";
+        exit(1);
     }
 
-    print "\nHello. I am the parrot_github_release.pl script. Because you ",
-      "didn't employ all of the command line options, I need to ask you ",
-      "$questions.\n\n";
+    $repos .= '/';
+
+    # Test '$repo' directory to ensure we can read and write to it.
+    my $tstfile   = $repos . 'parrot_github_release.out';
+    my $outstring = "A simple test string: parrot_github_release.out";
+    open my $OUT, '+>', $tstfile or
+      stop("Unable to open file for output in $repos directory.");
+    print $OUT $outstring;
+    close $OUT or stop("Unable to close file in $repos directory");
+
+    open my $IN, '<', $tstfile or
+      stop("Unable to open file for input in $repos directory.");
+    my $instring = <$IN>;
+    close $IN or stop("Unable to close $tstfile");
+    stop("Unable to read and to write to $repos directory")
+      unless $instring eq $outstring;
+
+    unlink $tstfile or warn "Unable to delete $tstfile: $!";
 }
 
 # Get 'docs/' directory
 sub get_docs_directory {
     while (1) {
-        print "What is the path to the previous documentation release? ";
+        print "Please specify the path to the previous documentation release? ";
         $docs = <>;
         chomp $docs;
 
@@ -187,18 +194,18 @@ sub get_docs_directory {
     $docs .= '/' if $docs =~ /[a-zA-Z0-9]$/;
 }
 
-# Get the directory in which to clone the repos
-sub get_repo_directory {
-    while (1) {
-        print "What is the path in which to clone the 'parrot.github.com' ",
-          "and the 'parrot-docsx' repositories? ";
-        $repos = <>;
-        chomp $repos;
+# Test whether or not we actually have a valid 'docs/' directory.
+sub tst_docs_directory {
+    my $parrot_dir = getcwd();
+    my $filename   = 'parrothist.pod'; # This one's likely to stick around.
 
-        last if -d $repos;
-    }
+    $docs .= '/' if $docs =~ /[a-zA-Z0-9]$/;
+    chdir $docs;
 
-    $repos .= '/' if $repos =~ /[a-zA-Z0-9]$/;
+    stop("Unable to access the $docs directory")
+      unless (-f $filename && -s $filename);
+
+    chdir $parrot_dir;
 }
 
 # Clone a local copy of 'parrot.github.com'
@@ -272,8 +279,8 @@ sub update_parrot_github {
     my $tmp = $PConfig{tempdir};
 
     print "\n== SAVING KEY 'PARROT.GITHUB.COM' FILES ==\n";
-    system('cp', "--target-directory=$tmp", 'README.pod') == 0 or
-      stop("Unable to save 'README.pod'");
+    system('cp', "--target-directory=$tmp", 'README.md') == 0 or
+      stop("Unable to save 'README.md'");
     system('cp', "--target-directory=$tmp", 'index.html') == 0 or
       stop("Unable to save 'index.html'");
     system('cp', "--target-directory=$tmp", 'releases.html') == 0 or
@@ -292,8 +299,8 @@ sub update_parrot_github {
       stop("Unable to commit to 'parrot.github.com'");
 
     print "\n== RESTORING KEY 'PARROT.GITHUB.COM' FILES ==\n";
-    system('cp', "$tmp/README.pod", '.') == 0 or
-      stop("Unable to restore 'README.pod'");
+    system('cp', "$tmp/README.md", '.') == 0 or
+      stop("Unable to restore 'README.md'");
     system('cp', "$tmp/index.html", '.') == 0 or
       stop("Unable to restore 'index.html'");
      system('cp', "$tmp/releases.html", '.') == 0 or
