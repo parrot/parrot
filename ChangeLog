@@ -1,6 +1,10 @@
-2012-07-XX    release 4.6.0
+2012-07-17    release 4.6.0
     - Core
     - Documentation
+	+ Added source lines from 'docs/index/book.json' to 'index.json'
+	  to make display of 'Parrot Developer's Guide: PIR (draft)'
+	  display more like the other books, e.g., 'PCT Book'.
+	+ Removed 'docs/index/book.json' as unnecessary.
     - Tests
     - Community
 
