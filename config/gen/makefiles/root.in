@@ -1869,7 +1869,8 @@ src/embed/pmc$(O) : \
 	$(INC_DIR)/api.h \
 	src/embed/pmc.c \
 	src/embed/embed_private.h \
-	$(INC_PMC_DIR)/pmc_parrotinterpreter.h
+	$(INC_PMC_DIR)/pmc_parrotinterpreter.h \
+	$(INC_PMC_DIR)/pmc_task.h
 
 src/dataypes$(O) : $(GEN_HEADERS) src/dataypes.c
 

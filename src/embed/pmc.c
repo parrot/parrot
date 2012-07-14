@@ -20,6 +20,7 @@ This file implements PMC functions of the Parrot embedding interface.
 #include "parrot/parrot.h"
 #include "parrot/api.h"
 #include "embed_private.h"
+#include "pmc/pmc_task.h"
 
 /* HEADERIZER HFILE: include/parrot/api.h */
 
@@ -541,7 +542,17 @@ Parrot_api_pmc_invoke(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC sub),
     EMBED_API_CALLIN(interp_pmc, interp)
     PMC  * const old_call_obj = Parrot_pcc_get_signature(interp,
         CURRENT_CONTEXT(interp));
-    Parrot_pcc_invoke_from_sig_object(interp, sub, signature);
+
+    PMC * const task = Parrot_pmc_new(interp, enum_class_Task);
+    Parrot_Task_attributes * const tdata = PARROT_TASK(task);
+
+    tdata->code = sub;
+    tdata->signature = signature;
+    PARROT_GC_WRITE_BARRIER(interp, task);
+
+    Parrot_cx_schedule_immediate(interp, task);
+    Parrot_cx_outer_runloop(interp);
+
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), old_call_obj);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
