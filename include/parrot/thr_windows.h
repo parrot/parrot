@@ -62,9 +62,12 @@ typedef HANDLE Parrot_thread;
          ++(c).m_lWaiters; \
          UNLOCK(m); \
          diff = (DWORD)(((t)->tv_sec - sec)*1000L + ((t)->tv_nsec - nsec)/1000000L); \
-         (rc) |= WaitForSingleObject((c).m_hSema, diff); \
+         (rc) = WaitForSingleObject((c).m_hSema, diff) != WAIT_OBJECT_0; \
          LOCK(m); \
          --(c).m_lWaiters; \
+       } \
+       else { \
+         (rc) = 1; \
        } \
      } while (0)
 

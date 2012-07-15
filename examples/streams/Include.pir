@@ -1,5 +1,5 @@
 
-=head1 Include Example
+=head1 DESCRIPTION
 
 This example demonstrates how to include another stream inside a stream.
 

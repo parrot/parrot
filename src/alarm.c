@@ -5,6 +5,10 @@ Copyright (C) 2010-2012, Parrot Foundation.
 
 src/alarm.c - Implements a mechanism for alarms, setting a flag after a delay.
 
+=head1 DESCRIPTION
+
+This program implements a mechanism for alarms, setting a flag after a delay.
+
 =cut
 
 */
@@ -16,6 +20,7 @@ src/alarm.c - Implements a mechanism for alarms, setting a flag after a delay.
 /* Some per-process state */
 static volatile UINTVAL  alarm_serial = 0;
 static volatile FLOATVAL alarm_set_to = 0.0;
+static volatile FLOATVAL current_alarm = 0.0;
 
 /* HEADERIZER HFILE: include/parrot/alarm.h */
 
@@ -74,31 +79,39 @@ Parrot_alarm_runloop(ARGIN_NULLOK(void *arg))
 {
     ASSERT_ARGS(Parrot_alarm_runloop)
 
-    struct timespec ts;
-    FLOATVAL alarm = 0.0;
-    FLOATVAL now = Parrot_floatval_time();
-    INTVAL notify = 0;
-
     while (1) {
         int rc = 0;
+        INTVAL notify = 0;
+
         LOCK(alarm_lock);
 
-        if (alarm_set_to >= now) {
+        if (alarm_set_to > 0) {
+            struct timespec ts;
             ts.tv_sec = (time_t)alarm_set_to;
-            ts.tv_nsec = (long)((alarm_set_to - ts.tv_sec) * 1000.0f) * 1000000L;
+            ts.tv_nsec = (long)((alarm_set_to - ts.tv_sec) * 1000000000.0f);
+            current_alarm = alarm_set_to;
+            alarm_set_to = 0;
             rc = 0;
-            while (alarm == alarm_set_to && rc == 0)
+            while (alarm_set_to == 0 && rc == 0) {
                 COND_TIMED_WAIT(sleep_cond, alarm_lock, &ts, rc);
+            }
         }
         else { /* no alarms set, just wait for new alarms */
-            while (alarm == alarm_set_to)
+            while (alarm_set_to == 0) {
                 COND_WAIT(sleep_cond, alarm_lock);
+            }
         }
 
-        /* notify on timeout but not on setting new alarm */
-        now = Parrot_floatval_time();
-        notify = (rc != 0 || alarm_set_to <= now);
-        alarm = alarm_set_to;
+        if (alarm_set_to > 0 && alarm_set_to <= Parrot_floatval_time()) {
+            /* New alarm is already in the past. Don't bother waiting, notify immediately */
+            notify = 1;
+            alarm_set_to = 0;
+        }
+        else /* notify on timeout but not on setting new alarm */
+            notify = (rc != 0);
+
+        if (notify)
+            current_alarm = 0;
 
         UNLOCK(alarm_lock);
 
@@ -163,7 +176,8 @@ Parrot_alarm_set(FLOATVAL when)
     LOCK(alarm_lock);
     now = Parrot_floatval_time();
 
-    if (alarm_set_to > now && alarm_set_to < when) {
+    if (current_alarm > 0 && current_alarm <= when) {
+        /* there's already an active alarm for an earlier point in time */
         UNLOCK(alarm_lock);
         return;
     }

@@ -1017,7 +1017,8 @@ prefix):
 TOTAL_MEM_ALLOC, TOTAL_MEM_USED, GC_MARK_RUNS, GC_COLLECT_RUNS, ACTIVE_PMCS,
 ACTIVE_BUFFERS, TOTAL_PMCS, TOTAL_BUFFERS, HEADER_ALLOCS_SINCE_COLLECT,
 MEM_ALLOCS_SINCE_COLLECT, TOTAL_COPIED, IMPATIENT_PMCS, GC_LAZY_MARK_RUNS,
-EXTENDED_PMCS, CURRENT_RUNCORE
+EXTENDED_PMCS, CURRENT_RUNCORE, PARROT_INTSIZE, PARROT_FLOATSIZE, PARROT_POINTERSIZE,
+PARROT_INTMAX, PARROT_INTMIN
 
 =item B<interpinfo>(out PMC, in INT)
 
@@ -1025,7 +1026,8 @@ CURRENT_SUB, CURRENT_CONT, CURRENT_OBJECT, CURRENT_LEXPAD
 
 =item B<interpinfo>(out STR, in INT)
 
-EXECUTABLE_FULLNAME, EXECUTABLE_BASENAME, RUNTIME_PREFIX, CURRENT_RUNCORE
+EXECUTABLE_FULLNAME, EXECUTABLE_BASENAME, RUNTIME_PREFIX, CURRENT_RUNCORE, PARROT_OS,
+PARROT_OS_VERSION, PARROT_OS_VERSION_NUMBER, CPU_ARCH, CPU_TYPE
 
 =back
 
@@ -1419,15 +1421,11 @@ op dlvar(out PMC, invar PMC, in STR) {
 }
 
 inline op compreg(in STR, invar PMC) {
-    PMC * const compreg_hash = VTABLE_get_pmc_keyed_int(interp,
-            interp->iglobals, IGLOBALS_COMPREG_HASH);
-    VTABLE_set_pmc_keyed_str(interp, compreg_hash, $1, $2);
+    Parrot_interp_set_compiler(interp, $1, $2);
 }
 
 inline op compreg(out PMC, in STR) {
-    PMC * const compreg_hash = VTABLE_get_pmc_keyed_int(interp,
-            interp->iglobals, IGLOBALS_COMPREG_HASH);
-    $1 = VTABLE_get_pmc_keyed_str(interp, compreg_hash, $2);
+    $1 = Parrot_interp_get_compiler(interp, $2);
 }
 
 op new_callback(out PMC, invar PMC, invar PMC, in STR) {

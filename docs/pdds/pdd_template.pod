@@ -6,10 +6,6 @@
 
 Summary of the contents of the PDD.
 
-
-
-
-
 =head2 Synopsis I<(optional)>
 
 Code snippets showing the semantics of the PDD (if applicable).

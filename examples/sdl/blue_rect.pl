@@ -1,5 +1,6 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
 
-=head1 TITLE
+=head1 NAME
 
 blue_rect.pl - draw a blue rectangle using the SDL library and NQP
 
@@ -9,6 +10,11 @@ To run this file, execute the following command from the Parrot
 directory:
 
     $ ./parrot compilers/nqp/nqp.pbc examples/sdl/blue_rect.pl
+
+=head1 DESCRIPTION
+
+This is a Perl script which draws a blue rectangle, using the SDL library
+and NQP.
 
 =cut
 

@@ -1,3 +1,41 @@
+2012-07-XX    release 4.6.0
+    - Core
+    - Documentation
+    - Tests
+    - Community
+
+2012-06-19    release 4.5.0
+    - Core
+        + Added .write_bytes and .read_bytes methods to FileHandle and Socket
+          PMCs.
+        + Added Parrot_api_set_stdhandle, Parrot_api_new_call_object and
+          Parrot_api_setup_signature functions to the embedding API
+        + Removed the "can" VTABLE
+    - Languages
+      + Winxed snapshot updated to 1.9.1
+        - New syntax for parameters in multi
+        - New syntax for initalization with new
+        - Cast to var improved
+    - IMCC
+        + Removed .line, .file, setline and setfile directives from IMCC
+    - Documentation
+        + Fixed up Pod in 240 files to pass 't/codingstd/pod_description.t'.
+    - Tests
+        + Added 'docs/pdds' and 'docs/pdds/draft' as files for
+          'Parrot::Test::Pod.pm' to exclude.
+    - Build
+        + Reduced number of packages under 'lib/Parrot/Pmc2c/'.
+        + Added method-level documentation to several of the remaining packages.
+        + Added 'docs/pdds' and 'docs/pdds/draft' as files for
+          'Parrot::Test::Pod.pm' to exclude.
+    - Community
+        + M1, a C-like language that targets M0 had a burst of development
+          and now has many working examples such as recursive Fibonacci and
+          recursive factorial : https://github.com/parrot/m1
+        + Parrot bindings to LAPACK are being worked on as part of Google
+          Summer of Code: https://github.com/leto/parrot-lapack
+
+
 2012-05-15    release 4.4.0
     - Core
         + Most internal calls to libc exit(x) have been replaced with

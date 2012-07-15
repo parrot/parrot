@@ -166,7 +166,7 @@ sub get_sources {
         next if $ofile =~ m/^\Qsrc$PConfig{slash}ops\E/ || # if run by hand...
                 $ofile =~ m{^src/ops};                     # ... or by makefile
 
-        $ofile =~ s/\\/\//g;
+        $ofile =~ s{\\}{/}g; # Normalize path separators
 
         my $is_yacc = ($ofile =~ /\.y$/);
         if ( !$is_yacc ) {

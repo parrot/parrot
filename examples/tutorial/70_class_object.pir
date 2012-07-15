@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 Classes
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's classes.
+
+=head1 CLASSES
 
 If we combine the ideas of namespaces, subroutines, and global variables,
 we are well along our way to the concept of a class. Classes are

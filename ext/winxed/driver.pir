@@ -1,5 +1,5 @@
 # THIS IS A GENERATED FILE! DO NOT EDIT!
-# Compiled with Winxed 1.8.1
+# Compiled with Winxed 1.9.1
 # Source file: winxed_installed.winxed
 # Begin generated code
 
@@ -365,8 +365,8 @@
   __label_24: # endif
     if_null $S4, __label_25
     eq $S4, "-", __label_25
-    root_new $P7, ['parrot';'FileHandle']
-    $P7.'open'($S4,'w')
+    root_new $P7, ["parrot";"FileHandle"]
+    $P7."open"($S4,'w')
     set $P6, $P7
     goto __label_26
   __label_25: # else
@@ -426,8 +426,8 @@
     isne $I6, $S4, "-"
   __label_34:
     unless $I6 goto __label_36
-    root_new $P10, ['parrot';'FileHandle']
-    $P10.'open'($S4,'w')
+    root_new $P10, ["parrot";"FileHandle"]
+    $P10."open"($S4,'w')
     goto __label_35
   __label_36:
     getstdout $P13

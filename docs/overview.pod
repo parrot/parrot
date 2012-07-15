@@ -1,17 +1,17 @@
-# Copyright (C) 2001-2006, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
 docs/overview.pod - A Parrot Overview
 
-=head1 The Parrot Interpreter
+=head1 DESCRIPTION
 
 This document is an introduction to the structure of and the concepts used by
 the Parrot shared bytecode compiler/interpreter system. We will primarily
 concern ourselves with the interpreter, since this is the target platform for
 which all compiler frontends should compile their code.
 
-=head1 The Software CPU
+=head1 THE SOFTWARE CPU
 
 Like all interpreter systems of its kind, the Parrot interpreter is a virtual
 machine; this is another way of saying that it is a software CPU. However,
@@ -42,7 +42,7 @@ Registers will be stored in register frames, which can be pushed and popped
 onto the register stack. For instance, a subroutine or a block might need its
 own register frame.
 
-=head1 The Operations
+=head1 THE OPERATIONS
 
 The Parrot interpreter has a large number of very low level instructions, and
 it is expected that high-level languages will compile down to a medium-level
@@ -92,7 +92,7 @@ Pythonic activities.
 For documentation on the specific PMCs that ship with Parrot, see the
 F<docs/pmc> directory.
 
-=head1 Vtables
+=head1 VTABLES
 
 The way we achieve this abstraction is to assign to each PMC a set of function
 pointers that determine how it ought to behave when asked to do various things.
@@ -134,7 +134,7 @@ runtimes for bytecompiled languages.
 One interesting thing about vtables is that you can construct them dynamically.
 You can find out more about vtables in F<docs/vtables.pod>.
 
-=head1 String Handling
+=head1 STRING HANDLING
 
 Parrot provides a programmer-friendly view of strings. The Parrot string
 handling subsection handles all the work of memory allocation, expansion, and
@@ -149,7 +149,7 @@ function either to the other encodings or just to Unicode for use as a pivot.
 
 The string handling API is explained in F<docs/strings.pod>.
 
-=head1 Bytecode format
+=head1 BYTECODE FORMAT
 
 We have already explained the format of the main stream of bytecode; operations
 will be followed by arguments packed in such a format as the individual
@@ -174,3 +174,4 @@ program file.
 
 The bytecode format is fully documented in F<docs/parrotbyte.pod>.
 
+=cut

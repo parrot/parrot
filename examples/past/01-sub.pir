@@ -1,4 +1,20 @@
-# Copyright (C) 2006-2008, Parrot Foundation.
+# Copyright (C) 2006-2012, Parrot Foundation.
+
+=pod
+
+=head1 DESCRIPTION
+
+A PIR module to set up a PAST which, roughly, represents the following
+Perl 6 code:
+
+    sub foo
+    {
+        my $a = 4;
+        my $b = $a + 1;
+	say($b);
+    }
+
+=cut
 
 =for doc
 

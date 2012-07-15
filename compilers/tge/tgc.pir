@@ -8,13 +8,13 @@ tgc.pir - The TGE rules compiler
 
     > ./parrot compilers/tge/tgc.pir [OPTIONS] FILE
 
-=head2 DESCRIPTION
+=head1 DESCRIPTION
 
 This program takes a tree grammar, specified in B<FILE>, and compiles it
 into the PIR code needed to execute that grammar. This PIR code is then
 suitable for inclusion or compilation into other larger programs.
 
-=head2 OPTIONS
+=head1 OPTIONS
 
 =over 4
 

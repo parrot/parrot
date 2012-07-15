@@ -1,6 +1,6 @@
 # Copyright (C) 2009-2010, Parrot Foundation.
 
-=head1 [DRAFT] PDD 31: HLL Compilers and Libraries
+=head1 PDD 31: HLL Compilers and Libraries
 
 =head2 Abstract
 

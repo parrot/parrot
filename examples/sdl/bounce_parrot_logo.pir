@@ -1,5 +1,6 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
 
-=head1 TITLE
+=head1 NAME
 
 bounce_parrot_logo.pir - bounce a Parrot logo with the SDL Parrot bindings
 
@@ -13,6 +14,11 @@ To run this file, run the following command from the Parrot directory:
 You'll see the happy Parrot logo in the middle of a new SDL window.  Use the
 cursor keys to apply velocity in the appropriate directions.  Watch it bounce!
 Use the Escape key or close the window when you've had enough.
+
+=head1 DESCRIPTION
+
+This is a PIR program which bounces a Parrot logo with the SDL Parrot
+bindings.
 
 =cut
 

@@ -69,9 +69,12 @@ Parrot_cx_init_scheduler(PARROT_INTERP)
 
     interp->scheduler = Parrot_pmc_new(interp, enum_class_Scheduler);
 
-    if (!interp->parent_interpreter) {
+    if (!interp->parent_interpreter) { /* only run once, for the master interp */
         /* Make sure the program can handle alarm signals */
         Parrot_alarm_init();
+
+        Parrot_thread_init_threads_array(interp);
+        Parrot_thread_insert_thread(interp, interp, 0);
     }
 }
 
@@ -100,9 +103,6 @@ Parrot_cx_begin_execution(PARROT_INTERP, ARGIN(PMC *main), ARGIN(PMC *argv))
     tdata->code = main;
     tdata->data = argv;
     PARROT_GC_WRITE_BARRIER(interp, main_task);
-
-    Parrot_thread_init_threads_array(interp);
-    Parrot_thread_insert_thread(interp, interp, 0);
 
     SCHEDULER_enable_scheduler_SET(scheduler);
 

@@ -1,10 +1,10 @@
-# Copyright (C) 2009-2011, Parrot Foundation.
+# Copyright (C) 2009-2012, Parrot Foundation.
 
 =head1 NAME
 
 distutils - Parrot Distribution Utilities
 
-=head2 DESCRIPTION
+=head1 DESCRIPTION
 
 This module is greatly inspired by Python Distribution Utilities
 (L<http://docs.python.org/distutils/>).
@@ -1326,7 +1326,7 @@ an array creates a PMC group
     .local string src
     src = shift $P1
     .local string ext
-    $I0 = 'rindex'(src, '.')
+    $I0 = rindex src, '.'
     ext = substr src, $I0
     unless ext == '.pmc' goto L6
     push pmcs, src
@@ -1339,7 +1339,7 @@ an array creates a PMC group
   L7:
     unless $P1 goto L8
     src = shift $P1
-    $I0 = 'rindex'(src, '.')
+    $I0 = rindex src, '.'
     ext = substr src, $I0
     if ext == '.h' goto L7
     $S0 = _mk_path_gen_dynpmc(src, obj)
@@ -1542,7 +1542,7 @@ an array creates a PMC group
 .sub '_mk_path_gen_dynpmc' :anon
     .param string src
     .param string ext
-    $I0 = 'rindex'(src, '.')
+    $I0 = rindex src, '.'
     $S0 = substr src, 0, $I0
     $S0 .= ext
     unless ext == '.h' goto L1
@@ -1937,7 +1937,7 @@ the value is the POD pathname, for example 'src/prog.pir'
     .local string src
     src = shift $P1
     .local string ext
-    $I0 = 'rindex'(src, '.')
+    $I0 = rindex src, '.'
     ext = substr src, $I0
     if ext == '.h' goto L3
     $S0 = _mk_path_gen_dynpmc(src, obj)

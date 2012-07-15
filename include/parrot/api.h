@@ -210,6 +210,15 @@ Parrot_Int Parrot_api_set_runcore(
         __attribute__nonnull__(2);
 
 PARROT_API
+Parrot_Int Parrot_api_set_stdhandle(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC handle,
+    Parrot_Int fileno,
+    ARGOUT(Parrot_PMC *old_handle))
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*old_handle);
+
+PARROT_API
 Parrot_Int Parrot_api_set_warnings(Parrot_PMC interp_pmc, Parrot_Int flags);
 
 PARROT_API
@@ -278,6 +287,8 @@ Parrot_Int Parrot_api_wrap_pointer(
        PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_Parrot_api_set_runcore __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(corename))
+#define ASSERT_ARGS_Parrot_api_set_stdhandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(old_handle))
 #define ASSERT_ARGS_Parrot_api_set_warnings __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_toggle_gc __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_unwrap_pointer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -643,6 +654,13 @@ Parrot_Int Parrot_api_pmc_keep_alive(
     Parrot_Int alive);
 
 PARROT_API
+Parrot_Int Parrot_api_pmc_new_call_object(
+    Parrot_PMC interp_pmc,
+    ARGOUT(Parrot_PMC *cc))
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*cc);
+
+PARROT_API
 Parrot_Int Parrot_api_pmc_new_from_class(
     ARGIN(Parrot_PMC interp_pmc),
     ARGIN(Parrot_PMC class_pmc),
@@ -729,6 +747,14 @@ Parrot_Int Parrot_api_pmc_set_string(
         __attribute__nonnull__(3);
 
 PARROT_API
+Parrot_Int Parrot_api_pmc_setup_signature(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC callcontext,
+    ARGIN(const char * const signature),
+    ...)
+        __attribute__nonnull__(3);
+
+PARROT_API
 Parrot_Int Parrot_api_pmc_wrap_string_array(
     ARGIN(Parrot_PMC interp_pmc),
     Parrot_Int argc,
@@ -791,6 +817,9 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
     , PARROT_ASSERT_ARG(sub) \
     , PARROT_ASSERT_ARG(signature))
 #define ASSERT_ARGS_Parrot_api_pmc_keep_alive __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_api_pmc_new_call_object \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(cc))
 #define ASSERT_ARGS_Parrot_api_pmc_new_from_class __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(class_pmc) \
@@ -822,6 +851,9 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(pmc) \
     , PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_Parrot_api_pmc_setup_signature \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(signature))
 #define ASSERT_ARGS_Parrot_api_pmc_wrap_string_array \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \

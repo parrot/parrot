@@ -9,10 +9,6 @@ installation system will provide support for binary packages, a working C<make
 install> target, compiled installables, and Filesystem Hierarchy Standard
 (FHS) compliant search paths for the installables.
 
-
-
-
-
 =head2 Synopsis
 
 Parrot installation process (from the parrot source directory):

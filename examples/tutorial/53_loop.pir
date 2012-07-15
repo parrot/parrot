@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 Loops
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's control flow (continued).
+
+=head1 LOOPS
 
 PIR has no built-in looping structures such as C<for>, C<while>,
 C<repeat> or C<until>. All loops are built by using conditionals

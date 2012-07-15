@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 Subroutines
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's subroutines.
+
+=head1 SUBROUTINES
 
 PIR is a subroutine-based or "procedural" programming language.
 Subroutines are used to break large tasks into smaller chunks. These

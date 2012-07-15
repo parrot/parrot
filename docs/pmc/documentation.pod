@@ -1,8 +1,12 @@
-=head1 TITLE
+# Copyright (C) 2001-2012, Parrot Foundation.
 
-Documenting PMCs
+=pod
 
-=head1 Overview
+=head1 NAME
+
+docs/pmc/documentation.pod - Documenting PMCs. 
+
+=head1 DESCRIPTION
 
 This document describes guidelines for writing documentation for PMCs.
 All core PMCs B<must> be documented using the format outlined here.

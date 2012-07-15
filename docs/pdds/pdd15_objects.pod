@@ -6,10 +6,6 @@
 
 This PDD describes the semantics of Parrot's object and class systems.
 
-
-
-
-
 =head2 Definitions
 
 =head3 Object

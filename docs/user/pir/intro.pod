@@ -1,10 +1,17 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
 
-# One first version of this article was published on TPR 2.3
-#
-# Please feel free to edit it to suit latest parrot developments,
-# and to be a good starting point for beginners.
+=pod
 
-=head1 Writing PIR
+=head1 NAME
+
+docs/user/pir/intro.pod - A User-oriented Introduction writing PIR.
+
+=head1 DESCRIPTION
+
+This document is a user-oriented introduction to writing PIR for the Parrot
+Virtual Machine.[*]
+
+=head1 WRITING PIR
 
 PIR (Parrot Intermediate Representation) is a way to program the
 parrot virtual machine that is easier to use than PASM (Parrot
@@ -434,11 +441,11 @@ With the PIR syntax shown in this article you should be able to start
 writing simple programs. Next article we will look into available
 Polymorphic Containers (PMCs), and how they can be used.
 
-=head2 Author
+=head1 AUTHOR
 
 Alberto Simões
 
-=head2 Thanks
+=head1 THANKS
 
 =over 4
 
@@ -446,5 +453,11 @@ Alberto Simões
 
 =back
 
-=cut
+=head1 NOTES
 
+[*] One first version of this article was published on TPR 2.3.
+
+Please feel free to edit it to suit latest parrot developments and to be a
+good starting point for beginners.
+
+=cut

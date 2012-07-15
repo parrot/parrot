@@ -7,15 +7,6 @@
 .sub main
     .include 'test_more.pir'
 
-    $S0 = sysinfo .SYSINFO_PARROT_OS
-    if $S0 == 'MSWin32' goto run_win32_tests
-    goto run_unix_tests
-  run_win32_tests:
-    say "1..1"
-    say "ok 1 - All tests skipped on Win32"
-    exit 0
-  run_unix_tests:
-
     plan(6)
 
     ok(1, "initialized")

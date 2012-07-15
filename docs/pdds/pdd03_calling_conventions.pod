@@ -6,10 +6,6 @@
 
 Parrot's inter-routine calling conventions.
 
-
-
-
-
 =head2 Synopsis
 
 Not applicable.

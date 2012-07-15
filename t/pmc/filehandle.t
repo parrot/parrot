@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 30;
+use Parrot::Test tests => 32;
 use Parrot::Test::Util 'create_tempfile';
 
 =head1 NAME
@@ -1071,6 +1071,34 @@ CODE
 0
 1
 OUT
+
+pir_output_is( <<'CODE', "This is a", ".write_bytes" );
+.const string temp_file = '%s'
+.sub main :main
+    $P0 = getinterp
+    $P1 = $P0.'stdout_handle'()
+
+    $P2 = new ['ByteBuffer']
+    $P2 = "This is a test"
+    $P1.'write_bytes'($P2, 9)
+.end
+
+CODE
+
+pir_output_is( <<'CODE', <<'OUTPUT', ".read_bytes" );
+.const string temp_file = '%s'
+.sub main :main
+    $P0 = new ['FileHandle']
+    $P0.'open'('README.pod')
+
+    $P1 = $P0.'read_bytes'(15) # bytes
+    $S0 = $P1.'get_string_as'('ascii')
+    say $S0
+.end
+
+CODE
+# Copyright (C)
+OUTPUT
 
 # GH #465
 # L<PDD22/I\/O PMC API/=item get_fd>

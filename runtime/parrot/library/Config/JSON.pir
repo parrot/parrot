@@ -1,6 +1,6 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 Config::JSON
+=head1 DESCRIPTION
 
 Provides a simple wrapper to read and write JSON config files.
 

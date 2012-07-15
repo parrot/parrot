@@ -53,7 +53,7 @@ do {                                                                \
                                                                     \
         for (_j = 0; _j < CELL_PER_CHUNK - chunk->num_free; _j++) { \
             void *ptr = chunk->data[_j];                            \
-            if ((UINTVAL)(ptr) & 1)                                 \
+            if ((ptrcast_t)(ptr) & 1)                                 \
                 continue;                                           \
                                                                     \
             { _code }                                               \
@@ -89,10 +89,7 @@ Parrot_pa_insert(ARGMOD(Parrot_Pointer_Array *self), ARGIN(void *ptr))
 
     /* Reuse removed cell */
     if (self->next_free) {
-        /* FIXME. Cast to UINTVAL is wrong. */
-        /* We have to provide parrot version of uintptr_t due lack of it in C89 */
-        /* See GH #378 */
-        void **next      = (void**)((UINTVAL)*self->next_free & ~1);
+        void **next      = (void**)((ptrcast_t)*self->next_free & ~1);
         ret = self->next_free;
         *self->next_free = ptr;
         self->next_free = next;
@@ -141,7 +138,7 @@ void
 Parrot_pa_remove(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *ptr))
 {
     /* Mark sell to avoid iterating over */
-    *(UINTVAL*)ptr = ((UINTVAL)self->next_free) | 1;
+    *(void**)ptr = (void*)((ptrcast_t)self->next_free | 1);
     self->next_free = (void**)ptr;
 }
 

@@ -173,6 +173,11 @@ Parrot-hosted languages
         say 'like dancing, but fancier'
     .end
 
+=head1 DESCRIPTION
+
+This PIR program is the compiler object for interoperability between high-
+level languages and Parrot-hosted languages.
+
 =cut
 
 # Local Variables:

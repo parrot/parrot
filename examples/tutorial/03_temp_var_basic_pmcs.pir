@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 Basic PMC Types
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's basic PMC types.
+
+=head1 BASIC PMC TYPES
 
 PMCs are objects, so to use a PMC, you first have to
 instantiate an object for the PMC using the 'new' opcode and

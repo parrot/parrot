@@ -1,9 +1,13 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
 src/runcore/subprof.c - Parrot's subroutine-level profiler
+
+=head1 DESCRIPTION
+
+This compilation unit implements Parrot's subroutine-level profiler.
 
 =head2 Functions
 
@@ -82,7 +86,6 @@ static subprofiledata * get_subprofiledata(PARROT_INTERP,
 PARROT_INLINE
 static UHUGEINTVAL getticks(void);
 
-static UHUGEINTVAL getticks(void);
 static void Parrot_runcore_subprof_hll_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -201,7 +204,6 @@ static lineinfo * sync_hll_linechange(PARROT_INTERP,
 #define ASSERT_ARGS_get_subprofiledata __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(runcore))
-#define ASSERT_ARGS_getticks __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_getticks __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_runcore_subprof_hll_init \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -1051,25 +1053,20 @@ Returns a high-resolution number representing how long Parrot has been running.
 
 */
 
-#if defined(__GNUC__) && (defined(__i386) || defined(__x86_64))
-
-#  include <stdint.h>
 
 PARROT_INLINE
 static UHUGEINTVAL
 getticks(void) {
     ASSERT_ARGS(getticks)
+#if defined(__GNUC__) && (defined(__i386) || defined(__x86_64))
 
-    uint32_t lo, hi;
+    unsigned lo, hi;
     __asm__ __volatile__("rdtsc" : "=a" (lo), "=d" (hi));
     return (UHUGEINTVAL) hi << 32 | lo;
-}
 #else
-static UHUGEINTVAL
-getticks(void) {
     return Parrot_hires_get_time();
-}
 #endif
+}
 
 /*
 

@@ -1,0 +1,673 @@
+#! winxed
+
+# Copyright (C) 2009-2012 Parrot Foundation.
+
+/*
+
+=head1 NAME
+
+pbc_to_exe - Generate executables from Parrot bytecode
+
+=head1 DESCRIPTION
+
+Compile bytecode to executable.
+
+=head2 SYNOPSIS
+
+  pbc_to_exe my.pbc
+  => my.exe
+
+  pbc_to_exe my.pbc --install
+  => installable_my.exe
+
+=cut
+
+*/
+
+$include_const "interpcores.pasm";
+
+$load "Getopt/Obj.pbc";
+$load "config.pbc";
+
+#-------------------------------------------------------
+
+#           Blocks of C code
+
+const string C_HEADER = <<:HEADER
+#include <stdio.h>
+#include <stdlib.h>
+#include "parrot/api.h"
+int Parrot_set_config_hash(Parrot_PMC interp_pmc);
+static void show_last_error_and_exit(Parrot_PMC interp);
+static void print_parrot_string(Parrot_PMC interp, FILE *vector, Parrot_String str, int newline);
+static void setup_pir_compregs(Parrot_PMC interp);
+static PMC * get_class_pmc(Parrot_PMC interp, const char *name);
+static void get_imcc_compiler_pmc(Parrot_PMC interp, Parrot_PMC class_pmc, Parrot_Int is_pasm);
+
+
+    #define TRACE 0
+HEADER:>>
+    ;
+
+#-------------------------------------------------------
+
+const string C_MAIN = <<:MAIN
+        int main(int argc, const char *argv[])
+        {
+            PMC                 *interp;
+            PMC                 *pbc;
+            PMC                 *argsarray;
+            const unsigned char *program_code_addr;
+
+            Parrot_Init_Args    *initargs;
+            GET_INIT_STRUCT(initargs);
+
+            initargs->gc_system = GCCORE;
+
+            program_code_addr = get_program_code();
+
+            if (!program_code_addr)
+                exit(EXIT_FAILURE);
+
+            if (!(Parrot_api_make_interpreter(NULL, 0, initargs, &interp) &&
+                  Parrot_set_config_hash(interp) &&
+                  Parrot_api_set_executable_name(interp, argv[0]) &&
+                  Parrot_api_set_runcore(interp, RUNCORE, TRACE))) {
+                fprintf(stderr, "PARROT VM: Could not initialize new interpreter\n");
+                show_last_error_and_exit(interp);
+            }
+
+            setup_pir_compregs(interp);
+
+            if (!Parrot_api_pmc_wrap_string_array(interp, argc, argv, &argsarray)) {
+                fprintf(stderr, "PARROT VM: Could not build args array");
+                show_last_error_and_exit(interp);
+            }
+
+            if (!Parrot_api_load_bytecode_bytes(interp,
+                                                program_code_addr,
+                                                (Parrot_Int) bytecode_size,
+                                                &pbc)) {
+                fprintf(stderr, "PARROT VM: Could not load bytecode\n");
+                show_last_error_and_exit(interp);
+            }
+
+            if (!Parrot_api_run_bytecode(interp, pbc, argsarray)) {
+                show_last_error_and_exit(interp);
+            }
+
+            if (!Parrot_api_destroy_interpreter(interp)) {
+                fprintf(stderr, "PARROT VM: Could not destroy interpreter\n");
+                show_last_error_and_exit(interp);
+            }
+
+            exit(EXIT_SUCCESS);
+        }
+
+        static void
+        show_last_error_and_exit(Parrot_PMC interp)
+        {
+            Parrot_String errmsg, backtrace;
+            Parrot_Int exit_code, is_error;
+            Parrot_PMC exception;
+
+            if (!Parrot_api_get_result(interp, &is_error, &exception, &exit_code, &errmsg))
+                exit(EXIT_FAILURE);
+
+            if (is_error) {
+                if (!Parrot_api_get_exception_backtrace(interp, exception, &backtrace))
+                    exit(EXIT_FAILURE);
+                print_parrot_string(interp, stderr, errmsg, 1);
+                print_parrot_string(interp, stderr, backtrace, 0);
+            }
+
+            exit(exit_code);
+        }
+
+        static void
+        print_parrot_string(Parrot_PMC interp, FILE *vector, Parrot_String str, int newline)
+        {
+            char *msg_raw;
+
+            if (!str)
+                return;
+
+            if (!Parrot_api_string_export_ascii(interp, str, &msg_raw))
+                show_last_error_and_exit(interp);
+
+            if (msg_raw) {
+                fprintf(vector, "%s%s", msg_raw, newline ? "\n" : "");
+
+                if (!Parrot_api_string_free_exported_ascii(interp, msg_raw))
+                    show_last_error_and_exit(interp);
+            }
+        }
+
+        static void
+        setup_pir_compregs(Parrot_PMC interp)
+        {
+            Parrot_PMC class_pmc = get_class_pmc(interp, "IMCCompiler");
+            get_imcc_compiler_pmc(interp, class_pmc, 0);
+            get_imcc_compiler_pmc(interp, class_pmc, 1);
+        }
+
+        PARROT_CANNOT_RETURN_NULL
+        static PMC *
+        get_class_pmc(Parrot_PMC interp, ARGIN(const char *name))
+        {
+            Parrot_String name_s = NULL;
+            Parrot_PMC name_pmc = NULL;
+            Parrot_PMC class_pmc = NULL;
+            if (!(Parrot_api_string_import_ascii(interp, name, &name_s) &&
+                  Parrot_api_pmc_box_string(interp, name_s, &name_pmc) &&
+                  Parrot_api_pmc_get_class(interp, name_pmc, &class_pmc)))
+                show_last_error_and_exit(interp);
+            return class_pmc;
+        }
+
+        PARROT_CANNOT_RETURN_NULL
+        static void
+        get_imcc_compiler_pmc(Parrot_PMC interp, Parrot_PMC class_pmc, Parrot_Int is_pasm)
+        {
+            Parrot_PMC is_pasm_pmc = NULL;
+            Parrot_PMC compiler_pmc = NULL;
+            const char * const name = is_pasm ? "PASM" : "PIR";
+            Parrot_String name_s = NULL;
+
+            if (!Parrot_api_pmc_box_integer(interp, is_pasm, &is_pasm_pmc))
+                show_last_error_and_exit(interp);
+            if (!Parrot_api_pmc_new_from_class(interp, class_pmc, is_pasm_pmc, &compiler_pmc))
+                show_last_error_and_exit(interp);
+            if (!(Parrot_api_string_import_ascii(interp, name, &name_s) &&
+                  Parrot_api_set_compiler(interp, name_s, compiler_pmc)))
+                show_last_error_and_exit(interp);
+        }
+
+MAIN:>>
+    ;
+
+#-------------------------------------------------------
+
+function main [main] (var argv)
+{
+    :(string infile, string cfile, string objfile, string exefile,
+            string runcore, string gccore, int install) =
+        handle_args(argv)
+    if (infile == "")
+        throw "cannot read infile";
+
+    var outfh = open(cfile, 'w');
+    if (! outfh)
+        throw "cannot write outfile";
+
+    outfh.print(C_HEADER);
+    string code_type = determine_code_type();
+    switch (code_type) {
+      case "gcc":
+        generate_code_gcc(infile, outfh);
+	break;
+      case "msvc":
+        generate_code_msvc(infile, outfh);
+	break;
+      default:
+        generate_code(infile, outfh);
+    }
+
+    print_define(outfh, "RUNCORE", runcore);
+    print_define(outfh, "GCCORE", gccore);
+
+    outfh.print(C_MAIN);
+
+    # The close opcode does not return a result code,
+    # use the method instead.
+    int closeresult = outfh.close();
+    if (closeresult != 0)
+        throw "cannot close outfile";
+
+    string extra_obj = code_type != 'msvc' ?
+            '' :
+            replace_pbc_extension(infile, '.RES');
+
+    compile_file(cfile, objfile, install);
+    link_file(objfile, exefile, extra_obj, install);
+}
+
+function print_define(var outfh, var args[slurpy])
+{
+    string name = args[1];
+
+    if (name == null)
+        name = sprintf("#define %s NULL\n", args);
+    else
+        name = sprintf("#define %s \"%s\"\n", args);
+    outfh.print(name);
+}
+
+
+function handle_args(var argv)
+{
+    var config = _config();
+    string obj = config['o'];
+    string exe = config['exe'];
+
+    var getopt = new ['Getopt','Obj'];
+    push(getopt, 'install|i');
+    push(getopt, 'runcore|R:s');
+    push(getopt, 'output|o:s');
+    push(getopt, 'help|h');
+    push(getopt, 'gc:s');
+
+    argv.shift(); # ignore program name
+    var opts = getopt.get_options(argv);
+
+    int help    = opts['help'];
+    int install = opts['install'];
+    string runcore = opts['runcore'];
+    string outfile = opts['output'];
+    string gccore  = opts['gc'];
+    if (gccore == "")
+        gccore = null;
+
+    if (help) {
+        getstderr().print(<<:HELP
+pbc_to_exe [options] <file>
+  Options:
+    -h --help
+    -i --install
+    -R --runcore=slow|fast
+    -o --output=FILE
+       --gc=ms2|gms
+HELP:>>
+        );
+        exit(0);
+    }
+
+    string infile = argv.shift();
+
+    string ext = downcase(substr(infile, -4, 4));
+    if (ext != '.pbc')
+        throw "input pbc file name does not end in '.pbc'";
+
+    string cfile, objfile, exefile;
+    if (outfile != '') {
+        int l = length(exe);
+        string $S0 = downcase(substr(outfile, -l, l));
+        string $S1 = downcase(exe);
+        if ($S0 != $S1)
+            throw "output executable name does not end in '" + exe + "'";
+
+        outfile = replace(outfile, -l, l, '');
+
+        cfile   = outfile + '.c';
+        objfile = outfile + obj;
+        exefile = outfile + exe;
+    }
+    else {
+        # substitute .c for .pbc
+        # remove .c for executable
+        outfile = replace(infile, -4, 4, ''); # remove .pbc extension
+        cfile   = outfile + '.c';
+        objfile = outfile + obj;
+        exefile = outfile + exe;
+        if (install)
+            exefile = prepend_installable(exefile);
+    }
+
+    string runcore_code;
+    switch (runcore) {
+      case 'slow':
+        runcore_code = 'slow';
+	break;
+      case 'fast':
+      case '':
+        runcore_code = 'fast';
+	break;
+      default:
+        # invalid runcore name
+        throw "Unsupported runcore: '" + runcore + "'";
+    }
+
+    return infile, cfile, objfile, exefile, runcore_code, gccore, install;
+}
+
+function determine_code_type()
+{
+    var config = _config();
+
+    string gcc_ver = config['gccversion'];
+    if (gcc_ver != '')
+        return ('gcc');
+
+    string cc      = config['cc'];
+    string os_name = config['osname'];
+
+    if (os_name == 'MSWin32' && cc == 'cl')
+        return 'msvc';
+
+    return 'default';
+}
+
+# Winxed has no builtin for spawnw with string argument.
+# This function provides it.
+function spawnw_cmd(string cmd)
+{
+    int status;
+    ${ spawnw status, cmd };
+    return status;
+}
+
+
+const int READBUFFER_SIZE = 16384;
+
+function generate_code(string infile, var outfh)
+{
+    var ifh = open(infile, 'rb');
+    if (!ifh)
+        throw "cannot open infile";
+
+    outfh.print("const Parrot_UInt1 program_code[] = {");
+    int size = 0;
+
+    for (;;) {
+        string pbcstring = ifh.read(READBUFFER_SIZE);
+        int pbclength = length(pbcstring);
+        if (pbclength <= 0)
+	    break;
+        for (int pos = 0; pos < pbclength; ++pos) {
+            outfh.print(string(ord(pbcstring, pos)));
+            outfh.print(',');
+            ++size;
+            if ((size % 32) == 0)
+                outfh.print("\n");
+	}
+    }
+    ifh.close();
+
+    outfh.print("\n};\n\nconst size_t bytecode_size = ");
+    outfh.print(size);
+    outfh.print(";\n");
+    outfh.print(<<:END_OF_FUNCTION
+        const unsigned char * get_program_code(void)
+        {
+            return program_code;
+        }
+END_OF_FUNCTION:>>
+    );
+}
+
+
+# The PBC will be represented as a C string, so this sub builds a table
+# of the C representation of each ASCII character, for lookup by ordinal value.
+function generate_encoding_table()
+{
+    # Use '\%o' for speed, or '\x%02x' for readability
+    const string encoding_format = '\%o';
+
+    # The 'sprintf' op requires the arglist to be in an array, even when
+    # there is only one arg.
+    int one_number[1];
+
+    string coded_strings[256];
+    for (int index = 0; index < 256; ++index) {
+        one_number[0] = index;
+        coded_strings[index] = sprintf(encoding_format, one_number);
+    }
+    return coded_strings;
+}
+
+function generate_code_gcc(string infile, var outfh)
+{
+    var ifh = open(infile, 'rb');
+    if (!ifh)
+        throw "cannot open infile";
+
+    var encoding_table = generate_encoding_table();
+
+    outfh.print("const unsigned char program_code[] =\n\"");
+    int size = 0;
+
+    for (;;) {
+        string pbcstring = ifh.read(READBUFFER_SIZE);
+        int pbclength = length(pbcstring);
+        if (pbclength <= 0)
+	    break;
+        for(int pos = 0; pos < pbclength; ++pos) {
+            outfh.print(string(encoding_table[ord(pbcstring, pos)]));
+            ++size;
+            if ((size % 32) == 0)
+                outfh.print("\"\n\"");
+	}
+    }
+    ifh.close();
+
+    outfh.print("\"\n;\n\nconst size_t bytecode_size = ");
+    outfh.print(size);
+    outfh.print(";\n");
+
+    outfh.print(<<:END_OF_FUNCTION
+        const unsigned char * get_program_code(void)
+        {
+            return program_code;
+        }
+END_OF_FUNCTION:>>
+    );
+}
+
+
+# Transforms the .pbc path into one with a different extension.
+# Passing '' means no extension.
+# Extensions without leading dots will have a dot pre-pended.
+function replace_pbc_extension(string pbc_path, string new_extension)
+{
+    string ext = downcase(substr(pbc_path, -4));
+    if (ext != '.pbc')
+        throw "input pbc file name does not end in '.pbc'";
+
+    string base_path = replace(pbc_path, -4, 4, '');
+    string new_path = substr(base_path, 0);
+    if (new_extension != '') {
+        if (substr(new_extension, 0, 1) != '.')
+            new_path += '.';
+        new_path += new_extension;
+    }
+    return new_path;
+}
+
+
+# In addition to generating the code for inclusion in the C file,
+# this sub creates supplemental .rc and .RES files.
+function generate_code_msvc(string pbc_path, var outfh)
+{
+    string rc_path  = replace_pbc_extension(pbc_path, '.rc' );
+    string res_path = replace_pbc_extension(pbc_path, '.res');
+
+    # The exact numbers are not relevant;
+    # they are used to identify the resource within the final executable.
+    string rc_constant_defines = <<:END_OF_DEFINES
+#define RESOURCE_NAME_ID_WHOLE_PBC 333
+#define RESOURCE_TYPE_ID_WHOLE_PBC 444
+END_OF_DEFINES:>>
+    ;
+
+    string rc_contents = rc_constant_defines +
+            'RESOURCE_NAME_ID_WHOLE_PBC RESOURCE_TYPE_ID_WHOLE_PBC "' +
+            pbc_path + "\"\n";
+
+    var rc_fh = open(rc_path, 'w');
+
+    if (! rc_fh)
+        throw "cannot open .rc file";
+    rc_fh.print(rc_contents);
+
+    if (rc_fh.close() != 0)
+        throw "cannot close .rc file";
+
+    var $P0 = loadlib('os');
+    var $P1 = new ['OS'];
+    var $P2 = $P1.stat(pbc_path);
+    int pbc_size = $P2[7];
+
+    outfh.print("#include <windows.h>\n");
+    outfh.print(rc_constant_defines);
+    outfh.print("const unsigned int bytecode_size = ");
+    outfh.print(pbc_size);
+    outfh.print(";\n");
+
+    outfh.print(<<:END_OF_FUNCTION
+        const unsigned char * get_program_code(void)
+        {
+            HRSRC   hResource;
+            DWORD   size;
+            HGLOBAL hPBC;
+            LPVOID  actual_pointer_to_pbc_in_memory;
+
+            hResource = FindResource(
+                NULL,
+                MAKEINTRESOURCE(RESOURCE_NAME_ID_WHOLE_PBC),
+                MAKEINTRESOURCE(RESOURCE_TYPE_ID_WHOLE_PBC)
+            );
+            if (!hResource)
+                return NULL;
+
+            size = SizeofResource( NULL, hResource );
+            if (size != bytecode_size)
+                return NULL;
+
+            hPBC = LoadResource( NULL, hResource );
+            if (!hPBC)
+                return NULL;
+
+            actual_pointer_to_pbc_in_memory = LockResource( hPBC );
+            if (!actual_pointer_to_pbc_in_memory)
+                return NULL;
+
+            return actual_pointer_to_pbc_in_memory;
+        }
+END_OF_FUNCTION:>>
+    );
+
+    string rc_cmd  = 'rc ' + rc_path;
+    say(rc_cmd);
+    int status = spawnw_cmd(rc_cmd);
+    if (status != 0)
+        throw "RC command failed";
+}
+
+# util functions
+function compile_file(string cfile, string objfile, int install)
+{
+    var $P0 = '_config'();
+    string cc        = $P0['cc'];
+    string ccflags   = $P0['ccflags'];
+    string optimize  = $P0['optimize'];
+    string cc_o_out  = $P0['cc_o_out'];
+    string osname    = $P0['osname'];
+    string build_dir = $P0['build_dir'];
+    string slash     = $P0['slash'];
+    string installed = $P0['installed'];
+    string includepath = $P0['includedir'];
+    string versiondir = $P0['versiondir'];
+
+    string includedir = installed != "1" ?
+            build_dir + slash + 'include' :
+            includepath + versiondir;
+
+    string pathquote  = '"';
+
+    string compile  = cc + ' ' + cc_o_out + objfile +
+        ' -I' + pathquote + includedir + pathquote + ' ' +
+        ccflags + ' ' +
+        optimize +
+        ' -c ' + cfile;
+    say(compile);
+    int status = spawnw_cmd(compile);
+    if (status != 0)
+        throw "compilation failed";
+
+    say("Compiled: ", objfile);
+    return;
+}
+
+function link_file(string objfile, string exefile, string extra_obj, int install)
+{
+    var $P0 = _config();
+    string cc           = $P0['cc'];
+    string link         = $P0['link'];
+    string link_dynamic = $P0['link_dynamic'];
+    string linkflags    = $P0['linkflags'];
+    string ld_out       = $P0['ld_out'];
+    string libparrot    = $P0['libparrot_linkflags'];
+    string libs         = $P0['libs'];
+    string o            = $P0['o'];
+    string rpath        = $P0['rpath_blib'];
+    string osname       = $P0['osname'];
+    string build_dir    = $P0['build_dir'];
+    string slash        = $P0['slash'];
+    string icushared    = $P0['icu_shared'];
+    string installed    = $P0['installed'];
+    string libdir       = $P0['libdir'];
+    string versiondir   = $P0['versiondir'];
+    string optimize     = $P0['optimize'];
+
+    string pathquote  = '"';
+    string config     = pathquote;
+    if (installed != '1') {
+        config += build_dir + slash + 'src' + slash;
+	if (! install)
+            config += 'parrot_config';
+        else {
+            config += 'install_config';
+            rpath  += $P0['rpath_lib'];
+        }
+    }
+    else {
+        rpath      = $P0['rpath_lib'];
+        libparrot  = $P0['inst_libparrot_linkflags'];
+        config    += libdir + versiondir + slash + 'parrot_config';
+    }
+    config += o;
+    config += pathquote;
+
+    if (osname == 'cygwin' || install || optimize == '')
+        link += ' -s';
+    link += ' ' + ld_out + exefile + ' ' + pathquote + objfile + pathquote;
+    if (extra_obj != '')
+        link += ' ' + pathquote + extra_obj + pathquote;
+    link += ' ' + config + ' ' + rpath + ' ' + libparrot + ' ' +
+            link_dynamic + ' ' + linkflags + ' ' + libs + ' ' + icushared;
+
+    say(link);
+    int status = spawnw_cmd(link);
+    if (status != 0)
+        throw "linking failed";
+    # Check if there is a MSVC app manifest
+    $P0 = loadlib('file');
+    var file = new [ 'File' ];
+    string manifest_file_name = exefile + '.manifest';
+    var manifest_exists = file.exists(manifest_file_name);
+    if (manifest_exists != 0) {
+        # MSVC app manifest exists, embed it
+        string embed_manifest_str = 'mt.exe -nologo -manifest ' +
+                manifest_file_name +
+                ' -outputresource:' + exefile + ';1';
+        say(embed_manifest_str);
+        int embed_manifest_status = spawnw_cmd(embed_manifest_str);
+        if (embed_manifest_status != 0)
+            throw 'manifest embedding failed';
+    }
+    say("Linked: ", exefile);
+    return;
+}
+
+# handle any directory components
+function prepend_installable(string file)
+{
+    var path = split('/', file);
+    file     = path[-1];
+    file     = 'installable_' + file;
+    path[-1] = file;
+    file     = join('/', path);
+    return file;
+}
+
+// End

@@ -1,10 +1,15 @@
-# Copyright (C) 2001-2006, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
 docs/dev/c_functions.pod - C function decoration guidelines
 
-=head1 Overview
+=head1 DESCRIPTION
+
+This document addresses Parrot's macro and configuration system, which help
+to ensure various, important compile-time checks.
+
+=head1 OVERVIEW
 
 Compilers have the ability to detect a wide class of potential errors in
 code during the compilation phase, especially if certain metadata is
@@ -31,7 +36,7 @@ compilers. In some cases, the various macros might be empty placeholders.
 Also, where it says "compiler", it could also mean "lint or any
 other static analysis tool like splint."
 
-=head1 Function Parameter Decorators
+=head1 FUNCTION PARAMETER DECORATORS
 
 =head2 What's a shim?
 
@@ -126,7 +131,7 @@ and C<ARGMOD_NULLOK>. These have the same semantics as their
 non-NULLOK counterparts, except the compiler will not throw errors if
 a null value is passed.
 
-=head1 Function Decorators
+=head1 FUNCTION DECORATORS
 
 In addition to the C<SHIM>, C<ARGIN>, C<ARGOUT> and C<ARGMOD> parameters
 and variants for parameters, there are a number of helpful modifiers that
@@ -194,7 +199,7 @@ For functions that are important API functions.
 
 {{TODO: More detail is needed on this}}
 
-=head1 Examples
+=head1 EXAMPLES
 
     PARROT_EXPORT
     PARROT_WARN_UNUSED_RESULT
@@ -226,3 +231,4 @@ We could put C<PARROT_WARN_UNUSED_RESULT> on this function, but since
 all C<PARROT_PURE_FUNCTION>s and C<PARROT_CONST_FUNCTION>s get flagged
 that way anyway, there's no need.
 
+=cut

@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+ # Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 Logical Operations
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's logical operations.
+
+=head1 LOGICAL OPERATIONS
 
 The logical operations are short-circuiting, so if the first
 argument to an 'or' is true, the second will never be

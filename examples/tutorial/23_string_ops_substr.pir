@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2010, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 String Operations (continued)
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's string operations (continued).
+
+=head1 STRING OPERATIONS
 
 We can pick apart a string and pull substrings out of it using the
 C<substr> command. C<substr> takes a string, a starting position and

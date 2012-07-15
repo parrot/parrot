@@ -1,4 +1,17 @@
-=head1 Parrot PMC/Object Design Meeting Notes
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+docs/dev/pmc_obj_design_meeting_notes.pod 
+
+=head1 DESCRIPTION
+
+This document sets out PMC/Object Design Meeting Notes which took place in
+Chicago in 2006.
+
+=head1 PARROT PMC/OBJECT DESIGN MEETING NOTES
 
 During the Chicago Hackathon 2006, Jerry Gay, Matt Diephouse, chromatic,
 Leo Toetch, Jonathan Worthington and Chip Salzenberg (arriving late) met to
@@ -9,9 +22,8 @@ L<http://rakudo.org/hackathon-chicago/index.cgi?pmc>. A log of the discussion
 that took place can be found at
 L<http://www.parrotcode.org/misc/parrotsketch-logs/irclog.parrotsketch-200611/irclog.parrotsketch.20061112>.
 
-This summary has been compiled from these sources,
-and from other conversations that were not recorded.
-
+This summary has been compiled from these sources and from other
+conversations which were not recorded.
 
 =head2 List of problems and proposed solutions for PMCs:
 

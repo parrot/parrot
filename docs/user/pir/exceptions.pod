@@ -1,7 +1,18 @@
-=head1 Exceptions
+# Copyright (C) 2001-2012, Parrot Foundation.
 
-This is a basic overview of how to deal with exceptions from PIR.  There
-are two main topics: throwing exceptions and catching exceptions.  We'll
+=pod
+
+=head1 NAME
+
+docs/user/pir/exceptions.pod - Overview of using exceptions in PIR. 
+
+=head1 DESCRIPTION
+
+This is a basic overview of how to deal with exceptions from PIR.
+
+=head1 EXCEPTIONS
+
+There are two main topics: throwing exceptions and catching exceptions.  We'll
 start with the first.
 
 =head2 Throwing exceptions

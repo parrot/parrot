@@ -1,9 +1,8 @@
 {
-    "release.version"  : "4.3.0",
-    "release.name"     : "In Which...",
+    "release.version"  : "4.5.0",
+    "release.name"     : "Buff-faced Pygmy Parrot",
     "release.day"      : "Tuesday",
-    "release.nextdate" : "17 April 2012",
-    "release.nextdate" : "15 May 2012",
+    "release.nextdate" : "17 July 2012",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -12,10 +11,10 @@
     "web.org_root"    :  "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "13 May 2012",
+    "bugday.date"      : "14 July 2012",
 
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
-    "wiki.bugday"      : "bug_day_2012_03_17",
+    "wiki.bugday"      : "bug_day_2012_07_14",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/stable/4.3.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/4.5.0/"
 }

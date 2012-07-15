@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
-$Id$
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -88,6 +87,7 @@ Returns the PMC associated with C<key>.
 */
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
+        UNUSED(INTERP);
         if (key == PARROT_ALARM_TASK) {
             const Parrot_Alarm_attributes * const data = PARROT_ALARM(SELF);
             return data->alarm_task;
@@ -107,6 +107,7 @@ Returns the number associated with C<key>.
 */
 
     VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
+        UNUSED(INTERP);
         if (key == PARROT_ALARM_TIME) {
             const Parrot_Alarm_attributes * const data = PARROT_ALARM(SELF);
             return data->alarm_time;
@@ -127,6 +128,7 @@ Having the alarm numify to the time is convienient for sorting.
 
     VTABLE FLOATVAL get_number() {
         const Parrot_Alarm_attributes * const data = PARROT_ALARM(SELF);
+        UNUSED(INTERP);
         return data->alarm_time;
     }
 

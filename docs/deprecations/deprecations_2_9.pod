@@ -1,10 +1,12 @@
-# Copyright (C) 2011, Parrot Foundation.
+# Copyright (C) 2011-2012, Parrot Foundation.
 
 =head1 NAME
 
 docs/deprecations/deprecations_2_9.pod - Parrot Deprecations for 2.9
 
-=head1 Parrot Deprecations for 2.9
+=head1 DESCRIPTION
+
+Parrot Deprecations for 2.9.
 
 =head2 Remove charset opcodes and fixed_8 encoding
 

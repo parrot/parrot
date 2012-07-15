@@ -19,7 +19,7 @@ embed.pod - Parrot embedding system overview
             return 1;
         }
 
-        if (!Parrot_api_load_bytecode_file(interp, "foo.pbc", &pf)
+        if (!Parrot_api_load_bytecode_file(interp, "foo.pbc", &pf))
             show_last_error_and_exit(interp);
         
         if (!Parrot_api_pmc_wrap_string_array(interp, argc, argv, &args))

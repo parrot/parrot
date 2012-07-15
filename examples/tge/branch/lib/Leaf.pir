@@ -2,9 +2,11 @@
 
 =head1 NAME
 
-Leaf - a sample leaf node for Language::AttributeGrammar
+Leaf
 
 =head1 DESCRIPTION
+
+A sample leaf node for Language::AttributeGrammar.
 
 =cut
 
