@@ -143,5 +143,6 @@ Starred release numbers indicate supported releases.
 
  cotto       4.3.0 *        2012-Apr-17     "In Which..."
  Whiteknight 4.4.0          2012-May-15     "Banana Fanna Fo Ferret"
+ alvis       4.5.0          2012-Jun-19     "Buff-faced Pygmy Parrot"
 
 =cut

@@ -1,16 +1,22 @@
-# Copyright (C) 2007-2011, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 Cage Cleaner Guide
+=pod
+
+=head1 NAME
+
+docs/project/cage_cleaners_guide.pod - Cage Cleaner Guide.
+
+=head1 DESCRIPTION
 
 From F<docs/project/roles_responsibilities.pod>:
 
- Fixes failing tests, makes sure coding standards are implemented,
- reviews documentation and examples. A class of tickets in the
- tracking system (Trac) has been created for use by this
- group. This is an entry level position, and viewed as a good way
- to get familiar with parrot internals.
+  Fixes failing tests, makes sure coding standards are implemented,
+  reviews documentation and examples. A class of tickets in the
+  tracking system (Trac) has been created for use by this
+  group. This is an entry level position, and viewed as a good way
+  to get familiar with parrot internals.
 
-=head1 Testing Parrot after making a code cleaning change
+=head1 TESTING PARROT AFTER MAKING A CODE CLEANING CHANGE
 
 To be really I<really> sure you're not breaking anything after doing code
 cleaning or attending to the newspaper at the bottom of our Parrot's cage
@@ -29,7 +35,7 @@ maintain reasonably up to date references for the diffs.
 
 This process should be put into a script and stored somewhere...
 
-=head1 Parrot Cage Cleaners high-level goals
+=head1 PARROT CAGE CLEANERS' HIGH-LEVEL GOALS
 
 =head2 Smoke testing on many platforms with many compilers
 
@@ -335,7 +341,7 @@ If you can make it run, great!  Make it a TODO test instead.
 
 If neither, please report your findings so that everyone can decide what to do.
 
-=head1 Handy configuration tips
+=head1 HANDY CONFIGURATION TIPS
 
 =head2 Displaying trailing whitespace in vim and emacs
 

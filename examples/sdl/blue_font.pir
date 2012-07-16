@@ -1,5 +1,6 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
 
-=head1 TITLE
+=head1 NAME
 
 blue_font.pir - draw a friendly message to the screen
 
@@ -15,6 +16,10 @@ I recommend making a symlink.
 
 Yes, getting this to work across platforms is tricky, as is distributing a
 royalty-free font file.  Maybe soon.
+
+=head1 DESCRIPTION
+
+This is a PIR program which draws a message to the screen.
 
 =cut
 

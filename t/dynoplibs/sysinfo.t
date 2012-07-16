@@ -50,6 +50,16 @@ Tests for basic system information.
 
 =cut
 
+#define PARROT_INTSIZE               16
+#define PARROT_FLOATSIZE             17
+#define PARROT_POINTERSIZE           18
+#define PARROT_OS                    30
+#define PARROT_OS_VERSION            31
+#define PARROT_OS_VERSION_NUMBER     32
+#define CPU_ARCH                     33
+#define CPU_TYPE                     34
+#define PARROT_INTMAX                19
+#define PARROT_INTMIN                20
 
 my @setup = (
     { pconfig_key => 'intvalsize',

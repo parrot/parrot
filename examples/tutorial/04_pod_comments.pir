@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 Pod Documentation
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about how PIR files can contain Pod documentation.
+
+=head1 POD DOCUMENTATION
 
 As you may have noticed, PIR files can contain Pod documentation.
 

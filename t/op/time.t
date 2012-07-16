@@ -5,6 +5,10 @@
 
 t/op/time.t - Time and Sleep
 
+=head1 DESCRIPTION
+
+This PIR code implements time and sleep operations.
+
 =cut
 
 .sub main :main

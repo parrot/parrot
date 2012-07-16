@@ -4,6 +4,10 @@
 
 docs/dev/parrot_api.pod - Notes on the PARROT_EXPORT macro
 
+=head1 DESCRIPTION
+
+This document addresses the correct use of the C<PARROT_EXPORT> macro.
+
 =head1 OVERVIEW
 
 Some compilers and platforms export all symbols either by default or through
@@ -17,12 +21,16 @@ anything that will be used by a shared library or by the main Parrot executable
 when Parrot is built as a shared library.
 
 
-=head1 USAGE NOTES
+=head1 USAGE
 
 Incorrect usage of C<PARROT_EXPORT> can break the build on some platforms,
 especially Win32. The rules for how to use it are as follows.
 
 =over 4
+
+=item If you decorate a function with multiple modifiers, I<e.g.,>
+C<PARROT_EXPORT>, C<PARROT_COLD>, C<PARROT_CANNOT_RETURN_NULL>,
+C<PARROT_EXPORT> I<must> appear first in the list.
 
 =item If you decorate a function with C<PARROT_EXPORT> in a .c file, you must
 also decorate the symbol with C<PARROT_EXPORT> in all .h files that mention it.

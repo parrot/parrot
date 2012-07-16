@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2006, Parrot Foundation.
+# Copyright (C) 2004-2012, Parrot Foundation.
 package Parrot::Pmc2c::Emitter;
 use strict;
 use warnings;
@@ -7,26 +7,153 @@ use Parrot::Pmc2c::Pmc2cMain ();
 use overload '""'   => \&stringify;
 use overload 'bool' => \&boolify;
 
+=head1 NAME
+
+Parrot::Pmc2c::Emitter
+
+=head1 SYNOPSIS
+
+    use Parrot::Pmc2c::Emitter ();
+
+=head1 DESCRIPTION
+
+This package provides various methods for composing parts of files created by
+parsing PMCs.  Its methods are called by several other packages under
+F<lib/Parrot/Pmc2c/>, all of which are ultimately run during the many
+instances of F<tools/build/pmc2c.pl> invoked during the F<make> build process.
+
+=head1 PUBLIC METHODS
+
+=head2 C<new()>
+
+=over 4
+
+=item * Purpose
+
+Parrot::Pmc2c::Emitter constructor.
+
+=item * Arguments
+
+    Parrot::Pmc2c::Emitter->new( 'path/to/file' );
+
+String holding relative path to file to be written.
+
+=item * Return Value
+
+Parrot::Pmc2c::Emitter object.
+
+=item * Comment
+
+The method's argument is, in practice, the return value of a method call.
+Examples:
+
+    # lib/Parrot/Pmc2c/PMC.pm
+    my $c_emitter = Parrot::Pmc2c::Emitter->new( $self->filename(".c") );
+    my $h_emitter = Parrot::Pmc2c::Emitter->new( $self->filename(".h", $self->is_dynamic) );
+
+    # lib/Parrot/Pmc2c/PCCMETHOD.pm
+    my $e = Parrot::Pmc2c::Emitter->new( $pmc->filename );
+
+=back
+
+=cut
+
 sub new {
     my ( $class, $filename ) = @_;
-    my $self = { filename => $filename, };
-    bless $self, ( ref($class) || $class );
-    $self;
+    my $data = { filename => $filename, };
+    return bless $data, $class;
 }
 
+=head2 C<text()>
+
+=over 4
+
+=item * Purpose
+
+This, in effect, is a different type of constructor from C<new()>.  It takes
+up to three arguments and returns an object with a more complex structure.
+
+=item * Arguments
+
+List of one to three strings:
+
+=over 4
+
+=item 1 body
+
+=item 2 filename
+
+=item 3 bline
+
+=back
+
+Examples:
+
+    # lib/Parrot/Pmc2c/PMC.pm
+    body => Parrot::Pmc2c::Emitter->text($body),
+
+    # lib/Parrot/Pmc2c/Parser.pm
+    $pmc->preamble( Parrot::Pmc2c::Emitter->text( $preamble, $filename, 1 ) );
+
+    $pmc->postamble( Parrot::Pmc2c::Emitter->text( $post, $filename, $lineno ) );
+
+    body => Parrot::Pmc2c::Emitter->text( $methodblock, $filename, $lineno ),
+
+=item * Return Value
+
+Parrot::Pmc2c::Emitter object, apparently suitable for using as value for a
+C<body> key in a Parrot::Pmc2c::Method object.  B<MUST VERIFY>.
+
+=item * Comment
+
+Also currently (June 2012) used in F<lib/Parrot/Pmc2c/PMC/Null.pm>,
+F<lib/Parrot/Pmc2c/PMC/Object.pm>, F<lib/Parrot/Pmc2c/PMC/RO.pm> and
+F<lib/Parrot/Pmc2c/PMC/default.pm>.
+
+=back
+
+=cut
+
 sub text {
-    my ( $class, $data, $filename, $bline ) = @_;
+    my ( $class, $body, $filename, $bline ) = @_;
     $filename ||= "";
     $bline    ||= -1;
-    my $self = {
-        data     => $data,
+    my %data = (
+        data     => $body,
         filename => $filename,
         bline    => $bline,
-        eline    => $bline + count_newlines($data),
-    };
-    bless $self, ref($class) || $class;
-    $self;
+        eline    => $bline + count_newlines($body),
+    );
+    return bless \%data, ref($class) || $class;
 }
+
+=head2 C<find()>
+
+=over 4
+
+=item * Purpose
+
+Recursively returns strings captured from pattern matches.
+
+=item * Arguments
+
+Single argument:  compiled regular expression.
+
+=item * Return Value
+
+If a pattern is matched within a list of items, return the matching string.
+Return the object itself it the match is against the C<data> element.  Return
+a false value otherwise.
+
+=item * Comment
+
+Used in Parrot::Pmc2c::PCCMETHOD.  Example:
+
+    $matched = $body->find($signature_re);
+
+=back
+
+=cut
 
 sub find {
     my ( $self, $regex ) = @_;
@@ -41,6 +168,62 @@ sub find {
     }
     return 0;
 }
+
+=head2 C<subst()>
+
+=over 4
+
+=item * Purpose
+
+Recursively perform substitutions.
+
+=item * Arguments
+
+List of two arguments:
+
+=over 4
+
+=item *
+
+Compiled regular expression.
+
+=item *
+
+Reference to a subroutine which performs a substitution on the string
+matched by the first argument's pattern.
+
+=back
+
+=item * Return Value
+
+True value.
+
+=item * Comment
+
+Used in Parrot::Pmc2c::Method.  Some of these substitutions can be quite
+simple:
+
+    $body->subst( qr{\bSELF\b},   sub { '_self' } );
+
+Others are more complex:
+
+    # Rewrite STATICSELF.other_method(args...)
+    $body->subst(
+        qr{
+      \bSTATICSELF\b    # Macro STATICSELF
+      \.(\w+)           # other_method
+      \(\s*(.*?)\)      # capture argument list
+      }x,
+        sub {
+            "Parrot_${pmcname}"
+                . ( $pmc->is_vtable_method($1) ? "" : "_nci" ) . "_$1("
+                . full_arguments($2) . ")";
+        }
+    );
+
+=back
+
+=cut
 
 sub subst {
     my ( $self, $regex, $replacement ) = @_;
@@ -57,6 +240,42 @@ sub subst {
     }
     return 1;
 }
+
+=head2 C<replace()>
+
+=over 4
+
+=item * Purpose
+
+=item * Arguments
+
+List of two arguments:
+
+=over 4
+
+=item *
+
+Compiled regular expression.
+
+=item *
+
+Another Parrot::Pmc2c::Emitter object.
+
+=back
+
+=item * Return Value
+
+True value upon success.
+
+=item * Comment
+
+Used in C<Parrot::Pmc2c::PCCMETHOD::rewrite_RETURNs()>.  Example:
+
+    $matched->replace( $match, $e );
+
+=back
+
+=cut
 
 sub replace {
     my ( $self, $regex, $replacement ) = @_;
@@ -122,7 +341,7 @@ sub annotate_worker {
         my $filename = $it->{filename} || $self->filename;
         my $line = $it->{bline};
 
-        #no need to emit uneccessary #line directive
+        #no need to emit unnecessary #line directive
         if ( $line == -1 and $self->filename eq $self->{current_file} ) {
             $data = $it->{data};
         }

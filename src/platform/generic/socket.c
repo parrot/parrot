@@ -7,6 +7,8 @@ src/platform/generic/socket.c - UNIX socket functions
 
 =head1 DESCRIPTION
 
+This code implements UNIX socket functions for Parrot.
+
 =head2 Functions
 
 =over 4

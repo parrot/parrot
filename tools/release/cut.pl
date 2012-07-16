@@ -1,14 +1,14 @@
 # perl
-# Copyright (C) 2011, Parrot Foundation.
+# Copyright (C) 2011-2012, Parrot Foundation.
 
 use strict;
 use warnings;
 use Archive::Tar;
 use ExtUtils::Manifest qw(maniread);
 
-=head1 Purpose
+=head1 DESCRIPTION
 
-Generate a gzip'd and bzip2'd tar file for release.
+This script generates a gzip'd and bzip2'd tar file for release.
 
 Remove the DEVELOPING file (and its line from the MANIFEST).
 

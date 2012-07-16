@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2008, Parrot Foundation.
+# Copyright (C) 2006-2012, Parrot Foundation.
 
 .namespace ['CGI'; 'QueryHash']
 
@@ -18,7 +18,11 @@ CGI;QueryHash - A helper for classic CGI
     .local pmc    params_from_post
     params_from_post = parse_post_sub()
 
-=head1 Functions
+=head1 DESCRIPTION
+
+This PIR module is a helper for classic CGI.
+
+=head1 FUNCTIONS
 
 =over
 
@@ -229,7 +233,6 @@ L<http://hoohoo.ncsa.uiuc.edu/cgi/overview.html>
 Bernhard Schmalhofer - <Bernhard.Schmalhofer@gmx.de>
 
 =cut
-
 
 # Local Variables:
 #   mode: pir

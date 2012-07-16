@@ -1,5 +1,5 @@
 # THIS IS A GENERATED FILE! DO NOT EDIT!
-# Compiled with Winxed 1.9.0
+# Compiled with Winxed 1.9.1
 # Source file: winxedst2.winxed
 # Begin generated code
 
@@ -9,7 +9,7 @@
     new $P1, ['FixedIntegerArray'], 3
     $P1[0] = 1
     $P1[1] = 9
-    $P1[2] = 0
+    $P1[2] = 1
     .return($P1)
 
 .end # getVersion
@@ -1180,20 +1180,22 @@
   __label_3: # for condition
     eq $S2, "\n", __label_2
     if $S2 == "" goto __label_6
-    if $S2 == "\"" goto __label_7
-    if $S2 == "\\" goto __label_8
+    if $S2 == "\r" goto __label_7
+    if $S2 == "\"" goto __label_8
+    if $S2 == "\\" goto __label_9
     goto __label_4
   __label_6: # case
     WSubId_36(__ARG_1, __ARG_3)
   __label_7: # case
+    goto __label_5 # break
   __label_8: # case
-    concat $S6, "\\", $S2
-    set $S2, $S6
+  __label_9: # case
+    concat $S1, $S1, "\\"
+    concat $S1, $S1, $S2
     goto __label_5 # break
   __label_4: # default
+    concat $S1, $S1, $S2
   __label_5: # switch end
-    concat $S5, $S1, $S2
-    set $S1, $S5
   __label_1: # for iteration
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
@@ -1203,38 +1205,41 @@
     set $S1, $S5
     set $S3, ""
     null $S4
-  __label_9: # do
+  __label_10: # do
     set $S4, ""
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
-  __label_14: # for condition
-    eq $S2, "\n", __label_13
-    if $S2 == "" goto __label_17
-    if $S2 == "\"" goto __label_18
-    if $S2 == "\\" goto __label_19
-    goto __label_15
-  __label_17: # case
-    WSubId_36(__ARG_1, __ARG_3)
+  __label_15: # for condition
+    eq $S2, "\n", __label_14
+    if $S2 == "" goto __label_18
+    if $S2 == "\r" goto __label_19
+    if $S2 == "\"" goto __label_20
+    if $S2 == "\\" goto __label_21
+    goto __label_16
   __label_18: # case
+    WSubId_36(__ARG_1, __ARG_3)
   __label_19: # case
-    concat $S6, "\\", $S2
-    set $S2, $S6
-    goto __label_16 # break
-  __label_15: # default
-  __label_16: # switch end
+    goto __label_17 # break
+  __label_20: # case
+  __label_21: # case
+    concat $S4, $S4, "\\"
     concat $S4, $S4, $S2
-  __label_12: # for iteration
+    goto __label_17 # break
+  __label_16: # default
+    concat $S4, $S4, $S2
+  __label_17: # switch end
+  __label_13: # for iteration
     $P1 = __ARG_1.'getchar'()
     set $S2, $P1
-    goto __label_14
-  __label_13: # for end
-    eq $S4, $S1, __label_20
+    goto __label_15
+  __label_14: # for end
+    eq $S4, $S1, __label_22
     concat $S3, $S3, $S4
     concat $S3, $S3, "\\n"
-  __label_20: # endif
-  __label_11: # continue
-    ne $S4, $S1, __label_9
-  __label_10: # enddo
+  __label_22: # endif
+  __label_12: # continue
+    ne $S4, $S1, __label_10
+  __label_11: # enddo
     new $P2, [ 'Winxed'; 'Compiler'; 'TokenQuoted' ]
     getattribute $P3, __ARG_1, 'filename'
     $P2.'TokenQuoted'($P3, __ARG_3, $S3)
@@ -1620,11 +1625,14 @@
   __label_4: # while
     set $S3, $S1
     iseq $I2, $S3, " "
-    if $I2 goto __label_7
+    if $I2 goto __label_8
     iseq $I2, $S3, "\n"
+  __label_8:
+    if $I2 goto __label_7
+    iseq $I2, $S3, "\t"
   __label_7:
     if $I2 goto __label_6
-    iseq $I2, $S3, "\t"
+    iseq $I2, $S3, "\r"
   __label_6:
   __label_5:
     unless $I2 goto __label_3
@@ -1634,54 +1642,54 @@
   __label_3: # endwhile
     getattribute $P3, self, 'line'
     set $I1, $P3
-    ne $S1, "", __label_8
+    ne $S1, "", __label_9
     new $P4, [ 'Winxed'; 'Compiler'; 'TokenEof' ]
     getattribute $P5, self, 'filename'
     $P4.'TokenEof'($P5)
     set $P3, $P4
     .return($P3)
-  __label_8: # endif
+  __label_9: # endif
     set $S4, $S1
     index $I4, "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_", $S4
     isgt $I3, $I4, -1
-  __label_10:
-    unless $I3 goto __label_9
+  __label_11:
+    unless $I3 goto __label_10
     .tailcall WSubId_38(self, $S1, $I1)
-  __label_9: # endif
+  __label_10: # endif
     set $S5, $S1
     index $I4, "0123456789", $S5
     isgt $I5, $I4, -1
-  __label_12:
-    unless $I5 goto __label_11
+  __label_13:
+    unless $I5 goto __label_12
     .tailcall WSubId_46(self, $S1, $I1)
-  __label_11: # endif
+  __label_12: # endif
     set $S2, $S1
     getattribute $P1, self, 'select'
     $P2 = $P1[$S1]
-  __label_14: # while
-    if_null $P2, __label_13
+  __label_15: # while
+    if_null $P2, __label_14
     isa $I4, $P2, "Hash"
-    unless $I4 goto __label_13
+    unless $I4 goto __label_14
     $P3 = self.'getchar'()
     set $S1, $P3
     set $P1, $P2
     $P2 = $P1[$S1]
-    unless_null $P2, __label_15
+    unless_null $P2, __label_16
     self.'ungetchar'($S1)
     $P2 = $P1[""]
-    goto __label_16
-  __label_15: # else
-    concat $S2, $S2, $S1
-  __label_16: # endif
-    goto __label_14
-  __label_13: # endwhile
-    if_null $P2, __label_18
-    $P3 = $P2(self, $S2, $I1)
     goto __label_17
-  __label_18:
+  __label_16: # else
+    concat $S2, $S2, $S1
+  __label_17: # endif
+    goto __label_15
+  __label_14: # endwhile
+    if_null $P2, __label_19
+    $P3 = $P2(self, $S2, $I1)
+    goto __label_18
+  __label_19:
     $P4 = WSubId_39(self, $S2, $I1)
     set $P3, $P4
-  __label_17:
+  __label_18:
     .return($P3)
 
 .end # get_token

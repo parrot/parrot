@@ -1,6 +1,6 @@
 # Copyright (C) 2005-2009, Parrot Foundation.
 
-=head1 TITLE
+=head1 DESCRIPTION
 
 PGE::Exp - base class for expressions
 

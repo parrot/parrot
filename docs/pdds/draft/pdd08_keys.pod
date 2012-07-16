@@ -7,10 +7,6 @@
 This PDD aims to clear up the confusion regarding the implementation of keyed
 access to PMCs in Parrot.
 
-
-
-
-
 =head2 Description
 
 First, let's define some terminology. An C<aggregate PMC> is one which stores

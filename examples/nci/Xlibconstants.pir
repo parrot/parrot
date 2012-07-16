@@ -1,10 +1,10 @@
 # Copyright (C) 2008, Parrot Foundation.
 
-=head1 TITLE
+=head1 NAME
 
 xlibconstants.pir - Test NCI with libX11
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Constants for xlib.pir
 

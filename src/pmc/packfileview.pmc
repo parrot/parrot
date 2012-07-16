@@ -146,6 +146,10 @@ pmclass PackfileView auto_attrs {
 
 Create the new PMC and set flags
 
+=item C<VTABLE void init_pmc(view)>
+
+Create a new PackFile from an existing PackFileView.
+
 =item C<VTABLE void destroy()>
 
 Destroy the PMC *AND* the underlying PackFile*
@@ -174,6 +178,11 @@ Mark the PMC and the PackFile* contents
                 PARROT_PACKFILEVIEW(SELF);
         attrs->pf = NULL;
         PObj_custom_mark_destroy_SETALL(SELF);
+    }
+
+    VTABLE void init_pmc(PMC *view) {
+        VTABLE_init(interp, SELF);
+        VTABLE_set_pointer(interp, SELF, VTABLE_get_pointer(interp, view));
     }
 
     VTABLE void destroy() {

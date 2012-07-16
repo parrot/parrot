@@ -7,10 +7,6 @@
 This PDD specifies Parrot's garbage collection and memory management
 subsystems.
 
-
-
-
-
 =head2 Definitions
 
 =head3 Garbage collection (GC)

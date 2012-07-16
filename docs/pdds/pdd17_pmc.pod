@@ -7,10 +7,6 @@
 This PDD describes the internal structure and behavior of the Polymorphic
 Container (PMC) data type.
 
-
-
-
-
 =head2 Description
 
 PMCs implement all internal data types more complex than a simple integer,

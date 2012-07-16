@@ -7,10 +7,6 @@
 This document outlines the architecture and core syntax of Parrot
 Intermediate Representation (PIR).
 
-
-
-
-
 =head2 Description
 
 PIR is a stable, middle-level language intended both as a target for the

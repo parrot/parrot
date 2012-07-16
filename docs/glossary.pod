@@ -1,16 +1,16 @@
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
 docs/glossary.pod - Parrot Glossary
 
-=head1 SUMMARY
+=head1 DESCRIPTION
 
 Short descriptions of words and acronyms found in Parrot development.
 
 =head1 VERSION
 
-LAST UPDATED: 14 FEB 2011
+LAST UPDATED: 24 MAY 2012
 
 glossary.pod is updated and maintained from Parrot's GitHub repository.
 You may get the most up-to-date version at:

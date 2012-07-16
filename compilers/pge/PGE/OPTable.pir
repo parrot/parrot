@@ -1,6 +1,6 @@
 # Copyright (C) 2005-2009, Parrot Foundation.
 
-=head1 Title
+=head1 DESCRIPTION
 
 PGE::OPTable - PGE operator precedence table and parser
 

@@ -61,7 +61,6 @@ PMC2C_FILES = \\
     lib/Parrot/Pmc2c/PMC.pm \\
     lib/Parrot/Pmc2c/Method.pm \\
     lib/Parrot/Pmc2c/PCCMETHOD.pm \\
-    lib/Parrot/Pmc2c/MULTI.pm \\
     lib/Parrot/Pmc2c/Library.pm \\
     lib/Parrot/Pmc2c/UtilFunctions.pm \\
     lib/Parrot/Pmc2c/PMC/default.pm \\

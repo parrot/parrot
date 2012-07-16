@@ -1,9 +1,12 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
 
 =head1 NAME
 
 editor/README.pod - Productivity Comes in Pretty Colors
 
-=head1 Syntax Highlighting and Other Editor Assistance
+=head1 DESCRIPTION
 
 Included in this directory are some add-ins for making working on parrot (or in
 parrot) easier, for various popular editors. Mostly that means

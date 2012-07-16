@@ -6,10 +6,6 @@
 
 This PDD describes Parrot's numeric data types.
 
-
-
-
-
 =head2 Description
 
 This PDD details the basic numeric datatypes that the Parrot core knows how to

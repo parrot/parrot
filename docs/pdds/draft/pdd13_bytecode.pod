@@ -1,15 +1,11 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
-=head1 PDD 13: Bytecode
+=head1 [DRAFT] PDD 13: Bytecode
 
 =head2 Abstract
 
 This PDD describes the file format for Parrot Bytecode (PBC) files and the
 interface through which they may be manipulated programmatically.
-
-
-
-
 
 =head2 Synopsis
 
@@ -462,34 +458,12 @@ following form.
 
 =head4 PIR Debug Segment
 
-This segment stores the filenames and line numbers of PIR code that was
-compiled to bytecode. The segment comes in two parts.
+This segment stores a list of mappings between offsets in the bytecode and
+filenames, indicating that the bytecode from that point on until the next
+entry was generated from the PIR found in the given filename
 
-=over 4
-
-=item A list of mappings between instructions in the bytecode and line
-numbers, with one entry per instruction
-
-=item A list of mappings between offsets in the bytecode and filenames,
-indicating that the bytecode from that point on until the next entry was
-generated from the PIR found in the given filename
-
-=back
-
-The length of the table of line number mappings is given by the last field
-of the segment header.
-
-Then comes the table:
-
-  +--------+--------+--------------------------------------------------------+
-  | Offset | Length | Description                                            |
-  +--------+--------+--------------------------------------------------------+
-  | 0      | 1      | Line number for the offset in the bytecode.            |
-  +--------+--------+--------------------------------------------------------+
-
-Then comes an opcode with n, the number of file mappings.
-
-Then come n mappings.
+The segment begins with an opcode with n, the number of file mappings.  Then
+come n mappings:
 
   +--------+--------+--------------------------------------------------------+
   | Offset | Length | Description                                            |

@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 Namespaces
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's namespaces.
+
+=head1 NAMESPACES
 
 Subroutines all have a unique name, which is how the software recognizes
 them. However, if we have many functions this can be difficult because

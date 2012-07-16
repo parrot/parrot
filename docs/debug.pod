@@ -1,10 +1,10 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
 docs/debug.pod - Debugging Parrot
 
-=head1 ABSTRACT
+=head1 DESCRIPTION
 
 This document describes how to debug various parts of Parrot.
 
@@ -240,3 +240,5 @@ with gdb and a version of parrot compiled with C<gcc> and the C<-g> flag.
             executable_name_pmc = (PMC *) 0x8204d70
             status = 1267896320
     (gdb) 
+
+=cut

@@ -1,5 +1,5 @@
 
-=head1 TITLE
+=head1 DESCRIPTION
 
 block.pir - a tetris block class
 

@@ -1,6 +1,6 @@
-# Copyright (C) 2004-2009, Parrot Foundation.
+# Copyright (C) 2004-2012, Parrot Foundation.
 
-=head1 TITLE
+=head1 NAME
 
 dumper.pir - PIR version of Perl 5's Data::Dumper module
 
@@ -21,7 +21,7 @@ version 0.10
 
 =head1 DESCRIPTION
 
-    PIR implementation of Perl 5's Data::Dumper module.
+PIR implementation of Perl 5's Data::Dumper module.
 
 =cut
 

@@ -6,10 +6,6 @@
 
 Parrot's I/O subsystem.
 
-
-
-
-
 =head2 Definitions
 
 A "stream" allows input or output operations on a source/destination

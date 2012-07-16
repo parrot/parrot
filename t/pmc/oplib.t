@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -8,6 +8,10 @@ t/pmc/oplib.t - OpLib PMC
 =head1 SYNOPSIS
 
     % prove t/pmc/oplib.t
+
+=head1 DESCRIPTION
+
+This PIR code implements various oplib tests.
 
 =cut
 

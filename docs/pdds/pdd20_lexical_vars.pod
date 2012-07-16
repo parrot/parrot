@@ -7,10 +7,6 @@
 This document defines the requirements and implementation strategy for
 lexically scoped variables.
 
-
-
-
-
 =head2 Synopsis
 
 =begin PIR_INVALID

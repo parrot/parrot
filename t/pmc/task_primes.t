@@ -1,10 +1,9 @@
 #!./parrot
-# Copyright (C) 2010-2011, Parrot Foundation.
+# Copyright (C) 2010-2012, Parrot Foundation.
 
-=head1 task_primes.t
+=head1 DESCRIPTION
 
-The classic threads/message passing prime checker
-is now a Parrot test.
+This PIR code implements the classic threads/message passing prime checker.
 
 =cut
 
