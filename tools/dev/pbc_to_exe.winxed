@@ -24,7 +24,7 @@ Compile bytecode to executable.
 
 */
 
-$include_const "interpcores.pasm";
+$include_const "interpcores.pir";
 
 $load "Getopt/Obj.pbc";
 $load "config.pbc";
