@@ -142,9 +142,11 @@ accomplish this,
 
 =item 1
 
-save, in some temporary location, the following three documents:
+save, in some temporary location, the following four documents:
 
-F<README.pod>;
+F<README.md>;
+
+F<README.pod>; and
 
 F<index.html>; and
 
@@ -183,8 +185,8 @@ Add and commit these changes to 'parrot.github.com'.
 
 =item 5
 
-Copy the three files you saved earlier, I<i.e.>, F<README.pod>, F<index.html>,
-and F<releases.html>, back to 'parrot.github.com'.
+Copy the four files you saved earlier, I<i.e.>, F<README.md>, F<README.pod>,
+F<index.html>, and F<releases.html>, back to 'parrot.github.com'.
 
 =back
 
@@ -202,7 +204,7 @@ to read
 
 =over 4
 
-<title>Parrot 4.1.0-devel - Home</title>
+<title>Parrot 4.1.0 - Home</title>
 
 =back
 
@@ -218,7 +220,7 @@ to read
 
 =over 4
 
-<br>Parrot version 4.1.0-devel            </div>
+<br>Parrot version 4.1.0            </div>
 
 =back
 
