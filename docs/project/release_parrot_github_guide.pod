@@ -229,7 +229,7 @@ Edit, again, for example, the line
 
 =over 4
 
-<a href="./releases.html">Parrot Documentation Releases (4.0.0 - 0.1.1)</a>
+<a href="./releases.html">Parrot Documentation Releases (3.9.0 - 0.1.1)</a>
 
 =back
 
@@ -237,11 +237,11 @@ to read
 
 =over 4
 
-<a href="./releases.html">Parrot Documentation Releases (4.1.0 - 0.1.1)</a>
+<a href="./releases.html">Parrot Documentation Releases (4.0.0 - 0.1.1)</a>
 
 =back
 
-Save your edits.
+Save your edits.[5]
 
 Next, open F<releases.html> in your editor and make the following edits:
 
@@ -258,7 +258,7 @@ in the 'parrot-docs4' repository. For example, copy the line,
 
 =over 4
 
-<li><a href="./parrot-docs4/4.0.0/html/index.html">Release 4.0.0</a></li>
+<li><a href="./parrot-docs4/3.9.0/html/index.html">Release 3.9.0</a></li>
 
 =back
 
@@ -266,7 +266,7 @@ and paste it in as the first element of the list.  Edit it to read,
 
 =over 4
 
-<li><a href="./parrot-docs4/4.1.0/html/index.html">Release 4.1.0</a></li>
+<li><a href="./parrot-docs4/4.0.0/html/index.html">Release 4.0.0</a></li>
 
 =back
 
@@ -313,6 +313,10 @@ Parrot because you only need the previous documentation release.
 [4] Unless there is good reason to do otherwise, please name the newly created
 directory after the F<VERSION> of the Parrot distribution you are archiving in
 the repo. Here, in our example, C<4.0.0>.
+
+[5] Please note: The newly archived release will I<always> be one less than
+the release on which you are presently working. That is, the release you just
+cut.
 
 =head1 COPYRIGHT
 
