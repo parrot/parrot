@@ -9,15 +9,23 @@
 
     $S0 = sysinfo .SYSINFO_PARROT_OS
     if $S0 == 'MSWin32' goto run_win32_tests
+    if $S0 == 'cygwin' goto run_cygwin_tests
     goto run_unix_tests
+
   run_win32_tests:
     say "1..1"
     say "ok 1 - All tests skipped on Win32"
     exit 0
+
+  run_cygwin_tests:
+    say "1..5"
+    tasks_run()
+    task_send_recv()
+    say "# cygwin has too slow and unreliable signals"
+    exit 0
+
   run_unix_tests:
-
     plan(10)
-
     tasks_run()
     task_send_recv()
     task_kill()
