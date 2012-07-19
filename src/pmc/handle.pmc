@@ -34,7 +34,7 @@ EXCEPTION_INVALID_OPERATION.
 pmclass Handle provides Handle manual_attrs {
     /* TODO: Consider encapsulating PIOHANDLE as a PMC type, for subclassing */
     ATTR PIOHANDLE os_handle;           /* Low level OS descriptor */
-    ATTR INTVAL    record_separator;    /* Record separator (only single
+    ATTR STRING    *record_separator;    /* Record separator (only single
                                          * char supported) */
     ATTR IO_VTABLE *io_vtable;    /* Function dispatch table */
     ATTR IO_BUFFER *read_buffer;        /* Read Buffer */

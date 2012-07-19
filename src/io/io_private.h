@@ -202,7 +202,8 @@ void io_read_chars_append_string(PARROT_INTERP,
     ARGMOD(PMC *handle),
     ARGIN(const IO_VTABLE *vtable),
     ARGMOD_NULLOK(IO_BUFFER *buffer),
-    size_t byte_length)
+    size_t byte_length,
+    size_t adv_length)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -233,11 +234,12 @@ STRING * io_readline_encoded_string(PARROT_INTERP,
     ARGIN(const IO_VTABLE *vtable),
     ARGMOD(IO_BUFFER *buffer),
     ARGIN_NULLOK(const STR_VTABLE *encoding),
-    INTVAL rs)
+    ARGIN(STRING * rs))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
+        __attribute__nonnull__(6)
         FUNC_MODIFIES(*handle)
         FUNC_MODIFIES(*buffer);
 
@@ -322,7 +324,8 @@ STRING * io_verify_string_encoding(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \
     , PARROT_ASSERT_ARG(vtable) \
-    , PARROT_ASSERT_ARG(buffer))
+    , PARROT_ASSERT_ARG(buffer) \
+    , PARROT_ASSERT_ARG(rs))
 #define ASSERT_ARGS_io_sync_buffers_for_read __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \

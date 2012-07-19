@@ -426,9 +426,10 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_io_readline_s(PARROT_INTERP,
     ARGMOD(PMC *handle),
-    INTVAL terminator)
+    ARGIN(STRING * terminator))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*handle);
 
 PARROT_EXPORT
@@ -757,7 +758,8 @@ INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP,
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_Parrot_io_readline_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle))
+    , PARROT_ASSERT_ARG(handle) \
+    , PARROT_ASSERT_ARG(terminator))
 #define ASSERT_ARGS_Parrot_io_reads __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
@@ -883,16 +885,20 @@ size_t io_buffer_find_string_marker(PARROT_INTERP,
     ARGIN(const IO_VTABLE *vtable),
     ARGIN(const STR_VTABLE *encoding),
     ARGMOD(Parrot_String_Bounds *bounds),
-    INTVAL delim)
+    ARGIN(STRING * delim),
+    ARGOUT(size_t *chars_total))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
         __attribute__nonnull__(6)
+        __attribute__nonnull__(7)
+        __attribute__nonnull__(8)
         FUNC_MODIFIES(*buffer)
         FUNC_MODIFIES(*handle)
-        FUNC_MODIFIES(*bounds);
+        FUNC_MODIFIES(*bounds)
+        FUNC_MODIFIES(*chars_total);
 
 void Parrot_io_buffer_add_to_handle(PARROT_INTERP,
     ARGMOD(PMC *handle),
@@ -1042,7 +1048,9 @@ size_t Parrot_io_buffer_write_b(PARROT_INTERP,
     , PARROT_ASSERT_ARG(handle) \
     , PARROT_ASSERT_ARG(vtable) \
     , PARROT_ASSERT_ARG(encoding) \
-    , PARROT_ASSERT_ARG(bounds))
+    , PARROT_ASSERT_ARG(bounds) \
+    , PARROT_ASSERT_ARG(delim) \
+    , PARROT_ASSERT_ARG(chars_total))
 #define ASSERT_ARGS_Parrot_io_buffer_add_to_handle \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

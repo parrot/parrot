@@ -675,12 +675,16 @@ Parrot_io_buffer_advance_position(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer
 
 =item C<size_t io_buffer_find_string_marker(PARROT_INTERP, IO_BUFFER *buffer,
 PMC *handle, const IO_VTABLE *vtable, const STR_VTABLE *encoding,
-Parrot_String_Bounds *bounds, INTVAL delim)>
+Parrot_String_Bounds *bounds, STRING * delim, size_t *chars_total)>
 
 Search the buffer for the given delimiter substr or end-of-buffer,
 whichever comes first. Return a count of the number of bytes to be
 read, in addition to scan information in *bounds. Does not return an
 amount of bytes to read which would create an incomplete codepoint.
+
+The return value is the number of bytes to read for the string contents. The
+pointer C<*chars_total> returns the total number of bytes to remove from the
+buffer
 
 =cut
 
@@ -691,29 +695,74 @@ size_t
 io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
         ARGMOD(PMC *handle), ARGIN(const IO_VTABLE *vtable),
         ARGIN(const STR_VTABLE *encoding), ARGMOD(Parrot_String_Bounds *bounds),
-        ARGIN(STRING * delim))
+        ARGIN(STRING * delim), ARGOUT(size_t *chars_total))
 {
     ASSERT_ARGS(io_buffer_find_string_marker)
     INTVAL bytes_needed = 0;
 
-    size_t bytes_available = Parrot_io_buffer_fill(interp, buffer, handle,
-                                                   vtable);
-    STRING str;
-    if (bytes_available == 0)
+    const size_t delim_bytelen = STRING_byte_length(delim);
+    const size_t bytes_available = Parrot_io_buffer_fill(interp, buffer, handle, vtable);
+
+    if (bytes_available == 0 || bytes_available < delim_bytelen)
         return 0;
 
-    bounds->bytes = BUFFER_USED_SIZE(buffer);
+    bounds->bytes = bytes_available;
     bounds->chars = -1;
     bounds->delim = -1;
 
-    /* Search the buffer. Return either when we find the delimiter or reach
-       the end of the available buffer. partial_scan returns the number of
-       bytes needed to complete the final codepoint (0 if we have read a
-       complete codepoint and do not need any more to complete it). Lop those
-       last few bytes off the end of the found sequence, so we only read
-       complete codepoints out into the STRING. */
+    /* Partial scan the buffer to get information about bounds. */
     bytes_needed = encoding->partial_scan(interp, buffer->buffer_start, bounds);
-    return bounds->bytes;
+    if (bounds->bytes) {
+        /* Wrap the buffer up into a temporary STRING header. Use this to do
+           string search to try and find the delimiter. If we do not find it,
+           we might have part of the delimiter at the end of the buffer, so we
+           can only safely read out part of it. */
+        INTVAL delim_idx;
+        STRING str;
+
+        str._bufstart = buffer->buffer_start;
+        str.strstart = buffer->buffer_start;
+        str._buflen = bounds->bytes;
+        str.bufused = bounds->bytes;
+        str.strlen = bounds->chars;
+        str.hashval = 0;
+        str.encoding = encoding;
+
+        /* If we've found the delimiter, return the number of bytes up to and
+           including it. */
+        delim_idx = STRING_index(interp, &str, delim, 0);
+        if (delim_idx >= 0) {
+            *chars_total = delim_idx + delim_bytelen;
+            return delim_idx;
+        }
+
+        /* If we haven't found the delimiter, we MIGHT have part of it. If the
+           delimiter is multiple bytes, we need to leave that many bytes in the
+           buffer at the end so that a subsequent fill+search will get the whole
+           delimiter. If the delimiter is a single byte, we don't need to do
+           that.
+
+           If the delimiter is multiple bytes, and we don't have enough bytes
+           in the buffer to guarantee we can return bytes without eating into
+           a partial delimiter, we return 0.
+
+           If the delimiter is exactly one byte, we know we don't have it so
+           we can just return everything. */
+        if (delim_bytelen == 1) {
+            *chars_total = bounds->bytes;
+            return bounds->bytes;
+        }
+
+        if (bytes_available > delim_bytelen) {
+            const size_t bytes_to_read = bytes_available - delim_bytelen;
+            *chars_total = bytes_to_read;
+            return bytes_to_read;
+        }
+    }
+    /* For whatever reason, we have nothing to return. This may be because there
+       is no text in the buffer, or because we have a multi-byte delimiter but
+       we don't have enough bytes in the buffer to match it. */
+    return 0;
 }
 
 /*

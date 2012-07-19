@@ -300,7 +300,7 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
                                 handle, vtable, encoding, &bounds,
                                 BUFFER_USED_SIZE(buffer));
         if (bytes_to_read != 0)
-            io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read);
+            io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read, 0);
         return s;
     }
 
@@ -315,7 +315,7 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
             break;
 
         /* Append buffer to result */
-        io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read);
+        io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read, 0);
         total_bytes_read += bytes_to_read;
 
         if (bounds.chars == char_length)
@@ -342,14 +342,17 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
 /*
 
 =item C<void io_read_chars_append_string(PARROT_INTERP, STRING * s, PMC *handle,
-const IO_VTABLE *vtable, IO_BUFFER *buffer, size_t byte_length)>
+const IO_VTABLE *vtable, IO_BUFFER *buffer, size_t byte_length, size_t
+adv_length)>
 
 Read characters out of the buffer and append them to the end of the existing
 STRING. The STRING should be in "edit" mode and should not be referenced
 by anything outside the IO subsystem. The byte_length should be accurate,
 The buffer should be prepared and scanned ahead of time to ensure the
 number of bytes to be read is the number of bytes actually available for
-reading.
+reading. The value in C<adv_length>, if larger than C<byte_length> is the
+actual number of bytes to advance the buffer by (the difference adv_length -
+byte_length are characters which are discarded).
 
 =cut
 
@@ -358,13 +361,18 @@ reading.
 void
 io_read_chars_append_string(PARROT_INTERP, ARGMOD(STRING * s),
         ARGMOD(PMC *handle), ARGIN(const IO_VTABLE *vtable),
-        ARGMOD_NULLOK(IO_BUFFER *buffer), size_t byte_length)
+        ARGMOD_NULLOK(IO_BUFFER *buffer), size_t byte_length, size_t adv_length)
 {
     ASSERT_ARGS(io_read_chars_append_string)
     const size_t alloc_size = s->bufused + byte_length;
     size_t bytes_read = 0;
     PARROT_ASSERT(s->encoding);
-    PARROT_ASSERT(byte_length > 0);
+    PARROT_ASSERT(byte_length > 0 || adv_length > 0);
+
+    if (byte_length == 0 && adv_length > 0) {
+        Parrot_io_buffer_advance_position(interp, buffer, adv_length);
+        return;
+    }
 
     if (alloc_size > s->_buflen) {
         if (s->strstart)
@@ -380,6 +388,11 @@ io_read_chars_append_string(PARROT_INTERP, ARGMOD(STRING * s),
         bytes_read = vtable->read_b(interp, handle, s->strstart + s->bufused,
                                     byte_length);
 
+    if (adv_length > byte_length) {
+        const size_t diff = adv_length - byte_length;
+        Parrot_io_buffer_advance_position(interp, buffer, diff);
+    }
+
     PARROT_ASSERT(bytes_read <= byte_length);
     s->bufused += byte_length;
     vtable->adv_position(interp, handle, byte_length);
@@ -389,7 +402,7 @@ io_read_chars_append_string(PARROT_INTERP, ARGMOD(STRING * s),
 /*
 
 =item C<STRING * io_readline_encoded_string(PARROT_INTERP, PMC *handle, const
-IO_VTABLE *vtable, IO_BUFFER *buffer, const STR_VTABLE *encoding, INTVAL rs)>
+IO_VTABLE *vtable, IO_BUFFER *buffer, const STR_VTABLE *encoding, STRING * rs)>
 
 Read a line, up to and including the terminator character rs, from the
 input handle
@@ -420,19 +433,24 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
 
     while (1) {
         Parrot_String_Bounds bounds;
+        size_t total_bytes = 0;
         const size_t bytes_to_read = io_buffer_find_string_marker(interp,
-                               buffer, handle, vtable, encoding, &bounds, rs);
+                               buffer, handle, vtable, encoding, &bounds, rs,
+                               &total_bytes);
 
         /* Buffer is empty, so we're probably at EOF. */
-        if (bytes_to_read == 0)
+        if (total_bytes == 0)
             break;
 
         /* Append buffer to result */
-        io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read);
+        io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read, total_bytes);
+
         total_bytes_read += bytes_to_read;
 
-        /* If we've found the delimiter, we're at the end of line. Return it */
-        if (bounds.delim == rs)
+        /* If we've found the delimiter, we're at the end of line. We know we've
+           found the delimiter if the total number of bytes to take from the
+           buffer is larger than the number of bytes to read. */
+        if (total_bytes > bytes_to_read)
             break;
 
         /* Some types, like Socket, don't want to be read more than once in a

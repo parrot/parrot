@@ -64,7 +64,7 @@ Initializes a newly created FileHandle object.
         Parrot_FileHandle_attributes * const attrs =
             PMC_data_typed(SELF, Parrot_FileHandle_attributes *);
 
-        attrs->record_separator = '\n';
+        attrs->record_separator = CONST_STRING(interp, "\n");
         attrs->flags            = 0;
         attrs->filename         = STRINGNULL;
         attrs->mode             = STRINGNULL;
