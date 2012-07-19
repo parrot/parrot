@@ -229,7 +229,8 @@ Edit, again, for example, the line
 
 =over 4
 
-<a href="./releases.html">Parrot Documentation Releases (3.9.0 - 0.1.1)</a>
+<a href="./releases.html">Previous Parrot Documentation Releases (3.9.0 -
+0.1.1)</a>
 
 =back
 
@@ -237,7 +238,8 @@ to read
 
 =over 4
 
-<a href="./releases.html">Parrot Documentation Releases (4.0.0 - 0.1.1)</a>
+<a href="./releases.html">Previous Parrot Documentation Releases (4.0.0 -
+0.1.1)</a>
 
 =back
 
