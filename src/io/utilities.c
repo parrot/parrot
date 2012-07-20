@@ -300,7 +300,7 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
                                 handle, vtable, encoding, &bounds,
                                 BUFFER_USED_SIZE(buffer));
         if (bytes_to_read != 0)
-            io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read, 0);
+            io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read);
         return s;
     }
 
@@ -315,7 +315,7 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
             break;
 
         /* Append buffer to result */
-        io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read, 0);
+        io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read);
         total_bytes_read += bytes_to_read;
 
         if (bounds.chars == char_length)
@@ -342,8 +342,7 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
 /*
 
 =item C<void io_read_chars_append_string(PARROT_INTERP, STRING * s, PMC *handle,
-const IO_VTABLE *vtable, IO_BUFFER *buffer, size_t byte_length, size_t
-adv_length)>
+const IO_VTABLE *vtable, IO_BUFFER *buffer, size_t byte_length)>
 
 Read characters out of the buffer and append them to the end of the existing
 STRING. The STRING should be in "edit" mode and should not be referenced
@@ -361,18 +360,13 @@ byte_length are characters which are discarded).
 void
 io_read_chars_append_string(PARROT_INTERP, ARGMOD(STRING * s),
         ARGMOD(PMC *handle), ARGIN(const IO_VTABLE *vtable),
-        ARGMOD_NULLOK(IO_BUFFER *buffer), size_t byte_length, size_t adv_length)
+        ARGMOD_NULLOK(IO_BUFFER *buffer), size_t byte_length)
 {
     ASSERT_ARGS(io_read_chars_append_string)
     const size_t alloc_size = s->bufused + byte_length;
     size_t bytes_read = 0;
     PARROT_ASSERT(s->encoding);
-    PARROT_ASSERT(byte_length > 0 || adv_length > 0);
-
-    if (byte_length == 0 && adv_length > 0) {
-        Parrot_io_buffer_advance_position(interp, buffer, adv_length);
-        return;
-    }
+    PARROT_ASSERT(byte_length > 0);
 
     if (alloc_size > s->_buflen) {
         if (s->strstart)
@@ -387,11 +381,6 @@ io_read_chars_append_string(PARROT_INTERP, ARGMOD(STRING * s),
     else
         bytes_read = vtable->read_b(interp, handle, s->strstart + s->bufused,
                                     byte_length);
-
-    if (adv_length > byte_length) {
-        const size_t diff = adv_length - byte_length;
-        Parrot_io_buffer_advance_position(interp, buffer, diff);
-    }
 
     PARROT_ASSERT(bytes_read <= byte_length);
     s->bufused += byte_length;
@@ -433,25 +422,16 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
 
     while (1) {
         Parrot_String_Bounds bounds;
-        size_t total_bytes = 0;
         const size_t bytes_to_read = io_buffer_find_string_marker(interp,
-                               buffer, handle, vtable, encoding, &bounds, rs,
-                               &total_bytes);
+                               buffer, handle, vtable, encoding, &bounds, rs);
 
         /* Buffer is empty, so we're probably at EOF. */
-        if (total_bytes == 0)
+        if (bytes_to_read == 0)
             break;
 
         /* Append buffer to result */
-        io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read, total_bytes);
-
+        io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read);
         total_bytes_read += bytes_to_read;
-
-        /* If we've found the delimiter, we're at the end of line. We know we've
-           found the delimiter if the total number of bytes to take from the
-           buffer is larger than the number of bytes to read. */
-        if (total_bytes > bytes_to_read)
-            break;
 
         /* Some types, like Socket, don't want to be read more than once in a
            single request because recv can hang waiting for data. In those

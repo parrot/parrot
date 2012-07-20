@@ -779,7 +779,7 @@ Parrot_io_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
             io_sync_buffers_for_read(interp, handle, vtable, read_buffer, write_buffer);
             while (available_bytes > 0 && !Parrot_io_eof(interp, handle)) {
                 io_read_chars_append_string(interp, s, handle, vtable, read_buffer,
-                                            available_bytes, 0);
+                                            available_bytes);
                 available_bytes = Parrot_io_buffer_fill(interp, read_buffer, handle, vtable);
             }
             return s;
@@ -789,7 +789,7 @@ Parrot_io_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
             STRING * const s = io_get_new_empty_string(interp, encoding, -1, total_size);
 
             io_sync_buffers_for_read(interp, handle, vtable, read_buffer, write_buffer);
-            io_read_chars_append_string(interp, s, handle, vtable, read_buffer, total_size, 0);
+            io_read_chars_append_string(interp, s, handle, vtable, read_buffer, total_size);
             return s;
         }
     }

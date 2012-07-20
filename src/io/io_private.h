@@ -202,8 +202,7 @@ void io_read_chars_append_string(PARROT_INTERP,
     ARGMOD(PMC *handle),
     ARGIN(const IO_VTABLE *vtable),
     ARGMOD_NULLOK(IO_BUFFER *buffer),
-    size_t byte_length,
-    size_t adv_length)
+    size_t byte_length)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)

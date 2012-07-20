@@ -675,7 +675,7 @@ Parrot_io_buffer_advance_position(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer
 
 =item C<size_t io_buffer_find_string_marker(PARROT_INTERP, IO_BUFFER *buffer,
 PMC *handle, const IO_VTABLE *vtable, const STR_VTABLE *encoding,
-Parrot_String_Bounds *bounds, STRING * delim, size_t *chars_total)>
+Parrot_String_Bounds *bounds, STRING * delim)>
 
 Search the buffer for the given delimiter substr or end-of-buffer,
 whichever comes first. Return a count of the number of bytes to be
@@ -695,7 +695,7 @@ size_t
 io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
         ARGMOD(PMC *handle), ARGIN(const IO_VTABLE *vtable),
         ARGIN(const STR_VTABLE *encoding), ARGMOD(Parrot_String_Bounds *bounds),
-        ARGIN(STRING * delim), ARGOUT(size_t *chars_total))
+        ARGIN(STRING * delim))
 {
     ASSERT_ARGS(io_buffer_find_string_marker)
     INTVAL bytes_needed = 0;
@@ -731,10 +731,8 @@ io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
         /* If we've found the delimiter, return the number of bytes up to and
            including it. */
         delim_idx = STRING_index(interp, &str, delim, 0);
-        if (delim_idx >= 0) {
-            *chars_total = delim_idx + delim_bytelen;
-            return delim_idx;
-        }
+        if (delim_idx >= 0)
+            return delim_idx + delim_bytelen;
 
         /* If we haven't found the delimiter, we MIGHT have part of it. If the
            delimiter is multiple bytes, we need to leave that many bytes in the
@@ -748,16 +746,11 @@ io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
 
            If the delimiter is exactly one byte, we know we don't have it so
            we can just return everything. */
-        if (delim_bytelen == 1) {
-            *chars_total = bounds->bytes;
+        if (delim_bytelen == 1)
             return bounds->bytes;
-        }
 
-        if (bytes_available > delim_bytelen) {
-            const size_t bytes_to_read = bytes_available - delim_bytelen;
-            *chars_total = bytes_to_read;
-            return bytes_to_read;
-        }
+        if (bytes_available > delim_bytelen)
+            return bytes_available - delim_bytelen;
     }
     /* For whatever reason, we have nothing to return. This may be because there
        is no text in the buffer, or because we have a multi-byte delimiter but
