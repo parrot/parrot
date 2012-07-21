@@ -10,11 +10,11 @@ src/io/userhandle.c - IO_VTABLE and helpers for user-defined types
 This file implements the IO_VTABLE for user-defined types. It is not currently
 used.
 
-=cut
-
 =head2 IO_VTABLE Functions
 
 =over 4
+
+=cut
 
 */
 
