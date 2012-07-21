@@ -96,8 +96,7 @@ Parrot_io_buffer_allocate(PARROT_INTERP, ARGMOD(PMC *owner), INTVAL flags,
 {
     ASSERT_ARGS(Parrot_io_buffer_allocate)
     IO_BUFFER * const buffer =
-            (IO_BUFFER *)Parrot_gc_allocate_fixed_size_storage(interp,
-                                                        sizeof (IO_BUFFER));
+            (IO_BUFFER *)Parrot_gc_allocate_fixed_size_storage(interp, sizeof (IO_BUFFER));
     buffer->encoding = encoding;
     if (init_size == BUFFER_SIZE_ANY) {
         if (flags & PIO_BF_LINEBUF)
@@ -738,21 +737,32 @@ io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
             return delim_idx + delim_bytelen;
         }
 
-        /* If we haven't found the delimiter, we MIGHT have part of it. If the
-           delimiter is multiple bytes, we need to leave that many bytes in the
-           buffer at the end so that a subsequent fill+search will get the whole
-           delimiter. If the delimiter is a single byte, we don't need to do
-           that.
-
-           If the delimiter is multiple bytes, and we don't have enough bytes
-           in the buffer to guarantee we can return bytes without eating into
-           a partial delimiter, we return 0.
+        /* If we haven't found the delimiter, we MIGHT have part of it. First,
+           check a few simplifying cases before we do anything else.
 
            If the delimiter is exactly one byte, we know we don't have it so
-           we can just return everything. */
+           we can just return everything. This is a small optimization for the
+           common case where the delimiter is "\n" */
         if (delim_bytelen == 1)
             return bounds->bytes;
 
+        /* If we've hit EOF and don't have the terminator, we'll never have it.
+           return everything we do have and call it a day. */
+        if (vtable->is_eof(interp, handle))
+            return bounds->bytes;
+
+        /* If the delimiter is multiple bytes, we might have part of it. We need
+           to leave that many bytes in the buffer at the end so that a
+           subsequent fill+search will get the whole delimiter. Because we've
+           required that the delimiter can be, at most, less than half the size
+           of the buffer (which is obnoxiously large considering most delimiters
+           will be either "\n" or "\r\n") we know that the buffer will be
+           normalized and the remainder of the terminator will be found with the
+           next fill.
+
+           If the delimiter is multiple bytes, and we don't have enough bytes
+           in the buffer to guarantee we can return bytes without eating into
+           a partial delimiter, we return 0. */
         if (bytes_available > delim_bytelen)
             return bytes_available - delim_bytelen;
     }

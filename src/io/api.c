@@ -561,7 +561,7 @@ Parrot_io_close(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL autoflush)
         /* TODO: We need to better-document the autoflush values, and maybe
            turn it into an enum or a series of typedefs */
         if (autoflush == -1)
-            autoflush == (vtable->flags && PIO_VF_FLUSH_ON_CLOSE) ? 1 : 0;
+            autoflush == (vtable->flags & PIO_VF_FLUSH_ON_CLOSE) ? 1 : 0;
         if (autoflush == 1)
             vtable->flush(interp, handle);
         return vtable->close(interp, handle);
@@ -932,15 +932,15 @@ Parrot_io_readline_s(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING * terminat
         size_t bytes_read;
         STRING *result;
 
-        if (terminator->bufused > (read_buffer->buffer_size / 2))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "Readline terminator string must be smaller than %d bytes for this buffer");
-
         io_sync_buffers_for_read(interp, handle, vtable, read_buffer, write_buffer);
         io_verify_is_open_for(interp, handle, vtable, PIO_F_READ);
 
         if (read_buffer == NULL)
             read_buffer = io_verify_has_read_buffer(interp, handle, vtable, BUFFER_SIZE_ANY);
+
+        if (terminator->bufused > (read_buffer->buffer_size / 2))
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Readline terminator string must be smaller than %d bytes for this buffer");
 
         return io_readline_encoded_string(interp, handle, vtable, read_buffer, NULL, terminator);
     }

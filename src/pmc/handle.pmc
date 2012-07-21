@@ -199,19 +199,15 @@ Set the record separator for readline.
 */
 
     METHOD record_separator(STRING *str :optional, int has_str :opt_flag) {
-        INTVAL c;
-
         if (has_str) {
             if (STRING_length(str) != 1)
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "Record separator must be a single character");
 
-            c = STRING_ord(interp, str, 0);
-            SET_ATTR_record_separator(INTERP, SELF, c);
+            SET_ATTR_record_separator(INTERP, SELF, str);
         }
         else {
-            GET_ATTR_record_separator(INTERP, SELF, c);
-            str = Parrot_str_chr(interp, c);
+            GET_ATTR_record_separator(INTERP, SELF, str);
         }
 
         RETURN(STRING *str);
