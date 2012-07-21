@@ -938,7 +938,11 @@ Parrot_io_readline_s(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING * terminat
         if (read_buffer == NULL)
             read_buffer = io_verify_has_read_buffer(interp, handle, vtable, BUFFER_SIZE_ANY);
 
-        if (terminator->bufused > (read_buffer->buffer_size / 2))
+        /* Because of the way buffering works, the terminator sequence may be,
+           at most, one character shorter than half the size of the buffer.
+           Most cases will use "\n" or "\r\n" or some permutation thereof, so
+           this isn't a big deal. */
+        if (terminator->bufused > ((read_buffer->buffer_size / 2) - STRING_max_bytes_per_codepoint(terminator)))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Readline terminator string must be smaller than %d bytes for this buffer");
 

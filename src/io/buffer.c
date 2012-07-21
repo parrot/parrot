@@ -768,8 +768,13 @@ io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
            If the delimiter is multiple bytes, and we don't have enough bytes
            in the buffer to guarantee we can return bytes without eating into
            a partial delimiter, we return 0. */
-        if (bytes_available > delim_bytelen)
-            return bytes_available - delim_bytelen;
+        if (bytes_available > delim_bytelen) {
+            bounds->bytes = (bytes_available / 2) - delim_bytelen;
+            bounds->chars = -1;
+            bounds->delim = -1;
+            encoding->partial_scan(interp, buffer->buffer_start, bounds);
+            return bounds->bytes;
+        }
     }
     /* For whatever reason, we have nothing to return. This may be because there
        is no text in the buffer, or because we have a multi-byte delimiter but

@@ -244,7 +244,26 @@ scheme) for the filehandle.
         STRING *encoding;
 
         if (got_encoding) {
+            /* TODO: This is something of a hack. We need to make sure the
+               record terminator has the right encoding for when we do
+               .readline(), but we don't want to re-encode it for every single
+               call to .readline(). We'll re-encode it here, since .encoding()
+               calls are less common than .readline() calls. */
+
+            STRING * record_separator;
+            STR_VTABLE * encoding;
+            IO_VTABLE * vtable;
+
             SET_ATTR_encoding(INTERP, SELF, new_encoding);
+            GET_ATTR_record_separator(INTERP, SELF, record_separator);
+            GET_ATTR_io_vtable(INTERP, SELF, vtable);
+            encoding = vtable->get_encoding(INTERP, SELF);
+
+            if (encoding != NULL && record_separator->encoding != encoding) {
+                record_separator = encoding->to_encoding(INTERP, record_separator);
+                SET_ATTR_record_separator(INTERP, SELF, record_separator);
+            }
+
             RETURN(STRING *new_encoding);
         }
 
