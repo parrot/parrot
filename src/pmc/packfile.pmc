@@ -112,6 +112,10 @@ pmclass Packfile auto_attrs {
 
 Initialize the structure.  (Create a blank PackFile object.)
 
+=item C<VTABLE void init_pmc(view)>
+
+Create a new PackFile from an existing PackFileView.
+
 =cut
 
 */
@@ -130,6 +134,11 @@ Initialize the structure.  (Create a blank PackFile object.)
         pf = PackFile_new(INTERP, 0);
         copy_packfile_header(INTERP, SELF, pf);
         PackFile_destroy(INTERP, pf);
+    }
+
+    VTABLE void init_pmc(PMC *view) {
+        VTABLE_init(interp, SELF);
+        VTABLE_set_pointer(interp, SELF, VTABLE_get_pointer(interp, view));
     }
 
 
