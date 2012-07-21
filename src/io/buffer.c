@@ -733,8 +733,13 @@ io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
            including it. */
         delim_idx = STRING_index(interp, &str, delim, 0);
         if (delim_idx >= 0) {
+            bounds->chars = delim_idx;
+            bounds->delim = -1;
+            encoding->partial_scan(interp, buffer->buffer_start, bounds);
+
             *have_delim = 1;
-            return delim_idx + delim_bytelen;
+
+            return bounds->bytes + delim_bytelen;
         }
 
         /* If we haven't found the delimiter, we MIGHT have part of it. First,
