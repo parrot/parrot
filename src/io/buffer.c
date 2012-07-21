@@ -675,7 +675,7 @@ Parrot_io_buffer_advance_position(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer
 
 =item C<size_t io_buffer_find_string_marker(PARROT_INTERP, IO_BUFFER *buffer,
 PMC *handle, const IO_VTABLE *vtable, const STR_VTABLE *encoding,
-Parrot_String_Bounds *bounds, STRING * delim)>
+Parrot_String_Bounds *bounds, STRING * delim, INTVAL *have_delim)>
 
 Search the buffer for the given delimiter substr or end-of-buffer,
 whichever comes first. Return a count of the number of bytes to be
@@ -695,13 +695,15 @@ size_t
 io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
         ARGMOD(PMC *handle), ARGIN(const IO_VTABLE *vtable),
         ARGIN(const STR_VTABLE *encoding), ARGMOD(Parrot_String_Bounds *bounds),
-        ARGIN(STRING * delim))
+        ARGIN(STRING * delim), ARGOUT(INTVAL *have_delim))
 {
     ASSERT_ARGS(io_buffer_find_string_marker)
     INTVAL bytes_needed = 0;
 
     const size_t delim_bytelen = STRING_byte_length(delim);
     const size_t bytes_available = Parrot_io_buffer_fill(interp, buffer, handle, vtable);
+
+    *have_delim = 0;
 
     if (bytes_available == 0 || bytes_available < delim_bytelen)
         return 0;
@@ -731,8 +733,10 @@ io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
         /* If we've found the delimiter, return the number of bytes up to and
            including it. */
         delim_idx = STRING_index(interp, &str, delim, 0);
-        if (delim_idx >= 0)
+        if (delim_idx >= 0) {
+            *have_delim = 1;
             return delim_idx + delim_bytelen;
+        }
 
         /* If we haven't found the delimiter, we MIGHT have part of it. If the
            delimiter is multiple bytes, we need to leave that many bytes in the

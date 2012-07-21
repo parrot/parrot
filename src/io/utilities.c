@@ -422,8 +422,9 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
 
     while (1) {
         Parrot_String_Bounds bounds;
+        INTVAL have_delim = 0;
         const size_t bytes_to_read = io_buffer_find_string_marker(interp,
-                               buffer, handle, vtable, encoding, &bounds, rs);
+                               buffer, handle, vtable, encoding, &bounds, rs, &have_delim);
 
         /* Buffer is empty, so we're probably at EOF. */
         if (bytes_to_read == 0)
@@ -432,6 +433,9 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
         /* Append buffer to result */
         io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read);
         total_bytes_read += bytes_to_read;
+
+        if (have_delim)
+            break;
 
         /* Some types, like Socket, don't want to be read more than once in a
            single request because recv can hang waiting for data. In those
