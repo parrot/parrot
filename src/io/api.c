@@ -931,6 +931,7 @@ Parrot_io_readline_s(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING * terminat
         IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
         size_t bytes_read;
         STRING *result;
+        size_t max_delimiter_byte_size = 0;
 
         io_sync_buffers_for_read(interp, handle, vtable, read_buffer, write_buffer);
         io_verify_is_open_for(interp, handle, vtable, PIO_F_READ);
@@ -942,7 +943,9 @@ Parrot_io_readline_s(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING * terminat
            at most, one character shorter than half the size of the buffer.
            Most cases will use "\n" or "\r\n" or some permutation thereof, so
            this isn't a big deal. */
-        if (terminator->bufused > ((read_buffer->buffer_size / 2) - STRING_max_bytes_per_codepoint(terminator)))
+        max_delimiter_byte_size = (read_buffer->buffer_size / 2) -
+                                     STRING_max_bytes_per_codepoint(terminator)
+        if (terminator->bufused > max_delimiter_byte_size)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Readline terminator string must be smaller than %d bytes for this buffer");
 
