@@ -713,7 +713,7 @@ io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
 
     /* Partial scan the buffer to get information about bounds. */
     bytes_needed = encoding->partial_scan(interp, buffer->buffer_start, bounds);
-    if (bounds->bytes) {
+    if (bounds->bytes > 0) {
         /* Wrap the buffer up into a temporary STRING header. Use this to do
            string search to try and find the delimiter. If we do not find it,
            we might have part of the delimiter at the end of the buffer, so we
@@ -751,9 +751,12 @@ io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
         if (delim_bytelen == 1)
             return bounds->bytes;
 
-        /* If we've hit EOF and don't have the terminator, we'll never have it.
-           return everything we do have and call it a day. */
-        if (vtable->is_eof(interp, handle))
+        /* If the buffer did not fill completely, we can assume there's nothing
+           left for us to read because we tried to fill before we started this
+           loop. If so, just return all the bytes in the buffer. If we've hit
+           EOF and don't have the terminator, we'll never have it, so just
+           return everything also. */
+        if (BUFFER_FREE_END_SPACE(buffer) > 0 || vtable->is_eof(interp, handle))
             return bounds->bytes;
 
         /* If the delimiter is multiple bytes, we might have part of it. We need
@@ -769,10 +772,12 @@ io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
            in the buffer to guarantee we can return bytes without eating into
            a partial delimiter, we return 0. */
         if (bytes_available > delim_bytelen) {
-            bounds->bytes = (bytes_available / 2) - delim_bytelen;
+            const size_t max_readable_bytes = (bytes_available / 2) - delim_bytelen;
+            bounds->bytes = max_readable_bytes;
             bounds->chars = -1;
             bounds->delim = -1;
             encoding->partial_scan(interp, buffer->buffer_start, bounds);
+
             return bounds->bytes;
         }
     }
