@@ -704,7 +704,7 @@ io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
 
     *have_delim = 0;
 
-    if (bytes_available == 0 || bytes_available < delim_bytelen)
+    if (bytes_available == 0)
         return 0;
 
     bounds->bytes = bytes_available;
