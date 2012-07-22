@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 34;
+use Parrot::Test tests => 35;
 use Parrot::Test::Util 'create_tempfile';
 
 =head1 NAME
@@ -809,6 +809,31 @@ CODE
 8002
 118785
 line 2
+OUTPUT
+
+($FOO, $temp_file) = create_tempfile( UNLINK => 1 );
+print $FOO "This is a TEST of multicharacter TEST readline delimiter 'TEST'";
+close $FOO;
+
+pir_output_is( sprintf(<<'CODE', $temp_file), <<'OUTPUT', 'readline with multichar delimiter' );
+.const string temp_file = '%s'
+.sub 'main' :main
+    $P0 = new ['FileHandle']
+
+    $P0.'open'(temp_file, 'r')
+  loop_top:
+    $S0 = $P0.'readline'('TEST')
+    unless $S0 goto loop_bottom
+    say $S0
+    goto loop_top
+  loop_bottom:
+    $P0.'close'()
+.end
+CODE
+This is a TEST
+ of multicharacter TEST
+ readline delimiter 'TEST
+'
 OUTPUT
 
 # Local Variables:
