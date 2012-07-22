@@ -2037,6 +2037,42 @@ Parrot_io_get_buffer_mode(PARROT_INTERP, ARGMOD(PMC *handle))
 
 /*
 
+=item C<STRING * Parrot_io_reencode_string_for_handle(PARROT_INTERP, PMC
+*handle, STRING *str)>
+
+Verify that the given string matches the encoding for the given handle. If so,
+return it directly. If not, create a new string with the proper encoding and
+return that.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+STRING *
+Parrot_io_reencode_string_for_handle(PARROT_INTERP, ARGIN(PMC *handle), ARGIN(STRING *str))
+{
+    ASSERT_ARGS(Parrot_io_reencode_string_for_handle)
+
+    if (PMC_IS_NULL(handle))
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "Handle may not be null");
+    if (STRING_IS_NULL(str))
+        return STRINGNULL;
+
+    {
+        const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+        const STR_VTABLE * const encoding = vtable->get_encoding(interp, handle);
+
+        if (encoding != NULL && str->encoding != encoding)
+            return encoding->to_encoding(interp, str);
+        return str;
+    }
+}
+
+/*
+
 =back
 
 =cut

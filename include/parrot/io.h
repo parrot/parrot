@@ -645,6 +645,15 @@ void Parrot_io_mark(PARROT_INTERP, ARGIN(ParrotIOData *piodata))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+STRING * Parrot_io_reencode_string_for_handle(PARROT_INTERP,
+    ARGIN(PMC *handle),
+    ARGIN(STRING *str))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 void Parrot_io_set_buffer_mode(PARROT_INTERP,
     ARGMOD(PMC *handle),
     ARGIN(STRING *mode))
@@ -841,6 +850,11 @@ INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_io_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(piodata))
+#define ASSERT_ARGS_Parrot_io_reencode_string_for_handle \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle) \
+    , PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_Parrot_io_set_buffer_mode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \

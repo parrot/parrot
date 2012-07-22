@@ -201,10 +201,11 @@ Set the record separator for readline.
 
     METHOD record_separator(STRING *str :optional, int has_str :opt_flag) {
         if (has_str) {
-            if (STRING_length(str) != 1)
+            if (STRING_IS_NULL(str))
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                    "Record separator must be a single character");
+                    "Record separator may not be null");
 
+            str = Parrot_io_reencode_string_for_handle(INTERP, SELF, str);
             SET_ATTR_record_separator(INTERP, SELF, str);
         }
         else {
@@ -241,34 +242,18 @@ scheme) for the filehandle.
 
 */
 
-    METHOD encoding(STRING *new_encoding :optional, INTVAL got_encoding :opt_flag) {
-        STRING *encoding;
-
+    METHOD encoding(STRING *encoding :optional, INTVAL got_encoding :opt_flag) {
         if (got_encoding) {
-            /* TODO: This is something of a hack. We need to make sure the
-               record terminator has the right encoding for when we do
-               .readline(), but we don't want to re-encode it for every single
-               call to .readline(). We'll re-encode it here, since .encoding()
-               calls are less common than .readline() calls. */
-
             STRING * record_separator;
-            STR_VTABLE * encoding;
-            IO_VTABLE * vtable;
 
-            SET_ATTR_encoding(INTERP, SELF, new_encoding);
+            SET_ATTR_encoding(INTERP, SELF, encoding);
             GET_ATTR_record_separator(INTERP, SELF, record_separator);
-            GET_ATTR_io_vtable(INTERP, SELF, vtable);
-            encoding = vtable->get_encoding(INTERP, SELF);
-
-            if (encoding != NULL && record_separator->encoding != encoding) {
-                record_separator = encoding->to_encoding(INTERP, record_separator);
-                SET_ATTR_record_separator(INTERP, SELF, record_separator);
-            }
-
-            RETURN(STRING *new_encoding);
+            record_separator = Parrot_io_reencode_string_for_handle(INTERP, SELF, record_separator);
+            SET_ATTR_record_separator(INTERP, SELF, record_separator);
         }
-
-        GET_ATTR_encoding(INTERP, SELF, encoding);
+        else {
+            GET_ATTR_encoding(INTERP, SELF, encoding);
+        }
         RETURN(STRING *encoding);
     }
 }
