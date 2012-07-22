@@ -944,7 +944,7 @@ Parrot_io_readline_s(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING * terminat
            Most cases will use "\n" or "\r\n" or some permutation thereof, so
            this isn't a big deal. */
         max_delimiter_byte_size = (read_buffer->buffer_size / 2) -
-                                     STRING_max_bytes_per_codepoint(terminator)
+                                     STRING_max_bytes_per_codepoint(terminator);
         if (terminator->bufused > max_delimiter_byte_size)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Readline terminator string must be smaller than %d bytes for this buffer");
