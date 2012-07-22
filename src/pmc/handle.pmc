@@ -158,10 +158,11 @@ Read a line from the handle and return it in a string.
 
 */
 
-    METHOD readline() {
-        STRING * record_separator;
+    METHOD readline(STRING * record_separator :optional, INTVAL has_rs :opt_flag) {
         STRING * string_result;
-        GET_ATTR_record_separator(interp, SELF, record_separator);
+        if (!has_rs) {
+            GET_ATTR_record_separator(interp, SELF, record_separator);
+        }
         string_result = Parrot_io_readline_s(INTERP, SELF, record_separator);
         RETURN(STRING *string_result);
     }
