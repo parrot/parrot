@@ -239,11 +239,35 @@ sub collapse_path {
     return $path unless defined $path;
 
     my $cwd = getcwd();
-    $path = abs_path($path);
-    return $path unless defined $path;
-
-    $path =~ s/^\Q$cwd\E\///;
-    return $path;
+    # With a symlinked builddir need to collapse x/../y sections into y.
+    # It is safe with our directory structure
+    if ( -l $path ) {
+	my $up = File::Spec->updir();
+	my $upsep = File::Spec->catfile($up, '');
+	if (index($path, $upsep) > -1) {
+	    my ($vol,$dir,$fname) = File::Spec->splitpath($path);
+	    my @dirs = File::Spec->splitdir($dir);
+	    my @newdirs;
+	    while (@dirs) {
+		my $d = shift @dirs;
+		if ($d eq $up) {
+		    warn unless @newdirs;
+		    pop @newdirs;
+		} else {
+		    push @newdirs, $d;
+		}
+	    }
+	    my $newpath = File::Spec->catfile
+	      ($vol ? ($vol, File::Spec->catdir(@newdirs), $fname)
+	            : (File::Spec->catdir(@newdirs), $fname));
+	    return $newpath;
+	}
+	return File::Spec->abs2rel( $path, $cwd ) ;
+    }
+    my $abspath = abs_path($path);
+    return $path unless defined $abspath;
+    $abspath =~ s/^\Q$cwd\E\///;
+    return $abspath;
 }
 
 sub get_deps {
