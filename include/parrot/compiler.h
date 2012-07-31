@@ -38,11 +38,7 @@
 #  ifdef _MSC_VER
 #    define __attribute__noreturn__         __declspec(noreturn)
 #  else
-#    ifdef __clang__
-#      define __attribute__noreturn__         __attribute__((analyzer_noreturn))
-#    else
-#      define __attribute__noreturn__         __attribute__((__noreturn__))
-#    endif
+#    define __attribute__noreturn__         __attribute__((__noreturn__))
 #  endif
 #endif
 #ifdef HASATTRIBUTE_PURE
