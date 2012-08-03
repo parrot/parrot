@@ -424,8 +424,9 @@ present, it is used to determine line endings instead of the default C<\n>.
     METHOD readline(STRING *delimiter    :optional,
                     INTVAL has_delimiter :opt_flag) {
 
-        INTVAL delim = has_delimiter ? Parrot_str_indexed(INTERP, delimiter, 0) : '\n';
-        STRING *result = Parrot_io_readline_s(INTERP, SELF, delim);
+        if (!has_delimiter)
+            delimiter = PARROT_SOCKET(SELF)->record_separator;
+        STRING *result = Parrot_io_readline_s(INTERP, SELF, delimiter);
         RETURN(STRING *result);
     }
 
