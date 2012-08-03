@@ -1976,6 +1976,12 @@ Gets a string representation of the current buffer settings for C<handle>.This
 is a function for legacy compatibility and will disappear eventually. Do not
 use.
 
+=item C<INTVAL Parrot_io_buffer_size(PARROT_INTERP, PMC *handle, INTVAL size,
+INTVAL has_size)>
+
+Legacy routine to pretend get/set buffer size info for the old FileHandle
+interface.
+
 =cut
 
 */
@@ -2035,6 +2041,22 @@ Parrot_io_get_buffer_mode(PARROT_INTERP, ARGMOD(PMC *handle))
     return CONST_STRING(interp, "full-buffered");
 }
 
+PARROT_WARN_UNUSED_RESULT
+INTVAL
+Parrot_io_buffer_size(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL size, INTVAL has_size)
+{
+    ASSERT_ARGS(Parrot_io_buffer_size)
+
+    if (has_size)
+        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_READ_BUFFER,
+                                                           size, PIO_BF_BLKBUF);
+    {
+        IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
+        return read_buffer == NULL ? 0 : read_buffer->buffer_size;
+    }
+}
+
+
 /*
 
 =item C<STRING * Parrot_io_reencode_string_for_handle(PARROT_INTERP, PMC
@@ -2070,6 +2092,7 @@ Parrot_io_reencode_string_for_handle(PARROT_INTERP, ARGIN(PMC *handle), ARGIN(ST
         return str;
     }
 }
+
 
 /*
 

@@ -506,16 +506,7 @@ Set or retrieve the buffer size for the filehandle.
 */
 
     METHOD buffer_size(INTVAL new_size :optional, INTVAL got_size :opt_flag) {
-        INTVAL buffer_size;
-
-
-        /*
-        if (got_size)
-            Parrot_io_setbuf(INTERP, SELF, (size_t)new_size);
-
-        buffer_size = (INTVAL)Parrot_io_get_buffer_size(INTERP, SELF);
-        */
-
+        INTVAL buffer_size = Parrot_io_buffer_size(INTERP, SELF, new_size, got_size);
         RETURN(INTVAL buffer_size);
     }
 
