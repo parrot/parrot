@@ -579,7 +579,8 @@ OUT
 my $nl = [ stat("myconfig") ]->[3];
 if (-l "myconfig") {
     ok( 1, "hard link on symlink skipped" );
-} else {
+}
+else {
     ok( $nl > 1, "hard link to file was really created" );
 }
 unlink "xpto" if -f "xpto";
