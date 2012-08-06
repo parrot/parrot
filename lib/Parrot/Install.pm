@@ -2,8 +2,8 @@ package Parrot::Install;
 # Copyright (C) 2001-2009, Parrot Foundation.
 use strict;
 use warnings;
-use File::Basename qw(dirname);
-use File::Copy;
+use File::Basename qw( dirname );
+use File::Copy qw( cp );
 use File::Path qw( mkpath );
 use File::Spec;
 use base qw( Exporter );
@@ -241,7 +241,7 @@ sub install_files {
                     }
                 }
             }
-            copy( $src, $dest ) or die "Error: couldn't copy $src to $dest: $!\n";
+            cp( $src, $dest ) or die "Error: couldn't copy $src to $dest: $!\n";
             print "$dest\n";
         }
         $mode = ( stat($src) )[2];
