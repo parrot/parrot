@@ -1,15 +1,43 @@
 #! perl
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
-use Test::More;
-use Parrot::Config;
-use Parrot::BuildUtil;
+use t::native_pbc::Test;
 
 #use Parrot::Test skip_all => 'pending robust testing strategy, GH #394';
-use Parrot::Test tests => 6;
+use Parrot::Test tests => 4;
+
+# 4th string as utf8 "Ärger"
+my $output = "
+%Ec
+\xC2\x80
+ABCX
+\xC3\x84rger
+";
+
+sub test_pbc_string {
+    my $id   = shift;
+    my $desc = shift;
+    test_native_pbc($id, "string", $output, $desc, {}, {});
+}
+
+# execute t/native_pbc/string_1.pbc
+#
+# HEADER => [
+#         wordsize  = 4   (interpreter's wordsize/INTVAL = 4/4)
+#         byteorder = 0   (interpreter's byteorder       = 0)
+#         floattype = 0   (interpreter's NUMVAL_SIZE     = 8)
+#         parrot-version 4.6.0, bytecode-version 12.0
+#         UUID type = 0, UUID size = 0
+#         no endianize, no opcode, no numval transform
+#         dirformat = 1
+# ]
+test_pbc_string(1, "4_le i386 32 bit opcode_t, 4 byte intval" );
+test_pbc_string(3, "4_be PPC BE 32 bit opcode_t, 4 byte intval");
+test_pbc_string(4, "8_le x86_64 64 bit opcode_t, 8 byte intval");
+test_pbc_string(6, "8_be big-endian 64 bit opcode_t, 8 byte intval");
 
 =head1 NAME
 
@@ -33,14 +61,16 @@ native pbcs.
 
 =head1 PLATFORMS
 
-  _1   i386 32 bit opcode_t, 32 bit intval   (linux-gcc-ix86, freebsd-gcc, cygwin)
+  _1   4_le: i386 32 bit opcode_t, 32 bit intval   (linux-gcc-ix86, freebsd-gcc, cygwin)
+  _3   4_be: PPC BE 32 bit opcode_t, 32 bit intval (darwin-ppc, sparc32 or mips32)
+  _4   8_le: x86_64 double float 64 bit opcode_t   (linux-gcc-x86_64, solaris-cc-64int)
+  _6   8_be: big-endian 64 bit opcode_t, 8 byte double (Sparc64, mips64, ppc64)
+
   _2   (skipped) i386 32 bit opcode_t, 32 bit intval, 12 bit long double
-  _3   PPC BE 32 bit opcode_t, 32 bit intval (darwin-ppc or sparc32)
-  _4   x86_64 double float 64 bit opcode_t   (linux-gcc-x86_64, solaris-cc-64int)
+  _8   (skipped) i386 32 bit opcode_t, 32 bit intval, 4-byte single float --floatval=float
   _5   (skipped) x86_64 16 bit long double 64 bit opcode_t
-  _6   big-endian 64 bit opcode_t, 8 byte double (Sparc64/Solaris, MIPS irix)
   _7   (skipped) big-endian 64 bit opcode_t, 16 byte long double
-  _8   (skipped) i386 32 bit opcode_t, 32 bit intval, 4-byte float --floatval=float
+  _9   (skipped) big-endian 32 bit opcode_t, 4 byte intval, 4 byte single float
 
 =cut
 
@@ -51,113 +81,6 @@ The PBC is generated from t/native_pbc/testdata/string.pasm for different archit
 For adding tests, see the comments in t/native_pbc/number.t
 
 =cut
-
-my @archtest = qw(4_le 4_le 4_be 8_le 8_le 8_be 8_be 4_le);
-sub this_arch {
-    return $PConfig{intvalsize}
-      . "_"
-      . (substr($PConfig{byteorder},0,2) eq '12' ? "le" : "be");
-}
-sub bc_version {
-    my $f = shift;
-    my $b;
-    open my $F, "<", "$f" or return "Can't open $f: $!";
-    binmode $F;
-    seek $F, 14, 0;
-    read $F, $b, 8;
-    my ($bc_major, $bc_minor) = unpack "cc", $b;
-    return ($bc_major . "." . $bc_minor);
-}
-
-my ( $bc_major, $bc_minor ) = Parrot::BuildUtil::get_bc_version();
-my $bc = ($bc_major . "." . $bc_minor);
-my $arch = this_arch();
-# all should pass
-my $todo = {};
-my $nn = "not needed";
-my $skip = {
-  2 => $nn,
-  5 => $nn,
-  7 => $nn,
-  8 => $nn
-};
-
-# 4th string as utf8 "Ärger"
-my $output = "
-%Ec
-\xC2\x80
-ABCX
-\xC3\x84rger
-";
-
-# test_pbc_string(1, "i386 8-byte double float, 32 bit opcode_t");
-sub test_pbc_string {
-    my $id   = shift;
-    my $desc = shift;
-    my $file = "t/native_pbc/string_$id.pbc";
-    my $cvt = "$archtest[$id-1]=>$arch";
-    my $skip_msg;
-    # check if this a platform where we can produce the needed file
-    if ($archtest[$id-1] eq $arch) {
-        $skip_msg = "Want to help? Regenerate $file "
-          . "with tools/dev/mk_native_pbc --noconf";
-    }
-    else {
-        $skip_msg  = "$file is outdated. "
-          . "Need $archtest[$id-1] platform.";
-    }
-    # check if skip or todo
-  SKIP: {
-    if ( $skip->{$id} ) {
-        my $skip_msg = $skip->{$id};
-        if (length $skip_msg > 2) {
-            skip "$cvt $skip_msg", 1;
-        }
-        else {
-            skip "$cvt not yet implemented", 1;
-        }
-    }
-    elsif ( $todo->{$id} ) {
-        skip $skip_msg, 1
-          if ($bc ne bc_version($file));
-        my $todo_msg = $todo->{$id};
-        if (length $todo_msg > 2) {
-            $todo_msg = "$cvt $todo_msg"
-        }
-        else {
-            $todo_msg = "$cvt yet untested, GH #394. "
-                       . "Please report success."
-        }
-        pbc_output_is( undef, $output, "$cvt $desc",
-                       todo => "$todo_msg" );
-    }
-    else {
-        skip $skip_msg, 1
-          if ($bc ne bc_version($file));
-        pbc_output_is( undef, $output, "$cvt $desc" );
-    }
-  }
-}
-
-# execute t/native_pbc/string_1.pbc
-#
-# HEADER => [
-#         wordsize  = 4   (interpreter's wordsize/INTVAL = 4/4)
-#         byteorder = 0   (interpreter's byteorder       = 0)
-#         floattype = 0   (interpreter's NUMVAL_SIZE     = 8)
-#         parrot-version 0.9.1, bytecode-version 3.38
-#         UUID type = 0, UUID size = 0
-#         no endianize, no opcode, no numval transform
-#         dirformat = 1
-# ]
-test_pbc_string(1, "i386 32 bit opcode_t, 4 byte intval" );
-test_pbc_string(2, "dummy" );
-test_pbc_string(3, "PPC BE 32 bit opcode_t, 4 byte intval");
-test_pbc_string(4, "i86_64 64 bit opcode_t, 8 byte intval");
-test_pbc_string(5, "dummy" );
-test_pbc_string(6, "big-endian 64 bit opcode_t, 8 byte intval");
-#test_pbc_number(7, "(16_be) big-endian 64 bit opcode_t, 8 byte intval, 16 byte long double");
-#test_pbc_number(8, "(4_le) i386 32 bit opcode_t, 4 byte intval, 4 byte single float");
 
 # Local Variables:
 #   mode: cperl
