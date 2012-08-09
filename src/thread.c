@@ -242,7 +242,6 @@ Parrot_thread_create_local_task(PARROT_INTERP, ARGIN(Parrot_Interp const thread_
 
     for (i = 0; i < elements; i++) {
         PMC * const data  = VTABLE_get_pmc_keyed_int(interp, shared, i);
-
         VTABLE_push_pmc(thread_interp, new_struct->shared,
             Parrot_thread_maybe_create_proxy(interp, thread_interp, data));
     }
@@ -275,7 +274,6 @@ Parrot_thread_schedule_task(PARROT_INTERP, ARGIN(Interp *thread_interp), ARGIN(P
 
     VTABLE_push_pmc(thread_interp, thread_interp->scheduler,
         Parrot_thread_create_local_task(interp, thread_interp, task));
-
     Parrot_thread_notify_thread(thread_interp);
 
     Parrot_unblock_GC_mark_locked(thread_interp);
@@ -405,9 +403,10 @@ Parrot_thread_notify_threads(ARGIN_NULLOK(PARROT_INTERP))
     int i;
     Interp ** const tarray = Parrot_thread_get_threads_array(interp);
 
-    for (i = 0; i < MAX_THREADS; i++)
+    for (i = 0; i < MAX_THREADS; i++) {
         if (tarray[i])
             Parrot_thread_notify_thread(tarray[i]);
+    }
 }
 
 
@@ -488,9 +487,8 @@ Parrot_thread_make_local_copy(PARROT_INTERP, ARGIN(Parrot_Interp from), ARGIN(PM
     STRING * const  _sub       = interp->vtables[enum_class_Sub]->whoami;
     STRING * const  _multi_sub = interp->vtables[enum_class_MultiSub]->whoami;
 
-    if (PMC_IS_NULL(arg)) {
+    if (PMC_IS_NULL(arg))
         ret_val = PMCNULL;
-    }
     else if (VTABLE_isa(from, arg, _multi_sub)) {
         INTVAL i = 0;
         const INTVAL n = VTABLE_elements(from, arg);
@@ -508,10 +506,10 @@ Parrot_thread_make_local_copy(PARROT_INTERP, ARGIN(Parrot_Interp from), ARGIN(PM
          * not correctly copied
          */
         Parrot_Sub_attributes *ret_val_sub, *arg_sub;
+        ret_val = Parrot_clone(interp, arg);
 
-        ret_val               = Parrot_clone(interp, arg);
         PMC_get_sub(interp, ret_val, ret_val_sub);
-        PMC_get_sub(interp, arg,     arg_sub);
+        PMC_get_sub(interp, arg, arg_sub);
         ret_val_sub->seg = arg_sub->seg;
         /* Skip vtable overrides and methods. */
         if (ret_val_sub->vtable_index == -1
@@ -519,9 +517,8 @@ Parrot_thread_make_local_copy(PARROT_INTERP, ARGIN(Parrot_Interp from), ARGIN(PM
             Parrot_ns_store_sub(interp, ret_val);
         }
     }
-    else {
+    else
         ret_val = Parrot_clone(interp, arg);
-    }
     return ret_val;
 }
 
@@ -542,27 +539,27 @@ Parrot_thread_make_local_args_copy(PARROT_INTERP, ARGIN(Parrot_Interp source),
                                    ARGIN_NULLOK(PMC *args))
 {
     ASSERT_ARGS(Parrot_thread_make_local_args_copy)
-    PMC   *ret_val;
-    INTVAL old_size;
     INTVAL i;
 
     if (PMC_IS_NULL(args))
         return PMCNULL;
+    else {
+        INTVAL i;
+        const INTVAL old_size = VTABLE_get_integer(source, args);
 
-    old_size = VTABLE_get_integer(source, args);
+        /* XXX should this be a different type? */
+        PMC * const ret_val = Parrot_pmc_new(interp, enum_class_FixedPMCArray);
+        VTABLE_set_integer_native(interp, ret_val, old_size);
 
-    /* XXX should this be a different type? */
-    ret_val = Parrot_pmc_new(interp, enum_class_FixedPMCArray);
-    VTABLE_set_integer_native(interp, ret_val, old_size);
+        for (i = 0; i < old_size; ++i) {
+            PMC * const copy = Parrot_thread_make_local_copy(interp, source,
+                    VTABLE_get_pmc_keyed_int(source, args, i));
 
-    for (i = 0; i < old_size; ++i) {
-        PMC * const copy = Parrot_thread_make_local_copy(interp, source,
-                VTABLE_get_pmc_keyed_int(source, args, i));
+            VTABLE_set_pmc_keyed_int(interp, ret_val, i, copy);
+        }
 
-        VTABLE_set_pmc_keyed_int(interp, ret_val, i, copy);
+        return ret_val;
     }
-
-    return ret_val;
 }
 
 /*
@@ -600,7 +597,6 @@ Parrot_thread_init_threads_array(PARROT_INTERP)
     ASSERT_ARGS(Parrot_thread_init_threads_array)
 
     int i = 0;
-
     for (; i < MAX_THREADS; i++)
         threads_array[i] = NULL;
 }
@@ -622,7 +618,6 @@ Parrot_thread_get_free_threads_array_index(PARROT_INTERP)
     ASSERT_ARGS(Parrot_thread_get_free_threads_array_index)
 
     int i = 0;
-
     for (; i < MAX_THREADS; i++)
         if (threads_array[i] == NULL)
             return i;
