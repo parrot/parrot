@@ -85,6 +85,7 @@ Parrot_alarm_runloop(ARGIN_NULLOK(void *arg))
 
         LOCK(alarm_lock);
 
+        /* First, check if we have any outstanding alarms, and wait for those. */
         if (alarm_set_to > 0) {
             struct timespec ts;
             ts.tv_sec = (time_t)alarm_set_to;
@@ -92,29 +93,36 @@ Parrot_alarm_runloop(ARGIN_NULLOK(void *arg))
             current_alarm = alarm_set_to;
             alarm_set_to = 0;
             rc = 0;
-            while (alarm_set_to == 0 && rc == 0) {
+            while (alarm_set_to == 0 && rc == 0)
                 COND_TIMED_WAIT(sleep_cond, alarm_lock, &ts, rc);
-            }
         }
-        else { /* no alarms set, just wait for new alarms */
-            while (alarm_set_to == 0) {
+        else {
+            /* no alarms set, just wait for new alarms */
+            while (alarm_set_to == 0)
                 COND_WAIT(sleep_cond, alarm_lock);
-            }
         }
 
+        /* Check if we need to notify threads. We need to notify threads if
+           an alarm time has passed, or if there has been a timeout error in
+           waiting for alarms. */
         if (alarm_set_to > 0 && alarm_set_to <= Parrot_floatval_time()) {
-            /* New alarm is already in the past. Don't bother waiting, notify immediately */
+            /* New alarm is already in the past. Don't bother waiting, notify
+               immediately */
             notify = 1;
             alarm_set_to = 0;
         }
-        else /* notify on timeout but not on setting new alarm */
+        else {
+            /* notify on timeout but not on setting new alarm */
             notify = (rc != 0);
+        }
 
         if (notify)
             current_alarm = 0;
 
         UNLOCK(alarm_lock);
 
+        /* If we need to notify, do that here. Otherwise, back to the top of
+           the loop*/
         if (notify) {
             alarm_serial += 1;
             Parrot_thread_notify_threads(NULL);
@@ -128,7 +136,7 @@ Parrot_alarm_runloop(ARGIN_NULLOK(void *arg))
 
 =item C<int Parrot_alarm_check(UINTVAL* last_serial)>
 
-Has any alarm triggered since we last checked?
+Determine if any alarms have passed since last checked.
 
 Possible design improvement: Alert only the thread that
 set the alarm.
@@ -144,13 +152,10 @@ Parrot_alarm_check(ARGMOD(UINTVAL* last_serial))
     ASSERT_ARGS(Parrot_alarm_check)
 
 #ifdef PARROT_HAS_THREADS
-    if (*last_serial == alarm_serial) {
+    if (*last_serial == alarm_serial)
         return 0;
-    }
-    else {
-        *last_serial = alarm_serial;
-        return 1;
-    }
+    *last_serial = alarm_serial;
+    return 1;
 #else
     return (alarm_set_to <= Parrot_floatval_time());
 #endif
@@ -172,18 +177,19 @@ Parrot_alarm_set(FLOATVAL when)
 {
     ASSERT_ARGS(Parrot_alarm_set)
 
-    FLOATVAL now;
     LOCK(alarm_lock);
-    now = Parrot_floatval_time();
+    {
+        const FLOATVAL now = Parrot_floatval_time();
 
-    if (current_alarm > 0 && current_alarm <= when) {
-        /* there's already an active alarm for an earlier point in time */
-        UNLOCK(alarm_lock);
-        return;
+        if (current_alarm > 0 && current_alarm <= when) {
+            /* there's already an active alarm for an earlier point in time */
+            UNLOCK(alarm_lock);
+            return;
+        }
+
+        alarm_set_to = when;
+        COND_SIGNAL(sleep_cond);
     }
-
-    alarm_set_to = when;
-    COND_SIGNAL(sleep_cond);
     UNLOCK(alarm_lock);
 }
 
@@ -191,7 +197,10 @@ Parrot_alarm_set(FLOATVAL when)
 
 =item C<void Parrot_alarm_wait_for_next_alarm(PARROT_INTERP)>
 
-Sleep till the next alarm expires.
+Sleep till the next alarm expires. This is a fallback function which is only
+used if we try to sleep the interp without threads support. If we have
+threading enabled, this function will not be used and the normal threads-based
+mechanism will be used instead.
 
 =cut
 
@@ -203,8 +212,8 @@ Parrot_alarm_wait_for_next_alarm(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_alarm_wait_for_next_alarm)
 
-    FLOATVAL const now_time  = Parrot_floatval_time();
-    FLOATVAL const time = alarm_set_to - now_time;
+    const FLOATVAL now_time  = Parrot_floatval_time();
+    const FLOATVAL time = alarm_set_to - now_time;
 
     if (time > 0)
         Parrot_usleep(time * 1000000);
