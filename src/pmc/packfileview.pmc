@@ -341,6 +341,10 @@ and PMC constants in the respective constant tables.
 
 Get the :main sub from the packfile, if any.
 
+=item C<METHOD subs_by_tag(STRING *tag)>
+
+Get an array of all Subs with the given tag.
+
 =item C<METHOD trigger(STRING *flag)>
 
 Trigger subs with the given flag. Currently supported values are "load" and
