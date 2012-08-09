@@ -245,6 +245,7 @@ struct parrot_interp_t {
 
     int current_runloop_level;                /* for reentering run loop */
     int current_runloop_id;
+    int runloop_id_counter;                   /* for synthesizing runloop ids. */
 
     UINTVAL              last_alarm;          /* has an alarm triggered? */
     FLOATVAL             quantum_done;        /* expiration of current quantum */
