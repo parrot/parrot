@@ -1332,7 +1332,8 @@ OUTPUT
   set I20, 0
 loop:
   inc I20
-  sleep 0.01
+  # Avoid sleep deadlock in threads branch [GH #808]
+  # sleep 0.01
   get_global P11, "cb_done"
   if P11, fin
   gt I20, 10, err
