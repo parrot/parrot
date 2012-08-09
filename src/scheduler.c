@@ -69,10 +69,8 @@ Parrot_cx_init_scheduler(PARROT_INTERP)
 
     interp->scheduler = Parrot_pmc_new(interp, enum_class_Scheduler);
 
-    if (!interp->parent_interpreter) {
-        /* Make sure the program can handle alarm signals */
+    if (!interp->parent_interpreter)
         Parrot_alarm_init();
-    }
 }
 
 /*
@@ -135,7 +133,11 @@ Parrot_cx_outer_runloop(PARROT_INTERP)
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
     INTVAL alarm_count, foreign_count, i;
 
+    /* Main loop. Continue to loop so long as we have any tasks, any alarms,
+       or any foreign tasks to execute. If we have none of these things, exit. */
     do {
+        /* If we have tasks in the scheduler, run them in a loop until there
+           are no more. */
         while (VTABLE_get_integer(interp, scheduler) > 0) {
             /* there can be no active runloops at this point, so it should be save
              * to start counting at 0 again. This way the continuation in the next
@@ -149,6 +151,8 @@ Parrot_cx_outer_runloop(PARROT_INTERP)
             Parrot_cx_check_alarms(interp, interp->scheduler);
         }
 
+        /* Loop over all foreign tasks in the scheduler. If the foreign task
+           is killed, remove it from the scheduler. */
         foreign_count = VTABLE_get_integer(interp, sched->foreign_tasks);
         for (i = 0; i < foreign_count; i++) {
             PMC * const task = VTABLE_get_pmc_keyed_int(interp, sched->foreign_tasks, i);
@@ -161,6 +165,9 @@ Parrot_cx_outer_runloop(PARROT_INTERP)
             UNLOCK(PARROT_TASK(task)->waiters_lock);
         }
 
+        /* If we have no scheduled tasks, but we do have an alarm or foreign
+           task, we can wait for one of those before we start executing things
+           again. */
         alarm_count = VTABLE_get_integer(interp, sched->alarms);
         if (VTABLE_get_integer(interp, scheduler) == 0 && (alarm_count > 0 || foreign_count > 0)) {
             /* Nothing to do except to wait for the next alarm to expire */
@@ -187,7 +194,6 @@ Parrot_cx_set_scheduler_alarm(PARROT_INTERP)
     const FLOATVAL time_now = Parrot_floatval_time();
 
     interp->quantum_done = time_now + PARROT_TASK_SWITCH_QUANTUM;
-
     Parrot_alarm_set(interp->quantum_done);
 }
 
@@ -214,6 +220,8 @@ Parrot_cx_next_task(PARROT_INTERP, ARGIN(PMC *scheduler))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Found a non-Task in the task queue.\n");
 
+    /* If we have no tasks in the queue, we can disable task preemption and
+       save ourselves a few cycles. */
     if (VTABLE_get_integer(interp, scheduler) > 0)
         Parrot_cx_enable_preemption(interp);
     else
@@ -239,6 +247,8 @@ Parrot_cx_check_scheduler(PARROT_INTERP, ARGIN(opcode_t *next))
     ASSERT_ARGS(Parrot_cx_check_scheduler)
     PMC * const scheduler = interp->scheduler;
 
+    /* If we have any outstanding alarms, or if we have been requested to
+       wake up, run the scheduler. */
     if (Parrot_alarm_check(&(interp->last_alarm))
         || SCHEDULER_wake_requested_TEST(scheduler)) {
         SCHEDULER_wake_requested_CLEAR(scheduler);
@@ -302,10 +312,14 @@ void
 Parrot_cx_check_quantum(PARROT_INTERP, ARGIN(PMC *scheduler))
 {
     ASSERT_ARGS(Parrot_cx_check_quantum)
-    const FLOATVAL time_now = Parrot_floatval_time();
 
-    if (Parrot_cx_preemption_enabled(interp) && time_now >= interp->quantum_done)
-        SCHEDULER_resched_requested_SET(scheduler);
+    /* If we are using preemption, check the current time and possibly
+       schedule the next preemption */
+    if (Parrot_cx_preemption_enabled(interp)) {
+        const FLOATVAL time_now = Parrot_floatval_time();
+        if (time_now >= interp->quantum_done)
+            SCHEDULER_resched_requested_SET(scheduler);
+    }
 }
 
 /*
@@ -328,6 +342,8 @@ Parrot_cx_stop_task(PARROT_INTERP, ARGIN(opcode_t *next))
 
     VTABLE_set_pointer(interp, cont, next);
 
+    /* TODO: This check seems expensive. Do we need to have this active at all
+       times, or can we make this conditional on NDEBUG? */
     if (PMC_IS_NULL(task) || !VTABLE_isa(interp, task, CONST_STRING(interp, "Task")))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Attempt to stop invalid interp->current_task.\n");
@@ -405,9 +421,9 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task_or_sub))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Scheduler was not initialized for this interpreter.\n");
 
-    if (VTABLE_isa(interp, task_or_sub, CONST_STRING(interp, "Task"))) {
+    /* TODO: Can we do anything less expensive than an ISA check here? */
+    if (VTABLE_isa(interp, task_or_sub, CONST_STRING(interp, "Task")))
         task = task_or_sub;
-    }
     else if (VTABLE_isa(interp, task_or_sub, CONST_STRING(interp, "Sub"))) {
         Parrot_Task_attributes *tdata;
         task  = Parrot_pmc_new(interp, enum_class_Task);
@@ -415,16 +431,19 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task_or_sub))
         tdata->code = task_or_sub;
         PARROT_GC_WRITE_BARRIER(interp, task);
     }
-    else {
+    else
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Can only schedule Tasks and Subs.\n");
-    }
 
 #ifdef PARROT_HAS_THREADS
+    /* Search for a thread that is free. If we have a free thread, schedule
+       the task there. Otherwise, find the thread with the fewest tasks in its
+       queue and schedule it there. */
     index = Parrot_thread_get_free_threads_array_index(interp);
     if (index > -1) { /* start a new thread */
-        PMC * const thread =
-            Parrot_thread_create(interp, enum_class_ParrotInterpreter, PARROT_CLONE_DEFAULT);
+        PMC * const thread = Parrot_thread_create(interp,
+                                                  enum_class_ParrotInterpreter,
+                                                  PARROT_CLONE_DEFAULT);
         Interp * const thread_interp = (Interp *)VTABLE_get_pointer(interp, thread);
         Parrot_thread_schedule_task(interp, thread_interp, task);
         Parrot_thread_insert_thread(interp, thread_interp, index);
@@ -453,6 +472,8 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task_or_sub))
             Parrot_cx_enable_preemption(interp);
     }
 #else
+    /* If we don't have threads, we still have tasks and basic preemption. Add
+       the task to the queue. */
     VTABLE_push_pmc(interp, interp->scheduler, task);
 
     /* going from single to multi tasking? */
@@ -478,9 +499,9 @@ Parrot_cx_schedule_immediate(PARROT_INTERP, ARGIN(PMC *task_or_sub))
     ASSERT_ARGS(Parrot_cx_schedule_immediate)
     PMC *task;
 
-    if (VTABLE_isa(interp, task_or_sub, CONST_STRING(interp, "Task"))) {
+    /* TODO: Can we do something less expensive than ISA? */
+    if (VTABLE_isa(interp, task_or_sub, CONST_STRING(interp, "Task")))
         task = task_or_sub;
-    }
     else if (VTABLE_isa(interp, task_or_sub, CONST_STRING(interp, "Sub"))) {
         Parrot_Task_attributes *tdata;
         task  = Parrot_pmc_new(interp, enum_class_Task);
@@ -488,10 +509,9 @@ Parrot_cx_schedule_immediate(PARROT_INTERP, ARGIN(PMC *task_or_sub))
         tdata->code = task_or_sub;
         PARROT_GC_WRITE_BARRIER(interp, task);
     }
-    else {
+    else
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Can only schedule Tasks and Subs.\n");
-    }
 
     VTABLE_unshift_pmc(interp, interp->scheduler, task);
     SCHEDULER_wake_requested_SET(interp->scheduler);
@@ -545,7 +565,7 @@ Parrot_cx_send_message(PARROT_INTERP, ARGIN(STRING *messagetype), ARGIN(SHIM(PMC
     ASSERT_ARGS(Parrot_cx_send_message)
     if (interp->scheduler) {
         Parrot_Scheduler_attributes * const sched_struct =
-                PARROT_SCHEDULER(interp->scheduler);
+                                            PARROT_SCHEDULER(interp->scheduler);
         PMC * const message = Parrot_pmc_new(interp, enum_class_SchedulerMessage);
         VTABLE_set_string_native(interp, message, messagetype);
 
@@ -596,12 +616,16 @@ Parrot_cx_check_alarms(PARROT_INTERP, ARGIN(PMC *scheduler))
     INTVAL alarm_count = VTABLE_get_integer(interp, sched->alarms);
     const FLOATVAL now_time = Parrot_floatval_time();
 
+    /* Loop over all alarms, searching for expired ones. Since they are ordered
+       by execution time, as soon as we find one that is not expired we can
+       exit the loop. For each alarm that is expired, add the associated
+       Sub/Task to the queue. */
     while (alarm_count) {
         PMC * const alarm = VTABLE_shift_pmc(interp, sched->alarms);
         const FLOATVAL alarm_time = VTABLE_get_number(interp, alarm);
 
         if (alarm_time < now_time) {
-            Parrot_Alarm_attributes *data = PARROT_ALARM(alarm);
+            Parrot_Alarm_attributes * const data = PARROT_ALARM(alarm);
             Parrot_cx_schedule_immediate(interp, data->alarm_task);
         }
         else {
