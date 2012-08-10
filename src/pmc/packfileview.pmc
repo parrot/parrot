@@ -7,10 +7,15 @@ src/pmc/packfileview.pmc - PackfileView PMC
 
 =head1 DESCRIPTION
 
-This class implements a user-accessible wrapper for the PackFile* structure
-used internally by Parrot. It is essentially an interface for the user to call
-Packfile subsystem API calls, and work with the PackFile* structures output
-from utilities which generate them.
+This class implements a user-accessible, read-only wrapper for the PackFile*
+structure used internally by Parrot. It is essentially an interface for the user
+to call Packfile subsystem API calls, and work with the PackFile* structures
+output from utilities which generate them.
+
+NOTICE: This PMC should contain very little logic. It should be a thin wrapper
+around the public functions in src/packfile/api.c. This PMC should contain
+absolutely NO functionality for modifying the packfile. To create a new
+packfile or modify an existing one, use the PackFile PMC instead.
 
 =head2 VTABLES
 
@@ -219,15 +224,11 @@ otherwise.
     }
 
     VTABLE void *get_pointer() {
-        Parrot_PackfileView_attributes * const attrs =
-                PARROT_PACKFILEVIEW(SELF);
-        return attrs->pf;
+        return PARROT_PACKFILEVIEW(SELF)->pf;
     }
 
     VTABLE INTVAL get_bool() {
-        Parrot_PackfileView_attributes * const attrs =
-                PARROT_PACKFILEVIEW(SELF);
-        return (attrs->pf != NULL);
+        return (PARROT_PACKFILEVIEW(SELF)->pf != NULL);
     }
 
 /*
@@ -241,9 +242,7 @@ otherwise.
 */
 
     VTABLE void set_string_native(STRING * path) {
-        Parrot_PackfileView_attributes * const attrs =
-                PARROT_PACKFILEVIEW(SELF);
-        attrs->path = path;
+        PARROT_PACKFILEVIEW(SELF)->path = path;
     }
 
     VTABLE STRING * get_string() {
