@@ -507,8 +507,46 @@ Parrot_pf_subs_by_tag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
 
 /*
 
+=item C<PMC * Parrot_pf_all_tags_list(PARROT_INTERP, PMC * pfpmc)>
+
+Return a ResizableStringArray of all tags in the packfile.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC *
+Parrot_pf_all_tags_list(PARROT_INTERP, ARGIN(PMC * pfpmc))
+{
+    ASSERT_ARGS(Parrot_pf_all_tags_list)
+    PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
+    PMC * const tags = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
+
+    if (!pf || !pf->cur_cs || !pf->cur_cs->const_table)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "NULL or invalid packfile");
+    {
+        PackFile_ConstTable * const ct = pf->cur_cs->const_table;
+        const opcode_t ntags = ct->ntags;
+        opcode_t i = 0;
+        opcode_t last_seen = -1;
+        for (; i < ntags; i++) {
+            const opcode_t cur_tag = ct->tag_map[i].tag_idx;
+            if (cur_tag == last_seen)
+                continue;
+            VTABLE_push_string(interp, tags, ct->str.constants[cur_tag]);
+            last_seen = cur_tag;
+        }
+    }
+    return tags;
+}
+
+/*
+
 =item C<static int sub_pragma(PARROT_INTERP, pbc_action_enum_t action, const PMC
-*sub_pmc)>
+*sub_pmc)
 
 Checks B<sub_pmc>'s pragmas (e.g. flags like C<:load>, C<:main>, etc.)
 returning 1 if the sub should be run for C<action>, a C<pbc_action_enum_t>.

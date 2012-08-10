@@ -350,9 +350,21 @@ Get an array of all Subs with the given tag.
 Trigger subs with the given flag. Currently supported values are "load" and
 "init".
 
+=item C<METHOD all_tags()>
+
+Return an array of all tags.
+
 =item C<METHOD all_subs()>
 
 Return a ResizablePMCArray with all Sub constants from the constant table.
+
+item C<METHOD mark_initialized(STRING *tag)>
+
+Mark a given tag as being initialized
+
+item C<METHOD is_initialized(STRING *tag)>
+
+Determine if the given tag has been marked initialized
 
 =cut
 
@@ -387,6 +399,11 @@ Return a ResizablePMCArray with all Sub constants from the constant table.
             }
         }
         RETURN(PMC *array);
+    }
+
+    METHOD all_tags() {
+        PMC * const array = Parrot_pf_all_tags_list(interp, SELF);
+        RETURN (PMC *array);
     }
 
     METHOD mark_initialized(STRING *tag) {
