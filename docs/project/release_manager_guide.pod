@@ -544,7 +544,6 @@ The calendar of releases is available at the C<comp.lang.parrot> Google
 calendar, visible at
 L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.calendar.google.com>.
 
-    - Jul 17, 2012 - 4.6.0   - rurban
     - Aug 21, 2012 - 4.7.0   - whiteknight
     - Sep 18, 2012 - 4.8.0   - alvis
     - Oct 16, 2012 - 4.9.0   - dukeleto
