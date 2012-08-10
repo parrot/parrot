@@ -396,12 +396,12 @@ Determine if the given tag has been marked initialized
 
     METHOD all_tags() {
         PMC * const array = Parrot_pf_all_tags_list(interp, SELF);
-        RETURN (PMC *array);
+        RETURN(PMC *array);
     }
 
     METHOD all_tagged_pmcs() {
         PMC * const hash = Parrot_pf_all_tagged_pmcs(INTERP, SELF);
-        RETURN (PMC *hash);
+        RETURN(PMC *hash);
     }
 
     METHOD mark_initialized(STRING *tag) {

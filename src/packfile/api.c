@@ -559,7 +559,7 @@ PARROT_WARN_UNUSED_RESULT
 PMC *
 Parrot_pf_all_tagged_pmcs(PARROT_INTERP, ARGIN(PMC * pfpmc))
 {
-    ASSERT_ARGS(Parrot_pf_all_tags_list)
+    ASSERT_ARGS(Parrot_pf_all_tagged_pmcs)
     PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
     PMC * const taghash = Parrot_pmc_new(interp, enum_class_Hash);
 
@@ -624,7 +624,7 @@ Parrot_pf_all_subs(PARROT_INTERP, ARGIN(PMC *pfpmc))
 /*
 
 =item C<static int sub_pragma(PARROT_INTERP, pbc_action_enum_t action, const PMC
-*sub_pmc)
+*sub_pmc)>
 
 Checks B<sub_pmc>'s pragmas (e.g. flags like C<:load>, C<:main>, etc.)
 returning 1 if the sub should be run for C<action>, a C<pbc_action_enum_t>.
