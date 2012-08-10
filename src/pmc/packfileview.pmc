@@ -387,17 +387,7 @@ Determine if the given tag has been marked initialized
     }
 
     METHOD all_subs() {
-        PMC * const array = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-        PackFile_ConstTable * const ct = get_const_table(INTERP, SELF);
-        if (ct) {
-            INTVAL i;
-            STRING * const SUB = CONST_STRING(interp, "Sub");
-            for (i = 0; i < ct->pmc.const_count; ++i) {
-                PMC * const x = ct->pmc.constants[i];
-                if (VTABLE_isa(interp, x, SUB))
-                    VTABLE_push_pmc(INTERP, array, x);
-            }
-        }
+        PMC * const array = Parrot_pf_all_subs(INTERP, SELF);
         RETURN(PMC *array);
     }
 

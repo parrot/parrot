@@ -545,6 +545,40 @@ Parrot_pf_all_tags_list(PARROT_INTERP, ARGIN(PMC * pfpmc))
 
 /*
 
+=item C<PMC * Parrot_pf_all_subs(PARROT_INTERP, PMC *pfpmc)>
+
+Return an array of all Sub PMCs from the packfile
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC *
+Parrot_pf_all_subs(PARROT_INTERP, ARGIN(PMC *pfpmc))
+{
+    ASSERT_ARGS(Parrot_pf_all_subs)
+    PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
+    if (!pf || !pf->cur_cs || !pf->cur_cs->const_table)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "NULL or invalid packfile");
+
+    {
+        PackFile_ConstTable * const ct = pf->cur_cs->const_table;
+        PMC * const array = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        INTVAL i;
+        STRING * const SUB = CONST_STRING(interp, "Sub");
+        for (i = 0; i < ct->pmc.const_count; ++i) {
+            PMC * const x = ct->pmc.constants[i];
+            if (VTABLE_isa(interp, x, SUB))
+                VTABLE_push_pmc(interp, array, x);
+        }
+        return array;
+    }
+}
+/*
+
 =item C<static int sub_pragma(PARROT_INTERP, pbc_action_enum_t action, const PMC
 *sub_pmc)
 
