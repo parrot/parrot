@@ -545,6 +545,50 @@ Parrot_pf_all_tags_list(PARROT_INTERP, ARGIN(PMC * pfpmc))
 
 /*
 
+=item C<PMC * Parrot_pf_all_tagged_pmcs(PARROT_INTERP, PMC * pfpmc)>
+
+Return a hash of all tags in the packfile. Each tag is a key in the hash. Each
+value is a ResizablePMCArray of pmcs with that tag.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC *
+Parrot_pf_all_tagged_pmcs(PARROT_INTERP, ARGIN(PMC * pfpmc))
+{
+    ASSERT_ARGS(Parrot_pf_all_tags_list)
+    PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
+    PMC * const taghash = Parrot_pmc_new(interp, enum_class_Hash);
+
+    if (!pf || !pf->cur_cs || !pf->cur_cs->const_table)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "NULL or invalid packfile");
+    {
+        PackFile_ConstTable * const ct = pf->cur_cs->const_table;
+        const opcode_t ntags = ct->ntags;
+        opcode_t i = 0;
+        opcode_t last_seen = -1;
+        STRING * cur_tag_str = NULL;
+        PMC * cur_tag_list = NULL;
+        for (; i < ntags; i++) {
+            const opcode_t cur_tag = ct->tag_map[i].tag_idx;
+            if (cur_tag != last_seen) {
+                cur_tag_str = ct->str.constants[cur_tag];
+                cur_tag_list = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+                VTABLE_set_pmc_keyed_str(interp, taghash, cur_tag_str, cur_tag_list);
+                last_seen = cur_tag;
+            }
+            VTABLE_push_pmc(interp, cur_tag_list, ct->pmc.constants[ct->tag_map[i].const_idx]);
+        }
+    }
+    return taghash;
+}
+
+/*
+
 =item C<PMC * Parrot_pf_all_subs(PARROT_INTERP, PMC *pfpmc)>
 
 Return an array of all Sub PMCs from the packfile

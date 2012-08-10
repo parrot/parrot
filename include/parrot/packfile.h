@@ -762,6 +762,12 @@ PMC * Parrot_pf_all_subs(PARROT_INTERP, ARGIN(PMC *pfpmc))
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
+PMC * Parrot_pf_all_tagged_pmcs(PARROT_INTERP, ARGIN(PMC * pfpmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_pf_all_tags_list(PARROT_INTERP, ARGIN(PMC * pfpmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -898,6 +904,9 @@ void Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD_NULLOK(PackFile * pf))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_Parrot_pf_all_subs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pfpmc))
+#define ASSERT_ARGS_Parrot_pf_all_tagged_pmcs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pfpmc))
 #define ASSERT_ARGS_Parrot_pf_all_tags_list __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

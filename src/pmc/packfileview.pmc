@@ -354,6 +354,10 @@ Trigger subs with the given flag. Currently supported values are "load" and
 
 Return an array of all tags.
 
+=item C<METHOD all_tagged_pmcs()>
+
+Return a hash map of all tags, and the lists of pmcs with those tags.
+
 =item C<METHOD all_subs()>
 
 Return a ResizablePMCArray with all Sub constants from the constant table.
@@ -394,6 +398,11 @@ Determine if the given tag has been marked initialized
     METHOD all_tags() {
         PMC * const array = Parrot_pf_all_tags_list(interp, SELF);
         RETURN (PMC *array);
+    }
+
+    METHOD all_tagged_pmcs() {
+        PMC * const hash = Parrot_pf_all_tagged_pmcs(INTERP, SELF);
+        RETURN (PMC *hash);
     }
 
     METHOD mark_initialized(STRING *tag) {
