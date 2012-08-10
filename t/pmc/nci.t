@@ -1332,11 +1332,11 @@ OUTPUT
   set I20, 0
 loop:
   inc I20
-  # Avoid sleep deadlock in threads branch [GH #808]
+  # Avoid sleep deadlocks in threads branch [GH #808]
   # sleep 0.01
   get_global P11, "cb_done"
   if P11, fin
-  gt I20, 10, err
+  gt I20, 10000, err
   branch loop
 fin:
   print "done.\n"
@@ -1403,11 +1403,10 @@ OUTPUT
     sleep_cnt = 0
 LOOP:
     sleep_cnt += 1
-    sleep 0.01
     .local pmc callback_has_run
     callback_has_run = get_global "cb_done"
     if callback_has_run goto FINISHED
-    if sleep_cnt > 10 goto ERROR
+    if sleep_cnt > 10000 goto ERROR
     goto LOOP
 FINISHED:
     print "the callback has run\n"
@@ -1466,10 +1465,10 @@ OUTPUT
   set I20, 0
 loop:
   inc I20
-  sleep 0.01
+  #sleep 0.01
   get_global P11, "cb_done"
   if P11, fin
-  gt I20, 10, err
+  gt I20, 10000, err
   branch loop
 fin:
   print "done.\n"
@@ -1540,11 +1539,11 @@ OUTPUT
     sleep_cnt = 0
 LOOP:
     sleep_cnt += 1
-    sleep 0.01
+    #sleep 0.01
     .local pmc callback_has_run
     callback_has_run = get_global "cb_done"
     if callback_has_run goto FINISHED
-    if sleep_cnt > 10 goto ERROR
+    if sleep_cnt > 10000 goto ERROR
     goto LOOP
 FINISHED:
     print "the callback has run\n"
@@ -1614,10 +1613,10 @@ OUTPUT
   set I20, 0
 loop:
   inc I20
-  sleep 0.01
+  #sleep 0.01
   get_global P11, "cb_done"
   if P11, fin
-  gt I20, 10, err
+  gt I20, 10000, err
   branch loop
 fin:
   print "done.\n"
@@ -1673,10 +1672,10 @@ OUTPUT
   set I20, 0
 loop:
   inc I20
-  sleep 0.01
+  #sleep 0.01
   get_global P11, "cb_done"
   if P11, fin
-  gt I20, 10, err
+  gt I20, 10000, err
   branch loop
 fin:
   print "done.\n"
@@ -1744,11 +1743,11 @@ OUTPUT
     sleep_cnt = 0
 LOOP:
     sleep_cnt += 1
-    sleep 0.01
+    #sleep 0.01
     .local pmc callback_has_run
     callback_has_run = get_global "cb_done"
     if callback_has_run goto FINISHED
-    if sleep_cnt > 10 goto ERROR
+    if sleep_cnt > 10000 goto ERROR
     goto LOOP
 FINISHED:
     print "the callback has run\n"
@@ -1821,11 +1820,11 @@ OUTPUT
     sleep_cnt = 0
 LOOP:
     sleep_cnt += 1
-    sleep 0.01
+    #sleep 0.01
     .local pmc callback_has_run
     callback_has_run = get_global "cb_done"
     if callback_has_run goto FINISHED
-    if sleep_cnt > 10 goto ERROR
+    if sleep_cnt > 10000 goto ERROR
     goto LOOP
 FINISHED:
     print "the callback has run\n"
