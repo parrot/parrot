@@ -426,8 +426,10 @@ present, it is used to determine line endings instead of the default C<\n>.
 
         if (!has_delimiter)
             delimiter = PARROT_SOCKET(SELF)->record_separator;
-        STRING *result = Parrot_io_readline_s(INTERP, SELF, delimiter);
-        RETURN(STRING *result);
+        {
+            STRING *result = Parrot_io_readline_s(INTERP, SELF, delimiter);
+            RETURN(STRING *result);
+        }
     }
 
 /*
