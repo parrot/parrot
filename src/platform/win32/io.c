@@ -243,7 +243,6 @@ PARROT_WARN_UNUSED_RESULT
 INTVAL
 Parrot_io_internal_async(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL async)
 {
-    ASSERT_ARGS(Parrot_io_internal_async)
     int rflags;
     PIOHANDLE file_descriptor;
     if (Parrot_io_is_closed(interp, pmc))
