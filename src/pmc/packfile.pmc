@@ -512,6 +512,18 @@ start of the packfile.
         RETURN(PMC *dir);
     }
 
+/*
+
+=item C<PMC *view()>
+
+Get a PackfileView for the current packfile. PackfileView is a read-only
+wrapper around a static packfile structure. This method creates a fresh copy
+of the packfile structure and assigns that copy to the new PackfileView PMC.
+
+=cut
+
+*/
+
     METHOD view() {
         const Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);
         PackFile * const pf =
