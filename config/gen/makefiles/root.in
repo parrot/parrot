@@ -859,7 +859,7 @@ bootstrap-ops : $(OPS2C)
 	$(OPS2C) --core --quiet
 	$(MAKE_C) .
 
-$(RUN_INC_DIR)/parrotlib.pbc: $(LIBRARY_DIR)/parrotlib.pir $(PARROT) $(GEN_PASM_INCLUDES)
+$(RUN_INC_DIR)/parrotlib.pbc: $(GEN_PIR_INCLUDES) $(LIBRARY_DIR)/parrotlib.pir $(PARROT)
 	$(PARROT) -o $@ $(LIBRARY_DIR)/parrotlib.pir
 
 $(RUN_INC_DIR)/parrot_version.pir:
@@ -899,7 +899,7 @@ $(PARROTOLD) : $(FRP_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 
 $(PARROT) : $(FRPTWO_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	src/parrot_config$(O) src/longopt$(O) \
-	$(MINIPARROT) $(FRPTWO_DIR)/prt0.pbc$(O) $(GEN_PASM_INCLUDES)
+	$(MINIPARROT) $(FRPTWO_DIR)/prt0.pbc$(O) $(GEN_PIR_INCLUDES)
 	$(LINK) @ld_out@$@ \
 	$(FRPTWO_DIR)/main$(O) $(FRPTWO_DIR)/prt0.pbc$(O) src/parrot_config$(O) src/longopt$(O) \
 	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
@@ -2318,7 +2318,7 @@ clean : \
 	$(RM_F) $(NQP_CLEANUPS) $(PGE_CLEANUPS) $(TGE_CLEANUPS)
 	$(RM_F) $(PCT_CLEANUPS) $(DATA_JSON_CLEANUPS)
 	$(RM_F) $(DYNOPLIBS_CLEANUPS) $(DYNPMC_CLEANUPS)
-	$(RM_F) $(GEN_PASM_INCLUDES) $(GEN_PM_INCLUDES)
+	$(RM_F) $(GEN_PIR_INCLUDES) $(GEN_PM_INCLUDES)
 	$(RM_F) $(NQPRX_CLEANUPS)  $(OPSC_CLEANUPS)
 	$(RM_F) $(WINXED_CLEANUPS)
 	$(RM_RF) blib
