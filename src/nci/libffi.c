@@ -480,7 +480,7 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
     parrot_var_t  *pcc_arg;     /* values of pcc arguments */
     nci_var_t     *nci_val;     /* values of nci arguments */
     void         **nci_arg;     /* pointers for pass-by-ref arguments */
-    void         **nci_arg_ptr; /* pointers to arguments for libffi */
+    void         **nci_arg_ptr = NULL; /* pointers to arguments for libffi */
 
     void *return_data; /* Holds return data from FFI call */
     int i;

@@ -76,7 +76,7 @@ U: allison
 
 N: Alvis Yardley
 D: Documentation Shepherd (3.9.0 - Present)
-D: Release manger for 4.1.0 and 4.5.0
+D: Release manager for 4.1.0 and 4.5.0
 E: ac.yardley@gmail.com
 U: alvis
 S: Ft. Worth, Texas
@@ -966,7 +966,10 @@ D: Fixed typos
 N: Reini Urban
 U: rurban
 E: rurban@cpan.org
-D: cygwin, 64-bit pbc compat, float converters, bignum.pmc
+E: rurban@cpanel.net
+D: cygwin, install, 64-bit pbc compat, float converters
+D: Release manager for 4.6.0
+S: Houston, TX
 
 N: Richard Hainsworth
 U: finanalyst

@@ -134,6 +134,10 @@ my @permitted_duplicate_copyright_files = (
         reason  => 'heredoc for print_introduction()',
     },
     {
+        file    => 'lib/Parrot/Distribution.pm',
+        reason  => 'in pod for new()',
+    },
+    {
         file    => 't/tools/dev/search_ops/samples.pm',
         reason  => 'sample code used in testing',
     },
@@ -146,6 +150,10 @@ my @permitted_duplicate_copyright_files = (
         reason  => 'generated files in data section',
     },
     {
+        file    => 'tools/release/parrot_github_release.pl',
+        reason  => 'in --version ballot',
+    },
+    {
         file    => 'examples/pir/quine_ord.pir',
         reason  => 'quine',
     },
@@ -154,12 +162,16 @@ my @permitted_duplicate_copyright_files = (
         reason  => 'heredoc text for generated file',
     },
     {
-        file    => 'src/main.c',
+        file    => 'frontend/parrot/main.c',
         reason  => 'Parrot_version() prints copyright notice ',
     },
     {
         file    => 't/examples/streams.t',
         reason  => 'heredoc-like text in test',
+    },
+    {
+        file    => 't/pmc/stringhandle.t',
+        reason  => 'text for generated test file',
     },
 );
 my $cwd = cwd();

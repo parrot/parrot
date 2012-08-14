@@ -1,6 +1,6 @@
 {
-    "release.version"  : "4.5.0",
-    "release.name"     : "Buff-faced Pygmy Parrot",
+    "release.version"  : "4.6.0",
+    "release.name"     : "Wild Parrots of Telegraph Hill",
     "release.day"      : "Tuesday",
     "release.nextdate" : "17 July 2012",
 
@@ -16,5 +16,5 @@
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
     "wiki.bugday"      : "bug_day_2012_07_14",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/4.5.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/4.6.0/"
 }

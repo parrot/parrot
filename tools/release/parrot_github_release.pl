@@ -330,7 +330,7 @@ sub update_parrot_github {
     chdir $parrot_dir;
 }
 
-# Update the link to 'Parrot Documentation Releases' in 'index.html'
+# Update the link to 'Previous Parrot Documentation Releases' in 'index.html'
 sub update_index_html {
     my $buffer = '';
     open my $FH, '+<', 'index.html' or stop("Unable to open 'index.html'");
@@ -338,7 +338,7 @@ sub update_index_html {
         s/$1/$version/ if /Parrot ($major\.$minor\.$patch)-devel - Home/;
         s/$1/$version/ if /Parrot version ($major\.$minor\.$patch)-devel/;
         s/$1/$major\.$minor\.$patch/
-          if /Parrot Documentation Releases \((\d.\d.\d) - 0.1.1\)/;
+          if /Previous Parrot Documentation Releases \((\d.\d.\d) - 0.1.1\)/;
         $buffer .= $_;
     }
     seek($FH, 0, 0)          or stop("Unable to seek start of 'index.html'");

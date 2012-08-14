@@ -1,11 +1,19 @@
+2012-08-21    release 4.7.0
+    - Core
+        + Added .all_tags() and .all_tagged_pmcs() methods to PackfileView PMC
+
 2012-07-17    release 4.6.0
     - Core
+        + Added init_pmc method to PackFileView.
     - Documentation
-	+ Added source lines from 'docs/index/book.json' to 'index.json'
-	  to make display of 'Parrot Developer's Guide: PIR (draft)'
-	  display more like the other books, e.g., 'PCT Book'.
-	+ Removed 'docs/index/book.json' as unnecessary.
+        + Added source lines from 'docs/index/book.json' to 'index.json'
+          to make display of 'Parrot Developer's Guide: PIR (draft)'
+          display more like the other books, e.g., 'PCT Book'.
+        + Removed 'docs/index/book.json' as unnecessary.
     - Tests
+    - Build
+        + Improve on 'sudo make install' permission errors by using
+          File::Copy::cp.
     - Community
 
 2012-06-19    release 4.5.0
