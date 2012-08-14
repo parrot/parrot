@@ -924,7 +924,7 @@ CODE
 -1
 OUT
 
-pir_output_is( <<"CODE", <<'OUT', 'write after buffered read' );
+pir_output_is( <<"CODE", <<'OUT', 'write after buffered read', todo => 'GH #811 Write error: No space left on device on swap fs' );
 .sub test :main
     .local pmc fh
     .local string str
