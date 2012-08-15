@@ -429,7 +429,7 @@ ok 3 - $P0.record_separator() # .readline works as expected
 OUT
 
 # L<PDD22/I\/O PMC API/=item record_separator>
-pir_output_is( <<"CODE", <<'OUT', 'record_separator, multiple chars', todo => 'not yet implemented' );
+pir_output_is( <<"CODE", <<'OUT', 'record_separator, multiple chars', todo => 'not yet implemented GH #812' );
 .sub 'test' :main
     \$P0 = new ['FileHandle']
 
