@@ -577,7 +577,12 @@ ok
 OUT
 
 my $nl = [ stat("myconfig") ]->[3];
-ok( $nl > 1, "hard link to file was really created" );
+if (-l "myconfig") {
+    ok( 1, "hard link on symlink skipped" );
+}
+else {
+    ok( $nl > 1, "hard link to file was really created" );
+}
 unlink "xpto" if -f "xpto";
 
 my $prevnl = [ stat("tools") ]->[3];
