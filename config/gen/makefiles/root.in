@@ -405,7 +405,7 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/thr_windows.h \
 	$(INC_DIR)/atomic.h \
 	$(INC_DIR)/atomic/fallback.h \
-	$(INC_DIR)/atomic/gcc_pcc.h \
+	$(INC_DIR)/atomic/gcc_ppc.h \
 	$(INC_DIR)/atomic/gcc_x86.h \
 	$(INC_DIR)/atomic/sparc.h \
 	$(INC_DIR)/oo.h \

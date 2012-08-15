@@ -1780,7 +1780,10 @@ build_key(ARGMOD(imc_info_t * imcc), ARGIN(SymReg *key_reg),
                 Parrot_key_set_register(imcc->interp, tail, regno, KEY_pmc_FLAG);
                 break;
               default:
-                IMCC_fatal(imcc, 1, "build_key: wrong register set '%c' (%d) in keyed access. Expects one of 'I', 'S' or 'P'\n", r->set, r->set);
+                IMCC_fatal(imcc, 1,
+                    "build_key: wrong register set '%c' (%d) in keyed access. "
+                    "Expects one of 'I', 'S' or 'P'\n",
+                    r->set, r->set);
             }
 
             IMCC_debug(imcc, DEBUG_PBC_CONST, " keypart reg %s %c%d\n",

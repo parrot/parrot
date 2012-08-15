@@ -1,4 +1,4 @@
-/* atomic/gcc_pcc.h
+/* atomic/gcc_ppc.h
  *  Copyright (C) 2006-2010, Parrot Foundation.
  *  Overview:
  *     This header provides an implementation of atomic
@@ -15,7 +15,7 @@
 
 =head1 NAME
 
-include/parrot/atomic/gcc_pcc.h
+include/parrot/atomic/gcc_ppc.h
 
 =head1 DESCRIPTION
 

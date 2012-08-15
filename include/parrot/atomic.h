@@ -18,7 +18,7 @@
 #  if defined(PARROT_HAS_I386_GCC_CMPXCHG)
 #    include "parrot/atomic/gcc_x86.h"
 #  elif defined(PARROT_HAS_PPC_GCC_CMPSET)
-#    include "parrot/atomic/gcc_pcc.h"
+#    include "parrot/atomic/gcc_ppc.h"
 #  elif defined(PARROT_HAS_SPARC_ATOMIC)
 #    include "parrot/atomic/sparc.h"
 #  else
