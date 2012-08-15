@@ -408,7 +408,7 @@ pir_output_is( <<"CODE", <<'OUT', 'record_separator' );
     if \$S0 == \$S99 goto ok_2
     print 'not '
   ok_2:
-    say 'ok 2 - \$P0.record_separator(\$S1)'
+    say 'ok 2 - \$P0.record_separator("a")'
 
     \$P0.'print'(123)
     \$S0 = \$P0.'record_separator'()
@@ -424,12 +424,12 @@ pir_output_is( <<"CODE", <<'OUT', 'record_separator' );
 .end
 CODE
 ok 1 - $S0 = $P1.record_separator() # default
-ok 2 - $P0.record_separator($S1)
+ok 2 - $P0.record_separator("a")
 ok 3 - $P0.record_separator() # .readline works as expected
 OUT
 
 # L<PDD22/I\/O PMC API/=item record_separator>
-pir_output_is( <<"CODE", <<'OUT', 'record_separator, multiple chars', todo => 'not yet implemented GH #812' );
+pir_output_is( <<"CODE", <<'OUT', 'record_separator, multiple chars' );
 .sub 'test' :main
     \$P0 = new ['FileHandle']
 
@@ -439,7 +439,7 @@ pir_output_is( <<"CODE", <<'OUT', 'record_separator, multiple chars', todo => 'n
     if \$S0 == \$S99 goto ok_2
     print 'not '
   ok_2:
-    say 'ok 1 - \$P0.record_separator(\$S1)'
+    say 'ok 1 - \$P0.record_separator("abc")'
 
     \$P0.'open'('$temp_file', 'rw')
     \$P0.'print'(123)
@@ -447,6 +447,7 @@ pir_output_is( <<"CODE", <<'OUT', 'record_separator, multiple chars', todo => 'n
     \$P0.'print'(\$S0)
     \$P0.'print'(456)
 
+    \$P0.'seek'(0, 0)
     \$S0 = \$P0.'readline'()
     if \$S0 == '123abc' goto ok_3
     print 'not '
@@ -454,7 +455,7 @@ pir_output_is( <<"CODE", <<'OUT', 'record_separator, multiple chars', todo => 'n
     say 'ok 2 - \$P0.record_separator() # .readline works as expected'
 .end
 CODE
-ok 1 - $P0.record_separator($S1)
+ok 1 - $P0.record_separator("abc")
 ok 2 - $P0.record_separator() # .readline works as expected
 OUT
 
