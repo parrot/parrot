@@ -22,6 +22,7 @@ Parrot. This file implements the public interface to the I/O subsystem.
 #include "parrot/extend.h"
 #include "io_private.h"
 #include "api.str"
+#include "pmc/pmc_handle.h"
 #include "pmc/pmc_filehandle.h"
 #include "pmc/pmc_stringhandle.h"
 #include "pmc/pmc_socket.h"
@@ -905,7 +906,11 @@ STRING *
 Parrot_io_readline(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(Parrot_io_readline)
-    return Parrot_io_readline_s(interp, handle, STRINGNULL);
+
+    STRING * terminator;
+    GETATTR_Handle_record_separator(interp, handle, terminator);
+
+    return Parrot_io_readline_s(interp, handle, terminator);
 }
 
 PARROT_EXPORT
