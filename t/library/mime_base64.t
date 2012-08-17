@@ -24,12 +24,13 @@ Test cases taken from base64.t of MIME::Base64.
     load_bytecode 'PGE/Util.pbc'
     load_language 'data_json'
 
-    .local pmc plan, is, ok
-    plan = get_hll_global [ 'Test'; 'More' ], 'plan'
-    is   = get_hll_global [ 'Test'; 'More' ], 'is'
-    ok   = get_hll_global [ 'Test'; 'More' ], 'ok'
+    .local pmc plan, is, ok, lives_ok
+    plan     = get_hll_global [ 'Test'; 'More' ], 'plan'
+    is       = get_hll_global [ 'Test'; 'More' ], 'is'
+    ok       = get_hll_global [ 'Test'; 'More' ], 'ok'
+    lives_ok = get_hll_global [ 'Test'; 'More' ], 'lives_ok'
 
-    plan(550)
+    plan(551)
 
     .local pmc json
     json = compreg 'data_json'
@@ -370,6 +371,16 @@ END_JSON
     goto dec_loop
     dec_loop_end:
 
+    lives_ok(<<'CODE', 'enc_sub with utf8 GH#813')
+.sub foo
+    .local pmc enc_sub
+    enc_sub = get_global [ "MIME"; "Base64" ], 'encode_base64'
+
+    .local string result_encode
+    result_encode = enc_sub(utf8:"\x{203e}")
+.end
+CODE
+
 .end
 
 .sub test_encode
@@ -407,6 +418,7 @@ END_JSON
     result_decode = dec_sub( base64 )
     is( result_decode, plain, comment )
 .end
+
 
 =head1 AUTHOR
 
