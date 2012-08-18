@@ -28,7 +28,6 @@ Test cases taken from base64.t of MIME::Base64.
     plan     = get_hll_global [ 'Test'; 'More' ], 'plan'
     is       = get_hll_global [ 'Test'; 'More' ], 'is'
     ok       = get_hll_global [ 'Test'; 'More' ], 'ok'
-    lives_ok = get_hll_global [ 'Test'; 'More' ], 'lives_ok'
 
     plan(551)
 
@@ -371,7 +370,15 @@ END_JSON
     goto dec_loop
     dec_loop_end:
 
-    lives_ok(<<'CODE', 'enc_sub with utf8 GH#813')
+    gh813_base64_utf8()
+
+.end
+
+.sub gh813_base64_utf8
+    .local pmc lives_ok
+    lives_ok = get_hll_global [ 'Test'; 'More' ], 'lives_ok'
+
+    lives_ok(<<'CODE', 'enc_sub("\x{203e}") # Github issue #813')
 .sub foo
     .local pmc enc_sub
     enc_sub = get_global [ "MIME"; "Base64" ], 'encode_base64'
