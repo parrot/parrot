@@ -297,12 +297,10 @@ Parrot_io_buffer_read_b(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
         return vtable->read_b(interp, handle, s, length);
     {
         size_t bytes_read = io_buffer_transfer_to_mem(interp, buffer, s, length);
-
         PARROT_ASSERT(bytes_read <= length);
 
+        PARROT_ASSERT(length >= bytes_read);
         length = length - bytes_read;
-
-        PARROT_ASSERT(length >= 0);
 
         /* If we still need more data than the buffer can hold, just read it
            directly. */

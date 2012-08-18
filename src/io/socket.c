@@ -221,7 +221,7 @@ io_socket_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), INTVAL i
 {
     ASSERT_ARGS(io_socket_setup_vtable)
     if (vtable == NULL)
-        vtable = (IO_VTABLE *)(&(interp->piodata->vtables[idx]));
+        vtable = IO_EDITABLE_IO_VTABLE(interp, idx);
     vtable->number = idx;
     vtable->flags = PIO_VF_DEFAULT_READ_BUF     /* Use a read buffer by default */
                   | PIO_VF_FLUSH_ON_CLOSE;      /* Flush the socket on close    */

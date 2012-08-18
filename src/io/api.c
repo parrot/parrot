@@ -147,7 +147,7 @@ Parrot_io_allocate_new_vtable(PARROT_INTERP, ARGIN(const char *name))
     interp->piodata->vtables = mem_gc_realloc_n_typed(interp,
                                 (void *)interp->piodata->vtables,
                                 number_of_vtables + 1, const IO_VTABLE);
-    vtable = (IO_VTABLE *)(&(interp->piodata->vtables[number_of_vtables]));
+    vtable = IO_EDITABLE_IO_VTABLE(interp, number_of_vtables);
     vtable->name = name;
     vtable->number = number_of_vtables;
     interp->piodata->num_vtables++;
@@ -1204,12 +1204,8 @@ Parrot_io_peek(PARROT_INTERP, ARGMOD(PMC *handle))
         return STRINGNULL;
     {
         const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
-        IO_BUFFER * read_buffer = IO_GET_READ_BUFFER(interp, handle);
-        INTVAL c;
-
-        io_verify_has_read_buffer(interp, handle, vtable, BUFFER_SIZE_ANY);
-
-        c = Parrot_io_buffer_peek(interp, read_buffer, handle, vtable);
+        IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
+        const INTVAL c = Parrot_io_buffer_peek(interp, read_buffer, handle, vtable);
 
         if (c == -1)
             return STRINGNULL;

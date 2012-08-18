@@ -216,7 +216,7 @@ io_pipe_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), INTVAL idx
 {
     ASSERT_ARGS(io_pipe_setup_vtable)
     if (vtable == NULL)
-        vtable = (IO_VTABLE *)(&(interp->piodata->vtables[idx]));
+        vtable = IO_EDITABLE_IO_VTABLE(interp, idx);
     vtable->number = idx;
     vtable->flags = PIO_VF_DEFAULT_READ_BUF     /* Use read buffers by default */
                   | PIO_VF_MULTI_READABLE       /* Can read multiple times without hanging */

@@ -180,7 +180,7 @@ io_userhandle_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), INTV
 {
     ASSERT_ARGS(io_userhandle_setup_vtable)
     if (vtable == NULL)
-        vtable = ((IO_VTABLE *)(&(interp->piodata->vtables[idx])));
+        vtable = IO_EDITABLE_IO_VTABLE(interp, idx);
     vtable->number = idx;
     vtable->name = "User Handle Type";
     /*

@@ -225,7 +225,7 @@ io_stringhandle_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), IN
        PIO_VF_CUSTOM_BUFFER and new vtables to set up a custom buffer to be used
     */
     if (vtable == NULL)
-        vtable = (IO_VTABLE *)(&(interp->piodata->vtables[idx]));
+        vtable = IO_EDITABLE_IO_VTABLE(interp, idx);
     vtable->number = idx;
     vtable->flags =
         PIO_VF_PATH_NOT_REQUIRED |  /* StringHandle does not require a path to open */
