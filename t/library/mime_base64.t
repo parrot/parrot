@@ -3,7 +3,7 @@
 
 =head1 NAME
 
-t/library/mime_base64.t - test [ 'MIME'; 'Base64' ]
+t/library/mime_base64.t - MIME::Base64 tests
 
 =head1 SYNOPSIS
 
@@ -11,8 +11,9 @@ t/library/mime_base64.t - test [ 'MIME'; 'Base64' ]
 
 =head1 DESCRIPTION
 
-Test [ 'MIME'; 'Base64' ]
-Test cases taken from base64.t of MIME::Base64.
+
+This file contains various tests related to base64 encoding and decoding.  Some
+test cases were taken from base64.t of MIME::Base64 from Perl 5.
 
 =cut
 
