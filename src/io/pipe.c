@@ -397,6 +397,8 @@ static void
 io_pipe_adv_position(PARROT_INTERP, ARGMOD(PMC *handle), size_t offset)
 {
     ASSERT_ARGS(io_pipe_adv_position)
+    UNUSED(handle);
+    UNUSED(offset);
     /* Pipes don't keep track of file position internally. Ignore this. */
 }
 
@@ -415,6 +417,8 @@ static void
 io_pipe_set_position(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T pos)
 {
     ASSERT_ARGS(io_pipe_set_position)
+    UNUSED(handle);
+    UNUSED(pos);
     /* Pipes don't keep track of file position internally. Ignore. */
 }
 

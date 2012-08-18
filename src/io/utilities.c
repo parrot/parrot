@@ -318,7 +318,7 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
         io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read);
         total_bytes_read += bytes_to_read;
 
-        if (bounds.chars == char_length)
+        if (((size_t)bounds.chars) == char_length)
             break;
 
         /* We weren't able to read so many characters at once. Count the ones
@@ -532,6 +532,8 @@ io_sync_buffers_for_write(PARROT_INTERP, ARGMOD(PMC *handle),
         ARGMOD_NULLOK(IO_BUFFER * write_buffer))
 {
     ASSERT_ARGS(io_sync_buffers_for_write)
+
+    UNUSED(write_buffer);
 
     /* If we have a read buffer, the on-disk file position is ahead of the
        current cursor. We need to clear the read buffer and reset the on-disk

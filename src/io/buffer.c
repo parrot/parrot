@@ -864,7 +864,7 @@ Parrot_io_buffer_seek(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
     pos_diff = offset - cur_pos;
     PARROT_ASSERT(pos_diff > 0);
 
-    if (pos_diff > BUFFER_USED_SIZE(buffer)) {
+    if ((size_t)pos_diff > BUFFER_USED_SIZE(buffer)) {
         Parrot_io_buffer_clear(interp, buffer);
         return vtable->seek(interp, handle, offset, w);
     }

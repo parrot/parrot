@@ -139,7 +139,7 @@ struct _ParrotIOData {
 #define BUFFER_USED_SIZE(b) ((size_t)((b)->buffer_end - (b)->buffer_start))
 #define BUFFER_FREE_HEAD_SPACE(b) ((b)->buffer_start - (b)->buffer_ptr)
 #define BUFFER_FREE_END_SPACE(b) ((b)->buffer_size - ((b)->buffer_end - (b)->buffer_ptr))
-#define BUFFER_CAN_BE_NORMALIZED(b) (BUFFER_FREE_HEAD_SPACE(b) > BUFFER_USED_SIZE(b))
+#define BUFFER_CAN_BE_NORMALIZED(b) (((size_t)BUFFER_FREE_HEAD_SPACE(b)) > ((size_t)BUFFER_USED_SIZE(b)))
 
 #define BUFFER_ASSERT_SANITY(b) do { \
         PARROT_ASSERT((b)->buffer_ptr <= (b)->buffer_start); \

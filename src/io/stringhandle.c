@@ -455,6 +455,8 @@ static void
 io_stringhandle_adv_position(PARROT_INTERP, ARGMOD(PMC *handle), size_t offset)
 {
     ASSERT_ARGS(io_stringhandle_adv_position)
+    UNUSED(handle)
+    UNUSED(offset)
     /* StringHandle keeps track of position directly. Ignore this. */
 }
 
@@ -462,6 +464,8 @@ static void
 io_stringhandle_set_position(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T pos)
 {
     ASSERT_ARGS(io_stringhandle_set_position)
+    UNUSED(handle)
+    UNUSED(pos)
     /* StringHandle keeps track of position directly. Ignore this. */
 }
 

@@ -402,6 +402,8 @@ static void
 io_socket_adv_position(PARROT_INTERP, ARGMOD(PMC *handle), size_t offset)
 {
     ASSERT_ARGS(io_socket_adv_position)
+    UNUSED(handle)
+    UNUSED(offset)
     /* Socket doesn't keep track of position internally. Ignore this. */
 }
 
@@ -409,6 +411,8 @@ static void
 io_socket_set_position(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T pos)
 {
     ASSERT_ARGS(io_socket_set_position)
+    UNUSED(handle)
+    UNUSED(pos)
     /* Socket doesn't keep track of position internally. Ignore. */
 }
 
