@@ -119,7 +119,13 @@ sub _build_compile_command {
     my ( $cc, $ccflags, $cc_args ) = @_;
     $_ ||= '' for ( $cc, $ccflags, $cc_args );
 
-    return "$cc $ccflags $cc_args -I./include -c test_$$.c";
+    if ($^O eq 'VMS') {
+        $cc_args =~ s/-D/\/Define=/;
+    }
+    else {
+        $cc_args .= "-I./include -c";
+    }
+    return "$cc $ccflags $cc_args test_$$.c";
 }
 
 =item C<integrate($orig, $new)>
