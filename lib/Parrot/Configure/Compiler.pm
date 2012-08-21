@@ -730,7 +730,7 @@ sub append_configure_log {
     my $conf = shift;
     my $target = shift;
     if ( $conf->{active_configuration} ) {
-        my $generated_log = 'MANIFEST.configure.generated';
+        my $generated_log = 'MANIFEST_configure.generated';
         open my $GEN, '>>', $generated_log
             or die "Can't open $generated_log for appending: $!";
         print $GEN "$target\n";

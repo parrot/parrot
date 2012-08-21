@@ -223,7 +223,7 @@ CONFIGURE_GENERATED_FILES = \
 	$(GEN_CONFIGS) \
 	$(GEN_MAKEFILES) \
 	myconfig  \
-	MANIFEST.configure.generated \
+	MANIFEST_configure.generated \
 	.configure_trace.sto \
 	.parrot_current_rev \
 	.parrot_current_sha1 \

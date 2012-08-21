@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2009, Parrot Foundation.
+# Copyright (C) 2006-2012, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -37,6 +37,8 @@ conform to a set of highly portable standards.
 Files with more than one dot ( '.' ) in their filename are problematic on
 some platforms (e.g. VMS) hence avoid these in Parrot.
 
+Even generated files have to obey this.
+
 =item No strange characters in filenames
 
 Filenames are restricted to the characters C<a-zA-Z0-9_-.>
@@ -64,6 +66,12 @@ if (@ARGV){
 }
 else {
     my $manifest = maniread('MANIFEST');
+    if (-e 'MANIFEST.generated') {
+        my $mani2 = maniread('MANIFEST.generated');
+        for (keys %$mani2) {
+            $manifest->{$_} = $mani2->{$_} unless /(lib|cyg)parrot/;
+        }
+    }
     # Give ports a little more leeway
     @files = grep {! /^ports/} sort keys %$manifest;
 }
