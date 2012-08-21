@@ -208,7 +208,7 @@ sub shebang_mod {
     my ( $source, $target ) = @_;
 
     open my $in,  '<', $source       or die "Can't open $source: $!";
-    open my $out, '>', "$target.tmp" or die "Can't open $target.tmp: $!";
+    open my $out, '>', "${target}_tmp" or die "Can't open ${target}_tmp: $!";
 
     my $line = <$in>;
 
@@ -232,7 +232,7 @@ sub shebang_mod {
     close($in)  or die "Can't close $source: $!";
     close($out) or die "Can't close $target: $!";
 
-    move_if_diff( "$target.tmp", $target );
+    move_if_diff( "${target}_tmp", $target );
 }
 
 =item C<genfile()>
@@ -397,7 +397,7 @@ sub genfile {
     }
 
     open my $in,  '<', $source       or die "Can't open $source: $!";
-    open my $out, '>', "$target.tmp" or die "Can't open $target.tmp: $!";
+    open my $out, '>', "${target}_tmp" or die "Can't open ${target}_tmp: $!";
 
     if ( !exists $options{file_type}) {
         if ( $target =~ m/makefile$/i || $target =~ m/\.mak/) {
@@ -608,7 +608,7 @@ sub genfile {
     close($in)  or die "Can't close $source: $!";
     close($out) or die "Can't close $target: $!";
 
-    move_if_diff( "$target.tmp", $target, $options{ignore_pattern} );
+    move_if_diff( "${target}_tmp", $target, $options{ignore_pattern} );
 }
 
 # Return the next subexpression from the expression in $_[0]
