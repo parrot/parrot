@@ -20,13 +20,13 @@ sub runstep {
         *Parrot::Configure::Compiler::cc_build = sub {
             my $conf = shift;
             my ( $cc, $ccflags ) = $conf->data->get(qw(cc ccflags));
-            system("$cc $ccflags test.c") and die "C compiler died!";
-            system("link/exe=test test")  and die "Link failed!";
+            system("$cc $ccflags test_$$.c") and die "C compiler died!";
+            system("link test_$$")  and die "Link failed!";
         };
 
         *Parrot::Configure::Compiler::cc_run = sub {
             my $conf = shift;
-            `mcr []test`;
+            `mcr []test_$$`;
         };
     }
 }
