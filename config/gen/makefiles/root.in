@@ -3171,6 +3171,7 @@ include ext/winxed/Rules.mak
 $(NQP):	ext/nqp-p6/nqp.pbc $(PBC_TO_EXE)
 	$(PBC_TO_EXE) ext/nqp-p6/nqp.pbc
 	$(CP) ext/nqp-p6/nqp$(EXE) $(NQP)
+	$(CHMOD) 755 $(NQP)
 
 ext/nqp-p6/nqp.pbc: ext/nqp-p6/Makefile
 
