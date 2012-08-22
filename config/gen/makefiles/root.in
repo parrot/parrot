@@ -140,7 +140,6 @@ include compilers/tge/Defines.mak
 include compilers/pge/Defines.mak
 include compilers/pct/Defines.mak
 include compilers/opsc/Defines.mak
-include ext/nqp-rx/Defines.mak
 include compilers/data_json/Defines.mak
 include ext/winxed/Defines.mak
 
@@ -534,7 +533,7 @@ PBC_MERGE           = .@slash@pbc_merge$(EXE)
 PDB                 = .@slash@parrot_debugger$(EXE)
 PBC_TO_EXE          = .@slash@pbc_to_exe$(EXE)
 PARROT_CONFIG       = .@slash@parrot_config$(EXE)
-NQP_RX              = .@slash@parrot-nqp$(EXE)
+NQP                 = .@slash@parrot-nqp$(EXE)
 NCI_THUNK_GEN       = .@slash@parrot_nci_thunk_gen$(EXE)
 PARROT_PROVE        = .@slash@parrot-prove$(EXE)
 OPS2C               = .@slash@ops2c$(EXE)
@@ -627,7 +626,7 @@ all : \
 	$(PBC_MERGE) \
 	$(PDB) \
 	$(PDUMP) \
-	$(NQP_RX) \
+	$(NQP) \
 	$(TGE_LIB_PBCS) \
 	$(PGE_LIB_PBCS) \
 	$(PCT_LIB_PBCS) \
@@ -1227,36 +1226,36 @@ $(LIBRARY_DIR)/ProfTest.pbc: $(LIBRARY_DIR)/ProfTest/PIRProfile.pbc \
 $(LIBRARY_DIR)/ProfTest/PIRProfile.pbc: $(LIBRARY_DIR)/ProfTest/PIRProfile.pir
 	$(PARROT) -o $@ $(LIBRARY_DIR)/ProfTest/PIRProfile.pir
 
-$(LIBRARY_DIR)/ProfTest/PIRProfile.pir: $(LIBRARY_DIR)/ProfTest/PIRProfile.nqp $(NQP_RX)
-	$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/PIRProfile.nqp > $@
+$(LIBRARY_DIR)/ProfTest/PIRProfile.pir: $(LIBRARY_DIR)/ProfTest/PIRProfile.nqp $(NQP)
+	$(NQP) --target=pir $(LIBRARY_DIR)/ProfTest/PIRProfile.nqp > $@
 
 
 $(LIBRARY_DIR)/ProfTest/NQPProfile.pbc: $(LIBRARY_DIR)/ProfTest/NQPProfile.pir
 	$(PARROT) -o $@ $(LIBRARY_DIR)/ProfTest/NQPProfile.pir
 
-$(LIBRARY_DIR)/ProfTest/NQPProfile.pir: $(LIBRARY_DIR)/ProfTest/NQPProfile.nqp $(NQP_RX)
-	$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/NQPProfile.nqp > $@
+$(LIBRARY_DIR)/ProfTest/NQPProfile.pir: $(LIBRARY_DIR)/ProfTest/NQPProfile.nqp $(NQP)
+	$(NQP) --target=pir $(LIBRARY_DIR)/ProfTest/NQPProfile.nqp > $@
 
 
 $(LIBRARY_DIR)/ProfTest/Want.pbc: $(LIBRARY_DIR)/ProfTest/Want.pir
 	$(PARROT) -o $@ $(LIBRARY_DIR)/ProfTest/Want.pir
 
-$(LIBRARY_DIR)/ProfTest/Want.pir: $(LIBRARY_DIR)/ProfTest/Want.nqp $(NQP_RX)
-	$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/Want.nqp > $@
+$(LIBRARY_DIR)/ProfTest/Want.pir: $(LIBRARY_DIR)/ProfTest/Want.nqp $(NQP)
+	$(NQP) --target=pir $(LIBRARY_DIR)/ProfTest/Want.nqp > $@
 
 
 $(LIBRARY_DIR)/ProfTest/Matcher.pbc: $(LIBRARY_DIR)/ProfTest/Matcher.pir
 	$(PARROT) -o $@ $(LIBRARY_DIR)/ProfTest/Matcher.pir
 
-$(LIBRARY_DIR)/ProfTest/Matcher.pir: $(LIBRARY_DIR)/ProfTest/Matcher.nqp $(NQP_RX)
-	$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/Matcher.nqp > $@
+$(LIBRARY_DIR)/ProfTest/Matcher.pir: $(LIBRARY_DIR)/ProfTest/Matcher.nqp $(NQP)
+	$(NQP) --target=pir $(LIBRARY_DIR)/ProfTest/Matcher.nqp > $@
 
 #
 # YAML::Tiny
 #
 
-$(LIBRARY_DIR)/YAML/Tiny.pir: $(LIBRARY_DIR)/YAML/Tiny.pm $(NQP_RX)
-	$(NQP_RX) --target=pir $(LIBRARY_DIR)/YAML/Tiny.pm > $@
+$(LIBRARY_DIR)/YAML/Tiny.pir: $(LIBRARY_DIR)/YAML/Tiny.pm $(NQP)
+	$(NQP) --target=pir $(LIBRARY_DIR)/YAML/Tiny.pm > $@
 
 $(LIBRARY_DIR)/YAML/Tiny.pbc: $(LIBRARY_DIR)/YAML/Tiny.pir
 	$(PARROT) -o $@ $(LIBRARY_DIR)/YAML/Tiny.pir
@@ -3169,8 +3168,20 @@ include compilers/pct/Rules.mak
 include compilers/opsc/Rules.mak
 include compilers/tge/Rules.mak
 include compilers/data_json/Rules.mak
-include ext/nqp-rx/Rules.mak
 include ext/winxed/Rules.mak
+
+$(NQP):	ext/nqp-p6/nqp.pbc $(PBC_TO_EXE)
+	$(PBC_TO_EXE) ext/nqp-p6/nqp.pbc
+	$(CP) ext/nqp-p6/nqp$(EXE) $(NQP)
+
+ext/nqp-p6/nqp.pbc: ext/nqp-p6/Makefile
+
+ext/nqp-p6/Makefile: $(PARROT)
+	cd ext/nqp-p6 && $(PERL) Configure.pl --with-parrot=../../parrot
+	cd ext/nqp-p6 && $(MAKE)
+
+$(INSTALLLLABLENQP): $(NQP) ext/nqp-p6/nqp.pbc src/install_config$(O) $(PBC_TO_EXE)
+	$(PBC_TO_EXE) ext/nqp-p6/nqp.pbc --install
 
 # Local variables:
 #   mode: makefile

@@ -1,0 +1,3 @@
+[submodule "ext/nqp-p6"]
+	path = ext/nqp-p6
+	url = http://github.com/perl6/nqp.git
