@@ -14,7 +14,7 @@ my $parrot_config = "parrot_config" . $PConfig{o};
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
 
-plan tests => 8;
+plan tests => 9;
 
 =head1 NAME
 
@@ -387,6 +387,39 @@ executed MyMethod
 executed MyMethod
 executed MyMethod
 OUTPUT
+
+
+c_output_is( linedirective(__LINE__) . <<"CODE", << 'OUTPUT', "Parrot_api_get_compiler" );
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "parrot/api.h"
+
+int main(void) {
+    Parrot_PMC interp;
+    Parrot_PMC pir_compiler, foobar_compiler;
+	Parrot_String pir_s, foobar_s;
+
+    Parrot_api_make_interpreter(NULL, 0, NULL, &interp);
+	Parrot_api_string_import_ascii(interp, "PIR", &pir_s);
+	if(!Parrot_api_get_compiler(interp, pir_s, &pir_compiler)) {
+	  puts("I could not get the PIR compiler");
+	} else {
+	  puts("I got the PIR compiler");
+	}
+	Parrot_api_string_import_ascii(interp, "foobar", &foobar_s);
+    if(!Parrot_api_get_compiler(interp, foobar_s, &foobar_compiler)) {
+	  puts("I could not get the foobar compiler");
+    } else {
+	  puts("I got the foobar compiler");
+    }
+	exit(0);
+}
+CODE
+I got the PIR compiler
+I did not get the foobar compiler
+OUTPUT
+
 
 # Local Variables:
 #   mode: cperl
