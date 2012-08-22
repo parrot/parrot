@@ -2074,7 +2074,7 @@ return that.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-Parrot_io_reencode_string_for_handle(PARROT_INTERP, ARGIN(PMC *handle), ARGIN(STRING *str))
+Parrot_io_reencode_string_for_handle(PARROT_INTERP, ARGIN(PMC *handle), ARGIN_NULLOK(STRING *str))
 {
     ASSERT_ARGS(Parrot_io_reencode_string_for_handle)
 
