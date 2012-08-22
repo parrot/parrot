@@ -14,7 +14,7 @@ my $parrot_config = "parrot_config" . $PConfig{o};
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
 
-plan tests => 8;
+plan tests => 9;
 
 =head1 NAME
 
@@ -386,6 +386,71 @@ executed MyMethod
 executed MyMethod
 executed MyMethod
 executed MyMethod
+OUTPUT
+
+
+(undef, $temp_pir)  = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
+open $PIR_FILE, ">", $temp_pir;
+print $PIR_FILE <<'PIR_CODE';
+.namespace [ ]
+
+.sub 'main' :main
+    say "foo"
+    new $P1, ['Exception']
+    box $P2, "fooError"
+    setattribute $P1, 'message', $P2
+    throw $P1
+.end # main
+PIR_CODE
+
+
+c_output_is( linedirective(__LINE__) . <<"CODE", << 'OUTPUT', "Parrot_api_get_result" );
+#include <stdio.h>
+#include "parrot/api.h"
+#include "imcc/api.h"
+
+void report_error(Parrot_PMC interp_pmc) {
+	Parrot_Int is_error, exit_code;
+	Parrot_String backtrace_str, error_str;
+	Parrot_PMC exception_pmc;
+	char * backtrace, * error;
+	Parrot_api_get_result(interp_pmc, &is_error, &exception_pmc, &exit_code, &error_str);
+	Parrot_api_get_exception_backtrace(interp_pmc, exception_pmc, &backtrace_str);
+	
+	Parrot_api_string_export_ascii(interp_pmc, error_str, &error);
+	
+	puts(error);
+    fflush(NULL);
+
+	Parrot_api_string_free_exported_ascii(interp_pmc, error);
+
+}
+
+int main(int argc, char **argv) {
+	Parrot_PMC interp_pmc;
+	Parrot_PMC bytecode_pmc;
+    Parrot_PMC pir_pmc;
+	Parrot_String filename_str;
+	Parrot_api_make_interpreter(NULL, 0,  NULL, &interp_pmc);
+	Parrot_api_string_import_ascii(interp_pmc, "$temp_pir", &filename_str);
+
+    imcc_get_pir_compreg_api(interp_pmc, 1, &pir_pmc);
+    imcc_compile_file_api(interp_pmc, pir_pmc, filename_str, &bytecode_pmc);
+
+	if(!Parrot_api_run_bytecode(interp_pmc, bytecode_pmc, NULL)) {
+		report_error(interp_pmc);
+	}
+	if(!Parrot_api_run_bytecode(interp_pmc, bytecode_pmc, NULL)) {
+		report_error(interp_pmc);
+	}
+	Parrot_api_destroy_interpreter(interp_pmc);
+    exit(0);
+}
+CODE
+foo
+fooError
+foo
+fooError
 OUTPUT
 
 # Local Variables:
