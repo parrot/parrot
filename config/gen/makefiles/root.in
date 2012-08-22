@@ -533,7 +533,7 @@ PBC_MERGE           = .@slash@pbc_merge$(EXE)
 PDB                 = .@slash@parrot_debugger$(EXE)
 PBC_TO_EXE          = .@slash@pbc_to_exe$(EXE)
 PARROT_CONFIG       = .@slash@parrot_config$(EXE)
-NQP                 = .@slash@parrot-nqp$(EXE)
+NQP                 = .@slash@nqp$(EXE)
 NCI_THUNK_GEN       = .@slash@parrot_nci_thunk_gen$(EXE)
 PARROT_PROVE        = .@slash@parrot-prove$(EXE)
 OPS2C               = .@slash@ops2c$(EXE)
@@ -547,7 +547,7 @@ INSTALLABLEPBC_MERGE = .@slash@installable_pbc_merge$(EXE)
 INSTALLABLEPBCTOEXE  = .@slash@installable_pbc_to_exe$(EXE)
 INSTALLABLEPDB       = .@slash@installable_parrot_debugger$(EXE)
 INSTALLABLECONFIG    = .@slash@installable_parrot_config$(EXE)
-INSTALLABLENQP       = .@slash@installable_parrot-nqp$(EXE)
+INSTALLABLENQP       = .@slash@installable_nqp$(EXE)
 INSTALLABLENCITHUNKGEN  = .@slash@installable_parrot_nci_thunk_gen$(EXE)
 INSTALLABLEPARROT_PROVE = .@slash@installable_parrot-prove$(EXE)
 INSTALLABLEOPS2C    = .@slash@installable_ops2c$(EXE)
@@ -1222,20 +1222,17 @@ $(LIBRARY_DIR)/ProfTest.pbc: $(LIBRARY_DIR)/ProfTest/PIRProfile.pbc \
 	$(LIBRARY_DIR)/ProfTest/NQPProfile.pbc $(LIBRARY_DIR)/ProfTest/Matcher.pbc \
 	$(LIBRARY_DIR)/ProfTest/Want.pbc
 
-
 $(LIBRARY_DIR)/ProfTest/PIRProfile.pbc: $(LIBRARY_DIR)/ProfTest/PIRProfile.pir
 	$(PARROT) -o $@ $(LIBRARY_DIR)/ProfTest/PIRProfile.pir
 
 $(LIBRARY_DIR)/ProfTest/PIRProfile.pir: $(LIBRARY_DIR)/ProfTest/PIRProfile.nqp $(NQP)
 	$(NQP) --target=pir $(LIBRARY_DIR)/ProfTest/PIRProfile.nqp > $@
 
-
 $(LIBRARY_DIR)/ProfTest/NQPProfile.pbc: $(LIBRARY_DIR)/ProfTest/NQPProfile.pir
 	$(PARROT) -o $@ $(LIBRARY_DIR)/ProfTest/NQPProfile.pir
 
 $(LIBRARY_DIR)/ProfTest/NQPProfile.pir: $(LIBRARY_DIR)/ProfTest/NQPProfile.nqp $(NQP)
 	$(NQP) --target=pir $(LIBRARY_DIR)/ProfTest/NQPProfile.nqp > $@
-
 
 $(LIBRARY_DIR)/ProfTest/Want.pbc: $(LIBRARY_DIR)/ProfTest/Want.pir
 	$(PARROT) -o $@ $(LIBRARY_DIR)/ProfTest/Want.pir
@@ -2068,7 +2065,8 @@ pdf-clean:
 ###############################################################################
 
 ext-clean:
-	$(RM_RF) $(NQPRX_LIB_PBCS) $(NQPRX_LIB_SETTING) parrot-nqp*
+	$(RM_RF) $(NQP)
+	$(MAKE_C) ext/nqp-p6 clean
 
 ###############################################################################
 #
@@ -3177,8 +3175,9 @@ $(NQP):	ext/nqp-p6/nqp.pbc $(PBC_TO_EXE)
 ext/nqp-p6/nqp.pbc: ext/nqp-p6/Makefile
 
 ext/nqp-p6/Makefile: $(PARROT)
+	@echo TODO portability
 	cd ext/nqp-p6 && $(PERL) Configure.pl --with-parrot=../../parrot
-	cd ext/nqp-p6 && $(MAKE)
+	$(MAKE_C) ext/nqp-p6
 
 $(INSTALLLLABLENQP): $(NQP) ext/nqp-p6/nqp.pbc src/install_config$(O) $(PBC_TO_EXE)
 	$(PBC_TO_EXE) ext/nqp-p6/nqp.pbc --install
