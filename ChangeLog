@@ -1,6 +1,7 @@
 2012-08-21    release 4.7.0
     - Core
         + Added .all_tags() and .all_tagged_pmcs() methods to PackfileView PMC
+        + Several build and coding standards fixes
 
 2012-07-17    release 4.6.0
     - Core

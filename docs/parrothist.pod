@@ -145,5 +145,6 @@ Starred release numbers indicate supported releases.
  Whiteknight 4.4.0          2012-May-15     "Banana Fanna Fo Ferret"
  alvis       4.5.0          2012-Jun-19     "Buff-faced Pygmy Parrot"
  rurban      4.6.0 *        2012-Jul-17     "Wild Parrots of Telegraph Hill"
+ Whiteknight 4.7.0          2012-Aug-22     "Hispaniolan"
 
 =cut
