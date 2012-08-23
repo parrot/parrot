@@ -137,6 +137,7 @@ Parrot_x_execute_on_exit_handlers(PARROT_INTERP, int status)
 
     /* It could be that the interpreter already is destroyed. See issue 765 */
     interp->exit_handler_list = NULL;
+    interp->final_exception = NULL;
 
     /* Re-enable GC, which we will want if GC finalizes */
     Parrot_unblock_GC_mark(interp);
