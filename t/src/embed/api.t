@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -416,9 +416,9 @@ void report_error(Parrot_PMC interp_pmc) {
 	char * backtrace, * error;
 	Parrot_api_get_result(interp_pmc, &is_error, &exception_pmc, &exit_code, &error_str);
 	Parrot_api_get_exception_backtrace(interp_pmc, exception_pmc, &backtrace_str);
-	
+
 	Parrot_api_string_export_ascii(interp_pmc, error_str, &error);
-	
+
 	puts(error);
     fflush(NULL);
 
