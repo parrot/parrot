@@ -112,7 +112,7 @@ useful work done.
 
 =over 4
 
-=item C<PARROT_PROFILING_CANONICAL_OUPUT>
+=item C<PARROT_PROFILING_CANONICAL_OUTPUT>
 
 When this is set, the profiling runcore will record all addresses as a single
 constant value and all times as C<1>.  This option is useful primarily for
