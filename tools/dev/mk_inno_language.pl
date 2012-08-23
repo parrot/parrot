@@ -103,7 +103,7 @@ Source: ".\blib\Perl6\*.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib\Perl6
 Source: ".\perl6.pbc"; DestDir: "{app}\lib\parrot\languages\perl6"; Flags:
 Source: ".\*.setting.pbc"; DestDir: "{app}\lib\parrot\languages\perl6\lib"; Flags:
 Source: ".\lib\Test.pm"; DestDir: "{app}\lib\parrot\languages\perl6\lib"; Flags:
-Source: ".\lib\lib.pm"; DestDir: "{app}\lib\parrot\languages\perl6\lib"; Flags:
+Source: ".\lib\lib.pm6"; DestDir: "{app}\lib\parrot\languages\perl6\lib"; Flags:
 Source: ".\lib\Pod\To\Text.pm"; DestDir: "{app}\lib\parrot\languages\perl6\lib\Pod\To"; Flags:
 RAKUDO
 
