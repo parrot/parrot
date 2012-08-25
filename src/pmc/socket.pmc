@@ -47,9 +47,13 @@ Initializes a newly created Socket object.
         Parrot_Socket_attributes * const data_struct =
                 (Parrot_Socket_attributes *) PMC_data(SELF);
 
-        data_struct->local  = PMCNULL;
-        data_struct->remote = PMCNULL;
+        data_struct->record_separator = CONST_STRING(interp, "\n");
+        data_struct->local            = PMCNULL;
+        data_struct->remote           = PMCNULL;
         data_struct->io_vtable = (IO_VTABLE *)Parrot_io_get_vtable(interp, IO_VTABLE_SOCKET, NULL);
+        data_struct->read_buffer      = NULL;
+        data_struct->write_buffer     = NULL;
+        data_struct->encoding         = STRINGNULL;
 
         Parrot_io_socket_initialize(INTERP, SELF);
 

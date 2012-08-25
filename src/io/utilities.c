@@ -411,6 +411,11 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
     STRING * const s = Parrot_gc_new_string_header(interp, 0);
     size_t total_bytes_read = 0;
     const size_t raw_reads = buffer->raw_reads;
+    size_t available_bytes = BUFFER_USED_SIZE(buffer);
+    const size_t delim_size = STRING_byte_length(rs);
+
+    if (available_bytes < delim_size)
+        available_bytes = Parrot_io_buffer_fill(interp, buffer, handle, vtable);
 
     s->bufused  = 0;
     s->strlen   = 0;
@@ -442,6 +447,9 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
            cases, break out of the loop early. */
         if ((vtable->flags & PIO_VF_MULTI_READABLE) == 0 && buffer->raw_reads > raw_reads)
             break;
+        available_bytes -= bytes_to_read;
+        if (available_bytes < delim_size)
+            available_bytes = Parrot_io_buffer_fill(interp, buffer, handle, vtable);
     }
 
     if (total_bytes_read == 0)

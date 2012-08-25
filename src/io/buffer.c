@@ -610,11 +610,8 @@ Parrot_io_buffer_fill(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
 
     /* Normalize to make sure we have a maximum amount of free space */
     io_buffer_normalize(interp, buffer);
-    if (BUFFER_FREE_END_SPACE(buffer) == 0)
-        return BUFFER_USED_SIZE(buffer);
-    else
     {
-        size_t available_size = BUFFER_FREE_END_SPACE(buffer);
+        const size_t available_size = BUFFER_FREE_END_SPACE(buffer);
         size_t read_bytes;
         if (available_size == 0)
             return BUFFER_USED_SIZE(buffer);
@@ -698,7 +695,7 @@ io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
     INTVAL bytes_needed = 0;
 
     const size_t delim_bytelen = STRING_byte_length(delim);
-    const size_t bytes_available = Parrot_io_buffer_fill(interp, buffer, handle, vtable);
+    const size_t bytes_available = BUFFER_USED_SIZE(buffer);
 
     *have_delim = 0;
 
@@ -811,8 +808,8 @@ io_buffer_find_num_characters(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
     INTVAL bytes_needed = 0;
 
     if (BUFFER_IS_EMPTY(buffer)) {
-        size_t bytes_available = Parrot_io_buffer_fill(interp, buffer, handle,
-                                                       vtable);
+        const size_t bytes_available = Parrot_io_buffer_fill(interp, buffer,
+                                                             handle, vtable);
         if (bytes_available == 0)
             return 0;
     }
