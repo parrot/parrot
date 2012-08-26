@@ -415,14 +415,14 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
     size_t available_bytes = BUFFER_USED_SIZE(buffer);
     const size_t delim_size = STRING_byte_length(rs);
 
-    if (available_bytes < delim_size)
-        available_bytes = Parrot_io_buffer_fill(interp, buffer, handle, vtable);
-
     s->bufused  = 0;
     s->strlen   = 0;
 
     if (encoding == NULL)
         encoding = io_get_encoding(interp, handle, vtable, PIO_F_READ);
+
+    if (available_bytes < delim_size || available_bytes < encoding->max_bytes_per_codepoint)
+        available_bytes = Parrot_io_buffer_fill(interp, buffer, handle, vtable);
 
     s->encoding = encoding;
 
@@ -449,7 +449,7 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
         if ((vtable->flags & PIO_VF_MULTI_READABLE) == 0 && buffer->raw_reads > raw_reads)
             break;
         available_bytes -= bytes_to_read;
-        if (available_bytes < delim_size)
+        if (available_bytes < delim_size || available_bytes < encoding->max_bytes_per_codepoint)
             available_bytes = Parrot_io_buffer_fill(interp, buffer, handle, vtable);
     }
 
