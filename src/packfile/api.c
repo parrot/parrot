@@ -2532,7 +2532,7 @@ Parrot_pf_write_pbc_file(PARROT_INTERP, ARGIN(PMC *pf_pmc), ARGIN(STRING *filena
     else {
         PIOHANDLE fp;
         Parrot_block_GC_mark(interp);
-        fp = PIO_OPEN(interp, filename, PIO_F_WRITE);
+        fp = Parrot_io_internal_open(interp, filename, PIO_F_WRITE);
         if (fp == PIO_INVALID_HANDLE) {
             Parrot_unblock_GC_mark(interp);
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
@@ -2542,9 +2542,9 @@ Parrot_pf_write_pbc_file(PARROT_INTERP, ARGIN(PMC *pf_pmc), ARGIN(STRING *filena
             const Parrot_Int size = PackFile_pack_size(interp, pf) * sizeof (opcode_t);
             opcode_t * const packed = (opcode_t*)mem_sys_allocate(size);
             PackFile_pack(interp, pf, packed);
-            PIO_WRITE(interp, fp, (char *)packed, size);
+            Parrot_io_internal_write(interp, fp, (char *)packed, size);
         }
-        PIO_CLOSE(interp, fp);
+        Parrot_io_internal_close(interp, fp);
         Parrot_unblock_GC_mark(interp);
     }
 }
@@ -2559,7 +2559,7 @@ Parrot_pf_read_pbc_file(PARROT_INTERP, ARGIN_NULLOK(STRING * const fullname))
     INTVAL    program_size;
 
     if (fullname == NULL || STRING_length(fullname) == 0) {
-        PIOHANDLE stdin_h = PIO_STDHANDLE(interp, PIO_STDIN_FILENO);
+        PIOHANDLE stdin_h = Parrot_io_get_standard_piohandle(interp, PIO_STDIN_FILENO);
         STRING * const hname = CONST_STRING(interp, "standard input");
         pf = read_pbc_file_packfile_handle(interp, hname, stdin_h, 0);
     }
@@ -2638,7 +2638,7 @@ read_pbc_file_bytes_handle(PARROT_INTERP, PIOHANDLE io, INTVAL program_size)
     char  *cursor       = program_code;
     program_size        = 0;
 
-    while ((read_result = PIO_READ(interp, io, cursor, chunk_size)) > 0) {
+    while ((read_result = Parrot_io_internal_read(interp, io, cursor, chunk_size)) > 0) {
         program_size += read_result;
 
         if (program_size == wanted)
@@ -2649,7 +2649,7 @@ read_pbc_file_bytes_handle(PARROT_INTERP, PIOHANDLE io, INTVAL program_size)
                 program_size + chunk_size, char);
 
         if (!program_code) {
-            PIO_CLOSE(interp, io);
+            Parrot_io_internal_close(interp, io);
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                     "Could not reallocate buffer while reading packfile from PIO.\n");
         }
@@ -2680,7 +2680,7 @@ read_pbc_file_packfile(PARROT_INTERP, ARGIN(STRING * const fullname),
     ASSERT_ARGS(read_pbc_file_packfile)
     char * program_code = NULL;
     PackFile * pf;
-    PIOHANDLE io = PIO_OPEN(interp, fullname, PIO_F_READ);
+    PIOHANDLE io = Parrot_io_internal_open(interp, fullname, PIO_F_READ);
     INTVAL is_mapped = 0;
 
     if (io == PIO_INVALID_HANDLE)
@@ -2721,7 +2721,7 @@ read_pbc_file_packfile(PARROT_INTERP, ARGIN(STRING * const fullname),
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Can't unpack packfile %Ss.\n", fullname);
 
-    PIO_CLOSE(interp, io);
+    Parrot_io_internal_close(interp, io);
     return pf;
 }
 

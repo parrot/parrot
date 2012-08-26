@@ -86,7 +86,7 @@ static int handle_identifier(ARGMOD(imc_info_t *imcc), YYSTYPE *valp, ARGIN(cons
   } while (0)
 
 #define YY_INPUT(buf, result, max_size) \
-    (result) = PIO_READ((Interp *)yyextra->interp, (PIOHANDLE)yyin, (buf), (max_size))
+    (result) = Parrot_io_internal_read((Interp *)yyextra->interp, (PIOHANDLE)yyin, (buf), (max_size))
 
 %}
 
@@ -1193,7 +1193,7 @@ include_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *file_name), void *yyscanner
     PIOHANDLE  file;
 
     if (STRING_IS_NULL(s)
-    ||  (file = PIO_OPEN(imcc->interp, s, PIO_F_READ)) == PIO_INVALID_HANDLE) {
+    ||  (file = Parrot_io_internal_open(imcc->interp, s, PIO_F_READ)) == PIO_INVALID_HANDLE) {
         IMCC_fataly(imcc, EXCEPTION_EXTERNAL_ERROR,
             "No such file or directory '%Ss'", file_name);
     }
@@ -1258,7 +1258,7 @@ pop_parser_state(ARGMOD(imc_info_t *imcc), void *yyscanner)
     if (tmp) {
         int l;
         if (tmp->s.handle != PIO_INVALID_HANDLE)
-            PIO_CLOSE(imcc->interp, tmp->s.handle);
+            Parrot_io_internal_close(imcc->interp, tmp->s.handle);
 
         imcc->frames =
             (macro_frame_t *)imcc->frames->s.next;
@@ -1288,7 +1288,7 @@ determine_input_file_type(ARGMOD(imc_info_t * imcc), ARGIN(STRING *sourcefile))
 
     if (STRING_length(sourcefile) == 1
             && STRING_ord(imcc->interp, sourcefile, 0) ==  '-') {
-        handle = PIO_STDHANDLE(imcc->interp, PIO_STDIN_FILENO);
+        handle = Parrot_io_internal_std_os_handle(imcc->interp, PIO_STDIN_FILENO);
 
         if ((FILE *)handle == NULL) {
             /*
@@ -1296,7 +1296,7 @@ determine_input_file_type(ARGMOD(imc_info_t * imcc), ARGIN(STRING *sourcefile))
              * lex would think it's a NULL FILE pointer and reset it to the
              * stdin FILE pointer.
              */
-            handle = Parrot_io_dup(imcc->interp, handle);
+            handle = Parrot_io_internal_dup(imcc->interp, handle);
         }
     }
     else {
@@ -1304,7 +1304,7 @@ determine_input_file_type(ARGMOD(imc_info_t * imcc), ARGIN(STRING *sourcefile))
             Parrot_ex_throw_from_c_args(imcc->interp, NULL, EXCEPTION_EXTERNAL_ERROR,
                 "imcc_compile_file: '%Ss' is a directory\n", sourcefile);
 
-        handle = PIO_OPEN(imcc->interp, sourcefile, PIO_F_READ);
+        handle = Parrot_io_internal_open(imcc->interp, sourcefile, PIO_F_READ);
         if (handle == PIO_INVALID_HANDLE)
             IMCC_fatal_standalone(imcc, EXCEPTION_EXTERNAL_ERROR,
                                   "Error reading source file %Ss.\n",
@@ -1345,7 +1345,7 @@ imcc_cleanup_input(ARGMOD(imc_info_t * imcc), PIOHANDLE file,
         ARGIN(char *source_c), int is_file)
 {
     if (is_file)
-        PIO_CLOSE(imcc->interp, file);
+        Parrot_io_internal_close(imcc->interp, file);
 
     Parrot_str_free_cstring(source_c);
 }

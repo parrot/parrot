@@ -73,43 +73,43 @@ typedef INTVAL PIOHANDLE;
 typedef off_t PIOOFF_T;
 #endif
 
-PIOHANDLE Parrot_io_std_os_handle(PARROT_INTERP, INTVAL fileno);
-PIOHANDLE Parrot_io_open(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags);
-PIOHANDLE Parrot_io_dup(PARROT_INTERP, PIOHANDLE handle);
-INTVAL Parrot_io_close(PARROT_INTERP, PIOHANDLE handle);
-INTVAL Parrot_io_is_tty(PARROT_INTERP, PIOHANDLE fd);
+PIOHANDLE Parrot_io_internal_std_os_handle(PARROT_INTERP, INTVAL fileno);
+PIOHANDLE Parrot_io_internal_open(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags);
+PIOHANDLE Parrot_io_internal_dup(PARROT_INTERP, PIOHANDLE handle);
+INTVAL Parrot_io_internal_close(PARROT_INTERP, PIOHANDLE handle);
+INTVAL Parrot_io_internal_is_tty(PARROT_INTERP, PIOHANDLE fd);
 PARROT_CONST_FUNCTION
-INTVAL Parrot_io_getblksize(PIOHANDLE fd);
-INTVAL Parrot_io_flush(PARROT_INTERP, PIOHANDLE os_handle);
-size_t Parrot_io_read(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(char *buf), size_t len);
-size_t Parrot_io_write(PARROT_INTERP, PIOHANDLE os_handle, ARGIN(const char *buf), size_t len);
-PIOOFF_T Parrot_io_seek(PARROT_INTERP, PIOHANDLE os_handle, PIOOFF_T offset, INTVAL whence);
-PIOOFF_T Parrot_io_tell(PARROT_INTERP, PIOHANDLE os_handle);
-PIOHANDLE Parrot_io_open_pipe(PARROT_INTERP, ARGIN(STRING *command), INTVAL flags,
+INTVAL Parrot_io_internal_getblksize(PIOHANDLE fd);
+INTVAL Parrot_io_internal_flush(PARROT_INTERP, PIOHANDLE os_handle);
+size_t Parrot_io_internal_read(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(char *buf), size_t len);
+size_t Parrot_io_internal_write(PARROT_INTERP, PIOHANDLE os_handle, ARGIN(const char *buf), size_t len);
+PIOOFF_T Parrot_io_internal_seek(PARROT_INTERP, PIOHANDLE os_handle, PIOOFF_T offset, INTVAL whence);
+PIOOFF_T Parrot_io_internal_tell(PARROT_INTERP, PIOHANDLE os_handle);
+PIOHANDLE Parrot_io_internal_open_pipe(PARROT_INTERP, ARGIN(STRING *command), INTVAL flags,
         ARGOUT(INTVAL *pid_out));
-INTVAL Parrot_io_pipe(PARROT_INTERP, ARGMOD(PIOHANDLE *reader), ARGMOD(PIOHANDLE *writer));
+INTVAL Parrot_io_internal_pipe(PARROT_INTERP, ARGMOD(PIOHANDLE *reader), ARGMOD(PIOHANDLE *writer));
 
 PARROT_EXPORT
-INTVAL Parrot_io_async(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL async);
+INTVAL Parrot_io_internal_async(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL async);
 
 /*
  * Socket
  */
 
-PMC *Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port, INTVAL protocol,
+PMC *Parrot_io_internal_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port, INTVAL protocol,
             INTVAL family, INTVAL passive);
-INTVAL Parrot_io_addr_match(PARROT_INTERP, ARGIN(PMC *sa), INTVAL family, INTVAL type,
+INTVAL Parrot_io_internal_addr_match(PARROT_INTERP, ARGIN(PMC *sa), INTVAL family, INTVAL type,
             INTVAL protocol);
-STRING *Parrot_io_getnameinfo(PARROT_INTERP, ARGIN(const void *addr), INTVAL addr_len);
-PIOHANDLE Parrot_io_socket(PARROT_INTERP, int fam, int type, int proto);
-void Parrot_io_connect(PARROT_INTERP, PIOHANDLE handle, ARGIN(void *addr), INTVAL addr_len);
-void Parrot_io_bind(PARROT_INTERP, PIOHANDLE handle, ARGIN(void *addr), INTVAL addr_len);
-void Parrot_io_listen(PARROT_INTERP, PIOHANDLE handle, INTVAL sec);
-PIOHANDLE Parrot_io_accept(PARROT_INTERP, PIOHANDLE handle, ARGOUT(PMC * remote_addr));
-INTVAL Parrot_io_send(PARROT_INTERP, PIOHANDLE handle, ARGIN(const char *buf), size_t len);
-INTVAL Parrot_io_recv(PARROT_INTERP, PIOHANDLE handle, ARGOUT(char *buf), size_t len);
-INTVAL Parrot_io_poll(PARROT_INTERP, PIOHANDLE handle, int which, int sec, int usec);
-INTVAL Parrot_io_close_socket(PARROT_INTERP, PIOHANDLE handle);
+STRING *Parrot_io_internal_getnameinfo(PARROT_INTERP, ARGIN(const void *addr), INTVAL addr_len);
+PIOHANDLE Parrot_io_internal_socket(PARROT_INTERP, int fam, int type, int proto);
+void Parrot_io_internal_connect(PARROT_INTERP, PIOHANDLE handle, ARGIN(void *addr), INTVAL addr_len);
+void Parrot_io_internal_bind(PARROT_INTERP, PIOHANDLE handle, ARGIN(void *addr), INTVAL addr_len);
+void Parrot_io_internal_listen(PARROT_INTERP, PIOHANDLE handle, INTVAL sec);
+PIOHANDLE Parrot_io_internal_accept(PARROT_INTERP, PIOHANDLE handle, ARGOUT(PMC * remote_addr));
+INTVAL Parrot_io_internal_send(PARROT_INTERP, PIOHANDLE handle, ARGIN(const char *buf), size_t len);
+INTVAL Parrot_io_internal_recv(PARROT_INTERP, PIOHANDLE handle, ARGOUT(char *buf), size_t len);
+INTVAL Parrot_io_internal_poll(PARROT_INTERP, PIOHANDLE handle, int which, int sec, int usec);
+INTVAL Parrot_io_internal_close_socket(PARROT_INTERP, PIOHANDLE handle);
 
 /*
  * Files and directories

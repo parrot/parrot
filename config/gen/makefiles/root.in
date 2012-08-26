@@ -435,11 +435,14 @@ ENCODING_O_FILES = \
 	src/string/encoding/ucs4$(O)
 
 IO_O_FILES = \
-	src/io/core$(O) \
 	src/io/api$(O) \
 	src/io/buffer$(O) \
 	src/io/filehandle$(O) \
-	src/io/socket_api$(O)
+	src/io/socket$(O) \
+	src/io/stringhandle$(O) \
+	src/io/pipe$(O) \
+	src/io/userhandle$(O) \
+	src/io/utilities$(O) \
 
 INTERP_O_FILES = \
 	src/string/api$(O) \
@@ -1041,15 +1044,32 @@ src/events$(O) : \
 src/alarm$(O) : $(PARROT_H_HEADERS) src/alarm.c \
 	$(INC_DIR)/alarm.h
 
-src/io/core$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/core.c
+src/io/utilities$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/utilities.c
 
-src/io/socket_api$(O) : \
+src/io/socket$(O) : \
 	$(PARROT_H_HEADERS) \
 	src/io/io_private.h \
 	src/io/api.str \
 	$(INC_PMC_DIR)/pmc_socket.h \
 	$(INC_PMC_DIR)/pmc_sockaddr.h \
-	src/io/socket_api.c
+	src/io/socket.c
+
+src/io/stringhandle$(O) : \
+	$(PARROT_H_HEADERS) \
+	src/io/io_private.h \
+	$(INC_PMC_DIR)/pmc_stringhandle.h \
+	src/io/stringhandle.c
+
+src/io/pipe$(O) : \
+	$(PARROT_H_HEADERS) \
+	src/io/io_private.h \
+	$(INC_PMC_DIR)/pmc_filehandle.h \
+	src/io/pipe.c
+
+src/io/userhandle$(O) : \
+	$(PARROT_H_HEADERS) \
+	src/io/io_private.h \
+	src/io/userhandle.c
 
 O_FILES = \
 	$(INTERP_O_FILES) \
@@ -1640,9 +1660,11 @@ src/io/api$(O) : \
 	src/io/io_private.h \
 	src/io/api.c \
 	src/io/api.str \
+	$(INC_PMC_DIR)/pmc_handle.h \
 	$(INC_PMC_DIR)/pmc_filehandle.h \
 	$(INC_PMC_DIR)/pmc_stringhandle.h \
 	$(INC_PMC_DIR)/pmc_socket.h \
+	$(INC_PMC_DIR)/pmc_sockaddr.h \
     $(INC_PMC_DIR)/pmc_bytebuffer.h \
 	$(EXTEND_HEADERS)
 

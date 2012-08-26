@@ -252,7 +252,7 @@ mark_interp(PARROT_INTERP)
         Parrot_mmd_cache_mark(interp, interp->op_mmd_cache);
 
     /* Walk the iodata */
-    Parrot_IOData_mark(interp, interp->piodata);
+    Parrot_io_mark(interp, interp->piodata);
 
     if (!PMC_IS_NULL(interp->final_exception))
         Parrot_gc_mark_PMC_alive(interp, interp->final_exception);
