@@ -172,24 +172,28 @@ typedef struct _io_vtable {
     io_vtable_get_piohandle get_piohandle;  /* Get the raw file PIOHANDLE */
 } IO_VTABLE;
 
+/* Indices to common IO vtables */
 #define IO_VTABLE_FILEHANDLE        0
 #define IO_VTABLE_PIPE              1
 #define IO_VTABLE_SOCKET            2
 #define IO_VTABLE_STRINGHANDLE      3
 #define IO_VTABLE_USER              4
 
-#define IO_PTR_IDX_VTABLE 0
-#define IO_PTR_IDX_READ_BUFFER 1
-#define IO_PTR_IDX_WRITE_BUFFER 2
+/* get_pointer values for common io-related pointer values.
+   ALL IO handle types MUST implement get_pointer and MUST respond to these
+   values. */
+#define IO_PTR_IDX_VTABLE           0
+#define IO_PTR_IDX_READ_BUFFER      1
+#define IO_PTR_IDX_WRITE_BUFFER     2
 
 /* Specify that the buffer may be any size */
 #define BUFFER_SIZE_ANY     (size_t)-1
 #define BUFFER_FLAGS_ANY    (INTVAL)0
 
+/* Helpful wrappers to get common pointers from IO handle PMCs */
 #define IO_GET_VTABLE(i, p) ((const IO_VTABLE *)VTABLE_get_pointer_keyed_int((i), (p), IO_PTR_IDX_VTABLE))
 #define IO_GET_READ_BUFFER(i, p) ((IO_BUFFER *)VTABLE_get_pointer_keyed_int((i), (p), IO_PTR_IDX_READ_BUFFER))
 #define IO_GET_WRITE_BUFFER(i, p) ((IO_BUFFER *)VTABLE_get_pointer_keyed_int((i), (p), IO_PTR_IDX_WRITE_BUFFER))
-
 
 /* io/api.c - Public API functions */
 /* HEADERIZER BEGIN: src/io/api.c */

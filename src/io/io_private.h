@@ -56,7 +56,7 @@ src/io/stringhandle.c:
     IO VTABLE definitions for stringhandle-related operations. StringHandle
     PMC methods and related IO API calls will invoke these functions.
 
-src/io/userobject.c:
+src/io/userhandle.c:
     IO VTABLE definitions for user-defined and PBC-level IO objects. These
     are the IO operations that will be used for a user-defined IO object that
     does not directly inherit from FileHandle, Socket, or Handle.
@@ -87,15 +87,23 @@ src/platform/X/socket.c:
 
 DIAGRAM
 
-    IO API (api.c)
-         |
-         |
-         |      [                     PRIVATE                      ]
-         +----> IO VTABLEs -----> Buffers -----> Low-Level Interface
-         |
-         |
-         |
-    IO PMCs
+    IO PMCs         (src/pmc/*handle.pmc)
+        |
+        v
+    IO API          (src/io/api.c)
+        |
+        v
+    Utilities       (src/io/utilities.c)
+        |
+        v
+    Buffers         (src/io/buffer.c)
+        |
+        v
+    IO VTABLES      (src/io/filehandle.c, pipe.c, stringhandle.c, socket.c)
+        |
+        v
+    Low-Level Platform
+    Interface       (src/platform/XXX/file.c, io.c, socket.c)
 
 */
 
@@ -110,8 +118,9 @@ DIAGRAM
 #define PIO_STRING_BUFFER_MINSIZE 32
 
 #define PIO_BUFFER_MIN_SIZE       2048  /* Smallest size for a block buffer */
-#define PIO_BUFFER_LINEBUF_SIZE   256   /* Smallest size for a line buffer */
+#define PIO_BUFFER_LINEBUF_SIZE   256   /* Smallest size for a line buffer  */
 
+/* Interp-level IO system data */
 struct _ParrotIOData {
     PMC ** table;               /* Standard IO Streams (STDIN, STDOUT, STDERR) */
     INTVAL num_vtables;         /* Number of vtables */
@@ -145,9 +154,6 @@ struct _ParrotIOData {
         PARROT_ASSERT((b)->buffer_ptr <= (b)->buffer_start); \
         PARROT_ASSERT((b)->buffer_start <= (b)->buffer_end); \
         PARROT_ASSERT((b)->buffer_end <= (b)->buffer_ptr + (b)->buffer_size); \
-        /*PARROT_ASSERT(BUFFER_FREE_HEAD_SPACE(b) >= 0);*/ \
-        /*PARROT_ASSERT(BUFFER_FREE_END_SPACE(b) >= 0);*/ \
-        /*PARROT_ASSERT(BUFFER_USED_SIZE(b) >= 0);*/ \
         PARROT_ASSERT(BUFFER_FREE_HEAD_SPACE(b) + BUFFER_USED_SIZE(b) + BUFFER_FREE_END_SPACE(b) == (b)->buffer_size); \
     } while (0);
 
@@ -157,6 +163,8 @@ struct _ParrotIOData {
         fprintf(stderr, "\t\t\t = %d\n", BUFFER_FREE_HEAD_SPACE(b) + BUFFER_USED_SIZE(b) + BUFFER_FREE_END_SPACE(b)); \
     } while (0);
 
+/* Get an editable version of the IO_VTABLE structure, typically used during
+   vtable initialization. */
 #define IO_EDITABLE_IO_VTABLE(i, idx) ((IO_VTABLE *)(void *)(&((i)->piodata->vtables[(idx)])))
 
 
