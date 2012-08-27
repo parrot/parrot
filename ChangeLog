@@ -1,6 +1,8 @@
 2012-09-18    release 4.8.0
     - Core
         + Prevent interpreter from dying twice
+        + Complete rewrite of the IO system, including new unified IO PMC
+          semantics.
     - Community
         + Updated the vms port on a YAPC::EU hackathon with vaxman and mvorl.
 
