@@ -50,7 +50,6 @@ Tests the Integer PMC.
     test_cmp_subclass()
     test_cmp_RT59336()
     test_cmp_num()
-    test_get_pointer()
 
     $I0 = has_bigint()
     unless $I0 goto no_bigint
@@ -138,14 +137,6 @@ CODE
     i1 = 42
     i2 = new ['Integer'], i1
     is(i2, 42, "Initialize with argument set correct value")
-.end
-
-.sub test_get_pointer
-    $P0 = new ['Integer']
-    $I0 = $P0.'get_pointer'()
-    $P0 = 42
-
-    isnt($I0,0,'get_pointer returns non-zero')
 .end
 
 .sub test_get_as_base_bounds_check
