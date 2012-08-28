@@ -87,7 +87,7 @@ src/platform/X/socket.c:
 
 DIAGRAM
 
-    IO PMCs         (src/pmc/*handle.pmc)
+    IO PMCs         (src/pmc/XXXhandle.pmc)
         |
         v
     IO API          (src/io/api.c)
