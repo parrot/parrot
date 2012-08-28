@@ -3,6 +3,8 @@
         + Prevent interpreter from dying twice
         + Complete rewrite of the IO system, including new unified IO PMC
           semantics.
+        + The Integer and Float PMCs now have a get_pointer vtable which is
+          needed when using NCI to bind to Fortran libraries such as LAPACK
     - Community
         + Updated the vms port on a YAPC::EU hackathon with vaxman and mvorl.
 
