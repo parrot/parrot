@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2011, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -172,7 +172,6 @@ sub _init {
         -Wfloat-equal
         -Wformat=2
         -Wlarger-than-4096
-        -Wlong-long
         -Wmissing-format-attribute
         -Wdeprecated-declarations
         -Wno-format-extra-args

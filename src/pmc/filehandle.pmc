@@ -39,16 +39,11 @@ pmclass FileHandle extends Handle auto_attrs {
     ATTR INTVAL flags;                /* Filehandle flags             */
     ATTR STRING *filename;            /* The opened path and filename */
     ATTR STRING *mode;                /* The mode string used in open */
-    ATTR STRING *encoding;            /* The encoding for read/write  */
     ATTR INTVAL process_id;           /* Child process on pipes       */
     ATTR INTVAL exit_status;          /* Child exit status on pipes   */
     ATTR PIOOFF_T file_pos;           /* Current real file pointer    */
     ATTR PIOOFF_T last_pos;           /* Last file position           */
-    ATTR size_t buffer_size;          /* Buffer size                  */
-    ATTR INTVAL buffer_flags;         /* Buffer flags                 */
-    ATTR unsigned char *buffer_start; /* Start of buffer              */
-    ATTR unsigned char *buffer_end;   /* End of buffer                */
-    ATTR unsigned char *buffer_next;  /* Current read/write pointer   */
+
 
 /*
  * Using INTVAL for process_id is a temporary solution.
@@ -69,7 +64,7 @@ Initializes a newly created FileHandle object.
         Parrot_FileHandle_attributes * const attrs =
             PMC_data_typed(SELF, Parrot_FileHandle_attributes *);
 
-        attrs->record_separator = '\n';
+        attrs->record_separator = CONST_STRING(interp, "\n");
         attrs->flags            = 0;
         attrs->filename         = STRINGNULL;
         attrs->mode             = STRINGNULL;
@@ -78,14 +73,13 @@ Initializes a newly created FileHandle object.
         attrs->exit_status      = 0;
         attrs->file_pos         = piooffsetzero;
         attrs->last_pos         = piooffsetzero;
-        attrs->buffer_size      = 0;
-        attrs->buffer_flags     = 0;
-        attrs->buffer_start     = NULL;
-        attrs->buffer_end       = NULL;
-        attrs->buffer_next      = NULL;
+        attrs->io_vtable        = (IO_VTABLE *)Parrot_io_get_vtable(interp,
+                                                                    IO_VTABLE_FILEHANDLE, NULL);
 
         /* Initialize the os_handle to the platform-specific value for closed */
         attrs->os_handle     = (PIOHANDLE) PIO_INVALID_HANDLE;
+        attrs->read_buffer = NULL;
+        attrs->write_buffer = NULL;
 
         PObj_custom_mark_SET(SELF);
         PObj_custom_destroy_SET(SELF);
@@ -127,27 +121,9 @@ Create a copy of the filehandle.
         new_attrs->last_pos       = old_attrs->last_pos;
 
         /* Duplicate the file handle. */
-        new_attrs->os_handle = PIO_DUP(interp, old_attrs->os_handle);
+        new_attrs->os_handle = Parrot_io_internal_dup(interp, old_attrs->os_handle);
 
-        /* We need to correctly allocate a buffer, so we check for the buffering mode. */
-        if (new_attrs->flags & PIO_F_LINEBUF)
-            Parrot_io_setbuf(INTERP, copy, PIO_LINEBUFSIZE);
-        else
-            Parrot_io_setbuf(INTERP, copy, old_attrs->buffer_size);
-
-        /* Transfer only read/write flags on the buffer. */
-        new_attrs->buffer_flags &= ~(PIO_BF_READBUF & PIO_BF_WRITEBUF);
-        new_attrs->buffer_flags |= old_attrs->buffer_flags &
-            (PIO_BF_READBUF & PIO_BF_WRITEBUF);
-
-        /* Then after we've set the buffer mode we can memcpy the data over. */
-        if (old_attrs->buffer_size > 0)
-            memcpy(new_attrs->buffer_start, old_attrs->buffer_start,
-                old_attrs->buffer_end - old_attrs->buffer_start);
-
-        /* This is an offset, so we must do math to get a new offset. */
-        new_attrs->buffer_next = new_attrs->buffer_start +
-            (old_attrs->buffer_next - old_attrs->buffer_start);
+        /* TODO: Clone the buffers and copy flags/data */
 
         return copy;
     }
@@ -170,6 +146,8 @@ Mark active filehandle data as live.
         Parrot_gc_mark_STRING_alive(INTERP, attrs->mode);
         Parrot_gc_mark_STRING_alive(INTERP, attrs->filename);
         Parrot_gc_mark_STRING_alive(INTERP, attrs->encoding);
+        Parrot_io_buffer_mark(interp, attrs->read_buffer);
+        Parrot_io_buffer_mark(interp, attrs->write_buffer);
     }
 
 
@@ -183,19 +161,9 @@ Free structures.
 
 */
     VTABLE void destroy() {
-        if (PARROT_FILEHANDLE(SELF)) {
-            Parrot_FileHandle_attributes * const attrs = PARROT_FILEHANDLE(SELF);
+        Parrot_io_close(INTERP, SELF, 1);
 
-            if (!Parrot_io_is_closed_filehandle(INTERP, SELF)) {
-                if (attrs->flags & PIO_F_SHARED)
-                    Parrot_io_flush_filehandle(INTERP, SELF);
-                else
-                    Parrot_io_close_filehandle(INTERP, SELF);
-            }
-
-            if (attrs->buffer_start)
-                mem_gc_free(INTERP, attrs->buffer_start);
-        }
+        /* TODO: flush and free the buffers */
     }
 
 
@@ -288,7 +256,7 @@ filehandle, rather than modifying the invocant).
         STRING *mode :optional, INTVAL got_mode :opt_flag) {
         PMC    *filehandle;
 
-        if (!Parrot_io_is_closed_filehandle(INTERP, SELF))
+        if (!Parrot_io_is_closed(INTERP, SELF))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
                                 "Cannot reopen already open filehandle");
 
@@ -298,8 +266,7 @@ filehandle, rather than modifying the invocant).
         if (!got_filename || STRING_IS_NULL(filename))
             GET_ATTR_filename(INTERP, SELF, filename);
 
-        filehandle = Parrot_io_open_handle(INTERP, SELF, filename, mode);
-
+        filehandle = Parrot_io_open(INTERP, SELF, filename, mode);
         RETURN(PMC *filehandle);
     }
 
@@ -442,38 +409,19 @@ filehandle when finished.
 
             GET_ATTR_encoding(INTERP, SELF, encoding);
 
-            if (!Parrot_io_is_closed_filehandle(INTERP, SELF))
+            if (!Parrot_io_is_closed(INTERP, SELF))
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
                     "Cannot readall on a new file from an already open filehandle");
 
-            filehandle  = Parrot_io_open_handle(INTERP, PMCNULL, name, STRINGNULL);
-
-            PARROT_ASSERT(filehandle->vtable->base_type == enum_class_FileHandle);
+            filehandle = Parrot_io_open(INTERP, PMCNULL, name, STRINGNULL);
 
             SET_ATTR_encoding(INTERP, filehandle, encoding);
-            size = (size_t)(Parrot_file_stat_intval(INTERP, name, STAT_FILESIZE));
+            result = Parrot_io_readall_s(INTERP, filehandle);
 
-            result = Parrot_io_reads(INTERP, filehandle, size);
-            Parrot_io_close_handle(INTERP, filehandle);
+            Parrot_io_close(INTERP, filehandle, 1);
         }
-        else {
-            PMC *sb;
-
-            /* slurp open file */
-            if (Parrot_io_is_closed_filehandle(INTERP, SELF))
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
-                    "Cannot readall without a file name or open filehandle");
-
-            sb = Parrot_pmc_new_init_int(interp, enum_class_StringBuilder,
-                    4096);
-
-            do {
-                STRING * const part = Parrot_io_reads(INTERP, SELF, 4096);
-                VTABLE_push_string(interp, sb, part);
-            } while (!Parrot_io_eof(INTERP, SELF));
-
-            result = VTABLE_get_string(interp, sb);
-        }
+        else
+            result = Parrot_io_readall_s(INTERP, SELF);
 
         RETURN(STRING *result);
     }
@@ -490,7 +438,7 @@ Flushes the filehandle.
 */
 
     METHOD flush() {
-        Parrot_io_flush_filehandle(INTERP, SELF);
+        Parrot_io_flush(INTERP, SELF);
     }
 
 /*
@@ -507,7 +455,7 @@ Print the passed in integer, number, string, or PMC to the filehandle.
     METHOD print(PMC *to_print) {
         STRING * const string_to_print = VTABLE_get_string(INTERP, to_print);
 
-        const INTVAL status = Parrot_io_putps(INTERP, SELF, string_to_print);
+        const INTVAL status = Parrot_io_write_s(INTERP, SELF, string_to_print);
 
         RETURN(INTVAL status);
     }
@@ -538,28 +486,12 @@ Full buffering, bytes are sent when the buffer is full.
 */
 
     METHOD buffer_type(STRING *new_type :optional, INTVAL got_type :opt_flag) {
-        STRING * const nobuffer_string   = CONST_STRING(INTERP, "unbuffered");
-        STRING * const linebuffer_string = CONST_STRING(INTERP, "line-buffered");
-        STRING * const fullbuffer_string = CONST_STRING(INTERP, "full-buffered");
-        INTVAL flags;
-
-        if (got_type) {
-            if (STRING_equal(INTERP, new_type, nobuffer_string))
-                Parrot_io_setbuf(INTERP, SELF, PIOCTL_NONBUF);
-            else if (STRING_equal(INTERP, new_type, linebuffer_string))
-                Parrot_io_setlinebuf(INTERP, SELF);
-            else if (STRING_equal(INTERP, new_type, fullbuffer_string))
-                Parrot_io_setbuf(INTERP, SELF, PIO_UNBOUND);
+        if (got_type)
+            Parrot_io_set_buffer_mode(INTERP, SELF, new_type);
+        else {
+            STRING * type_str = Parrot_io_get_buffer_mode(INTERP, SELF);
+            RETURN(STRING *type_str);
         }
-
-        GET_ATTR_flags(INTERP, SELF, flags);
-
-        if (flags & PIO_F_LINEBUF)
-            RETURN(STRING *linebuffer_string);
-        else if (flags & PIO_F_BLKBUF)
-            RETURN(STRING *fullbuffer_string);
-
-        RETURN(STRING *nobuffer_string);
     }
 
 
@@ -574,13 +506,7 @@ Set or retrieve the buffer size for the filehandle.
 */
 
     METHOD buffer_size(INTVAL new_size :optional, INTVAL got_size :opt_flag) {
-        INTVAL buffer_size;
-
-        if (got_size)
-            Parrot_io_setbuf(INTERP, SELF, (size_t)new_size);
-
-        buffer_size = (INTVAL)Parrot_io_get_buffer_size(INTERP, SELF);
-
+        INTVAL buffer_size = Parrot_io_buffer_size(INTERP, SELF, new_size, got_size);
         RETURN(INTVAL buffer_size);
     }
 
@@ -600,31 +526,6 @@ Retrieve the read mode string for the filehandle.
         GET_ATTR_mode(INTERP, SELF, mode);
         RETURN(STRING *mode);
     }
-
-
-/*
-
-=item C<METHOD encoding(STRING *new_encoding)>
-
-Set or retrieve the encoding attribute (a string name of the selected encoding
-scheme) for the filehandle.
-
-=cut
-
-*/
-
-    METHOD encoding(STRING *new_encoding :optional, INTVAL got_encoding :opt_flag) {
-        STRING *encoding;
-
-        if (got_encoding) {
-            SET_ATTR_encoding(INTERP, SELF, new_encoding);
-            RETURN(STRING *new_encoding);
-        }
-
-        GET_ATTR_encoding(INTERP, SELF, encoding);
-        RETURN(STRING *encoding);
-    }
-
 
 /*
 
@@ -720,8 +621,10 @@ C<offs_overflow> is optional and is used to handle offsets higher than 2Gb on
         const PIOOFF_T pio_offs = has_overflow ?
                                     Parrot_io_make_offset32(offs_overflow, offs) :
                                     offs;
-        if (0 > Parrot_io_seek_handle(INTERP, SELF, pio_offs, whence))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR, "seek failed");
+        const INTVAL status = Parrot_io_seek(INTERP, SELF, pio_offs, whence);
+        if (0 > status)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
+                                        "seek failed: %d", status);
     }
 
 /*
@@ -747,7 +650,7 @@ Returns the next byte from the stream, but does not remove it.
 
 */
     METHOD setasync() {
-        Parrot_io_async(INTERP, SELF, 1);
+        /* Parrot_io_async(INTERP, SELF, 1); */
     }
 
 /*
@@ -758,7 +661,7 @@ Returns the next byte from the stream, but does not remove it.
 
 */
     METHOD setblocking() {
-        Parrot_io_async(INTERP, SELF, 0);
+        /* Parrot_io_async(INTERP, SELF, 0); */
     }
 
 /*

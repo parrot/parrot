@@ -651,7 +651,7 @@ Parrot_dyn_load_lib(PARROT_INTERP,
         ARGIN_NULLOK(PMC *parameters))
 {
     ASSERT_ARGS(Parrot_dyn_load_lib)
-    /* NULL intializa handle to protect against pitfalls in called functions.
+    /* NULL intialize handle to protect against pitfalls in called functions.
      * This function should not be so speed critical that this has any impact.
      */
     void   *handle = NULL;

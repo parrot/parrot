@@ -32,7 +32,6 @@ pmclass Socket extends Handle provides socket auto_attrs {
     ATTR INTVAL  family;
     ATTR INTVAL  type;
     ATTR INTVAL  protocol;
-    ATTR STRING *buf;
 
 /*
 
@@ -48,11 +47,15 @@ Initializes a newly created Socket object.
         Parrot_Socket_attributes * const data_struct =
                 (Parrot_Socket_attributes *) PMC_data(SELF);
 
-        data_struct->local  = PMCNULL;
-        data_struct->remote = PMCNULL;
-        data_struct->buf    = STRINGNULL;
+        data_struct->record_separator = CONST_STRING(interp, "\n");
+        data_struct->local            = PMCNULL;
+        data_struct->remote           = PMCNULL;
+        data_struct->io_vtable = (IO_VTABLE *)Parrot_io_get_vtable(interp, IO_VTABLE_SOCKET, NULL);
+        data_struct->read_buffer      = NULL;
+        data_struct->write_buffer     = NULL;
+        data_struct->encoding         = STRINGNULL;
 
-        Parrot_io_socket_initialize_handle(INTERP, SELF);
+        Parrot_io_socket_initialize(INTERP, SELF);
 
         PObj_custom_mark_destroy_SETALL(SELF);
     }
@@ -96,7 +99,8 @@ Mark active socket handle data as live.
         if (data) {
             Parrot_gc_mark_PMC_alive(INTERP, data->local);
             Parrot_gc_mark_PMC_alive(INTERP, data->remote);
-            Parrot_gc_mark_STRING_alive(INTERP, data->buf);
+            Parrot_io_buffer_mark(interp, data->read_buffer);
+            Parrot_io_buffer_mark(interp, data->write_buffer);
         }
     }
 /*
@@ -109,13 +113,8 @@ Free structures.
 
 */
     VTABLE void destroy() {
-        if (PARROT_SOCKET(SELF)) {
-            Parrot_Socket_attributes * const data_struct = PARROT_SOCKET(SELF);
-
-            if (data_struct->os_handle != PIO_INVALID_HANDLE)
-                Parrot_io_close_socket(INTERP, data_struct->os_handle);
-            data_struct->os_handle = PIO_INVALID_HANDLE;
-        }
+        /* TODO: Make sure to free the buffers */
+        Parrot_io_close(INTERP, SELF, 1);
     }
 
 /*
@@ -129,7 +128,7 @@ Returns whether the Socket is currently open.
 */
 
     VTABLE INTVAL get_bool() {
-        return !Parrot_io_socket_is_closed(INTERP, SELF);
+        return !Parrot_io_is_closed(INTERP, SELF);
     }
 
 /*
@@ -148,9 +147,9 @@ Returns whether the Socket is currently open.
 
 
     METHOD socket(INTVAL fam, INTVAL type, INTVAL proto) {
-        if (Parrot_io_socket_handle(INTERP, SELF, fam, type, proto) < 0)
-            RETURN(PMC * PMCNULL);
-        RETURN(PMC * SELF);
+        if (Parrot_io_socket(INTERP, SELF, fam, type, proto))
+            RETURN(PMC * SELF);
+        RETURN(PMC * PMCNULL);
     }
 
 /*
@@ -167,7 +166,7 @@ for readable, two for writeable, and four for exceptions.
 
 
     METHOD poll(INTVAL which, INTVAL sec, INTVAL usec) {
-        const INTVAL poll = Parrot_io_poll_handle(INTERP, SELF, which, sec, usec);
+        const INTVAL poll = Parrot_io_poll(INTERP, SELF, which, sec, usec);
         RETURN(INTVAL poll);
     }
 
@@ -190,7 +189,7 @@ family (integer). If no address family is given, it defaults to IPv4.
         if (!family)
             family = PIO_PF_INET;
 
-        array = Parrot_io_getaddrinfo(INTERP, address, port, PIO_PROTO_TCP,
+        array = Parrot_io_internal_getaddrinfo(INTERP, address, port, PIO_PROTO_TCP,
                     family, 0);
 
         if (VTABLE_elements(interp, array))
@@ -214,7 +213,8 @@ including family and protocol. It can be passed to C<bind()> or C<connect()>.
 */
     METHOD getaddrinfo(STRING * address,
                        INTVAL port, INTVAL protocol, INTVAL family, INTVAL passive) {
-        PMC * const res = Parrot_io_getaddrinfo(INTERP, address, port, protocol, family, passive);
+        PMC * const res = Parrot_io_internal_getaddrinfo(INTERP, address, port, protocol, family,
+                                                         passive);
         RETURN(PMC * res);
     }
 
@@ -281,7 +281,7 @@ connected socket object.]
 */
 
     METHOD connect(PMC * address) {
-        Parrot_io_connect_handle(INTERP, SELF, address);
+        Parrot_io_socket_connect(INTERP, SELF, address);
         RETURN(INTVAL 0);
     }
 
@@ -302,15 +302,7 @@ string containing the received message.
 */
 
     METHOD recv() {
-        STRING * result;
-        GET_ATTR_buf(INTERP, SELF, result);
-
-        if (result != STRINGNULL && Parrot_str_length(INTERP, result) > 0) {
-            SET_ATTR_buf(INTERP, SELF, STRINGNULL);
-        }
-        else {
-            result = Parrot_io_reads(INTERP, SELF, CHUNK_SIZE);
-        }
+        STRING * const result = Parrot_io_read_s(INTERP, SELF, PIO_READ_SIZE_ANY);
         RETURN(STRING * result);
     }
 
@@ -329,7 +321,7 @@ complete, it invokes the callback, passing it a status object.
 */
 
     METHOD send(STRING *buf) {
-        const INTVAL res = Parrot_io_send_handle(INTERP, SELF, buf);
+        const INTVAL res = Parrot_io_write_s(INTERP, SELF, buf);
         RETURN(INTVAL res);
     }
 
@@ -352,7 +344,7 @@ bound socket object.]
 */
 
     METHOD bind(PMC *host) {
-        Parrot_io_bind_handle(INTERP, SELF, host);
+        Parrot_io_socket_bind(INTERP, SELF, host);
         RETURN(INTVAL 0);
     }
 
@@ -372,7 +364,7 @@ the socket object.
 */
 
     METHOD listen(INTVAL backlog) {
-        Parrot_io_listen_handle(INTERP, SELF, backlog);
+        Parrot_io_socket_listen(INTERP, SELF, backlog);
         RETURN(INTVAL 0);
     }
 
@@ -396,7 +388,7 @@ but continues to send new connection events until the socket is closed.]
 */
 
     METHOD accept() {
-        PMC * const res = Parrot_io_accept_handle(INTERP, SELF);
+        PMC * const res = Parrot_io_socket_accept(INTERP, SELF);
         RETURN(PMC * res);
     }
 
@@ -411,29 +403,14 @@ Read the given number of bytes from the socket and return them in a string.
 */
 
     METHOD read(INTVAL nb) {
-        STRING *result;
         STRING *buf;
-        GET_ATTR_buf(INTERP, SELF, buf);
 
-        if (Parrot_io_socket_is_closed(INTERP, SELF))
+        if (Parrot_io_is_closed(INTERP, SELF))
             RETURN(STRING * STRINGNULL);
 
-        if (buf == STRINGNULL)
-            buf = Parrot_io_reads(INTERP, SELF, CHUNK_SIZE);
+        buf = Parrot_io_read_s(INTERP, SELF, nb);
 
-        while (Parrot_str_length(INTERP, buf) < nb) {
-            STRING * const more = Parrot_io_reads(INTERP, SELF, CHUNK_SIZE);
-            if (Parrot_str_length(INTERP, more) == 0) {
-                SET_ATTR_buf(INTERP, SELF, STRINGNULL);
-                RETURN(STRING *buf);
-            }
-            buf = Parrot_str_concat(INTERP, buf, more);
-        }
-
-        result = Parrot_str_substr(INTERP, buf, 0, nb);
-        buf = Parrot_str_substr(INTERP, buf, nb, Parrot_str_length(INTERP, buf) - nb);
-        SET_ATTR_buf(INTERP, SELF, buf);
-        RETURN(STRING *result);
+        RETURN(STRING *buf);
     }
 
 
@@ -450,34 +427,13 @@ present, it is used to determine line endings instead of the default C<\n>.
 
     METHOD readline(STRING *delimiter    :optional,
                     INTVAL has_delimiter :opt_flag) {
-        INTVAL idx;
-        STRING *result;
-        STRING *buf;
-        GET_ATTR_buf(INTERP, SELF, buf);
 
         if (!has_delimiter)
-            delimiter = CONST_STRING(INTERP, "\n");
-
-        if (Parrot_io_socket_is_closed(INTERP, SELF))
-            RETURN(STRING * STRINGNULL);
-
-        if (buf == STRINGNULL)
-            buf = Parrot_io_reads(INTERP, SELF, CHUNK_SIZE);
-
-        while ((idx = Parrot_str_find_index(INTERP, buf, delimiter, 0)) < 0) {
-            STRING * const more = Parrot_io_reads(INTERP, SELF, CHUNK_SIZE);
-            if (Parrot_str_length(INTERP, more) == 0) {
-                SET_ATTR_buf(INTERP, SELF, STRINGNULL);
-                RETURN(STRING *buf);
-            }
-            buf = Parrot_str_concat(INTERP, buf, more);
+            delimiter = PARROT_SOCKET(SELF)->record_separator;
+        {
+            STRING *result = Parrot_io_readline_s(INTERP, SELF, delimiter);
+            RETURN(STRING *result);
         }
-
-        idx += Parrot_str_length(INTERP, delimiter);
-        result = Parrot_str_substr(INTERP, buf, 0, idx);
-        buf = Parrot_str_substr(INTERP, buf, idx, Parrot_str_length(INTERP, buf) - idx);
-        SET_ATTR_buf(INTERP, SELF, buf);
-        RETURN(STRING *result);
     }
 
 /*
@@ -491,7 +447,7 @@ Print the string to the socket.
 */
 
     METHOD puts(STRING *buf) {
-        const INTVAL res = Parrot_io_send_handle(INTERP, SELF, buf);
+        const INTVAL res = Parrot_io_write_s(INTERP, SELF, buf);
         RETURN(INTVAL res);
     }
 

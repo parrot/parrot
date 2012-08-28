@@ -617,7 +617,7 @@ function link_file(string objfile, string exefile, string extra_obj, int install
             config += 'parrot_config';
         else {
             config += 'install_config';
-            rpath  += $P0['rpath_lib'];
+            rpath  = $P0['rpath_lib'];
         }
     }
     else {

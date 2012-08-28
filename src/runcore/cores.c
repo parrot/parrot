@@ -561,12 +561,11 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
 
         pio = Parrot_io_STDERR(debugger);
 
-        if (Parrot_io_is_tty_handle(debugger, pio))
-            Parrot_io_setlinebuf(debugger, pio);
-        else {
+        if (!Parrot_io_is_tty_handle(debugger, pio)) {
             /* this is essential (100 x faster!)  and should probably
              * be in init/open code */
-            Parrot_io_setbuf(debugger, pio, 8192);
+            Parrot_io_buffer_add_to_handle(debugger, pio, IO_PTR_IDX_WRITE_BUFFER, 8192,
+                                           BUFFER_FLAGS_ANY);
         }
     }
 
