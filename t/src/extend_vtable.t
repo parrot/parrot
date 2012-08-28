@@ -200,7 +200,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pointer");
     /* Now give them values and verify stuff still works */
 
     Parrot_PMC_set_integer_native(interp, pmc, 42);
-    Parrot_PMC_set_number_native(interp, pmc, 42.0);
+    Parrot_PMC_set_number_native(interp, pmc_float, 42.0);
 
     integer = (Parrot_Int) Parrot_PMC_get_pointer(interp, pmc);
     if (integer != NULL)
