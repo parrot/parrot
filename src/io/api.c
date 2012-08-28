@@ -827,25 +827,43 @@ Parrot_io_read_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC *handle),
             "Attempt to read bytes from a null or invalid PMC");
 
     if (PMC_IS_NULL(buffer))
-        buffer = Parrot_pmc_new_init_int(interp, enum_class_ByteBuffer, byte_length);
-    else
-        VTABLE_set_integer_native(interp, buffer, byte_length);
+        buffer = Parrot_pmc_new(interp, enum_class_ByteBuffer);
 
     if (!byte_length)
         return buffer;
 
     {
-        char * content = (char *)VTABLE_get_pointer(interp, buffer);
         const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
         IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
         IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
         size_t bytes_read;
+        char * content;
 
+        /* Prepare to read */
         io_verify_is_open_for(interp, handle, vtable, PIO_F_READ);
         io_sync_buffers_for_read(interp, handle, vtable, read_buffer, write_buffer);
 
+        /* If the user has not specified a read size, we want to get data as
+           lazily as possible. If we have something in the buffer, read that
+           out. Otherwise, fill the buffer and use whatever we get. */
+        if (byte_length == PIO_READ_SIZE_ANY) {
+            const size_t available_bytes = BUFFER_USED_SIZE(read_buffer);
+            if (available_bytes >= read_buffer->encoding->max_bytes_per_codepoint)
+                byte_length = available_bytes;
+            else
+                byte_length = Parrot_io_buffer_fill(interp, read_buffer, handle, vtable);
+            if (byte_length <= 0)
+                return buffer;
+        }
+
+        VTABLE_set_integer_native(interp, buffer, byte_length);
+        content = (char *)VTABLE_get_pointer(interp, buffer);
         bytes_read = Parrot_io_buffer_read_b(interp, read_buffer, handle, vtable, content,
                                              byte_length);
+
+        /* If we read less than we requested, re-size the buffer. If we got
+           no bytes, we're at EOF. If we got something, advance the handle to
+           account for whatever we read. */
         if (bytes_read != byte_length)
             VTABLE_set_integer_native(interp, buffer, bytes_read);
         if (bytes_read == 0)
