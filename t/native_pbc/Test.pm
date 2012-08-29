@@ -26,6 +26,17 @@ sub num_arch {
       . (substr($PConfig{byteorder},0,2) eq '12' ? "le" : "be");
 }
 
+sub pbc_version {
+    my $f = shift;
+    my $b;
+    open my $F, "<", "$f" or return "Can't open $f: $!";
+    binmode $F;
+    seek $F, 11, 0;
+    read $F, $b, 3;
+    my ($major, $minor, $patch) = unpack "ccc", $b;
+    return ($major . "." . $minor . ".". $patch);
+}
+
 sub pbc_bc_version {
     my $f = shift;
     my $b;
@@ -39,6 +50,7 @@ sub pbc_bc_version {
 
 my ( $bc_major, $bc_minor ) = Parrot::BuildUtil::get_bc_version();
 my $bc = ($bc_major . "." . $bc_minor);
+my $version = $PConfig{MAJOR}.".".$PConfig{MINOR}.".".$PConfig{PATCH};
 my $arch = int_arch();
 
 sub test_native_pbc {
@@ -67,6 +79,8 @@ sub test_native_pbc {
         # 16 -> 8 drops some mantissa bits
         $expected =~ s/1\.12589990684262e\+15/1.12589990684058e+15/;
     }
+    my $pbc_version = pbc_version($file);
+    my $pbc_bc_version = pbc_bc_version($file);
     # check if skip or todo
   SKIP: {
     if ( $skip->{$id} ) {
@@ -80,7 +94,9 @@ sub test_native_pbc {
     }
     elsif ( $todo->{$id} ) {
         skip $skip_msg, 1
-          if ($bc ne pbc_bc_version($file));
+          if ($bc ne $pbc_bc_version);
+        skip "$file is outdated. Try to bump the pbc version from $pbc_version to $version.", 1
+          if ($version ne $pbc_version);
         my $todo_msg = $todo->{$id};
         if (length $todo_msg > 2) {
             $todo_msg = "$cvt $todo_msg"
@@ -94,7 +110,9 @@ sub test_native_pbc {
     }
     else {
         skip $skip_msg, 1
-          if ($bc ne pbc_bc_version($file));
+          if ($bc ne $pbc_bc_version);
+        skip "$file is outdated. Try to bump the pbc version from $pbc_version to $version.", 1
+          if ($version ne $pbc_version);
         Parrot::Test::pbc_output_is( $file, $expected, "$cvt $desc" );
     }
   }

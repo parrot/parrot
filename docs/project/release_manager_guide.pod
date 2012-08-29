@@ -240,7 +240,12 @@ Once you've updated F<PBC_COMPAT> - running C<sh tools/dev/mk_packfile_pbc> if
 necessary - then run C<sh tools/dev/mk_native_pbc> to update the PBC files used
 in the native PBC tests. Note: Parrot must already have built Parrot for this
 to work, and this script will reconfigure and rebuild Parrot with various
-primitive size options.
+primitive size options. You will need 32-bit and 64-bit, little-endian and
+big-endian Parrot versions for full native_pbc coverage.
+
+If F<PBC_COMPAT> was not updated and you got no updated native_pbc files,
+you can still update the pbc headers with
+C<perl tools/dev/pbc_header.pl --update-fingerprint t/native_pbc/*.pbc>.
 
 =item 8
 
