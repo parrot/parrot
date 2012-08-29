@@ -65,22 +65,24 @@ sub test_native_pbc {
         $arch = num_arch();
     }
     my $cvt = "$id=>$arch";
+    my $pbc_version = pbc_version($file);
+    my $pbc_bc_version = pbc_bc_version($file);
     my $skip_msg;
+    my $skip_msgv = "$file has old v$pbc_version. "
+      . "Try tools/dev/pbc_header.pl --update-fingerprint $file";
     # check if this a platform where we can produce the needed file
     if ($id eq $arch) {
-        $skip_msg = "Want to help? Regenerate $file "
+        $skip_msg = "$file has old PBC_COMPAT $pbc_bc_version. Regenerate "
           . "with tools/dev/mk_native_pbc --noconf";
     }
     else {
-        $skip_msg  = "$file is outdated. "
-          . "Need $id platform.";
+        $skip_msg  = "$file has old PBC_COMPAT $pbc_bc_version. "
+          . "Need $id platform to generate it.";
     }
     if ($type eq 'number' and $cvt =~ /^8_16_[bl]e=>4_8_/) {
         # 16 -> 8 drops some mantissa bits
         $expected =~ s/1\.12589990684262e\+15/1.12589990684058e+15/;
     }
-    my $pbc_version = pbc_version($file);
-    my $pbc_bc_version = pbc_bc_version($file);
     # check if skip or todo
   SKIP: {
     if ( $skip->{$id} ) {
@@ -93,10 +95,8 @@ sub test_native_pbc {
         }
     }
     elsif ( $todo->{$id} ) {
-        skip $skip_msg, 1
-          if ($bc ne $pbc_bc_version);
-        skip "$file is outdated. Try to bump the pbc version from $pbc_version to $version.", 1
-          if ($version ne $pbc_version);
+        skip $skip_msg, 1 if $bc ne $pbc_bc_version;
+        skip $skip_msgv, 1 if $version ne $pbc_version;
         my $todo_msg = $todo->{$id};
         if (length $todo_msg > 2) {
             $todo_msg = "$cvt $todo_msg"
@@ -109,10 +109,8 @@ sub test_native_pbc {
                        todo => "$todo_msg" );
     }
     else {
-        skip $skip_msg, 1
-          if ($bc ne $pbc_bc_version);
-        skip "$file is outdated. Try to bump the pbc version from $pbc_version to $version.", 1
-          if ($version ne $pbc_version);
+        skip $skip_msg, 1 if $bc ne $pbc_bc_version;
+        skip $skip_msgv, 1 if $version ne $pbc_version;
         Parrot::Test::pbc_output_is( $file, $expected, "$cvt $desc" );
     }
   }
