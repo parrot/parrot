@@ -56,9 +56,9 @@ Parrot_alarm_init(void)
 {
     ASSERT_ARGS(Parrot_alarm_init)
     Parrot_thread thread;
-    THREAD_CREATE_JOINABLE(thread, Parrot_alarm_runloop, NULL);
     MUTEX_INIT(alarm_lock);
     COND_INIT(sleep_cond);
+    THREAD_CREATE_JOINABLE(thread, Parrot_alarm_runloop, NULL);
 }
 
 /*
