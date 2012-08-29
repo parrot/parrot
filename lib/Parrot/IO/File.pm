@@ -29,6 +29,14 @@ use FileHandle;
 use File::Spec ();
 use Parrot::IO::Directory;
 
+# [GH #820] Win32 stat() for mtime is broken. Try to use Win32::UTCFileTime
+BEGIN {
+    if ($^O eq 'MSWin32') {
+        eval { require Win32::UTCFileTime; }
+	  and Win32::UTCFileTime::import(':globally');
+    }
+}
+
 =item C<tmp_file($path)>
 
 Returns the file for C<$path> relative to the default temporary

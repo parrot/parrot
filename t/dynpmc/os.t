@@ -323,6 +323,13 @@ close $X;
 my $stat;
 
 my $count = $MSWin32 ? 11 : 13;
+# [GH #820] Win32 stat() for mtime is broken. Try to use Win32::UTCFileTime
+BEGIN {
+    if ($^O eq 'MSWin32') {
+        eval { require Win32::UTCFileTime; }
+	  and Win32::UTCFileTime::import(':globally');
+    }
+}
 my @s = stat('xpto');
 $s[6] = 0; # Parrot does this internally...
 if ( $cygwin ) {
