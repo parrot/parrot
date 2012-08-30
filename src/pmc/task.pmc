@@ -442,7 +442,9 @@ Send a message to this task.
     METHOD send(PMC *message) {
         Parrot_Task_attributes * const tdata = PARROT_TASK(SELF);
         if (PMC_IS_NULL(tdata->mailbox)) {
+            LOCK(tdata->mailbox_lock);
             tdata->mailbox = Parrot_pmc_new(interp, enum_class_PMCList);
+            UNLOCK(tdata->mailbox_lock);
             PARROT_GC_WRITE_BARRIER(interp, SELF);
         }
 

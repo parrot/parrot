@@ -53,6 +53,7 @@ static void* Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg));
 /* HEADERIZER END: static */
 
 static Interp * threads_array[MAX_THREADS];
+static Parrot_mutex threads_mutex;
 
 /*
 
@@ -84,6 +85,7 @@ Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
     new_interp->wake_up = 0;
     COND_INIT(new_interp->sleep_cond);
     MUTEX_INIT(new_interp->sleep_mutex);
+    MUTEX_INIT(threads_mutex);
 
     if (! interp->thread_data) { /* first time we go multi threaded */
         interp->thread_data = mem_internal_allocate_zeroed_typed(Thread_data);
@@ -388,7 +390,7 @@ Parrot_thread_notify_thread(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_thread_notify_threads(PARROT_INTERP)>
+=item C<void Parrot_thread_notify_threads(NULL)>
 
 Give all threads a chance to check their alarms.
 
@@ -397,15 +399,16 @@ Give all threads a chance to check their alarms.
 */
 
 void
-Parrot_thread_notify_threads(ARGIN_NULLOK(PARROT_INTERP))
+Parrot_thread_notify_threads(SHIM_INTERP)
 {
-    ASSERT_ARGS(Parrot_thread_notify_threads)
     int i;
-    Interp ** const tarray = Parrot_thread_get_threads_array(interp);
+    Interp ** const tarray = Parrot_thread_get_threads_array(NULL);
 
     for (i = 0; i < MAX_THREADS; i++) {
+        LOCK(threads_mutex);
         if (tarray[i])
             Parrot_thread_notify_thread(tarray[i]);
+        UNLOCK(threads_mutex);
     }
 }
 
@@ -564,7 +567,7 @@ Parrot_thread_make_local_args_copy(PARROT_INTERP, ARGIN(Parrot_Interp source),
 
 /*
 
-=item C<Interp** Parrot_thread_get_threads_array(PARROT_INTERP)>
+=item C<Interp** Parrot_thread_get_threads_array(NULL)>
 
 Returns the threads array.
 
@@ -574,16 +577,14 @@ Returns the threads array.
 
 PARROT_CANNOT_RETURN_NULL
 Interp**
-Parrot_thread_get_threads_array(ARGIN_NULLOK(PARROT_INTERP))
+Parrot_thread_get_threads_array(SHIM_INTERP)
 {
-    ASSERT_ARGS(Parrot_thread_get_threads_array)
-
     return threads_array;
 }
 
 /*
 
-=item C<void Parrot_thread_init_threads_array(PARROT_INTERP)>
+=item C<void Parrot_thread_init_threads_array(NULL)>
 
 Initialize the threads array.
 
@@ -592,10 +593,8 @@ Initialize the threads array.
 */
 
 void
-Parrot_thread_init_threads_array(PARROT_INTERP)
+Parrot_thread_init_threads_array(SHIM_INTERP)
 {
-    ASSERT_ARGS(Parrot_thread_init_threads_array)
-
     int i = 0;
     for (; i < MAX_THREADS; i++)
         threads_array[i] = NULL;
@@ -603,7 +602,7 @@ Parrot_thread_init_threads_array(PARROT_INTERP)
 
 /*
 
-=item C<int Parrot_thread_get_free_threads_array_index(PARROT_INTERP)>
+=item C<int Parrot_thread_get_free_threads_array_index(NULL)>
 
 Returns an index of a free slot in the threads_array.
 Returns -1 if no slot is available.
@@ -613,15 +612,12 @@ Returns -1 if no slot is available.
 */
 
 int
-Parrot_thread_get_free_threads_array_index(PARROT_INTERP)
+Parrot_thread_get_free_threads_array_index(SHIM_INTERP)
 {
-    ASSERT_ARGS(Parrot_thread_get_free_threads_array_index)
-
     int i = 0;
     for (; i < MAX_THREADS; i++)
         if (threads_array[i] == NULL)
             return i;
-
     return -1;
 }
 
@@ -641,7 +637,9 @@ Parrot_thread_insert_thread(PARROT_INTERP, ARGIN(Interp* thread), int index)
 {
     ASSERT_ARGS(Parrot_thread_insert_thread)
 
+    LOCK(threads_mutex);
     threads_array[index] = thread;
+    UNLOCK(threads_mutex);
 }
 
 /*

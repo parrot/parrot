@@ -143,14 +143,12 @@ PMC* Parrot_thread_create_proxy(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-int Parrot_thread_get_free_threads_array_index(PARROT_INTERP)
-        __attribute__nonnull__(1);
+int Parrot_thread_get_free_threads_array_index(SHIM_INTERP);
 
 PARROT_CANNOT_RETURN_NULL
-Interp** Parrot_thread_get_threads_array(ARGIN_NULLOK(PARROT_INTERP));
+Interp** Parrot_thread_get_threads_array(SHIM_INTERP);
 
-void Parrot_thread_init_threads_array(PARROT_INTERP)
-        __attribute__nonnull__(1);
+void Parrot_thread_init_threads_array(SHIM_INTERP);
 
 void Parrot_thread_insert_thread(PARROT_INTERP,
     ARGIN(Interp* thread),
@@ -169,7 +167,7 @@ PMC * Parrot_thread_make_local_copy(PARROT_INTERP,
 void Parrot_thread_notify_thread(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void Parrot_thread_notify_threads(ARGIN_NULLOK(PARROT_INTERP));
+void Parrot_thread_notify_threads(SHIM_INTERP);
 int Parrot_thread_run(PARROT_INTERP,
     ARGMOD(PMC *thread_interp_pmc),
     ARGIN(PMC *sub),

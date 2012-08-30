@@ -440,7 +440,7 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task_or_sub))
     /* Search for a thread that is free. If we have a free thread, schedule
        the task there. Otherwise, find the thread with the fewest tasks in its
        queue and schedule it there. */
-    index = Parrot_thread_get_free_threads_array_index(interp);
+    index = Parrot_thread_get_free_threads_array_index(NULL);
     if (index > -1) { /* start a new thread */
         PMC * const thread = Parrot_thread_create(interp,
                                                   enum_class_ParrotInterpreter,
