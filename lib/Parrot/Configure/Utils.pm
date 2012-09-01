@@ -120,7 +120,18 @@ sub _build_compile_command {
     $_ ||= '' for ( $cc, $ccflags, $cc_args );
 
     if ($^O eq 'VMS') {
-        $cc_args =~ s/-D/\/Define=/;
+      # Gather all -D and -I into two lists, and feed them
+      # into /Define and /Include qualifiers
+      my ( @defs, @incs );
+      $ccflags .= " $cc_args"; $cc_args = '';
+      push @defs, $1 while $ccflags =~ /-D(\S+)/g;
+      $ccflags =~ s/-D\S+//g;
+      push @incs, $1 while $ccflags =~ /-I(\S+)/g;
+      $ccflags =~ s/-I\S+//g;
+      $cc_args .= '/Define=("'.join('","', map {s/"/""/g; $_} @defs).'")'
+        if @defs;
+      $cc_args .= '/Include=("'.join('","',map {s/"/""/g; $_} @incs).'")'
+        if @incs;
     }
     else {
         $cc_args .= "-I./include -c";
