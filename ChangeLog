@@ -5,7 +5,9 @@
           semantics.
         + The Integer and Float PMCs now have a get_pointer vtable which is
           needed when using NCI to bind to Fortran libraries such as LAPACK
-    - Community
+    - Platforms
+        + Fixed for the FileHandle open method the append mode on Windows.
+        + Detect GNU/Hurd as linux proper.
         + Updated the vms port on a YAPC::EU hackathon with vaxman and mvorl.
 
 2012-08-21    release 4.7.0
