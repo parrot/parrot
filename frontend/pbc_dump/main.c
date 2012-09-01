@@ -147,11 +147,10 @@ disas_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
         INTVAL j;
         const PackFile_ByteCode_OpMappingEntry * const entry = &map->libs[i];
         Parrot_io_printf(interp, "  map #%d => [\n", i);
-        Parrot_io_printf(interp, "    oplib: \"%s\" version %d.%d.%d (%d ops)\n",
+        Parrot_io_printf(interp, "    oplib: \"%s\" version %d.%d (%d ops)\n",
                 entry->lib->name,
-                entry->lib->major_version,
-                entry->lib->minor_version,
-                entry->lib->patch_version,
+                entry->lib->bc_major_version,
+                entry->lib->bc_minor_version,
                 entry->n_ops);
 
         for (j = 0; j < map->libs[i].n_ops; j++) {

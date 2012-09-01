@@ -1,3 +1,5 @@
+# Copyright (C) 2012, Parrot Foundation.
+
 .sub 'main'
 .annotate "file", "annotations.pir"
 .annotate "creator", "Parrot Foundation"
@@ -7,3 +9,9 @@
 .annotate "line", 2
     .return ()
 .end
+
+# Local Variables:
+#   mode: pir
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=pir:
