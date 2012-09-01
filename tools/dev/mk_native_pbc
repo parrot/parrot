@@ -4,11 +4,12 @@
 #
 # Generate/update t/native_pbc/*_*.pbc
 # This should only be run on known systems to regenerate the native pbcs.
-# Better do not try that on mingw, use cygwin instead.
+# You need at least a multilib 64bit intel and powerpc machine to generate all.
 #
 # NOTE:  For _2/_5/_8 this will need a compiler with long double support.
 # NOTE2: Installing ccache speeds this process up considerably.
 
+# old versions:
 #  _1   i386 32 bit opcode_t, 32 bit intval   (linux-gcc-ix86, freebsd-gcc, cygwin)
 #  _2   i386 32 bit opcode_t, 32 bit intval, 12 bit long double (linux-gcc-ix86)
 #  _3   PPC BE 32 bit opcode_t, 32 bit intval (darwin-ppc)
@@ -19,7 +20,6 @@
 #  _8   (skipped) i386 32 bit opcode_t, 32 bit intval, 4-byte float --floatval=float
 #  _9   (skipped) big-endian 32 bit opcode_t, 4 byte intval, 4 byte single float
 #                 (darwin or debian/ppc with --floatval="float")
-
 
 #tests:
 # t/native_pbc/testdata/integer.pasm
