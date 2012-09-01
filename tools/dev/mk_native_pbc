@@ -45,38 +45,29 @@ fi
 if [ "$ptrsize" = "4" ]
 then
     if [ "$intvalsize" != "4" ]
+    then
         echo "Sorry, unsupported perl - probably using use64bitint. ptrsize/intvalsize mismatch."
 	exit
-    then
     fi
     if [ "$byteorder" = "1234" ]
     then
-        n_id=${numvalsize}_le
+        n_id=4_${numvalsize}_le
 	i_id=4_le
-        if [ "$numvalsize" = "12" ]
-        then
-            echo "2: i386 32-bit opcode_t, 32-bit intval, 12-byte long double"
-        else
-            if [ "$numvalsize" = "4" ]
-            then
-                echo "8: i386 32-bit opcode_t, 32-bit intval, 4-byte float"
-            else
-                id=1
-                echo "1: i386 32-bit opcode_t, 32-bit intval, 8-byte double"
-                # try --floatval="long double" and see if that makes 12
-                enable_long_double=1
-                # force double on 2nd run not to default to long double
-                conf=" --floatval=double"
-            fi
+        if [ "$numvalsize" = "8" ]
+	then
+            # try --floatval="long double" and see if that makes 12
+            enable_long_double=1
+            # force double on 2nd run not to default to long double
+            conf=" --floatval=double"
         fi
     else
 	i_id=4_be
-        n_id=${numvalsize}_be
+        n_id=4_${numvalsize}_be
         if [ "$byteorder" = "4321" ]
         then
-            echo "3: PPC BE 32 bit opcode_t, 32 bit intval"
+            echo "${n_id} PPC BE 32 bit opcode_t, 32 bit intval"
         else
-            echo "Sorry, unsupported perl - parrot ptrsize mismatch."
+            echo "${n_id} Sorry, unsupported perl - parrot ptrsize mismatch."
             exit
         fi
     fi
@@ -85,29 +76,29 @@ else
     then
         if [ "$byteorder" = "12345678" ]
         then
-            n_id=${numvalsize}_le
+            n_id=8_${numvalsize}_le
 	    i_id=8_le
             if [ "$numvalsize" = "8" ]
             then
-                echo "4: x86_64 double float 64 bit opcode_t, 8-byte double"
+                echo "${n_id} x86_64 double float 64 bit opcode_t, 8-byte double"
                 # try --floatval="long double" and see if that makes 16
                 enable_long_double=1
                 # force double on 2nd run not to default to long double
                 conf=" --floatval=double"
             else
-                echo "5: x86_64 64 bit opcode_t, 16-byte long double"
+                echo "${n_id} x86_64 64 bit opcode_t, 16-byte long double"
             fi
         else
-            n_id=${numvalsize}_be
+            n_id=8_${numvalsize}_be
             if [ "$numvalsize" = "8" ]
             then
-                echo "6: big-endian 64-bit"
+                echo "${n_id} big-endian 64-bit"
                 # try --floatval="long double" and see if that makes 16
                 enable_long_double=1
                 # force double on 2nd run not to default to long double
                 conf=" --floatval=double"
             else
-                echo "7: ppc/BE 64 bit opcode_t, 16-byte long double"
+                echo "${n_id} ppc/BE 64 bit opcode_t, 16-byte long double"
             fi
         fi
     else
@@ -124,14 +115,21 @@ fi
 tail myconfig
 make -s || exit 1
 
-for T in integer number string
+for T in integer string
 do
-    ./parrot -o t/native_pbc/${T}_${id}.pbc t/native_pbc/testdata/${T}.pasm && \
-	echo "t/native_pbc/${T}_${id}.pbc updated"
+    ./parrot -o t/native_pbc/${T}_${i_id}.pbc t/native_pbc/testdata/${T}.pasm && \
+	echo "t/native_pbc/${T}_${i_id}.pbc updated"
+done
+for T in number
+do
+    ./parrot -o t/native_pbc/${T}_${n_id}.pbc t/native_pbc/testdata/${T}.pasm && \
+	echo "t/native_pbc/${T}_${n_id}.pbc updated"
 done
 
-make pbc_dump$exe
-./pbc_dump -h t/native_pbc/number_${id}.pbc
+# broken
+#make pbc_dump$exe
+#./pbc_dump -h t/native_pbc/number_${id}.pbc
+perl tools/dev/pbc_header.pl t/native_pbc/number_${n_id}.pbc
 
 perl t/harness t/native_pbc/integer.t t/native_pbc/number.t t/native_pbc/string.t
 
@@ -150,10 +148,10 @@ if [ "$enable_long_double" = "1" ]; then
     #if [ "hugefloatvalsize" = "12" ]; then echo "Only 12 byte long double. Sorry"; exit; fi
     #if [ "numvalsize" = "12" ]; then echo "Only 12 byte double. Sorry"; exit; fi
     # 1+2, 4+5, 6+7
-    if [ "${byteorder:0:2]" = "12" ]; then
-        M=${numvalsize}_le
+    if [ "${byteorder:0:2}" = "12" ]; then
+        M=${intvalsize}_${numvalsize}_le
     else
-        M=${numvalsize}_be
+        M=${intvalsize}_${numvalsize}_be
     fi
     ./parrot -o t/native_pbc/number_${M}.pbc t/native_pbc/testdata/number.pasm \
 	&& echo "t/native_pbc/number_${M}.pbc updated"
