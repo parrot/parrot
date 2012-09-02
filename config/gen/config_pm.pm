@@ -180,6 +180,13 @@ END
         elsif (s/\"\@PWD\@\"/$cwdcharset\"$cwd\"/) {
             print {$OUT} $_;
         }
+        elsif (/\@NOINSTALL\@/) {
+            # do not install internal keys
+            for ($conf->data->keys()) {
+       	        print {$OUT} "    delete \$P0[\"$_\"]\n"
+       	          if /^ccwarn::/ or /_tests$/ or /coveragedir$/;
+            }
+        }
         else {
             print {$OUT} $_;
         }
