@@ -45,8 +45,8 @@ sub runstep {
 
     $conf->data->set( clock_best => ' ' );
 
-    my $mt_output = `mt.exe /help` || '';
-    my $has_mt = $mt_output =~ m/manifest/; # TODO untested
+    my $mt_output = `mt.exe /?` || '';
+    my $has_mt = $mt_output =~ m/manifest/;
     $conf->data->set( has_mt => $has_mt ? 1 : 0);
 
     if ($is_msvc) {
