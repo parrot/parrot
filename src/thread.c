@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011, Parrot Foundation.
+Copyright (C) 2011-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -53,7 +53,6 @@ static void* Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg));
 /* HEADERIZER END: static */
 
 static Interp * threads_array[MAX_THREADS];
-static Parrot_mutex threads_mutex;
 
 /*
 
@@ -85,7 +84,6 @@ Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
     new_interp->wake_up = 0;
     COND_INIT(new_interp->sleep_cond);
     MUTEX_INIT(new_interp->sleep_mutex);
-    MUTEX_INIT(threads_mutex);
 
     if (! interp->thread_data) { /* first time we go multi threaded */
         interp->thread_data = mem_internal_allocate_zeroed_typed(Thread_data);
@@ -405,10 +403,8 @@ Parrot_thread_notify_threads(SHIM_INTERP)
     Interp ** const tarray = Parrot_thread_get_threads_array(NULL);
 
     for (i = 0; i < MAX_THREADS; i++) {
-        LOCK(threads_mutex);
         if (tarray[i])
             Parrot_thread_notify_thread(tarray[i]);
-        UNLOCK(threads_mutex);
     }
 }
 
@@ -637,9 +633,7 @@ Parrot_thread_insert_thread(PARROT_INTERP, ARGIN(Interp* thread), int index)
 {
     ASSERT_ARGS(Parrot_thread_insert_thread)
 
-    LOCK(threads_mutex);
     threads_array[index] = thread;
-    UNLOCK(threads_mutex);
 }
 
 /*
