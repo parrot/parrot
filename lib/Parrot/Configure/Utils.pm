@@ -134,7 +134,7 @@ sub _build_compile_command {
         if @incs;
     }
     else {
-        $cc_args .= "-I./include -c";
+        $cc_args .= " -I./include -c";
     }
     return "$cc $ccflags $cc_args test_$$.c";
 }
