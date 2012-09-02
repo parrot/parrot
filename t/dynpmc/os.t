@@ -327,7 +327,7 @@ my $count = $MSWin32 ? 11 : 13;
 BEGIN {
     if ($^O eq 'MSWin32') {
         eval { require Win32::UTCFileTime; }
-	  and Win32::UTCFileTime::import(':globally');
+          and Win32::UTCFileTime::import(':globally');
     }
 }
 my @s = stat('xpto');

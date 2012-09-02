@@ -33,7 +33,7 @@ use Parrot::IO::Directory;
 BEGIN {
     if ($^O eq 'MSWin32') {
         eval { require Win32::UTCFileTime; }
-	  and Win32::UTCFileTime::import(':globally');
+          and Win32::UTCFileTime::import(':globally');
     }
 }
 
