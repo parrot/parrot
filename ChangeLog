@@ -7,6 +7,7 @@
           needed when using NCI to bind to Fortran libraries such as LAPACK
     - Platforms
         + Fixed for the FileHandle open method the append mode on Windows.
+	+ Fix compilation on Windows without working mt.exe
         + Detect GNU/Hurd as linux proper.
         + Updated the vms port on a YAPC::EU hackathon with vaxman and mvorl.
 
