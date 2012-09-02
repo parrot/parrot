@@ -45,7 +45,7 @@ sub runstep {
 
     $conf->data->set( clock_best => ' ' );
 
-    my $mt_output = `mt.exe /?` || '';
+    my $mt_output = `mt.exe /? 2>null` || '';
     my $has_mt = $mt_output =~ m/manifest/;
     $conf->data->set( has_mt => $has_mt ? 1 : 0);
 
