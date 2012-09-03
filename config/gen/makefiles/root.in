@@ -912,7 +912,7 @@ $(PARROT) : $(FRPTWO_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 $(DEV_TOOLS_DIR)/pbc_to_exe.pir: $(DEV_TOOLS_DIR)/pbc_to_exe.winxed $(PARROT) $(WINXED_LANG) winxed.pbc
 	$(PARROT) winxed.pbc -c --noan $(DEV_TOOLS_DIR)/pbc_to_exe.winxed
 
-$(PBC_TO_EXE) : $(DEV_TOOLS_DIR)/pbc_to_exe.pir $(LIBRARY_DIR)/config.pir $(PARROT) $(DYNEXT_DIR)/os$(LOAD_EXT) $(DYNEXT_DIR)/file$(LOAD_EXT)
+$(PBC_TO_EXE) : $(DEV_TOOLS_DIR)/pbc_to_exe.pir $(LIBRARY_DIR)/config.pir $(PARROT) $(DYNEXT_DIR)/file$(LOAD_EXT)
 	$(PARROT) -o pbc_to_exe.pbc $(DEV_TOOLS_DIR)/pbc_to_exe.pir
 	$(PARROT) pbc_to_exe.pbc pbc_to_exe.pbc
 
