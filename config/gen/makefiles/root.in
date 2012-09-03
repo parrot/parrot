@@ -738,13 +738,13 @@ PMC2CD = $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --dump @no_lines_flag@
 PMC2CC = $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --c @no_lines_flag@
 PMC2CV = $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --vtable @no_lines_flag@
 
-.pmc.dump : # suffix rule (limited support)
-	$(PMC2CD) $<
+#.pmc.dump : # suffix rule (limited support)
+#	$(PMC2CD) $<
+#
+#.pmc.c : # suffix rule (limited support)
+#	$(PMC2CC) $<
 
-.pmc.c : # suffix rule (limited support)
-	$(PMC2CC) $<
-
-vtable.dump : src/vtable.tbl lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm
+vtable.dump : src/vtable.tbl lib/Parrot/Pmc2c/VTable.pm lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm $(PMC2C_FILES)
 	$(PMC2CV)
 
 # This is a listing of all targets meant to be called by users
