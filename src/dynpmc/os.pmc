@@ -1,0 +1,25 @@
+/*
+Copyright (C) 2001-2012, Parrot Foundation.
+
+=head1 NAME
+
+src/dynpmc/os.pmc - Dummy dynpmc placeholder
+
+=head1 DESCRIPTION
+
+This pmc does nothing, OS is now a builtin.
+
+For backwards compatiblity with existing C<loadlib 'os'> calls.
+
+=cut
+
+*/
+
+pmclass OS pmc {}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

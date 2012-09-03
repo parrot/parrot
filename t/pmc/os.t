@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 34;
+use Parrot::Test tests => 35;
 use Parrot::Config;
 use Cwd;
 use File::Spec;
@@ -782,9 +782,20 @@ $xa
 $xb
 OUT
 
+# Support loadlib 'os' for a while
+pir_output_is( <<'CODE', <<"OUT", "loadlib 'os' deprecation" );
+.sub main :main
+        $P0 = loadlib 'os'
+        $P1 = new 'OS'
+        $S1 = $P1."cwd"()
+        print "ok\n"
+        end
+.end
+CODE
+ok
+OUT
+
 unlink "test_f_a", "test_f_b", "test_f_c";
-
-
 
 # Local Variables:
 #   mode: cperl
