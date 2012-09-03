@@ -1767,6 +1767,7 @@ t/native_pbc/string_5.pbc                                   [test]
 t/native_pbc/string_6.pbc                                   [test]
 t/native_pbc/string_7.pbc                                   [test]
 t/native_pbc/testdata/README.pod                            []doc
+t/native_pbc/testdata/integer.pasm                          [test]
 t/native_pbc/testdata/number.pasm                           [test]
 t/native_pbc/testdata/string.pasm                           [test]
 t/oo/attributes.t                                           [test]

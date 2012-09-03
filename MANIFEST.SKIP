@@ -76,8 +76,8 @@
 ^/.*\.vcproj.*/
 ^/CFLAGS$
 ^/CFLAGS/
-^/MANIFEST\.configure\.generated$
-^/MANIFEST\.configure\.generated/
+^/MANIFEST_configure\.generated$
+^/MANIFEST_configure\.generated/
 ^/Makefile$
 ^/Makefile/
 ^/TAGS$
