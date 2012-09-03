@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -411,7 +411,7 @@ pir_output_is( <<'CODE', $entries, 'Test OS.readdir' );
 CODE
 
 SKIP: {
-    skip 'not implemented on windows yet', 1 if ( $MSWin32 && $MSVC );
+    skip 'not implemented on windows yet', 1 if $MSWin32;
 
     mkdir 'silly-dir-with-silly-names';
     open my $fileh, '>', "silly-dir-with-silly-names/sillyname\x{263A}";
