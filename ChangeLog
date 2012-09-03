@@ -5,6 +5,8 @@
           semantics.
         + The Integer and Float PMCs now have a get_pointer vtable which is
           needed when using NCI to bind to Fortran libraries such as LAPACK
+    - Deprecations
+	+ Moved dynpmc/os to pmc os. loadlib 'os' is not needed anymore.
     - Platforms
         + Fixed for the FileHandle open method the append mode on Windows.
 	+ Fix compilation on Windows without working mt.exe
