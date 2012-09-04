@@ -34,10 +34,10 @@ sub test_pbc_string {
 #         no endianize, no opcode, no numval transform
 #         dirformat = 1
 # ]
-test_pbc_string(1, "4_le i386 32 bit opcode_t, 4 byte intval" );
-test_pbc_string(3, "4_be PPC BE 32 bit opcode_t, 4 byte intval");
-test_pbc_string(4, "8_le x86_64 64 bit opcode_t, 8 byte intval");
-test_pbc_string(6, "8_be big-endian 64 bit opcode_t, 8 byte intval");
+test_pbc_string("4_le","i386 32 bit opcode_t, 4 byte intval" );
+test_pbc_string("4_be","big-endian 32 bit opcode_t, 4 byte intval");
+test_pbc_string("8_le","x86_64 64 bit opcode_t, 8 byte intval");
+test_pbc_string("8_be","big-endian 64 bit opcode_t, 8 byte intval");
 
 =head1 NAME
 
@@ -61,16 +61,15 @@ native pbcs.
 
 =head1 PLATFORMS
 
-  _1   4_le: i386 32 bit opcode_t, 32 bit intval   (linux-gcc-ix86, freebsd-gcc, cygwin)
-  _3   4_be: PPC BE 32 bit opcode_t, 32 bit intval (darwin-ppc, sparc32 or mips32)
-  _4   8_le: x86_64 double float 64 bit opcode_t   (linux-gcc-x86_64, solaris-cc-64int)
-  _6   8_be: big-endian 64 bit opcode_t, 8 byte double (Sparc64, mips64, ppc64)
+The id consists of ptrsize=intvalsize in byte and le/be for
+little/big-endian.
+Systems with different ptrsize + intvalsize (i.e. perl -V:use64bitint) may not be
+used to generate native pbc's.
 
-  _2   (skipped) i386 32 bit opcode_t, 32 bit intval, 12 bit long double
-  _8   (skipped) i386 32 bit opcode_t, 32 bit intval, 4-byte single float --floatval=float
-  _5   (skipped) x86_64 16 bit long double 64 bit opcode_t
-  _7   (skipped) big-endian 64 bit opcode_t, 16 byte long double
-  _9   (skipped) big-endian 32 bit opcode_t, 4 byte intval, 4 byte single float
+  4_le: i386 32 bit opcode_t, 32 bit intval   (linux-gcc-ix86, freebsd-gcc, cygwin)
+  4_be: PPC BE 32 bit opcode_t, 32 bit intval (darwin-ppc, sparc32 or mips32)
+  8_le: x86_64 double float 64 bit opcode_t   (linux-gcc-x86_64, solaris-cc-64int)
+  8_be: big-endian 64 bit opcode_t, 8 byte double (Sparc64, mips64, ppc64)
 
 =cut
 

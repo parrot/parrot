@@ -685,6 +685,7 @@ sub _run_test_file {
     }
     elsif ( $func =~ m/^pbc_(exit_code|.*?output_)/ ) {
         $code_f = per_test( '.pbc', $test_no );
+        $code_f = $code if $code =~ /\.pbc$/ and -f $code;
     }
     else {
         die "Unknown test function: $func";
@@ -692,8 +693,8 @@ sub _run_test_file {
     $code_f = File::Spec->rel2abs($code_f);
     my $code_basef = basename($code_f);
 
-    # native tests are just run, others need to write code first
-    if ( $code_f !~ /\.pbc$/ ) {
+    # existing pbc test files are just run, need to write code first
+    if ( $code_f !~ /\.pbc$/ or ! -f $code_f ) {
         write_code_to_file( $code, $code_f );
     }
 
@@ -796,11 +797,7 @@ sub _generate_test_functions {
             my ( $code, $expected, $desc, %extra ) = @_;
             my $args                               = $ENV{TEST_PROG_ARGS} || '';
 
-            # Due to ongoing changes in PBC format, all tests in
-            # t/native_pbc/*.t are currently being SKIPped. This means we
-            # have no tests on which to model tests of the following block.
-            # Hence, test coverage will be lacking.
-            if ( $func =~ /^pbc_output_/ && $args =~ /-r / ) {
+            if ( $code =~ m|t/native_pbc/| && $func =~ /^pbc_output_/ && $args =~ /-r / ) {
                 # native tests with --run-pbc don't make sense
                 return $builder->skip("no native tests with -r");
             }

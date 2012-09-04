@@ -14,16 +14,16 @@ require Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = ('test_native_pbc');
 
-my @archtest = qw(4_le 4_le 4_be 8_le 8_le 8_be 8_be 4_le 4_be);
 sub int_arch {
     return $PConfig{intvalsize}
       . "_"
       . (substr($PConfig{byteorder},0,2) eq '12' ? "le" : "be");
 }
 sub num_arch {
-    return $PConfig{numvalsize}
+    return $PConfig{ptrsize}
+      . "_". $PConfig{numvalsize}
       . "_"
-	. (substr($PConfig{byteorder},0,2) eq '12' ? "le" : "be");
+      . (substr($PConfig{byteorder},0,2) eq '12' ? "le" : "be");
 }
 
 sub pbc_bc_version {
@@ -50,22 +50,21 @@ sub test_native_pbc {
     my $todo = shift;
     my $file = "t/native_pbc/${type}_${id}.pbc";
     if ($type eq 'number') {
-	$arch = num_arch();
-	@archtest = qw(8_le 12_le 8_be 8_le 16_le 8_be 16_be 4_le 4_be);
+        $arch = num_arch();
     }
-    my $cvt = "$archtest[$id-1]=>$arch";
+    my $cvt = "$id=>$arch";
     my $skip_msg;
     # check if this a platform where we can produce the needed file
-    if ($archtest[$id-1] eq $arch) {
+    if ($id eq $arch) {
         $skip_msg = "Want to help? Regenerate $file "
           . "with tools/dev/mk_native_pbc --noconf";
     }
     else {
         $skip_msg  = "$file is outdated. "
-          . "Need $archtest[$id-1] platform.";
+          . "Need $id platform.";
     }
-    if ($type eq 'number' and $cvt =~ /^16_[bl]e=>8_/) {
-	# 16 -> 8 drops some mantissa bits
+    if ($type eq 'number' and $cvt =~ /^8_16_[bl]e=>4_8_/) {
+        # 16 -> 8 drops some mantissa bits
         $expected =~ s/1\.12589990684262e\+15/1.12589990684058e+15/;
     }
     # check if skip or todo
@@ -90,13 +89,13 @@ sub test_native_pbc {
             $todo_msg = "$cvt yet untested, GH #394. "
                        . "Please report success."
         }
-        Parrot::Test::pbc_output_is( undef, $expected, "$cvt $desc",
+        Parrot::Test::pbc_output_is( $file, $expected, "$cvt $desc",
                        todo => "$todo_msg" );
     }
     else {
         skip $skip_msg, 1
           if ($bc ne pbc_bc_version($file));
-        Parrot::Test::pbc_output_is( undef, $expected, "$cvt $desc" );
+        Parrot::Test::pbc_output_is( $file, $expected, "$cvt $desc" );
     }
   }
 }

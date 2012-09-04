@@ -29,13 +29,8 @@ my $testmatrix = <<EOF;
 EOF
 
 my $arch = t::native_pbc::Test::num_arch();
-my $destarch = { '8_le'  => [1,4], '12_le' => [2], '16_le' => [5],
-                 '8_be'  => [3,6], '16_be' => [7], '4_le'  => [8],
-                 '4_be'  => [9] };
-# the reverse: which tests for which arch
-my @archtest = qw(8_le 12_le 8_be 8_le 16_le 8_be 16_be 4_le 4_be);
-# @todo lists of tests for your architecture.
-# e.g. for arch 8_le => tests (8_be) => todo (3 6)
+# %todo and %skip lists of tests for your architecture.
+#   e.g. for arch 8_le => 8_be => todo (4_8_le, 8_8_le )
 sub generate_skip_list {
     my $arch = shift;
     my $check = shift;
@@ -45,12 +40,14 @@ sub generate_skip_list {
     shift @dest unless $dest[0];
     my $i = 0;
     my %cols  = map { $_ => $i++ } @dest;
-    my $col   = $cols{$arch};      # the column for our arch
+    my ($sarch) = $arch =~ m/^\d_(\d.+)$/;
+    my $col   = $cols{$sarch};      # the column for our arch
     for my $s (@lines) {
         my @s  = split /\s+/, $s;
         my $pbc = shift @s;
         if ($s[$col] eq $check) {
-            for (@{$destarch->{$pbc}}) { $skip{$_}++ }
+            $skip{"4_".$pbc}++;
+            $skip{"8_".$pbc}++;
         }
     }
     \%skip
@@ -106,7 +103,7 @@ sub test_pbc_number {
 #         no endianize, no opcode, no numval transform
 #         dirformat = 1
 # ]
-test_pbc_number(1, "(8_le) i386 32 bit opcode_t, 4 byte intval, 8 byte double");
+test_pbc_number('4_8_le', "i386 32 bit opcode_t, 4 byte intval, 8 byte double");
 
 # HEADER => [
 #         wordsize  = 4   (interpreter's wordsize/INTVAL = 4/4)
@@ -117,7 +114,7 @@ test_pbc_number(1, "(8_le) i386 32 bit opcode_t, 4 byte intval, 8 byte double");
 #         no endianize, no opcode, no numval transform
 #         dirformat = 1
 # ]
-test_pbc_number(2, "(12_le) i386 32 bit opcode_t, 4 byte intval, 12 byte long double");
+test_pbc_number('4_12_le', "i386 32 bit opcode_t, 4 byte intval, 12 byte long double");
 
 # darwin/ppc:
 # HEADER => [
@@ -129,7 +126,7 @@ test_pbc_number(2, "(12_le) i386 32 bit opcode_t, 4 byte intval, 12 byte long do
 #         no endianize, no opcode, no numval transform
 #         dirformat = 1
 # ]
-test_pbc_number(3, "(8_be) PPC BE 32 bit opcode_t, 4 byte intval, 8 byte double");
+test_pbc_number('4_8_be', "big-endian 32 bit opcode_t, 4 byte intval, 8 byte double");
 
 # any ordinary 64-bit intel unix:
 # HEADER => [
@@ -141,7 +138,7 @@ test_pbc_number(3, "(8_be) PPC BE 32 bit opcode_t, 4 byte intval, 8 byte double"
 #         no endianize, no opcode, no numval transform
 #         dirformat = 1
 # ]
-test_pbc_number(4, "(8_le) x86_64 64 bit opcode_t, 8 byte intval, 8 byte double");
+test_pbc_number('8_8_le', "x86_64 64 bit opcode_t, 8 byte intval, 8 byte double");
 
 # i86_64 with floatval='long double'
 # HEADER => [
@@ -153,7 +150,7 @@ test_pbc_number(4, "(8_le) x86_64 64 bit opcode_t, 8 byte intval, 8 byte double"
 #         no endianize, no opcode, no numval transform
 #         dirformat = 1
 # ]
-test_pbc_number(5, "(16_le) x86_64 64 bit opcode_t, 8 byte intval, 16 byte long double");
+test_pbc_number('8_16_le', "x86_64 64 bit opcode_t, 8 byte intval, 16 byte long double");
 
 # PowerPC64 -m64
 # HEADER => [
@@ -165,7 +162,7 @@ test_pbc_number(5, "(16_le) x86_64 64 bit opcode_t, 8 byte intval, 16 byte long 
 #         *need* endianize, no opcode, no numval transform
 #         dirformat = 1
 # ]
-test_pbc_number(6, "(8_be) big-endian 64 bit opcode_t, 8 byte intval, 8 byte double");
+test_pbc_number('8_8_be', "big-endian 64 bit opcode_t, 8 byte intval, 8 byte double");
 
 # ppc/mips -m64 --floatval="long double"
 # HEADER => [
@@ -177,13 +174,13 @@ test_pbc_number(6, "(8_be) big-endian 64 bit opcode_t, 8 byte intval, 8 byte dou
 #         *need* endianize, no opcode, no numval transform
 #         dirformat = 1
 # ]
-test_pbc_number(7, "(16_be) big-endian 64 bit opcode_t, 8 byte intval, 16 byte long double");
+test_pbc_number('8_16_be', "big-endian 64 bit opcode_t, 8 byte intval, 16 byte long double");
 
 # i386 --floatval=float
-#test_pbc_number(8, "(4_le) i386 32 bit opcode_t, 4 byte intval, 4 byte single float");
+#test_pbc_number('4_4_le', "i386 32 bit opcode_t, 4 byte intval, 4 byte single float");
 
 # ppc -m32 --floatval=float
-#test_pbc_number(9, "(4_be) big-endian 32 bit opcode_t, 4 byte intval, 4 byte single float");
+#test_pbc_number('4_4_be', "big-endian 32 bit opcode_t, 4 byte intval, 4 byte single float");
 
 =head1 NAME
 
@@ -203,31 +200,35 @@ native pbcs on 4 different machines.
 
 =head1 PLATFORMS
 
-  _1   (8_le) i386 32 bit opcode_t, 4 byte intval, 8 byte double
+The id consists of ptrsize in byte, numvalsize in bytes and le/be for
+little/big-endian.
+
+
+  4_8_le: i386 32 bit opcode_t, 4 byte intval, 8 byte double
        (linux-gcc-i386, freebsd-gcc, cygwin, ...)
 
-  _3   (8_be) PPC BE 32 bit opcode_t, 4 byte intval, 8 byte double
+  4_8_be: PPC BE 32 bit opcode_t, 4 byte intval, 8 byte double
        (darwin-ppc or sparc32)
 
-  _4   (8_le) x86_64 64 bit opcode_t, 8 byte intval, 8 byte double
+  8_8_le: x86_64 64 bit opcode_t, 8 byte intval, 8 byte double
        (linux-gcc-x86_64 resp. amd64, solaris-cc-64int)
 
-  _6   (8_be) big-endian 64 bit opcode_t, 8 byte intval, 8 byte double
+  8_8_be: big-endian 64 bit opcode_t, 8 byte intval, 8 byte double
        (Sparc64/Solaris, MIPS irix or similar)
 
-  _2   (12_le) i386 32 bit opcode_t, 4 byte intval, 12 byte long double
+  4_12_le: i386 32 bit opcode_t, 4 byte intval, 12 byte long double
        (linux-gcc-i386 or cygwin with --floatval="long double")
 
-  _5   (16_le) x86_64 64 bit opcode_t, 8 byte intval, 16 byte long double
+  8_16_le: x86_64 64 bit opcode_t, 8 byte intval, 16 byte long double
        (linux-gcc-x86_64, solaris-cc-64int --floatval="long double")
 
-  _7   (16_be) big-endian 64 bit opcode_t, 8 byte intval, 16 byte long double
+  8_16_be: big-endian 64 bit opcode_t, 8 byte intval, 16 byte long double
        (Sparc64/Solaris --floatval="long double")
 
-  _8   (4_le) i386 32 bit opcode_t, 4 byte intval, 4 byte single float
+  4_4_le: i386 32 bit opcode_t, 4 byte intval, 4 byte single float
        (linux-gcc-i386 or cygwin with --floatval="float")
 
-  _9   (4_be) big-endian 32 bit opcode_t, 4 byte intval, 4 byte single float
+  4_4_be: big-endian 32 bit opcode_t, 4 byte intval, 4 byte single float
        (darwin or debian/ppc with --floatval="float")
 
 =cut
@@ -243,7 +244,7 @@ native pbcs on 4 different machines.
   $ ./parrot -o n.pbc t/native_pbc/testdata/number.pasm
   $ make pbc_dump
   $ ./pbc_dump -h n.pbc
-  $ mv n.pbc t/native_pbc/number_$(N).pbc
+  $ mv n.pbc t/native_pbc/number_$(id).pbc
 
 # then
 # - increase number of tests
@@ -254,14 +255,14 @@ native pbcs on 4 different machines.
 
 On test failures please add the output of
 
-  $ ./pbc_dump -h t/native_pbc/number_${N}.pbc
+  $ ./pbc_dump -h t/native_pbc/number_${id}.pbc
 
 into your report. We need your wordsize/floattype/endianess.
 
 =cut
 
 # Local Variables:
-#   mode: perl
+#   mode: cperl
 #   cperl-indent-level: 4
 #   fill-column: 100
 # End:
