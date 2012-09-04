@@ -8,8 +8,8 @@ use Test::More;
 use Parrot::Config;
 use Parrot::BuildUtil;
 
-use Parrot::Test skip_all => 'pending robust testing strategy, GH #394';
-#use Parrot::Test tests => 7;
+#use Parrot::Test skip_all => 'pending robust testing strategy, GH #394';
+use Parrot::Test tests => 7;
 
 =head1 NAME
 
@@ -54,7 +54,7 @@ native pbcs.
        (linux-gcc-i386 or cygwin with --floatval="float")
 
   _9   (4_be) big-endian 32 bit opcode_t, 4 byte intval, 4 byte single float
-       (darwin/ppc with --floatval="float")
+       (darwin or debian/ppc with --floatval="float")
 
 =cut
 
@@ -66,7 +66,7 @@ native pbcs.
 # If your wordsize/floattype/endianess is not covered here
 # please add it:
 
-  $ ./parrot -o n.pbc t/op/number_1.pasm
+  $ ./parrot -o n.pbc t/native_pbc/testdata/number.pasm
   $ make pbc_dump
   $ ./pbc_dump -h n.pbc
   $ mv n.pbc t/native_pbc/number_$(N).pbc
@@ -275,7 +275,7 @@ test_pbc_number(3, "(8_be) PPC BE 32 bit opcode_t, 4 byte intval, 8 byte double"
 #         wordsize  = 8   (interpreter's wordsize/INTVAL = 8/8)
 #         byteorder = 0   (interpreter's byteorder       = 0)
 #         floattype = 0   (interpreter's NUMVAL_SIZE     = 8)
-#         parrot-version 0.9.1, bytecode-version 3.38
+#         parrot-version 4.6.0, bytecode-version 12.0
 #         UUID type = 0, UUID size = 0
 #         no endianize, no opcode, no numval transform
 #         dirformat = 1
@@ -287,7 +287,7 @@ test_pbc_number(4, "(8_le) x86_64 64 bit opcode_t, 8 byte intval, 8 byte double"
 #         wordsize  = 8   (interpreter's wordsize/INTVAL = 8/8)
 #         byteorder = 0   (interpreter's byteorder       = 0)
 #         floattype = 2   (interpreter's NUMVAL_SIZE     = 16)
-#         parrot-version 0.9.1, bytecode-version 3.38
+#         parrot-version 4.6.0, bytecode-version 12.0
 #         UUID type = 0, UUID size = 0
 #         no endianize, no opcode, no numval transform
 #         dirformat = 1

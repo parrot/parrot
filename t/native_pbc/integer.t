@@ -8,8 +8,8 @@ use Test::More;
 use Parrot::Config;
 use Parrot::BuildUtil;
 
-use Parrot::Test skip_all => 'pending robust testing strategy, GH #394';
-#use Parrot::Test tests => 7;
+#use Parrot::Test skip_all => 'pending robust testing strategy, GH #394';
+use Parrot::Test tests => 7;
 
 =head1 NAME
 
@@ -52,6 +52,9 @@ native pbcs.
 
   _8   (4_le) i386 32 bit opcode_t, 4 byte intval, 4 byte single float
        (linux-gcc-i386 or cygwin with --floatval="float")
+
+  _9   (4_be) big-endian 32 bit opcode_t, 4 byte intval, 4 byte single float
+       (darwin or debian/ppc with --floatval="float")
 
 =cut
 

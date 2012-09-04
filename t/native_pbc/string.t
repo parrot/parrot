@@ -8,8 +8,8 @@ use Test::More;
 use Parrot::Config;
 use Parrot::BuildUtil;
 
-use Parrot::Test skip_all => 'pending robust testing strategy, GH #394';
-#use Parrot::Test tests => 6;
+#use Parrot::Test skip_all => 'pending robust testing strategy, GH #394';
+use Parrot::Test tests => 6;
 
 =head1 NAME
 
@@ -23,8 +23,8 @@ t/native_pbc/string.t - PBC string tests
 
 Tests word-size/endian-ness for different architectures.
 
-We test 4+8 byte opcode_t with le and be.
-Foreign encodings (TODO) and charsets are tested witin F<t/op/strings.t>
+We test 4+8 byte opcode_t with le and be, binary and utf8 encoding.
+More foreign encodings (TODO) and charsets are tested within F<t/op/strings.t>
 and F<t/op/strings_cs.t>
 
 These tests usually only work on updated native pbc test files.
@@ -40,12 +40,13 @@ native pbcs.
   _5   (skipped) x86_64 16 bit long double 64 bit opcode_t
   _6   big-endian 64 bit opcode_t, 8 byte double (Sparc64/Solaris, MIPS irix)
   _7   (skipped) big-endian 64 bit opcode_t, 16 byte long double
+  _8   (skipped) i386 32 bit opcode_t, 32 bit intval, 4-byte float --floatval=float
 
 =cut
 
 =begin comment
 
-The PBC is generated from t/op/string_133.pasm for different architectures.
+The PBC is generated from t/native_pbc/testdata/string.pasm for different architectures.
 
 For adding tests, see the comments in t/native_pbc/number.t
 
@@ -73,17 +74,21 @@ my $bc = ($bc_major . "." . $bc_minor);
 my $arch = this_arch();
 # all should pass
 my $todo = {};
+my $nn = "not needed";
 my $skip = {
-  2 => "dummy",
-  5 => "dummy"
+  2 => $nn,
+  5 => $nn,
+  7 => $nn,
+  8 => $nn
 };
 
-my $output = << 'END_OUTPUT';
+# 4th string as utf8 "Ärger"
+my $output = "
 %Ec
-Dw
+\xC2\x80
 ABCX
-   X
-END_OUTPUT
+\xC3\x84rger
+";
 
 # test_pbc_string(1, "i386 8-byte double float, 32 bit opcode_t");
 sub test_pbc_string {
@@ -151,6 +156,8 @@ test_pbc_string(3, "PPC BE 32 bit opcode_t, 4 byte intval");
 test_pbc_string(4, "i86_64 64 bit opcode_t, 8 byte intval");
 test_pbc_string(5, "dummy" );
 test_pbc_string(6, "big-endian 64 bit opcode_t, 8 byte intval");
+#test_pbc_number(7, "(16_be) big-endian 64 bit opcode_t, 8 byte intval, 16 byte long double");
+#test_pbc_number(8, "(4_le) i386 32 bit opcode_t, 4 byte intval, 4 byte single float");
 
 # Local Variables:
 #   mode: cperl
