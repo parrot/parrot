@@ -133,16 +133,18 @@ native pbcs on 4 different machines.
 
 =head1 PLATFORMS
 
-  _1   i386 32 bit opcode_t, 32 bit intval   (linux-gcc-ix86, freebsd-gcc, cygwin)
-  _3   PPC BE 32 bit opcode_t, 32 bit intval (darwin-ppc, sparc32 or mips32)
-  _4   x86_64 double float 64 bit opcode_t   (linux-gcc-x86_64, solaris-cc-64int)
-  _6   big-endian 64 bit opcode_t, 8 byte double (Sparc64, mips64, ppc64)
+  i386 32 bit opcode_t, 2 byte intval, 8 byte double (linux-gcc-ix86, freebsd-gcc, cygwin)
+  i386 32 bit opcode_t, 2 byte intval, 12 bit long double --floatval="long double"
+  x86_64 64 bit opcode_t, 4 byte intval, 8 byte double  (linux-gcc-x86_64, solaris-cc-64int)
+  x86_64 64 bit opcode_t, 4 byte intval, 16 byte long double --floatval="long double"
+  big-endian 32 bit opcode_t, 2 byte intval, 8 byte double (darwin-ppc, sparc32 or mips32)
+  big-endian 32 bit opcode_t, 2 byte intval, 16 byte long double --floatval="long double"
+  big-endian 64 bit opcode_t, 4 byte intval, 8 byte double (Sparc64, mips64, ppc64)
+  big-endian 64 bit opcode_t, 4 byte intval, 16 byte long double --floatval="long double"
 
-  _2   (skipped) i386 32 bit opcode_t, 32 bit intval, 12 bit long double
-  _8   (skipped) i386 32 bit opcode_t, 32 bit intval, 4-byte single float --floatval=float
-  _5   (skipped) x86_64 16 bit long double 64 bit opcode_t
-  _7   (skipped) big-endian 64 bit opcode_t, 16 byte long double
-  _9   (skipped) big-endian 32 bit opcode_t, 4 byte intval, 4 byte single float
+  (skipped) i386 32 bit opcode_t, 2 byte intval, 4-byte single float --floatval=float
+  (skipped) x86_64 64 bit opcode_t, 4 byte intval, 4-byte single float --floatval=float
+  (skipped) big-endian 32 bit opcode_t, 2 byte intval, 4 byte single float --floatval=float
 
 =head2 Functions
 

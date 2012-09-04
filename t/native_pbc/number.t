@@ -19,11 +19,11 @@ use Parrot::Test tests => 7;
 # The _le there is for reading.
 my $testmatrix = <<EOF;
         8_le 12_le 16_le 8_be 16_be  4_le 4_be
-8_le     1     1    1     1     0     ?    ?
-12_le    1     1    0     0     0     ?    ?
-16_le    0     0    1     0     0     ?    ?
+8_le     1     1    1     1     ?     ?    ?
+12_le    1     1    1     ?     ?     ?    ?
+16_le    1     1    1     ?     ?     ?    ?
 8_be     ?     1    1     1     1     ?    ?
-16_be    0     0    0     0     1     ?    ?
+16_be    ?     ?    ?     ?     1     ?    ?
 4_le     ?     ?    ?     ?     ?     ?    ?
 4_be     ?     ?    ?     ?     ?     ?    ?
 EOF
