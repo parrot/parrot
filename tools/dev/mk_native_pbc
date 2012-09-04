@@ -5,21 +5,23 @@
 # Generate/update t/native_pbc/*_*.pbc
 # This should only be run on known systems to regenerate the native pbcs.
 # You need at least a multilib 64bit intel and powerpc machine to generate all.
+# QEMU images of big-endian 64bit machines are still being worked on, openbios
+# problems on SPARC64.
 #
-# NOTE:  For _2/_5/_8 this will need a compiler with long double support.
-# NOTE2: Installing ccache speeds this process up considerably.
+# NOTE: Installing ccache speeds this process up considerably.
 
-# old versions:
-#  _1   i386 32 bit opcode_t, 32 bit intval   (linux-gcc-ix86, freebsd-gcc, cygwin)
-#  _2   i386 32 bit opcode_t, 32 bit intval, 12 bit long double (linux-gcc-ix86)
-#  _3   PPC BE 32 bit opcode_t, 32 bit intval (darwin-ppc)
-#  _4   x86_64 double float 64 bit opcode_t   (linux-gcc-x86_64, solaris-cc-64int)
-#  _5   x86_64 16 byte long double 64 bit opcode_t (linux-gcc-x86_64, solaris-cc-64int)
-#  _6   big-endian 64-bit                     (sparc, irix or similar)
-#  _7   big-endian 64-bit 16-byte long-double (sparc64, irix, mips or similar)
-#  _8   (skipped) i386 32 bit opcode_t, 32 bit intval, 4-byte float --floatval=float
-#  _9   (skipped) big-endian 32 bit opcode_t, 4 byte intval, 4 byte single float
-#                 (darwin or debian/ppc with --floatval="float")
+# Supported versions:
+#  i386 32 bit opcode_t, 32 bit intval, 8 byte double (linux-gcc-ix86, freebsd-gcc, cygwin)
+#  i386 32 bit opcode_t, 32 bit intval, 12 byte long double (linux-gcc-ix86)
+#  big-endian 32 bit opcode_t, 32 bit intval (darwin-ppc or mips)
+#  x86_64 8 byte double 64 bit opcode_t   (linux-gcc-x86_64, solaris-cc-64int)
+#  x86_64 16 byte long double 64 bit opcode_t (linux-gcc-x86_64, solaris-cc-64int)
+#  big-endian 64-bit 8 byte double       (sparc64, irix or similar)
+#  big-endian 64-bit 16-byte long double (sparc64, irix, mips or similar)
+# Not yet: (branch float)
+#  i386 32 bit opcode_t, 32 bit intval, 4-byte float --floatval=float
+#  big-endian 32 bit opcode_t, 4 byte intval, 4 byte single float
+#    (darwin or debian/ppc with --floatval="float")
 
 #tests:
 # t/native_pbc/testdata/integer.pasm
@@ -147,7 +149,6 @@ if [ "$enable_long_double" = "1" ]; then
     numvalsize=$(./parrot_config numvalsize)
     #if [ "hugefloatvalsize" = "12" ]; then echo "Only 12 byte long double. Sorry"; exit; fi
     #if [ "numvalsize" = "12" ]; then echo "Only 12 byte double. Sorry"; exit; fi
-    # 1+2, 4+5, 6+7
     if [ "${byteorder:0:2}" = "12" ]; then
         M=${intvalsize}_${numvalsize}_le
     else
