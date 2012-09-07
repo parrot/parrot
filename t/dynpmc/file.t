@@ -229,7 +229,6 @@ pir_output_is( <<"CODE", <<"OUT", "Test copy for files" );
        \$S2 = '$otpxcopy'
 
        \$P0 = loadlib 'file'
-       \$P0 = loadlib 'os'
        \$P1 = new ['File']
        \$P2 = new ['OS']
 
@@ -264,7 +263,6 @@ SKIP: {
        \$S2 = '$otpxcopy'
 
        \$P0 = loadlib 'file'
-       \$P0 = loadlib 'os'
        \$P1 = new ['File']
        \$P2 = new ['OS']
 

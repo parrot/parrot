@@ -33,7 +33,7 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    $conf->append_configure_log('MANIFEST.configure.generated');
+    $conf->append_configure_log('MANIFEST_configure.generated');
     if ( $conf->options->get('nomanicheck') ) {
         $self->set_result('skipped');
         return 1;

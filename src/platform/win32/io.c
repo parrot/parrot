@@ -88,7 +88,10 @@ convert_flags_to_win32(INTVAL flags, ARGOUT(DWORD * fdwAccess),
             *fdwCreate = OPEN_ALWAYS;
     }
     else if (flags & PIO_F_WRITE) {
-        *fdwAccess = GENERIC_WRITE;
+        if (flags & PIO_F_APPEND)
+            *fdwAccess = FILE_APPEND_DATA;
+        else
+            *fdwAccess = GENERIC_WRITE;
         if (flags & PIO_F_TRUNC)
             *fdwCreate = CREATE_ALWAYS;
         else

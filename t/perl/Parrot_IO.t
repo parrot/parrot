@@ -155,7 +155,8 @@ is( 'txt', join( ' ', @a ), 'file_suffixes recursive ignore' );
 is( 'file1.txt', join( ' ', map { $_->name } @a ), 'files_with_suffix recursive ignore' );
 
 # Status (stat info)
-my $time = time;
+my $time = $f3->stat->mtime;
+diag $time if $^O eq 'MSWin32';
 ok( !$f3->modified_since($time), 'not modified_since' );
 
 # So that the modified time will be greater than $time.
@@ -169,8 +170,12 @@ is( $f3->read, "hello\nworld", 'append and scalar read' );
 @a = $f3->read;
 is( $a[1], "world", 'array read' );
 
-ok( $f3->modified_since($time), 'modified_since' );
-
+TODO: {
+    local $TODO = "stat->mtime broken in the Windows msvcrt [GH #820]"
+      if $^O eq 'MSWin32' and !defined &Win32::UTCFileTime::stat;
+    diag $f3->stat->mtime if $^O eq 'MSWin32';
+    ok( $f3->modified_since($time), 'modified_since' );
+}
 $f3->delete();
 @a = $d2->files();
 is( @a, 1, 'file delete' );

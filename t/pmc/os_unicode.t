@@ -34,7 +34,6 @@ Tests the C<OS> PMC with Unicode filenames.
 
   has_unicode:
     plan(17)
-    $P0 = loadlib 'os'
     $P0 = loadlib 'file'
     test_unicode_dirs()
     test_unicode_files()
