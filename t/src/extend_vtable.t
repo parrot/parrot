@@ -14,7 +14,7 @@ my $parrot_config = "parrot_config" . $PConfig{o};
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
 
 
-plan tests => 133;
+plan tests => 134;
 
 =head1 NAME
 
@@ -186,6 +186,36 @@ CODE
 
 }
 # actual tests start here
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pointer");
+
+    integer = (Parrot_Int) Parrot_PMC_get_pointer(interp, pmc);
+    if (integer != NULL)
+        Parrot_printf(interp,"get_pointer on Integer PMC is non-null!\n");
+
+    integer = (Parrot_Int) Parrot_PMC_get_pointer(interp, pmc_float);
+    if (integer != NULL)
+        Parrot_printf(interp,"get_pointer on Float PMC is non-null!\n");
+
+    /* Now give them values and verify stuff still works */
+
+    Parrot_PMC_set_integer_native(interp, pmc, 42);
+    Parrot_PMC_set_number_native(interp, pmc_float, 42.0);
+
+    integer = (Parrot_Int) Parrot_PMC_get_pointer(interp, pmc);
+    if (integer != NULL)
+        Parrot_printf(interp,"get_pointer on Integer PMC is non-null!\n");
+
+    integer = (Parrot_Int) Parrot_PMC_get_pointer(interp, pmc_float);
+    if (integer != NULL)
+        Parrot_printf(interp,"get_pointer on Float PMC is non-null!\n");
+CODE
+get_pointer on Integer PMC is non-null!
+get_pointer on Float PMC is non-null!
+get_pointer on Integer PMC is non-null!
+get_pointer on Float PMC is non-null!
+Done!
+OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_ext_try coverage");
     type         = Parrot_PMC_typenum(interp, "Object");
@@ -913,6 +943,7 @@ CODE
 Got non-zero hash value!
 Done!
 OUTPUT
+
 
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pointer_keyed");

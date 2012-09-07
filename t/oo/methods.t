@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2007-2010, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -54,16 +54,9 @@ END
 
 .sub try_delete_library
     .local pmc os
-    $P0 = loadlib 'os'
-    unless $P0 goto no_os
     os = new 'OS'
     os.'rm'(library_file)
     .return ()
-
-  no_os:
-    $S1 = concat "WARNING: could not delete test file `", library_file
-    $S1 = concat $S1, "' because the OS PMC is unavailable"
-    diag($S1)
 .end
 
 .sub loading_methods_from_file

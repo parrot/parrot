@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -551,7 +551,7 @@ io_sync_buffers_for_write(PARROT_INTERP, ARGMOD(PMC *handle),
     if (read_buffer && !BUFFER_IS_EMPTY(read_buffer)) {
         const size_t buffer_size = BUFFER_USED_SIZE(read_buffer);
         Parrot_io_buffer_clear(interp, read_buffer);
-        vtable->seek(interp, handle, -buffer_size, SEEK_CUR);
+        vtable->seek(interp, handle, -(PIOOFF_T)buffer_size, SEEK_CUR);
     }
 }
 

@@ -66,6 +66,7 @@ PMC2C_FILES = \\
     lib/Parrot/Pmc2c/PMC/default.pm \\
     lib/Parrot/Pmc2c/PMC/Null.pm \\
     lib/Parrot/Pmc2c/PMC/RO.pm
+
 END
 
     my %universal_deps;
@@ -96,7 +97,6 @@ END
         $o_deps{"include/pmc/pmc_$pmc.h"} = 1;
 
         if (contains_pccmethod($pmc_fname)) {
-            $pccmethod_depend = 'lib/Parrot/Pmc2c/PCCMETHOD.pm';
             $o_deps{"include/pmc/pmc_fixedintegerarray.h"} = 1;
             if ($pmc ne 'fixedintegerarray') {
                 $pccmethod_depend .= ' include/pmc/pmc_fixedintegerarray.h';

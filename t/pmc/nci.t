@@ -69,7 +69,7 @@ OUTPUT
   .local pmc func
   .local int func_defined
   libnci_test = loadlib "no_such_library"
-  dlfunc func, libnci_test, "no_such_function", "v"
+  func = dlfunc libnci_test, "no_such_function", "v"
   func_defined = defined func
   if func_defined goto FUNC_DEFINED
   branch FUNC_UNDEFINED
@@ -96,7 +96,7 @@ OUTPUT
   unless libnci_test goto NOT_LOADED
   print "libnci_test was successfully loaded\n"
 
-  dlfunc func, libnci_test, "no_such_function", "v"
+  func = dlfunc libnci_test, "no_such_function", "v"
   func_defined = defined func
   if func_defined goto FUNC_DEFINED
   branch FUNC_UNDEFINED

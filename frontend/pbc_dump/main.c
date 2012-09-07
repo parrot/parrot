@@ -433,6 +433,11 @@ main(int argc, const char **argv)
         return 1;
     }
 
+    if (options & PFOPT_HEADERONLY) {
+        PackFile_header_dump(interp, pf);
+        Parrot_x_exit(interp, 0);
+    }
+
     pfpmc = Parrot_pf_get_packfile_pmc(interp, pf, infilename);
     Parrot_pf_set_current_packfile(interp, pfpmc);
 
