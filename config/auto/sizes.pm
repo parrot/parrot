@@ -45,7 +45,7 @@ sub runstep {
     );
 
     my @std_ints   = ( 'short', 'int', 'long', 'long long' );
-    my @std_floats = ( 'float', 'double', 'long double' );
+    my @std_floats = ( 'float', 'double', 'long double', '__float128' );
     my @extra_ints = ( '__int16', '__int32', '__int64' );
 
     my $sizes = _get_sizes($conf, values %types, @extra_ints);
@@ -240,6 +240,10 @@ sub _set_floatval_range {
     elsif ( $nv eq 'long double' ) {
         $nvmin = 'LDBL_MIN';
         $nvmax = 'LDBL_MAX';
+    }
+    elsif ( $nv eq '__float128' ) { #libquadmath
+        $nvmin = 'FLT128_MIN';
+        $nvmax = 'FLT128_MAX';
     }
     else {
         print <<END;

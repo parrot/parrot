@@ -6,8 +6,8 @@
 *
 *
 * History:
-*  Rework by Melvin; new bytecode format, make bytecode portable.
-*   (Do endian conversion and wordsize transforms on the fly.)
+*  Rework by Melvin and Reini; new bytecode format, make bytecode portable.
+*  Do endian conversion and wordsize transforms on the fly.
 */
 
 #ifndef PARROT_PACKFILE_H_GUARD
@@ -22,22 +22,37 @@
 
 #define FLOATTYPE_8           0
 #define FLOATTYPE_8_NAME      "IEEE-754 8 byte double"
-#define FLOATTYPE_12          1
-#define FLOATTYPE_12_NAME     "x86 little endian 12 byte long double"
+/* 10 byte, on i386 aligned to 12 or 16 byte on x86_64 */
+#define FLOATTYPE_10          1
+#define FLOATTYPE_10_NAME     "Intel 80-bit long double"
+/* __float128 in HW so far only on a Sparc64/s390, but gcc has sw emul. */
 #define FLOATTYPE_16          2
-#define FLOATTYPE_16_NAME     "IEEE-754 16 byte long double"
+#define FLOATTYPE_16_NAME     "IEEE-754 16 byte quad double (__float128)"
+
+#define FLOATTYPE_4           3
+#define FLOATTYPE_4_NAME      "IEEE-754 4-byte single float"
+
+static
+int PF_floattype_size[] = { 8,12,16,4,2,16,16,16 };
+
 /* Supported until here. */
-#define FLOATTYPE_MAX         2
+#define FLOATTYPE_MAX         3
+
+/* Reserved for later */
+#define FLOATTYPE_2           4
+#define FLOATTYPE_2_NAME      "IEEE-754 2-byte half-precision float"
+
 /* Non IEEE-754 versions, yet unsupported. */
-/* NaN difference, but patches welcome */
-#define FLOATTYPE_16MIPS      3
+/* NaN and other minor differences, but patches welcome */
+#define FLOATTYPE_16PPC       5
+#define FLOATTYPE_16PPC_NAME  "PPC64 16 byte double-double"
+
+#define FLOATTYPE_16MIPS      6
 #define FLOATTYPE_16MIPS_NAME "MIPS 16 byte long double"
+
 /* See http://www.ncsa.uiuc.edu/UserInfo/Resources/Hardware/IBMp690/IBM/usr/share/man/info/en_US/a_doc_lib/aixprggd/genprogc/128bit_long_double_floating-point_datatype.htm */
-#define FLOATTYPE_16AIX       4
+#define FLOATTYPE_16AIX       7
 #define FLOATTYPE_16AIX_NAME  "AIX 16 byte long double"
-/* IEEE-754 old and tiny, yet unsupported */
-#define FLOATTYPE_4           5
-#define FLOATTYPE_4_NAME      "4-byte float"
 
 /*
 ** Parrot_pbc_read() options:

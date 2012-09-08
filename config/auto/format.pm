@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -35,6 +35,7 @@ sub runstep {
 
     _set_floatvalfmt_nvsize($conf);
 
+    $conf->cc_clean();
     return 1;
 }
 
@@ -70,17 +71,33 @@ sub _set_floatvalfmt_nvsize {
     }
     elsif ( $nv eq "long double" ) {
 
-        # Stay way from long double for now (it may be 64 or 80 bits)
-        # die "long double not supported at this time, use double.";
+        # long double may be 64 or 80 bits or even quadmath.
         $nvsize   = $ldsize;
         my $spri = $conf->data->get('sPRIgldbl_provisional');
         if ( defined $spri ) {
-            $nvformat = "%.15" .  $spri;
+	    # TT #308 same values as in imcc
+	    if ($nvsize == 8) {
+		$nvformat = "%.16" .  $spri;
+	    }
+	    elsif ($nvsize == 12) {
+		$nvformat = "%.16Lg"; # i386 only
+	    }
+	    elsif ($nvsize == 16) {
+		# only on a sparc64/s390 or __float128. intel cheats
+		$nvformat = $nv eq '__float128'
+		    ? "%Qe"     # libquadmath printf hook support (linux only).
+		                # TODO probe for it.
+		    : "%.16Lg"; # intel, ppc, mips, aix
+	    }
             $nvformat =~ s/"//g;   # Perl 5's Config value has embedded double quotes
         }
         else {
             die qq{Configure.pl:  Can't find a printf-style format specifier for type '$nv'\n};
         }
+    }
+    elsif ( $nv eq "float" ) {
+        $nvsize   = 4;
+        $nvformat = "%.7g"; # http://www.keil.com/support/docs/2191.htm
     }
     else {
         die qq{Configure.pl:  Can't find a printf-style format specifier for type '$nv'\n};

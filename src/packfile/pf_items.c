@@ -32,6 +32,8 @@ for "little endian".
 */
 
 #include "parrot/parrot.h"
+/* FIXME: config probe (endian/byteswap/osx/manually) */
+#include <byteswap.h>
 #include "pf_items.str"
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
@@ -39,42 +41,21 @@ for "little endian".
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void cvt_num12_num16(
+static void cvt_num10_num16(
     ARGOUT(unsigned char *dest),
     ARGIN(const unsigned char *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*dest);
 
-static void cvt_num12_num16_le(
+static void cvt_num10_num8(
     ARGOUT(unsigned char *dest),
     ARGIN(const unsigned char *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*dest);
 
-static void cvt_num12_num8(
-    ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*dest);
-
-static void cvt_num12_num8_le(
-    ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*dest);
-
-static void cvt_num16_num12(
-    ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*dest);
-
-static void cvt_num16_num12_be(
+static void cvt_num16_num10(
     ARGOUT(unsigned char *dest),
     ARGIN(const unsigned char *src))
         __attribute__nonnull__(1)
@@ -88,28 +69,7 @@ static void cvt_num16_num8(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*dest);
 
-static void cvt_num16_num8_be(
-    ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*dest);
-
-static void cvt_num16_num8_le(
-    ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*dest);
-
-static void cvt_num8_num12(
-    ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*dest);
-
-static void cvt_num8_num12_be(
+static void cvt_num8_num10(
     ARGOUT(unsigned char *dest),
     ARGIN(const unsigned char *src))
         __attribute__nonnull__(1)
@@ -117,20 +77,6 @@ static void cvt_num8_num12_be(
         FUNC_MODIFIES(*dest);
 
 static void cvt_num8_num16(
-    ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*dest);
-
-static void cvt_num8_num16_be(
-    ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*dest);
-
-static void cvt_num8_num16_le(
     ARGOUT(unsigned char *dest),
     ARGIN(const unsigned char *src))
         __attribute__nonnull__(1)
@@ -253,46 +199,22 @@ PARROT_WARN_UNUSED_RESULT
 static opcode_t fetch_op_le_8(ARGIN(const unsigned char *b))
         __attribute__nonnull__(1);
 
-#define ASSERT_ARGS_cvt_num12_num16 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_cvt_num10_num16 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
     , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_cvt_num12_num16_le __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_cvt_num10_num8 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
     , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_cvt_num12_num8 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_cvt_num12_num8_le __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_cvt_num16_num12 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_cvt_num16_num12_be __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_cvt_num16_num10 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_cvt_num16_num8 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
     , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_cvt_num16_num8_be __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_cvt_num16_num8_le __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_cvt_num8_num12 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_cvt_num8_num12_be __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_cvt_num8_num10 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_cvt_num8_num16 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_cvt_num8_num16_be __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_cvt_num8_num16_le __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_fetch_buf_be_12 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -355,21 +277,77 @@ static opcode_t fetch_op_le_8(ARGIN(const unsigned char *b))
  */
 #define OFFS(pf, cursor) ((pf) ? ((const char *)(cursor) - (const char *)((pf)->src)) : 0)
 
+#define SWAB_4(rb,b) \
+    rb[0] = b[3]; \
+    rb[1] = b[2]; \
+    rb[2] = b[1]; \
+    rb[3] = b[0]
+
+#define SWAB_8(rb,b) \
+    rb[0] = b[7]; \
+    rb[1] = b[6]; \
+    rb[2] = b[5]; \
+    rb[3] = b[4]; \
+    rb[4] = b[3]; \
+    rb[5] = b[2]; \
+    rb[6] = b[1]; \
+    rb[7] = b[0]
+
+#define SWAB_12(rb,b) \
+    rb[0]  = b[11]; \
+    rb[1]  = b[10]; \
+    rb[2]  = b[9]; \
+    rb[3]  = b[8]; \
+    rb[4]  = b[7]; \
+    rb[5]  = b[6]; \
+    rb[6]  = b[5]; \
+    rb[7]  = b[4]; \
+    rb[8]  = b[3]; \
+    rb[9]  = b[2]; \
+    rb[10] = b[1]; \
+    rb[11] = b[0]
+
+#define SWAB_16(rb,b) \
+    rb[0]  = b[15]; \
+    rb[1]  = b[14]; \
+    rb[2]  = b[13]; \
+    rb[3]  = b[12]; \
+    rb[4]  = b[11]; \
+    rb[5]  = b[10]; \
+    rb[6]  = b[9]; \
+    rb[7]  = b[8]; \
+    rb[8]  = b[7]; \
+    rb[9]  = b[6]; \
+    rb[10] = b[5]; \
+    rb[11] = b[4]; \
+    rb[12] = b[3]; \
+    rb[13] = b[2]; \
+    rb[14] = b[1]; \
+    rb[15] = b[0]
+
 /*
- * low level FLOATVAL fetch and convert functions
+ * low level FLOATVAL fetch and convert functions (see packfile.h)
  *
- * Floattype 0 = IEEE-754 8 byte double
- * Floattype 1 = x86 little endian 12 byte long double
- * Floattype 2 = IEEE-754 16 byte long double
+ * Floattype 0 = IEEE-754 8 byte double (binary64)
+ * Floattype 1 = Intel 80-bit long double stored in 12 byte (i386)
+ *                                    or aligned to 16 byte (x86_64/ia64)
+ * Floattype 2 = IEEE-754 128 bit quad precision stored in 16 byte,
+ *               Sparc64 quad-float or __float128, gcc since 4.3 (binary128)
+ * Floattype 3 = IEEE-754 4 byte float (binary32)
+ * not yet:
+ * Floattype 4 = IEEE-754 2 byte half-precision float (binary16)
+ * Floattype 5 = PowerPC64 16 byte double-double
+ * Floattype 6 = MIPS64 16 byte long double
+ * Floattype 7 = AIX 16 byte long double
  *
  */
 
 /*
 
-=item C<static void cvt_num12_num8(unsigned char *dest, const unsigned char
+=item C<static void cvt_num10_num8(unsigned char *dest, const unsigned char
 *src)>
 
-Converts i386 LE 12-byte long double to IEEE 754 8-byte double.
+Converts i386 LE 12-byte long double to IEEE 754 LE 8-byte double.
 
 Tested ok.
 
@@ -379,7 +357,7 @@ Tested ok.
 
 #if (NUMVAL_SIZE == 8)
 static void
-cvt_num12_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+cvt_num10_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
     ASSERT_ARGS(cvt_num12_num8)
     int expo, i, s;
@@ -388,21 +366,22 @@ cvt_num12_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 #  endif
 
     /*
-       12-byte double (96 bits):
-       sign  1  bit 95
-       exp  15 bits 94-80
-       man  80 bits 79-0
+       padding + 10-byte double (80 bits):
+       unused 2 byte on i386, 6 byte on x86_84/ia64
+       sign    1 bit  79
+       exp    15 bits 78-64
+       man    64 bits 63-0
     to 8-byte double (64 bits):
-       sign  1  bit 63
-       exp  11 bits 62-52
-       man  52 bits 51-0
+       sign    1 bit 63
+       exp    11 bits 62-52
+       man    52 bits 51-0
 
     +-------+-------+-------+-------+-------+-------+--...--+-------+
     |src[11]|src[10]|src[9] |src[8] |src[7] |src[6] | ...   |src[0] |
-    S|     E        |                    F                          |
+    |   unused      |S|     Exp     |               Fract           |
     +-------+-------+-------+-------+-------+-------+--...--+-------+
-    1|<-----15----->|<----------------80 bits---------------------->|
-    <----------------------------96 bits---------------------------->
+    |<-----16------>|1|<-----15---->|<-----------64 bits----------->|
+    <-------------->|<----------------80 bits----------------------->
 
     +-------+-------+-------+-------+-------+-------+-------+-------+
     |dest[7]|dest[6]|dest[5]|dest[4]|dest[3]|dest[2]|dest[1]|dest[0]|
@@ -415,11 +394,11 @@ cvt_num12_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
     memset(dest, 0, 8);
     /* exponents 15 -> 11 bits */
-    s = src[9] & 0x80; /* sign */
+    sign = src[9] & 0x80;
     expo = ((src[9] & 0x7f)<< 8 | src[8]);
     if (expo == 0) {
-nul:
-        if (s)
+      nul:
+        if (sign)
             dest[7] |= 0x80;
         return;
     }
@@ -442,135 +421,17 @@ nul:
     expo <<= 4;
     dest[6] = (expo & 0xff);
     dest[7] = (expo & 0x7f00) >> 8;
-    if (s)
+    if (sign)
         dest[7] |= 0x80;
     /* long double frac 63 bits => 52 bits
        src[7] &= 0x7f; reset integer bit */
     for (i = 0; i < 6; ++i) {
-        dest[i+1] |= (i==5 ? src[7]&0x7f : src[i+2]) >> 3;
+        dest[i+1] |= (i==5 ? src[7] & 0x7f : src[i+2]) >> 3;
         dest[i] |= (src[i+2] & 0x1f) << 5;
     }
     dest[0] |= src[1] >> 3;
 }
-#endif
 
-/*
-
-=item C<static void cvt_num16_num12(unsigned char *dest, const unsigned char
-*src)>
-
-Converts IEEE 754 LE 16-byte long double to i386 LE 12-byte long double.
-See http://babbage.cs.qc.cuny.edu/IEEE-754/References.xhtml
-
-Tested ok.
-
-=cut
-
-*/
-
-#if (NUMVAL_SIZE == 12)
-static void
-cvt_num16_num12(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
-{
-    ASSERT_ARGS(cvt_num16_num12)
-
-    /*
-       16-byte double (128 bits):
-       sign  1  bit 127
-       exp  15 bits 126-112
-       man 112 bits 111-0
-    to 12-byte double (96 bits):
-       sign  1  bit 95
-       exp  15 bits 94-80
-       man  80 bits 79-0
-
-    +-------+-------+-------+-------+-------+-------+--...--+-------+
-    |src[15]|src[14]|src[13]|src[12]|src[11]|src[10]| ...   |src[0] |
-    S|     E        |                    F                          |
-    +-------+-------+-------+-------+-------+-------+--...--+-------+
-    1|<-----15----->|<----------------112 bits--------------------->|
-    <---------------------------128 bits---------------------------->
-            16-byte LONG DOUBLE FLOATING-POINT (IA64 or BE 64-bit)
-
-    +-------+-------+-------+-------+-------+-------+--...--+-------+
-    |dest[11]dest[10]dest[9]|dest[8]|dest[7]|dest[6]| ...   |dest[0]|
-    S|     E        |                    F                          |
-    +-------+-------+-------+-------+-------+-------+--...--+-------+
-    1|<-----15----->|<----------------80 bits---------------------->|
-    <----------------------------96 bits---------------------------->
-              12-byte LONG DOUBLE FLOATING-POINT (i386 special)
-
-    */
-
-    memset(dest, 0, 12);
-    /* simply copy over sign + exp */
-    dest[10] = src[15];
-    dest[11] = src[14];
-    /* and copy the rest */
-    memcpy(&dest[0], &src[0], 10);
-}
-#endif
-
-/*
-
-=item C<static void cvt_num12_num16(unsigned char *dest, const unsigned char
-*src)>
-
-Converts i386 LE 12-byte long double to IEEE 754 LE 16-byte long double.
-
-Tested ok.
-Fallback 12->8->16 disabled.
-
-=cut
-
-*/
-
-#if (NUMVAL_SIZE == 16)
-static void
-cvt_num12_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
-{
-    ASSERT_ARGS(cvt_num12_num16)
-#  if 0
-    unsigned char b[8];
-    cvt_num12_num8(b, src);
-    cvt_num8_num16(dest, b);
-#  endif
-    /*
-       12-byte double (96 bits):
-       sign  1  bit 95
-       exp  15 bits 94-80
-       man  80 bits 79-0
-    to 16-byte double (128 bits):
-       sign  1  bit 127
-       exp  15 bits 126-112
-       man 112 bits 111-0
-
-    +-------+-------+-------+-------+-------+-------+--...--+-------+
-    |src[11]|src[10]| src[9]| src[8]| src[7]| src[6]| ...   | src[0]|
-    S|     E        |                    F                          |
-    +-------+-------+-------+-------+-------+-------+--...--+-------+
-    1|<-----15----->|<----------------80 bits---------------------->|
-    <----------------------------96 bits---------------------------->
-              12-byte LONG DOUBLE FLOATING-POINT (i386 special)
-
-    +-------+-------+-------+-------+-------+-------+--...--+-------+
-    |dest[15]dest[14]dest[13]dest[12]dest[11]dest[10] ...   |dest[0]|
-    S|     E        |                    F                          |
-    +-------+-------+-------+-------+-------+-------+--...--+-------+
-    1|<-----15----->|<----------------112 bits--------------------->|
-    <---------------------------128 bits---------------------------->
-            16-byte LONG DOUBLE FLOATING-POINT (x86_64 or BE 64-bit)
-
-    */
-
-    memset(dest, 0, 16);
-    /* simply copy over sign + exp */
-    dest[15] = src[11];
-    dest[14] = src[10];
-    /* and copy the rest */
-    memcpy(&dest[0], &src[0], 10);
-}
-#endif
 /*
 
 =item C<static void cvt_num16_num8(unsigned char *dest, const unsigned char
@@ -584,7 +445,6 @@ First variant ok, 2nd not ok.
 
 */
 
-#if (NUMVAL_SIZE == 8)
 static void
 cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
@@ -601,23 +461,25 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
     }
     else {
-        /* FIXME: This codepath fails */
-        int expo, i, s;
+        /* Yet untested. Need native sparc64 */
+        int expo, i, sign;
 #  ifdef __LCC__
         int expo2;
 #  endif
+#  if 0
         Parrot_x_force_error_exit(NULL, 1, "cvt_num16_num8: long double conversion unsupported");
+#  endif
 
     /* Have only 12-byte long double, or no long double at all. Need to disect it */
 
     /*
-       16-byte double (128 bits):
+       16-byte long double (128 bits):
        sign  1  bit 127
-       exp  15 bits 126-112
+       exp  15 bits 126-112 16383
        man 112 bits 111-0
     to 8-byte double (64 bits):
        sign  1  bit 63
-       exp  11 bits 62-52
+       exp  11 bits 62-52 1023
        man  52 bits 51-0
 
     +-------+-------+-------+-------+-------+-------+--...--+-------+
@@ -626,7 +488,7 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     +-------+-------+-------+-------+-------+-------+--...--+-------+
     1|<-----15----->|<----------------112 bits--------------------->|
     <---------------------------128 bits---------------------------->
-            16-byte LONG DOUBLE FLOATING-POINT (IA64 or BE 64-bit)
+            16-byte LONG DOUBLE FLOATING-POINT (Sparc 64-bit)
 
     +-------+-------+-------+-------+-------+-------+-------+-------+
     |dest[7]|dest[6]|dest[5]|dest[4]|dest[3]|dest[2]|dest[1]|dest[0]|
@@ -635,16 +497,15 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     1|<---11-->|<---------------------52 bits---------------------->|
     <----------------------------64 bits---------------------------->
                        8-byte DOUBLE FLOATING-POINT
-
    */
 
         memset(dest, 0, 8);
-        s = src[15] & 0x80; /* 10000000 */
+        sign = src[15] & 0x80; /* 10000000 */
         /* 15->11 exponents bits */
         expo = ((src[15] & 0x7f)<< 8 | src[14]);
         if (expo == 0) {
           nul:
-            if (s)
+            if (sign)
                 dest[7] |= 0x80;
             return;
         }
@@ -656,29 +517,181 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 #  else
         expo -= 16383;       /* - same bias as with 12-byte */
 #  endif
-        expo += 1023;       /* + bias 8byte */
+        expo += 1023;        /* + bias 8byte */
+
         if (expo <= 0)       /* underflow */
             goto nul;
-        if (expo > 0x7ff) {  /* inf/nan */
+        if (expo > 0x7ff) {  /* overflow, inf/nan */
             dest[7] = 0x7f;
-            dest[6] = src[7] == 0xc0 ? 0xf8 : 0xf0 ;
+            dest[6] |= src[7] == 0xc0 ? 0xf8 : 0xf0 ;
             goto nul;
         }
         expo <<= 4;
-        dest[6] = (expo & 0xff);
+        dest[6] |= (expo & 0xff);
         dest[7] = (expo & 0x7f00) >> 8;
-        if (s)
+        if (sign)
             dest[7] |= 0x80;
-        /* long double frac 112 bits => 52 bits
-           src[13] &= 0x7f; reset integer bit */
-        for (i = 0; i < 6; ++i) {
-            dest[i+1] |= (i==5 ? src[13]&0x7f : src[i+7]) >> 3;
-            dest[i] |= (src[i+7] & 0x1f) << 5;
-        }
-        dest[0] |= src[1] >> 3;
     }
 }
+
+static void
+cvt_num4_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+{
+    float f;
+    double d;
+    memcpy(&f, src, 4);
+    d = (double)f; /* TODO: test compiler cast */
+    memcpy(dest, &d, 8);
+}
+
 #endif
+
+/*
+
+=item C<static void cvt_num16_num10(unsigned char *dest, const unsigned char
+*src)>
+
+Converts IEEE 754 LE 16-byte long double to i386 LE 12-byte long double.
+See http://babbage.cs.qc.cuny.edu/IEEE-754/References.xhtml
+
+Tested ok.
+
+=cut
+
+*/
+
+#if (NUMVAL_SIZE == 12)
+static void
+cvt_num16_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+{
+    ASSERT_ARGS(cvt_num16_num10)
+
+    /*
+       16-byte double (128 bits):
+       sign  1  bit 127
+       exp  15 bits 126-112
+       man 112 bits 111-0
+    to 12-byte double (96 bits):
+       unused 16 bits 95-80
+       sign    1 bit  79
+       exp    15 bits 78-64
+       man    64 bits 63-0
+
+    +-------+-------+-------+-------+-------+-------+--...--+-------+
+    |src[15]|src[14]|src[13]|src[12]|src[11]|src[10]| ...   |src[0] |
+    S|     E        |                    F                          |
+    +-------+-------+-------+-------+-------+-------+--...--+-------+
+    1|<-----15----->|<----------------112 bits--------------------->|
+    <---------------------------128 bits---------------------------->
+            16-byte LONG DOUBLE FLOATING-POINT (IA64 or BE 64-bit)
+
+    +-------+-------+-------+-------+-------+-------+--...--+-------+
+    |dest[11]dest[10]dest[9]|dest[8]|dest[7]|dest[6]| ...   |dest[0]|
+    |   unused      |S|     Exp     |               Fract           |
+    +-------+-------+-------+-------+-------+-------+--...--+-------+
+    |<-----16------>|1|<-----15---->|<-----------64 bits----------->|
+    <-------------->|<----------------80 bits----------------------->
+              12-byte LONG DOUBLE FLOATING-POINT (i386 special)
+    */
+
+    memset(dest, 0, 12);
+    /* simply copy over sign + exp */
+    dest[8] = src[15];
+    dest[9] = src[14];
+    /* and copy the rest */
+    memcpy(&dest[0], &src[0], 8);
+}
+
+/*
+
+=item C<static void cvt_num8_num10(unsigned char *dest, const unsigned char
+*src)>
+
+Converts i386 8-byte double to i386 12 byte long double.
+
+Tested ok.
+
+=cut
+
+*/
+
+static void
+cvt_num8_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+{
+    ASSERT_ARGS(cvt_num8_num10)
+    long double ld;
+    double d;
+    memcpy(&d, src, 8);
+    ld = (long double)d; /* compiler cast */
+    memcpy(dest, &ld, 12);
+}
+
+static void
+cvt_num4_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+{
+    float f;
+    long double ld;
+    memcpy(&f, src, 4);
+    ld = (long double)f; /* TODO: test compiler cast */
+    memcpy(dest, &ld, sizeof(long double));
+}
+
+#endif
+
+/*
+
+=item C<static void cvt_num10_num16(unsigned char *dest, const unsigned char
+*src)>
+
+Converts i386 LE 10-byte long double to IEEE 754 LE 16-byte long double.
+
+Not tested yet.
+
+=cut
+
+*/
+
+#if (NUMVAL_SIZE == 16)
+static void
+cvt_num10_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+{
+    ASSERT_ARGS(cvt_num10_num16)
+    /*
+       12/16-byte double (80 bit):
+       unused padding 2-6 byte
+       sign    1 bit  79
+       exp    15 bits 78-64
+       man    64 bits 63-0
+    to 16-byte double (__float128):
+       sign  1  bit 127
+       exp  15 bits 126-112
+       man 112 bits 111-0
+
+    +-------+-------+-------+-------+-------+-------+--...--+-------+
+    |src[11]|src[10]|src[9] |src[8] |src[7] |src[6] | ...   |src[0] |
+    |    unused     |S|     Exp     |               Fract           |
+    +-------+-------+-------+-------+-------+-------+--...--+-------+
+    |<------------->|1|<-----15---->|<-----------64 bits----------->|
+    <-------------->|<----------------80 bits----------------------->
+           12/16-byte LONG DOUBLE FLOATING-POINT (intel special)
+
+    +-------+-------+-------+-------+-------+-------+--...--+-------+
+    |dest[15]dest[14]dest[13]dest[12]dest[11]dest[10] ...   |dest[0]|
+    S|     E        |                    F                          |
+    +-------+-------+-------+-------+-------+-------+--...--+-------+
+    1|<-----15----->|<----------------112 bits--------------------->|
+    <---------------------------128 bits---------------------------->
+            16-byte LONG DOUBLE FLOATING-POINT (BE 64-bit)
+
+    */
+
+    memset(dest, 0, 16);
+    /* simply copy over sign + exp */
+    dest[15] = src[9];
+    dest[14] = src[8];
+    /* and copy the rest */
+    memcpy(&dest[0], &src[0], 8);
+}
 
 /*
 
@@ -687,13 +700,12 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 Converts IEEE 754 8-byte double to IEEE 754 16 byte long double.
 
-Tested ok.
+Not yet tested.
 
 =cut
 
 */
 
-#if (NUMVAL_SIZE == 16)
 static void
 cvt_num8_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
@@ -705,230 +717,66 @@ cvt_num8_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     ld = (long double)d; /* TODO: test compiler cast */
     memcpy(dest, &ld, 16);
 }
-#endif
 
-/*
-
-=item C<static void cvt_num8_num12(unsigned char *dest, const unsigned char
-*src)>
-
-Converts i386 8-byte double to i386 12 byte long double.
-
-Tested ok.
-
-=cut
-
-*/
-
-#if (NUMVAL_SIZE == 12) && !PARROT_BIGENDIAN
 static void
-cvt_num8_num12(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+cvt_num4_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
-    ASSERT_ARGS(cvt_num8_num12)
+    float f;
     long double ld;
+    memcpy(&f, src, 4);
+    ld = (long double)f; /* TODO: test compiler cast */
+    memcpy(dest, &ld, sizeof(long double));
+}
+#endif
+
+#if (NUMVAL_SIZE == 4)
+static void
+cvt_num8_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+{
+    float f;
     double d;
-    memcpy(&d, src, 8);
-    ld = (long double)d; /* compiler cast */
-    memcpy(dest, &ld, 12);
+    memcpy(&d, src, 4);
+    f = (float)d; /* TODO: test compiler cast */
+    memcpy(dest, &f, 4);
 }
-#endif
 
-
-/*
-
-=item C<static void cvt_num8_num12_be(unsigned char *dest, const unsigned char
-*src)>
-
-Converts a big-endian IEEE 754 8-byte double to i386 LE 12-byte long double.
-
-Tested ok.
-
-=cut
-
-*/
-
-#if (NUMVAL_SIZE == 12) && !PARROT_BIGENDIAN
 static void
-cvt_num8_num12_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+cvt_num10_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
-    ASSERT_ARGS(cvt_num8_num12_be)
-    unsigned char b[8];
-    fetch_buf_be_8(b, src);
-    cvt_num8_num12(dest, b);
-}
+#if (__I86__ || defined(__INTEL__) || defined(_M_IA64) || defined(__ia64__))
+#  if NUMVAL_SIZE == 12
+    /* i386 only */
+    float f;
+    long double ld;
+    memcpy(&ld, src, 12);
+    f = (float)ld; /* TODO: test compiler cast */
+    memcpy(dest, &f, 4);
+#  elif NUMVAL_SIZE == 16
+    /* x86_64 or itanium */
+    float f;
+    long double ld;
+    memcpy(&ld, src, 16);
+    f = (float)ld; /* TODO: test compiler cast */
+    memcpy(dest, &f, 4);
+#  endif
+#else
+    cvt_num10_num8();
+    cvt_num8_num4();
 #endif
+}
 
-/*
-
-=item C<static void cvt_num8_num16_le(unsigned char *dest, const unsigned char
-*src)>
-
-Converts a little-endian IEEE 754 8-byte double to big-endian 16-byte long double.
-
-Yet untested.
-
-=cut
-
-*/
-
-#if (NUMVAL_SIZE == 16) && PARROT_BIGENDIAN
 static void
-cvt_num8_num16_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+cvt_num16_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
-    ASSERT_ARGS(cvt_num8_num16_le)
-    unsigned char b[8];
-    fetch_buf_be_8(b, src);  /* TODO test endianize */
-    cvt_num8_num16(dest, b);
+    float f;
+    long double ld;
+    /* 64bit only */
+    memcpy(&ld, src, 16);
+    f = (float)ld; /* TODO: test compiler cast */
+    memcpy(dest, &f, 4);
 }
 #endif
 
-/*
-
-=item C<static void cvt_num12_num16_le(unsigned char *dest, const unsigned char
-*src)>
-
-Converts a little-endian 12-byte double to big-endian 16-byte long double.
-
-Tested nok.
-
-=cut
-
-*/
-
-#if (NUMVAL_SIZE == 16) && PARROT_BIGENDIAN
-static void
-cvt_num12_num16_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
-{
-    ASSERT_ARGS(cvt_num12_num16_le)
-    unsigned char b[12];
-    fetch_buf_be_12(b, src);  /* TODO test endianize */
-    cvt_num12_num16(dest, b);
-}
-#endif
-
-/*
-
-=item C<static void cvt_num12_num8_le(unsigned char *dest, const unsigned char
-*src)>
-
-Converts a little-endian 12-byte i386 long double into a big-endian IEEE 754 8-byte double.
-
-Tested nok.
-
-=cut
-
-*/
-
-#if (NUMVAL_SIZE == 8) && PARROT_BIGENDIAN
-static void
-cvt_num12_num8_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
-{
-    ASSERT_ARGS(cvt_num12_num8_le)
-    unsigned char b[12];
-    fetch_buf_le_12(b, src);  /* TODO test endianize */
-    cvt_num12_num8(dest, b);
-    Parrot_x_force_error_exit(NULL, 1, "cvt_num12_num8_le: long double conversion unsupported");
-}
-#endif
-
-/*
-
-=item C<static void cvt_num16_num8_le(unsigned char *dest, const unsigned char
-*src)>
-
-Converts a little-endian IEEE 754 intel 16-byte long double into a
-big-endian IEEE 754 8-byte double.
-
-Tested nok. Produces all zeros.
-
-=cut
-
-*/
-
-#if (NUMVAL_SIZE == 8) && PARROT_BIGENDIAN
-static void
-cvt_num16_num8_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
-{
-    ASSERT_ARGS(cvt_num16_num8_le)
-    unsigned char b[16];
-    fetch_buf_le_16(b, src);
-    cvt_num16_num8(dest, b);
-    Parrot_x_force_error_exit(NULL, 1, "cvt_num16_num8_le: long double conversion unsupported");
-}
-#endif
-
-/*
-
-=item C<static void cvt_num16_num8_be(unsigned char *dest, const unsigned char
-*src)>
-
-Converts a big-endian IEEE 754 16-byte long double into a IEEE 754 8-byte double.
-
-Untested.
-
-=cut
-
-*/
-
-#if (NUMVAL_SIZE == 8) && !PARROT_BIGENDIAN
-static void
-cvt_num16_num8_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
-{
-    ASSERT_ARGS(cvt_num16_num8_be)
-    unsigned char b[16];
-    fetch_buf_be_16(b, src);
-    cvt_num16_num8(dest, b);
-}
-#endif
-
-/*
-
-=item C<static void cvt_num16_num12_be(unsigned char *dest, const unsigned char
-*src)>
-
-Converts a big-endian IEEE 754 16-byte long double into a 12-byte i386 long double.
-
-Untested.
-
-=cut
-
-*/
-
-#if (NUMVAL_SIZE == 12) && !PARROT_BIGENDIAN
-static void
-cvt_num16_num12_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
-{
-    ASSERT_ARGS(cvt_num16_num12_be)
-    unsigned char b[16];
-    fetch_buf_be_16(b, src);
-    cvt_num16_num12(dest, b);
-}
-#endif
-
-/*
-
-=item C<static void cvt_num8_num16_be(unsigned char *dest, const unsigned char
-*src)>
-
-Converts a big-endian IEEE 754 8-byte double to little-endian IEEE 754 16 byte
-long double.
-
-Untested.
-
-=cut
-
-*/
-
-#if (NUMVAL_SIZE == 16) && !PARROT_BIGENDIAN
-static void
-cvt_num8_num16_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
-{
-    ASSERT_ARGS(cvt_num8_num16_be)
-    unsigned char b[8];
-    fetch_buf_be_8(b, src);
-    cvt_num8_num16(dest, b);
-}
-#endif
 
 /*
 
@@ -1223,42 +1071,61 @@ FLOATVAL
 PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
 {
     ASSERT_ARGS(PF_fetch_number)
+
     /* When we have alignment all squared away we don't need
      * to use memcpy() for native byteorder.  */
-    FLOATVAL f;
-    double d;
+    FLOATVAL f = 0;
     if (!pf || !pf->fetch_nv) {
         memcpy(&f, (const char *)*stream, sizeof (FLOATVAL));
         (*stream) += (sizeof (FLOATVAL) + sizeof (opcode_t) - 1)/
             sizeof (opcode_t);
         return f;
     }
-    f = (FLOATVAL) 0;
     /* 12->8 has a messy cast. */
-    if (NUMVAL_SIZE == 8 && pf->header->floattype == FLOATTYPE_12) {
+    if (NUMVAL_SIZE == 8 && pf->header->floattype == FLOATTYPE_10) {
+        double d;
+        int floatsize = pf->header->wordsize == 8 ? 16 : 12;
         (pf->fetch_nv)((unsigned char *)&d, (const unsigned char *) *stream);
         f = d;
+        *((const unsigned char **) (stream)) += floatsize;
     }
     else {
+        int floatsize = PF_floattype_size[ pf->header->floattype ];
+        /* Intel x86_64 has FLOATTYPE_10 aligned to size 16. */
+        if ( floatsize == 12 && pf->header->wordsize == 8 )
+            floatsize = 16;
+        if ( pf->header->byteorder != PARROT_BIGENDIAN
+             /* and not already endianized in fetcher */
+             && NUMVAL_SIZE != floatsize )
+        {
+            const unsigned char *c = (const unsigned char *)*stream;
+#if 0
+            /* can swab in native wordsize? */
+            if (floatsize <= INTVAL_SIZE) {
+                if (floatsize == 8)
+                    bswap_64(&c);
+                else if (floatsize == 4)
+                    bswap_32(&c);
+                else if (floatsize == 2)
+                    bswap_16(&c);
+            }
+            else
+#endif
+            {
+                if (floatsize == 8) {
+                    unsigned char rb[8];
+                    SWAB_8(rb, c);
+                    memcpy(*stream, rb, 8);
+                }
+                else if (floatsize == 16) {
+                    unsigned char rb[16];
+                    SWAB_16(rb, c);
+                    memcpy(*stream, rb, 16);
+                }
+            }
+        }
         (pf->fetch_nv)((unsigned char *)&f, (const unsigned char *) *stream);
-    }
-    if (pf->header->floattype == FLOATTYPE_8) {
-        *((const unsigned char **) (stream)) += 8;
-    }
-    else if (pf->header->floattype == FLOATTYPE_12) {
-        *((const unsigned char **) (stream)) += 12;
-    }
-    else if (pf->header->floattype == FLOATTYPE_16) {
-        *((const unsigned char **) (stream)) += 16;
-    }
-    else if (pf->header->floattype == FLOATTYPE_16MIPS) {
-        *((const unsigned char **) (stream)) += 16;
-    }
-    else if (pf->header->floattype == FLOATTYPE_16AIX) {
-        *((const unsigned char **) (stream)) += 16;
-    }
-    else if (pf->header->floattype == FLOATTYPE_4) {
-        *((const unsigned char **) (stream)) += 4;
+        *((const unsigned char **) (stream)) += floatsize;
     }
     return f;
 }
@@ -1670,186 +1537,100 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
     pf->need_endianize = need_endianize;
     pf->need_wordsize  = need_wordsize;
 
-#if PARROT_BIGENDIAN
-    /* this Parrot is on a BIG ENDIAN machine */
     if (need_endianize) {
+#if PARROT_BIGENDIAN
         if (pf->header->wordsize == 4)
             pf->fetch_op = fetch_op_le_4;
         else
             pf->fetch_op = fetch_op_le_8;
-        pf->fetch_iv = pf->fetch_op;
-
-        switch (pf->header->floattype) {
-#  if NUMVAL_SIZE == 8
-          case FLOATTYPE_8:
-            pf->fetch_nv = fetch_buf_le_8;
-            break;
-          case FLOATTYPE_12:
-            pf->fetch_nv = cvt_num12_num8_le;
-            break;
-          case FLOATTYPE_16:
-            pf->fetch_nv = cvt_num16_num8_le;
-            break;
-#  endif
-#  if NUMVAL_SIZE == 16
-          case FLOATTYPE_8:
-            pf->fetch_nv = cvt_num8_num16_le;
-            break;
-          case FLOATTYPE_12:
-            pf->fetch_nv = cvt_num12_num16_le;
-            break;
-          case FLOATTYPE_16:
-            pf->fetch_nv = fetch_buf_le_16;
-            break;
-#  endif
-          default:
-            Parrot_x_force_error_exit(NULL, 1,
-              "PackFile_unpack: unsupported float conversion %d to %d, "
-              "PARROT_BIGENDIAN=%d\n",
-              NUMVAL_SIZE, pf->header->floattype, PARROT_BIGENDIAN);
-            break;
-        }
-        return;
-    }
-    else {  /* no need_endianize */
+#else
         if (pf->header->wordsize == 4)
             pf->fetch_op = fetch_op_be_4;
         else
             pf->fetch_op = fetch_op_be_8;
-        pf->fetch_iv = pf->fetch_op;
-
-        switch (pf->header->floattype) {
-#  if NUMVAL_SIZE == 8
-          case FLOATTYPE_8: /* native */
-            break;
-          case FLOATTYPE_12:
-            pf->fetch_nv = cvt_num12_num8;
-            break;
-          case FLOATTYPE_16:
-            pf->fetch_nv = cvt_num16_num8;
-            break;
-#  endif
-#  if NUMVAL_SIZE == 16
-          case FLOATTYPE_8:
-            pf->fetch_nv = cvt_num8_num16;
-            break;
-          case FLOATTYPE_12:
-            pf->fetch_nv = cvt_num12_num16;
-            break;
-          case FLOATTYPE_16: /* native */
-            break;
-#  endif
-          default:
-            Parrot_x_force_error_exit(NULL, 1,
-              "PackFile_unpack: unsupported float conversion %d to %d, "
-              "PARROT_BIGENDIAN=%d\n",
-              NUMVAL_SIZE, pf->header->floattype, PARROT_BIGENDIAN);
-            break;
-        }
-        return;
-    }
-
-#else  /* ENDIAN */
-
-    /* this Parrot is on a LITTLE ENDIAN machine */
-    if (need_endianize) {
-        if (pf->header->wordsize == 4)
-            pf->fetch_op = fetch_op_be_4;
-        else
-            pf->fetch_op = fetch_op_be_8;
-        pf->fetch_iv = pf->fetch_op;
-
-        switch (pf->header->floattype) {
-#  if NUMVAL_SIZE == 8
-          case FLOATTYPE_8:
-            pf->fetch_nv = fetch_buf_be_8;
-            break;
-          case FLOATTYPE_12:
-            Parrot_x_force_error_exit(NULL, 1, "PackFile_unpack: invalid floattype 1 big-endian");
-            break;
-          case FLOATTYPE_16:
-            pf->fetch_nv = cvt_num16_num8_be;
-            break;
-#  endif
-#  if NUMVAL_SIZE == 12
-          case FLOATTYPE_8:
-            pf->fetch_nv = cvt_num8_num12_be;
-            break;
-          case FLOATTYPE_12:
-            Parrot_x_force_error_exit(NULL, 1, "PackFile_unpack: invalid floattype 1 big-endian");
-            break;
-          case FLOATTYPE_16:
-            pf->fetch_nv = cvt_num16_num12_be;
-            break;
-#  endif
-#  if NUMVAL_SIZE == 16
-          case FLOATTYPE_8:
-            pf->fetch_nv = cvt_num8_num16_be;
-            break;
-          case FLOATTYPE_12:
-            Parrot_x_force_error_exit(NULL, 1, "PackFile_unpack: invalid floattype 1 big-endian");
-            break;
-          case FLOATTYPE_16:
-            pf->fetch_nv = fetch_buf_be_16;
-            break;
-#  endif
-          default:
-            Parrot_x_force_error_exit(NULL, 1,
-              "PackFile_unpack: unsupported float conversion %d to %d, "
-              "PARROT_BIGENDIAN=%d\n",
-              NUMVAL_SIZE, pf->header->floattype, PARROT_BIGENDIAN);
-            break;
-        }
-        return;
+#endif
     }
     else {
+#if PARROT_BIGENDIAN
+        if (pf->header->wordsize == 4)
+            pf->fetch_op = fetch_op_be_4;
+        else
+            pf->fetch_op = fetch_op_be_8;
+#else
         if (pf->header->wordsize == 4)
             pf->fetch_op = fetch_op_le_4;
         else
             pf->fetch_op = fetch_op_le_8;
-        pf->fetch_iv = pf->fetch_op;
+#endif
+    }
 
-        switch (pf->header->floattype) {
-#  if NUMVAL_SIZE == 8
-          case FLOATTYPE_8: /* native */
-            break;
-          case FLOATTYPE_12:
-            pf->fetch_nv = cvt_num12_num8;
-            break;
-          case FLOATTYPE_16:
-            pf->fetch_nv = cvt_num16_num8;
-            break;
-#  endif
-#  if NUMVAL_SIZE == 12
-          case FLOATTYPE_8:
-            pf->fetch_nv = cvt_num8_num12;
-            break;
-          case FLOATTYPE_12: /* native */
-            break;
-          case FLOATTYPE_16:
-            pf->fetch_nv = cvt_num16_num12;
-            break;
-#  endif
-#  if NUMVAL_SIZE == 16
-          case FLOATTYPE_8:
-            pf->fetch_nv = cvt_num8_num16;
-            break;
-          case FLOATTYPE_12:
-            pf->fetch_nv = cvt_num12_num16;
-            break;
-          case FLOATTYPE_16: /* native */
-            break;
-#  endif
-          default:
-            Parrot_x_force_error_exit(NULL, 1,
+    pf->fetch_iv = pf->fetch_op;
+
+    switch (pf->header->floattype) {
+#if NUMVAL_SIZE == 8
+      case FLOATTYPE_8:
+        pf->fetch_nv = pf->header->byteorder ? fetch_buf_be_8 : fetch_buf_le_8;
+        break;
+      case FLOATTYPE_10:
+        pf->fetch_nv = cvt_num10_num8;
+        break;
+      case FLOATTYPE_16:
+        pf->fetch_nv = cvt_num16_num8;
+        break;
+      case FLOATTYPE_4:
+        pf->fetch_nv = cvt_num4_num8;
+        break;
+#endif
+#if NUMVAL_SIZE == 12
+      case FLOATTYPE_8:
+        pf->fetch_nv = cvt_num8_num10;
+        break;
+      case FLOATTYPE_10:
+        pf->fetch_nv = pf->header->byteorder ? fetch_buf_be_12 : fetch_buf_le_12;
+        break;
+      case FLOATTYPE_16:
+        pf->fetch_nv = cvt_num16_num10;
+        break;
+      case FLOATTYPE_4:
+        pf->fetch_nv = cvt_num4_num10;
+        break;
+#endif
+#if NUMVAL_SIZE == 16
+      case FLOATTYPE_8:
+        pf->fetch_nv = cvt_num8_num16;
+        break;
+      case FLOATTYPE_10:
+        pf->fetch_nv = cvt_num10_num16;
+        break;
+      case FLOATTYPE_16:
+        pf->fetch_nv = pf->header->byteorder ? fetch_buf_be_16 : fetch_buf_le_16;
+        break;
+      case FLOATTYPE_4:
+        pf->fetch_nv = cvt_num4_num16;
+        break;
+#endif
+#if NUMVAL_SIZE == 4
+      case FLOATTYPE_8:
+        pf->fetch_nv = cvt_num8_num4;
+        break;
+      case FLOATTYPE_10:
+        pf->fetch_nv = cvt_num10_num4;
+        break;
+      case FLOATTYPE_16:
+        pf->fetch_nv = cvt_num16_num4;
+        break;
+      case FLOATTYPE_4:
+        pf->fetch_nv = pf->header->byteorder ? fetch_buf_be_4 : fetch_buf_le_4;
+        break;
+#endif
+      default:
+        Parrot_x_force_error_exit(NULL, 1,
               "PackFile_unpack: unsupported float conversion %d to %d, "
               "PARROT_BIGENDIAN=%d\n",
               NUMVAL_SIZE, pf->header->floattype, PARROT_BIGENDIAN);
             break;
-        }
-        return;
     }
-#endif
+    return;
 }
 
 
@@ -2034,7 +1815,7 @@ out of a padded buffer.
 
 =item C<static void fetch_buf_be_4(unsigned char *rb, const unsigned char *b)>
 
-Converts a 4-byte big-endian buffer C<b> into a little-endian C<rb>.
+Fetches a 4-byte big-endian buffer C<b> into C<rb>.
 
 =cut
 
@@ -2048,10 +1829,7 @@ fetch_buf_be_4(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 4);
 #else
-    rb[0] = b[3];
-    rb[1] = b[2];
-    rb[2] = b[1];
-    rb[3] = b[0];
+    SWAB_4(rb,b);
 #endif
 }
 
@@ -2059,7 +1837,7 @@ fetch_buf_be_4(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 
 =item C<static void fetch_buf_le_4(unsigned char *rb, const unsigned char *b)>
 
-Converts a 4-byte little-endian buffer C<b> into a big-endian buffer C<rb>.
+Fetches a 4-byte little-endian buffer C<b> into C<rb>.
 
 =cut
 
@@ -2073,10 +1851,7 @@ fetch_buf_le_4(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 4);
 #else
-    rb[0] = b[3];
-    rb[1] = b[2];
-    rb[2] = b[1];
-    rb[3] = b[0];
+    SWAB_4(rb,b);
 #endif
 }
 
@@ -2084,7 +1859,7 @@ fetch_buf_le_4(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 
 =item C<static void fetch_buf_be_8(unsigned char *rb, const unsigned char *b)>
 
-Converts an 8-byte big-endian buffer C<b> into a little-endian buffer C<rb>
+Fetches a 8-byte big-endian buffer C<b> into C<rb>.
 
 =cut
 
@@ -2098,14 +1873,7 @@ fetch_buf_be_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 8);
 #else
-    rb[0] = b[7];
-    rb[1] = b[6];
-    rb[2] = b[5];
-    rb[3] = b[4];
-    rb[4] = b[3];
-    rb[5] = b[2];
-    rb[6] = b[1];
-    rb[7] = b[0];
+    SWAB_8(rb,b);
 #endif
 }
 
@@ -2113,7 +1881,7 @@ fetch_buf_be_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 
 =item C<static void fetch_buf_le_8(unsigned char *rb, const unsigned char *b)>
 
-Converts an 8-byte little-endian buffer C<b> into a big-endian buffer C<rb>.
+Fetches a 8-byte little-endian buffer C<b> into C<rb>.
 
 =cut
 
@@ -2127,14 +1895,7 @@ fetch_buf_le_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 8);
 #else
-    rb[0] = b[7];
-    rb[1] = b[6];
-    rb[2] = b[5];
-    rb[3] = b[4];
-    rb[4] = b[3];
-    rb[5] = b[2];
-    rb[6] = b[1];
-    rb[7] = b[0];
+    SWAB_8(rb,b);
 #endif
 }
 
@@ -2142,7 +1903,7 @@ fetch_buf_le_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 
 =item C<static void fetch_buf_le_12(unsigned char *rb, const unsigned char *b)>
 
-Converts a 12-byte little-endian buffer C<b> into a big-endian buffer C<b>.
+Fetches a 12-byte little-endian buffer C<b> into C<rb>.
 
 =cut
 
@@ -2156,18 +1917,22 @@ fetch_buf_le_12(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 12);
 #else
-    rb[0]  = b[11];
-    rb[1]  = b[10];
-    rb[2]  = b[9];
-    rb[3]  = b[8];
-    rb[4]  = b[7];
-    rb[5]  = b[6];
-    rb[6]  = b[5];
-    rb[7]  = b[4];
-    rb[8]  = b[3];
-    rb[9]  = b[2];
-    rb[10] = b[1];
-    rb[11] = b[0];
+    SWAB_12(rb,b);
+#  if 0
+    /* what ?? */
+    rb[0]  = b[9];
+    rb[1]  = b[8];
+    rb[2]  = b[11];
+    rb[3]  = b[10];
+    rb[4]  = b[5];
+    rb[5]  = b[4];
+    rb[6]  = b[7];
+    rb[7]  = b[6];
+    rb[8]  = b[2];
+    rb[9]  = b[1];
+    rb[10] = b[4];
+    rb[11] = b[3];
+#  endif
 #endif
 }
 
@@ -2175,7 +1940,7 @@ fetch_buf_le_12(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 
 =item C<static void fetch_buf_be_12(unsigned char *rb, const unsigned char *b)>
 
-Converts a 12-byte big-endian buffer C<b> into a little-endian buffer C<b>.
+Fetches a 12-byte big-endian buffer C<b> into C<rb>.
 
 =cut
 
@@ -2189,18 +1954,7 @@ fetch_buf_be_12(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 12);
 #else
-    rb[0]  = b[11];
-    rb[1]  = b[10];
-    rb[2]  = b[9];
-    rb[3]  = b[8];
-    rb[4]  = b[7];
-    rb[5]  = b[6];
-    rb[6]  = b[5];
-    rb[7]  = b[4];
-    rb[8]  = b[3];
-    rb[9]  = b[2];
-    rb[10] = b[1];
-    rb[11] = b[0];
+    SWAB_12(rb,b);
 #endif
 }
 
@@ -2208,7 +1962,7 @@ fetch_buf_be_12(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 
 =item C<static void fetch_buf_le_16(unsigned char *rb, const unsigned char *b)>
 
-Converts a 16-byte little-endian buffer C<b> into a big-endian buffer C<b>.
+Fetches a 16-byte little-endian buffer C<b> into C<rb>.
 
 =cut
 
@@ -2222,22 +1976,7 @@ fetch_buf_le_16(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 16);
 #else
-    rb[0]  = b[15];
-    rb[1]  = b[14];
-    rb[2]  = b[13];
-    rb[3]  = b[12];
-    rb[4]  = b[11];
-    rb[5]  = b[10];
-    rb[6]  = b[9];
-    rb[7]  = b[8];
-    rb[8]  = b[7];
-    rb[9]  = b[6];
-    rb[10] = b[5];
-    rb[11] = b[4];
-    rb[12] = b[3];
-    rb[13] = b[2];
-    rb[14] = b[1];
-    rb[15] = b[0];
+    SWAB_16(rb,b);
 #endif
 }
 
@@ -2245,7 +1984,7 @@ fetch_buf_le_16(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 
 =item C<static void fetch_buf_be_16(unsigned char *rb, const unsigned char *b)>
 
-Converts a 16-byte big-endian buffer C<b> into a little-endian buffer C<b>.
+Fetches a 16-byte big-endian buffer C<b> into C<rb>.
 
 =cut
 
@@ -2259,22 +1998,7 @@ fetch_buf_be_16(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 16);
 #else
-    rb[0]  = b[15];
-    rb[1]  = b[14];
-    rb[2]  = b[13];
-    rb[3]  = b[12];
-    rb[4]  = b[11];
-    rb[5]  = b[10];
-    rb[6]  = b[9];
-    rb[7]  = b[8];
-    rb[8]  = b[7];
-    rb[9]  = b[6];
-    rb[10] = b[5];
-    rb[11] = b[4];
-    rb[12] = b[3];
-    rb[13] = b[2];
-    rb[14] = b[1];
-    rb[15] = b[0];
+    SWAB_16(rb,b);
 #endif
 }
 
@@ -2282,7 +2006,7 @@ fetch_buf_be_16(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 
 =item C<static void fetch_buf_le_32(unsigned char *rb, const unsigned char *b)>
 
-Converts a 32-byte little-endian buffer C<b> into a big-endian buffer C<b>.
+Fetches a 32-byte little-endian buffer C<b> into a C<rb>.
 
 =cut
 
@@ -2335,7 +2059,7 @@ fetch_buf_le_32(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 
 =item C<static void fetch_buf_be_32(unsigned char *rb, const unsigned char *b)>
 
-Converts a 32-byte big-endian buffer C<b> into a little-endian buffer C<b>.
+Fetches a 32-byte big-endian buffer C<b> into C<rb>.
 
 =cut
 
