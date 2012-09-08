@@ -1,168 +1,126 @@
 #!/bin/sh
 
-# sh tools/dev/mk_native_pbc [--noconf]
+# sh tools/dev/mk_native_pbc [--noconf] [config_opts...]
 #
 # Generate/update t/native_pbc/*_*.pbc
 # This should only be run on known systems to regenerate the native pbcs.
 # You need at least a multilib 64bit intel and powerpc machine to generate all.
-# QEMU images of big-endian 64bit machines are still being worked on, openbios
-# problems on SPARC64.
+# QEMU images of big-endian 64bit machines are still being worked on,
+#   still openbios problems on SPARC64 qemu.
+#
+# Without --noconf all known floatval types are tried to be generated.
+# float, double, long double, __float128
 #
 # NOTE: Installing ccache speeds this process up considerably.
+# E.g.
+# tools/dev/mk_native_pbc --m=32 --cc='ccache cc' --without-icu
+# tools/dev/mk_native_pbc --cc='ccache cc' --without-icu
 
-# Supported versions:
-#  i386 32 bit opcode_t, 32 bit intval, 8 byte double (linux-gcc-ix86, freebsd-gcc, cygwin)
-#  i386 32 bit opcode_t, 32 bit intval, 12 byte long double (linux-gcc-ix86)
-#  big-endian 32 bit opcode_t, 32 bit intval (darwin-ppc or mips)
-#  x86_64 8 byte double 64 bit opcode_t   (linux-gcc-x86_64, solaris-cc-64int)
-#  x86_64 16 byte long double 64 bit opcode_t (linux-gcc-x86_64, solaris-cc-64int)
-#  big-endian 64-bit 8 byte double       (sparc64, irix or similar)
-#  big-endian 64-bit 16-byte long double (sparc64, irix, mips or similar)
-# Not yet: (branch float)
-#  i386 32 bit opcode_t, 32 bit intval, 4-byte float --floatval=float
-#  big-endian 32 bit opcode_t, 4 byte intval, 4 byte single float
-#    (darwin or debian/ppc with --floatval="float")
-
-#tests:
-# t/native_pbc/testdata/integer.pasm
-# t/native_pbc/testdata/number.pasm
-# t/native_pbc/testdata/string.pasm
-
-# check 32/64 bit, endianess, hugefloat
 i_id=
 n_id=
-enable_long_double=
-conf=
+conf="$@"
 exe=
+targets="parrot parrot_config pbc_dump"
 
-byteorder=$(./parrot_config byteorder)
-ptrsize=$(./parrot_config ptrsize)
-intvalsize=$(./parrot_config intvalsize)
-# 4, 8, 12 or 16 on intel
-numvalsize=$(./parrot_config numvalsize)
+initconfig () {
+    byteorder=$(./parrot_config byteorder)
+    ptrsize=$(./parrot_config ptrsize)
+    intvalsize=$(./parrot_config intvalsize)
+    # 4, 8, 12, 16
+    numvalsize=$(./parrot_config numvalsize)
+    hugefloatvalsize=$(./parrot_config hugefloatvalsize)
+    # 4, 8, 10, 16, 16PPC, 16AIX, 16MIPS
+    floattype=$(./parrot_config floattype|sed 's,FLOATTYPE_,,')
+    if [ "$(echo $byteorder|cut -c1-2)" = "12" ]; then
+	suffix=le
+    else
+	suffix=be
+    fi
+    i_id=${intvalsize}_${suffix}
+    n_id=${intvalsize}_${floattype}_${suffix}
+}
 
-if [ "$(./parrot_config osname)" = "cygwin" ]; then
-    exe=.exe
-fi
-if [ "$ptrsize" = "4" ]
-then
-    if [ "$intvalsize" != "4" ]
-    then
-        echo "Sorry, unsupported perl - probably using use64bitint. ptrsize/intvalsize mismatch."
-	exit
-    fi
-    if [ "$byteorder" = "1234" ]
-    then
-        n_id=4_${numvalsize}_le
-	i_id=4_le
-        if [ "$numvalsize" = "8" ]
-	then
-            # try --floatval="long double" and see if that makes 12
-            enable_long_double=1
-            # force double on 2nd run not to default to long double
-            conf=" --floatval=double"
-        fi
-    else
-	i_id=4_be
-        n_id=4_${numvalsize}_be
-        if [ "$byteorder" = "4321" ]
-        then
-            echo "${n_id} PPC BE 32 bit opcode_t, 32 bit intval"
-        else
-            echo "${n_id} Sorry, unsupported perl - parrot ptrsize mismatch."
-            exit
-        fi
-    fi
-else
-    if [ "$ptrsize" = "8" ]
-    then
-        if [ "$byteorder" = "12345678" ]
-        then
-            n_id=8_${numvalsize}_le
-	    i_id=8_le
-            if [ "$numvalsize" = "8" ]
-            then
-                echo "${n_id} x86_64 double float 64 bit opcode_t, 8-byte double"
-                # try --floatval="long double" and see if that makes 16
-                enable_long_double=1
-                # force double on 2nd run not to default to long double
-                conf=" --floatval=double"
-            else
-                echo "${n_id} x86_64 64 bit opcode_t, 16-byte long double"
-            fi
-        else
-            n_id=8_${numvalsize}_be
-            if [ "$numvalsize" = "8" ]
-            then
-                echo "${n_id} big-endian 64-bit"
-                # try --floatval="long double" and see if that makes 16
-                enable_long_double=1
-                # force double on 2nd run not to default to long double
-                conf=" --floatval=double"
-            else
-                echo "${n_id} ppc/BE 64 bit opcode_t, 16-byte long double"
-            fi
-        fi
-    else
-        echo "unsupported ptrsize $ptrsize"
-        exit 1
-    fi
+createpbc () {
+    for T in integer string
+    do
+	./parrot -o t/native_pbc/${T}_${i_id}.pbc t/native_pbc/testdata/${T}.pasm && \
+	    echo "t/native_pbc/${T}_${i_id}.pbc updated"
+    done
+    for T in number
+    do
+	./parrot -o t/native_pbc/${T}_${n_id}.pbc t/native_pbc/testdata/${T}.pasm && \
+	    echo "t/native_pbc/${T}_${n_id}.pbc updated"
+    done
+}
+
+if [ "$(./parrot_config osname)" = "cygwin" ]; then exe=.exe; fi
+if [ "$ptrsize" = "4" -a "$intvalsize" != "4" ]; then
+    echo "Sorry, unsupported perl - probably using use64bitint. ptrsize/intvalsize mismatch."
+    exit
 fi
 
 echo ""
 if [ "$1" != "--noconf" ]; then
     make -s prog-clean
-    perl Configure.pl --debugging $conf --nomanicheck --without-icu --without-pcre --without-gmp --without-libffi
+    perl Configure.pl --debugging $conf --nomanicheck --without-icu --without-pcre --without-gmp --without-libffi --without-opengl
 fi
 tail myconfig
-make -s || exit 1
+make -s $targets || exit 1
 
-for T in integer string
-do
-    ./parrot -o t/native_pbc/${T}_${i_id}.pbc t/native_pbc/testdata/${T}.pasm && \
-	echo "t/native_pbc/${T}_${i_id}.pbc updated"
-done
-for T in number
-do
-    ./parrot -o t/native_pbc/${T}_${n_id}.pbc t/native_pbc/testdata/${T}.pasm && \
-	echo "t/native_pbc/${T}_${n_id}.pbc updated"
-done
+initconfig
+createpbc
 
-# broken
 #make pbc_dump$exe
 #./pbc_dump -h t/native_pbc/number_${id}.pbc
 perl tools/dev/pbc_header.pl t/native_pbc/number_${n_id}.pbc
-
 perl t/harness t/native_pbc/integer.t t/native_pbc/number.t t/native_pbc/string.t
 
-if [ "$enable_long_double" = "1" ]; then
-    if [ "$1" = "--noconf" ]; then
-      echo "Hmm. You have no long double, and we want to try --floatval=long double"
-      echo "However for this you must reconfigure your parrot and you gave --noconf"
-      exit
-    fi
+# reconfigure with various floatvals
+reconfig () {
+    floatval="$1"
+    shift
     make -s prog-clean
-    perl Configure.pl --floatval="long double" --nomanicheck
+    echo perl Configure.pl --floatval=\"$floatval\" --nomanicheck $@
+    perl Configure.pl --floatval=\"$floatval\" $conf --nomanicheck $@
     tail myconfig
-    make -s || exit 1
-    hugefloatvalsize=$(./parrot_config hugefloatvalsize)
-    numvalsize=$(./parrot_config numvalsize)
-    #if [ "hugefloatvalsize" = "12" ]; then echo "Only 12 byte long double. Sorry"; exit; fi
-    #if [ "numvalsize" = "12" ]; then echo "Only 12 byte double. Sorry"; exit; fi
-    if [ "${byteorder:0:2}" = "12" ]; then
-        M=${intvalsize}_${numvalsize}_le
-    else
-        M=${intvalsize}_${numvalsize}_be
-    fi
-    ./parrot -o t/native_pbc/number_${M}.pbc t/native_pbc/testdata/number.pasm \
-	&& echo "t/native_pbc/number_${M}.pbc updated"
-    make pbc_dump$exe
-    ./pbc_dump -h t/native_pbc/number_${M}.pbc
+    make -s $targets || return
+    initconfig
+    ./parrot -o t/native_pbc/number_${n_id}.pbc t/native_pbc/testdata/number.pasm \
+	&& echo "t/native_pbc/number_${n_id}.pbc updated"
+    perl tools/dev/pbc_header.pl t/native_pbc/number_${n_id}.pbc
+    perl t/harness t/native_pbc/number.t
+}
 
-    perl t/harness t/native_pbc/integer.t t/native_pbc/number.t t/native_pbc/string.t
+if [ "x$1" != "x--noconf" ]
+then
+    case "$numvalsize" in
+	"4")
+	    reconfig "double" $conf
+	    reconfig "long double" $conf
+	    reconfig "__float128" $conf
+	    ;;
+	"8")
+	    if [ "$hugefloatvalsize" != "8" ]; then
+		reconfig "long double" $conf
+	    fi
+	    reconfig "float" $conf
+	    reconfig "__float128" $conf
+	    ;;
+	"12")
+	    reconfig "double" $conf
+	    reconfig "float" $conf
+	    reconfig "__float128" $conf
+	    ;;
+	"16")
+	    reconfig "double" $conf
+	    reconfig "float" $conf
+	    if [ "$floattype" != "16" ]; then
+		reconfig "__float128" $conf
+	    fi
+	    ;;
+    esac
 fi
 
 echo "You should run these commands to update the PBC files in your repo:"
-echo "cd t/native_pbc"
-echo "git add *.pbc"
+echo "git add t/native_pbc/*.pbc"
 echo "git commit -m 'native_pbc platform updates'"
