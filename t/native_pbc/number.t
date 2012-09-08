@@ -67,6 +67,7 @@ sub generate_skip_list {
 my $todo = generate_skip_list($arch, '?');
 my $skip = generate_skip_list($arch, '0');
 
+# old and unused
 my $output1 = << 'END_OUTPUT';
 1
 4
@@ -125,7 +126,6 @@ my $output2 = << 'END_OUTPUT';
 17592186044416
 70368744177664
 281474976710656
-1125899906842620
 END_OUTPUT
 
 my $output = $output2;
