@@ -55,7 +55,7 @@ sub runstep {
     _handle_ptrcast(
         $conf, \%types, $sizes, [ @std_ints, @extra_ints ]);
 
-    for ( keys %types ) {
+    for ( sort keys %types ) {
         $conf->data->set( $_.'size' => $sizes->{$types{$_}} );
     }
 

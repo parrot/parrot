@@ -151,6 +151,8 @@ typedef void DPOINTER;
 #define INTVAL_FMT "@intvalfmt@"
 #define FLOATVAL_FMT "@floatvalfmt@"
 
+#define FLOATTYPE @floattype@
+
 #include "parrot/has_header.h"
 #include "parrot/feature.h"
 

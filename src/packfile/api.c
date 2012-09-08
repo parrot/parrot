@@ -1372,35 +1372,7 @@ PackFile_set_header(ARGOUT(PackFile_Header *header))
     header->patch       = PARROT_PATCH_VERSION;
     header->bc_major    = PARROT_PBC_MAJOR;
     header->bc_minor    = PARROT_PBC_MINOR;
-#if NUMVAL_SIZE == 8
-    header->floattype = FLOATTYPE_8; /* IEEE-754 8 byte double */
-/* intel 80bit extended precision format, aligned or not */
-/* http://sourceforge.net/apps/mediawiki/predef/index.php?title=Architectures#Intel_x86 */
-#elif ((NUMVAL_SIZE == 12 || NUMVAL_SIZE == 16) \
-       && (defined(i386) || defined(__I86__) || defined(__INTEL__) \
-           || defined(_M_IA64) || defined(__ia64__)) \
-        && !PARROT_BIGENDIAN)
-    header->floattype = FLOATTYPE_10;
-/* Non-Intel 16 byte quad double */
-#elif (NUMVAL_SIZE == 16)
-    /* This is IEEE-754 Sparc64, also gcc __float128.
-       TODO: Need to know if i64 uses this format */
-    header->floattype = FLOATTYPE_16;
-#  if defined(__mips__)
-    header->floattype = FLOATTYPE_16MIPS;
-#  elif (defined(__powerpc) && OPCODE_T_SIZE == 8)
-    header->floattype = FLOATTYPE_16PPC;
-#  elif defined(_AIX)
-    header->floattype = FLOATTYPE_16AIX;
-#  endif
-#elif (NUMVAL_SIZE == 4)
-    header->floattype = FLOATTYPE_4;
-#else
-    Parrot_x_force_error_exit(NULL, 1,
-        "PackFile_set_header: Unsupported floattype NUMVAL_SIZE=%d,"
-        " PARROT_BIGENDIAN=%s\n", NUMVAL_SIZE,
-        PARROT_BIGENDIAN ? "big-endian" : "little-endian");
-#endif
+    header->floattype   = FLOATTYPE;
 }
 
 

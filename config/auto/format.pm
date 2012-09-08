@@ -61,43 +61,67 @@ sub _set_intvalfmt {
 
 sub _set_floatvalfmt_nvsize {
     my $conf = shift;
-    my ( $nv, $floatsize, $doublesize, $ldsize ) =
-        $conf->data->get(qw(nv floatsize doublesize hugefloatvalsize));
-    my ( $nvformat, $nvsize );
+    my ( $nv, $floatsize, $doublesize, $ldsize, $cpuarch ) =
+        $conf->data->get(qw(nv floatsize doublesize hugefloatvalsize cpuarch));
+    my ( $nvformat, $nvsize, $floattype );
     $nvsize = $floatsize;
     if ( $nv eq "double" ) {
         $nvsize   = $doublesize;
         $nvformat = "%.15g";
+	$floattype = 'FLOATTYPE_8';
     }
     elsif ( $nv eq "long double" ) {
-
-        # long double may be 64 or 80 bits or even quadmath.
+        # 64 or 80 bits, 12 or 16 bytes
         $nvsize   = $ldsize;
         my $spri = $conf->data->get('sPRIgldbl_provisional');
         if ( defined $spri ) {
 	    # TT #308 same values as in imcc
 	    if ($nvsize == 8) {
+		$floattype = 'FLOATTYPE_8';
 		$nvformat = "%.16" .  $spri;
 	    }
 	    elsif ($nvsize == 12) {
+		$floattype = 'FLOATTYPE_10';
 		$nvformat = "%.16Lg"; # i386 only
 	    }
 	    elsif ($nvsize == 16) {
-		# only on a sparc64/s390 or __float128. intel cheats
-		$nvformat = $nv eq '__float128'
-		    ? "%Qe"     # libquadmath printf hook support (linux only).
-		                # TODO probe for it.
-		    : "%.16Lg"; # intel, ppc, mips, aix
+		$nvformat = "%.41Lg";
+		if ($cpuarch =~ /^amd64|ia64$/) {
+		    $floattype = 'FLOATTYPE_10';
+		    $nvformat = "%.16Lg";
+		}
+		elsif ($cpuarch eq 'mips') {
+		    # quadmath with special NaN
+		    $floattype = 'FLOATTYPE_16MIPS';
+		}
+		elsif ($cpuarch eq 'ppc') {
+		    # double-double
+		    $floattype = 'FLOATTYPE_16PPC';
+		}
+		elsif ($cpuarch =~ /^s390|sparc/) {
+		    # IEEE-754 quadmath
+		    $floattype = 'FLOATTYPE_16';
+		}
+		else {
+		    die qq{Configure.pl:  Can't find the binary representation for '$nv'\n};
+		}
 	    }
             $nvformat =~ s/"//g;   # Perl 5's Config value has embedded double quotes
         }
-        else {
-            die qq{Configure.pl:  Can't find a printf-style format specifier for type '$nv'\n};
-        }
+	else {
+	    die qq{Configure.pl:  Can't find a printf-style format specifier for type '$nv'\n};
+	}
+    }
+    elsif ( $nv eq '__float128' ) {
+	$nvsize   = $ldsize;
+	# TODO probe for it.
+	$nvformat = "%Qg";   # libquadmath printf hook support (linux only).
+	$floattype = 'FLOATTYPE_16';
     }
     elsif ( $nv eq "float" ) {
         $nvsize   = 4;
         $nvformat = "%.7g"; # http://www.keil.com/support/docs/2191.htm
+	$floattype = 'FLOATTYPE_4';
     }
     else {
         die qq{Configure.pl:  Can't find a printf-style format specifier for type '$nv'\n};
@@ -105,7 +129,8 @@ sub _set_floatvalfmt_nvsize {
 
     $conf->data->set(
         floatvalfmt => $nvformat,
-        nvsize      => $nvsize
+        nvsize      => $nvsize,
+        floattype   => $floattype
     );
 }
 
