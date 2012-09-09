@@ -98,19 +98,24 @@ then
 	"4")
 	    reconfig "double" $conf
 	    reconfig "long double" $conf
-	    reconfig "__float128" $conf
+	    if [ x$ptrsize = x8 ]; then
+		reconfig "__float128" $conf
+	    fi
 	    ;;
 	"8")
 	    if [ "$hugefloatvalsize" != "8" ]; then
 		reconfig "long double" $conf
 	    fi
 	    reconfig "float" $conf
-	    reconfig "__float128" $conf
+	    if [ x$ptrsize = x8 ]; then
+		reconfig "__float128" $conf
 	    ;;
 	"12")
 	    reconfig "double" $conf
 	    reconfig "float" $conf
-	    reconfig "__float128" $conf
+	    if [ x$ptrsize = x8 ]; then
+		reconfig "__float128" $conf
+	    fi
 	    ;;
 	"16")
 	    reconfig "double" $conf

@@ -9,7 +9,7 @@ use Parrot::Config;
 use Parrot::BuildUtil;
 use t::native_pbc::Test;
 
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 11;
 
 # Testmatrix for coverage overview (GH #394)
 # float conversion src: left-side (pbc) to dest: upper-side (platform)
@@ -20,10 +20,10 @@ use Parrot::Test tests => 8;
 # The _le there is for reading.
 # 8_16_le=>4_8_le fails, but 8_16_le=>8_8_le passes
 my $testmatrix = <<EOF;
-        8_le 12_le 16_le 8_be 16_be  4_le 4_be
-8_le     1     1    1     0     0     ?    ?
-12_le    1     1    1     0     0     ?    ?
-16_le    S4    1    1     0     0     ?    ?
+        8_le 10_le 16_le 8_be 16_be  4_le 4_be
+8_le     1     1    1     ?     0     ?    ?
+10_le    1     1    1     ?     0     ?    ?
+16_le    S4    1    1     ?     0     ?    ?
 8_be     1     1    1     1     1     ?    ?
 16_be    ?     ?    ?     ?     1     ?    ?
 4_le     ?     ?    ?     ?     ?     ?    ?
@@ -143,7 +143,7 @@ sub test_pbc_number {
 test_pbc_number('4_8_le', "i386 32 bit opcode_t, 4 byte intval, 8 byte double");
 
 #         floattype = 1   (interpreter's NUMVAL_SIZE     = 12)
-test_pbc_number('4_12_le', "i386 32 bit opcode_t, 4 byte intval, 12 byte long double");
+test_pbc_number('4_10_le', "i386 32 bit opcode_t, 4 byte intval, 12 byte long double");
 
 # darwin/ppc:
 #         floattype = 0   (interpreter's NUMVAL_SIZE     = 8)
@@ -153,9 +153,13 @@ test_pbc_number('4_8_be', "big-endian 32 bit opcode_t, 4 byte intval, 8 byte dou
 #         floattype = 0   (interpreter's NUMVAL_SIZE     = 8)
 test_pbc_number('8_8_le', "x86_64 64 bit opcode_t, 8 byte intval, 8 byte double");
 
-# i86_64 with floatval='long double'
+# x86_64 with floatval='long double'
+#         floattype = 1   (interpreter's NUMVAL_SIZE     = 16)
+test_pbc_number('8_10_le', "x86_64 64 bit opcode_t, 8 byte intval, 16 byte long double");
+
+# x86_64 with floatval='__float128'
 #         floattype = 2   (interpreter's NUMVAL_SIZE     = 16)
-test_pbc_number('8_16_le', "x86_64 64 bit opcode_t, 8 byte intval, 16 byte long double");
+test_pbc_number('8_16_le', "x86_64 64 bit opcode_t, 8 byte intval, 16 byte __float128");
 
 # PowerPC64 -m64
 #         floattype = 0   (interpreter's NUMVAL_SIZE     = 8)
@@ -168,11 +172,11 @@ test_pbc_number('4_16_be', "big-endian 32 bit opcode_t, 4 byte intval, 16 byte l
 
 # i386 --floatval=float
 #         floattype = 3   (interpreter's NUMVAL_SIZE     = 4)
-#test_pbc_number('4_4_le', "i386 32 bit opcode_t, 4 byte intval, 4 byte single float");
+test_pbc_number('4_4_le', "i386 32 bit opcode_t, 4 byte intval, 4 byte single float");
 
 # ppc -m32 --floatval=float
 #         floattype = 3   (interpreter's NUMVAL_SIZE     = 4)
-#test_pbc_number('4_4_be', "big-endian 32 bit opcode_t, 4 byte intval, 4 byte single float");
+test_pbc_number('4_4_be', "big-endian 32 bit opcode_t, 4 byte intval, 4 byte single float");
 
 =head1 NAME
 

@@ -99,7 +99,7 @@ sub _set_floatvalfmt_nvsize {
 		    $floattype = 'FLOATTYPE_16PPC';
 		}
 		elsif ($cpuarch =~ /^s390|sparc/) {
-		    # IEEE-754 quadmath
+		    # native IEEE-754 quadmath
 		    $floattype = 'FLOATTYPE_16';
 		}
 		else {
@@ -114,8 +114,8 @@ sub _set_floatvalfmt_nvsize {
     }
     elsif ( $nv eq '__float128' ) {
 	$nvsize   = $ldsize;
-	# TODO probe for it.
-	$nvformat = "%Qg";   # libquadmath printf hook support (linux only).
+	# TODO probe for "%Qg" libquadmath printf hook support (linux only)
+	$nvformat = "%.41Lg";
 	$floattype = 'FLOATTYPE_16';
     }
     elsif ( $nv eq "float" ) {
