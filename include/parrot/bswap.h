@@ -7,6 +7,11 @@
 
 #ifdef HAS_HEADER_BYTESWAP
 #  include <byteswap.h>                    /* GNU */
+#  define bswap_16(x) __bswap_16(x)
+#  define bswap_32(x) __bswap_32(x)
+#  if __WORDSIZE == 64
+#    define bswap_64(x) __bswap_64(x)
+#   endif
 #else
 #  ifdef HAS_HEADER_ENDIAN                 /* linux */
 #    include <endian.h>
@@ -75,7 +80,8 @@
 #          else
 #            define bswap_64(x) ({   \
                unsigned char rb[16]; \
-	       SWAB_16(rb,(const unsigned char *)x); \
+               const unsigned char *c = &x; \
+               SWAB_16(rb,c); \
 	       memcpy(x,rb,16); })
 #          endif
 #        endif
@@ -178,11 +184,12 @@ static inline Parrot_UInt4 bswap32(Parrot_UInt4 x)
 
 static inline Parrot_UInt8 bswap64(Parrot_UInt8 x)
 {
-#ifdef bswap_64
+#if defined(bswap_64)
     return bswap_64(x);
 #else
     unsigned char rb[16];
-    SWAB_16(rb,(const unsigned char *)x);
+    const unsigned char *c = &x;
+    SWAB_16(rb, c);
     return rb;
 #endif
 }
