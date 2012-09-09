@@ -61,24 +61,22 @@ sub _set_intvalfmt {
 
 sub _set_floatvalfmt_nvsize {
     my $conf = shift;
-    my ( $nv, $floatsize, $doublesize, $ldsize, $cpuarch ) =
-        $conf->data->get(qw(nv floatsize doublesize hugefloatvalsize cpuarch));
+    my ( $nv, $numvalsize, $cpuarch ) =
+        $conf->data->get(qw(nv numvalsize cpuarch));
     my ( $nvformat, $nvsize, $floattype );
-    $nvsize = $floatsize;
+    $nvsize = $numvalsize;
     if ( $nv eq "double" ) {
-        $nvsize   = $doublesize;
         $nvformat = "%.15g";
 	$floattype = 'FLOATTYPE_8';
     }
     elsif ( $nv eq "long double" ) {
         # 64 or 80 bits, 12 or 16 bytes
-        $nvsize   = $ldsize;
         my $spri = $conf->data->get('sPRIgldbl_provisional');
         if ( defined $spri ) {
 	    # TT #308 same values as in imcc
 	    if ($nvsize == 8) {
 		$floattype = 'FLOATTYPE_8';
-		$nvformat = "%.16" .  $spri;
+		$nvformat = "%.15" .  $spri;
 	    }
 	    elsif ($nvsize == 12) {
 		$floattype = 'FLOATTYPE_10';
@@ -86,7 +84,7 @@ sub _set_floatvalfmt_nvsize {
 	    }
 	    elsif ($nvsize == 16) {
 		$nvformat = "%.41Lg";
-		if ($cpuarch =~ /^amd64|ia64$/) {
+		if ($cpuarch =~ /^i386|amd64|ia64$/) {
 		    $floattype = 'FLOATTYPE_10';
 		    $nvformat = "%.16Lg";
 		}
@@ -95,7 +93,8 @@ sub _set_floatvalfmt_nvsize {
 		    $floattype = 'FLOATTYPE_16MIPS';
 		}
 		elsif ($cpuarch eq 'ppc') {
-		    # double-double
+		    # double-double https://developer.apple.com/library/mac/#documentation/Darwin/Reference/ManPages/man3/float.3.html
+		    $nvformat = "%.31Lg";
 		    $floattype = 'FLOATTYPE_16PPC';
 		}
 		elsif ($cpuarch =~ /^s390|sparc/) {
@@ -113,7 +112,6 @@ sub _set_floatvalfmt_nvsize {
 	}
     }
     elsif ( $nv eq '__float128' ) {
-	$nvsize   = $ldsize;
 	# TODO probe for "%Qg" libquadmath printf hook support (linux only)
 	$nvformat = "%.41Lg";
 	$floattype = 'FLOATTYPE_16';
