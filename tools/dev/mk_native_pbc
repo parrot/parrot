@@ -23,6 +23,7 @@ exe=
 targets="parrot parrot_config pbc_dump"
 
 initconfig () {
+    test -e parrot_config || exit
     byteorder=$(./parrot_config byteorder)
     ptrsize=$(./parrot_config ptrsize)
     intvalsize=$(./parrot_config intvalsize)
@@ -53,21 +54,19 @@ createpbc () {
     done
 }
 
+echo ""
+tail -n4 myconfig
+echo make -s $targets
+make -s $targets || exit 1
+
+initconfig
+
 if [ "$(./parrot_config osname)" = "cygwin" ]; then exe=.exe; fi
 if [ "$ptrsize" = "4" -a "$intvalsize" != "4" ]; then
     echo "Sorry, unsupported perl - probably using use64bitint. ptrsize/intvalsize mismatch."
     exit
 fi
 
-echo ""
-if [ "$1" != "--noconf" ]; then
-    make -s prog-clean
-    perl Configure.pl --debugging $conf --nomanicheck --without-icu --without-pcre --without-gmp --without-libffi --without-opengl
-fi
-tail myconfig
-make -s $targets || exit 1
-
-initconfig
 createpbc
 
 #make pbc_dump$exe
@@ -80,9 +79,11 @@ reconfig () {
     floatval="$1"
     shift
     make -s prog-clean
-    echo perl Configure.pl --floatval=\"$floatval\" --nomanicheck $@
-    perl Configure.pl --floatval=\"$floatval\" $conf --nomanicheck $@
-    tail myconfig
+    confargs="--nomanicheck --without-icu --without-pcre --without-gmp --without-libffi --without-opengl"
+    echo perl Configure.pl --floatval="$floatval" $confargs $@
+    perl Configure.pl --floatval="$floatval" $conf $confargs $@
+    tail -n4 myconfig
+    echo make -s $targets
     make -s $targets || return
     initconfig
     ./parrot -o t/native_pbc/number_${n_id}.pbc t/native_pbc/testdata/number.pasm \

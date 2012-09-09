@@ -355,7 +355,6 @@ Tested ok.
 
 */
 
-#if (NUMVAL_SIZE == 8)
 static void
 cvt_num10_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
@@ -445,6 +444,7 @@ First variant ok, 2nd not ok.
 
 */
 
+#if (NUMVAL_SIZE == 8)
 static void
 cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
@@ -729,7 +729,6 @@ cvt_num4_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 }
 #endif
 
-#if (NUMVAL_SIZE == 4)
 static void
 cvt_num8_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
@@ -740,10 +739,11 @@ cvt_num8_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     memcpy(dest, &f, 4);
 }
 
+#if (NUMVAL_SIZE == 4)
 static void
 cvt_num10_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
-#if (__I86__ || defined(__INTEL__) || defined(_M_IA64) || defined(__ia64__))
+#if (defined(__I86__) || defined(__INTEL__) || defined(_M_IA64) || defined(__ia64__))
 #  if NUMVAL_SIZE == 12
     /* i386 only */
     float f;
@@ -760,8 +760,8 @@ cvt_num10_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     memcpy(dest, &f, 4);
 #  endif
 #else
-    cvt_num10_num8();
-    cvt_num8_num4();
+    cvt_num10_num8(dest, src);
+    cvt_num8_num4(dest, src);
 #endif
 }
 
