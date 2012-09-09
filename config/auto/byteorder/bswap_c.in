@@ -1,0 +1,68 @@
+/*
+Copyright (C) 2012, Parrot Foundation.
+
+*/
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <stdint.h>
+
+#include <@TEMP_include@>
+
+#ifdef HAS_HEADER_BYTESWAP
+#  include <byteswap.h>
+#else
+#  ifdef HAS_HEADER_ENDIAN
+#    include <endian.h>
+#  elif defined(HAS_HEADER_SYS_ENDIAN)
+#    include <sys/endian.h>
+#  endif
+#  if defined(HAS_HEADER_ENDIAN) || defined(HAS_HEADER_SYS_ENDIAN)
+#    define bswap_16(x) __bswap_16(x)
+#    define bswap_32(x) __bswap_32(x)
+#    if __WORDSIZE == 64
+#      define bswap_64(x) __bswap_64(x)
+#    endif
+#  else
+#    ifdef HAS_HEADER_LIBKERN_OSBYTEORDER
+#      if __BYTE_ORDER == __LITTLE_ENDIAN
+#        define bswap_16(x) OSSwapHostToBigInt16(x)
+#        define bswap_32(x) OSSwapHostToBigInt32(x)
+#        if __WORDSIZE == 64
+#          define bswap_64(x) OSSwapHostToBigInt64(x)
+#        endif
+#      else
+#        define bswap_16(x) OSSwapBigToHostInt16(x)
+#        define bswap_32(x) OSSwapBigToHostInt32(x)
+#        if __WORDSIZE == 64
+#          define bswap_64(x) OSSwapBigToHostInt64(x)
+#        endif
+#      endif
+#    else
+#      define bswap_16(x) { unsigned char rb[4]; SWAB_4(rb,x); memcpy(x,rb,4); }
+#      define bswap_32(x) { unsigned char rb[8]; SWAB_8(rb,x); memcpy(x,rb,8); }
+#      if __WORDSIZE == 64
+#        define bswap_64(x) { unsigned char rb[16]; SWAB_16(rb,x); memcpy(x,rb,16); }
+#      endif
+#    endif
+#  endif
+#endif
+
+int
+main()
+{
+    long l = 0x12345678;
+    bswap_16(l);
+    bswap_32(l);
+#if __WORDSIZE == 64
+    bswap_64(l);
+#endif
+    return EXIT_SUCCESS;
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */
