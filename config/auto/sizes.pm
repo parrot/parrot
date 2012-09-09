@@ -42,6 +42,7 @@ sub runstep {
         float      => 'float',
         double     => 'double',
         longdouble => 'long double',
+        float128   => '__float128',
     );
 
     my @std_ints   = ( 'short', 'int', 'long', 'long long' );
@@ -51,6 +52,7 @@ sub runstep {
     my $sizes = _get_sizes($conf, values %types, @extra_ints);
 
     $conf->data->set( HAS_LONGLONG => $sizes->{'long long'} ? 1 : 0 );
+    $conf->data->set( HAS_FLOAT128 => $sizes->{'__float128'} ? 1 : 0 );
 
     _handle_ptrcast(
         $conf, \%types, $sizes, [ @std_ints, @extra_ints ]);
