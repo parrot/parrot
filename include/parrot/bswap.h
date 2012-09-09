@@ -5,48 +5,53 @@
  *
  */
 
-#ifdef HAS_HEADER_BYTESWAP
+#include "parrot/config.h"
+
+#ifdef PARROT_HAS_HEADER_BYTESWAP
 #  include <byteswap.h>                    /* GNU */
 #  define bswap_16(x) __bswap_16(x)
 #  define bswap_32(x) __bswap_32(x)
-#  if __WORDSIZE == 64
+/* we want fast bswap on 64bit cpus with -m32 */
+#  ifdef HAS_LONGLONG
 #    define bswap_64(x) __bswap_64(x)
 #   endif
 #else
-#  ifdef HAS_HEADER_ENDIAN                 /* linux */
+#  ifdef PARROT_HAS_HEADER_ENDIAN                 /* linux */
 #    include <endian.h>
-#  elif defined(HAS_HEADER_SYS_ENDIAN)	   /* FreeBSD */
+#  elif defined(PARROT_HAS_HEADER_SYS_ENDIAN)	   /* FreeBSD */
 #    include <sys/endian.h>
 #  endif
-#  if defined(HAS_HEADER_ENDIAN) \
-      || defined(HAS_HEADER_SYS_ENDIAN)
+#  if defined(PARROT_HAS_HEADER_ENDIAN) \
+      || defined(PARROT_HAS_HEADER_SYS_ENDIAN)
 #    define bswap_16(x) __bswap_16(x)
 #    define bswap_32(x) __bswap_32(x)
-#    if __WORDSIZE == 64
+#    ifdef HAS_LONGLONG
 #      define bswap_64(x) __bswap_64(x)
 #    endif
 #  else
-#    ifdef HAS_HEADER_LIBKERN_OSBYTEORDER
+#    ifdef PARROT_HAS_HEADER_LIBKERN_OSBYTEORDER
 #      include <libkern/OSByteOrder.h>
 #      define bswap_16(x) OSSwapInt16(x)
 #      define bswap_32(x) OSSwapInt32(x)
-#      if __WORDSIZE == 64
+#      ifdef HAS_LONGLONG
 #        define bswap_64(x) OSSwapInt64(x)
 #      endif
 #    else
-#      ifdef HAS_HEADER_SYS_BYTEORDER
+#      ifdef PARROT_HAS_HEADER_SYS_BYTEORDER
 #        define bswap_16(x) BSWAP_16(x)
 #        define bswap_32(x) BSWAP_32(x)
-#        if __WORDSIZE == 64
+#        ifdef HAS_LONGLONG
 #          define bswap_64(x) BSWAP_64(x)
 #        endif
 #      else
 #        ifdef __MSC_VER
 #          define bswap_16(x) _byteswap_ushort(x)
 #          define bswap_32(x) _byteswap_ulong(x)
-#          define bswap_64(x) _byteswap_uint64(x)
+#          ifdef HAS_LONGLONG
+#            define bswap_64(x) _byteswap_uint64(x)
+#          endif
 #        else
-           /* lost */
+           /* no native bswap */
 #          define bswap_16(x)						\
   ({									\
     Parrot_UInt2 __x = (x);						\
@@ -63,7 +68,7 @@
 		(((Parrot_UInt4)(__x) & (Parrot_UInt4)0x00ff0000UL) >>  8) | \
 		(((Parrot_UInt4)(__x) & (Parrot_UInt4)0xff000000UL) >> 24) )); \
   })
-#          if __WORDSIZE == 64
+#          ifdef HAS_LONGLONG
 #            define bswap_64(x)						\
   ({									\
     Parrot_UInt8 __x = (x);						\
@@ -78,11 +83,11 @@
       (Parrot_UInt8)(((Parrot_UInt8)(__x) & (Parrot_UInt8)0xff00000000000000ULL) >> 56) )); \
   })
 #          else
-#            define bswap_64(x) ({   \
-               unsigned char rb[16]; \
+#            define bswap_64(x) ({          \
+               unsigned char rb[8];         \
                const unsigned char *c = &x; \
-               SWAB_16(rb,c); \
-	       memcpy(x,rb,16); })
+               SWAB_8(rb, c);               \
+               (Parrot_UInt8)rb; })
 #          endif
 #        endif
 #      endif
@@ -187,10 +192,10 @@ static inline Parrot_UInt8 bswap64(Parrot_UInt8 x)
 #if defined(bswap_64)
     return bswap_64(x);
 #else
-    unsigned char rb[16];
+    unsigned char rb[8];
     const unsigned char *c = &x;
-    SWAB_16(rb, c);
-    return rb;
+    SWAB_8(rb, c);
+    return (Parrot_UInt8)rb;
 #endif
 }
 

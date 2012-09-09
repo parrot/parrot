@@ -285,9 +285,9 @@ static opcode_t fetch_op_le_8(ARGIN(const unsigned char *b))
  * Floattype 2 = IEEE-754 128 bit quad precision stored in 16 byte,
  *               Sparc64 quad-float or __float128, gcc since 4.3 (binary128)
  * Floattype 3 = IEEE-754 4 byte float (binary32)
+ * Floattype 4 = PowerPC 16 byte double-double
  * not yet:
  * Floattype 4 = IEEE-754 2 byte half-precision float (binary16)
- * Floattype 5 = PowerPC64 16 byte double-double
  * Floattype 6 = MIPS64 16 byte long double
  * Floattype 7 = AIX 16 byte long double
  *
@@ -1055,12 +1055,16 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
             else if (floatsize == 4) {
                 *((const unsigned char **)stream) = bswap32((Parrot_UInt4)*stream);
             }
-            else if (floatsize == 2) {
-                *((const unsigned char **)stream) = bswap16((Parrot_UInt2)*stream);
-            }
             else if (floatsize == 16) {
+#if 0
+                /* TODO 64bit CPU: bswap64 with temp */
+                Parrot_UInt8 tmp = bswap64((Parrot_UInt8)*stream);
+                *((const unsigned char **)stream) =
+                    bswap64((Parrot_UInt8)*((const unsigned char *)stream+8));
+                *(((const unsigned char **)stream+8)) = tmp;
+#endif
                 unsigned char rb[16];
-                const unsigned char *c = (const unsigned char *) *stream;
+                const unsigned char *c = (const unsigned char *)*stream;
                 SWAB_16(rb, c);
                 memcpy(*((const unsigned char **)stream), rb, 16);
             }
@@ -1508,7 +1512,7 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
     pf->fetch_iv = pf->fetch_op;
 
     switch (pf->header->floattype) {
-#if NUMVAL_SIZE == 8
+#if FLOATTYPE == FLOATTYPE_8
       case FLOATTYPE_8:
         pf->fetch_nv = pf->header->byteorder ? fetch_buf_be_8 : fetch_buf_le_8;
         break;
@@ -1516,27 +1520,31 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
         pf->fetch_nv = cvt_num10_num8;
         break;
       case FLOATTYPE_16:
+      case FLOATTYPE_16PPC:
         pf->fetch_nv = cvt_num16_num8;
         break;
       case FLOATTYPE_4:
         pf->fetch_nv = cvt_num4_num8;
         break;
 #endif
-#if NUMVAL_SIZE == 12
+#if FLOATTYPE == FLOATTYPE_10
       case FLOATTYPE_8:
         pf->fetch_nv = cvt_num8_num10;
         break;
       case FLOATTYPE_10:
-        pf->fetch_nv = pf->header->byteorder ? fetch_buf_be_12 : fetch_buf_le_12;
+        pf->fetch_nv = pf->header->wordsize == 8
+            ? fetch_buf_le_16;
+            ? fetch_buf_le_12;
         break;
       case FLOATTYPE_16:
+      case FLOATTYPE_16PPC:
         pf->fetch_nv = cvt_num16_num10;
         break;
       case FLOATTYPE_4:
         pf->fetch_nv = cvt_num4_num10;
         break;
 #endif
-#if NUMVAL_SIZE == 16
+#if FLOATTYPE == FLOATTYPE_16
       case FLOATTYPE_8:
         pf->fetch_nv = cvt_num8_num16;
         break;
@@ -1544,13 +1552,29 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
         pf->fetch_nv = cvt_num10_num16;
         break;
       case FLOATTYPE_16:
+      case FLOATTYPE_16PPC:
         pf->fetch_nv = pf->header->byteorder ? fetch_buf_be_16 : fetch_buf_le_16;
         break;
       case FLOATTYPE_4:
         pf->fetch_nv = cvt_num4_num16;
         break;
 #endif
-#if NUMVAL_SIZE == 4
+#if FLOATTYPE == FLOATTYPE_16PPC
+      case FLOATTYPE_8:
+        pf->fetch_nv = cvt_num8_num16;
+        break;
+      case FLOATTYPE_10:
+        pf->fetch_nv = cvt_num10_num16;
+        break;
+      case FLOATTYPE_16:
+      case FLOATTYPE_16PPC:
+        pf->fetch_nv = pf->header->byteorder ? fetch_buf_be_16 : fetch_buf_le_16;
+        break;
+      case FLOATTYPE_4:
+        pf->fetch_nv = cvt_num4_num16;
+        break;
+#endif
+#if FLOATTYPE == FLOATTYPE_4
       case FLOATTYPE_8:
         pf->fetch_nv = cvt_num8_num4;
         break;
@@ -1558,6 +1582,7 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
         pf->fetch_nv = cvt_num10_num4;
         break;
       case FLOATTYPE_16:
+      case FLOATTYPE_16PPC:
         pf->fetch_nv = cvt_num16_num4;
         break;
       case FLOATTYPE_4:
@@ -1565,11 +1590,18 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
         break;
 #endif
       default:
+      {
+        int floatsize = PF_floattype_size[ pf->header->floattype ];
+        /* Intel x86_64 has FLOATTYPE_10 aligned to size 16. */
+        if ( floatsize == 12 && pf->header->wordsize == 8 )
+            floatsize = 16;
         Parrot_x_force_error_exit(NULL, 1,
               "PackFile_unpack: unsupported float conversion %d to %d, "
-              "PARROT_BIGENDIAN=%d\n",
-              NUMVAL_SIZE, pf->header->floattype, PARROT_BIGENDIAN);
+              "size=%d, bigendian=%d\n",
+              pf->header->floattype, FLOATTYPE,
+              floatsize, pf->header->byteorder );
             break;
+      }
     }
     return;
 }
@@ -1729,8 +1761,7 @@ fetch_buf_be_4(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 4);
 #else
-    memcpy(rb, bswap16((Parrot_UInt2)*b), 4);
-    //SWAB_4(rb,b);
+    *(Parrot_UInt4*)rb = bswap32(*(Parrot_UInt4*)b);
 #endif
 }
 
@@ -1752,8 +1783,7 @@ fetch_buf_le_4(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 4);
 #else
-    memcpy(rb, bswap16((Parrot_UInt2)*b), 4);
-    //SWAB_4(rb,b);
+    *(Parrot_UInt4*)rb = bswap32(*(Parrot_UInt4*)b);
 #endif
 }
 
@@ -1774,9 +1804,10 @@ fetch_buf_be_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
     ASSERT_ARGS(fetch_buf_be_8)
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 8);
+#elif defined(HAS_LONGLONG)
+    *(Parrot_UInt8*)rb = bswap64(*(Parrot_UInt8*)b);
 #else
-    memcpy(rb, bswap32((Parrot_UInt4)*b), 8);
-    //SWAB_8(rb,b);
+    SWAB_8(rb, b);
 #endif
 }
 
@@ -1797,9 +1828,10 @@ fetch_buf_le_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
     ASSERT_ARGS(fetch_buf_le_8)
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 8);
+#elif defined(HAS_LONGLONG)
+    *(Parrot_UInt8*)rb = bswap64(*(Parrot_UInt8*)b);
 #else
-    memcpy(rb, bswap32((Parrot_UInt4)*b), 8);
-    //SWAB_8(rb,b);
+    SWAB_8(rb, b);
 #endif
 }
 
@@ -1880,8 +1912,7 @@ fetch_buf_le_16(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 16);
 #else
-    memcpy(rb, bswap64((Parrot_UInt8)*b), 16);
-    //SWAB_16(rb,b);
+    SWAB_16(rb, b);
 #endif
 }
 
@@ -1903,8 +1934,7 @@ fetch_buf_be_16(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 16);
 #else
-    memcpy(rb, bswap64((Parrot_UInt8)*b), 16);
-    //SWAB_16(rb,b);
+    SWAB_16(rb, b);
 #endif
 }
 
@@ -1926,7 +1956,7 @@ fetch_buf_le_32(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 32);
 #else
-    SWAB_32(rb,b);
+    SWAB_32(rb, b);
 #endif
 }
 
@@ -1948,7 +1978,7 @@ fetch_buf_be_32(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 32);
 #else
-    SWAB_32(rb,b);
+    SWAB_32(rb, b);
 #endif
 }
 

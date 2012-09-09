@@ -32,20 +32,21 @@
 #define FLOATTYPE_4           3
 #define FLOATTYPE_4_NAME      "IEEE-754 4-byte single float"
 
+#define FLOATTYPE_16PPC       4
+#define FLOATTYPE_16PPC_NAME  "PPC64 16 byte double-double"
+
 static
-int PF_floattype_size[] = { 8,12,16,4,2,16,16,16 };
+int PF_floattype_size[] = { 8,12,16,4,16,2,16,16 };
 
 /* Supported until here. */
-#define FLOATTYPE_MAX         3
+#define FLOATTYPE_MAX         4
 
 /* Reserved for later */
-#define FLOATTYPE_2           4
+#define FLOATTYPE_2           5
 #define FLOATTYPE_2_NAME      "IEEE-754 2-byte half-precision float"
 
 /* Non IEEE-754 versions, yet unsupported. */
 /* NaN and other minor differences, but patches welcome */
-#define FLOATTYPE_16PPC       5
-#define FLOATTYPE_16PPC_NAME  "PPC64 16 byte double-double"
 
 #define FLOATTYPE_16MIPS      6
 #define FLOATTYPE_16MIPS_NAME "MIPS 16 byte long double"
