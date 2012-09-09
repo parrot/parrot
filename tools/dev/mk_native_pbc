@@ -109,6 +109,7 @@ then
 	    reconfig "float" $conf
 	    if [ x$ptrsize = x8 ]; then
 		reconfig "__float128" $conf
+	    fi
 	    ;;
 	"12")
 	    reconfig "double" $conf
