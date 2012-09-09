@@ -32,8 +32,7 @@ for "little endian".
 */
 
 #include "parrot/parrot.h"
-/* FIXME: config probe (endian/byteswap/osx/manually) */
-#include <byteswap.h>
+#include "parrot/bswap.h"
 #include "pf_items.str"
 
 /* HEADERIZER HFILE: include/parrot/packfile.h */
@@ -276,54 +275,6 @@ static opcode_t fetch_op_le_8(ARGIN(const unsigned char *b))
  * offset not in ptr diff, but in byte
  */
 #define OFFS(pf, cursor) ((pf) ? ((const char *)(cursor) - (const char *)((pf)->src)) : 0)
-
-#define SWAB_4(rb,b) \
-    rb[0] = b[3]; \
-    rb[1] = b[2]; \
-    rb[2] = b[1]; \
-    rb[3] = b[0]
-
-#define SWAB_8(rb,b) \
-    rb[0] = b[7]; \
-    rb[1] = b[6]; \
-    rb[2] = b[5]; \
-    rb[3] = b[4]; \
-    rb[4] = b[3]; \
-    rb[5] = b[2]; \
-    rb[6] = b[1]; \
-    rb[7] = b[0]
-
-#define SWAB_12(rb,b) \
-    rb[0]  = b[11]; \
-    rb[1]  = b[10]; \
-    rb[2]  = b[9]; \
-    rb[3]  = b[8]; \
-    rb[4]  = b[7]; \
-    rb[5]  = b[6]; \
-    rb[6]  = b[5]; \
-    rb[7]  = b[4]; \
-    rb[8]  = b[3]; \
-    rb[9]  = b[2]; \
-    rb[10] = b[1]; \
-    rb[11] = b[0]
-
-#define SWAB_16(rb,b) \
-    rb[0]  = b[15]; \
-    rb[1]  = b[14]; \
-    rb[2]  = b[13]; \
-    rb[3]  = b[12]; \
-    rb[4]  = b[11]; \
-    rb[5]  = b[10]; \
-    rb[6]  = b[9]; \
-    rb[7]  = b[8]; \
-    rb[8]  = b[7]; \
-    rb[9]  = b[6]; \
-    rb[10] = b[5]; \
-    rb[11] = b[4]; \
-    rb[12] = b[3]; \
-    rb[13] = b[2]; \
-    rb[14] = b[1]; \
-    rb[15] = b[0]
 
 /*
  * low level FLOATVAL fetch and convert functions (see packfile.h)
@@ -1085,7 +1036,7 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
     if (NUMVAL_SIZE == 8 && pf->header->floattype == FLOATTYPE_10) {
         double d;
         int floatsize = pf->header->wordsize == 8 ? 16 : 12;
-        (pf->fetch_nv)((unsigned char *)&d, (const unsigned char *) *stream);
+        (pf->fetch_nv)((unsigned char *)&d, (const unsigned char *)*stream);
         f = d;
         *((const unsigned char **) (stream)) += floatsize;
     }
@@ -1098,30 +1049,20 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
              /* and not already endianized in fetcher */
              && NUMVAL_SIZE != floatsize )
         {
-            const unsigned char *c = (const unsigned char *)*stream;
-#if 0
-            /* can swab in native wordsize? */
-            if (floatsize <= INTVAL_SIZE) {
-                if (floatsize == 8)
-                    bswap_64(&c);
-                else if (floatsize == 4)
-                    bswap_32(&c);
-                else if (floatsize == 2)
-                    bswap_16(&c);
+            if (floatsize == 8) {
+                *((const unsigned char **)stream) = bswap64((Parrot_UInt8)*stream);
             }
-            else
-#endif
-            {
-                if (floatsize == 8) {
-                    unsigned char rb[8];
-                    SWAB_8(rb, c);
-                    memcpy(*stream, rb, 8);
-                }
-                else if (floatsize == 16) {
-                    unsigned char rb[16];
-                    SWAB_16(rb, c);
-                    memcpy(*stream, rb, 16);
-                }
+            else if (floatsize == 4) {
+                *((const unsigned char **)stream) = bswap32((Parrot_UInt4)*stream);
+            }
+            else if (floatsize == 2) {
+                *((const unsigned char **)stream) = bswap16((Parrot_UInt2)*stream);
+            }
+            else if (floatsize == 16) {
+                unsigned char rb[16];
+                const unsigned char *c = (const unsigned char *) *stream;
+                SWAB_16(rb, c);
+                memcpy(*((const unsigned char **)stream), rb, 16);
             }
         }
         (pf->fetch_nv)((unsigned char *)&f, (const unsigned char *) *stream);
@@ -1657,20 +1598,10 @@ fetch_iv_le(INTVAL w)
     return w;
 #else
 #  if INTVAL_SIZE == 4
-    return (w << 24) | ((w & 0xff00) << 8) | ((w & 0xff0000) >> 8) | (w >> 24);
+    return bswap32(w);
 #  else
 #    if INTVAL_SIZE == 8
-    INTVAL r;
-
-    r = w << 56;
-    r |= (w & 0xff00) << 40;
-    r |= (w & 0xff0000) << 24;
-    r |= (w & 0xff000000) << 8;
-    r |= (w & 0xff00000000) >> 8;
-    r |= (w & 0xff0000000000) >> 24;
-    r |= (w & 0xff000000000000) >> 40;
-    r |= (w & 0xff00000000000000) >> 56;
-    return r;
+    return bswap64(w);
 #    else
     Parrot_x_force_error_exit(NULL, 1, "Unsupported INTVAL_SIZE=%d\n",
                INTVAL_SIZE);
@@ -1701,19 +1632,10 @@ fetch_iv_be(INTVAL w)
     return w;
 #else
 #  if INTVAL_SIZE == 4
-    return (w << 24) | ((w & 0xff00) << 8) | ((w & 0xff0000) >> 8) | (w >> 24);
+    return bswap32(w);
 #  else
 #    if INTVAL_SIZE == 8
-    INTVAL r;
-    r = w << 56;
-    r |= (w & 0xff00) << 40;
-    r |= (w & 0xff0000) << 24;
-    r |= (w & 0xff000000) << 8;
-    r |= (w & 0xff00000000) >> 8;
-    r |= (w & 0xff0000000000) >> 24;
-    r |= (w & 0xff000000000000) >> 40;
-    r |= (w & 0xff00000000000000) >> 56;
-    return r;
+    return bswap64(w);
 #    else
     Parrot_x_force_error_exit(NULL, 1, "Unsupported INTVAL_SIZE=%d\n", INTVAL_SIZE);
 #    endif
@@ -1742,20 +1664,9 @@ fetch_op_be(opcode_t w)
     return w;
 #else
 #  if OPCODE_T_SIZE == 4
-    return (w << 24) | ((w & 0x0000ff00) << 8) | ((w & 0x00ff0000) >> 8) |
-        ((w & 0xff000000) >> 24);
+    return bswap32(w);
 #  else
-    opcode_t r;
-
-    r = w << 56;
-    r |= (w & 0xff00) << 40;
-    r |= (w & 0xff0000) << 24;
-    r |= (w & 0xff000000) << 8;
-    r |= (w & 0xff00000000) >> 8;
-    r |= (w & 0xff0000000000) >> 24;
-    r |= (w & 0xff000000000000) >> 40;
-    r |= (w & 0xff00000000000000) >> 56;
-    return r;
+    return bswap64(w);
 #  endif
 #endif
 }
@@ -1781,20 +1692,9 @@ fetch_op_le(opcode_t w)
     return w;
 #else
 #  if OPCODE_T_SIZE == 4
-    return (w << 24) | ((w & 0x0000ff00) << 8) | ((w & 0x00ff0000) >> 8) |
-        ((w & 0xff000000) >> 24);
+    return bswap32(w);
 #  else
-    opcode_t r;
-
-    r = w << 56;
-    r |= (w & 0xff00) << 40;
-    r |= (w & 0xff0000) << 24;
-    r |= (w & 0xff000000) << 8;
-    r |= (w & 0xff00000000) >> 8;
-    r |= (w & 0xff0000000000) >> 24;
-    r |= (w & 0xff000000000000) >> 40;
-    r |= (w & 0xff00000000000000) >> 56;
-    return r;
+    return bswap64(w);
 #  endif
 #endif
 }
@@ -1829,7 +1729,8 @@ fetch_buf_be_4(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 4);
 #else
-    SWAB_4(rb,b);
+    memcpy(rb, bswap16((Parrot_UInt2)*b), 4);
+    //SWAB_4(rb,b);
 #endif
 }
 
@@ -1851,7 +1752,8 @@ fetch_buf_le_4(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 4);
 #else
-    SWAB_4(rb,b);
+    memcpy(rb, bswap16((Parrot_UInt2)*b), 4);
+    //SWAB_4(rb,b);
 #endif
 }
 
@@ -1873,7 +1775,8 @@ fetch_buf_be_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 8);
 #else
-    SWAB_8(rb,b);
+    memcpy(rb, bswap32((Parrot_UInt4)*b), 8);
+    //SWAB_8(rb,b);
 #endif
 }
 
@@ -1895,7 +1798,8 @@ fetch_buf_le_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 8);
 #else
-    SWAB_8(rb,b);
+    memcpy(rb, bswap32((Parrot_UInt4)*b), 8);
+    //SWAB_8(rb,b);
 #endif
 }
 
@@ -1919,7 +1823,7 @@ fetch_buf_le_12(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #else
     SWAB_12(rb,b);
 #  if 0
-    /* what ?? */
+    /* XXX I'm sceptical */
     rb[0]  = b[9];
     rb[1]  = b[8];
     rb[2]  = b[11];
@@ -1976,7 +1880,8 @@ fetch_buf_le_16(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 16);
 #else
-    SWAB_16(rb,b);
+    memcpy(rb, bswap64((Parrot_UInt8)*b), 16);
+    //SWAB_16(rb,b);
 #endif
 }
 
@@ -1998,7 +1903,8 @@ fetch_buf_be_16(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 16);
 #else
-    SWAB_16(rb,b);
+    memcpy(rb, bswap64((Parrot_UInt8)*b), 16);
+    //SWAB_16(rb,b);
 #endif
 }
 
@@ -2020,38 +1926,7 @@ fetch_buf_le_32(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 32);
 #else
-    rb[0]  = b[31];
-    rb[1]  = b[30];
-    rb[2]  = b[29];
-    rb[3]  = b[28];
-    rb[4]  = b[27];
-    rb[5]  = b[26];
-    rb[6]  = b[25];
-    rb[7]  = b[24];
-    rb[8]  = b[23];
-    rb[9]  = b[22];
-    rb[10] = b[21];
-    rb[11] = b[20];
-    rb[12] = b[19];
-    rb[13] = b[18];
-    rb[14] = b[17];
-    rb[15] = b[16];
-    rb[16] = b[15];
-    rb[17] = b[14];
-    rb[18] = b[13];
-    rb[19] = b[12];
-    rb[20] = b[11];
-    rb[21] = b[10];
-    rb[22] = b[9];
-    rb[23] = b[8];
-    rb[24] = b[7];
-    rb[25] = b[6];
-    rb[26] = b[5];
-    rb[27] = b[4];
-    rb[28] = b[3];
-    rb[29] = b[2];
-    rb[30] = b[1];
-    rb[31] = b[0];
+    SWAB_32(rb,b);
 #endif
 }
 
@@ -2073,38 +1948,7 @@ fetch_buf_be_32(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 32);
 #else
-    rb[0]  = b[31];
-    rb[1]  = b[30];
-    rb[2]  = b[29];
-    rb[3]  = b[28];
-    rb[4]  = b[27];
-    rb[5]  = b[26];
-    rb[6]  = b[25];
-    rb[7]  = b[24];
-    rb[8]  = b[23];
-    rb[9]  = b[22];
-    rb[10] = b[21];
-    rb[11] = b[20];
-    rb[12] = b[19];
-    rb[13] = b[18];
-    rb[14] = b[17];
-    rb[15] = b[16];
-    rb[16] = b[15];
-    rb[17] = b[14];
-    rb[18] = b[13];
-    rb[19] = b[12];
-    rb[20] = b[11];
-    rb[21] = b[10];
-    rb[22] = b[9];
-    rb[23] = b[8];
-    rb[24] = b[7];
-    rb[25] = b[6];
-    rb[26] = b[5];
-    rb[27] = b[4];
-    rb[28] = b[3];
-    rb[29] = b[2];
-    rb[30] = b[1];
-    rb[31] = b[0];
+    SWAB_32(rb,b);
 #endif
 }
 

@@ -1822,6 +1822,7 @@ src/packfile/output$(O) : \
 
 src/packfile/pf_items$(O) : \
 	$(PARROT_H_HEADERS) \
+	$(INC_DIR)/bswap.h \
 	src/packfile/pf_items.str \
 	src/packfile/pf_items.c
 

@@ -23,7 +23,7 @@ use base qw(Parrot::Configure::Step);
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Compute native byteorder and check bswap};
+    $data{description} = q{Native byteorder and bswap};
     $data{result}      = q{};
     return \%data;
 }
@@ -34,10 +34,11 @@ sub runstep {
     my $byteorder = _probe_for_byteorder($conf);
     $self->_evaluate_byteorder($conf, $byteorder);
 
-    $self->_probe_byteswap($conf, "endian.h") ||
-      $self->_probe_byteswap($conf, "sys/endian.h") ||
-      $self->_probe_byteswap($conf, "byteswap.h") ||
-      $self->_probe_byteswap($conf, "libkern/OSByteOrder.h");
+    $self->_probe_byteswap($conf, "byteswap.h") ||         # GNU (esp. linux)
+      $self->_probe_byteswap($conf, "endian.h") ||         # Linux
+      $self->_probe_byteswap($conf, "sys/endian.h") ||     # Freebsd
+      $self->_probe_byteswap($conf, "sys/byteorder.h") ||  # BSWAP_32 on Solaris 10
+      $self->_probe_byteswap($conf, "libkern/OSByteOrder.h"); # OSX
 
     return 1;
 }
@@ -60,14 +61,14 @@ sub _evaluate_byteorder {
             byteorder => $byteorder,
             bigendian => 0
         );
-        $self->set_result('little-endian');
+        $self->set_result('le');
     }
     elsif ( $byteorder =~ /^(?:8765|4321)/ ) {
         $conf->data->set(
             byteorder => $byteorder,
             bigendian => 1
         );
-        $self->set_result('big-endian');
+        $self->set_result('be');
     }
     else {
         die "Unsupported byte-order [$byteorder]!";
@@ -77,24 +78,25 @@ sub _evaluate_byteorder {
 
 sub _probe_byteswap {
     my ($self, $conf, $include) = @_;
-    $conf->data->set( TEMP_include => $include );
     my $i = $include;
     $i =~ s|/|_|g;
     $i =~ s|\.h$||g;
 
     $conf->cc_gen('config/auto/byteorder/bswap_c.in');
     eval { $conf->cc_build("-DHAS_HEADER_".uc($i)) };
-    my $ret = $@ ? 0 : eval $conf->cc_run();
+    my $ret = $@ ? 0 : $conf->cc_run();
     $conf->cc_clean();
-    if ($ret) {
+    if ($ret and $ret ne '0x12345678') {
 	my $i = $include;
 	$i =~ s|/|_|g;
 	$i =~ s|\.h$||g;
-        $conf->data->set( "i_".lc($i) );
-	$self->set_result($include);
+        $conf->data->set( "i_".lc($i) => 'define');
+	$self->set_result($self->result()." ".$i);
+    }
+    else {
+        $conf->data->set( "i_".lc($i) => undef) unless $ret;
     }
 
-    $conf->data->set( 'TEMP_include' => undef );
     return $ret;
 }
 

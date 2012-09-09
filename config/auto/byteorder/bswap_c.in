@@ -7,8 +7,6 @@ Copyright (C) 2012, Parrot Foundation.
 #include <stdio.h>
 #include <stdint.h>
 
-#include <@TEMP_include@>
-
 #ifdef HAS_HEADER_BYTESWAP
 #  include <byteswap.h>
 #else
@@ -25,6 +23,7 @@ Copyright (C) 2012, Parrot Foundation.
 #    endif
 #  else
 #    ifdef HAS_HEADER_LIBKERN_OSBYTEORDER
+#      include <libkern/OSXByteOrder.h>
 #      if __BYTE_ORDER == __LITTLE_ENDIAN
 #        define bswap_16(x) OSSwapHostToBigInt16(x)
 #        define bswap_32(x) OSSwapHostToBigInt32(x)
@@ -38,12 +37,6 @@ Copyright (C) 2012, Parrot Foundation.
 #          define bswap_64(x) OSSwapBigToHostInt64(x)
 #        endif
 #      endif
-#    else
-#      define bswap_16(x) { unsigned char rb[4]; SWAB_4(rb,x); memcpy(x,rb,4); }
-#      define bswap_32(x) { unsigned char rb[8]; SWAB_8(rb,x); memcpy(x,rb,8); }
-#      if __WORDSIZE == 64
-#        define bswap_64(x) { unsigned char rb[16]; SWAB_16(rb,x); memcpy(x,rb,16); }
-#      endif
 #    endif
 #  endif
 #endif
@@ -51,12 +44,13 @@ Copyright (C) 2012, Parrot Foundation.
 int
 main()
 {
-    long l = 0x12345678;
-    bswap_16(l);
-    bswap_32(l);
+    unsigned long l = 0x12345678;
+    l = bswap_16((short)l);
+    l = bswap_32(l);
 #if __WORDSIZE == 64
-    bswap_64(l);
+    l = bswap_64(l);
 #endif
+    printf("0x%lx", l);
     return EXIT_SUCCESS;
 }
 
