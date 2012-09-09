@@ -47,6 +47,20 @@ static void cvt_num10_num16(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*dest);
 
+static void cvt_num10_num16ppc(
+    ARGOUT(unsigned char *dest),
+    ARGIN(const unsigned char *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest);
+
+static void cvt_num10_num4(
+    ARGOUT(unsigned char *dest),
+    ARGIN(const unsigned char *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest);
+
 static void cvt_num10_num8(
     ARGOUT(unsigned char *dest),
     ARGIN(const unsigned char *src))
@@ -61,7 +75,77 @@ static void cvt_num16_num10(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*dest);
 
+static void cvt_num16_num16ppc(
+    ARGOUT(unsigned char *dest),
+    ARGIN(const unsigned char *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest);
+
+static void cvt_num16_num4(
+    ARGOUT(unsigned char *dest),
+    ARGIN(const unsigned char *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest);
+
 static void cvt_num16_num8(
+    ARGOUT(unsigned char *dest),
+    ARGIN(const unsigned char *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest);
+
+static void cvt_num16ppc_num10(
+    ARGOUT(unsigned char *dest),
+    ARGIN(const unsigned char *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest);
+
+static void cvt_num16ppc_num16(
+    ARGOUT(unsigned char *dest),
+    ARGIN(const unsigned char *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest);
+
+static void cvt_num16ppc_num4(
+    ARGOUT(unsigned char *dest),
+    ARGIN(const unsigned char *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest);
+
+static void cvt_num16ppc_num8(
+    ARGOUT(unsigned char *dest),
+    ARGIN(const unsigned char *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest);
+
+static void cvt_num4_num10(
+    ARGOUT(unsigned char *dest),
+    ARGIN(const unsigned char *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest);
+
+static void cvt_num4_num16(
+    ARGOUT(unsigned char *dest),
+    ARGIN(const unsigned char *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest);
+
+static void cvt_num4_num16ppc(
+    ARGOUT(unsigned char *dest),
+    ARGIN(const unsigned char *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest);
+
+static void cvt_num4_num8(
     ARGOUT(unsigned char *dest),
     ARGIN(const unsigned char *src))
         __attribute__nonnull__(1)
@@ -76,6 +160,20 @@ static void cvt_num8_num10(
         FUNC_MODIFIES(*dest);
 
 static void cvt_num8_num16(
+    ARGOUT(unsigned char *dest),
+    ARGIN(const unsigned char *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest);
+
+static void cvt_num8_num16ppc(
+    ARGOUT(unsigned char *dest),
+    ARGIN(const unsigned char *src))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*dest);
+
+static void cvt_num8_num4(
     ARGOUT(unsigned char *dest),
     ARGIN(const unsigned char *src))
         __attribute__nonnull__(1)
@@ -201,19 +299,61 @@ static opcode_t fetch_op_le_8(ARGIN(const unsigned char *b))
 #define ASSERT_ARGS_cvt_num10_num16 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
     , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_cvt_num10_num16ppc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(dest) \
+    , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_cvt_num10_num4 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(dest) \
+    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_cvt_num10_num8 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_cvt_num16_num10 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
     , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_cvt_num16_num16ppc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(dest) \
+    , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_cvt_num16_num4 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(dest) \
+    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_cvt_num16_num8 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(dest) \
+    , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_cvt_num16ppc_num10 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(dest) \
+    , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_cvt_num16ppc_num16 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(dest) \
+    , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_cvt_num16ppc_num4 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(dest) \
+    , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_cvt_num16ppc_num8 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(dest) \
+    , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_cvt_num4_num10 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(dest) \
+    , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_cvt_num4_num16 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(dest) \
+    , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_cvt_num4_num16ppc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(dest) \
+    , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_cvt_num4_num8 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_cvt_num8_num10 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_cvt_num8_num16 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(dest) \
+    , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_cvt_num8_num16ppc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(dest) \
+    , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_cvt_num8_num4 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_fetch_buf_be_12 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -285,7 +425,7 @@ static opcode_t fetch_op_le_8(ARGIN(const unsigned char *b))
  * Floattype 2 = IEEE-754 128 bit quad precision stored in 16 byte,
  *               Sparc64 quad-float or __float128, gcc since 4.3 (binary128)
  * Floattype 3 = IEEE-754 4 byte float (binary32)
- * Floattype 4 = PowerPC 16 byte double-double
+ * Floattype 4 = PowerPC 16 byte double-double (-mlong-double-128)
  * not yet:
  * Floattype 4 = IEEE-754 2 byte half-precision float (binary16)
  * Floattype 6 = MIPS64 16 byte long double
@@ -298,7 +438,8 @@ static opcode_t fetch_op_le_8(ARGIN(const unsigned char *b))
 =item C<static void cvt_num10_num8(unsigned char *dest, const unsigned char
 *src)>
 
-Converts i386 LE 12-byte long double to IEEE 754 LE 8-byte double.
+Converts intel 80-bit long double to IEEE 754 LE 8-byte double.
+On 64bit intel the size is 16 byte, on 32bit intel 12 byte.
 
 Tested ok.
 
@@ -485,13 +626,26 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     }
 }
 
+/*
+
+=item C<static void cvt_num4_num8(unsigned char *dest, const unsigned char
+*src)>
+
+Converts IEEE 754 4-byte float to IEEE 754 8 byte double.
+
+Not yet tested.
+
+=cut
+
+*/
+
 static void
 cvt_num4_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
     float f;
     double d;
     memcpy(&f, src, 4);
-    d = (double)f; /* TODO: test compiler cast */
+    d = (double)f;
     memcpy(dest, &d, 8);
 }
 
@@ -502,7 +656,7 @@ cvt_num4_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 =item C<static void cvt_num16_num10(unsigned char *dest, const unsigned char
 *src)>
 
-Converts IEEE 754 LE 16-byte long double to i386 LE 12-byte long double.
+Converts IEEE 754 LE 16-byte long double to i386 LE 80-bit long double.
 See http://babbage.cs.qc.cuny.edu/IEEE-754/References.xhtml
 
 Tested ok.
@@ -558,7 +712,7 @@ cvt_num16_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 =item C<static void cvt_num8_num10(unsigned char *dest, const unsigned char
 *src)>
 
-Converts i386 8-byte double to i386 12 byte long double.
+Converts i386 8-byte double to i386 80bit long double.
 
 Tested ok.
 
@@ -576,6 +730,19 @@ cvt_num8_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     ld = (long double)d; /* compiler cast */
     memcpy(dest, &ld, 12);
 }
+
+/*
+
+=item C<static void cvt_num4_num10(unsigned char *dest, const unsigned char
+*src)>
+
+Converts i386 4-byte float to i386 80bit long double.
+
+Tested ok.
+
+=cut
+
+*/
 
 static void
 cvt_num4_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
@@ -602,7 +769,7 @@ Not tested yet.
 
 */
 
-#if (NUMVAL_SIZE == 16)
+#if (NUMVAL_SIZE == 16) || defined(__powerpc__) || defined(_M_PPC)
 static void
 cvt_num10_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
@@ -643,6 +810,7 @@ cvt_num10_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     /* and copy the rest */
     memcpy(&dest[0], &src[0], 8);
 }
+#endif
 
 /*
 
@@ -669,6 +837,19 @@ cvt_num8_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     memcpy(dest, &ld, 16);
 }
 
+/*
+
+=item C<static void cvt_num4_num16(unsigned char *dest, const unsigned char
+*src)>
+
+Converts IEEE 754 4-byte float to IEEE 754 16 byte long double.
+
+Not yet tested.
+
+=cut
+
+*/
+
 static void
 cvt_num4_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
@@ -678,7 +859,145 @@ cvt_num4_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     ld = (long double)f; /* TODO: test compiler cast */
     memcpy(dest, &ld, sizeof(long double));
 }
+
+/*
+
+=item C<static void cvt_num4_num16ppc(unsigned char *dest, const unsigned char
+*src)>
+
+=item C<static void cvt_num8_num16ppc(unsigned char *dest, const unsigned char
+*src)>
+
+=item C<static void cvt_num10_num16ppc(unsigned char *dest, const unsigned char
+*src)>
+
+=item C<static void cvt_num16_num16ppc(unsigned char *dest, const unsigned char
+*src)>
+
+Convert to powerpc 16 byte double double,
+
+Not yet tested.
+
+=cut
+
+*/
+
+#if (NUMVAL_SIZE == 16) && (defined(__powerpc__) || defined(_M_PPC))
+static void
+cvt_num4_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+{
+    cvt_num4_num16(dest, src);
+    cvt_num16_num16ppc(dest, src);
+}
+static void
+cvt_num8_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+{
+    cvt_num8_num16(dest, src);
+    cvt_num16_num16ppc(dest, src);
+}
+static void
+cvt_num10_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+{
+    cvt_num10_num16(dest, src);
+    cvt_num16_num16ppc(dest, src);
+}
+
+static void
+cvt_num16_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+{
+    double d1;
+    long double ld;
+    cvt_num16_num8((unsigned char *)&d1, src);
+    ld = (long double)d1;
+    memcpy(dest, &ld, sizeof(long double));
+}
 #endif
+
+/*
+
+=item C<static void cvt_num16ppc_num4(unsigned char *dest, const unsigned char
+*src)>
+
+=item C<static void cvt_num16ppc_num8(unsigned char *dest, const unsigned char
+*src)>
+
+=item C<static void cvt_num16ppc_num10(unsigned char *dest, const unsigned char
+*src)>
+
+=item C<static void cvt_num16ppc_num16(unsigned char *dest, const unsigned char
+*src)>
+
+Convert from powerpc 16 byte double double,
+
+Not yet tested.
+
+=cut
+
+*/
+
+/* num16ppc is the addition of two doubles */
+static void
+cvt_num16ppc_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+{
+    double d1, d2;
+    long double ld;
+    float f;
+    cvt_num8_num16((unsigned char *)&d1, src);
+    cvt_num8_num16((unsigned char *)&d2, src+8);
+    ld = d1 + d2;
+    f = (float)ld;
+    memcpy(dest, &f, 4);
+}
+static void
+cvt_num16ppc_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+{
+    double d1, d2;
+    long double ld;
+    cvt_num8_num16((unsigned char *)&d1, src);
+    cvt_num8_num16((unsigned char *)&d2, src+8);
+    ld = d1 + d2;
+    d1 = (double)ld;
+    memcpy(dest, &d1, 8);
+}
+static void
+cvt_num16ppc_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+{
+    double d1, d2;
+    long double ld;
+    cvt_num8_num16((unsigned char *)&d1, src);
+    cvt_num8_num16((unsigned char *)&d2, src+8);
+    ld = d1 + d2;
+    memcpy(dest, &ld, sizeof(ld));
+}
+static void
+cvt_num16ppc_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+{
+    double d1, d2;
+    long double ld;
+    cvt_num8_num16((unsigned char *)&d1, src);
+    cvt_num8_num16((unsigned char *)&d2, src+8);
+    ld = d1 + d2;
+    memcpy(dest, &ld, 16);
+}
+
+/*
+
+=item C<static void cvt_num8_num4(unsigned char *dest, const unsigned char
+*src)>
+
+=item C<static void cvt_num10_num4(unsigned char *dest, const unsigned char
+*src)>
+
+=item C<static void cvt_num16_num4(unsigned char *dest, const unsigned char
+*src)>
+
+Convert to 4 byte single float,
+
+Not yet tested.
+
+=cut
+
+*/
 
 static void
 cvt_num8_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
@@ -1520,8 +1839,10 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
         pf->fetch_nv = cvt_num10_num8;
         break;
       case FLOATTYPE_16:
-      case FLOATTYPE_16PPC:
         pf->fetch_nv = cvt_num16_num8;
+        break;
+      case FLOATTYPE_16PPC:
+        pf->fetch_nv = cvt_num16ppc_num8;
         break;
       case FLOATTYPE_4:
         pf->fetch_nv = cvt_num4_num8;
@@ -1533,12 +1854,14 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
         break;
       case FLOATTYPE_10:
         pf->fetch_nv = pf->header->wordsize == 8
-            ? fetch_buf_le_16;
-            ? fetch_buf_le_12;
+            ? fetch_buf_le_16
+            : fetch_buf_le_12;
         break;
       case FLOATTYPE_16:
-      case FLOATTYPE_16PPC:
         pf->fetch_nv = cvt_num16_num10;
+        break;
+      case FLOATTYPE_16PPC:
+        pf->fetch_nv = cvt_num16ppc_num10;
         break;
       case FLOATTYPE_4:
         pf->fetch_nv = cvt_num4_num10;
@@ -1551,8 +1874,10 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
       case FLOATTYPE_10:
         pf->fetch_nv = cvt_num10_num16;
         break;
-      case FLOATTYPE_16:
       case FLOATTYPE_16PPC:
+        pf->fetch_nv = cvt_num16ppc_num16;
+        break;
+      case FLOATTYPE_16:
         pf->fetch_nv = pf->header->byteorder ? fetch_buf_be_16 : fetch_buf_le_16;
         break;
       case FLOATTYPE_4:
@@ -1561,17 +1886,19 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
 #endif
 #if FLOATTYPE == FLOATTYPE_16PPC
       case FLOATTYPE_8:
-        pf->fetch_nv = cvt_num8_num16;
+        pf->fetch_nv = cvt_num8_num16ppc;
         break;
       case FLOATTYPE_10:
-        pf->fetch_nv = cvt_num10_num16;
+        pf->fetch_nv = cvt_num10_num16ppc;
         break;
       case FLOATTYPE_16:
+        pf->fetch_nv = cvt_num16_num16ppc;
+        break;
       case FLOATTYPE_16PPC:
         pf->fetch_nv = pf->header->byteorder ? fetch_buf_be_16 : fetch_buf_le_16;
         break;
       case FLOATTYPE_4:
-        pf->fetch_nv = cvt_num4_num16;
+        pf->fetch_nv = cvt_num4_num16ppc;
         break;
 #endif
 #if FLOATTYPE == FLOATTYPE_4
@@ -1582,8 +1909,10 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
         pf->fetch_nv = cvt_num10_num4;
         break;
       case FLOATTYPE_16:
-      case FLOATTYPE_16PPC:
         pf->fetch_nv = cvt_num16_num4;
+        break;
+      case FLOATTYPE_16PPC:
+        pf->fetch_nv = cvt_num16ppc_num4;
         break;
       case FLOATTYPE_4:
         pf->fetch_nv = pf->header->byteorder ? fetch_buf_be_4 : fetch_buf_le_4;
@@ -1596,9 +1925,10 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
         if ( floatsize == 12 && pf->header->wordsize == 8 )
             floatsize = 16;
         Parrot_x_force_error_exit(NULL, 1,
-              "PackFile_unpack: unsupported float conversion %d to %d, "
+              "PackFile_unpack: unsupported float conversion %d %s to %d %s, "
               "size=%d, bigendian=%d\n",
-              pf->header->floattype, FLOATTYPE,
+              pf->header->floattype, PF_floattype_names[pf->header->floattype],
+              FLOATTYPE, PF_floattype_names[FLOATTYPE],
               floatsize, pf->header->byteorder );
             break;
       }

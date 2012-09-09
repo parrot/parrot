@@ -33,7 +33,7 @@
 #define FLOATTYPE_4_NAME      "IEEE-754 4-byte single float"
 
 #define FLOATTYPE_16PPC       4
-#define FLOATTYPE_16PPC_NAME  "PPC64 16 byte double-double"
+#define FLOATTYPE_16PPC_NAME  "PPC 16 byte double-double"
 
 static
 int PF_floattype_size[] = { 8,12,16,4,16,2,16,16 };
@@ -54,6 +54,18 @@ int PF_floattype_size[] = { 8,12,16,4,16,2,16,16 };
 /* See http://www.ncsa.uiuc.edu/UserInfo/Resources/Hardware/IBMp690/IBM/usr/share/man/info/en_US/a_doc_lib/aixprggd/genprogc/128bit_long_double_floating-point_datatype.htm */
 #define FLOATTYPE_16AIX       7
 #define FLOATTYPE_16AIX_NAME  "AIX 16 byte long double"
+
+static
+const char* PF_floattype_names[] = {
+    FLOATTYPE_8_NAME,
+    FLOATTYPE_10_NAME,
+    FLOATTYPE_16_NAME,
+    FLOATTYPE_4_NAME,
+    FLOATTYPE_16PPC_NAME,
+    FLOATTYPE_2_NAME,
+    FLOATTYPE_16MIPS_NAME,
+    FLOATTYPE_16AIX_NAME
+};
 
 /*
 ** Parrot_pbc_read() options:

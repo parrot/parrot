@@ -9,7 +9,7 @@ use Parrot::Config;
 use Parrot::BuildUtil;
 use t::native_pbc::Test;
 
-use Parrot::Test tests => 11;
+use Parrot::Test tests => 12;
 
 # Testmatrix for coverage overview (GH #394)
 # float conversion src: left-side (pbc) to dest: upper-side (platform)
@@ -20,14 +20,15 @@ use Parrot::Test tests => 11;
 # The _le there is for reading.
 # 8_16_le=>4_8_le fails, but 8_16_le=>8_8_le passes
 my $testmatrix = <<EOF;
-        8_le 10_le 16_le 8_be 16_be  4_le 4_be
-8_le     1     1    1     ?     0     ?    ?
-10_le    1     1    1     ?     0     ?    ?
-16_le    S4    1    1     ?     0     ?    ?
-8_be     1     1    1     1     1     ?    ?
-16_be    ?     ?    ?     ?     1     ?    ?
-4_le     ?     ?    ?     ?     ?     ?    ?
-4_be     ?     ?    ?     ?     ?     ?    ?
+        8_le 10_le 16_le 8_be 16_be  4_le 4_be 16PPC_be
+8_le     1     1    1     ?     0     ?    ?    ?
+10_le    1     1    1     ?     0     ?    ?    ?
+16_le    S4    1    1     ?     0     ?    ?    ?
+8_be     1     1    1     1     1     ?    ?    ?
+16_be    ?     ?    ?     ?     1     ?    ?    ?
+4_le     ?     ?    ?     ?     ?     ?    ?    ?
+4_be     ?     ?    ?     ?     ?     ?    ?    ?
+16PPC_be 0     ?    ?     ?     ?     ?    ?    1
 EOF
 
 my $arch = t::native_pbc::Test::num_arch();
@@ -68,36 +69,36 @@ my $todo = generate_skip_list($arch, '?');
 my $skip = generate_skip_list($arch, '0');
 
 # old and unused
-my $output1 = << 'END_OUTPUT';
-1
-4
-16
-64
-256
-1024
-4096
-16384
-65536
-262144
-1048576
-4194304
-16777216
-67108864
-268435456
-1073741824
-4294967296
-17179869184
-68719476736
-274877906944
-1099511627776
-4398046511104
-17592186044416
-70368744177664
-281474976710656
-1.12589990684262e+15
-END_OUTPUT
+# my $output1 = << 'END_OUTPUT';
+# 1
+# 4
+# 16
+# 64
+# 256
+# 1024
+# 4096
+# 16384
+# 65536
+# 262144
+# 1048576
+# 4194304
+# 16777216
+# 67108864
+# 268435456
+# 1073741824
+# 4294967296
+# 17179869184
+# 68719476736
+# 274877906944
+# 1099511627776
+# 4398046511104
+# 17592186044416
+# 70368744177664
+# 281474976710656
+# 1.12589990684262e+15
+# END_OUTPUT
 
-my $output2 = << 'END_OUTPUT';
+my $output = << 'END_OUTPUT';
 0
 -0
 -1
@@ -128,8 +129,6 @@ my $output2 = << 'END_OUTPUT';
 281474976710656
 END_OUTPUT
 
-my $output = $output2;
-
 sub test_pbc_number {
     my $id   = shift;
     my $desc = shift;
@@ -140,10 +139,10 @@ sub test_pbc_number {
 #
 # any ordinary intel 386 linux, cygwin, mingw, MSWin32, ...
 #         floattype = 0   (interpreter's NUMVAL_SIZE     = 8)
-test_pbc_number('4_8_le', "i386 32 bit opcode_t, 4 byte intval, 8 byte double");
+test_pbc_number('4_8_le', "little-endian 32 bit opcode_t, 4 byte intval, 8 byte double");
 
 #         floattype = 1   (interpreter's NUMVAL_SIZE     = 12)
-test_pbc_number('4_10_le', "i386 32 bit opcode_t, 4 byte intval, 12 byte long double");
+test_pbc_number('4_10_le', "i386 32 bit opcode_t, 4 byte intval, 80bit/12 byte long double");
 
 # darwin/ppc:
 #         floattype = 0   (interpreter's NUMVAL_SIZE     = 8)
@@ -151,28 +150,32 @@ test_pbc_number('4_8_be', "big-endian 32 bit opcode_t, 4 byte intval, 8 byte dou
 
 # any ordinary 64-bit intel unix:
 #         floattype = 0   (interpreter's NUMVAL_SIZE     = 8)
-test_pbc_number('8_8_le', "x86_64 64 bit opcode_t, 8 byte intval, 8 byte double");
+test_pbc_number('8_8_le', "little-endian 64 bit opcode_t, 8 byte intval, 8 byte double");
 
 # x86_64 with floatval='long double'
 #         floattype = 1   (interpreter's NUMVAL_SIZE     = 16)
-test_pbc_number('8_10_le', "x86_64 64 bit opcode_t, 8 byte intval, 16 byte long double");
+test_pbc_number('8_10_le', "x86_64 64 bit opcode_t, 8 byte intval, 80bit/16 byte long double");
 
 # x86_64 with floatval='__float128'
 #         floattype = 2   (interpreter's NUMVAL_SIZE     = 16)
-test_pbc_number('8_16_le', "x86_64 64 bit opcode_t, 8 byte intval, 16 byte __float128");
+test_pbc_number('8_16_le', "little-endian 64 bit opcode_t, 8 byte intval, 16 byte __float128");
 
 # PowerPC64 -m64
 #         floattype = 0   (interpreter's NUMVAL_SIZE     = 8)
 test_pbc_number('8_8_be', "big-endian 64 bit opcode_t, 8 byte intval, 8 byte double");
 
-# ppc/mips -m64 --floatval="long double"
+# sparc64/__float128 --floatval="long double"
 #         floattype = 2   (interpreter's NUMVAL_SIZE     = 8)
 test_pbc_number('8_16_be', "big-endian 64 bit opcode_t, 8 byte intval, 16 byte long double");
 test_pbc_number('4_16_be', "big-endian 32 bit opcode_t, 4 byte intval, 16 byte long double");
 
+# ppc --floatval="long double"
+#         floattype = 4   (interpreter's NUMVAL_SIZE     = 8)
+test_pbc_number('4_16PPC_be', "big-endian 32 bit opcode_t, 4 byte intval, 16 byte double double");
+
 # i386 --floatval=float
 #         floattype = 3   (interpreter's NUMVAL_SIZE     = 4)
-test_pbc_number('4_4_le', "i386 32 bit opcode_t, 4 byte intval, 4 byte single float");
+test_pbc_number('4_4_le', "little-endian 32 bit opcode_t, 4 byte intval, 4 byte single float");
 
 # ppc -m32 --floatval=float
 #         floattype = 3   (interpreter's NUMVAL_SIZE     = 4)
@@ -212,17 +215,23 @@ little/big-endian.
   8_8_be: big-endian 64 bit opcode_t, 8 byte intval, 8 byte double
        (Sparc64/Solaris, MIPS irix or similar)
 
-  4_12_le: i386 32 bit opcode_t, 4 byte intval, 12 byte long double
-       (linux-gcc-i386 or cygwin with --floatval="long double")
+  4_10_le: i386 32 bit opcode_t, 4 byte intval, 12 byte long double
+       (i386 with --floatval="long double")
+
+  8_10_le: x86_64 64 bit opcode_t, 8 byte intval, 16 byte long double
+       (--floatval="long double")
 
   8_16_le: x86_64 64 bit opcode_t, 8 byte intval, 16 byte long double
-       (linux-gcc-x86_64, solaris-cc-64int --floatval="long double")
+       (--floatval="__float128")
 
   8_16_be: big-endian 64 bit opcode_t, 8 byte intval, 16 byte long double
        (Sparc64/Solaris --floatval="long double")
 
+  8_16PPC_be: powerpc 64 bit opcode_t, 8 byte intval, 16 byte double double
+       (--floatval="long double")
+
   4_4_le: i386 32 bit opcode_t, 4 byte intval, 4 byte single float
-       (linux-gcc-i386 or cygwin with --floatval="float")
+       (i386 --floatval="float")
 
   4_4_be: big-endian 32 bit opcode_t, 4 byte intval, 4 byte single float
        (darwin or debian/ppc with --floatval="float")

@@ -9,12 +9,11 @@
 
 #ifdef PARROT_HAS_HEADER_BYTESWAP
 #  include <byteswap.h>                    /* GNU */
-#  define bswap_16(x) __bswap_16(x)
-#  define bswap_32(x) __bswap_32(x)
-/* we want fast bswap on 64bit cpus with -m32 */
-#  ifdef HAS_LONGLONG
+#  ifndef bswap_16
+#    define bswap_16(x) __bswap_16(x)
+#    define bswap_32(x) __bswap_32(x)
 #    define bswap_64(x) __bswap_64(x)
-#   endif
+#  endif
 #else
 #  ifdef PARROT_HAS_HEADER_ENDIAN                 /* linux */
 #    include <endian.h>
@@ -177,17 +176,20 @@
     rb[30] = b[1]; \
     rb[31] = b[0];
 
-static inline Parrot_UInt2 bswap16(Parrot_UInt2 x)
+static inline
+Parrot_UInt2 bswap16(Parrot_UInt2 x)
 {
     return bswap_16(x);
 }
 
-static inline Parrot_UInt4 bswap32(Parrot_UInt4 x)
+static inline
+Parrot_UInt4 bswap32(Parrot_UInt4 x)
 {
     return bswap_32(x);
 }
 
-static inline Parrot_UInt8 bswap64(Parrot_UInt8 x)
+static inline
+Parrot_UInt8 bswap64(Parrot_UInt8 x)
 {
 #if defined(bswap_64)
     return bswap_64(x);
