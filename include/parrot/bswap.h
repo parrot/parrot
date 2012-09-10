@@ -14,42 +14,45 @@
 #    define bswap_32(x) __bswap_32(x)
 #    define bswap_64(x) __bswap_64(x)
 #  endif
-#else
+#elif defined(PARROT_HAS_HEADER_ENDIAN) \
+      || defined(PARROT_HAS_HEADER_SYS_ENDIAN)
 #  ifdef PARROT_HAS_HEADER_ENDIAN                 /* linux */
 #    include <endian.h>
 #  elif defined(PARROT_HAS_HEADER_SYS_ENDIAN)	   /* FreeBSD */
 #    include <sys/endian.h>
 #  endif
-#  if defined(PARROT_HAS_HEADER_ENDIAN) \
-      || defined(PARROT_HAS_HEADER_SYS_ENDIAN)
-#    define bswap_16(x) __bswap_16(x)
-#    define bswap_32(x) __bswap_32(x)
-#    ifdef HAS_LONGLONG
+#  define bswap_16(x) __bswap_16(x)
+#  define bswap_32(x) __bswap_32(x)
+#  ifdef __bswap_64
 #      define bswap_64(x) __bswap_64(x)
-#    endif
-#  else
-#    ifdef PARROT_HAS_HEADER_LIBKERN_OSBYTEORDER
-#      include <libkern/OSByteOrder.h>
-#      define bswap_16(x) OSSwapInt16(x)
-#      define bswap_32(x) OSSwapInt32(x)
-#      ifdef HAS_LONGLONG
-#        define bswap_64(x) OSSwapInt64(x)
-#      endif
-#    else
-#      ifdef PARROT_HAS_HEADER_SYS_BYTEORDER
-#        define bswap_16(x) BSWAP_16(x)
-#        define bswap_32(x) BSWAP_32(x)
-#        ifdef HAS_LONGLONG
-#          define bswap_64(x) BSWAP_64(x)
-#        endif
-#      else
-#        ifdef __MSC_VER
-#          define bswap_16(x) _byteswap_ushort(x)
-#          define bswap_32(x) _byteswap_ulong(x)
-#          ifdef HAS_LONGLONG
-#            define bswap_64(x) _byteswap_uint64(x)
-#          endif
-#        else
+#  endif
+#elif defined(PARROT_HAS_HEADER_LIBKERN_OSBYTEORDER)
+#  include <libkern/OSByteOrder.h>
+#  define bswap_16(x) OSSwapInt16(x)
+#  define bswap_32(x) OSSwapInt32(x)
+#  ifdef OSSwapInt64
+#    define bswap_64(x) OSSwapInt64(x)
+#  endif
+#elif defined(PARROT_HAS_HEADER_MACHINE_ENDIAN) && defined(__APPLE__)
+#  include <machine/endian.h>
+#  define bswap_16(x) __DARWIN_OSSwapInt16(x)
+#  define bswap_32(x) __DARWIN_OSSwapInt32(x)
+#  ifdef __DARWIN_OSSwapInt64
+#    define bswap_64(x) __DARWIN_OSSwapInt64(x)
+#  endif
+#elif defined(PARROT_HAS_HEADER_SYS_BYTEORDER)
+#  define bswap_16(x) BSWAP_16(x)
+#  define bswap_32(x) BSWAP_32(x)
+#  ifdef BSWAP_64
+#    define bswap_64(x) BSWAP_64(x)
+#  endif
+#elif defined(__MSC_VER)
+#  define bswap_16(x) _byteswap_ushort(x)
+#  define bswap_32(x) _byteswap_ulong(x)
+#  ifdef HAS_LONGLONG
+#    define bswap_64(x) _byteswap_uint64(x)
+#  endif
+#else
            /* no native bswap */
 #          define bswap_16(x)						\
   ({									\
@@ -87,11 +90,6 @@
                const unsigned char *c = &x; \
                SWAB_8(rb, c);               \
                (Parrot_UInt8)rb; })
-#          endif
-#        endif
-#      endif
-#    endif
-#  endif
 #endif
 
 #define SWAB_4(rb,b) \

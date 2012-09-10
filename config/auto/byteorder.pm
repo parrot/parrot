@@ -38,7 +38,8 @@ sub runstep {
       $self->_probe_byteswap($conf, "endian.h") ||         # Linux
       $self->_probe_byteswap($conf, "sys/endian.h") ||     # Freebsd
       $self->_probe_byteswap($conf, "sys/byteorder.h") ||  # BSWAP_32 on Solaris 10
-      $self->_probe_byteswap($conf, "libkern/OSByteOrder.h"); # OSX
+      $self->_probe_byteswap($conf, "libkern/OSByteOrder.h") || # OSX
+      $self->_probe_byteswap($conf, "machine/endian.h");   # Old OSX
 
     return 1;
 }
@@ -83,7 +84,7 @@ sub _probe_byteswap {
     $i =~ s|\.h$||g;
 
     $conf->cc_gen('config/auto/byteorder/bswap_c.in');
-    eval { $conf->cc_build("-DHAS_HEADER_".uc($i)) };
+    eval { $conf->cc_build("-DPARROT_HAS_HEADER_".uc($i)) };
     my $ret = $@ ? 0 : $conf->cc_run();
     $conf->cc_clean();
     if ($ret and $ret ne '0x12345678') {

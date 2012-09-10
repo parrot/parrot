@@ -7,37 +7,50 @@ Copyright (C) 2012, Parrot Foundation.
 #include <stdio.h>
 #include <stdint.h>
 
-#ifdef HAS_HEADER_BYTESWAP
-#  include <byteswap.h>
-#else
-#  ifdef HAS_HEADER_ENDIAN
-#    include <endian.h>
-#  elif defined(HAS_HEADER_SYS_ENDIAN)
-#    include <sys/endian.h>
-#  endif
-#  if defined(HAS_HEADER_ENDIAN) || defined(HAS_HEADER_SYS_ENDIAN)
+#ifdef PARROT_HAS_HEADER_BYTESWAP
+#  include <byteswap.h>                    /* GNU */
+#  ifndef bswap_16
 #    define bswap_16(x) __bswap_16(x)
 #    define bswap_32(x) __bswap_32(x)
-#    if __WORDSIZE == 64
+#    define bswap_64(x) __bswap_64(x)
+#  endif
+#elif defined(PARROT_HAS_HEADER_ENDIAN) \
+      || defined(PARROT_HAS_HEADER_SYS_ENDIAN)
+#  ifdef PARROT_HAS_HEADER_ENDIAN                 /* linux */
+#    include <endian.h>
+#  elif defined(PARROT_HAS_HEADER_SYS_ENDIAN)	   /* FreeBSD */
+#    include <sys/endian.h>
+#  endif
+#  define bswap_16(x) __bswap_16(x)
+#  define bswap_32(x) __bswap_32(x)
+#  ifdef __bswap_64
 #      define bswap_64(x) __bswap_64(x)
-#    endif
-#  else
-#    ifdef HAS_HEADER_LIBKERN_OSBYTEORDER
-#      include <libkern/OSXByteOrder.h>
-#      if __BYTE_ORDER == __LITTLE_ENDIAN
-#        define bswap_16(x) OSSwapHostToBigInt16(x)
-#        define bswap_32(x) OSSwapHostToBigInt32(x)
-#        if __WORDSIZE == 64
-#          define bswap_64(x) OSSwapHostToBigInt64(x)
-#        endif
-#      else
-#        define bswap_16(x) OSSwapBigToHostInt16(x)
-#        define bswap_32(x) OSSwapBigToHostInt32(x)
-#        if __WORDSIZE == 64
-#          define bswap_64(x) OSSwapBigToHostInt64(x)
-#        endif
-#      endif
-#    endif
+#  endif
+#elif defined(PARROT_HAS_HEADER_LIBKERN_OSBYTEORDER) && defined(__APPLE__)
+#  include <libkern/OSByteOrder.h>
+#  define bswap_16(x) OSSwapInt16(x)
+#  define bswap_32(x) OSSwapInt32(x)
+#  ifdef OSSwapInt64
+#    define bswap_64(x) OSSwapInt64(x)
+#  endif
+#elif defined(PARROT_HAS_HEADER_MACHINE_ENDIAN) && defined(__APPLE__)
+#  include <machine/endian.h>
+#  define bswap_16(x) __DARWIN_OSSwapInt16(x)
+#  define bswap_32(x) __DARWIN_OSSwapInt32(x)
+#  ifdef __DARWIN_OSSwapInt64
+#    define bswap_64(x) __DARWIN_OSSwapInt64(x)
+#  endif
+#elif defined(PARROT_HAS_HEADER_SYS_BYTEORDER)
+#  define bswap_16(x) BSWAP_16(x)
+#  define bswap_32(x) BSWAP_32(x)
+#  ifdef BSWAP_64
+#    define bswap_64(x) BSWAP_64(x)
+#  endif
+#elif defined(__MSC_VER)
+#  define bswap_16(x) _byteswap_ushort(x)
+#  define bswap_32(x) _byteswap_ulong(x)
+#  ifdef _byteswap_uint64
+#    define bswap_64(x) _byteswap_uint64(x)
 #  endif
 #endif
 
