@@ -169,17 +169,17 @@ test_pbc_number('8_8_be', "big-endian 64 bit opcode_t, 8 byte intval, 8 byte dou
 test_pbc_number('8_16_be', "big-endian 64 bit opcode_t, 8 byte intval, 16 byte long double");
 test_pbc_number('4_16_be', "big-endian 32 bit opcode_t, 4 byte intval, 16 byte long double");
 
-# ppc --floatval="long double"
-#         floattype = 4   (interpreter's NUMVAL_SIZE     = 8)
-test_pbc_number('4_16PPC_be', "big-endian 32 bit opcode_t, 4 byte intval, 16 byte double double");
-
 # i386 --floatval=float
 #         floattype = 3   (interpreter's NUMVAL_SIZE     = 4)
 test_pbc_number('4_4_le', "little-endian 32 bit opcode_t, 4 byte intval, 4 byte single float");
 
-# ppc -m32 --floatval=float
+# ppc --floatval=float
 #         floattype = 3   (interpreter's NUMVAL_SIZE     = 4)
 test_pbc_number('4_4_be', "big-endian 32 bit opcode_t, 4 byte intval, 4 byte single float");
+
+# ppc --floatval="long double" -mlong-double-128
+#         floattype = 4   (interpreter's NUMVAL_SIZE     = 16)
+test_pbc_number('4_16PPC_be', "big-endian 32 bit opcode_t, 4 byte intval, 16 byte double double");
 
 =head1 NAME
 

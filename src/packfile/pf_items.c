@@ -798,16 +798,32 @@ cvt_num10_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     +-------+-------+-------+-------+-------+-------+--...--+-------+
     1|<-----15----->|<----------------112 bits--------------------->|
     <---------------------------128 bits---------------------------->
-            16-byte LONG DOUBLE FLOATING-POINT (BE 64-bit)
+            16-byte LONG DOUBLE FLOATING-POINT __float128
 
     */
 
+    FLOATVAL ld;
+    long double d;
     memset(dest, 0, 16);
     /* simply copy over sign + exp */
     dest[15] = src[9];
     dest[14] = src[8];
     /* and copy the rest */
     memcpy(&dest[0], &src[0], 8);
+#if 0
+    /* TODO round on 15 digits */
+    memcpy(&ld, dest, 16);
+#  if 1
+    {
+        char buf[20];
+        sprintf(buf, "%.15g", ld);
+        d = atof(buf);
+    }
+#  else
+    d = (long double)ld;
+#  endif
+    memcpy(dest, &d, 16);
+#endif
 }
 #endif
 
@@ -936,23 +952,26 @@ cvt_num16_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 Convert from powerpc 16 byte double double,
 
-Not yet tested.
+Tested ok.
+
+num16ppc is the sum of two doubles one after another, the head being rounded
+to the nearest double and the tail containing the rest.
+
+See https://developer.apple.com/library/mac/#documentation/Darwin/Reference/ManPages/man3/float.3.html
 
 =cut
 
 */
 
-/* num16ppc is the addition of two doubles */
 static void
 cvt_num16ppc_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
     double d1, d2;
     long double ld;
     float f;
-    ((unsigned char *)&d1, src);
-    cvt_num8_num16((unsigned char *)&d2, src+8);
-    ld = d1 + d2;
-    if (d2 == -0.0 && d1 == 0.0) ld = -0.0;
+    memcpy(&d1, src, 8);
+    memcpy(&d2, src+8, 8);
+    ld = (d2 == -0.0 && d1 == 0.0) ? -0.0 : d1 + d2;
     f = (float)ld;
     memcpy(dest, &f, 4);
 }
@@ -961,10 +980,9 @@ cvt_num16ppc_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
     double d1, d2;
     long double ld;
-    cvt_num8_num16((unsigned char *)&d1, src);
-    cvt_num8_num16((unsigned char *)&d2, src+8);
-    ld = d1 + d2;
-    if (d2 == -0.0 && d1 == 0.0) ld = -0.0;
+    memcpy(&d1, src, 8);
+    memcpy(&d2, src+8, 8);
+    ld = (d2 == -0.0 && d1 == 0.0) ? -0.0 : d1 + d2;
     d1 = (double)ld;
     memcpy(dest, &d1, 8);
 }
@@ -973,20 +991,20 @@ cvt_num16ppc_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
     double d1, d2;
     long double ld;
-    cvt_num8_num16((unsigned char *)&d1, src);
-    cvt_num8_num16((unsigned char *)&d2, src+8);
-    ld = d1 + d2;
-    if (d2 == -0.0 && d1 == 0.0) ld = -0.0;
+    memcpy(&d1, src, 8);
+    memcpy(&d2, src+8, 8);
+    ld = (d2 == -0.0 && d1 == 0.0) ? -0.0 : d1 + d2;
     memcpy(dest, &ld, sizeof(ld));
 }
 static void
 cvt_num16ppc_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
-    FLOATVAL d1, d2;
-    cvt_num8_num16((unsigned char *)&d1, src);
-    cvt_num8_num16((unsigned char *)&d2, src+8);
-    d1 = (d2 == -0.0 && d1 == 0.0) ? -0.0 : d1 + d2;
-    memcpy(dest, &d1, 16);
+    double d1, d2;
+    FLOATVAL ld;
+    memcpy(&d1, src, 8);
+    memcpy(&d2, src+8, 8);
+    ld = (d2 == -0.0 && d1 == 0.0) ? -0.0 : d1 + d2;
+    memcpy(dest, &ld, 16);
 }
 
 /*
