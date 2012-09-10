@@ -927,12 +927,11 @@ IMCC_subst_constants(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
     };
 
     size_t i;
-    const char *fmt;
     char op[20];
+    const char *fmt = FLOATVAL_FMT;
     const char *debug_fmt = NULL;   /* gcc -O uninit warn */
     int found, branched;
 
-    fmt = FLOATVAL_FMT;
     tmp = NULL;
     found = 0;
     for (i = 0; i < N_ELEMENTS(ops); i++) {
