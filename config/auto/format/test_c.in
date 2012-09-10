@@ -1,0 +1,22 @@
+/*
+Copyright (C) 2012, Parrot Foundation.
+
+Probe for proper printf number format round trips
+*/
+
+#include <stdlib.h>
+#include <stdio.h>
+
+int
+main(int argc, char **argv)
+{
+    printf("@TEMP_nvformat@", @TEMP_number@);
+    return EXIT_SUCCESS;
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

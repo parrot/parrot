@@ -6,7 +6,7 @@ config/auto/format.pm - Sprintf Formats
 
 =head1 DESCRIPTION
 
-Figures out what formats should be used for C<sprintf()>.
+Figures out what integer and number formats should be used for C<sprintf()>.
 
 =cut
 
@@ -66,7 +66,7 @@ sub _set_floatvalfmt_nvsize {
     my ( $nvformat, $nvsize, $floattype );
     $nvsize = $numvalsize;
     if ( $nv eq "double" ) {
-        $nvformat = "%.16g";
+        $nvformat = "%.15g";
 	$floattype = 'FLOATTYPE_8';
     }
     elsif ( $nv eq "long double" ) {
@@ -112,8 +112,13 @@ sub _set_floatvalfmt_nvsize {
 	}
     }
     elsif ( $nv eq '__float128' ) {
-	# TODO probe for "%Qg" libquadmath printf hook support (linux only)
-	$nvformat = "%.41Lg";
+	# Probe for "%Q" libquadmath printf hook support (linux only)
+	if( _test_format($conf, "%Qg", 1.0)) {
+	    $nvformat = "%Qg";
+	}
+	else {
+	    $nvformat = "%.41Lg";
+	}
 	$floattype = 'FLOATTYPE_16';
     }
     elsif ( $nv eq "float" ) {
@@ -125,11 +130,47 @@ sub _set_floatvalfmt_nvsize {
         die qq{Configure.pl:  Can't find a printf-style format specifier for type '$nv'\n};
     }
 
+    # For a series of numbers test the nvformat precision, and decrease it
+    for my $num (-2.5, -4.00305267, -10.48576, 4.398046511104) {
+	if (!_test_format($conf, $nvformat, $num)) {
+	    $nvformat = _decrease_nvformat_precision($conf, $nvformat);
+	    $conf->debug("nvformat: $nvformat");
+	}
+    }
+
     $conf->data->set(
         floatvalfmt => $nvformat,
         nvsize      => $nvsize,
         floattype   => $floattype
     );
+}
+
+sub _decrease_nvformat_precision {
+    my ($conf, $nvformat) = @_;
+    my ($num, $suff) = $nvformat =~ m/^%(\d+)(.+)$/;
+    # require at least some sort of precision
+    if ($num < 5) {
+	my ( $nv, $numvalsize, $cpuarch ) =
+	  $conf->data->get(qw(nv numvalsize cpuarch));
+	die "Unable to find stable rount-trip numeric precision\n"
+	  . "for $nv, size $numvalsize on $cpuarch. Please choose another --floatval\n";
+    }
+    return sprintf("\%%d%s", $num-1, $suff);
+}
+
+sub _test_format {
+    my ($conf, $nvformat, $number) = @_;
+
+    my $num = $number;
+    $num .= "L" if $nvformat =~ /L/;
+    $conf->data->set( TEMP_nvformat => $nvformat,
+		      TEMP_number   => $num);
+    $conf->cc_gen('config/auto/format/test_c.in');
+    eval { $conf->cc_build() };
+    my $ret = $@ ? 0 : eval $conf->cc_run();
+    $conf->cc_clean();
+
+    return $ret == $number;
 }
 
 1;
