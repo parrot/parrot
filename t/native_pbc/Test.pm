@@ -21,7 +21,7 @@ sub int_arch {
 }
 sub num_arch {
     return $PConfig{ptrsize}
-      . "_". $PConfig{numvalsize}
+      . "_". substr($PConfig{floattype},length("FLOATTYPE_"))
       . "_"
       . (substr($PConfig{byteorder},0,2) eq '12' ? "le" : "be");
 }

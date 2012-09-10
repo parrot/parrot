@@ -897,42 +897,44 @@ Not yet tested.
 
 */
 
-#if (NUMVAL_SIZE == 16) && (defined(__powerpc__) || defined(_M_PPC))
+#if (NUMVAL_SIZE == 16) && (defined(__ppc__) || defined(__POWERPC__) || defined(_M_PPC))
 
-/* special case -0.0 */
-#define TO_16PPC(d1, d2, dest)                   \
-    d2 = (d1 == -0.0) ? d1 : d1 / 2.0;           \
-    memcpy(dest, &d2, 8);                        \
-    memcpy(dest+8, &d2, 8)
+#define TO_16PPC(d, ld, dest)      \
+    ld = (long double)d;           \
+    memcpy(dest, &ld, 16);
 
 static void
 cvt_num4_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
-    double d1, d2;
-    cvt_num4_num8(&d1, src);
-    TO_16PPC(d1,d2,dest);
+    double d;
+    long double ld;
+    cvt_num4_num8((unsigned char *)&d, src);
+    TO_16PPC(d,ld,dest);
 }
 static void
 cvt_num8_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
-    double d1, d2;
-    memcpy(&d1, src, 8);
-    TO_16PPC(d1,d2,dest);
+    double d;
+    long double ld;
+    memcpy(&d, src, 8);
+    TO_16PPC(d,ld,dest);
 }
 static void
 cvt_num10_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
-    double d1, d2;
-    cvt_num10_num8(&d, src);
-    TO_16PPC(d1,d2,dest);
+    double d;
+    long double ld;
+    cvt_num10_num8((unsigned char *)&d, src);
+    TO_16PPC(d,ld,dest);
 }
 
 static void
 cvt_num16_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
-    double d1, d2;
-    cvt_num16_num8(&d, src);
-    TO_16PPC(d1,d2,dest);
+    double d;
+    long double ld;
+    cvt_num16_num8((unsigned char *)&d, src);
+    TO_16PPC(d,ld,dest);
 }
 #endif
 
@@ -1404,18 +1406,18 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
              && FLOATTYPE != pf->header->floattype )
         {
             if (floatsize == 8) {
-                *((const unsigned char **)stream) = bswap64((Parrot_UInt8)*stream);
+                *(Parrot_UInt8*)*stream = bswap64(*(Parrot_UInt8*)*stream);
             }
             else if (floatsize == 4) {
-                *((const unsigned char **)stream) = bswap32((Parrot_UInt4)*stream);
+                *(Parrot_UInt4*)*stream = bswap32(*(Parrot_UInt4*)*stream);
             }
             else if (floatsize == 16) {
 #if 0
                 /* TODO 64bit CPU: bswap64 with temp */
-                Parrot_UInt8 tmp = bswap64((Parrot_UInt8)*stream);
-                *((const unsigned char **)stream) =
-                    bswap64((Parrot_UInt8)*((const unsigned char *)stream+8));
-                *(((const unsigned char **)stream+8)) = tmp;
+                Parrot_UInt8 tmp = bswap64(*(Parrot_UInt8*)*stream);
+                *(Parrot_UInt8*)*stream =
+                    bswap64(*(Parrot_UInt8*)*((const unsigned char *)stream+8));
+                *(Parrot_UInt8*)*((const unsigned char *)stream+8)) = tmp;
 #endif
                 unsigned char rb[16];
                 const unsigned char *c = (const unsigned char *)*stream;
