@@ -536,7 +536,6 @@ First variant ok, 2nd not ok.
 
 */
 
-#if (NUMVAL_SIZE == 8)
 static void
 cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
@@ -648,8 +647,6 @@ cvt_num4_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     memcpy(dest, &d, 8);
 }
 
-#endif
-
 /*
 
 =item C<static void cvt_num16_num10(unsigned char *dest, const unsigned char
@@ -664,7 +661,7 @@ Tested ok.
 
 */
 
-#if (NUMVAL_SIZE == 12)
+#if (FLOATTYPE == FLOATTYPE_10)
 static void
 cvt_num16_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
@@ -965,6 +962,7 @@ See https://developer.apple.com/library/mac/#documentation/Darwin/Reference/ManP
 
 */
 
+#if (NUMVAL_SIZE == 4)
 static void
 cvt_num16ppc_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
@@ -977,6 +975,9 @@ cvt_num16ppc_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     f = (float)ld;
     memcpy(dest, &f, 4);
 }
+#endif
+
+#if (NUMVAL_SIZE == 16)
 static void
 cvt_num16ppc_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
@@ -988,6 +989,9 @@ cvt_num16ppc_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     d1 = (double)ld;
     memcpy(dest, &d1, 8);
 }
+#endif
+
+#if (FLOATTYPE == FLOATTYPE_10)
 static void
 cvt_num16ppc_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
@@ -998,6 +1002,9 @@ cvt_num16ppc_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     ld = (d2 == -0.0 && d1 == 0.0) ? -0.0 : d1 + d2;
     memcpy(dest, &ld, sizeof(ld));
 }
+#endif
+
+#if (NUMVAL_SIZE == 16)
 static void
 cvt_num16ppc_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
@@ -1008,7 +1015,7 @@ cvt_num16ppc_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     ld = (d2 == -0.0 && d1 == 0.0) ? -0.0 : d1 + d2;
     memcpy(dest, &ld, 16);
 }
-
+#endif
 /*
 
 =item C<static void cvt_num8_num4(unsigned char *dest, const unsigned char
@@ -1028,6 +1035,8 @@ Not yet tested.
 
 */
 
+#if (NUMVAL_SIZE == 4)
+
 static void
 cvt_num8_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
@@ -1038,7 +1047,6 @@ cvt_num8_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     memcpy(dest, &f, 4);
 }
 
-#if (NUMVAL_SIZE == 4)
 static void
 cvt_num10_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
@@ -1081,6 +1089,7 @@ cvt_num16_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     cvt_num8_num4(dest, tmp);
 #endif
 }
+
 #endif
 
 
@@ -1380,7 +1389,7 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
 
     /* When we have alignment all squared away we don't need
      * to use memcpy() for native byteorder.  */
-    FLOATVAL f = 0;
+    FLOATVAL f;
     if (!pf || !pf->fetch_nv) {
         memcpy(&f, (const char *)*stream, sizeof (FLOATVAL));
         (*stream) += (sizeof (FLOATVAL) + sizeof (opcode_t) - 1)/
