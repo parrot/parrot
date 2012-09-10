@@ -68,36 +68,6 @@ sub generate_skip_list {
 my $todo = generate_skip_list($arch, '?');
 my $skip = generate_skip_list($arch, '0');
 
-# old and unused
-# my $output1 = << 'END_OUTPUT';
-# 1
-# 4
-# 16
-# 64
-# 256
-# 1024
-# 4096
-# 16384
-# 65536
-# 262144
-# 1048576
-# 4194304
-# 16777216
-# 67108864
-# 268435456
-# 1073741824
-# 4294967296
-# 17179869184
-# 68719476736
-# 274877906944
-# 1099511627776
-# 4398046511104
-# 17592186044416
-# 70368744177664
-# 281474976710656
-# 1.12589990684262e+15
-# END_OUTPUT
-
 my $output = << 'END_OUTPUT';
 0
 -0
@@ -129,10 +99,15 @@ my $output = << 'END_OUTPUT';
 281474976710656
 END_OUTPUT
 
+$output =~ s/(\.\d{1,5})\d+/$1.'\d+'/eg;
+# $output =~ s/(\d{7,9})\d+/$1.'[\d\.]+'/eg;
+# $output =~ s/(\d{4,5})\d+/$1.'[\d\.]+'/eg;
+my $qr = qr/$output/m;
+
 sub test_pbc_number {
     my $id   = shift;
     my $desc = shift;
-    test_native_pbc($id, "number", $output, $desc, $skip, $todo);
+    test_native_pbc($id, "number", $qr, $desc, $skip, $todo);
 }
 
 # execute t/native_pbc/number_*.pbc

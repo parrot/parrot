@@ -79,9 +79,9 @@ sub test_native_pbc {
         $skip_msg  = "$file has old PBC_COMPAT $pbc_bc_version. "
           . "Need $id platform to generate it.";
     }
-    if ($type eq 'number' and $cvt =~ /^8_16_[bl]e=>4_8_/) {
+    if ($type eq 'number' and $cvt =~ /_16_[bl]e=>._8_/) {
         # 16 -> 8 drops some mantissa bits
-        $expected =~ s/1\.12589990684262e\+15/1.12589990684058e+15/;
+        # $expected =~ s/1\.12589990684262e\+15/1.12589990684058e+15/;
     }
     # check if skip or todo
   SKIP: {
@@ -108,13 +108,22 @@ sub test_native_pbc {
         else {
             $todo_msg = "$cvt yet untested. Please report success."
         }
-        Parrot::Test::pbc_output_is( $file, $expected, "$cvt $desc",
-                       todo => "$todo_msg" );
+	if ($type eq 'number') {
+	    Parrot::Test::pbc_output_like( $file, $expected, "$cvt $desc",
+					   todo => "$todo_msg" );
+	} else {
+	    Parrot::Test::pbc_output_is( $file, $expected, "$cvt $desc",
+					 todo => "$todo_msg" );
+	}
     }
     else {
         skip $skip_msg, 1 if $bc ne $pbc_bc_version;
         local $TODO = $skip_msgv if $version ne $pbc_version;
-        Parrot::Test::pbc_output_is( $file, $expected, "$cvt $desc" );
+	if ($type eq 'number') {
+	    Parrot::Test::pbc_output_like( $file, $expected, "$cvt $desc" );
+	} else {
+	    Parrot::Test::pbc_output_is( $file, $expected, "$cvt $desc" );
+	}
     }
   }
 }
