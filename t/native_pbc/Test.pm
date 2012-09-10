@@ -79,10 +79,10 @@ sub test_native_pbc {
         $skip_msg  = "$file has old PBC_COMPAT $pbc_bc_version. "
           . "Need $id platform to generate it.";
     }
-    if ($type eq 'number' and $cvt =~ /_16_[bl]e=>._8_/) {
-        # 16 -> 8 drops some mantissa bits
-        # $expected =~ s/1\.12589990684262e\+15/1.12589990684058e+15/;
-    }
+    #if ($type eq 'number' and $cvt =~ /_16_[bl]e=>._8_/) {
+    #   16 -> 8 drops some mantissa bits
+    #   $expected =~ s/1\.12589990684262e\+15/1.12589990684058e+15/;
+    #}
     # check if skip or todo
   SKIP: {
     # TODO: -r requires -o *.pbc. We could add and run it
@@ -145,18 +145,21 @@ native pbcs on 4 different machines.
 
 =head1 PLATFORMS
 
-  i386 32 bit opcode_t, 2 byte intval, 8 byte double (linux-gcc-ix86, freebsd-gcc, cygwin)
-  i386 32 bit opcode_t, 2 byte intval, 12 bit long double --floatval="long double"
-  x86_64 64 bit opcode_t, 4 byte intval, 8 byte double  (linux-gcc-x86_64, solaris-cc-64int)
-  x86_64 64 bit opcode_t, 4 byte intval, 16 byte long double --floatval="long double"
-  big-endian 32 bit opcode_t, 2 byte intval, 8 byte double (darwin-ppc, sparc32 or mips32)
-  big-endian 32 bit opcode_t, 2 byte intval, 16 byte long double --floatval="long double"
-  big-endian 64 bit opcode_t, 4 byte intval, 8 byte double (Sparc64, mips64, ppc64)
-  big-endian 64 bit opcode_t, 4 byte intval, 16 byte long double --floatval="long double"
+  i386 32 bit opcode_t, 2 byte intval, 8 byte double
+  x86_64 64 bit opcode_t, 4 byte intval, 8 byte double
+  i386 32 bit opcode_t, 2 byte intval, 80bit/12 byte long double --floatval="long double"
+  x86_64 64 bit opcode_t, 4 byte intval, 80bit/16 byte long double --floatval="long double"
+  x86_64 64 bit opcode_t, 4 byte intval, 16 byte quad double --floatval=__float128
+  i386   32 bit opcode_t, 4 byte intval, 4-byte single float --floatval=float
 
-  (skipped) i386 32 bit opcode_t, 2 byte intval, 4-byte single float --floatval=float
-  (skipped) x86_64 64 bit opcode_t, 4 byte intval, 4-byte single float --floatval=float
-  (skipped) big-endian 32 bit opcode_t, 2 byte intval, 4 byte single float --floatval=float
+  big-endian 32 bit opcode_t, 2 byte intval, 8 byte double (darwin-ppc, sparc32 or mips32)
+  PPC 32 bit opcode_t, 2 byte intval, 16 byte double-double --floatval="long double"
+  big-endian 32 bit opcode_t, 2 byte intval, 4 byte single float --floatval=float
+
+Hard to find platforms:
+
+  big-endian 64 bit opcode_t, 4 byte intval, 8 byte double (Sparc64, mips64, ppc64)
+  Sparc64 big-endian 64 bit opcode_t, 4 byte intval, 16 byte quad double --floatval="long double"
 
 =head2 Functions
 

@@ -530,7 +530,7 @@ cvt_num10_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 Converts IEEE 754 16-byte long double to IEEE 754 8 byte double.
 
-First variant ok, 2nd not ok.
+First variant ok, 2nd with too low precision.
 
 =cut
 
@@ -541,29 +541,26 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
     ASSERT_ARGS(cvt_num16_num8)
 
-    if ((sizeof(FLOATVAL) == 16) && (sizeof(double) == 8)) {
+    if ((FLOATTYPE == FLOATTYPE_16) && (sizeof(double) == 8)) {
         FLOATVAL ld;
         double d;
 
         memcpy(&ld, src, 16);
-        d = (double)ld; /* compiler cast */
+        d = (double)ld; /* native compiler cast */
         memcpy(dest, &d, 8);
         return;
     }
     else {
-        /* Yet untested. Need native sparc64 */
+        /* In work. Need __float128 or native sparc64 */
         int expo, i, sign;
 #  ifdef __LCC__
         int expo2;
-#  endif
-#  if 0
-        Parrot_x_force_error_exit(NULL, 1, "cvt_num16_num8: long double conversion unsupported");
 #  endif
 
     /* Have only 12-byte long double, or no long double at all. Need to disect it */
 
     /*
-       16-byte long double (128 bits):
+       16-byte quad double (128 bits):
        sign  1  bit 127
        exp  15 bits 126-112 16383
        man 112 bits 111-0
@@ -578,15 +575,15 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     +-------+-------+-------+-------+-------+-------+--...--+-------+
     1|<-----15----->|<----------------112 bits--------------------->|
     <---------------------------128 bits---------------------------->
-            16-byte LONG DOUBLE FLOATING-POINT (Sparc 64-bit)
+      16-byte LONG DOUBLE FLOATING-POINT (__float128 or Sparc 64-bit)
 
     +-------+-------+-------+-------+-------+-------+-------+-------+
     |dest[7]|dest[6]|dest[5]|dest[4]|dest[3]|dest[2]|dest[1]|dest[0]|
-    S|    E    |                           F                        |
+    S|    E     |                          F                        |
     +-------+-------+-------+-------+-------+-------+-------+-------+
-    1|<---11-->|<---------------------52 bits---------------------->|
+    1|<---11-- >|<--------------------52 bits---------------------->|
     <----------------------------64 bits---------------------------->
-                       8-byte DOUBLE FLOATING-POINT
+                     8-byte DOUBLE FLOATING-POINT
    */
 
         memset(dest, 0, 8);
@@ -621,6 +618,15 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
         dest[7] = (expo & 0x7f00) >> 8;
         if (sign)
             dest[7] |= 0x80;
+        /* bypass if mantissa is zero, well bytes 12-5 */
+        if (*(Parrot_UInt8*)&src[5]) {
+            /* src[13] => dest[6]; => dest[0] */
+            for (i = 0; i < 6; ++i) {
+                dest[i+1] |= (i==5 ? src[13] & 0xf0 : src[i+9]) >> 4;
+                dest[i]   |= (src[i+8] & 0xf) << 4;
+            }
+            dest[0] |= (src[7] & 0xf0) >> 4;
+        }
     }
 }
 

@@ -99,16 +99,38 @@ my $output = << 'END_OUTPUT';
 281474976710656
 END_OUTPUT
 
-# $output =~ s/\n/\$\n/g;
-# TODO required precision: 7 for float, 15 for double
-$output =~ s/(\.\d{1,6})\d+/$1.'\d+'/eg;
-# $output =~ s/(\d{7,9})\d+/$1.'[\d\.]+'/eg;
-# $output =~ s/(\d{4,5})\d+/$1.'[\d\.]+'/eg;
-my $qr = qr/$output/;
+sub my_precision {
+    my ($myprec) = $PConfig{floatvalfmt} =~ m/(\d+)/;
+    $myprec = '41' if !$myprec and $PConfig{floatvalfmt} =~ m/%Q/;
+    return $myprec;
+}
+
+sub min_precision {
+    my $id = shift;
+    my $myprec = shift;
+    my ($theirtype) = $id =~ m/^\d_(\d.*)_/;
+    # See various LDBL_DIG
+    my $prec = {4 => 7, 8 => 15, 10 => 18, '16ppc' => 31, 16 => 41};
+    my $theirprec = $prec->{$theirtype} // 7;
+    return $myprec < $theirprec ? $myprec : $theirprec;
+}
+
+my $myprec = my_precision;
 
 sub test_pbc_number {
     my $id   = shift;
     my $desc = shift;
+
+    # required precision: 7 for float, 15 for double, ...
+    my $out = $output;
+    my $minprec = min_precision($id, $myprec);
+    my $prec1 = $minprec - 1; # 4.398046511104
+    my $prec2 = $minprec - 2; # -10.48576
+    $out =~ s/(^-?\d{1,$minprec})\d+/$1.'\d+'/eg;
+    $out =~ s/(^-?\d\.\d{1,$prec1})\d+/$1.'\d+'/eg;
+    $out =~ s/(^-?\d\d\.\d{1,$prec2})\d+/$1.'\d+'/eg;
+    my $qr = qr/$out/;
+
     test_native_pbc($id, "number", $qr, $desc, $skip, $todo);
 }
 
