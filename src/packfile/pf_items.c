@@ -1850,7 +1850,8 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
     switch (pf->header->floattype) {
 #if FLOATTYPE == FLOATTYPE_8
       case FLOATTYPE_8:
-        pf->fetch_nv = pf->header->byteorder ? fetch_buf_be_8 : fetch_buf_le_8;
+        if (need_endianize)
+            pf->fetch_nv = pf->header->byteorder ? fetch_buf_be_8 : fetch_buf_le_8;
         break;
       case FLOATTYPE_10:
         pf->fetch_nv = cvt_num10_num8;
@@ -1870,9 +1871,10 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
         pf->fetch_nv = cvt_num8_num10;
         break;
       case FLOATTYPE_10:
-        pf->fetch_nv = pf->header->wordsize == 8
-            ? fetch_buf_le_16
-            : fetch_buf_le_12;
+        if (need_endianize || need_wordsize)
+            pf->fetch_nv = pf->header->wordsize == 8
+                ? fetch_buf_le_16
+                : fetch_buf_le_12;
         break;
       case FLOATTYPE_16:
         pf->fetch_nv = cvt_num16_num10;
@@ -1895,7 +1897,8 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
         pf->fetch_nv = cvt_num16ppc_num16;
         break;
       case FLOATTYPE_16:
-        pf->fetch_nv = pf->header->byteorder ? fetch_buf_be_16 : fetch_buf_le_16;
+        if (need_endianize)
+            pf->fetch_nv = pf->header->byteorder ? fetch_buf_be_16 : fetch_buf_le_16;
         break;
       case FLOATTYPE_4:
         pf->fetch_nv = cvt_num4_num16;
@@ -1912,7 +1915,8 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
         pf->fetch_nv = cvt_num16_num16ppc;
         break;
       case FLOATTYPE_16PPC:
-        pf->fetch_nv = pf->header->byteorder ? fetch_buf_be_16 : fetch_buf_le_16;
+        if (need_endianize)
+            pf->fetch_nv = pf->header->byteorder ? fetch_buf_be_16 : fetch_buf_le_16;
         break;
       case FLOATTYPE_4:
         pf->fetch_nv = cvt_num4_num16ppc;
@@ -1932,7 +1936,8 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
         pf->fetch_nv = cvt_num16ppc_num4;
         break;
       case FLOATTYPE_4:
-        pf->fetch_nv = pf->header->byteorder ? fetch_buf_be_4 : fetch_buf_le_4;
+        if (need_endianize)
+            pf->fetch_nv = pf->header->byteorder ? fetch_buf_be_4 : fetch_buf_le_4;
         break;
 #endif
       default:
