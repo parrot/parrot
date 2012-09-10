@@ -90,6 +90,7 @@
                const unsigned char *c = &x; \
                SWAB_8(rb, c);               \
                (Parrot_UInt8)rb; })
+#          endif
 #endif
 
 #define SWAB_4(rb,b) \
