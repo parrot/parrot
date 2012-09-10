@@ -962,7 +962,7 @@ See https://developer.apple.com/library/mac/#documentation/Darwin/Reference/ManP
 
 */
 
-#if (NUMVAL_SIZE == 4)
+#if FLOATTYPE == FLOATTYPE_4
 static void
 cvt_num16ppc_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
@@ -977,7 +977,7 @@ cvt_num16ppc_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 }
 #endif
 
-#if (NUMVAL_SIZE == 16)
+#if FLOATTYPE == FLOATTYPE_8
 static void
 cvt_num16ppc_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
@@ -991,7 +991,7 @@ cvt_num16ppc_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 }
 #endif
 
-#if (FLOATTYPE == FLOATTYPE_10)
+#if FLOATTYPE == FLOATTYPE_10
 static void
 cvt_num16ppc_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
@@ -1004,7 +1004,7 @@ cvt_num16ppc_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 }
 #endif
 
-#if (NUMVAL_SIZE == 16)
+#if FLOATTYPE == FLOATTYPE_16
 static void
 cvt_num16ppc_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
