@@ -66,7 +66,7 @@ sub _set_floatvalfmt_nvsize {
     my ( $nvformat, $nvsize, $floattype );
     $nvsize = $numvalsize;
     if ( $nv eq "double" ) {
-        $nvformat = "%.15g";
+        $nvformat = "%.16g";
 	$floattype = 'FLOATTYPE_8';
     }
     elsif ( $nv eq "long double" ) {
@@ -76,17 +76,17 @@ sub _set_floatvalfmt_nvsize {
 	    # TT #308 same values as in imcc
 	    if ($nvsize == 8) {
 		$floattype = 'FLOATTYPE_8';
-		$nvformat = "%.15" .  $spri;
+		$nvformat = "%.16" .  $spri;
 	    }
 	    elsif ($nvsize == 12) {
 		$floattype = 'FLOATTYPE_10';
-		$nvformat = "%.16Lg"; # i386 only
+		$nvformat = "%.18Lg"; # i386 only
 	    }
 	    elsif ($nvsize == 16) {
 		$nvformat = "%.41Lg";
 		if ($cpuarch =~ /^i386|amd64|ia64$/) {
 		    $floattype = 'FLOATTYPE_10';
-		    $nvformat = "%.16Lg";
+		    $nvformat = "%.18Lg";
 		}
 		elsif ($cpuarch eq 'mips') {
 		    # quadmath with special NaN
