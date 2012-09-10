@@ -542,15 +542,14 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
     ASSERT_ARGS(cvt_num16_num8)
 
-    if ((sizeof (long double) == 16) && (sizeof (double) == 8)) {
-
-        long double ld;
+    if ((sizeof(FLOATVAL) == 16) && (sizeof(double) == 8)) {
+        FLOATVAL ld;
         double d;
 
         memcpy(&ld, src, 16);
         d = (double)ld; /* compiler cast */
         memcpy(dest, &d, 8);
-
+        return;
     }
     else {
         /* Yet untested. Need native sparc64 */
@@ -830,10 +829,10 @@ cvt_num8_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
     ASSERT_ARGS(cvt_num8_num16)
     /* The compiler can do this for us */
-    long double ld;
+    HUGEFLOATVAL ld;
     double d;
     memcpy(&d, src, 8);
-    ld = (long double)d; /* TODO: test compiler cast */
+    ld = (HUGEFLOATVAL)d; /* TODO: test compiler cast */
     memcpy(dest, &ld, 16);
 }
 
@@ -854,10 +853,10 @@ static void
 cvt_num4_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
     float f;
-    long double ld;
+    HUGEFLOATVAL ld;
     memcpy(&f, src, 4);
-    ld = (long double)f; /* TODO: test compiler cast */
-    memcpy(dest, &ld, sizeof(long double));
+    ld = (HUGEFLOATVAL)f; /* TODO: test compiler cast */
+    memcpy(dest, &ld, 16);
 }
 
 /*
@@ -883,33 +882,41 @@ Not yet tested.
 */
 
 #if (NUMVAL_SIZE == 16) && (defined(__powerpc__) || defined(_M_PPC))
+
+/* special case -0.0 */
+#define TO_16PPC(d1, d2, dest)                   \
+    d2 = (d1 == -0.0) ? d1 : d1 / 2.0;           \
+    memcpy(dest, &d2, 8);                        \
+    memcpy(dest+8, &d2, 8)
+
 static void
 cvt_num4_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
-    cvt_num4_num16(dest, src);
-    cvt_num16_num16ppc(dest, src);
+    double d1, d2;
+    cvt_num4_num8(&d1, src);
+    TO_16PPC(d1,d2,dest);
 }
 static void
 cvt_num8_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
-    cvt_num8_num16(dest, src);
-    cvt_num16_num16ppc(dest, src);
+    double d1, d2;
+    memcpy(&d1, src, 8);
+    TO_16PPC(d1,d2,dest);
 }
 static void
 cvt_num10_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
-    cvt_num10_num16(dest, src);
-    cvt_num16_num16ppc(dest, src);
+    double d1, d2;
+    cvt_num10_num8(&d, src);
+    TO_16PPC(d1,d2,dest);
 }
 
 static void
 cvt_num16_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
-    double d1;
-    long double ld;
-    cvt_num16_num8((unsigned char *)&d1, src);
-    ld = (long double)d1;
-    memcpy(dest, &ld, sizeof(long double));
+    double d1, d2;
+    cvt_num16_num8(&d, src);
+    TO_16PPC(d1,d2,dest);
 }
 #endif
 
@@ -942,9 +949,10 @@ cvt_num16ppc_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     double d1, d2;
     long double ld;
     float f;
-    cvt_num8_num16((unsigned char *)&d1, src);
+    ((unsigned char *)&d1, src);
     cvt_num8_num16((unsigned char *)&d2, src+8);
     ld = d1 + d2;
+    if (d2 == -0.0 && d1 == 0.0) ld = -0.0;
     f = (float)ld;
     memcpy(dest, &f, 4);
 }
@@ -956,6 +964,7 @@ cvt_num16ppc_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     cvt_num8_num16((unsigned char *)&d1, src);
     cvt_num8_num16((unsigned char *)&d2, src+8);
     ld = d1 + d2;
+    if (d2 == -0.0 && d1 == 0.0) ld = -0.0;
     d1 = (double)ld;
     memcpy(dest, &d1, 8);
 }
@@ -967,17 +976,17 @@ cvt_num16ppc_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     cvt_num8_num16((unsigned char *)&d1, src);
     cvt_num8_num16((unsigned char *)&d2, src+8);
     ld = d1 + d2;
+    if (d2 == -0.0 && d1 == 0.0) ld = -0.0;
     memcpy(dest, &ld, sizeof(ld));
 }
 static void
 cvt_num16ppc_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
-    double d1, d2;
-    long double ld;
+    FLOATVAL d1, d2;
     cvt_num8_num16((unsigned char *)&d1, src);
     cvt_num8_num16((unsigned char *)&d2, src+8);
-    ld = d1 + d2;
-    memcpy(dest, &ld, 16);
+    d1 = (d2 == -0.0 && d1 == 0.0) ? -0.0 : d1 + d2;
+    memcpy(dest, &d1, 16);
 }
 
 /*
@@ -1030,20 +1039,27 @@ cvt_num10_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     memcpy(dest, &f, 4);
 #  endif
 #else
-    cvt_num10_num8(dest, src);
-    cvt_num8_num4(dest, src);
+    unsigned char tmp[8];
+    cvt_num10_num8(tmp, src);
+    cvt_num8_num4(dest, tmp);
 #endif
 }
 
 static void
 cvt_num16_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
+#ifdef HAS_FLOAT128
     float f;
-    long double ld;
-    /* 64bit only */
-    memcpy(&ld, src, 16);
-    f = (float)ld; /* TODO: test compiler cast */
+    __float128 ld;
+
+    memcpy(&ld, src, 16); /* 64bit only */
+    f = (float)ld;
     memcpy(dest, &f, 4);
+#else
+    unsigned char tmp[8];
+    cvt_num16_num8(tmp, src);
+    cvt_num8_num4(dest, tmp);
+#endif
 }
 #endif
 
@@ -1361,12 +1377,13 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
     }
     else {
         int floatsize = PF_floattype_size[ pf->header->floattype ];
+        const int need_endianize = pf->header->byteorder != PARROT_BIGENDIAN;
         /* Intel x86_64 has FLOATTYPE_10 aligned to size 16. */
         if ( floatsize == 12 && pf->header->wordsize == 8 )
             floatsize = 16;
-        if ( pf->header->byteorder != PARROT_BIGENDIAN
-             /* and not already endianized in fetcher */
-             && NUMVAL_SIZE != floatsize )
+        if ( need_endianize
+             /* and not endianized in fetcher */
+             && FLOATTYPE != pf->header->floattype )
         {
             if (floatsize == 8) {
                 *((const unsigned char **)stream) = bswap64((Parrot_UInt8)*stream);
