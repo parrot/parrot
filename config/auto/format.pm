@@ -130,11 +130,17 @@ sub _set_floatvalfmt_nvsize {
         die qq{Configure.pl:  Can't find a printf-style format specifier for type '$nv'\n};
     }
 
-    # For a series of numbers test the nvformat precision, and decrease it
-    for my $num (-2.5, -4.00305267, -10.48576, 4.398046511104) {
+    # For a series of random numbers test the nvformat precision, and decrease it.
+    # 4: 7 digits, 8: 15, 10: 18, 16ppc: 31, 16: 41
+  LOOP:
+    my @TEST = (-2.5, -4.003052, -10.48576);
+    push @TEST, (-4.0030526, 4.398046511104) if $nvsize > 4;
+    push @TEST, (-104.398046517704) if $nvsize >= 16;
+    for my $num (@TEST) {
 	if (!_test_format($conf, $nvformat, $num)) {
 	    $nvformat = _decrease_nvformat_precision($conf, $nvformat);
 	    $conf->debug("nvformat: $nvformat");
+	    redo LOOP;
 	}
     }
 
@@ -147,7 +153,7 @@ sub _set_floatvalfmt_nvsize {
 
 sub _decrease_nvformat_precision {
     my ($conf, $nvformat) = @_;
-    my ($num, $suff) = $nvformat =~ m/^%(\d+)(.+)$/;
+    my ($prefix, $num, $suff) = $nvformat =~ m/^(%\.?)(\d+)(.+)$/;
     # require at least some sort of precision
     if ($num < 5) {
 	my ( $nv, $numvalsize, $cpuarch ) =
@@ -155,7 +161,7 @@ sub _decrease_nvformat_precision {
 	die "Unable to find stable rount-trip numeric precision\n"
 	  . "for $nv, size $numvalsize on $cpuarch. Please choose another --floatval\n";
     }
-    return sprintf("\%%d%s", $num-1, $suff);
+    return sprintf("%s%d%s", $prefix, $num-1, $suff);
 }
 
 sub _test_format {
@@ -163,6 +169,7 @@ sub _test_format {
 
     my $num = $number;
     $num .= "L" if $nvformat =~ /L/;
+    $num .= "Q" if $nvformat =~ /Q/;
     $conf->data->set( TEMP_nvformat => $nvformat,
 		      TEMP_number   => $num);
     $conf->cc_gen('config/auto/format/test_c.in');

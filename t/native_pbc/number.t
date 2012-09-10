@@ -28,7 +28,7 @@ my $testmatrix = <<EOF;
 16_be    ?     ?    ?     ?     1     ?    ?    ?
 4_le     ?     ?    ?     ?     ?     ?    ?    ?
 4_be     ?     ?    ?     ?     ?     ?    ?    ?
-16PPC_be ?     ?    ?     1     ?     ?    ?    1
+16PPC_be 1     ?    ?     1     ?     ?    ?    1
 EOF
 
 my $arch = t::native_pbc::Test::num_arch();
@@ -99,10 +99,12 @@ my $output = << 'END_OUTPUT';
 281474976710656
 END_OUTPUT
 
-$output =~ s/(\.\d{1,5})\d+/$1.'\d+'/eg;
+# $output =~ s/\n/\$\n/g;
+# TODO required precision: 7 for float, 15 for double
+$output =~ s/(\.\d{1,6})\d+/$1.'\d+'/eg;
 # $output =~ s/(\d{7,9})\d+/$1.'[\d\.]+'/eg;
 # $output =~ s/(\d{4,5})\d+/$1.'[\d\.]+'/eg;
-my $qr = qr/$output/m;
+my $qr = qr/$output/;
 
 sub test_pbc_number {
     my $id   = shift;
