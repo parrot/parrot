@@ -123,12 +123,15 @@ sub test_pbc_number {
 
     # required precision: 7 for float, 15 for double, ...
     my $out = $output;
-    my $minprec = min_precision($id, $myprec) - 1;
-    my $prec1 = $minprec - 1; # 4.398046511104
-    my $prec2 = $minprec - 2; # -10.48576
-    $out =~ s/(^-?\d{1,$minprec})\d*/$1.'\d+'/eg;
-    $out =~ s/(^-?\d\.\d{1,$prec1})\d*/$1.'\d+'/eg;
-    $out =~ s/(^-?\d\d\.\d{1,$prec2})\d*/$1.'\d+'/eg;
+    my $minprec = min_precision($id, $myprec);
+    # [GH #xxx] Looks like we cannot guarantee more then 15 digits
+    $minprec = 15 if $minprec > 15 and $id ne $arch;
+    $minprec--;
+    my $prec1 = $minprec - 1; # 4.398046511104 => 4.398046\d*
+    my $prec2 = $minprec - 2; # -10.48576 => -10.48576\*
+    $out =~ s/(^-?\d\d\.\d{$prec2,})\d*/$1\\d*/mg;
+    $out =~ s/(^-?\d\.\d{$prec1,})\d*/$1\\d*/mg;
+    $out =~ s/(^-?\d{$minprec,})\d*/$1\\d*/mg;
     my $qr = qr/$out/;
 
     test_native_pbc($id, "number", $qr, $desc, $skip, $todo);
