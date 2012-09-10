@@ -280,6 +280,11 @@ PackFile_header_dump(PARROT_INTERP, ARGIN(const PackFile *pf))
 {
     ASSERT_ARGS(PackFile_header_dump)
     const PackFile_Header * const header = pf->header;
+    int floatsize = PF_floattype_size[ header->floattype ];
+
+    /* Intel x86_64 has FLOATTYPE_10 aligned to size 16. */
+    if ( floatsize == 12 && pf->header->wordsize == 8 )
+        floatsize = 16;
 
     Parrot_io_printf(interp, "HEADER => [\n");
     Parrot_io_printf(interp, "\twordsize  = %d", header->wordsize);
@@ -288,9 +293,10 @@ PackFile_header_dump(PARROT_INTERP, ARGIN(const PackFile *pf))
     Parrot_io_printf(interp, "\tbyteorder = %d", header->byteorder);
     Parrot_io_printf(interp, "\t(interpreter's byteorder       = %d)\n",
             PARROT_BIGENDIAN);
-    Parrot_io_printf(interp, "\tfloattype = %d", header->floattype);
-    Parrot_io_printf(interp, "\t(interpreter's NUMVAL_SIZE     = %d)\n",
-            NUMVAL_SIZE);
+    Parrot_io_printf(interp, "\tfloattype = %d/%d", header->floattype,
+            floatsize);
+    Parrot_io_printf(interp, " (interpreter's FLOATTYPE/SIZE = %d/%d)\n",
+            FLOATTYPE, NUMVAL_SIZE);
     Parrot_io_printf(interp, "\tparrot-version %d.%d.%d, "
             "bytecode-version %d.%d\n",
             header->major, header->minor, header->patch,
