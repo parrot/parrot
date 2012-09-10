@@ -21,12 +21,12 @@ use Parrot::Test tests => 11;
 # 8_16_le=>4_8_le fails, but 8_16_le=>8_8_le passes
 my $testmatrix = <<EOF;
         8_le 10_le 16_le 8_be 16_be  4_le 4_be 16PPC_be
-8_le     1     1    1     1     ?     ?    ?    ?
-10_le    1     1    1     ?     ?     ?    ?    ?
-16_le    S4    1    1     ?     ?     ?    ?    ?
+8_le     1     1    1     1     ?     ?    ?    1
+10_le    1     1    1     ?     ?     ?    ?    0
+16_le    S4    1    1     ?     ?     ?    ?    0
 8_be     1     1    1     1     1     ?    ?    1
 16_be    ?     ?    ?     ?     1     ?    ?    ?
-4_le     ?     ?    ?     ?     ?     ?    ?    ?
+4_le     ?     ?    ?     ?     ?     ?    ?    1
 4_be     ?     ?    ?     ?     ?     ?    ?    ?
 16PPC_be 1     ?    ?     1     ?     ?    ?    1
 EOF
@@ -123,12 +123,12 @@ sub test_pbc_number {
 
     # required precision: 7 for float, 15 for double, ...
     my $out = $output;
-    my $minprec = min_precision($id, $myprec);
+    my $minprec = min_precision($id, $myprec) - 1;
     my $prec1 = $minprec - 1; # 4.398046511104
     my $prec2 = $minprec - 2; # -10.48576
-    $out =~ s/(^-?\d{1,$minprec})\d+/$1.'\d+'/eg;
-    $out =~ s/(^-?\d\.\d{1,$prec1})\d+/$1.'\d+'/eg;
-    $out =~ s/(^-?\d\d\.\d{1,$prec2})\d+/$1.'\d+'/eg;
+    $out =~ s/(^-?\d{1,$minprec})\d*/$1.'\d+'/eg;
+    $out =~ s/(^-?\d\.\d{1,$prec1})\d*/$1.'\d+'/eg;
+    $out =~ s/(^-?\d\d\.\d{1,$prec2})\d*/$1.'\d+'/eg;
     my $qr = qr/$out/;
 
     test_native_pbc($id, "number", $qr, $desc, $skip, $todo);
