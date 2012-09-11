@@ -461,7 +461,8 @@ cvt_num10_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
        unused 2 byte on i386, 6 byte on x86_84/ia64
        sign    1 bit  79
        exp    15 bits 78-64     bias 16383
-       man    64 bits 63-0
+       intbit  1 bit  63        set if normalized
+       man    63 bits 62-0
     to 8-byte double (64 bits):
        sign    1 bit 63
        exp    11 bits 62-52     bias 1023
@@ -682,7 +683,8 @@ cvt_num16_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
        unused 16 bits 95-80
        sign    1 bit  79
        exp    15 bits 78-64     bias 16383
-       man    64 bits 63-0      bit 63 should be 1
+       intbit 1  bit  63        set if normalized
+       man    63 bits 62-0
 
     +-------+-------+-------+-------+-------+-------+--...--+-------+
     |src[15]|src[14]|src[13]|src[12]|src[11]|src[10]| ...   |src[0] |
@@ -782,7 +784,8 @@ cvt_num10_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
        unused padding 2-6 byte
        sign    1 bit  79
        exp    15 bits 78-64   bias 16383
-       man    64 bits 63-0    bit 63 should be 1 (normalized)
+       intbit 1  bit  63      set if normalized
+       man    63 bits 62-0
     to 16-byte double (__float128):
        sign  1  bit 127
        exp  15 bits 126-112   bias 16383
@@ -1069,6 +1072,7 @@ cvt_num10_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     long double ld;
     memcpy(&ld, src, 12);
     f = (float)ld; /* TODO: test compiler cast */
+    /* TODO round off */
     memcpy(dest, &f, 4);
 #  elif NUMVAL_SIZE == 16
     /* x86_64 or itanium */
@@ -1076,6 +1080,7 @@ cvt_num10_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     long double ld;
     memcpy(&ld, src, 16);
     f = (float)ld; /* TODO: test compiler cast */
+    /* TODO round off */
     memcpy(dest, &f, 4);
 #  endif
 #else
@@ -1094,6 +1099,7 @@ cvt_num16_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
     memcpy(&ld, src, 16); /* 64bit only */
     f = (float)ld;
+    /* TODO round off */
     memcpy(dest, &f, 4);
 #else
     unsigned char tmp[8];

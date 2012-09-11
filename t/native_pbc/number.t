@@ -28,7 +28,7 @@ my $testmatrix = <<EOF;
 16_be    ?     ?    ?     ?     1     ?    ?    ?
 4_le     ?     ?    ?     ?     ?     ?    ?    1
 4_be     ?     ?    ?     ?     ?     ?    ?    ?
-16PPC_be 1     ?    ?     1     ?     ?    ?    1
+16PPC_be 1     ?    1     1     ?     ?    ?    1
 EOF
 
 my $arch = t::native_pbc::Test::num_arch();
