@@ -427,7 +427,7 @@ static opcode_t fetch_op_le_8(ARGIN(const unsigned char *b))
  * Floattype 3 = IEEE-754 4 byte float (binary32)
  * Floattype 4 = PowerPC 16 byte double-double (-mlong-double-128)
  * not yet:
- * Floattype 4 = IEEE-754 2 byte half-precision float (binary16)
+ * Floattype 5 = IEEE-754 2 byte half-precision float (binary16)
  * Floattype 6 = MIPS64 16 byte long double
  * Floattype 7 = AIX 16 byte long double
  *
@@ -460,18 +460,18 @@ cvt_num10_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
        padding + 10-byte double (80 bits):
        unused 2 byte on i386, 6 byte on x86_84/ia64
        sign    1 bit  79
-       exp    15 bits 78-64
+       exp    15 bits 78-64     bias 16383
        man    64 bits 63-0
     to 8-byte double (64 bits):
        sign    1 bit 63
-       exp    11 bits 62-52
+       exp    11 bits 62-52     bias 1023
        man    52 bits 51-0
 
     +-------+-------+-------+-------+-------+-------+--...--+-------+
     |src[11]|src[10]|src[9] |src[8] |src[7] |src[6] | ...   |src[0] |
-    |   unused      |S|     Exp     |               Fract           |
+    |   unused      |S|     Exp     |i|          Fract              |
     +-------+-------+-------+-------+-------+-------+--...--+-------+
-    |<-----16------>|1|<-----15---->|<-----------64 bits----------->|
+    |<-----16------>|1|<-----15---->|1|<---------63 bits----------->|
     <-------------->|<----------------80 bits----------------------->
 
     +-------+-------+-------+-------+-------+-------+-------+-------+
@@ -515,7 +515,7 @@ cvt_num10_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     if (sign)
         dest[7] |= 0x80;
     /* long double frac 63 bits => 52 bits
-       src[7] &= 0x7f; reset integer bit */
+       src[7] &= 0x7f; reset integer bit 63 */
     for (i = 0; i < 6; ++i) {
         dest[i+1] |= (i==5 ? src[7] & 0x7f : src[i+2]) >> 3;
         dest[i] |= (src[i+2] & 0x1f) << 5;
@@ -562,11 +562,11 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     /*
        16-byte quad double (128 bits):
        sign  1  bit 127
-       exp  15 bits 126-112 16383
+       exp  15 bits 126-112  bias 16383
        man 112 bits 111-0
     to 8-byte double (64 bits):
        sign  1  bit 63
-       exp  11 bits 62-52 1023
+       exp  11 bits 62-52    bias 1023
        man  52 bits 51-0
 
     +-------+-------+-------+-------+-------+-------+--...--+-------+
@@ -602,7 +602,7 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
         expo2 = expo - 16383;
         expo  = expo2;
 #  else
-        expo -= 16383;       /* - same bias as with 12-byte */
+        expo -= 16383;       /* - same bias as with 80-bit */
 #  endif
         expo += 1023;        /* + bias 8byte */
 
@@ -676,13 +676,13 @@ cvt_num16_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     /*
        16-byte double (128 bits):
        sign  1  bit 127
-       exp  15 bits 126-112
+       exp  15 bits 126-112     bias 16383
        man 112 bits 111-0
     to 12-byte double (96 bits):
        unused 16 bits 95-80
        sign    1 bit  79
-       exp    15 bits 78-64
-       man    64 bits 63-0
+       exp    15 bits 78-64     bias 16383
+       man    64 bits 63-0      bit 63 should be 1
 
     +-------+-------+-------+-------+-------+-------+--...--+-------+
     |src[15]|src[14]|src[13]|src[12]|src[11]|src[10]| ...   |src[0] |
@@ -690,7 +690,7 @@ cvt_num16_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     +-------+-------+-------+-------+-------+-------+--...--+-------+
     1|<-----15----->|<----------------112 bits--------------------->|
     <---------------------------128 bits---------------------------->
-            16-byte LONG DOUBLE FLOATING-POINT (IA64 or BE 64-bit)
+        16-byte QUAD DOUBLE FLOATING-POINT (__float128 or BE 64-bit)
 
     +-------+-------+-------+-------+-------+-------+--...--+-------+
     |dest[11]dest[10]dest[9]|dest[8]|dest[7]|dest[6]| ...   |dest[0]|
@@ -698,7 +698,7 @@ cvt_num16_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     +-------+-------+-------+-------+-------+-------+--...--+-------+
     |<-----16------>|1|<-----15---->|<-----------64 bits----------->|
     <-------------->|<----------------80 bits----------------------->
-              12-byte LONG DOUBLE FLOATING-POINT (i386 special)
+              12-byte LONG DOUBLE FLOATING-POINT (intel special)
     */
 
     memset(dest, 0, 12);
@@ -707,6 +707,7 @@ cvt_num16_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     dest[9] = src[14];
     /* and copy the rest */
     memcpy(&dest[0], &src[0], 8);
+    dest[7] |= 0x80;  /* set integer bit 63 */
 }
 
 /*
@@ -763,9 +764,9 @@ cvt_num4_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 =item C<static void cvt_num10_num16(unsigned char *dest, const unsigned char
 *src)>
 
-Converts i386 LE 10-byte long double to IEEE 754 LE 16-byte long double.
+Converts i386 LE 10-byte long double to IEEE 754 LE 16-byte quad double.
 
-Not tested yet.
+Rounding errors.
 
 =cut
 
@@ -780,18 +781,18 @@ cvt_num10_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
        12/16-byte double (80 bit):
        unused padding 2-6 byte
        sign    1 bit  79
-       exp    15 bits 78-64
-       man    64 bits 63-0
+       exp    15 bits 78-64   bias 16383
+       man    64 bits 63-0    bit 63 should be 1 (normalized)
     to 16-byte double (__float128):
        sign  1  bit 127
-       exp  15 bits 126-112
+       exp  15 bits 126-112   bias 16383
        man 112 bits 111-0
 
     +-------+-------+-------+-------+-------+-------+--...--+-------+
     |src[11]|src[10]|src[9] |src[8] |src[7] |src[6] | ...   |src[0] |
-    |    unused     |S|     Exp     |               Fract           |
+    |    unused     |S|     Exp     |i|             Fract           |
     +-------+-------+-------+-------+-------+-------+--...--+-------+
-    |<------------->|1|<-----15---->|<-----------64 bits----------->|
+    |<------------->|1|<-----15---->|1|<---------63 bits----------->|
     <-------------->|<----------------80 bits----------------------->
            12/16-byte LONG DOUBLE FLOATING-POINT (intel special)
 
@@ -805,28 +806,33 @@ cvt_num10_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
     */
 
-    FLOATVAL ld;
-    long double d;
+    int expo, i;
     memset(dest, 0, 16);
-    /* simply copy over sign + exp */
+    /* sign + exp */
     dest[15] = src[9];
     dest[14] = src[8];
-    /* and copy the rest */
-    memcpy(&dest[0], &src[0], 8);
-#if 0
-    /* TODO round on 15 digits */
-    memcpy(&ld, dest, 16);
-#  if 1
-    {
-        char buf[20];
-        sprintf(buf, "%.15g", ld);
-        d = atof(buf);
-    }
-#  else
-    d = (long double)ld;
-#  endif
-    memcpy(dest, &d, 16);
+    expo = ((src[9] & 0x7f)<< 8 | src[8]);
+    expo -= 16383;
+    /* On Intel expo 0 is allowed */
+    if (expo <= 0)     /* underflow */
+        return;
+    if (expo > 0x7ff)  /* overflow, inf/nan */
+        return;
+    /* shortcut 0 mantissa */
+#if __WORDSIZE == 64
+    if (*(Parrot_UInt8*)src != 0x8000000000000000LU)
+#else
+    if (*(Parrot_UInt4*)src || *(Parrot_UInt4*)&src[4] != 0x80000000U)
 #endif
+    {
+#if 0
+	memcpy(&dest[6], &src[0], 8);
+#endif
+	for (i = 13; i > 5; i--) {
+	    dest[i] |= ((i==13 ? src[7] & 0x7f : src[i-5]) << 1)
+		    | (src[i-6] & 0x7f) >> 7;
+	}
+    }
 }
 #endif
 
