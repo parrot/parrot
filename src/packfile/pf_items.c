@@ -620,7 +620,7 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
         if (sign)
             dest[7] |= 0x80;
         /* bypass if mantissa is zero, well bytes 12-5 */
-        if (*(Parrot_UInt8*)&src[5]) {
+        if (*(const Parrot_UInt8*)&src[5]) {
             /* src[13] => dest[6]; => dest[0] */
             for (i = 0; i < 6; ++i) {
                 dest[i+1] |= (i==5 ? src[13] & 0xf0 : src[i+9]) >> 4;
@@ -823,9 +823,9 @@ cvt_num10_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
         return;
     /* shortcut 0 mantissa */
 #if __WORDSIZE == 64
-    if (*(Parrot_UInt8*)src != 0x8000000000000000LU)
+    if (*(const Parrot_UInt8*)src != 0x8000000000000000LU)
 #else
-    if (*(Parrot_UInt4*)src || *(Parrot_UInt4*)&src[4] != 0x80000000U)
+    if (*(const Parrot_UInt4*)src || *(const Parrot_UInt4*)&src[4] != 0x80000000U)
 #endif
     {
 #if 0
@@ -1433,23 +1433,23 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
              && FLOATTYPE != pf->header->floattype )
         {
             if (floatsize == 8) {
-                *(Parrot_UInt8*)*stream = bswap64(*(Parrot_UInt8*)*stream);
+                *(Parrot_UInt8*)*stream = bswap64(*(const Parrot_UInt8*)*stream);
             }
             else if (floatsize == 4) {
-                *(Parrot_UInt4*)*stream = bswap32(*(Parrot_UInt4*)*stream);
+                *(Parrot_UInt4*)*stream = bswap32(*(const Parrot_UInt4*)*stream);
             }
             else if (floatsize == 16) {
 #if 0
                 /* TODO 64bit CPU: bswap64 with temp */
-                Parrot_UInt8 tmp = bswap64(*(Parrot_UInt8*)*stream);
+                Parrot_UInt8 tmp = bswap64(*(const Parrot_UInt8*)*stream);
                 *(Parrot_UInt8*)*stream =
-                    bswap64(*(Parrot_UInt8*)*((const unsigned char *)stream+8));
+                    bswap64(*(const Parrot_UInt8*)*((const unsigned char *)stream+8));
                 *(Parrot_UInt8*)*((const unsigned char *)stream+8)) = tmp;
 #endif
                 unsigned char rb[16];
                 const unsigned char *c = (const unsigned char *)*stream;
                 SWAB_16(rb, c);
-                memcpy(*((const unsigned char **)stream), rb, 16);
+                memcpy(*stream, rb, 16);
             }
         }
         (pf->fetch_nv)((unsigned char *)&f, (const unsigned char *) *stream);
@@ -2182,7 +2182,7 @@ fetch_buf_le_4(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 4);
 #else
-    *(Parrot_UInt4*)rb = bswap32(*(Parrot_UInt4*)b);
+    *(Parrot_UInt4*)rb = bswap32(*(const Parrot_UInt4*)b);
 #endif
 }
 
@@ -2204,7 +2204,7 @@ fetch_buf_be_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 8);
 #elif defined(HAS_LONGLONG)
-    *(Parrot_UInt8*)rb = bswap64(*(Parrot_UInt8*)b);
+    *(Parrot_UInt8*)rb = bswap64(*(const Parrot_UInt8*)b);
 #else
     SWAB_8(rb, b);
 #endif
@@ -2228,7 +2228,7 @@ fetch_buf_le_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 8);
 #elif defined(HAS_LONGLONG)
-    *(Parrot_UInt8*)rb = bswap64(*(Parrot_UInt8*)b);
+    *(Parrot_UInt8*)rb = bswap64(*(const Parrot_UInt8*)b);
 #else
     SWAB_8(rb, b);
 #endif
