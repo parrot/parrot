@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -322,7 +322,11 @@ getfloat_va(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
         return (HUGEFLOATVAL)(HUGEFLOATVAL) va_arg(*arg, HUGEFLOATVAL);
 
       case SIZE_XVAL:
+#if FLOATTYPE == FLOATTYPE_4
+        return (HUGEFLOATVAL)(FLOATVAL) va_arg(*arg, double);
+#else
         return (HUGEFLOATVAL)(FLOATVAL) va_arg(*arg, FLOATVAL);
+#endif
 
       case SIZE_PMC:
         {
