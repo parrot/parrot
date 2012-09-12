@@ -619,8 +619,13 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
         dest[7] = (expo & 0x7f00) >> 8;
         if (sign)
             dest[7] |= 0x80;
-        /* bypass if mantissa is zero, well bytes 12-5 */
-        if (*(const Parrot_UInt8*)&src[5]) {
+        /* bypass if mantissa is zero, well bytes 13-12,11-4 */
+#  ifdef HAS_LONGLONG
+        if (*(const Parrot_UInt2*)&src[12] || *(const Parrot_UInt8*)&src[4])
+#  else
+        if (*(const Parrot_UInt4*)&src[10] || *(const Parrot_UInt4*)&src[6])
+#  endif
+        {
             /* src[13] => dest[6]; => dest[0] */
             for (i = 0; i < 6; ++i) {
                 dest[i+1] |= (i==5 ? src[13] & 0xf0 : src[i+9]) >> 4;
@@ -1015,7 +1020,7 @@ cvt_num16ppc_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     memcpy(&d1, src, 8);
     memcpy(&d2, src+8, 8);
     ld = (d2 == -0.0 && d1 == 0.0) ? -0.0 : d1 + d2;
-    memcpy(dest, &ld, sizeof(ld));
+    memcpy(dest, &ld, sizeof(ld)); /* sizeof: 12 or 16 */
 }
 #endif
 
@@ -1444,12 +1449,13 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
                 Parrot_UInt8 tmp = bswap64(*(const Parrot_UInt8*)*stream);
                 *(Parrot_UInt8*)*stream =
                     bswap64(*(const Parrot_UInt8*)*((const unsigned char *)stream+8));
-                *(Parrot_UInt8*)*((const unsigned char *)stream+8)) = tmp;
-#endif
+                *(Parrot_UInt8*)*((const unsigned char *)stream+8) = tmp;
+#else
                 unsigned char rb[16];
                 const unsigned char *c = (const unsigned char *)*stream;
                 SWAB_16(rb, c);
                 memcpy(*stream, rb, 16);
+#endif
             }
         }
         (pf->fetch_nv)((unsigned char *)&f, (const unsigned char *) *stream);
