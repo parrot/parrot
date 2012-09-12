@@ -242,7 +242,7 @@ init_context(ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
     PARROT_ASSERT(PMC_IS_NULL(pmcold) || pmcold->vtable->base_type == enum_class_CallContext);
 
     /*
-     * FIXME Invoking corotine shouldn't initialise context. So just
+     * FIXME Invoking coroutine shouldn't initialise context. So just
      * check ctx->current_sub. If it's not null return from here
      */
     if (!PMC_IS_NULL(ctx->current_sub))
@@ -765,7 +765,7 @@ Parrot_pcc_get_regs_used(SHIM_INTERP, ARGIN(const PMC *ctx), int type)
 
 =item C<Regs_ni* Parrot_pcc_get_regs_ni(PARROT_INTERP, const PMC *ctx)>
 
-Get pointer to FLOANFAL and INTVAL registers.
+Get pointer to FLOATVAL and INTVAL registers.
 
 =cut
 

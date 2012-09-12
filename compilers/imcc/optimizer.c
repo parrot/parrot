@@ -928,7 +928,6 @@ IMCC_subst_constants(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
 
     size_t i;
     char op[20];
-    const char *fmt = FLOATVAL_FMT;
     const char *debug_fmt = NULL;   /* gcc -O uninit warn */
     int found, branched;
 
@@ -1040,7 +1039,7 @@ IMCC_subst_constants(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
             r[1] = mk_const(imcc, b, r[0]->set);
             break;
           case 'N':
-            snprintf(b, sizeof (b), fmt, REG_NUM(imcc->interp, 0));
+            snprintf(b, sizeof (b), FLOATVAL_FMT, REG_NUM(imcc->interp, 0));
             r[1] = mk_const(imcc, b, r[0]->set);
             break;
           case 'S':
