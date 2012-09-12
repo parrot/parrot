@@ -388,7 +388,7 @@ Parrot_thread_notify_thread(PARROT_INTERP)
 
 /*
 
-=item C<void Parrot_thread_notify_threads(NULL)>
+=item C<void Parrot_thread_notify_threads(PARROT_INTERP)>
 
 Give all threads a chance to check their alarms.
 
@@ -399,6 +399,7 @@ Give all threads a chance to check their alarms.
 void
 Parrot_thread_notify_threads(SHIM_INTERP)
 {
+    ASSERT_ARGS(Parrot_thread_notify_threads)
     int i;
     Interp ** const tarray = Parrot_thread_get_threads_array(NULL);
 
@@ -563,7 +564,7 @@ Parrot_thread_make_local_args_copy(PARROT_INTERP, ARGIN(Parrot_Interp source),
 
 /*
 
-=item C<Interp** Parrot_thread_get_threads_array(NULL)>
+=item C<Interp** Parrot_thread_get_threads_array(PARROT_INTERP)>
 
 Returns the threads array.
 
@@ -575,12 +576,13 @@ PARROT_CANNOT_RETURN_NULL
 Interp**
 Parrot_thread_get_threads_array(SHIM_INTERP)
 {
+    ASSERT_ARGS(Parrot_thread_get_threads_array)
     return threads_array;
 }
 
 /*
 
-=item C<void Parrot_thread_init_threads_array(NULL)>
+=item C<void Parrot_thread_init_threads_array(PARROT_INTERP)>
 
 Initialize the threads array.
 
@@ -591,6 +593,7 @@ Initialize the threads array.
 void
 Parrot_thread_init_threads_array(SHIM_INTERP)
 {
+    ASSERT_ARGS(Parrot_thread_init_threads_array)
     int i = 0;
     for (; i < MAX_THREADS; i++)
         threads_array[i] = NULL;
@@ -598,7 +601,7 @@ Parrot_thread_init_threads_array(SHIM_INTERP)
 
 /*
 
-=item C<int Parrot_thread_get_free_threads_array_index(NULL)>
+=item C<int Parrot_thread_get_free_threads_array_index(PARROT_INTERP)>
 
 Returns an index of a free slot in the threads_array.
 Returns -1 if no slot is available.
@@ -610,6 +613,7 @@ Returns -1 if no slot is available.
 int
 Parrot_thread_get_free_threads_array_index(SHIM_INTERP)
 {
+    ASSERT_ARGS(Parrot_thread_get_free_threads_array_index)
     int i = 0;
     for (; i < MAX_THREADS; i++)
         if (threads_array[i] == NULL)

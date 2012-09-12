@@ -195,7 +195,7 @@ Parrot_alarm_set(FLOATVAL when)
 
 /*
 
-=item C<void Parrot_alarm_wait_for_next_alarm(SHIM_INTERP)>
+=item C<void Parrot_alarm_wait_for_next_alarm(PARROT_INTERP)>
 
 Sleep till the next alarm expires. This is a fallback function which is only
 used if we try to sleep the interp without threads support. If we have
@@ -210,6 +210,7 @@ PARROT_EXPORT
 void
 Parrot_alarm_wait_for_next_alarm(SHIM_INTERP)
 {
+    ASSERT_ARGS(Parrot_alarm_wait_for_next_alarm)
     const FLOATVAL now_time  = Parrot_floatval_time();
     const FLOATVAL time = alarm_set_to - now_time;
 
