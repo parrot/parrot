@@ -52,7 +52,14 @@ sub runstep {
     my $sizes = _get_sizes($conf, values %types, @extra_ints);
 
     $conf->data->set( HAS_LONGLONG => $sizes->{'long long'} ? 1 : 0 );
-    $conf->data->set( HAS_FLOAT128 => $sizes->{'__float128'} ? 1 : 0 );
+    my $cpuarch = $conf->data->get('cpuarch');
+    $conf->data->set( HAS_FLOAT128 => $sizes->{'__float128'}
+		      ? 1 # either GNU quadmath
+		      # or native CPU. amd64 NOT
+		      : ($sizes->{'long double'} == 16
+			 && $cpuarch =~ /^s390|sparc/
+		        ? 1 : 0)
+		    );
 
     _handle_ptrcast(
         $conf, \%types, $sizes, [ @std_ints, @extra_ints ]);
@@ -63,6 +70,7 @@ sub runstep {
 
     _set_intval_range($conf);
     _set_floatval_range($conf);
+    _set_floatval_digits($conf);
 
     # not as portable as possible, but should cover common architectures
     # extend list of types as necessary
@@ -77,7 +85,6 @@ sub runstep {
 
     _set_huge($conf, $sizes, 'int',
         [ reverse(@std_ints), reverse(@extra_ints), $types{intval} ] );
-
     _set_huge($conf, $sizes, 'float',
         [ reverse(@std_floats), $types{numval} ] );
 
@@ -86,12 +93,31 @@ sub runstep {
 
 #################### INTERNAL SUBROUTINES ####################
 
-sub test_size {
+sub _test_size {
     my ($conf, $type) = @_;
 
-    $conf->data->set( TEMP_type => $type );
+    $conf->data->set(
+        TEMP_type => $type, TEMP_define => 'xx',
+        TEMP_include => '');
     $conf->cc_gen('config/auto/sizes/test_c.in');
-    eval { $conf->cc_build() };
+    eval { $conf->cc_build('-DWANT_SIZE') };
+    my $ret = $@ ? 0 : eval $conf->cc_run();
+    $conf->cc_clean();
+
+    return $ret;
+}
+
+sub _test_define {
+    my ($conf, $define) = @_;
+
+    $conf->data->set(
+        TEMP_define => $define,
+        TEMP_type => '',
+        TEMP_include =>
+          $define =~ /^FLT128/ ? "#  include <quadmath.h>" : "",
+	);
+    $conf->cc_gen('config/auto/sizes/test_c.in');
+    eval { $conf->cc_build('-DWANT_DEFINE') };
     my $ret = $@ ? 0 : eval $conf->cc_run();
     $conf->cc_clean();
 
@@ -102,7 +128,7 @@ sub _get_sizes {
     my $conf = shift;
     my %sizes = map { $_ => 0 } @_;
     for my $size (keys %sizes) {
-      $sizes{$size} = test_size($conf, $size);
+      $sizes{$size} = _test_size($conf, $size);
     }
     return \%sizes;
 }
@@ -183,28 +209,31 @@ sub _set_huge {
 
 sub _set_intval_range {
     my $conf = shift;
-    my $ivmin;
-    my $ivmax;
+    my ($ivmin, $ivmax, $ivfmt);
     my $iv = $conf->data->get('iv');
 
     if ( ( $iv eq 'short' ) || ( $iv eq 'short int' ) ) {
         $ivmin = 'SHRT_MIN';
         $ivmax = 'SHRT_MAX';
+	$ivfmt = "%d";
     }
     elsif ( $iv eq 'int' ) {
         $ivmin = 'INT_MIN';
         $ivmax = 'INT_MAX';
+	$ivfmt = "%d";
     }
     elsif ( ( $iv eq 'long' ) || ( $iv eq 'long int' ) ) {
         $ivmin = 'LONG_MIN';
         $ivmax = 'LONG_MAX';
-    }
+	$ivfmt = "%ld";
+     }
     elsif ( ( $iv eq 'long long' ) || ( $iv eq 'long long int' ) ) {
         # The assumption is that a compiler that have the long long type
         # also provides its limit macros.
         $ivmin = 'LLONG_MIN';
         $ivmax = 'LLONG_MAX';
-    }
+	$ivfmt = "%lld";
+     }
     else {
         my $size = $conf->data->get('intvalsize');
         my $n = 8 * $size;
@@ -221,14 +250,18 @@ two's complement representation and CHAR_BIT == 8.
 END
     }
 
+    if (   !_test_define($conf, $ivmin)
+	|| !_test_define($conf, $ivmax)) {
+	die "\nConfigure.pl: Invalid preprocessor define $ivmin or $ivmax\n";
+    }
+
     $conf->data->set( intvalmin   => $ivmin );
     $conf->data->set( intvalmax   => $ivmax );
 }
 
 sub _set_floatval_range {
     my $conf = shift;
-    my $nvmin;
-    my $nvmax;
+    my ($nvmin, $nvmax);
     my $nv = $conf->data->get('nv');
 
     if ( $nv eq  'float') {
@@ -255,11 +288,41 @@ The range of representable values cannot be computed for arbitrary
 floating-point types.
 
 END
-        die "Configure.pl: Cannot find limits for type '$nv'\n";
+        die "\nConfigure.pl: Cannot find limits for type '$nv'\n";
+    }
+
+    if (   !_test_define($conf, $nvmin)
+	|| !_test_define($conf, $nvmax)) {
+	die "\nConfigure.pl: Invalid preprocessor define $nvmin or $nvmax\n";
     }
 
     $conf->data->set( floatvalmin => $nvmin );
     $conf->data->set( floatvalmax => $nvmax );
+}
+
+sub _set_floatval_digits {
+    my $conf = shift;
+    my $nvdig;
+    my $nv = $conf->data->get('nv');
+
+    if ( $nv eq  'float') {
+        $nvdig = 'FLT_DIG';
+    }
+    elsif ( $nv eq 'double' ) {
+        $nvdig = 'DBL_DIG';
+    }
+    elsif ( $nv eq 'long double' ) {
+        $nvdig = 'LDBL_DIG';
+    }
+    elsif ( $nv eq '__float128' ) { #libquadmath
+        $nvdig = 'FLT128_DIG';
+    }
+
+    if (!_test_define($conf, $nvdig)) {
+	die "\nConfigure.pl: Invalid preprocessor define $nvdig\n";
+    }
+
+    $conf->data->set( floatvaldig => $nvdig );
 }
 
 sub _handle_ptrcast {
@@ -272,7 +335,7 @@ sub _handle_ptrcast {
         $conf->data->set( ptrcast => 'unsigned '.$intptr );
     }
     else {
-        die "Configure.pl: No int type of at least pointer size found.\n";
+        die "\nConfigure.pl: No int type of at least pointer size found.\n";
     }
 
     return if $intvalsize >= $ptrsize;

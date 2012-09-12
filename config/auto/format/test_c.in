@@ -6,6 +6,8 @@ Probe for proper printf number format round trips
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
+#include <float.h>
 
 int
 main(int argc, char **argv)

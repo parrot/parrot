@@ -1,16 +1,25 @@
 /*
 Copyright (C) 2002-2011, Parrot Foundation.
 
-figure out some Configure settings
+Figure out some Configure settings
 */
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
+#include <limits.h>
+#include <float.h>
+
+@TEMP_include@
 
 int
 main(int argc, char **argv)
 {
+#ifdef WANT_SIZE
     printf("%u\n", (unsigned)sizeof (@TEMP_type@));
+#elif defined(WANT_DEFINE) && defined(@TEMP_define@)
+    printf("1\n");
+#endif
     return EXIT_SUCCESS;
 }
 

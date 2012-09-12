@@ -61,12 +61,15 @@ sub _set_intvalfmt {
 
 sub _set_floatvalfmt_nvsize {
     my $conf = shift;
-    my ( $nv, $numvalsize, $cpuarch ) =
-        $conf->data->get(qw(nv numvalsize cpuarch));
+    my ( $nv, $numvalsize, $cpuarch, $floatvaldig ) =
+        $conf->data->get(qw(nv numvalsize cpuarch floatvaldig));
     my ( $nvformat, $nvsize, $floattype );
     $nvsize = $numvalsize;
+
+    my $fltdig = _get_floatvaldigits($conf, $floatvaldig)
+      if $floatvaldig;
     if ( $nv eq "double" ) {
-        $nvformat = "%.15g";
+        $nvformat = sprintf("%%.%dg", $fltdig ? $fltdig : 15);
 	$floattype = 'FLOATTYPE_8';
     }
     elsif ( $nv eq "long double" ) {
@@ -76,17 +79,17 @@ sub _set_floatvalfmt_nvsize {
 	    # TT #308 same values as in imcc
 	    if ($nvsize == 8) {
 		$floattype = 'FLOATTYPE_8';
-		$nvformat = "%.16" .  $spri;
+		$nvformat = sprintf("%%.%dg", $fltdig ? $fltdig : 16);
 	    }
 	    elsif ($nvsize == 12) {
-		$floattype = 'FLOATTYPE_10';
-		$nvformat = "%.18Lg"; # i386 only
+		$floattype = 'FLOATTYPE_10'; # i386 only
+		$nvformat = sprintf("%%.%dLg", $fltdig ? $fltdig : 18);
 	    }
 	    elsif ($nvsize == 16) {
-		$nvformat = "%.41Lg";
+		$nvformat = sprintf("%%.%dLg", $fltdig ? $fltdig : 41);
 		if ($cpuarch =~ /^i386|amd64|ia64$/) {
 		    $floattype = 'FLOATTYPE_10';
-		    $nvformat = "%.18Lg";
+		    $nvformat = "%.18Lg" unless $fltdig;
 		}
 		elsif ($cpuarch eq 'mips') {
 		    # quadmath with special NaN
@@ -94,7 +97,7 @@ sub _set_floatvalfmt_nvsize {
 		}
 		elsif ($cpuarch eq 'ppc') {
 		    # double-double https://developer.apple.com/library/mac/#documentation/Darwin/Reference/ManPages/man3/float.3.html
-		    $nvformat = "%.31Lg";
+		    $nvformat = "%.31Lg" unless $fltdig;
 		    $floattype = 'FLOATTYPE_16PPC';
 		}
 		elsif ($cpuarch =~ /^s390|sparc/) {
@@ -117,13 +120,14 @@ sub _set_floatvalfmt_nvsize {
 	    $nvformat = "%Qg";
 	}
 	else {
-	    $nvformat = "%.41Lg";
+	    $nvformat = sprintf("%%.%dLg", $fltdig ? $fltdig : 41);
 	}
 	$floattype = 'FLOATTYPE_16';
     }
     elsif ( $nv eq "float" ) {
         $nvsize   = 4;
-        $nvformat = "%.7g"; # http://www.keil.com/support/docs/2191.htm
+        # http://www.keil.com/support/docs/2191.htm
+	$nvformat = sprintf("%%.%dg", $fltdig ? $fltdig : 7);
 	$floattype = 'FLOATTYPE_4';
     }
     else {
@@ -132,15 +136,14 @@ sub _set_floatvalfmt_nvsize {
 
     # For a series of random numbers test the nvformat precision, and decrease it.
     # 4: 7 digits, 8: 15, 10: 18, 16ppc: 31, 16: 41
-  LOOP:
-    my @TEST = (-2.5, -4.003052, -10.48576);
+    my @TEST = (-2.5, -4.003052, -10.48576, 1.0/3.0 );
     push @TEST, (-4.0030526, 4.398046511104) if $nvsize > 4;
     push @TEST, (-104.398046517704) if $nvsize >= 16;
     for my $num (@TEST) {
 	if (!_test_format($conf, $nvformat, $num)) {
 	    $nvformat = _decrease_nvformat_precision($conf, $nvformat);
-	    $conf->debug("nvformat: $nvformat");
-	    redo LOOP;
+	    $conf->debug("nvformat reduced: $nvformat\n");
+	    redo;
 	}
     }
 
@@ -153,15 +156,37 @@ sub _set_floatvalfmt_nvsize {
 
 sub _decrease_nvformat_precision {
     my ($conf, $nvformat) = @_;
-    my ($prefix, $num, $suff) = $nvformat =~ m/^(%\.?)(\d+)(.+)$/;
+    my ($prefix, $num, $suff) = $nvformat =~ m/^(%\.?)([Q\d]+)(.+)$/;
+    $num = 41 if $num eq 'Q';
     # require at least some sort of precision
-    if ($num < 5) {
+    if ($num < 6) {
 	my ( $nv, $numvalsize, $cpuarch ) =
 	  $conf->data->get(qw(nv numvalsize cpuarch));
-	die "Unable to find stable rount-trip numeric precision\n"
+	die "\nConfigure.pl: Unable to find stable round-trip numeric precision\n"
 	  . "for $nv, size $numvalsize on $cpuarch. Please choose another --floatval\n";
     }
     return sprintf("%s%d%s", $prefix, $num-1, $suff);
+}
+
+sub _rounded_numeq {
+    my ($conf, $n1, $n2, $prec) = @_;
+    return 1 if $n1 == $n2;
+    if (length("$n1") > 3) {
+	if (length("$n1") >= 7) {
+	    $n1 = sprintf("%.$prec"."g", $n1);
+	}
+	if (length("$n2") >= 7) {
+	    $n2 = sprintf("%.$prec"."g", $n2);
+	}
+	$n1 = substr("$n1", 0, $prec-1);
+	$n2 = substr("$n2", 0, $prec-1);
+	$conf->debug(" nvformat:\n  \"$n1\" == \n  \"$n2\" ($prec digits)\n");
+	return $n1 == $n2;
+    }
+    else {
+	$conf->debug(" nvformat: \n  $n1 == \n  $n2 ($prec digits)\n");
+        return $n1 == $n2;
+    }
 }
 
 sub _test_format {
@@ -170,14 +195,28 @@ sub _test_format {
     my $num = $number;
     $num .= "L" if $nvformat =~ /L/;
     $num .= "Q" if $nvformat =~ /Q/;
+    my ($prefix, $prec, $suff) = $nvformat =~ m/^(%\.?)([Q\d]+)(.+)$/;
+    $prec = 41 if $prec eq 'Q';
     $conf->data->set( TEMP_nvformat => $nvformat,
 		      TEMP_number   => $num);
     $conf->cc_gen('config/auto/format/test_c.in');
     eval { $conf->cc_build() };
     my $ret = $@ ? 0 : eval $conf->cc_run();
     $conf->cc_clean();
+    return _rounded_numeq($conf, $ret, $number, $prec);
+}
 
-    return $ret == $number;
+sub _get_floatvaldigits {
+    my ($conf, $floatvaldig) = @_;
+
+    $conf->data->set( TEMP_nvformat => "%u",
+		      TEMP_number   => $floatvaldig);
+    $conf->cc_gen('config/auto/format/test_c.in');
+    eval { $conf->cc_build() };
+    my $ret = $@ ? 0 : eval $conf->cc_run();
+    $conf->cc_clean();
+
+    return $ret;
 }
 
 1;

@@ -2203,7 +2203,7 @@ fetch_buf_be_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
     ASSERT_ARGS(fetch_buf_be_8)
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 8);
-#elif defined(HAS_LONGLONG)
+#elif defined(HAS_INT64)
     *(Parrot_UInt8*)rb = bswap64(*(const Parrot_UInt8*)b);
 #else
     SWAB_8(rb, b);
@@ -2227,7 +2227,7 @@ fetch_buf_le_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
     ASSERT_ARGS(fetch_buf_le_8)
 #if !PARROT_BIGENDIAN
     memcpy(rb, b, 8);
-#elif defined(HAS_LONGLONG)
+#elif defined(HAS_INT64)
     *(Parrot_UInt8*)rb = bswap64(*(const Parrot_UInt8*)b);
 #else
     SWAB_8(rb, b);
