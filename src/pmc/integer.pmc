@@ -132,6 +132,8 @@ Initializes the integer with a default value of C<0>.
 
 /*
 
+
+
 =item C<PMC *clone()>
 
 Creates an exact duplicate of this PMC.
@@ -142,6 +144,20 @@ Creates an exact duplicate of this PMC.
     VTABLE PMC *clone() {
         return Parrot_pmc_new_init_int(INTERP, SELF->vtable->base_type,
             SELF.get_integer());
+    }
+/*
+
+=item C<void *get_pointer()>
+
+Return the memory address of an Integer PMC. This is needed for certain NCI
+applications and may be disabled in certain security contexts.
+
+=cut
+
+*/
+
+    VTABLE void *get_pointer() {
+        return &(PARROT_INTEGER(SELF)->iv);
     }
 
 /*

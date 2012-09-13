@@ -92,6 +92,7 @@ include/pmc/pmc_opcode.h                         [devel]include
 include/pmc/pmc_oplib.h                          [devel]include
 include/pmc/pmc_orderedhash.h                    [devel]include
 include/pmc/pmc_orderedhashiterator.h            [devel]include
+include/pmc/pmc_os.h                             [devel]include
 include/pmc/pmc_packfile.h                       [devel]include
 include/pmc/pmc_packfileannotation.h             [devel]include
 include/pmc/pmc_packfileannotations.h            [devel]include
@@ -204,10 +205,6 @@ runtime/parrot/dynext/obscure_ops.bundle         [library]
 runtime/parrot/dynext/obscure_ops.dll            [library]
 runtime/parrot/dynext/obscure_ops.dylib          [library]
 runtime/parrot/dynext/obscure_ops.so             [library]
-runtime/parrot/dynext/os.bundle                  [library]
-runtime/parrot/dynext/os.dll                     [library]
-runtime/parrot/dynext/os.dylib                   [library]
-runtime/parrot/dynext/os.so                      [library]
 runtime/parrot/dynext/rational.bundle            [library]
 runtime/parrot/dynext/rational.dll               [library]
 runtime/parrot/dynext/rational.dylib             [library]
@@ -409,6 +406,7 @@ src/pmc/opcode.dump                              [devel]src
 src/pmc/oplib.dump                               [devel]src
 src/pmc/orderedhash.dump                         [devel]src
 src/pmc/orderedhashiterator.dump                 [devel]src
+src/pmc/os.dump                                  [devel]src
 src/pmc/packfile.dump                            [devel]src
 src/pmc/packfileannotation.dump                  [devel]src
 src/pmc/packfileannotations.dump                 [devel]src

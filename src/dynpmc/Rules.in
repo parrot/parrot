@@ -1,4 +1,4 @@
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2012, Parrot Foundation.
 
 $(DYNEXT_DIR)/dynlexpad$(LOAD_EXT): src/dynpmc/dynlexpad$(O)
 	$(LD)  @ld_out@$(DYNEXT_DIR)/dynlexpad$(LOAD_EXT) \
@@ -132,11 +132,15 @@ src/dynpmc/pmc_os.h : src/dynpmc/os.c
 src/dynpmc/os$(O): \
     src/dynpmc/os.c \
     $(DYNPMC_H_FILES) \
+    src/dynpmc/os.str \
     src/dynpmc/pmc_os.h \
     include/pmc/pmc_fixedintegerarray.h
 
 src/dynpmc/os.c: src/dynpmc/os.dump
 	$(PMC2CC) src/dynpmc/os.pmc
+
+src/dynpmc/os.str: src/dynpmc/os.c
+	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl $< >$@
 
 src/dynpmc/os.dump: src/dynpmc/os.pmc vtable.dump $(CLASS_O_FILES)
 	$(PMC2CD) src/dynpmc/os.pmc

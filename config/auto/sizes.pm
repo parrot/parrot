@@ -99,7 +99,9 @@ sub test_size {
 sub _get_sizes {
     my $conf = shift;
     my %sizes = map { $_ => 0 } @_;
-    $sizes{$_} = test_size($conf, $_) for keys %sizes;
+    for my $size (keys %sizes) {
+      $sizes{$size} = test_size($conf, $size);
+    }
     return \%sizes;
 }
 

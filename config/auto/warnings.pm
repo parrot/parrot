@@ -98,24 +98,34 @@ sub _init {
     my $gpp = {};
     my $icc = {};
 
+    # man gcc
+    # -Wall contains:
+    #   -Waddress -Warray-bounds (only with -O2) -Wc++0x-compat -Wchar-subscripts
+    #   -Wenum-compare (in C/Objc; this is on by default in C++) -Wimplicit-int (C and
+    #    Objective-C only) -Wimplicit-function-declaration (C and Objective-C only) -Wcomment
+    #   -Wformat -Wmain (only for C/ObjC and unless -ffreestanding) -Wmissing-braces -Wnonnull
+    #   -Wparentheses -Wpointer-sign -Wreorder -Wreturn-type -Wsequence-point -Wsign-compare
+    #    (only in C++) -Wstrict-aliasing -Wstrict-overflow=1 -Wswitch -Wtrigraphs
+    #   -Wuninitialized -Wunknown-pragmas -Wunused-function -Wunused-label -Wunused-value
+    #   -Wunused-variable -Wvolatile-register-var
+    # -Wextra contains:
+    #   -Wclobbered -Wempty-body -Wignored-qualifiers -Wmissing-field-initializers
+    #   -Wmissing-parameter-type (C only) -Wold-style-declaration (C only) -Woverride-init
+    #   -Wsign-compare -Wtype-limits -Wuninitialized -Wunused-parameter (only with -Wunused or
+    #   -Wall) -Wunused-but-set-parameter (only with -Wunused or -Wall)
     my @gcc_or_gpp_basic = qw(
         -falign-functions=16
         -funit-at-a-time
         -fexcess-precision=standard
         -maccumulate-outgoing-args
-        -W
         -Wall
+        -Wextra
         -Waggregate-return
         -Wcast-align
         -Wcast-qual
-        -Wchar-subscripts
-        -Wcomment
         -Wdisabled-optimization
         -Wdiv-by-zero
-        -Wenum-compare
         -Wendif-labels
-        -Wextra
-        -Wformat
         -Wformat-extra-args
         -Wformat-nonliteral
         -Wformat-security
@@ -129,14 +139,11 @@ sub _init {
         -Wlogical-op
         -Werror=missing-braces
         -Wmissing-declarations
-        -Wmissing-field-initializers
         -Wno-missing-format-attribute
         -Wmissing-include-dirs
         -Wmultichar
         -Wpacked
-        -Wparentheses
         -Wpointer-arith
-        -Wpointer-sign
         -Wreturn-type
         -Wsequence-point
         -Wsign-compare
@@ -144,10 +151,8 @@ sub _init {
         -Wstrict-aliasing=2
         -Wswitch
         -Wswitch-default
-        -Wtrigraphs
         -Werror=undef
         -Wno-unused
-        -Wunknown-pragmas
         -Wvariadic-macros
         -Wwrite-strings
         -Wstack-usage=500
@@ -249,7 +254,6 @@ sub _init {
         -Wmissing-prototypes
         -Wpointer-arith
         -Wport
-        -Wreturn-type
         -Wshadow
         -Wstrict-prototypes
         -Wuninitialized
