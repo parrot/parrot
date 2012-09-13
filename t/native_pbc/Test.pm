@@ -60,6 +60,7 @@ sub test_native_pbc {
     my $desc = shift;
     my $skip = shift;
     my $todo = shift;
+    my $precision = shift if @_;
     my $file = "t/native_pbc/${type}_${id}.pbc";
     if ($type eq 'number') {
         $arch = num_arch();
@@ -109,8 +110,9 @@ sub test_native_pbc {
             $todo_msg = "$cvt yet untested. Please report success."
         }
 	if ($type eq 'number') {
-	    Parrot::Test::pbc_output_like( $file, $expected, "$cvt $desc",
-					   todo => "$todo_msg" );
+	    Parrot::Test::pbc_output_numcmp( $file, $expected, "$cvt $desc",
+					     (todo => "$todo_msg",
+					      precision => $precision) );
 	} else {
 	    Parrot::Test::pbc_output_is( $file, $expected, "$cvt $desc",
 					 todo => "$todo_msg" );
@@ -120,7 +122,8 @@ sub test_native_pbc {
         skip $skip_msg, 1 if $bc ne $pbc_bc_version;
         local $TODO = $skip_msgv if $version ne $pbc_version;
 	if ($type eq 'number') {
-	    Parrot::Test::pbc_output_like( $file, $expected, "$cvt $desc" );
+	    Parrot::Test::pbc_output_numcmp( $file, $expected, "$cvt $desc",
+					     precision => $precision );
 	} else {
 	    Parrot::Test::pbc_output_is( $file, $expected, "$cvt $desc" );
 	}

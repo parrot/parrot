@@ -82,7 +82,7 @@ my $output = << 'END_OUTPUT';
 16384
 -65536
 -262144
--10.48576\d*
+-10.48576
 4194304
 16777216
 67108864
@@ -93,7 +93,7 @@ my $output = << 'END_OUTPUT';
 68719476736
 274877906944
 1099511627776
-4.39804651110\d*
+4.398046511104
 17592186044416
 70368744177664
 281474976710656
@@ -110,8 +110,8 @@ sub min_precision {
     my $myprec = shift;
     my ($theirtype) = $id =~ m/^\d_(\d.*)_/;
     # See various LDBL_DIG
-    my $prec = {4 => 7, 8 => 15, 10 => 18, '16ppc' => 31, 16 => 41};
-    my $theirprec = $prec->{$theirtype} // 7;
+    my $prec = {4 => 6, 8 => 15, 10 => 16, '16ppc' => 31, 16 => 41};
+    my $theirprec = $prec->{$theirtype}; $theirprec = 7 unless $theirprec;
     return $myprec < $theirprec ? $myprec : $theirprec;
 }
 
@@ -121,20 +121,12 @@ sub test_pbc_number {
     my $id   = shift;
     my $desc = shift;
 
-    # required precision: 7 for float, 15 for double, ...
+    # required precision: 6 for float, 15 for double, ...
     my $out = $output;
     my $minprec = min_precision($id, $myprec);
     # [GH #xxx] Looks like we cannot guarantee more then 13 digits
     $minprec = 13 if $minprec > 13 and $id ne $arch;
-    $minprec -= 2;
-    my $prec1 = $minprec - 2; # 4.398046511104 => 4.398046\d*
-    #my $prec2 = $minprec - 3; # -10.48576 => -10.48576\d*
-    #$out =~ s/^(-?\d\d\.\d{$prec2,})\d*/$1\\d*/mg;
-    $out =~ s/^(-?\d\.\d{$prec1,})\d+$/$1\\d*/mg;
-    $out =~ s/^(-?\d{$minprec,})\d+$/$1\\d*/mg;
-    my $qr = qr/$out/;
-
-    test_native_pbc($id, "number", $qr, $desc, $skip, $todo);
+    test_native_pbc($id, "number", $out, $desc, $skip, $todo, $minprec);
 }
 
 # execute t/native_pbc/number_*.pbc

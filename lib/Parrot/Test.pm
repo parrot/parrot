@@ -272,6 +272,14 @@ Generate functions that are only used by a couple of Parrot::Test::<lang>
 modules. This implementation is experimental and currently only works for
 languages/pipp.
 
+=item C<pbc_output_numcmp($code, $expected, precision, $description, %options)>
+
+Runs the Parrot bytecode and passes the test if the output matches the
+expected result within the given numeric precision of digits, I<and>
+if Parrot exits with a non-zero exit code.
+
+The output lines are compared line by line to the expected string.
+
 =back
 
 =cut
@@ -556,9 +564,9 @@ verified to match the single or multiple regular expressions given.
 sub pbc_postprocess_output_like {
     my ( $postprocess, $file, $ext, $check, $diag ) = @_;
     my $testno   = $builder->current_test() + 1;
-    my $codefn   = "$0.$testno.$ext";
-    my $pbcfn    = "$0.$testno.pbc";
-    my $stdoutfn = "$0.$testno.stdout";
+    my $codefn   = "${0}_$testno.$ext";
+    my $pbcfn    = "${0}_$testno.pbc";
+    my $stdoutfn = "${0}_$testno.stdout";
     my $f        = IO::File->new(">$codefn");
     my $parrot   = File::Spec->catfile( ".", $PConfig{test_prog} );
     $f->print($file);
@@ -789,6 +797,7 @@ sub _generate_test_functions {
         $_ . '_error_output_isnt'   => 'isnt_eq',
         $_ . '_output_like'         => 'like',
         $_ . '_error_output_like'   => 'like',
+        $_ . '_output_numcmp'       => 'numcmp',
         $_ . '_output_unlike'       => 'unlike',
         $_ . '_error_output_unlike' => 'unlike',
     } qw( pasm pbc pir );
@@ -819,7 +828,7 @@ sub _generate_test_functions {
 
             no strict 'refs';
             local *{ $call_pkg . '::TODO' } = ## no critic Variables::ProhibitConditionalDeclarations
-                \$extra{todo}
+                                              \$extra{todo}
                 if defined $extra{todo};
 
             if ( $func =~ /_exit_code_is$/ ) {
@@ -845,7 +854,9 @@ sub _generate_test_functions {
                         . $ori_output ne $real_output ? "$ori_output\n" : "");
                 return 0;
             }
-            my $pass = $builder->$meth( $real_output, $expected, $desc );
+            my $pass = $builder->$meth( $real_output, $expected,
+					($meth =~ /numcmp$/ ? $extra{precision} : (),
+					 $desc) );
             $builder->diag("'$cmd' failed with exit code $exit_code")
                 if not $pass and $exit_code;
             return $pass;
@@ -1165,6 +1176,38 @@ sub _unlink_or_retain {
         $deleted = unlink @deletables;
     }
     return $deleted;
+}
+
+package Test::Builder;
+
+sub _normalize {
+    my ($num, $prec) = @_;
+    $prec--; # because the leading digit does also count
+    my $s = sprintf("%.${prec}e", $num);
+    if ($s =~ /^(.*)(\d)e(.+)/) { # strip overlong numbers
+	# and round last digit
+	$s = $1.($2 <5 ? '0e' : '5e').$3;
+    } else {
+	$s = substr($s, 0, $prec-1).round(substr($s, $prec, 1));
+    }
+    return 0.0 + $s;
+}
+
+sub numcmp {
+    my ($builder, $out, $expected, $precision, $desc) = @_;
+    if ($out eq $expected) {
+	return $builder->ok($desc);
+    }
+    my $epsilon = 1.0 / $precision;
+    my @out = split(/\r?\n/, $out);
+    my @exp = split(/\r?\n/, $expected);
+    for my $i (0 .. $#out) {
+	next if $out[$i] == $exp[$i];
+	return $builder->is_num($out[$i], $exp[$i], $desc)
+	  if abs(_normalize($out[$i], $precision)
+	       - _normalize($exp[$i], $precision)) > $epsilon;
+    }
+    $builder->ok($desc);
 }
 
 package DB;

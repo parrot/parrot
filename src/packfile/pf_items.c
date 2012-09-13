@@ -1063,7 +1063,7 @@ cvt_num8_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     float f;
     double d;
     memcpy(&d, src, 8);
-    f = (float)d; /* TODO: test compiler cast */
+    f = (float)d;
     memcpy(dest, &f, 4);
 }
 
