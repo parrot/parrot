@@ -42,142 +42,182 @@ for "little endian".
 
 static void cvt_num10_num16(
     ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
+    ARGIN(const unsigned char *src),
+    ARGIN(const PackFile_Header *header))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
 
 static void cvt_num10_num16ppc(
     ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
+    ARGIN(const unsigned char *src),
+    ARGIN(const PackFile_Header *header))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
 
 static void cvt_num10_num4(
     ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
+    ARGIN(const unsigned char *src),
+    ARGIN(const PackFile_Header *header))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
 
 static void cvt_num10_num8(
     ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
+    ARGIN(const unsigned char *src),
+    ARGIN(const PackFile_Header *header))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
 
 static void cvt_num16_num10(
     ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
+    ARGIN(const unsigned char *src),
+    ARGIN(const PackFile_Header *header))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
 
 static void cvt_num16_num16ppc(
     ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
+    ARGIN(const unsigned char *src),
+    ARGIN(const PackFile_Header *header))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
 
 static void cvt_num16_num4(
     ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
+    ARGIN(const unsigned char *src),
+    ARGIN(const PackFile_Header *header))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
 
 static void cvt_num16_num8(
     ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
+    ARGIN(const unsigned char *src),
+    ARGIN(const PackFile_Header *header))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
 
 static void cvt_num16ppc_num10(
     ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
+    ARGIN(const unsigned char *src),
+    ARGIN(const PackFile_Header *header))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
 
 static void cvt_num16ppc_num16(
     ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
+    ARGIN(const unsigned char *src),
+    ARGIN(const PackFile_Header *header))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
 
 static void cvt_num16ppc_num4(
     ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
+    ARGIN(const unsigned char *src),
+    ARGIN(const PackFile_Header *header))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
 
 static void cvt_num16ppc_num8(
     ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
+    ARGIN(const unsigned char *src),
+    ARGIN(const PackFile_Header *header))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
 
 static void cvt_num4_num10(
     ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
+    ARGIN(const unsigned char *src),
+    ARGIN(const PackFile_Header *header))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
 
 static void cvt_num4_num16(
     ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
+    ARGIN(const unsigned char *src),
+    ARGIN(const PackFile_Header *header))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
 
 static void cvt_num4_num16ppc(
     ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
+    ARGIN(const unsigned char *src),
+    ARGIN(const PackFile_Header *header))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
 
 static void cvt_num4_num8(
     ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
+    ARGIN(const unsigned char *src),
+    ARGIN(const PackFile_Header *header))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
 
 static void cvt_num8_num10(
     ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
+    ARGIN(const unsigned char *src),
+    ARGIN(const PackFile_Header *header))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
 
 static void cvt_num8_num16(
     ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
+    ARGIN(const unsigned char *src),
+    ARGIN(const PackFile_Header *header))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
 
 static void cvt_num8_num16ppc(
     ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
+    ARGIN(const unsigned char *src),
+    ARGIN(const PackFile_Header *header))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
 
 static void cvt_num8_num4(
     ARGOUT(unsigned char *dest),
-    ARGIN(const unsigned char *src))
+    ARGIN(const unsigned char *src),
+    ARGIN(const PackFile_Header *header))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
         FUNC_MODIFIES(*dest);
 
 PARROT_INLINE
@@ -298,64 +338,84 @@ static opcode_t fetch_op_le_8(ARGIN(const unsigned char *b))
 
 #define ASSERT_ARGS_cvt_num10_num16 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_cvt_num10_num16ppc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_cvt_num10_num4 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_cvt_num10_num8 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_cvt_num16_num10 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_cvt_num16_num16ppc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_cvt_num16_num4 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_cvt_num16_num8 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_cvt_num16ppc_num10 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_cvt_num16ppc_num16 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_cvt_num16ppc_num4 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_cvt_num16ppc_num8 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_cvt_num4_num10 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_cvt_num4_num16 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_cvt_num4_num16ppc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_cvt_num4_num8 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_cvt_num8_num10 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_cvt_num8_num16 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_cvt_num8_num16ppc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_cvt_num8_num4 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
-    , PARROT_ASSERT_ARG(src))
+    , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_fetch_buf_be_12 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(rb) \
     , PARROT_ASSERT_ARG(b))
@@ -416,6 +476,10 @@ static opcode_t fetch_op_le_8(ARGIN(const unsigned char *b))
  */
 #define OFFS(pf, cursor) ((pf) ? ((const char *)(cursor) - (const char *)((pf)->src)) : 0)
 
+#define PF_NEEDS_ENDIANIZE(header) header->byteorder != PARROT_BIGENDIAN
+#define PF_IS_BIGENDIAN(header) header->byteorder != 0
+#define ROUND_NUM_TO(num, type, prec) /* TODO: not yet */
+
 /*
  * low level FLOATVAL fetch and convert functions (see packfile.h)
  *
@@ -436,7 +500,7 @@ static opcode_t fetch_op_le_8(ARGIN(const unsigned char *b))
 /*
 
 =item C<static void cvt_num10_num8(unsigned char *dest, const unsigned char
-*src)>
+*src, const PackFile_Header *header)>
 
 Converts intel 80-bit long double to IEEE 754 LE 8-byte double.
 On 64bit intel the size is 16 byte, on 32bit intel 12 byte.
@@ -448,13 +512,11 @@ Tested ok.
 */
 
 static void
-cvt_num10_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+cvt_num10_num8(ARGOUT(unsigned char *dest),
+               ARGIN(const unsigned char *src),
+               ARGIN(const PackFile_Header *header))
 {
-    ASSERT_ARGS(cvt_num12_num8)
-    int expo, i, s;
-#  ifdef __LCC__
-    int expo2;
-#  endif
+    ASSERT_ARGS(cvt_num10_num8)
 
     /*
        padding + 10-byte double (80 bits):
@@ -484,10 +546,22 @@ cvt_num10_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
                        8-byte DOUBLE FLOATING-POINT
     */
 
+    unsigned char b[10];
+    int expo, i, sign;
+#  ifdef __LCC__
+    int expo2;
+#  endif
+
+    if (PF_IS_BIGENDIAN(header)) {
+        SWAB_10(b, src);
+    }
+    else
+        memcpy(b, src, 16);
+
     memset(dest, 0, 8);
     /* exponents 15 -> 11 bits */
-    sign = src[9] & 0x80;
-    expo = ((src[9] & 0x7f)<< 8 | src[8]);
+    sign = b[9] & 0x80;
+    expo = ((b[9] & 0x7f)<< 8 | b[8]);
     if (expo == 0) {
       nul:
         if (sign)
@@ -507,7 +581,7 @@ cvt_num10_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
         goto nul;
     if (expo > 0x7ff) {  /* inf/nan */
         dest[7] = 0x7f;
-        dest[6] = src[7] == 0xc0 ? 0xf8 : 0xf0 ;
+        dest[6] = b[7] == 0xc0 ? 0xf8 : 0xf0 ;
         goto nul;
     }
     expo <<= 4;
@@ -516,18 +590,26 @@ cvt_num10_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     if (sign)
         dest[7] |= 0x80;
     /* long double frac 63 bits => 52 bits
-       src[7] &= 0x7f; reset integer bit 63 */
+       b[7] &= 0x7f; reset integer bit 63 */
     for (i = 0; i < 6; ++i) {
-        dest[i+1] |= (i==5 ? src[7] & 0x7f : src[i+2]) >> 3;
-        dest[i] |= (src[i+2] & 0x1f) << 5;
+        dest[i+1] |= (i==5 ? b[7] & 0x7f : b[i+2]) >> 3;
+        dest[i] |= (b[i+2] & 0x1f) << 5;
     }
-    dest[0] |= src[1] >> 3;
+    dest[0] |= b[1] >> 3;
+
+#if PARROT_BIGENDIAN
+#  if HAS_INT64
+    *(Parrot_UInt8*)dest = bswap64(*(Parrot_UInt8*)dest);
+#  else
+    bswap64(dest, dest);
+#  endif
+#endif
 }
 
 /*
 
 =item C<static void cvt_num16_num8(unsigned char *dest, const unsigned char
-*src)>
+*src, const PackFile_Header *header)>
 
 Converts IEEE 754 16-byte long double to IEEE 754 8 byte double.
 
@@ -538,7 +620,9 @@ First variant ok, 2nd with too low precision.
 */
 
 static void
-cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+cvt_num16_num8(ARGOUT(unsigned char *dest),
+               ARGIN(const unsigned char *src),
+               ARGIN(const PackFile_Header *header))
 {
     ASSERT_ARGS(cvt_num16_num8)
 
@@ -546,17 +630,30 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
         FLOATVAL ld;
         double d;
 
-        memcpy(&ld, src, 16);
+        if (PF_NEEDS_ENDIANIZE(header)) {
+            unsigned char rb[16];
+            SWAB_16(rb, src);
+            memcpy(&ld, rb, 16);
+        }
+        else
+            memcpy(&ld, src, 16);
+
         d = (double)ld; /* native compiler cast */
         memcpy(dest, &d, 8);
         return;
     }
     else {
-        /* In work. Need __float128 or native sparc64 */
+        unsigned char b[16];
         int expo, i, sign;
 #  ifdef __LCC__
         int expo2;
 #  endif
+
+        if (PF_IS_BIGENDIAN(header)) {
+            SWAB_16(b, src);
+        }
+        else
+            memcpy(b, src, 16);
 
     /* Have only 12-byte long double, or no long double at all. Need to disect it */
 
@@ -588,9 +685,9 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
    */
 
         memset(dest, 0, 8);
-        sign = src[15] & 0x80; /* 10000000 */
+        sign = b[15] & 0x80; /* 10000000 */
         /* 15->11 exponents bits */
-        expo = ((src[15] & 0x7f)<< 8 | src[14]);
+        expo = ((b[15] & 0x7f)<< 8 | b[14]);
         if (expo == 0) {
           nul:
             if (sign)
@@ -611,7 +708,7 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
             goto nul;
         if (expo > 0x7ff) {  /* overflow, inf/nan */
             dest[7] = 0x7f;
-            dest[6] |= src[7] == 0xc0 ? 0xf8 : 0xf0 ;
+            dest[6] |= b[7] == 0xc0 ? 0xf8 : 0xf0 ;
             goto nul;
         }
         expo <<= 4;
@@ -620,26 +717,33 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
         if (sign)
             dest[7] |= 0x80;
         /* bypass if mantissa is zero, well bytes 13-12,11-4 */
-#  ifdef HAS_LONGLONG
-        if (*(const Parrot_UInt2*)&src[12] || *(const Parrot_UInt8*)&src[4])
+#  ifdef HAS_INT64
+        if (*(const Parrot_UInt2*)&b[12] || *(const Parrot_UInt8*)&b[4])
 #  else
-        if (*(const Parrot_UInt4*)&src[10] || *(const Parrot_UInt4*)&src[6])
+        if (*(const Parrot_UInt4*)&b[10] || *(const Parrot_UInt4*)&b[6])
 #  endif
         {
-            /* src[13] => dest[6]; => dest[0] */
+            /* b[13] => dest[6]; => dest[0] */
             for (i = 0; i < 6; ++i) {
-                dest[i+1] |= (i==5 ? src[13] & 0xf0 : src[i+9]) >> 4;
-                dest[i]   |= (src[i+8] & 0xf) << 4;
+                dest[i+1] |= (i==5 ? b[13] & 0xf0 : b[i+9]) >> 4;
+                dest[i]   |= (b[i+8] & 0xf) << 4;
             }
-            dest[0] |= (src[7] & 0xf0) >> 4;
+            dest[0] |= (b[7] & 0xf0) >> 4;
         }
     }
+#if PARROT_BIGENDIAN
+#  if HAS_INT64
+    *(Parrot_UInt8*)dest = bswap64(*(Parrot_UInt8*)dest);
+#  else
+    bswap64(dest, dest);
+#  endif
+#endif
 }
 
 /*
 
-=item C<static void cvt_num4_num8(unsigned char *dest, const unsigned char
-*src)>
+=item C<static void cvt_num4_num8(unsigned char *dest, const unsigned char *src,
+const PackFile_Header *header)>
 
 Converts IEEE 754 4-byte float to IEEE 754 8 byte double.
 
@@ -650,19 +754,30 @@ Not yet tested.
 */
 
 static void
-cvt_num4_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+cvt_num4_num8(ARGOUT(unsigned char *dest),
+              ARGIN(const unsigned char *src),
+              ARGIN(const PackFile_Header *header))
 {
-    float f;
+    union {
+        float f;
+        Parrot_UInt4 i;
+    } u;
     double d;
-    memcpy(&f, src, 4);
-    d = (double)f;
+
+    if (PF_NEEDS_ENDIANIZE(header))
+        u.i = bswap32(*(const Parrot_UInt4*)src);
+    else {
+        memcpy(&u.f, src, 4);
+    }
+    d = (double)u.f;
+    ROUND_NUM_TO(d, double, PARROT_FLOATVAL_DIG);
     memcpy(dest, &d, 8);
 }
 
 /*
 
 =item C<static void cvt_num16_num10(unsigned char *dest, const unsigned char
-*src)>
+*src, const PackFile_Header *header)>
 
 Converts IEEE 754 LE 16-byte long double to i386 LE 80-bit long double.
 See http://babbage.cs.qc.cuny.edu/IEEE-754/References.xhtml
@@ -675,7 +790,9 @@ Tested ok.
 
 #if (FLOATTYPE == FLOATTYPE_10)
 static void
-cvt_num16_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+cvt_num16_num10(ARGOUT(unsigned char *dest),
+                ARGIN(const unsigned char *src),
+                ARGIN(const PackFile_Header *header))
 {
     ASSERT_ARGS(cvt_num16_num10)
 
@@ -708,19 +825,31 @@ cvt_num16_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
               12-byte LONG DOUBLE FLOATING-POINT (intel special)
     */
 
+    unsigned char b[16];
+    if (PF_IS_BIGENDIAN(header)) {
+        SWAB_16(b, src);
+    }
+    else
+        memcpy(b, src, 16);
+
     memset(dest, 0, 12);
     /* simply copy over sign + exp */
-    dest[8] = src[15];
-    dest[9] = src[14];
+    dest[8] = b[15];
+    dest[9] = b[14];
     /* and copy the rest */
-    memcpy(&dest[0], &src[0], 8);
+    memcpy(&dest[0], &b[0], 8);
     dest[7] |= 0x80;  /* set integer bit 63 */
+
+#if PARROT_BIGENDIAN
+    memcpy(b, dest, 10);
+    SWAB_10(dest, b);
+#endif
 }
 
 /*
 
 =item C<static void cvt_num8_num10(unsigned char *dest, const unsigned char
-*src)>
+*src, const PackFile_Header *header)>
 
 Converts i386 8-byte double to i386 80bit long double.
 
@@ -731,20 +860,34 @@ Tested ok.
 */
 
 static void
-cvt_num8_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+cvt_num8_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARGIN(const PackFile_Header *header))
 {
     ASSERT_ARGS(cvt_num8_num10)
     long double ld;
-    double d;
-    memcpy(&d, src, 8);
-    ld = (long double)d; /* compiler cast */
+    union {
+        double d;
+        unsigned char c[8];
+    } u;
+
+    if (PF_NEEDS_ENDIANIZE(header)) { /* swab to native */
+#if HAS_INT64
+        *(Parrot_UInt8*)u.c = bswap64(*(const Parrot_UInt8*)src);
+#else
+        bswap64(u.c, src);
+#endif
+    }
+    else {
+        memcpy(&u.d, src, 8);
+    }
+    ld = (long double)u.d; /* compiler cast */
+    ROUND_NUM_TO(ld, long double, PARROT_FLOATVAL_DIG);
     memcpy(dest, &ld, 12);
 }
 
 /*
 
 =item C<static void cvt_num4_num10(unsigned char *dest, const unsigned char
-*src)>
+*src, const PackFile_Header *header)>
 
 Converts i386 4-byte float to i386 80bit long double.
 
@@ -755,12 +898,21 @@ Tested ok.
 */
 
 static void
-cvt_num4_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+cvt_num4_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARGIN(const PackFile_Header *header))
 {
-    float f;
     long double ld;
-    memcpy(&f, src, 4);
-    ld = (long double)f; /* TODO: test compiler cast */
+    union {
+        float f;
+        Parrot_UInt4 i;
+    } u;
+
+    if (PF_NEEDS_ENDIANIZE(header))
+        u.i = bswap32(*(const Parrot_UInt4*)src);
+    else {
+        memcpy(&u.f, src, 4);
+    }
+    ld = (long double)u.f; /* compiler cast */
+    ROUND_NUM_TO(ld, long double, PARROT_FLOATVAL_DIG);
     memcpy(dest, &ld, sizeof(long double));
 }
 
@@ -769,11 +921,11 @@ cvt_num4_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 /*
 
 =item C<static void cvt_num10_num16(unsigned char *dest, const unsigned char
-*src)>
+*src, const PackFile_Header *header)>
 
 Converts i386 LE 10-byte long double to IEEE 754 LE 16-byte quad double.
 
-Rounding errors.
+Not yet properly rounded.
 
 =cut
 
@@ -781,7 +933,7 @@ Rounding errors.
 
 #if (NUMVAL_SIZE == 16) || defined(__powerpc__) || defined(_M_PPC)
 static void
-cvt_num10_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+cvt_num10_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARGIN(const PackFile_Header *header))
 {
     ASSERT_ARGS(cvt_num10_num16)
     /*
@@ -813,13 +965,20 @@ cvt_num10_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
             16-byte LONG DOUBLE FLOATING-POINT __float128
 
     */
-
+    unsigned char b[10];
     int expo, i;
+
+    if (PF_IS_BIGENDIAN(header)) {
+        SWAB_10(b, src);
+    }
+    else
+        memcpy(b, src, 10);
+
     memset(dest, 0, 16);
     /* sign + exp */
-    dest[15] = src[9];
-    dest[14] = src[8];
-    expo = ((src[9] & 0x7f)<< 8 | src[8]);
+    dest[15] = b[9];
+    dest[14] = b[8];
+    expo = ((b[9] & 0x7f)<< 8 | b[8]);
     expo -= 16383;
     /* On Intel expo 0 is allowed */
     if (expo <= 0)     /* underflow */
@@ -827,84 +986,118 @@ cvt_num10_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     if (expo > 0x7ff)  /* overflow, inf/nan */
         return;
     /* shortcut 0 mantissa */
-#if __WORDSIZE == 64
-    if (*(const Parrot_UInt8*)src != 0x8000000000000000LU)
+#if HAS_INT64
+    if (*(const Parrot_UInt8*)b != 0x8000000000000000LU)
 #else
-    if (*(const Parrot_UInt4*)src || *(const Parrot_UInt4*)&src[4] != 0x80000000U)
+    if (*(const Parrot_UInt4*)b || *(const Parrot_UInt4*)&b[4] != 0x80000000U)
 #endif
     {
 #if 0
-	memcpy(&dest[6], &src[0], 8);
+	memcpy(&dest[6], &b[0], 8);
 #endif
 	for (i = 13; i > 5; i--) {
-	    dest[i] |= ((i==13 ? src[7] & 0x7f : src[i-5]) << 1)
-		    | (src[i-6] & 0x7f) >> 7;
+	    dest[i] |= ((i==13 ? b[7] & 0x7f : b[i-5]) << 1)
+		    | (b[i-6] & 0x7f) >> 7;
 	}
     }
+#if PARROT_BIGENDIAN
+    SWAB_16(b, dest);
+    memcpy(dest, b, 16);
+#endif
+#if 0
+    {
+        FLOATVAL ld;
+        memcpy(&ld, dest, 16);
+        ROUND_NUM_TO(ld, FLOATVAL, PARROT_FLOATVAL_DIG);
+        memcpy(dest, &ld, 16);
+    }
+#endif
 }
 #endif
 
 /*
 
 =item C<static void cvt_num8_num16(unsigned char *dest, const unsigned char
-*src)>
+*src, const PackFile_Header *header)>
 
-Converts IEEE 754 8-byte double to IEEE 754 16 byte long double.
+Converts IEEE 754 8-byte double to IEEE 754 16 byte long double/float128
 
-Not yet tested.
+Not yet properly rounded.
 
 =cut
 
 */
 
 static void
-cvt_num8_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+cvt_num8_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARGIN(const PackFile_Header *header))
 {
     ASSERT_ARGS(cvt_num8_num16)
-    /* The compiler can do this for us */
+
     HUGEFLOATVAL ld;
-    double d;
-    memcpy(&d, src, 8);
-    ld = (HUGEFLOATVAL)d; /* TODO: test compiler cast */
+    union {
+        double d;
+        unsigned char c[8];
+    } u;
+
+    if (PF_NEEDS_ENDIANIZE(header)) {
+#if HAS_INT64
+        *(Parrot_UInt8*)u.c = bswap64(*(const Parrot_UInt8*)src);
+#else
+        bswap64(u.c, src);
+#endif
+    }
+    else
+        memcpy(&u.d, src, 8);
+    ld = (HUGEFLOATVAL)u.d;
+    ROUND_NUM_TO(ld, HUGEFLOATVAL, PARROT_FLOATVAL_DIG);
     memcpy(dest, &ld, 16);
 }
 
 /*
 
 =item C<static void cvt_num4_num16(unsigned char *dest, const unsigned char
-*src)>
+*src, const PackFile_Header *header)>
 
 Converts IEEE 754 4-byte float to IEEE 754 16 byte long double.
 
-Not yet tested.
+Not yet properly rounded.
 
 =cut
 
 */
 
 static void
-cvt_num4_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+cvt_num4_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARGIN(const PackFile_Header *header))
 {
-    float f;
     HUGEFLOATVAL ld;
-    memcpy(&f, src, 4);
-    ld = (HUGEFLOATVAL)f; /* TODO: test compiler cast */
+    union {
+        float f;
+        Parrot_UInt4 i;
+    } u;
+
+    if (PF_NEEDS_ENDIANIZE(header))
+        u.i = bswap32(*(const Parrot_UInt4*)src);
+    else {
+        memcpy(&u.f, src, 4);
+    }
+    ld = (HUGEFLOATVAL)u.f; /* Properly reounded already? */
+    ROUND_NUM_TO(ld, HUGEFLOATVAL, PARROT_FLOATVAL_DIG);
     memcpy(dest, &ld, 16);
 }
 
 /*
 
 =item C<static void cvt_num4_num16ppc(unsigned char *dest, const unsigned char
-*src)>
+*src, const PackFile_Header *header)>
 
 =item C<static void cvt_num8_num16ppc(unsigned char *dest, const unsigned char
-*src)>
+*src, const PackFile_Header *header)>
 
 =item C<static void cvt_num10_num16ppc(unsigned char *dest, const unsigned char
-*src)>
+*src, const PackFile_Header *header)>
 
 =item C<static void cvt_num16_num16ppc(unsigned char *dest, const unsigned char
-*src)>
+*src, const PackFile_Header *header)>
 
 Convert to powerpc 16 byte double double,
 
@@ -918,39 +1111,55 @@ Not yet tested.
 
 #define TO_16PPC(d, ld, dest)      \
     ld = (long double)d;           \
+    ROUND_NUM_TO(ld, long double, PARROT_FLOATVAL_DIG); \
     memcpy(dest, &ld, 16);
 
 static void
-cvt_num4_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+cvt_num4_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARGIN(const PackFile_Header *header))
 {
     double d;
     long double ld;
-    cvt_num4_num8((unsigned char *)&d, src);
+
+    cvt_num4_num8((unsigned char *)&d, src, header);
     TO_16PPC(d,ld,dest);
 }
 static void
-cvt_num8_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+cvt_num8_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARGIN(const PackFile_Header *header))
 {
-    double d;
     long double ld;
-    memcpy(&d, src, 8);
-    TO_16PPC(d,ld,dest);
+    union {
+        double d;
+        unsigned char c[8];
+    } u;
+
+    if (PF_NEEDS_ENDIANIZE(header)) {
+#if HAS_INT64
+        *(Parrot_UInt8*)u.c = bswap64(*(Parrot_UInt8*)src);
+#else
+        bswap64(u.c, src);
+#endif
+    }
+    else
+        memcpy(&u.d, src, 8);
+    TO_16PPC(u.d,ld,dest);
 }
 static void
-cvt_num10_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+cvt_num10_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARGIN(const PackFile_Header *header))
 {
     double d;
     long double ld;
-    cvt_num10_num8((unsigned char *)&d, src);
+
+    cvt_num10_num8((unsigned char *)&d, src, header);
     TO_16PPC(d,ld,dest);
 }
 
 static void
-cvt_num16_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+cvt_num16_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARGIN(const PackFile_Header *header))
 {
     double d;
     long double ld;
-    cvt_num16_num8((unsigned char *)&d, src);
+
+    cvt_num16_num8((unsigned char *)&d, src, header);
     TO_16PPC(d,ld,dest);
 }
 #endif
@@ -958,16 +1167,16 @@ cvt_num16_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 /*
 
 =item C<static void cvt_num16ppc_num4(unsigned char *dest, const unsigned char
-*src)>
+*src, const PackFile_Header *header)>
 
 =item C<static void cvt_num16ppc_num8(unsigned char *dest, const unsigned char
-*src)>
+*src, const PackFile_Header *header)>
 
 =item C<static void cvt_num16ppc_num10(unsigned char *dest, const unsigned char
-*src)>
+*src, const PackFile_Header *header)>
 
 =item C<static void cvt_num16ppc_num16(unsigned char *dest, const unsigned char
-*src)>
+*src, const PackFile_Header *header)>
 
 Convert from powerpc 16 byte double double,
 
@@ -984,14 +1193,29 @@ See https://developer.apple.com/library/mac/#documentation/Darwin/Reference/ManP
 
 #if FLOATTYPE == FLOATTYPE_4
 static void
-cvt_num16ppc_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+cvt_num16ppc_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARGIN(const PackFile_Header *header))
 {
-    double d1, d2;
     long double ld;
     float f;
-    memcpy(&d1, src, 8);
-    memcpy(&d2, src+8, 8);
-    ld = (d2 == -0.0 && d1 == 0.0) ? -0.0 : d1 + d2;
+    union {
+        double d;
+        unsigned char c[ sizeof(double) ];
+    } u1, u2;
+
+    if (PF_NEEDS_ENDIANIZE(header)) {
+#if HAS_INT64
+        *(Parrot_UInt8*)u1.c = bswap64(*(Parrot_UInt8*)src);
+        *(Parrot_UInt8*)u2.c = bswap64(*(Parrot_UInt8*)(src+8));
+#else
+        bswap64(u1.c, src);
+        bswap64(u2.c, src+8);
+#endif
+    }
+    else {
+        memcpy(&u1.d, src, 8);
+        memcpy(&u2.d, src+8, 8);
+    }
+    ld = (u2.d == -0.0 && u1.d == 0.0) ? -0.0 : u1.d + u2.d;
     f = (float)ld;
     memcpy(dest, &f, 4);
 }
@@ -999,53 +1223,92 @@ cvt_num16ppc_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 #if FLOATTYPE == FLOATTYPE_8
 static void
-cvt_num16ppc_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+cvt_num16ppc_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARGIN(const PackFile_Header *header))
 {
-    double d1, d2;
+    union {
+        double d;
+        unsigned char c[ sizeof(double) ];
+    } u1, u2;
     long double ld;
-    memcpy(&d1, src, 8);
-    memcpy(&d2, src+8, 8);
-    ld = (d2 == -0.0 && d1 == 0.0) ? -0.0 : d1 + d2;
-    d1 = (double)ld;
-    memcpy(dest, &d1, 8);
+
+    if (PF_NEEDS_ENDIANIZE(header)) {
+#if HAS_INT64
+        *(Parrot_UInt8*)u1.c = bswap64(*(Parrot_UInt8*)src);
+        *(Parrot_UInt8*)u2.c = bswap64(*(Parrot_UInt8*)(src+8));
+#else
+        bswap64(u1.c, src);
+        bswap64(u2.c, src+8);
+#endif
+    } else {
+        memcpy(u1.c, src, 8);
+        memcpy(u2.c, src+8, 8);
+    }
+    ld = (u2.d == -0.0 && u1.d == 0.0) ? -0.0 : u1.d + u2.d;
+    u1.d = (double)ld;
+    memcpy(dest, &u1.d, 8);
 }
 #endif
 
 #if FLOATTYPE == FLOATTYPE_10
 static void
-cvt_num16ppc_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+cvt_num16ppc_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARGIN(const PackFile_Header *header))
 {
-    double d1, d2;
-    long double ld;
-    memcpy(&d1, src, 8);
-    memcpy(&d2, src+8, 8);
-    ld = (d2 == -0.0 && d1 == 0.0) ? -0.0 : d1 + d2;
-    memcpy(dest, &ld, sizeof(ld)); /* sizeof: 12 or 16 */
+    union {
+        double d;
+        unsigned char c[ sizeof(double) ];
+    } d1, d2;
+    union {
+        long double ld;
+        unsigned char c[ sizeof(long double) ];
+    } u;
+
+    if (PF_NEEDS_ENDIANIZE(header)) {
+#if HAS_INT64
+        *(Parrot_UInt8*)d2.c = bswap64(*(const Parrot_UInt8*)src);
+        *(Parrot_UInt8*)d2.c = bswap64(*(const Parrot_UInt8*)(src+8));
+#else
+        SWAB_16(d1.c, src);
+        SWAB_16(d2.c, src);
+#endif
+    } else {
+        memcpy(&d1.d, src, 8);
+        memcpy(&d2.d, src+8, 8);
+    }
+    u.ld = (d2.d == -0.0 && d1.d == 0.0) ? -0.0 : d1.d + d2.d;
+    memcpy(dest, u.c, sizeof(long double));
 }
 #endif
 
 #if FLOATTYPE == FLOATTYPE_16
 static void
-cvt_num16ppc_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+cvt_num16ppc_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARGIN(const PackFile_Header *header))
 {
     double d1, d2;
-    FLOATVAL ld;
+    union {
+        FLOATVAL ld;
+        unsigned char c[16];
+    } u;
+
+    if (PF_NEEDS_ENDIANIZE(header)) {
+        *(Parrot_UInt8*)src     = bswap64(*(Parrot_UInt8*)src);
+        *(Parrot_UInt8*)(src+8) = bswap64(*(Parrot_UInt8*)(src+8));
+    }
     memcpy(&d1, src, 8);
     memcpy(&d2, src+8, 8);
-    ld = (d2 == -0.0 && d1 == 0.0) ? -0.0 : d1 + d2;
-    memcpy(dest, &ld, 16);
+    u.ld = (d2 == -0.0 && d1 == 0.0) ? -0.0 : d1 + d2;
+    memcpy(dest, u.c, 16);
 }
 #endif
 /*
 
-=item C<static void cvt_num8_num4(unsigned char *dest, const unsigned char
-*src)>
+=item C<static void cvt_num8_num4(unsigned char *dest, const unsigned char *src,
+const PackFile_Header *header)>
 
 =item C<static void cvt_num10_num4(unsigned char *dest, const unsigned char
-*src)>
+*src, const PackFile_Header *header)>
 
 =item C<static void cvt_num16_num4(unsigned char *dest, const unsigned char
-*src)>
+*src, const PackFile_Header *header)>
 
 Convert to 4 byte single float,
 
@@ -1058,58 +1321,62 @@ Not yet tested.
 #if (NUMVAL_SIZE == 4)
 
 static void
-cvt_num8_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+cvt_num8_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARGIN(const PackFile_Header *header))
 {
     float f;
     double d;
+
+    if (PF_NEEDS_ENDIANIZE(header))
+        *(Parrot_UInt8*)src     = bswap64(*(Parrot_UInt8*)src);
     memcpy(&d, src, 8);
     f = (float)d;
     memcpy(dest, &f, 4);
 }
 
 static void
-cvt_num10_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
+cvt_num10_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARGIN(const PackFile_Header *header))
 {
 #if (defined(__I86__) || defined(__INTEL__) || defined(_M_IA64) || defined(__ia64__))
-#  if NUMVAL_SIZE == 12
-    /* i386 only */
     float f;
     long double ld;
-    memcpy(&ld, src, 12);
-    f = (float)ld; /* TODO: test compiler cast */
-    /* TODO round off */
-    memcpy(dest, &f, 4);
-#  elif NUMVAL_SIZE == 16
-    /* x86_64 or itanium */
-    float f;
-    long double ld;
-    memcpy(&ld, src, 16);
-    f = (float)ld; /* TODO: test compiler cast */
-    /* TODO round off */
-    memcpy(dest, &f, 4);
-#  endif
-#else
-    unsigned char tmp[8];
-    cvt_num10_num8(tmp, src);
-    cvt_num8_num4(dest, tmp);
-#endif
-}
 
-static void
-cvt_num16_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
-{
-#ifdef HAS_FLOAT128
-    float f;
-    __float128 ld;
-
-    memcpy(&ld, src, 16); /* 64bit only */
+    if (PF_IS_BIGENDIAN(header)) {
+        unsigned char rb[10];
+        SWAB_10(rb, src);
+        memcpy(src, rb, 10);
+    }
+    memcpy(&ld, src, NUMVAL_SIZE);
     f = (float)ld;
     /* TODO round off */
     memcpy(dest, &f, 4);
 #else
     unsigned char tmp[8];
-    cvt_num16_num8(tmp, src);
-    cvt_num8_num4(dest, tmp);
+    cvt_num10_num8(tmp, src, header);
+    cvt_num8_num4(dest, tmp, header);
+#endif
+}
+
+static void
+cvt_num16_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARGIN(const PackFile_Header *header))
+{
+#if defined(HAS_FLOAT128) || FLOATTYPE == FLOATTYPE_16
+    float f;
+    union {
+        FLOATVAL ld;
+        unsigned char c[16];
+    } u;
+
+    if (PF_NEEDS_ENDIANIZE(header))
+        SWAB_16(u.c, src);
+    else
+        memcpy(u.c, src, 16); /* 64bit only */
+    f = (float)ld;
+    /* TODO round off */
+    memcpy(dest, &f, 4);
+#else
+    unsigned char tmp[8];
+    cvt_num16_num8(tmp, src, header);
+    cvt_num8_num4(dest, tmp, header);
 #endif
 }
 
@@ -1410,58 +1677,27 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
 {
     ASSERT_ARGS(PF_fetch_number)
 
+    union {
+        FLOATVAL f;
+        unsigned char c[NUMVAL_SIZE];
+    } u;
+    int floatsize;
+
     /* When we have alignment all squared away we don't need
      * to use memcpy() for native byteorder.  */
-    FLOATVAL f;
     if (!pf || !pf->fetch_nv) {
-        memcpy(&f, (const char *)*stream, sizeof (FLOATVAL));
+        memcpy(&u.f, (const char *)*stream, sizeof (FLOATVAL));
         (*stream) += (sizeof (FLOATVAL) + sizeof (opcode_t) - 1)/
             sizeof (opcode_t);
-        return f;
+        return u.f;
     }
-    /* 12->8 has a messy cast. */
-    if (NUMVAL_SIZE == 8 && pf->header->floattype == FLOATTYPE_10) {
-        double d;
-        int floatsize = pf->header->wordsize == 8 ? 16 : 12;
-        (pf->fetch_nv)((unsigned char *)&d, (const unsigned char *)*stream);
-        f = d;
-        *((const unsigned char **) (stream)) += floatsize;
-    }
-    else {
-        int floatsize = PF_floattype_size[ pf->header->floattype ];
-        const int need_endianize = pf->header->byteorder != PARROT_BIGENDIAN;
-        /* Intel x86_64 has FLOATTYPE_10 aligned to size 16. */
-        if ( floatsize == 12 && pf->header->wordsize == 8 )
-            floatsize = 16;
-        if ( need_endianize
-             /* and not endianized in fetcher */
-             && FLOATTYPE != pf->header->floattype )
-        {
-            if (floatsize == 8) {
-                *(Parrot_UInt8*)*stream = bswap64(*(const Parrot_UInt8*)*stream);
-            }
-            else if (floatsize == 4) {
-                *(Parrot_UInt4*)*stream = bswap32(*(const Parrot_UInt4*)*stream);
-            }
-            else if (floatsize == 16) {
-#if 0
-                /* TODO 64bit CPU: bswap64 with temp */
-                Parrot_UInt8 tmp = bswap64(*(const Parrot_UInt8*)*stream);
-                *(Parrot_UInt8*)*stream =
-                    bswap64(*(const Parrot_UInt8*)*((const unsigned char *)stream+8));
-                *(Parrot_UInt8*)*((const unsigned char *)stream+8) = tmp;
-#else
-                unsigned char rb[16];
-                const unsigned char *c = (const unsigned char *)*stream;
-                SWAB_16(rb, c);
-                memcpy(*stream, rb, 16);
-#endif
-            }
-        }
-        (pf->fetch_nv)((unsigned char *)&f, (const unsigned char *) *stream);
-        *((const unsigned char **) (stream)) += floatsize;
-    }
-    return f;
+    (pf->fetch_nv)(&u.c, (const unsigned char *)*stream, pf->header);
+    floatsize = PF_floattype_size[ pf->header->floattype ];
+    /* Intel x86_64 has FLOATTYPE_10 aligned to size 16. */
+    if ( floatsize == 12 && pf->header->wordsize == 8 )
+        floatsize = 16;
+    *((const unsigned char **) (stream)) += floatsize;
+    return u.f;
 }
 
 /*
@@ -2031,7 +2267,7 @@ static INTVAL
 fetch_iv_le(INTVAL w)
 {
     ASSERT_ARGS(fetch_iv_le)
-#if !PARROT_BIGENDIAN
+#if PARROT_LITTLEENDIAN
     return w;
 #else
 #  if INTVAL_SIZE == 4
@@ -2125,7 +2361,7 @@ static opcode_t
 fetch_op_le(opcode_t w)
 {
     ASSERT_ARGS(fetch_op_le)
-#if !PARROT_BIGENDIAN
+#if PARROT_LITTLEENDIAN
     return w;
 #else
 #  if OPCODE_T_SIZE == 4
@@ -2166,7 +2402,7 @@ fetch_buf_be_4(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 4);
 #else
-    *(Parrot_UInt4*)rb = bswap32(*(Parrot_UInt4*)b);
+    *(Parrot_UInt4*)rb = bswap32(*(const Parrot_UInt4*)b);
 #endif
 }
 
@@ -2185,7 +2421,7 @@ static void
 fetch_buf_le_4(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
     ASSERT_ARGS(fetch_buf_le_4)
-#if !PARROT_BIGENDIAN
+#if PARROT_LITTLEENDIAN
     memcpy(rb, b, 4);
 #else
     *(Parrot_UInt4*)rb = bswap32(*(const Parrot_UInt4*)b);
@@ -2209,7 +2445,7 @@ fetch_buf_be_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
     ASSERT_ARGS(fetch_buf_be_8)
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 8);
-#elif defined(HAS_INT64)
+#elif HAS_INT64
     *(Parrot_UInt8*)rb = bswap64(*(const Parrot_UInt8*)b);
 #else
     SWAB_8(rb, b);
@@ -2231,7 +2467,7 @@ static void
 fetch_buf_le_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
     ASSERT_ARGS(fetch_buf_le_8)
-#if !PARROT_BIGENDIAN
+#if PARROT_LITTLEENDIAN
     memcpy(rb, b, 8);
 #elif defined(HAS_INT64)
     *(Parrot_UInt8*)rb = bswap64(*(const Parrot_UInt8*)b);
@@ -2255,25 +2491,10 @@ static void
 fetch_buf_le_12(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
     ASSERT_ARGS(fetch_buf_le_12)
-#if !PARROT_BIGENDIAN
+#if PARROT_LITTLEENDIAN
     memcpy(rb, b, 12);
 #else
-    SWAB_12(rb,b);
-#  if 0
-    /* XXX I'm sceptical */
-    rb[0]  = b[9];
-    rb[1]  = b[8];
-    rb[2]  = b[11];
-    rb[3]  = b[10];
-    rb[4]  = b[5];
-    rb[5]  = b[4];
-    rb[6]  = b[7];
-    rb[7]  = b[6];
-    rb[8]  = b[2];
-    rb[9]  = b[1];
-    rb[10] = b[4];
-    rb[11] = b[3];
-#  endif
+    SWAB_10(rb,b);
 #endif
 }
 
@@ -2295,7 +2516,7 @@ fetch_buf_be_12(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 #if PARROT_BIGENDIAN
     memcpy(rb, b, 12);
 #else
-    SWAB_12(rb,b);
+    SWAB_10(rb,b);
 #endif
 }
 
@@ -2314,7 +2535,7 @@ static void
 fetch_buf_le_16(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
     ASSERT_ARGS(fetch_buf_le_16)
-#if !PARROT_BIGENDIAN
+#if PARROT_LITTLEENDIAN
     memcpy(rb, b, 16);
 #else
     SWAB_16(rb, b);
@@ -2358,7 +2579,7 @@ static void
 fetch_buf_le_32(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b))
 {
     ASSERT_ARGS(fetch_buf_le_32)
-#if !PARROT_BIGENDIAN
+#if PARROT_LITTLEENDIAN
     memcpy(rb, b, 32);
 #else
     SWAB_32(rb, b);

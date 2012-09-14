@@ -295,10 +295,11 @@ typedef struct PackFile_Directory {
     PackFile_Segment **segments;
 } PackFile_Directory;
 
-
 typedef opcode_t (*packfile_fetch_op_t)(ARGIN(const unsigned char *));
 typedef INTVAL   (*packfile_fetch_iv_t)(ARGIN(const unsigned char *));
-typedef void     (*packfile_fetch_nv_t)(ARGOUT(unsigned char *), ARGIN(const unsigned char *));
+typedef void     (*packfile_fetch_nv_t)(ARGOUT(unsigned char *),
+                                        ARGIN(const unsigned char *),
+                                        ARGIN(const PackFile_Header *));
 
 typedef struct PackFile {
     /* the packfile is its own directory */
@@ -325,7 +326,6 @@ typedef struct PackFile {
     packfile_fetch_iv_t  fetch_iv;
     packfile_fetch_nv_t  fetch_nv;
 } PackFile;
-
 
 typedef enum {
     PBC_MAIN   = 1,

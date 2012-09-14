@@ -70,7 +70,7 @@
 		(((Parrot_UInt4)(__x) & (Parrot_UInt4)0x00ff0000UL) >>  8) | \
 		(((Parrot_UInt4)(__x) & (Parrot_UInt4)0xff000000UL) >> 24) )); \
   })
-#          ifdef HAS_LONGLONG
+#          if HAS_INT64
 #            define bswap_64(x)						\
   ({									\
     Parrot_UInt8 __x = (x);						\
@@ -89,7 +89,7 @@
                unsigned char rb[8];         \
                const unsigned char *c = &x; \
                SWAB_8(rb, c);               \
-               (Parrot_UInt8)rb; })
+               rb; })
 #          endif
 #endif
 
@@ -109,19 +109,17 @@
     rb[6] = b[1]; \
     rb[7] = b[0]
 
-#define SWAB_12(rb,b) \
-    rb[0]  = b[11]; \
-    rb[1]  = b[10]; \
-    rb[2]  = b[9]; \
-    rb[3]  = b[8]; \
-    rb[4]  = b[7]; \
-    rb[5]  = b[6]; \
-    rb[6]  = b[5]; \
-    rb[7]  = b[4]; \
-    rb[8]  = b[3]; \
-    rb[9]  = b[2]; \
-    rb[10] = b[1]; \
-    rb[11] = b[0]
+#define SWAB_10(rb,b) \
+    rb[0]  = b[9]; \
+    rb[1]  = b[8]; \
+    rb[2]  = b[7]; \
+    rb[3]  = b[6]; \
+    rb[4]  = b[5]; \
+    rb[5]  = b[4]; \
+    rb[6]  = b[3]; \
+    rb[7]  = b[2]; \
+    rb[8]  = b[1]; \
+    rb[9]  = b[0];
 
 #define SWAB_16(rb,b) \
     rb[0]  = b[15]; \
@@ -188,15 +186,22 @@ Parrot_UInt4 bswap32(Parrot_UInt4 x)
 }
 
 static inline
+#if HAS_INT64
 Parrot_UInt8 bswap64(Parrot_UInt8 x)
+#else
+void bswap64(unsigned char *rb, const unsigned char *b)
+#endif
 {
 #if defined(bswap_64)
     return bswap_64(x);
 #else
-    unsigned char rb[8];
-    const unsigned char *c = &x;
-    SWAB_8(rb, c);
-    return (Parrot_UInt8)rb;
+    if (b == rb) {
+        unsigned char tmp[8];
+        memcpy(tmp, b, 8);
+        SWAB_8(rb, tmp);
+    } else {
+        SWAB_8(rb, b);
+    }
 #endif
 }
 
