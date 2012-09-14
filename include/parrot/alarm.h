@@ -18,16 +18,14 @@ PARROT_EXPORT
 void Parrot_alarm_set(FLOATVAL when);
 
 PARROT_EXPORT
-void Parrot_alarm_wait_for_next_alarm(PARROT_INTERP)
-        __attribute__nonnull__(1);
+void Parrot_alarm_wait_for_next_alarm(PARROT_INTERP);
 
 void Parrot_alarm_init(void);
 #define ASSERT_ARGS_Parrot_alarm_check __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(last_serial))
 #define ASSERT_ARGS_Parrot_alarm_set __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_alarm_wait_for_next_alarm \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_alarm_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/alarm.c */
