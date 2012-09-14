@@ -1196,7 +1196,7 @@ sub _normalize {
 sub numcmp {
     my ($builder, $out, $expected, $precision, $desc) = @_;
     if ($out eq $expected) {
-	return $builder->ok($desc);
+	return $builder->ok(1, $desc);
     }
     my $epsilon = 1.0 / $precision;
     my @out = split(/\r?\n/, $out);
@@ -1207,7 +1207,7 @@ sub numcmp {
 	  if abs(_normalize($out[$i], $precision)
 	       - _normalize($exp[$i], $precision)) > $epsilon;
     }
-    $builder->ok($desc);
+    $builder->ok(1, $desc);
 }
 
 package DB;

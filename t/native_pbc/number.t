@@ -26,14 +26,14 @@ use Parrot::Test tests => 11;
 # 8_16_le=>4_8_le fails, but 8_16_le=>8_8_le passes
 my $testmatrix = <<EOF;
         8_le 10_le 16_le 8_be 16_be  4_le 4_be 16PPC_be
-8_le     1     1    1     1     ?     ?    ?    1
-10_le    1     1    1     ?     ?     ?    ?    0
-16_le    S4    1    1     ?     ?     ?    ?    0
-8_be     1     1    1     1     1     ?    ?    1
+8_le     1     1    1     1     ?     1    ?    1
+10_le    1     1    1     ?     ?     1    ?    0
+16_le    S4    1    1     ?     ?     1    ?    0
+8_be     1     1    1     1     1     1    ?    1
 16_be    ?     ?    ?     ?     1     ?    ?    ?
 4_le     ?     ?    ?     ?     ?     ?    ?    1
-4_be     ?     ?    ?     ?     ?     ?    ?    ?
-16PPC_be 1     ?    1     1     ?     ?    ?    1
+4_be     ?     ?    ?     ?     ?     1    ?    ?
+16PPC_be 1     ?    1     1     ?     1    ?    1
 EOF
 
 my $arch = t::native_pbc::Test::num_arch();
