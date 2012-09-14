@@ -120,6 +120,9 @@ sub _test_define {
     eval { $conf->cc_build('-DWANT_DEFINE') };
     my $ret = $@ ? 0 : eval $conf->cc_run();
     $conf->cc_clean();
+    if ($define =~ /^FLT128/) {
+	$conf->data->set( i_quadmath => $ret ? 'define' : undef );
+    }
 
     return $ret;
 }

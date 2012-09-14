@@ -62,6 +62,22 @@ typedef @float8_t@              Parrot_Float8;
 #ifndef PARROT_FLOATVAL_MAX
 #  define PARROT_FLOATVAL_MAX            @floatvalmax@
 #endif
+#ifndef PARROT_FLOATVAL_DIG
+#  ifdef PARROT_HAS_HEADER_MATH
+#    include <math.h>
+#  endif
+#  ifdef PARROT_HAS_HEADER_FLOAT
+#    include <float.h>
+#  endif
+#  ifdef PARROT_HAS_HEADER_LIMITS
+#    include <limits.h>
+#  endif
+#  if defined(PARROT_HAS_FLOAT128) && defined(PARROT_HAS_HEADER_QUADMATH)
+#    include <quadmath.h>
+#  endif
+#  define PARROT_FLOATVAL_DIG              @floatvaldig@
+#endif
+
 
 /* Symbol export and import decoration. At the time of writing, note that
  * PARROT_IN_CORE won't always imply !PARROT_IN_EXTENSION. */
@@ -112,7 +128,7 @@ typedef @float8_t@              Parrot_Float8;
 
 typedef Parrot_Int INTVAL;
 typedef Parrot_UInt UINTVAL;
-typedef Parrot_Float FLOATVAL;
+typedef @nv@ FLOATVAL;
 
 typedef @hugeintval@ HUGEINTVAL;
 typedef unsigned @hugeintval@ UHUGEINTVAL;
