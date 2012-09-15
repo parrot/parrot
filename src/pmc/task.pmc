@@ -176,7 +176,10 @@ code as the first argument.
             Parrot_pcc_set_recursion_depth(interp, CURRENT_CONTEXT(interp), current_depth);
         }
 
-        if (task->killed || !TASK_in_preempt_TEST(SELF)) {
+        if (task->killed
+	    /* TODO: racy read with write in send TASK_recv_block_CLEAR(partner) */
+	    || !TASK_in_preempt_TEST(SELF))
+	{
             /* The task is done. */
             /* Remove it from the set of active Tasks */
 
@@ -441,14 +444,13 @@ Send a message to this task.
 
     METHOD send(PMC *message) {
         Parrot_Task_attributes * const tdata = PARROT_TASK(SELF);
+        LOCK(tdata->mailbox_lock);
         if (PMC_IS_NULL(tdata->mailbox)) {
-            LOCK(tdata->mailbox_lock);
             tdata->mailbox = Parrot_pmc_new(interp, enum_class_PMCList);
-            UNLOCK(tdata->mailbox_lock);
             PARROT_GC_WRITE_BARRIER(interp, SELF);
         }
-
         VTABLE_push_pmc(interp, tdata->mailbox, message);
+        UNLOCK(tdata->mailbox_lock);
 
         if (tdata->partner) {
             PMC *                    const partner = tdata->partner;
@@ -456,6 +458,7 @@ Send a message to this task.
             LOCK(tdata->mailbox_lock);
             Parrot_block_GC_mark_locked(pdata->interp);
             if (TASK_recv_block_TEST(partner)) {
+                /* TODO: racy write with read in invoke task->killed || in_preempt */
                 TASK_recv_block_CLEAR(partner);
                 Parrot_cx_schedule_immediate(pdata->interp, partner);
             }
