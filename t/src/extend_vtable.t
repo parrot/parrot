@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2010-2011, Parrot Foundation.
+# Copyright (C) 2010-2012, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -278,7 +278,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(set|get)_number_keyed
     string = createstring(interp,"foo");
     Parrot_PMC_set_number_keyed_str(interp, hash, string, 42.00);
     number = Parrot_PMC_get_number_keyed_str(interp, hash, string);
-    Parrot_printf(interp,"%.6f\n", number);
+    Parrot_printf(interp,"%.6f\n", (double)number);
 CODE
 42.000000
 Done!
@@ -437,7 +437,7 @@ extend_vtable_output_is(<<'CODE',<<'OUTPUT', "Parrot_PMC_i_modulus_float" );
     Parrot_PMC_set_number_native(interp, pmc,  50.0);
 
     Parrot_PMC_i_modulus_float(interp, pmc, 42.0);
-    Parrot_printf(interp, "%.2f\n",Parrot_PMC_get_number(interp, pmc));
+    Parrot_printf(interp, "%.2f\n",(double)Parrot_PMC_get_number(interp, pmc));
 CODE
 8.00
 Done!
@@ -687,7 +687,7 @@ OUTPUT
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(set|get)_number_keyed");
     Parrot_PMC_set_number_keyed(interp, rpa, key_int, 42.0);
     number = Parrot_PMC_get_number_keyed(interp, rpa, key_int);
-    Parrot_printf(interp,"%.02f\n", number);
+    Parrot_printf(interp,"%.02f\n", (double)number);
 CODE
 42.00
 Done!
@@ -696,7 +696,7 @@ OUTPUT
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(set|get)_number_keyed_int");
     Parrot_PMC_set_number_keyed_int(interp, rpa, 0, 42.0);
     number = Parrot_PMC_get_number_keyed_int(interp, rpa, 0);
-    Parrot_printf(interp,"%.02f\n", number);
+    Parrot_printf(interp,"%.02f\n", (double)number);
 CODE
 42.00
 Done!
@@ -811,10 +811,10 @@ OUTPUT
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(set|get)_number_keyed_int");
     number  = 42.0;
     number2 = 17.8;
-    Parrot_printf(interp,"%.2f\n", number2);
+    Parrot_printf(interp,"%.2f\n", (double)number2);
     Parrot_PMC_set_number_keyed_int(interp, rpa, 42, number);
     number2 = Parrot_PMC_get_number_keyed_int(interp, rpa, 42);
-    Parrot_printf(interp,"%.2f\n", number2);
+    Parrot_printf(interp,"%.2f\n", (double)number2);
 CODE
 17.80
 42.00
@@ -1022,7 +1022,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_add_float" );
 
     Parrot_PMC_i_add_float(interp, pmc, number);
     number = Parrot_PMC_get_number(interp, pmc);
-    Parrot_printf(interp,"%.2f\n", number);
+    Parrot_printf(interp,"%.2f\n", (double)number);
 CODE
 1.00
 Done!
@@ -1133,7 +1133,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(push|pop)_float" );
     Parrot_PMC_push_float(interp, rpa, number);
     number2 = Parrot_PMC_pop_float(interp, rpa);
 
-    Parrot_printf(interp,"%.2f\n", number2);
+    Parrot_printf(interp,"%.2f\n", (double)number2);
 CODE
 42.00
 Done!
@@ -1146,7 +1146,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(unshift|shift)_float"
     Parrot_PMC_unshift_float(interp, rpa, number);
     number2 = Parrot_PMC_shift_float(interp, rpa);
 
-    Parrot_printf(interp,"%.2f\n", number2);
+    Parrot_printf(interp,"%.2f\n", (double)number2);
 CODE
 42.00
 Done!
@@ -1254,7 +1254,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_floor_divide_float" 
 
     Parrot_PMC_i_floor_divide_float(interp, pmc, number);
     number = Parrot_PMC_get_number(interp, pmc);
-    printf("%.2f\n", number);
+    printf("%.2f\n", (double)number);
 CODE
 2.00
 Done!
@@ -1267,7 +1267,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_floor_divide_float" );
 
     pmc3 = Parrot_PMC_floor_divide_float(interp, pmc, number, pmc3);
     number = Parrot_PMC_get_number(interp, pmc3);
-    printf("%.2f\n", number);
+    printf("%.2f\n", (double)number);
 CODE
 2.00
 Done!
@@ -1373,7 +1373,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_multiply_float" );
     */
     Parrot_PMC_i_multiply_float(interp, pmc, number);
     number = Parrot_PMC_get_integer(interp, pmc);
-    printf("%.2f\n", number);
+    printf("%.2f\n", (double)number);
 CODE
 42.00
 Done!
@@ -1391,7 +1391,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_multiply_float" );
     */
     pmc3 = Parrot_PMC_multiply_float(interp, pmc, number, pmc3);
     number = Parrot_PMC_get_number(interp, pmc3);
-    printf("%.2f\n", number);
+    printf("%.2f\n", (double)number);
 CODE
 42.00
 Done!
@@ -1468,7 +1468,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_i_divide_float" );
     number = 21.0;
     Parrot_PMC_i_divide_float(interp, pmc, number);
     number = Parrot_PMC_get_number(interp, pmc);
-    printf("%.2f\n", number);
+    printf("%.2f\n", (double)number);
 CODE
 2.00
 Done!
@@ -1480,7 +1480,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_divide_float" );
     number = 21.0;
     pmc3 = Parrot_PMC_divide_float(interp, pmc, number, pmc3);
     number = Parrot_PMC_get_number(interp, pmc3);
-    printf("%.2f\n", number);
+    printf("%.2f\n", (double)number);
 CODE
 2.00
 Done!
@@ -1885,7 +1885,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_add_float" );
 
     pmc3 = Parrot_PMC_add_float(interp, pmc, number, pmc3);
     number = Parrot_PMC_get_number(interp, pmc3);
-    printf("%.2f\n", number);
+    printf("%.2f\n", (double)number);
 CODE
 958.00
 Done!

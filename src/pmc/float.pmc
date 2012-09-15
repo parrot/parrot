@@ -138,9 +138,14 @@ Returns a Parrot string representation of the number.
 
     VTABLE STRING *get_repr() {
         const FLOATVAL val      = SELF.get_number();
+#if NUMVAL_SIZE != 8
+        /* [GH #828] need to cast to double for varargs */
         const double d          = fabs((double)val);
         const char * const sign = val < 0 ? "-" : "";
-        return Parrot_sprintf_c(INTERP, "%s" FLOATVAL_FMT, sign, d);
+        return Parrot_sprintf_c(INTERP, "%s%.15g", sign, (double)val);
+#else
+        return Parrot_sprintf_c(INTERP, FLOATVAL_FMT, val);
+#endif
     }
 
 /*
