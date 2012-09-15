@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -313,16 +313,16 @@ getfloat_va(PARROT_INTERP, INTVAL size, ARGIN(SPRINTF_OBJ *obj))
     switch (size) {
       case SIZE_SHORT:
         /* float is promoted to double */
-        return (HUGEFLOATVAL)(float)va_arg(*arg, double);
+        return (HUGEFLOATVAL)(float)va_arg(*arg, PARROT_VA_PTR_FLOATVAL);
 
       case SIZE_REG:
-        return (HUGEFLOATVAL)(double)va_arg(*arg, double);
+        return (HUGEFLOATVAL)(double)va_arg(*arg, PARROT_VA_PTR_FLOATVAL);
 
       case SIZE_HUGE:
-        return (HUGEFLOATVAL)(HUGEFLOATVAL) va_arg(*arg, HUGEFLOATVAL);
+        return (HUGEFLOATVAL)(HUGEFLOATVAL) va_arg(*arg, PARROT_VA_PTR_FLOATVAL);
 
       case SIZE_XVAL:
-        return (HUGEFLOATVAL)(FLOATVAL) va_arg(*arg, FLOATVAL);
+        return (HUGEFLOATVAL)(FLOATVAL) va_arg(*arg, PARROT_VA_PTR_FLOATVAL);
 
       case SIZE_PMC:
         {

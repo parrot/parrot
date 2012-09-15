@@ -1790,7 +1790,7 @@ static FLOATVAL*
 numval_param_from_c_args(SHIM_INTERP, ARGIN(va_list *args), SHIM(INTVAL param_index))
 {
     ASSERT_ARGS(numval_param_from_c_args)
-    return va_arg(*args, FLOATVAL*);
+    return va_arg(*args, PARROT_VA_PTR_FLOATVAL*);
 }
 
 PARROT_WARN_UNUSED_RESULT
