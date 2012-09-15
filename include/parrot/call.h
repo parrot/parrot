@@ -503,6 +503,12 @@ PMC * Parrot_pcc_init_context(PARROT_INTERP,
     ARGIN_NULLOK(PMC *old))
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC * Parrot_pcc_unproxy_context(PARROT_INTERP, ARGIN(PMC * proxy))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_set_new_context(PARROT_INTERP,
@@ -567,6 +573,9 @@ PMC * Parrot_set_new_context(PARROT_INTERP,
     , PARROT_ASSERT_ARG(pmcctx))
 #define ASSERT_ARGS_Parrot_pcc_init_context __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(ctx))
+#define ASSERT_ARGS_Parrot_pcc_unproxy_context __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(proxy))
 #define ASSERT_ARGS_Parrot_set_new_context __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(number_regs_used))
