@@ -1677,27 +1677,24 @@ PF_fetch_number(ARGIN_NULLOK(PackFile *pf), ARGIN(const opcode_t **stream))
 {
     ASSERT_ARGS(PF_fetch_number)
 
-    union {
-        FLOATVAL f;
-        unsigned char c[NUMVAL_SIZE];
-    } u;
+    FLOATVAL f;
     int floatsize;
 
     /* When we have alignment all squared away we don't need
      * to use memcpy() for native byteorder.  */
     if (!pf || !pf->fetch_nv) {
-        memcpy(&u.f, (const char *)*stream, sizeof (FLOATVAL));
+        memcpy(&f, (const char *)*stream, sizeof (FLOATVAL));
         (*stream) += (sizeof (FLOATVAL) + sizeof (opcode_t) - 1)/
             sizeof (opcode_t);
-        return u.f;
+        return f;
     }
-    (pf->fetch_nv)(&u.c, (const unsigned char *)*stream, pf->header);
+    (pf->fetch_nv)((unsigned char *)&f, (const unsigned char *)*stream, pf->header);
     floatsize = PF_floattype_size[ pf->header->floattype ];
     /* Intel x86_64 has FLOATTYPE_10 aligned to size 16. */
     if ( floatsize == 12 && pf->header->wordsize == 8 )
         floatsize = 16;
     *((const unsigned char **) (stream)) += floatsize;
-    return u.f;
+    return f;
 }
 
 /*
