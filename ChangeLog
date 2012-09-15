@@ -6,6 +6,7 @@
         + Added MEMORY_DEBUG tracing to --gc inf and ms2, added
           GC validation to ms2.
         + Fix bignum.i_substract and i_multiply #1144
+        + Optimize printing of single numbers #828
     - Build
     - Documentation
     - Tests
