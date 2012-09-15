@@ -1059,16 +1059,22 @@ sub _generate_test_functions {
                     'STDERR' => $out_f
                 );
                 my $output = slurp_file($out_f);
+                my $ori_output = $output;
+                if ( defined $ENV{VALGRIND} ) {
+                    $output =~ s/(^==\d+==.*\n)//mg;
+                }
 
                 if ($exit_code) {
                     $pass = $builder->ok( 0, $desc );
                     $builder->diag( "Exited with error code: $exit_code\n"
-                            . "Received:\n$output\nExpected:\n$expected\n" );
+                            . "Received:\n$output\nExpected:\n$expected\n"
+                            . $ori_output ne $output ? "$ori_output\n" : "");
                 }
                 else {
                     my $meth = $c_test_map{$func};
                     $pass = $builder->$meth( $output, $expected, $desc );
-                    $builder->diag("'$cmd' failed with exit code $exit_code")
+                    $builder->diag("'$cmd' failed with exit code $exit_code.\n"
+                                   . $ori_output ne $output ? "$ori_output\n" : "")
                         unless $pass;
                 }
             }
