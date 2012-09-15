@@ -625,7 +625,7 @@ set_call_from_varargs(PARROT_INTERP,
             Parrot_CallContext_push_integer(interp, signature, va_arg(*args, INTVAL));
             break;
           case 'N':
-            Parrot_CallContext_push_float(interp, signature, va_arg(*args, FLOATVAL));
+            Parrot_CallContext_push_float(interp, signature, va_arg(*args, PARROT_VA_PTR_FLOATVAL));
             break;
           case '-':
             return;
@@ -747,7 +747,7 @@ Parrot_pcc_build_sig_object_from_varargs(PARROT_INTERP, ARGIN_NULLOK(PMC *obj),
             Parrot_CallContext_push_integer(interp, call_object, va_arg(args, INTVAL));
             break;
           case 'N':
-            Parrot_CallContext_push_float(interp, call_object, va_arg(args, FLOATVAL));
+            Parrot_CallContext_push_float(interp, call_object, va_arg(args, PARROT_VA_PTR_FLOATVAL));
             break;
           case 'S':
             Parrot_CallContext_push_string(interp, call_object, va_arg(args, STRING *));
