@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2008-2010, Parrot Foundation.
+# Copyright (C) 2008-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -643,7 +643,7 @@ CODE
     $N0 = 11.1
     $P0 = $N0
     $N1 = $P0
-    is($N1,11.1,'set and get a native float')
+    is($N1,11.1,'set and get a native float',1e-6)
 .end
 
 .sub test_set_get_native_string

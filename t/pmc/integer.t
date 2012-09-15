@@ -552,7 +552,7 @@ fin:
     $P1 = new ['Integer']
     $P1 = 10
     sub $P1, $P1, $P0
-    is($P1, 6.9, 'DEFAULT sub')
+    is($P1, 6.9, 'DEFAULT sub', 1e-5)
 
     $P0 = new ['Integer']
     $P0 = 5
