@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2009-2011, Parrot Foundation.
+Copyright (C) 2009-2012, Parrot Foundation.
 
 =head1 NAME
 
