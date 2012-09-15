@@ -1264,7 +1264,7 @@ cvt_num16ppc_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src),
 
     if (PF_NEEDS_ENDIANIZE(header)) {
 #if HAS_INT64
-        *(Parrot_UInt8*)d2.c = bswap64(*(const Parrot_UInt8*)src);
+        *(Parrot_UInt8*)d1.c = bswap64(*(const Parrot_UInt8*)src);
         *(Parrot_UInt8*)d2.c = bswap64(*(const Parrot_UInt8*)(src+8));
 #else
         SWAB_16(d1.c, src);
