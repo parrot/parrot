@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2009, Parrot Foundation.
+# Copyright (C) 2004-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -607,7 +607,7 @@ sub _pir_stdin_output_slurp {
             or die "Unable to pipe output to us: $!";
         <$in>;
     };
-
+    $result =~ s/(^==\d+==.*\n)//mg if defined $ENV{VALGRIND};
     return $result;
 }
 
@@ -809,6 +809,8 @@ sub _generate_test_functions {
 
             my $meth        = $parrot_test_map{$func};
             my $real_output = slurp_file($out_f);
+            my $ori_output = $real_output;
+            $real_output =~ s/(^==\d+==.*\n)//mg if defined $ENV{VALGRIND};
 
             _unlink_or_retain( $out_f );
 
@@ -839,7 +841,8 @@ sub _generate_test_functions {
             elsif ($exit_code) {
                 $builder->ok( 0, $desc );
                 $builder->diag( "Exited with error code: $exit_code\n"
-                        . "Received:\n$real_output\nExpected:\n$expected\n" );
+                        . "Received:\n$real_output\nExpected:\n$expected\n"
+                        . $ori_output ne $real_output ? "$ori_output\n" : "");
                 return 0;
             }
             my $pass = $builder->$meth( $real_output, $expected, $desc );
@@ -1060,9 +1063,7 @@ sub _generate_test_functions {
                 );
                 my $output = slurp_file($out_f);
                 my $ori_output = $output;
-                if ( defined $ENV{VALGRIND} ) {
-                    $output =~ s/(^==\d+==.*\n)//mg;
-                }
+                $output =~ s/(^==\d+==.*\n)//mg if defined $ENV{VALGRIND};
 
                 if ($exit_code) {
                     $pass = $builder->ok( 0, $desc );
