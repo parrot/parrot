@@ -8,7 +8,8 @@
 
 .sub '_filename'
     .local string filename
-    filename = 't/pmc/testlib/number.pbc'
+    # numbers are too fragile to test them binary
+    filename = 't/pmc/testlib/annotations.pbc'
     .return (filename)
 .end
 

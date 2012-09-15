@@ -300,10 +300,10 @@ CODE
 
     test_fail( 'comparing Float PMC and a float with precision, failure' )
     $P0 = new 'Float'
-    $P0 = 888.81
-    is( $P0, 888.82, 'comparing Float PMC and a float with precision, failure', 1e-2)
-    test_diag( 'Have: 888.81' )
-    test_diag( 'Want: 888.82' )
+    $P0 = 888.82
+    is( $P0, 888.83, 'comparing Float PMC and a float with precision, failure', 1e-2)
+    test_diag( 'Have: 888.82' )
+    test_diag( 'Want: 888.83' )
     test_test( 'failing test is() for comparing a Float PMC and float with precision')
 
     test_pass( 'comparing Float PMC and a float with precision, success' )

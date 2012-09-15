@@ -71,7 +71,7 @@ my @setup = (
     { pconfig_key => 'numvalsize',
       pasm_key    => 17,
       pir_key     => 'SYSINFO_PARROT_FLOATSIZE',
-      desc        => 'float size',
+      desc        => 'floatval size',
       reg_type    => 'I',
     },
     { pconfig_key => 'ptrsize',

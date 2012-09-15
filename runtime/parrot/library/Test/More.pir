@@ -30,7 +30,7 @@ Test::More - Parrot extension for testing modules
     is( 200, 100, 'failing integer compare with diagnostic' )
 
     is( 1.001, 1.001, 'passing float compare with diagnostic' )
-    is( 8.008, 4.004 )
+    is( 8.008, 4.004, 'compare float up to 6 digits precision', 1e-6 )
 
     is( 'foo', 'foo', 'passing string compare with diagnostic' )
     is( 'foo', 'bar', 'failing string compare with diagnostic' )

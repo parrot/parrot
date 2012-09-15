@@ -132,9 +132,9 @@ ask. They are:
 
 =over 4
 
-=item C<PARROT_INTSIZE> The size of a platform integer
+=item C<PARROT_INTSIZE> The size of the platform integer
 
-=item C<PARROT_FLOATSIZE> The size of a platform float
+=item C<PARROT_FLOATSIZE> The size of the platform floatval
 
 =item C<PARROT_POINTERSIZE> The size of a platform pointer (Largest possible data pointer)
 
