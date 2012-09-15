@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2012, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -97,7 +97,7 @@ int main(int argc, char* argv[])
     Parrot_api_pmc_get_float(interpmc, p_float, &f_out);
 
     printf("%d\n", i_out);
-    printf("%.5f\n", f_out);
+    printf("%.5f\n", (double)f_out);
     return 0;
 }
 
