@@ -604,7 +604,9 @@ Parrot_thread_init_threads_array(PARROT_INTERP)
     }
     else {                   /* or a useful default */
         nprocs = Parrot_get_num_cpus(interp);
-        if (nprocs < 0 || nprocs > MAX_THREADS)
+        if (nprocs == 1)     /* need at least 2 threads, one for sleep */
+            nprocs = 4;
+        else if (nprocs < 0 || nprocs > MAX_THREADS)
             nprocs = MAX_THREADS;
         num_threads = nprocs;
     }
@@ -681,7 +683,7 @@ Parrot_set_num_threads(PARROT_INTERP, INTVAL numthreads)
     ASSERT_ARGS(Parrot_set_num_threads)
 
     /* Ensure that threads are not already initialized */
-    if (num_threads < 0 && num_threads <= MAX_THREADS)
+    if (num_threads < 0 && num_threads > 1 && num_threads <= MAX_THREADS)
         num_threads = numthreads;
     return num_threads;
 }
