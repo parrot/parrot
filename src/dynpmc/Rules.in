@@ -142,7 +142,8 @@ src/dynpmc/os.c: src/dynpmc/os.dump
 src/dynpmc/os.dump: src/dynpmc/os.pmc vtable.dump $(CLASS_O_FILES)
 	$(PMC2CD) src/dynpmc/os.pmc
 
-
+src/dynpmc/os.str: src/dynpmc/os.c
+	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl src/dynpmc/os.c > src/dynpmc/os.str
 
 $(DYNEXT_DIR)/pccmethod_test$(LOAD_EXT): src/dynpmc/pccmethod_test$(O)
 	$(LD)  @ld_out@$(DYNEXT_DIR)/pccmethod_test$(LOAD_EXT) \
