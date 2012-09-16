@@ -1,5 +1,5 @@
 /* thread.h
- *  Copyright (C) 2001-2011, Parrot Foundation.
+ *  Copyright (C) 2001-2012, Parrot Foundation.
  *  Overview:
  *     This is the api header for the thread primitives
  *  Data Structure and Algorithms:
@@ -25,7 +25,7 @@
 
 #include "parrot/atomic.h"
 
-#define MAX_THREADS 9
+#define MAX_THREADS 16
 
 #ifndef YIELD
 #  define YIELD
@@ -115,6 +115,9 @@ VAR_SCOPE Shared_gc_info *shared_gc_info;
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 void Parrot_clone_code(Parrot_Interp d, Parrot_Interp s);
+void Parrot_set_num_threads(PARROT_INTERP, INTVAL numthreads)
+        __attribute__nonnull__(1);
+
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
         __attribute__nonnull__(1);
@@ -147,7 +150,9 @@ int Parrot_thread_get_free_threads_array_index(PARROT_INTERP);
 PARROT_CANNOT_RETURN_NULL
 Interp** Parrot_thread_get_threads_array(PARROT_INTERP);
 
-void Parrot_thread_init_threads_array(PARROT_INTERP);
+void Parrot_thread_init_threads_array(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 void Parrot_thread_insert_thread(PARROT_INTERP,
     ARGIN(Interp* thread),
     int index)
@@ -196,6 +201,8 @@ void Parrot_thread_wait_for_notification(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_Parrot_clone_code __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_set_num_threads __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_thread_create __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_thread_create_local_sub \
@@ -217,7 +224,8 @@ void Parrot_thread_wait_for_notification(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_thread_get_threads_array \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_thread_init_threads_array \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_thread_insert_thread __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(thread))

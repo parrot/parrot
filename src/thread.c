@@ -53,6 +53,7 @@ static void* Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg));
 /* HEADERIZER END: static */
 
 static Interp * threads_array[MAX_THREADS];
+static size_t   num_threads = -1;
 
 /*
 
@@ -591,11 +592,24 @@ Initialize the threads array.
 */
 
 void
-Parrot_thread_init_threads_array(SHIM_INTERP)
+Parrot_thread_init_threads_array(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_thread_init_threads_array)
-    int i = 0;
-    for (; i < MAX_THREADS; i++)
+
+    int i;
+    int nprocs;
+
+    if (num_threads > 0) {   /* cmdline or API override */
+        nprocs = num_threads;
+    }
+    else {                   /* or a useful default */
+        nprocs = Parrot_get_num_cpus(interp);
+        if (nprocs < 0 || nprocs > MAX_THREADS)
+            nprocs = MAX_THREADS;
+        num_threads = nprocs;
+    }
+
+    for (i = 0; i < nprocs; i++)
         threads_array[i] = NULL;
 }
 
@@ -614,8 +628,9 @@ int
 Parrot_thread_get_free_threads_array_index(SHIM_INTERP)
 {
     ASSERT_ARGS(Parrot_thread_get_free_threads_array_index)
+
     int i = 0;
-    for (; i < MAX_THREADS; i++)
+    for (; i < num_threads; i++)
         if (threads_array[i] == NULL)
             return i;
     return -1;
@@ -638,6 +653,30 @@ Parrot_thread_insert_thread(PARROT_INTERP, ARGIN(Interp* thread), int index)
     ASSERT_ARGS(Parrot_thread_insert_thread)
 
     threads_array[index] = thread;
+}
+
+
+/*
+
+=item C<void Parrot_set_num_threads(PARROT_INTERP, INTVAL numthreads)>
+
+Overrides the default number of allocated threads, which defaults to
+the number of online CPUs.
+
+This function must be called before C<Parrot_thread_init_threads_array()>;
+
+=cut
+
+*/
+
+void
+Parrot_set_num_threads(PARROT_INTERP, INTVAL numthreads)
+{
+    ASSERT_ARGS(Parrot_set_num_threads)
+
+    /* Ensure that threads are not already initialized */
+    if (num_threads < 0)
+        num_threads = numthreads;
 }
 
 /*

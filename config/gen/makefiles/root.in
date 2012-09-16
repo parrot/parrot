@@ -1810,6 +1810,8 @@ src/platform/generic/math$(O) : src/platform/generic/math.c $(PARROT_H_HEADERS)
 
 src/platform/generic/misc$(O) : src/platform/generic/misc.c $(PARROT_H_HEADERS)
 
+src/platform/generic/num_cpus$(O) : src/platform/generic/num_cpus.c $(PARROT_H_HEADERS)
+
 src/platform/generic/socket$(O) : $(PARROT_H_HEADERS) $(INC_PMC_DIR)/pmc_socket.h \
 	src/io/io_private.h $(INC_PMC_DIR)/pmc_sockaddr.h src/platform/generic/socket.c
 
@@ -1851,6 +1853,8 @@ src/platform/win32/io$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
 	src/platform/win32/io.c
 
 src/platform/win32/misc$(O) : src/platform/win32/misc.c $(PARROT_H_HEADERS)
+
+src/platform/win32/num_cpus$(O) : src/platform/win32/num_cpus.c $(PARROT_H_HEADERS)
 
 src/platform/win32/sysmem$(O) : src/platform/win32/sysmem.c $(PARROT_H_HEADERS)
 

@@ -413,10 +413,14 @@ PARROT_EXPORT
 INTVAL Parrot_get_entropy(PARROT_INTERP);
 
 /*
- * CPU Type
+ * CPU
  */
 PARROT_EXPORT
 STRING *Parrot_get_cpu_type(PARROT_INTERP);
+
+PARROT_EXPORT
+INTVAL Parrot_get_num_cpus(PARROT_INTERP);
+
 
 #endif /* PARROT_PLATFORM_INTERFACE_H_GUARD */
 
