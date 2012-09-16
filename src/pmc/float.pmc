@@ -140,9 +140,9 @@ Returns a Parrot string representation of the number.
     VTABLE STRING *get_repr() :no_wb {
         const FLOATVAL val      = SELF.get_number();
 #if defined(PARROT_HAS_FABSL) && NUMVAL_SIZE > 8
-        const double d        = fabsl((long double)val);
+        const PARROT_VA_PTR_FLOATVAL d = (PARROT_VA_PTR_FLOATVAL)fabsl((long double)val);
 #else
-        const double d        = fabs((double)val);
+        const PARROT_VA_PTR_FLOATVAL d = (PARROT_VA_PTR_FLOATVAL)fabs((double)val);
 #endif
         const char * const sign = val < 0 ? "-" : "";
         return Parrot_sprintf_c(INTERP, "%s" FLOATVAL_FMT, sign, d);
