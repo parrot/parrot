@@ -132,6 +132,7 @@ src/dynpmc/pmc_os.h : src/dynpmc/os.c
 src/dynpmc/os$(O): \
     src/dynpmc/os.c \
     $(DYNPMC_H_FILES) \
+    src/dynpmc/os.str \
     src/dynpmc/pmc_os.h \
     include/pmc/pmc_fixedintegerarray.h
 
