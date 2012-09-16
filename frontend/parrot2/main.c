@@ -136,6 +136,7 @@ main(int argc, const char *argv[])
 
     GET_INIT_STRUCT(initargs);
 
+    initargs->numthreads = 0;
     /* Parse minimal subset of flags */
     parseflags_minimal(initargs, argc, argv);
 
@@ -428,6 +429,7 @@ Parrot_cmd_options(void)
         { '\0', OPT_GC_DYNAMIC_THRESHOLD, OPTION_required_FLAG, { "--gc-dynamic-threshold" } },
         { '\0', OPT_GC_MIN_THRESHOLD, OPTION_required_FLAG, { "--gc-min-threshold" } },
         { '\0', OPT_GC_DEBUG, (OPTION_flags)0, { "--gc-debug" } },
+        { '\0', OPT_NUMTHREADS, OPTION_required_FLAG, { "--numthreads" } },
         { 'V', 'V', (OPTION_flags)0, { "--version" } },
         { 'X', 'X', OPTION_required_FLAG, { "--dynext" } },
         { '\0', OPT_DESTROY_FLAG, (OPTION_flags)0,
@@ -507,6 +509,22 @@ parseflags_minimal(ARGMOD(Parrot_Init_Args * initargs), int argc, ARGIN(const ch
             }
             else {
                 fprintf(stderr, "error: invalid GC nursery size specified:"
+                        "'%s'\n", opt.opt_arg);
+                exit(EXIT_FAILURE);
+            }
+            break;
+
+          case OPT_NUMTHREADS:
+            if (opt.opt_arg && is_all_digits(opt.opt_arg)) {
+                initargs->numthreads = strtoul(opt.opt_arg, NULL, 8);
+
+                if ( initargs->numthreads < 2 || initargs->numthreads > 1e8 ) {
+                    fprintf(stderr, "error: minimum number of threads is 2\n");
+                    exit(EXIT_FAILURE);
+                }
+            }
+            else {
+                fprintf(stderr, "error: invalid number of threads specified:"
                         "'%s'\n", opt.opt_arg);
                 exit(EXIT_FAILURE);
             }

@@ -335,6 +335,7 @@ cachegrind.out.*
 /src/dynpmc/*.obj
 /src/dynpmc/*.pdb
 /src/dynpmc/*.so
+/src/dynpmc/*.str
 /src/gc/*.o
 /src/gc/*.obj
 /src/interp/*.o

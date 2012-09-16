@@ -17,7 +17,6 @@ Functions related to managing the Parrot interpreter
 
 */
 
-
 #include "parrot/parrot.h"
 #include "parrot/runcore_api.h"
 #include "parrot/oplib/core_ops.h"
@@ -27,6 +26,7 @@ Functions related to managing the Parrot interpreter
 #include "pmc/pmc_parrotinterpreter.h"
 #include "parrot/has_header.h"
 #include "imcc/embed.h"
+#include "parrot/thread.h"
 
 #ifdef PARROT_HAS_HEADER_SYSUTSNAME
 #  include <sys/utsname.h>
@@ -319,8 +319,9 @@ Parrot_interp_initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *a
     /* setup stdio PMCs */
     Parrot_io_init(interp);
 
-    /* all sys running, init the event and signal stuff */
-
+    /* all sys running, init the threads, event and signal stuff */
+    if (args->numthreads)
+        Parrot_set_num_threads(interp, args->numthreads);
     Parrot_cx_init_scheduler(interp);
 
 #ifdef PARROT_HAS_THREADS
