@@ -3,11 +3,11 @@ Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
-src/dynpmc/os.pmc - Dummy dynpmc placeholder
+src/dynpmc/osdummy.pmc - Dummy dynpmc placeholder
 
 =head1 DESCRIPTION
 
-This pmc does nothing, OS is now a builtin.
+This dynpmc is copied to dynpmc/os. It does nothing, OS is now a builtin.
 
 For backwards compatiblity with existing C<loadlib 'os'> calls.
 
@@ -15,7 +15,7 @@ For backwards compatiblity with existing C<loadlib 'os'> calls.
 
 */
 
-pmclass OS pmc {}
+pmclass OSdummy dynpmc {}
 
 /*
  * Local variables:
