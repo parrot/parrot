@@ -115,7 +115,10 @@ VAR_SCOPE Shared_gc_info *shared_gc_info;
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 void Parrot_clone_code(Parrot_Interp d, Parrot_Interp s);
-void Parrot_set_num_threads(PARROT_INTERP, INTVAL numthreads)
+int Parrot_get_num_threads(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+int Parrot_set_num_threads(PARROT_INTERP, INTVAL numthreads)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
@@ -201,6 +204,8 @@ void Parrot_thread_wait_for_notification(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_Parrot_clone_code __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_get_num_threads __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_set_num_threads __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_thread_create __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
