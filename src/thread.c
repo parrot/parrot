@@ -599,15 +599,15 @@ Parrot_thread_init_threads_array(PARROT_INTERP)
     int i;
     int nprocs;
 
-    if (num_threads > 0) {   /* cmdline or API override */
+    if (num_threads > 1) {   /* cmdline or API override */
         nprocs = num_threads;
     }
     else {                   /* or a useful default */
         nprocs = Parrot_get_num_cpus(interp);
-        if (nprocs == 1)     /* need at least 2 threads, one for sleep */
-            nprocs = 4;
-        else if (nprocs < 0 || nprocs > MAX_THREADS)
+        if (nprocs < 0 || nprocs > MAX_THREADS)
             nprocs = MAX_THREADS;
+        else if (nprocs < 3)  /* need at least 2 threads, one for sleep */
+            nprocs = 4;
         num_threads = nprocs;
     }
 
