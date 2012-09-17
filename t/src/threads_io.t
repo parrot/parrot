@@ -59,7 +59,13 @@ $pir->print(<<'EOF');
 
     $S0 = $P0
     if $S0 == "grumblecake\n" goto good
+    if $S0 == "grumblecake\r\n" goto good
     say "not ok 3"
+    print "# "
+    print $S0
+    print " - "
+    $I0 = length $S0
+    say $I0
     .return()
 
 good:
