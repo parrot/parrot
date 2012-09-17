@@ -176,10 +176,8 @@ code as the first argument.
             Parrot_pcc_set_recursion_depth(interp, CURRENT_CONTEXT(interp), current_depth);
         }
 
-        if (task->killed
-	    /* TODO: racy read with write in send TASK_recv_block_CLEAR(partner) */
-	    || !TASK_in_preempt_TEST(SELF))
-	{
+        /* TODO: racy read with write in send TASK_recv_block_CLEAR(partner) */
+        if (task->killed || !TASK_in_preempt_TEST(SELF)) {
             /* The task is done. */
             /* Remove it from the set of active Tasks */
 
