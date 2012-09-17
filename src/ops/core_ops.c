@@ -23242,7 +23242,7 @@ Parrot_find_sub_not_null_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_trap(opcode_t *cur_opcode, PARROT_INTERP) {
     UNUSED(interp);
-    #if defined(__GNUC__) && defined(i386)
+    #if defined(__GNUC__) && defined(i386) && !defined(sun)
         __asm__("int3");
 
 #endif
