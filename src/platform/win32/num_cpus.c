@@ -31,7 +31,7 @@ Returns the number of CPUs for win32 systems
 
 =over 4
 
-=item C<INTVAL Parrot_get_num_cpus(Parrot_Interp)>
+=item C<INTVAL Parrot_get_num_cpus(Parrot_Interp interp)>
 
 Returns the number of CPUs
 
