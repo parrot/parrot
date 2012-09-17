@@ -518,7 +518,7 @@ parseflags_minimal(ARGMOD(Parrot_Init_Args * initargs), int argc, ARGIN(const ch
             if (opt.opt_arg && is_all_digits(opt.opt_arg)) {
                 initargs->numthreads = strtoul(opt.opt_arg, NULL, 8);
 
-                if ( initargs->numthreads < 2 || initargs->numthreads > 1e8 ) {
+                if (initargs->numthreads < 2 || initargs->numthreads > 1e8) {
                     fprintf(stderr, "error: minimum number of threads is 2\n");
                     exit(EXIT_FAILURE);
                 }
