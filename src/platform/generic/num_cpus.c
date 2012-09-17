@@ -50,7 +50,7 @@ Parrot_get_num_cpus(Parrot_Interp interp) {
 
 #ifdef _SC_NPROCESSORS_ONLN
     nprocs = sysconf(_SC_NPROCESSORS_ONLN);
-#elif defined (PARROT_HAS_HEADER_LIBCPUID)
+#elif defined(PARROT_HAS_HEADER_LIBCPUID)
     struct cpu_raw_data_t raw;
     struct cpu_id_t data;
 
@@ -81,11 +81,11 @@ Parrot_get_num_cpus(Parrot_Interp interp) {
         if (strlen(line) == 1) continue;
         if (strncmp(line, "cpu cores", 8) == 0) {
             sscanf(line, "cpu cores\t: %d", &nprocs);
-            fclose (f);
+            fclose(f);
             return nprocs;
         }
     }
-    fclose (f);
+    fclose(f);
 #endif
     return nprocs;
 }
