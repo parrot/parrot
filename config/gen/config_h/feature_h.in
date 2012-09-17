@@ -257,6 +257,22 @@ END_PRINT
 
 print OUT <<'END_PRINT';
 
+/* from config/auto/snprintf */
+END_PRINT
+if (@HAS_BROKEN_SPRINTF_UPLUS@) {
+    print OUT <<'END_PRINT';
+/* mingw */
+#define PARROT_HAS_BROKEN_SPRINTF_UPLUS 1
+END_PRINT
+}
+else {
+    print OUT <<'END_PRINT';
+#undef PARROT_HAS_BROKEN_SPRINTF_UPLUS
+END_PRINT
+}
+
+print OUT <<'END_PRINT';
+
 #endif /* PARROT_FEATURE_H_GUARD */
 END_PRINT
 

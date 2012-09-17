@@ -426,6 +426,9 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
     SpfInfo info = { 0, 0, 0, 0, (PHASE)0 }; /* Storage for flags, etc. */
     PMC * const targ = Parrot_pmc_new_init_int(interp, enum_class_StringBuilder, pat_len * 2);
     INTVAL fmt_start_idx;
+#ifdef PARROT_HAS_BROKEN_SPRINTF_UPLUS
+    INTVAL plus = -1; /* index for '+' to skip on mingw */
+#endif
 
     /* ts is used almost universally as an intermediate target;
      * tc is used as a temporary buffer by Parrot_str_from_uint and
@@ -565,6 +568,9 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
 
                   case '+':
                     info.flags |= FLAG_PLUS;
+#ifdef PARROT_BROKEN_SPRINTF_PLUS
+                    plus = i;
+#endif
                     continue;
 
                   case '0':
@@ -774,6 +780,14 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                         const UHUGEINTVAL theuint =
                             obj->getuint(interp, info.type, obj);
                         sharedint = theuint;
+#ifdef PARROT_HAS_BROKEN_SPRINTF_UPLUS
+                        if ((info.flags & FLAG_PLUS) && (plus > -1)) { /* [GH #832] mingw */
+                            pat = Parrot_str_concat(interp, STRING_substr(interp, pat, 0, plus),
+                                                    STRING_substr(interp, pat, plus+1, pat_len));
+                            pat_len--;
+                            i--;
+                        }
+#endif
                     }
                     goto do_sprintf;
                   case 'd':
