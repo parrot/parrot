@@ -453,10 +453,11 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task_or_sub))
     else {
         /* find the thread with the fewest tasks */
         Interp ** const threads_array = Parrot_thread_get_threads_array(interp);
+        int numthreads = Parrot_get_num_threads(interp);
         Interp * candidate = NULL;
         int i, min_tasks = INT_MAX;
 
-        for (i = 1; i < MAX_THREADS; i++)
+        for (i = 1; i < numthreads; i++)
             if (threads_array[i]) {
                 int const tasks = VTABLE_get_integer(threads_array[i], threads_array[i]->scheduler);
                 if (tasks < min_tasks) {
@@ -464,6 +465,9 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task_or_sub))
                     candidate = threads_array[i];
                 }
             }
+        if (candidate == NULL)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Could not find a free thread.\n");
 
         Parrot_thread_schedule_task(interp, candidate, task);
         Parrot_thread_notify_thread(candidate);

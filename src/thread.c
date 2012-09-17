@@ -53,6 +53,7 @@ static void* Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg));
 /* HEADERIZER END: static */
 
 static Interp * threads_array[MAX_THREADS];
+static int      num_threads = -1;
 
 /*
 
@@ -403,7 +404,7 @@ Parrot_thread_notify_threads(SHIM_INTERP)
     int i;
     Interp ** const tarray = Parrot_thread_get_threads_array(NULL);
 
-    for (i = 0; i < MAX_THREADS; i++) {
+    for (i = 0; i < num_threads; i++) {
         if (tarray[i])
             Parrot_thread_notify_thread(tarray[i]);
     }
@@ -591,11 +592,26 @@ Initialize the threads array.
 */
 
 void
-Parrot_thread_init_threads_array(SHIM_INTERP)
+Parrot_thread_init_threads_array(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_thread_init_threads_array)
-    int i = 0;
-    for (; i < MAX_THREADS; i++)
+
+    int i;
+    int nprocs;
+
+    if (num_threads > 1) {   /* cmdline or API override */
+        nprocs = num_threads;
+    }
+    else {                   /* or a useful default */
+        nprocs = Parrot_get_num_cpus(interp);
+        if (nprocs < 0 || nprocs > MAX_THREADS)
+            nprocs = MAX_THREADS;
+        else if (nprocs < 3)  /* need at least 2 threads, one for sleep */
+            nprocs = 4;
+        num_threads = nprocs;
+    }
+
+    for (i = 0; i < nprocs; i++)
         threads_array[i] = NULL;
 }
 
@@ -614,8 +630,9 @@ int
 Parrot_thread_get_free_threads_array_index(SHIM_INTERP)
 {
     ASSERT_ARGS(Parrot_thread_get_free_threads_array_index)
+
     int i = 0;
-    for (; i < MAX_THREADS; i++)
+    for (; i < num_threads; i++)
         if (threads_array[i] == NULL)
             return i;
     return -1;
@@ -638,6 +655,61 @@ Parrot_thread_insert_thread(PARROT_INTERP, ARGIN(Interp* thread), int index)
     ASSERT_ARGS(Parrot_thread_insert_thread)
 
     threads_array[index] = thread;
+}
+
+
+/*
+
+=item C<int Parrot_set_num_threads(PARROT_INTERP, INTVAL numthreads)>
+
+Overrides the default number of allocated threads, which defaults to
+the number of online CPUs.
+
+This function must be called before C<Parrot_thread_init_threads_array()>;
+
+It returns the actual number of num_threads, which might -1 be if
+numthreads is invalid, e.g. it exceeds the hard-coded constant
+MAX_THREADS (16), or if Parrot_set_num_threads() was called too late
+and threads were already initialized.
+
+
+=cut
+
+*/
+
+int
+Parrot_set_num_threads(PARROT_INTERP, INTVAL numthreads)
+{
+    ASSERT_ARGS(Parrot_set_num_threads)
+
+    /* Ensure that threads are not already initialized */
+    if (num_threads < 0 && num_threads > 1 && num_threads <= MAX_THREADS)
+        num_threads = numthreads;
+    return num_threads;
+}
+
+
+/*
+
+=item C<int Parrot_get_num_threads(PARROT_INTERP)>
+
+It returns the number of allocated C<num_threads>,
+not the number of active threads and not the number
+of maximum possible threads.
+
+A return value of -1 means that threads were
+not yet initialized.
+
+=cut
+
+*/
+
+int
+Parrot_get_num_threads(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_get_num_threads)
+
+    return num_threads;
 }
 
 /*

@@ -19,7 +19,7 @@ use strict;
 use warnings;
 use lib qw( lib . ../lib ../../lib );
 
-use Test::More tests => 35;
+use Test::More tests => 40;
 use Parrot::Config;
 use File::Temp 0.13 qw/tempfile/;
 use File::Spec;
@@ -115,6 +115,25 @@ like( $output, qr/maximum GC nursery size is 50%/,
                  '--gc-nursery-size max warning' );
 is( $exit, 0, '... and should not crash' );
 
+
+sub numthreads_tests() {
+    my $output = qx{$PARROT 2>&1 --numthreads 0};
+    like($output, qr/minimum number of threads is 2/, '--numthreads 0 gives an error');
+
+    $output = qx{$PARROT 2>&1 --numthreads 1};
+    like($output, qr/minimum number of threads is 2/, '--numthreads 1 gives an error');
+
+    $output = qx{$PARROT 2>&1 --numthreads -2};
+    like($output, qr/invalid number of threads/, '--numthreads -2 gives an error');
+
+    $output = qx{$PARROT 2>&1 --numthreads 1e9};
+    like($output, qr/invalid number of threads/, '--numthreads 1e9 gives an error');
+
+    $output = qx{$PARROT 2>&1 --numthreads 2 $first_pir_file};
+    like($output, qr/first/, '--numthreads 2 works');
+}
+
+numthreads_tests();
 
 # Test --leak-test. See issue GH #765
 is( qx{$PARROT --leak-test "$first_pir_file"}, "first\n", '--leak-test' );

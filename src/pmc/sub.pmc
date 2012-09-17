@@ -460,8 +460,12 @@ Invokes the subroutine.
         }
 
         /* set outer context */
-        if (!PMC_IS_NULL(sub->outer_ctx))
-            Parrot_pcc_set_outer_ctx(INTERP, context, sub->outer_ctx);
+        if (!PMC_IS_NULL(sub->outer_ctx)) {
+            PMC * outer_ctx = sub->outer_ctx;
+            if (outer_ctx->vtable->base_type == enum_class_Proxy)
+                outer_ctx = Parrot_pcc_unproxy_context(INTERP, outer_ctx);
+            Parrot_pcc_set_outer_ctx(INTERP, context, outer_ctx);
+        }
         else {
             /* autoclose */
             PMC *c       = context;
