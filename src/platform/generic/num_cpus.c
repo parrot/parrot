@@ -51,19 +51,19 @@ Parrot_get_num_cpus(Parrot_Interp interp) {
 #ifdef _SC_NPROCESSORS_ONLN
     nprocs = sysconf(_SC_NPROCESSORS_ONLN);
 #elif defined (PARROT_HAS_HEADER_LIBCPUID)
-    struct cpu_raw_data_t raw; 
-    struct cpu_id_t data;     
+    struct cpu_raw_data_t raw;
+    struct cpu_id_t data;
 
     if (!cpuid_present()) {
         printf("cpuid_present failed\n");
         exit(EXIT_FAILURE);
     }
-    if (cpuid_get_raw_data(&raw) < 0) { 
+    if (cpuid_get_raw_data(&raw) < 0) {
         printf("cpuid_get_raw_data failed\n");
         printf("Error: %s\n", cpuid_error());
         exit(EXIT_FAILURE);
     }
-    if (cpu_identify(&raw, &data) < 0) {    
+    if (cpu_identify(&raw, &data) < 0) {
         printf("cpu_identify failed\n");
         printf("Error: %s\n", cpuid_error());
         exit(EXIT_FAILURE);
