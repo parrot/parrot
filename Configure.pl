@@ -42,6 +42,13 @@ my ($args, $steps_list_ref) = process_options(
 );
 exit(1) unless defined $args;
 
+# preload all steps for debugging because some Windows systems cannot
+# do "b postpone stepname"
+for my $step_name (@{ $steps_list_ref } ) {
+    eval "use $step_name;"; ## no critic (BuiltinFunctions::ProhibitStringyEval)
+    die $@ if $@;
+}
+
 my $opttest = Parrot::Configure::Options::Test->new($args);
 
 # configuration tests will only be run if you requested them
