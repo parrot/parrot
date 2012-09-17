@@ -678,13 +678,13 @@ and threads were already initialized.
 */
 
 int
-Parrot_set_num_threads(PARROT_INTERP, INTVAL numthreads)
+Parrot_set_num_threads(PARROT_INTERP, INTVAL input)
 {
     ASSERT_ARGS(Parrot_set_num_threads)
 
     /* Ensure that threads are not already initialized */
-    if (num_threads < 0 && num_threads > 1 && num_threads <= MAX_THREADS)
-        num_threads = numthreads;
+    if (num_threads < 0 && input > 1 && input <= MAX_THREADS)
+        num_threads = input;
     return num_threads;
 }
 
