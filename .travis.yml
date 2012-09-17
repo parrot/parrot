@@ -22,6 +22,7 @@ script: "perl Configure.pl $PARROT_CONFIG_ARGS $PARROT_OPTIMIZE --cc=\"$CC\" --l
 branches:
    only:
      - master
+     - threads
 notifications:
   recipients:
     - parrot-ci@lists.parrot.org
