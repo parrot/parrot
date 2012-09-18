@@ -53,6 +53,7 @@
 
 #  define CLEANUP_PUSH(f, a) pthread_cleanup_push((f), (a))
 #  define CLEANUP_POP(a)     pthread_cleanup_pop(a)
+#  define THREAD_CANCEL(t)   pthread_cancel(t)
 
 #ifdef PARROT_HAS_HEADER_UNISTD
 #  include <unistd.h>

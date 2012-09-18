@@ -52,8 +52,8 @@ static void* Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg));
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-static Interp * threads_array[MAX_THREADS];
-static int      num_threads = -1;
+Interp  ** threads_array;
+static int num_threads = -1;
 
 /*
 
@@ -614,8 +614,7 @@ Parrot_thread_init_threads_array(PARROT_INTERP)
         num_threads = nprocs;
     }
 
-    for (i = 0; i < nprocs; i++)
-        threads_array[i] = NULL;
+    threads_array = mem_internal_allocate_n_zeroed_typed(num_threads, Interp*);
 }
 
 /*
@@ -636,7 +635,7 @@ Parrot_thread_get_free_threads_array_index(SHIM_INTERP)
 
     int i = 0;
     for (; i < num_threads; i++)
-        if (threads_array[i] == NULL)
+        if (!threads_array[i])
             return i;
     return -1;
 }
@@ -672,7 +671,7 @@ This function must be called before C<Parrot_thread_init_threads_array()>;
 
 It returns the actual number of num_threads, which might -1 be if
 numthreads is invalid, e.g. it exceeds the hard-coded constant
-MAX_THREADS (16), or if Parrot_set_num_threads() was called too late
+MAX_THREADS (16000), or if Parrot_set_num_threads() was called too late
 and threads were already initialized.
 
 =cut
@@ -712,6 +711,49 @@ Parrot_get_num_threads(SHIM_INTERP)
     ASSERT_ARGS(Parrot_get_num_threads)
 
     return num_threads;
+}
+
+/*
+
+=item C<void Parrot_thread_destroy(PARROT_INTERP)>
+
+Stop and destroy all threads.
+
+=cut
+
+*/
+
+void
+Parrot_thread_destroy(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_thread_destroy)
+
+    /* XXX I (rurban) am not sure if we need task kill and thread cancel at all */
+    int i, foreign_count;
+    PMC * const scheduler = interp->scheduler;
+    Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
+
+    foreign_count = VTABLE_get_integer(interp, sched->foreign_tasks);
+
+    /* let the task kill */
+    for (i = 0; i < foreign_count; i++) {
+        PMC * const task = VTABLE_get_pmc_keyed_int(interp, sched->foreign_tasks, i);
+        LOCK(PARROT_TASK(task)->waiters_lock);
+        PARROT_TASK(task)->killed = 1;
+        VTABLE_delete_keyed_int(interp, sched->foreign_tasks, i);
+        i--;
+        foreign_count--;
+        UNLOCK(PARROT_TASK(task)->waiters_lock);
+    }
+
+    /* cancel all threads */
+    for (i = 0; i < num_threads; i++) {
+        if (threads_array[i])
+            if (threads_array[i]->thread_data)
+                THREAD_CANCEL(threads_array[i]->thread_data->thread);
+    }
+
+    mem_sys_free(threads_array);
 }
 
 /*

@@ -91,6 +91,7 @@ typedef HANDLE Parrot_thread;
      } while (0)
 
 #  define DETACH(t) CloseHandle(t)
+#  define THREAD_CANCEL(t)   /*TerminateThread(t, 0)*/
 
 /* If the compiler CRT library has a good _beginthreadXX() routine, use it instead of
    the Win32 API CreateThread(). _beginthreadXX guards call to the thread start routine

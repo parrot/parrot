@@ -23,6 +23,7 @@
 
 #define JOIN(t, ret)
 #define DETACH(t)
+#define THREAD_CANCEL(t)
 
 #define CLEANUP_PUSH(f, a)
 #define CLEANUP_POP(a)
