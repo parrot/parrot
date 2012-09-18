@@ -11,6 +11,7 @@
         + Fixed for the FileHandle open method the append mode on Windows.
 	+ Fix compilation on Windows without working mt.exe
         + Detect GNU/Hurd as linux proper.
+        + Fixed broken int3 trap on Solaris with gcc.
         + Updated the vms port on a YAPC::EU hackathon with vaxman and mvorl.
     - Tests
         + Improve testability with valgrind or thread-sanitizer
