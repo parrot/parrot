@@ -98,14 +98,14 @@ foreach my $file (sort grep /\.[hc]$/, @incfiles) {
             }
         }
 
-	# skip bogus warnings
-	if (!$found
-	    and ($file ne 'src/gc/malloc.c' or $include ne '/usr/include/malloc.h'
-		 or defined $Parrot::Config::PConfig{HAVE_USR_INCLUDE_MALLOC_H})
-	    and ($file ne 'src/glut_nci_thunks.c' or $include ne 'glut_nci_thunks.str'))
+        # skip bogus warnings
+        if (!$found
+            and ($file ne 'src/gc/malloc.c' or $include ne '/usr/include/malloc.h'
+                 or defined $Parrot::Config::PConfig{HAVE_USR_INCLUDE_MALLOC_H})
+            and ($file ne 'src/glut_nci_thunks.c' or $include ne 'glut_nci_thunks.str'))
         {
-	    diag "couldn't find $include, included from $file";
-	}
+            diag "couldn't find $include, included from $file";
+        }
     }
     # always require an explicit .o -> .c dep. This is lazy and not always
     # needed. However, missing it when it is needed causes pain.

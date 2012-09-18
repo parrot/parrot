@@ -1,8 +1,8 @@
 {
-    "release.version"  : "4.7.0",
-    "release.name"     : "Hispaniolan",
-    "release.day"      : "Wednesday",
-    "release.nextdate" : "18 September 2012",
+    "release.version"  : "4.8.0",
+    "release.name"     : "Spix's Macaw",
+    "release.day"      : "Tuesday",
+    "release.nextdate" : "16 October 2012",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -11,10 +11,10 @@
     "web.org_root"    :  "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "15 September 2012",
+    "bugday.date"      : "13 October 2012",
 
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
-    "wiki.bugday"      : "bug_day_2012_09_15",
+    "wiki.bugday"      : "bug_day_2012_10_13",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/4.7.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/4.8.0/"
 }
