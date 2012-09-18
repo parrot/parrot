@@ -115,12 +115,8 @@ VAR_SCOPE Shared_gc_info *shared_gc_info;
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 void Parrot_clone_code(Parrot_Interp d, Parrot_Interp s);
-int Parrot_get_num_threads(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-int Parrot_set_num_threads(PARROT_INTERP, INTVAL number_of_threads)
-        __attribute__nonnull__(1);
-
+int Parrot_get_num_threads(PARROT_INTERP);
+int Parrot_set_num_threads(PARROT_INTERP, INTVAL number_of_threads);
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
         __attribute__nonnull__(1);
@@ -149,7 +145,7 @@ PMC* Parrot_thread_create_proxy(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-void Parrot_thread_destroy(PARROT_INTERP)
+void Parrot_thread_destroy_all(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 int Parrot_thread_get_free_threads_array_index(PARROT_INTERP);
@@ -163,6 +159,9 @@ void Parrot_thread_insert_thread(PARROT_INTERP,
     ARGIN(Interp* thread),
     int index)
         __attribute__nonnull__(2);
+
+void Parrot_thread_kill_all(PARROT_INTERP)
+        __attribute__nonnull__(1);
 
 PARROT_CAN_RETURN_NULL
 PMC * Parrot_thread_make_local_copy(PARROT_INTERP,
@@ -223,7 +222,7 @@ void Parrot_thread_wait_for_notification(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(thread) \
     , PARROT_ASSERT_ARG(pmc))
-#define ASSERT_ARGS_Parrot_thread_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_thread_destroy_all __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_thread_get_free_threads_array_index \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -234,6 +233,8 @@ void Parrot_thread_wait_for_notification(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_thread_insert_thread __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(thread))
+#define ASSERT_ARGS_Parrot_thread_kill_all __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_thread_make_local_copy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(from) \

@@ -715,27 +715,24 @@ Parrot_get_num_threads(SHIM_INTERP)
 
 /*
 
-=item C<void Parrot_thread_destroy(PARROT_INTERP)>
+=item C<void Parrot_thread_kill_all(PARROT_INTERP)>
 
-Stop and destroy all threads.
+Kill all foreign tasks.
 
 =cut
 
 */
 
 void
-Parrot_thread_destroy(PARROT_INTERP)
+Parrot_thread_kill_all(PARROT_INTERP)
 {
-    ASSERT_ARGS(Parrot_thread_destroy)
+    ASSERT_ARGS(Parrot_thread_kill_all)
 
-    /* XXX I (rurban) am not sure if we need task kill and thread cancel at all */
     int i, foreign_count;
     PMC * const scheduler = interp->scheduler;
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
 
     foreign_count = VTABLE_get_integer(interp, sched->foreign_tasks);
-
-    /* let the task kill */
     for (i = 0; i < foreign_count; i++) {
         PMC * const task = VTABLE_get_pmc_keyed_int(interp, sched->foreign_tasks, i);
         LOCK(PARROT_TASK(task)->waiters_lock);
@@ -745,14 +742,32 @@ Parrot_thread_destroy(PARROT_INTERP)
         foreign_count--;
         UNLOCK(PARROT_TASK(task)->waiters_lock);
     }
+}
 
-    /* cancel all threads */
+/*
+
+=item C<void Parrot_thread_destroy_all(PARROT_INTERP)>
+
+Cancel all already killed threads, destroy all thread
+interpreters and free the threads_array.
+
+=cut
+
+*/
+
+void
+Parrot_thread_destroy_all(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_thread_destroy_all)
+
+    int i;
     for (i = 0; i < num_threads; i++) {
-        if (threads_array[i])
+        if (threads_array[i]) {
             if (threads_array[i]->thread_data)
                 THREAD_CANCEL(threads_array[i]->thread_data->thread);
+            Parrot_runcore_destroy(threads_array[i]);
+        }
     }
-
     mem_sys_free(threads_array);
 }
 

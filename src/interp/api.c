@@ -600,7 +600,7 @@ Parrot_interp_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg)
         Parrot_runcore_destroy(interp);
 
 #ifdef PARROT_HAS_THREADS
-    Parrot_thread_destroy(interp);
+    Parrot_thread_kill_all(interp);
 #endif
 
     /*
@@ -626,6 +626,10 @@ Parrot_interp_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg)
 
     if (interp->parent_interpreter)
         Parrot_gc_destroy_child_interp(interp->parent_interpreter, interp);
+
+#ifdef PARROT_HAS_THREADS
+    Parrot_thread_destroy_all(interp);
+#endif
 
     Parrot_gc_mark_and_sweep(interp, GC_finish_FLAG);
 
