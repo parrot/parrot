@@ -42,6 +42,7 @@ Initializes the key.
 */
 
     VTABLE void init() {
+        UNUSED(INTERP)
         PObj_custom_mark_SET(SELF);
     }
 
@@ -186,7 +187,9 @@ Sets the value of the key to C<*value>.
 */
 
     VTABLE void set_pmc(PMC *value) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        UNUSED(SELF)
+        UNUSED(value)
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                 "this is broken - see TT #1683");
     }
 
@@ -245,6 +248,8 @@ Returns the key itself.
 */
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
+        UNUSED(INTERP)
+        UNUSED(SELF)
         return key;
     }
 
@@ -398,6 +403,7 @@ Aggregate interface.
 */
 
     VTABLE INTVAL elements() {
+        UNUSED(INTERP)
         INTVAL n = 0;
         for (; SELF; SELF = PARROT_KEY(SELF)->next_key)
             n++;
