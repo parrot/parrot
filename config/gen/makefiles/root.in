@@ -2022,6 +2022,7 @@ src/gc/malloc_trace$(O) : src/gc/malloc.c src/gc/malloc_trace.c
 
 src/packfile/pf_items$(O) : $(PARROT_H_HEADERS) src/packfile/pf_items.c
 
+## SUFFIX OVERRIDE - add -Wno-unused-result for number of write_b
 # core_ops depends upon config.h so that it gets updated along with
 # updates to config.h's version numbers
 src/ops/core_ops$(O) : src/ops/core_ops.c \
@@ -2038,6 +2039,7 @@ src/ops/core_ops$(O) : src/ops/core_ops.c \
 	$(INC_DIR)/events.h \
 	$(INC_DIR)/scheduler_private.h \
 	src/io/io_private.h
+	$(CC) $(CFLAGS) @optimize::src/ops/core_ops.c@ @ccwarn::src/ops/core_ops.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/ops/core_ops.c
 
 
 @TEMP_pmc_build@
