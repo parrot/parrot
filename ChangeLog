@@ -12,6 +12,8 @@
 	+ Fix compilation on Windows without working mt.exe
         + Detect GNU/Hurd as linux proper.
         + Updated the vms port on a YAPC::EU hackathon with vaxman and mvorl.
+    - Tests
+        + Improve testability with valgrind or thread-sanitizer
 
 2012-08-21    release 4.7.0
     - Core
