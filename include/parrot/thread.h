@@ -145,9 +145,7 @@ PMC* Parrot_thread_create_proxy(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-void Parrot_thread_destroy_all(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
+void Parrot_thread_destroy_all(PARROT_INTERP);
 int Parrot_thread_get_free_threads_array_index(PARROT_INTERP);
 PARROT_CANNOT_RETURN_NULL
 Interp** Parrot_thread_get_threads_array(PARROT_INTERP);
@@ -222,8 +220,7 @@ void Parrot_thread_wait_for_notification(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(thread) \
     , PARROT_ASSERT_ARG(pmc))
-#define ASSERT_ARGS_Parrot_thread_destroy_all __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_thread_destroy_all __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_thread_get_free_threads_array_index \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_thread_get_threads_array \

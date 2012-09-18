@@ -595,13 +595,13 @@ Parrot_interp_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg)
     /* Now the PIOData gets also cleared */
     Parrot_io_finish(interp);
 
-    /* deinit runcores and dynamic op_libs */
-    if (!interp->parent_interpreter)
-        Parrot_runcore_destroy(interp);
-
 #ifdef PARROT_HAS_THREADS
     Parrot_thread_kill_all(interp);
 #endif
+
+    /* deinit runcores and dynamic op_libs */
+    if (!interp->parent_interpreter)
+        Parrot_runcore_destroy(interp);
 
     /*
      * now all objects that need timely destruction should be finalized
@@ -628,7 +628,7 @@ Parrot_interp_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg)
         Parrot_gc_destroy_child_interp(interp->parent_interpreter, interp);
 
 #ifdef PARROT_HAS_THREADS
-    Parrot_thread_destroy_all(interp);
+    Parrot_thread_destroy_all(NULL);
 #endif
 
     Parrot_gc_mark_and_sweep(interp, GC_finish_FLAG);

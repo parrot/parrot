@@ -748,15 +748,16 @@ Parrot_thread_kill_all(PARROT_INTERP)
 
 =item C<void Parrot_thread_destroy_all(PARROT_INTERP)>
 
-Cancel all already killed threads, destroy all thread
-interpreters and free the threads_array.
+Cancel all already killed threads, destroy all
+remaining thread interpreters and free the
+threads_array.
 
 =cut
 
 */
 
 void
-Parrot_thread_destroy_all(PARROT_INTERP)
+Parrot_thread_destroy_all(SHIM_INTERP)
 {
     ASSERT_ARGS(Parrot_thread_destroy_all)
 
