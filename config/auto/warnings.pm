@@ -62,7 +62,7 @@ Configure. This can be used to hold warnings that aren't ready to be
 added to the default run yet.
 
 'only' should be used as we add new warnings to the build, it will let
-us insure that files we know are clean for a new warning stay clean.
+us ensure that files we know are clean for a new warning stay clean.
 
 'never' should be used when a particular file contains generated code
 (e.g. imcc) and we cannot update it to conform to the standards.
@@ -97,6 +97,7 @@ sub _init {
     my $gcc = {};
     my $gpp = {};
     my $icc = {};
+    my $clang = {};
 
     # man gcc
     # -Wall contains:
@@ -208,6 +209,7 @@ sub _init {
     $gcc->{'cage'} = [ @gcc_or_gpp_cage ];
     $gpp->{'cage'} = [ @gcc_or_gpp_cage, @gpp_cage ];
 
+    # strip from the list
     $gcc->{'todo'} = $gpp->{'todo'} = {
         '-Wformat-nonliteral' => [ qw(
             src/spf_render.c
@@ -218,7 +220,7 @@ sub _init {
             src/extra_nci_thunks.c
         ) ],
     };
-
+    # strip from the list
     $gcc->{'never'} = $gpp->{'never'} = {
         '-Wformat-nonliteral' => [ qw(
             compilers/imcc/imclexer.c
@@ -231,6 +233,12 @@ sub _init {
         ) ],
         '-Wlogical-op' => [ qw(
             compilers/imcc/imcparser.c
+        ) ],
+    };
+    # add at the end
+    $gcc->{'override'} = $gpp->{'override'} = {
+        '-Wno-unused-result' => [ qw(
+            src/ops/core_ops.c
         ) ],
     };
 
@@ -274,10 +282,13 @@ sub _init {
         '-diag-enable sc-include',
     ];
 
+    $clang = $gcc;
+    push $clang->{'basic'}, '-Wno-parentheses-equality';
+
     $data->{'warnings'}{'gcc'} = $gcc;
     $data->{'warnings'}{'g++'} = $gpp;
     $data->{'warnings'}{'icc'} = $icc;
-    $data->{'warnings'}{'clang'} = $gcc;
+    $data->{'warnings'}{'clang'} = $clang;
 
     ## end gcc/g++
 
@@ -345,6 +356,17 @@ sub runstep {
             }
         }
     }
+
+    if (exists $self->{'warnings'}{$compiler}{override}) {
+	my %add = %{$self->{'warnings'}{$compiler}{override}};
+	foreach my $warning (keys %add) {
+	    foreach my $file (@{$add{$warning}}) {
+		$per_file{$file} = [ @warnings, $warning ]
+		  unless exists $per_file{$file};
+            }
+        }
+    }
+
 
     $conf->data->set('ccwarn', join(' ', @warnings));
     foreach my $file (keys %per_file) {
