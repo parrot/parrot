@@ -53,7 +53,7 @@ Displays the version and copyright information and exits.
 the Release Manger Guide, and have, therefore, already cut the new Parrot
 release.
 
-2. You must use a fully qualified path for the '-d' option.
+2. You must use a fully qualified path for the '--docs' option.
 
 For example, if the path to the previous version of the documentation is
 contained in F</home/user/git-work/parrot/docs/'>, you I<must> specify the
