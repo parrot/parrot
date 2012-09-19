@@ -1,9 +1,9 @@
 #!./parrot
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
-t/pmc/string.t - Strings
+t/pmc/string.t - Tests for strings
 
 =head1 SYNOPSIS
 
@@ -20,8 +20,9 @@ Tests the C<String> PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(160)
+    plan(161)
 
+    test_concat_unicode()
     set_or_get_strings()
     setting_integers()
     setting_numbers()
@@ -975,6 +976,20 @@ check:
     s1 = '\u0043\u0044'
     s2 = s1.'unescape'('ascii')
     is( s2, 'CD', "unescape('\\u0043\\u0044') == 'CD'" )
+.end
+
+.sub test_concat_unicode
+    lives_ok(<<'CODE',"concat with unicode string constants")
+.sub main
+    concat $S1, unicode:"\x{a2}", unicode:"\x{a2}"
+    concat $S2, unicode:"\x{a2}", "c"
+    concat $S3, unicode:"\x{62}", unicode:"\x{62}"
+.end
+CODE
+#    is($S1, "¢¢", "two unicode strings concat correctly")
+#    is($S2, "¢c", "one unicode string and one ascii string concat correctly")
+#    is($S3, "bb", "one unicode string and one ascii string concat correctly")
+
 .end
 
 # Local Variables:
