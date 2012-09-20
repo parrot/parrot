@@ -1,4 +1,4 @@
-# Copyright (C) 2011, Parrot Foundation.
+# Copyright (C) 2011-2012, Parrot Foundation.
 
 =pod
 
@@ -237,34 +237,6 @@ Print the runtime prefix path and exit.
 
 =head2 Compiler options
 
-=over 4
-
-=item B<-d>
-
-=item B<--imcc-debug>=[HEXFLAGS]
-
-=over 11
-
-The B<-d> switch takes an optional argument, consisting of a hexadecimal value
-of debug bits. If no value is supplied, 'debug' is set to 1.
-
-To list the individual bits on the command line, use the B<--help-debug> switch.
-
-To produce a vary large output on F<stderr>, run C<"parrot B<-d 0ffff> ...">.
-
-=back
-
-=item B<-v>
-
-=item B<--verbose>      One C<-v> shows which files are worked on and prints
-
-=over 11
-
-a summary over register usage and optimization stats per I<subroutine>.  With
-two C<-v> switches, C<parrot> prints a line per individual processing step too.
-
-=back
-
 =item B<-E>
 
 =item B<--pre-process-only>
@@ -286,8 +258,7 @@ Preprocess source file (expand macros) and print result to C<stdout>:
 
 unless the B<-r> is supplied as well. If 'outputfile' ends with F<.pbc>,
 'parrot' will write a PBC file. If it ends with F<.pasm>, 'parrot' will output
-a PASM file, even from PASM input. This can be useful when needing to check
-various optimizations, including C<-Op>.
+a PASM file, even from PASM input.
 
 =back
 
@@ -296,34 +267,6 @@ various optimizations, including C<-Op>.
 =over 11
 
 even if the output file does not end in F<.pbc>
-
-=back
-
-=item B<-O>
-
-=item B<--optimize>[=LEVEL]
-
-=over 11
-
-Optimization levels
-
-    -O0 no optimization (default)
-    -O1 optimizations without life info (e.g. branches)
-    -O  same
-    -O2 optimizations with life info
-    -Op rewrite I and N PASM registers most used first
-    -Ot select fastest runcore
-    -Oc turns on the optional/experimental tail call optimizations
-
-I<See> F<docs/dev/optimizer.pod> for more information on the optimizer.
-
-=back
-
-=over 11
-
-=item Note:
-
-Optimization is currently an experimental feature and these options are likely to change.
 
 =back
 
