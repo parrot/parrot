@@ -1,5 +1,8 @@
 2012-10-16    release 4.9.0
     - Core
+      + Keep encoding information in the imcc optimizer, which fixes the
+	concat op but probably many more cases with non-ascii encoded
+        constant strings. [GH #837]
     - Documentation
     - Tests
     - Community
