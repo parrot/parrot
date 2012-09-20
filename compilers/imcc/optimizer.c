@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2010, Parrot Foundation.
+ * Copyright (C) 2002-2012, Parrot Foundation.
  */
 
 /*
@@ -1070,13 +1070,15 @@ IMCC_subst_constants(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
           case 'S':
           {
             char * const cstr = Parrot_str_to_cstring(imcc->interp, REG_STR(imcc->interp, 0));
-
-            r[1] = mk_const(imcc, cstr, r[0]->set);
-
-            snprintf(b, sizeof (b), "%p", REG_STR(imcc->interp, 0));
+            const STR_VTABLE* encoding = REG_STR(imcc->interp, 0)->encoding;
+            if (encoding == Parrot_ascii_encoding_ptr) {
+                r[1] = mk_const(imcc, cstr, r[0]->set);
+            }
+            else {
+                snprintf(b, sizeof (b), "%s:\"%s\"", encoding->name, cstr);
+                r[1] = mk_const(imcc, b, 'U');
+            }
             Parrot_str_free_cstring(cstr);
-
-            break;
           }
           default:
             break;

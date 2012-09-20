@@ -22,8 +22,11 @@ Tests Parrot unicode string system.
 
 =cut
 
-pir_output_is(<<'CODE',<<'OUTPUT', 'concat utf8 GH#837');
+pir_output_is(<<'CODE',<<'OUTPUT', 'non-ascii immc optimizer GH#837');
 .sub main
+    $S1 = utf8:"\x{a2}"
+    say $S1
+
     concat $S1, unicode:"\x{a2}", unicode:"\x{a2}"
     say $S1
 
@@ -34,6 +37,7 @@ pir_output_is(<<'CODE',<<'OUTPUT', 'concat utf8 GH#837');
     say $S3
 .end
 CODE
+¢
 ¢¢
 ¢c
 bb
