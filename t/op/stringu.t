@@ -1,11 +1,11 @@
 #!perl
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 47;
+use Parrot::Test tests => 48;
 use Parrot::Config;
 
 =head1 NAME
@@ -21,6 +21,23 @@ t/op/stringu.t - Unicode String Test
 Tests Parrot unicode string system.
 
 =cut
+
+pir_output_is(<<'CODE',<<'OUTPUT', 'concat utf8 GH#837');
+.sub main
+    concat $S1, unicode:"\x{a2}", unicode:"\x{a2}"
+    say $S1
+
+    concat $S2, unicode:"\x{a2}", "c"
+    say $S2
+
+    concat $S3, unicode:"\x{62}", unicode:"\x{62}"
+    say $S3
+.end
+CODE
+¢¢
+¢c
+bb
+OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "angstrom" );
 .sub main :main
