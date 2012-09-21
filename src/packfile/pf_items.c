@@ -221,6 +221,56 @@ static void cvt_num8_num4(
         FUNC_MODIFIES(*dest);
 
 PARROT_INLINE
+static void fetch_buf_12(
+    ARGOUT(unsigned char *rb),
+    ARGIN(const unsigned char *b),
+    ARGIN(const PackFile_Header *header))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*rb);
+
+PARROT_INLINE
+static void fetch_buf_16(
+    ARGOUT(unsigned char *rb),
+    ARGIN(const unsigned char *b),
+    ARGIN(const PackFile_Header *header))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*rb);
+
+PARROT_INLINE
+static void fetch_buf_32(
+    ARGOUT(unsigned char *rb),
+    ARGIN(const unsigned char *b),
+    ARGIN(const PackFile_Header *header))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*rb);
+
+PARROT_INLINE
+static void fetch_buf_4(
+    ARGOUT(unsigned char *rb),
+    ARGIN(const unsigned char *b),
+    ARGIN(const PackFile_Header *header))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*rb);
+
+PARROT_INLINE
+static void fetch_buf_8(
+    ARGOUT(unsigned char *rb),
+    ARGIN(const unsigned char *b),
+    ARGIN(const PackFile_Header *header))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*rb);
+
+PARROT_INLINE
 static void fetch_buf_be_12(
     ARGOUT(unsigned char *rb),
     ARGIN(const unsigned char *b))
@@ -415,6 +465,26 @@ static opcode_t fetch_op_le_8(ARGIN(const unsigned char *b))
 #define ASSERT_ARGS_cvt_num8_num4 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(dest) \
     , PARROT_ASSERT_ARG(src) \
+    , PARROT_ASSERT_ARG(header))
+#define ASSERT_ARGS_fetch_buf_12 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(rb) \
+    , PARROT_ASSERT_ARG(b) \
+    , PARROT_ASSERT_ARG(header))
+#define ASSERT_ARGS_fetch_buf_16 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(rb) \
+    , PARROT_ASSERT_ARG(b) \
+    , PARROT_ASSERT_ARG(header))
+#define ASSERT_ARGS_fetch_buf_32 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(rb) \
+    , PARROT_ASSERT_ARG(b) \
+    , PARROT_ASSERT_ARG(header))
+#define ASSERT_ARGS_fetch_buf_4 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(rb) \
+    , PARROT_ASSERT_ARG(b) \
+    , PARROT_ASSERT_ARG(header))
+#define ASSERT_ARGS_fetch_buf_8 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(rb) \
+    , PARROT_ASSERT_ARG(b) \
     , PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_fetch_buf_be_12 __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(rb) \
@@ -833,9 +903,10 @@ cvt_num16_num10(ARGOUT(unsigned char *dest),
         memcpy(b, src, 16);
 
     memset(dest, 0, 12);
-    /* simply copy over sign + exp */
+    /* simply copy over sign + exp, TODO: need to check -inf */
     dest[8] = b[15];
     dest[9] = b[14];
+
     /* and copy the rest */
     memcpy(&dest[0], &b[0], 8);
     dest[7] |= 0x80;  /* set integer bit 63 */
@@ -1052,7 +1123,7 @@ cvt_num8_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARG
     else
         memcpy(&u.d, src, 8);
 #ifdef PARROT_HAS_HEADER_QUADMATH
-    snprintf(&buf, sizeof(buf), "%."PARROT_DBL_DIG"g", u.d);
+    snprintf(buf, sizeof(buf), "%.16g", u.d);
     ld = strtoflt128 (buf, NULL);
 #else
     /* This cast does not work */
@@ -1220,8 +1291,8 @@ cvt_num16ppc_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), 
 
     if (PF_NEEDS_ENDIANIZE(header)) {
 #if HAS_INT64
-        *(Parrot_UInt8*)u1.c = bswap64(*(Parrot_UInt8*)src);
-        *(Parrot_UInt8*)u2.c = bswap64(*(Parrot_UInt8*)(src+8));
+        *(Parrot_UInt8*)u1.c = bswap64(*(const Parrot_UInt8*)src);
+        *(Parrot_UInt8*)u2.c = bswap64(*(const Parrot_UInt8*)(src+8));
 #else
         bswap64(u1.c, src);
         bswap64(u2.c, src+8);
@@ -1249,8 +1320,8 @@ cvt_num16ppc_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), 
 
     if (PF_NEEDS_ENDIANIZE(header)) {
 #if HAS_INT64
-        *(Parrot_UInt8*)u1.c = bswap64(*(Parrot_UInt8*)src);
-        *(Parrot_UInt8*)u2.c = bswap64(*(Parrot_UInt8*)(src+8));
+        *(Parrot_UInt8*)u1.c = bswap64(*(const Parrot_UInt8*)src);
+        *(Parrot_UInt8*)u2.c = bswap64(*(const Parrot_UInt8*)(src+8));
 #else
         bswap64(u1.c, src);
         bswap64(u2.c, src+8);
@@ -1299,19 +1370,29 @@ cvt_num16ppc_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src),
 static void
 cvt_num16ppc_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARGIN(const PackFile_Header *header))
 {
-    double d1, d2;
+    union {
+        double d;
+        unsigned char c[8];
+    } u1, u2;
     union {
         FLOATVAL ld;
         unsigned char c[16];
     } u;
 
     if (PF_NEEDS_ENDIANIZE(header)) {
-        *(Parrot_UInt8*)src     = bswap64(*(Parrot_UInt8*)src);
-        *(Parrot_UInt8*)(src+8) = bswap64(*(Parrot_UInt8*)(src+8));
+#if HAS_INT64
+        *(Parrot_UInt8*)u1.c = bswap64(*(const Parrot_UInt8*)src);
+        *(Parrot_UInt8*)u2.c = bswap64(*(const Parrot_UInt8*)(src+8));
+#else
+        bswap64(u1.c, src);
+        bswap64(u2.c, src+8);
+#endif
     }
-    memcpy(&d1, src, 8);
-    memcpy(&d2, src+8, 8);
-    u.ld = (d2 == -0.0 && d1 == 0.0) ? -0.0 : d1 + d2;
+    else {
+        memcpy(&u1.d, src, 8);
+        memcpy(&u2.d, src+8, 8);
+    }
+    u.ld = (u2.d == -0.0 && u1.d == 0.0) ? -0.0 : u1.d + u2.d;
     memcpy(dest, u.c, 16);
 }
 #endif
@@ -1340,12 +1421,20 @@ static void
 cvt_num8_num4(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARGIN(const PackFile_Header *header))
 {
     float f;
-    double d;
+    union {
+        double d;
+        unsigned char c[sizeof(double)];
+    } u;
 
     if (PF_NEEDS_ENDIANIZE(header))
-        *(Parrot_UInt8*)src     = bswap64(*(Parrot_UInt8*)src);
-    memcpy(&d, src, 8);
-    f = (float)d;
+#if HAS_INT64
+        *(Parrot_UInt8*)u.c = bswap64(*(const Parrot_UInt8*)src);
+#else
+        bswap64(u.c, src);
+#endif
+    else
+        memcpy(&u.d, src, 8);
+    f = (float)u.d;
     memcpy(dest, &f, 4);
 }
 
@@ -2153,7 +2242,7 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
 #if FLOATTYPE == FLOATTYPE_8
       case FLOATTYPE_8:
         if (need_endianize)
-            pf->fetch_nv = pf->header->byteorder ? fetch_buf_be_8 : fetch_buf_le_8;
+            pf->fetch_nv = fetch_buf_8;
         break;
       case FLOATTYPE_10:
         pf->fetch_nv = cvt_num10_num8;
@@ -2175,8 +2264,8 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
       case FLOATTYPE_10:
         if (need_endianize || need_wordsize)
             pf->fetch_nv = pf->header->wordsize == 8
-                ? fetch_buf_le_16
-                : fetch_buf_le_12;
+                ? fetch_buf_16
+                : fetch_buf_12;
         break;
       case FLOATTYPE_16:
         pf->fetch_nv = cvt_num16_num10;
@@ -2200,7 +2289,7 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
         break;
       case FLOATTYPE_16:
         if (need_endianize)
-            pf->fetch_nv = pf->header->byteorder ? fetch_buf_be_16 : fetch_buf_le_16;
+            pf->fetch_nv = fetch_buf_16;
         break;
       case FLOATTYPE_4:
         pf->fetch_nv = cvt_num4_num16;
@@ -2218,7 +2307,7 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
         break;
       case FLOATTYPE_16PPC:
         if (need_endianize)
-            pf->fetch_nv = pf->header->byteorder ? fetch_buf_be_16 : fetch_buf_le_16;
+            pf->fetch_nv = fetch_buf_16;
         break;
       case FLOATTYPE_4:
         pf->fetch_nv = cvt_num4_num16ppc;
@@ -2239,7 +2328,7 @@ PackFile_assign_transforms(ARGMOD(PackFile *pf))
         break;
       case FLOATTYPE_4:
         if (need_endianize)
-            pf->fetch_nv = pf->header->byteorder ? fetch_buf_be_4 : fetch_buf_le_4;
+            pf->fetch_nv = fetch_buf_4;
         break;
 #endif
       default:
@@ -2389,15 +2478,87 @@ fetch_op_le(opcode_t w)
 
 =pod
 
-Unrolled routines for swapping various sizes from 32-128 bits. These
-should only be used if alignment is unknown or we are pulling something
-out of a padded buffer.
+Unrolled routines for swapping various sizes from 32-128 bits,
+with automatic endianizing, depending on the packfile header.
+
+=item C<static void fetch_buf_4(unsigned char *rb, const unsigned char *b, const
+PackFile_Header *header)>
+
+Fetches a 4-byte buffer C<b> into C<rb>.
+
+=item C<static void fetch_buf_8(unsigned char *rb, const unsigned char *b, const
+PackFile_Header *header)>
+
+Fetches a 8-byte buffer C<b> into C<rb>.
+
+=item C<static void fetch_buf_12(unsigned char *rb, const unsigned char *b,
+const PackFile_Header *header)>
+
+Fetches a 12-byte buffer C<b> into C<rb>.
+
+=item C<static void fetch_buf_16(unsigned char *rb, const unsigned char *b,
+const PackFile_Header *header)>
+
+Fetches a 16-byte buffer C<b> into C<rb>.
+
+=item C<static void fetch_buf_32(unsigned char *rb, const unsigned char *b,
+const PackFile_Header *header)>
+
+Fetches a 32-byte buffer C<b> into C<rb>.
 
 =cut
 
 */
 
+PARROT_INLINE
+static void
+fetch_buf_4(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b),
+            ARGIN(const PackFile_Header *header))
+{
+    ASSERT_ARGS(fetch_buf_4)
+    header->byteorder ? fetch_buf_be_4(rb, b): fetch_buf_le_4(rb, b);
+}
+PARROT_INLINE
+static void
+fetch_buf_8(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b),
+            ARGIN(const PackFile_Header *header))
+{
+    ASSERT_ARGS(fetch_buf_8)
+    header->byteorder ? fetch_buf_be_8(rb, b): fetch_buf_le_8(rb, b);
+}
+PARROT_INLINE
+static void
+fetch_buf_12(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b),
+             ARGIN(const PackFile_Header *header))
+{
+    ASSERT_ARGS(fetch_buf_12)
+    header->byteorder ? fetch_buf_be_12(rb, b): fetch_buf_le_12(rb, b);
+}
+PARROT_INLINE
+static void
+fetch_buf_16(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b),
+             ARGIN(const PackFile_Header *header))
+{
+    ASSERT_ARGS(fetch_buf_16)
+    header->byteorder ? fetch_buf_be_16(rb, b): fetch_buf_le_16(rb, b);
+}
+PARROT_INLINE
+static void
+fetch_buf_32(ARGOUT(unsigned char *rb), ARGIN(const unsigned char *b),
+             ARGIN(const PackFile_Header *header))
+{
+    ASSERT_ARGS(fetch_buf_32)
+    header->byteorder ? fetch_buf_be_32(rb,b) : fetch_buf_le_32(rb, b);
+}
+
+
 /*
+
+=pod
+
+Unrolled routines for swapping various sizes from 32-128 bits. These
+should only be used if alignment is unknown or we are pulling something
+out of a padded buffer.
 
 =item C<static void fetch_buf_be_4(unsigned char *rb, const unsigned char *b)>
 
