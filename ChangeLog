@@ -1,5 +1,7 @@
 2012-10-16    release 4.9.0
     - Core
+      + Fixed ByteBuffer set_string_native, which became out of sync with
+	two internal buffers. [GH #835]
     - Documentation
     - Tests
     - Community

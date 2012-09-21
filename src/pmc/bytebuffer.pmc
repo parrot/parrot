@@ -200,15 +200,18 @@ Reset the buffer with the content of the string.
 
     VTABLE void set_string_native(STRING *new_string) {
         INTVAL allocated_size;
+        INTVAL new_length;
         GET_ATTR_allocated_size(INTERP, SELF, allocated_size);
+        new_length = Parrot_str_byte_length(interp, new_string);
         if (allocated_size) {
             unsigned char *content;
             GET_ATTR_content(INTERP, SELF, content);
             Parrot_gc_free_memory_chunk(INTERP, content);
-            SET_ATTR_allocated_size(INTERP, SELF, 0);
+            SET_ATTR_allocated_size(INTERP, SELF, new_length);
         }
         SET_ATTR_source(INTERP, SELF, new_string);
-        SET_ATTR_size(INTERP, SELF, Parrot_str_byte_length(INTERP, new_string));
+        SET_ATTR_content(INTERP, SELF, new_string->strstart);
+        SET_ATTR_size(INTERP, SELF, new_length);
     }
 
 /*

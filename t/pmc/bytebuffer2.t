@@ -43,7 +43,7 @@ function from there does not expose this problem.
     i = b_resize_normal[0]
     is(i, 65, 'simple init - no problem expected')
 
-    # oddly also works resize to smallar values like 2,1,0
+    # oddly also works resize to smaller values like 2,1,0
     b_resize_normal = 3
     b_resize_normal = s2
     i = b_resize_normal[0]
