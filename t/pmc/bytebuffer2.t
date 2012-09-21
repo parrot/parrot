@@ -72,7 +72,7 @@ function from there does not expose this problem.
     i = b_resize_too_big[0]
     is(i, 68, 'reset resized too big buff with new string GH #835')
 .end
-       
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
