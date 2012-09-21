@@ -21,7 +21,7 @@ Tests C<ByteBuffer> PMC..
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(52)
+    plan(57)
 
     test_init()
     test_set_string()
