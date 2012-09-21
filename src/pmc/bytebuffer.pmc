@@ -204,14 +204,24 @@ Reset the buffer with the content of the string.
         GET_ATTR_allocated_size(INTERP, SELF, allocated_size);
         new_length = Parrot_str_byte_length(interp, new_string);
         if (allocated_size) {
-            unsigned char *content;
+            char *content;
             GET_ATTR_content(INTERP, SELF, content);
-            Parrot_gc_free_memory_chunk(INTERP, content);
-            SET_ATTR_allocated_size(INTERP, SELF, new_length);
+            if (allocated_size < new_length) {
+                content = (char *)Parrot_gc_reallocate_memory_chunk(INTERP, content, new_length);
+            }
+            memcpy(content, new_string->strstart, new_length);
+            SET_ATTR_content(INTERP, SELF, content);
+        }
+        else {
+            char *content;
+            GET_ATTR_content(INTERP, SELF, content);
+            content = (char *)Parrot_gc_allocate_memory_chunk(INTERP, new_length);
+            memcpy(content, new_string->strstart, new_length);
+            SET_ATTR_content(INTERP, SELF, content);
         }
         SET_ATTR_source(INTERP, SELF, new_string);
-        SET_ATTR_content(INTERP, SELF, new_string->strstart);
         SET_ATTR_size(INTERP, SELF, new_length);
+        SET_ATTR_allocated_size(INTERP, SELF, new_length);
     }
 
 /*

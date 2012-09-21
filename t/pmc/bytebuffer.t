@@ -429,7 +429,7 @@ end:
     i = b_resize_normal[0]
     is(i, 65, 'simple init - no problem expected')
 
-    # oddly also works resize to smallar values like 2,1,0
+    # oddly also works resize to smaller values like 2,1,0
     b_resize_normal = 3
     b_resize_normal = s2
     i = b_resize_normal[0]
@@ -446,7 +446,7 @@ end:
 
     b_init_size = s2
     i = b_init_size[0]
-    is(i, 68, 'reset sized buff with new string', 'todo' => 'GH #835')
+    is(i, 68, 'reset sized buff with new string GH #835')
 
     b_resize_too_big = s1
     i = b_resize_too_big[0]
@@ -455,7 +455,7 @@ end:
     b_resize_too_big = 5
     b_resize_too_big = s2
     i = b_resize_too_big[0]
-    is(i, 68, 'reset resized too big buff with new string', 'todo' => 'GH #835')
+    is(i, 68, 'reset resized too big buff with new string GH #835')
 .end
 
 
