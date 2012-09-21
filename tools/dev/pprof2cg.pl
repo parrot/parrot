@@ -1,4 +1,4 @@
-#! perl
+#! /usr/bin/perl
 
 # Copyright (C) 2009, Parrot Foundation.
 
