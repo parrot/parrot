@@ -638,7 +638,7 @@ cvt_num16_num8(ARGOUT(unsigned char *dest),
         else
             memcpy(&ld, src, 16);
 
-        d = (double)ld; /* native compiler cast */
+        d = (double)ld; /* native compiler cast. Beware: the other direction cannot be casted */
         memcpy(dest, &d, 8);
         return;
     }
@@ -770,7 +770,7 @@ cvt_num4_num8(ARGOUT(unsigned char *dest),
         memcpy(&u.f, src, 4);
     }
     d = (double)u.f;
-    ROUND_NUM_TO(d, double, PARROT_FLOATVAL_DIG);
+    ROUND_NUM_TO(d, double, PARROT_FLT_DIG);
     memcpy(dest, &d, 8);
 }
 
@@ -880,7 +880,7 @@ cvt_num8_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARG
         memcpy(&u.d, src, 8);
     }
     ld = (long double)u.d; /* compiler cast */
-    ROUND_NUM_TO(ld, long double, PARROT_FLOATVAL_DIG);
+    ROUND_NUM_TO(ld, long double, PARROT_DBL_DIG);
     memcpy(dest, &ld, 12);
 }
 
@@ -912,7 +912,7 @@ cvt_num4_num10(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARG
         memcpy(&u.f, src, 4);
     }
     ld = (long double)u.f; /* compiler cast */
-    ROUND_NUM_TO(ld, long double, PARROT_FLOATVAL_DIG);
+    ROUND_NUM_TO(ld, long double, PARROT_FLT_DIG);
     memcpy(dest, &ld, sizeof(long double));
 }
 
@@ -1008,7 +1008,7 @@ cvt_num10_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), AR
     {
         FLOATVAL ld;
         memcpy(&ld, dest, 16);
-        ROUND_NUM_TO(ld, FLOATVAL, PARROT_FLOATVAL_DIG);
+        ROUND_NUM_TO(ld, FLOATVAL, PARROT_LDBL_DIG);
         memcpy(dest, &ld, 16);
     }
 #endif
@@ -1022,6 +1022,7 @@ cvt_num10_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), AR
 
 Converts IEEE 754 8-byte double to IEEE 754 16 byte long double/float128
 
+Not properly casted.
 Not yet properly rounded.
 
 =cut
@@ -1032,8 +1033,10 @@ static void
 cvt_num8_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARGIN(const PackFile_Header *header))
 {
     ASSERT_ARGS(cvt_num8_num16)
-
-    HUGEFLOATVAL ld;
+#ifdef PARROT_HAS_HEADER_QUADMATH
+    char buf[128];
+#endif
+    FLOATVAL ld;
     union {
         double d;
         unsigned char c[8];
@@ -1048,8 +1051,14 @@ cvt_num8_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARG
     }
     else
         memcpy(&u.d, src, 8);
-    ld = (HUGEFLOATVAL)u.d;
-    ROUND_NUM_TO(ld, HUGEFLOATVAL, PARROT_FLOATVAL_DIG);
+#ifdef PARROT_HAS_HEADER_QUADMATH
+    snprintf(&buf, sizeof(buf), "%."PARROT_DBL_DIG"g", u.d);
+    ld = strtoflt128 (buf, NULL);
+#else
+    /* This cast does not work */
+    ld = (FLOATVAL)u.d;
+#endif
+    ROUND_NUM_TO(ld, FLOATVAL, PARROT_DBL_DIG);
     memcpy(dest, &ld, 16);
 }
 
@@ -1080,8 +1089,8 @@ cvt_num4_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARG
     else {
         memcpy(&u.f, src, 4);
     }
-    ld = (HUGEFLOATVAL)u.f; /* Properly reounded already? */
-    ROUND_NUM_TO(ld, HUGEFLOATVAL, PARROT_FLOATVAL_DIG);
+    ld = (HUGEFLOATVAL)u.f; /* Properly rounded already? */
+    ROUND_NUM_TO(ld, HUGEFLOATVAL, PARROT_FLT_DIG);
     memcpy(dest, &ld, 16);
 }
 
@@ -1111,7 +1120,6 @@ Not yet tested.
 
 #define TO_16PPC(d, ld, dest)      \
     ld = (long double)d;           \
-    ROUND_NUM_TO(ld, long double, PARROT_FLOATVAL_DIG); \
     memcpy(dest, &ld, 16);
 
 static void
@@ -1121,7 +1129,9 @@ cvt_num4_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), 
     long double ld;
 
     cvt_num4_num8((unsigned char *)&d, src, header);
-    TO_16PPC(d,ld,dest);
+    ld = (long double)d;
+    ROUND_NUM_TO(ld, long double, PARROT_FLT_DIG);
+    memcpy(dest, &ld, 16);
 }
 static void
 cvt_num8_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARGIN(const PackFile_Header *header))
@@ -1141,7 +1151,9 @@ cvt_num8_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), 
     }
     else
         memcpy(&u.d, src, 8);
-    TO_16PPC(u.d,ld,dest);
+    ld = (long double)u.d;
+    ROUND_NUM_TO(ld, long double, PARROT_DBL_DIG);
+    memcpy(dest, &ld, 16);
 }
 static void
 cvt_num10_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src), ARGIN(const PackFile_Header *header))
@@ -1150,7 +1162,9 @@ cvt_num10_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src),
     long double ld;
 
     cvt_num10_num8((unsigned char *)&d, src, header);
-    TO_16PPC(d,ld,dest);
+    ld = (long double)d;
+    ROUND_NUM_TO(ld, long double, PARROT_LDBL_DIG);
+    memcpy(dest, &ld, 16);
 }
 
 static void
@@ -1160,7 +1174,9 @@ cvt_num16_num16ppc(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src),
     long double ld;
 
     cvt_num16_num8((unsigned char *)&d, src, header);
-    TO_16PPC(d,ld,dest);
+    ld = (long double)d;
+    ROUND_NUM_TO(ld, long double, PARROT_DBL_DIG);
+    memcpy(dest, &ld, 16);
 }
 #endif
 

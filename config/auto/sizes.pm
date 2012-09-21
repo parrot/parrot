@@ -120,10 +120,6 @@ sub _test_define {
     eval { $conf->cc_build('-DWANT_DEFINE') };
     my $ret = $@ ? 0 : eval $conf->cc_run();
     $conf->cc_clean();
-    if ($define =~ /^FLT128/) {
-	$conf->data->set( i_quadmath => $ret ? 'define' : undef );
-    }
-
     return $ret;
 }
 
@@ -317,12 +313,19 @@ sub _set_floatval_digits {
     elsif ( $nv eq 'long double' ) {
         $nvdig = 'LDBL_DIG';
     }
-    elsif ( $nv eq '__float128' ) { #libquadmath
+    elsif ( $nv eq '__float128' ) {
         $nvdig = 'FLT128_DIG';
     }
 
     if (!_test_define($conf, $nvdig)) {
 	die "\nConfigure.pl: Invalid preprocessor define $nvdig\n";
+    }
+
+    # add -lquadmath with soft-gcc (since 4.6)
+    if ( $nv eq '__float128' and $conf->data->get('gccversion') ) {
+	$conf->data->set( i_quadmath => 'define' );
+	my $libs = $conf->data->get('libs');
+	$conf->data->set( libs => "$libs -lquadmath" );
     }
 
     $conf->data->set( floatvaldig => $nvdig );

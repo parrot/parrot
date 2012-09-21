@@ -49,35 +49,17 @@ typedef @float8_t@              Parrot_Float8;
 #define HAS_LONGLONG            @HAS_LONGLONG@
 #define HAS_INT64               @HAS_INT64@
 
-#ifndef PARROT_INTVAL_MIN
-#  define PARROT_INTVAL_MIN              @intvalmin@
-#endif
-#ifndef PARROT_INTVAL_MAX
-#  define PARROT_INTVAL_MAX              @intvalmax@
-#endif
+#define PARROT_INTVAL_MIN       @intvalmin@
+#define PARROT_INTVAL_MAX       @intvalmax@
 
-#ifndef PARROT_FLOATVAL_MIN
-#  define PARROT_FLOATVAL_MIN            @floatvalmin@
-#endif
-#ifndef PARROT_FLOATVAL_MAX
-#  define PARROT_FLOATVAL_MAX            @floatvalmax@
-#endif
-#ifndef PARROT_FLOATVAL_DIG
-#  ifdef PARROT_HAS_HEADER_MATH
-#    include <math.h>
-#  endif
-#  ifdef PARROT_HAS_HEADER_FLOAT
-#    include <float.h>
-#  endif
-#  ifdef PARROT_HAS_HEADER_LIMITS
-#    include <limits.h>
-#  endif
-#  if defined(PARROT_HAS_FLOAT128) && defined(PARROT_HAS_HEADER_QUADMATH)
-#    include <quadmath.h>
-#  endif
-#  define PARROT_FLOATVAL_DIG              @floatvaldig@
-#endif
-
+#define PARROT_FLOATVAL_MIN     @floatvalmin@
+#define PARROT_FLOATVAL_MAX     @floatvalmax@
+#define PARROT_FLOATVAL_DIG     @floatvaldig@
+#define PARROT_FLT_DIG          7
+#define PARROT_DBL_DIG          16
+#define PARROT_LDBL_DIG         18
+#define PARROT_DDBL_DIG         31
+#define PARROT_FLT128_DIG       34
 
 /* Symbol export and import decoration. At the time of writing, note that
  * PARROT_IN_CORE won't always imply !PARROT_IN_EXTENSION. */
@@ -171,6 +153,19 @@ typedef void DPOINTER;
 
 #include "parrot/has_header.h"
 #include "parrot/feature.h"
+
+#ifdef PARROT_HAS_HEADER_MATH
+#  include <math.h>
+#endif
+#ifdef PARROT_HAS_HEADER_FLOAT
+#  include <float.h>
+#endif
+#ifdef PARROT_HAS_HEADER_LIMITS
+#  include <limits.h>
+#endif
+#if defined(PARROT_HAS_FLOAT128) && defined(PARROT_HAS_HEADER_QUADMATH)
+#  include <quadmath.h>
+#endif
 
 #endif
 
