@@ -3,6 +3,8 @@
       + Keep encoding information in the imcc optimizer, which fixes the
 	concat op but probably many more cases with non-ascii encoded
         constant strings. [GH #837]
+      + Fixed ByteBuffer set_string_native, which became out of sync with
+	two internal buffers. [GH #835]
     - Documentation
     - Tests
     - Community
