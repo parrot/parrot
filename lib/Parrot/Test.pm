@@ -1187,6 +1187,8 @@ sub _normalize {
     if ($s =~ /^(.*)(\d)e(.+)/) { # strip overlong numbers
 	# and round last digit
 	$s = $1.($2 <5 ? '0e' : '5e').$3;
+    } elsif ($s =~ /inf|nan|Inf|NaN/) {
+	return $s;
     } else {
 	$s = substr($s, 0, $prec-1).round(substr($s, $prec, 1));
     }
