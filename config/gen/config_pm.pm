@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -183,8 +183,8 @@ END
         elsif (/\@NOINSTALL\@/) {
             # do not install internal keys
             for ($conf->data->keys()) {
-       	        print {$OUT} "    delete \$P0[\"$_\"]\n"
-       	          if /^ccwarn::/ or /_tests$/ or /coveragedir$/;
+                print {$OUT} "    delete \$P0[\"$_\"]\n"
+                    if /^ccwarn::/ or /_tests$/ or /coveragedir$/;
             }
         }
         else {
