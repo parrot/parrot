@@ -39,6 +39,7 @@ my @steps = qw(
     auto::inline
     auto::gc
     auto::memalign
+    auto::alignof
     auto::signal
     auto::socklen_t
     auto::stat

@@ -77,50 +77,59 @@ struct _data_types {
     size_t align;
 };
 
-#define ALIGNOF(x) offsetof(struct { char c; x d; }, d)
+#if defined(__clang__) && defined(__cplusplus)
+#  define ALIGNOF(name,x) PARROT_ALIGNOF_##name
+#  define ALIGNOF1(name)  PARROT_ALIGNOF_##name
+#else
+#  define ALIGNOF(name,x) offsetof(struct {char c; x d;}, d)
+#  define ALIGNOF1(x)     offsetof(struct {char c; x d;}, d)
+#endif
 
 extern const struct _data_types data_types[];
 #if defined(INSIDE_GLOBAL_SETUP)
 const struct _data_types data_types[] = {
     /* parrot types */
-    { "INTVAL",     sizeof (INTVAL),             ALIGNOF(INTVAL) },
-    { "FLOATVAL",   sizeof (FLOATVAL),           ALIGNOF(FLOATVAL) },
-    { "STRING",     sizeof (STRING *),           ALIGNOF(STRING *) },
-    { "PMC",        sizeof (PMC *),              ALIGNOF(PMC *) },
+    { "INTVAL",     sizeof (INTVAL),             ALIGNOF(intval,INTVAL) },
+    { "FLOATVAL",   sizeof (FLOATVAL),           ALIGNOF(floatval,FLOATVAL) },
+    { "STRING",     sizeof (STRING *),           ALIGNOF(stringptr,STRING *) },
+    { "PMC",        sizeof (PMC *),              ALIGNOF(pmcptr,PMC *) },
 
     /* native integer types */
-    { "char",       sizeof (char),               ALIGNOF(char) },
-    { "short",      sizeof (short),              ALIGNOF(short) },
-    { "int",        sizeof (int),                ALIGNOF(int) },
-    { "long",       sizeof (long),               ALIGNOF(long)  },
+    { "char",       sizeof (char),               ALIGNOF1(char) },
+    { "short",      sizeof (short),              ALIGNOF1(short) },
+    { "int",        sizeof (int),                ALIGNOF1(int) },
+    { "long",       sizeof (long),               ALIGNOF1(long) },
 #  if PARROT_HAS_LONGLONG
-    { "longlong",   sizeof (long long),          ALIGNOF(long long) },
+    { "longlong",   sizeof (long long),          ALIGNOF(longlong,long long) },
 #  else
     { "longlong",   0,                           0 },
 #  endif
 
     /* native unsigned types */
-    { "uchar",      sizeof (unsigned char),      ALIGNOF(unsigned char) },
-    { "ushort",     sizeof (unsigned short),     ALIGNOF(unsigned short) },
-    { "uint",       sizeof (unsigned int),       ALIGNOF(unsigned int) },
-    { "ulong",      sizeof (unsigned long),      ALIGNOF(unsigned long) },
+    { "uchar",      sizeof (unsigned char),      ALIGNOF(uchar,unsigned char) },
+    { "ushort",     sizeof (unsigned short),     ALIGNOF(ushort,unsigned short) },
+    { "uint",       sizeof (unsigned int),       ALIGNOF(uint,unsigned int) },
+    { "ulong",      sizeof (unsigned long),      ALIGNOF(ulong,unsigned long) },
 #  if PARROT_HAS_LONGLONG
-    { "ulonglong",  sizeof (unsigned long long), ALIGNOF(unsigned long long) },
+    { "ulonglong",  sizeof (unsigned long long), ALIGNOF(ulonglong,unsigned long long) },
 #  else
     { "ulonglong",  0,                           0 },
 #  endif
 
     /* native float types */
-    { "float",      sizeof (float),              ALIGNOF(float) },
-    { "double",     sizeof (double),             ALIGNOF(double) },
-    { "longdouble", sizeof (long double),        ALIGNOF(long double)},
+    { "float",      sizeof (float),              ALIGNOF1(float) },
+    { "double",     sizeof (double),             ALIGNOF1(double) },
+    { "longdouble", sizeof (long double),        ALIGNOF(longdouble,long double)},
+#  ifdef PARROT_HAS_FLOAT128
+    { "__float128", sizeof (__float128),         ALIGNOF1(__float128)},
+#  endif
 
     /* explicitly sized integer types */
-    { "int8",       1,                           ALIGNOF(Parrot_Int1) },
-    { "int16",      2,                           ALIGNOF(Parrot_Int2) },
-    { "int32",      4,                           ALIGNOF(Parrot_Int4) },
+    { "int8",       1,                           ALIGNOF1(Parrot_Int1) },
+    { "int16",      2,                           ALIGNOF1(Parrot_Int2) },
+    { "int32",      4,                           ALIGNOF1(Parrot_Int4) },
 #  if PARROT_HAS_INT64
-    { "int64",      8,                           ALIGNOF(Parrot_Int8) },
+    { "int64",      8,                           ALIGNOF1(Parrot_Int8) },
 #  else
     { "int64",      0,                           0 },
 #  endif
@@ -128,23 +137,23 @@ const struct _data_types data_types[] = {
     /* unsigned variants */
     { "uint1",      0,                           0 }, /* = bit */
     { "uint4",      0,                           0 },
-    { "uint8",      1,                           ALIGNOF(Parrot_Int1) },
-    { "uint16",     2,                           ALIGNOF(Parrot_Int2) },
-    { "uint32",     4,                           ALIGNOF(Parrot_Int4) },
+    { "uint8",      1,                           ALIGNOF1(Parrot_Int1) },
+    { "uint16",     2,                           ALIGNOF1(Parrot_Int2) },
+    { "uint32",     4,                           ALIGNOF1(Parrot_Int4) },
 #  if PARROT_HAS_INT64
-    { "uint64",     8,                           ALIGNOF(Parrot_Int8) },
+    { "uint64",     8,                           ALIGNOF1(Parrot_Int8) },
 #  else
     { "uint64",     0,                           0 },
 #  endif
 
     { "void",       0,                          0 },
 
-    { "ptr",        sizeof (void *),             ALIGNOF(void *) },
-    { "cstr",       sizeof (char *),             ALIGNOF(char *) },
-    { "struct_ptr", sizeof (void *),             ALIGNOF(void *) },
+    { "ptr",        sizeof (void *),             ALIGNOF(voidptr,void *) },
+    { "cstr",       sizeof (char *),             ALIGNOF(charptr,char *) },
+    { "struct_ptr", sizeof (void *),             ALIGNOF(voidptr,void *) },
     { "struct",     0,                           0 },
     { "union",      0,                           0 },
-    { "func_ptr",   sizeof (funcptr_t),          ALIGNOF(funcptr_t) },
+    { "func_ptr",   sizeof (funcptr_t),          ALIGNOF1(funcptr_t) },
 
     { "sized",      0,                           0 },
 
