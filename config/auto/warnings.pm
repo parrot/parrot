@@ -97,7 +97,6 @@ sub _init {
     my $gcc = {};
     my $gpp = {};
     my $icc = {};
-    my $clang = {};
 
     # man gcc
     # -Wall contains:
@@ -240,6 +239,9 @@ sub _init {
         '-Wno-unused-result' => [ qw(
             src/ops/core_ops.c
         ) ],
+        '-Wno-parentheses-equality' => [ qw(
+            src/ops/core_ops.c
+        ) ],
     };
 
     # Warning flags docs
@@ -282,13 +284,10 @@ sub _init {
         '-diag-enable sc-include',
     ];
 
-    $clang = $gcc;
-    push $clang->{'basic'}, '-Wno-parentheses-equality';
-
     $data->{'warnings'}{'gcc'} = $gcc;
     $data->{'warnings'}{'g++'} = $gpp;
     $data->{'warnings'}{'icc'} = $icc;
-    $data->{'warnings'}{'clang'} = $clang;
+    $data->{'warnings'}{'clang'} = $gcc;
 
     ## end gcc/g++
 
@@ -322,6 +321,11 @@ sub runstep {
         push @{$self->{'warnings'}{$compiler}{'basic'}},
             '-fvisibility=hidden';
     };
+    if ($conf->data->get('clang') and $compiler eq 'g++') { # clang++
+        unshift @{$self->{'warnings'}{$compiler}{'basic'}},
+            '-x c++';
+    }
+
     # standard warnings.
     my @warnings = grep {$self->valid_warning($conf, $_)}
         @{$self->{'warnings'}{$compiler}{'basic'}};
@@ -361,8 +365,8 @@ sub runstep {
 	my %add = %{$self->{'warnings'}{$compiler}{override}};
 	foreach my $warning (keys %add) {
 	    foreach my $file (@{$add{$warning}}) {
-		$per_file{$file} = [ @warnings, $warning ]
-		  unless exists $per_file{$file};
+		$per_file{$file} = exists $per_file{$file}
+		  ? [ @{$per_file{$file}}, $warning ] : [ @warnings, $warning ];
             }
         }
     }
