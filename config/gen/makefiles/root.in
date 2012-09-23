@@ -591,10 +591,12 @@ MAKE_C = @make_c@
 # These need to be above lines that define suffix rules to be portable
 # (certainly FreeBSD make doesn't grok the pir.pbc rule otherwise)
 
-.SUFFIXES : .c .S .s .pmc .dump $(O) .str .pir .pbc
+.SUFFIXES : .c .S .s .i .pmc .dump $(O) .str .pir .pbc
 
 .c$(O) : # suffix rule (limited support)
 	$(CC) $(CFLAGS) @optimize@ $(CC_WARN) -I$(@D) -Isrc/ @cc_o_out@$@ -c $<
+.c.i : # suffix rule (limited support)
+	$(CC) -E $(CFLAGS) -I$(@D) -Isrc/ @cc_o_out@$@ -c $<
 
 #UNLESS(win32):.s$(O) : # suffix rule (limited support)
 #UNLESS(win32):	$(CC) $(CFLAGS) @optimize@ $(CC_WARN) -I$(@D) @cc_o_out@$@ -c $<
