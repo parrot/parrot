@@ -1,3 +1,14 @@
+2012-10-16    release 4.9.0
+    - Core
+      + Keep encoding information in the imcc optimizer, which fixes the
+	concat op but probably many more cases with non-ascii encoded
+        constant strings. [GH #837]
+      + Fixed ByteBuffer set_string_native, which became out of sync with
+	two internal buffers. [GH #835]
+    - Documentation
+    - Tests
+    - Community
+
 2012-09-18    release 4.8.0
     - Core
         + Prevent interpreter from dying twice
@@ -11,7 +22,10 @@
         + Fixed for the FileHandle open method the append mode on Windows.
 	+ Fix compilation on Windows without working mt.exe
         + Detect GNU/Hurd as linux proper.
+        + Fixed broken int3 trap on Solaris with gcc.
         + Updated the vms port on a YAPC::EU hackathon with vaxman and mvorl.
+    - Tests
+        + Improve testability with valgrind or thread-sanitizer
 
 2012-08-21    release 4.7.0
     - Core

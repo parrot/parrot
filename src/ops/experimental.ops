@@ -49,7 +49,7 @@ For other architectures, this is a C<noop>.
 
 op trap() :deprecated {
     UNUSED(interp);
-#if defined(__GNUC__) && defined(i386)
+#if defined(__GNUC__) && defined(i386) && !defined(sun)
     __asm__("int3");       /* opcode 0xcc */
 #endif
 #if defined(__GNUC__) && defined(PPC)

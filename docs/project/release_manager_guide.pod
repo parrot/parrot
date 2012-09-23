@@ -471,7 +471,7 @@ to keep the main page fresh.
 To update both the C<parrot.github.com> and the relevant C<parrot-docsx> repositories,
 execute the following command:
 
-    perl tools/release/parrot_github_release.pl
+    perl tools/release/parrot_github_release.pl --docs=[/path/to/old/docs/]
 
 Please note: To review the available options, use the C<-h | --help> option.
 In addition, you may also want to review the pod with,
@@ -544,10 +544,12 @@ The calendar of releases is available at the C<comp.lang.parrot> Google
 calendar, visible at
 L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.calendar.google.com>.
 
-    - Sep 18, 2012 - 4.8.0   - alvis
     - Oct 16, 2012 - 4.9.0   - dukeleto
-    - Nov 20, 2012 - 4.10.0  - ??
+    - Nov 20, 2012 - 4.10.0  - rurban
     - Dec 18, 2012 - 4.11.0  - ??
+    - Jan 15, 2013 - 5.0.0   - dukeleto
+    - Feb 19, 2013 - 5.1.0   - ??
+    - Mar 19, 2013 - 5.2.0   - ??
 
 =cut
 
