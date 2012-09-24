@@ -10,6 +10,10 @@
         bytes from every installed executable.
     - Build
         + Improved warnings for clang.
+    - Branches
+        + The threads branch is almost ready to be merged. Some remaining races
+	  have been fixed. There are only some remaining platforms errors on
+	  darwin/x86.
     - Documentation
     - Tests
     - Community
