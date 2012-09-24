@@ -37,6 +37,9 @@ Test cases taken from base64.t of MIME::Base64.
     .local pmc encode_decode_tests, decode_tests
     encode_decode_tests = json.'compile'( <<'END_JSON' )
 [ ["Hello, World!\n","SGVsbG8sIFdvcmxkIQo="],
+  ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+   "YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh
+YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYQ=="],
   ["\u0000","AA=="],
   ["\u0001","AQ=="],
   ["\u0002","Ag=="],
@@ -304,7 +307,6 @@ Test cases taken from base64.t of MIME::Base64.
   ["aaa","YWFh"],
   ["aaa","YWFh"],
   ["Aladdin:open sesame","QWxhZGRpbjpvcGVuIHNlc2FtZQ=="],
-  ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYQ=="],
   ["Multipurpose Internet Mail Extensions: The Base64 Content-Transfer-Encoding is designed to represent sequences of octets in a form that is not humanly readable. ","TXVsdGlwdXJwb3NlIEludGVybmV0IE1haWwgRXh0ZW5zaW9uczogVGhlIEJhc2U2NCBDb250ZW50LVRyYW5zZmVyLUVuY29kaW5nIGlzIGRlc2lnbmVkIHRvIHJlcHJlc2VudCBzZXF1ZW5jZXMgb2Ygb2N0ZXRzIGluIGEgZm9ybSB0aGF0IGlzIG5vdCBodW1hbmx5IHJlYWRhYmxlLiA="]
 ]
 END_JSON
@@ -342,6 +344,8 @@ END_JSON
         comment     = 'encode'
         comment_count = count
         comment = concat comment, comment_count
+        # comment = concat comment, " "
+        # comment = concat comment, plain
         test_encode( plain, base64, comment )
         comment     = 'decode'
         comment_count = count
