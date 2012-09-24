@@ -421,8 +421,14 @@ CODE
     .local pmc is
     is   = get_hll_global [ 'Test'; 'More' ], 'is'
 
-    .local string result_decode
-    result_decode = dec_sub( base64 )
+    .local string decode, result_decode
+    .local string enc
+    $I0 = encoding plain
+    enc = encodingname $I0
+    decode = dec_sub( base64 )
+    result_decode = trans_encoding decode, $I0
+    comment = concat comment, " <-"
+    comment = concat comment, enc
     is( result_decode, plain, comment )
 .end
 
