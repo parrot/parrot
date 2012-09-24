@@ -87,8 +87,8 @@ sub interp_unused {
 
     my $body = $self->body;
     if ($body->{data} and $body->{data} =~ /^\s+return 1;\s+$/) {
-	$self->{interp_unused} = 1;
-	$self->{pmc_unused} = 1;
+        $self->{interp_unused} = 1;
+        $self->{pmc_unused} = 1;
     }
     return $self->{interp_unused};
 }
@@ -260,20 +260,20 @@ sub decl {
     # SHIM UNUSED(arg) in body
     my $body = $self->body;
     if ($body->{data} and $body->{data} =~ /^\s*UNUSED\((\w+)\)/m) {
-	my $key = $1;
-	if ($args =~ s/, (\w+ \*?$key)/, SHIM($1)/) {
-	    $body->{data} =~ s/^\s*UNUSED\((\w+)\);?\n//;
-	}
-	if ($body->{data} =~ m/^\s*UNUSED\((INTERP|interp)\);?\n/) {
-	    $self->{interp_unused} = 1;
-	    warn "Replace UNUSED(interp) with UNUSED(INTERP) in $pmcname METHOD $meth\n"
-	      if $1 eq 'interp' and $self->{parent_name} ne 'Null';
-	    $body->{data} =~ s/^\s*UNUSED\((INTERP|interp)\);?\n//;
-	}
-	if ($body->{data} =~ m/^\s*UNUSED\(SELF\);?\n/) {
-	    $self->{pmc_unused} = 1;
-	    $body->{data} =~ s/^\s*UNUSED\(SELF\);?\n//;
-	}
+        my $key = $1;
+        if ($args =~ s/, (\w+ \*?$key)/, SHIM($1)/) {
+            $body->{data} =~ s/^\s*UNUSED\((\w+)\);?\n//;
+        }
+        if ($body->{data} =~ m/^\s*UNUSED\((INTERP|interp)\);?\n/) {
+            $self->{interp_unused} = 1;
+            warn "Replace UNUSED(interp) with UNUSED(INTERP) in $pmcname METHOD $meth\n"
+              if $1 eq 'interp' and $self->{parent_name} ne 'Null';
+            $body->{data} =~ s/^\s*UNUSED\((INTERP|interp)\);?\n//;
+        }
+        if ($body->{data} =~ m/^\s*UNUSED\(SELF\);?\n/) {
+            $self->{pmc_unused} = 1;
+            $body->{data} =~ s/^\s*UNUSED\(SELF\);?\n//;
+        }
     }
 
     my ( $extern, $newl, $semi );
