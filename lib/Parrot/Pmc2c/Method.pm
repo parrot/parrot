@@ -262,7 +262,7 @@ sub decl {
     if ($body->{data} and $body->{data} =~ /^\s*UNUSED\((\w+)\)/m) {
 	my $key = $1;
 	if ($args =~ s/, (\w+ \*?$key)/, SHIM($1)/) {
-	    $body->{data} =~ s/^\s*UNUSED\((\w+)\)\n//;
+	    $body->{data} =~ s/^\s*UNUSED\((\w+)\);?\n//;
 	}
 	if ($body->{data} =~ m/^\s*UNUSED\((INTERP|interp)\);?\n/) {
 	    $self->{interp_unused} = 1;
