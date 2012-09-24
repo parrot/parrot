@@ -5,6 +5,8 @@
         constant strings. [GH #837]
       + Fixed ByteBuffer set_string_native, which became out of sync with
 	two internal buffers. [GH #835]
+    - Build
+        + Improved warnings for clang.
     - Documentation
     - Tests
     - Community
