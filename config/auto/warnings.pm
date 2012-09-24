@@ -97,7 +97,6 @@ sub _init {
     my $gcc = {};
     my $gpp = {};
     my $icc = {};
-    my $clang = {};
 
     # man gcc
     # -Wall contains:
@@ -285,13 +284,9 @@ sub _init {
         '-diag-enable sc-include',
     ];
 
-    $clang = $gcc;
-    push $clang->{'basic'}, '-Wno-parentheses-equality';
-
     $data->{'warnings'}{'gcc'} = $gcc;
     $data->{'warnings'}{'g++'} = $gpp;
     $data->{'warnings'}{'icc'} = $icc;
-    $data->{'warnings'}{'clang'} = $clang;
 
     ## end gcc/g++
 
