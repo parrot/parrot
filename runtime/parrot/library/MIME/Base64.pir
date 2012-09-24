@@ -89,7 +89,6 @@ then a warning is generated if perl is running under -w.
     .param string plain
 
     .local string base64
-
     .local pmc six_to_eight
     six_to_eight = get_global 'six_to_eight'
 
@@ -106,13 +105,14 @@ then a warning is generated if perl is running under -w.
 
     base64 = ''
 
-    .local int    i
+    .local int    i, j
     .local int    eight_0, eight_1, eight_2
     .local int    six_0, six_1, six_2, six_3
     .local int    tmp_int_1, tmp_int_2
     .local string s_tmp_1
 
     i = 0
+    j = 0
     START_3:
     if i >= len goto END_3
 
@@ -156,9 +156,14 @@ then a warning is generated if perl is running under -w.
 	tmp_int_1 = six_to_eight[six_3]
 	s_tmp_1 = chr tmp_int_1
 	base64 = concat base64, s_tmp_1
+	inc j
 
-
-    goto START_3
+	if j == 19 goto line_split
+	goto START_3
+      line_split:
+        base64 = concat base64, "\n"
+        j = 0
+        goto START_3
     END_3:
 
     # padding with '='
