@@ -94,13 +94,17 @@ then a warning is generated if perl is running under -w.
 
     .local int len, len_mod_3
     len = length plain
-    len_mod_3 = len % 3
+    .local pmc bb
+    bb = new ['ByteBuffer'], len
+    bb = plain
 
+    len = elements bb
+    len_mod_3 = len % 3
     # Fill up with with null bytes
     if len_mod_3 == 0 goto END_1
-        plain = concat plain, ascii:"\0"
+        push bb, 0
         if len_mod_3 == 2 goto END_1
-            plain = concat plain, ascii:"\0"
+            push bb, 0
     END_1:
 
     base64 = ''
@@ -118,11 +122,11 @@ then a warning is generated if perl is running under -w.
 
 	# read 3*8 bits
 	# TODO GH #813 and #814 unicode chars
-        eight_0 = ord plain, i
+        eight_0 = bb[i]
 	inc i
-        eight_1 = ord plain, i
+        eight_1 = bb[i]
 	inc i
-        eight_2 = ord plain, i
+        eight_2 = bb[i]
 	inc i
 
         # d[i]>>2;
