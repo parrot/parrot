@@ -893,7 +893,6 @@ Initializes the PMC during unarchiving.
 */
 
     VTABLE void thaw(PMC *info) {
-        UNUSED(INTERP);
         UNUSED(info);
         /* default - initialize the PMC */
         SELF.init();
