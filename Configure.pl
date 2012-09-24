@@ -46,8 +46,8 @@ exit(1) unless defined $args;
 # do "b postpone stepname"
 if (defined &DB::DB) {
     for my $step_name (@{ $steps_list_ref } ) {
-	eval "use $step_name;"; ## no critic (BuiltinFunctions::ProhibitStringyEval)
-	die $@ if $@;
+        eval "use $step_name;"; ## no critic (BuiltinFunctions::ProhibitStringyEval)
+        die $@ if $@;
     }
 }
 
