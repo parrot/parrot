@@ -9,7 +9,8 @@
       + Strip unneeded config keys from installed config hash. Saves 6360
         bytes from every installed executable.
     - Libraries
-      + Fixed Mime/Base64 encode_base64. Split long lines at 76 chars [GH #826]
+      + Fixed Mime/Base64 encode_base64. Split long lines at 76 chars [GH #826],
+	Correctly decode encoded strings [GH #813] and [GH #814]
     - Documentation
     - Tests
     - Community
