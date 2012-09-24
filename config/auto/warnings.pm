@@ -239,9 +239,6 @@ sub _init {
         '-Wno-unused-result' => [ qw(
             src/ops/core_ops.c
         ) ],
-        '-Wno-parentheses-equality' => [ qw(
-            src/ops/core_ops.c
-        ) ],
     };
 
     # Warning flags docs
@@ -289,6 +286,12 @@ sub _init {
     $data->{'warnings'}{'icc'} = $icc;
     $data->{'warnings'}{'clang'} = $gcc;
 
+    $data->{'warnings'}{'clang'}->{'override'} = {
+        '-Wno-parentheses-equality' => [ qw(
+            src/ops/core_ops.c
+        ) ],
+    };
+
     ## end gcc/g++
 
     return $data;
@@ -324,6 +327,11 @@ sub runstep {
     if ($conf->data->get('clang') and $compiler eq 'g++') { # clang++
         unshift @{$self->{'warnings'}{$compiler}{'basic'}},
             '-x c++';
+        $self->{'warnings'}{$compiler}{'override'} = {
+            '-Wno-parentheses-equality' => [ qw(
+                src/ops/core_ops.c
+            ) ],
+        };
     }
 
     # standard warnings.
@@ -364,9 +372,11 @@ sub runstep {
     if (exists $self->{'warnings'}{$compiler}{override}) {
         my %add = %{$self->{'warnings'}{$compiler}{override}};
         foreach my $warning (keys %add) {
-            foreach my $file (@{$add{$warning}}) {
-                $per_file{$file} = exists $per_file{$file}
-                  ? [ @{$per_file{$file}}, $warning ] : [ @warnings, $warning ];
+	    if ($self->valid_warning($conf, $warning)) {
+                foreach my $file (@{$add{$warning}}) {
+                    $per_file{$file} = exists $per_file{$file}
+                      ? [ @{$per_file{$file}}, $warning ] : [ @warnings, $warning ];
+                }
             }
         }
     }
