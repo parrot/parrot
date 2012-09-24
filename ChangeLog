@@ -14,6 +14,8 @@
         + The threads branch is almost ready to be merged. Some remaining races
 	  have been fixed. There are only some remaining platforms errors on
 	  darwin/x86.
+    - Libraries
+      + Fixed Mime/Base64 encode_base64. Split long lines at 76 chars [GH #826]
     - Documentation
     - Tests
     - Community
