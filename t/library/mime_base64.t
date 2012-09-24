@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2010, Parrot Foundation.
+# Copyright (C) 2006-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -37,9 +37,8 @@ Test cases taken from base64.t of MIME::Base64.
     .local pmc encode_decode_tests, decode_tests
     encode_decode_tests = json.'compile'( <<'END_JSON' )
 [ ["Hello, World!\n","SGVsbG8sIFdvcmxkIQo="],
-  ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-   "YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh
-YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYQ=="],
+ ["aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFh\nYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYQ=="],
   ["\u0000","AA=="],
   ["\u0001","AQ=="],
   ["\u0002","Ag=="],
@@ -307,7 +306,8 @@ YWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYWFhYQ=="],
   ["aaa","YWFh"],
   ["aaa","YWFh"],
   ["Aladdin:open sesame","QWxhZGRpbjpvcGVuIHNlc2FtZQ=="],
-  ["Multipurpose Internet Mail Extensions: The Base64 Content-Transfer-Encoding is designed to represent sequences of octets in a form that is not humanly readable. ","TXVsdGlwdXJwb3NlIEludGVybmV0IE1haWwgRXh0ZW5zaW9uczogVGhlIEJhc2U2NCBDb250ZW50LVRyYW5zZmVyLUVuY29kaW5nIGlzIGRlc2lnbmVkIHRvIHJlcHJlc2VudCBzZXF1ZW5jZXMgb2Ygb2N0ZXRzIGluIGEgZm9ybSB0aGF0IGlzIG5vdCBodW1hbmx5IHJlYWRhYmxlLiA="]
+  ["Multipurpose Internet Mail Extensions: The Base64 Content-Transfer-Encoding is designed to represent sequences of octets in a form that is not humanly readable. ",
+  "TXVsdGlwdXJwb3NlIEludGVybmV0IE1haWwgRXh0ZW5zaW9uczogVGhlIEJhc2U2NCBDb250ZW50\nLVRyYW5zZmVyLUVuY29kaW5nIGlzIGRlc2lnbmVkIHRvIHJlcHJlc2VudCBzZXF1ZW5jZXMgb2Yg\nb2N0ZXRzIGluIGEgZm9ybSB0aGF0IGlzIG5vdCBodW1hbmx5IHJlYWRhYmxlLiA="]
 ]
 END_JSON
 
@@ -410,7 +410,7 @@ END_JSON
 
 =head1 AUTHOR
 
-Bernhard Schmalhofer <Bernhard Schmalhofer@gmx.de>
+Bernhard Schmalhofer <Bernhard Schmalhofer@gmx.de> and others.
 
 =cut
 

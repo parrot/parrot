@@ -117,6 +117,7 @@ then a warning is generated if perl is running under -w.
     if i >= len goto END_3
 
 	# read 3*8 bits
+	# TODO GH #813 and #814 unicode chars
         eight_0 = ord plain, i
 	inc i
         eight_1 = ord plain, i
@@ -286,7 +287,7 @@ and on the article on de.selfhtml.org.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006-2008, Parrot Foundation.
+Copyright (C) 2006-2012, Parrot Foundation.
 
 =cut
 

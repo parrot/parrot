@@ -8,6 +8,8 @@
       + Preload Configure steps when called with perl -d Configure.pl
       + Strip unneeded config keys from installed config hash. Saves 6360
         bytes from every installed executable.
+    - Libraries
+      + Fixed Mime/Base64 encode_base64. Split long lines at 76 chars [GH #826]
     - Documentation
     - Tests
     - Community
