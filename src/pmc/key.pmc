@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -355,8 +355,8 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
     }
 
     VTABLE void thawfinish(PMC *info) {
-        PMC *key = SELF;
         UNUSED(info)
+        PMC *key = SELF;
 
         while (1) {
             PMC *next;
