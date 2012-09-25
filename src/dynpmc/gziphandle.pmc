@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2011, Parrot Foundation.
+Copyright (C) 2010-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -19,15 +19,16 @@ This PMC wraps the zlib.
 
 */
 
+BEGIN_PMC_HEADER_PREAMBLE
 #include <zlib.h>
-#include "parrot/extend.h"
+END_PMC_HEADER_PREAMBLE
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
 
 pmclass GzipHandle extends Handle dynpmc auto_attrs {
-    ATTR void *file;
+    ATTR gzFile file;
 
 /*
 
