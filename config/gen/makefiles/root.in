@@ -876,12 +876,19 @@ $(RUN_INC_DIR)/config.fpmc : myconfig config_lib.pir \
 	$(PERL) tools/build/gen_version.pl >$(RUN_INC_DIR)/parrot_version.pir
 	$(MINIPARROT) -I$(RUN_INC_DIR) config_lib.pir > $@
 
+
+bootstrap-prt0: $(WINXED) $(FRPTWO_DIR)/prt0.winxed
+	$(WINXED) --noan -c $(FRPTWO_DIR)/prt0.winxed
+
+# Circular dependencies winxed.pbc <- parrot and more
+$(FRPTWO_DIR)/prt0.pir: $(FRPTWO_DIR)/prt0.winxed
+	@echo "$@ out of date. Need to call: make parrot bootstrap-prt0"
+
 $(FRPTWO_DIR)/prt0.pbc : $(FRPTWO_DIR)/prt0.pir $(MINIPARROT)
 	$(MINIPARROT) -I$(RUN_INC_DIR) -o $(FRPTWO_DIR)/prt0.pbc $(FRPTWO_DIR)/prt0.pir
 
 $(FRPTWO_DIR)/prt0.pbc.c : $(FRPTWO_DIR)/prt0.pbc $(FRPTWO_DIR)/build.pir $(MINIPARROT)
 	$(MINIPARROT) $(FRPTWO_DIR)/build.pir $(FRPTWO_DIR)/prt0.pbc
-
 
 $(FRPTWO_DIR)/prt0.pbc$(O) : $(FRPTWO_DIR)/prt0.pbc.c \
 	$(INC_DIR)/feature.h \
@@ -890,9 +897,6 @@ $(FRPTWO_DIR)/prt0.pbc$(O) : $(FRPTWO_DIR)/prt0.pbc.c \
 	$(INC_DIR)/has_header.h \
 	$(INC_DIR)/api.h \
 	$(INC_DIR)/config.h
-
-bootstrap-prt0: $(WINXED) $(FRPTWO_DIR)/prt0.winxed
-	$(WINXED) --noan -c $(FRPTWO_DIR)/prt0.winxed
 
 $(PARROTOLD) : $(FRP_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	src/parrot_config$(O) src/longopt$(O) \
