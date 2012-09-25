@@ -264,15 +264,17 @@ sub decl {
         if ($args =~ s/, (\w+ \*?$key)/, SHIM($1)/) {
             $body->{data} =~ s/^\s*UNUSED\((\w+)\);?\n//;
         }
-        if ($body->{data} =~ m/^\s*UNUSED\((INTERP|interp)\);?\n/) {
-            $self->{interp_unused} = 1;
-            warn "Replace UNUSED(interp) with UNUSED(INTERP) in $pmcname METHOD $meth\n"
-              if $1 eq 'interp' and $self->{parent_name} ne 'Null';
-            $body->{data} =~ s/^\s*UNUSED\((INTERP|interp)\);?\n//;
-        }
         if ($body->{data} =~ m/^\s*UNUSED\(SELF\);?\n/) {
             $self->{pmc_unused} = 1;
             $body->{data} =~ s/^\s*UNUSED\(SELF\);?\n//;
+        }
+        if ($body->{data} =~ m/^\s*UNUSED\((INTERP|interp)\);?\n/) {
+            $self->{interp_unused} = 1;
+            $body->{data} =~ s/^\s*UNUSED\((INTERP|interp)\);?\n//;
+            warn "Replace UNUSED(interp) with UNUSED(INTERP) in $pmcname METHOD $meth\n"
+              if $1 eq 'interp'
+		and $self->{parent_name} ne 'Null'
+		and $body->{data} != /^\s*$/;
         }
     }
 
