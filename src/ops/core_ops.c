@@ -13605,13 +13605,14 @@ static op_info_t core_op_info_table[1126] = {
 
 opcode_t *
 Parrot_end(opcode_t *cur_opcode, PARROT_INTERP) {
+    UNUSED(interp);
+    UNUSED(cur_opcode);
     return (opcode_t *)0;
 }
 
 opcode_t *
 Parrot_noop(opcode_t *cur_opcode, PARROT_INTERP) {
     UNUSED(interp);
-    UNUSED(CUR_OPCODE);
     return cur_opcode + 1;
 }
 
@@ -13746,15 +13747,13 @@ Parrot_local_return_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_jump_i(opcode_t *cur_opcode, PARROT_INTERP) {
-    opcode_t  * const  loc = INTVAL2PTR(opcode_t *, IREG(1));
-
+    opcode_t * const loc = INTVAL2PTR(opcode_t *, IREG(1));
     return (opcode_t *)loc;
 }
 
 opcode_t *
 Parrot_jump_ic(opcode_t *cur_opcode, PARROT_INTERP) {
-    opcode_t  * const  loc = INTVAL2PTR(opcode_t *, ICONST(1));
-
+    opcode_t * const loc = INTVAL2PTR(opcode_t *, ICONST(1));
     return (opcode_t *)loc;
 }
 
