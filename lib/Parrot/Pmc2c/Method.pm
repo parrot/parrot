@@ -273,8 +273,8 @@ sub decl {
             $body->{data} =~ s/^\s*UNUSED\((INTERP|interp)\);?\n//;
             warn "Replace UNUSED(interp) with UNUSED(INTERP) in $pmcname METHOD $meth\n"
               if $1 eq 'interp'
-		and $self->{parent_name} ne 'Null'
-		and $body->{data} != /^\s*$/;
+                and $self->{parent_name} ne 'Null'
+                and $body->{data} != /^\s*$/;
         }
     }
 

@@ -372,7 +372,7 @@ sub runstep {
     if (exists $self->{'warnings'}{$compiler}{override}) {
         my %add = %{$self->{'warnings'}{$compiler}{override}};
         foreach my $warning (keys %add) {
-	    if ($self->valid_warning($conf, $warning)) {
+            if ($self->valid_warning($conf, $warning)) {
                 foreach my $file (@{$add{$warning}}) {
                     $per_file{$file} = exists $per_file{$file}
                       ? [ @{$per_file{$file}}, $warning ] : [ @warnings, $warning ];
