@@ -700,7 +700,7 @@ STRING *encodingname)>
 Given a buffer and an encoding, creates and returns a new string. If buffer is
 NULL the result is a null string. Otherwise, the buffer should be a zero
 terminated c-style string and its content must be valid for the encoding
-specified. If encoding is null, assume plaftorm encoding.
+specified. If encoding is null, assume platform encoding.
 
 =cut
 

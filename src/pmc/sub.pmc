@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -334,8 +334,8 @@ now.> -DRS
 */
 
     VTABLE INTVAL get_integer_keyed(PMC *key) {
-        Parrot_Sub_attributes *sub;
         UNUSED(key)
+        Parrot_Sub_attributes *sub;
         PMC_get_sub(INTERP, SELF, sub);
 
         return (INTVAL) (sub->seg->base.data);

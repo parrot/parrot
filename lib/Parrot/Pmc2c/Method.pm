@@ -36,6 +36,7 @@ sub new {
             parent_name => "",
             decorators  => [],
             pmc_unused  => 0,
+            interp_unused => 0,
             %{ $self_hash || {} }
         )
     };
@@ -66,8 +67,7 @@ EOC
     }
 
 sub is_vtable {
-    my ($self) = @_;
-    my $type = $self->type;
+    my $type = shift->type;
     return $type eq VTABLE || $type eq VTABLE_ENTRY;
 }
 
@@ -76,10 +76,21 @@ sub is_multi {
     return $self->type eq MULTI;
 }
 
+# if is_ro
 sub pmc_unused {
+    return shift->{pmc_unused};
+}
+
+# detect empty body, like return 1
+sub interp_unused {
     my ($self) = @_;
 
-    return $self->{pmc_unused};
+    my $body = $self->body;
+    if ($body->{data} and $body->{data} =~ /^\s+return 1;\s+$/) {
+        $self->{interp_unused} = 1;
+        $self->{pmc_unused} = 1;
+    }
+    return $self->{interp_unused};
 }
 
 =head2 C<trans($type)>
@@ -246,6 +257,27 @@ sub decl {
     $args = ", $args" if $args =~ /\S/;
     $args =~ s/(\w+)\s*(\*)\s*/$1 $2/g;
 
+    # SHIM UNUSED(arg) in body
+    my $body = $self->body;
+    if ($body->{data} and $body->{data} =~ /^\s*UNUSED\((\w+)\)/m) {
+        my $key = $1;
+        if ($args =~ s/, (\w+ \*?$key)/, SHIM($1)/) {
+            $body->{data} =~ s/^\s*UNUSED\((\w+)\);?\n//;
+        }
+        if ($body->{data} =~ m/^\s*UNUSED\(SELF\);?\n/) {
+            $self->{pmc_unused} = 1;
+            $body->{data} =~ s/^\s*UNUSED\(SELF\);?\n//;
+        }
+        if ($body->{data} =~ m/^\s*UNUSED\((INTERP|interp)\);?\n/) {
+            $self->{interp_unused} = 1;
+            $body->{data} =~ s/^\s*UNUSED\((INTERP|interp)\);?\n//;
+            warn "Replace UNUSED(interp) with UNUSED(INTERP) in $pmcname METHOD $meth\n"
+              if $1 eq 'interp'
+		and $self->{parent_name} ne 'Null'
+		and $body->{data} != /^\s*$/;
+        }
+    }
+
     my ( $extern, $newl, $semi );
     if ( $for_header eq 'HEADER' ) {
         $newl   = ' ';
@@ -255,10 +287,11 @@ sub decl {
         $newl   = "\n";
         $semi   = '';
     }
+    my $interp = $self->interp_unused ? 'SHIM_INTERP' : 'PARROT_INTERP';
     my $pmcarg = $self->pmc_unused ? 'SHIM(PMC *_self)' : 'ARGMOD(PMC *_self)';
 
     return <<"EOC";
-static $decs $ret${newl}Parrot_${pmcname}_$meth(PARROT_INTERP, $pmcarg$args)$semi
+static $decs $ret${newl}Parrot_${pmcname}_$meth($interp, $pmcarg$args)$semi
 EOC
 }
 
