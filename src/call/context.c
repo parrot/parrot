@@ -933,7 +933,7 @@ Parrot_pcc_unproxy_context(PARROT_INTERP, ARGIN(PMC * proxy))
     PMC * const target_ctx_pmc = PARROT_PROXY(proxy)->target;
     Parrot_Context * const ctx = CONTEXT_STRUCT(ctx_pmc);
     Parrot_Context * const target_ctx = CONTEXT_STRUCT(target_ctx_pmc);
-    Parrot_Interp * const target_interp = PARROT_PROXY(proxy)->interp;
+    Parrot_Interp const target_interp = PARROT_PROXY(proxy)->interp;
 
     ctx->caller_ctx = PMCNULL;      /* TODO: Double-check this */
     ctx->outer_ctx = PMCNULL;
