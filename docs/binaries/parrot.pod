@@ -1,5 +1,3 @@
-# Copyright (C) 2011-2012, Parrot Foundation.
-
 =pod
 
 =head1 NAME
@@ -27,29 +25,19 @@ reasons.
 
 =item B<--help>         Print the option summary on the command line.
 
-=item 
-
 =item B<-V>
 
 =item B<--version>      Print version information and exit.
-
-=item 
 
 =item B<-I>
 
 =item B<--include>      Add C<path> to the include search path.
 
-=item
-
 =item B<-L>
 
 =item B<--library>      Add C<path> to the library search path.
 
-=item
-
 =item B<--hash-seed> [hexnum]
-
-=over 11
 
 Sets the hash seed to the specified value. This option is useful for debugging intermittent
 failures, but should I<not> be used in production.  For more information about this option,
@@ -57,6 +45,8 @@ I<see> F<docs/dev/profiling.pod>, F<docs/project/hacking_tips.pod>, F<docs/runni
 and F<docs/submissions.pod>.
 
 =back
+
+=over 11
 
 =item B<-X>
 
@@ -74,8 +64,6 @@ information about these options, I<see> the "About runcores" section in F<docs/r
 =item B<-R>
 
 =item B<--runcore> [CORE]
-
-=over 11
 
 Select the runcore. The following cores are available in Parrot, but not all
 may be available on your system:
@@ -96,23 +84,15 @@ may be available on your system:
   gcdebug        performs a full GC run before every op dispatch
                  (good for debugging GC problems)
 
-=back
-
 =item B<-p>
 
 =item B<--profile>      Run with the slow core and print an execution profile.
-
-=item
 
 =item B<-t>
 
 =item B<--trace>        Run with the slow core and print trace information to B<stderr>.
 
-=over 11
-
 I<See> C<parrot --help-debug> for available flag bits.
-
-=back
 
 =back
 
@@ -124,35 +104,21 @@ I<See> C<parrot --help-debug> for available flag bits.
 
 =item B<--parrot-debug>[=HEXFLAGS] 
 
-=over 11
-
 Turn on interpreter debug flag.  I<See> C<parrot --help-debug> for available flag bits.
 
-=back
-
 =item B<--help-debug>   Print the summary of debugging and tracing flag bits.
-
-=item
 
 =item B<-w>
 
 =item B<--warnings>     Turn on warnings.
 
-=over 11
-
 I<See> C<parrot --help-debug> for available flag bits.
-
-=back
 
 =item B<-G>
 
 =item B<--no-gc>        Turn off GC.
 
-=over 11
-
 This may prove useful for finding GC-related bugs.
-
-=back
 
 =over 11
 
@@ -175,11 +141,7 @@ quickly become exhausted.
 
 =item B<--gc-dynamic-threshold>=percentage
 
-=over 11
-
 Maximum memory wasted by GC
-
-=back
 
 =item B<--gc-min-threshold>=Kb
 
@@ -191,84 +153,54 @@ Maximum memory wasted by GC
 
 =item B<--gc-nursery-size>=percent of system
 
-=over 11
-
 Size of gen0 (default 2)
 
-=back
-
 =item B<--gc-debug>     Turn on GC (Garbage Collection) debugging.
-
-=over 11
 
 This imposes some stress on the GC subsystem and can considerably slow
 down execution.
 
-=back
-
 =item B<--leak-test|--destroy-at-end> 
-
-=over 11
 
 Free all memory of the last interpreter.  This is useful when running leak
 checkers.
-
-=back
 
 =item B<-.>
 
 =item B<--wait>         Read a keystroke before starting.
 
-=over 11
-
 This is useful when you want to attach a debugger on platforms such as Windows.
 
-=back
-
 =item B<--runtime-prefix>
-
-=over 11
 
 Print the runtime prefix path and exit.
 
 =back
 
-=back
-
 =head2 Compiler options
+
+=over 4
 
 =item B<-E>
 
 =item B<--pre-process-only>
-
-=over 11
 
 Preprocess source file (expand macros) and print result to C<stdout>:
 
   $> parrot -E t/op/macro_10.pasm
   $> parrot -E t/op/macro_10.pasm | parrot -- -
 
-=back
-
 =item B<-o>
 
 =item B<--output>=FILE  Act like an assembler, but do not execute the code, 
-
-=over 11
 
 unless the B<-r> is supplied as well. If 'outputfile' ends with F<.pbc>,
 'parrot' will write a PBC file. If it ends with F<.pasm>, 'parrot' will output
 a PASM file, even from PASM input.
 
-=back
-
 =item B<--output-pbc>   Act like an assembler, but always output bytecode, 
 
-=over 11
-
 even if the output file does not end in F<.pbc>
-
-=back
 
 =item B<-a>
 
@@ -278,24 +210,16 @@ even if the output file does not end in F<.pbc>
 
 =item B<--pbc>          Assume PBC file on C<stdin> and execute it.
 
-=over 11
-
 NOTE: If whitespace separates the B<-d> switch from the argument, the argument
 I<must> start with a number, I<i.e.>, a decimal digit.
-
-=back
 
 =item B<-r>
 
 =item B<--run-pbc>      Only useful after C<-o> or C<--output-pbc>.
 
-=over 11
-
 Execute the program from the compiled in-memory image. If two C<-r> options are
 supplied, the F<.pbc> file is read from disc and executed. This is needed,
 primarily, for tests.
-
-=back
 
 =item B<-y>
 
@@ -355,6 +279,6 @@ most of these people, I<see> F<CREDITS>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =cut
