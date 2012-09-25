@@ -1,0 +1,53 @@
+/*
+Copyright (C) 2012, Parrot Foundation.
+
+figure out some Configure settings
+*/
+
+#include <stdlib.h>
+#include <stdio.h>
+
+struct PMC {
+    unsigned int  flags;
+    void         *vtable;
+    void         *data;
+    PMC          *_metadata;
+};
+struct parrot_string_t {
+    unsigned int flags;
+    void *     _bufstart;
+    size_t     _buflen;
+    char       *strstart;
+    unsigned int  bufused;
+    unsigned int  strlen;
+    unsigned int  hashval;
+    const struct PMC *encoding;
+};
+typedef struct PMC PMC;
+typedef struct parrot_string_t STRING;
+typedef void (*funcptr_t)(void);
+
+typedef struct {char c; @TEMP_type@ d;} mystruct_t;
+
+
+/* from parrot.h: 
+ * some SGI compilers have an offsetof()
+ * definition that doesn't work for us. */
+#if defined(__sgi) && defined(_COMPILER_VERSION) && (_COMPILER_VERSION >= 400)
+#  undef offsetof
+#  define offsetof(s, m) (size_t)(&((((s) *)0)->(m)))
+#endif
+
+int
+main(int argc, char **argv)
+{
+  printf("%u\n", (unsigned)offsetof(mystruct_t, d));
+    return EXIT_SUCCESS;
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

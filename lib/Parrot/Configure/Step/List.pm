@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 package Parrot::Configure::Step::List;
 use strict;
 use warnings;
@@ -39,7 +39,6 @@ my @steps = qw(
     auto::inline
     auto::gc
     auto::memalign
-    auto::alignof
     auto::signal
     auto::socklen_t
     auto::stat
@@ -64,6 +63,7 @@ my @steps = qw(
     auto::libffi
     auto::ipv6
     auto::platform
+    auto::alignof
     gen::config_h
     gen::core_pmcs
     gen::opengl
