@@ -70,10 +70,13 @@ us ensure that files we know are clean for a new warning stay clean.
 'todo' functions just like never does, but it indicates that these
 files are expected to eventually be free of this warning.
 
+'override' adds warnings to the end, to override previous warnings enabled
+by -Wall or -Wextra for example.
+
 Note that there is no actual requirement that the 'file' be a full path
 to a .c file; the file could be "PMCS" or "OPS" or some other identifier;
 whatever the value, it will generate a Config entry prefixed with
-C<ccwarn::>, which will probably be used via @@ expansion in a makefile.
+C<ccwarn::>, which will be used via @@ expansion in a makefile.
 
 It is tempting to put this into a config file, but having it in
 perl gives us the ability to dynamically setup certain warnings based
@@ -325,7 +328,7 @@ sub runstep {
             '-fvisibility=hidden';
     };
     if ($conf->data->get('clang') and $compiler eq 'g++') { # clang++
-        $self->{'warnings'}{$compiler}{'override'} = {
+        $self->{'warnings'}{'g++'}{'override'} = {
             '-Wno-parentheses-equality' => [ qw(
                 src/ops/core_ops.c
             ) ],
@@ -412,7 +415,7 @@ sub valid_warning {
 
     $conf->debug("trying attribute '$warning'\n");
 
-    my $cc = $conf->option_or_data('cc');
+    my $cc = $conf->data->get('cc');
     $conf->cc_gen('config/auto/warnings/test_c.in');
 
     my $ccflags  = $conf->data->get('ccflags');
