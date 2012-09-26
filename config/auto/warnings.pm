@@ -325,8 +325,6 @@ sub runstep {
             '-fvisibility=hidden';
     };
     if ($conf->data->get('clang') and $compiler eq 'g++') { # clang++
-        unshift @{$self->{'warnings'}{$compiler}{'basic'}},
-            '-x c++';
         $self->{'warnings'}{$compiler}{'override'} = {
             '-Wno-parentheses-equality' => [ qw(
                 src/ops/core_ops.c
