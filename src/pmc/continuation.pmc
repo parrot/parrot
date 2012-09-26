@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -283,10 +283,10 @@ destination to continue execution.
 */
 
     VTABLE opcode_t *invoke(void *next) {
+        UNUSED(next)
         PMC * const        from_obj = Parrot_pcc_get_signature(INTERP, CURRENT_CONTEXT(INTERP));
         opcode_t          *pc;
         PackFile_ByteCode *seg;
-        UNUSED(next)
 
         GET_ATTR_seg(INTERP, SELF, seg);
         GET_ATTR_address(INTERP, SELF, pc);

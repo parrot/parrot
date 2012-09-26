@@ -46,7 +46,7 @@ it to become ready for an I/O operation.
     test_update()
     test_read()
     test_write()
-    test_select()
+    test_select(osname)
   end:
 .end
 
@@ -151,6 +151,7 @@ it to become ready for an I/O operation.
 .end
 
 .sub 'test_select'
+    .param string osname
     $S0 = 'README2'
     $P9 = new 'String'
     $P9 = 'FH1'
@@ -180,9 +181,16 @@ it to become ready for an I/O operation.
 
     $P7 = $P6[2]
     $I0 = $P7
-    # passes on linux, cygwin, freebsd
-    is($I0, 0, 'Test has_exception() for README2 (array index)', 'varies across OSes' :named('todo'))
 
+    if osname == 'linux' goto good
+    if osname == 'cygwin' goto good
+    if osname == 'freebsd' goto good
+  todo:
+    is($I0, 0, 'Test has_exception() for README2 (array index)', 'varies across OSes' :named('todo'))
+    goto out
+  good:
+    is($I0, 0, 'Test has_exception() for README2 (array index)')
+  out:
     unlink($S0)
 .end
 

@@ -120,6 +120,8 @@ compilers/tge/TGE/Tree.pir                                  [tge]
 compilers/tge/tgc.pir                                       [tge]
 config/README.pod                                           []doc
 config/auto/arch.pm                                         []
+config/auto/alignof.pm                                      []
+config/auto/alignof/test_c.in                               []
 config/auto/attributes.pm                                   []
 config/auto/attributes/test_c.in                            []
 config/auto/backtrace.pm                                    []

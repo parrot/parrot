@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2011, Parrot Foundation.
+Copyright (C) 2005-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -183,10 +183,10 @@ reaches 0, delete the entry.
 */
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
+        UNUSED(value)
         const void *oldval;
         ptrcast_t   newval = 1;
         Hash       *hash;
-        UNUSED(value);
 
         GET_ATTR_pmc_registry(INTERP, SELF, hash);
 
@@ -199,10 +199,10 @@ reaches 0, delete the entry.
     }
 
     VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
+        UNUSED(value)
         const void *oldval;
         ptrcast_t   newval = 1;
         Hash       *hash;
-        UNUSED(value);
 
         GET_ATTR_str_registry(INTERP, SELF, hash);
 
