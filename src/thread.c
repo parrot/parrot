@@ -660,7 +660,7 @@ Parrot_thread_insert_thread(PARROT_INTERP, ARGIN(Interp* thread), int index)
 
 /*
 
-=item C<int Parrot_set_num_threads(PARROT_INTERP, INTVAL numthreads)>
+=item C<int Parrot_set_num_threads(PARROT_INTERP, INTVAL number_of_threads)>
 
 Overrides the default number of allocated threads, which defaults to
 the number of online CPUs.
@@ -678,13 +678,13 @@ and threads were already initialized.
 */
 
 int
-Parrot_set_num_threads(PARROT_INTERP, INTVAL input)
+Parrot_set_num_threads(PARROT_INTERP, INTVAL number_of_threads)
 {
     ASSERT_ARGS(Parrot_set_num_threads)
 
     /* Ensure that threads are not already initialized */
-    if (num_threads < 0 && input > 1 && input <= MAX_THREADS)
-        num_threads = input;
+    if (num_threads < 0 && number_of_threads > 1 && number_of_threads <= MAX_THREADS)
+        num_threads = number_of_threads;
     return num_threads;
 }
 
