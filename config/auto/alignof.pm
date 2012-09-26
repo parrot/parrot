@@ -6,7 +6,9 @@ config/auto/alignof.pm - clang++ offsetof values
 
 =head1 DESCRIPTION
 
-Determines the offsetof values of our types for clang++.
+Determines the offsetof() values of our types, if the compiler cannot do compile-time ALIGNOF
+definitions via offsetof(). clang++ or strict C++ compilers need this step, to calculate these
+pre-compiled PARROT_ALIGNOF_* definitions.
 
 =cut
 
@@ -31,11 +33,15 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     # This step only needed for clang++
-    if (!$conf->data->get('clang') or !$conf->data->get('g++')) {
+    if (test_if_needed($conf)) {
+	# Can do compile-time ALIGNOF definitions via offsetof()
+	$conf->data->set( 'HAS_COMPILER_OFFSETOF_ALIGNOF' => 1 );
         $conf->debug("DEBUG: auto::alignof is only needed for clang++\n");
-	$self->set_result('skipped');
+        $self->set_result('skipped');
 	return 1;
     }
+    # Need pre-compiled PARROT_ALIGNOF_* definitions
+    $conf->data->set( 'HAS_COMPILER_OFFSETOF_ALIGNOF' => 0 );
 
     my %types = (
         intval     => $conf->data->get('iv'),
@@ -82,6 +88,18 @@ sub runstep {
 
 #################### INTERNAL SUBROUTINES ####################
 
+sub test_if_needed {
+    my ($conf) = @_;
+
+    my ($cc_inc, $ccflags) = $conf->data->get( 'cc_inc', 'ccflags' );
+    $conf->cc_gen('config/auto/alignof/test_c.in');
+    eval { $conf->cc_build("$cc_inc -DCHECK_COMPILER_OFFSETOF_ALIGNOF") };
+    my $ret = $@ ? 0 : eval $conf->cc_run();
+    $conf->cc_clean();
+
+    return $ret;
+}
+
 sub test_alignof {
     my ($conf, $name, $type) = @_;
 
@@ -90,7 +108,7 @@ sub test_alignof {
     $conf->cc_gen('config/auto/alignof/test_c.in');
     eval { $conf->cc_build("$cc_inc -x c++") };
     my $ret = $@ ? 0 : eval $conf->cc_run();
-    # $conf->cc_clean();
+    $conf->cc_clean();
 
     return $ret;
 }

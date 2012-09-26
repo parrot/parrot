@@ -178,6 +178,14 @@ print OUT <<'END_PRINT';
 /* from config/auto/alignof */
 END_PRINT
 my $alignof = @alignof@ || '';
+if ($alignof) {
+    # The other case is handled by parrot/has_header.h
+    print OUT <<'END_PRINT';
+/* Need pre-compiled PARROT_ALIGNOF_* definitions */
+#undef PARROT_HAS_COMPILER_OFFSETOF_ALIGNOF
+END_PRINT
+}
+
 for my $name (split / /,$alignof) {
     my $value = $conf->data->get("PARROT_ALIGNOF_".$name);
     if ($name and $value) {

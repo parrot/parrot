@@ -1,6 +1,6 @@
 /*
  * datatypes.h
- *  Copyright (C) 2002-2008, Parrot Foundation.
+ *  Copyright (C) 2002-2012, Parrot Foundation.
  *  License:  Artistic 2.0, see README.pod and LICENSE for details
  *  Overview:
  *     Parrot and native data types enums and type names.
@@ -77,22 +77,22 @@ struct _data_types {
     size_t align;
 };
 
-#if defined(__clang__) && defined(__cplusplus)
-#  define ALIGNOF(name,x) PARROT_ALIGNOF_##name
-#  define ALIGNOF1(name)  PARROT_ALIGNOF_##name
+#ifdef PARROT_HAS_COMPILER_OFFSETOF_ALIGNOF
+#  define ALIGNOF(name, x) offsetof(struct {char c; x d;}, d)
+#  define ALIGNOF1(x)      offsetof(struct {char c; x d;}, d)
 #else
-#  define ALIGNOF(name,x) offsetof(struct {char c; x d;}, d)
-#  define ALIGNOF1(x)     offsetof(struct {char c; x d;}, d)
+#  define ALIGNOF(name, x) PARROT_ALIGNOF_##name
+#  define ALIGNOF1(name)   PARROT_ALIGNOF_##name
 #endif
 
 extern const struct _data_types data_types[];
 #if defined(INSIDE_GLOBAL_SETUP)
 const struct _data_types data_types[] = {
     /* parrot types */
-    { "INTVAL",     sizeof (INTVAL),             ALIGNOF(intval,INTVAL) },
-    { "FLOATVAL",   sizeof (FLOATVAL),           ALIGNOF(floatval,FLOATVAL) },
-    { "STRING",     sizeof (STRING *),           ALIGNOF(stringptr,STRING *) },
-    { "PMC",        sizeof (PMC *),              ALIGNOF(pmcptr,PMC *) },
+    { "INTVAL",     sizeof (INTVAL),             ALIGNOF(intval, INTVAL) },
+    { "FLOATVAL",   sizeof (FLOATVAL),           ALIGNOF(floatval, FLOATVAL) },
+    { "STRING",     sizeof (STRING *),           ALIGNOF(stringptr, STRING *) },
+    { "PMC",        sizeof (PMC *),              ALIGNOF(pmcptr, PMC *) },
 
     /* native integer types */
     { "char",       sizeof (char),               ALIGNOF1(char) },
@@ -100,18 +100,18 @@ const struct _data_types data_types[] = {
     { "int",        sizeof (int),                ALIGNOF1(int) },
     { "long",       sizeof (long),               ALIGNOF1(long) },
 #  if PARROT_HAS_LONGLONG
-    { "longlong",   sizeof (long long),          ALIGNOF(longlong,long long) },
+    { "longlong",   sizeof (long long),          ALIGNOF(longlong, long long) },
 #  else
     { "longlong",   0,                           0 },
 #  endif
 
     /* native unsigned types */
-    { "uchar",      sizeof (unsigned char),      ALIGNOF(uchar,unsigned char) },
-    { "ushort",     sizeof (unsigned short),     ALIGNOF(ushort,unsigned short) },
-    { "uint",       sizeof (unsigned int),       ALIGNOF(uint,unsigned int) },
-    { "ulong",      sizeof (unsigned long),      ALIGNOF(ulong,unsigned long) },
+    { "uchar",      sizeof (unsigned char),      ALIGNOF(uchar, unsigned char) },
+    { "ushort",     sizeof (unsigned short),     ALIGNOF(ushort, unsigned short) },
+    { "uint",       sizeof (unsigned int),       ALIGNOF(uint, unsigned int) },
+    { "ulong",      sizeof (unsigned long),      ALIGNOF(ulong, unsigned long) },
 #  if PARROT_HAS_LONGLONG
-    { "ulonglong",  sizeof (unsigned long long), ALIGNOF(ulonglong,unsigned long long) },
+    { "ulonglong",  sizeof (unsigned long long), ALIGNOF(ulonglong, unsigned long long) },
 #  else
     { "ulonglong",  0,                           0 },
 #  endif
@@ -119,7 +119,7 @@ const struct _data_types data_types[] = {
     /* native float types */
     { "float",      sizeof (float),              ALIGNOF1(float) },
     { "double",     sizeof (double),             ALIGNOF1(double) },
-    { "longdouble", sizeof (long double),        ALIGNOF(longdouble,long double)},
+    { "longdouble", sizeof (long double),        ALIGNOF(longdouble, long double)},
 #  ifdef PARROT_HAS_FLOAT128
     { "__float128", sizeof (__float128),         ALIGNOF1(__float128)},
 #  endif
@@ -148,9 +148,9 @@ const struct _data_types data_types[] = {
 
     { "void",       0,                          0 },
 
-    { "ptr",        sizeof (void *),             ALIGNOF(voidptr,void *) },
-    { "cstr",       sizeof (char *),             ALIGNOF(charptr,char *) },
-    { "struct_ptr", sizeof (void *),             ALIGNOF(voidptr,void *) },
+    { "ptr",        sizeof (void *),             ALIGNOF(voidptr, void *) },
+    { "cstr",       sizeof (char *),             ALIGNOF(charptr, char *) },
+    { "struct_ptr", sizeof (void *),             ALIGNOF(voidptr, void *) },
     { "struct",     0,                           0 },
     { "union",      0,                           0 },
     { "func_ptr",   sizeof (funcptr_t),          ALIGNOF1(funcptr_t) },

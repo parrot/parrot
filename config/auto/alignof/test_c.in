@@ -6,12 +6,21 @@ figure out some Configure settings
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stddef.h>
+
+/* from parrot/parrot.h:
+ * some SGI compilers have an offsetof()
+ * definition that doesn't work for us. */
+#if defined(__sgi) && defined(_COMPILER_VERSION) && (_COMPILER_VERSION >= 400)
+#  undef offsetof
+#  define offsetof(s, m) (size_t)(&((((s) *)0)->(m)))
+#endif
 
 struct PMC {
     unsigned int  flags;
     void         *vtable;
     void         *data;
-    PMC          *_metadata;
+    struct PMC   *_metadata;
 };
 struct parrot_string_t {
     unsigned int flags;
@@ -27,21 +36,34 @@ typedef struct PMC PMC;
 typedef struct parrot_string_t STRING;
 typedef void (*funcptr_t)(void);
 
-typedef struct {char c; @TEMP_type@ d;} mystruct_t;
+#define ALIGNOF(x) offsetof(struct {char c; x d;}, d)
 
+#ifdef CHECK_COMPILER_OFFSETOF_ALIGNOF
 
-/* from parrot.h: 
- * some SGI compilers have an offsetof()
- * definition that doesn't work for us. */
-#if defined(__sgi) && defined(_COMPILER_VERSION) && (_COMPILER_VERSION >= 400)
-#  undef offsetof
-#  define offsetof(s, m) (size_t)(&((((s) *)0)->(m)))
+/* as used in parrot/datatypes.h */
+struct _test {
+    const char *name;
+    size_t      align;
+};
+extern const struct _test test[];
+const struct _test test[] = {
+    { "int", ALIGNOF(int) }
+};
+
+#else
+
+typedef struct mystruct {char c; @TEMP_type@ d;} mystruct_t;
+
 #endif
 
 int
 main(int argc, char **argv)
 {
-  printf("%u\n", (unsigned)offsetof(mystruct_t, d));
+#ifdef CHECK_COMPILER_OFFSETOF_ALIGNOF
+    printf("%u\n", (unsigned)test[0].align);
+#else
+    printf("%u\n", (unsigned)offsetof(mystruct_t, d));
+#endif
     return EXIT_SUCCESS;
 }
 
