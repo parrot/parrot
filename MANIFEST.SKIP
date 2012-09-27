@@ -656,6 +656,8 @@
 ^/src/dynpmc/.*\.pdb/
 ^/src/dynpmc/.*\.so$
 ^/src/dynpmc/.*\.so/
+^/src/dynpmc/.*\.str$
+^/src/dynpmc/.*\.str/
 ^/src/embed/.*\.o$
 ^/src/embed/.*\.o/
 ^/src/exec_cpu\.c$
