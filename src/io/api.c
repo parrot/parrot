@@ -952,11 +952,15 @@ Parrot_io_readline_s(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING * terminat
         const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
         IO_BUFFER * read_buffer = IO_GET_READ_BUFFER(interp, handle);
         IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
+        INTVAL flags = Parrot_io_get_flags(interp, handle);
         size_t bytes_read;
         STRING *result;
         size_t max_delimiter_byte_size = 0;
 
         io_sync_buffers_for_read(interp, handle, vtable, read_buffer, write_buffer);
+        if (!write_buffer)
+            Parrot_io_flush(interp, _PIO_STDOUT(interp));
+
         io_verify_is_open_for(interp, handle, vtable, PIO_F_READ);
 
         if (read_buffer == NULL)
