@@ -746,10 +746,10 @@ src/string/private_cstring.h : $(STR_FILES) $(BUILD_TOOLS_DIR)/c2str.pl
 H2INC = $(BUILD_TOOLS_DIR)/h2inc.pl
 
 # classes PMC build utils and rules
-PMC2C  = $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl @no_lines_flag@
-PMC2CD = $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --dump @no_lines_flag@
-PMC2CC = $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --c @no_lines_flag@
-PMC2CV = $(PERL) $(BUILD_TOOLS_DIR)/pmc2c.pl --vtable @no_lines_flag@
+PMC2C  = $(PERL) -Ilib $(BUILD_TOOLS_DIR)/pmc2c.pl @no_lines_flag@
+PMC2CD = $(PERL) -Ilib $(BUILD_TOOLS_DIR)/pmc2c.pl --dump @no_lines_flag@
+PMC2CC = $(PERL) -Ilib $(BUILD_TOOLS_DIR)/pmc2c.pl --c @no_lines_flag@
+PMC2CV = $(PERL) -Ilib $(BUILD_TOOLS_DIR)/pmc2c.pl --vtable @no_lines_flag@
 
 #.pmc.dump : # suffix rule (limited support)
 #	$(PMC2CD) $<
@@ -887,12 +887,19 @@ $(RUN_INC_DIR)/config.fpmc : myconfig config_lib.pir \
 	$(PERL) tools/build/gen_version.pl >$(RUN_INC_DIR)/parrot_version.pir
 	$(MINIPARROT) -I$(RUN_INC_DIR) config_lib.pir > $@
 
+
+bootstrap-prt0: $(WINXED) $(FRPTWO_DIR)/prt0.winxed
+	$(WINXED) --noan -c $(FRPTWO_DIR)/prt0.winxed
+
+# Circular dependencies winxed.pbc <- parrot and more
+$(FRPTWO_DIR)/prt0.pir: $(FRPTWO_DIR)/prt0.winxed
+	@echo "$@ out of date. Need to call: make parrot bootstrap-prt0"
+
 $(FRPTWO_DIR)/prt0.pbc : $(FRPTWO_DIR)/prt0.pir $(MINIPARROT)
 	$(MINIPARROT) -I$(RUN_INC_DIR) -o $(FRPTWO_DIR)/prt0.pbc $(FRPTWO_DIR)/prt0.pir
 
 $(FRPTWO_DIR)/prt0.pbc.c : $(FRPTWO_DIR)/prt0.pbc $(FRPTWO_DIR)/build.pir $(MINIPARROT)
 	$(MINIPARROT) $(FRPTWO_DIR)/build.pir $(FRPTWO_DIR)/prt0.pbc
-
 
 $(FRPTWO_DIR)/prt0.pbc$(O) : $(FRPTWO_DIR)/prt0.pbc.c \
 	$(INC_DIR)/feature.h \
@@ -901,9 +908,6 @@ $(FRPTWO_DIR)/prt0.pbc$(O) : $(FRPTWO_DIR)/prt0.pbc.c \
 	$(INC_DIR)/has_header.h \
 	$(INC_DIR)/api.h \
 	$(INC_DIR)/config.h
-
-bootstrap-prt0: $(WINXED) $(FRPTWO_DIR)/prt0.winxed
-	$(WINXED) --noan -c $(FRPTWO_DIR)/prt0.winxed
 
 $(PARROTOLD) : $(FRP_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	src/parrot_config$(O) src/longopt$(O) \

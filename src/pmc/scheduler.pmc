@@ -206,8 +206,8 @@ Frees the scheduler's underlying struct.
 
 */
     VTABLE void destroy() {
-        UNUSED(SELF);
-        UNUSED(interp);
+        UNUSED(SELF)
+        UNUSED(INTERP)
     }
 
 
@@ -339,16 +339,16 @@ Returns a ResizablePMCArray containing pointers to all active tasks.
 
     METHOD active_tasks() {
         Parrot_Scheduler_attributes *sdata = PARROT_SCHEDULER(SELF);
-        PMC * const tasks = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
-        PMC * const iter  = Parrot_pmc_new_init(interp, enum_class_HashIterator, sdata->all_tasks);
+        PMC * const tasks = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        PMC * const iter  = Parrot_pmc_new_init(INTERP, enum_class_HashIterator, sdata->all_tasks);
 
-        while (!VTABLE_get_bool(interp, iter)) {
-            PMC * const pair = VTABLE_shift_pmc(interp, iter);
+        while (!VTABLE_get_bool(INTERP, iter)) {
+            PMC * const pair = VTABLE_shift_pmc(INTERP, iter);
             PMC * task = PMCNULL;
-            STRING * const value = CONST_STRING(interp, "value");
-            Parrot_pcc_invoke_method_from_c_args(interp, pair,
+            STRING * const value = CONST_STRING(INTERP, "value");
+            Parrot_pcc_invoke_method_from_c_args(INTERP, pair,
                 value, "->P", &task);
-            VTABLE_push_pmc(interp, tasks, task);
+            VTABLE_push_pmc(INTERP, tasks, task);
         }
 
         RETURN(PMC* tasks);

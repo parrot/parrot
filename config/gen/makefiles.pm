@@ -38,7 +38,6 @@ sub _init {
         'src/dynoplibs/Defines.mak' => {
              SOURCE => 'src/dynoplibs/Defines.in',
         },
-
         'src/dynpmc/Rules.mak' => {
              SOURCE => 'src/dynpmc/Rules.in',
         },

@@ -175,6 +175,60 @@ END_PRINT
 
 print OUT <<'END_PRINT';
 
+/* from config/auto/alignof */
+END_PRINT
+my $alignof = @alignof@ || '';
+if ($alignof) {
+    # The other case is handled by parrot/has_header.h
+    print OUT <<'END_PRINT';
+/* Need pre-compiled PARROT_ALIGNOF_* definitions */
+#undef PARROT_HAS_COMPILER_OFFSETOF_ALIGNOF
+END_PRINT
+}
+
+for my $name (split / /,$alignof) {
+    my $value = $conf->data->get("PARROT_ALIGNOF_".$name);
+    if ($name and $value) {
+        print OUT <<"END_PRINT";
+#define PARROT_ALIGNOF_$name	$value
+END_PRINT
+    }
+}
+for my $name (split / /,$alignof) {
+    my $value = $conf->data->get("PARROT_ALIGNOF_".$name);
+    if ($name and !$value) {
+        if ($name eq 'intval') {
+            $value = "PARROT_ALIGNOF_".$conf->data->get('iv');
+        }
+        elsif ($name eq 'floatval') {
+            $value = "PARROT_ALIGNOF_".$conf->data->get('nv');
+        }
+        elsif ($name =~ /ptr(|_t)$/) {
+            $value = "PARROT_ALIGNOF_charptr";
+        }
+        elsif ($name =~ /^Parrot_Int1$/) {
+            $value = "PARROT_ALIGNOF_char";
+        }
+        elsif ($name =~ /^Parrot_Int2$/) {
+            $value = "PARROT_ALIGNOF_short";
+        }
+        elsif ($name =~ /^Parrot_Int4$/) {
+            $value = "PARROT_ALIGNOF_int";
+        }
+        elsif ($name =~ /^Parrot_Int8$/ and $conf->data->get('HAS_LONGLONG')) {
+            $value = "PARROT_ALIGNOF_long";
+        }
+	else {
+            $value = 0;
+	}
+	print OUT <<"END_PRINT";
+#define PARROT_ALIGNOF_$name	$value
+END_PRINT
+    }
+}
+
+print OUT <<'END_PRINT';
+
 #endif /* PARROT_FEATURE_H_GUARD */
 END_PRINT
 
