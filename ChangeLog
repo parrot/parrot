@@ -1,10 +1,21 @@
 2012-10-16    release 4.9.0
     - Core
       + Keep encoding information in the imcc optimizer, which fixes the
-	concat op but probably many more cases with non-ascii encoded
+        concat op but probably many more cases with non-ascii encoded
         constant strings. [GH #837]
       + Fixed ByteBuffer set_string_native, which became out of sync with
-	two internal buffers. [GH #835]
+        two internal buffers. [GH #835]
+      + Preload Configure steps when called with perl -d Configure.pl
+      + Strip unneeded config keys from installed config hash. Saves 6360
+        bytes from every installed executable.
+    - Build
+        + Improved warnings for clang.
+    - Branches
+        + The threads branch is almost ready to be merged. Some remaining races
+	  have been fixed. There are only some remaining platforms errors on
+	  darwin/x86.
+    - Libraries
+      + Fixed Mime/Base64 encode_base64. Split long lines at 76 chars [GH #826]
     - Documentation
     - Tests
     - Community
@@ -20,7 +31,7 @@
 	+ Moved dynpmc/os to pmc os. loadlib 'os' is not needed anymore.
     - Platforms
         + Fixed for the FileHandle open method the append mode on Windows.
-	+ Fix compilation on Windows without working mt.exe
+        + Fix compilation on Windows without working mt.exe
         + Detect GNU/Hurd as linux proper.
         + Fixed broken int3 trap on Solaris with gcc.
         + Updated the vms port on a YAPC::EU hackathon with vaxman and mvorl.

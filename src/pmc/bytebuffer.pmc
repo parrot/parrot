@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2011, Parrot Foundation.
+Copyright (C) 2010-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -208,7 +208,7 @@ Reset the buffer with the content of the string.
             GET_ATTR_content(INTERP, SELF, content);
             if (allocated_size < new_length) {
                 content = (unsigned char *)Parrot_gc_reallocate_memory_chunk(INTERP,
-                            content, new_length);
+                    content, new_length);
             }
             memcpy(content, new_string->strstart, new_length);
             SET_ATTR_content(INTERP, SELF, content);

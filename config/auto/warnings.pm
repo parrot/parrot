@@ -62,7 +62,7 @@ Configure. This can be used to hold warnings that aren't ready to be
 added to the default run yet.
 
 'only' should be used as we add new warnings to the build, it will let
-us insure that files we know are clean for a new warning stay clean.
+us ensure that files we know are clean for a new warning stay clean.
 
 'never' should be used when a particular file contains generated code
 (e.g. imcc) and we cannot update it to conform to the standards.
@@ -208,6 +208,7 @@ sub _init {
     $gcc->{'cage'} = [ @gcc_or_gpp_cage ];
     $gpp->{'cage'} = [ @gcc_or_gpp_cage, @gpp_cage ];
 
+    # strip from the list
     $gcc->{'todo'} = $gpp->{'todo'} = {
         '-Wformat-nonliteral' => [ qw(
             src/spf_render.c
@@ -218,7 +219,7 @@ sub _init {
             src/extra_nci_thunks.c
         ) ],
     };
-
+    # strip from the list
     $gcc->{'never'} = $gpp->{'never'} = {
         '-Wformat-nonliteral' => [ qw(
             compilers/imcc/imclexer.c
@@ -231,6 +232,12 @@ sub _init {
         ) ],
         '-Wlogical-op' => [ qw(
             compilers/imcc/imcparser.c
+        ) ],
+    };
+    # add at the end
+    $gcc->{'override'} = $gpp->{'override'} = {
+        '-Wno-unused-result' => [ qw(
+            src/ops/core_ops.c
         ) ],
     };
 
@@ -279,6 +286,12 @@ sub _init {
     $data->{'warnings'}{'icc'} = $icc;
     $data->{'warnings'}{'clang'} = $gcc;
 
+    $data->{'warnings'}{'clang'}->{'override'} = {
+        '-Wno-parentheses-equality' => [ qw(
+            src/ops/core_ops.c
+        ) ],
+    };
+
     ## end gcc/g++
 
     return $data;
@@ -311,6 +324,16 @@ sub runstep {
         push @{$self->{'warnings'}{$compiler}{'basic'}},
             '-fvisibility=hidden';
     };
+    if ($conf->data->get('clang') and $compiler eq 'g++') { # clang++
+        unshift @{$self->{'warnings'}{$compiler}{'basic'}},
+            '-x c++';
+        $self->{'warnings'}{$compiler}{'override'} = {
+            '-Wno-parentheses-equality' => [ qw(
+                src/ops/core_ops.c
+            ) ],
+        };
+    }
+
     # standard warnings.
     my @warnings = grep {$self->valid_warning($conf, $_)}
         @{$self->{'warnings'}{$compiler}{'basic'}};
@@ -345,6 +368,19 @@ sub runstep {
             }
         }
     }
+
+    if (exists $self->{'warnings'}{$compiler}{override}) {
+        my %add = %{$self->{'warnings'}{$compiler}{override}};
+        foreach my $warning (keys %add) {
+	    if ($self->valid_warning($conf, $warning)) {
+                foreach my $file (@{$add{$warning}}) {
+                    $per_file{$file} = exists $per_file{$file}
+                      ? [ @{$per_file{$file}}, $warning ] : [ @warnings, $warning ];
+                }
+            }
+        }
+    }
+
 
     $conf->data->set('ccwarn', join(' ', @warnings));
     foreach my $file (keys %per_file) {

@@ -1917,7 +1917,7 @@ OUTPUT
     .local int current
 wait:
     # Give the scheduler a point to interrupt this Task
-    # and switch to the asynchonous callback Task
+    # and switch to the asynchronous callback Task
     pass
 
     # Usually a single pass will be enough, but on a loaded system preemption

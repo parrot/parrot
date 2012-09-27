@@ -602,10 +602,12 @@ MAKE_C = @make_c@
 # These need to be above lines that define suffix rules to be portable
 # (certainly FreeBSD make doesn't grok the pir.pbc rule otherwise)
 
-.SUFFIXES : .c .S .s .pmc .dump $(O) .str .pir .pbc
+.SUFFIXES : .c .S .s .i .pmc .dump $(O) .str .pir .pbc
 
 .c$(O) : # suffix rule (limited support)
 	$(CC) $(CFLAGS) @optimize@ $(CC_WARN) -I$(@D) -Isrc/ @cc_o_out@$@ -c $<
+.c.i : # suffix rule (limited support)
+	$(CC) -E $(CFLAGS) -I$(@D) -Isrc/ @cc_o_out@$@ -c $<
 
 #UNLESS(win32):.s$(O) : # suffix rule (limited support)
 #UNLESS(win32):	$(CC) $(CFLAGS) @optimize@ $(CC_WARN) -I$(@D) @cc_o_out@$@ -c $<
@@ -2057,6 +2059,7 @@ src/packfile/pf_items$(O) : $(PARROT_H_HEADERS) src/packfile/pf_items.c
 
 src/atomic/gcc_x86$(O) : $(PARROT_H_HEADERS) src/atomic/gcc_x86.c
 
+## SUFFIX OVERRIDE - add -Wno-unused-result for number of write_b
 # core_ops depends upon config.h so that it gets updated along with
 # updates to config.h's version numbers
 src/ops/core_ops$(O) : src/ops/core_ops.c \
@@ -2073,6 +2076,7 @@ src/ops/core_ops$(O) : src/ops/core_ops.c \
 	$(INC_DIR)/events.h \
 	$(INC_DIR)/scheduler_private.h \
 	src/io/io_private.h
+	$(CC) $(CFLAGS) @optimize::src/ops/core_ops.c@ @ccwarn::src/ops/core_ops.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/ops/core_ops.c
 
 
 @TEMP_pmc_build@
