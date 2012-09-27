@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011, Parrot Foundation.
+ * Copyright (C) 2011-2012, Parrot Foundation.
  */
 
 /*
@@ -33,8 +33,8 @@ For win32, look in platform/win32/cpu_type.c
 
 =item C<STRING * Parrot_get_cpu_type(Parrot_Interp interp)>
 
-Fetch CPU type for non-win32 systems
-For win32, look in platform/win32/misc.c
+Fetch CPU type for non-win32 systems.
+For win32, look in platform/win32/cpu_type.c
 
 =back
 
@@ -42,6 +42,7 @@ For win32, look in platform/win32/misc.c
 
 */
 
+PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_get_cpu_type(Parrot_Interp interp) {
     struct utsname uname_info;
@@ -51,10 +52,10 @@ Parrot_get_cpu_type(Parrot_Interp interp) {
     uname(&uname_info);
     proc_arch = uname_info.machine;
 #else
-    *proc_arch = '\0';
+    proc_arch ="unknown";
 #endif
     return Parrot_str_new_init(interp, proc_arch, strlen(proc_arch),
-            Parrot_ascii_encoding_ptr, 0);
+             Parrot_ascii_encoding_ptr, 0);
 
 }
 
