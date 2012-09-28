@@ -26,6 +26,10 @@ UTF-16 encoding
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_CANNOT_RETURN_NULL
+static STRING * utf16_chr(PARROT_INTERP, UINTVAL codepoint)
+        __attribute__nonnull__(1);
+
 PARROT_WARN_UNUSED_RESULT
 static UINTVAL utf16_decode(PARROT_INTERP, ARGIN(const utf16_t *p))
         __attribute__nonnull__(2);
@@ -80,11 +84,6 @@ static UINTVAL utf16_ord(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_CANNOT_RETURN_NULL
-static STRING *
-utf16_chr(PARROT_INTERP, UINTVAL codepoint)
-        __attribute__nonnull__(1);
-
 static INTVAL utf16_partial_scan(PARROT_INTERP,
     ARGIN(const char *buf),
     ARGMOD(Parrot_String_Bounds *bounds))
@@ -118,6 +117,8 @@ static STRING * utf16_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_utf16_chr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_utf16_decode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(p))
 #define ASSERT_ARGS_utf16_encode __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -141,9 +142,6 @@ static STRING * utf16_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
 #define ASSERT_ARGS_utf16_ord __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
-#define ASSERT_ARGS_utf16_chr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(codepoint))
 #define ASSERT_ARGS_utf16_partial_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(buf) \
@@ -465,14 +463,17 @@ utf16_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
     if ((UINTVAL)idx >= len)
         encoding_ord_error(interp, src, idx);
 
-    start = utf16_skip_forward((const utf16_t *)src->strstart, idx);
-
-    return utf16_decode(interp, start);
+    if (idx == 0)
+        return utf16_decode(interp, (const utf16_t *)src->strstart);
+    else {
+        start = utf16_skip_forward((const utf16_t *)src->strstart, idx);
+        return utf16_decode(interp, start);
+    }
 }
 
 /*
 
-=item C<STRING * utf16_chr(PARROT_INTERP, UINTVAL codepoint)>
+=item C<static STRING * utf16_chr(PARROT_INTERP, UINTVAL codepoint)>
 
 Returns a one-codepoint string for the given codepoint.
 
