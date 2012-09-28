@@ -183,9 +183,9 @@ transform pir (string) {
     $S1 = substr $S0, 2, 4
     $P1 = $S1
     $I0 = $P1.'to_int'(16)
-    # encode to utf16 not utf8. GH #845
+    # encode to ucs2 not utf8. GH #845
     $S0 = chr $I0
-    $I0 = find_encoding 'utf16'
+    $I0 = find_encoding 'ucs2'
     $S0 = trans_encoding $S0, $I0
     goto char
   escape:
