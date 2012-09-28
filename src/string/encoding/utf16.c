@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -80,6 +80,11 @@ static UINTVAL utf16_ord(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
+static STRING *
+utf16_chr(PARROT_INTERP, UINTVAL codepoint)
+        __attribute__nonnull__(1);
+
 static INTVAL utf16_partial_scan(PARROT_INTERP,
     ARGIN(const char *buf),
     ARGMOD(Parrot_String_Bounds *bounds))
@@ -136,6 +141,9 @@ static STRING * utf16_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
 #define ASSERT_ARGS_utf16_ord __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
+#define ASSERT_ARGS_utf16_chr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(codepoint))
 #define ASSERT_ARGS_utf16_partial_scan __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(buf) \
@@ -462,6 +470,35 @@ utf16_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
     return utf16_decode(interp, start);
 }
 
+/*
+
+=item C<STRING * utf16_chr(PARROT_INTERP, UINTVAL codepoint)>
+
+Returns a one-codepoint string for the given codepoint.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+static STRING *
+utf16_chr(PARROT_INTERP, UINTVAL codepoint)
+{
+    ASSERT_ARGS(utf16_chr)
+    String_iter    iter;
+    STRING * const dest = Parrot_str_new_init(interp, NULL, 4,
+        Parrot_utf16_encoding_ptr, 0);
+
+    dest->bufused = 4;
+    dest->strlen  = 1;
+
+    STRING_ITER_INIT(interp, &iter);
+    STRING_iter_set_and_advance(interp, dest, &iter, codepoint);
+    dest->bufused = iter.bytepos;
+
+    return dest;
+}
+
 
 /*
 
@@ -590,7 +627,7 @@ static STR_VTABLE Parrot_utf16_encoding = {
     4, /* Max bytes per codepoint */
 
     utf16_to_encoding,
-    unicode_chr,
+    utf16_chr,
 
     encoding_equal,
     encoding_compare,
