@@ -76,8 +76,8 @@ Parrot_io_init(PARROT_INTERP)
 
         os_handle = Parrot_io_internal_std_os_handle(interp, PIO_STDOUT_FILENO);
         handle    = Parrot_io_fdopen_flags(interp, PMCNULL, os_handle, PIO_F_WRITE);
-        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY,
-                                       PIO_BF_LINEBUF);
+        /* Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY,
+                                       PIO_BF_LINEBUF); */
         _PIO_STDOUT(interp) = handle;
 
         os_handle           = Parrot_io_internal_std_os_handle(interp, PIO_STDERR_FILENO);
