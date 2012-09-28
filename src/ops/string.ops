@@ -59,6 +59,10 @@ inline op ord(out INT, in STR, in INT)  {
 
 The character specified by codepoint integer $2 is returned in string $1.
 
+For characters > 0xff an utf8 encoded string is returned,
+for characters between 0x7f and 0xff a latin1 encoded string is returned,
+for characters below 0x7f an ascii encoded string.
+
 =cut
 
 inline op chr(out STR, in INT)  {

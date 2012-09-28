@@ -183,7 +183,10 @@ transform pir (string) {
     $S1 = substr $S0, 2, 4
     $P1 = $S1
     $I0 = $P1.'to_int'(16)
+    # encode to utf16 not utf8. GH #845
     $S0 = chr $I0
+    $I0 = find_encoding 'utf16'
+    $S0 = trans_encoding $S0, $I0
     goto char
   escape:
     $P0 = get_root_global ['parrot'; 'data_json'], '$escapes'
