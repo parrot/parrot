@@ -550,9 +550,82 @@ Parrot_str_internal_find_codepoint(PARROT_INTERP, ARGIN(const STRING *name))
 
 /*
 
-=back
+=item C<STRING * str_internal_trans_to_fixed8(PARROT_INTERP, const STRING *src)>
+
+Encodes the src string to fixed8 or returns NULL if not possible.
+
+=cut
 
 */
+
+PARROT_CAN_RETURN_NULL
+STRING *
+str_internal_trans_to_fixed8(PARROT_INTERP, ARGIN(const STRING *src))
+{
+    ASSERT_ARGS(str_internal_trans_to_fixed8)
+
+    STRING        *dest;
+    String_iter    iter;
+    unsigned char *ptr;
+    const UINTVAL  len = src->strlen;
+
+    dest  = Parrot_str_new_init(interp, NULL, len, Parrot_latin1_encoding_ptr, 0);
+    ptr   = (unsigned char *)dest->strstart;
+    STRING_ITER_INIT(interp, &iter);
+    while (iter.charpos < len) {
+        const UINTVAL c = STRING_iter_get_and_advance(interp, src, &iter);
+        if (c >= 0x100)
+            return NULL;
+        *ptr++ = c;
+    }
+    dest->bufused = len;
+    dest->strlen  = len;
+    return dest;
+}
+
+/*
+
+=item C<STRING * str_internal_trans_to_ucs2(PARROT_INTERP, const STRING *src)>
+
+Encodes the src string to ucs2 or returns NULL if not possible.
+
+=cut
+
+*/
+
+PARROT_CAN_RETURN_NULL
+STRING *
+str_internal_trans_to_ucs2(PARROT_INTERP, ARGIN(const STRING *src))
+{
+    ASSERT_ARGS(str_internal_trans_to_ucs2)
+
+    STRING * const result =
+        Parrot_utf16_encoding_ptr->to_encoding(interp, src);
+    /* conversion to utf16 downgrades to ucs-2 if possible - check result */
+    if (result->encoding == Parrot_utf16_encoding_ptr)
+        return NULL;
+    return result;
+}
+
+/*
+
+=item C<STRING * str_internal_trans_to_ucs4(PARROT_INTERP, const STRING *src)>
+
+Encodes the src string to ucs4.
+
+=back
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+STRING *
+str_internal_trans_to_ucs4(PARROT_INTERP, ARGIN(const STRING *src))
+{
+    ASSERT_ARGS(str_internal_trans_to_ucs4)
+    return Parrot_ucs4_encoding_ptr->to_encoding(interp, src);
+}
 
 /*
  * Local variables:

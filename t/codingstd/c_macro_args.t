@@ -95,6 +95,8 @@ sub check_macro_args {
 
                     # eliminate macros that deal with flags, since they're special
                     next if $macro =~ m/(TEST|SET|CLEAR)$/;
+                    # BITWISE_UPGRADE_BOTH uses the arg on the lhs
+                    next if $macro eq 'BITWISE_UPGRADE_BOTH';
 
                     # Any remaining usage must be improper
                     if ($definition =~ m/\b\Q$arg\E\b/) {
