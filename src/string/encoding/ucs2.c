@@ -30,6 +30,10 @@ PARROT_INLINE
 static void ucs2_check_codepoint(PARROT_INTERP, UINTVAL c)
         __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
+static STRING * ucs2_chr(PARROT_INTERP, UINTVAL codepoint)
+        __attribute__nonnull__(1);
+
 static size_t ucs2_hash(PARROT_INTERP,
     ARGIN(const STRING *src),
     size_t hashval)
@@ -90,6 +94,8 @@ static STRING * ucs2_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_ucs2_check_codepoint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_ucs2_chr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_ucs2_hash __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(src))
@@ -280,6 +286,35 @@ ucs2_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
 
 /*
 
+=item C<static STRING * ucs2_chr(PARROT_INTERP, UINTVAL codepoint)>
+
+Returns a one-codepoint string for the given codepoint.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+static STRING *
+ucs2_chr(PARROT_INTERP, UINTVAL codepoint)
+{
+    ASSERT_ARGS(ucs2_chr)
+    String_iter    iter;
+    STRING * const dest = Parrot_str_new_init(interp, NULL, 4,
+        Parrot_ucs2_encoding_ptr, 0);
+
+    dest->bufused = 4;
+    dest->strlen  = 1;
+
+    STRING_ITER_INIT(interp, &iter);
+    STRING_iter_set_and_advance(interp, dest, &iter, codepoint);
+    dest->bufused = iter.bytepos;
+
+    return dest;
+}
+
+/*
+
 =item C<static UINTVAL ucs2_iter_get(PARROT_INTERP, const STRING *str, const
 String_iter *i, INTVAL offset)>
 
@@ -410,7 +445,7 @@ static STR_VTABLE Parrot_ucs2_encoding = {
     2, /* Max bytes per codepoint */
 
     ucs2_to_encoding,
-    unicode_chr,
+    ucs2_chr,
 
     encoding_equal,
     encoding_compare,
