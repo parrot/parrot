@@ -619,7 +619,7 @@ Used to unarchive the string.
 
 =over 4
 
-=item C<void trans(STRING *src, PMC *trams_table)>
+=item C<void trans(STRING *src, PMC *trans_table)>
 
 Translate ascii string C<src> with entries from C<trans_table>.
 
