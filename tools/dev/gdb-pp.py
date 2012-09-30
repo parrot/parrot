@@ -161,7 +161,7 @@ def _parrot_str_to_str(val):
     if encoding_name == 'binary':
         encoding_name='raw_unicode_escape'
     if encoding_name == 'ucs2':
-        encoding_name='utf_16_le'
+        encoding_name='utf_16'
     if encoding_name == 'ucs4':
-        encoding_name=='utf_32_le'
+        encoding_name=='utf_32'
     return val['strstart'].string(encoding=encoding_name,length=length)
