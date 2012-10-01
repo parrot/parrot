@@ -76,8 +76,8 @@ Parrot_io_init(PARROT_INTERP)
 
         os_handle = Parrot_io_internal_std_os_handle(interp, PIO_STDOUT_FILENO);
         handle    = Parrot_io_fdopen_flags(interp, PMCNULL, os_handle, PIO_F_WRITE);
-        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY,
-                                       PIO_BF_LINEBUF);
+        /* Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY,
+                                       PIO_BF_LINEBUF); */
         _PIO_STDOUT(interp) = handle;
 
         os_handle           = Parrot_io_internal_std_os_handle(interp, PIO_STDERR_FILENO);
@@ -952,6 +952,7 @@ Parrot_io_readline_s(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING * terminat
         const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
         IO_BUFFER * read_buffer = IO_GET_READ_BUFFER(interp, handle);
         IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
+        INTVAL flags = Parrot_io_get_flags(interp, handle);
         size_t bytes_read;
         STRING *result;
         size_t max_delimiter_byte_size = 0;

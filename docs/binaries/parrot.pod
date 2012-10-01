@@ -1,3 +1,5 @@
+# Copyright (C) 2011-2012, Parrot Foundation.
+
 =pod
 
 =head1 NAME
