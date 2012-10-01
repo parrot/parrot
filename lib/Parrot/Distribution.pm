@@ -147,6 +147,8 @@ BEGIN {
 
 =item C<pmc_source_file_directories()>
 
+=item C<pod_source_file_directories()()>
+
 =item C<python_source_file_directories()>
 
 =item C<yacc_source_file_directories()>
@@ -167,6 +169,8 @@ Returns the directories which contain source files of the appropriate filetype.
 
 =item C<pmc_source_file_with_name()>
 
+=item C<pod_source_file_with_name()()>
+
 =item C<python_source_file_with_name()>
 
 =item C<yacc_source_file_with_name()>
@@ -186,6 +190,8 @@ Returns the source file with the specified name and of the appropriate filetype.
 =item C<pir_source_files()>
 
 =item C<pmc_source_files()>
+
+=item C<pod_source_files()>
 
 =item C<python_source_files()>
 
@@ -208,6 +214,7 @@ BEGIN {
                 except_dirs => [qw{ examples/library }],
             },
             yacc => { file_exts => ['y'] },
+            pod  => { file_exts => ['pod'] },
             perl => {
                 file_exts   => [ 'pl', 'pm', 't' ],
                 shebang     => qr/^#!\s*perl/,

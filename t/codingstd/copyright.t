@@ -42,6 +42,7 @@ my @files = @ARGV ? <@ARGV> : (
     $DIST->get_make_language_files(),
     $DIST->get_pir_language_files(),
     $DIST->get_python_language_files(),
+    $DIST->pod_source_files(),
 );
 my (
     @no_copyright_files,
