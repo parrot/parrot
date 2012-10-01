@@ -15,6 +15,8 @@
         + Cleaned wrong UNUSED(arg) macros in all pmc's due to an improved
           pmc2c compiler, which SHIMs all UNUSED args. [GH #836]
         + Added clang++ support and a new auto::alignof Configure step. [GH #844]
+        + Fixed auto::inline for C++ compilers
+        + Improved auto::llvm
     - Branches
         + The threads branch is almost ready to be merged. Some remaining races
           have been fixed. There are only some remaining platforms errors on
