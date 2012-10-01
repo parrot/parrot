@@ -26,6 +26,8 @@
     - Documentation
         + Cleaned up removed parrot cmdline options -D/-O/-v from --help output and
           running.pod [GH #838]
+    - Tools
+        + Improved gdb pretty-printing for multi-byte strings
     - Tests
     - Community
 
