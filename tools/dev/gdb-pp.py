@@ -155,10 +155,10 @@ def _parrot_str_to_str(val):
     """
     encoding = val['encoding'].dereference()
     encoding_name = encoding['name'].string()
-    name = encoding_name + ':'
-    if name == 'ascii:':
+    name = encoding_name
+    if name == 'ascii':
         name = ''
-    if name == 'iso-8859-1:':
+    if name == 'iso-8859-1':
         name = ''
     length = val['bufused']
 
@@ -172,6 +172,6 @@ def _parrot_str_to_str(val):
     if name == '':
         return val['strstart'].string(encoding=encoding_name,errors='replace',length=length)
     else:
-        return '%s%s [%d/%d]' % \
+        return '%s:%s [%d/%d]' % \
             (name, val['strstart'].string(encoding=encoding_name,errors='replace',length=length), \
              val['strlen'], length)
