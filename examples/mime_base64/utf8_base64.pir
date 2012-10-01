@@ -37,7 +37,7 @@ See L<https://github.com/parrot/parrot/issues/814>
     say   "expected: 4oC+"
     print "result:   "
     say result_encode
-    
+
 .end
 
 =head1 AUTHOR
