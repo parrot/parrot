@@ -96,7 +96,7 @@ sub _evaluate_gcc {
 
     # and set -x c++ for clang++
     if ($clang and $gpp and index($cc, '-x c++') < 1) {
-	$conf->data->set('cc' => $cc.' -x c++');
+        $conf->data->set('cc' => $cc.' -x c++');
     }
 
     $conf->data->set(
