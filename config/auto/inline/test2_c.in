@@ -1,12 +1,12 @@
 /*
-Copyright (C) 2003-2009, Parrot Foundation.
+Copyright (C) 2003-2012, Parrot Foundation.
 
 test to check if compiler supports __inline
 */
 
 #include <stdio.h>
 
-__inline f(void) {
+__inline void f(void) {
     puts("__inline");
 }
 
