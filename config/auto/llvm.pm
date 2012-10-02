@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2011, Parrot Foundation.
+# Copyright (C) 2009-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -46,13 +46,21 @@ sub runstep {
     # runstep() with a value of 1.  If a given probe does not rule out LLVM,
     # we will proceed onward.
 
-    my ($llvm_bindir, $llvm_config);
-    for my $bin (qw(llvm-config llvm-config-3.0 llvm-config-2.9 llvm-config-2.8)) {
-        $llvm_bindir = capture_output( $bin, "--bindir" ) || '';
+    my $llvm_config = $conf->options->get( 'llvm-config' );
+    my $llvm_bindir;
+    if ( $llvm_config and -e "$llvm_config" ) {
+        $llvm_bindir = capture_output( $llvm_config, "--bindir" ) || '';
         chomp $llvm_bindir;
-        if ( $llvm_bindir ) {
-            $llvm_config = $bin;
-            last;
+    }
+    else {
+        for my $ver ('',qw(-3.2 -3.1 -3.0 -2.9 -2.8 -2.7)) {
+            my $bin = 'llvm-config'.$ver;
+            $llvm_bindir = capture_output( $bin, "--bindir" ) || '';
+            chomp $llvm_bindir;
+            if ( $llvm_bindir ) {
+                $llvm_config = $bin;
+                last;
+            }
         }
     }
     if (! $llvm_bindir ) {
@@ -65,31 +73,25 @@ sub runstep {
     chomp(@output = `"$llvm_bindir/lli" --version`);
     my $rv = $self->version_check($conf, \@output, $verbose);
     return 1 unless $rv;
+    my $version = $rv;
 
-    # Find lib
-    my $ldd = `ldd "$llvm_bindir/lli"`;
-    if ($ldd =~ /(libLLVM[^ ]+)(.*)/m){
-        my $lib  = $1;
-        my $path = (split(' ',$2))[1];
-        $conf->data->set( llvm_shared => $path );
-        if ($lib =~ /lib(LLVM.*)\.(so|dll)/){
-            $conf->data->add( ' ', libs   => "-l$1" );
-        }
-        else {
-            if ($verbose) {
-                print "Found 'lli' version $version\n";
-            }
-        }
+    # Find flags
+    my ($cflags, $cxxflags, $ldflags, $libs);
+    if ($ldflags = $self->_llvm_config($llvm_config, '--ldflags')) {
+        $conf->data->set( llvm_ldflags  => $ldflags );
     }
-    else {
-        print "Unable to extract version for LLVM component 'lli'\n"
-            if $verbose;
-        $self->_handle_result( $conf, 0 );
-        return 1;
+    if ($libs = $self->_llvm_config($llvm_config, '--libs')) {
+        $conf->data->set( llvm_libs  => $libs );
+    }
+    if ($cflags = $self->_llvm_config($llvm_config, '--cflags')) {
+        $conf->data->set( llvm_cflags  => $cflags );
+    }
+    if ($cxxflags = $self->_llvm_config($llvm_config, '--cxxflags')) {
+        $conf->data->set( llvm_cxxflags  => $cxxflags );
     }
 
-    $self->_handle_result($conf, $rv);
-    return 1;
+    # $self->_handle_result($conf, $version);
+    # return 1;
 
     # Having gotten this far,  we will take a simple C file, compile it into
     # an LLVM bitcode file, execute it as bitcode, then compile it to native
@@ -103,11 +105,22 @@ sub runstep {
     my $bcfile = qq|$stem.bc|;
     my $sfile = qq|$stem.s|;
     my $nativefile = qq|$stem.native|;
-    eval {
-        system(qq{llvm-gcc -O3 -emit-llvm $fullcfile -c -o $bcfile});
-    };
-    $rv = '';
-    if ($@) {
+    unlink $bcfile;
+    for my $cc ($conf->data->get('cc'),
+                "$llvm_bindir/clang", "$llvm_bindir/llvm-gcc",
+                qw(llvm-gcc clang))
+    {
+        # Note: gcc and g++ with -c just skips over -emit-llvm and produce native code
+        # without -c: ld: warning: cannot find entry symbol 'mit-llvm'
+        eval {
+            system(qq{$cc -emit-llvm -O3 $fullcfile -c -o $bcfile});
+        };
+        if (!$@ and -e $bcfile and $self->_check_bcfile($bcfile)) {
+            $conf->data->set( llvm_gcc  => $cc );
+            last;
+        }
+    }
+    if (! $conf->data->get( 'llvm_gcc' )) {
         $rv = $self->_handle_failure_to_compile_into_bitcode(
             $conf,
             $verbose,
@@ -120,7 +133,7 @@ sub runstep {
     else {
         my $output;
         eval {
-            $output = capture_output( 'lli', $bcfile );
+            $output = capture_output( "$llvm_bindir/lli", $bcfile );
         };
         if ( $@ or $output !~ /hello world/ ) {
             $rv = $self->_handle_failure_to_execute_bitcode( $conf, $verbose );
@@ -131,7 +144,7 @@ sub runstep {
         }
         else {
             eval {
-                system(qq{llc $bcfile -o $sfile});
+                system(qq{"$llvm_bindir/llc" $bcfile -o $sfile});
             };
             if ( $@ or (! -e $sfile) ) {
                 $rv = $self->_handle_failure_to_compile_to_assembly(
@@ -163,7 +176,7 @@ sub runstep {
                         $output = capture_output(qq{./$nativefile});
                     };
                     $self->_handle_native_assembly_output(
-                        $conf, $output, $verbose
+                        $conf, $output, $verbose, $version
                     );
                 }
            }
@@ -177,10 +190,26 @@ sub runstep {
     return 1;
 }
 
+sub _check_bcfile {
+    my ($self, $bcfile) = @_;
+    open my $fh, '<', $bcfile or return;
+    my $read = read $fh, my $bytes, 2;
+    my $result = 1 if $read == 2 and $bytes eq 'BC';
+    close $fh;
+    return $result;
+}
+
+sub _llvm_config {
+    my ($self, $llvm_config, $arg) = @_;
+    my $result = `"$llvm_config" $arg`;
+    chomp $result;
+    return $result;
+}
+
 sub version_check {
     my ($self, $conf, $outputref, $verbose) = @_;
     my $version;
-    if ( $outputref->[1] =~ m/llvm\sversion\s(\d+\.\d+)/s ) {
+    if ( $outputref->[1] =~ m/llvm\sversion\s(\d+\.\d+)/is ) {
         $version = $1;
         if ($version < $self->{lli_min_version}) {
             if ($verbose) {
@@ -238,7 +267,12 @@ sub _handle_failure_to_assemble_assembly {
 sub _handle_result {
     my ($self, $conf, $result) = @_;
     if ( $result ) {
-        $self->set_result( "yes, ".$result );
+        if ($result == 1) {
+            $self->set_result( "yes" );
+        }
+        else {
+            $self->set_result( "yes, ".$result );
+        }
         $conf->data->set( has_llvm => 1 );
     }
     else {
@@ -249,14 +283,14 @@ sub _handle_result {
 }
 
 sub _handle_native_assembly_output {
-    my ($self, $conf, $output, $verbose) = @_;
+    my ($self, $conf, $output, $verbose, $rv) = @_;
     if ( $@ or ( $output !~ /hello world/ ) ) {
         print "Unable to execute native assembly program successfully\n"
             if $verbose;
         $self->_handle_result( $conf, 0 );
     }
     else {
-        $self->_handle_result( $conf, 1 );
+        $self->_handle_result( $conf, $rv );
     }
 }
 
@@ -276,7 +310,7 @@ sub _cleanup_llvm_files {
 
 =head1 AUTHOR
 
-James E Keenan
+James E Keenan, Reini Urban
 
 =cut
 

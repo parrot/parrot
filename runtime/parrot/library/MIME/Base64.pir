@@ -25,18 +25,17 @@ is the string to encode.
 The returned encoded string is broken into lines
 of no more than 76 characters each.
 
-=item C<decode_base64( str )>
+Note: Unicode stored as MIME::Base64 is inherently endian-dependent.
+
+=item C<decode_base64( str, ?:encoding )>
 
 Decode a base64 string by calling the decode_base64() function.
-This function takes a single argument which is the string to decode
-and returns the decoded data.
+This function takes as first argument the string to decode,
+as optional second argument the encoding string for the decoded data.
+It returns the decoded data.
 
 Any character not part of the 65-character base64 subset is silently ignored.
 Characters occurring after a '=' padding character are never decoded.
-
-If the length of the string to decode, after ignoring non-base64 chars,
-is not a multiple of 4 or if padding occurs too early,
-then a warning is generated if perl is running under -w.
 
 =back
 
@@ -93,14 +92,19 @@ then a warning is generated if perl is running under -w.
     six_to_eight = get_global 'six_to_eight'
 
     .local int len, len_mod_3
-    len = length plain
-    len_mod_3 = len % 3
+    .local pmc bb
+    # For unicode we cannot use chr/ord. This breaks endianness.
+    # GH 813 and #814
+    len = bytelength plain
+    bb = new ['ByteBuffer'], len
+    bb = plain
 
+    len_mod_3 = len % 3
     # Fill up with with null bytes
     if len_mod_3 == 0 goto END_1
-        plain = concat plain, ascii:"\0"
+        push bb, 0
         if len_mod_3 == 2 goto END_1
-            plain = concat plain, ascii:"\0"
+            push bb, 0
     END_1:
 
     base64 = ''
@@ -117,12 +121,11 @@ then a warning is generated if perl is running under -w.
     if i >= len goto END_3
 
 	# read 3*8 bits
-	# TODO GH #813 and #814 unicode chars
-        eight_0 = ord plain, i
+        eight_0 = bb[i]
 	inc i
-        eight_1 = ord plain, i
+        eight_1 = bb[i]
 	inc i
-        eight_2 = ord plain, i
+        eight_2 = bb[i]
 	inc i
 
         # d[i]>>2;
@@ -179,32 +182,37 @@ then a warning is generated if perl is running under -w.
 
 .sub decode_base64
     .param string base64
+    .param string enc     :optional
+    .param int    has_enc :opt_flag
 
-    .local string plain, base64_cleaned
+    .local string result, base64_cleaned
+    .local int    enc_num
     base64_cleaned = ''
-    plain          = ''
+    if has_enc goto HAS_ENC
+      enc = 'ascii'
+  HAS_ENC:
 
-    .local pmc eight_to_six
+    .local pmc eight_to_six, bb
     eight_to_six = get_global 'eight_to_six'
 
     .local int    i, len
     .local int    tmp_int_1, tmp_int_2
-    .local string s_tmp_1
 
     # Get rid of non-base64 chars
     len = length base64
     i = 0
-    START_5:
+  START_5:
+    .local string s_tmp_1
     if i >= len goto END_5
         tmp_int_1 = ord base64, i
-	inc i
-	tmp_int_2 = eight_to_six[tmp_int_1]
-	if tmp_int_2 == -1 goto START_5
-	s_tmp_1 = chr tmp_int_1
-	base64_cleaned = concat base64_cleaned, s_tmp_1
+        inc i
+        tmp_int_2 = eight_to_six[tmp_int_1]
+        if tmp_int_2 == -1 goto START_5
+        s_tmp_1 = chr tmp_int_1
+        base64_cleaned = concat base64_cleaned, s_tmp_1
     goto START_5
-    END_5:
 
+  END_5:
     .local int len_mod_4
     len = length base64_cleaned
     len_mod_4 = len % 4
@@ -212,27 +220,27 @@ then a warning is generated if perl is running under -w.
     # make sure that there are dummy bits beyond
     base64_cleaned = concat base64_cleaned, ascii:"\0\0\0"
 
+    bb = new ['ByteBuffer']
     .local int    eight_0, eight_1, eight_2
     .local int    six_0, six_1, six_2, six_3
 
     i = 0
-    START_2:
+  START_2:
     if i >= len goto END_2
 
 	# read 4*6 bits
         tmp_int_1 = ord base64_cleaned, i
-	six_0 = eight_to_six[tmp_int_1]
-	inc i
+        six_0 = eight_to_six[tmp_int_1]
+        inc i
         tmp_int_1 = ord base64_cleaned, i
-	six_1 = eight_to_six[tmp_int_1]
-	inc i
+        six_1 = eight_to_six[tmp_int_1]
+        inc i
         tmp_int_1 = ord base64_cleaned, i
-	six_2 = eight_to_six[tmp_int_1]
-	inc i
+        six_2 = eight_to_six[tmp_int_1]
+        inc i
         tmp_int_1 = ord base64_cleaned, i
-	six_3 = eight_to_six[tmp_int_1]
-	inc i
-
+        six_3 = eight_to_six[tmp_int_1]
+        inc i
 
         # (f64[t.charAt(i)]<<2) | (f64[t.charAt(i+1)]>>4)
         shl tmp_int_1, six_0, 2
@@ -252,25 +260,25 @@ then a warning is generated if perl is running under -w.
 
 	# write 3*8 bits
 	# output is larger than input
-	s_tmp_1 = chr eight_0
-	plain = concat plain, s_tmp_1
-	s_tmp_1 = chr eight_1
-	plain = concat plain, s_tmp_1
-	s_tmp_1 = chr eight_2
-	plain = concat plain, s_tmp_1
-
+        push bb, eight_0
+        push bb, eight_1
+        push bb, eight_2
     goto START_2
-    END_2:
 
+  END_2:
     # cut padded '='
     if len_mod_4 == 0 goto END_3
         if len_mod_4 == 1 goto END_3
-	    plain = chopn plain, 1
+            len = elements bb
+	    dec len
+	    bb = len
             if len_mod_4 == 3 goto END_3
-	        plain = chopn plain, 1
-    END_3:
+	        dec len
+	        bb = len
 
-    .return( plain )
+  END_3:
+    result = bb.'get_string'(enc)
+    .return( result )
 .end
 
 =head1 SEE ALSO
