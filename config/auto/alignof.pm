@@ -92,6 +92,7 @@ sub runstep {
 sub test_if_needed {
     my ($conf) = @_;
 
+    $conf->data->set( TEMP_type => 'int' );
     my ($cc_inc, $ccflags) = $conf->data->get( 'cc_inc', 'ccflags' );
     $conf->cc_gen('config/auto/alignof/test_c.in');
     eval { $conf->cc_build("$cc_inc -DCHECK_COMPILER_OFFSETOF_ALIGNOF") };

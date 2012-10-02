@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 # auto/alignof-01.t
 
 use strict;
