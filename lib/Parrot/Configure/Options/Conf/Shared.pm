@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 package Parrot::Configure::Options::Conf::Shared;
 
 use strict;
@@ -47,6 +47,7 @@ our @shared_valid_options = qw{
     libs
     link
     linkflags
+    llvm-config
     localstatedir
     m
     make
