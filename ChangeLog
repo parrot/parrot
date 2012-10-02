@@ -22,7 +22,10 @@
           have been fixed. There are only some remaining platforms errors on
           darwin/x86.
     - Libraries
-        + Fixed Mime/Base64 encode_base64. Split long lines at 76 chars. [GH #826]
+        + Fixed Mime::Base64: Split long lines at 76 chars. [GH #826]
+          Support multi-byte codepoints. use now binary encoding,
+          encoded files are now endian specific [GH #813 + #814],
+          added 2nd optional encoding arg to decode_base64().
     - Documentation
         + Cleaned up removed parrot cmdline options -D/-O/-v from --help output and
           running.pod [GH #838]
