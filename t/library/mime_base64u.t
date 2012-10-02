@@ -98,6 +98,33 @@ perl -MMIME::Base64 -e'for ([qq(a2)],[qq(c2a2)],[qw(203e)],[qw(3e 20)],[qw(1000)
     .local string plain, base64, comment, comment_count, enc, esc_plain, hex_str
     hex_str = ''
 
+    .include "iglobals.pasm"
+    .local pmc interp
+    interp = getinterp
+    .local pmc config
+    config = interp[.IGLOBALS_CONFIG_HASH]
+    .local int bigendian
+    bigendian  = config['bigendian']
+
+    unless bigendian goto BE_INIT
+        .local pmc be_result
+        be_result = new 'FixedStringArray', size
+	test_iterator = iter encode_decode_tests
+      be_loop:
+        unless test_iterator goto be_loop_end
+        test_case   = shift test_iterator
+        base64      = test_case[1]
+	be_result[count] = base64
+        inc count
+        goto be_loop
+    be_loop_end:
+    be_result[1] = 'ID4='
+    be_result[5] = 'AQA='
+    be_result[7] = 'AMc='
+    be_result[8] = 'AP8AAA=='
+
+  BE_INIT:
+    count = 0
     test_iterator = iter encode_decode_tests
     enc_dec_loop:
         unless test_iterator goto enc_dec_loop_end
@@ -118,6 +145,10 @@ perl -MMIME::Base64 -e'for ([qq(a2)],[qq(c2a2)],[qw(203e)],[qw(3e 20)],[qw(1000)
         $P0[4] = bufused
         $P0[5] = len
         comment = sprintf "encode%d %s:\"%s\" %s(size=%d,len=%d)", $P0
+
+	unless bigendian goto BE_SWAP
+	    base64 = be_result[count]
+      BE_SWAP:
         test_encode( plain, base64, comment )
         comment     = 'decode'
         comment_count = count
@@ -196,11 +227,16 @@ loop_1:
     .param string base64
     .param string comment
 
-    #.include "iglobals.pasm"
-    #.local pmc interp
-    #interp = getinterp
-    #.local pmc config
-    #config = interp[.IGLOBALS_CONFIG_HASH]
+    .include "iglobals.pasm"
+    .local pmc interp
+    interp = getinterp
+    .local pmc config
+    config = interp[.IGLOBALS_CONFIG_HASH]
+    .local int has_icu
+    has_icu = config['has_icu']
+    .local int bigendian
+    bigendian  = config['bigendian']
+
     .local pmc dec_sub
     dec_sub = get_global [ "MIME"; "Base64" ], 'decode_base64'
 
@@ -223,17 +259,14 @@ loop_1:
     push $P0, $I0
     comment = sprintf "%s %s<-%s(enc=%d)", $P0
     if enc == 'binary' goto HEX_C
-    .local int has_icu
-    #has_icu = config['has_icu']
-    has_icu = 1
-    if has_icu goto HAS_ICU
-
-    is( decode, plain, comment )
+        if has_icu goto HAS_ICU
+            is( decode, plain, comment )
+            goto END
   HAS_ICU:
-    result_norm = compose decode
-    plain_norm  = compose plain
-    is( result_norm, plain_norm, comment )
-    goto END
+        result_norm = compose decode
+        plain_norm  = compose plain
+        is( result_norm, plain_norm, comment )
+        goto END
   HEX_C:
     $S0 = hex_chars(decode, enc1)
     $S1 = hex_chars(plain, enc)

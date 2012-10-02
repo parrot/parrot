@@ -418,12 +418,29 @@ CODE
     .param string base64
     .param string comment
 
+    .include "iglobals.pasm"
+    .local pmc interp
+    interp = getinterp
+    .local pmc config
+    config = interp[.IGLOBALS_CONFIG_HASH]
+    .local int has_icu
+    has_icu = config['has_icu']
+    .local int bigendian
+    bigendian  = config['bigendian']
+
     .local pmc dec_sub
     dec_sub = get_global [ "MIME"; "Base64" ], 'decode_base64'
 
-    .local pmc is
+    .local pmc is, skip
     is   = get_hll_global [ 'Test'; 'More' ], 'is'
+    skip = get_hll_global [ 'Test'; 'More' ], 'skip'
 
+    $S0 = 'AAAA'
+    ne base64, $S0, CONT_TEST
+        unless bigendian goto CONT_TEST
+            skip(1, 'multi-byte codepoint test in big-endian')
+            goto END
+  CONT_TEST:
     .local string decode, result_decode
     .local string enc, enc1
     $I0 = encoding plain
@@ -438,14 +455,20 @@ CODE
   DEC_2:
     $I1 = encoding decode
     enc1 = encodingname $I1
-    .local string plain_norm, result_norm
-    result_norm = compose decode
-    plain_norm  = compose plain
     comment = concat comment, " "
     comment = concat comment, enc1
     comment = concat comment, " <-"
     comment = concat comment, enc
+
+    .local string plain_norm, result_norm
+    if has_icu goto HAS_ICU
+        is( decode, plain, comment )
+	goto END
+  HAS_ICU:
+    result_norm = compose decode
+    plain_norm  = compose plain
     is( result_norm, plain_norm, comment )
+  END:
 .end
 
 
