@@ -84,6 +84,8 @@ DYNPMC_H_FILES =                   \
 #ELSIF(win32):LIB_ZLIB = zlib.lib
 #ELSE:LIB_ZLIB = -lz
 
+#IF(has_llvm):LIB_LLVM = @llvm_ldflags@ @llvm_libs@
+
 DYNPMC_CLEANUPS =                        \
     $(DYNPMC_TARGETS)                    \
     $(DYNPMC_FOO_OBJS)                   \

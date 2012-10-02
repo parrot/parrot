@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2010-2011, Parrot Foundation.
+# Copyright (C) 2010-2012, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -12,7 +12,7 @@ use File::Spec::Functions;
 my $parrot_config = "parrot_config" . $PConfig{o};
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
-
+plan skip_all => 'not yet fixed for llvm' if $PConfig{has_llvm};
 
 plan tests => 134;
 

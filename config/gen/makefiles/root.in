@@ -610,7 +610,7 @@ MAKE_C = @make_c@
 # These need to be above lines that define suffix rules to be portable
 # (certainly FreeBSD make doesn't grok the pir.pbc rule otherwise)
 
-.SUFFIXES : .c .S .s .i .pmc .dump $(O) .str .pir .pbc
+.SUFFIXES : .c .S .s .i .cpp .pmc .dump $(O) .str .pir .pbc
 
 .c$(O) : # suffix rule (limited support)
 	$(CC) $(CFLAGS) @optimize@ $(CC_WARN) -I$(@D) -Isrc/ @cc_o_out@$@ -c $<
@@ -1099,6 +1099,10 @@ src/io/userhandle$(O) : \
 	src/io/io_private.h \
 	src/io/userhandle.c
 
+## SUFFIX OVERRIDE - need llvm_cxxflags
+src/llvm_extra$(O) : src/llvm_extra.cpp
+	$(CXX) @llvm_cxxflags@ $(CFLAGS) @optimize@ -I$(@D) -Isrc/ @cc_o_out@$@ -c src/llvm_extra.cpp
+
 O_FILES = \
 	$(INTERP_O_FILES) \
 	$(IO_O_FILES) \
@@ -1136,7 +1140,9 @@ $(LIBPARROT_SHARED) : $(O_FILES)
 #IF(cygwin and optimize):		-s \
 #IF(cygwin):		-Wl,--out-implib=libparrot.dll.a \
 #IF(win32 and cc==gcc):		-Wl,--out-implib=libparrot.lib \
-		$(O_FILES) $(C_LIBS) $(ICU_SHARED)
+		$(O_FILES) $(C_LIBS) \
+#IF(has_llvm):	@llvm_ldflags@ @llvm_libs@ \
+		$(ICU_SHARED)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(libparrot_shared_alias):	( cd @blib_dir@ ; ln -sf @libparrot_shared@ @libparrot_shared_alias@ )
 	$(CP) tools/dev/gdb-pp-load.py @blib_dir@/@libparrot_shared@-gdb.py
