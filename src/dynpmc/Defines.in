@@ -1,4 +1,4 @@
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2012, Parrot Foundation.
 
 # The Select dynpmc is extravagantly broken on win32.  Help wanted.
 DYNPMC_TARGETS =                                      \
@@ -11,7 +11,8 @@ DYNPMC_TARGETS =                                      \
     $(DYNEXT_DIR)/pccmethod_test$(LOAD_EXT)           \
     $(DYNEXT_DIR)/rotest$(LOAD_EXT)                   \
     $(DYNEXT_DIR)/rational$(LOAD_EXT)                 \
-    $(DYNEXT_DIR)/subproxy$(LOAD_EXT)
+    $(DYNEXT_DIR)/subproxy$(LOAD_EXT)		      \
+    $(DYNEXT_DIR)/llvm_engine$(LOAD_EXT)
 
 DYNPMC_FOO =            \
     src/dynpmc/foo.pmc  \
