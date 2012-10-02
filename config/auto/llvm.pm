@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2011, Parrot Foundation.
+# Copyright (C) 2009-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -227,7 +227,7 @@ sub _handle_failure_to_assemble_assembly {
 sub _handle_result {
     my ($self, $conf, $result) = @_;
     if ( $result ) {
-        $self->set_result( "yes, ".$result );
+        $self->set_result( "yes" );
         $conf->data->set( has_llvm => 1 );
     }
     else {
