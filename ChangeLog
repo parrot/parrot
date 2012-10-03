@@ -10,6 +10,7 @@
           bytes from every installed executable. [GH #824]
         + Parrot_get_cpu_type returns now "unknown" for all unknown cpu types.
           On non-windows it returned before 4.9.0 a null string. [GH #846]
+        + Fixed src/hash.c for platforms where size_t is unsigned (e.g. vms) [GH #854]
     - Build
         + Improved warnings for clang. [GH #843]
         + Cleaned wrong UNUSED(arg) macros in all pmc's due to an improved
