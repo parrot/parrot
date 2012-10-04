@@ -6,7 +6,7 @@ config/auto/thread.pm - Thread support
 
 =head1 DESCRIPTION
 
-Determining if the system has a Thread support.
+Determining if the system has thread support.
 
 =cut
 
@@ -22,7 +22,7 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Does your system has thread};
+    $data{description} = q{Does your system have threads};
     $data{result}      = q{};
     return \%data;
 }
