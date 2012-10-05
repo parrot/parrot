@@ -1,6 +1,4 @@
-/* Copyright (C) 2010, Parrot Foundation.
-
-
+/* Copyright (C) 2010-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -30,18 +28,21 @@ This file implements a native call frame (thunk) factory using libffi.
 #  error "unhandled INTVAL_SIZE value"
 #endif
 
-#if (NUMVAL_SIZE == 4)
+#if (FLOATTYPE == FLOATTYPE_4)
 #  define ffi_type_parrot_numval ffi_type_float
-#elif(NUMVAL_SIZE == 8)
+#elif(FLOATTYPE == FLOATTYPE_8)
 #  define ffi_type_parrot_numval ffi_type_double
-#elif(NUMVAL_SIZE == 12)
+#elif(FLOATTYPE == FLOATTYPE_10)
+#  define ffi_type_parrot_numval ffi_type_longdouble
+#elif(FLOATTYPE == FLOATTYPE_16PPC)
 #  define ffi_type_parrot_numval ffi_type_longdouble
 #elif(NUMVAL_SIZE == 16)
+#  /* TODO native quad (sparc64/s390 %q registers) */
 #  if PARROT_HAS_LONGLONG
 #    if (LONGLONG_SIZE == 8)
 #      define ffi_type_parrot_numval ffi_type_sint64
 #    else
-#      error "unhandled long long size"
+#      error "unhandled long long size for NUMVAL_SIZE = 16"
 #    endif
 #  endif
 #else
