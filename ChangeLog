@@ -17,6 +17,7 @@
         + Move -Wformat to --cage #1165
         + Fix and allow --cxx on FreeBSD 10 (clang, not g++) #1166
         + Fix git_describe config probe on tag-less repos, e.g. git clone --depth #1167
+        + Fix solaris asctime_r with _POSIX_C_SOURCE #858
     - Documentation
     - Tests
     - Community
