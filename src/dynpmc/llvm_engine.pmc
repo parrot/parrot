@@ -1,3 +1,11 @@
+/*
+ * Copyright (C) 2011, Parrot Foundation.
+ */
+
+/*
+ * Create a LLVM based JIT compiler for a PMC module
+ */
+
 
 #include <stdint.h>
 #include <limits.h>
@@ -84,3 +92,11 @@ pmclass LLVM_Engine dynpmc group llvm auto_attrs {
         RETURN(PMC* ptr);
     }
 };
+
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */
