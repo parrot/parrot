@@ -47,8 +47,10 @@ sub _probe_for_gcc {
 sub _evaluate_gcc {
     my ($self, $conf, $gnucref) = @_;
 
-    # Set gccversion to undef.  This will also trigger any hints-file
-    # callbacks that depend on knowing whether or not we're using gcc.
+    # Set empty noonline and gccversion to undef.
+    # This will also trigger any hints-file callbacks that depend on
+    # knowing whether or not we're using gcc.
+    $conf->data->set( noinline => '' );
 
     # This key should always exist unless the program couldn't be run,
     # which should have been caught by the 'die' above.
@@ -96,7 +98,7 @@ sub _evaluate_gcc {
 
     # and set -x c++ for clang++
     if ($clang and $gpp and index($cc, '-x c++') < 1) {
-	$conf->data->set('cc' => $cc.' -x c++');
+        $conf->data->set('cc' => $cc.' -x c++');
     }
 
     $conf->data->set(

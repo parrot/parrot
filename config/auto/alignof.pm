@@ -6,9 +6,10 @@ config/auto/alignof.pm - clang++ offsetof values
 
 =head1 DESCRIPTION
 
-Determines the offsetof() values of our types, if the compiler cannot do compile-time ALIGNOF
-definitions via offsetof(). clang++ or strict C++ compilers need this step, to calculate these
-pre-compiled PARROT_ALIGNOF_* definitions.
+Determines the offsetof() values of our types, if the compiler cannot do
+compile-time ALIGNOF definitions via offsetof(). clang++ or strict C++
+compilers need this step, to calculate these pre-compiled PARROT_ALIGNOF_*
+definitions.
 
 =cut
 
@@ -34,11 +35,11 @@ sub runstep {
 
     # This step only needed for clang++
     if (test_if_needed($conf)) {
-	# Can do compile-time ALIGNOF definitions via offsetof()
-	$conf->data->set( 'HAS_COMPILER_OFFSETOF_ALIGNOF' => 1 );
+        # Can do compile-time ALIGNOF definitions via offsetof()
+        $conf->data->set( 'HAS_COMPILER_OFFSETOF_ALIGNOF' => 1 );
         $conf->debug("DEBUG: auto::alignof is only needed for clang++\n");
         $self->set_result('skipped');
-	return 1;
+        return 1;
     }
     # Need pre-compiled PARROT_ALIGNOF_* definitions
     $conf->data->set( 'HAS_COMPILER_OFFSETOF_ALIGNOF' => 0 );
@@ -46,8 +47,8 @@ sub runstep {
     my %types = (
         intval     => $conf->data->get('iv'),
         floatval   => $conf->data->get('nv'),
-	stringptr  => 'STRING *',
-	pmcptr     => 'PMC *',
+        stringptr  => 'STRING *',
+        pmcptr     => 'PMC *',
         char       => 'char',
         short      => 'short',
         int        => 'int',
@@ -59,14 +60,13 @@ sub runstep {
         float      => 'float',
         double     => 'double',
         longdouble => 'long double',
-	Parrot_Int1 => 'char',
-	Parrot_Int2 => 'short',
-	Parrot_Int4 => 'int',
-	Parrot_Int8 => 'long long',
-	charptr    => 'char *',
-	voidptr    => 'void *',
-	funcptr_t  => 'funcptr_t',
-
+        Parrot_Int1 => 'char',
+        Parrot_Int2 => 'short',
+        Parrot_Int4 => 'int',
+        Parrot_Int8 => 'long long',
+        charptr    => 'char *',
+        voidptr    => 'void *',
+        funcptr_t  => 'funcptr_t',
         longlong   => 'long long',
         ulonglong  => 'unsigned long long',
         __float128 => '__float128',
@@ -74,14 +74,15 @@ sub runstep {
 
     my $alignof = '';
     for my $name (keys %types) {
-	my $type = $types{$name};
-	my $value = test_alignof($conf, $name, $type);
-	$alignof .= ' '.$name;
-	if ($value) {
-	    $conf->data->set( 'PARROT_ALIGNOF_'.$name => $value );
-	}
+        my $type = $types{$name};
+        my $value = test_alignof($conf, $name, $type);
+        $alignof .= ' '.$name;
+        if ($value) {
+            $conf->data->set( 'PARROT_ALIGNOF_'.$name => $value );
+        }
     }
     $conf->data->set( 'alignof' => $alignof );
+    $self->set_result('done');
 
     return 1;
 }
@@ -91,6 +92,7 @@ sub runstep {
 sub test_if_needed {
     my ($conf) = @_;
 
+    $conf->data->set( TEMP_type => 'int' );
     my ($cc_inc, $ccflags) = $conf->data->get( 'cc_inc', 'ccflags' );
     $conf->cc_gen('config/auto/alignof/test_c.in');
     eval { $conf->cc_build("$cc_inc -DCHECK_COMPILER_OFFSETOF_ALIGNOF") };

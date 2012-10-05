@@ -1,4 +1,4 @@
-# Copyright (C) 2011, Parrot Foundation.
+# Copyright (C) 2011-2012, Parrot Foundation.
 from gdb.printing import PrettyPrinter, SubPrettyPrinter
 import gdb.types
 import gdb
@@ -155,6 +155,23 @@ def _parrot_str_to_str(val):
     """
     encoding = val['encoding'].dereference()
     encoding_name = encoding['name'].string()
-    length = val['strlen']
+    name = encoding_name
+    if name == 'ascii':
+        name = ''
+    if name == 'iso-8859-1':
+        name = ''
+    length = val['bufused']
 
-    return val['strstart'].string(encoding=encoding_name,length=length)
+    # See http://docs.python.org/library/codecs.html#standard-encodings
+    if encoding_name == 'binary':
+        encoding_name='raw_unicode_escape'
+    if encoding_name == 'ucs2':
+        encoding_name='utf_16'
+    if encoding_name == 'ucs4':
+        encoding_name=='utf_32'
+    if name == '':
+        return val['strstart'].string(encoding=encoding_name,errors='replace',length=length)
+    else:
+        return '%s:%s [%d/%d]' % \
+            (name, val['strstart'].string(encoding=encoding_name,errors='replace',length=length), \
+             val['strlen'], length)
