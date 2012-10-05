@@ -116,7 +116,7 @@ like( $output, qr/maximum GC nursery size is 50%/,
 is( $exit, 0, '... and should not crash' );
 
 
-sub numthreads_tests() {
+sub numthreads_tests {
     my $output = qx{$PARROT 2>&1 --numthreads 0};
     like($output, qr/minimum number of threads is 2/, '--numthreads 0 gives an error');
 
