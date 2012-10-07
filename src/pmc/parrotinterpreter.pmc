@@ -57,6 +57,8 @@ static void create_interp(
 
 Clones the interpreter as specified by the flags.
 
+TODO: Move this logic into src/interp/api.c or src/threads.c, as appropriate
+
 =cut
 
 */
@@ -141,7 +143,16 @@ clone_interpreter(Parrot_Interp s, INTVAL flags)
     if (flags & PARROT_CLONE_HLL) {
         /* we'd like to share the HLL data. Give it a PMC_sync structure
            if it doesn't have one already */
-        d->HLL_info = Parrot_thread_create_proxy(s, d, s->HLL_info);
+
+        /* This used to be proxied:
+
+            d->HLL_info = Parrot_thread_create_proxy(s, d, s->HLL_info);
+
+            But src/hll.c:Parrot_hll_get_HLL_type() pokes directly into the
+            PMC attributes which is a problem if we're using a Proxy. Instead,
+            clone the structure so direct accesses continue working.
+        */
+        d->HLL_info = VTABLE_clone(d, s->HLL_info);
         d->HLL_namespace = Parrot_thread_create_proxy(s, d, s->HLL_namespace);
         d->HLL_entries   = Parrot_thread_create_proxy(s, d, s->HLL_entries);
     }
