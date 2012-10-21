@@ -99,6 +99,7 @@ Mark active socket handle data as live.
         if (data) {
             Parrot_gc_mark_PMC_alive(INTERP, data->local);
             Parrot_gc_mark_PMC_alive(INTERP, data->remote);
+            Parrot_gc_mark_STRING_alive(INTERP, data->record_separator);
             Parrot_io_buffer_mark(interp, data->read_buffer);
             Parrot_io_buffer_mark(interp, data->write_buffer);
         }
