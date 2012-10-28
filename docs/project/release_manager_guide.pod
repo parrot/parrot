@@ -413,9 +413,9 @@ on L<http://www.parrot.org>.
 
 =item 1
 
-Create a new page for the release announcement by navigating to I<Create content>
--> I<Story>. There's some additional stuff needed at the top of the page; use one of the
-old announcements as a guide.
+Create a new page for the release announcement by navigating to going to
+L<https://www.parrot.org/node/add/story>. There's some additional stuff needed
+at the top of the page; use one of the old announcements as a guide.
 
 The "<!--break-->" line marks the end of the text that will appear on the front page.
 
