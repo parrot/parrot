@@ -20,6 +20,7 @@ use strict;
 use warnings;
 
 use File::Temp qw (tempfile );
+use File::Spec qw (catfile );
 use base qw(Parrot::Configure::Step);
 use Parrot::Configure::Utils ':auto';
 
@@ -35,8 +36,7 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $slash = $conf->data->get('slash');
-    my $cmd = $conf->data->get('scriptdirexp_provisional') . $slash . q{perldoc};
+    my $cmd = File::Spec->catfile($conf->data->get('scriptdirexp_provisional'), q{perldoc});
     my ( $fh, $filename ) = tempfile( UNLINK => 1 );
     my $content = capture_output("$cmd -ud $filename perldoc") || undef;
 

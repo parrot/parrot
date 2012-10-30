@@ -91,8 +91,9 @@ sub new {
     die "Must have key 'args' which is a reference to a list of the remaining arguments"
         unless ( defined $allargsref->{args} and ref( $allargsref->{args} ) eq q{ARRAY} );
 
+    my $base = File::Spec->catdir($allargsref->{bin},'..','..');
     unshift @{ $allargsref->{include} },
-        '.', "$allargsref->{bin}/../..", "$allargsref->{bin}/../../src/pmc", "$allargsref->{bin}/../../src/dynpmc";
+      '.', $base, File::Spec->catdir($base,'src','pmc'), File::Spec->catdir($base,'src','dynpmc');
 
     foreach my $opt ( qw(nolines) ) {
         if ( !defined $allargsref->{opt}{$opt} ) {
