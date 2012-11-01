@@ -13747,13 +13747,15 @@ Parrot_local_return_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_jump_i(opcode_t *cur_opcode, PARROT_INTERP) {
-    opcode_t * const loc = INTVAL2PTR(opcode_t *, IREG(1));
+    opcode_t  * const  loc = INTVAL2PTR(opcode_t *, IREG(1));
+
     return (opcode_t *)loc;
 }
 
 opcode_t *
 Parrot_jump_ic(opcode_t *cur_opcode, PARROT_INTERP) {
-    opcode_t * const loc = INTVAL2PTR(opcode_t *, ICONST(1));
+    opcode_t  * const  loc = INTVAL2PTR(opcode_t *, ICONST(1));
+
     return (opcode_t *)loc;
 }
 
@@ -13980,7 +13982,7 @@ Parrot_result_info_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const  caller_ctx = Parrot_pcc_get_caller_ctx(interp, CURRENT_CONTEXT(interp));
     PMC  * const  sig = VTABLE_get_attr_str(interp, caller_ctx, Parrot_str_new_constant(interp, "return_flags"));
 
-    if ((!sig)) {
+    if (PMC_IS_NULL(sig)) {
         PREG(1) = Parrot_pmc_new(interp, enum_class_FixedIntegerArray);
     }
     else {

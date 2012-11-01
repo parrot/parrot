@@ -567,7 +567,7 @@ inline op result_info(out PMC) {
             Parrot_str_new_constant(interp, "return_flags"));
 
     /* If no elements, hand back empty array; otherwise PMC. */
-    if (!sig)
+    if (PMC_IS_NULL(sig))
         $1 = Parrot_pmc_new(interp, enum_class_FixedIntegerArray);
     else
         $1 = sig;
