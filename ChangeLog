@@ -1,7 +1,73 @@
-2012-07-XX    release 4.6.0
+2012-10-16    release 4.9.0
     - Core
+        + Keep encoding information in the imcc optimizer, which fixes the
+          concat op but probably many more cases with non-ascii encoded
+          constant strings. [GH #837]
+        + Fixed ByteBuffer set_string_native, which became out of sync with
+          two internal buffers. [GH #835]
+        + Preload Configure steps when called with perl -d Configure.pl [GH #833]
+        + Strip unneeded config keys from installed config hash. Saves 6360
+          bytes from every installed executable. [GH #824]
+        + Parrot_get_cpu_type returns now "unknown" for all unknown cpu types.
+          On non-windows it returned before 4.9.0 a null string. [GH #846]
+        + Fixed src/hash.c for platforms where size_t is unsigned (e.g. vms) [GH #854]
+    - Build
+        + Improved warnings for clang. [GH #843]
+        + Cleaned wrong UNUSED(arg) macros in all pmc's due to an improved
+          pmc2c compiler, which SHIMs all UNUSED args. [GH #836]
+        + Added clang++ support and a new auto::alignof Configure step. [GH #844]
+        + Fixed auto::inline for C++ compilers
+        + Improved auto::llvm
+    - Branches
+        + The threads branch is almost ready to be merged. Some remaining races
+          have been fixed. There are only some remaining platforms errors on
+          darwin/x86.
+    - Libraries
+        + Fixed Mime::Base64: Split long lines at 76 chars. [GH #826]
+          Support multi-byte codepoints. Use binary encoding,
+          encoded files are now endian specific [GH #813 + #814],
+          Added 2nd optional encoding arg to decode_base64().
     - Documentation
+        + Cleaned up removed parrot cmdline options -D/-O/-v from --help output and
+          running.pod [GH #838]
+    - Tools
+        + Improved gdb pretty-printing for multi-byte strings
+
+2012-09-18    release 4.8.0
+    - Core
+        + Prevent interpreter from dying twice
+        + Complete rewrite of the IO system, including new unified IO PMC
+          semantics.
+        + The Integer and Float PMCs now have a get_pointer vtable which is
+          needed when using NCI to bind to Fortran libraries such as LAPACK
+    - Deprecations
+	+ Moved dynpmc/os to pmc os. loadlib 'os' is not needed anymore.
+    - Platforms
+        + Fixed for the FileHandle open method the append mode on Windows.
+        + Fix compilation on Windows without working mt.exe
+        + Detect GNU/Hurd as linux proper.
+        + Fixed broken int3 trap on Solaris with gcc.
+        + Updated the vms port on a YAPC::EU hackathon with vaxman and mvorl.
     - Tests
+        + Improve testability with valgrind or thread-sanitizer
+
+2012-08-21    release 4.7.0
+    - Core
+        + Added .all_tags() and .all_tagged_pmcs() methods to PackfileView PMC
+        + Several build and coding standards fixes
+
+2012-07-17    release 4.6.0
+    - Core
+        + Added init_pmc method to PackFileView.
+    - Documentation
+        + Added source lines from 'docs/index/book.json' to 'index.json'
+          to make display of 'Parrot Developer's Guide: PIR (draft)'
+          display more like the other books, e.g., 'PCT Book'.
+        + Removed 'docs/index/book.json' as unnecessary.
+    - Tests
+    - Build
+        + Improve on 'sudo make install' permission errors by using
+          File::Copy::cp.
     - Community
 
 2012-06-19    release 4.5.0

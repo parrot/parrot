@@ -12,7 +12,7 @@ Simon Cozens, Jeff Goff, Steve Fink, Leo Toetsch, Chip Salzenberg, Jerry Gay,
 Patrick Michaud, Will "coke" Coleda, Matt Diephouse, chromatic, Allison Randal,
 Jonathan Worthington, Bob Rogers, Bernhard Schmalhofer, Andrew Whitworth,
 Francois Perrad, Jonathan "Duke" Leto, Michael Hind, James E Keenan, Alvis
-Yardley.
+Yardley, Reini Urban.
 
 
 =head1 THE RECORDS
@@ -144,5 +144,9 @@ Starred release numbers indicate supported releases.
  cotto       4.3.0 *        2012-Apr-17     "In Which..."
  Whiteknight 4.4.0          2012-May-15     "Banana Fanna Fo Ferret"
  alvis       4.5.0          2012-Jun-19     "Buff-faced Pygmy Parrot"
+ rurban      4.6.0 *        2012-Jul-17     "Wild Parrots of Telegraph Hill"
+ Whiteknight 4.7.0          2012-Aug-22     "Hispaniolan"
+ alvis       4.8.0          2012-Sep-18     "Spix's Macaw"
+ dukeleto    4.9.0 *        2012-Oct-16     "Proto-Hydra"
 
 =cut

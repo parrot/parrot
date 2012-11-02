@@ -409,15 +409,6 @@ Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, SHIM(void *arg))
      */
     Parrot_gc_completely_unblock(interp);
 
-    /* Set non buffered mode in standard out and err handles, flushing
-     * the buffers and avoiding pending output gets confused or lost in
-     * case of errors during destruction.
-     */
-    Parrot_io_setbuf(interp,
-            Parrot_io_stdhandle(interp, PIO_STDOUT_FILENO, NULL), PIOCTL_NONBUF);
-    Parrot_io_setbuf(interp,
-            Parrot_io_stdhandle(interp, PIO_STDERR_FILENO, NULL), PIOCTL_NONBUF);
-
     if (Interp_trace_TEST(interp, ~0)) {
         Parrot_io_eprintf(interp, "FileHandle objects (like stdout and stderr)"
             "are about to be closed, so clearing trace flags.\n");
@@ -450,9 +441,11 @@ Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, SHIM(void *arg))
   */
 
     /* we destroy all child interpreters and the last one too,
-     * if the --leak-test commandline was given */
-    if (! (interp->parent_interpreter
-    ||    Interp_flags_TEST(interp, PARROT_DESTROY_FLAG)))
+     * if the --leak-test commandline was given, and there is no
+     * pending exception. */
+    if (! (interp->parent_interpreter)
+        || (Interp_flags_TEST(interp, PARROT_DESTROY_FLAG)
+            && !PMC_IS_NULL(interp->final_exception)))
         return;
 
     if (interp->parent_interpreter)

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -1762,8 +1762,8 @@ Called after the class has been thawed.
 */
 
     VTABLE void thawfinish(PMC *info) {
-        Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
         UNUSED(info)
+        Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
 
         /* Recalculate full MRO from thawed parents */
         _class->all_parents         = Parrot_ComputeMRO_C3(INTERP, SELF);

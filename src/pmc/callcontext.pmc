@@ -1019,8 +1019,9 @@ return current Namespace
         else
             Parrot_ex_throw_from_c_args(INTERP, NULL,
                 EXCEPTION_ATTRIB_NOT_FOUND, "No such attribute '%S'", key);
-
-        return value;
+        if (value)
+            return value;
+        return PMCNULL;
     }
 
     VTABLE INTVAL elements() {

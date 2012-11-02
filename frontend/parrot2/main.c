@@ -345,8 +345,8 @@ usage(ARGMOD(FILE *fp))
 {
     ASSERT_ARGS(usage)
     fprintf(fp,
-            "parrot -[acEGhrtvVwy.] [-d [FLAGS]] [-D [FLAGS]]"
-            "[-O [level]] [-R runcore] [-o FILE] <file>\n");
+            "parrot -[acEGhrtVwy.] [-D [FLAGS]]"
+            "[-R runcore] [-o FILE] <file>\n");
 }
 
 /*
@@ -364,19 +364,6 @@ help_debug(void)
 {
     ASSERT_ARGS(help_debug)
     /* split printf for C89 compliance on string length */
-    printf(
-    "--imcc-debug -d [Flags] ...\n"
-    "    0002    lexer\n"
-    "    0004    parser\n"
-    "    0008    imc\n"
-    "    0010    CFG\n"
-    "    0020    optimization 1\n"
-    "    0040    optimization 2\n"
-    "    0100    AST\n"
-    "    1000    PBC\n"
-    "    2000    PBC constants\n"
-    "    4000    PBC fixups\n"
-    "\n");
     printf(
     "--parrot-debug -D [Flags] ...\n"
     "    0001    memory statistics\n"

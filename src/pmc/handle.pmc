@@ -33,9 +33,13 @@ EXCEPTION_INVALID_OPERATION.
 
 pmclass Handle provides Handle manual_attrs {
     /* TODO: Consider encapsulating PIOHANDLE as a PMC type, for subclassing */
-    ATTR PIOHANDLE os_handle;         /* Low level OS descriptor      */
-    ATTR INTVAL    record_separator;  /* Record separator (only single char
-                                       * supported) */
+    ATTR PIOHANDLE os_handle;           /* Low level OS descriptor */
+    ATTR STRING    *record_separator;   /* Record separator */
+    ATTR IO_VTABLE *io_vtable;          /* Function dispatch table */
+    ATTR IO_BUFFER *read_buffer;        /* Read Buffer */
+    ATTR IO_BUFFER *write_buffer;       /* Write Buffer */
+    ATTR STRING *encoding;              /* The encoding for read/write  */
+
 
     VTABLE void init() {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
@@ -45,6 +49,44 @@ pmclass Handle provides Handle manual_attrs {
     VTABLE void init_pmc(PMC * init) {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Handle cannot be instantiated directly.");
+    }
+
+    VTABLE void *get_pointer_keyed_int(INTVAL key)
+    {
+        void * ptr;
+        switch (key) {
+            case IO_PTR_IDX_VTABLE:
+                GET_ATTR_io_vtable(INTERP, SELF, ptr);
+                break;
+            case IO_PTR_IDX_READ_BUFFER:
+                GET_ATTR_read_buffer(INTERP, SELF, ptr);
+                break;
+            case IO_PTR_IDX_WRITE_BUFFER:
+                GET_ATTR_write_buffer(INTERP, SELF, ptr);
+                break;
+            default:
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
+                    "Handle: Cannot get pointer %d", key);
+        }
+        return ptr;
+    }
+
+    VTABLE void set_pointer_keyed_int(INTVAL key, void *ptr)
+    {
+        switch (key) {
+            case IO_PTR_IDX_VTABLE:
+                SET_ATTR_io_vtable(INTERP, SELF, (IO_VTABLE *)ptr);
+                break;
+            case IO_PTR_IDX_READ_BUFFER:
+                SET_ATTR_read_buffer(INTERP, SELF, (IO_BUFFER *)ptr);
+                break;
+            case IO_PTR_IDX_WRITE_BUFFER:
+                SET_ATTR_write_buffer(INTERP, SELF, (IO_BUFFER *)ptr);
+                break;
+            default:
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
+                    "Handle: Cannot set pointer %d", key);
+        }
     }
 
 /*
@@ -115,8 +157,12 @@ Read a line from the handle and return it in a string.
 
 */
 
-    METHOD readline() {
-        STRING * const string_result = Parrot_io_readline(INTERP, SELF);
+    METHOD readline(STRING * record_separator :optional, INTVAL has_rs :opt_flag) {
+        STRING * string_result;
+        if (!has_rs) {
+            GET_ATTR_record_separator(interp, SELF, record_separator);
+        }
+        string_result = Parrot_io_readline_s(INTERP, SELF, record_separator);
         RETURN(STRING *string_result);
     }
 
@@ -125,14 +171,16 @@ Read a line from the handle and return it in a string.
 =item C<METHOD read_bytes(INTVAL bytes)>
 
 Read the given number of bytes from the handle and return them in a
-ByteBuffer.
+ByteBuffer. If C<bytes> is omitted, or if it's C<-1> the handle will attempt
+to read whatever is available, up to the size of the buffer.
 
 =cut
 
 */
 
-    METHOD read_bytes(INTVAL length) {
-        PMC * const bb = Parrot_io_read_byte_buffer_pmc(INTERP, SELF, PMCNULL, length);
+    METHOD read_bytes(INTVAL length :optional, INTVAL has_length :opt_flag) {
+        PMC * const bb = Parrot_io_read_byte_buffer_pmc(INTERP, SELF, PMCNULL,
+                                       has_length ? length : PIO_READ_SIZE_ANY);
         RETURN(PMC *bb);
     }
 
@@ -153,19 +201,16 @@ Set the record separator for readline.
 */
 
     METHOD record_separator(STRING *str :optional, int has_str :opt_flag) {
-        INTVAL c;
-
         if (has_str) {
-            if (STRING_length(str) != 1)
+            if (STRING_IS_NULL(str))
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                    "Record separator must be a single character");
+                    "Record separator may not be null");
 
-            c = STRING_ord(interp, str, 0);
-            SET_ATTR_record_separator(INTERP, SELF, c);
+            str = Parrot_io_reencode_string_for_handle(INTERP, SELF, str);
+            SET_ATTR_record_separator(INTERP, SELF, str);
         }
         else {
-            GET_ATTR_record_separator(INTERP, SELF, c);
-            str = Parrot_str_chr(interp, c);
+            GET_ATTR_record_separator(INTERP, SELF, str);
         }
 
         RETURN(STRING *str);
@@ -183,10 +228,35 @@ Close the handle.
 */
 
     METHOD close() {
-        const INTVAL status = Parrot_io_close_handle(INTERP, SELF);
+        const INTVAL status = Parrot_io_close(INTERP, SELF, 1);
         RETURN(INTVAL status);
     }
 
+/*
+
+=item C<METHOD encoding(STRING *new_encoding)>
+
+Set or retrieve the encoding attribute (a string name of the selected encoding
+scheme) for the filehandle.
+
+=cut
+
+*/
+
+    METHOD encoding(STRING *encoding :optional, INTVAL got_encoding :opt_flag) {
+        if (got_encoding) {
+            STRING * record_separator;
+
+            SET_ATTR_encoding(INTERP, SELF, encoding);
+            GET_ATTR_record_separator(INTERP, SELF, record_separator);
+            record_separator = Parrot_io_reencode_string_for_handle(INTERP, SELF, record_separator);
+            SET_ATTR_record_separator(INTERP, SELF, record_separator);
+        }
+        else {
+            GET_ATTR_encoding(INTERP, SELF, encoding);
+        }
+        RETURN(STRING *encoding);
+    }
 }
 
 /*

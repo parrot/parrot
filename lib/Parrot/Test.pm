@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2009, Parrot Foundation.
+# Copyright (C) 2004-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -607,7 +607,7 @@ sub _pir_stdin_output_slurp {
             or die "Unable to pipe output to us: $!";
         <$in>;
     };
-
+    $result =~ s/(^==\d+==.*\n)//mg if defined $ENV{VALGRIND};
     return $result;
 }
 
@@ -809,6 +809,8 @@ sub _generate_test_functions {
 
             my $meth        = $parrot_test_map{$func};
             my $real_output = slurp_file($out_f);
+            my $ori_output = $real_output;
+            $real_output =~ s/(^==\d+==.*\n)//mg if defined $ENV{VALGRIND};
 
             _unlink_or_retain( $out_f );
 
@@ -839,7 +841,8 @@ sub _generate_test_functions {
             elsif ($exit_code) {
                 $builder->ok( 0, $desc );
                 $builder->diag( "Exited with error code: $exit_code\n"
-                        . "Received:\n$real_output\nExpected:\n$expected\n" );
+                        . "Received:\n$real_output\nExpected:\n$expected\n"
+                        . $ori_output ne $real_output ? "$ori_output\n" : "");
                 return 0;
             }
             my $pass = $builder->$meth( $real_output, $expected, $desc );
@@ -998,7 +1001,7 @@ sub _generate_test_functions {
                 my $cmd =
                       "$PConfig{cc} $PConfig{ccflags} $PConfig{cc_debug} "
                     . ($^O =~ m/MSWin32/ and $PConfig{cc} eq 'cl' ? "-DPARROT_IN_EXTENSION" : "")
-                    . " -I./include -c "
+                    . ($^O eq 'VMS' ? "" : " -I./include -c ")
                     . "$PConfig{cc_o_out}$obj_f $source_f";
                 my $exit_code = run_command(
                     $cmd,
@@ -1059,16 +1062,20 @@ sub _generate_test_functions {
                     'STDERR' => $out_f
                 );
                 my $output = slurp_file($out_f);
+                my $ori_output = $output;
+                $output =~ s/(^==\d+==.*\n)//mg if defined $ENV{VALGRIND};
 
                 if ($exit_code) {
                     $pass = $builder->ok( 0, $desc );
                     $builder->diag( "Exited with error code: $exit_code\n"
-                            . "Received:\n$output\nExpected:\n$expected\n" );
+                            . "Received:\n$output\nExpected:\n$expected\n"
+                            . $ori_output ne $output ? "$ori_output\n" : "");
                 }
                 else {
                     my $meth = $c_test_map{$func};
                     $pass = $builder->$meth( $output, $expected, $desc );
-                    $builder->diag("'$cmd' failed with exit code $exit_code")
+                    $builder->diag("'$cmd' failed with exit code $exit_code.\n"
+                                   . $ori_output ne $output ? "$ori_output\n" : "")
                         unless $pass;
                 }
             }

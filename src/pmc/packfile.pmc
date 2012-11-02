@@ -112,6 +112,10 @@ pmclass Packfile auto_attrs {
 
 Initialize the structure.  (Create a blank PackFile object.)
 
+=item C<VTABLE void init_pmc(view)>
+
+Create a new PackFile from an existing PackFileView.
+
 =cut
 
 */
@@ -130,6 +134,11 @@ Initialize the structure.  (Create a blank PackFile object.)
         pf = PackFile_new(INTERP, 0);
         copy_packfile_header(INTERP, SELF, pf);
         PackFile_destroy(INTERP, pf);
+    }
+
+    VTABLE void init_pmc(PMC *view) {
+        VTABLE_init(interp, SELF);
+        VTABLE_set_pointer(interp, SELF, VTABLE_get_pointer(interp, view));
     }
 
 
@@ -502,6 +511,18 @@ start of the packfile.
         PMC * const dir = PARROT_PACKFILE(SELF)->directory;
         RETURN(PMC *dir);
     }
+
+/*
+
+=item C<PMC *view()>
+
+Get a PackfileView for the current packfile. PackfileView is a read-only
+wrapper around a static packfile structure. This method creates a fresh copy
+of the packfile structure and assigns that copy to the new PackfileView PMC.
+
+=cut
+
+*/
 
     METHOD view() {
         const Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);

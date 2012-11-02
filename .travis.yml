@@ -22,6 +22,8 @@ script: "perl Configure.pl $PARROT_CONFIG_ARGS $PARROT_OPTIMIZE --cc=\"$CC\" --l
 branches:
    only:
      - master
+     - threads
+     - /smoke-me/
 notifications:
   recipients:
     - parrot-ci@lists.parrot.org
@@ -34,12 +36,16 @@ notifications:
     on_success: change
     on_failure: change
 env:
-    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize" PARROT_TEST="smoke" CC="clang"
     - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE=""           PARROT_TEST="smoke" CC="clang"
     - PARROT_CONFIG_ARGS="--without-gettext --without-gmp --without-libffi --without-extra-nci-thunks --without-opengl --without-readline --without-pcre --without-zlib --without-threads --without-icu" PARROT_OPTIMIZE="" PARROT_TEST="smoke" CC="clang"
     - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize" PARROT_TEST="smoke" CC="gcc"
-    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE=""           PARROT_TEST="smoke" CC="gcc"
     - PARROT_CONFIG_ARGS="--without-gettext --without-gmp --without-libffi --without-extra-nci-thunks --without-opengl --without-readline --without-pcre --without-zlib --without-threads --without-icu" PARROT_OPTIMIZE="" PARROT_TEST="smoke" CC="gcc"
-    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize" PARROT_TEST="smoke" CC="g++"
     - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE=""           PARROT_TEST="smoke" CC="g++"
-    - PARROT_CONFIG_ARGS="--without-gettext --without-gmp --without-libffi --without-extra-nci-thunks --without-opengl --without-readline --without-pcre --without-zlib --without-threads --without-icu" PARROT_OPTIMIZE="" PARROT_TEST="smoke" CC="g++"
+
+# Use clang to run our coding standard and manifest tests, because it is the fastest
+# These will cause Travis to report a build failure when somebody breaks the manifest
+# tests by forgetting to add files to our manifest, or when they break our coding standards.
+# The reason we do not use smolder_fulltest is becuase it will intermittently trigger
+# the Travis CI time-out of 15 minutes
+    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE=""           PARROT_TEST="codingstd_tests" CC="clang"
+    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE=""           PARROT_TEST="manifest_tests" CC="clang"

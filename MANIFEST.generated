@@ -1,14 +1,14 @@
 # See tools/dev/install_files.pl for documentation on the
 # format of this file.
 # Please re-sort this file after *EVERY* modification
-blib/lib/libparrot.4.5.0.dylib                   [main]lib
+blib/lib/libparrot.4.9.0.dylib                   [main]lib
 blib/lib/libparrot.a                             [main]lib
 blib/lib/libparrot.dylib                         [main]lib
 blib/lib/libparrot.so                            [main]lib
-blib/lib/libparrot.so.4.5.0                      [main]lib
+blib/lib/libparrot.so.4.9.0                      [main]lib
 compilers/data_json/data_json.pbc                [data_json]
 config/gen/call_list/opengl.in                   []
-cygparrot-4.5.0.dll                              [main]bin
+cygparrot-4.9.0.dll                              [main]bin
 docs/ops/bit.pod                                 [doc]
 docs/ops/cmp.pod                                 [doc]
 docs/ops/core.pod                                [doc]
@@ -91,6 +91,7 @@ include/pmc/pmc_opcode.h                         [devel]include
 include/pmc/pmc_oplib.h                          [devel]include
 include/pmc/pmc_orderedhash.h                    [devel]include
 include/pmc/pmc_orderedhashiterator.h            [devel]include
+include/pmc/pmc_os.h                             [devel]include
 include/pmc/pmc_packfile.h                       [devel]include
 include/pmc/pmc_packfileannotation.h             [devel]include
 include/pmc/pmc_packfileannotations.h            [devel]include
@@ -407,6 +408,7 @@ src/pmc/opcode.dump                              [devel]src
 src/pmc/oplib.dump                               [devel]src
 src/pmc/orderedhash.dump                         [devel]src
 src/pmc/orderedhashiterator.dump                 [devel]src
+src/pmc/os.dump                                  [devel]src
 src/pmc/packfile.dump                            [devel]src
 src/pmc/packfileannotation.dump                  [devel]src
 src/pmc/packfileannotations.dump                 [devel]src

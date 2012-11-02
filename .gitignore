@@ -46,7 +46,7 @@ cachegrind.out.*
 /.parrot_current_sha1
 /.parrot_current_git_describe
 /CFLAGS
-/MANIFEST.configure.generated
+/MANIFEST_configure.generated
 /Makefile
 /TAGS
 /all_cstring.str

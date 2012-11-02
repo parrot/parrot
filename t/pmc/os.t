@@ -1,11 +1,11 @@
 #! perl
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 34;
+use Parrot::Test tests => 35;
 use Parrot::Config;
 use Cwd;
 use File::Spec;
@@ -22,7 +22,7 @@ t/pmc/os.t - Files and Dirs
 
 =head1 SYNOPSIS
 
-    % prove t/dynpmc/os.t
+    % prove t/pmc/os.t
 
 =head1 DESCRIPTION
 
@@ -42,9 +42,8 @@ if (File::Spec->case_tolerant(substr($cwd,0,2))) {
     $cwd = lc($cwd);
     pir_output_is( <<'CODE', <<"OUT", 'Test cwd' );
 .sub main :main
-        $P0 = loadlib 'os'
-        $P1 = new ['OS']
-        $S1 = $P1."cwd"()
+        $P0 = new ['OS']
+        $S1 = $P0."cwd"()
         # Unicode downcase needs ICU
         $I0 = find_encoding "iso-8859-1"
         $S1 = trans_encoding $S1, $I0
@@ -60,9 +59,8 @@ OUT
 else {
     pir_output_is( <<'CODE', <<"OUT", 'Test cwd' );
 .sub main :main
-        $P0 = loadlib 'os'
-        $P1 = new ['OS']
-        $S1 = $P1."cwd"()
+        $P0 = new ['OS']
+        $S1 = $P0."cwd"()
         print $S1
         print "\n"
         end
@@ -81,12 +79,11 @@ SKIP:
 
     pir_error_output_like( <<'CODE', <<"OUT", 'Test bad cwd' );
     .sub main :main
-            $P0 = loadlib 'os'
-            $P1 = new ['OS']
+            $P0 = new ['OS']
 
-            $P1.'chdir'('test-bad-cwd')
-            $P1.'rm'('../test-bad-cwd')
-            $S0 = $P1.'cwd'()
+            $P0.'chdir'('test-bad-cwd')
+            $P0.'rm'('../test-bad-cwd')
+            $S0 = $P0.'cwd'()
     .end
 CODE
 /getcwd failed/
@@ -104,7 +101,6 @@ if (File::Spec->case_tolerant(substr($cwd,0,2))) {
 
     pir_output_is( <<'CODE', <<"OUT", 'Test chdir' );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = "src"
@@ -137,7 +133,6 @@ OUT
 else {
     pir_output_is( <<'CODE', <<"OUT", 'Test chdir' );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = "src"
@@ -164,7 +159,6 @@ OUT
 
 pir_error_output_like( <<'CODE', <<"OUT", 'Test bad chdir' );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = repeat "-!", 10
@@ -183,7 +177,6 @@ if (File::Spec->case_tolerant(substr($cwd,0,2))) {
 
     pir_output_is( <<'CODE', <<"OUT", 'Test mkdir' );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = "xpto"
@@ -218,7 +211,6 @@ OUT
 else {
     pir_output_is( <<'CODE', <<"OUT", 'Test mkdir' );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = "xpto"
@@ -245,7 +237,6 @@ OUT
 
 pir_error_output_like( <<'CODE', <<"OUT", 'Test bad mkdir' );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $P1."mkdir"(".", 0)
@@ -259,7 +250,6 @@ mkdir "xpto" unless -d "xpto";
 
 pir_output_is( <<'CODE', <<'OUT', 'Test rm call in a directory' );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = "xpto"
@@ -282,7 +272,6 @@ close $testfile;
 
 pir_output_like( <<'CODE', <<'OUT', 'Test bad rm calls' );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         push_eh eh1
@@ -323,6 +312,13 @@ close $X;
 my $stat;
 
 my $count = $MSWin32 ? 11 : 13;
+# [GH #820] Win32 stat() for mtime is broken. Try to use Win32::UTCFileTime
+BEGIN {
+    if ($^O eq 'MSWin32') {
+        eval { require Win32::UTCFileTime; }
+          and Win32::UTCFileTime::import(':globally');
+    }
+}
 my @s = stat('xpto');
 $s[6] = 0; # Parrot does this internally...
 if ( $cygwin ) {
@@ -339,7 +335,6 @@ if ( $MSWin32 ) {
     $stat = sprintf("0x%08x\n" x 11, @s);
     pir_output_is( <<'CODE', $stat, 'Test OS.stat' );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
         $S1 = "xpto"
         $P2 = $P1."stat"($S1)
@@ -360,7 +355,6 @@ else {
     $stat = sprintf("0x%08x\n" x 13, @s);
     pir_output_is( <<'CODE', $stat, 'Test OS.stat' );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
         $S1 = "xpto"
         $P2 = $P1."stat"($S1)
@@ -377,7 +371,6 @@ CODE
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', 'test bad stat');
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
         $P2 = $P1."stat"("non-existent something")
 .end
@@ -391,7 +384,6 @@ closedir $IN;
 my $entries = join( ' ', @entries ) . "\n";
 pir_output_is( <<'CODE', $entries, 'Test OS.readdir' );
 .sub main :main
-    $P0 = loadlib 'os'
     $P1 = new ['OS']
     $P2 = $P1.'readdir'('docs')
 
@@ -404,7 +396,7 @@ pir_output_is( <<'CODE', $entries, 'Test OS.readdir' );
 CODE
 
 SKIP: {
-    skip 'not implemented on windows yet', 1 if ( $MSWin32 && $MSVC );
+    skip 'not implemented on windows yet', 1 if $MSWin32;
 
     mkdir 'silly-dir-with-silly-names';
     open my $fileh, '>', "silly-dir-with-silly-names/sillyname\x{263A}";
@@ -417,7 +409,6 @@ SKIP: {
 
     pir_output_is( <<'CODE', $entries2, 'Test OS.readdir with ord >127' );
 .sub main :main
-    $P0 = loadlib 'os'
     $P1 = new ['OS']
     $P2 = $P1.'readdir'('silly-dir-with-silly-names')
 
@@ -433,7 +424,6 @@ CODE
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', 'Test bad OS.readdir' );
 .sub main :main
-    $P0 = loadlib 'os'
     $P1 = new ['OS']
     $P2 = $P1.'readdir'('non-existent directory')
 .end
@@ -447,7 +437,6 @@ open my $FILE, ">", "____some_test_file";
 close $FILE;
 pir_output_is( <<'CODE', <<"OUT", 'Test OS.rename' );
 .sub main :main
-    $P0 = loadlib 'os'
     $P1 = new ['OS']
     $P1.'rename'('____some_test_file', '___some_other_file')
     say "ok"
@@ -467,7 +456,6 @@ else {
 
 pir_error_output_like( <<'CODE', <<"OUT", 'Test bad OS.rename' );
 .sub main :main
-    $P0 = loadlib 'os'
     $P1 = new ['OS']
     $P1.'rename'('some silly non-existent file name', 'arglblargl')
 .end
@@ -492,7 +480,6 @@ SKIP: {
     $lstat = sprintf( "0x%08x\n" x 13, @s );
     pir_error_output_like( <<'CODE', <<"OUTPUT", "Test OS.lstat" );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
         $S1 = "xpto"
         $P2 = $P1."lstat"($S1)
@@ -513,7 +500,6 @@ OUTPUT
 # Test remove on a file
 pir_output_is( <<'CODE', <<"OUT", "Test rm call in a file" );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = "xpto"
@@ -536,7 +522,6 @@ SKIP: {
 
     pir_error_output_like( <<'CODE', <<"OUT", "Test symlink" );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = "xpto"
@@ -561,7 +546,6 @@ OUT
 # Test link to file. May require root permissions
 pir_output_is( <<'CODE', <<"OUT", "Test link" );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $S1 = "xpto"
@@ -577,7 +561,12 @@ ok
 OUT
 
 my $nl = [ stat("myconfig") ]->[3];
-ok( $nl > 1, "hard link to file was really created" );
+if (-l "myconfig") {
+    ok( 1, "hard link on symlink skipped" );
+}
+else {
+    ok( $nl > 1, "hard link to file was really created" );
+}
 unlink "xpto" if -f "xpto";
 
 my $prevnl = [ stat("tools") ]->[3];
@@ -585,7 +574,6 @@ pir_output_like( <<"CODE", <<"OUT", "Test dirlink" );
 .sub main :main
     .local pmc os
     .local string xpto, tools
-    \$P0 = loadlib 'os'
     os    = new ['OS']
     xpto  = "xpto"
     tools = "tools"
@@ -628,7 +616,6 @@ SKIP: {
     my $umask = umask;
     pir_output_like( <<'CODE', <<"OUT", "Test umask" );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $I0 = $P1.'umask'(0)
@@ -658,7 +645,6 @@ SKIP: {
 
     pir_error_output_like( <<'CODE', <<'OUT', "Test chroot" );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $P1.'chdir'('my-super-chroot')
@@ -679,7 +665,6 @@ OUT
 # test get_user_id
 pir_output_is( <<'CODE', $UID, 'Test get_user_id' );
 .sub main :main
-    $P0 = loadlib 'os'
     $P1 = new ['OS']
 
     $I0 = $P1."get_user_id"()
@@ -707,7 +692,6 @@ SKIP: {
     # test chmod
     pir_output_is( <<'CODE', <<"OUT", 'Test chmod' );
     .sub main :main
-            $P0 = loadlib 'os'
             $P1 = new ['OS']
 
             $P1."chmod"("test_f_c", 420)
@@ -726,7 +710,6 @@ OUT
     # test chmod
     pir_error_output_like( <<'CODE', <<"OUT", 'Test chmod' );
     .sub main :main
-            $P0 = loadlib 'os'
             $P1 = new ['OS']
 
             $P1."chmod"("this is another non-existent directory", 420)
@@ -746,7 +729,6 @@ my ($ra, $rb, $wa, $wb, $xa, $xb);
 $ra = -r "README" ? 1 : 0;
 pir_output_is( <<'CODE', <<"OUT", 'Test can_read' );
 .sub main :main
-    $P0 = loadlib 'os'
     $P1 = new ['OS']
 
     $I0 = $P1."can_read"("README")
@@ -763,7 +745,6 @@ $wa = -w "test_f_a" ? 1 : 0;
 $wb = -w "test_f_b" ? 1 : 0;
 pir_output_is( <<'CODE', <<"OUT", 'Test can_write' );
 .sub main :main
-        $P0 = loadlib 'os'
         $P1 = new ['OS']
 
         $I0 = $P1."can_write"("test_f_a")
@@ -786,7 +767,6 @@ my $parrot_exe_name = $MSWin32 ? "parrot.exe" : "parrot";
 $xb = -x $parrot_exe_name ? 1 : 0;
 pir_output_is( <<"CODE", <<"OUT", 'Test can_execute' );
 .sub main :main
-        \$P0 = loadlib 'os'
         \$P1 = new ['OS']
 
         \$I0 = \$P1."can_execute"("README")
@@ -802,9 +782,20 @@ $xa
 $xb
 OUT
 
+# Support loadlib 'os' for a while
+pir_output_is( <<'CODE', <<"OUT", "loadlib 'os' deprecation" );
+.sub main :main
+        $P0 = loadlib 'os'
+        $P1 = new 'OS'
+        $S1 = $P1."cwd"()
+        print "ok\n"
+        end
+.end
+CODE
+ok
+OUT
+
 unlink "test_f_a", "test_f_b", "test_f_c";
-
-
 
 # Local Variables:
 #   mode: cperl

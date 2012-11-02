@@ -42,6 +42,15 @@ my ($args, $steps_list_ref) = process_options(
 );
 exit(1) unless defined $args;
 
+# preload all steps for debugging because some Windows systems cannot
+# do "b postpone stepname"
+if (defined &DB::DB) {
+    for my $step_name (@{ $steps_list_ref } ) {
+        eval "use $step_name;"; ## no critic (BuiltinFunctions::ProhibitStringyEval)
+        die $@ if $@;
+    }
+}
+
 my $opttest = Parrot::Configure::Options::Test->new($args);
 
 # configuration tests will only be run if you requested them
@@ -68,9 +77,9 @@ $conf->data->set(configure_args => @ARGV
     ? '"'.join("\" \"", map {qq($_)} @ARGV).'"'
     : '');
 
-# Log files created by Configure.pl in MANIFEST.configure.generated
+# Log files created by Configure.pl in MANIFEST_configure.generated
 $conf->{active_configuration} = 1;
-unlink 'MANIFEST.configure.generated';
+unlink 'MANIFEST_configure.generated';
 
 # Run the actual steps from Parrot::Configure
 $conf->runsteps or exit(1);

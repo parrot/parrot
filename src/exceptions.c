@@ -108,21 +108,20 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
     ASSERT_ARGS(die_from_exception)
     /* Avoid anything that can throw if we are already throwing from
      * a previous call to this function */
-    static int already_dying = 0;
-
+    int already_dying = !PMC_IS_NULL(interp->final_exception);
     STRING * const message     = already_dying ? STRINGNULL :
             VTABLE_get_string(interp, exception);
     const INTVAL   severity    = already_dying ? (INTVAL)EXCEPT_fatal :
             VTABLE_get_integer_keyed_str(interp, exception, CONST_STRING(interp, "severity"));
 
-    if (already_dying)
+    if (already_dying) {
         Parrot_x_jump_out(interp, 1);
+    }
     else {
         /* In some cases we have a fatal exception before the IO system
          * is completely initialized. Do some attempt to output the
          * message to stderr, to help diagnosing. */
         const int use_perr = !PMC_IS_NULL(Parrot_io_STDERR(interp));
-        already_dying = 1;
         interp->final_exception = exception;
         interp->exit_code = 1;
 

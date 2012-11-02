@@ -64,6 +64,8 @@ sub check_asserts {
 
     # next, cross reference them.
     my @missing = grep { ! exists($usages{$_->[0]}) } @defines;
+    # skip yet unused io_userhandle vtable functions [GH #796]
+    @missing = grep { $_->[0] !~ /^io_userhandle_/ } @missing;
     ok(! @missing, 'no unused assert macros');
     if (@missing) {
         diag('unused assert macros found:');

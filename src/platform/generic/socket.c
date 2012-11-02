@@ -209,12 +209,12 @@ Very minimal stubs for now, maybe someone will run with these.
 
 /*
 
-=item C<PMC * Parrot_io_getaddrinfo(PARROT_INTERP, STRING *addr, INTVAL port,
-INTVAL protocol, INTVAL fam, INTVAL passive)>
+=item C<PMC * Parrot_io_internal_getaddrinfo(PARROT_INTERP, STRING *addr, INTVAL
+port, INTVAL protocol, INTVAL fam, INTVAL passive)>
 
-C<Parrot_io_getaddrinfo()> calls get_addrinfo() to convert hostnames or IP
+C<Parrot_io_internal_getaddrinfo()> calls get_addrinfo() to convert hostnames or IP
 addresses to sockaddrs (and more) and returns an Addrinfo PMC which can be
-passed to C<Parrot_io_connect_unix()> or C<Parrot_io_bind_unix()>.
+passed to C<Parrot_io_internal_connect_unix()> or C<Parrot_io_internal_bind_unix()>.
 
 =cut
 
@@ -223,7 +223,7 @@ passed to C<Parrot_io_connect_unix()> or C<Parrot_io_bind_unix()>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
+Parrot_io_internal_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
         INTVAL protocol, INTVAL fam, INTVAL passive)
 {
 #ifdef PARROT_HAS_IPV6
@@ -367,8 +367,8 @@ Parrot_io_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
 
 /*
 
-=item C<INTVAL Parrot_io_addr_match(PARROT_INTERP, PMC *sa, INTVAL fam, INTVAL
-type, INTVAL protocol)>
+=item C<INTVAL Parrot_io_internal_addr_match(PARROT_INTERP, PMC *sa, INTVAL fam,
+INTVAL type, INTVAL protocol)>
 
 Returns true if the address C<sa> matches C<family>, C<type> and C<protocol>.
 
@@ -377,7 +377,7 @@ Returns true if the address C<sa> matches C<family>, C<type> and C<protocol>.
 */
 
 INTVAL
-Parrot_io_addr_match(PARROT_INTERP, ARGIN(PMC *sa), INTVAL fam,
+Parrot_io_internal_addr_match(PARROT_INTERP, ARGIN(PMC *sa), INTVAL fam,
         INTVAL type, INTVAL protocol)
 {
     Parrot_Sockaddr_attributes * const sa_data = PARROT_SOCKADDR(sa);
@@ -403,8 +403,8 @@ Parrot_io_addr_match(PARROT_INTERP, ARGIN(PMC *sa), INTVAL fam,
 
 /*
 
-=item C<STRING * Parrot_io_getnameinfo(PARROT_INTERP, const void *addr, INTVAL
-len)>
+=item C<STRING * Parrot_io_internal_getnameinfo(PARROT_INTERP, const void *addr,
+INTVAL len)>
 
 Uses C<socket()> to create a socket with the specified address family,
 socket type and protocol number.
@@ -416,7 +416,7 @@ socket type and protocol number.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_io_getnameinfo(PARROT_INTERP, ARGIN(const void *addr), INTVAL len)
+Parrot_io_internal_getnameinfo(PARROT_INTERP, ARGIN(const void *addr), INTVAL len)
 {
     /* TODO: get hostname, not only numeric */
 
@@ -441,7 +441,8 @@ Parrot_io_getnameinfo(PARROT_INTERP, ARGIN(const void *addr), INTVAL len)
 
 /*
 
-=item C<PIOHANDLE Parrot_io_socket(PARROT_INTERP, int fam, int type, int proto)>
+=item C<PIOHANDLE Parrot_io_internal_socket(PARROT_INTERP, int fam, int type,
+int proto)>
 
 Uses C<socket()> to create a socket with the specified address family,
 socket type and protocol number.
@@ -452,7 +453,7 @@ socket type and protocol number.
 
 PARROT_WARN_UNUSED_RESULT
 PIOHANDLE
-Parrot_io_socket(PARROT_INTERP, int fam, int type, int proto)
+Parrot_io_internal_socket(PARROT_INTERP, int fam, int type, int proto)
 {
     PIOSOCKET sock;
     const int value = 1;
@@ -491,8 +492,8 @@ Parrot_io_socket(PARROT_INTERP, int fam, int type, int proto)
 
 /*
 
-=item C<void Parrot_io_connect(PARROT_INTERP, PIOHANDLE os_handle, void *addr,
-INTVAL addr_len)>
+=item C<void Parrot_io_internal_connect(PARROT_INTERP, PIOHANDLE os_handle, void
+*addr, INTVAL addr_len)>
 
 Connects C<*io>'s socket to address C<*r>.
 
@@ -501,7 +502,7 @@ Connects C<*io>'s socket to address C<*r>.
 */
 
 void
-Parrot_io_connect(PARROT_INTERP, PIOHANDLE os_handle, ARGIN(void *addr),
+Parrot_io_internal_connect(PARROT_INTERP, PIOHANDLE os_handle, ARGIN(void *addr),
         INTVAL addr_len)
 {
 AGAIN:
@@ -523,8 +524,8 @@ AGAIN:
 
 /*
 
-=item C<void Parrot_io_bind(PARROT_INTERP, PIOHANDLE os_handle, void *addr,
-INTVAL addr_len)>
+=item C<void Parrot_io_internal_bind(PARROT_INTERP, PIOHANDLE os_handle, void
+*addr, INTVAL addr_len)>
 
 Binds C<*io>'s socket to the local address and port specified by C<*l>.
 
@@ -533,7 +534,7 @@ Binds C<*io>'s socket to the local address and port specified by C<*l>.
 */
 
 void
-Parrot_io_bind(PARROT_INTERP, PIOHANDLE os_handle, ARGMOD(void *addr),
+Parrot_io_internal_bind(PARROT_INTERP, PIOHANDLE os_handle, ARGMOD(void *addr),
         INTVAL addr_len)
 {
     if (bind((PIOSOCKET)os_handle, (struct sockaddr *)addr, addr_len) != 0)
@@ -544,7 +545,8 @@ Parrot_io_bind(PARROT_INTERP, PIOHANDLE os_handle, ARGMOD(void *addr),
 
 /*
 
-=item C<void Parrot_io_listen(PARROT_INTERP, PIOHANDLE os_handle, INTVAL sec)>
+=item C<void Parrot_io_internal_listen(PARROT_INTERP, PIOHANDLE os_handle,
+INTVAL sec)>
 
 Listen for new connections. This is only applicable to C<STREAM> or
 C<SEQ> sockets.
@@ -554,7 +556,7 @@ C<SEQ> sockets.
 */
 
 void
-Parrot_io_listen(PARROT_INTERP, PIOHANDLE os_handle, INTVAL sec)
+Parrot_io_internal_listen(PARROT_INTERP, PIOHANDLE os_handle, INTVAL sec)
 {
     if (listen((PIOSOCKET)os_handle, sec) != 0)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
@@ -564,8 +566,8 @@ Parrot_io_listen(PARROT_INTERP, PIOHANDLE os_handle, INTVAL sec)
 
 /*
 
-=item C<PIOHANDLE Parrot_io_accept(PARROT_INTERP, PIOHANDLE os_handle, PMC *
-remote_addr)>
+=item C<PIOHANDLE Parrot_io_internal_accept(PARROT_INTERP, PIOHANDLE os_handle,
+PMC * remote_addr)>
 
 Accept a new connection and return a newly created C<ParrotIO> socket.
 
@@ -576,7 +578,7 @@ Accept a new connection and return a newly created C<ParrotIO> socket.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 PIOHANDLE
-Parrot_io_accept(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(PMC * remote_addr))
+Parrot_io_internal_accept(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(PMC * remote_addr))
 {
     Parrot_Socklen_t addr_len = sizeof (struct sockaddr_storage);
     struct sockaddr_storage *addr =
@@ -606,8 +608,8 @@ Parrot_io_accept(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(PMC * remote_addr))
 
 /*
 
-=item C<INTVAL Parrot_io_send(PARROT_INTERP, PIOHANDLE os_handle, const char
-*buf, size_t len)>
+=item C<INTVAL Parrot_io_internal_send(PARROT_INTERP, PIOHANDLE os_handle, const
+char *buf, size_t len)>
 
 Send the message C<*s> to C<*io>'s connected socket.
 
@@ -616,7 +618,7 @@ Send the message C<*s> to C<*io>'s connected socket.
 */
 
 INTVAL
-Parrot_io_send(PARROT_INTERP, PIOHANDLE os_handle, ARGIN(const char *buf),
+Parrot_io_internal_send(PARROT_INTERP, PIOHANDLE os_handle, ARGIN(const char *buf),
         size_t len)
 {
     int error, byteswrote;
@@ -646,8 +648,8 @@ AGAIN:
 
 /*
 
-=item C<INTVAL Parrot_io_recv(PARROT_INTERP, PIOHANDLE os_handle, char *buf,
-size_t len)>
+=item C<INTVAL Parrot_io_internal_recv(PARROT_INTERP, PIOHANDLE os_handle, char
+*buf, size_t len)>
 
 Receives a message in C<**s> from C<*io>'s connected socket.
 
@@ -656,7 +658,7 @@ Receives a message in C<**s> from C<*io>'s connected socket.
 */
 
 INTVAL
-Parrot_io_recv(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(char *buf), size_t len)
+Parrot_io_internal_recv(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(char *buf), size_t len)
 {
     int error;
     unsigned int bytesread = 0;
@@ -681,8 +683,8 @@ AGAIN:
 
 /*
 
-=item C<INTVAL Parrot_io_poll(PARROT_INTERP, PIOHANDLE os_handle, int which, int
-sec, int usec)>
+=item C<INTVAL Parrot_io_internal_poll(PARROT_INTERP, PIOHANDLE os_handle, int
+which, int sec, int usec)>
 
 Utility function for polling a single IO stream with a timeout.
 
@@ -701,7 +703,7 @@ the read buffer.
 */
 
 INTVAL
-Parrot_io_poll(PARROT_INTERP, PIOHANDLE os_handle, int which, int sec,
+Parrot_io_internal_poll(PARROT_INTERP, PIOHANDLE os_handle, int which, int sec,
     int usec)
 {
     fd_set r, w, e;
@@ -737,7 +739,7 @@ AGAIN:
 
 /*
 
-=item C<INTVAL Parrot_io_close_socket(PARROT_INTERP, PIOHANDLE handle)>
+=item C<INTVAL Parrot_io_internal_close_socket(PARROT_INTERP, PIOHANDLE handle)>
 
 Closes the given file descriptor.  Returns 0 on success, -1 on error.
 
@@ -746,7 +748,7 @@ Closes the given file descriptor.  Returns 0 on success, -1 on error.
 */
 
 INTVAL
-Parrot_io_close_socket(SHIM_INTERP, PIOHANDLE handle)
+Parrot_io_internal_close_socket(SHIM_INTERP, PIOHANDLE handle)
 {
 #ifdef _WIN32
     return closesocket((PIOSOCKET)handle);

@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2011, Parrot Foundation.
+# Copyright (C) 2009-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -36,6 +36,7 @@ sub runstep {
     my $verbose = $conf->options->get( 'verbose' );
     unless ( $conf->options->get( 'with-llvm' ) ) {
         $self->_handle_result( $conf, 0 );
+        $self->set_result('not requested');
         print "LLVM not requested\n" if $verbose;
         return 1;
     }
@@ -45,8 +46,15 @@ sub runstep {
     # runstep() with a value of 1.  If a given probe does not rule out LLVM,
     # we will proceed onward.
 
-    my $llvm_bindir = capture_output( qw| llvm-config --bindir | ) || '';
-    chomp $llvm_bindir;
+    my ($llvm_bindir, $llvm_config);
+    for my $bin (qw(llvm-config llvm-config-3.0 llvm-config-2.9 llvm-config-2.8)) {
+        $llvm_bindir = capture_output( $bin, "--bindir" ) || '';
+        chomp $llvm_bindir;
+        if ( $llvm_bindir ) {
+            $llvm_config = $bin;
+            last;
+        }
+    }
     if (! $llvm_bindir ) {
         print "Unable to find directory for 'llvm-config' executable\n"
             if $verbose;
@@ -69,7 +77,7 @@ sub runstep {
         }
     }
 
-    $self->_handle_result($conf, 1);
+    $self->_handle_result($conf, $rv);
     return 1;
 
     # Having gotten this far,  we will take a simple C file, compile it into
@@ -176,14 +184,14 @@ sub version_check {
             if ($verbose) {
                 print "Found 'lli' version $version\n";
             }
-            return 1;
+            return $version;
         }
     }
     else {
         print "Unable to extract version for LLVM component 'lli'\n"
             if $verbose;
         $self->_handle_result( $conf, 0 );
-        return;
+        return 0;
     }
 }
 
@@ -219,7 +227,7 @@ sub _handle_failure_to_assemble_assembly {
 sub _handle_result {
     my ($self, $conf, $result) = @_;
     if ( $result ) {
-        $self->set_result('yes');
+        $self->set_result( "yes" );
         $conf->data->set( has_llvm => 1 );
     }
     else {

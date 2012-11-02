@@ -166,7 +166,7 @@ Returns the string representation of this sockaddr by calling C<getnameinfo(3)>.
         if (!data->pointer)
             return Parrot_sprintf_c(interp, "(?)");
 
-        return Parrot_io_getnameinfo(INTERP, data->pointer, data->len);
+        return Parrot_io_internal_getnameinfo(INTERP, data->pointer, data->len);
     }
 
 /*

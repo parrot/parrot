@@ -13605,13 +13605,14 @@ static op_info_t core_op_info_table[1126] = {
 
 opcode_t *
 Parrot_end(opcode_t *cur_opcode, PARROT_INTERP) {
+    UNUSED(interp);
+    UNUSED(cur_opcode);
     return (opcode_t *)0;
 }
 
 opcode_t *
 Parrot_noop(opcode_t *cur_opcode, PARROT_INTERP) {
     UNUSED(interp);
-    UNUSED(CUR_OPCODE);
     return cur_opcode + 1;
 }
 
@@ -13981,7 +13982,7 @@ Parrot_result_info_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC  * const  caller_ctx = Parrot_pcc_get_caller_ctx(interp, CURRENT_CONTEXT(interp));
     PMC  * const  sig = VTABLE_get_attr_str(interp, caller_ctx, Parrot_str_new_constant(interp, "return_flags"));
 
-    if ((!sig)) {
+    if (PMC_IS_NULL(sig)) {
         PREG(1) = Parrot_pmc_new(interp, enum_class_FixedIntegerArray);
     }
     else {
@@ -23242,7 +23243,7 @@ Parrot_find_sub_not_null_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_trap(opcode_t *cur_opcode, PARROT_INTERP) {
     UNUSED(interp);
-    #if defined(__GNUC__) && defined(i386)
+    #if defined(__GNUC__) && defined(i386) && !defined(sun)
         __asm__("int3");
 
 #endif
@@ -24440,7 +24441,7 @@ op_lib_t core_op_lib = {
   PARROT_FUNCTION_CORE,                       /* core_type = PARROT_XX_CORE */
   0,                                /* flags */
   4,    /* major_version */
-  5,    /* minor_version */
+  9,    /* minor_version */
   0,    /* patch_version */
   1125,             /* op_count */
   core_op_info_table,       /* op_info_table */
@@ -24569,7 +24570,7 @@ static void hop_deinit(PARROT_INTERP)
     hop_buckets = NULL;
 }PARROT_EXPORT
 op_lib_t *
-Parrot_DynOp_core_4_5_0(PARROT_INTERP, long init) {
+Parrot_DynOp_core_4_9_0(PARROT_INTERP, long init) {
     /* initialize and return op_lib ptr */
     if (init == 1) {
 
@@ -24598,7 +24599,7 @@ Parrot_lib_core_ops_load(PARROT_INTERP)
 
 {
     PMC *const lib = Parrot_pmc_new(interp, enum_class_ParrotLibrary);
-    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) Parrot_DynOp_core_4_5_0;
+    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) Parrot_DynOp_core_4_9_0;
     dynop_register(interp, lib);
     return lib;
 }

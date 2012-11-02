@@ -502,10 +502,9 @@ END_OF_DEFINES:>>
     if (rc_fh.close() != 0)
         throw "cannot close .rc file";
 
-    var $P0 = loadlib('os');
-    var $P1 = new ['OS'];
-    var $P2 = $P1.stat(pbc_path);
-    int pbc_size = $P2[7];
+    var $P0 = new ['OS'];
+    var $P1 = $P0.stat(pbc_path);
+    int pbc_size = $P1[7];
 
     outfh.print("#include <windows.h>\n");
     outfh.print(rc_constant_defines);
@@ -617,7 +616,7 @@ function link_file(string objfile, string exefile, string extra_obj, int install
             config += 'parrot_config';
         else {
             config += 'install_config';
-            rpath  += $P0['rpath_lib'];
+            rpath  = $P0['rpath_lib'];
         }
     }
     else {

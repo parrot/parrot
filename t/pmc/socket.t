@@ -24,12 +24,11 @@ stack, so we don't need to check if this parrot is IPv6-aware.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(20)
+    plan(19)
 
     test_init()
     test_get_fd()
     test_read()
-    test_readline()
     test_clone()
     test_bool()
     test_close()
@@ -60,12 +59,6 @@ stack, so we don't need to check if this parrot is IPv6-aware.
     new $P0, ['Socket']
     $N0 = $P0.'read'(5)
     is($N0, 0, 'Socket read returns 0 when not connected')
-.end
-
-.sub test_readline
-    new $P0, ['Socket']
-    $N0 = $P0.'readline'()
-    is($N0, 0, 'Socket readline returns 0 when not connected')
 .end
 
 .sub test_bool

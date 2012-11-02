@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2011, Parrot Foundation.
+# Copyright (C) 2002-2012, Parrot Foundation.
 
 This is a list of project roles, with a partial list of the folks who have
 taken responsibility for them.  This does not list all the people with
@@ -38,6 +38,7 @@ Release Manager                 Bob Rogers
                                 James E Keenan
                                 Kevin Polulak
                                 Alvis Yardley
+                                Reini Urban
 
 Metacommitter                   Allison Randal
                                 Jerry Gay
@@ -66,6 +67,7 @@ Core Developer                  Jonathan Worthington
                                 Mark Glines
                                 Vasily Chekalkin
                                 Jonathan "Duke" Leto
+                                Alvis Yardley
 
 Compiler Developer              Patrick Michaud (PGE, PCT)
                                 Allison Randal (TGE)
@@ -101,5 +103,6 @@ Cage Cleaner                    James E Keenan
                                 Mark Glines
                                 Bruce Gray
                                 Michael Hind
+                                Alvis Yardley
 
 General Contributor             See CREDITS
