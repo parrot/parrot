@@ -125,13 +125,11 @@ END
 
         my $o_deps = "    " . join(" \\\n    ", keys %o_deps);
         $TEMP_pmc_build .= <<END
-src/pmc/$pmc.c : src/pmc/$pmc.dump
+include/pmc/pmc_$pmc.h src/pmc/$pmc.c : src/pmc/$pmc.dump
 \t\$(PMC2CC) src/pmc/$pmc.pmc
 
 src/pmc/$pmc.dump : vtable.dump $parent_dumps src/pmc/$pmc.pmc \$(PMC2C_FILES) $pccmethod_depend
 \t\$(PMC2CD) src/pmc/$pmc.pmc
-
-include/pmc/pmc_$pmc.h: src/pmc/$pmc.c
 
 ## SUFFIX OVERRIDE -Warnings
 src/pmc/$pmc\$(O): \\
