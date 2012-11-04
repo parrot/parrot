@@ -1918,6 +1918,10 @@ src/platform/win32/time$(O) : src/platform/win32/time.c $(PARROT_H_HEADERS)
 
 src/platform/win32/uid$(O) : src/platform/win32/uid.c $(PARROT_H_HEADERS)
 
+src/platform/vms/entropy$(O) : src/platform/vms/entropy.c $(PARROT_H_HEADERS)
+
+src/platform/vms/exec$(O) : src/platform/vms/exec.c $(PARROT_H_HEADERS)
+
 src/runcore/cores$(O) : src/runcore/cores.str \
 	src/runcore/cores.c \
 	$(INC_PMC_DIR)/pmc_sub.h \
