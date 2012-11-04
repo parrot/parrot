@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2012, Parrot Foundation.
+ * Copyright (C) 1996, 1997, 1998, 1999, Peter Gutmann (and various others).
  */
 
 /*
@@ -260,7 +261,7 @@ rndvms_gather_random( char *buffer, size_t length, int level )
                 }
             }
         }
-    
+
         /* Form the (process-unique) mailbox logical name. */
         sprintf( lnm_mbx, "%s%08x", MBX_BASE_NAME, getpid());
         lnm_mbx_dscr.dsc$w_length = sizeof MBX_BASE_NAME - 1 + 8;

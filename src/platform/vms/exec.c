@@ -1,5 +1,7 @@
 /*
  * Copyright (C) 2004-2010, Parrot Foundation.
+ * Copyright (C) 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001,
+ *    2002, 2003, 2004, 2005, 2006, 2007 by Charles Bailey and others
  */
 
 /*
@@ -382,7 +384,7 @@ struct exit_control_block {
   unsigned int arg_count;
   unsigned int *status_address;
   unsigned int exit_status;
-}; 
+};
 
 typedef struct _closed_pipes {
   int             pid;            /* PID of subprocess */
@@ -416,7 +418,7 @@ pipe_exit_routine(void)
   unsigned int retsts = SS$_NORMAL, abort = SS$_TIMEOUT;
   int sts, did_stuff, j;
 
-  /* 
+  /*
    * Flush any pending i/o, but since we are in process run-down, be
    * careful about referencing PerlIO structures that may already have
    * been deallocated.  We may not even have an interpreter anymore.
@@ -428,7 +430,7 @@ pipe_exit_routine(void)
     info = info->next;
   }
 
-  /* 
+  /*
      next we try sending an EOF...ignore if doesn't work, make sure we
      don't hang
   */
@@ -455,14 +457,14 @@ pipe_exit_routine(void)
     info = open_pipes;
     while (info) {
       _ckvmssts(sys$setast(0));
-      if (info->waiting && info->done) 
+      if (info->waiting && info->done)
         info->waiting = 0;
       nwait += info->waiting;
       _ckvmssts(sys$setast(1));
       info = info->next;
     }
     if (!nwait) break;
-    sleep(1);  
+    sleep(1);
   }
 
   did_stuff = 0;
@@ -471,7 +473,7 @@ pipe_exit_routine(void)
     _ckvmssts(sys$setast(0));
     if (!info->done) { /* Tap them gently on the shoulder . . .*/
       sts = sys$forcex(&info->pid,0,abort);
-      if (!(sts&1) && sts != SS$_NONEXPR) _ckvmssts(sts); 
+      if (!(sts&1) && sts != SS$_NONEXPR) _ckvmssts(sts);
       did_stuff = 1;
     }
     _ckvmssts(sys$setast(1));
@@ -486,14 +488,14 @@ pipe_exit_routine(void)
     info = open_pipes;
     while (info) {
       _ckvmssts(sys$setast(0));
-      if (info->waiting && info->done) 
+      if (info->waiting && info->done)
         info->waiting = 0;
       nwait += info->waiting;
       _ckvmssts(sys$setast(1));
       info = info->next;
     }
     if (!nwait) break;
-    sleep(1);  
+    sleep(1);
   }
 
   info = open_pipes;
@@ -501,7 +503,7 @@ pipe_exit_routine(void)
     _ckvmssts(sys$setast(0));
     if (!info->done) {  /* We tried to be nice . . . */
       sts = sys$delprc(&info->pid,0);
-      if (!(sts&1) && sts != SS$_NONEXPR) _ckvmssts(sts); 
+      if (!(sts&1) && sts != SS$_NONEXPR) _ckvmssts(sts);
       info->done = 1;  /* sys$delprc is as done as we're going to get. */
     }
     _ckvmssts(sys$setast(1));
@@ -543,7 +545,7 @@ popen_completion_ast(pInfo info)
   closed_list[closed_index].pid = info->pid;
   closed_list[closed_index].completion = info->completion;
   closed_index++;
-  if (closed_index == NKEEPCLOSED) 
+  if (closed_index == NKEEPCLOSED)
     closed_index = 0;
   closed_num++;
 
@@ -1057,11 +1059,11 @@ vmspipe_tempfile(void)
   fprintf(fp,"$ pif parrot_popen_err .nes. \"\" then parrot_define/user/name_attributes=confine sys$error  'parrot_popen_err'\n");
   fprintf(fp,"$ pif parrot_popen_out .nes. \"\" then parrot_define      sys$output 'parrot_popen_out'\n");
   fprintf(fp,"$!  --- build command line to get max possible length\n");
-  fprintf(fp,"$ c=parrot_popen_cmd0\n"); 
-  fprintf(fp,"$ c=c+parrot_popen_cmd1\n"); 
-  fprintf(fp,"$ c=c+parrot_popen_cmd2\n"); 
-  fprintf(fp,"$ x=parrot_popen_cmd3\n"); 
-  fprintf(fp,"$ c=c+x\n"); 
+  fprintf(fp,"$ c=parrot_popen_cmd0\n");
+  fprintf(fp,"$ c=c+parrot_popen_cmd1\n");
+  fprintf(fp,"$ c=c+parrot_popen_cmd2\n");
+  fprintf(fp,"$ x=parrot_popen_cmd3\n");
+  fprintf(fp,"$ c=c+x\n");
   fprintf(fp,"$ parrot_on\n");
   fprintf(fp,"$ 'c'\n");
   fprintf(fp,"$ parrot_status = $STATUS\n");
@@ -1419,7 +1421,7 @@ safe_popen(const char *cmd, const char *in_mode, int *psts)
   vmspipedsc.dsc$a_pointer = tfilebuf;
 
   sts = setup_cmddsc(cmd,0,0,&vmscmd);
-  if (!(sts & 1)) { 
+  if (!(sts & 1)) {
     switch (sts) {
     case RMS$_FNF:
     case RMS$_DNF:
@@ -1442,7 +1444,7 @@ safe_popen(const char *cmd, const char *in_mode, int *psts)
     case SS$_ACCVIO: /* shouldn't happen */
       _ckvmssts(sts); /* fall through */
     default:  /* SS$_DUPLNAM, SS$_CLI, resource exhaustion, etc. */
-      set_errno(EVMSERR); 
+      set_errno(EVMSERR);
     }
     set_vaxc_errno(sts);
 #if 0
@@ -1451,11 +1453,11 @@ safe_popen(const char *cmd, const char *in_mode, int *psts)
     }
 #endif
     *psts = sts;
-    return NULL; 
+    return NULL;
   }
   n = sizeof(Info);
   _ckvmssts(lib$get_vm(&n, &info));
-        
+
   strncpy(mode, in_mode, sizeof(mode));
   info->mode       = *mode;
   info->done       = FALSE;
@@ -1502,7 +1504,7 @@ safe_popen(const char *cmd, const char *in_mode, int *psts)
 
     if (!info->fp && info->out) {
       sys$cancel(info->out->chan_out);
-        
+
       while (!info->out_done) {
         int done;
         _ckvmssts(sys$setast(0));
@@ -1693,7 +1695,7 @@ safe_popen(const char *cmd, const char *in_mode, int *psts)
       my_pclose_pinfo(info);
     SETERRNO(saved_errno, saved_vms_errno);
 
-  } else { 
+  } else {
     *psts = info->pid;
   }
   return ret_fp;
@@ -1803,7 +1805,7 @@ my_pclose(FILE *fp)
 {
   pInfo info, last = NULL;
   int ret_status;
-    
+
   /* Fixme - need ast and mutex protection here */
   for (info = open_pipes; info != NULL; last = info, info = info->next)
     if (info->fp == fp) break;
@@ -1825,8 +1827,8 @@ my_pclose(FILE *fp)
  */
 __pid_t __vms_waitpid( __pid_t __pid, int *__stat_loc, int __options );
 #endif
-/* sort-of waitpid; special handling of pipe clean-up for subprocesses 
-   created with popen(); otherwise partially emulate waitpid() unless 
+/* sort-of waitpid; special handling of pipe clean-up for subprocesses
+   created with popen(); otherwise partially emulate waitpid() unless
    we have a suitable one from the CRTL that came with VMS 7.2 and later.
    Also check processes not considered by the CRTL waitpid().
 */
@@ -1838,9 +1840,9 @@ my_waitpid(pid_t pid, int *statusp, int flags)
   int done;
   int sts;
   int j;
-    
+
   if (statusp) *statusp = 0;
-    
+
   for (info = open_pipes; info != NULL; info = info->next)
     if (info->pid == pid)
       break;
@@ -1877,13 +1879,13 @@ my_waitpid(pid_t pid, int *statusp, int flags)
 
   sts = __vms_waitpid( pid, statusp, flags );
 
-  if ( sts == 0 || !(sts == -1 && errno == ECHILD) ) 
+  if ( sts == 0 || !(sts == -1 && errno == ECHILD) )
     return sts;
 
-  /* If the real waitpid tells us the child does not exist, we 
-   * fall through here to implement waiting for a child that 
+  /* If the real waitpid tells us the child does not exist, we
+   * fall through here to implement waiting for a child that
    * was created by some means other than exec() (say, spawned
-   * from DCL) or to wait for a process that is not a subprocess 
+   * from DCL) or to wait for a process that is not a subprocess
    * of the current process.
    */
 
@@ -1895,22 +1897,22 @@ my_waitpid(pid_t pid, int *statusp, int flags)
     unsigned long int ownerpid, mypid;
     QUAD_t interval;
     IOSB jpi_iosb;
-    struct item_list_3 jpilist[] = { 
+    struct item_list_3 jpilist[] = {
       {sizeof(ownerpid), JPI$_OWNER, &ownerpid, 0},
-      {               0,          0,         0, 0} 
+      {               0,          0,         0, 0}
     };
 
     if (pid <= 0) {
-      /* Sorry folks, we don't presently implement rooting around for 
+      /* Sorry folks, we don't presently implement rooting around for
 	 the first child we can find, and we definitely don't want to
 	 pass a pid of -1 to $getjpi, where it is a wildcard operation.
       */
-      set_errno(ENOTSUP); 
+      set_errno(ENOTSUP);
       return -1;
     }
 
-    /* Get the owner of the child so I can warn if it's not mine. If the 
-     * process doesn't exist or I don't have the privs to look at it, 
+    /* Get the owner of the child so I can warn if it's not mine. If the
+     * process doesn't exist or I don't have the privs to look at it,
      * I can go home early.
      */
     sts = sys$getjpiw(EFN$C_ENF,(unsigned int *)&pid,NULL,&jpilist,&jpi_iosb,NULL,0);
@@ -1987,7 +1989,7 @@ my_waitpid(pid_t pid, int *statusp, int flags)
  */
 
 static void
-vms_execfree(struct dsc$descriptor_s *vmscmd) 
+vms_execfree(struct dsc$descriptor_s *vmscmd)
 {
   if (vmscmd) {
     if (vmscmd->dsc$a_pointer) {
@@ -2122,7 +2124,7 @@ setup_cmddsc(const char *incmd, int check_img, int *suggest_quote,
          *rest && !isspace(*rest) && cp2 - resspec < (VMS_MAXRSS - 1);
          rest++, cp2++) *cp2 = *rest;
     *cp2 = '\0';
-    if (int_tovmsspec(resspec, cp, 0, NULL)) { 
+    if (int_tovmsspec(resspec, cp, 0, NULL)) {
       s = vmsspec;
 
       /* When a UNIX spec with no file type is translated to VMS, */
@@ -2362,8 +2364,8 @@ setup_cmddsc(const char *incmd, int check_img, int *suggest_quote,
   free(vmsspec);
 
   /* check if it's a symbol (for quoting purposes) */
-  if (suggest_quote && !*suggest_quote) { 
-    int iss;     
+  if (suggest_quote && !*suggest_quote) {
+    int iss;
     char equiv[LNM$C_NAMLENGTH];
     struct dsc$descriptor_s eqvdsc = {sizeof(equiv), DSC$K_DTYPE_T, DSC$K_CLASS_S, equiv};
 
@@ -2430,7 +2432,7 @@ do_spawn2(const char *cmd, int flags)
     FILE * fp;
 
     strcpy(mode, (flags & CLI$M_NOWAIT) ? "n" : "nW" );
-    
+
     fp = safe_popen(cmd, mode, (int *)&sts);
     if (fp != NULL)
       my_pclose(fp);
@@ -2506,7 +2508,7 @@ create_mbx(unsigned short int *chan, struct dsc$descriptor_s *namdsc)
      * Get the SYSGEN parameter MAXBUF
      *
      * If the logical 'PERL_MBX_SIZE' is defined
-     * use the value of the logical instead of PERL_BUFSIZ, but 
+     * use the value of the logical instead of PERL_BUFSIZ, but
      * keep the size between 128 and MAXBUF.
      *
      */
