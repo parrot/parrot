@@ -1,7 +1,6 @@
 /*
  * Copyright (C) 2012, Parrot Foundation.
  * Copyright (C) 2006, 2007 Steven M. Schweda.
- * Copyright (C) 1996, 1997, 1998, 1999, Peter Gutmann (and various others).
  */
 
 /*
@@ -24,13 +23,13 @@ Get some entropy from the system, VMS version.
 
 #include "parrot/parrot.h"
 
-static int vms_get_entropy( char *result, size_t length );
+static int vms_get_entropy(char *result, size_t length);
 
 /* HEADERIZER HFILE: none */
 
 /*
 
-=item C<void Parrot_get_entropy(PARROT_INTERP)>
+=item C<INTVAL Parrot_get_entropy(PARROT_INTERP)>
 
 Get one INTVAL worth of entropy from the system.
 
@@ -38,12 +37,11 @@ Get one INTVAL worth of entropy from the system.
 
 */
 
-INTVAL
-Parrot_get_entropy(PARROT_INTERP) {
+INTVAL Parrot_get_entropy(PARROT_INTERP) {
     INTVAL  entropy;
     int     sts;
 
-    sts = vms_get_entropy((char *)&entropy, sizeof(INTVAL));
+    sts = vms_get_entropy((char *)&entropy, sizeof (INTVAL));
     if (sts != 0) {
         const char *msg = "Couldn't gather random bytes.";
         /* This function is called during interp init, so use the GC registry
@@ -56,15 +54,6 @@ Parrot_get_entropy(PARROT_INTERP) {
     }
     return entropy;
 }
-
-/*
-
-=back
-
-=cut
-
-*/
-
 
 /****************************************************************************
  *									    *
@@ -82,40 +71,6 @@ Parrot_get_entropy(PARROT_INTERP) {
 
    We see no code here which could be based on cryptlib.
 */
-
-/* This module is part of the cryptlib continuously seeded pseudorandom
-   number generator.  For usage conditions, see lib_rand.c
-
-   [Here is the notice from lib_rand.c:]
-
-   This module and the misc/rnd*.c modules represent the cryptlib
-   continuously seeded pseudorandom number generator (CSPRNG) as described in
-   my 1998 Usenix Security Symposium paper "The generation of random numbers
-   for cryptographic purposes".
-
-   The CSPRNG code is copyright Peter Gutmann (and various others) 1996,
-   1997, 1998, 1999, all rights reserved.  Redistribution of the CSPRNG
-   modules and use in source and binary forms, with or without modification,
-   are permitted provided that the following conditions are met:
-
-   1. Redistributions of source code must retain the above copyright notice
-      and this permission notice in its entirety.
-
-   2. Redistributions in binary form must reproduce the copyright notice in
-      the documentation and/or other materials provided with the distribution.
-
-   3. A copy of any bugfixes or enhancements made must be provided to the
-      author, <pgut001@cs.auckland.ac.nz> to allow them to be added to the
-      baseline version of the code.
-
-  ALTERNATIVELY, the code may be distributed under the terms of the GNU
-  General Public License, version 2 or any later version published by the
-  Free Software Foundation, in which case the provisions of the GNU GPL are
-  required INSTEAD OF the above restrictions.
-
-  Although not required under the terms of the GPL, it would still be nice if
-  you could make any changes available to the author to allow a consistent
-  code base to be maintained */
 
 /* General includes */
 
@@ -202,8 +157,8 @@ static char lnm_mbx[ 32];
 static struct dsc$descriptor_s cmd_dscr =
  { 0, DSC$K_DTYPE_T, DSC$K_CLASS_S, (char *) NULL };
 
-static $DESCRIPTOR( lnm_mbx_dscr, lnm_mbx);
-static $DESCRIPTOR( nla0_dscr, "NLA0:");
+static $DESCRIPTOR(lnm_mbx_dscr, lnm_mbx);
+static $DESCRIPTOR(nla0_dscr, "NLA0:");
 
 
 static unsigned short chan_mbx = 0;
@@ -211,23 +166,32 @@ static int fd_mbx = -1;
 static char *dbgfn;
 static FILE *dbgfp = NULL;
 
-#define GR_MIN( a, b) ((a > b) ? b : a)
+#define GR_MIN(a, b) (((a) > (b)) ? (b) : (a))
 
-
-/*    buffer     buffer to copy into
- *    length:    bytes requested
- *    level:     source code.  (See random.c: add_randomness().)
- *               0 - used ony for initialization
- *               1 - fast random poll function
- *               2 - normal poll function
- *               3 - used when level 2 random quality has been requested
- *                   to do an extra pool seed.
- */
 
 #define MBX_BASE_NAME "MBX_PARROT_ENTROPY_"
 
+/*
+
+=item C<static int rndvms_gather_random(char *buffer, size_t length, int level)>
+
+buffer     buffer to copy into
+
+length:    bytes requested
+
+level:     source code.  (See random.c: add_randomness().)
+           0 - used ony for initialization
+           1 - fast random poll function
+           2 - normal poll function
+           3 - used when level 2 random quality has been requested
+               to do an extra pool seed. (unused)
+
+=cut
+
+*/
+
 static int
-rndvms_gather_random( char *buffer, size_t length, int level )
+rndvms_gather_random(char *buffer, size_t length, int level)
 {
     char *gbp1;
     char *gbp2;
@@ -253,66 +217,66 @@ rndvms_gather_random( char *buffer, size_t length, int level )
         dbgfn = getenv("PARROT_RND_DEBUG");
         if (dbgfn != NULL)
         {
-            if (strcmp( dbgfn, "-") == 0)
+            if (strcmp(dbgfn, "-") == 0)
             {
                 dbgfp = stdout;
             }
             else
             {
-                dbgfp = fopen( dbgfn, "w");
+                dbgfp = fopen(dbgfn, "w");
                 if (dbgfp == NULL)
                 {
-                    fprintf( stderr,
+                    fprintf(stderr,
                      "rndvms()  Can't open (write) rnd debug file \"%s\".\n %s\n",
-                     dbgfn, strerror( errno));
+                     dbgfn, strerror(errno));
                 }
             }
         }
 
         /* Form the (process-unique) mailbox logical name. */
-        sprintf( lnm_mbx, "%s%08x", MBX_BASE_NAME, getpid());
+        sprintf(lnm_mbx, "%s%08x", MBX_BASE_NAME, getpid());
         lnm_mbx_dscr.dsc$w_length = sizeof MBX_BASE_NAME - 1 + 8;
 
         /* If target mailbox already exists (left-over), read/waste any
            pending data, and close and delete the old mailbox.
         */
-        fd_mbx = open( lnm_mbx, O_RDONLY, 0);
+        fd_mbx = open(lnm_mbx, O_RDONLY, 0);
         if (fd_mbx >= 0)
         {
             if (dbgfp)
             {
-                fprintf( dbgfp,
+                fprintf(dbgfp,
                  "rndvms()  Process mailbox (%s) unexpectedly exists.\n",
                  lnm_mbx);
-                fprintf( dbgfp, "rndvms()  Wasting data ...");
-                fflush( dbgfp);
+                fprintf(dbgfp, "rndvms()  Wasting data ...");
+                fflush(dbgfp);
             }
 
-            while (read( fd_mbx, g_buffer, 1024));
-            close( fd_mbx);
+            while (read(fd_mbx, g_buffer, 1024));
+            close(fd_mbx);
             if (dbgfp)
             {
-                fprintf( dbgfp, " done.\n");
-                fflush( dbgfp);
+                fprintf(dbgfp, " done.\n");
+                fflush(dbgfp);
             }
         }
 
-        sts = sys$crembx( 0,       	    /* Temporary mailbox. */
-                          &chan_mbx,        /* Channel. */
-                          0,                /* Max msg size (default). */
-                          0,                /* Msg buf quota (default). */
-                          0x00f0,           /* Prot = O:LPWR. */
-                          PSL$C_USER,       /* Access mode, */
-                          &lnm_mbx_dscr,    /* Logical name. */
-                          CMB$M_READONLY,   /* Flags. */
-                          0);               /* Reserved. */
+        sts = sys$crembx(0,       	    /* Temporary mailbox. */
+                         &chan_mbx,        /* Channel. */
+                         0,                /* Max msg size (default). */
+                         0,                /* Msg buf quota (default). */
+                         0x00f0,           /* Prot = O:LPWR. */
+                         PSL$C_USER,       /* Access mode, */
+                         &lnm_mbx_dscr,    /* Logical name. */
+                         CMB$M_READONLY,   /* Flags. */
+                         0);               /* Reserved. */
 
         if (dbgfp)
         {
-            fprintf( dbgfp,
+            fprintf(dbgfp,
              "rndvms()  Create process mailbox (%s).  sts = %%x%08x .\n",
              lnm_mbx, sts);
-            fflush( dbgfp);
+            fflush(dbgfp);
         }
 
         if ((sts& STS$M_SEVERITY) != STS$K_SUCCESS)
@@ -325,10 +289,10 @@ rndvms_gather_random( char *buffer, size_t length, int level )
 
     if (dbgfp)
     {
-        fprintf( dbgfp,
+        fprintf(dbgfp,
          "rndvms() len = %d, lev = %d.  Bytes avail = %d\n",
          length, level, (g_byte_count- g_byte_used_count));
-        fflush( dbgfp);
+        fflush(dbgfp);
     }
 
     /* While more data remain to be supplied, supply them. */
@@ -337,17 +301,17 @@ rndvms_gather_random( char *buffer, size_t length, int level )
         if (g_byte_count > g_byte_used_count)
         {
             /* Data are available (left-over?).  Use them (first). */
-            n = GR_MIN( length, (g_byte_count- g_byte_used_count));
+            n = GR_MIN(length, (g_byte_count- g_byte_used_count));
 
             /* Call the consumer's buffer-stuffer. */
             if (dbgfp)
             {
-                fprintf( dbgfp,
+                fprintf(dbgfp,
                  "rndvms()  Adding %d \"random\" bytes.\n", n);
-                fflush( dbgfp);
+                fflush(dbgfp);
             }
 
-            memcpy( buffer, &g_buffer[ g_byte_used_count], n );
+            memcpy(buffer, &g_buffer[ g_byte_used_count], n);
 
             g_byte_used_count += n;
             length -= n;
@@ -368,7 +332,7 @@ rndvms_gather_random( char *buffer, size_t length, int level )
                     /* Read data while there are more data to read,
                        and space is available in the buffer.
                     */
-                    while (((sts = read( fd_mbx,
+                    while (((sts = read(fd_mbx,
                      &g_buffer[ g_byte_count],          /* gbp1 */
                      (G_BUFSIZE- g_byte_count))) > 0) &&
                      (G_BUFSIZE- g_byte_count > 0))
@@ -411,7 +375,7 @@ rndvms_gather_random( char *buffer, size_t length, int level )
                     */
                     if (sts <= 0)
                     {
-                        sts = close( fd_mbx);
+                        sts = close(fd_mbx);
                         fd_mbx = 0;
                     }
                 }
@@ -422,35 +386,35 @@ rndvms_gather_random( char *buffer, size_t length, int level )
                    next command.
                 */
                 cmd_dscr.dsc$a_pointer = (char *) dataSources[ src_ndx].cmd;
-                cmd_dscr.dsc$w_length = strlen( cmd_dscr.dsc$a_pointer);
+                cmd_dscr.dsc$w_length = strlen(cmd_dscr.dsc$a_pointer);
 
 
                 /* Run the next command, and open the mailbox. */
                 if (dbgfp)
                 {
-                    fprintf( dbgfp,
+                    fprintf(dbgfp,
                      "rndvms()  Spawning: %.*s\n",
                      cmd_dscr.dsc$w_length, cmd_dscr.dsc$a_pointer);
-                    fflush( dbgfp);
+                    fflush(dbgfp);
                 }
 
-                sts = lib$spawn( &cmd_dscr,     /* Command. */
-                                 &nla0_dscr,    /* SYS$INPUT */
-                                 &lnm_mbx_dscr, /* SYS$OUTPUT */
-                                 &spwn_flgs,    /* Flags.  1 = NOWAIT. */
-                                 0,             /* Process name */
-                                 &spwn_pid,     /* Process ID */
-                                 0,             /* Completion status */
-                                 0,             /* Event flag */
-                                 0,             /* AST address */
-                                 0,             /* AST argument */
-                                 0,             /* Prompt string */
-                                 0,             /* CLI */
-                                 0);            /* command table */
+                sts = lib$spawn(&cmd_dscr,     /* Command. */
+                                &nla0_dscr,    /* SYS$INPUT */
+                                &lnm_mbx_dscr, /* SYS$OUTPUT */
+                                &spwn_flgs,    /* Flags.  1 = NOWAIT. */
+                                0,             /* Process name */
+                                &spwn_pid,     /* Process ID */
+                                0,             /* Completion status */
+                                0,             /* Event flag */
+                                0,             /* AST address */
+                                0,             /* AST argument */
+                                0,             /* Prompt string */
+                                0,             /* CLI */
+                                0);            /* command table */
 
                 if ((sts& STS$M_SEVERITY) == STS$K_SUCCESS)
                 {
-                    fd_mbx = open( lnm_mbx, O_RDONLY, 0);
+                    fd_mbx = open(lnm_mbx, O_RDONLY, 0);
                     if (fd_mbx < 0)
                     {
                         return -1;
@@ -474,20 +438,31 @@ rndvms_gather_random( char *buffer, size_t length, int level )
     return 0;
 }
 
+/*
+
+=item C<static int vms_get_entropy(char *result, size_t length)>
+
+Call I<rndvms_gather_random()> until the entropy buffer
+has size length.
+
+=cut
+
+*/
+
 static int
-vms_get_entropy ( char *result, size_t length )
+vms_get_entropy(char *result, size_t length)
 {
     char buffer [ 1 << 12 ];
     int  sts, sz, i;
 
-    if (length > sizeof(buffer))
+    if (length > sizeof (buffer))
         return -1;
 
-    sts = rndvms_gather_random(buffer, sizeof(buffer) -1, 3);
+    sts = rndvms_gather_random(buffer, sizeof (buffer) -1, 3);
     if (sts != 0)
         return sts;
 
-    for (sz = sizeof(buffer) >> 1; sz > length; sz >>= 1)
+    for (sz = sizeof (buffer) >> 1; sz > length; sz >>= 1)
     {
         for (i = 0; i < sz; ++i)
             buffer[i] ^= buffer[sz+i];
@@ -499,15 +474,27 @@ vms_get_entropy ( char *result, size_t length )
 
 #ifdef TEST_RNDVMS
 
-#include <stdlib.h>
+#  include <stdlib.h>
+
+/*
+
+=item C<int main(int argc, char **argv, char **envp)>
+
+Compile with /Define=TEST_RNDVMS
+
+=back
+
+=cut
+
+*/
 
 int
-main ( int argc, char **argv, char **envp )
+main(int argc, char **argv, char **envp)
 {
     INTVAL entropy;
     int    sts;
 
-    sts = vms_get_entropy( (char *)&entropy, sizeof(INTVAL));
+    sts = vms_get_entropy((char *)&entropy, sizeof (INTVAL));
     if (sts != 0)
         return EXIT_FAILURE;
 
