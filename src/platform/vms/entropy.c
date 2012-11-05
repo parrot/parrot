@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2012, Parrot Foundation.
+ * Copyright (C) 2006, 2007 Steven M. Schweda.
  * Copyright (C) 1996, 1997, 1998, 1999, Peter Gutmann (and various others).
  */
 
@@ -74,7 +75,13 @@ Parrot_get_entropy(PARROT_INTERP) {
  ****************************************************************************/
 
 /* Slightly modified from the GnuPG for VMS source file [.cipher]rndvms.c .
-   See http://antinode.info/dec/sw/gnupg.html */
+   See http://antinode.info/dec/sw/gnupg.html
+   New file by Steven M. Schweda:
+      gnupg-1_4_9a_vms/cipher/rndvms.c    VMS-specific "entropy gathering" code.
+   Licensed under the GNU GPL v3
+
+   We see no code here which could be based on cryptlib.
+*/
 
 /* This module is part of the cryptlib continuously seeded pseudorandom
    number generator.  For usage conditions, see lib_rand.c
