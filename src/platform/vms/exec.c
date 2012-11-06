@@ -196,6 +196,8 @@ Parrot_proc_waitpid(SHIM_INTERP, INTVAL pid)
 
 =over
 
+=cut
+
 */
 
 
@@ -2001,6 +2003,8 @@ created with popen(); otherwise partially emulate waitpid() unless
 we have a suitable one from the CRTL that came with VMS 7.2 and later.
 Also check processes not considered by the CRTL waitpid().
 
+=back
+
 =cut
 
 */
@@ -2161,6 +2165,8 @@ from C<lib$spawn> and what Unix folks expect from C<exec>.
 */
 
 /*
+
+=over
 
 =item C<static void vms_execfree(struct dsc$descriptor_s *vmscmd)>
 
@@ -2793,6 +2799,8 @@ create_mbx(unsigned short int *chan, struct dsc$descriptor_s *namdsc)
 =item C<static void vms_get_subproc_handles(int pid, PIOHANDLE *handles)>
 
 Return the three stdio handles for the command.
+
+=back
 
 =cut
 
