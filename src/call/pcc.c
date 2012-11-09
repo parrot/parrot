@@ -185,6 +185,33 @@ order that they appear in the function signature.
 
 */
 
+static void
+pcc_invoke_method_obj_from_varargs(PARROT_INTERP, ARGIN(PMC *pmc),
+    ARGIN(PMC * subobj), ARGIN(const char * sig), ARGIN(va_list *args))
+{
+    ASSERT_ARGS(pcc_invoke_method_obj_from_varargs)
+    PMC        *call_obj;
+    PMC        *sub_obj;
+    const char *arg_sig, *ret_sig;
+    PMC        * const old_call_obj =
+        Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
+
+    Parrot_pcc_split_signature_string(signature, &arg_sig, &ret_sig);
+
+    call_obj = Parrot_pcc_build_call_from_varargs(interp, PMCNULL, arg_sig, &args);
+    Parrot_pcc_add_invocant(interp, call_obj, pmc);
+
+    Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), call_obj);
+
+    /* Invoke the subroutine object with the given CallContext object */
+    Parrot_pcc_invoke_from_sig_object(interp, sub_obj, call_obj);
+    call_obj = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
+    Parrot_pcc_fill_params_from_varargs(interp, call_obj, ret_sig, &args,
+            PARROT_ERRORS_RESULT_COUNT_FLAG);
+    Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), old_call_obj);
+}
+
+
 PARROT_EXPORT
 void
 Parrot_pcc_invoke_method_from_c_args(PARROT_INTERP, ARGIN(PMC* pmc),
@@ -192,20 +219,7 @@ Parrot_pcc_invoke_method_from_c_args(PARROT_INTERP, ARGIN(PMC* pmc),
         ARGIN(const char *signature), ...)
 {
     ASSERT_ARGS(Parrot_pcc_invoke_method_from_c_args)
-    PMC        *call_obj;
-    PMC        *sub_obj;
-    va_list     args;
-    const char *arg_sig, *ret_sig;
-    PMC        * const old_call_obj =
-        Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
-
-    Parrot_pcc_split_signature_string(signature, &arg_sig, &ret_sig);
-
-    va_start(args, signature);
-    call_obj = Parrot_pcc_build_call_from_varargs(interp, PMCNULL, arg_sig, &args);
-    Parrot_pcc_add_invocant(interp, call_obj, pmc);
-
-    Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), call_obj);
+    va_list args;
 
     /* Find the subroutine object as a named method on pmc */
     sub_obj = VTABLE_find_method(interp, pmc, method_name);
@@ -214,15 +228,24 @@ Parrot_pcc_invoke_method_from_c_args(PARROT_INTERP, ARGIN(PMC* pmc),
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_METHOD_NOT_FOUND,
             "Method '%Ss' not found", method_name);
 
-    /* Invoke the subroutine object with the given CallContext object */
-    Parrot_pcc_invoke_from_sig_object(interp, sub_obj, call_obj);
-    call_obj = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
-    Parrot_pcc_fill_params_from_varargs(interp, call_obj, ret_sig, &args,
-            PARROT_ERRORS_RESULT_COUNT_FLAG);
+    va_start(args, signature);
+    pcc_invoke_method_obj_from_varargs(interp, pmc, sub_obj, sig, &args);
     va_end(args);
-    Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), old_call_obj);
+
 }
 
+PARROT_EXPORT
+void
+Parrot_pcc_invoke_method_obj_from_c_args(PARROT_INTERP, ARGIN(PMC *pmc),
+    ARGIN(PMC * method), ARGIN(const char * sig), ...)
+{
+    ASSERT_ARGS(Parrot_pcc_invoke_method_obj_from_c_args)
+    va_list args;
+
+    va_start(args, signature);
+    pcc_invoke_method_obj_from_varargs(interp, pmc, method, sig, &args);
+    va_end(args);
+}
 
 /*
 

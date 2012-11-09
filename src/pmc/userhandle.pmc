@@ -1,0 +1,102 @@
+
+
+pmclass UserHandle auto_attrs {
+    ATTR Hash * accessors;
+    ATTR Hash * attributes;
+    ATTR PMC * read_buffer;
+    ATTR PMC * write_buffer;
+    ATTR IO_VTABLE * io_vtable;
+
+    VTABLE void init() {
+        Parrot_UserHandle_attributes * const attrs =
+            PMC_data_typed(SELF, Parrot_UserHandle_attributes *);
+
+        attrs->accessors = Parrot_hash_new_cstring_hash(interp);
+        attrs->attributes = Parrot_hash_new(interp);
+        attrs->read_buffer = PMCNULL;
+        attrs->write_buffer = PMCNULL;
+        attrs->io_vtable = (IO_VTABLE *)Parrot_io_get_vtable(interp,
+                                                    IO_VTABLE_USER, NULL);
+
+        PObj_custom_mark_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
+    }
+
+    VTABLE void mark() {
+        Parrot_io_buffer_mark(INTERP, PARROT_IOBUFFER(SELF)->buffer);
+    }
+
+    VTABLE void destroy() {
+        Parrot_io_buffer_free(INTERP, PARROT_IOBUFFER(SELF)->buffer);
+        PARROT_IOBUFFER(SELF)->buffer = NULL;
+    }
+
+    VTABLE void *get_pointer_keyed_int(INTVAL key)
+    {
+        PMC * temp;
+        void * ptr = NULL;
+        switch (key) {
+            case IO_PTR_IDX_VTABLE:
+                GET_ATTR_io_vtable(INTERP, SELF, ptr);
+                break;
+            case IO_PTR_IDX_READ_BUFFER:
+                GET_ATTR_read_buffer(INTERP, SELF, temp);
+                if (!PMC_IS_NULL(temp))
+                    ptr = VTABLE_get_pointer(temp);
+                break;
+            case IO_PTR_IDX_WRITE_BUFFER:
+                GET_ATTR_write_buffer(INTERP, SELF, temp);
+                if (!PMC_IS_NULL(temp))
+                    ptr = VTABLE_get_pointer(temp);
+                break;
+            default:
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
+                    "UserHandle: Cannot get pointer %d", key);
+        }
+        return ptr;
+    }
+
+    VTABLE void set_pointer_keyed_int(INTVAL key, void *ptr)
+    {
+        PMC * temp;
+        switch (key) {
+            case IO_PTR_IDX_VTABLE:
+                SET_ATTR_io_vtable(INTERP, SELF, (IO_VTABLE *)ptr);
+                break;
+            case IO_PTR_IDX_READ_BUFFER:
+                GET_ATTR_read_buffer(INTERP, SELF, temp);
+                if (PMC_IS_NULL(temp)) {
+                    temp = Parrot_pmc_new(INTERP, enum_class_IOBuffer);
+                    SET_ATTR_read_buffer(INTERP, SELF, temp);
+                }
+                VTABLE_set_pointer(INTERP, temp, ptr);
+                break;
+            case IO_PTR_IDX_WRITE_BUFFER:
+                GET_ATTR_write_buffer(INTERP, SELF, temp);
+                if (PMC_IS_NULL(temp)) {
+                    temp = Parrot_pmc_new(INTERP, enum_class_IOBuffer);
+                    SET_ATTR_write_buffer(INTERP, SELF, temp);
+                }
+                VTABLE_set_pointer(INTERP, temp, ptr);
+                break;
+            default:
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
+                    "Handle: Cannot set pointer %d", key);
+        }
+    }
+
+    METHOD set_accessor(STRING * name, PMC * acc) {
+        Hash * accessors = PARROT_USERHANDLE(SELF)->accessors;
+        const char * cstr = Parrot_str_to_cstring(INTERP, name);
+        Parrot_hash_put(INTERP, accessors, cstr, acc);
+        Parrot_str_free_cstring(cstr);
+    }
+
+    METHOD get_accessor(STRING * name) {
+        Hash * accessors = PARROT_USERHANDLE(SELF)->accessors;
+        const char * cstr = Parrot_str_to_cstring(INTERP, name);
+        PMC * value = Parrot_hash_get(INTERP, accessors, cstr);
+        Parrot_str_free_cstring(cstr);
+        RETURN(PMC *value);
+    }
+}
