@@ -39,6 +39,7 @@ sub _init {
     $data{icuconfig_default}    = q{icu-config};
     $data{icu_headers}          = [ qw(ucnv.h utypes.h uchar.h) ];
     $data{icu_shared_pattern}   = qr/-licui18n\w*/;
+    $data{icu_version}          = q{};
     return \%data;
 }
 
@@ -81,6 +82,7 @@ sub runstep {
     my $icuheaders = (defined $icuheaders_opt)
         ? $icuheaders_opt
         : undef;
+    my $icuversion;
 
     # $without_opt holds user's command-line value for --without-icu=?
     # If it's a true value, there's no point in going further.  We set the
@@ -117,7 +119,7 @@ sub runstep {
         return 1;
     }
 
-    ($without, $icushared, $icuheaders) =
+    ($without, $icushared, $icuheaders, $icuversion) =
         $self->_try_icuconfig(
             $conf,
             {
@@ -134,7 +136,7 @@ sub runstep {
         return 1;
     }
 
-    _verbose_report($conf, $icuconfig, $icushared, $icuheaders);
+    _verbose_report($conf, $icuconfig, $icushared, $icuheaders, $icuversion);
 
     $icuheaders = $self->_handle_icuconfig_errors( {
         icushared   => $icushared,
@@ -149,6 +151,7 @@ sub runstep {
         has_icu    => 1,
         icu_shared => $icushared,
         icu_dir    => $icudir,
+        $icuversion ? ( icu_version    => $icuversion ) : (),
     );
 
     # Add -I $Icuheaders if necessary.
@@ -170,7 +173,7 @@ sub runstep {
         },
     );
     $conf->cc_clean();
-    $self->set_result("yes");
+    $self->set_result("yes, $icuversion");
     # 5th possible return point; this is the only really successful return.
     return 1;
 }
@@ -272,6 +275,7 @@ sub _try_icuconfig {
     my $icuheaders = ( defined $arg->{icuheaders} )
         ? $arg->{icuheaders}
         : undef;
+    my $icuversion;
     if (
         ( ! $arg->{without} )  &&
         $arg->{autodetect}    &&
@@ -295,9 +299,16 @@ sub _try_icuconfig {
         ($icuheaders, $arg->{without}) =
             $self->_handle_icuheaders($conf, $icuheaders, $arg->{without});
         $conf->debug("For icuheaders, found $icuheaders and $arg->{without}\n");
+
+        # icu-config --version for missing (void) declarations with 4.4
+        $conf->debug("Trying $arg->{icuconfig} with '--version'\n");
+        $icuversion = capture_output("$arg->{icuconfig} --version");
+        chomp ($icuversion);
+        $icuversion =~ s/\n//g;
+        $conf->debug("$arg->{icuconfig} --version:  captured $icuversion\n");
     }
 
-    return ($arg->{without}, $icushared, $icuheaders);
+    return ($arg->{without}, $icushared, $icuheaders, $icuversion);
 }
 
 sub _handle_icushared {
@@ -339,10 +350,11 @@ sub _handle_icuheaders {
 }
 
 sub _verbose_report {
-    my ($conf, $icuconfig, $icushared, $icuheaders) = @_;
+    my ($conf, $icuconfig, $icushared, $icuheaders, $icuversion) = @_;
     if ($conf->options->get('verbose')) {
         print "icuconfig: $icuconfig\n"  if defined $icuconfig;
         print "icushared='$icushared'\n" if defined $icushared;
+        print "icu_version='$icuversion'\n" if defined $icuversion;
         print "headers='$icuheaders'\n"  if defined $icuheaders;
     }
 }
