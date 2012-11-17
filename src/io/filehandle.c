@@ -54,8 +54,18 @@ static const STR_VTABLE * io_filehandle_get_encoding(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_WARN_UNUSED_RESULT
+static PIOOFF_T io_filehandle_get_file_position(PARROT_INTERP,
+    ARGIN(const PMC *filehandle))
+        __attribute__nonnull__(2);
+
 static INTVAL io_filehandle_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+static PIOHANDLE io_filehandle_get_os_handle(PARROT_INTERP,
+    ARGIN(const PMC *filehandle))
         __attribute__nonnull__(2);
 
 static PIOHANDLE io_filehandle_get_piohandle(PARROT_INTERP,
@@ -115,6 +125,12 @@ static void io_filehandle_set_eof(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
+static void io_filehandle_set_file_position(PARROT_INTERP,
+    ARGMOD(PMC *filehandle),
+    PIOOFF_T file_pos)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*filehandle);
+
 static void io_filehandle_set_flags(PARROT_INTERP,
     ARGIN(PMC *handle),
     INTVAL flags)
@@ -158,9 +174,14 @@ static INTVAL io_filehandle_write_b(PARROT_INTERP,
 #define ASSERT_ARGS_io_filehandle_get_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_filehandle_get_file_position \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(filehandle))
 #define ASSERT_ARGS_io_filehandle_get_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_filehandle_get_os_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(filehandle))
 #define ASSERT_ARGS_io_filehandle_get_piohandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -188,6 +209,9 @@ static INTVAL io_filehandle_write_b(PARROT_INTERP,
 #define ASSERT_ARGS_io_filehandle_set_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_filehandle_set_file_position \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(filehandle))
 #define ASSERT_ARGS_io_filehandle_set_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -644,7 +668,7 @@ io_filehandle_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
 
 /*
 
-=item C<PIOOFF_T io_filehandle_get_file_position(PARROT_INTERP, const PMC
+=item C<static PIOOFF_T io_filehandle_get_file_position(PARROT_INTERP, const PMC
 *filehandle)>
 
 Get the C<file_pos> attribute of the FileHandle object, which stores
@@ -669,8 +693,8 @@ io_filehandle_get_file_position(SHIM_INTERP, ARGIN(const PMC *filehandle))
 
 /*
 
-=item C<void io_filehandle_set_file_position(PARROT_INTERP, PMC *filehandle,
-PIOOFF_T file_pos)>
+=item C<static void io_filehandle_set_file_position(PARROT_INTERP, PMC
+*filehandle, PIOOFF_T file_pos)>
 
 Get the C<file_pos> attribute of the FileHandle object, which stores the
 current file position of the filehandle. Also set the C<last_pos> attribute to
@@ -714,7 +738,7 @@ buffer and file positions) to their default values.
 
 */
 
-static void
+void
 io_filehandle_set_os_handle(SHIM_INTERP, ARGMOD(PMC *filehandle), PIOHANDLE file_descriptor)
 {
     ASSERT_ARGS(io_filehandle_set_os_handle)
@@ -723,7 +747,7 @@ io_filehandle_set_os_handle(SHIM_INTERP, ARGMOD(PMC *filehandle), PIOHANDLE file
 
 /*
 
-=item C<PIOHANDLE io_filehandle_get_os_handle(PARROT_INTERP, const PMC
+=item C<static PIOHANDLE io_filehandle_get_os_handle(PARROT_INTERP, const PMC
 *filehandle)>
 
 Retrieve the C<os_handle> attribute of the FileHandle object, which stores the

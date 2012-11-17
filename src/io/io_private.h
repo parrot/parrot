@@ -362,30 +362,6 @@ STRING * io_verify_string_encoding(PARROT_INTERP,
 /* HEADERIZER BEGIN: src/io/filehandle.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-const IO_VTABLE * io_filehandle_convert_to_pipe(PARROT_INTERP,
-    ARGMOD(PMC *handle))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*handle);
-
-PARROT_WARN_UNUSED_RESULT
-PIOOFF_T io_filehandle_get_file_position(PARROT_INTERP,
-    ARGIN(const PMC *filehandle))
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PIOHANDLE io_filehandle_get_os_handle(PARROT_INTERP,
-    ARGIN(const PMC *filehandle))
-        __attribute__nonnull__(2);
-
-void io_filehandle_set_file_position(PARROT_INTERP,
-    ARGMOD(PMC *filehandle),
-    PIOOFF_T file_pos)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*filehandle);
-
 void io_filehandle_set_os_handle(PARROT_INTERP,
     ARGMOD(PMC *filehandle),
     PIOHANDLE file_descriptor)
@@ -398,17 +374,6 @@ void io_filehandle_setup_vtable(PARROT_INTERP,
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*vtable);
 
-#define ASSERT_ARGS_io_filehandle_convert_to_pipe __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle))
-#define ASSERT_ARGS_io_filehandle_get_file_position \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(filehandle))
-#define ASSERT_ARGS_io_filehandle_get_os_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(filehandle))
-#define ASSERT_ARGS_io_filehandle_set_file_position \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(filehandle))
 #define ASSERT_ARGS_io_filehandle_set_os_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(filehandle))
 #define ASSERT_ARGS_io_filehandle_setup_vtable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -419,12 +384,26 @@ void io_filehandle_setup_vtable(PARROT_INTERP,
 /* HEADERIZER BEGIN: src/io/pipe.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_WARN_UNUSED_RESULT
+PIOHANDLE io_pipe_get_os_handle(PARROT_INTERP, ARGIN(const PMC *pipe))
+        __attribute__nonnull__(2);
+
+void io_pipe_set_os_handle(PARROT_INTERP,
+    ARGMOD(PMC *pipe),
+    PIOHANDLE pipe_descriptor)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pipe);
+
 void io_pipe_setup_vtable(PARROT_INTERP,
     ARGMOD_NULLOK(IO_VTABLE *vtable),
     INTVAL idx)
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*vtable);
 
+#define ASSERT_ARGS_io_pipe_get_os_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pipe))
+#define ASSERT_ARGS_io_pipe_set_os_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pipe))
 #define ASSERT_ARGS_io_pipe_setup_vtable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

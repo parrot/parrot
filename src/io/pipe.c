@@ -634,8 +634,8 @@ io_pipe_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
 
 =over 4
 
-=item C<void io_pipe_set_os_handle(PARROT_INTERP, PMC *pipe,
-PIOHANDLE pipe_descriptor)>
+=item C<void io_pipe_set_os_handle(PARROT_INTERP, PMC *pipe, PIOHANDLE
+pipe_descriptor)>
 
 Sets the C<os_handle> attribute of the Pipe object, which stores the
 low-level pipe for the OS.
@@ -661,8 +661,7 @@ io_pipe_set_os_handle(SHIM_INTERP, ARGMOD(PMC *pipe), PIOHANDLE pipe_descriptor)
 
 /*
 
-=item C<PIOHANDLE io_pipe_get_os_handle(PARROT_INTERP, const PMC
-*pipe)>
+=item C<PIOHANDLE io_pipe_get_os_handle(PARROT_INTERP, const PMC *pipe)>
 
 Retrieve the C<os_handle> attribute of the pipe object, which stores the
 low-level pipe for the OS.
