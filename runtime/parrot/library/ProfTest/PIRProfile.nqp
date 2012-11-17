@@ -83,8 +83,8 @@ method build_pir_profile() {
 
     my $cli := "\"$parrot_exe\" $hash_seed_opt --runcore profiling $tmp_pir";
 
-    my $pipe := pir::new__p_sc('FileHandle');
-    $pipe.open($cli, "rp");
+    my $pipe := pir::new__p_sc('Pipe');
+    $pipe.open($cli, "r");
     $pipe.readall();
     self<exit_status> := $pipe.exit_status();
 
