@@ -199,6 +199,7 @@ io_userhandle_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), INTV
     vtable->total_size = io_userhandle_total_size;
     vtable->get_piohandle = io_userhandle_get_piohandle;
     */
+    Parrot_hash_put(interp, interp->piodata->vtable_map, enum_class_Object, vtable);
 }
 
 

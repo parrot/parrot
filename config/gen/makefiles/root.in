@@ -702,6 +702,7 @@ STR_FILES = \
 	src/interp/inter_cb.str \
 	src/interp/api.str \
 	src/io/api.str \
+	src/io/utilities.str \
 	src/key.str \
 	src/library.str \
 	src/multidispatch.str \
@@ -1050,7 +1051,11 @@ src/events$(O) : \
 src/alarm$(O) : $(PARROT_H_HEADERS) src/alarm.c \
 	$(INC_DIR)/alarm.h
 
-src/io/utilities$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/utilities.c
+src/io/utilities$(O) : \
+	$(PARROT_H_HEADERS) \
+	src/io/io_private.h \
+	src/io/utilities.str \
+	src/io/utilities.c
 
 src/io/socket$(O) : \
 	$(PARROT_H_HEADERS) \

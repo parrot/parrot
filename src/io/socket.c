@@ -243,6 +243,8 @@ io_socket_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), INTVAL i
     vtable->set_flags = io_socket_set_flags;
     vtable->get_flags = io_socket_get_flags;
     vtable->total_size = io_socket_total_size;
+
+    Parrot_hash_put(interp, interp->piodata->vtable_map, enum_class_Socket, vtable);
 }
 
 /*

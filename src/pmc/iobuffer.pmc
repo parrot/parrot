@@ -2,24 +2,26 @@ pmclass IOBuffer auto_attrs {
     ATTR IO_BUFFER * buffer;
 
     VTABLE void init() {
-        Parrot_IOBuffer_attributes * const attrs =
-            PMC_data_typed(SELF, Parrot_IOBuffer_attributes *);
-
-        attrs->buffer = Parrot_io_buffer_allocate(INTERP, SELF, 0, Parrot_str_default_encoding, BUFFER_SIZE_ANY);
-
+        Parrot_IOBuffer_attributes * const attrs = PARROT_IOBUFFER(SELF);
+        attrs->buffer = NULL;
         PObj_custom_mark_SET(SELF);
         PObj_custom_destroy_SET(SELF);
     }
 
     VTABLE void init_int(INTVAL buffer_size) {
-        Parrot_IOBuffer_attributes * const attrs =
-            PMC_data_typed(SELF, Parrot_IOBuffer_attributes *);
+        VTABLE_init(INTERP, SELF);
+        VTABLE_set_integer_native(INTERP, SELF, buffer_size);
+    }
+
+    VTABLE void set_integer_native(INTVAL buffer_size) {
+        Parrot_IOBuffer_attributes * const attrs = PARROT_IOBUFFER(SELF);
 
         PARROT_ASSERT(buffer_size > 0);
-        attrs->buffer = Parrot_io_buffer_allocate(INTERP, SELF, 0, Parrot_str_default_encoding, (size_t)buffer_size);
-
-        PObj_custom_mark_SET(SELF);
-        PObj_custom_destroy_SET(SELF);
+        if (attrs->buffer)
+            Parrot_io_buffer_resize(INTERP, attrs->buffer, buffer_size);
+        else
+            attrs->buffer = Parrot_io_buffer_allocate(INTERP, 0,
+                              Parrot_platform_encoding_ptr, (size_t)buffer_size);
     }
 
     VTABLE void mark() {

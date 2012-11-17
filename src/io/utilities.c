@@ -21,10 +21,22 @@ of intelligence between the IO API and the buffering API.
 
 #include "parrot/parrot.h"
 #include "io_private.h"
+#include "utilities.str"
 
 /* HEADERIZER HFILE: src/io/io_private.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+static STRING * io_get_buffer_prop_name(PARROT_INTERP, INTVAL buffer_idx)
+        __attribute__nonnull__(1);
+
+#define ASSERT_ARGS_io_get_buffer_prop_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*
@@ -199,6 +211,18 @@ IO_VTABLE *vtable, INTVAL flags)>
 Verify that the given C<handle> has a read buffer attached. If not, allocate
 one.
 
+=item C<IO_BUFFER * io_get_handle_read_buffer_pmc(PARROT_INTERP, PMC *handle,
+INTVAL autocreate)>
+
+Get the read buffer PMC for the given handle, if any. Autocreate the buffer
+if necessary.
+
+=item C<IO_BUFFER * io_get_handle_write_buffer_pmc(PARROT_INTERP, PMC *handle,
+INTVAL autocreate)>
+
+Get the write buffer for the given handle, if any. Autocreate the buffer
+if necessary.
+
 =cut
 
 */
@@ -206,22 +230,86 @@ one.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 IO_BUFFER *
-io_verify_has_read_buffer(PARROT_INTERP, ARGIN(PMC *handle),
-        ARGIN(const IO_VTABLE *vtable), INTVAL flags)
+io_verify_has_buffer(PARROT_INTERP, ARGIN(PMC *handle), INTVAL buffer_idx,
+        ARGIN(const IO_VTABLE *vtable), size_t buffer_size, INTVAL flags)
 {
-    ASSERT_ARGS(io_verify_has_read_buffer)
-    IO_BUFFER * buffer = IO_GET_READ_BUFFER(interp, handle);
-    if (!buffer) {
+    ASSERT_ARGS(io_verify_has_buffer)
+    PMC * buffer_pmc = io_get_handle_buffer_pmc(interp, handle, buffer_idx,
+                                                 vtable, buffer_size, flags, 1);
+    return (IO_BUFFER*) VTABLE_get_pointer(interp, buffer_pmc);
+}
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PARROT_PURE_FUNCTION
+static STRING *
+io_get_buffer_prop_name(PARROT_INTERP, INTVAL buffer_idx)
+{
+    ASSERT_ARGS(io_get_buffer_prop_name)
+    switch (buffer_idx) {
+        case IO_IDX_READ_BUFFER:
+            return CONST_STRING(interp, "!Parrot_io_read_buffer!");
+        case IO_IDX_WRITE_BUFFER:
+            return CONST_STRING(interp, "!Parrot_io_write_buffer!");
+        default:
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Unknown buffer index %d", buffer_idx);
+    }
+}
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC *
+io_get_handle_buffer_pmc(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL buffer_idx,
+        ARGIN(const IO_VTABLE *vtable), size_t buffer_size, INTVAL flags,
+        INTVAL autocreate)
+{
+    ASSERT_ARGS(io_get_handle_buffer_pmc)
+    STRING * const prop_name = io_get_buffer_prop_name(interp, buffer_idx);
+
+    PMC * buffer_pmc = Parrot_pmc_getprop(interp, handle, prop_name);
+    /* TODO: Verify that the buffer is at least the size specified */
+    if (PMC_IS_NULL(buffer_pmc) && autocreate) {
+        buffer_pmc = Parrot_pmc_new(interp, enum_class_IOBuffer);
+        io_initialize_buffer_pmc(interp, buffer_pmc, handle, vtable, buffer_size, flags);
+
+        /* Store the buffer on the handle as a property */
+        Parrot_pmc_setprop(interp, handle, prop_name, buffer_pmc);
+    }
+    return buffer_pmc;
+}
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+IO_BUFFER *
+io_initialize_buffer_pmc(PARROT_INTERP, ARGMOD(PMC * buffer_pmc),
+        ARGMOD(PMC * handle), ARGIN(const IO_VTABLE *vtable), size_t buffer_size,
+        INTVAL flags)
+{
+    ASSERT_ARGS(io_initialize_buffer_pmc)
+    PARROT_ASSERT(!PMC_IS_NULL(buffer_pmc));
+    PARROT_ASSERT(!PMC_IS_NULL(handle));
+    vtable = vtable ? vtable : IO_GET_VTABLE(interp, handle);
+    PARROT_ASSERT(vtable);
+    {
+        /* Set up the buffer with the correct encoding */
         const STR_VTABLE * encoding = vtable->get_encoding(interp, handle);
         if (encoding == NULL)
             encoding = Parrot_platform_encoding_ptr;
-        buffer = Parrot_io_buffer_allocate(interp, handle, flags, encoding, BUFFER_SIZE_ANY);
-        VTABLE_set_pointer_keyed_int(interp, handle, IO_PTR_IDX_READ_BUFFER, buffer);
+        {
+            IO_BUFFER * const buffer = Parrot_io_buffer_allocate(interp,
+                                              BUFFER_FLAGS_ANY, encoding,
+                                              buffer_size);
+
+            /* Make sure to use the correct flags */
+            if (flags != BUFFER_FLAGS_ANY)
+                buffer->flags = flags;
+
+            /* Assign the buffer to the IOBuffer PMC */
+            VTABLE_set_pointer(interp, buffer_pmc, buffer);
+            return buffer;
+        }
     }
-    PARROT_ASSERT(buffer);
-    if (flags != BUFFER_FLAGS_ANY)
-        buffer->flags = flags;
-    return buffer;
 }
 
 /*

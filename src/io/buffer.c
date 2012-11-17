@@ -74,10 +74,10 @@ static size_t io_buffer_transfer_to_mem(PARROT_INTERP,
 
 /*
 
-=item C<IO_BUFFER * Parrot_io_buffer_allocate(PARROT_INTERP, PMC *owner, INTVAL
-flags, const STR_VTABLE *encoding, size_t init_size)>
+=item C<IO_BUFFER * Parrot_io_buffer_allocate(PARROT_INTERP, INTVAL flags, const
+STR_VTABLE *encoding, size_t init_size)>
 
-Allocate a new buffer for PMC C<owner> with the given flags and settings.
+Allocate a new buffer with the given flags and settings.
 
 =item C<void Parrot_io_buffer_free(PARROT_INTERP, IO_BUFFER *buffer)>
 
@@ -91,7 +91,7 @@ Free the C<buffer> memory.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 IO_BUFFER *
-Parrot_io_buffer_allocate(PARROT_INTERP, ARGMOD(PMC *owner), INTVAL flags,
+Parrot_io_buffer_allocate(PARROT_INTERP, INTVAL flags,
         ARGIN_NULLOK(const STR_VTABLE *encoding), size_t init_size)
 {
     ASSERT_ARGS(Parrot_io_buffer_allocate)
@@ -145,15 +145,15 @@ Parrot_io_buffer_free(PARROT_INTERP, ARGFREE(IO_BUFFER *buffer))
 idx, size_t length, INTVAL flags)>
 
 Allocate a new C<IO_BUFFER*> and attach it to PMC C<handle> at position
-C<idx>. Valid positions are C<IO_PTR_IDX_READ_BUFFER> and
-C<IO_PTR_IDX_WRITE_BUFFER>. If the buffer already exists, resize it to match
+C<idx>. Valid positions are C<IO_IDX_READ_BUFFER> and
+C<IO_IDX_WRITE_BUFFER>. If the buffer already exists, resize it to match
 the specifications.
 
 =item C<void Parrot_io_buffer_remove_from_handle(PARROT_INTERP, PMC *handle,
 INTVAL idx)>
 
 Remove the buffer from C<handle> at position C<idx>. Valid positions are
-C<IO_PTR_IDX_READ_BUFFER> and  C<IO_PTR_IDX_WRITE_BUFFER>.
+C<IO_IDX_READ_BUFFER> and  C<IO_IDX_WRITE_BUFFER>.
 
 =cut
 
@@ -164,22 +164,12 @@ Parrot_io_buffer_add_to_handle(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL idx,
         size_t length, INTVAL flags)
 {
     ASSERT_ARGS(Parrot_io_buffer_add_to_handle)
-    if (idx != IO_PTR_IDX_READ_BUFFER && idx != IO_PTR_IDX_WRITE_BUFFER)
+    if (idx != IO_IDX_READ_BUFFER && idx != IO_IDX_WRITE_BUFFER)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "Unknown buffer number %d", idx);
     {
-        IO_BUFFER * buffer = (IO_BUFFER *)VTABLE_get_pointer_keyed_int(interp, handle, idx);
-        if (buffer) {
-            Parrot_io_buffer_resize(interp, buffer, length);
-            PARROT_ASSERT(length == BUFFER_SIZE_ANY || buffer->buffer_size >= length);
-        }
-        else {
-            buffer = Parrot_io_buffer_allocate(interp, handle, flags, NULL, length);
-            PARROT_ASSERT(buffer);
-            VTABLE_set_pointer_keyed_int(interp, handle, idx, buffer);
-        }
-        if (flags != BUFFER_FLAGS_ANY)
-            buffer->flags = flags;
+        const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+        io_verify_has_buffer(interp, handle, idx, vtable, length, flags);
     }
 }
 
@@ -187,7 +177,7 @@ void
 Parrot_io_buffer_remove_from_handle(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL idx)
 {
     ASSERT_ARGS(Parrot_io_buffer_remove_from_handle)
-    if (idx != IO_PTR_IDX_READ_BUFFER && idx != IO_PTR_IDX_WRITE_BUFFER)
+    if (idx != IO_IDX_READ_BUFFER && idx != IO_IDX_WRITE_BUFFER)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "Unknown buffer number %d", idx);
     {
@@ -248,8 +238,6 @@ Parrot_io_buffer_mark(SHIM_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
     ASSERT_ARGS(Parrot_io_buffer_mark)
     if (!buffer)
         return;
-    /*if (!PMC_IS_NULL(buffer->owner_pmc))
-        Parrot_gc_mark_PMC_alive(interp, buffer->owner_pmc);*/
 }
 
 /*

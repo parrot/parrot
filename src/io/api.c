@@ -70,13 +70,13 @@ Parrot_io_init(PARROT_INTERP)
 
         os_handle = Parrot_io_internal_std_os_handle(interp, PIO_STDIN_FILENO);
         handle    = Parrot_io_fdopen_flags(interp, PMCNULL, os_handle, PIO_F_READ);
-        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_READ_BUFFER, BUFFER_SIZE_ANY,
+        Parrot_io_buffer_add_to_handle(interp, handle, IO_IDX_READ_BUFFER, BUFFER_SIZE_ANY,
                                        PIO_BF_BLKBUF);
         _PIO_STDIN(interp) = handle;
 
         os_handle = Parrot_io_internal_std_os_handle(interp, PIO_STDOUT_FILENO);
         handle    = Parrot_io_fdopen_flags(interp, PMCNULL, os_handle, PIO_F_WRITE);
-        /* Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY,
+        /* Parrot_io_buffer_add_to_handle(interp, handle, IO_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY,
                                        PIO_BF_LINEBUF); */
         _PIO_STDOUT(interp) = handle;
 
@@ -110,8 +110,8 @@ io_setup_vtables(PARROT_INTERP)
     const int number_of_vtables = 5;
     interp->piodata->vtables = (const IO_VTABLE*)mem_gc_allocate_n_zeroed_typed(interp,
                                             number_of_vtables, const IO_VTABLE);
-    interp->piodata->vtable_maps = Parrot_hash_create(interp, enum_type_INTVAL,
-                                                              Hash_key_type_ptr;
+    interp->piodata->vtable_map = Parrot_hash_create(interp, enum_type_INTVAL,
+                                                              Hash_key_type_ptr);
 
     interp->piodata->num_vtables = number_of_vtables;
     io_filehandle_setup_vtable(interp, NULL, IO_VTABLE_FILEHANDLE);
@@ -135,8 +135,8 @@ Retrieves the vtable at index C<idx>. If C<idx> is -1, the vtable is instead
 searched for by C<name>. Notice that name lookups are much slower. If both the
 C<idx> and C<name> are missing or invalid, the default vtable is returned.
 
-=item C<const IO_VTABLE *Parrot_io_get_vtable_for_pmc(PARROT_INTERP, ARGIN(PMC
-*handle))>
+=item C<const IO_VTABLE * Parrot_io_get_vtable_for_pmc(PARROT_INTERP, PMC
+*handle)>
 
 Retrieves the vtable for the given handle type.
 
@@ -180,7 +180,7 @@ Parrot_io_get_vtable(PARROT_INTERP, INTVAL idx, ARGIN_NULLOK(const char * name))
 
     /* If we have neither an idx nor a name, return the default user vtable */
     if (!name)
-        return interp->piodata->vtables[IO_VTABLE_USER];
+        return &(interp->piodata->vtables[IO_VTABLE_USER]);
 
     /* If we have a name, try to look it up by name. If we can't find it, return
        the default */
@@ -188,7 +188,7 @@ Parrot_io_get_vtable(PARROT_INTERP, INTVAL idx, ARGIN_NULLOK(const char * name))
         if (!strcmp(name, interp->piodata->vtables[i].name))
             return &(interp->piodata->vtables[i]);
     }
-    return interp->piodata->vtables[IO_VTABLE_USER];
+    return &(interp->piodata->vtables[IO_VTABLE_USER]);
 }
 
 PARROT_WARN_UNUSED_RESULT
@@ -196,59 +196,56 @@ PARROT_CANNOT_RETURN_NULL
 const IO_VTABLE *
 Parrot_io_get_vtable_for_pmc(PARROT_INTERP, ARGIN(PMC *handle))
 {
-    ASSERT_AGS(Parrot_io_get_vtable_for_pmc)
-    const IO_VTABLE * vtable = Parrot_hash_get(interp, interp->piodata->vtable_maps,
+    ASSERT_ARGS(Parrot_io_get_vtable_for_pmc)
+    const IO_VTABLE * vtable = Parrot_hash_get(interp, interp->piodata->vtable_map,
                                                      handle->vtable->base_type);
     if (!vtable)
-        return interp->piodata->vtables[IO_VTABLE_USER];
+        return &(interp->piodata->vtables[IO_VTABLE_USER]);
     return vtable;
 }
 
 /*
 
-=item C<IO_BUFFER * Parrot_io_get_handle_read_buffer(PARROT_INTERP, PMC *handle,
-INTVAL autocreate)>
+=item C<IO_BUFFER * Parrot_io_get_handle_read_buffer(PARROT_INTERP, PMC
+*handle)>
 
 Get the read buffer for the given handle, if any.
 
-=item C<IO_BUFFER * Parrot_io_get_handle_write_buffer(PARROT_INTERP, PMC *handle,
-INTVAL autocreate)>
+=item C<IO_BUFFER * Parrot_io_get_handle_write_buffer(PARROT_INTERP, PMC
+*handle)>
 
 Get the write buffer for the given handle, if any.
-
-=item C<void Parrot_io_set_handle_buffer(PARROT_INTERP, PMC *handle, IO_BUFFER
-*buffer)>
-
-Set the buffer for the given handle, if any.
 
 =cut
 
 */
 
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 IO_BUFFER *
-Parrot_io_get_handle_read_buffer(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL autocreate)
+Parrot_io_get_handle_read_buffer(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(Parrot_io_get_handle_read_buffer)
-    PMC * const buffer = VTABLE_get_prop(interp, handle, CONST_STRING("!io_read_buffer!"));
-    if (PMC_IS_NULL(buffer) && autocreate) {
-        // TODO: When we have buffer pmcs, fill them in here.
-    }
-    return buffer;
+    IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+    PMC * const buffer_pmc = io_get_handle_buffer_pmc(interp, handle, IO_IDX_READ_BUFFER,
+                                            vtable, BUFFER_SIZE_ANY, BUFFER_FLAGS_ANY, 0);
+    if (!PMC_IS_NULL(buffer_pmc))
+        return VTABLE_get_pointer(interp, buffer_pmc);
+    return NULL;
 }
 
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 IO_BUFFER *
-Parrot_io_get_handle_write_buffer(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL autocreate)
+Parrot_io_get_handle_write_buffer(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(Parrot_io_get_handle_write_buffer)
-    PMC * const buffer = VTABLE_get_prop(interp, handle, CONST_STRING("!io_write_buffer!"));
-    if (PMC_IS_NULL(buffer) && autocreate) {
-        // TODO: When we have buffer pmcs, fill them in here.
-    }
-    return buffer;
+    IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
+    PMC * const buffer_pmc = io_get_handle_buffer_pmc(interp, handle, IO_IDX_WRITE_BUFFER,
+                                            vtable, BUFFER_SIZE_ANY, BUFFER_FLAGS_ANY, 0);
+    if (!PMC_IS_NULL(buffer_pmc))
+        return VTABLE_get_pointer(interp, buffer_pmc);
+    return NULL;
 }
 
 /*
@@ -419,10 +416,10 @@ Parrot_io_open(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *path),
         /* If this type uses buffers by default, set them up, and if we're
            in an acceptable mode, set up buffers. */
         if (vtable->flags & PIO_VF_DEFAULT_READ_BUF && flags & PIO_F_READ)
-            Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_READ_BUFFER, BUFFER_SIZE_ANY,
+            Parrot_io_buffer_add_to_handle(interp, handle, IO_IDX_READ_BUFFER, BUFFER_SIZE_ANY,
                                            PIO_BF_BLKBUF);
         if (vtable->flags & PIO_VF_DEFAULT_WRITE_BUF && flags & PIO_F_WRITE)
-            Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY,
+            Parrot_io_buffer_add_to_handle(interp, handle, IO_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY,
                                            PIO_BF_BLKBUF);
     }
 
@@ -781,7 +778,8 @@ Parrot_io_read_s(PARROT_INTERP, ARGMOD(PMC *handle), size_t length)
            avoid using a read_buffer here. Detect that case and don't assign
            a buffer if not needed. */
         if (read_buffer == NULL)
-            read_buffer = io_verify_has_read_buffer(interp, handle, vtable, BUFFER_SIZE_ANY);
+            read_buffer = io_verify_has_buffer(interp, handle, IO_IDX_READ_BUFFER,
+                                        vtable, BUFFER_SIZE_ANY, BUFFER_FLAGS_ANY);
         io_verify_is_open_for(interp, handle, vtable, PIO_F_READ);
         io_sync_buffers_for_read(interp, handle, vtable, read_buffer, write_buffer);
 
@@ -843,8 +841,8 @@ Parrot_io_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
             return Parrot_str_new_init(interp, "", 0, encoding, 0);
 
         if (total_size == PIO_UNKNOWN_SIZE) {
-            IO_BUFFER * const read_buffer = io_verify_has_read_buffer(interp, handle, vtable,
-                                                                      BUFFER_FLAGS_ANY);
+            IO_BUFFER * const read_buffer = io_verify_has_buffer(interp, handle,
+                        IO_IDX_READ_BUFFER, vtable, BUFFER_SIZE_ANY, BUFFER_FLAGS_ANY);
             size_t available_bytes = Parrot_io_buffer_fill(interp, read_buffer, handle, vtable);
             STRING * const s = io_get_new_empty_string(interp, encoding, -1,
                                                        PIO_STRING_BUFFER_MINSIZE);
@@ -1033,7 +1031,8 @@ Parrot_io_readline_s(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING * terminat
         io_verify_is_open_for(interp, handle, vtable, PIO_F_READ);
 
         if (read_buffer == NULL)
-            read_buffer = io_verify_has_read_buffer(interp, handle, vtable, BUFFER_SIZE_ANY);
+            read_buffer = io_verify_has_buffer(interp, handle,IO_IDX_READ_BUFFER,
+                                        vtable, BUFFER_SIZE_ANY, BUFFER_FLAGS_ANY);
 
         /* Because of the way buffering works, the terminator sequence may be,
            at most, one character shorter than half the size of the buffer.
@@ -2089,19 +2088,19 @@ Parrot_io_set_buffer_mode(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *mode
        uses separate read/write buffers, so we have to act on them separately.
     */
     if (STRING_equal(interp, mode, CONST_STRING(interp, "unbuffered"))) {
-        Parrot_io_buffer_remove_from_handle(interp, handle, IO_PTR_IDX_READ_BUFFER);
-        Parrot_io_buffer_remove_from_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER);
+        Parrot_io_buffer_remove_from_handle(interp, handle, IO_IDX_READ_BUFFER);
+        Parrot_io_buffer_remove_from_handle(interp, handle, IO_IDX_WRITE_BUFFER);
     }
     else if (STRING_equal(interp, mode, CONST_STRING(interp, "line-buffered"))) {
-        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_READ_BUFFER, BUFFER_SIZE_ANY,
+        Parrot_io_buffer_add_to_handle(interp, handle, IO_IDX_READ_BUFFER, BUFFER_SIZE_ANY,
                                        PIO_BF_LINEBUF);
-        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY,
+        Parrot_io_buffer_add_to_handle(interp, handle, IO_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY,
                                        PIO_BF_LINEBUF);
     }
     else if (STRING_equal(interp, mode, CONST_STRING(interp, "full-buffered"))) {
-        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_READ_BUFFER, BUFFER_SIZE_ANY,
+        Parrot_io_buffer_add_to_handle(interp, handle, IO_IDX_READ_BUFFER, BUFFER_SIZE_ANY,
                                        PIO_BF_BLKBUF);
-        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY,
+        Parrot_io_buffer_add_to_handle(interp, handle, IO_IDX_WRITE_BUFFER, BUFFER_SIZE_ANY,
                                        PIO_BF_BLKBUF);
     }
     else
@@ -2140,7 +2139,7 @@ Parrot_io_buffer_size(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL size, INTVAL ha
     ASSERT_ARGS(Parrot_io_buffer_size)
 
     if (has_size)
-        Parrot_io_buffer_add_to_handle(interp, handle, IO_PTR_IDX_READ_BUFFER,
+        Parrot_io_buffer_add_to_handle(interp, handle, IO_IDX_READ_BUFFER,
                                                            size, PIO_BF_BLKBUF);
     {
         IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);

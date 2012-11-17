@@ -251,6 +251,8 @@ io_stringhandle_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), IN
     vtable->get_flags = io_stringhandle_get_flags;
     vtable->total_size = io_stringhandle_total_size;
     vtable->get_piohandle = io_stringhandle_get_piohandle;
+
+    Parrot_hash_put(interp, interp->piodata->vtable_map, enum_class_StringHandle, vtable);
 }
 
 /*

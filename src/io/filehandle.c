@@ -272,6 +272,8 @@ io_filehandle_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), INTV
     vtable->get_flags = io_filehandle_get_flags;
     vtable->total_size = io_filehandle_total_size;
     vtable->get_piohandle = io_filehandle_get_piohandle;
+
+    Parrot_hash_put(interp, interp->piodata->vtable_map, enum_class_FileHandle, vtable);
 }
 
 /*

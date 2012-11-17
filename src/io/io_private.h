@@ -125,7 +125,7 @@ struct _ParrotIOData {
     PMC ** table;               /* Standard IO Streams (STDIN, STDOUT, STDERR) */
     INTVAL num_vtables;         /* Number of vtables */
     const IO_VTABLE * vtables;  /* Array of VTABLES */
-    Hash * vtable_maps;         /* Mapping of pmc base_type -> io_vtable */
+    Hash * vtable_map;         /* Mapping of pmc base_type -> io_vtable */
 };
 
 /* redefine PIO_STD* for internal use */
@@ -192,6 +192,20 @@ const STR_VTABLE * io_get_encoding(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
+PMC * io_get_handle_buffer_pmc(PARROT_INTERP,
+    ARGMOD(PMC *handle),
+    INTVAL buffer_idx,
+    ARGIN(const IO_VTABLE *vtable),
+    size_t buffer_size,
+    INTVAL flags,
+    INTVAL autocreate)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*handle);
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 STRING * io_get_new_empty_string(PARROT_INTERP,
     ARGIN_NULLOK(const STR_VTABLE *encoding),
     INTVAL char_length,
@@ -207,6 +221,21 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC * io_get_new_socket(PARROT_INTERP)
         __attribute__nonnull__(1);
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+IO_BUFFER * io_initialize_buffer_pmc(PARROT_INTERP,
+    ARGMOD(PMC * buffer_pmc),
+    ARGMOD(PMC * handle),
+    ARGIN(const IO_VTABLE *vtable),
+    size_t buffer_size,
+    INTVAL flags)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(* buffer_pmc)
+        FUNC_MODIFIES(* handle);
 
 void io_read_chars_append_string(PARROT_INTERP,
     ARGMOD(STRING * s),
@@ -279,13 +308,15 @@ void io_sync_buffers_for_write(PARROT_INTERP,
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-IO_BUFFER * io_verify_has_read_buffer(PARROT_INTERP,
+IO_BUFFER * io_verify_has_buffer(PARROT_INTERP,
     ARGIN(PMC *handle),
+    INTVAL buffer_idx,
     ARGIN(const IO_VTABLE *vtable),
+    size_t buffer_size,
     INTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
+        __attribute__nonnull__(4);
 
 void io_verify_is_open_for(PARROT_INTERP,
     ARGIN(PMC *handle),
@@ -314,12 +345,21 @@ STRING * io_verify_string_encoding(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \
     , PARROT_ASSERT_ARG(vtable))
+#define ASSERT_ARGS_io_get_handle_buffer_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle) \
+    , PARROT_ASSERT_ARG(vtable))
 #define ASSERT_ARGS_io_get_new_empty_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_io_get_new_filehandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_io_get_new_socket __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_io_initialize_buffer_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(buffer_pmc) \
+    , PARROT_ASSERT_ARG(handle) \
+    , PARROT_ASSERT_ARG(vtable))
 #define ASSERT_ARGS_io_read_chars_append_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(s) \
@@ -344,7 +384,7 @@ STRING * io_verify_string_encoding(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \
     , PARROT_ASSERT_ARG(vtable))
-#define ASSERT_ARGS_io_verify_has_read_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_io_verify_has_buffer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \
     , PARROT_ASSERT_ARG(vtable))
