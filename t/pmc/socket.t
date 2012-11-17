@@ -154,8 +154,8 @@ stack, so we don't need to check if this parrot is IPv6-aware.
     command .= str
     command .= '" t/pmc/testlib/test_server.pir'
 
-    server = new 'FileHandle'
-    server.'open'(command, 'rp')
+    server = new 'Pipe'
+    server.'open'(command, 'r')
     str = server.'readline'()
     part = substr str, 0, 34
     is(part, 'Server started, listening on port ', 'Server process started')

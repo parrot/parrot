@@ -135,8 +135,8 @@ IPv6-related tests for the Socket PMC.
     command .= str
     command .= '" t/pmc/testlib/test_server_ipv6.pir'
 
-    server = new 'FileHandle'
-    server.'open'(command, 'rp')
+    server = new 'Pipe'
+    server.'open'(command, 'r')
     str = server.'readline'()
     part = substr str, 0, 34
     is(part, 'Server started, listening on port ', 'Server process started')
