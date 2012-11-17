@@ -967,9 +967,9 @@ C<TAP;Parser> is designed to produce a proper parse of TAP output.
     unless $P0 goto L1
     cmd .= ' 2>&1'
   L1:
-    $P0 = new 'FileHandle'
+    $P0 = new 'Pipe'
     push_eh _handler
-    $P0.'open'(cmd, 'pr')
+    $P0.'open'(cmd, 'r')
     pop_eh
     $P0.'encoding'('utf8')
     setattribute self, 'stream', $P0
