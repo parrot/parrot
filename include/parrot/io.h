@@ -190,9 +190,9 @@ typedef struct _io_vtable {
 #define BUFFER_FLAGS_ANY    (INTVAL)0
 
 /* Helpful wrappers to get common pointers from IO handle PMCs */
-#define IO_GET_VTABLE(i, p) ((const IO_VTABLE *)VTABLE_get_pointer_keyed_int((i), (p), IO_PTR_IDX_VTABLE))
-#define IO_GET_READ_BUFFER(i, p) ((IO_BUFFER *)VTABLE_get_pointer_keyed_int((i), (p), IO_PTR_IDX_READ_BUFFER))
-#define IO_GET_WRITE_BUFFER(i, p) ((IO_BUFFER *)VTABLE_get_pointer_keyed_int((i), (p), IO_PTR_IDX_WRITE_BUFFER))
+#define IO_GET_VTABLE(i, p) ((const IO_VTABLE *)Parrot_io_get_vtable_for_pmc((i), (p)))
+#define IO_GET_READ_BUFFER(i, p) Parrot_io_get_handle_read_buffer((i), (p), 0)
+#define IO_GET_WRITE_BUFFER(i, p) Parrot_io_get_handle_write_buffer((i), (p), 0)
 
 /* io/api.c - Public API functions */
 /* HEADERIZER BEGIN: src/io/api.c */

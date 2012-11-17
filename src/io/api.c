@@ -109,7 +109,10 @@ io_setup_vtables(PARROT_INTERP)
     ASSERT_ARGS(io_setup_vtables)
     const int number_of_vtables = 5;
     interp->piodata->vtables = (const IO_VTABLE*)mem_gc_allocate_n_zeroed_typed(interp,
-                                                                number_of_vtables, const IO_VTABLE);
+                                            number_of_vtables, const IO_VTABLE);
+    interp->piodata->vtable_maps = Parrot_hash_create(interp, enum_type_INTVAL,
+                                                              Hash_key_type_ptr;
+
     interp->piodata->num_vtables = number_of_vtables;
     io_filehandle_setup_vtable(interp, NULL, IO_VTABLE_FILEHANDLE);
     io_socket_setup_vtable(interp, NULL, IO_VTABLE_SOCKET);
@@ -129,7 +132,13 @@ Allocates a new IO_VTABLE * structure with the given name.
 char * name)>
 
 Retrieves the vtable at index C<idx>. If C<idx> is -1, the vtable is instead
-searched for by C<name>. Notice that name lookups are much slower.
+searched for by C<name>. Notice that name lookups are much slower. If both the
+C<idx> and C<name> are missing or invalid, the default vtable is returned.
+
+=item C<const IO_VTABLE *Parrot_io_get_vtable_for_pmc(PARROT_INTERP, ARGIN(PMC
+*handle))>
+
+Retrieves the vtable for the given handle type.
 
 =cut
 
@@ -155,7 +164,7 @@ Parrot_io_allocate_new_vtable(PARROT_INTERP, ARGIN(const char *name))
 }
 
 PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
+PARROT_CANNOT_RETURN_NULL
 const IO_VTABLE *
 Parrot_io_get_vtable(PARROT_INTERP, INTVAL idx, ARGIN_NULLOK(const char * name))
 {
@@ -163,20 +172,83 @@ Parrot_io_get_vtable(PARROT_INTERP, INTVAL idx, ARGIN_NULLOK(const char * name))
     INTVAL i;
     if (idx >= interp->piodata->num_vtables)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-            "Cannot get IO VTABLE %d", idx);
+            "Cannot get IO VTABLE %d (max = %d)", idx, interp->piodata->num_vtables);
+
+    /* If we have an idx, do a quick lookup. */
     if (idx >= 0)
         return &(interp->piodata->vtables[idx]);
-    if (!name)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-            "Cannot get IO VTABLE with no index and no name");
 
+    /* If we have neither an idx nor a name, return the default user vtable */
+    if (!name)
+        return interp->piodata->vtables[IO_VTABLE_USER];
+
+    /* If we have a name, try to look it up by name. If we can't find it, return
+       the default */
     for (i = 0; i < interp->piodata->num_vtables; i++) {
         if (!strcmp(name, interp->piodata->vtables[i].name))
             return &(interp->piodata->vtables[i]);
     }
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-            "Cannot get IO VTABLE %s", name);
-    return NULL;
+    return interp->piodata->vtables[IO_VTABLE_USER];
+}
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+const IO_VTABLE *
+Parrot_io_get_vtable_for_pmc(PARROT_INTERP, ARGIN(PMC *handle))
+{
+    ASSERT_AGS(Parrot_io_get_vtable_for_pmc)
+    const IO_VTABLE * vtable = Parrot_hash_get(interp, interp->piodata->vtable_maps,
+                                                     handle->vtable->base_type);
+    if (!vtable)
+        return interp->piodata->vtables[IO_VTABLE_USER];
+    return vtable;
+}
+
+/*
+
+=item C<IO_BUFFER * Parrot_io_get_handle_read_buffer(PARROT_INTERP, PMC *handle,
+INTVAL autocreate)>
+
+Get the read buffer for the given handle, if any.
+
+=item C<IO_BUFFER * Parrot_io_get_handle_write_buffer(PARROT_INTERP, PMC *handle,
+INTVAL autocreate)>
+
+Get the write buffer for the given handle, if any.
+
+=item C<void Parrot_io_set_handle_buffer(PARROT_INTERP, PMC *handle, IO_BUFFER
+*buffer)>
+
+Set the buffer for the given handle, if any.
+
+=cut
+
+*/
+
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+IO_BUFFER *
+Parrot_io_get_handle_read_buffer(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL autocreate)
+{
+    ASSERT_ARGS(Parrot_io_get_handle_read_buffer)
+    PMC * const buffer = VTABLE_get_prop(interp, handle, CONST_STRING("!io_read_buffer!"));
+    if (PMC_IS_NULL(buffer) && autocreate) {
+        // TODO: When we have buffer pmcs, fill them in here.
+    }
+    return buffer;
+}
+
+PARROT_CAN_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+IO_BUFFER *
+Parrot_io_get_handle_write_buffer(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL autocreate)
+{
+    ASSERT_ARGS(Parrot_io_get_handle_write_buffer)
+    PMC * const buffer = VTABLE_get_prop(interp, handle, CONST_STRING("!io_write_buffer!"));
+    if (PMC_IS_NULL(buffer) && autocreate) {
+        // TODO: When we have buffer pmcs, fill them in here.
+    }
+    return buffer;
 }
 
 /*

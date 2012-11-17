@@ -125,6 +125,7 @@ struct _ParrotIOData {
     PMC ** table;               /* Standard IO Streams (STDIN, STDOUT, STDERR) */
     INTVAL num_vtables;         /* Number of vtables */
     const IO_VTABLE * vtables;  /* Array of VTABLES */
+    Hash * vtable_maps;         /* Mapping of pmc base_type -> io_vtable */
 };
 
 /* redefine PIO_STD* for internal use */
