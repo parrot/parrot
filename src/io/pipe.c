@@ -19,7 +19,7 @@ This file implements the IO_VTABLE for pipes and helper functions.
 
 #include "parrot/parrot.h"
 #include "io_private.h"
-#include "pmc/pmc_filehandle.h"
+#include "pmc/pmc_pipe.h"
 
 /* HEADERIZER HFILE: src/io/io_private.h */
 
@@ -257,13 +257,13 @@ static INTVAL
 io_pipe_read_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGOUT(char *buffer), size_t byte_length)
 {
     ASSERT_ARGS(io_pipe_read_b)
-    const PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
+    const PIOHANDLE os_handle = io_pipe_get_os_handle(interp, handle);
     const size_t bytes_read = Parrot_io_internal_read(interp, os_handle, buffer, byte_length);
     if (bytes_read == 0) {
         INTVAL flags;
-        GETATTR_FileHandle_flags(interp, handle, flags);
+        GETATTR_Pipe_flags(interp, handle, flags);
         flags |= PIO_F_EOF;
-        SETATTR_FileHandle_flags(interp, handle, flags);
+        SETATTR_Pipe_flags(interp, handle, flags);
     }
     return bytes_read;
 }
@@ -283,7 +283,7 @@ static INTVAL
 io_pipe_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(char *buffer), size_t byte_length)
 {
     ASSERT_ARGS(io_pipe_write_b)
-    const PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
+    const PIOHANDLE os_handle = io_pipe_get_os_handle(interp, handle);
     return Parrot_io_internal_write(interp, os_handle, buffer, byte_length);
 }
 
@@ -302,7 +302,7 @@ io_pipe_flush(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_pipe_flush)
     /* TODO: In read mode, don't do what this does. */
-    PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
+    PIOHANDLE os_handle = io_pipe_get_os_handle(interp, handle);
     return Parrot_io_internal_flush(interp, os_handle);
 }
 
@@ -325,7 +325,7 @@ io_pipe_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_pipe_is_eof)
     INTVAL flags;
-    GETATTR_FileHandle_flags(interp, handle, flags);
+    GETATTR_Pipe_flags(interp, handle, flags);
     if (flags & PIO_F_EOF)
         return 1;
     return 0;
@@ -336,9 +336,9 @@ io_pipe_set_eof(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL is_set)
 {
     ASSERT_ARGS(io_pipe_set_eof)
     if (is_set)
-        PARROT_FILEHANDLE(handle)->flags |= PIO_F_EOF;
+        PARROT_PIPE(handle)->flags |= PIO_F_EOF;
     else
-        PARROT_FILEHANDLE(handle)->flags &= ~PIO_F_EOF;
+        PARROT_PIPE(handle)->flags &= ~PIO_F_EOF;
 }
 
 /*
@@ -399,7 +399,7 @@ io_pipe_adv_position(PARROT_INTERP, ARGMOD(PMC *handle), size_t offset)
     ASSERT_ARGS(io_pipe_adv_position)
     UNUSED(handle);
     UNUSED(offset);
-    /* Pipes don't keep track of file position internally. Ignore this. */
+    /* Pipes don't keep track of stream position internally. Ignore this. */
 }
 
 /*
@@ -419,7 +419,7 @@ io_pipe_set_position(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T pos)
     ASSERT_ARGS(io_pipe_set_position)
     UNUSED(handle);
     UNUSED(pos);
-    /* Pipes don't keep track of file position internally. Ignore. */
+    /* Pipes don't keep track of stream position internally. Ignore. */
 }
 
 /*
@@ -436,7 +436,7 @@ static PIOOFF_T
 io_pipe_get_position(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_pipe_get_position)
-    /* Pipes don't keep track of file position internally. Return 0 */
+    /* Pipes don't keep track of stream position internally. Return 0 */
     return (PIOOFF_T)0;
 }
 
@@ -462,14 +462,6 @@ io_pipe_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTVAL fla
     INTVAL    pid;
     PIOHANDLE os_handle;
 
-    /* Hack! If we're opening in file mode, turn this FileHandle into a file
-       and use that vtable instead. */
-    if ((flags & PIO_F_PIPE) == 0) {
-        const IO_VTABLE * const vtable = Parrot_io_get_vtable(interp, IO_VTABLE_FILEHANDLE, NULL);
-        VTABLE_set_pointer_keyed_int(interp, handle, IO_PTR_IDX_VTABLE, (void *)vtable);
-        return vtable->open(interp, handle, path, flags, mode);
-    }
-
     if (f_read == f_write)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "Invalid pipe mode: %X", flags);
@@ -480,13 +472,12 @@ io_pipe_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTVAL fla
     VTABLE_set_integer_keyed_int(interp, handle, 0, pid);
 
     if (flags & PIO_F_BINARY)
-        SETATTR_FileHandle_encoding(interp, handle, Parrot_str_new(interp, "binary", 0));
+        SETATTR_Pipe_encoding(interp, handle, Parrot_str_new(interp, "binary", 0));
 
-    SETATTR_FileHandle_os_handle(interp, handle, os_handle);
-    SETATTR_FileHandle_flags(interp, handle, flags);
-    SETATTR_FileHandle_filename(interp, handle, path);
-    SETATTR_FileHandle_mode(interp, handle, mode);
-    SETATTR_FileHandle_file_pos(interp, handle, 0);
+    SETATTR_Pipe_os_handle(interp, handle, os_handle);
+    SETATTR_Pipe_flags(interp, handle, flags);
+    SETATTR_Pipe_procname(interp, handle, path);
+    SETATTR_Pipe_mode(interp, handle, mode);
 
     return 1;
 }
@@ -505,7 +496,7 @@ static INTVAL
 io_pipe_is_open(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_pipe_is_open)
-    const PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
+    const PIOHANDLE os_handle = io_pipe_get_os_handle(interp, handle);
     return os_handle != PIO_INVALID_HANDLE;
 }
 
@@ -523,7 +514,7 @@ static INTVAL
 io_pipe_close(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_pipe_close)
-    const PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
+    const PIOHANDLE os_handle = io_pipe_get_os_handle(interp, handle);
 
     if (os_handle == PIO_INVALID_HANDLE)
         return -1;
@@ -532,10 +523,10 @@ io_pipe_close(PARROT_INTERP, ARGMOD(PMC *handle))
         INTVAL pid;
         INTVAL status;
         INTVAL result = Parrot_io_internal_close(interp, os_handle);
-        io_filehandle_set_os_handle(interp, handle, PIO_INVALID_HANDLE);
-        GETATTR_FileHandle_process_id(interp, handle, pid);
+        io_pipe_set_os_handle(interp, handle, PIO_INVALID_HANDLE);
+        GETATTR_Pipe_process_id(interp, handle, pid);
         status = Parrot_proc_waitpid(interp, pid);
-        SETATTR_FileHandle_exit_status(interp, handle, status);
+        SETATTR_Pipe_exit_status(interp, handle, status);
         io_pipe_set_flags(interp, handle, 0);
         return result;
     }
@@ -561,7 +552,7 @@ io_pipe_get_encoding(PARROT_INTERP, ARGIN(PMC *handle))
     STRING           *encoding_str;
     const STR_VTABLE *encoding;
 
-    GETATTR_FileHandle_encoding(interp, handle, encoding_str);
+    GETATTR_Pipe_encoding(interp, handle, encoding_str);
     if (!STRING_IS_NULL(encoding_str))
         return Parrot_find_encoding_by_string(interp, encoding_str);
     return NULL;
@@ -581,7 +572,7 @@ static void
 io_pipe_set_flags(PARROT_INTERP, ARGIN(PMC *handle), INTVAL flags)
 {
     ASSERT_ARGS(io_pipe_set_flags)
-    PARROT_FILEHANDLE(handle)->flags = flags;
+    PARROT_PIPE(handle)->flags = flags;
 }
 
 /*
@@ -598,7 +589,7 @@ static INTVAL
 io_pipe_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_pipe_get_flags)
-    return PARROT_FILEHANDLE(handle)->flags;
+    return PARROT_PIPE(handle)->flags;
 }
 
 /*
@@ -632,7 +623,65 @@ static PIOHANDLE
 io_pipe_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_pipe_get_piohandle)
-    return io_filehandle_get_os_handle(interp, handle);
+    return io_pipe_get_os_handle(interp, handle);
+}
+
+/*
+
+=back
+
+=head2 Private Helper Functions
+
+=over 4
+
+=item C<void io_pipe_set_os_handle(PARROT_INTERP, PMC *pipe,
+PIOHANDLE pipe_descriptor)>
+
+Sets the C<os_handle> attribute of the Pipe object, which stores the
+low-level pipe for the OS.
+
+Currently, this pokes directly into the C struct of the Pipe PMC. This
+needs to change to a general interface that can be used by all subclasses and
+polymorphic equivalents of Pipe. For now, hiding it behind a function, so
+it can be cleanly changed later.
+
+Possibly, this function should reset some characteristics of the object (like
+buffer position) to their default values.
+
+=cut
+
+*/
+
+void
+io_pipe_set_os_handle(SHIM_INTERP, ARGMOD(PMC *pipe), PIOHANDLE pipe_descriptor)
+{
+    ASSERT_ARGS(io_pipe_set_os_handle)
+    PARROT_PIPE(pipe)->os_handle = pipe_descriptor;
+}
+
+/*
+
+=item C<PIOHANDLE io_pipe_get_os_handle(PARROT_INTERP, const PMC
+*pipe)>
+
+Retrieve the C<os_handle> attribute of the pipe object, which stores the
+low-level pipe for the OS.
+
+Currently, this pokes directly into the C struct of the Pipe PMC. This
+needs to change to a general interface that can be used by all subclasses and
+polymorphic equivalents of Pipe. For now, hiding it behind a function, so
+it can be cleanly changed later.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PIOHANDLE
+io_pipe_get_os_handle(SHIM_INTERP, ARGIN(const PMC *pipe))
+{
+    ASSERT_ARGS(io_pipe_get_os_handle)
+    return PARROT_PIPE(pipe)->os_handle;
 }
 
 /*

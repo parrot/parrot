@@ -71,7 +71,8 @@ Parrot_io_parse_open_flags(PARROT_INTERP, ARGIN(const STRING *mode_str))
                 flags &= ~PIO_F_TRUNC;
             break;
           case 'p':
-            flags |= PIO_F_PIPE;
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Open mode 'p' is no longer valid. Use a Pipe PMC instead.");
             break;
           case 'b':
             flags |= PIO_F_BINARY;

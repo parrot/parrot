@@ -453,13 +453,6 @@ io_filehandle_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTV
     ASSERT_ARGS(io_filehandle_open)
     PIOHANDLE os_handle;
 
-    /* Hack! If we're opening in pipe mode, turn this FileHandle into a pipe
-       and use that vtable instead. */
-    if (flags & PIO_F_PIPE) {
-        const IO_VTABLE * const vtable = io_filehandle_convert_to_pipe(interp, handle);
-        return vtable->open(interp, handle, path, flags, mode);
-    }
-
     if ((flags & (PIO_F_WRITE | PIO_F_READ)) == 0)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Invalid mode for file open");
@@ -637,65 +630,11 @@ io_filehandle_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
     return io_filehandle_get_os_handle(interp, handle);
 }
 
-
-
-/*
-
-=item C<void io_filehandle_set_os_handle(PARROT_INTERP, PMC *filehandle,
-PIOHANDLE file_descriptor)>
-
-Sets the C<os_handle> attribute of the FileHandle object, which stores the
-low-level filehandle for the OS.
-
-Currently, this pokes directly into the C struct of the FileHandle PMC. This
-needs to change to a general interface that can be used by all subclasses and
-polymorphic equivalents of FileHandle. For now, hiding it behind a function, so
-it can be cleanly changed later.
-
-Possibly, this function should reset some characteristics of the object (like
-buffer and file positions) to their default values.
-
-=cut
-
-*/
-
-void
-io_filehandle_set_os_handle(SHIM_INTERP, ARGMOD(PMC *filehandle), PIOHANDLE file_descriptor)
-{
-    ASSERT_ARGS(io_filehandle_set_os_handle)
-    PARROT_FILEHANDLE(filehandle)->os_handle = file_descriptor;
-}
-
-/*
-
-=item C<PIOHANDLE io_filehandle_get_os_handle(PARROT_INTERP, const PMC
-*filehandle)>
-
-Retrieve the C<os_handle> attribute of the FileHandle object, which stores the
-low-level filehandle for the OS.
-
-Currently, this pokes directly into the C struct of the FileHandle PMC. This
-needs to change to a general interface that can be used by all subclasses and
-polymorphic equivalents of FileHandle. For now, hiding it behind a function, so
-it can be cleanly changed later.
-
-=cut
-
-*/
-
-PARROT_WARN_UNUSED_RESULT
-PIOHANDLE
-io_filehandle_get_os_handle(SHIM_INTERP, ARGIN(const PMC *filehandle))
-{
-    ASSERT_ARGS(io_filehandle_get_os_handle)
-    return PARROT_FILEHANDLE(filehandle)->os_handle;
-}
-
 /*
 
 =back
 
-=head2 Helper Functions
+=head2 Private Helper Functions
 
 =over 4
 
@@ -721,7 +660,7 @@ it can be cleanly changed later.
 */
 
 PARROT_WARN_UNUSED_RESULT
-PIOOFF_T
+static PIOOFF_T
 io_filehandle_get_file_position(SHIM_INTERP, ARGIN(const PMC *filehandle))
 {
     ASSERT_ARGS(io_filehandle_get_file_position)
@@ -746,7 +685,7 @@ it can be cleanly changed later.
 
 */
 
-void
+static void
 io_filehandle_set_file_position(SHIM_INTERP, ARGMOD(PMC *filehandle), PIOOFF_T file_pos)
 {
     ASSERT_ARGS(io_filehandle_set_file_position)
@@ -757,28 +696,54 @@ io_filehandle_set_file_position(SHIM_INTERP, ARGMOD(PMC *filehandle), PIOOFF_T f
 
 /*
 
-=item C<const IO_VTABLE * io_filehandle_convert_to_pipe(PARROT_INTERP, PMC
-*handle)>
+=item C<void io_filehandle_set_os_handle(PARROT_INTERP, PMC *filehandle,
+PIOHANDLE file_descriptor)>
 
-Convert FileHandle C<handle> from file mode to pipe mode by swapping vtables.
-Return the Pipe vtable.
+Sets the C<os_handle> attribute of the FileHandle object, which stores the
+low-level filehandle for the OS.
 
-Notice that this function may go away when FileHandle and Pipe are separate
-PMC types.
+Currently, this pokes directly into the C struct of the FileHandle PMC. This
+needs to change to a general interface that can be used by all subclasses and
+polymorphic equivalents of FileHandle. For now, hiding it behind a function, so
+it can be cleanly changed later.
+
+Possibly, this function should reset some characteristics of the object (like
+buffer and file positions) to their default values.
 
 =cut
 
 */
 
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-const IO_VTABLE *
-io_filehandle_convert_to_pipe(PARROT_INTERP, ARGMOD(PMC *handle))
+static void
+io_filehandle_set_os_handle(SHIM_INTERP, ARGMOD(PMC *filehandle), PIOHANDLE file_descriptor)
 {
-    ASSERT_ARGS(io_filehandle_convert_to_pipe)
-    const IO_VTABLE * const vtable = Parrot_io_get_vtable(interp, IO_VTABLE_PIPE, NULL);
-    VTABLE_set_pointer_keyed_int(interp, handle, IO_PTR_IDX_VTABLE, (void *)vtable);
-    return vtable;
+    ASSERT_ARGS(io_filehandle_set_os_handle)
+    PARROT_FILEHANDLE(filehandle)->os_handle = file_descriptor;
+}
+
+/*
+
+=item C<PIOHANDLE io_filehandle_get_os_handle(PARROT_INTERP, const PMC
+*filehandle)>
+
+Retrieve the C<os_handle> attribute of the FileHandle object, which stores the
+low-level filehandle for the OS.
+
+Currently, this pokes directly into the C struct of the FileHandle PMC. This
+needs to change to a general interface that can be used by all subclasses and
+polymorphic equivalents of FileHandle. For now, hiding it behind a function, so
+it can be cleanly changed later.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+static PIOHANDLE
+io_filehandle_get_os_handle(SHIM_INTERP, ARGIN(const PMC *filehandle))
+{
+    ASSERT_ARGS(io_filehandle_get_os_handle)
+    return PARROT_FILEHANDLE(filehandle)->os_handle;
 }
 
 /*

@@ -46,7 +46,6 @@
 #define PIO_F_APPEND    00000004        /* File is opened for append    */
 #define PIO_F_TRUNC     00000010
 #define PIO_F_EOF       00000020        /* File is at EOF               */
-#define PIO_F_PIPE      00000040        /* FileHandle is in pipe mode   */
 #define PIO_F_CONSOLE   00001000        /* A terminal                   */
 #define PIO_F_READLINE  00002000        /* user interactive readline    */
 #define PIO_F_SOFT_SP   00040000        /* Python softspace             */

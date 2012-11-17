@@ -3,11 +3,11 @@ Copyright (C) 2008-2011, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/filehandle.pmc - FileHandle PMC
+src/pmc/pipe.pmc - Pipe PMC
 
 =head1 DESCRIPTION
 
-The FileHandle PMC performs I/O operations on a source or destination file.
+The Pipe PMC spawns a child process and captures standard input or output.
 
 =head2 Vtable Functions
 
@@ -35,40 +35,45 @@ extern "C" {
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
 
-pmclass FileHandle extends Handle auto_attrs {
-    ATTR INTVAL flags;                /* Filehandle flags             */
-    ATTR STRING *filename;            /* The opened path and filename */
+pmclass Pipe extends Handle auto_attrs {
+    ATTR INTVAL flags;                /* Pipe flags                   */
+    ATTR STRING *procname;            /* The opened process name      */
     ATTR STRING *mode;                /* The mode string used in open */
-    ATTR PIOOFF_T file_pos;           /* Current real file pointer    */
-    ATTR PIOOFF_T last_pos;           /* Last file position           */
+    ATTR INTVAL process_id;           /* Child process ID             */
+    ATTR INTVAL exit_status;          /* Child exit status on pipes   */
+
+
+/*
+ * TODO: Using INTVAL for process_id is a temporary solution.
+ * We may need to define a custom type to store it in a platform dependant way.
+ */
 
 /*
 
 =item C<void init()>
 
-Initializes a newly created FileHandle object.
+Initializes a newly created Pipe object.
 
 =cut
 
 */
 
     VTABLE void init() {
-        Parrot_FileHandle_attributes * const attrs =
-            PMC_data_typed(SELF, Parrot_FileHandle_attributes *);
+        Parrot_Pipe_attributes * const attrs = PARROT_PIPE(SELF);
 
         attrs->record_separator = CONST_STRING(interp, "\n");
         attrs->flags            = 0;
-        attrs->filename         = STRINGNULL;
+        attrs->procname         = STRINGNULL;
         attrs->mode             = STRINGNULL;
         attrs->encoding         = STRINGNULL;
-        attrs->file_pos         = piooffsetzero;
-        attrs->last_pos         = piooffsetzero;
+        attrs->process_id       = 0;
+        attrs->exit_status      = 0;
         attrs->io_vtable        = (IO_VTABLE *)Parrot_io_get_vtable(interp,
-                                                                    IO_VTABLE_FILEHANDLE, NULL);
+                                                          IO_VTABLE_PIPE, NULL);
 
         /* Initialize the os_handle to the platform-specific value for closed */
-        attrs->os_handle     = (PIOHANDLE) PIO_INVALID_HANDLE;
-        attrs->read_buffer = NULL;
+        attrs->os_handle    = (PIOHANDLE) PIO_INVALID_HANDLE;
+        attrs->read_buffer  = NULL;
         attrs->write_buffer = NULL;
 
         PObj_custom_mark_SET(SELF);
@@ -80,35 +85,33 @@ Initializes a newly created FileHandle object.
 
 =item C<PMC *clone()>
 
-Create a copy of the filehandle.
+Create a copy of the pipe.
 
 =cut
 
 */
 
     VTABLE PMC *clone() {
-        Parrot_FileHandle_attributes * const old_attrs
-            = PARROT_FILEHANDLE(SELF);
-        PMC * const copy = Parrot_pmc_new(interp, enum_class_FileHandle);
-        Parrot_FileHandle_attributes * const new_attrs
-            = PARROT_FILEHANDLE(copy);
+        PMC * const copy = Parrot_pmc_new(interp, enum_class_Pipe);
+        Parrot_Pipe_attributes * const old_attrs = PARROT_PIPE(SELF);
+        Parrot_Pipe_attributes * const new_attrs = PARROT_PIPE(copy);
 
         /* Properly clone string data. */
-        new_attrs->filename       = old_attrs->filename;
+        new_attrs->procname       = old_attrs->procname;
         new_attrs->mode           = old_attrs->mode;
         new_attrs->encoding       = old_attrs->encoding;
 
         /* Prevent GC of the strings. */
-        Parrot_gc_mark_STRING_alive(INTERP, new_attrs->filename);
+        Parrot_gc_mark_STRING_alive(INTERP, new_attrs->procname);
         Parrot_gc_mark_STRING_alive(INTERP, new_attrs->mode);
         Parrot_gc_mark_STRING_alive(INTERP, new_attrs->encoding);
 
         /* Copy over some metadata */
         new_attrs->flags          = old_attrs->flags;
-        new_attrs->file_pos       = old_attrs->file_pos;
-        new_attrs->last_pos       = old_attrs->last_pos;
+        new_attrs->process_id     = old_attrs->process_id;
+        new_attrs->exit_status    = old_attrs->exit_status;
 
-        /* Duplicate the file handle. */
+        /* Duplicate the pipe handle. */
         new_attrs->os_handle = Parrot_io_internal_dup(interp, old_attrs->os_handle);
 
         /* TODO: Clone the buffers and copy flags/data */
@@ -121,18 +124,17 @@ Create a copy of the filehandle.
 
 =item C<void mark()>
 
-Mark active filehandle data as live.
+Mark active pipe data as live.
 
 =cut
 
 */
 
     VTABLE void mark() {
-        Parrot_FileHandle_attributes * const attrs
-            = PARROT_FILEHANDLE(SELF);
+        Parrot_Pipe_attributes * const attrs = PARROT_PIPE(SELF);
 
         Parrot_gc_mark_STRING_alive(INTERP, attrs->mode);
-        Parrot_gc_mark_STRING_alive(INTERP, attrs->filename);
+        Parrot_gc_mark_STRING_alive(INTERP, attrs->procname);
         Parrot_gc_mark_STRING_alive(INTERP, attrs->encoding);
         Parrot_gc_mark_STRING_alive(INTERP, attrs->record_separator);
         Parrot_io_buffer_mark(interp, attrs->read_buffer);
@@ -155,22 +157,67 @@ Free structures.
         /* TODO: flush and free the buffers */
     }
 
+
+/*
+
+=item C<INTVAL get_integer_keyed_int(INTVAL key)>
+
+Shortcut to get the value of some attributes.
+For internal usage only, subject to change without notice.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
+        INTVAL result;
+        switch (key) {
+          case 0:
+            GET_ATTR_process_id(INTERP, SELF, result);
+            break;
+          default:
+            result = 0;
+        }
+
+        return result;
+    }
+
+
+/*
+
+=item C<void set_integer_keyed_int(INTVAL key, INTVAL value)>
+
+Shortcut to set the value of some attributes
+For internal usage only, subject to change without notice.
+
+=cut
+
+*/
+
+    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
+        switch (key) {
+          case 0:
+            SET_ATTR_process_id(INTERP, SELF, value);
+            break;
+          default:
+            break;
+        }
+    }
+
+
 /*
 
 =item C<INTVAL get_bool()>
 
-Return false if a previous read attempted to read past the end of the underlying
-filehandle.  Note that this method may return true even if there are no bytes
-remaining if the most recent read requested the exact number of bytes remaining
-in the file.
-
+Return true if the pipe is open and ready to make operations. False otherwise.
 
 =cut
 
 */
 
     VTABLE INTVAL get_bool() {
-        return !Parrot_io_eof(INTERP, SELF);
+        /* TODO: Make sure that this makes sense for pipes */
+        return !Parrot_io_is_closed(INTERP, SELF);
     }
 
 
@@ -182,33 +229,33 @@ in the file.
 
 =over 4
 
-=item C<METHOD open(STRING *filename :optional, STRING *mode :optional)>
+=item C<METHOD open(STRING *procname :optional, STRING *mode :optional)>
 
-Opens the file at the given filename (including path) with the given mode. The
-invocant is modified and becomes an open filehandle. A copy of the invocant is
+Opens the pipe at the given procname (including path) with the given mode. The
+invocant is modified and becomes an open pipe. A copy of the invocant is
 also returned by the method (some subclasses may create this as the primary
-filehandle, rather than modifying the invocant).
+pipe, rather than modifying the invocant).
 
 =cut
 
 */
 
-    METHOD open(STRING *filename :optional, INTVAL got_filename :opt_flag,
+    METHOD open(STRING *procname :optional, INTVAL got_procname :opt_flag,
         STRING *mode :optional, INTVAL got_mode :opt_flag) {
-        PMC    *filehandle;
+        PMC    *pipe;
 
         if (!Parrot_io_is_closed(INTERP, SELF))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
-                                "Cannot reopen already open filehandle");
+                                "Cannot reopen already open pipe");
 
         if (!got_mode || STRING_IS_NULL(mode))
             GET_ATTR_mode(INTERP, SELF, mode);
 
-        if (!got_filename || STRING_IS_NULL(filename))
-            GET_ATTR_filename(INTERP, SELF, filename);
+        if (!got_procname || STRING_IS_NULL(procname))
+            GET_ATTR_procname(INTERP, SELF, procname);
 
-        filehandle = Parrot_io_open(INTERP, SELF, filename, mode);
-        RETURN(PMC *filehandle);
+        pipe = Parrot_io_open(INTERP, SELF, procname, mode);
+        RETURN(PMC *pipe);
     }
 
 
@@ -232,7 +279,7 @@ Returns a boolean value indicating whether C<SELF> is a console/tty.
 
 =item C<METHOD is_closed()>
 
-Test if the filehandle is closed.
+Test if the pipe is closed.
 
 =cut
 
@@ -248,7 +295,7 @@ Test if the filehandle is closed.
 
 =item C<METHOD readline_interactive(STRING *prompt)>
 
-Read a line from the filehandle and return it in a string.
+Read a line from the pipe and return it in a string.
 
 =cut
 
@@ -319,20 +366,20 @@ Read a line from the filehandle and return it in a string.
 
 =item METHOD readall(STRING *name);
 
-Read the entire contents of a file named I<name> into a Parrot string. On a
-filehandle object that isn't opened yet, the path to a file can be passed to
-C<readall> and it will open a filehandle on that file, read in the contents,
-and close the filehandle.
+Read the entire contents of a pipe to process I<name> into a Parrot string.
+On a pipe object that isn't opened yet, the path to a pipe can be passed to
+C<readall> and it will open a pipe on that process, read in the contents,
+and close the pipe.
 
   .local pmc pio
-  pio = new 'FileHandle'
-  $S0 = pio.'readall'('the_file')
+  pio = new 'Pipe'
+  $S0 = pio.'readall'('proc_name')
 
-If the filehandle is already open, then no file path should be passed. The
-C<readall> method will read the contents of the file, and will not close the
-filehandle when finished.
+If the pipe is already open, then no process name should be passed. The
+C<readall> method will read the contents of the pipe, and will not close the
+pipe when finished.
 
-  pio = open 'the_file', 'r'
+  pio = open 'proc', 'r'
   $S0 = pio.'readall'()
 
 =cut
@@ -343,8 +390,8 @@ filehandle when finished.
         STRING *result;
 
         if (got_name) {
-            /* called as class method - open, slurp, close file */
-            PMC    *filehandle;
+            /* called as class method - open, slurp, close pipe */
+            PMC    *pipe;
             STRING *encoding;
             size_t  size;
 
@@ -352,14 +399,14 @@ filehandle when finished.
 
             if (!Parrot_io_is_closed(INTERP, SELF))
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
-                    "Cannot readall on a new file from an already open filehandle");
+                    "Cannot readall on a new pipe from an already open pipe");
 
-            filehandle = Parrot_io_open(INTERP, PMCNULL, name, STRINGNULL);
+            pipe = Parrot_io_open(INTERP, PMCNULL, name, STRINGNULL);
 
-            SET_ATTR_encoding(INTERP, filehandle, encoding);
-            result = Parrot_io_readall_s(INTERP, filehandle);
+            SET_ATTR_encoding(INTERP, pipe, encoding);
+            result = Parrot_io_readall_s(INTERP, pipe);
 
-            Parrot_io_close(INTERP, filehandle, 1);
+            Parrot_io_close(INTERP, pipe, 1);
         }
         else
             result = Parrot_io_readall_s(INTERP, SELF);
@@ -372,7 +419,7 @@ filehandle when finished.
 
 =item C<METHOD flush()>
 
-Flushes the filehandle.
+Flushes the pipe.
 
 =cut
 
@@ -386,7 +433,7 @@ Flushes the filehandle.
 
 =item C<METHOD print([INTVAL|FLOATVAL|STRING *|PMC*] value)>
 
-Print the passed in integer, number, string, or PMC to the filehandle.
+Print the passed in integer, number, string, or PMC to the pipe.
 (Integers, numbers, and strings are auto-boxed as PMCs.)
 
 =cut
@@ -405,7 +452,7 @@ Print the passed in integer, number, string, or PMC to the filehandle.
 
 =item C<METHOD buffer_type(STRING *new_type :optional)>
 
-Set or retrieve the buffering behavior for the filehandle. The argument and
+Set or retrieve the buffering behavior for the pipe. The argument and
 return value are one of the following:
 
 =over
@@ -440,7 +487,7 @@ Full buffering, bytes are sent when the buffer is full.
 
 =item C<METHOD buffer_size(INTVAL new_size :optional)>
 
-Set or retrieve the buffer size for the filehandle.
+Set or retrieve the buffer size for the pipe.
 
 =cut
 
@@ -456,7 +503,7 @@ Set or retrieve the buffer size for the filehandle.
 
 =item C<METHOD mode()>
 
-Retrieve the read mode string for the filehandle.
+Retrieve the read mode string for the pipe.
 
 =cut
 
@@ -473,9 +520,9 @@ Retrieve the read mode string for the filehandle.
 =item C<METHOD eof()>
 
 Return true if a previous read attempted to read past the end of the underlying
-filehandle.  Note that this method may return false even if there are no bytes
+pipe.  Note that this method may return false even if there are no bytes
 remaining if the most recent read requested the exact number of bytes remaining
-in the file.
+in the pipe.
 
 =cut
 
@@ -491,7 +538,7 @@ in the file.
 
 =item C<METHOD handle()>
 
-Returns the INTVAL used by the OS to identify this filehandle.
+Returns the INTVAL used by the OS to identify this pipe.
 
 =cut
 
@@ -505,52 +552,20 @@ Returns the INTVAL used by the OS to identify this filehandle.
 
 /*
 
-=item C<METHOD tell()>
+=item C<METHOD exit_status()>
 
-Get the file position of the stream. 2 C<INTVAL>s are returned. The first is
-the position. The second is the position shifted down by 32 bits to handle
-overflows on 32-bit systems.
+If this is a pipe, return the exit status of the child process.
 
 =cut
 
 */
-
-    METHOD tell() {
-        PIOOFF_T pos;
-        GET_ATTR_file_pos(INTERP, SELF, pos);
-        RETURN(INTVAL pos, INTVAL pos >> 32);
+    METHOD exit_status() {
+        INTVAL exit_status;
+        GET_ATTR_exit_status(INTERP, SELF, exit_status);
+        RETURN(INTVAL exit_status);
     }
 
-/*
 
-=item C<METHOD seek(INTVAL whence, INTVAL offs, INTVAL offs_overflow)>
-
-Set the file position to an offset specified by C<offs> (and optionally
-C<offs_overflow>). C<whence> determines from where in the file the offset is
-taken.
-
- Whence Value      Meaning
- 0                 Seek from the beginning of the file
- 1                 Seek from the current position
- 2                 Seek from the end of the file
-
-C<offs_overflow> is optional and is used to handle offsets higher than 2Gb on
-32bit systems.
-
-=cut
-
-*/
-
-    METHOD seek(INTVAL whence, INTVAL offs, INTVAL offs_overflow :optional,
-                int has_overflow :opt_flag) {
-        const PIOOFF_T pio_offs = has_overflow ?
-                                    Parrot_io_make_offset32(offs_overflow, offs) :
-                                    offs;
-        const INTVAL status = Parrot_io_seek(INTERP, SELF, pio_offs, whence);
-        if (0 > status)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
-                                        "seek failed: %d", status);
-    }
 
 /*
 
