@@ -1,0 +1,41 @@
+pmclass IOBuffer auto_attrs {
+    ATTR IO_BUFFER * buffer;
+
+    VTABLE void init() {
+        Parrot_IOBuffer_attributes * const attrs =
+            PMC_data_typed(SELF, Parrot_IOBuffer_attributes *);
+
+        attrs->buffer = Parrot_io_buffer_allocate(INTERP, SELF, 0, Parrot_str_default_encoding, BUFFER_SIZE_ANY);
+
+        PObj_custom_mark_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
+    }
+
+    VTABLE void init_int(INTVAL buffer_size) {
+        Parrot_IOBuffer_attributes * const attrs =
+            PMC_data_typed(SELF, Parrot_IOBuffer_attributes *);
+
+        PARROT_ASSERT(buffer_size > 0);
+        attrs->buffer = Parrot_io_buffer_allocate(INTERP, SELF, 0, Parrot_str_default_encoding, (size_t)buffer_size);
+
+        PObj_custom_mark_SET(SELF);
+        PObj_custom_destroy_SET(SELF);
+    }
+
+    VTABLE void mark() {
+        Parrot_io_buffer_mark(INTERP, PARROT_IOBUFFER(SELF)->buffer);
+    }
+
+    VTABLE void destroy() {
+        Parrot_io_buffer_free(INTERP, PARROT_IOBUFFER(SELF)->buffer);
+        PARROT_IOBUFFER(SELF)->buffer = NULL;
+    }
+
+    VTABLE void* get_pointer() {
+        return PARROT_IOBUFFER(SELF)->buffer;
+    }
+
+    VTABLE void set_pointer(void * ptr) {
+        PARROT_IOBUFFER(SELF)->buffer = (IO_BUFFER*)ptr;
+    }
+}

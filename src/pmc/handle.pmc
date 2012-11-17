@@ -51,44 +51,6 @@ pmclass Handle provides Handle manual_attrs {
             "Handle cannot be instantiated directly.");
     }
 
-    VTABLE void *get_pointer_keyed_int(INTVAL key)
-    {
-        void * ptr;
-        switch (key) {
-            case IO_PTR_IDX_VTABLE:
-                GET_ATTR_io_vtable(INTERP, SELF, ptr);
-                break;
-            case IO_PTR_IDX_READ_BUFFER:
-                GET_ATTR_read_buffer(INTERP, SELF, ptr);
-                break;
-            case IO_PTR_IDX_WRITE_BUFFER:
-                GET_ATTR_write_buffer(INTERP, SELF, ptr);
-                break;
-            default:
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
-                    "Handle: Cannot get pointer %d", key);
-        }
-        return ptr;
-    }
-
-    VTABLE void set_pointer_keyed_int(INTVAL key, void *ptr)
-    {
-        switch (key) {
-            case IO_PTR_IDX_VTABLE:
-                SET_ATTR_io_vtable(INTERP, SELF, (IO_VTABLE *)ptr);
-                break;
-            case IO_PTR_IDX_READ_BUFFER:
-                SET_ATTR_read_buffer(INTERP, SELF, (IO_BUFFER *)ptr);
-                break;
-            case IO_PTR_IDX_WRITE_BUFFER:
-                SET_ATTR_write_buffer(INTERP, SELF, (IO_BUFFER *)ptr);
-                break;
-            default:
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
-                    "Handle: Cannot set pointer %d", key);
-        }
-    }
-
 /*
 
 =back
