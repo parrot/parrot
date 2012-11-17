@@ -20,11 +20,10 @@ Tests various io opcodes.
 .sub 'main' :main
     .include 'test_more.pir'
 
-    plan(59)
+    plan(57)
 
     read_on_null()
     test_bad_open()
-    open_pipe_for_reading()
     getfd_fdopen()
     test_fdopen_p_i_sc()
     test_fdopen_p_ic_s()
@@ -39,7 +38,6 @@ Tests various io opcodes.
     stdout_tests()
 
     # must come after (these don't use test_more)
-    open_pipe_for_writing()
     read_invalid_fh()
 .end
 
@@ -98,86 +96,6 @@ CODE
 .end
 
 .include 'iglobals.pasm'
-
-.sub 'open_pipe_for_reading'
-    .local pmc interp
-    interp = getinterp
-
-    .local pmc conf
-    conf = interp[.IGLOBALS_CONFIG_HASH]
-
-    .local string command
-    command = '"'
-    $S0 = conf['build_dir']
-    command .= $S0
-
-    .local string aux
-    aux = conf['slash']
-    command .= aux
-    aux = conf['test_prog']
-    command .= aux
-    aux = conf['exe']
-    command .= aux
-    command .= '" -V'
-
-    .local pmc pipe
-    pipe = open command, 'rp'
-    unless pipe goto open_pipe_for_reading_failed
-    .local string line
-    line = readline pipe
-    line = substr line, 0, 14
-    is('This is Parrot', line, 'open pipe for reading')
-    .return ()
-
-  open_pipe_for_reading_failed:
-    nok(1, 'open pipe for reading')
-    .return ()
-.end
-
-.sub 'open_pipe_for_writing'
-    $I0 = tt661_todo_test()
-    if $I0 goto open_pipe_for_writing_todoed
-    .local pmc interp
-    interp = getinterp
-
-    .local pmc conf
-    conf = interp[.IGLOBALS_CONFIG_HASH]
-
-    .local string command
-    .local string aux
-    command = '"'
-    aux = conf['build_dir']
-    command .= aux
-
-    aux = conf['slash']
-    command .= aux
-    .local string filename
-    filename .= command
-    filename .= 'examples/pasm/cat.pasm'
-    aux = conf['test_prog']
-    command .= aux
-    aux = conf['exe']
-    command .= aux
-    command .= '" '
-    command .= filename
-    command .= '"'
-
-    .local pmc pipe
-    pipe = open command, 'wp'
-    unless pipe goto open_pipe_for_writing_failed
-
-    ok(1, 'open pipe for writing')
-    close pipe
-    .return ()
-
-  open_pipe_for_writing_failed:
-    nok(1, 'open pipe for writing')
-    .return ()
-
-  open_pipe_for_writing_todoed:
-    todo(0, 'Unimplemented in this platform, TT #661')
-
-.end
 
 # GH #465
 .sub 'getfd_fdopen'
