@@ -87,6 +87,9 @@ Returns a new Parrot interpreter.
 The first created interpreter (C<parent> is C<NULL>) is the last one
 to get destroyed.
 
+Note that subsequently created interpreters with C<parent> C<NULL>
+will use the first interpreter as parent.
+
 =cut
 
 */
@@ -191,9 +194,16 @@ Parrot_interp_allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     if (parent)
         interp->parent_interpreter = parent;
     else {
-        interp->parent_interpreter = NULL;
-        if (!emergency_interp)
+        if (!emergency_interp) {
             emergency_interp = interp;
+	}
+#ifdef PARROT_HAS_THREADS
+	else {
+	    interp->parent_interpreter = emergency_interp;
+	}
+#else
+	interp->parent_interpreter = NULL;
+#endif
 
         PMCNULL = NULL;
     }
