@@ -1,3 +1,7 @@
+/* HEADERIZER HFILE: none */
+/* HEADERIZER BEGIN: static */
+/* HEADERIZER END: static */
+
 pmclass IOBuffer auto_attrs {
     ATTR IO_BUFFER * buffer;
 
@@ -29,6 +33,8 @@ pmclass IOBuffer auto_attrs {
     }
 
     VTABLE void destroy() {
+        /* TODO: Decrease reference count, only free it if the refcount is
+           zero */
         Parrot_io_buffer_free(INTERP, PARROT_IOBUFFER(SELF)->buffer);
         PARROT_IOBUFFER(SELF)->buffer = NULL;
     }

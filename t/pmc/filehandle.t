@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 31;
+use Parrot::Test tests => 30;
 use Parrot::Test::Util 'create_tempfile';
 
 =head1 NAME
@@ -457,39 +457,6 @@ pir_output_is( <<"CODE", <<'OUT', 'record_separator, multiple chars' );
 CODE
 ok 1 - $P0.record_separator("abc")
 ok 2 - $P0.record_separator() # .readline works as expected
-OUT
-
-# L<PDD22/I\/O PMC API/=item buffer_type>
-pir_output_is( <<'CODE', <<'OUT', 'buffer_type' );
-.sub 'test' :main
-    $P0 = new ['FileHandle']
-
-    $P0.'buffer_type'('unbuffered')
-    $S0 = $P0.'buffer_type'()
-    if $S0 == 'unbuffered' goto ok_1
-    print 'not '
-  ok_1:
-    say 'ok 1 - $S0 = $P1.buffer_type() # unbuffered'
-
-    $P0.'buffer_type'('line-buffered')
-    $S0 = $P0.'buffer_type'()
-    if $S0 == 'line-buffered' goto ok_2
-    print 'not '
-  ok_2:
-    say 'ok 2 - $S0 = $P1.buffer_type() # line-buffered'
-
-    $P0.'buffer_type'('full-buffered')
-    $S0 = $P0.'buffer_type'()
-    if $S0 == 'full-buffered' goto ok_3
-    print 'not '
-  ok_3:
-    say 'ok 3 - $S0 = $P1.buffer_type() # full-buffered'
-
-.end
-CODE
-ok 1 - $S0 = $P1.buffer_type() # unbuffered
-ok 2 - $S0 = $P1.buffer_type() # line-buffered
-ok 3 - $S0 = $P1.buffer_type() # full-buffered
 OUT
 
 # GH #535 test effects of buffer_type, not just set/get

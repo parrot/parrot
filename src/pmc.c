@@ -1168,10 +1168,13 @@ PMC *
 Parrot_pmc_getprop(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *key))
 {
     ASSERT_ARGS(Parrot_pmc_getprop)
-    if (PMC_IS_NULL(PMC_metadata(pmc)))
+    PMC * const props = PMC_metadata(pmc);
+    if (PMC_IS_NULL(props))
         return check_get_std_props(interp, pmc, key);
-    else
-        return VTABLE_get_pmc_keyed_str(interp, PMC_metadata(pmc), key);
+    else {
+        PARROT_ASSERT(props);
+        return VTABLE_get_pmc_keyed_str(interp, props, key);
+    }
 }
 
 /*
@@ -1386,6 +1389,8 @@ make_prop_hash(PARROT_INTERP, ARGMOD(PMC *self))
     PMC * const prop = Parrot_pmc_new(interp, enum_class_Hash);
 
     propagate_std_props(interp, self, prop);
+    PARROT_ASSERT(prop);
+    PARROT_ASSERT(prop->data);
     PARROT_GC_WRITE_BARRIER(interp, self);
     return prop;
 }

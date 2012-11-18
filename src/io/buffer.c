@@ -181,13 +181,10 @@ Parrot_io_buffer_remove_from_handle(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL i
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
             "Unknown buffer number %d", idx);
     {
-        IO_BUFFER * const buffer = (IO_BUFFER *)VTABLE_get_pointer_keyed_int(interp, handle, idx);
-        if (!buffer)
+        PMC * const buffer_pmc = io_get_handle_buffer_pmc(interp, handle, idx, NULL, BUFFER_SIZE_ANY, BUFFER_FLAGS_ANY, 0);
+        if (PMC_IS_NULL(buffer_pmc))
             return;
-        /* TODO: Decrease reference count, only free it if the refcount is
-           zero */
-        Parrot_io_buffer_free(interp, buffer);
-        VTABLE_set_pointer_keyed_int(interp, handle, idx, NULL);
+        io_remove_buffer_from_handle(interp, handle, idx);
     }
 }
 

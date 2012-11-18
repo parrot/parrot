@@ -227,6 +227,14 @@ if necessary.
 
 */
 
+void
+io_remove_buffer_from_handle(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL buffer_idx)
+{
+    //ASSERT_ARGS(io_remove_buffer_from_handle)
+    STRING * const prop_name = io_get_buffer_prop_name(interp, buffer_idx);
+    Parrot_pmc_delprop(interp, handle, prop_name);
+}
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 IO_BUFFER *
@@ -261,7 +269,7 @@ PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 PMC *
 io_get_handle_buffer_pmc(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL buffer_idx,
-        ARGIN(const IO_VTABLE *vtable), size_t buffer_size, INTVAL flags,
+        ARGIN_NULLOK(const IO_VTABLE *vtable), size_t buffer_size, INTVAL flags,
         INTVAL autocreate)
 {
     ASSERT_ARGS(io_get_handle_buffer_pmc)

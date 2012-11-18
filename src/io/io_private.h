@@ -195,13 +195,12 @@ PARROT_WARN_UNUSED_RESULT
 PMC * io_get_handle_buffer_pmc(PARROT_INTERP,
     ARGMOD(PMC *handle),
     INTVAL buffer_idx,
-    ARGIN(const IO_VTABLE *vtable),
+    ARGIN_NULLOK(const IO_VTABLE *vtable),
     size_t buffer_size,
     INTVAL flags,
     INTVAL autocreate)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(4)
         FUNC_MODIFIES(*handle);
 
 PARROT_CANNOT_RETURN_NULL
@@ -282,6 +281,13 @@ STRING * io_readline_encoded_string(PARROT_INTERP,
         FUNC_MODIFIES(*handle)
         FUNC_MODIFIES(*buffer);
 
+void io_remove_buffer_from_handle(PARROT_INTERP,
+    ARGMOD(PMC *handle),
+    INTVAL buffer_idx)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*handle);
+
 void io_sync_buffers_for_read(PARROT_INTERP,
     ARGMOD(PMC *handle),
     ARGIN(const IO_VTABLE *vtable),
@@ -347,8 +353,7 @@ STRING * io_verify_string_encoding(PARROT_INTERP,
     , PARROT_ASSERT_ARG(vtable))
 #define ASSERT_ARGS_io_get_handle_buffer_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle) \
-    , PARROT_ASSERT_ARG(vtable))
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_get_new_empty_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_io_get_new_filehandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -376,6 +381,9 @@ STRING * io_verify_string_encoding(PARROT_INTERP,
     , PARROT_ASSERT_ARG(vtable) \
     , PARROT_ASSERT_ARG(buffer) \
     , PARROT_ASSERT_ARG(rs))
+#define ASSERT_ARGS_io_remove_buffer_from_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_sync_buffers_for_read __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \
