@@ -32,8 +32,6 @@
           running.pod [GH #838]
     - Tools
         + Improved gdb pretty-printing for multi-byte strings
-    - Tests
-    - Community
 
 2012-09-18    release 4.8.0
     - Core

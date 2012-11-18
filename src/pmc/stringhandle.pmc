@@ -136,6 +136,7 @@ Mark active stringhandle data as live.
         Parrot_gc_mark_STRING_alive(INTERP, data_struct->mode);
         Parrot_gc_mark_STRING_alive(INTERP, data_struct->encoding);
         Parrot_gc_mark_STRING_alive(INTERP, data_struct->filename);
+        Parrot_gc_mark_STRING_alive(INTERP, data_struct->record_separator);
         Parrot_io_buffer_mark(interp, data_struct->read_buffer);
         Parrot_io_buffer_mark(interp, data_struct->write_buffer);
     }

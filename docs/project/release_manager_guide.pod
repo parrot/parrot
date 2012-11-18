@@ -413,9 +413,9 @@ on L<http://www.parrot.org>.
 
 =item 1
 
-Create a new page for the release announcement by navigating to I<Create content>
--> I<Story>. There's some additional stuff needed at the top of the page; use one of the
-old announcements as a guide.
+Create a new page for the release announcement by navigating to going to
+L<https://www.parrot.org/node/add/story>. There's some additional stuff needed
+at the top of the page; use one of the old announcements as a guide.
 
 The "<!--break-->" line marks the end of the text that will appear on the front page.
 
@@ -544,7 +544,6 @@ The calendar of releases is available at the C<comp.lang.parrot> Google
 calendar, visible at
 L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.calendar.google.com>.
 
-    - Oct 16, 2012 - 4.9.0   - dukeleto
     - Nov 20, 2012 - 4.10.0  - rurban
     - Dec 18, 2012 - 4.11.0  - ??
     - Jan 15, 2013 - 5.0.0   - dukeleto

@@ -327,6 +327,11 @@ sub runstep {
         push @{$self->{'warnings'}{$compiler}{'basic'}},
             '-fvisibility=hidden';
     };
+
+    # icu4.4 has a uset_openEmpty() declaration without (void)
+    $self->{'warnings'}{$compiler}{'never'}{'-Werror=strict-prototypes'} =
+        [ 'src/string/encoding/shared.c' ];
+
     if ($conf->data->get('clang') and $compiler eq 'g++') { # clang++
         $self->{'warnings'}{'g++'}{'override'} = {
             '-Wno-parentheses-equality' => [ qw(

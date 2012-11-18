@@ -607,7 +607,7 @@ MAKE_C = @make_c@
 .c$(O) : # suffix rule (limited support)
 	$(CC) $(CFLAGS) @optimize@ $(CC_WARN) -I$(@D) -Isrc/ @cc_o_out@$@ -c $<
 .c.i : # suffix rule (limited support)
-	$(CC) -E $(CFLAGS) -I$(@D) -Isrc/ @cc_o_out@$@ -c $<
+	$(CC) -E $(CFLAGS) -I$(@D) -Isrc/ @cc_o_out@$@ $<
 
 #UNLESS(win32):.s$(O) : # suffix rule (limited support)
 #UNLESS(win32):	$(CC) $(CFLAGS) @optimize@ $(CC_WARN) -I$(@D) @cc_o_out@$@ -c $<
@@ -1992,11 +1992,13 @@ src/string/encoding/tables$(O) : \
 	src/string/encoding/tables.h \
 	src/string/encoding/tables.c
 
+## SUFFIX OVERRIDE
 src/string/encoding/shared$(O) : \
-	$(PARROT_H_HEADERS) \
-	src/string/encoding/shared.h \
-	src/string/encoding/shared.c \
-	src/string/encoding/tables.h
+  $(PARROT_H_HEADERS) \
+  src/string/encoding/shared.h \
+  src/string/encoding/shared.c \
+  src/string/encoding/tables.h
+	$(CC) $(CFLAGS) @optimize::src/string/encoding/shared.c@ @ccwarn::src/string/encoding/shared.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/string/encoding/shared.c
 
 src/string/encoding/null$(O) : \
 	$(PARROT_H_HEADERS) \
