@@ -120,6 +120,7 @@ sub _init {
         -falign-functions=16
         -funit-at-a-time
         -fexcess-precision=standard
+        -fpermissive
         -maccumulate-outgoing-args
         -Wall
         -Wextra
