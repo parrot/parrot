@@ -740,7 +740,11 @@ CODE
 Result is 300.
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', 'multiple Parrot_interp_new/Parrot_x_exit cycles' );
+SKIP: {
+    skip "threads need parent for multiple parallel interp [GH #856]", 1
+      if $PConfig{HAS_THREADS};
+
+    c_output_is( <<'CODE', <<'OUTPUT', 'multiple Parrot_interp_new/Parrot_x_exit cycles' );
 
 #include <stdio.h>
 #include "parrot/parrot.h"
@@ -793,6 +797,8 @@ Destroying interp 1
 Starting interp 2
 Destroying interp 2
 OUTPUT
+
+}
 
 # Local Variables:
 #   mode: cperl

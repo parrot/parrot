@@ -132,7 +132,7 @@ int main(int argc, const char **argv)
     if (!interp1)
         fail("Cannot create 1st parrot interpreter");
 
-    interp2 = Parrot_interp_new(NULL);
+    interp2 = Parrot_interp_new(interp1); /* threads need subsequent interp connected */
 
     if (!interp2)
         fail("Cannot create 2nd parrot interpreter");
