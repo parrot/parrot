@@ -702,6 +702,7 @@ STR_FILES = \
 	src/interp/inter_cb.str \
 	src/interp/api.str \
 	src/io/api.str \
+	src/io/userhandle.str \
 	src/io/utilities.str \
 	src/key.str \
 	src/library.str \
@@ -1080,6 +1081,7 @@ src/io/pipe$(O) : \
 src/io/userhandle$(O) : \
 	$(PARROT_H_HEADERS) \
 	src/io/io_private.h \
+	src/io/userhandle.str \
 	src/io/userhandle.c
 
 O_FILES = \

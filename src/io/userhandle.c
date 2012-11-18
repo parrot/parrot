@@ -20,6 +20,7 @@ used.
 
 #include "parrot/parrot.h"
 #include "io_private.h"
+#include "userhandle.str"
 
 /* HEADERIZER HFILE: src/io/io_private.h */
 
@@ -282,7 +283,7 @@ io_userhandle_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(char *buffer), s
     ASSERT_ARGS(io_userhandle_write_b)
     STRING * const str = Parrot_str_new(interp, buffer, byte_length);
     INTVAL result;
-    Parrot_pcc_invoke_method_fromc_c_args(interp, handle, CONST_STRING(interp, "write"),
+    Parrot_pcc_invoke_method_from_c_args(interp, handle, CONST_STRING(interp, "write"),
             "S->I", str, &result);
     return result;
 }
