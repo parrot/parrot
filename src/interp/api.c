@@ -195,14 +195,15 @@ Parrot_interp_allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
         interp->parent_interpreter = parent;
     else {
         if (!emergency_interp) {
+            interp->parent_interpreter = NULL;
             emergency_interp = interp;
-	}
+        }
 #ifdef PARROT_HAS_THREADS
-	else {
-	    interp->parent_interpreter = emergency_interp;
-	}
+        else {
+            interp->parent_interpreter = emergency_interp;
+        }
 #else
-	interp->parent_interpreter = NULL;
+        interp->parent_interpreter = NULL;
 #endif
 
         PMCNULL = NULL;
