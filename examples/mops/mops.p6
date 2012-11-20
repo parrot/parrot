@@ -1,6 +1,6 @@
 # Copyright (C) 2001-2012, Parrot Foundation.
 
-=pod
+=begin pod
 
 =head1 NAME
 
@@ -45,7 +45,7 @@ F<examples/mops/mops.py>,
 F<examples/mops/mops.rb>,
 F<examples/mops/mops.scheme>.
 
-=cut
+=end pod
 
 sub MAIN() {
     my ($I1, $I2, $I3, $I4, $I5, $N1, $N2, $N4, $N5);
