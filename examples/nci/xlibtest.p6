@@ -2,7 +2,7 @@
 
 use v6;
 
-=pod
+=begin pod
 
 =head1 NAME
 
@@ -23,7 +23,7 @@ current directory:
 
 Press Esc key to exit the program.
 
-=cut
+=end pod
 
 use Xlib:from<parrot>;
 
