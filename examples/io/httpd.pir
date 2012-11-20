@@ -224,12 +224,12 @@ SERVE_file:
     set_addr eh, handle_404_exception
     eh.'handle_types'(.EXCEPTION_PIO_ERROR)
     push_eh eh
-    fp = open url, 'r'
+    fp = open url, 'rb'
     pop_eh
     unless fp goto SERVE_404
     len = stat url, .STAT_FILESIZE
     read file_content, fp, len
-
+    close fp
 SERVE_blob:
     response = '200 OK'
     send_response(work, response, headers, file_content)
