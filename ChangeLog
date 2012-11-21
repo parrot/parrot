@@ -1,3 +1,24 @@
+2012-12-18    release 4.11.0
+    - Core
+    - Documentation
+    - Tests
+    - Community
+
+2012-11-21    release 4.10.0
+    - Core
+        + Add PMCNULL check to result_info op
+        + Fixed record separator bug on io handles
+    - Build
+        + Add -fpermissive so that nqp builds under gcc 4.7.2
+        + Fixed warnings for old ICU 4.4
+    - Platforms
+        + More VMS fixes, but not yet done
+    - Branches
+        + The threads branch is ready to be merged, but nqp needs some changes,
+          so it will be merged with 4.11.0.
+    - Examples
+        + Parrot mini-web server fixes
+
 2012-10-16    release 4.9.0
     - Core
         + Keep encoding information in the imcc optimizer, which fixes the

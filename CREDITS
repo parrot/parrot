@@ -968,7 +968,7 @@ U: rurban
 E: rurban@cpan.org
 E: rurban@cpanel.net
 D: cygwin, install, 64-bit pbc compat, float converters
-D: Release manager for 4.6.0
+D: Release manager for 4.6.0, 4.10.0
 S: Houston, TX
 
 N: Richard Hainsworth

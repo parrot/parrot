@@ -148,5 +148,6 @@ Starred release numbers indicate supported releases.
  Whiteknight 4.7.0          2012-Aug-22     "Hispaniolan"
  alvis       4.8.0          2012-Sep-18     "Spix's Macaw"
  dukeleto    4.9.0 *        2012-Oct-16     "Proto-Hydra"
+ rurban      4.10.0         2012-Nov-21     "Red-eared Parakeet"
 
 =cut
