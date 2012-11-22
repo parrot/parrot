@@ -1,6 +1,6 @@
 #! perl
 
-# Copyright (C) 2004-2008, Parrot Foundation.
+# Copyright (C) 2004-2012, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -29,8 +29,8 @@ If no options are given, a summary of the PBC header is printed to STDOUT.
 
 =head1 SEE ALSO
 
-The C<pbc_dump> utility does a much more thorough job of showing bytecode file
-headers.
+The C<pbc_dump -h> utility does a much more thorough job of showing bytecode file
+headers, but fails with version-incompatible pbc files.
 
 =cut
 
@@ -104,6 +104,18 @@ BEGIN {
                                  bytecode annotations pic dependencies );
 }
 
+sub pbc_info {
+    my @args = @_;
+    for my $f (@args) {
+        my $b;
+        open my $F, "+<", "$f" or die "Can't open $f: $!";
+        binmode $F;
+        print "$f:\n";
+        show_pbc_file_info($F);
+        close $F;
+    }
+}
+
 sub show_pbc_file_info {
     my $F = shift;
 
@@ -169,7 +181,7 @@ sub main {
         exit;
     };
 
-    return pbc_info();
+    return pbc_info(@args);
 }
 
 # Local Variables:

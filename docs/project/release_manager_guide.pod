@@ -133,7 +133,7 @@ in sync.
 
 First, ensure you have configured Parrot (C<perl Configure.pl>) and ran
 C<make> and C<make html> with the old version of Parrot. Second, save a copy
-of the entire 'docs/' directory to some temporary location; you will need
+of the entire F<docs/> directory to some temporary location; you will need
 them later in I<Section X> below. Next, update files with the following
 version-specific information.
 
@@ -544,7 +544,6 @@ The calendar of releases is available at the C<comp.lang.parrot> Google
 calendar, visible at
 L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.calendar.google.com>.
 
-    - Nov 20, 2012 - 4.10.0  - rurban
     - Dec 18, 2012 - 4.11.0  - ??
     - Jan 15, 2013 - 5.0.0   - dukeleto
     - Feb 19, 2013 - 5.1.0   - ??
