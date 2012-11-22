@@ -90,9 +90,10 @@ Source: ".\nqp\nqp.exe"; DestDir: "{app}\bin"; Flags:
 Source: ".\nqp\src\pmc\*.dll"; DestDir: "{app}\lib\parrot\dynext"; Flags:
 Source: ".\nqp\src\ops\*.dll"; DestDir: "{app}\lib\parrot\dynext"; Flags:
 Source: ".\nqp\ModuleLoader.pbc"; DestDir: "{app}\lib\parrot\library"; Flags:
-Source: ".\nqp\PASTRegex.pbc"; DestDir: "{app}\lib\parrot\library"; Flags:
 Source: ".\nqp\QAST.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
+Source: ".\nqp\QASTNode.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
 Source: ".\nqp\NQPP6QRegex.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
+Source: ".\nqp\NQPP5QRegex.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
 Source: ".\nqp\NQPHLL.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
 Source: ".\nqp\NQPCORE.setting.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
 Source: ".\nqp\nqpmo.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
