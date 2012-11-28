@@ -627,8 +627,8 @@ function link_file(string objfile, string exefile, string extra_obj, int install
     config += o;
     config += pathquote;
 
-    if (osname == 'cygwin' || install || optimize == '')
-        link += ' -s';
+    #if (osname == 'cygwin' || install || optimize == '')
+    #    link += ' -s';
     link += ' ' + ld_out + exefile + ' ' + pathquote + objfile + pathquote;
     if (extra_obj != '')
         link += ' ' + pathquote + extra_obj + pathquote;
