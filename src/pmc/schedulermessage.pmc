@@ -1,9 +1,9 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/schedulermessage.pmc - The concurrency scheduler
+src/pmc/schedulermessage.pmc - Scheduler messages
 
 =head1 DESCRIPTION
 
