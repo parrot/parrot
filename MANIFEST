@@ -1073,7 +1073,7 @@ lib/Pod/Simple/TranscodeSmart.pm                            []
 lib/Pod/Simple/XHTML.pm                                     []
 lib/Pod/Simple/XMLOutStream.pm                              []
 lib/README.pod                                              []doc
-parrotbug                                                   []
+parrotbug                                                   [devel]bin
 runtime/README.pod                                          []doc
 runtime/parrot/bin/prove.pir                                [library]
 runtime/parrot/dynext/README.pod                            []doc

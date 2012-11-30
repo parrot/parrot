@@ -147,6 +147,7 @@ installable_parrot.exe                           [main]bin
 installable_parrot_config                        [main]bin
 installable_parrot_config.exe                    [main]bin
 installable_parrot_nci_thunk_gen                 [main]bin
+installable_parrot_nci_thunk_gen.exe             [main]bin
 installable_pbc_disassemble                      [main]bin
 installable_pbc_disassemble.exe                  [main]bin
 installable_pbc_dump                             [main]bin
@@ -163,6 +164,7 @@ lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm               [devel]lib
 libparrot.dll                                    [main]bin
 libparrot.dll.a                                  [main]lib
 libparrot.lib                                    [main]bin
+myconfig                                         [devel]lib
 runtime/parrot/dynext/bit_ops.bundle             [library]
 runtime/parrot/dynext/bit_ops.dll                [library]
 runtime/parrot/dynext/bit_ops.dylib              [library]
