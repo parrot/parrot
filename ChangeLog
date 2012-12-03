@@ -6,6 +6,7 @@
           See http://wknight8111.blogspot.co.at/2010/08/gsoc-threads-chandons-results.html and
           http://niner.name/Hybrid_Threads_for_the_Parrot_VM.pdf
         + New parrot cmdline option --numthreads
+        + Export new dynpmc_class_<ClassName> types [GH #870].
     - Documentation
     - Tests
         failing Pod::Simple pod_todo.t tests are now skipped
