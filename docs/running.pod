@@ -170,6 +170,12 @@ Print the runtime prefix path and exit.
 
 Add C<path> to the library search path
 
+=item --numthreads <number>
+
+Overrides the automatically detected number of CPU cores to set the
+number of OS threads. Minimum number: 2
+
+
 =back
 
 =head2 <file>

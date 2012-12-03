@@ -1,9 +1,11 @@
 2012-12-18    release 4.11.0
     - Core
-        parrot supports now fast and lightweight OS threads, based on Nat Tucks's initial work
-        on lightweight green threads and then Stefan Seifert's extension to OS threads as
-        hybrid threads.
-        See http://niner.name/Hybrid_Threads_for_the_Parrot_VM.pdf
+        + parrot supports now fast and lightweight OS threads, based on Nat Tucks's
+          initial GSoC work on green threads and then Stefan Seifert's extension
+          to true parallel OS threads as hybrid threads.
+          See http://wknight8111.blogspot.co.at/2010/08/gsoc-threads-chandons-results.html and
+          http://niner.name/Hybrid_Threads_for_the_Parrot_VM.pdf
+        + New parrot cmdline option --numthreads
     - Documentation
     - Tests
         failing Pod::Simple pod_todo.t tests are now skipped
