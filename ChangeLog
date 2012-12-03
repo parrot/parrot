@@ -9,7 +9,9 @@
         + Export new dynpmc_class_<ClassName> types [GH #870].
     - Documentation
     - Tests
-        failing Pod::Simple pod_todo.t tests are now skipped
+        + failing Pod::Simple pod_todo.t tests are now skipped
+        + added nqp-rx tests
+        + removed duplicate ext/nqp-rx/t/p6regex tests
     - Community
 
 2012-11-21    release 4.10.0
