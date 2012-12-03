@@ -7,30 +7,14 @@
 .sub main
     .include 'test_more.pir'
 
-    $S0 = sysinfo .SYSINFO_PARROT_OS
-    if $S0 == 'MSWin32' goto run_win32_tests
-    if $S0 == 'cygwin' goto run_cygwin_tests
-    goto run_unix_tests
+    plan(6)
 
-  run_win32_tests:
-    say "1..1"
-    say "ok 1 - All tests skipped on Win32"
-    exit 0
+    ok(1, "initialized")
 
-  run_cygwin_tests:
-    say "1..5"
     tasks_run()
     task_send_recv()
-    say "# cygwin has too slow and unreliable signals"
-    exit 0
-
-  run_unix_tests:
-    plan(10)
-    tasks_run()
-    task_send_recv()
-    task_kill()
-    task_wait()
-    preempt_and_exit()
+#    task_kill()      # kill NYI
+#    preempt_and_exit()
 .end
 
 .sub tasks_run
@@ -40,32 +24,34 @@
     $P0 = get_global 'task1'
     $P1 = new 'Task', $P0
     schedule $P1
-
-    $P0 = get_global 'sub1'
-    schedule $P0
+    wait $P1
 
     $P0 = get_global 'task2'
     $P1 = new 'Task', $P0
     schedule $P1
+    wait $P1
+
+    $P0 = get_global 'sub1'
+    schedule $P0
 .end
 
 .sub task1
-    ok(1, "task1 ran")
-.end
-
-.sub sub1
-    ok(1, "sub1 ran")
+    say "ok 2 task1 ran"
 .end
 
 .sub task2
-    ok(1, "task2 ran")
+    say "ok 3 task2 ran"
+.end
+
+.sub sub1
+    say "ok 4 sub1 ran"
 .end
 
 .sub task_send_recv
     $P0 = get_global 'recv_msg1'
     $P1 = new 'Task', $P0
     schedule $P1
-    pass
+    sleep 0.1
 
     $P2 = new 'String'
     $P2 = "Hai 1"
@@ -90,14 +76,20 @@
     $P0 = receive
     $P1 = new 'String'
     $P1 = "Hai 1"
-    is($P0, $P1, "Got message after block")
+    if $P0 == $P1 goto ok
+    returncc
+ok:
+    say "ok 5 Got message after block"
 .end
 
 .sub recv_msg2
     $P0 = receive
     $P1 = new 'String'
     $P1 = "Hai 2"
-    is($P0, $P1, "Got existing message")
+    if $P0 == $P1 goto ok
+    returncc
+ok:
+    say "ok 6 Got existing message"
 .end
 
 .sub task_kill
@@ -116,19 +108,6 @@
     ok(0, "task_to_kill wasn't killed")
 .end
 
-.sub task_wait
-    $P0 = get_global 'wait_sub1'
-    $P1 = new 'Task', $P0
-    schedule $P1
-
-    wait $P1
-    ok(1, "After wait")
-.end
-
-.sub wait_sub1
-    ok(1, "in wait_sub1")
-.end
-
 .sub preempt_and_exit
     $P0 = get_global 'exit0'
     $P1 = new 'Task', $P0
@@ -139,7 +118,7 @@ again:
 .end
 
 .sub exit0
-    ok(1, "Pre-empt and exit")
+    say "ok 7 Pre-empt and exit"
     exit 0
 .end
 

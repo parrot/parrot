@@ -27,8 +27,11 @@ These are the vtable functions for the ParrotInterpreter base class
 #include "parrot/dynext.h"
 #include "parrot/io.h"
 #include "parrot/runcore_api.h"
+#include "parrot/thread.h"
 #include "pmc/pmc_class.h"
 #include "pmc/pmc_sub.h"
+#include "pmc/pmc_proxy.h"
+#include "pmc/pmc_task.h"
 
 #define PMC_interp(x) ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->interp
 #define PMC_args(x)   ((Parrot_ParrotInterpreter_attributes *)PMC_data(x))->args
@@ -50,21 +53,80 @@ static void create_interp(
 
 /*
 
-=item C<void clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)>
+=item C<PMC * clone_interpreter(Parrot_Interp s, INTVAL flags)>
 
 Clones the interpreter as specified by the flags.
+
+TODO: Move this logic into src/interp/api.c or src/threads.c, as appropriate
 
 =cut
 
 */
 
-void
-clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
+PARROT_CANNOT_RETURN_NULL
+PMC *
+clone_interpreter(Parrot_Interp s, INTVAL flags)
 {
-    /* we block GC runs while cloning since C<d> is not yet running */
-    Parrot_block_GC_mark(d);
+    /* have to pass a parent to allocate_interpreter to prevent PMCNULL from being set to NULL */
+    Parrot_Interp d = Parrot_interp_allocate_interpreter(s, flags);
+    int stacktop;
+    Parrot_GC_Init_Args args;
 
-    d->scheduler = Parrot_pmc_new(d, enum_class_Scheduler);
+    PMC * interp_pmc;
+    PMC * const s_config_hash = VTABLE_get_pmc_keyed_int(s, s->iglobals, IGLOBALS_CONFIG_HASH);
+
+    memset(&args, 0, sizeof (args));
+    args.stacktop = &stacktop;
+
+    /* Set up the memory allocation system */
+    Parrot_gc_initialize(d, &args);
+    Parrot_block_GC_mark(d);
+    Parrot_block_GC_sweep(d);
+
+    d->ctx         = PMCNULL;
+    d->resume_flag = RESUME_INITIAL;
+
+    d->recursion_limit = RECURSION_LIMIT;
+
+    /* PANIC will fail until this is done */
+    d->piodata = NULL;
+    Parrot_io_init(d);
+
+    /*
+     * Set up the string subsystem
+     * This also generates the constant string tables
+     * Do this before unsetting parent_interpreter to copy its hash_seed and constant string table
+     */
+    Parrot_str_init(d);
+
+    /* create caches structure */
+    init_object_cache(d);
+
+    d->n_vtable_max = s->n_vtable_max;
+    d->vtables = s->vtables;
+    d->class_hash = Parrot_thread_create_proxy(s, d, s->class_hash);
+
+    Parrot_cx_init_scheduler(d);
+
+    d->parent_interpreter = NULL;
+
+    /* create the root set registry */
+    d->gc_registry = Parrot_pmc_new(d, enum_class_AddrRegistry);
+
+    interp_pmc  = Parrot_pmc_new_noinit(d, enum_class_ParrotInterpreter);
+    VTABLE_set_pointer(d, interp_pmc, d);
+
+    /* init the interpreter globals array */
+    d->iglobals = Parrot_pmc_new_init_int(d, enum_class_FixedPMCArray, (INTVAL)IGLOBALS_SIZE);
+
+    VTABLE_set_pmc_keyed_int(d, d->iglobals, (INTVAL) IGLOBALS_INTERPRETER, interp_pmc);
+
+    /* initialize built-in runcores */
+    Parrot_runcore_init(d);
+
+    /* create a proxy for the config_hash */
+    VTABLE_set_pmc_keyed_int(d, d->iglobals, (INTVAL) IGLOBALS_CONFIG_HASH,
+        Parrot_thread_create_proxy(s, d, s_config_hash));
 
     /* can't copy directly, unless you want double-frees */
     if (flags & PARROT_CLONE_RUNOPS)
@@ -76,78 +138,46 @@ clone_interpreter(Parrot_Interp d, Parrot_Interp s, INTVAL flags)
         d->debug_flags = s->debug_flags;
     }
 
+    d->root_namespace = Parrot_thread_create_proxy(s, d, s->root_namespace);
+
     if (flags & PARROT_CLONE_HLL) {
         /* we'd like to share the HLL data. Give it a PMC_sync structure
            if it doesn't have one already */
-        d->HLL_info = s->HLL_info;
-        Parrot_hll_regenerate_HLL_namespaces(d);
+
+        /* This used to be proxied:
+
+            d->HLL_info = Parrot_thread_create_proxy(s, d, s->HLL_info);
+
+            But src/hll.c:Parrot_hll_get_HLL_type() pokes directly into the
+            PMC attributes which is a problem if we're using a Proxy. Instead,
+            clone the structure so direct accesses continue working.
+        */
+        d->HLL_info = VTABLE_clone(d, s->HLL_info);
+        d->HLL_namespace = Parrot_thread_create_proxy(s, d, s->HLL_namespace);
+        d->HLL_entries   = Parrot_thread_create_proxy(s, d, s->HLL_entries);
     }
 
     if (flags & (PARROT_CLONE_LIBRARIES | PARROT_CLONE_CLASSES)) {
-        INTVAL i, last_remove;
-        const INTVAL start = d->n_vtable_max;
-
-        /* copy type registrations to keep type numbers the same */
-        d->class_hash   = Parrot_clone(d, s->class_hash);
-        d->n_vtable_max = s->n_vtable_max;
-
-        if (d->n_vtable_max > d->n_vtable_alloced)
-            Parrot_vtbl_realloc_vtables(d);
-
-        last_remove = s->n_vtable_max;
-
-        for (i = s->n_vtable_max - 1; i >= start; --i) {
-            if (s->vtables[i] && s->vtables[i]->pmc_class &&
-                PObj_is_class_TEST(s->vtables[i]->pmc_class)) {
-                STRING * const class_name =
-                    VTABLE_get_string(s, s->vtables[i]->pmc_class);
-                PARROT_ASSERT(VTABLE_exists_keyed_str(d,
-                    d->class_hash, class_name));
-
-                VTABLE_delete_keyed_str(d, d->class_hash, class_name);
-
-                if (last_remove == i + 1) {
-                    --d->n_vtable_max;
-                    last_remove = i;
-                }
-            }
-        }
     }
 
     if (flags & PARROT_CLONE_LIBRARIES) {
-        PMC   * const libs     = VTABLE_get_pmc_keyed_int(s, s->iglobals,
-            IGLOBALS_DYN_LIBS);
-        PMC   * const lib_iter = VTABLE_get_iter(s, libs);
-        const INTVAL n         = VTABLE_elements(s, libs);
-        INTVAL i;
-
-        for (i = 0; i < n; ++i) {
-            STRING * const key     = VTABLE_shift_string(s, lib_iter);
-            PMC    * const lib_pmc = VTABLE_get_pmc_keyed_str(s, libs, key);
-            PMC    * const ignored = Parrot_dyn_clone_lib_into(d, s, lib_pmc);
-            UNUSED(ignored);
-        }
+        PMC * const s_pbc_libs = VTABLE_get_pmc_keyed_int(s, s->iglobals, IGLOBALS_PBC_LIBS);
+        VTABLE_set_pmc_keyed_int(d, d->iglobals, (INTVAL) IGLOBALS_PBC_LIBS,
+            Parrot_thread_create_proxy(s, d, s_pbc_libs));
     }
 
-    if (flags & PARROT_CLONE_CLASSES) {
-        INTVAL i;
-        for (i = 0; i < s->n_vtable_max; ++i) {
-            if (s->vtables[i] && s->vtables[i]->pmc_class &&
-                    PObj_is_class_TEST(s->vtables[i]->pmc_class)) {
-                /* Cloning the class into the new interpreter ought
-                 * to be sufficient to instantiate the class.  */
-                PMC                     * const source       = s->vtables[i]->pmc_class;
-                PMC                     * const dest         = Parrot_clone(d, source);
-                Parrot_Class_attributes * const source_class = PARROT_CLASS(source);
-                Parrot_Class_attributes * const dest_class   = PARROT_CLASS(dest);
+    create_initial_context(d);
 
-                dest_class->name           = source_class->name;
-                dest_class->_namespace     = VTABLE_clone(d, source_class->_namespace);
-            }
-        }
-    }
+    if (flags & PARROT_CLONE_CODE)
+        Parrot_clone_code(d, s);
 
+    /* setup stdio PMCs */
+    Parrot_io_init(d);
+
+    Parrot_unblock_GC_sweep(d);
     Parrot_unblock_GC_mark(d);
+
+    return interp_pmc;
 }
 
 
@@ -588,10 +618,7 @@ XXX this should of course call C<Parrot_clone()> and use freeze/thaw.
 */
 
     VTABLE PMC *clone() {
-        PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
-
-        clone_interpreter(PMC_interp(dest),
-                          PMC_interp(SELF), PARROT_CLONE_DEFAULT);
+        PMC * const dest = clone_interpreter(PMC_interp(SELF), PARROT_CLONE_DEFAULT);
 
         return dest;
     }
@@ -745,10 +772,63 @@ support it.
         RETURN(INTVAL id);
     }
 
+/*
+
+=item METHOD current_task()
+
+Returns the task currently executed by this interpreter.
+
+=cut
+
+*/
+
     METHOD current_task() {
         Interp * const this_interp = PMC_interp(SELF);
         PMC * const current_task = this_interp->cur_task;
         RETURN(PMC *current_task);
+    }
+
+/*
+
+=item METHOD schedule(PMC *task)
+
+Schedules the given task on this interpreter.
+
+=cut
+
+*/
+
+    METHOD schedule(PMC *task) {
+        Interp * const this_interp = PMC_interp(SELF);
+        Parrot_cx_schedule_immediate(this_interp, task);
+    }
+
+/*
+
+=item METHOD schedule_proxied(PMC *task, PMC *proxy)
+
+Schedules the given task on the proxy's interpreter.
+
+=cut
+
+*/
+
+    METHOD schedule_proxied(PMC *task, PMC *proxy) {
+        Parrot_Proxy_attributes * const core_struct    = PARROT_PROXY(proxy);
+        Interp                  * const proxied_interp = core_struct->interp;
+
+#ifdef PARROT_HAS_THREADS
+        /* don't run GC from the wrong thread since GC involves stack walking and we
+         * don't want the foreign GC to find our objects */
+        Parrot_block_GC_mark_locked(proxied_interp);
+
+        Parrot_cx_schedule_immediate(proxied_interp,
+            Parrot_thread_create_local_task(INTERP, proxied_interp, task));
+
+        Parrot_unblock_GC_mark_locked(proxied_interp);
+#else
+        Parrot_cx_schedule_immediate(interp, task);
+#endif
     }
 
 }

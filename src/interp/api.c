@@ -17,7 +17,6 @@ Functions related to managing the Parrot interpreter
 
 */
 
-
 #include "parrot/parrot.h"
 #include "parrot/runcore_api.h"
 #include "parrot/oplib/core_ops.h"
@@ -27,6 +26,7 @@ Functions related to managing the Parrot interpreter
 #include "pmc/pmc_parrotinterpreter.h"
 #include "parrot/has_header.h"
 #include "imcc/embed.h"
+#include "parrot/thread.h"
 
 #ifdef PARROT_HAS_HEADER_SYSUTSNAME
 #  include <sys/utsname.h>
@@ -86,6 +86,9 @@ Returns a new Parrot interpreter.
 
 The first created interpreter (C<parent> is C<NULL>) is the last one
 to get destroyed.
+
+Note that subsequently created interpreters with C<parent> C<NULL>
+will use the first interpreter as parent.
 
 =cut
 
@@ -191,9 +194,17 @@ Parrot_interp_allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     if (parent)
         interp->parent_interpreter = parent;
     else {
-        interp->parent_interpreter = NULL;
-        if (!emergency_interp)
+        if (!emergency_interp) {
+            interp->parent_interpreter = NULL;
             emergency_interp = interp;
+        }
+#ifdef PARROT_HAS_THREADS
+        else {
+            interp->parent_interpreter = emergency_interp;
+        }
+#else
+        interp->parent_interpreter = NULL;
+#endif
 
         PMCNULL = NULL;
     }
@@ -237,6 +248,7 @@ Parrot_Interp
 Parrot_interp_initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 {
     ASSERT_ARGS(Parrot_interp_initialize_interpreter)
+    int numthr;
 
     /* Set up the memory allocation system */
     Parrot_gc_initialize(interp, args);
@@ -319,6 +331,17 @@ Parrot_interp_initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *a
     /* setup stdio PMCs */
     Parrot_io_init(interp);
 
+    /* all sys running, init the threads, event and signal stuff */
+    if (args->numthreads)
+        numthr = Parrot_set_num_threads(interp, args->numthreads);
+    Parrot_cx_init_scheduler(interp);
+
+#ifdef PARROT_HAS_THREADS
+    interp->wake_up = 0;
+    COND_INIT(interp->sleep_cond);
+    MUTEX_INIT(interp->sleep_mutex);
+#endif
+
     /* Done. Return and be done with it */
 
     /* Okay, we've finished doing anything that might trigger GC.
@@ -327,12 +350,6 @@ Parrot_interp_initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *a
      */
     Parrot_unblock_GC_mark(interp);
     Parrot_unblock_GC_sweep(interp);
-
-    /* all sys running, init the event and signal stuff
-     * the first or "master" interpreter is handling events and signals
-     */
-
-    Parrot_cx_init_scheduler(interp);
 
 #ifdef ATEXIT_DESTROY
     /*
@@ -389,10 +406,7 @@ Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, SHIM(void *arg))
 {
     ASSERT_ARGS(Parrot_interp_really_destroy)
 
-    /* wait for threads to complete if needed; terminate the event loop */
     if (!interp->parent_interpreter) {
-        Parrot_cx_runloop_end(interp);
-
         /* Don't bother trying to provide a pir backtrace on assertion failures
          * during global destruction.  It only works in movies. */
        Parrot_interp_clear_emergency_interpreter();

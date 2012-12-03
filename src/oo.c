@@ -964,8 +964,12 @@ Parrot_find_method_direct(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *metho
 
         TRACE_FM(interp, _class_i, method_name, method);
 
-        if (!PMC_IS_NULL(method))
+        if (!PMC_IS_NULL(method)) {
+            if (interp->thread_data != NULL)
+                method = VTABLE_clone(interp, method);
+            PARROT_ASSERT_INTERP(method, interp);
             return method;
+        }
     }
 
     TRACE_FM(interp, _class, method_name, NULL);

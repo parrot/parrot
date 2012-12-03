@@ -19,6 +19,7 @@ The Task PMC represents a concurrent running "green thread".
 
 #include "parrot/scheduler_private.h"
 #include "pmc/pmc_scheduler.h"
+#include "pmc/pmc_proxy.h"
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
@@ -32,8 +33,12 @@ pmclass Task provides invokable auto_attrs {
     ATTR PMC          *data;      /* Additional data for the task */
     ATTR INTVAL        killed;    /* Dead tasks don't get run */
     ATTR PMC          *mailbox;   /* List of incoming messages */
+    ATTR Parrot_mutex mailbox_lock;
     ATTR PMC          *waiters;   /* Tasks waiting on this one */
-    ATTR Parrot_jump_buff abort_jump; /* Jump buffer to abort task */
+    ATTR Parrot_mutex waiters_lock;
+    ATTR PMC          *shared;    /* List of variables shared with this task */
+    ATTR PMC          *partner;   /* Copy of this task on the other side of a GC barrier,
+                                     meaning in another thread */
 
 /*
 
@@ -61,6 +66,11 @@ Initialize a concurrency task object.
         core_struct->killed    = 0;
         core_struct->mailbox   = PMCNULL; /* Created lazily on demand */
         core_struct->waiters   = PMCNULL; /* Created lazily on demand */
+        core_struct->shared    = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        core_struct->partner   = NULL; /* Set by Parrot_thread_create_local_task */
+
+        MUTEX_INIT(core_struct->mailbox_lock);
+        MUTEX_INIT(core_struct->waiters_lock);
 
         /* Assign a unique ID */
         /* TODO: Fix collisions. */
@@ -100,7 +110,6 @@ Some data that will be passed to C<code> when invoked.
 */
 
     VTABLE void init_pmc(PMC *data) {
-        PMC         *elem;
         Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
 
         SELF.init();
@@ -109,7 +118,7 @@ Some data that will be passed to C<code> when invoked.
             core_struct->code = data;
         }
         else if (VTABLE_isa(INTERP, data, CONST_STRING(INTERP, "Hash"))) {
-            elem = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "birthtime"));
+            PMC * elem = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "birthtime"));
             if (! PMC_IS_NULL(elem))
                 core_struct->birthtime = VTABLE_get_number(INTERP, elem);
 
@@ -146,20 +155,16 @@ code as the first argument.
                 PARROT_SCHEDULER(interp->scheduler);
         PMC * const active_tasks = sdata->all_tasks;
 
+        PARROT_ASSERT(! PMC_IS_NULL(task->code));
+
         /* If a task is pre-empted, this will be set again. */
         TASK_in_preempt_CLEAR(SELF);
 
-#ifndef WIN32
-        if (setjmp(task->abort_jump)) {
-            /* do nothing, we're back where we want to be */
-        }
-#endif
-
-        if (!(task->killed || PMC_IS_NULL(task->code))) {
-            const int current_depth =
+        if (! task->killed) {
+            const INTVAL current_depth =
                 Parrot_pcc_get_recursion_depth(interp, CURRENT_CONTEXT(interp));
             /* Add the task to the set of active Tasks */
-            PMC *task_id = Parrot_pmc_new(interp, enum_class_Integer);
+            PMC * const task_id = Parrot_pmc_new(interp, enum_class_Integer);
             VTABLE_set_integer_native(interp, task_id, task->id);
             VTABLE_set_pmc_keyed(interp, active_tasks, task_id, SELF);
             TASK_active_SET(SELF);
@@ -171,15 +176,17 @@ code as the first argument.
             Parrot_pcc_set_recursion_depth(interp, CURRENT_CONTEXT(interp), current_depth);
         }
 
+        /* TODO: racy read with write in send TASK_recv_block_CLEAR(partner) */
         if (task->killed || !TASK_in_preempt_TEST(SELF)) {
             /* The task is done. */
             /* Remove it from the set of active Tasks */
 
-            int i, n = 0;
+            INTVAL i, n = 0;
             PMC * const task_id = Parrot_pmc_new(interp, enum_class_Integer);
             VTABLE_set_integer_native(interp, task_id, task->id);
             TASK_active_CLEAR(SELF);
             VTABLE_delete_keyed(interp, active_tasks, task_id);
+            task->killed = 1;
 
             /* schedule any waiters. */
             if (!PMC_IS_NULL(task->waiters))
@@ -189,11 +196,33 @@ code as the first argument.
                 PMC * const wtask = VTABLE_get_pmc_keyed_int(interp, task->waiters, i);
                 Parrot_cx_schedule_task(interp, wtask);
             }
+
+            if (task->partner) { /* TODO how can we know if the partner's still alive? */
+                Parrot_Task_attributes * const partner_task = PARROT_TASK(task->partner);
+                LOCK(partner_task->waiters_lock);
+
+                if (!PMC_IS_NULL(partner_task->waiters)) {
+                    Parrot_block_GC_mark_locked(partner_task->interp);
+                    partner_task->killed = 1;
+
+                    n = VTABLE_get_integer(interp, partner_task->waiters);
+
+                    for (i = 0; i < n; ++i) {
+                        PMC * const wtask =
+                            VTABLE_get_pmc_keyed_int(interp, partner_task->waiters, i);
+                        Parrot_cx_schedule_immediate(partner_task->interp, wtask);
+                    }
+                    Parrot_unblock_GC_mark_locked(partner_task->interp);
+                }
+                else
+                    partner_task->killed = 1;
+
+                UNLOCK(partner_task->waiters_lock);
+            }
         }
 
         return (opcode_t*) next;
     }
-
 
 /*
 
@@ -212,8 +241,9 @@ Create a copy of the task, resetting status, ID, and birthtime.
         Parrot_Task_attributes * const new_struct = PARROT_TASK(copy);
         const Parrot_Task_attributes * const old_struct = PARROT_TASK(SELF);
 
-        new_struct->code = VTABLE_clone(INTERP, old_struct->code);
-        new_struct->data = VTABLE_clone(INTERP, old_struct->data);
+        new_struct->code   = VTABLE_clone(INTERP, old_struct->code);
+        new_struct->data   = VTABLE_clone(INTERP, old_struct->data);
+        new_struct->shared = VTABLE_clone(INTERP, old_struct->shared);
 
         return copy;
     }
@@ -272,6 +302,36 @@ Sets the value of an attribute for this task.
 
 /*
 
+=item C<void push_pmc(PMC *value)>
+
+Add value to the list of PMCs shared with this task.
+
+=cut
+
+*/
+
+    VTABLE void push_pmc(PMC *value) {
+        VTABLE_push_pmc(interp, PARROT_TASK(SELF)->shared, value);
+
+        return;
+    }
+
+/*
+
+=item C<PMC *pop_pmc()>
+
+Return a proxy for the last shared PMC.
+
+=cut
+
+*/
+
+    VTABLE PMC *pop_pmc() {
+        return VTABLE_pop_pmc(interp, PARROT_TASK(SELF)->shared);
+    }
+
+/*
+
 =item C<void mark()>
 
 Mark any referenced strings and PMCs.
@@ -287,6 +347,8 @@ Mark any referenced strings and PMCs.
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->data);
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->mailbox);
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->waiters);
+            Parrot_gc_mark_PMC_alive(INTERP, core_struct->shared);
+            /* don't mark our partner, since it belongs to another GC */
         }
     }
 
@@ -380,13 +442,32 @@ Send a message to this task.
 
     METHOD send(PMC *message) {
         Parrot_Task_attributes * const tdata = PARROT_TASK(SELF);
-        if (PMC_IS_NULL(tdata->mailbox))
+        LOCK(tdata->mailbox_lock);
+        if (PMC_IS_NULL(tdata->mailbox)) {
             tdata->mailbox = Parrot_pmc_new(interp, enum_class_PMCList);
+            PARROT_GC_WRITE_BARRIER(interp, SELF);
+        }
         VTABLE_push_pmc(interp, tdata->mailbox, message);
+        UNLOCK(tdata->mailbox_lock);
 
-        if (TASK_recv_block_TEST(SELF)) {
-            TASK_recv_block_CLEAR(SELF);
-            Parrot_cx_schedule_task(interp, SELF);
+        if (tdata->partner) {
+            PMC *                    const partner = tdata->partner;
+            Parrot_Task_attributes * const pdata = PARROT_TASK(partner);
+            LOCK(tdata->mailbox_lock);
+            Parrot_block_GC_mark_locked(pdata->interp);
+            if (TASK_recv_block_TEST(partner)) {
+                /* TODO: racy write with read in invoke task->killed || in_preempt */
+                TASK_recv_block_CLEAR(partner);
+                Parrot_cx_schedule_immediate(pdata->interp, partner);
+            }
+            Parrot_unblock_GC_mark_locked(pdata->interp);
+            UNLOCK(tdata->mailbox_lock);
+        }
+        else {
+            if (TASK_recv_block_TEST(SELF)) {
+                TASK_recv_block_CLEAR(SELF);
+                Parrot_cx_schedule_task(interp, SELF);
+            }
         }
     }
 

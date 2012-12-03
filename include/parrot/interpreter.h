@@ -21,7 +21,7 @@ typedef enum {
     PARROT_DESTROY_FLAG     = 0x200, /* the last interpreter shall cleanup */
 
     PARROT_IS_THREAD        = 0x1000, /* interpreter is a thread */
-    PARROT_THR_COPY_INTERP  = 0x2000, /* thread start copies interp state */
+    PARROT_THR_FLAG_NEW_PMC = 0x2000, /* flag new PMCs */
     PARROT_THR_THREAD_POOL  = 0x4000  /* type3 threads */
 
 } Parrot_Interp_flag;
@@ -137,6 +137,7 @@ typedef Parrot_Run_core_t Run_Cores;
 #include "parrot/multidispatch.h"
 #include "parrot/call.h"
 #include "parrot/gc_api.h"
+#include "parrot/thread.h"
 
 typedef struct warnings_t {
     Warnings_classes classes;
@@ -244,9 +245,15 @@ struct parrot_interp_t {
 
     int current_runloop_level;                /* for reentering run loop */
     int current_runloop_id;
+    int runloop_id_counter;                   /* for synthesizing runloop ids. */
 
-    UINTVAL          last_alarm;              /* has an alarm triggered? */
-    FLOATVAL         quantum_done;            /* expiration of current quantum */
+    UINTVAL              last_alarm;          /* has an alarm triggered? */
+    FLOATVAL             quantum_done;        /* expiration of current quantum */
+
+    struct _Thread_data *thread_data;         /* thread specific items */
+    int                  wake_up;
+    Parrot_cond          sleep_cond;
+    Parrot_mutex         sleep_mutex;
 
     UINTVAL recursion_limit;                  /* Sub call recursion limit */
 
@@ -651,7 +658,7 @@ void Parrot_run_callback(PARROT_INTERP,
 
 /* parrotinterpreter.pmc */
 /* XXX Would be nice if this could live in some headerized grouping */
-void clone_interpreter(Parrot_Interp dest, Parrot_Interp self, INTVAL flags);
+PMC * clone_interpreter(Parrot_Interp self, INTVAL flags);
 
 #else /* !PARROT_IN_CORE */
 

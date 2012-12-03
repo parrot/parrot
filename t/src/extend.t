@@ -740,7 +740,7 @@ CODE
 Result is 300.
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', 'multiple Parrot_interp_new/Parrot_x_exit cycles' );
+c_output_is( <<'CODE', <<'OUTPUT', 'multiple Parrot_interp_new/Parrot_x_exit cycles', $^O eq 'darwin' ? (todo => "GH #856 may fail on darwin threaded") : () );
 
 #include <stdio.h>
 #include "parrot/parrot.h"

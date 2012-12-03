@@ -639,6 +639,16 @@ inline op schedule(invar PMC) {
     Parrot_cx_schedule_task(interp, $1);
 }
 
+=item B<schedule_local>(invar PMC)
+
+Like schedule but execute it on the current thread.
+
+=cut
+
+inline op schedule_local(invar PMC) {
+    Parrot_cx_schedule_immediate(interp, $1);
+}
+
 =item B<addhandler>(invar PMC)
 
 Add an event or exception handler to the concurrency scheduler. Details about

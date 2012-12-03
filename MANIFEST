@@ -761,6 +761,11 @@ examples/tge/branch/branch.g                                [examples]
 examples/tge/branch/lib/Branch.pir                          [examples]
 examples/tge/branch/lib/Leaf.pir                            [examples]
 examples/tge/branch/transform.pir                           [examples]
+examples/threads/alloc_test.pir                             [examples]
+examples/threads/chameneos.pir                              [examples]
+examples/threads/matrix_part.winxed                         [examples]
+examples/threads/moretasks.pir                              [examples]
+examples/threads/tasks.pir                                  [examples]
 examples/tools/Makefile                                     [examples]
 examples/tools/pbc_checker.cpp                              [examples]
 examples/tools/pgegrep                                      [examples]
@@ -888,6 +893,11 @@ include/imcc/embed.h                                        [main]include
 include/imcc/yyscanner.h                                    [main]include
 include/parrot/alarm.h                                      [main]include
 include/parrot/api.h                                        [main]include
+include/parrot/atomic.h                                     [main]include
+include/parrot/atomic/fallback.h                            [main]include
+include/parrot/atomic/gcc_ppc.h                             [main]include
+include/parrot/atomic/gcc_x86.h                             [main]include
+include/parrot/atomic/sparc.h                               [main]include
 include/parrot/caches.h                                     [main]include
 include/parrot/call.h                                       [main]include
 include/parrot/cclass.h                                     [main]include
@@ -944,6 +954,10 @@ include/parrot/settings.h                                   [main]include
 include/parrot/string.h                                     [main]include
 include/parrot/string_funcs.h                               [main]include
 include/parrot/sub.h                                        [main]include
+include/parrot/thr_none.h                                   [main]include
+include/parrot/thr_pthread.h                                [main]include
+include/parrot/thr_windows.h                                [main]include
+include/parrot/thread.h                                     [main]include
 include/parrot/vtables.h                                    [main]include
 include/parrot/warnings.h                                   [main]include
 include/pmc/dummy                                           [main]include
@@ -1018,6 +1032,7 @@ lib/Parrot/Pmc2c/PMC.pm                                     [devel]lib
 lib/Parrot/Pmc2c/PMC/Null.pm                                [devel]lib
 lib/Parrot/Pmc2c/PMC/Object.pm                              [devel]lib
 lib/Parrot/Pmc2c/PMC/PrintTree.pm                           [devel]lib
+lib/Parrot/Pmc2c/PMC/Proxy.pm                               [devel]lib
 lib/Parrot/Pmc2c/PMC/RO.pm                                  [devel]lib
 lib/Parrot/Pmc2c/PMC/default.pm                             [devel]lib
 lib/Parrot/Pmc2c/Parser.pm                                  [devel]lib
@@ -1184,6 +1199,8 @@ runtime/parrot/library/uuid.pir                             [library]
 runtime/parrot/library/yaml_dumper.pir                      [library]
 src/README.pod                                              []doc
 src/alarm.c                                                 []
+src/atomic/gcc_x86.c                                        []
+src/atomic/sparc_v9.s                                       []
 src/call/args.c                                             []
 src/call/context.c                                          []
 src/call/context_accessors.c                                []
@@ -1316,6 +1333,7 @@ src/platform/generic/io.c                                   []
 src/platform/generic/itimer.c                               []
 src/platform/generic/math.c                                 []
 src/platform/generic/misc.c                                 []
+src/platform/generic/num_cpus.c                             []
 src/platform/generic/socket.c                               []
 src/platform/generic/sysmem.c                               []
 src/platform/generic/time.c                                 []
@@ -1336,6 +1354,7 @@ src/platform/win32/file.c                                   []
 src/platform/win32/hires_timer.c                            []
 src/platform/win32/io.c                                     []
 src/platform/win32/misc.c                                   []
+src/platform/win32/num_cpus.c                               []
 src/platform/win32/sysmem.c                                 []
 src/platform/win32/time.c                                   []
 src/platform/win32/uid.c                                    []
@@ -1412,6 +1431,7 @@ src/pmc/pmc.num                                             []
 src/pmc/pmclist.pmc                                         []
 src/pmc/pmcproxy.pmc                                        []
 src/pmc/pointer.pmc                                         []
+src/pmc/proxy.pmc                                           []
 src/pmc/ptr.pmc                                             []
 src/pmc/ptrbuf.pmc                                          []
 src/pmc/ptrobj.pmc                                          []
@@ -1463,6 +1483,7 @@ src/string/spf_render.c                                     []
 src/string/spf_vtable.c                                     []
 src/string/sprintf.c                                        []
 src/sub.c                                                   []
+src/thread.c                                                []
 src/utils.c                                                 []
 src/vtable.tbl                                              [devel]src
 src/vtables.c                                               []
@@ -2000,6 +2021,7 @@ t/src/extend.t                                              [test]
 t/src/extend_vtable.t                                       [test]
 t/src/misc.t                                                [test]
 t/src/pointer_array.t                                       [test]
+t/src/threads.t                                             [test]
 t/src/threads_io.t                                          [test]
 t/src/warnings.t                                            [test]
 t/steps/auto/alignof-01.t                                   [test]

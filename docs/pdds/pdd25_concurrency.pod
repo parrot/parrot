@@ -421,36 +421,39 @@ Kill a task without waiting for it to complete.
 
 Dec 2003 - (Dan ponders threads based on POSIX and Perl 5 experience)
 
-- L<https://groups.google.com/forum/?fromgroups=#!topic/perl.perl6.internals/5ksiq33gp6Y>
+L<https://groups.google.com/forum/?fromgroups=#!topic/perl.perl6.internals/5ksiq33gp6Y>
 
 Dec. 2003 - "threads and shared interpreter data structures"
 
-- L<https://groups.google.com/forum/?fromgroups=#!topic/perl.perl6.internals/5k6k_yh-BP0>
+L<https://groups.google.com/forum/?fromgroups=#!topic/perl.perl6.internals/5k6k_yh-BP0>
 
 Jan. 2004 - "Threads Design. A Win32 perspective."
 
-- L<https://groups.google.com/forum/?fromgroups=#!topic/perl.perl6.internals/MglimyMwYCk>
+L<https://groups.google.com/forum/?fromgroups=#!topic/perl.perl6.internals/MglimyMwYCk>
 
 Jan. 2004 - "Start of threads proposal"
 
-- L<https://groups.google.com/forum/?fromgroups#!topic/perl.perl6.internals/TH3kQNqE1cY>
+L<https://groups.google.com/forum/?fromgroups#!topic/perl.perl6.internals/TH3kQNqE1cY>
 
 Sept. 2005 - "consider using OS threads"
 
-- L<https://groups.google.com/forum/?fromgroups=#!topic/perl.perl6.internals/QLUOOqklX44>
+L<https://groups.google.com/forum/?fromgroups=#!topic/perl.perl6.internals/QLUOOqklX44>
 
 Aug. 2007 - "multi-threading a work in progress"
 
-- L<http://perlmonks.org/?node_id=636466>
+L<http://perlmonks.org/?node_id=636466>
 
-Apr. 2012 - (green threads basics implemented by Nat Tuck
+Aug. 2010 - "GSoC Threads: Chandon's Results" (green threads by Nat Tuck)
+
+L<http://wknight8111.blogspot.co.at/2010/08/gsoc-threads-chandons-results.html>
 
 Apr. 2012 - (hybrid threads implemented by Stefan Seifert)
 
-- L<http://lists.parrot.org/pipermail/parrot-dev/2012-April/006855.html>
-- L<http://niner.name/Hybrid_Threads_for_the_Parrot_VM.pdf>
+L<http://lists.parrot.org/pipermail/parrot-dev/2012-April/006855.html>
+L<http://niner.name/Hybrid_Threads_for_the_Parrot_VM.pdf>
 
-Concurrency as Futures -
+Concurrency as Futures
+
 L<http://www.cincomsmalltalk.com/userblogs/mls/blogView?showComments=true&entry=3336838959>
 
 Io language - L<http://www.iolanguage.com/about/>

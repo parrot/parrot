@@ -1850,6 +1850,18 @@ EOA
 
 EOA
 
+    #my $assertion = ($attrtype =~ $isptrtopmc and not $isfuncptr)
+    #    ? 'PARROT_ASSERT_INTERP((PMC *)(value), interp);'
+    #    : '';
+    #$decl .= <<"EOA";
+    #    } \\
+    #    else {\\
+    #        $assertion \\
+    #        ((Parrot_${pmcname}_attributes *)PMC_data(pmc))->$attrname = (value); \\
+    #    } \\
+    #} while (0)
+#EOA
+
     $attribute->{inherit} = $inherit;
 
     $pmc->{emitter}->emit($decl);
