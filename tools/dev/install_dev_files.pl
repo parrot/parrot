@@ -95,7 +95,7 @@ foreach (@ARGV) {
 my $parrotdir = $options{versiondir};
 
 # Set up transforms on filenames
-my(@transformorder) = (qw(lib share include src doc), '^(tools|VERSION)', '^compilers');
+my(@transformorder) = (qw(lib share include bin src doc), '^(tools|VERSION)', '^compilers');
 my(%metatransforms) = (
     lib => {
         ismeta => 1,
@@ -126,6 +126,18 @@ my(%metatransforms) = (
             $filehash->{DestDirs} = [$parrotdir];
             return($filehash);
         },
+    },
+    bin => {
+        ismeta => 1,
+        optiondir => 'bin',
+        transform => sub {
+            my($filehash) = @_;
+            if ($filehash->{Dest} ne 'parrotbug') {
+                $filehash->{Installable} = $filehash->{Dest} =~ s/^installable_//;
+            }
+            return($filehash);
+        },
+        isbin => 1,
     },
     src => {
         ismeta => 1,
