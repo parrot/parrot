@@ -1,4 +1,4 @@
-#!./parrot nqp.pbc
+#!./parrot-nqp
 
 plan(3);
 

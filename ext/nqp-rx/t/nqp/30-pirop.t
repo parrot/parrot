@@ -1,4 +1,4 @@
-#! nqp
+#!./parrot-nqp
 
 # Test PIR::op pseudo-functions.
 

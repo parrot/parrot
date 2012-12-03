@@ -1,4 +1,4 @@
-#! nqp
+#!./parrot-nqp
 
 # Test grammars and regexes
 

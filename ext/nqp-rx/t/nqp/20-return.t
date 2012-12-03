@@ -1,4 +1,4 @@
-#! nqp
+#!./parrot-nqp
 
 # implicit and explicit returns from subs
 
