@@ -443,7 +443,9 @@ Aug. 2007 - "multi-threading a work in progress"
 
 - L<http://perlmonks.org/?node_id=636466>
 
-Apr. 2012 - (green threads basics implemented by Nat Tuck
+Aug. 2010 - "GSoC Threads: Chandon's Results" (green threads implemented by Nat Tuck)
+
+- L<http://wknight8111.blogspot.co.at/2010/08/gsoc-threads-chandons-results.html>
 
 Apr. 2012 - (hybrid threads implemented by Stefan Seifert)
 
