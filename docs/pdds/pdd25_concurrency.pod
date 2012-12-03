@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 PDD 25: Concurrency
 
@@ -420,22 +420,35 @@ Kill a task without waiting for it to complete.
 =head2 References
 
 Dec 2003 - (Dan ponders threads based on POSIX and Perl 5 experience)
-L<http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/e64b22ab7de0a7a6/889b5d8c4cd267b7?lnk=gst&q=threads&rnum=3#889b5d8c4cd267b7>
+
+- L<https://groups.google.com/forum/?fromgroups=#!topic/perl.perl6.internals/5ksiq33gp6Y>
 
 Dec. 2003 - "threads and shared interpreter data structures"
-L<http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/e64ea4ff287e04fd/b71333e282d3d187?lnk=gst&q=threads&rnum=9#b71333e282d3d187>
+
+- L<https://groups.google.com/forum/?fromgroups=#!topic/perl.perl6.internals/5k6k_yh-BP0>
 
 Jan. 2004 - "Threads Design. A Win32 perspective."
-L<http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/3209629b23306029/52ba9d37425ba015?lnk=gst&q=threads&rnum=8#52ba9d37425ba015>
+
+- L<https://groups.google.com/forum/?fromgroups=#!topic/perl.perl6.internals/MglimyMwYCk>
 
 Jan. 2004 - "Start of threads proposal"
-L<http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/4c7de440da84d5c6/04cfb70b0d81dfba?tvc=1&q=threads#04cfb70b0d81dfba>
+
+- L<https://groups.google.com/forum/?fromgroups#!topic/perl.perl6.internals/TH3kQNqE1cY>
 
 Sept. 2005 - "consider using OS threads"
-L<http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/40b50e3aa9255f8e/036a87b5d2b5ed2c?lnk=gst&q=threads&rnum=2#036a87b5d2b5ed2c>
+
+- L<https://groups.google.com/forum/?fromgroups=#!topic/perl.perl6.internals/QLUOOqklX44>
 
 Aug. 2007 - "multi-threading a work in progress"
-L<http://perlmonks.org/?node_id=636466>
+
+- L<http://perlmonks.org/?node_id=636466>
+
+Apr. 2012 - (green threads basics implemented by Nat Tuck
+
+Apr. 2012 - (hybrid threads implemented by Stefan Seifert)
+
+- L<http://lists.parrot.org/pipermail/parrot-dev/2012-April/006855.html>
+- L<http://niner.name/Hybrid_Threads_for_the_Parrot_VM.pdf>
 
 Concurrency as Futures -
 L<http://www.cincomsmalltalk.com/userblogs/mls/blogView?showComments=true&entry=3336838959>
@@ -448,6 +461,6 @@ Java memory and concurrency - L<http://www.cs.umd.edu/~pugh/java/memoryModel/>
 
 __END__
 Local Variables:
-  fill-column:78
+  fill-column:100
 End:
 vim: expandtab shiftwidth=4:
