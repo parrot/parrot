@@ -126,6 +126,10 @@ our %second_analysis_subs = (
                     delete $files_needing_analysis->{ $file };
                     next SECOND_FILE;
                 }
+                if ($full_file =~ m{(?:docs/pdds/|docs/dev/pmc).*\.pod$}) {
+                    delete $files_needing_analysis->{ $file };
+                    next SECOND_FILE;
+                }
                 if (no_pod_todo($full_file)) {
                     delete $files_needing_analysis->{ $file };
                     next SECOND_FILE;
@@ -338,7 +342,9 @@ sub no_pod_todo {
 
     my $text;
     $checker->output_string( \$text );
-    $checker->parse_file($file);
+    # Some pods are not parsable. They fail in Text::Wrap in overlong links
+    eval { $checker->parse_file($file); };
+    return 1 if $@;
 
     # if the text contains todo items return false
     if ( $text =~ m/TODO|FIXME|XXX/ ) {
