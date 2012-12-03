@@ -108,11 +108,8 @@ ok( !@strange_chars, 'Portable characters in filenames' )
         . @strange_chars . " files:\n@strange_chars" );
 
 if (@too_long == 1 and $too_long[0] eq "installable_parrot_nci_thunk_gen.exe:36 chars\n") {
-  TODO: {
     # Only on Windows and Windows allows filename lengths > 36
-    local $TODO = "installable_parrot_nci_thunk_gen.exe:36";
-    ok( @too_long == 1, "Filenames length, one >36" );
-  }
+    ok( @too_long == 1, "Filenames length - installable_parrot_nci_thunk_gen.exe:36 okay on Windows" );
 }
 else {
     ok( !@too_long, 'Filenames length' )
