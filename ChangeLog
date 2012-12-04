@@ -8,6 +8,8 @@
         + New parrot cmdline option --numthreads
         + Export new dynpmc_class_<ClassName> types [GH #870].
     - Documentation
+    - Languages
+        + nqp-rx tests updated from perl6/nqp-rx.git, and enabled to run on make test
     - Tests
         + failing Pod::Simple pod_todo.t tests are now skipped
         + added nqp-rx tests
