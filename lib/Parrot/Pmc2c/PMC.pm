@@ -589,7 +589,7 @@ EOH
 ${export}Parrot_PMC Parrot_lib_${lc_name}_load(PARROT_INTERP);
 
 #ifndef PARROT_DYNPMC_CLASS_LOAD
-PARROT_DYNEXT_EXPORT INTVAL dynpmc_class_${name};
+PARROT_DATA INTVAL dynpmc_class_${name};
 #endif
 EOH
     }
