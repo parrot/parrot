@@ -2,9 +2,9 @@
 
 # Copyright (C) 2012, Parrot Foundation.
 
-plan(4);
+plan(3);
 
-my $x := "ok 3 - sub sucessfully called from Task";
+my $x := "ok 2 - sub sucessfully called from Task";
 my $sub := sub foo() {
     say($x);
 }
@@ -15,10 +15,9 @@ my $task := pir::new__PSP('Task', $sub);
 say("ok 1 - created a Task PMC from nqp");
 
 pir::schedule__0P($task);
-say("ok 2 - scheduled a task");
 pir::wait__0P($task);
 
-say("ok 4 - wait on a task");
+say("ok 3 - wait on a task");
 
 # Local Variables:
 #   mode: nqp
