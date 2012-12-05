@@ -39,20 +39,20 @@ method new(:$ops_file!, :$trans!, :$script!, :$file, :%flags!) {
         self<func_header> := (~%flags<dir>) ~ "include/" ~ self<include>;
         self<enum_header> := (~%flags<dir>) ~ "include/parrot/oplib/ops.h";
         self<source>  := (~%flags<dir>) ~ "src/ops/$base_ops_stub.c";
+        self<init_func>  := join('_', 'PARROT', 'CORE', 'OPLIB', 'INIT' );
     }
     else {
         my $dynops_dir := subst( $file, /\w+\.ops$$/, '');
         self<include> := $base ~ "_ops.h";
         self<func_header>  := $dynops_dir ~ self<include>;
         self<source>  := $dynops_dir ~ $base ~ "_ops.c";
+        self<init_func>  := join('_', 'PARROT', 'DYNOP', uc($base ~ $suffix), 'INIT' );
     }
 
     self<sym_export> := %flags<core>
                         ?? ''
                         !! 'PARROT_DYNEXT_EXPORT';
 
-    self<init_func>  := join('_',
-        'PARROT', 'DYNOP', uc($base ~ $suffix), 'INIT' );
 
     # Prepare ops
     $trans.prepare_ops(self, $ops_file);
@@ -354,10 +354,7 @@ method _emit_includes($fh) {
     $fh.print(qq|
 #include "parrot/parrot.h"
 #include "parrot/oplib.h"
-#include "parrot/pbcversion.h"
 #include "parrot/runcore_api.h"
-
-#define | ~ self.init_func ~ ' Parrot_DynOp_' ~ self.bs ~ q| ## PARROT_PBC_MAJOR ## _ ## PARROT_PBC_MINOR
 
 | ~ (self.flags<core> ?? 'PARROT_EXPORT' !! '') ~ qq|
 op_lib_t *{self.init_func}(PARROT_INTERP, long init);
