@@ -74,7 +74,7 @@ Parrot_get_num_cpus(Parrot_Interp interp) {
     char line[128];
 
     if (!fopen("/proc/cpuinfo", "rb"))
-        exit(EXIT_FAILURE);
+        return nprocs;
 
     while (!feof(f)) {
         fgets(line, 128, f);
