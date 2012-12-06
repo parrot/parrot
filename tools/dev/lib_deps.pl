@@ -101,7 +101,7 @@ sub do_source {
     print "Running cxref (pass 1)\n";
     system("$cmd > $devnull 2>$devnull");
     print "Running cxref (pass 2)\n";
-    open( my $F, '<', "$cmd 2>$devnull|" )
+    open( my $F, '-|', "$cmd 2>$devnull|" )
         || die "Can't run $cmd.\n";
 
     my %external_calls;
@@ -215,12 +215,12 @@ sub do_source {
 
 sub do_object {
     foreach my $obj (@files) {
-        open( my $F, '<', "nm -a $obj|" ) || die "Can't run nm on $obj\n";
+        open( my $F, '-|', "nm -a $obj" ) || die "Can't run nm -a $obj\n";
 
         while (<$F>) {
             chomp;
 
-            my ( $type, $symbol ) = /^........ (\S) (.*)/;
+            my ( $type, $symbol ) = /^.+ (\S) (.*)/;
 
             if ( $type eq 'U' ) {
                 $defined_in{$symbol} ||= undef;
