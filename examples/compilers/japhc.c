@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2008, Parrot Foundation.
+ * Copyright (C) 2004-2008,2012 Parrot Foundation.
  */
 
 /*
@@ -27,7 +27,7 @@ example compiler used by japh16.pasm
  */
 
 #include "parrot/parrot.h"
-#include "../../src/pmc/pmc_sub.h"
+#include "pmc/pmc_sub.h"
 
 #define C_DEBUG 0
 
