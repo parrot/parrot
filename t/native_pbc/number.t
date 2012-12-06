@@ -12,16 +12,19 @@ use t::native_pbc::Test;
 #use Parrot::Test skip_all => 'pending robust testing strategy, GH #394';
 use Parrot::Test tests => 7;
 
-# testmatrix for coverage overview (GH #394)
+# Testmatrix for coverage overview (GH #394)
 # float conversion src: left-side (pbc) to dest: upper-side (platform)
 # 1: tested ok, 0: fails (skip), ?: not yet tested (todo)
+# S4: skip on 4 byte platform, S8: skip on 8 byte (64bit)
+# T4: skip 4 byte test, T8: skip 8 byte test (64bit) (number_8_xx_xe.pbc)
 # Note that the corresponding cvt_num* functions in F<pf_items.c> have odd names.
 # The _le there is for reading.
+# 8_16_le=>4_8_le fails, but 8_16_le=>8_8_le passes
 my $testmatrix = <<EOF;
         8_le 12_le 16_le 8_be 16_be  4_le 4_be
 8_le     1     1    1     0     0     ?    ?
 12_le    1     1    1     0     0     ?    ?
-16_le    1     1    1     0     0     ?    ?
+16_le    S4    1    1     0     0     ?    ?
 8_be     1     1    1     1     1     ?    ?
 16_be    ?     ?    ?     ?     1     ?    ?
 4_le     ?     ?    ?     ?     ?     ?    ?
@@ -40,14 +43,23 @@ sub generate_skip_list {
     shift @dest unless $dest[0];
     my $i = 0;
     my %cols  = map { $_ => $i++ } @dest;
-    my ($sarch) = $arch =~ m/^\d_(\d.+)$/;
-    my $col   = $cols{$sarch};      # the column for our arch
+    my ($byte, $sarch) = $arch =~ m/^(\d)_(\d.+)$/;
+    my $col = $cols{$sarch};  # the column for our arch
     for my $s (@lines) {
         my @s  = split /\s+/, $s;
         my $pbc = shift @s;
         if ($s[$col] eq $check) {
             $skip{"4_".$pbc}++;
             $skip{"8_".$pbc}++;
+        }
+        if (my ($b) = $s[$col] =~ /S(.)/) {
+	    if ($byte == $b) {
+		$skip{"4_".$pbc}++;
+		$skip{"8_".$pbc}++;
+	    }
+        }
+        if (my ($b) = $s[$col] =~ /T(.)/) {
+            $skip{$b."_".$pbc}++;
         }
     }
     \%skip
