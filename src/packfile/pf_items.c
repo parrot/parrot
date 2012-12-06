@@ -383,9 +383,9 @@ cvt_num12_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
     ASSERT_ARGS(cvt_num12_num8)
     int expo, i, s;
-#ifdef __LCC__
+#  ifdef __LCC__
     int expo2;
-#endif
+#  endif
 
     /*
        12-byte double (96 bits):
@@ -423,14 +423,14 @@ nul:
             dest[7] |= 0x80;
         return;
     }
-#ifdef __LCC__
+#  ifdef __LCC__
     /* Yet again, LCC blows up mysteriously until a temporary variable is
      * added. */
     expo2 = expo - 16383;
     expo  = expo2;
-#else
+#  else
     expo -= 16383;       /* - bias */
-#endif
+#  endif
     expo += 1023;       /* + bias 8byte */
     if (expo <= 0)       /* underflow */
         goto nul;
@@ -603,9 +603,9 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     else {
         /* FIXME: This codepath fails */
         int expo, i, s;
-#ifdef __LCC__
+#  ifdef __LCC__
         int expo2;
-#endif
+#  endif
         Parrot_x_force_error_exit(NULL, 1, "cvt_num16_num8: long double conversion unsupported");
 
     /* Have only 12-byte long double, or no long double at all. Need to disect it */
@@ -648,14 +648,14 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
                 dest[7] |= 0x80;
             return;
         }
-#ifdef __LCC__
+#  ifdef __LCC__
         /* LCC blows up mysteriously until a temporary variable is
          * added. */
         expo2 = expo - 16383;
         expo  = expo2;
-#else
+#  else
         expo -= 16383;       /* - same bias as with 12-byte */
-#endif
+#  endif
         expo += 1023;       /* + bias 8byte */
         if (expo <= 0)       /* underflow */
             goto nul;

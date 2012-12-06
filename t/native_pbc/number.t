@@ -53,10 +53,10 @@ sub generate_skip_list {
             $skip{"8_".$pbc}++;
         }
         if (my ($b) = $s[$col] =~ /S(.)/) {
-	    if ($byte == $b) {
-		$skip{"4_".$pbc}++;
-		$skip{"8_".$pbc}++;
-	    }
+            if ($byte == $b) {
+                $skip{"4_".$pbc}++;
+                $skip{"8_".$pbc}++;
+            }
         }
         if (my ($b) = $s[$col] =~ /T(.)/) {
             $skip{$b."_".$pbc}++;
