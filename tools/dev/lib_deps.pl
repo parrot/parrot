@@ -59,6 +59,7 @@ if ( $mode !~ /^(source|object)$/ || !@files ) {
 while (<DATA>) {
     next if /^\s*#/;
     chomp;
+    next unless $_;
     my ( $symbol, $file ) = /(\S+)\s+(\S+)/;
     $ansi_c89_symbol{$symbol} = $file unless ( $symbol eq "UNDEF" );
     push @{ $ansi_c89_header{$file} }, $symbol;
