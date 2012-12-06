@@ -2,79 +2,75 @@
 
 # sh tools/dev/mk_native_pbc [--noconf]
 #
-# generate t/native_pbc/*_*.pbc
+# Generate/update t/native_pbc/*_*.pbc
 # This should only be run on known systems to regenerate the native pbcs.
-# Better do not try that on mingw, use cygwin instead.
+# You need at least a multilib 64bit intel and powerpc machine to generate all.
+# QEMU images of big-endian 64bit machines are still being worked on, openbios
+# problems on SPARC64.
 #
-# NOTE:  For _2/_5/_8 this will need a compiler with long double support
-# NOTE2: Installing ccache speeds this process up considerably
+# NOTE: Installing ccache speeds this process up considerably.
 
-#  _1   i386 32 bit opcode_t, 32 bit intval   (linux-gcc-ix86, freebsd-gcc, cygwin)
-#  _2   i386 32 bit opcode_t, 32 bit intval, 12 bit long double (linux-gcc-ix86)
-#  _3   PPC BE 32 bit opcode_t, 32 bit intval (darwin-ppc)
-#  _4   x86_64 double float 64 bit opcode_t   (linux-gcc-x86_64, solaris-cc-64int)
-#  _5   x86_64 16 byte long double 64 bit opcode_t (linux-gcc-x86_64, solaris-cc-64int)
-#  _6   big-endian 64-bit                     (sparc, irix or similar)
-#  _7   i386 32 bit opcode_t, 32 bit intval, 4-byte float --floatval=float
-#  _8   big-endian 64-bit 16-byte long-double (sparc64, irix, mips or similar)
+# Supported versions:
+#  i386 32 bit opcode_t, 32 bit intval, 8 byte double (linux-gcc-ix86, freebsd-gcc, cygwin)
+#  i386 32 bit opcode_t, 32 bit intval, 12 byte long double (linux-gcc-ix86)
+#  big-endian 32 bit opcode_t, 32 bit intval (darwin-ppc or mips)
+#  x86_64 8 byte double 64 bit opcode_t   (linux-gcc-x86_64, solaris-cc-64int)
+#  x86_64 16 byte long double 64 bit opcode_t (linux-gcc-x86_64, solaris-cc-64int)
+#  big-endian 64-bit 8 byte double       (sparc64, irix or similar)
+#  big-endian 64-bit 16-byte long double (sparc64, irix, mips or similar)
+# Not yet: (branch float)
+#  i386 32 bit opcode_t, 32 bit intval, 4-byte float --floatval=float
+#  big-endian 32 bit opcode_t, 4 byte intval, 4 byte single float
+#    (darwin or debian/ppc with --floatval="float")
 
 #tests:
-#parrot -o i.pbc -a - <<EOF
-#  print 0x10203040
-#  end
-#  EOF
-# t/op/number_1.pasm
-# t/op/string_133.pasm
+# t/native_pbc/testdata/integer.pasm
+# t/native_pbc/testdata/number.pasm
+# t/native_pbc/testdata/string.pasm
 
 # check 32/64 bit, endianess, hugefloat
-N=
+i_id=
+n_id=
 enable_long_double=
 conf=
 exe=
 
 byteorder=$(./parrot_config byteorder)
 ptrsize=$(./parrot_config ptrsize)
-# 8 or 12 or 16 on intel
+intvalsize=$(./parrot_config intvalsize)
+# 4, 8, 12 or 16 on intel
 numvalsize=$(./parrot_config numvalsize)
 
+if [ "$(./parrot_config osname)" = "cygwin" ]; then
+    exe=.exe
+fi
 if [ "$ptrsize" = "4" ]
 then
+    if [ "$intvalsize" != "4" ]
+    then
+        echo "Sorry, unsupported perl - probably using use64bitint. ptrsize/intvalsize mismatch."
+	exit
+    fi
     if [ "$byteorder" = "1234" ]
     then
-        if [ "$numvalsize" = "12" ]
-        then
-            N=2
-            echo "2: i386 32-bit opcode_t, 32-bit intval, 12-byte long double"
-        else
-            if [ "$numvalsize" = "4" ]
-            then
-                N=8
-                echo "8: i386 32-bit opcode_t, 32-bit intval, 4-byte float"
-            else
-                N=1
-                echo "1: i386 32-bit opcode_t, 32-bit intval, 8-byte double"
-                # try --floatval="long double" and see if that makes 12
-                enable_long_double=1
-                # force double on 2nd run not to default to long double
-                conf=" --floatval=double"
-            fi
+        n_id=4_${numvalsize}_le
+	i_id=4_le
+        if [ "$numvalsize" = "8" ]
+	then
+            # try --floatval="long double" and see if that makes 12
+            enable_long_double=1
+            # force double on 2nd run not to default to long double
+            conf=" --floatval=double"
         fi
     else
+	i_id=4_be
+        n_id=4_${numvalsize}_be
         if [ "$byteorder" = "4321" ]
         then
-            N=3
-            echo "3: PPC BE 32 bit opcode_t, 32 bit intval"
+            echo "${n_id} PPC BE 32 bit opcode_t, 32 bit intval"
         else
-            if [ "$byteorder" = "12345678" \
-                 -a "$(./parrot_config osname)" = "cygwin" ]
-            then
-                echo "1: cygwin use64bitint"
-                N=1
-                exe=.exe
-            else
-                echo "Sorry, unsupported perl - parrot ptrsize mismatch."
-                exit
-            fi
+            echo "${n_id} Sorry, unsupported perl - parrot ptrsize mismatch."
+            exit
         fi
     fi
 else
@@ -82,30 +78,29 @@ else
     then
         if [ "$byteorder" = "12345678" ]
         then
+            n_id=8_${numvalsize}_le
+	    i_id=8_le
             if [ "$numvalsize" = "8" ]
             then
-                N=4
-                echo "4: x86_64 double float 64 bit opcode_t, 8-byte double"
+                echo "${n_id} x86_64 double float 64 bit opcode_t, 8-byte double"
                 # try --floatval="long double" and see if that makes 16
                 enable_long_double=1
                 # force double on 2nd run not to default to long double
                 conf=" --floatval=double"
             else
-                N=5
-                echo "5: x86_64 64 bit opcode_t, 16-byte long double"
+                echo "${n_id} x86_64 64 bit opcode_t, 16-byte long double"
             fi
         else
+            n_id=8_${numvalsize}_be
             if [ "$numvalsize" = "8" ]
             then
-                N=6
-                echo "6: big-endian 64-bit"
+                echo "${n_id} big-endian 64-bit"
                 # try --floatval="long double" and see if that makes 16
                 enable_long_double=1
                 # force double on 2nd run not to default to long double
                 conf=" --floatval=double"
             else
-                N=7
-                echo "7: ppc/BE 64 bit opcode_t, 16-byte long double"
+                echo "${n_id} ppc/BE 64 bit opcode_t, 16-byte long double"
             fi
         fi
     else
@@ -117,24 +112,28 @@ fi
 echo ""
 if [ "$1" != "--noconf" ]; then
     make -s prog-clean
-    perl Configure.pl --debugging $conf --nomanicheck
+    perl Configure.pl --debugging $conf --nomanicheck --without-icu --without-pcre --without-gmp --without-libffi
 fi
 tail myconfig
 make -s || exit 1
 
-./parrot -o t/native_pbc/integer_${N}.pbc t/native_pbc/testdata/integer.pasm && \
-    echo "t/native_pbc/integer_${N}.pbc updated"
-./parrot -o t/native_pbc/number_${N}.pbc t/native_pbc/testdata/number.pasm && \
-    echo "t/native_pbc/number_${N}.pbc updated"
-./parrot -o t/native_pbc/string_${N}.pbc t/native_pbc/testdata/string.pasm  && \
-    echo "t/native_pbc/string_${N}.pbc updated"
+for T in integer string
+do
+    ./parrot -o t/native_pbc/${T}_${i_id}.pbc t/native_pbc/testdata/${T}.pasm && \
+	echo "t/native_pbc/${T}_${i_id}.pbc updated"
+done
+for T in number
+do
+    ./parrot -o t/native_pbc/${T}_${n_id}.pbc t/native_pbc/testdata/${T}.pasm && \
+	echo "t/native_pbc/${T}_${n_id}.pbc updated"
+done
 
-make pbc_dump$exe
-./pbc_dump -h t/native_pbc/number_${N}.pbc
+# broken
+#make pbc_dump$exe
+#./pbc_dump -h t/native_pbc/number_${id}.pbc
+perl tools/dev/pbc_header.pl t/native_pbc/number_${n_id}.pbc
 
-perl t/harness t/native_pbc/integer.t && \
-    perl t/harness t/native_pbc/number.t && \
-    perl t/harness t/native_pbc/string.t
+perl t/harness t/native_pbc/integer.t t/native_pbc/number.t t/native_pbc/string.t
 
 if [ "$enable_long_double" = "1" ]; then
     if [ "$1" = "--noconf" ]; then
@@ -150,16 +149,17 @@ if [ "$enable_long_double" = "1" ]; then
     numvalsize=$(./parrot_config numvalsize)
     #if [ "hugefloatvalsize" = "12" ]; then echo "Only 12 byte long double. Sorry"; exit; fi
     #if [ "numvalsize" = "12" ]; then echo "Only 12 byte double. Sorry"; exit; fi
-    # 1+2, 4+5, 6+7
-    M=$((N+1))
-    ./parrot -o t/native_pbc/number_${M}.pbc t/native_pbc/testdata/number.pasm && \
-	echo "t/native_pbc/number_${M}.pbc updated"
+    if [ "${byteorder:0:2}" = "12" ]; then
+        M=${intvalsize}_${numvalsize}_le
+    else
+        M=${intvalsize}_${numvalsize}_be
+    fi
+    ./parrot -o t/native_pbc/number_${M}.pbc t/native_pbc/testdata/number.pasm \
+	&& echo "t/native_pbc/number_${M}.pbc updated"
     make pbc_dump$exe
     ./pbc_dump -h t/native_pbc/number_${M}.pbc
 
-    perl t/harness t/native_pbc/integer.t && \
-      perl t/harness t/native_pbc/number.t && \
-      perl t/harness t/native_pbc/string.t
+    perl t/harness t/native_pbc/integer.t t/native_pbc/number.t t/native_pbc/string.t
 fi
 
 echo "You should run these commands to update the PBC files in your repo:"

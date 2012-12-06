@@ -6,8 +6,8 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 
-use Parrot::Test skip_all => 'pending robust testing strategy, GH #394';
-#use Parrot::Test tests => 9;
+#use Parrot::Test skip_all => 'pending robust testing strategy, GH #394';
+use Parrot::Test tests => 9;
 
 use File::Temp;
 use Parrot::Config;

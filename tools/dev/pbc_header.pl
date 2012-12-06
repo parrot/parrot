@@ -110,9 +110,9 @@ sub pbc_info {
         my $b;
         open my $F, "+<", "$f" or die "Can't open $f: $!";
         binmode $F;
-        print "$f:\n";
-        show_pbc_file_info($F);
-        close $F;
+	print "$f:\n";
+	show_pbc_file_info($F);
+	close $F;
     }
 }
 

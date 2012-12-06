@@ -24,9 +24,8 @@ typedef struct op_lib_t {
     const char *suffix;
     int         core_type;
     int         flags;
-    int         major_version;
-    int         minor_version;
-    int         patch_version;
+    int         bc_major_version;
+    int         bc_minor_version;
     opcode_t    op_count;
     op_info_t  *op_info_table;
     op_func_t  *op_func_table;

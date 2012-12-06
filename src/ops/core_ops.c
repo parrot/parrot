@@ -11,6 +11,7 @@
  */
 
 #include "parrot/oplib/core_ops.h"
+#include "parrot/pbcversion.h"
 #include "pmc/pmc_parrotlibrary.h"
 #include "pmc/pmc_callcontext.h"
 
@@ -24568,9 +24569,8 @@ op_lib_t core_op_lib = {
   "",                  /* suffix */
   PARROT_FUNCTION_CORE,                       /* core_type = PARROT_XX_CORE */
   0,                                /* flags */
-  4,    /* major_version */
-  10,    /* minor_version */
-  0,    /* patch_version */
+  PARROT_PBC_MAJOR,
+  PARROT_PBC_MINOR,
   1129,             /* op_count */
   core_op_info_table,       /* op_info_table */
   core_op_func_table,       /* op_func_table */
@@ -24696,9 +24696,11 @@ static void hop_deinit(PARROT_INTERP)
 
     hop         = NULL;
     hop_buckets = NULL;
-}PARROT_EXPORT
+}
+
+PARROT_EXPORT
 op_lib_t *
-Parrot_DynOp_core_4_10_0(PARROT_INTERP, long init) {
+PARROT_CORE_OPLIB_INIT(PARROT_INTERP, long init) {
     /* initialize and return op_lib ptr */
     if (init == 1) {
 
@@ -24727,7 +24729,7 @@ Parrot_lib_core_ops_load(PARROT_INTERP)
 
 {
     PMC *const lib = Parrot_pmc_new(interp, enum_class_ParrotLibrary);
-    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) Parrot_DynOp_core_4_10_0;
+    ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) PARROT_CORE_OPLIB_INIT;
     dynop_register(interp, lib);
     return lib;
 }

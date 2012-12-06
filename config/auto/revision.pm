@@ -18,6 +18,7 @@ use warnings;
 use base qw(Parrot::Configure::Step);
 
 use Parrot::Revision;
+use Parrot::BuildUtil;
 
 sub _init {
     my $self = shift;
@@ -37,6 +38,10 @@ sub runstep {
     }
 
     $conf->data->set( revision => $revision );
+
+    my ( $bc_major, $bc_minor ) = Parrot::BuildUtil::get_bc_version();
+    $conf->data->set( 'PBC_MAJOR' => $bc_major,
+                      'PBC_MINOR' => $bc_minor );
 
     if ( defined $revision ) {
         $self->set_result($revision);
