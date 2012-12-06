@@ -1213,8 +1213,10 @@ gc_gms_mark_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
     /* mark it live. */
     PObj_live_SET(pmc);
 
-    Parrot_pa_remove(interp, self->objects[gen], item->ptr);
-    item->ptr = Parrot_pa_insert(self->work_list, item);
+    if (self->work_list) {
+        Parrot_pa_remove(interp, self->objects[gen], item->ptr);
+        item->ptr = Parrot_pa_insert(self->work_list, item);
+    }
 }
 
 /*
