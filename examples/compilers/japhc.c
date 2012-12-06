@@ -27,6 +27,8 @@ example compiler used by japh16.pasm
  */
 
 #include "parrot/parrot.h"
+#define CONST_STRING(i, s) Parrot_str_new_constant((i), s)
+#define CONST_STRING_GEN(i, s) Parrot_str_new_constant((i), s)
 #include "pmc/pmc_sub.h"
 
 #define C_DEBUG 0
@@ -38,6 +40,7 @@ example compiler used by japh16.pasm
 #  define cdebug(x)
 #endif
 
+INTVAL dynpmc_class_JaPHC;
 PMC* japh_compiler(PARROT_INTERP, const char *s);
 
 /*
@@ -54,11 +57,13 @@ we use init to register the compiler
 void
 Parrot_lib_japhc_init(PARROT_INTERP, PMC* lib)
 {
-    STRING *cmp;
+    STRING *whoami;
 
     cdebug((stderr, "japhc_init\n"));
-    cmp = Parrot_str_new_constant(interp, "JaPH_Compiler");
-    Parrot_compreg(interp, cmp, japh_compiler);
+    whoami = CONST_STRING_GEN(interp, "JaPHC");
+    dynpmc_class_JaPHC = Parrot_pmc_register_new_type(interp, whoami);
+    /* Parrot_JaPHC_class_init(interp, dynpmc_class_JaPHC, 0); */
+    /* Parrot_compreg(interp, whoami, japh_compiler); */
 }
 
 

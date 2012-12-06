@@ -97,7 +97,7 @@ sub do_source {
     # note: need to run this a second time so the database is built.
     # should just use the build process to do it the first time.
     my $devnull = File::Spec->devnull;
-    my $cmd     = "cxref -raw -Iinclude -xref @files";
+    my $cmd     = "cxref -raw -Iinclude -Iinclude/pmc -xref @files";
     print "Running cxref (pass 1)\n";
     system("$cmd > $devnull 2>$devnull");
     print "Running cxref (pass 2)\n";
