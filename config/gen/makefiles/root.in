@@ -2450,7 +2450,7 @@ warnings_tests: test_prep
 
 #IF(win32):number_tests : tools/dev/testnumbers.bat
 #ELSE:number_tests : tools/dev/testnumbers
-	$(PERL) tools/dev/testnumbers.pl
+	$(PERL) tools/dev/mk_testnumbers.pl
 	$(SHELL) tools/dev/testnumbers
 
 buildtools_tests : corevm
