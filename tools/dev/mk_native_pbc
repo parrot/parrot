@@ -18,7 +18,7 @@
 
 i_id=
 n_id=
-conf="$@"
+conf="${@:- --without-icu --without-gmp --without-libffi --without-pcre --without-opengl}"
 exe=
 targets="parrot parrot_config pbc_dump"
 
@@ -39,6 +39,7 @@ initconfig () {
     fi
     i_id=${intvalsize}_${suffix}
     n_id=${intvalsize}_${floattype}_${suffix}
+    if [ "$(./parrot_config osname)" = "cygwin" ]; then exe=.exe; fi
 }
 
 createpbc () {
@@ -47,21 +48,35 @@ createpbc () {
 	./parrot -o t/native_pbc/${T}_${i_id}.pbc t/native_pbc/testdata/${T}.pasm && \
 	    echo "t/native_pbc/${T}_${i_id}.pbc updated"
     done
-    for T in number
-    do
-	./parrot -o t/native_pbc/${T}_${n_id}.pbc t/native_pbc/testdata/${T}.pasm && \
-	    echo "t/native_pbc/${T}_${n_id}.pbc updated"
-    done
+    T=number
+    ./parrot -o t/native_pbc/${T}_${n_id}.pbc t/native_pbc/testdata/${T}.pasm && \
+	echo "t/native_pbc/${T}_${n_id}.pbc updated"
+}
+
+# reconfigure with various floatvals
+reconfig () {
+    floatval="$1"
+    shift
+    make -s prog-clean
+    echo perl Configure.pl --floatval="$floatval" --nomanicheck $@
+    perl Configure.pl --floatval="$floatval" $conf --nomanicheck $@
+    tail -n4 myconfig
+    echo make -s $targets
+    make -s $targets || return
+    initconfig
+    ./parrot -o t/native_pbc/number_${n_id}.pbc t/native_pbc/testdata/number.pasm \
+	&& echo "t/native_pbc/number_${n_id}.pbc updated"
+    perl tools/dev/pbc_header.pl t/native_pbc/number_${n_id}.pbc
+    perl t/harness t/native_pbc/number.t
 }
 
 echo ""
+test -e parrot_config || reconfig "double"
+initconfig
 tail -n4 myconfig
 echo make -s $targets
 make -s $targets || exit 1
 
-initconfig
-
-if [ "$(./parrot_config osname)" = "cygwin" ]; then exe=.exe; fi
 if [ "$ptrsize" = "4" -a "$intvalsize" != "4" ]; then
     echo "Sorry, unsupported perl - probably using use64bitint. ptrsize/intvalsize mismatch."
     exit
@@ -73,24 +88,6 @@ createpbc
 #./pbc_dump -h t/native_pbc/number_${id}.pbc
 perl tools/dev/pbc_header.pl t/native_pbc/number_${n_id}.pbc
 perl t/harness t/native_pbc/integer.t t/native_pbc/number.t t/native_pbc/string.t
-
-# reconfigure with various floatvals
-reconfig () {
-    floatval="$1"
-    shift
-    make -s prog-clean
-    confargs="--nomanicheck --without-icu --without-pcre --without-gmp --without-libffi --without-opengl"
-    echo perl Configure.pl --floatval="$floatval" $confargs $@
-    perl Configure.pl --floatval="$floatval" $conf $confargs $@
-    tail -n4 myconfig
-    echo make -s $targets
-    make -s $targets || return
-    initconfig
-    ./parrot -o t/native_pbc/number_${n_id}.pbc t/native_pbc/testdata/number.pasm \
-	&& echo "t/native_pbc/number_${n_id}.pbc updated"
-    perl tools/dev/pbc_header.pl t/native_pbc/number_${n_id}.pbc
-    perl t/harness t/native_pbc/number.t
-}
 
 if [ "x$1" != "x--noconf" ]
 then
