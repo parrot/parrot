@@ -817,6 +817,7 @@ help :
 	@echo "  testexec:          Testing the exec runcore."
 	@echo "  benchmark_tests:   Run all benchmarks."
 	@echo "  warnings_tests:    Run standard test suite with warnings enabled."
+	@echo "  number_tests:      Run a few tests against all your floatval configurations."
 	@echo "  manitest:          Check for new and missing files."
 	@echo "  buildtools_tests:  Test build tool pmc2c.pl."
 	@echo "  manifest_tests:    Test code underlying mk_manifest_and_skip.pl."
@@ -2443,6 +2444,14 @@ codingstd_tests :
 # Run standard test suite with warnings enabled.
 warnings_tests: test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -w $(RUNCORE_TEST_FILES)
+
+#IF(win32):tools/dev/testnumbers.bat : tools/dev/mk_testnumbers.pl
+#ELSE:tools/dev/testnumbers : tools/dev/mk_testnumbers.pl
+
+#IF(win32):number_tests : tools/dev/testnumbers.bat
+#ELSE:number_tests : tools/dev/testnumbers
+	$(PERL) tools/dev/testnumbers.pl
+	$(SHELL) tools/dev/testnumbers
 
 buildtools_tests : corevm
 	$(PERL) t/harness $(BUILDTOOLS_TEST_FILES)
