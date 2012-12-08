@@ -18,9 +18,15 @@
 
 i_id=
 n_id=
+if [ x$1 = x--noconf ]; then
+  noconf=1
+  shift
+fi
 conf="${@:- --without-icu --without-gmp --without-libffi --without-pcre --without-opengl}"
 exe=
 targets="parrot parrot_config pbc_dump"
+DYLD_LIBRARY_PATH=`pwd`/blib/lib
+LD_LIBRARY_PATH=`pwd`/blib/lib
 
 initconfig () {
     test -e parrot_config || exit
@@ -58,7 +64,7 @@ reconfig () {
     floatval="$1"
     shift
     make -s prog-clean
-    echo perl Configure.pl --floatval="$floatval" --nomanicheck $@
+    echo perl Configure.pl --floatval="$floatval" $conf --nomanicheck $@
     perl Configure.pl --floatval="$floatval" $conf --nomanicheck $@
     tail -n4 myconfig
     echo make -s $targets
@@ -71,6 +77,7 @@ reconfig () {
 }
 
 echo ""
+test -e parrot_config || make -s parrot_config
 test -e parrot_config || reconfig "double"
 initconfig
 tail -n4 myconfig
@@ -89,8 +96,7 @@ createpbc
 perl tools/dev/pbc_header.pl t/native_pbc/number_${n_id}.pbc
 perl t/harness t/native_pbc/integer.t t/native_pbc/number.t t/native_pbc/string.t
 
-if [ "x$1" != "x--noconf" ]
-then
+if [ x$noconf != x1 ]; then
     case "$numvalsize" in
 	"4")
 	    reconfig "double" $conf
