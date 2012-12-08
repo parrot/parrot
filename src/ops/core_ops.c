@@ -16910,7 +16910,7 @@ Parrot_print_i(opcode_t *cur_opcode, PARROT_INTERP) {
 
 #endif
 ;
-    Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
+    (void)Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
     return cur_opcode + 2;
 }
 
@@ -16926,7 +16926,7 @@ Parrot_print_ic(opcode_t *cur_opcode, PARROT_INTERP) {
 
 #endif
 ;
-    Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
+    (void)Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
     return cur_opcode + 2;
 }
 
@@ -16943,14 +16943,14 @@ Parrot_print_n(opcode_t *cur_opcode, PARROT_INTERP) {
 #endif
 ;
     #if defined(PARROT_HAS_NEGATIVE_ZERO)
-        Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
+        (void)Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
 
 #else
         if ((!Parrot_is_nzero(NREG(1)))) {
-            Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
+            (void)Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
         }
         else {
-            Parrot_io_write_b(interp, _PIO_STDOUT(interp), "-0", 2);
+            (void)Parrot_io_write_b(interp, _PIO_STDOUT(interp), "-0", 2);
         }
 
 #endif
@@ -16971,14 +16971,14 @@ Parrot_print_nc(opcode_t *cur_opcode, PARROT_INTERP) {
 #endif
 ;
     #if defined(PARROT_HAS_NEGATIVE_ZERO)
-        Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
+        (void)Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
 
 #else
         if ((!Parrot_is_nzero(NREG(1)))) {
-            Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
+            (void)Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
         }
         else {
-            Parrot_io_write_b(interp, _PIO_STDOUT(interp), "-0", 2);
+            (void)Parrot_io_write_b(interp, _PIO_STDOUT(interp), "-0", 2);
         }
 
 #endif
@@ -17032,7 +17032,7 @@ Parrot_say_i(opcode_t *cur_opcode, PARROT_INTERP) {
 
 #endif
 ;
-    Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
+    (void)Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
     return cur_opcode + 2;
 }
 
@@ -17048,7 +17048,7 @@ Parrot_say_ic(opcode_t *cur_opcode, PARROT_INTERP) {
 
 #endif
 ;
-    Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
+    (void)Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
     return cur_opcode + 2;
 }
 
@@ -17066,14 +17066,14 @@ Parrot_say_n(opcode_t *cur_opcode, PARROT_INTERP) {
 #endif
 ;
     #if defined(PARROT_HAS_NEGATIVE_ZERO)
-        Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
+        (void)Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
 
 #else
         if ((!Parrot_is_nzero(NREG(1)))) {
-            Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
+            (void)Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
         }
         else {
-            Parrot_io_write_b(interp, _PIO_STDOUT(interp), "-0\n", 2);
+            (void)Parrot_io_write_b(interp, _PIO_STDOUT(interp), "-0\n", 2);
         }
 
 #endif
@@ -17095,14 +17095,14 @@ Parrot_say_nc(opcode_t *cur_opcode, PARROT_INTERP) {
 #endif
 ;
     #if defined(PARROT_HAS_NEGATIVE_ZERO)
-        Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
+        (void)Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
 
 #else
         if ((!Parrot_is_nzero(NREG(1)))) {
-            Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
+            (void)Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
         }
         else {
-            Parrot_io_write_b(interp, _PIO_STDOUT(interp), "-0\n", 2);
+            (void)Parrot_io_write_b(interp, _PIO_STDOUT(interp), "-0\n", 2);
         }
 
 #endif

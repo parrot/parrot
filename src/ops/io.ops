@@ -52,7 +52,7 @@ inline op print(in INT) :base_io {
 #else
     sprintf(buf, INTVAL_FMT, (INTVAL)$1);
 #endif
-    Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
+    (void)Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
 }
 
 inline op print(in NUM) :base_io {
@@ -63,13 +63,13 @@ inline op print(in NUM) :base_io {
     sprintf(buf, FLOATVAL_FMT, $1);
 #endif
 #ifdef PARROT_HAS_NEGATIVE_ZERO
-    Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
+    (void)Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
 #else
     if (!Parrot_is_nzero(NREG(1)))
-        Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
+        (void)Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
     else
         /* Workaround for older msvcrt and openbsd. GH #366 */
-        Parrot_io_write_b(interp, _PIO_STDOUT(interp), "-0", 2);
+        (void)Parrot_io_write_b(interp, _PIO_STDOUT(interp), "-0", 2);
 #endif
 }
 
@@ -105,7 +105,7 @@ inline op say(in INT) :base_io {
 #else
     sprintf(buf, INTVAL_FMT "\n", (INTVAL)$1);
 #endif
-    Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
+    (void)Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
 }
 
 inline op say(in NUM) :base_io {
@@ -117,13 +117,13 @@ inline op say(in NUM) :base_io {
     sprintf(buf, 128, FLOATVAL_FMT, $1);
 #endif
 #ifdef PARROT_HAS_NEGATIVE_ZERO
-    Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
+    (void)Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
 #else
     if (!Parrot_is_nzero(NREG(1)))
-        Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
+        (void)Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
     else
         /* Workaround for older msvcrt and openbsd. GH #366 */
-        Parrot_io_write_b(interp, _PIO_STDOUT(interp), "-0\n", 2);
+        (void)Parrot_io_write_b(interp, _PIO_STDOUT(interp), "-0\n", 2);
 #endif
 }
 
