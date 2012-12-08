@@ -40,7 +40,8 @@ Copyright (C) 2012, Parrot Foundation.
 #  ifdef __DARWIN_OSSwapInt64
 #    define bswap_64(x) __DARWIN_OSSwapInt64(x)
 #  endif
-#elif defined(PARROT_HAS_HEADER_SYS_BYTEORDER)
+#elif defined(PARROT_HAS_HEADER_SYS_BYTEORDER) /* BSWAP_32 on Solaris 10 */
+#  include <sys/byteorder.h>
 #  define bswap_16(x) BSWAP_16(x)
 #  define bswap_32(x) BSWAP_32(x)
 #  ifdef BSWAP_64
