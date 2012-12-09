@@ -3,14 +3,14 @@
         + parrot supports now fast and lightweight OS threads, based on Nat Tucks's
           initial GSoC work on green threads and then Stefan Seifert's extension
           to true parallel OS threads as hybrid threads.
-          See http://wknight8111.blogspot.co.at/2010/08/gsoc-threads-chandons-results.html and
-          http://niner.name/Hybrid_Threads_for_the_Parrot_VM.pdf
+          See http://wknight8111.blogspot.co.at/2010/08/gsoc-threads-chandons-results.html
+          and http://niner.name/Hybrid_Threads_for_the_Parrot_VM.pdf
         + New parrot cmdline option --numthreads
         + Export new dynpmc_class_<ClassName> types [GH #870].
         + Changed core_ops library format and ops2c to contain the PBC_COMPAT only,
           not the parrot version triple. Removed the duplicate PARROT_DYNOP_CORE_INIT
-          cpp definition in include/parrot/oplib/core_ops.h, use only PARROT_CORE_OPLIB_INIT
-          from config.h
+          cpp definition in include/parrot/oplib/core_ops.h, use only
+          PARROT_CORE_OPLIB_INIT from config.h
         + Store PBC_MAJOR and PBC_MINOR in the config hash, stored by auto::revision
     - Documentation
     - Languages
@@ -83,7 +83,7 @@
         + The Integer and Float PMCs now have a get_pointer vtable which is
           needed when using NCI to bind to Fortran libraries such as LAPACK
     - Deprecations
-	+ Moved dynpmc/os to pmc os. loadlib 'os' is not needed anymore.
+        + Moved dynpmc/os to pmc os. loadlib 'os' is not needed anymore.
     - Platforms
         + Fixed for the FileHandle open method the append mode on Windows.
         + Fix compilation on Windows without working mt.exe
