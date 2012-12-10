@@ -264,6 +264,13 @@ sub decl {
         if ($args =~ s/, (\w+ \*?$key)/, SHIM($1)/) {
             $body->{data} =~ s/^\s*UNUSED\($key\);?\n//;
             $self->{parameters} =~ s/(\w+ \*?$key)/SHIM($1)/;
+            while ($body->{data} =~ /^\s*UNUSED\((\w+)\)/m) {
+                $key = $1;
+                if ($args =~ s/, (\w+ \*?$key)/, SHIM($1)/) {
+                    $body->{data} =~ s/^\s*UNUSED\($key\);?\n//;
+                    $self->{parameters} =~ s/(\w+ \*?$key)/SHIM($1)/;
+                }
+            }
         }
         if ($body->{data} =~ m/^\s*UNUSED\(SELF\);?\n/) {
             $self->{pmc_unused} = 1;
