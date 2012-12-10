@@ -298,6 +298,7 @@ Sets the pointer to the actual subroutine.
 */
 
     VTABLE void set_pointer(void *value) {
+        UNUSED(SELF)
         UNUSED(value)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Don't set the address of a sub\nuse .const 'Sub' instead");

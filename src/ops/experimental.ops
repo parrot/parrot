@@ -476,6 +476,7 @@ Terminate the current task immediately.
 =cut
 
 op terminate() {
+    UNUSED(INTERP)
     goto ADDRESS(0);
 }
 
@@ -483,7 +484,7 @@ op terminate() {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 LICENSE
 

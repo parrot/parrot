@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010, Parrot Foundation.
+ * Copyright (C) 2010-2012, Parrot Foundation.
  */
 
 /*

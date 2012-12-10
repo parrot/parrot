@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008-2011, Parrot Foundation.
+Copyright (C) 2008-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -693,6 +693,7 @@ stored.)
 
 */
     VTABLE void morph(PMC *type) {
+        UNUSED(type)
         Hash     *hash;
 
         if (!PMC_data(SELF))

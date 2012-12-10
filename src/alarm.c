@@ -69,13 +69,15 @@ Parrot_alarm_init(void)
 
 The thread function handling alarms.
 
+The argument C<arg> is currently ignored.
+
 =cut
 
 */
 
 PARROT_CAN_RETURN_NULL
 static void*
-Parrot_alarm_runloop(ARGIN_NULLOK(void *arg))
+Parrot_alarm_runloop(SHIM(void *arg))
 {
     ASSERT_ARGS(Parrot_alarm_runloop)
 

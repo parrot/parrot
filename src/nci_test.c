@@ -411,7 +411,7 @@ writes the string C<str> to stdout and returns the value 4711.
 
 PARROT_DYNEXT_EXPORT
 int
-call_back(PARROT_INTERP, char *cstr)
+call_back(SHIM_INTERP, char *cstr)
 {
     puts(cstr);
     fflush(stdout);
@@ -615,7 +615,7 @@ Prints "ok" if C<PMC> is not null, prints "got null" otherwise.
 
 PARROT_DYNEXT_EXPORT
 void
-nci_vP(void *pmc)
+nci_vP(SHIM(void *pmc))
 {
     /* TODO:
      * Disable this test until someone figures a way to check for

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -377,7 +377,7 @@ Returns true if the address C<sa> matches C<family>, C<type> and C<protocol>.
 */
 
 INTVAL
-Parrot_io_internal_addr_match(PARROT_INTERP, ARGIN(PMC *sa), INTVAL fam,
+Parrot_io_internal_addr_match(SHIM_INTERP, ARGIN(PMC *sa), INTVAL fam,
         INTVAL type, INTVAL protocol)
 {
     Parrot_Sockaddr_attributes * const sa_data = PARROT_SOCKADDR(sa);

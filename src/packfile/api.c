@@ -925,8 +925,7 @@ These determine which subs get executed at this point. Some rules:
  :init subs execute when :main does
  :load subs execute on PBC_LOAD
 
-Also store the C<eval_pmc> in the sub structure, so that the eval PMC is kept
-alive by living subs.
+The argument C<eval_pmc> is ignored.
 
 This function and the entire underlying mechanism should be deprecated and
 removed. See GH #428 for details.
@@ -938,7 +937,7 @@ removed. See GH #428 for details.
 PARROT_EXPORT
 void
 do_sub_pragmas(PARROT_INTERP, ARGIN(PMC *pfpmc),
-               pbc_action_enum_t action, ARGIN_NULLOK(PMC *eval_pmc))
+               pbc_action_enum_t action, SHIM(PMC *eval_pmc))
 {
     ASSERT_ARGS(do_sub_pragmas)
     PackFile            * const pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);

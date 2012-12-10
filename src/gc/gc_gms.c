@@ -1482,7 +1482,7 @@ and phase of the Moon.
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
 static PMC*
-gc_gms_allocate_pmc_header(PARROT_INTERP, UINTVAL flags)
+gc_gms_allocate_pmc_header(PARROT_INTERP, SHIM(UINTVAL flags))
 {
     ASSERT_ARGS(gc_gms_allocate_pmc_header)
     MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;

@@ -110,6 +110,7 @@ Initializes the integer with a default value of C<0>.
 */
 
     VTABLE void init() {
+        UNUSED(INTERP)
         Parrot_Integer_attributes * const attrs =
             (Parrot_Integer_attributes *)PMC_data(SELF);
 
@@ -124,6 +125,7 @@ Initializes the integer with a default value of C<0>.
     }
 
     VTABLE void init_int(INTVAL init) {
+        UNUSED(INTERP)
         Parrot_Integer_attributes * const attrs =
             (Parrot_Integer_attributes *)PMC_data(SELF);
 
@@ -157,6 +159,7 @@ applications and may be disabled in certain security contexts.
 */
 
     VTABLE void *get_pointer() {
+        UNUSED(INTERP)
         return &(PARROT_INTEGER(SELF)->iv);
     }
 
@@ -650,6 +653,7 @@ Multiplies the integer by C<*value> and returns the result in C<*dest>.
 
 
     MULTI PMC *multiply(DEFAULT value, PMC *dest) {
+        UNUSED(dest)
         const FLOATVAL valf = VTABLE_get_number(INTERP, value);
         return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
             SELF.get_number() * valf);
@@ -748,6 +752,7 @@ Divides C<SELF> by C<value> inplace.
     }
 
     MULTI PMC *divide(DEFAULT value, PMC *dest) {
+        UNUSED(dest)
         const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
@@ -809,6 +814,7 @@ Divides C<SELF> by C<value> inplace.
 
 
     MULTI PMC *floor_divide(DEFAULT value, PMC *dest) {
+        UNUSED(dest)
         const FLOATVAL d = VTABLE_get_number(INTERP, value);
         FLOATVAL f;
 
@@ -823,6 +829,7 @@ Divides C<SELF> by C<value> inplace.
 
 
     VTABLE PMC *floor_divide_int(INTVAL value, PMC *dest) {
+        UNUSED(dest)
         FLOATVAL f;
 
         if (value == 0)
@@ -835,6 +842,7 @@ Divides C<SELF> by C<value> inplace.
     }
 
     VTABLE PMC *floor_divide_float(FLOATVAL value, PMC *dest) {
+        UNUSED(dest)
         FLOATVAL f;
 
         if (FLOAT_IS_ZERO(value))
@@ -923,6 +931,7 @@ Calculates modulus in place.
 
 
     MULTI PMC *modulus(DEFAULT value, PMC *dest) {
+        UNUSED(dest)
         const INTVAL d = VTABLE_get_integer(INTERP, value);
 
         if (d == 0)
@@ -935,6 +944,7 @@ Calculates modulus in place.
 
 
     VTABLE PMC *modulus_int(INTVAL value, PMC *dest) {
+        UNUSED(dest)
         if (value == 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                     "int modulus by zero");
@@ -945,6 +955,7 @@ Calculates modulus in place.
 
 
     VTABLE PMC *modulus_float(FLOATVAL value, PMC *dest) {
+        UNUSED(dest)
         if (FLOAT_IS_ZERO(value))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                     "int modulus by zero");
@@ -1006,6 +1017,7 @@ is the minimum integer, a BigInt is created.
 */
 
     VTABLE PMC *neg(PMC *dest) {
+        UNUSED(dest)
         const INTVAL a = SELF.get_integer();
 
         if (a != PARROT_INTVAL_MIN)

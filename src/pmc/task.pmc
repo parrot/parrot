@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -419,9 +419,10 @@ Called after the task has been thawed.
 */
 
     VTABLE void thawfinish(PMC *info) {
+        UNUSED(INTERP)
+        UNUSED(SELF)
+        UNUSED(info)
         /* Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF); */
-
-        /* UNUSED(core_struct); *//* Do nothing */
     }
 
 /*

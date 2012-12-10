@@ -204,6 +204,7 @@ Assigns context.
 
 */
     VTABLE void set_pmc(PMC *src) {
+        UNUSED(INTERP)
         STRUCT_COPY(PMC_data_typed(SELF, Parrot_Continuation_attributes *),
                     PMC_data_typed(src,  Parrot_Continuation_attributes *));
     }

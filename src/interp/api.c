@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -397,12 +397,14 @@ Parrot_interp_destroy(PARROT_INTERP)
 Waits for any threads to complete, then frees all allocated memory, and
 closes any open file handles, etc.
 
+The arguments C<exit_code> and C<arg> are currently ignored.
+
 =cut
 
 */
 
 void
-Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, SHIM(void *arg))
+Parrot_interp_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 {
     ASSERT_ARGS(Parrot_interp_really_destroy)
 
@@ -448,7 +450,7 @@ Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, SHIM(void *arg))
      * now all objects that need timely destruction should be finalized
      * so terminate the event loop
      */
- /*   if (!interp->parent_interpreter) {
+  /*  if (!interp->parent_interpreter) {
         PIO_internal_shutdown(interp);
         Parrot_kill_event_loop(interp);
     }

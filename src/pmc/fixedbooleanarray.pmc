@@ -71,6 +71,7 @@ Initializes the array.
 */
 
     VTABLE void init() {
+        UNUSED(INTERP)
         PObj_custom_destroy_SET(SELF);
     }
 

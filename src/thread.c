@@ -60,7 +60,9 @@ static int      num_threads = -1;
 =item C<PMC * Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL
 clone_flags)>
 
-Create a new thread, cloning the current interpreter
+Create a new thread, cloning the current interpreter.
+
+The argument C<type> is currently ignored.
 
 =cut
 
@@ -68,7 +70,7 @@ Create a new thread, cloning the current interpreter
 
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
+Parrot_thread_create(PARROT_INTERP, SHIM(INTVAL type), INTVAL clone_flags)
 {
     ASSERT_ARGS(Parrot_thread_create)
     PMC    * const new_interp_pmc = clone_interpreter(interp, clone_flags);

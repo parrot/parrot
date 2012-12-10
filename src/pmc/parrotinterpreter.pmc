@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -233,6 +233,7 @@ new.
 */
 
     METHOD recursion_limit(INTVAL l :optional, INTVAL has_l :opt_flag) {
+        UNUSED(SELF)
         const INTVAL ret = INTERP->recursion_limit;
         if (has_l)
             INTERP->recursion_limit = l;
@@ -313,7 +314,6 @@ Sets C<struct_val> to C<*value>.
 */
 
     VTABLE void set_pointer(void *value) {
-
         /* XXX: init_world in src/global_setup.c needs to create a
          * ParrotInterpreter through Parrot_pmc_new_noinit.  If this PMC hasn't been
          * initialized, cheat by initializing instead. */
@@ -337,6 +337,7 @@ Returns C<struct_val>.
 */
 
     VTABLE void *get_pointer() {
+        UNUSED(INTERP)
         return PMC_interp(SELF);
     }
 
@@ -351,6 +352,7 @@ Returns the thread id of the interpreter.
 */
 
     VTABLE INTVAL get_integer() {
+        UNUSED(INTERP)
         const Parrot_Interp i = PMC_interp(SELF);
         return 0;
     }
@@ -389,6 +391,7 @@ Return this Thread's args.
 */
 
     VTABLE PMC *get_pmc() {
+        UNUSED(INTERP)
         return PMC_args(SELF);
     }
 
@@ -403,6 +406,7 @@ Set this Thread's args.
 */
 
     VTABLE void set_pmc(PMC *args) {
+        UNUSED(INTERP)
         PMC_args(SELF) = args;
     }
 
@@ -418,6 +422,7 @@ Returns the PMC global value for C<key>.
 */
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
+        UNUSED(INTERP)
         Interp * const new_interp = PMC_interp(SELF);
 
         if (key >= 0 && key < IGLOBALS_SIZE) {
@@ -456,6 +461,7 @@ Introspection interface. C<key> can be:
 */
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
+        UNUSED(SELF)
         PMC    *nextkey;
         STRING *outer = NULL;
         STRING *item  = Parrot_key_string(INTERP, key);
@@ -574,6 +580,7 @@ Returns the interpreter info for C<key>.
 */
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
+        UNUSED(INTERP)
         Interp * const new_interp = PMC_interp(SELF);
 
         if (key == -1)
@@ -593,6 +600,7 @@ Sets the interpreter info for C<key> to C<val>.
 */
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL val) {
+        UNUSED(INTERP)
         Interp * const new_interp = PMC_interp(SELF);
 
         /* set interpreter flags */
@@ -618,6 +626,7 @@ XXX this should of course call C<Parrot_clone()> and use freeze/thaw.
 */
 
     VTABLE PMC *clone() {
+        UNUSED(INTERP)
         PMC * const dest = clone_interpreter(PMC_interp(SELF), PARROT_CLONE_DEFAULT);
 
         return dest;
@@ -637,12 +646,14 @@ have the same thread id.
 */
 
     MULTI INTVAL is_equal(ParrotInterpreter val) {
+        UNUSED(INTERP)
         Parrot_Interp self  = PMC_interp(SELF);
         Parrot_Interp other = PMC_interp(val);
         return self == other;
     }
 
     MULTI INTVAL is_equal(DEFAULT value) {
+        UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
                 EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
                 "ParrotInterpreter: no multiple dispatch variant 'is_equal' for %Ss",
@@ -677,11 +688,14 @@ Finish thawing.
 */
 
     VTABLE void freeze(PMC *info) {
+        UNUSED(SELF)
+        UNUSED(info)
         Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
                 "Attempt to freeze interpreter");
     }
 
     METHOD run_gc() {
+        UNUSED(INTERP)
         Parrot_gc_mark_and_sweep(PMC_interp(SELF), 0);
     }
 
@@ -696,6 +710,7 @@ Map core_type to hll_type.
 */
 
     METHOD hll_map(PMC *core_type, PMC *hll_type) {
+        UNUSED(SELF)
         const INTVAL core_type_id = VTABLE_type(INTERP, core_type);
         const INTVAL hll_type_id  = VTABLE_type(INTERP, hll_type);
         const INTVAL hll_id       = Parrot_pcc_get_HLL(INTERP, CURRENT_CONTEXT(INTERP));
@@ -716,6 +731,7 @@ If no PMC object is provided, the current standard input handle is returned.
 */
 
     METHOD stdin_handle(PMC *newhandle :optional) {
+        UNUSED(SELF)
         PMC * const handle = Parrot_io_stdhandle(INTERP, PIO_STDIN_FILENO, newhandle);
         RETURN(PMC *handle);
     }
@@ -814,6 +830,7 @@ Schedules the given task on the proxy's interpreter.
 */
 
     METHOD schedule_proxied(PMC *task, PMC *proxy) {
+        UNUSED(SELF)
         Parrot_Proxy_attributes * const core_struct    = PARROT_PROXY(proxy);
         Interp                  * const proxied_interp = core_struct->interp;
 

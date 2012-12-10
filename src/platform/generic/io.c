@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -110,7 +110,7 @@ Returns a standard file handle.
 */
 
 PIOHANDLE
-Parrot_io_internal_std_os_handle(PARROT_INTERP, INTVAL fileno)
+Parrot_io_internal_std_os_handle(SHIM_INTERP, INTVAL fileno)
 {
     PIOHANDLE os_handle;
 

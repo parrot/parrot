@@ -1,5 +1,5 @@
-/* Proxy.pmc
- *  Copyright (C) 2011, Parrot Foundation.
+/*
+Copyright (C) 2011-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -125,12 +125,15 @@ Don't mark target and interp since they belong to a different interpreter.
 
 */
     VTABLE void mark() {
+        UNUSED(INTERP)
+        UNUSED(SELF)
     }
 
 
     VTABLE PMC *find_method(STRING *method_name)
     {
-        return VTABLE_find_method(PARROT_PROXY(_self)->interp, PARROT_PROXY(_self)->target,
+        UNUSED(INTERP)
+        return VTABLE_find_method(PARROT_PROXY(SELF)->interp, PARROT_PROXY(SELF)->target,
                 method_name);
     }
 
@@ -172,7 +175,7 @@ Don't mark target and interp since they belong to a different interpreter.
     }
 
     VTABLE PMC *instantiate(PMC *init) {
-        PMC * const _class = PARROT_PROXY(_self)->target;
+        PMC * const _class = PARROT_PROXY(SELF)->target;
         /*TODO will fail if the class has not been instantiated in the main thread before */
 
         PARROT_ASSERT(_class->vtable->base_type != enum_class_Proxy);

@@ -13802,7 +13802,7 @@ Parrot_jump_i(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_jump_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_jump_ic(opcode_t *cur_opcode, SHIM_INTERP) {
     opcode_t  * const  loc = INTVAL2PTR(opcode_t *, ICONST(1));
 
     return (opcode_t *)loc;
@@ -24553,7 +24553,7 @@ Parrot_enable_preemption(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_terminate(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_terminate(opcode_t *cur_opcode, SHIM_INTERP) {
     return (opcode_t *)0;
     return cur_opcode + 1;
 }

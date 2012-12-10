@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -311,7 +311,12 @@ Finishes thawing the scheduler.
 */
 
     VTABLE void thawfinish(PMC *info) {
-        /* Parrot_cx_refresh_task_list(INTERP, SELF); */
+#if 1
+        UNUSED(INTERP)
+        UNUSED(SELF)
+#else
+        Parrot_cx_refresh_task_list(INTERP, SELF);
+#endif
     }
 
 

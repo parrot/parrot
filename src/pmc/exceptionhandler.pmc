@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -179,6 +179,7 @@ Mark whether the handler has been invoked.
 */
 
     VTABLE void set_integer_native(INTVAL value) {
+        UNUSED(INTERP)
         PARROT_CONTINUATION(SELF)->invoked = value;
     }
 
@@ -193,6 +194,7 @@ Check whether the handler has been invoked.
 */
 
     VTABLE INTVAL get_integer() {
+        UNUSED(INTERP)
         return PARROT_CONTINUATION(SELF)->invoked;
     }
 
@@ -202,11 +204,14 @@ Check whether the handler has been invoked.
 
 Set up the environment for the exception handler to be invoked.
 
+The argument C<next> is currently ignored.
+
 =cut
 
 */
 
     VTABLE opcode_t *invoke(void *next) {
+        UNUSED(next)
         opcode_t    * const pc = PARROT_CONTINUATION(SELF)->address;
 
         Parrot_sub_continuation_check(INTERP, SELF);

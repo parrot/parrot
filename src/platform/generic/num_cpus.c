@@ -45,7 +45,7 @@ Returns the number of CPUs
 */
 
 INTVAL
-Parrot_get_num_cpus(Parrot_Interp interp) {
+Parrot_get_num_cpus(SHIM_INTERP) {
     INTVAL nprocs = -1;
 
 #ifdef _SC_NPROCESSORS_ONLN

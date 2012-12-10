@@ -49,6 +49,7 @@ Initializes the alarm.
 */
 
     VTABLE void init() {
+        UNUSED(INTERP)
         Parrot_Alarm_attributes * const data = PARROT_ALARM(SELF);
         data->alarm_time = 0.0;
         data->alarm_task = PMCNULL;
@@ -113,6 +114,7 @@ Returns the number associated with C<key>.
 */
 
     VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
+        UNUSED(INTERP)
         if (key == PARROT_ALARM_TIME)
             return PARROT_ALARM(SELF)->alarm_time;
 
@@ -130,6 +132,7 @@ Having the alarm numify to the time is convienient for sorting.
 */
 
     VTABLE FLOATVAL get_number() {
+        UNUSED(INTERP)
         return PARROT_ALARM(SELF)->alarm_time;
     }
 

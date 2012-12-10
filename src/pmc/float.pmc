@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003-2009, Parrot Foundation.
+Copyright (C) 2003-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -68,6 +68,7 @@ applications and may be disabled in certain security contexts.
 */
 
     VTABLE void *get_pointer() {
+        UNUSED(INTERP)
         return &(PARROT_FLOAT(SELF)->fv);
     }
 

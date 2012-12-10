@@ -133,6 +133,7 @@ Returns the pointer value as a floating-point number.
 */
 
     VTABLE FLOATVAL get_number() {
+        UNUSED(INTERP)
         return (FLOATVAL)(INTVAL)(PARROT_POINTER(SELF)->pointer);
     }
 
