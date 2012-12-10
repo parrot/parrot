@@ -1129,28 +1129,28 @@ typedef struct BIGNUM {
     FLOATVAL b; /* bogus definition for users without libgmp*/
 } BIGNUM;
 
-#  define THROW_NYI Parrot_ex_throw_from_c_args(interp, NULL, \
+#  define THROW_NOGMP Parrot_ex_throw_from_c_args(interp, NULL, \
                         EXCEPTION_LIBRARY_ERROR, "no bignum lib loaded")
 
 static void
 bignum_set(PARROT_INTERP, ARGMOD(PMC *dest), PMC *src) {
     UNUSED(dest)
     UNUSED(src)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static void
 bignum_set_si(PARROT_INTERP, ARGIN(PMC *self), long value) {
     UNUSED(self)
     UNUSED(value)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static void
 bignum_set_double(PARROT_INTERP, ARGIN(PMC *self), double value) {
     UNUSED(self)
     UNUSED(value)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static void
@@ -1158,27 +1158,27 @@ bignum_set_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(const STRING *value), int 
     UNUSED(self)
     UNUSED(value)
     UNUSED(base)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static void
 bignum_set_self(PARROT_INTERP, ARGIN(PMC *self), BIGNUM *value) {
     UNUSED(self)
     UNUSED(value)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static BIGNUM*
 bignum_get_self(PARROT_INTERP, ARGIN(PMC *self)) {
     UNUSED(self)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static char *
 bignum_get_string(PARROT_INTERP, ARGIN(PMC *self), int base) {
     UNUSED(self)
     UNUSED(base)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static char *
@@ -1186,31 +1186,31 @@ bignum_get_string_size(PARROT_INTERP, ARGIN(PMC *self), int base, int digits) {
     UNUSED(self)
     UNUSED(base)
     UNUSED(digits)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static unsigned long
 bignum_get_ui(PARROT_INTERP, ARGIN(PMC *self)) {
     UNUSED(self)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static long
 bignum_get_si(PARROT_INTERP, ARGIN(PMC *self)) {
     UNUSED(self)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static INTVAL
 bignum_get_bool(PARROT_INTERP, ARGIN(PMC *self)) {
     UNUSED(self)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static double
 bignum_get_double(PARROT_INTERP, ARGIN(PMC *self)) {
     UNUSED(self)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static void
@@ -1218,7 +1218,7 @@ bignum_add_bignum(PARROT_INTERP, ARGIN(PMC *self), PMC *value, ARGMOD(PMC *dest)
     UNUSED(self)
     UNUSED(value)
     UNUSED(dest)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static void
@@ -1226,7 +1226,7 @@ bignum_add_bignum_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC 
     UNUSED(self)
     UNUSED(value)
     UNUSED(dest)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static void
@@ -1234,7 +1234,7 @@ bignum_add_bignum_float(PARROT_INTERP, ARGIN(PMC *self), FLOATVAL value, ARGMOD(
     UNUSED(self)
     UNUSED(value)
     UNUSED(dest)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static void
@@ -1242,7 +1242,7 @@ bignum_sub_bignum(PARROT_INTERP, ARGIN(PMC *self), PMC *value, ARGMOD(PMC *dest)
     UNUSED(self)
     UNUSED(value)
     UNUSED(dest)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static void
@@ -1250,7 +1250,7 @@ bignum_sub_bignum_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC 
     UNUSED(self)
     UNUSED(value)
     UNUSED(dest)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static void
@@ -1258,7 +1258,7 @@ bignum_sub_bignum_float(PARROT_INTERP, ARGIN(PMC *self), FLOATVAL value, ARGMOD(
     UNUSED(self)
     UNUSED(value)
     UNUSED(dest)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static void
@@ -1266,7 +1266,7 @@ bignum_mul_bignum(PARROT_INTERP, ARGIN(PMC *self), PMC *value, ARGMOD(PMC *dest)
     UNUSED(self)
     UNUSED(value)
     UNUSED(dest)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static void
@@ -1274,7 +1274,7 @@ bignum_mul_bignum_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC 
     UNUSED(self)
     UNUSED(value)
     UNUSED(dest)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static void
@@ -1282,7 +1282,7 @@ bignum_mul_bignum_float(PARROT_INTERP, ARGIN(PMC *self), FLOATVAL value, ARGMOD(
     UNUSED(self)
     UNUSED(value)
     UNUSED(dest)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static void
@@ -1290,7 +1290,7 @@ bignum_pow_bignum_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC 
     UNUSED(self)
     UNUSED(value)
     UNUSED(dest)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static void
@@ -1298,7 +1298,7 @@ bignum_pow_bignum_float(PARROT_INTERP, ARGIN(PMC *self), FLOATVAL value, ARGMOD(
     UNUSED(self)
     UNUSED(value)
     UNUSED(dest)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static void
@@ -1306,7 +1306,7 @@ bignum_div_bignum(PARROT_INTERP, ARGIN(PMC *self), PMC *value, ARGMOD(PMC *dest)
     UNUSED(self)
     UNUSED(value)
     UNUSED(dest)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static void
@@ -1314,7 +1314,7 @@ bignum_div_bignum_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC 
     UNUSED(self)
     UNUSED(value)
     UNUSED(dest)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static void
@@ -1322,7 +1322,7 @@ bignum_div_bignum_float(PARROT_INTERP, ARGIN(PMC *self), FLOATVAL value, ARGMOD(
     UNUSED(self)
     UNUSED(value)
     UNUSED(dest)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static void
@@ -1330,7 +1330,7 @@ bignum_fdiv_bignum(PARROT_INTERP, ARGIN(PMC *self), PMC *value, ARGMOD(PMC *dest
     UNUSED(self)
     UNUSED(value)
     UNUSED(dest)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static void
@@ -1338,7 +1338,7 @@ bignum_fdiv_bignum_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC
     UNUSED(self)
     UNUSED(value)
     UNUSED(dest)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static void
@@ -1346,58 +1346,58 @@ bignum_fdiv_bignum_float(PARROT_INTERP, ARGIN(PMC *self), FLOATVAL value, ARGMOD
     UNUSED(self)
     UNUSED(value)
     UNUSED(dest)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static INTVAL
 bignum_cmp(PARROT_INTERP, ARGIN(PMC *self), PMC *value) {
     UNUSED(self)
     UNUSED(value)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static INTVAL
 bignum_cmp_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value) {
     UNUSED(self)
     UNUSED(value)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static INTVAL
 bignum_cmp_float(PARROT_INTERP, ARGIN(PMC *self), FLOATVAL value) {
     UNUSED(self)
     UNUSED(value)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static void
 bignum_abs(PARROT_INTERP, ARGIN(PMC *self), ARGMOD(PMC *dest)) {
     UNUSED(self)
     UNUSED(dest)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static void
 bignum_neg(PARROT_INTERP, ARGIN(PMC *self), ARGMOD(PMC *dest)) {
     UNUSED(self)
     UNUSED(dest)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static INTVAL
 bignum_get_default_prec(PARROT_INTERP, ARGIN(PMC *self)) {
     UNUSED(self)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
 static void
 bignum_set_default_prec(PARROT_INTERP, ARGIN(PMC *self), INTVAL prec) {
     UNUSED(self)
     UNUSED(prec)
-    THROW_NYI;
+    THROW_NOGMP;
 }
 
-#  undef THROW_NYI
+#  undef THROW_NOGMP
 
 #endif /* ifdef PARROT_HAS_GMP */
 
