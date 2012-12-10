@@ -262,7 +262,8 @@ sub decl {
     if ($body->{data} and $body->{data} =~ /^\s*UNUSED\((\w+)\)/m) {
         my $key = $1;
         if ($args =~ s/, (\w+ \*?$key)/, SHIM($1)/) {
-            $body->{data} =~ s/^\s*UNUSED\((\w+)\);?\n//;
+            $body->{data} =~ s/^\s*UNUSED\($key\);?\n//;
+            $self->{parameters} =~ s/(\w+ \*?$key)/SHIM($1)/;
         }
         if ($body->{data} =~ m/^\s*UNUSED\(SELF\);?\n/) {
             $self->{pmc_unused} = 1;
