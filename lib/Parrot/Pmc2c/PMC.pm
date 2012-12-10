@@ -737,6 +737,9 @@ sub post_method_gen {
         # Skip methods with manual WBs.
         next if $self->vtable_method_has_manual_wb($name);
 
+        # Skip unimplemented methods
+        next if $self->unimplemented_vtable($name);
+
         $method = $self->get_method($name);
 
         #warn "Rewriting " . $self->name . "." . $name;
