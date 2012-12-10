@@ -13,6 +13,7 @@
           PARROT_CORE_OPLIB_INIT from config.h
         + Store PBC_MAJOR and PBC_MINOR in the config hash, stored by auto::revision
     - Documentation
+        + Marked unused API parameters
     - Languages
         + nqp-rx tests updated from perl6/nqp-rx.git, and enabled to run on make test
     - Tools
