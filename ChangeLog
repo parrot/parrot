@@ -18,6 +18,8 @@
         + nqp-rx tests updated from perl6/nqp-rx.git, and enabled to run on make test
     - Tools
         + Re-enabled pbc_dump -h --header-only
+        + Improved pmc2c, added more UNUSED(arg) macros [GH #836]. Parrot is now almost
+          -Wunused-parameters safe.
     - Tests
         + failing Pod::Simple pod_todo.t tests are now skipped
         + added nqp-rx tests
