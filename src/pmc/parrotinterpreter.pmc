@@ -207,7 +207,7 @@ create_interp(ARGIN(PMC *self), ARGIN_NULLOK(Parrot_Interp parent))
 
 pmclass ParrotInterpreter no_ro manual_attrs provides invokable {
     ATTR struct parrot_interp_t *interp; /* this PMC's interpreter */
-    ATTR INTVAL                  tid;    /* thread id */
+    ATTR INTVAL                  tid;    /* thread id. Unused, see get_integer() */
     ATTR PMC                    *args;   /* args passed to this thread */
     ATTR PMC                    *sub;    /* this thread's sub */
 
@@ -347,14 +347,17 @@ Returns C<struct_val>.
 
 Returns the thread id of the interpreter.
 
+Returns currently always the task id, which might be different to the OS thread id.
+
 =cut
 
 */
 
     VTABLE INTVAL get_integer() {
+        const Parrot_Interp this_interp = PMC_interp(SELF);
+        PMC * const current_task = this_interp->cur_task;
         UNUSED(INTERP)
-        const Parrot_Interp i = PMC_interp(SELF);
-        return 0;
+        return PARROT_TASK(current_task)->id;
     }
 
 /*
