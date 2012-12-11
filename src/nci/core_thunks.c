@@ -44,7 +44,6 @@ Parrot_nci_load_core_thunks(PARROT_INTERP)
  {
     PMC * const iglobals = interp->iglobals;
     PMC *nci_funcs;
-    PMC *temp_pmc;
 
     PARROT_ASSERT(!(PMC_IS_NULL(iglobals)));
 

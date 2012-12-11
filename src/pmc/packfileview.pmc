@@ -47,7 +47,6 @@ static INTVAL find_called_tag(PARROT_INTERP,
 PARROT_CAN_RETURN_NULL
 static PackFile_ConstTable * get_const_table(PARROT_INTERP,
     ARGIN(PMC * self))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_add_called_tag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -59,8 +58,7 @@ static PackFile_ConstTable * get_const_table(PARROT_INTERP,
     , PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(tag))
 #define ASSERT_ARGS_get_const_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
+       PARROT_ASSERT_ARG(self))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -76,7 +74,7 @@ Get the constant table for the PackFile*. Return NULL if there's a problem.
 
 PARROT_CAN_RETURN_NULL
 static PackFile_ConstTable *
-get_const_table(PARROT_INTERP, ARGIN(PMC * self))
+get_const_table(SHIM_INTERP, ARGIN(PMC * self))
 {
     ASSERT_ARGS(get_const_table)
     Parrot_PackfileView_attributes * const attrs =

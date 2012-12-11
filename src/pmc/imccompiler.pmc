@@ -139,10 +139,10 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         imcc_reset(imcc);
         result = imcc_compile_string(imcc, code, attrs->is_pasm);
         if (PMC_IS_NULL(result)) {
-            STRING * const msg = imcc_last_error_message(imcc);
-            const INTVAL code = imcc_last_error_code(imcc);
+            STRING * const msg   = imcc_last_error_message(imcc);
+            const INTVAL errcode = imcc_last_error_code(imcc);
             Parrot_unblock_GC_mark(interp);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, code, "%Ss", msg);
+            Parrot_ex_throw_from_c_args(INTERP, NULL, errcode, "%Ss", msg);
         }
         eval_pmc = get_packfile_eval_pmc(interp, result, attrs->current_eval++);
 

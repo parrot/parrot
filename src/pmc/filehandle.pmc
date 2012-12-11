@@ -406,7 +406,6 @@ filehandle when finished.
             /* called as class method - open, slurp, close file */
             PMC    *filehandle;
             STRING *encoding;
-            size_t  size;
 
             GET_ATTR_encoding(INTERP, SELF, encoding);
 

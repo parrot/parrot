@@ -447,7 +447,6 @@ Get iterator for declared lexicals.
         PMC    *ctx;
         PMC    *info_iter;
         PMC    *value_map = Parrot_pmc_new(INTERP, enum_class_Hash);
-        INTVAL  reg;
         Hash *  hash;
 
         GET_ATTR_lexinfo(INTERP, SELF, info);

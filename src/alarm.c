@@ -181,8 +181,6 @@ Parrot_alarm_set(FLOATVAL when)
 
     LOCK(alarm_lock);
     {
-        const FLOATVAL now = Parrot_floatval_time();
-
         if (current_alarm > 0 && current_alarm <= when) {
             /* there's already an active alarm for an earlier point in time */
             UNLOCK(alarm_lock);

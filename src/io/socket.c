@@ -577,7 +577,6 @@ io_socket_get_encoding(PARROT_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_socket_get_encoding)
     STRING           *encoding_str;
-    const STR_VTABLE *encoding;
 
     GETATTR_Socket_encoding(interp, handle, encoding_str);
     if (!STRING_IS_NULL(encoding_str))

@@ -115,12 +115,8 @@ VAR_SCOPE Shared_gc_info *shared_gc_info;
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 void Parrot_clone_code(Parrot_Interp d, Parrot_Interp s);
-int Parrot_get_num_threads(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
-int Parrot_set_num_threads(PARROT_INTERP, INTVAL number_of_threads)
-        __attribute__nonnull__(1);
-
+int Parrot_get_num_threads(PARROT_INTERP);
+int Parrot_set_num_threads(PARROT_INTERP, INTVAL number_of_threads);
 PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL clone_flags)
         __attribute__nonnull__(1);
@@ -159,7 +155,6 @@ void Parrot_thread_init_threads_array(PARROT_INTERP)
 void Parrot_thread_insert_thread(PARROT_INTERP,
     ARGIN(Interp* thread),
     int index)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_CAN_RETURN_NULL
@@ -176,11 +171,10 @@ void Parrot_thread_notify_thread(PARROT_INTERP)
 void Parrot_thread_notify_threads(PARROT_INTERP);
 int Parrot_thread_run(PARROT_INTERP,
     ARGMOD(PMC *thread_interp_pmc),
-    ARGIN(PMC *sub),
+    PMC *sub,
     ARGIN_NULLOK(PMC *arg))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
         FUNC_MODIFIES(*thread_interp_pmc);
 
 void Parrot_thread_schedule_task(PARROT_INTERP,
@@ -204,10 +198,8 @@ void Parrot_thread_wait_for_notification(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_Parrot_clone_code __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_Parrot_get_num_threads __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_set_num_threads __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_get_num_threads __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_set_num_threads __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_thread_create __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_thread_create_local_sub \
@@ -232,8 +224,7 @@ void Parrot_thread_wait_for_notification(PARROT_INTERP)
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_thread_insert_thread __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(thread))
+       PARROT_ASSERT_ARG(thread))
 #define ASSERT_ARGS_Parrot_thread_make_local_copy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(from) \
@@ -243,8 +234,7 @@ void Parrot_thread_wait_for_notification(PARROT_INTERP)
 #define ASSERT_ARGS_Parrot_thread_notify_threads __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_thread_run __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(thread_interp_pmc) \
-    , PARROT_ASSERT_ARG(sub))
+    , PARROT_ASSERT_ARG(thread_interp_pmc))
 #define ASSERT_ARGS_Parrot_thread_schedule_task __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(thread_interp) \

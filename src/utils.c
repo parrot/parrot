@@ -49,8 +49,8 @@ static long _mrand48(void);
 static long _nrand48(_rand_buf buf);
 static void _srand48(long seed);
 static INTVAL COMPARE(PARROT_INTERP,
-    ARGIN(void *a),
-    ARGIN(void *b),
+    ARGIN(void *_a),
+    ARGIN(void *_b),
     ARGIN(PMC *cmp),
     ARGIN(const char * cmp_signature))
         __attribute__nonnull__(1)
@@ -69,8 +69,8 @@ static void next_rand(_rand_buf X);
 #define ASSERT_ARGS__srand48 __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_COMPARE __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(a) \
-    , PARROT_ASSERT_ARG(b) \
+    , PARROT_ASSERT_ARG(_a) \
+    , PARROT_ASSERT_ARG(_b) \
     , PARROT_ASSERT_ARG(cmp) \
     , PARROT_ASSERT_ARG(cmp_signature))
 #define ASSERT_ARGS_next_rand __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -657,7 +657,7 @@ typedef INTVAL (*sort_func_t)(PARROT_INTERP, void *, void *);
 
 /*
 
-=item C<static INTVAL COMPARE(PARROT_INTERP, void *a, void *b, PMC *cmp, const
+=item C<static INTVAL COMPARE(PARROT_INTERP, void *_a, void *_b, PMC *cmp, const
 char * cmp_signature)>
 
 General PMC comparison function. Takes two PMCs. Returns 0 if they are equal,
@@ -672,21 +672,21 @@ returns 1 if C<a> is bigger, and returns -1 if C<b> is bigger.
 /* comparisons that never change. We ought to precompute everything. */
 /* XXX We should be able to guarantee that *a and *b never change via const parameters. */
 static INTVAL
-COMPARE(PARROT_INTERP, ARGIN(void *a), ARGIN(void *b),
+COMPARE(PARROT_INTERP, ARGIN(void *_a), ARGIN(void *_b),
         ARGIN(PMC *cmp),
         ARGIN(const char * cmp_signature))
 {
     ASSERT_ARGS(COMPARE)
     INTVAL result = 0;
     if (PMC_IS_NULL(cmp))
-        return VTABLE_cmp(interp, (PMC *)a, (PMC *)b);
+        return VTABLE_cmp(interp, (PMC *)_a, (PMC *)_b);
 
     if (cmp->vtable->base_type == enum_class_NCI) {
         const sort_func_t f = (sort_func_t)D2FPTR(PARROT_NCI(cmp)->func);
-        return f(interp, a, b);
+        return f(interp, _a, _b);
     }
 
-    Parrot_ext_call(interp, cmp, cmp_signature, a, b, &result);
+    Parrot_ext_call(interp, cmp, cmp_signature, _a, _b, &result);
     return result;
 }
 

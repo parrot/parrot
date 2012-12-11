@@ -440,8 +440,8 @@ mark_ct(PARROT_INTERP, ARGIN(PMC *self))
         if (ct) {
             INTVAL i;
             for (i = 0; i < ct->pmc.const_count; ++i) {
-                PMC * const sub = ct->pmc.constants[i];
-                Parrot_gc_mark_PMC_alive(interp, sub);
+                PMC * const csub = ct->pmc.constants[i];
+                Parrot_gc_mark_PMC_alive(interp, csub);
             }
         }
     }

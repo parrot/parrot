@@ -105,12 +105,14 @@ PMC *arg)>
 
 Run a Parrot_thread
 
+The C<sub> argument is currently unused.
+
 =cut
 
 */
 
 int
-Parrot_thread_run(PARROT_INTERP, ARGMOD(PMC *thread_interp_pmc), ARGIN(PMC *sub),
+Parrot_thread_run(PARROT_INTERP, ARGMOD(PMC *thread_interp_pmc), SHIM(PMC *sub),
         ARGIN_NULLOK(PMC *arg))
 {
     ASSERT_ARGS(Parrot_thread_run)
@@ -303,7 +305,7 @@ Parrot_thread_outer_runloop(ARGIN_NULLOK(void *arg))
 
     PMC * const scheduler = interp->scheduler;
     Parrot_Scheduler_attributes * const sched = PARROT_SCHEDULER(scheduler);
-    INTVAL alarm_count, foreign_count, i;
+    INTVAL foreign_count, i;
     int lo_var_ptr;
 
     /* need to set it here because argument passing can trigger GC */
@@ -547,7 +549,6 @@ Parrot_thread_make_local_args_copy(PARROT_INTERP, ARGIN(Parrot_Interp source),
     if (PMC_IS_NULL(args))
         return PMCNULL;
     else {
-        INTVAL i;
         const INTVAL old_size = VTABLE_get_integer(source, args);
 
         /* XXX should this be a different type? */
@@ -652,7 +653,7 @@ Insert the given thread into the threads_array at index i.
 */
 
 void
-Parrot_thread_insert_thread(PARROT_INTERP, ARGIN(Interp* thread), int index)
+Parrot_thread_insert_thread(SHIM_INTERP, ARGIN(Interp* thread), int index)
 {
     ASSERT_ARGS(Parrot_thread_insert_thread)
 
@@ -680,7 +681,7 @@ and threads were already initialized.
 */
 
 int
-Parrot_set_num_threads(PARROT_INTERP, INTVAL number_of_threads)
+Parrot_set_num_threads(SHIM_INTERP, INTVAL number_of_threads)
 {
     ASSERT_ARGS(Parrot_set_num_threads)
 
@@ -707,7 +708,7 @@ not yet initialized.
 */
 
 int
-Parrot_get_num_threads(PARROT_INTERP)
+Parrot_get_num_threads(SHIM_INTERP)
 {
     ASSERT_ARGS(Parrot_get_num_threads)
 

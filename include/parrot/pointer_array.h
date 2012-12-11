@@ -147,8 +147,7 @@ Parrot_pa_remove(SHIM_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *ptr
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-void Parrot_pa_destroy(PARROT_INTERP, ARGFREE(Parrot_Pointer_Array *self))
-        __attribute__nonnull__(1);
+void Parrot_pa_destroy(PARROT_INTERP, ARGFREE(Parrot_Pointer_Array *self));
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -162,35 +161,28 @@ int Parrot_pa_is_owned(
 PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-Parrot_Pointer_Array * Parrot_pa_new(PARROT_INTERP)
-        __attribute__nonnull__(1);
+Parrot_Pointer_Array * Parrot_pa_new(PARROT_INTERP);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 size_t Parrot_pa_count_allocated(PARROT_INTERP,
     ARGIN(const Parrot_Pointer_Array *self))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 size_t Parrot_pa_count_used(PARROT_INTERP,
     ARGIN(const Parrot_Pointer_Array *self))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_Parrot_pa_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_pa_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_pa_is_owned __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(orig))
-#define ASSERT_ARGS_Parrot_pa_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_pa_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_pa_count_allocated __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
+       PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_Parrot_pa_count_used __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
+       PARROT_ASSERT_ARG(self))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/pointer_array.c */
 

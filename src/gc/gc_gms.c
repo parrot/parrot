@@ -276,9 +276,7 @@ static void gc_gms_block_GC_mark_locked(PARROT_INTERP)
 static void gc_gms_block_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void gc_gms_check_sanity(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
+static void gc_gms_check_sanity(PARROT_INTERP);
 static void gc_gms_cleanup_dirty_list(PARROT_INTERP,
     ARGIN(MarkSweep_GC *self),
     ARGIN(Parrot_Pointer_Array *dirty_list))
@@ -377,7 +375,6 @@ static void gc_gms_mark_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
         FUNC_MODIFIES(*pmc);
 
 static void gc_gms_mark_str_header(PARROT_INTERP, ARGMOD(STRING *str))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*str);
 
@@ -386,11 +383,8 @@ static void gc_gms_pmc_get_youngest_generation(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void gc_gms_pmc_needs_early_collection(PARROT_INTERP,
-    ARGMOD(PMC *pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*pmc);
+static void gc_gms_pmc_needs_early_collection(PARROT_INTERP, PMC *pmc)
+        __attribute__nonnull__(1);
 
 static void gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header))
         __attribute__nonnull__(1)
@@ -436,7 +430,6 @@ static void gc_gms_reallocate_string_storage(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 static void gc_gms_seal_object(PARROT_INTERP, ARGIN(PMC *pmc))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static size_t gc_gms_select_generation_to_collect(PARROT_INTERP)
@@ -462,7 +455,6 @@ static void gc_gms_unblock_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 static void gc_gms_unseal_object(PARROT_INTERP, ARGIN(PMC *pmc))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void gc_gms_validate_objects(PARROT_INTERP)
@@ -512,8 +504,7 @@ static int gen2flags(int gen);
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_block_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_gc_gms_check_sanity __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_gms_check_sanity __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_gms_cleanup_dirty_list __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \
@@ -573,16 +564,14 @@ static int gen2flags(int gen);
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_gms_mark_str_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(str))
+       PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_gc_gms_pmc_get_youngest_generation \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_gms_pmc_needs_early_collection \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_print_stats __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(header))
@@ -607,8 +596,7 @@ static int gen2flags(int gen);
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_gc_gms_seal_object __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc))
+       PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_gms_select_generation_to_collect \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -626,8 +614,7 @@ static int gen2flags(int gen);
 #define ASSERT_ARGS_gc_gms_unblock_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_unseal_object __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc))
+       PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_gms_validate_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_validate_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -1230,7 +1217,7 @@ Mark String
 */
 
 static void
-gc_gms_mark_str_header(PARROT_INTERP, ARGMOD(STRING *str))
+gc_gms_mark_str_header(SHIM_INTERP, ARGMOD(STRING *str))
 {
     ASSERT_ARGS(gc_gms_mark_str_header)
 
@@ -2039,14 +2026,16 @@ failed_allocation(unsigned int line, size_t size)
 
 =item C<static void gc_gms_pmc_needs_early_collection(PARROT_INTERP, PMC *pmc)>
 
-Mark a PMC as needing timely destruction
+Mark a PMC as needing timely destruction.
+
+The C<pmc> argument is currently unused.
 
 =cut
 
 */
 
 static void
-gc_gms_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
+gc_gms_pmc_needs_early_collection(PARROT_INTERP, SHIM(PMC *pmc))
 {
     ASSERT_ARGS(gc_gms_pmc_needs_early_collection)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
@@ -2160,6 +2149,8 @@ Parrot_Pointer_Array *list)>
 
 find amount of used string memory
 
+Currently disabled, returns always C<0>.
+
 =cut
 
 */
@@ -2194,6 +2185,8 @@ gc_gms_count_used_string_memory(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *list)
 Parrot_Pointer_Array *list)>
 
 find amount of used pmc memory
+
+Currently disabled, returns always C<0>.
 
 =cut
 
@@ -2232,7 +2225,7 @@ Seal/unseal object with write barrier.
 =cut
 */
 static void
-gc_gms_seal_object(PARROT_INTERP, ARGIN(PMC *pmc))
+gc_gms_seal_object(SHIM_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(gc_gms_seal_object)
     /* "Seal" object with write barrier */
@@ -2240,7 +2233,7 @@ gc_gms_seal_object(PARROT_INTERP, ARGIN(PMC *pmc))
 }
 
 static void
-gc_gms_unseal_object(PARROT_INTERP, ARGIN(PMC *pmc))
+gc_gms_unseal_object(SHIM_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(gc_gms_unseal_object)
     /* "Unseal" object with write barrier */
@@ -2253,12 +2246,14 @@ gc_gms_unseal_object(PARROT_INTERP, ARGIN(PMC *pmc))
 
 sanity check
 
+Only enabled with C<-DDETAIL_MEMORY_DEBUG> in C<ccflags>.
+
 =cut
 
 */
 
 static void
-gc_gms_check_sanity(PARROT_INTERP)
+gc_gms_check_sanity(SHIM_INTERP)
 {
     ASSERT_ARGS(gc_gms_check_sanity)
 #ifdef DETAIL_MEMORY_DEBUG
@@ -2303,6 +2298,8 @@ gc_gms_check_sanity(PARROT_INTERP)
 =item C<static void gc_gms_print_stats(PARROT_INTERP, const char* header)>
 
 debug functions
+
+Only enabled with C<-DDETAIL_MEMORY_DEBUG> in C<ccflags>.
 
 =cut
 
