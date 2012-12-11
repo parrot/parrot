@@ -28,7 +28,7 @@ static volatile FLOATVAL current_alarm = 0.0;
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_CAN_RETURN_NULL
-static void* Parrot_alarm_runloop(ARGIN_NULLOK(void *arg));
+static void* Parrot_alarm_runloop(void *arg);
 
 #define ASSERT_ARGS_Parrot_alarm_runloop __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

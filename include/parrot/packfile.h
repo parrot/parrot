@@ -497,7 +497,7 @@ PARROT_EXPORT
 void do_sub_pragmas(PARROT_INTERP,
     ARGIN(PMC *pfpmc),
     pbc_action_enum_t action,
-    ARGIN_NULLOK(PMC *eval_pmc))
+    PMC *eval_pmc)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

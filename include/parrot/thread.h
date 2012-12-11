@@ -118,7 +118,7 @@ void Parrot_clone_code(Parrot_Interp d, Parrot_Interp s);
 int Parrot_get_num_threads(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-int Parrot_set_num_threads(PARROT_INTERP, INTVAL numthreads)
+int Parrot_set_num_threads(PARROT_INTERP, INTVAL number_of_threads)
         __attribute__nonnull__(1);
 
 PARROT_CANNOT_RETURN_NULL
