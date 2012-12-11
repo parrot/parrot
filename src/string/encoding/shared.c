@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2010, Parrot Foundation.
+Copyright (C) 2004-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -482,6 +482,8 @@ encoding_ord_error(PARROT_INTERP, ARGIN(const STRING *s), INTVAL offset)
         err_msg = "Cannot get character past end of string";
     else if (offset < 0)
         err_msg = "Cannot get character before beginning of string";
+    else
+        err_msg = "Unknown encoding_ord_error";
 
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ORD_OUT_OF_STRING,
         err_msg);
