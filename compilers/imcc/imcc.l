@@ -1352,7 +1352,7 @@ imcc_cleanup_input(ARGMOD(imc_info_t * imcc), PIOHANDLE file,
 
 INTVAL
 imcc_compile_buffer_safe(ARGMOD(imc_info_t *imcc), yyscan_t yyscanner,
-        ARGIN(STRING *source), int is_file, int is_pasm)
+        ARGIN(STRING *source), int is_file, SHIM(int is_pasm))
 {
     yyguts_t * const yyg = (yyguts_t *)yyscanner;
     YY_BUFFER_STATE  volatile buffer;
@@ -1374,7 +1374,7 @@ imcc_compile_buffer_safe(ARGMOD(imc_info_t *imcc), yyscan_t yyscanner,
 }
 
 static void
-do_a_better_error_message(imc_info_t * imcc, void * yyscanner)
+do_a_better_error_message(imc_info_t * imcc, SHIM(void * yyscanner))
 {
     STRING * loc;
     imcc->error_code    = IMCC_PARSEFAIL_EXCEPTION;

@@ -1890,6 +1890,10 @@ int yyget_lineno (yyscan_t yyscanner );
 
 void yyset_lineno (int line_number ,yyscan_t yyscanner );
 
+int yyget_column  (yyscan_t yyscanner );
+
+void yyset_column (int column_no ,yyscan_t yyscanner );
+
 /* Macros after this point can all be overridden by user definitions in
  * section 1.
  */
@@ -2059,7 +2063,7 @@ YY_DECL
             return 0;
         }
 
-#line 2063 "compilers/imcc/imclexer.c"
+#line 2067 "compilers/imcc/imclexer.c"
 
 	if ( !yyg->yy_init )
 		{
@@ -3230,7 +3234,7 @@ YY_RULE_SETUP
 #line 703 "compilers/imcc/imcc.l"
 ECHO;
 	YY_BREAK
-#line 3234 "compilers/imcc/imclexer.c"
+#line 3238 "compilers/imcc/imclexer.c"
 case YY_STATE_EOF(pod):
 case YY_STATE_EOF(cmt1):
 case YY_STATE_EOF(cmt2):
@@ -5093,7 +5097,7 @@ imcc_cleanup_input(ARGMOD(imc_info_t * imcc), PIOHANDLE file,
 
 INTVAL
 imcc_compile_buffer_safe(ARGMOD(imc_info_t *imcc), yyscan_t yyscanner,
-        ARGIN(STRING *source), int is_file, int is_pasm)
+        ARGIN(STRING *source), int is_file, SHIM(int is_pasm))
 {
     yyguts_t * const yyg = (yyguts_t *)yyscanner;
     YY_BUFFER_STATE  volatile buffer;
@@ -5115,7 +5119,7 @@ imcc_compile_buffer_safe(ARGMOD(imc_info_t *imcc), yyscan_t yyscanner,
 }
 
 static void
-do_a_better_error_message(imc_info_t * imcc, void * yyscanner)
+do_a_better_error_message(imc_info_t * imcc, SHIM(void * yyscanner))
 {
     STRING * loc;
     imcc->error_code    = IMCC_PARSEFAIL_EXCEPTION;
