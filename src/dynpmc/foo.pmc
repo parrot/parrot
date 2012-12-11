@@ -10,10 +10,13 @@
 pmclass Foo dynpmc group foo_group provides scalar extends Integer auto_attrs {
 
     VTABLE INTVAL get_integer() {
+        UNUSED(INTERP)
+        UNUSED(SELF)
         return 42;
     }
 
     MULTI PMC* subtract(Integer value, PMC *dest) {
+        UNUSED(value)
         if (!dest)
             dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_integer_native(INTERP, dest, 144);
@@ -21,6 +24,7 @@ pmclass Foo dynpmc group foo_group provides scalar extends Integer auto_attrs {
     }
 
     MULTI PMC* subtract(DEFAULT value, PMC *dest) {
+        UNUSED(value)
         if (!dest)
             dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         VTABLE_set_integer_native(INTERP, dest, 244);
