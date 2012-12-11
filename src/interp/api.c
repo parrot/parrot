@@ -1007,6 +1007,7 @@ Parrot_interp_info_s(PARROT_INTERP, INTVAL what)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                 "illegal argument in Parrot_interp_info_s");
     }
+    return CONST_STRING(interp, ""); /* in case of errors */
 }
 
 /*
