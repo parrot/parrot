@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -42,6 +42,7 @@ Create empty PackfileAnnotation.
 */
 
     VTABLE void init() {
+        UNUSED(INTERP)
         Parrot_PackfileAnnotation_attributes * const attrs =
                 PMC_data_typed(SELF, Parrot_PackfileAnnotation_attributes*);
 
@@ -228,6 +229,7 @@ Set the integer value of the annotation.
 
 */
     VTABLE void set_integer_native(INTVAL value) {
+        UNUSED(INTERP)
         Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
         attrs->value_type = PF_ANNOTATION_KEY_TYPE_INT;
         attrs->int_value  = value;
@@ -261,6 +263,7 @@ Set the string value of the annotation.
 
 */
     VTABLE void set_string_native(STRING * value) {
+        UNUSED(INTERP)
         Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
         attrs->value_type = PF_ANNOTATION_KEY_TYPE_STR;
         attrs->str_value  = value;

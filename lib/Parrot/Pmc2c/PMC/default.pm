@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2012, Parrot Foundation.
+# Copyright (C) 2007-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -82,25 +82,12 @@ sub _generate_default_method {
          }
      );
 
-    # Take care to mark the parameters as unused
+    # take care to mark the parameters as unused
     # to avoid compiler warnings
     my $body;
-    if ($clone->parameters eq '') {     # none
-    }
-    elsif ($clone->parameters !~ /,/) { # single
-        #$clone->{parameters} =~ s/(.*)\b(\w+)/SHIM($1$2)/; # cannot SHIM them yet, _orig
-        $clone->{parameters} =~ /(.*)\b(\w+)/;
-        $body .= "    UNUSED($2)\n";
-    }
-    else {
-        #my $new_params = '';
-        foreach my $param (split /,\s*/, $clone->parameters) { # multiple
-            #$param =~ s/(.*)\b(\w+)/SHIM($1$2)/;
-            $param =~ /(.*)\b(\w+)/;
-            $body .= "    UNUSED($2)\n";
-            #$new_params .= "$param, ";
-        }
-        #$clone->{parameters} = substr($new_params,0,-2);
+    foreach my $param (split /,\s*/, $method->parameters) {
+        $param =~ s/.*\b(\w+)/$1/;
+        $body .= "    UNUSED($param)\n";
     }
     my $vt_method_name = uc $method->name;
     $body .= qq{    $stub_func(interp, _self, PARROT_VTABLE_SLOT_$vt_method_name);\n};

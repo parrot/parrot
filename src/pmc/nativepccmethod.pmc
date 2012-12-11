@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2011, Parrot Foundation.
+Copyright (C) 2010-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -38,6 +38,7 @@ Initializes the PMC with a C<NULL> function pointer.
 */
 
     VTABLE void init() {
+        UNUSED(INTERP)
         Parrot_NativePCCMethod_attributes * const attrs = PARROT_NATIVEPCCMETHOD(SELF);
 
         attrs->func               = NULL;
@@ -64,10 +65,12 @@ Set the pointer to the native function and the PCC signature.
 
 
     VTABLE void *get_pointer() {
+        UNUSED(INTERP)
         return PARROT_NATIVEPCCMETHOD(SELF)->func;
     }
 
     VTABLE void set_pointer_keyed_str(STRING *sig, void *func) {
+        UNUSED(INTERP)
         PARROT_NATIVEPCCMETHOD(SELF)->signature = sig;
         PARROT_NATIVEPCCMETHOD(SELF)->func = func;
     }
@@ -85,6 +88,7 @@ NULLness check.
 */
 
     VTABLE INTVAL defined() {
+        UNUSED(INTERP)
         return !! PARROT_NATIVEPCCMETHOD(SELF)->func;
     }
 
@@ -148,9 +152,9 @@ Mark contained elements for GC.
     VTABLE void mark() {
         const Parrot_NativePCCMethod_attributes * const attrs = PARROT_NATIVEPCCMETHOD(SELF);
 
-        Parrot_gc_mark_STRING_alive(interp, attrs->signature);
-        Parrot_gc_mark_STRING_alive(interp, attrs->mmd_long_signature);
-        Parrot_gc_mark_PMC_alive(interp,    attrs->mmd_multi_sig);
+        Parrot_gc_mark_STRING_alive(INTERP, attrs->signature);
+        Parrot_gc_mark_STRING_alive(INTERP, attrs->mmd_long_signature);
+        Parrot_gc_mark_PMC_alive(INTERP,    attrs->mmd_multi_sig);
     }
 
 /*
