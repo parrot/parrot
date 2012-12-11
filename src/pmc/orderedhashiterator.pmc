@@ -124,6 +124,7 @@ Returns this Iterator's Hash.
 
 */
     VTABLE PMC* get_pmc() {
+        UNUSED(INTERP)
         return PARROT_ORDEREDHASHITERATOR(SELF)->pmc_hash;
     }
 
@@ -152,6 +153,7 @@ Returns the number of remaining elements in the Hash.
 */
 
     VTABLE INTVAL elements() {
+        UNUSED(INTERP)
         return PARROT_ORDEREDHASHITERATOR(SELF)->elements;
     }
 

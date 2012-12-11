@@ -181,12 +181,15 @@ Returns the flags describing the visit action
 
 Pushes the integer C<v> onto the end of the image.
 
+The argument C<v> is currently ignored.
+
 =cut
 
 */
 
     VTABLE void push_integer(INTVAL v) {
         UNUSED(INTERP)
+        UNUSED(v)
         const size_t len = PF_size_integer() * sizeof (opcode_t);
         PARROT_IMAGEIOSIZE(SELF)->size += len;
     }

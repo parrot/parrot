@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -289,6 +289,7 @@ Raises an exception; you can only instantiate objects from a class.
 */
 
     VTABLE void init() {
+        UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Object must be created by a class.");
     }
@@ -305,6 +306,8 @@ Raises an exception; you can only instantiate objects from a class.
 */
 
     VTABLE void init_pmc(PMC *worreva) {
+        UNUSED(SELF)
+        UNUSED(worreva)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Object must be created by a class.");
     }
@@ -320,6 +323,8 @@ Just to avoid the automatic generation of one.
 
 */
     VTABLE void destroy() {
+        UNUSED(INTERP)
+        UNUSED(SELF)
     }
 
 
@@ -627,6 +632,7 @@ Get the class PMC representing the class that this object is an instance of.
 
 */
     VTABLE PMC *get_class() {
+        UNUSED(INTERP)
         return PARROT_OBJECT(SELF)->_class;
     }
 
@@ -913,14 +919,22 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
 
 Realias magically generated methods so they don't wreak havoc.
 
+The C<info> arguments are ignored.
+
 =cut
 
 */
 
     VTABLE void freeze(PMC *info) {
+        UNUSED(INTERP)
+        UNUSED(SELF)
+        UNUSED(info)
     }
 
     VTABLE void thaw(PMC *info) {
+        UNUSED(INTERP)
+        UNUSED(SELF)
+        UNUSED(info)
     }
 
 
@@ -935,6 +949,8 @@ Called after the object has been thawed.
 */
 
     VTABLE void thawfinish(PMC *info) {
+        UNUSED(INTERP)
+        UNUSED(info)
         /* Set custom GC mark and destroy on the object. */
         PObj_custom_mark_SET(SELF);
         PObj_custom_destroy_SET(SELF);

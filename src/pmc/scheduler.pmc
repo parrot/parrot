@@ -206,8 +206,8 @@ Frees the scheduler's underlying struct.
 
 */
     VTABLE void destroy() {
-        UNUSED(SELF)
         UNUSED(INTERP)
+        UNUSED(SELF)
     }
 
 
@@ -311,12 +311,10 @@ Finishes thawing the scheduler.
 */
 
     VTABLE void thawfinish(PMC *info) {
-#if 1
         UNUSED(INTERP)
         UNUSED(SELF)
-#else
-        Parrot_cx_refresh_task_list(INTERP, SELF);
-#endif
+        UNUSED(info)
+        /* Parrot_cx_refresh_task_list(INTERP, SELF); */
     }
 
 
