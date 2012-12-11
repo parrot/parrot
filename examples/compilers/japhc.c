@@ -27,8 +27,8 @@ example compiler used by japh16.pasm
  */
 
 #include "parrot/parrot.h"
-#define CONST_STRING(i, s) Parrot_str_new_constant((i), s)
-#define CONST_STRING_GEN(i, s) Parrot_str_new_constant((i), s)
+#define CONST_STRING(i, s) Parrot_str_new_constant((i), (s))
+#define CONST_STRING_GEN(i, s) Parrot_str_new_constant((i), (s))
 #include "pmc/pmc_sub.h"
 
 #define C_DEBUG 0
