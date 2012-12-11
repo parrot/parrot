@@ -80,8 +80,8 @@ Adds an integer "value" to a Rational-PMC inplace.
 */
 static void rat_add_integer(PARROT_INTERP, PMC *self, int value) {
   #ifdef PARROT_HAS_GMP
-    UNUSED(interp)
     mpq_t t;
+    UNUSED(interp)
 
     mpq_init(t);
     mpq_set_si(t, value, 1);
@@ -106,8 +106,8 @@ rational using GMPs mpq_set_d-function. This is meant to be exact.
 */
 static void rat_add_float(PARROT_INTERP, PMC *self, double value) {
   #ifdef PARROT_HAS_GMP
-    UNUSED(interp)
     mpq_t t;
+    UNUSED(interp)
 
     mpq_init(t);
     mpq_set_d(t, value);
@@ -151,8 +151,8 @@ Multiplies a Rational-PMC with a float "value" in-place.
 */
 static void rat_multiply_float(PARROT_INTERP, PMC *self, double value) {
   #ifdef PARROT_HAS_GMP
-    UNUSED(interp)
     mpq_t t;
+    UNUSED(interp)
 
     mpq_init(t);
     mpq_set_d(t, (double) value);
@@ -176,8 +176,8 @@ Divides a Rational-PMC through an integer "value" in-place.
 */
 static void rat_divide_integer(PARROT_INTERP, PMC *self, int value) {
   #ifdef PARROT_HAS_GMP
-    UNUSED(interp)
     mpq_t t;
+    UNUSED(interp)
 
     mpq_init(t);
     mpq_set_si(t, (int) value, 1);
@@ -201,8 +201,8 @@ Divides a Rational-PMC through a float "value" in-place.
 */
 static void rat_divide_float(PARROT_INTERP, PMC *self, double value) {
   #ifdef PARROT_HAS_GMP
-    UNUSED(interp)
     mpq_t t;
+    UNUSED(interp)
 
     mpq_init(t);
     mpq_set_d(t, (double) value);
