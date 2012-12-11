@@ -229,6 +229,7 @@ Parrot_io_internal_async(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL async)
         return rflags;
     }
 #else
+    UNUSED(async)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_NOT_IMPLEMENTED,
         "Async support not available");
 #endif
