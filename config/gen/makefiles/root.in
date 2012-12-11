@@ -1951,13 +1951,16 @@ src/gc/malloc$(O) : src/gc/malloc.c
 
 src/warnings$(O) : $(PARROT_H_HEADERS) src/warnings.c
 
-src/string/sprintf$(O) : $(PARROT_H_HEADERS) src/string/sprintf.c src/string/spf_private.h
-
 src/utils$(O) : \
 	$(PARROT_H_HEADERS) \
 	$(INC_PMC_DIR)/pmc_nci.h \
 	src/utils.c \
 	$(EXTEND_HEADERS)
+
+## SUFFIX OVERRIDE
+src/string/sprintf$(O) : $(PARROT_H_HEADERS) src/string/sprintf.c src/string/spf_private.h
+	$(CC) $(CFLAGS) @optimize::src/string/sprintf.c@ @ccwarn::src/string/sprintf.c@ @cc_shared@ \
+	  -I$(@D) @cc_o_out@$@ -c src/string/sprintf.c
 
 ## SUFFIX OVERRIDE
 src/string/spf_render$(O) : $(PARROT_H_HEADERS) src/string/spf_render.str \

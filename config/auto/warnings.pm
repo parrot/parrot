@@ -125,7 +125,6 @@ sub _init {
         -Wall
         -Wextra
         -Waggregate-return
-        -Wcast-align
         -Wcast-qual
         -Wdisabled-optimization
         -Wdiv-by-zero
@@ -289,10 +288,18 @@ sub _init {
     $data->{'warnings'}{'g++'} = $gpp;
     $data->{'warnings'}{'icc'} = $icc;
     $data->{'warnings'}{'clang'} = $gcc;
+    $data->{'warnings'}{'clang'}->{'cage'} = [ @gcc_or_gpp_cage, '-Wcast-align' ];
 
     $data->{'warnings'}{'clang'}->{'override'} = {
         '-Wno-parentheses-equality' => [ qw(
             src/ops/core_ops.c
+        ) ],
+        '-Wno-format-nonliteral' => [ qw(
+            src/string/sprintf.c
+            src/string/spf_render.c
+        ) ],
+        '-Wno-unused-parameter' => [ qw(
+            compilers/imcc/imclexer.c
         ) ],
     };
 
@@ -334,11 +341,8 @@ sub runstep {
         [ 'src/string/encoding/shared.c' ];
 
     if ($conf->data->get('clang') and $compiler eq 'g++') { # clang++
-        $self->{'warnings'}{'g++'}{'override'} = {
-            '-Wno-parentheses-equality' => [ qw(
-                src/ops/core_ops.c
-            ) ],
-        };
+        $self->{'warnings'}{'g++'}{'override'} =
+          $self->{'warnings'}{'clang'}->{'override'};
     }
 
     # standard warnings.
