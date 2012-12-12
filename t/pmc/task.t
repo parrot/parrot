@@ -1,20 +1,22 @@
 #!./parrot
-# Copyright (C) 2010-2011, Parrot Foundation.
+# Copyright (C) 2010-2012, Parrot Foundation.
 
 .include 'sysinfo.pasm'
 .loadlib 'sys_ops'
 
 .sub main
+    # TODO not yet thread-safe (schedule counter updates)
+    # Use say instead inside tasks
     .include 'test_more.pir'
 
-    plan(6)
+    plan(9)
 
     ok(1, "initialized")
 
     tasks_run()
     task_send_recv()
-#    task_kill()      # kill NYI
-#    preempt_and_exit()
+    task_kill()
+    preempt_and_exit() # TODO does exit with 1
 .end
 
 .sub tasks_run
@@ -99,26 +101,32 @@ ok:
     pass
     $P1.'kill'()
     wait $P1
-    ok(1, "task_to_kill killed")
+
+    # poor man's sleep, sleep is also concurrent now
+    $I0 = 0
+loop:
+    $I0 = $I0 + 1
+    if $I0 < 2000 goto loop
+    print "ok 8 task_to_kill killed\n"
 .end
 
 .sub task_to_kill
-    ok(1, "task_to_kill running")
+    print "ok 7 task_to_kill running\n"
     sleep 0.2
-    ok(0, "task_to_kill wasn't killed")
+    say "not ok 8 task_to_kill wasn't killed"
 .end
 
 .sub preempt_and_exit
     $P0 = get_global 'exit0'
     $P1 = new 'Task', $P0
     schedule $P1
-
 again:
     goto again
 .end
 
 .sub exit0
-    say "ok 7 Pre-empt and exit"
+    say "ok 9 pre-empt and exit"
+    # TODO This causes parrot to exit with 1
     exit 0
 .end
 

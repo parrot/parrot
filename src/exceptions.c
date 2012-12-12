@@ -150,7 +150,7 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
         }
     }
 
-    Parrot_x_jump_out(interp, 1);
+    Parrot_x_jump_out(interp, interp->exit_code);
 }
 
 /*
