@@ -474,6 +474,20 @@ result in $1. (This is useful for storing data for a parent class
 attribute that is overridden in a child class.) The parent $3 is a
 class name, namespace, or key PMC.
 
+=item B<getattribute>(out INT, invar PMC, in STR)
+
+=item B<getattribute>(out INT, invar PMC, in PMC, in STR)
+
+=item B<getattribute>(out STR, invar PMC, in STR)
+
+=item B<getattribute>(out STR, invar PMC, in PMC, in STR)
+
+=item B<getattribute>(out NUM, invar PMC, in STR)
+
+=item B<getattribute>(out NUM, invar PMC, in PMC, in STR)
+
+Native variants
+
 =cut
 
 inline op getattribute(out PMC, invar PMC, in STR) :object_classes {
@@ -483,6 +497,37 @@ inline op getattribute(out PMC, invar PMC, in STR) :object_classes {
 inline op getattribute(out PMC, invar PMC, in PMC, in STR) :object_classes {
     $1 = VTABLE_get_attr_keyed(interp, $2, $3, $4);
 }
+
+inline op getattribute(out INT, invar PMC, in STR) :object_classes {
+    PMC * const attr = VTABLE_get_attr_str(interp, $2, $3);
+    $1 = VTABLE_get_integer(interp, attr);
+}
+
+inline op getattribute(out INT, invar PMC, in PMC, in STR) :object_classes {
+    PMC * const attr = VTABLE_get_attr_keyed(interp, $2, $3, $4);
+    $1 = VTABLE_get_integer(interp, attr);
+}
+
+inline op getattribute(out STR, invar PMC, in STR) :object_classes {
+    PMC * const attr = VTABLE_get_attr_str(interp, $2, $3);
+    $1 = VTABLE_get_string(interp, attr);
+}
+
+inline op getattribute(out STR, invar PMC, in PMC, in STR) :object_classes {
+    PMC * const attr = VTABLE_get_attr_keyed(interp, $2, $3, $4);
+    $1 = VTABLE_get_string(interp, attr);
+}
+
+inline op getattribute(out NUM, invar PMC, in STR) :object_classes {
+    PMC * const attr = VTABLE_get_attr_str(interp, $2, $3);
+    $1 = VTABLE_get_number(interp, attr);
+}
+
+inline op getattribute(out NUM, invar PMC, in PMC, in STR) :object_classes {
+    PMC * const attr = VTABLE_get_attr_keyed(interp, $2, $3, $4);
+    $1 = VTABLE_get_number(interp, attr);
+}
+
 
 =item B<setattribute>(invar PMC, in STR, invar PMC)
 
@@ -494,6 +539,20 @@ Set attribute $3 of the parent $2 of object $1 to $4. (This is useful
 for storing data for a parent class attribute that is overridden in a
 child class.) The parent $2 is a class name, namespace, or key PMC.
 
+=item B<setattribute>(invar PMC, in STR, invar INT)
+
+=item B<setattribute>(invar PMC, in PMC, in STR, invar INT)
+
+=item B<setattribute>(invar PMC, in STR, invar STR)
+
+=item B<setattribute>(invar PMC, in PMC, in STR, invar STR)
+
+=item B<setattribute>(invar PMC, in STR, invar NUM)
+
+=item B<setattribute>(invar PMC, in PMC, in STR, invar NUM)
+
+Native variants
+
 =cut
 
 inline op setattribute(invar PMC, in STR, invar PMC) :object_classes {
@@ -502,6 +561,36 @@ inline op setattribute(invar PMC, in STR, invar PMC) :object_classes {
 
 inline op setattribute(invar PMC, in PMC, in STR, invar PMC) :object_classes {
     VTABLE_set_attr_keyed(interp, $1, $2, $3, $4);
+}
+
+inline op setattribute(invar PMC, in STR, invar INT) :object_classes {
+    PMC * const attr = Parrot_pmc_box_integer(interp, $3);
+    VTABLE_set_attr_str(interp, $1, $2, attr);
+}
+
+inline op setattribute(invar PMC, in PMC, in STR, invar INT) :object_classes {
+    PMC * const attr  = Parrot_pmc_box_integer(interp, $4);
+    VTABLE_set_attr_keyed(interp, $1, $2, $3, attr);
+}
+
+inline op setattribute(invar PMC, in STR, invar STR) :object_classes {
+    PMC * const attr = Parrot_pmc_box_string(interp, $3);
+    VTABLE_set_attr_str(interp, $1, $2, attr);
+}
+
+inline op setattribute(invar PMC, in PMC, in STR, invar STR) :object_classes {
+    PMC * const attr = Parrot_pmc_box_string(interp, $4);
+    VTABLE_set_attr_keyed(interp, $1, $2, $3, attr);
+}
+
+inline op setattribute(invar PMC, in STR, invar NUM) :object_classes {
+    PMC * const attr = Parrot_pmc_box_number(interp, $3);
+    VTABLE_set_attr_str(interp, $1, $2, attr);
+}
+
+inline op setattribute(invar PMC, in PMC, in STR, invar NUM) :object_classes {
+    PMC * const attr = Parrot_pmc_box_number(interp, $4);
+    VTABLE_set_attr_keyed(interp, $1, $2, $3, attr);
 }
 
 ###############################################################################
