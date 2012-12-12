@@ -254,11 +254,16 @@ sub decl {
     $ret =~ s/^(.*)\s*(\*)$/$1 $2/;
 
     # convert args to PDD07
+    $self->{parameters} =~ s/(\w+)\s*(\*)\s*/$1 $2/g;
+    $args = $self->parameters;
     $args = ", $args" if $args =~ /\S/;
-    $args =~ s/(\w+)\s*(\*)\s*/$1 $2/g;
 
-    # SHIM UNUSED(arg) in body
+    # SHIM UNUSED(args) in body
     my $body = $self->body;
+    if ($body =~ /^\s*$/s) { # empty body
+        $self->{interp_unused} = 1;
+        $self->{pmc_unused}    = 1;
+    }
     my (%unused, $cnt);
     if ($body->{data} and $body->{data} !~ /^\s*#if/m) {
         while ($body->{data} =~ /^\s*UNUSED\((\w+)\);?\n/m) {
@@ -296,7 +301,6 @@ sub decl {
     }
 
     my $params = $self->parameters;
-    $params =~ s/(\w+)\s*(\*)\s*/$1 $2/g;
     for my $key ('INTERP', 'SELF',
                  map { /.*\b(\w+)$/ } split /,\s*/, $params) {
         my $inbody = $key eq 'INTERP' ? '(INTERP|interp)'
