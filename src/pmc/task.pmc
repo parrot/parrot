@@ -176,7 +176,7 @@ code as the first argument.
             Parrot_pcc_set_recursion_depth(interp, CURRENT_CONTEXT(interp), current_depth);
         }
 
-        /* TODO: racy read with write in send TASK_recv_block_CLEAR(partner) */
+        /* Fixed possibly racy read with write in send TASK_recv_block_CLEAR(partner) */
         if (task->killed || !TASK_in_preempt_TEST(SELF)) {
             /* The task is done. */
             /* Remove it from the set of active Tasks */
@@ -429,7 +429,7 @@ Called after the task has been thawed.
 
 =back
 
-=head2 Methdods
+=head2 Methods
 
 =over 4
 
@@ -457,9 +457,10 @@ Send a message to this task.
             LOCK(tdata->mailbox_lock);
             Parrot_block_GC_mark_locked(pdata->interp);
             if (TASK_recv_block_TEST(partner)) {
-                /* TODO: racy write with read in invoke task->killed || in_preempt */
-                TASK_recv_block_CLEAR(partner);
+                /* Was: racy write with read in invoke task->killed || in_preempt */
+                /* TASK_recv_block_CLEAR(partner); */
                 Parrot_cx_schedule_immediate(pdata->interp, partner);
+                TASK_recv_block_CLEAR(partner);
             }
             Parrot_unblock_GC_mark_locked(pdata->interp);
             UNLOCK(tdata->mailbox_lock);
@@ -475,6 +476,20 @@ Send a message to this task.
 /*
     METHOD receive() {
     }
+*/
+
+/*
+
+=item METHOD code(PMC * code :optional)
+
+Read or write optional code, an C<invokable> PMC related to this task.
+
+=item METHOD data(PMC * data :optional)
+
+Reads or writes optional task-specific data, that will be passed to C<code> when invoked.
+
+=cut
+
 */
 
     METHOD code(PMC * code :optional, INTVAL has_code :opt_flag) {
@@ -519,7 +534,7 @@ Kill this task.
 
 =head1 SEE ALSO
 
-F<docs/pdds/pdd15_objects.pod>.
+F<docs/pdds/pdd25_concurrency.pod>.
 
 =cut
 
