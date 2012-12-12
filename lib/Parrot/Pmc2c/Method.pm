@@ -260,7 +260,7 @@ sub decl {
 
     # SHIM UNUSED(args) in body
     my $body = $self->body;
-    if ($body =~ /^\s*$/s) { # empty body
+    if ($body =~ /^\s*(return \d;|)$/s) { # empty body
         $self->{interp_unused} = 1;
         $self->{pmc_unused}    = 1;
     }
