@@ -267,6 +267,23 @@ Test if the socket is closed.
 
 /*
 
+=item C<getprotobyname(STRING * name)>
+
+C<getprotobyname> returns a protocol number suitable for passing to
+C<socket>, based on the given protocol name. This is normal only
+necessary when opening sockets in raw mode.
+
+=cut
+
+*/
+
+    METHOD getprotobyname(STRING * name) {
+        INTVAL proto = Parrot_io_get_proto_by_name(INTERP, name);
+        RETURN(INTVAL proto);
+    }
+
+/*
+
 =item C<connect(PMC * address)>
 
 Connects a socket object to an address.

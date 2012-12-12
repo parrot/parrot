@@ -279,6 +279,12 @@ Parrot_io_fprintf(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+INTVAL Parrot_io_get_proto_by_name(PARROT_INTERP, ARGIN(STRING * name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 PIOHANDLE Parrot_io_getfd(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -718,6 +724,9 @@ INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc) \
     , PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_Parrot_io_get_proto_by_name __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_Parrot_io_getfd __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))

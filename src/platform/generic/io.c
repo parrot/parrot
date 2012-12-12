@@ -516,6 +516,32 @@ Parrot_io_internal_pipe(SHIM_INTERP, ARGMOD(PIOHANDLE *reader), ARGMOD(PIOHANDLE
 
 /*
 
+=item C<INTVAL Parrot_io_get_proto_by_name(PARROT_INTERP, STRING *name)>
+
+Return a protocol number based on the name of a protocol
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+INTVAL
+Parrot_io_get_proto_by_name(PARROT_INTERP, ARGIN(STRING *name))
+{
+    ASSERT_ARGS(Parrot_io_get_proto_by_name)
+
+    char            * const s        = Parrot_str_to_cstring(interp, name);
+    struct protoent * const protoent = getprotobyname(s);
+    int                     proto_number;
+
+    Parrot_str_free_cstring(s);
+    proto_number = protoent->p_proto;
+    return proto_number;
+}
+
+
+/*
+
 =back
 
 =head1 SEE ALSO
