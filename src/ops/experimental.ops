@@ -476,7 +476,6 @@ Terminate the current task immediately.
 =cut
 
 op terminate() {
-    UNUSED(INTERP)
     goto ADDRESS(0);
 }
 

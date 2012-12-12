@@ -235,7 +235,6 @@ Jump to the address held in register $1.
 =cut
 
 inline op jump(in LABEL) :base_loop :flow {
-    UNUSED(INTERP)
     opcode_t * const loc = INTVAL2PTR(opcode_t *, $1);
     goto ADDRESS(loc);
 }
