@@ -48,6 +48,8 @@
           not the parrot version triple. Removed the duplicate PARROT_DYNOP_CORE_INIT
           cpp definition in include/parrot/oplib/core_ops.h, use only
           PARROT_CORE_OPLIB_INIT from config.h
+        + Changed API for packfile_fetch_nv_t fetch_nv(), added a third argument
+          (only used internally)
         + Store PBC_MAJOR and PBC_MINOR in the config hash, stored by auto::revision
         + Added getprotobyname method to the Socket PMC
     - Documentation
