@@ -347,17 +347,16 @@ Returns C<struct_val>.
 
 Returns the thread id of the interpreter.
 
-Returns currently always the task id, which might be different to the OS thread id.
-
 =cut
 
 */
 
     VTABLE INTVAL get_integer() {
-        const Parrot_Interp this_interp = PMC_interp(SELF);
-        PMC * const current_task = this_interp->cur_task;
+        const Parrot_Interp i = PMC_interp(SELF);
         UNUSED(INTERP)
-        return PARROT_TASK(current_task)->id;
+        if (i->thread_data)
+            return (INTVAL)i->thread_data->tid;
+        return 0;
     }
 
 /*
