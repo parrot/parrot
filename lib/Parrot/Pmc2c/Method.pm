@@ -260,20 +260,20 @@ sub decl {
     # SHIM UNUSED(arg) in body
     my $body = $self->body;
     my (%unused, $cnt);
-    if ($body->{data} and $body !~ /^\s*#if/m) {
-        while ($body->{data} =~ /^\s*UNUSED\((\w+)\)/m) {
+    if ($body->{data} and $body->{data} !~ /^\s*#if/m) {
+        while ($body->{data} =~ /^\s*UNUSED\((\w+)\);?\n/m) {
             my $key = $1;
             $cnt++;
             if ($cnt > 6) {
-                warn "Internal Error: UNUSED($key) detection recursion in $pmcname METHOD $meth\n"
-                  .$args."\n"
-                    .$body."\n";
+                # This happens when the $body->{data} =~ s/// lines below do not remove the line
+                warn "Internal Error: UNUSED($key) detection recursion in $pmcname.$meth($args)\n"
+                  .$body->{data}."\n";
                 last;
             }
             if ($key eq 'INTERP' or $key eq 'interp') {
                 $unused{INTERP}++;
                 $self->{interp_unused} = 1;
-                $body->{data} =~ s/^\s*UNUSED\($key\);?\n//;
+                $body->{data} =~ s/^\s*UNUSED\($key\);?\n//m;
                 warn "Replace UNUSED(interp) with UNUSED(INTERP) in $pmcname METHOD $meth\n"
                   if $key eq 'interp'
                     and $self->{parent_name} ne 'Null'
@@ -281,13 +281,13 @@ sub decl {
             } elsif ($body->{data} =~ /^\s*UNUSED\(SELF\)/m) {
                 $unused{SELF}++;
                 $self->{pmc_unused} = 1;
-                $body->{data} =~ s/^\s*UNUSED\(SELF\);?\n//;
+                $body->{data} =~ s/^\s*UNUSED\(SELF\);?\n//m;
             } elsif ($args =~ s/, (\w+ \*?$key)/, SHIM($1)/) {
                 $unused{$key}++;
-                $body->{data} =~ s/^\s*UNUSED\($key\);?\n//;
+                $body->{data} =~ s/^\s*UNUSED\($key\);?\n//m;
                 $self->{parameters} =~ s/(\w+ \*?$key)/SHIM($1)/;
             } else {
-                $body->{data} =~ s|^(\s*)UNUSED\($key\);?\n|$1/**/UNUSED\($key\)\n|;
+                $body->{data} =~ s|^(\s*)UNUSED\($key\);?\n|$1/**/UNUSED\($key\)\n|m;
                 $unused{$key}++;
                 warn "Did not SHIM UNUSED($key) in $pmcname METHOD $meth\n";
                 last;
