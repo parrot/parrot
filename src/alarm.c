@@ -126,7 +126,10 @@ Parrot_alarm_runloop(SHIM(void *arg))
         /* If we need to notify, do that here. Otherwise, back to the top of
            the loop*/
         if (notify) {
+            /* possible racy write with read in Parrot_alarm_check */
+            LOCK(alarm_lock);
             alarm_serial += 1;
+            UNLOCK(alarm_lock);
             Parrot_thread_notify_threads(NULL);
         }
     }
