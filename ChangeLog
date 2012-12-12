@@ -12,6 +12,7 @@
           cpp definition in include/parrot/oplib/core_ops.h, use only
           PARROT_CORE_OPLIB_INIT from config.h
         + Store PBC_MAJOR and PBC_MINOR in the config hash, stored by auto::revision
+        + Added native getattribute/setattribute op variants for non-PMC types
     - Documentation
         + Marked unused API parameters
     - Languages
