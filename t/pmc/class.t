@@ -43,8 +43,55 @@ Tests the Class PMC.
      'more does'()
      'anon_inherit'()
      'method_cache_tt1497'()
+     'tailcall_with_overridden_init_gh596'()
 .end
 
+.sub 'tailcall_with_overridden_init_gh596'
+    .local pmc clazz, at1, at2, instance1, instance2
+    newclass clazz, ['Foo']
+    addattribute clazz, 'bar'
+
+    null at1
+    at1 = attrs1(clazz)
+    at1 = at1['bar']
+    at1 = at1['name']
+    null instance1
+    instance1 = newinstance1(clazz)
+    instance1.'hello'()
+
+    null at2
+    at2 = attrs2(clazz)
+    at2 = at2['bar']
+    at2 = at2['name']
+    null instance2
+    instance2 = newinstance2(clazz)
+    instance2.'hello'()
+    ok(1, 'tailcall with an overridden init')
+.end
+
+.sub attrs1
+    .param pmc clazz
+    .local pmc at
+    at = clazz.'attributes'()
+    .return(at)
+.end
+
+.sub attrs2
+    .param pmc clazz
+    .tailcall clazz.'attributes'()
+.end
+
+.sub newinstance1
+    .param pmc clazz
+    .local pmc instance
+    instance = clazz.'new'()
+    .return(instance)
+.end
+
+.sub newinstance2
+    .param pmc clazz
+    .tailcall clazz.'new'()
+.end
 
 # L<PDD15/Class PMC API/=item new>
 .sub 'new op'
@@ -837,6 +884,21 @@ t_class_meth:
     $P0 = foo2
   return_meth:
     .return($P0)
+.end
+
+.namespace ['Foo']
+
+.sub 'init' :method :vtable
+#    diag('Foo.init')
+.end
+
+.sub 'init_pmc' :method :vtable
+    .param pmc value
+#    diag('Foo.init')
+.end
+
+.sub hello :method
+#    diag('Foo.hello')
 .end
 
 # Local Variables:
