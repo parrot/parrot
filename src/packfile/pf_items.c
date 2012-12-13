@@ -626,7 +626,7 @@ cvt_num10_num8(ARGOUT(unsigned char *dest),
         SWAB_10(b, src);
     }
     else
-        memcpy(b, src, 16);
+        memcpy(b, src, 10);
 
     memset(dest, 0, 8);
     /* exponents 15 -> 11 bits */
