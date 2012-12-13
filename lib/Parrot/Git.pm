@@ -25,6 +25,7 @@ package Parrot::Git;
 use strict;
 use warnings;
 use lib qw( lib );
+use base 'Exporter';
 
 our @EXPORT_OK = qw/has_git/;
 
