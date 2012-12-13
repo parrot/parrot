@@ -17,7 +17,8 @@
     - Languages
         + nqp-rx tests updated from perl6/nqp-rx.git, and enabled to run on make test
     - Platforms
-        + More compilation fixes on Windows without working mt.exe or ranlib=rem
+        + More compilation fixes on Windows without working mt.exe or ranlib=rem,
+          enable smoking without git binary.
     - Tools
         + Re-enabled pbc_dump -h --header-only
         + Improved pmc2c, added more UNUSED(arg) macros [GH #836]. Parrot is now almost
