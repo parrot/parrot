@@ -95,18 +95,19 @@ ok:
 .end
 
 .sub task_kill
-    $P0 = get_global 'task_to_kill'
-    $P1 = new 'Task', $P0
-    schedule $P1
+    .local pmc task, code
+    code = get_global 'task_to_kill'
+    task = new 'Task', code
+    schedule task
     pass
-    $P1.'kill'()
-    wait $P1
+    task.'kill'()
+    wait task
 
     # poor man's sleep, sleep is also concurrent now
     $I0 = 0
 loop:
     $I0 = $I0 + 1
-    if $I0 < 2000 goto loop
+    if $I0 < 4000 goto loop
     print "ok 8 task_to_kill killed\n"
 .end
 
@@ -126,7 +127,6 @@ again:
 
 .sub exit0
     say "ok 9 pre-empt and exit"
-    # TODO This causes parrot to exit with 1
     exit 0
 .end
 
