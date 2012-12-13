@@ -2115,7 +2115,7 @@ Parrot_io_reencode_string_for_handle(PARROT_INTERP, ARGIN(PMC *handle), ARGIN_NU
 
 /*
 
-=item C<INTVAL Parrot_io_get_proto_by_name(PARROT_INTERP, STRING * name)>
+=item C<INTVAL Parrot_io_getprotobyname(PARROT_INTERP, STRING * name)>
 
 Return a protocol number given a protocol name.
 
@@ -2128,11 +2128,11 @@ Return a protocol number given a protocol name.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_io_get_proto_by_name(PARROT_INTERP, ARGIN(STRING * name))
+Parrot_io_getprotobyname(PARROT_INTERP, ARGIN(STRING * name))
 {
-    ASSERT_ARGS(Parrot_io_get_proto_by_name)
+    ASSERT_ARGS(Parrot_io_getprotobyname)
 
-    return PIO_GET_PROTO_BY_NAME(interp, name);
+    return Parrot_io_internal_getprotobyname(interp, name);
 }
 
 

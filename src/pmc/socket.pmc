@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008-2011, Parrot Foundation.
+Copyright (C) 2008-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -278,7 +278,7 @@ necessary when opening sockets in raw mode.
 */
 
     METHOD getprotobyname(STRING * name) {
-        INTVAL proto = Parrot_io_get_proto_by_name(INTERP, name);
+        INTVAL proto = Parrot_io_getprotobyname(INTERP, name);
         RETURN(INTVAL proto);
     }
 

@@ -24,7 +24,7 @@ stack, so we don't need to check if this parrot is IPv6-aware.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(19)
+    plan(20)
 
     test_init()
     test_get_fd()
@@ -37,6 +37,7 @@ stack, so we don't need to check if this parrot is IPv6-aware.
     test_tcp_socket6()
     test_udp_socket()
     test_udp_socket6()
+    test_getprotobyname()
     test_server()
 
 .end
@@ -78,6 +79,12 @@ stack, so we don't need to check if this parrot is IPv6-aware.
 
     $N0 = $P0.'is_closed'()
     is($N0, 1, 'Socket is_closed returned 1 to new socket')
+.end
+
+.sub test_getprotobyname
+    new $P0, ['Socket']
+    $N0 = $P0.'getprotobyname'("tcp")
+    is($N0, 6, 'Socket getprotobyname(tcp) returned 6')
 .end
 
 .sub test_clone

@@ -441,6 +441,27 @@ Parrot_io_internal_getnameinfo(PARROT_INTERP, ARGIN(const void *addr), INTVAL le
 
 /*
 
+=item C<INTVAL Parrot_io_internal_getprotobyname(PARROT_INTERP, STRING *name)>
+
+Return a protocol number based on the name of a protocol.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+INTVAL
+Parrot_io_internal_getprotobyname(PARROT_INTERP, ARGIN(STRING *name))
+{
+    char            * const s        = Parrot_str_to_cstring(interp, name);
+    struct protoent * const protoent = getprotobyname(s);
+
+    Parrot_str_free_cstring(s);
+    return protoent->p_proto;
+}
+
+/*
+
 =item C<PIOHANDLE Parrot_io_internal_socket(PARROT_INTERP, int fam, int type,
 int proto)>
 
