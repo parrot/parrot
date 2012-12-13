@@ -291,7 +291,8 @@ sub decl {
                 $unused{$key}++;
                 $body->{data} =~ s/^\s*UNUSED\($key\);?\n//m;
                 $self->{parameters} =~ s/(\w+ \*?$key)/SHIM($1)/;
-            } else {
+            }
+            else {
                 $body->{data} =~ s|^(\s*)UNUSED\($key\);?\n|$1/**/UNUSED\($key\)\n|m;
                 $unused{$key}++;
                 warn "Did not SHIM UNUSED($key) in $pmcname METHOD $meth\n";
