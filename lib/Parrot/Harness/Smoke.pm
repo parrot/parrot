@@ -82,6 +82,7 @@ use warnings;
 
 use lib qw( . lib ../lib ../../lib );
 use Parrot::Config qw/%PConfig/;
+use Parrot::Git qw/has_git/;
 use Parrot::Git::Describe;
 use base qw( Exporter );
 our @EXPORT_OK = qw(
@@ -162,8 +163,9 @@ sub collect_test_environment_data {
       $arch .= 8 * $PConfig{opcodesize};
     }
     my $devel = $PConfig{DEVEL};
+
     # check for local-modifications if -d .git and query to continue
-    if (-d ".git") {
+    if (-d ".git" && has_git()) {
         my $status = `git status`;
         @mods = grep /\S/, map { /^#\s+modified:\s+(.+)$/ and $1 } split(/\n/, $status);
         if (@mods) {
