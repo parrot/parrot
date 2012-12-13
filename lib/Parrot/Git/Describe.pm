@@ -12,7 +12,7 @@ Parrot::Git::Describe - Git describe string of Parrot
 
 =head1 DESCRIPTION
 
-Get Parrot's current and configure time "git describe" string, which is the out of
+Get Parrot's current and configure time "git describe" string, which is the output of
 
     git describe --tags
 
@@ -23,12 +23,14 @@ package Parrot::Git::Describe;
 use strict;
 use warnings;
 use lib qw( lib );
+use Parrot::Git qw/has_git/;
 
 our $current = _get_git_describe();
 
 sub _get_git_describe {
     my $git_describe = 0;
-    if ( -d '.git') {
+
+    if ( -d '.git' && has_git()) {
         $git_describe = `git describe --tags`;
         chomp( $git_describe );
     }
