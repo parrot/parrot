@@ -21,7 +21,7 @@ Tests the ParrotInterpreter PMC.
 .sub main :main
 .include 'test_more.pir'
 
-    plan(18)
+    plan(19)
     test_new()      # 1 test
     test_hll_map()  # 3 tests
     test_hll_map_invalid()  # 1 tests
@@ -154,13 +154,24 @@ Tests the ParrotInterpreter PMC.
 .end
 
 .sub task1
-    $P0 = getinterp
-    $I0 = $P0
+    .local pmc interp, task
+    interp = getinterp
+    task = interp.'current_task'()
+    $I0 = interp
     if $I0 > 0 goto t1
     print "not "
 t1:
-    print "ok 18 #TODO Can not get the task interp yet, child.tid="
+    print "ok 18 #TODO no task interp yet, child.tid="
     say $I0
+
+    $I0 = task
+    if $I0 > 0 goto t2
+    print "not "
+t2:
+    print "ok 19 #TODO reflection in child task.id="
+    say $I0
+
+
     exit 0
 .end
 
