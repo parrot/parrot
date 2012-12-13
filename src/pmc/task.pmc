@@ -252,6 +252,20 @@ Create a copy of the task, resetting status, ID, and birthtime.
 
 /*
 
+=item C<INTVAL get_integer()>
+
+Returns the unique id of the task.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_integer() {
+        return PARROT_TASK(SELF)->id;
+    }
+
+/*
+
 =item C<PMC *get_attr_str(STRING *name)>
 
 Gets the value of an attribute for this task.

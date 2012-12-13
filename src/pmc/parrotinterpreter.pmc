@@ -78,7 +78,7 @@ create_interp(ARGIN(PMC *self), ARGIN_NULLOK(Parrot_Interp parent))
 
 pmclass ParrotInterpreter no_ro manual_attrs provides invokable {
     ATTR struct parrot_interp_t *interp; /* this PMC's interpreter */
-    ATTR INTVAL                  tid;    /* thread id. Unused, see get_integer() */
+    ATTR INTVAL                  tid;    /* thread id. See get_integer() */
     ATTR PMC                    *args;   /* args passed to this thread */
     ATTR PMC                    *sub;    /* this thread's sub */
 
@@ -130,6 +130,8 @@ Initializes the interpreter.
         if (!PMC_interp(SELF))
             create_interp(SELF, INTERP);
         PObj_custom_destroy_SET(SELF);
+        if (INTERP->thread_data)
+            SETATTR_ParrotInterpreter_tid(INTERP, SELF, INTERP->thread_data->tid);
     }
 
 /*
@@ -153,6 +155,8 @@ C<parent> and uses that thread.
         if (!PMC_interp(SELF))
             create_interp(SELF, PMC_interp(parent));
         PObj_custom_destroy_SET(SELF);
+        if (INTERP->thread_data)
+            SETATTR_ParrotInterpreter_tid(INTERP, SELF, INTERP->thread_data->tid);
     }
 
 

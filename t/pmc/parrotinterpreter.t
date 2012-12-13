@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2010, Parrot Foundation.
+# Copyright (C) 2006-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -21,7 +21,7 @@ Tests the ParrotInterpreter PMC.
 .sub main :main
 .include 'test_more.pir'
 
-    plan(14)
+    plan(18)
     test_new()      # 1 test
     test_hll_map()  # 3 tests
     test_hll_map_invalid()  # 1 tests
@@ -95,27 +95,27 @@ Tests the ParrotInterpreter PMC.
     .lex 'foo', interp
 
     $P0 = interp['sub';0]
-    is($P0, 'test_inspect', 'Got ParrotInterp.sub')
+    is($P0, 'test_inspect', 'Got ParrotInterpreter.sub')
 
     $P0 = interp['lexpad';0]
     $I0 = isa $P0, 'LexPad'
-    ok($I0, 'Got ParrotInterp.lexpad')
+    ok($I0, 'Got ParrotInterpreter.lexpad')
 
     $P0 = interp['namespace';0]
     $I0 = isa $P0, 'NameSpace'
-    ok($I0, 'Got ParrotInterp.namespace')
+    ok($I0, 'Got ParrotInterpreter.namespace')
 
     $P0 = interp['continuation';0]
     $I0 = isa $P0, 'Continuation'
-    ok($I0, 'Got ParrotInterp.continuation')
+    ok($I0, 'Got ParrotInterpreter.continuation')
 
     $P0 = interp['annotations';1]
     $S0 = $P0['foo']
-    is($S0, 'bar', 'Got ParrotInterp.annotations')
+    is($S0, 'bar', 'Got ParrotInterpreter.annotations')
 
     $P0 = interp['context';0]
     $I0 = isa $P0, 'CallContext'
-    ok($I0, 'Got ParrotInterp.context')
+    ok($I0, 'Got ParrotInterpreter.context')
     # Add more tests for Context. E.g. it is correct Context by inspecting it.
 
     $P0 = interp['packfile']
@@ -138,7 +138,32 @@ Tests the ParrotInterpreter PMC.
     pop_eh
     ok($I0, "Access to wrong depth throws exception")
 
+    $I0 = interp.'recursion_limit'()
+    ok($I0, "Got recursion_limit")
+
+    $I0 = interp
+    is($I0, 0, "Got parent tid==0")
+
+    $P0 = get_global 'task1'
+    $P1 = new 'Task', $P0
+    $I0 = $P1
+    $I1 = $I0 > 0
+    ok($I1, "child task.id > 0")
+    schedule $P1
+    wait $P1
 .end
+
+.sub task1
+    $P0 = getinterp
+    $I0 = $P0
+    if $I0 > 0 goto t1
+    print "not "
+t1:
+    print "ok 18 #TODO Can not get the task interp yet, child.tid="
+    say $I0
+    exit 0
+.end
+
 
 # Local Variables:
 #   mode: pir
