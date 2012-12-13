@@ -34,7 +34,7 @@ sub _init {
     $data{description} = q{Does your platform support GMP};
     $data{result}      = q{};
     $data{cc_run_expected} =
-"6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151 0\n";
+"6864797660130609714981900799081393217269435300143305409394463459185543183397656052122559640661454554977296311391480858037121987999716643812574028291115057151 0";
 
     return \%data;
 }
@@ -70,18 +70,25 @@ sub runstep {
     if ($has_gmp) {
         $conf->data->add( ' ', libs => $extra_libs );
     }
-    $self->set_result($has_gmp ? 'yes' : 'no');
 
     return 1;
 }
 
 sub _evaluate_cc_run {
     my ($self, $conf, $test, $has_gmp) = @_;
-    if ( $test eq $self->{cc_run_expected} ) {
-        $has_gmp = 1;
-        $conf->debug(" (yes) ");
-        $self->set_result('yes');
+    my ($expected_line, $version_line)= split /\n/, $test;
 
+    if ( $expected_line eq $self->{cc_run_expected} ) {
+        $has_gmp = 1;
+        my $gmp_version = (split(/ /, $version_line))[1];
+
+        if ($gmp_version) {
+            $conf->debug("(yes, $gmp_version) ");
+            $self->set_result("yes, $gmp_version");
+        } else {
+            $conf->debug(" (yes) ");
+            $self->set_result('yes');
+        }
         $conf->data->set(
             gmp     => 'define',
             HAS_GMP => $has_gmp,
