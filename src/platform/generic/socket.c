@@ -445,6 +445,9 @@ Parrot_io_internal_getnameinfo(PARROT_INTERP, ARGIN(const void *addr), INTVAL le
 
 Return a protocol number based on the name of a protocol.
 
+In case of errors, typically when the protocol name is not found in /etc/services
+-1 is returned.
+
 =cut
 
 */
@@ -457,7 +460,10 @@ Parrot_io_internal_getprotobyname(PARROT_INTERP, ARGIN(STRING *name))
     struct protoent * const protoent = getprotobyname(s);
 
     Parrot_str_free_cstring(s);
-    return protoent->p_proto;
+    if (protoent)
+        return protoent->p_proto;
+    else
+        return -1;
 }
 
 /*
