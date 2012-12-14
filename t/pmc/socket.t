@@ -24,7 +24,7 @@ stack, so we don't need to check if this parrot is IPv6-aware.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(22)
+    plan(23)
 
     test_init()
     test_get_fd()
