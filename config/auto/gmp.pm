@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2004, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -46,7 +46,7 @@ sub runstep {
 
     if ($without) {
         $conf->data->set( has_gmp => 0 );
-        $self->set_result('no');
+        $self->set_result('skipped');
         return 1;
     }
 
@@ -69,6 +69,9 @@ sub runstep {
     }
     if ($has_gmp) {
         $conf->data->add( ' ', libs => $extra_libs );
+    }
+    else {
+        $self->set_result('no');
     }
 
     return 1;
