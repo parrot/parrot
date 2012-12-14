@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008-2011, Parrot Foundation.
+Copyright (C) 2008-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -264,6 +264,23 @@ Test if the socket is closed.
         RETURN(INTVAL status);
     }
 
+
+/*
+
+=item C<getprotobyname(STRING * name)>
+
+C<getprotobyname> returns a protocol number suitable for passing to
+C<socket>, based on the given protocol name. This is normal only
+necessary when opening sockets in raw mode.
+
+=cut
+
+*/
+
+    METHOD getprotobyname(STRING * name) {
+        INTVAL proto = Parrot_io_getprotobyname(INTERP, name);
+        RETURN(INTVAL proto);
+    }
 
 /*
 

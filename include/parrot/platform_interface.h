@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2011, Parrot Foundation.
+ * Copyright (C) 2003-2012, Parrot Foundation.
  */
 
 #ifndef PARROT_PLATFORM_INTERFACE_H_GUARD
@@ -101,6 +101,7 @@ PMC *Parrot_io_internal_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL p
 INTVAL Parrot_io_internal_addr_match(PARROT_INTERP, ARGIN(PMC *sa), INTVAL family, INTVAL type,
             INTVAL protocol);
 STRING *Parrot_io_internal_getnameinfo(PARROT_INTERP, ARGIN(const void *addr), INTVAL addr_len);
+INTVAL Parrot_io_internal_getprotobyname(PARROT_INTERP, ARGIN(STRING *name));
 PIOHANDLE Parrot_io_internal_socket(PARROT_INTERP, int fam, int type, int proto);
 void Parrot_io_internal_connect(PARROT_INTERP, PIOHANDLE handle, ARGIN(void *addr), INTVAL addr_len);
 void Parrot_io_internal_bind(PARROT_INTERP, PIOHANDLE handle, ARGIN(void *addr), INTVAL addr_len);
