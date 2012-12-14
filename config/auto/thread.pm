@@ -34,7 +34,7 @@ sub runstep {
 
     if ($without) {
         $conf->data->set( HAS_THREADS => 0 );
-        $self->set_result('no');
+        $self->set_result('skipped');
         return 1;
     }
 

@@ -46,7 +46,7 @@ sub runstep {
     if ($without) {
         $conf->data->set( HAS_LIBFFI => 0 );
         $conf->data->set( has_libffi => 0 );
-        $self->set_result('no');
+        $self->set_result('skipped');
         return 1;
     }
 

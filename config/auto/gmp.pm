@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2004, Parrot Foundation.
 
 =head1 NAME
 
@@ -50,6 +50,7 @@ sub runstep {
         return 1;
     }
 
+    $self->set_result('no');
     my $osname = $conf->data->get('osname');
 
     my $extra_libs = $self->_select_lib( {
@@ -69,9 +70,6 @@ sub runstep {
     }
     if ($has_gmp) {
         $conf->data->add( ' ', libs => $extra_libs );
-    }
-    else {
-        $self->set_result('no');
     }
 
     return 1;

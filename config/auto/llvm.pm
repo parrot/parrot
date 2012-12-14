@@ -36,8 +36,8 @@ sub runstep {
     my $verbose = $conf->options->get( 'verbose' );
     unless ( $conf->options->get( 'with-llvm' ) ) {
         $self->_handle_result( $conf, 0 );
-        $self->set_result('not requested');
-        print "LLVM not requested\n" if $verbose;
+        $self->set_result('skipped');
+        print "--with-llvm not requested.\n" if $verbose;
         return 1;
     }
 
