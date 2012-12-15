@@ -557,6 +557,7 @@ OPS2C               = .@slash@ops2c$(EXE)
 WINXED              = .@slash@winxed$(EXE)
 
 # Installable executables
+INSTALLABLELIBPARROT = @blib_dir@@slash@installable_@libparrot_shared@
 INSTALLABLEPARROT    = .@slash@installable_parrot$(EXE)
 INSTALLABLEDIS       = .@slash@installable_pbc_disassemble$(EXE)
 INSTALLABLEPDUMP     = .@slash@installable_pbc_dump$(EXE)
@@ -572,7 +573,7 @@ INSTALLABLEWINXED   = .@slash@installable_winxed$(EXE)
 
 # Libraries
 LIBPARROT_STATIC    = @blib_dir@/@libparrot_static@
-#IF(darwin):export DYLD_LIBRARY_PATH := @build_dir@/@blib_dir@:$(DYLD_LIBRARY_PATH)
+# #IF(darwin):export DYLD_LIBRARY_PATH := @build_dir@/@blib_dir@:$(DYLD_LIBRARY_PATH)
 #IF(win32 or msys or cygwin):LIBPARROT_SHARED  = @libparrot_shared@
 #ELSE:LIBPARROT_SHARED  = @blib_dir@/@libparrot_shared@
 
@@ -872,9 +873,10 @@ world : parrot_utils
 parrot_utils : all $(PDUMP) $(DIS) $(PDB) $(PBC_MERGE) $(PBC_TO_EXE) $(PARROT_CONFIG) \
   src/install_config$(O) $(PARROT_PROVE) $(OPS2C)
 
-installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPDB) \
-  $(INSTALLABLEPBC_MERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG) $(INSTALLABLENQP) \
-  $(INSTALLABLENCITHUNKGEN) $(INSTALLABLEPARROT_PROVE) $(INSTALLABLEOPS2C) $(INSTALLABLEWINXED)
+installable: all $(INSTALLABLELIBPARROT) $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) \
+  $(INSTALLABLEDIS) $(INSTALLABLEPDB) $(INSTALLABLEPBC_MERGE) $(INSTALLABLEPBCTOEXE) \
+  $(INSTALLABLECONFIG) $(INSTALLABLENQP) $(INSTALLABLENCITHUNKGEN) $(INSTALLABLEPARROT_PROVE) \
+  $(INSTALLABLEOPS2C) $(INSTALLABLEWINXED)
 
 # See compilers/opsc/Rules.mak
 bootstrap-ops : $(OPS2C)
@@ -1144,9 +1146,13 @@ $(LIBPARROT_SHARED) : $(O_FILES)
 		$(O_FILES) $(C_LIBS) $(ICU_SHARED)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(libparrot_shared_alias):	( cd @blib_dir@ ; ln -sf @libparrot_shared@ @libparrot_shared_alias@ )
-	$(CP) tools/dev/gdb-pp-load.py @blib_dir@/@libparrot_shared@-gdb.py
-	$(CP) tools/dev/gdb-pp.py @blib_dir@/GDBPrettyPrint.py
-	@echo '' > @blib_dir@/__init__.py
+	$(CP) tools@slash@dev@slash@gdb-pp-load.py @blib_dir@@slash@@libparrot_shared@-gdb.py
+	$(CP) tools@slash@dev@slash@gdb-pp.py @blib_dir@@slash@GDBPrettyPrint.py
+	@echo '' > @blib_dir@@slash@__init__.py
+
+$(INSTALLABLELIBPARROT) : $(LIBPARROT_SHARED)
+	$(CP) $(LIBPARROT_SHARED) $(INSTALLABLELIBPARROT)
+#IF(darwin):	install_name_tool -id @libdir@/@libparrot_shared@ $(INSTALLABLELIBPARROT)
 
 $(INSTALLABLECONFIG) : src/install_config$(O) $(PARROT_CONFIG) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc $(DEV_TOOLS_DIR)/parrot-config.pir

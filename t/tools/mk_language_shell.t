@@ -57,24 +57,17 @@ ok(-e $test_dir, "$test_dir dir exists");
 ok(-e $src_dir, "$src_dir dir exists");
 ok(-s $setup, "$setup exists and has nonzero size");
 
-SKIP: {
-    my $reason = "tools/dev/mk_language_shell.pl requires installed parrot on Darwin";
-    skip $reason, 2 if (
-        ($PConfig{osname} eq 'darwin') and
-        ($parrot_exe eq $build_parrot)
-    );
-    my $build_status =
-        system("cd $lang_dir && \"$parrot_exe\" setup.pir $to_dev_null")
-        and croak "Unable to execute setup.pir";
-    is($build_status, 0,
-        "system call to execute setup.pir completed successfully");
+my $build_status =
+  system("cd $lang_dir && \"$parrot_exe\" setup.pir $to_dev_null")
+  and croak "Unable to execute setup.pir";
+is($build_status, 0,
+   "system call to execute setup.pir completed successfully");
 
-    my $test_status =
-        system("cd $lang_dir && \"$parrot_exe\" setup.pir test $to_dev_null")
-        and croak "Unable to execute setup.pir test";
-    is($test_status, 0,
-        "system call to execute setup.pir test completed successfully");
-}
+my $test_status =
+  system("cd $lang_dir && \"$parrot_exe\" setup.pir test $to_dev_null")
+  and croak "Unable to execute setup.pir test";
+is($test_status, 0,
+   "system call to execute setup.pir test completed successfully");
 
 =head1 HELPER SUBROUTINES
 
