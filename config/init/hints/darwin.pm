@@ -90,9 +90,8 @@ sub runstep {
         rpath                  => "-L",
         libparrot_soname       => "-install_name "
             . '"'
-            . $conf->data->get('libdir')
-            . '/libparrot'
-            . $conf->data->get('share_ext')
+            . '@executable_path/blib/lib/'
+            . "libparrot.$version$share_ext"
             . '"'
     );
     $darwin_selections{dynext_dirs} = $flags->{dynext_dirs} if $flags->{dynext_dirs};

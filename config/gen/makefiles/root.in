@@ -559,6 +559,7 @@ OPS2C               = .@slash@parrot-ops2c$(EXE)
 WINXED              = .@slash@winxed$(EXE)
 
 # Installable executables
+INSTALLABLELIBPARROT = @blib_dir@@slash@installable_@libparrot_shared@
 INSTALLABLEPARROT    = .@slash@installable_parrot$(EXE)
 INSTALLABLEDIS       = .@slash@installable_pbc_disassemble$(EXE)
 INSTALLABLEPDUMP     = .@slash@installable_pbc_dump$(EXE)
@@ -881,9 +882,10 @@ world : parrot_utils
 parrot_utils : all $(PDUMP) $(DIS) $(PDB) $(PBC_MERGE) $(PBC_TO_EXE) $(PARROT_CONFIG) \
   src/install_config$(O) $(PARROT_PROVE) $(OPS2C)
 
-installable: all docs $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPDB) \
-  $(INSTALLABLEPBC_MERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG) $(INSTALLABLENQP) \
-  $(INSTALLABLENCITHUNKGEN) $(INSTALLABLEPARROT_PROVE) $(INSTALLABLEOPS2C) $(INSTALLABLEWINXED)
+installable: all docs $(INSTALLABLEPARROT) $(INSTALLABLELIBPARROT) $(INSTALLABLEPDUMP) \
+  $(INSTALLABLEDIS) $(INSTALLABLEPDB) $(INSTALLABLEPBC_MERGE) $(INSTALLABLEPBCTOEXE) \
+  $(INSTALLABLECONFIG) $(INSTALLABLENQP) $(INSTALLABLENCITHUNKGEN) $(INSTALLABLEPARROT_PROVE) \
+  $(INSTALLABLEOPS2C) $(INSTALLABLEWINXED)
 
 # See compilers/opsc/Rules.mak
 bootstrap-ops : $(OPS2C)
@@ -1172,9 +1174,13 @@ $(LIBPARROT_SHARED) : $(O_FILES)
 #IF(win32 or cygwin):	$(ADDGENERATED) "$@" "[main]" bin
 #ELSE:	$(ADDGENERATED) "$@" "[main]" lib
 #IF(cygwin or (win32 and cc==gcc)):	$(ADDGENERATED) "$(IMPORTLIB)" "[main]" lib
-	$(CP) tools/dev/gdb-pp-load.py @blib_dir@/@libparrot_shared@-gdb.py
-	$(CP) tools/dev/gdb-pp.py @blib_dir@/GDBPrettyPrint.py
-	@echo '' > @blib_dir@/__init__.py
+	$(CP) tools@slash@dev@slash@gdb-pp-load.py @blib_dir@@slash@@libparrot_shared@-gdb.py
+	$(CP) tools@slash@dev@slash@gdb-pp.py @blib_dir@@slash@GDBPrettyPrint.py
+	@echo '' > @blib_dir@@slash@__init__.py
+
+$(INSTALLABLELIBPARROT) : $(LIBPARROT_SHARED)
+	$(CP) $(LIBPARROT_SHARED) $(INSTALLABLELIBPARROT)
+#IF(darwin):	install_name_tool -id @libdir@/@libparrot_shared@ $(INSTALLABLELIBPARROT)
 
 $(INSTALLABLECONFIG) : src/install_config$(O) $(PARROT_CONFIG) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc $(DEV_TOOLS_DIR)/parrot-config.pir
