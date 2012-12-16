@@ -276,7 +276,9 @@ static void gc_gms_block_GC_mark_locked(PARROT_INTERP)
 static void gc_gms_block_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void gc_gms_check_sanity(PARROT_INTERP);
+static void gc_gms_check_sanity(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 static void gc_gms_cleanup_dirty_list(PARROT_INTERP,
     ARGIN(MarkSweep_GC *self),
     ARGIN(Parrot_Pointer_Array *dirty_list))
@@ -504,7 +506,8 @@ static int gen2flags(int gen);
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_block_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_gc_gms_check_sanity __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_gc_gms_check_sanity __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_cleanup_dirty_list __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \
@@ -1942,7 +1945,7 @@ gc_gms_allocate_memory_chunk(SHIM_INTERP, size_t size)
 {
     ASSERT_ARGS(gc_gms_allocate_memory_chunk)
     void * const ptr = malloc(size);
-#ifdef DETAIL_MEMORY_DEBUG
+#if defined(DETAIL_MEMORY_DEBUG)
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
     if (!ptr && size)
@@ -1957,14 +1960,14 @@ gc_gms_reallocate_memory_chunk(SHIM_INTERP, ARGFREE(void *from), size_t size)
 {
     ASSERT_ARGS(gc_gms_reallocate_memory_chunk)
     void *ptr;
-#ifdef DETAIL_MEMORY_DEBUG
+#if defined(DETAIL_MEMORY_DEBUG)
     fprintf(stderr, "Freed %p (realloc -- %i bytes)\n", from, size);
 #endif
     if (from)
         ptr = realloc(from, size);
     else
         ptr = calloc(1, size);
-#ifdef DETAIL_MEMORY_DEBUG
+#if defined(DETAIL_MEMORY_DEBUG)
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
     if (!ptr && size)
@@ -1979,7 +1982,7 @@ gc_gms_allocate_memory_chunk_zeroed(SHIM_INTERP, size_t size)
 {
     ASSERT_ARGS(gc_gms_allocate_memory_chunk_zeroed)
     void * const ptr = calloc(1, size);
-#ifdef DETAIL_MEMORY_DEBUG
+#if defined(DETAIL_MEMORY_DEBUG)
     fprintf(stderr, "Allocated %i at %p\n", size, ptr);
 #endif
     if (!ptr && size)
@@ -2004,7 +2007,7 @@ static void
 gc_gms_free_memory_chunk(SHIM_INTERP, ARGFREE(void *data))
 {
     ASSERT_ARGS(gc_gms_free_memory_chunk)
-#ifdef DETAIL_MEMORY_DEBUG
+#if defined(DETAIL_MEMORY_DEBUG)
     fprintf(stderr, "Freed %p\n", data);
 #endif
     if (data)
@@ -2245,17 +2248,17 @@ gc_gms_unseal_object(SHIM_INTERP, ARGIN(PMC *pmc))
 
 sanity check
 
-Only enabled with C<-DDETAIL_MEMORY_DEBUG> in C<ccflags>.
+Only enabled with C<-DMEMORY_DEBUG> in C<ccflags>.
 
 =cut
 
 */
 
 static void
-gc_gms_check_sanity(SHIM_INTERP)
+gc_gms_check_sanity(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_check_sanity)
-#ifdef DETAIL_MEMORY_DEBUG
+#ifdef MEMORY_DEBUG
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t            i;
 
@@ -2287,6 +2290,8 @@ gc_gms_check_sanity(SHIM_INTERP)
         PARROT_GC_ASSERT_INTERP(pmc, interp);
         PARROT_ASSERT(!PObj_GC_on_dirty_list_TEST(pmc)
             || !"Dirty object in work_list"););
+#else
+    UNUSED(interp);
 #endif
 }
 
@@ -2298,7 +2303,7 @@ gc_gms_check_sanity(SHIM_INTERP)
 
 debug functions
 
-Only enabled with C<-DDETAIL_MEMORY_DEBUG> in C<ccflags>.
+Only enabled with C<-DMEMORY_DEBUG> in C<ccflags>.
 
 =cut
 
@@ -2312,32 +2317,35 @@ gc_gms_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t            i;
 
-    fprintf(stderr, "%s\ntotal: %lu\ngen: %lu\n", header,
+    fprintf(stderr, "%s\ntotal: %lu, gen: %lu, ", header,
             (unsigned long)interp->gc_sys->stats.gc_mark_runs,
             (unsigned long)self->gen_to_collect);
 
-    fprintf(stderr, "dirty: %lu\nwork: %lu\n",
+    fprintf(stderr, "dirty: %lu, work: %lu\n",
             (unsigned long)Parrot_pa_count_used(interp, self->dirty_list),
-            self->work_list ? (unsigned long)Parrot_pa_count_used(interp, self->work_list) : 0);
+            self->work_list
+              ? (unsigned long)Parrot_pa_count_used(interp, self->work_list)
+              : 0);
 
     for (i = 0; i < MAX_GENERATIONS; i++)
-        fprintf(stderr, "%lu: %lu %lu\n",
+        fprintf(stderr, "GEN %lu: %lu objects, %lu strings\n",
                 (unsigned long)i,
                 (unsigned long)Parrot_pa_count_used(interp, self->objects[i]),
                 (unsigned long)Parrot_pa_count_used(interp, self->strings[i]));
 
-    fprintf(stderr, "STRING: %lu\n", (unsigned long)self->string_gc.memory_pool->total_allocated);
+#if 1
+    fprintf(stderr, "PMC: %lu\n",
+            Parrot_gc_pool_allocated_size(interp, self->pmc_allocator));
 
-#if 0
-    fprintf(stderr, "PMC: %d\n", Parrot_gc_pool_allocated_size(interp, self->pmc_allocator));
-    fprintf(stderr, "STRING: %d\n", Parrot_gc_pool_allocated_size(interp, self->string_allocator));
-
-    fprintf(stderr, "buffers: %d\n", self->string_gc.memory_pool->total_allocated);
-    fprintf(stderr, "const buffers: %d\n", self->string_gc.constant_string_pool->total_allocated);
-
-    fprintf(stderr, "attrs: %d\n", Parrot_gc_fixed_allocator_allocated_memory(interp,
-                                                                      self->fixed_size_allocator));
-
+    fprintf(stderr, "STRING: %lu\n",
+            Parrot_gc_pool_allocated_size(interp, self->string_allocator));
+    fprintf(stderr, "buffers: %lu\n",
+            self->string_gc.memory_pool->total_allocated);
+    fprintf(stderr, "const buffers: %lu\n",
+            self->string_gc.constant_string_pool->total_allocated);
+    fprintf(stderr, "attrs: %lu\n",
+            Parrot_gc_fixed_allocator_allocated_memory(interp,
+              self->fixed_size_allocator));
 #endif
     fprintf(stderr, "\n");
 
@@ -2348,8 +2356,8 @@ gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header))
 {
     ASSERT_ARGS(gc_gms_print_stats)
 
-#ifdef DETAIL_MEMORY_DEBUG
-    gc_gms_print_stats_always(interp, header, gen);
+#ifdef MEMORY_DEBUG
+    gc_gms_print_stats_always(interp, header);
 #else
     UNUSED(interp);
     UNUSED(header);
