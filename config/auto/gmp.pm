@@ -79,11 +79,11 @@ sub runstep {
 
 sub _evaluate_cc_run {
     my ($self, $conf, $test, $has_gmp) = @_;
-    my ($expected_line, $version_line)= split /\n/, $test;
+    my ($expected_line, $version_line) = split /\n/, $test;
 
     if ( $expected_line eq $self->{cc_run_expected} ) {
         $has_gmp = 1;
-        my $gmp_version = (split(/ /, $version_line))[1];
+        my $gmp_version = (split(/ /, $version_line || ''))[1];
 
         if ($gmp_version) {
             $conf->debug("(yes, $gmp_version) ");
