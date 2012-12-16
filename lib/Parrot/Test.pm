@@ -425,10 +425,13 @@ sub convert_line_endings {
     return;
 }
 
+# Works only if not installed.
+# Using $PConfig{build_dir} would be much better
 sub path_to_parrot {
 
-    my $path = $INC{'Parrot/Config.pm'};
-    $path =~ s{ /lib/Parrot/Config.pm \z}{}xms;
+    my $path = __FILE__; # lib/Parrot/Test.pm
+    $path =~ s{\Qlib/Parrot/Test.pm\E$}{};
+    $path =~ s{/$}{};
 
     return Cwd::realpath( $path );
 }
@@ -1122,6 +1125,10 @@ sub _handle_blib_path {
     }
     elsif ($^O eq 'MSWin32') {
         $ENV{PATH} = $blib_path . ';' . $ENV{PATH};
+    }
+    elsif ($^O eq 'darwin') {
+        $ENV{DYLD_LIBRARY_PATH} = "$blib_path"
+          if (!$ENV{DYLD_LIBRARY_PATH} or $ENV{DYLD_LIBRARY_PATH} !~ m|$blib_path|);
     }
     else {
         $ENV{LD_RUN_PATH} = $blib_path;
