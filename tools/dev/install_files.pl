@@ -126,6 +126,7 @@ my(%metatransforms) = (
             else {
                 # don't allow libraries to be installed into subdirs of libdir
                 $filehash->{Dest} = basename($_);
+                $filehash->{Installable} = $filehash->{Dest} =~ s/^installable_//;
             }
             return($filehash);
         },
