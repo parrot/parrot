@@ -1127,8 +1127,12 @@ sub _handle_blib_path {
         $ENV{PATH} = $blib_path . ';' . $ENV{PATH};
     }
     elsif ($^O eq 'darwin') {
-        $ENV{DYLD_LIBRARY_PATH} = "$blib_path"
-          if (!$ENV{DYLD_LIBRARY_PATH} or $ENV{DYLD_LIBRARY_PATH} !~ m|$blib_path|);
+        if (!$ENV{DYLD_LIBRARY_PATH}) {
+            $ENV{DYLD_LIBRARY_PATH} = $blib_path;
+        }
+        elsif ($ENV{DYLD_LIBRARY_PATH} !~ m|$blib_path|) {
+            $ENV{DYLD_LIBRARY_PATH} = "$blib_path:$ENV{DYLD_LIBRARY_PATH}";
+        }
     }
     else {
         $ENV{LD_RUN_PATH} = $blib_path;
