@@ -40,8 +40,7 @@ main(int argc, char *argv[])
     printf("%s %d.%d.%d\n", "version",
         __GNU_MP_VERSION,
         __GNU_MP_VERSION_MINOR,
-        __GNU_MP_VERSION_PATCHLEVEL
-    );
+        __GNU_MP_VERSION_PATCHLEVEL);
     free(s);
     return 0;
 }

@@ -10,7 +10,8 @@ Parrot::Git - Detect run-time Git support in a portable way
 
     if (has_git()){
         # git magic
-    } else {
+    }
+    else {
         # so sad, no git
     }
 

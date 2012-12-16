@@ -88,7 +88,8 @@ sub _evaluate_cc_run {
         if ($gmp_version) {
             $conf->debug("(yes, $gmp_version) ");
             $self->set_result("yes, $gmp_version");
-        } else {
+        }
+        else {
             $conf->debug(" (yes) ");
             $self->set_result('yes');
         }
