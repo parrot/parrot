@@ -9,7 +9,7 @@
     # Use say instead inside tasks
     .include 'test_more.pir'
 
-    plan(9)
+    plan(8)
 
     ok(1, "initialized")
 
@@ -102,13 +102,6 @@ ok:
     pass
     task.'kill'()
     wait task
-
-    # poor man's sleep, sleep is also concurrent now
-    $I0 = 0
-loop:
-    $I0 = $I0 + 1
-    if $I0 < 4000 goto loop
-    print "ok 8 task_to_kill killed\n"
 .end
 
 .sub task_to_kill
@@ -126,7 +119,7 @@ again:
 .end
 
 .sub exit0
-    say "ok 9 pre-empt and exit"
+    say "ok 8 pre-empt and exit"
     exit 0
 .end
 
