@@ -2334,9 +2334,11 @@ gc_gms_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
                 (unsigned long)Parrot_pa_count_used(interp, self->strings[i]));
 
 #if 1
+    fprintf(stderr, "parent: 0x%x, tid: %d\n", interp->parent_interpreter,
+            interp->thread_data ? interp->thread_data->tid : -1 );
+
     fprintf(stderr, "PMC: %lu\n",
             Parrot_gc_pool_allocated_size(interp, self->pmc_allocator));
-
     fprintf(stderr, "STRING: %lu\n",
             Parrot_gc_pool_allocated_size(interp, self->string_allocator));
     fprintf(stderr, "buffers: %lu\n",
