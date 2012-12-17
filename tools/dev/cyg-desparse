@@ -1,0 +1,7 @@
+#!/bin/sh
+# The cygwin linker creates sparse files.
+# Remove sparse fs bit from cygwin executables,
+# otherwise calling such an executable/dll is slow
+tmp="$1.tmp"
+/bin/cp "$1" "$tmp"
+/bin/mv "$tmp" "$1"

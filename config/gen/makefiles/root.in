@@ -922,6 +922,7 @@ $(PARROTOLD) : $(FRP_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	$(FRP_DIR)/main$(O) src/parrot_config$(O) src/longopt$(O) \
 	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
+#IF(cygwin):	tools/dev/cyg-desparse $@
 
 $(PARROT) : $(FRPTWO_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
   src/parrot_config$(O) src/longopt$(O) \
@@ -930,6 +931,7 @@ $(PARROT) : $(FRPTWO_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	$(FRPTWO_DIR)/main$(O) $(FRPTWO_DIR)/prt0.pbc$(O) src/parrot_config$(O) src/longopt$(O) \
 	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
+#IF(cygwin):	tools/dev/cyg-desparse $@
 
 $(DEV_TOOLS_DIR)/pbc_to_exe.pir: $(DEV_TOOLS_DIR)/pbc_to_exe.winxed $(PARROT) $(WINXED_LANG) winxed.pbc
 	$(PARROT) winxed.pbc -c --noan $(DEV_TOOLS_DIR)/pbc_to_exe.winxed
@@ -937,6 +939,7 @@ $(DEV_TOOLS_DIR)/pbc_to_exe.pir: $(DEV_TOOLS_DIR)/pbc_to_exe.winxed $(PARROT) $(
 $(PBC_TO_EXE) : $(DEV_TOOLS_DIR)/pbc_to_exe.pir $(LIBRARY_DIR)/config.pir $(PARROT) $(DYNEXT_DIR)/file$(LOAD_EXT)
 	$(PARROT) -o pbc_to_exe.pbc $(DEV_TOOLS_DIR)/pbc_to_exe.pir
 	$(PARROT) pbc_to_exe.pbc pbc_to_exe.pbc
+#IF(cygwin):	tools/dev/cyg-desparse $@
 
 parrot_nci_thunk_gen.pbc : \
   $(DEV_TOOLS_DIR)/nci_thunk_gen.pir \
@@ -955,16 +958,19 @@ parrot-prove.pbc : runtime/parrot/bin/prove.pir $(PARROT)
 
 $(PARROT_PROVE) : parrot-prove.pbc $(PARROT) $(PBC_TO_EXE)
 	$(PBC_TO_EXE) parrot-prove.pbc
+#IF(cygwin):	tools/dev/cyg-desparse $@
 
 $(PARROT_CONFIG) : $(DEV_TOOLS_DIR)/parrot-config.pir $(PARROT) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc $(DEV_TOOLS_DIR)/parrot-config.pir
 	$(PARROT) pbc_to_exe.pbc parrot_config.pbc
+#IF(cygwin):	tools/dev/cyg-desparse $@
 
 $(MINIPARROT) : $(FRP_DIR)/main$(O) $(INC_DIR)/api.h $(INC_DIR)/longopt.h $(LIBPARROT) \
   src/null_config$(O) src/longopt$(O)
 	$(LINK) @ld_out@$@ $(FRP_DIR)/main$(O) src/null_config$(O) src/longopt$(O) \
 	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
+#IF(cygwin):	tools/dev/cyg-desparse $@
 
 #IF(cygwin and optimize):$(INSTALLABLEPARROT) : LINK += -s
 $(INSTALLABLEPARROT) : $(FRPTWO_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
@@ -974,6 +980,7 @@ $(INSTALLABLEPARROT) : $(FRPTWO_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	$(FRPTWO_DIR)/main$(O) src/install_config$(O) src/longopt$(O) \
 	$(FRPTWO_DIR)/prt0.pbc$(O) @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
+#IF(cygwin):	tools/dev/cyg-desparse $@
 
 $(INC_DIR)/context.h : $(INC_PMC_DIR)/pmc_callcontext.h
 
@@ -1143,6 +1150,7 @@ $(LIBPARROT_SHARED) : $(O_FILES)
 #IF(win32 and cc==gcc):		-Wl,--out-implib=libparrot.lib \
 		$(O_FILES) $(C_LIBS) $(ICU_SHARED)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
+#IF(cygwin):	tools/dev/cyg-desparse $@
 #IF(libparrot_shared_alias):	( cd @blib_dir@ ; ln -sf @libparrot_shared@ @libparrot_shared_alias@ )
 	$(CP) tools/dev/gdb-pp-load.py @blib_dir@/@libparrot_shared@-gdb.py
 	$(CP) tools/dev/gdb-pp.py @blib_dir@/GDBPrettyPrint.py
@@ -1176,6 +1184,7 @@ $(PDB) : $(FR_DIR)/parrot_debugger/main$(O) src/parrot_config$(O) $(LIBPARROT)
 	src/parrot_config$(O) \
 	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
+#IF(cygwin):	tools/dev/cyg-desparse $@
 
 #IF(cygwin and optimize):$(INSTALLABLEPDB) : LINK += -s
 $(INSTALLABLEPDB) : $(FR_DIR)/parrot_debugger/main$(O) $(LIBPARROT) src/install_config$(O)
@@ -1201,6 +1210,7 @@ $(DIS) : $(FR_DIR)/pbc_disassemble/main$(O) $(LIBPARROT)
 	src/longopt$(O) \
 	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
+#IF(cygwin):	tools/dev/cyg-desparse $@
 
 #IF(cygwin and optimize):$(INSTALLABLEDIS) : LINK += -s
 $(INSTALLABLEDIS) : $(FR_DIR)/pbc_disassemble/main$(O) \
@@ -1223,6 +1233,7 @@ $(PDUMP) : $(FR_DIR)/pbc_dump/main$(O) $(FR_DIR)/pbc_dump/packdump$(O) $(LIBPARR
 	src/longopt$(O) \
 	$(FR_DIR)/pbc_dump/packdump$(O) $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
+#IF(cygwin):	tools/dev/cyg-desparse $@
 
 $(FR_DIR)/pbc_dump/main$(O) : \
 	$(INC_DIR)/longopt.h \
@@ -1254,6 +1265,7 @@ $(PBC_MERGE) : $(FR_DIR)/pbc_merge/main$(O) $(LIBPARROT) src/parrot_config$(O)
 	src/longopt$(O) \
 	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINK_DYNAMIC) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
+#IF(cygwin):	tools/dev/cyg-desparse $@
 
 #IF(cygwin and optimize):$(INSTALLABLEPBC_MERGE) : LINK += -s
 $(INSTALLABLEPBC_MERGE) : $(FR_DIR)/pbc_merge/main$(O) $(LIBPARROT) $(INSTALLABLECONFIG)
