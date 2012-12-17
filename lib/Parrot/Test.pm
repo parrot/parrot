@@ -432,7 +432,7 @@ sub path_to_parrot {
     my $path = __FILE__; # lib/Parrot/Test.pm
     $path =~ s{\Qlib/Parrot/Test.pm\E$}{};
     $path =~ s{/$}{};
-
+    $path = "." unless $path;
     return Cwd::realpath( $path );
 }
 
