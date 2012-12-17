@@ -16,7 +16,7 @@
     tasks_run()
     task_send_recv()
     task_kill()
-    preempt_and_exit() # TODO does exit with 1
+    preempt_and_exit()
 .end
 
 .sub tasks_run
