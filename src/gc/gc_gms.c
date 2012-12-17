@@ -2419,18 +2419,27 @@ gc_gms_validate_objects(PARROT_INTERP)
     INTVAL i;
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
+#  ifdef MEMORY_DEBUG
+    fprintf(stderr, "GMS Validate\n");
+#  endif
     interp->gc_sys->mark_pmc_header = gc_gms_validate_pmc;
     interp->gc_sys->mark_str_header = gc_gms_validate_str;
     Parrot_gc_trace_root(interp, NULL, GC_TRACE_FULL);
     interp->gc_sys->mark_pmc_header = gc_gms_mark_pmc_header;
     interp->gc_sys->mark_str_header = gc_gms_mark_str_header;
 
+#  ifdef MEMORY_DEBUG
+    fprintf(stderr, "GMS Clear Generations\n");
+#  endif
     for (i = 0; i < MAX_GENERATIONS; i++) {
         POINTER_ARRAY_ITER(self->objects[i],
             PMC * const pmc = &((pmc_alloc_struct *)ptr)->pmc;
             PARROT_GC_ASSERT_INTERP(pmc, interp);
             PObj_live_CLEAR(pmc););
     }
+#  ifdef MEMORY_DEBUG
+    fprintf(stderr, "\n");
+#  endif
 #else
     UNUSED(interp);
 #endif
