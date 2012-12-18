@@ -585,15 +585,20 @@ void Parrot_unblock_GC_sweep(PARROT_INTERP)
 #  define Parrot_gc_mark_PMC_alive(interp, obj) \
       do if (!PMC_IS_NULL(obj) \
           && (!PObj_is_shared_TEST(obj) || !Interp_flags_TEST((interp), PARROT_IS_THREAD))) { \
-            PARROT_ASSERT((obj)->orig_interp == (interp)); \
-            Parrot_gc_mark_PMC_alive_fun((interp), (obj)); \
+          if (!interp->thread_data) {                                   \
+              PARROT_ASSERT((obj)->orig_interp == (interp));            \
+              Parrot_gc_mark_PMC_alive_fun((interp), (obj));            \
+          } else if (interp == interp->thread_data->main_interp) {      \
+              Parrot_gc_mark_PMC_alive_fun((interp), (obj));            \
+          } \
         } \
       while (0)
 #else
 #  define Parrot_gc_mark_PMC_alive(interp, obj) \
       do if (!PMC_IS_NULL(obj) \
           && (!PObj_is_shared_TEST(obj) || !Interp_flags_TEST((interp), PARROT_IS_THREAD))) { \
-          Parrot_gc_mark_PMC_alive_fun((interp), (obj)); \
+          if (!interp->thread_data || interp == interp->thread_data->main_interp) \
+              Parrot_gc_mark_PMC_alive_fun((interp), (obj));            \
         } \
       while (0)
 #endif

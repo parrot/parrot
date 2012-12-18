@@ -149,7 +149,11 @@ void
 Parrot_gc_mark_PMC_alive_fun(PARROT_INTERP, ARGMOD_NULLOK(PMC *obj))
 {
     ASSERT_ARGS(Parrot_gc_mark_PMC_alive_fun)
-    if (obj)
+    if (obj
+#ifndef PARROT_IN_CORE
+        && (!interp->thread_data || interp == interp->thread_data->main_interp)
+#endif
+        )
         interp->gc_sys->mark_pmc_header(interp, obj);
 }
 
