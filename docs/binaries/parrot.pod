@@ -177,6 +177,11 @@ This is useful when you want to attach a debugger on platforms such as Windows.
 
 Print the runtime prefix path and exit.
 
+=item --numthreads <number>
+
+Overrides the automatically detected number of CPU cores to set the
+number of OS threads. Minimum number: 2
+
 =back
 
 =head2 Compiler options
