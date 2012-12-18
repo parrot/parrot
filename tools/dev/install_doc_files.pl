@@ -43,6 +43,10 @@ The library directory. Defaults to '/usr/lib'.
 
 The header directory. Defaults to '/usr/include'.
 
+=item C<mandir>
+
+The man directory. Defaults to '/usr/share/man'.
+
 =back
 
 =head1 SEE ALSO
@@ -76,6 +80,7 @@ my %options = (
     includedir  => '/usr/include',   # parrot/ subdir added below
     docdir      => '/usr/share/doc', # parrot/ subdir added below
     datadir     => '/usr/share/',    # parrot/ subdir added below
+    mandir      => '/usr/share/man',
     srcdir      => '/usr/src/',      # parrot/ subdir added below
     versiondir  => '',
     'dry-run'   => 0,
@@ -95,7 +100,7 @@ foreach (@ARGV) {
 my $parrotdir = $options{versiondir};
 
 # Set up transforms on filenames
-my(@transformorder) = (qw(doc examples));
+my(@transformorder) = (qw(doc man examples));
 my(%metatransforms) = (
     doc => {
         optiondir => 'doc',
@@ -104,6 +109,16 @@ my(%metatransforms) = (
             $filehash->{Dest} =~ s#^docs/resources#resources#; # resources go in the top level of docs
             $filehash->{Dest} =~ s/^docs/pod/; # other docs are actually raw Pod
             $filehash->{DestDirs} = [$parrotdir];
+            return($filehash);
+        },
+    },
+    man => {
+        ismeta => 1,
+        optiondir => 'man',
+        transform => sub {
+            my($filehash) = @_;
+            $filehash->{Dest} =~ s{^.*/}{}; # basedir only
+            $filehash->{Dest} =~ s{^(.+\.)(.+)$}{man$2/$1$2};
             return($filehash);
         },
     },

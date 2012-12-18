@@ -43,6 +43,10 @@ The library directory. Defaults to '/usr/lib'.
 
 The header directory. Defaults to '/usr/include'.
 
+=item C<mandir>
+
+The man directory. Defaults to '/usr/share/man'.
+
 =back
 
 =head1 SEE ALSO
@@ -75,6 +79,7 @@ my %options = (
     libdir      => '/usr/lib',       # parrot/ subdir added below
     includedir  => '/usr/include',   # parrot/ subdir added below
     docdir      => '/usr/share/doc', # parrot/ subdir added below
+    mandir      => '/usr/share/man', # man1/ subdir added below
     versiondir  => '',
     'dry-run'   => 0,
     packages    => 'main|library|pge',
@@ -93,7 +98,7 @@ foreach (@ARGV) {
 my $parrotdir = $options{versiondir};
 
 # Set up transforms on filenames
-my(@transformorder) = qw(lib bin include doc ^compilers);
+my(@transformorder) = qw(lib bin include doc man ^compilers);
 my(%metatransforms) = (
     lib => {
         ismeta => 1,
@@ -146,6 +151,16 @@ my(%metatransforms) = (
         transform => sub {
             my($filehash) = @_;
             $filehash->{DestDirs} = [$parrotdir];
+            return($filehash);
+        },
+    },
+    man => {
+        ismeta => 1,
+        optiondir => 'man',
+        transform => sub {
+            my($filehash) = @_;
+            $filehash->{Dest} =~ s{^.*/}{}; # basedir only
+            $filehash->{Dest} =~ s{^(.+\.)(.+)$}{man$2/$1$2};
             return($filehash);
         },
     },

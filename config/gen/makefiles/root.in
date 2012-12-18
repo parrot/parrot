@@ -36,6 +36,7 @@ LIB_DIR         = "@libdir@"
 INCLUDE_DIR     = "@includedir@"
 DATA_DIR        = "@datadir@"
 DOC_DIR         = "@docdir@"
+MAN_DIR         = "@mandir@"
 VERSION_DIR     = "@versiondir@"
 SRC_DIR         = "@srcdir@"
 COVERAGE_DIR    = "@coveragedir@"
@@ -92,6 +93,7 @@ RM_F             = @rm_f@
 RM_RF            = @rm_rf@
 TOUCH            = @touch@
 TAR              = @tar@
+POD2MAN          = @pod2man@
 AR_CR            = @ar@ @arflags@
 RANLIB           = @ranlib@
 YACC             = @yacc@
@@ -602,7 +604,7 @@ MAKE_C = @make_c@
 # These need to be above lines that define suffix rules to be portable
 # (certainly FreeBSD make doesn't grok the pir.pbc rule otherwise)
 
-.SUFFIXES : .c .S .s .i .pmc .dump $(O) .str .pir .pbc
+.SUFFIXES : .c .S .s .i .pmc .dump $(O) .str .pir .pbc .pod .1
 
 .c$(O) : # suffix rule (limited support)
 	$(CC) $(CFLAGS) @optimize@ $(CC_WARN) -I$(@D) -Isrc/ @cc_o_out@$@ -c $<
@@ -3019,10 +3021,26 @@ cover-clean:
 #
 ###############################################################################
 
+MAN_1   = docs/binaries/parrot.1 \
+	docs/binaries/ops2c.1 \
+	docs/binaries/parrotbug.1 \
+	docs/binaries/parrot_config.1 \
+	docs/binaries/parrot_nci_thunk_gen.1 \
+	docs/binaries/parrot-nqp.1 \
+	docs/binaries/parrot-prove.1 \
+	docs/binaries/pbc_to_exe.1 \
+	docs/binaries/plumage.1 \
+	docs/binaries/winxed.1
+
+.pod.1 : # suffix rule (limited support)
+	$(POD2MAN) $< > $@
+
 install: install-bin install-dev-only
 install-dev: install
+#IF(has_pod2man):install-man: $(MAN_1)
+#ELSE:install-man:
 
-install-bin: installable
+install-bin: installable install-man
 	$(PERL) $(DEV_TOOLS_DIR)/install_files.pl \
 	--buildprefix=$(BUILDPREFIX) \
 	--prefix=$(PREFIX) \
@@ -3032,6 +3050,7 @@ install-bin: installable
 	--includedir=$(INCLUDE_DIR) \
 	--destdir=$(DESTDIR) \
 	--docdir=$(DOC_DIR) \
+	--mandir=$(MAN_DIR) \
 	--versiondir=$(VERSION_DIR) \
 	MANIFEST MANIFEST.generated
 
@@ -3050,11 +3069,13 @@ install-dev-only: installable
 	--versiondir=$(VERSION_DIR) \
 	MANIFEST MANIFEST.generated
 
-install-doc:
+#IF(win32):install-doc:
+#ELSE:install-doc: install-man
 	$(PERL) $(DEV_TOOLS_DIR)/install_doc_files.pl \
 	--buildprefix=$(BUILDPREFIX) \
 	--prefix=$(PREFIX) \
 	--docdir=$(DOC_DIR) \
+	--mandir=$(MAN_DIR) \
 	--destdir=$(DESTDIR) \
 	--versiondir=$(VERSION_DIR) \
 	MANIFEST MANIFEST.generated
