@@ -1241,7 +1241,7 @@ $(INSTALLABLEPDUMP) : $(FR_DIR)/pbc_dump/main$(O) $(FR_DIR)/pbc_dump/packdump$(O
 	  $(FR_DIR)/pbc_dump/packdump$(O) \
 	  src/longopt$(O) \
 	  $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
-#IF(win32):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
+#IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 #
 # Parrot Bytecode File Merger
@@ -2402,6 +2402,7 @@ clean : \
 #IF(has_perldoc):    html-clean \
 	examples-clean \
 	ext-clean \
+#IF(has_pod2man):    man-clean \
 #UNLESS(win32):    cover-clean \
 	editor-clean
 	$(RM_F) chartypes "*.s" "*~"
@@ -2571,6 +2572,9 @@ test-clean :
 	$(RM_F) \
 	 "t/archive/parrot_test_run.tar.gz" \
 	 ".pod_examinable*.sto"
+
+man-clean :
+	$(RM_F) $(MAN_1)
 
 # a failing step of cleaning, usually doesn't concern the following steps
 realclean : clean
@@ -3141,9 +3145,9 @@ src/glut_nci_thunks$(O) : $(PARROT_H_HEADERS) \
 	$(INC_PMC_DIR)/pmc_nci.h
 
 $(LIBGLUTCB_SO): $(LIBPARROT) src/glut_callbacks$(O) src/glut_nci_thunks$(O)
-	$(LD) $(LD_LOAD_FLAGS) $(LDFLAGS) \
-	@ld_out@$@ src/glut_callbacks$(O) src/glut_nci_thunks$(O) \
-	$(ALL_PARROT_LIBS) @opengl_lib@
+	$(LD) @ld_out@$@ \
+	  src/glut_callbacks$(O) src/glut_nci_thunks$(O) \
+	  $(LINKARGS) @opengl_lib@
 
 src/extra_nci_thunks.c : src/nci/extra_thunks.nci $(NCI_THUNK_GEN)
 	$(NCI_THUNK_GEN) --dynext --no-warn-dups \

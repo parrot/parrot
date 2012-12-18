@@ -54,20 +54,23 @@ Metacommitter                   Allison Randal
 Committers
 ----------
 
-Core Developer                  Jonathan Worthington
+Core Developer
+                                Andrew Whitworth
+                                Reini Urban
                                 Bernhard Schmalhofer
                                 Kevin Tew
+                                Jonathan Worthington
                                 Bob Rogers
                                 Nuno Carvalho
                                 chromatic
                                 Allison Randal
-                                Andrew Whitworth
                                 Christoph Otto
                                 Julian Albo
                                 Mark Glines
                                 Vasily Chekalkin
                                 Jonathan "Duke" Leto
                                 Alvis Yardley
+                                Brian Gernhardt
 
 Compiler Developer              Patrick Michaud (PGE, PCT)
                                 Allison Randal (TGE)
@@ -79,8 +82,8 @@ Platform Porter                 Allison Randal (Debian, Ubuntu)
                                 Jerry Gay (Windows)
                                 Gerd Pokorra (Fedora)
 
-
 Patch Monster                   chromatic
+                                Reini Urban
                                 Jonathan Worthington
                                 Jerry Gay
                                 Will Coleda

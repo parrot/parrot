@@ -972,8 +972,8 @@ N: Reini Urban
 U: rurban
 E: rurban@cpan.org
 E: rurban@cpanel.net
-D: cygwin, install, 64-bit pbc compat, float converters
-D: Release manager for 4.6.0, 4.10.0
+D: cygwin, install, native_pbc
+D: Release manager
 S: Houston, TX
 
 N: Richard Hainsworth
@@ -1076,7 +1076,7 @@ U: sorear
 N: Stefan Seifert
 U: nine
 E: nine@detonation.org
-D: Continuation of Chandler's work on tasks
+D: Hybrid threads, continuation of Chandler's work on tasks
 S: Linz, Austria
 W: http://niner.name
 

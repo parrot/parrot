@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-README.pod - Readme to Parrot, version 4.10.0.
+README.pod - Readme to Parrot, version 4.11.0.
 
 =head1 DESCRIPTION
 
