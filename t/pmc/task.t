@@ -15,7 +15,15 @@
 
     tasks_run()
     task_send_recv()
+
+    $S0 = sysinfo .SYSINFO_PARROT_OS
+    if $S0 == 'MSWin32' goto skip_kill
+    if $S0 == 'cygwin' goto skip_kill
     task_kill()
+    goto post_kill
+  skip_kill:
+    print "ok 7 #SKIP task.kill - no signals on Windows yet\n"
+  post_kill:
     preempt_and_exit()
 .end
 
