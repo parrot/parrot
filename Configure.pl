@@ -5,7 +5,7 @@
 use 5.008;
 use strict;
 use warnings;
-use lib 'lib';
+use lib 'perl5';
 
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );

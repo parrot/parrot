@@ -17,13 +17,13 @@ Invoked by F<make>.  Imports functions from Parrot::H2inc.
 Example (from F<make> output):
 
     /usr/local/bin/perl tools/build/h2inc.pl include/parrot/enums.h \
-        lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm
+        perl5/Parrot/Pmc2c/PCCMETHOD_BITS.pm
 
 =cut
 
 use strict;
 use warnings;
-use lib qw( lib );
+use lib qw( perl5 );
 use Parrot::H2inc qw(
     parse_file
     perform_directive

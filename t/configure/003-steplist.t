@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use Test::More tests => 3;
 use Carp;
-use lib qw( lib );
+use lib qw( perl5 );
 use Parrot::Configure::Step::List qw| get_steps_list |;
 
 my @steps;

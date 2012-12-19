@@ -28,7 +28,7 @@ If this requirement has not been met, all tests will be skipped.
 
 use strict;
 use warnings;
-use lib qw(lib);
+use lib qw(perl5);
 
 use Test::More;
 use Parrot::Config;

@@ -10,7 +10,7 @@ use Fatal qw(open);
 use File::Find;
 use File::Spec;
 use Test::More;
-use lib qw( lib );
+use lib qw( perl5 );
 use Parrot::Config;
 
 =head1 NAME

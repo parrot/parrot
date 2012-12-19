@@ -8,7 +8,7 @@ use Test::More tests => 11;
 use Carp;
 use Cwd;
 use File::Temp qw( tempdir );
-use lib qw( lib );
+use lib qw( perl5 );
 use_ok('config::gen::config_h');
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Step::Test;

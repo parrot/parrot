@@ -54,12 +54,12 @@ sub runstep {
     open( my $IN, "<", $template )
         or die "Can't open $template: $!";
 
-    my $configdir = catdir(qw/lib Parrot Config/);
+    my $configdir = catdir(qw/perl5 Parrot Config/);
     unless ( -d $configdir ) {
         mkdir $configdir
             or die "Can't create dir $configdir: $!";
     }
-    my $gen_pm = q{lib/Parrot/Config/Generated.pm};
+    my $gen_pm = q{perl5/Parrot/Config/Generated.pm};
     $conf->append_configure_log($gen_pm);
     open( my $OUT, ">", $gen_pm )
         or die "Can't open $gen_pm: $!";

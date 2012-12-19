@@ -9,7 +9,7 @@ use Test::More tests =>  6;
 use Carp;
 use File::Path qw( mkpath );
 use File::Temp qw( tempdir );
-use lib qw( lib );
+use lib qw( perl5 );
 use Parrot::Install qw(
     create_directories
 );

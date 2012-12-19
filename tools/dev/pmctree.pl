@@ -3,7 +3,7 @@
 
 use strict;
 use warnings;
-use lib qw( lib );
+use lib qw( perl5 );
 use Parrot::Pmc2c::PMC::PrintTree;
 
 my ( %action, %options, @pmc_include_paths );

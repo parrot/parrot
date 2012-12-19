@@ -16,7 +16,7 @@ else {
     plan skip_all =>
         q{Tests irrelevant unless configuration completed with tracing requested};
 }
-use lib qw( lib );
+use lib qw( perl5 );
 use Parrot::Config;
 use_ok('Parrot::Configure::Trace');
 $Storable::Eval = 1;

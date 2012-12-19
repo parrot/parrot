@@ -81,7 +81,7 @@ use warnings;
 use Getopt::Long;
 use Pod::Usage;
 use System::Command;
-use lib qw( ./lib );
+use lib qw( perl5 );
 use Parrot::Config;
 use Cwd;
 

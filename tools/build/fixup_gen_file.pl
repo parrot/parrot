@@ -32,7 +32,7 @@ use strict;
 use warnings;
 
 use Getopt::Long;
-use lib 'lib';
+use lib 'perl5';
 use Parrot::BuildUtil;
 
 GetOptions( \my %opts, "noheaderizer", ) or die "error processing options";

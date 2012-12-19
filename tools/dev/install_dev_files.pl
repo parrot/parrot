@@ -57,7 +57,7 @@ format.
 use strict;
 use warnings;
 use File::Basename qw(basename);
-use lib qw( lib );
+use lib qw( perl5 );
 use Parrot::Install qw(
     install_files
     create_directories

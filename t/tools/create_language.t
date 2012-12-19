@@ -17,7 +17,7 @@ Tests the C<tools/dev/create_language.pl> tool.
 
 use strict;
 use warnings;
-use lib qw(lib);
+use lib qw(perl5);
 
 use Test::More;
 use IO::File ();

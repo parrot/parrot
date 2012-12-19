@@ -49,7 +49,7 @@ to verify that the new language compiles and configures properly.
 
 use strict;
 use warnings;
-use lib 'lib';
+use lib 'perl5';
 use File::Path;
 use File::Spec;
 

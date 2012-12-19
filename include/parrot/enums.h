@@ -41,7 +41,7 @@ typedef enum {
 
 /* &end_gen */
 
-/* &gen_from_enum(call_bits.pasm lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm) */
+/* &gen_from_enum(call_bits.pasm perl5/Parrot/Pmc2c/PCCMETHOD_BITS.pm) */
 typedef enum {
     /* 4 low bits are argument types */
     PARROT_ARG_INTVAL           = 0x0000,  /* 0 */

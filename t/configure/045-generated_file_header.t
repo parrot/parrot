@@ -7,7 +7,7 @@ use warnings;
 use Test::More tests => 12;
 use Carp;
 use File::Temp qw| tempfile |;
-use lib qw( lib );
+use lib qw( perl5 );
 use Parrot::BuildUtil;
 
 {

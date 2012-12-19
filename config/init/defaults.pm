@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -81,6 +81,10 @@ sub runstep {
     $ccdlflags =~ s/\s*-Wl,-rpath,\S*//g if $conf->options->get('disable-rpath');
 
     my $build_dir =  abs_path($FindBin::Bin);
+    my $bindir = File::Spec->catfile('bin','xx');
+    $bindir =~ s/xx$//;
+    my $libdir = File::Spec->catfile('lib','xx');
+    $libdir =~ s/xx$//;
 
     my $cc_option = $conf->options->get('cc');
     # We need a Glossary somewhere!
@@ -174,11 +178,11 @@ sub runstep {
         sym_import => '',
 
         # Library build directory
-        blib_dir => 'blib/lib',
+        blib_dir => 'lib',
 
         # libparrot library names
-        libparrot_static => 'libparrot' . $Config{_a},
-        libparrot_shared => 'libparrot.' . $Config{so},
+        libparrot_static => $libdir.'libparrot' . $Config{_a},
+        libparrot_shared => $libdir.'libparrot.' . $Config{so},
 
         # does the system know about static/dynamic linking?
         has_static_linking  => 1,
@@ -191,7 +195,7 @@ sub runstep {
         libparrot_soname => '',
 
         perl      => $^X,
-        test_prog => 'parrot',
+        test_prog => $bindir.'parrot',
 
         # some utilities in Makefile
         cat       => '$(PERL) -MExtUtils::Command -e cat',

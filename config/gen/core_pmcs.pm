@@ -152,7 +152,7 @@ END_C
 sub generate_pm {
     my ( $self, $conf ) = @_;
 
-    my $file = "lib/Parrot/PMC.pm";
+    my $file = "perl5/Parrot/PMC.pm";
     my @pmcs = split( qr/ /, $conf->data->get('pmc_names') );
 
     $conf->append_configure_log($file);

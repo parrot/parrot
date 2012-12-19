@@ -3,7 +3,7 @@
 
 use warnings;
 use strict;
-use lib 'lib';
+use lib 'perl5';
 use Parrot::SHA1;
 use Parrot::Git::Describe;
 

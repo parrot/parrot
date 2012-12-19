@@ -5,7 +5,7 @@ use strict;
 use warnings;
 
 use Getopt::Long;
-use lib qw( lib );
+use lib qw( perl5 );
 use Parrot::Headerizer;
 use Parrot::Headerizer::Functions qw(
     process_argv

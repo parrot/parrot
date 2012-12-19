@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use Test::More tests =>  7;
 use Carp;
-use lib qw( lib );
+use lib qw( perl5 );
 use_ok('auto::pmc');
 use_ok('config::gen::core_pmcs');
 use Parrot::Configure::Options qw( process_options );

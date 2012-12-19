@@ -5,7 +5,7 @@ package init::hints::darwin;
 use strict;
 use warnings;
 
-use lib qw( lib );
+use lib qw( perl5 );
 use base qw(Parrot::Configure::Step);
 use Parrot::BuildUtil;
 
@@ -41,7 +41,7 @@ sub runstep {
 
     my $deploy_target = _set_deployment_environment();
 
-    my $lib_dir = $conf->data->get('build_dir') . "/blib/lib";
+    my $lib_dir = $conf->data->get('build_dir') . "/lib";
     $flagsref->{ldflags} .= ' -L"' . $lib_dir . '"';
 
     if ($deploy_target =~ /^10\.(5|6|7)$/) {
@@ -86,12 +86,12 @@ sub runstep {
         # of the library.
 
         parrot_is_shared       => 1,
-        libparrot_shared       => "libparrot.$version$share_ext",
-        libparrot_shared_alias => "libparrot$share_ext",
+        libparrot_shared       => "lib/libparrot.$version$share_ext",
+        libparrot_shared_alias => "lib/libparrot$share_ext",
         rpath                  => "-L",
         libparrot_soname       => "-install_name "
             . '"'
-            . '@executable_path/blib/lib/'
+            . '@executable_path/../lib/'
             . "libparrot.$version$share_ext"
             . '"'
     );

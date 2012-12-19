@@ -18,7 +18,7 @@ use Cwd;
 use File::Copy;
 use File::Path ();
 use File::Temp qw| tempdir |;
-use lib qw( lib );
+use lib qw( perl5 );
 
 my $cwd = cwd();
 {

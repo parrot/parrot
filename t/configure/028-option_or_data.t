@@ -7,7 +7,7 @@ use warnings;
 
 use Test::More tests => 12;
 use Carp;
-use lib qw( lib );
+use lib qw( perl5 );
 use lib qw( config );
 use init::defaults;
 use init::install;

@@ -19,7 +19,7 @@ Windows programs.
 
 use strict;
 use warnings;
-use lib qw( ../../lib );
+use lib qw( ../../perl5 );
 use Parrot::Config;
 
 unless (@ARGV) {

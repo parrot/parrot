@@ -10,7 +10,7 @@ use File::Copy;
 use File::Path qw( mkpath );
 use File::Spec;
 use File::Temp qw( tempdir );
-use lib qw( lib );
+use lib qw( perl5 );
 use Parrot::Config;
 use Parrot::Headerizer::Functions qw(
     process_argv

@@ -7,7 +7,7 @@ use warnings;
 
 use Test::More tests => 14;
 use Carp;
-use lib qw( lib );
+use lib qw( perl5 );
 use_ok('config::init::defaults');
 use_ok('config::init::install');
 use Parrot::Configure;

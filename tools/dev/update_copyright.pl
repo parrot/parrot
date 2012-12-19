@@ -20,7 +20,7 @@ file before you commit it back to the repository.
 
 =cut
 
-use lib 'lib';
+use lib 'perl5';
 use Parrot::Test;
 
 # Accept a little fuzz in the original copyright notice..

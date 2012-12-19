@@ -9,7 +9,7 @@ use Carp;
 use Cwd;
 use File::Copy;
 use File::Temp qw| tempdir |;
-use lib qw( lib );
+use lib qw( perl5 );
 use_ok('config::init::defaults');
 use Parrot::Configure;
 use Parrot::Configure::Step;

@@ -55,17 +55,17 @@ E_NOTE
 
     $TEMP_pmc_build .= <<END;
 PMC2C_FILES = \\
-    lib/Parrot/Pmc2c/Pmc2cMain.pm \\
-    lib/Parrot/Pmc2c/Parser.pm \\
-    lib/Parrot/Pmc2c/Dumper.pm \\
-    lib/Parrot/Pmc2c/PMC.pm \\
-    lib/Parrot/Pmc2c/Method.pm \\
-    lib/Parrot/Pmc2c/PCCMETHOD.pm \\
-    lib/Parrot/Pmc2c/Library.pm \\
-    lib/Parrot/Pmc2c/UtilFunctions.pm \\
-    lib/Parrot/Pmc2c/PMC/default.pm \\
-    lib/Parrot/Pmc2c/PMC/Null.pm \\
-    lib/Parrot/Pmc2c/PMC/RO.pm
+    perl5/Parrot/Pmc2c/Pmc2cMain.pm \\
+    perl5/Parrot/Pmc2c/Parser.pm \\
+    perl5/Parrot/Pmc2c/Dumper.pm \\
+    perl5/Parrot/Pmc2c/PMC.pm \\
+    perl5/Parrot/Pmc2c/Method.pm \\
+    perl5/Parrot/Pmc2c/PCCMETHOD.pm \\
+    perl5/Parrot/Pmc2c/Library.pm \\
+    perl5/Parrot/Pmc2c/UtilFunctions.pm \\
+    perl5/Parrot/Pmc2c/PMC/default.pm \\
+    perl5/Parrot/Pmc2c/PMC/Null.pm \\
+    perl5/Parrot/Pmc2c/PMC/RO.pm
 
 END
 

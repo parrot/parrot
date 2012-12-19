@@ -1,4 +1,4 @@
-# Copyright (C) 2005, Parrot Foundation.
+# Copyright (C) 2005-2012, Parrot Foundation.
 
 package init::hints::cygwin;
 
@@ -18,11 +18,12 @@ sub runstep {
 
     my $build_dir = $conf->data->get('build_dir');
     $build_dir =~ s/ /\\ /g;
+    $blibdir = "$build_dir/lib";
     my $libdir = $conf->data->get('libdir');
     $libdir =~ s/ /\\ /g;
     my $libparrot_shared = $conf->data->get('libparrot_shared');
     # force cyg prefix
-    $libparrot_shared =~ s/^lib/cyg/g;
+    $libparrot_shared =~ s/{^lib/lib}{bin/cyg};
     # force the dll versioning
     my @parrot_version = Parrot::BuildUtil::parrot_version();
     my $dllsuffix = join('.', @parrot_version);
@@ -49,9 +50,9 @@ sub runstep {
         sym_export          => '__declspec(dllexport)',
         sym_import          => '__declspec(dllimport)',
         libparrot_shared    => $libparrot_shared,
-        libparrot_ldflags   => '-L' . $build_dir . ' -lparrot',
+        libparrot_ldflags   => '-L' . $blibdir . ' -lparrot',
         inst_libparrot_ldflags => '-L' . $libdir . ' -lparrot',
-        libparrot_linkflags   => '-L' . $build_dir . ' -lparrot',
+        libparrot_linkflags   => '-L' . $blibdir . ' -lparrot',
         inst_libparrot_linkflags => '-L' . $libdir . ' -lparrot',
     );
 

@@ -96,7 +96,7 @@ use warnings;
 # inside it. So jump up a dir to catch all the files.
 chdir '..';
 
-use lib 'lib';
+use lib 'perl5';
 use Fatal qw/open close/;
 
 use File::Basename qw/basename dirname/;

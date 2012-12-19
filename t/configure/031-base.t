@@ -4,7 +4,7 @@
 use strict;
 use warnings;
 
-use lib qw( lib );
+use lib qw( perl5 );
 use Test::More tests =>  5;
 
 =head1 NAME

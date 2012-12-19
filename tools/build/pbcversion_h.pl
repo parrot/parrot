@@ -19,7 +19,7 @@ them in a header file.
 
 use warnings;
 use strict;
-use lib 'lib';
+use lib 'perl5';
 use Parrot::BuildUtil;
 
 my ( $major, $minor ) = Parrot::BuildUtil::get_bc_version();

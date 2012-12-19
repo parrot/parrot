@@ -21,7 +21,7 @@ Alters files in docs/html and creates the following files :
 
 use strict;
 use warnings;
-use lib qw( lib ../lib ../../lib );
+use lib qw( perl5 ../perl5 ../../perl5 );
 
 use File::Copy;
 use File::Find;

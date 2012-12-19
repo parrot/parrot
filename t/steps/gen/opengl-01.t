@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use Test::More tests =>  20;
 use Carp;
-use lib qw( lib );
+use lib qw( perl5 );
 use_ok('config::gen::opengl');
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Step::Test;

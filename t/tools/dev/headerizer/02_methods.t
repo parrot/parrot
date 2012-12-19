@@ -11,7 +11,7 @@ use File::Path qw( mkpath );
 use File::Spec;
 use File::Temp qw( tempdir );
 use Test::More qw(no_plan); # tests => 46;
-use lib qw( lib );
+use lib qw( perl5 );
 use Parrot::Config;
 use Parrot::Headerizer::Functions qw( read_file );
 use Parrot::Headerizer;

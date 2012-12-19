@@ -18,7 +18,7 @@ Windows programs.
 
 use strict;
 use warnings;
-use lib qw( lib ../lib ../../lib );
+use lib qw( perl5 ../lib ../../lib );
 use Parrot::Config;
 
 my $version = $PConfig{VERSION} . $PConfig{DEVEL};

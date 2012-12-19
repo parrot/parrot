@@ -4,7 +4,7 @@
 
 use strict;
 use warnings;
-use lib qw(lib);
+use lib qw(perl5);
 
 use File::Temp;
 use Time::HiRes qw(sleep);

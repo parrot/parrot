@@ -10,7 +10,7 @@ use Carp;
 use Cwd;
 use File::Copy;
 use File::Temp qw| tempdir |;
-use lib qw( lib );
+use lib qw( perl5 );
 use Parrot::BuildUtil;
 
 my $cwd = cwd();

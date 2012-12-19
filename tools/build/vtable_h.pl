@@ -27,7 +27,7 @@ uses C<Parrot::Vtable>.
 use strict;
 use warnings;
 
-use lib 'lib';
+use lib 'perl5';
 use Parrot::Vtable;
 
 my $tbl = 'src/vtable.tbl';

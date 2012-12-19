@@ -6,7 +6,7 @@ use strict;
 use warnings;
 use Carp;
 use Test::More tests => 13;
-use lib qw( lib );
+use lib qw( perl5 );
 use Parrot::Configure::Messages qw|
     print_introduction
     print_conclusion

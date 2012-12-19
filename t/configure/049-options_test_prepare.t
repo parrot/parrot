@@ -10,7 +10,7 @@ use File::Basename qw( basename fileparse );
 use File::Path qw( mkpath );
 use File::Temp 0.13 qw| tempdir |;
 use Test::More tests => 12;
-use lib qw( lib );
+use lib qw( perl5 );
 use Parrot::Configure::Options::Test::Prepare ();
 
 my $cwd = cwd();

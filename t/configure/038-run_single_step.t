@@ -7,7 +7,7 @@ use warnings;
 
 use Test::More tests => 4;
 use Carp;
-use lib qw( lib );
+use lib qw( perl5 );
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 

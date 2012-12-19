@@ -20,7 +20,7 @@ use warnings;
 use Test::More;
 use Carp;
 use File::Spec;
-use lib qw( lib );
+use lib qw( perl5 );
 use Parrot::Config;
 use IO::CaptureOutput qw| capture |;
 

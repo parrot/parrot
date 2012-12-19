@@ -8,7 +8,7 @@ use Carp;
 use Cwd;
 use File::Temp qw( tempdir );
 use Test::More tests =>  7;
-use lib qw( lib );
+use lib qw( perl5 );
 use IO::CaptureOutput qw| capture |;
 use Parrot::Configure::Options qw| process_options |;
 use Parrot::Configure::Options::Test;

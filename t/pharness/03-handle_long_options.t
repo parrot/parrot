@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 
-use lib qw( lib );
+use lib qw( perl5 );
 use Test::More;
 eval {
     use Parrot::Config qw( %PConfig );

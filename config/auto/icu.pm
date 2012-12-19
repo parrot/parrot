@@ -24,7 +24,7 @@ use base qw(Parrot::Configure::Step);
 
 use Cwd qw(cwd);
 use File::Basename;
-use lib qw( lib );
+use lib qw( perl5 );
 use Parrot::Configure::Utils qw(capture_output);
 
 

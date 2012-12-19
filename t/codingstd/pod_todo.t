@@ -6,7 +6,7 @@ use warnings;
 
 use Carp;
 use Test::More;
-use lib qw( lib );
+use lib qw( perl5 );
 BEGIN {
     eval 'use Parrot::Test::Pod';
     if ($@) {

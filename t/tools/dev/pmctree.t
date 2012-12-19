@@ -9,7 +9,7 @@ use Cwd;
 use File::Basename;
 use File::Copy;
 use File::Temp qw( tempdir );
-use lib qw( lib );
+use lib qw( perl5 );
 use Parrot::Pmc2c::PMC::PrintTree;
 use IO::CaptureOutput qw| capture |;
 

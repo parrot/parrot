@@ -41,7 +41,7 @@ BEGIN {
     $RUNTIME_DIR = "$PARROT_ROOT/runtime/parrot";
 }
 
-use lib "$PARROT_ROOT/lib";
+use lib "$PARROT_ROOT/perl5";
 use Parrot::Config '%PConfig';
 
 my $DISASSEMBLER = "$PConfig{build_dir}$PConfig{slash}pbc_disassemble$PConfig{exe}";
