@@ -1,5 +1,7 @@
 2013-01-15    release 5.0.0
     - Core
+        + Remove duplicate library search path entries, move "." from the beginning to
+          the end. [GH 368]
         + Install forgotten runtime include files:
           cloneflags.pasm
           packfile_annotation_keytype.pasm
@@ -16,6 +18,9 @@
         + Improved Configure.pl probes for --with-llvm
     - Documentation
         + Re-added docs/ops, the generated ops summary and docs/packfile-c.pod
+        + Improved pdd10_embedding
+    - Tests
+        + Added t/library/lib_search_path.t
 
 2012-12-18    release 4.11.0
     - Core
