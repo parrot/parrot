@@ -72,8 +72,8 @@ sub test_native_pbc {
       . "Try tools/dev/pbc_header.pl --update-fingerprint $file";
     # check if this a platform where we can produce the needed file
     if ($id eq $arch) {
-        $skip_msg = "$file has old PBC_COMPAT $pbc_bc_version. Regenerate "
-          . "with tools/dev/mk_native_pbc --noconf";
+        $skip_msg = "$file has old PBC_COMPAT $pbc_bc_version. "
+          . "Regenerate with tools/dev/mk_native_pbc --noconf";
     }
     else {
         $skip_msg  = "$file has old PBC_COMPAT $pbc_bc_version. "
@@ -96,21 +96,20 @@ sub test_native_pbc {
     }
     elsif ( $todo->{$id} ) {
         skip $skip_msg, 1 if $bc ne $pbc_bc_version;
-        skip $skip_msgv, 1 if $version ne $pbc_version;
+        local $TODO = $skip_msgv if $version ne $pbc_version;
         my $todo_msg = $todo->{$id};
         if (length $todo_msg > 2) {
             $todo_msg = "$cvt $todo_msg"
         }
         else {
-            $todo_msg = "$cvt yet untested, GH #394. "
-                       . "Please report success."
+            $todo_msg = "$cvt yet untested. Please report success."
         }
         Parrot::Test::pbc_output_is( $file, $expected, "$cvt $desc",
                        todo => "$todo_msg" );
     }
     else {
         skip $skip_msg, 1 if $bc ne $pbc_bc_version;
-        skip $skip_msgv, 1 if $version ne $pbc_version;
+        local $TODO = $skip_msgv if $version ne $pbc_version;
         Parrot::Test::pbc_output_is( $file, $expected, "$cvt $desc" );
     }
   }
