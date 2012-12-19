@@ -50,7 +50,8 @@ no duplicates
 local $ENV{PARROT_LIBRARY} = 'libenvdir';
 local $ENV{PARROT_INCLUDE} = 'incenvdir';
 
-my ($builddir, $versiondir, $prefix) = @PConfig{qw(build_dir versiondir prefix)};
+my ($builddir, $versiondir, $libdir, $prefix) = @PConfig{qw(build_dir versiondir libdir)};
+my $versionlib = $libdir . $versiondir;
 my $what = 'DYNEXT';
 my $code = <<"CODE";
 .include 'iglobals.pasm'
@@ -79,7 +80,7 @@ my $dynext = Parrot::Test::_pir_stdin_output_slurp('', $code);
 my $expected =
 "dynext/
 $builddir/runtime/parrot/dynext/
-$prefix$versiondir/dynext/
+$versionlib/dynext/
 ";
 is ($dynext, $expected, "dynext");
 
@@ -89,7 +90,7 @@ $library = Parrot::Test::_pir_stdin_output_slurp('', $library);
 $expected =
 "libenvdir
 $builddir/runtime/parrot/library/
-$prefix$versiondir/library/
+$versionlib/library/
 ./
 ";
 is ($library, $expected, "library");
@@ -101,7 +102,7 @@ $expected =
 "incenvdir
 $builddir/
 $builddir/runtime/parrot/include/
-$prefix$versiondir/include/
+$versionlib/include/
 ./
 ";
 is ($include, $expected, "include");
@@ -111,7 +112,7 @@ $lang =~ s/DYNEXT/LANG/;
 $lang = Parrot::Test::_pir_stdin_output_slurp('', $lang);
 $expected =
 "$builddir/runtime/parrot/languages/
-$prefix$versiondir/languages/
+$versionlib/languages/
 ./
 ";
 is ($lang, $expected, "lang");
