@@ -4,6 +4,8 @@
 use strict;
 use warnings;
 use Archive::Tar;
+use IO::Zlib;
+use IO::Compress::Bzip2;
 use ExtUtils::Manifest qw(maniread);
 
 =head1 DESCRIPTION
