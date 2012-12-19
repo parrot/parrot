@@ -29,7 +29,7 @@ Notifications for the 2.6->2.9 transition and later will be complete.
 For instructions on how to deprecate Parrot code, please see:
  F<how_to_deprecate.pod>.
 
-=head2 Changes Between 4.12.0 and 4.11.0
+=head2 Changes Between 4.9 and 4.12
 
 =over 4
 
