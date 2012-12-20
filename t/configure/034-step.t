@@ -1,16 +1,16 @@
 #!perl
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 use strict;
 use warnings;
 
-use Test::More tests => 15;
+use Test::More tests => 17;
 use Carp;
 use Cwd;
 use File::Temp 0.13 qw/ tempdir /;
 use lib qw( lib t/configure/testlib );
 use Parrot::Configure;
-use IO::CaptureOutput qw | capture |;
+use Parrot::Configure::Utils qw(_slurp capture);
 
 my $cwd = cwd();
 my $conf = Parrot::Configure->new;
@@ -88,13 +88,11 @@ like(
 if (@verbose@) { sprint "Hello world\n"; }
 END_DUMMY
     close $IN or croak "Unable to close temp file";
-    my ($stdout, $stderr);
-    capture ( sub { eval { $conf->genfile( $dummy => 'CFLAGS', feature_file => 1, ) } },
-        \$stdout, \$stderr );
+    my ($retval, $stdout, $stderr, $evalerr) =
+      capture ( sub {$conf->genfile( $dummy => 'CFLAGS', feature_file => 1 )} );
     ok( $stderr, "Error message caught" );
     like( $stderr, qr/sprint/, "Error message had expected content" );
-    ok( $@,     "Bad Perl code caught by genfile()" );
-
+    ok( $evalerr, "Bad Perl code caught by genfile()" );
     unlink $dummy or croak "Unable to delete file after testing";
     chdir $cwd    or croak "Unable to change back to starting directory";
 }
@@ -106,12 +104,9 @@ END_DUMMY
     open my $IN, '>', $dummy or croak "Unable to open temp file for writing";
     print $IN q{@foobar@\n};
     close $IN or croak "Unable to close temp file";
-    my ($rv, $stdout, $stderr) ;
-    capture (
-        sub { $rv = $conf->genfile( $dummy => 'CFLAGS' ) },
-        \$stdout,
-        \$stderr
-    );
+    my $rv;
+    my ($result, $stdout, $stderr) =
+      capture ( sub { $rv = $conf->genfile( $dummy => 'CFLAGS' ) } );
     ok($rv, "genfile() returned true when warning expected" );
     like( $stderr, qr/value for '\@foobar\@'/, "got expected warning" );
 
@@ -124,12 +119,20 @@ END_DUMMY
     chdir $tdir or croak "Unable to change to temporary directory";
     my $dummy = 'dummy';
     open my $IN, '>', $dummy or croak "Unable to open temp file for writing";
-    print $IN q{This line ends in a slash/}, qq{\n};
+    if ($^O eq 'MSWin32') {
+        print $IN q{This c:\path\to\some\file ends in a backslash \\}, "\n";
+    } else {
+        print $IN q{This /path/to/some/file ends in a backslash \\}, "\n";
+    }
     close $IN or croak "Unable to close temp file";
-    eval { $conf->genfile(  $dummy => 'CFLAGS', replace_slashes => 1, ); };
-    like( $@, qr//,
-        "genfile() died as expected with replace_slashes option and line ending in trailing slash"
-    );
+    ok( $conf->genfile( $dummy => 'CFLAGS', replace_slashes => 1), "genfile replace_slashes" );
+    is( $@, '', "No error" );
+    # Test that replace_slashes works and ignores ending \
+    my $expected = $^O eq 'MSWin32'
+      ? q{This c:\path\to\some\file ends in a backslash \\}."\n"
+      : q{This /path/to/some/file ends in a backslash \\}."\n";
+    my $output = _slurp($dummy);
+    is( $output, $expected, "genfile replace_slashes content" );
 
     unlink $dummy or croak "Unable to delete file after testing";
     chdir $cwd    or croak "Unable to change back to starting directory";
