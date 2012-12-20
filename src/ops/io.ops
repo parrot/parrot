@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2008, Parrot Foundation.
+ * Copyright (C) 2002-2012, Parrot Foundation.
 ** io.ops
 */
 
@@ -16,7 +16,7 @@ io.ops - I/O Opcodes
 
 =head1 DESCRIPTION
 
-Parrot's IO API
+Parrot IO API
 
 When making changes to any ops file, run C<make bootstrap-ops> to regenerate
 all generated ops files.
@@ -106,11 +106,33 @@ inline op say(in NUM) :base_io {
 #endif
 }
 
+/*
+
+If the string argument can be extended by \n without copying,
+concat the strings before calling io_putps to provider better atomicity
+with threads. To avoid mixing strings with newlines in most cases.
+This is not foolproof of course. [GH #893]
+
+*/
+
 op say(in STR) :base_io {
     STRING * const s = $1;
-    if (s && Parrot_str_byte_length(interp, s))
-        Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
-    Parrot_io_putps(interp, _PIO_STDOUT(interp), Parrot_str_new_constant(interp, "\n"));
+    STRING * const nl = Parrot_str_new_constant(interp, "\n");
+
+    if (s && Parrot_str_byte_length(interp, s)) {
+        if (!PObj_is_growable_TESTALL(s)
+          || Buffer_buflen(s) <= s->bufused + s->encoding->to_encoding(interp, nl)->bufused) {
+            Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
+            Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
+        }
+        else {
+	    PARROT_ASSERT( s->strstart == Parrot_str_concat(interp, s, nl)->strstart );
+            Parrot_io_putps(interp, _PIO_STDOUT(interp),
+                            Parrot_str_concat(interp, s, nl));
+	}
+    }
+    else
+        Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
 }
 
 op say(invar PMC) :base_io {
@@ -124,9 +146,22 @@ op say(invar PMC) :base_io {
     }
     else {
         STRING * const s = VTABLE_get_string(interp, p);
-        if (s)
-            Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
-        Parrot_io_putps(interp, _PIO_STDOUT(interp), Parrot_str_new_constant(interp, "\n"));
+        STRING * const nl = Parrot_str_new_constant(interp, "\n");
+
+        if (s) {
+	  if (!PObj_is_growable_TESTALL(s)
+            || Buffer_buflen(s) <= s->bufused + s->encoding->to_encoding(interp, nl)->bufused) {
+                Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
+                Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
+            }
+            else {
+		PARROT_ASSERT( s->strstart == Parrot_str_concat(interp, s, nl)->strstart );
+                Parrot_io_putps(interp, _PIO_STDOUT(interp),
+                                Parrot_str_concat(interp, s, nl));
+	    }
+        }
+        else
+            Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
     }
 }
 
