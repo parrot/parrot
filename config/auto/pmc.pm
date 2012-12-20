@@ -136,7 +136,7 @@ include/pmc/pmc_$pmc.h: src/pmc/$pmc.c
 ## SUFFIX OVERRIDE -Warnings
 src/pmc/$pmc\$(O): \\
 $o_deps
-\t\$(CC) \$(CFLAGS) $optimize $cc_shared $warnings -I\$(\@D) $cc_o_out\$@ -c src/pmc/$pmc.c
+\t\$(CC) \$(CFLAGS) $optimize $cc_shared $warnings -I\$(\@D)/. $cc_o_out\$@ -c src/pmc/$pmc.c
 
 END
     }

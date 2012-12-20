@@ -610,12 +610,12 @@ MAKE_C = @make_c@
 .SUFFIXES : .c .S .s .i .pmc .dump $(O) .str .pir .pbc
 
 .c$(O) : # suffix rule (limited support)
-	$(CC) $(CFLAGS) @optimize@ $(CC_WARN) -I$(@D) -Isrc/ @cc_o_out@$@ -c $<
+	$(CC) $(CFLAGS) @optimize@ $(CC_WARN) -I$(@D)/. -Isrc @cc_o_out@$@ -c $<
 .c.i : # suffix rule (limited support)
-	$(CC) -E $(CFLAGS) -I$(@D) -Isrc/ @cc_o_out@$@ $<
+	$(CC) -E $(CFLAGS) -I$(@D)/. -Isrc @cc_o_out@$@ $<
 
 #UNLESS(win32):.s$(O) : # suffix rule (limited support)
-#UNLESS(win32):	$(CC) $(CFLAGS) @optimize@ $(CC_WARN) -I$(@D) @cc_o_out@$@ -c $<
+#UNLESS(win32):	$(CC) $(CFLAGS) @optimize@ $(CC_WARN) -I$(@D)/. @cc_o_out@$@ -c $<
 
 .pir.pbc : # suffix rule (limited support)
 	$(PARROT) -o $@ $<
@@ -1670,7 +1670,7 @@ src/extend$(O) : \
 	$(INC_DIR)/events.h \
 	src/extend.c
 	$(CC) $(CFLAGS) @optimize::src/extend.c@ @ccwarn::src/extend.c@ @cc_shared@ \
-          -I$(@D) @cc_o_out@$@ -c src/extend.c
+          -I$(@D)/. @cc_o_out@$@ -c src/extend.c
 
 src/runcore/main$(O) : \
 	src/runcore/main.c \
@@ -1996,7 +1996,7 @@ src/nci/extra_thunks$(O) : \
 	src/nci/extra_thunks.str \
 	src/nci/extra_thunks.c
 	$(CC) $(CFLAGS) @optimize::src/nci/extra_thunks.c@ @ccwarn::src/nci/extra_thunks.c@ \
-	  @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/nci/extra_thunks.c
+	  @cc_shared@ -I$(@D)/. @cc_o_out@$@ -c src/nci/extra_thunks.c
 
 src/nci/libffi$(O) : src/nci/libffi.c \
 	$(PARROT_H_HEADERS) \
@@ -2018,7 +2018,7 @@ src/gc/system$(O) : \
   src/gc/system.c\
   src/gc/variable_size_pool.h
 	$(CC) $(CFLAGS) @optimize::src/gc/system.c@ @ccwarn::src/gc/system.c@ @cc_shared@ \
-	  -I$(@D) @cc_o_out@$@ -c src/gc/system.c
+	  -I$(@D)/. @cc_o_out@$@ -c src/gc/system.c
 
 src/gc/gc_private.h : $(INC_DIR)/settings.h
 
@@ -2035,13 +2035,13 @@ src/utils$(O) : \
 ## SUFFIX OVERRIDE
 src/string/sprintf$(O) : $(PARROT_H_HEADERS) src/string/sprintf.c src/string/spf_private.h
 	$(CC) $(CFLAGS) @optimize::src/string/sprintf.c@ @ccwarn::src/string/sprintf.c@ @cc_shared@ \
-	  -I$(@D) @cc_o_out@$@ -c src/string/sprintf.c
+	  -I$(@D)/. @cc_o_out@$@ -c src/string/sprintf.c
 
 ## SUFFIX OVERRIDE
 src/string/spf_render$(O) : $(PARROT_H_HEADERS) src/string/spf_render.str \
   src/string/spf_render.c src/string/spf_private.h
 	$(CC) $(CFLAGS) @optimize::src/string/spf_render.c@ @ccwarn::src/string/spf_render.c@ \
-	  @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/string/spf_render.c
+	  @cc_shared@ -I$(@D)/. @cc_o_out@$@ -c src/string/spf_render.c
 
 src/string/spf_vtable$(O) : $(PARROT_H_HEADERS) src/string/spf_vtable.str \
 	src/string/spf_vtable.c src/string/spf_private.h
@@ -2062,7 +2062,7 @@ src/string/encoding/shared$(O) : \
   src/string/encoding/shared.h \
   src/string/encoding/shared.c \
   src/string/encoding/tables.h
-	$(CC) $(CFLAGS) @optimize::src/string/encoding/shared.c@ @ccwarn::src/string/encoding/shared.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/string/encoding/shared.c
+	$(CC) $(CFLAGS) @optimize::src/string/encoding/shared.c@ @ccwarn::src/string/encoding/shared.c@ @cc_shared@ -I$(@D)/. @cc_o_out@$@ -c src/string/encoding/shared.c
 
 src/string/encoding/null$(O) : \
 	$(PARROT_H_HEADERS) \
@@ -2146,7 +2146,7 @@ src/ops/core_ops$(O) : src/ops/core_ops.c \
 	$(INC_DIR)/events.h \
 	$(INC_DIR)/scheduler_private.h \
 	src/io/io_private.h
-	$(CC) $(CFLAGS) @optimize::src/ops/core_ops.c@ @ccwarn::src/ops/core_ops.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/ops/core_ops.c
+	$(CC) $(CFLAGS) @optimize::src/ops/core_ops.c@ @ccwarn::src/ops/core_ops.c@ @cc_shared@ -I$(@D)/. @cc_o_out@$@ -c src/ops/core_ops.c
 
 
 @TEMP_pmc_build@
@@ -3196,7 +3196,7 @@ exec : src/parrot_config$(O) $(LIBPARROT)
 # for use by t/pmc/nci.t
 ## SUFFIX OVERRIDE - dynloaded files need cc_shared
 src/nci_test$(O): $(PARROT_H_HEADERS) src/nci_test.c
-	$(CC) $(CFLAGS) @optimize::src/nci_test.c@ @ccwarn::src/nci_test.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/nci_test.c
+	$(CC) $(CFLAGS) @optimize::src/nci_test.c@ @ccwarn::src/nci_test.c@ @cc_shared@ -I$(@D)/. @cc_o_out@$@ -c src/nci_test.c
 
 $(LIBNCI_TEST_SO): src/nci_test$(O)
 	$(LD) $(LD_LOAD_FLAGS) @ncilib_link_extra@ $(LDFLAGS) \
@@ -3235,7 +3235,7 @@ bootstrap-nci : src/nci/core_thunks.nci src/nci/extra_thunks.nci $(NCI_THUNK_GEN
 ## SUFFIX OVERRIDE
 src/extra_nci_thunks$(O) : $(PARROT_H_HEADERS) src/extra_nci_thunks.c \
 	$(INC_PMC_DIR)/pmc_nci.h
-	$(CC) $(CFLAGS) @optimize::src/extra_nci_thunks.c@ @ccwarn::src/extra_nci_thunks.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c src/extra_nci_thunks.c
+	$(CC) $(CFLAGS) @optimize::src/extra_nci_thunks.c@ @ccwarn::src/extra_nci_thunks.c@ @cc_shared@ -I$(@D)/. @cc_o_out@$@ -c src/extra_nci_thunks.c
 
 # emacs etags
 # this needs exuberant-ctags

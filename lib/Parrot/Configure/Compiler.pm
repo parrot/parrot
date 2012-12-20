@@ -7,10 +7,12 @@ Parrot::Configure::Compiler - C-Related methods for configuration and more
 =head1 DESCRIPTION
 
 The Parrot::Configure::Compiler module provides methods inherited by
-Parrot::Configure which prepare and/or run C programs during compilation.
+Parrot::Configure which prepare and/or run C programs during configure probes.
 Other methods from this module will be used to generate makefiles and other
 files.  Template entries of the form C<@key@> will be replaced with C<key>'s
-value from the configuration system's data.
+value from the currently created configuration system's data.
+
+Beware that Parrot::Config is not available at configure time.
 
 =head2 Methods
 
@@ -382,6 +384,27 @@ syntax works ok.
 
 =back
 
+=item replace_slashes
+
+If set to a true value, then filenames on a win32 platform will get their
+forward slashes '/' automatically converted to '\'.
+win32 can handle forward slashes finer (since XP), but cmd.exe tries to
+detect /c and more as argument.
+If you ssh into cygwin for remote testing, or for smoker cronjobs
+calling cmd /c "nmake" or dmake or mingw32-make will fail.
+
+For example:
+
+    POD2MAN          = C:\perl516\perl\bin/pod2man
+    CC_INC           = -I./include -I./include/pmc
+    DEV_TOOLS_DIR = tools/dev
+    $(PERL) $(DEV_TOOLS_DIR)/headerizer.pl
+=>
+    POD2MAN          = C:\perl516\perl\bin\pod2man
+    CC_INC           = -I.\include -I.\include\pmc
+    DEV_TOOLS_DIR = tools\dev
+    $(PERL) $(DEV_TOOLS_DIR)\headerizer.pl
+
 =back
 
 =cut
@@ -425,6 +448,7 @@ sub genfile {
         }
         if ( $options{file_type} eq 'makefile' ) {
             $options{conditioned_lines} = 1;
+            $options{replace_slashes} = 1 if $^O eq 'MSWin32';
         }
     }
 
@@ -604,6 +628,12 @@ sub genfile {
                 '';
             }
         }egx;
+
+        my $warn_replace_slashes;
+        if ( $options{replace_slashes} and $^O eq 'MSWin32') {
+            # warn "option replace_slashes currently ignored\n" unless $warn_replace_slashes++;
+            $line =~ s{/}{\\}g;
+        }
 
         print $out $line;
     }
