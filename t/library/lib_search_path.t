@@ -8,11 +8,7 @@ use lib qw(lib);
 use Test::More;
 use Parrot::Config;
 use Parrot::Test;
-if ($PConfig{slash} eq '/') {
-    plan tests => 5;
-} else {
-    die "0..0 #SKIP $^O not yet supported\n";
-}
+plan tests => 5;
 
 =head1 NAME
 
@@ -27,19 +23,36 @@ proper order.
 
 =head1 DESCRIPTION
 
-Check for proper loadlib libpath order.
+Check for proper libpath order.
 
-if parrot is installed:
+dynext:
+  if parrot is installed:
 
-    $PARROT_LIBRARY
+    $ENV{PARROT_LIBRARY}
     dynext/
     $prefix/parrot/$ver/dynext/
 
-if not installed:
+  if not installed:
 
-    $PARROT_LIBRARY
+    $ENV{PARROT_LIBRARY}
     dynext/
     $build_dir/runtime/parrot/dynext
+
+library (similar for include):
+  if parrot is installed:
+
+    $ENV{PARROT_LIBRARY}
+    $prefix/parrot/$ver/library/
+    ./
+
+  if not installed:
+
+    $ENV{PARROT_LIBRARY}
+    $build_dir/runtime/parrot/library/
+    $prefix/parrot/$ver/library/
+    ./
+
+LANG does not observe $ENV{PARROT_LIBRARY}
 
 no duplicates
 
