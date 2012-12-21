@@ -2095,7 +2095,7 @@ $(INC_DIR)/vtable.h : src/vtable.tbl $(BUILD_TOOLS_DIR)/vtable_h.pl lib/Parrot/V
 #ELSE:docs : docs.stub
 
 docs.stub:
-	@echo "Perldoc is required, but not detected."
+	@echo "perldoc is required, but not detected."
 
 docs.dummy :
 	$(MAKE) docs
@@ -2107,7 +2107,7 @@ docs-clean :
 #ELSE:html : html.stub
 
 html.stub:
-	@echo "Perldoc is required, but not detected."
+	@echo "perldoc is required, but not detected."
 
 html.dummy :
 	$(MAKE_C) docs html
@@ -2119,7 +2119,7 @@ html-clean :
 #ELSE:htmlhelp : htmlhelp.stub
 
 htmlhelp.stub:
-	@echo "Perldoc is required, but not detected."
+	@echo "perldoc is required, but not detected."
 
 htmlhelp.dummy :
 	$(MAKE_C) docs htmlhelp
