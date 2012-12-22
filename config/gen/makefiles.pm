@@ -76,7 +76,7 @@ sub makefiles {
         my $args   = $self->{makefiles}->{$target};
         my $source = delete $args->{SOURCE};
 
-        $conf->genfile($source => $target, %$args );
+        $conf->genfile($source => $target, %$args);
     }
     return;
 }

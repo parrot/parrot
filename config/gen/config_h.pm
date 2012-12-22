@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -22,7 +22,6 @@ use base qw(Parrot::Configure::Step);
 
 use Parrot::Configure::Utils ':gen';
 
-
 sub _init {
     my $self = shift;
     my %data;
@@ -41,12 +40,13 @@ sub runstep {
 
     $conf->genfile($self->{templates}->{config_h}, 'include/parrot/config.h',
         ignore_pattern    => 'PARROT_CONFIG_DATE',
-        conditioned_lines => 1
+        conditioned_lines => 1,
+        manifest => [ "[main]", "include" ]
     );
-
     $conf->genfile($self->{templates}->{feature_h}, 'include/parrot/feature.h',
         ignore_pattern => 'PARROT_CONFIG_DATE',
-        feature_file   => 1
+        feature_file   => 1,
+        manifest => [ "[main]", "include" ]
     );
 
     my @sorted_keys = sort $conf->data->keys();
@@ -76,7 +76,9 @@ sub runstep {
                    split /,/, $conf->options->get('define') || ''
     );
 
-    $conf->genfile($self->{templates}->{has_header_h}, 'include/parrot/has_header.h');
+    $conf->genfile($self->{templates}->{has_header_h}, 'include/parrot/has_header.h',
+                   manifest => [ "[main]", "include" ]
+                  );
 
     return 1;
 }

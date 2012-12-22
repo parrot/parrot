@@ -77,9 +77,9 @@ $conf->data->set(configure_args => @ARGV
     ? '"'.join("\" \"", map {qq($_)} @ARGV).'"'
     : '');
 
-# Log files created by Configure.pl in MANIFEST_configure.generated
+# Log files created by Configure.pl in MANIFEST.generated
 $conf->{active_configuration} = 1;
-unlink 'MANIFEST_configure.generated';
+unlink 'MANIFEST.generated';
 
 # Run the actual steps from Parrot::Configure
 $conf->runsteps or exit(1);

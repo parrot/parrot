@@ -32,6 +32,7 @@ use Parrot::Configure::Utils qw(
     _run_command _build_compile_command
     move_if_diff
 );
+use Parrot::BuildUtil qw( add_to_generated );
 
 # report the makefile and lineno
 sub makecroak {
@@ -383,8 +384,6 @@ syntax works ok.
 
 =back
 
-=back
-
 =cut
 
 sub genfile {
@@ -392,9 +391,6 @@ sub genfile {
     my ( $source, $target, %options ) = @_;
 
     my $calling_sub = (caller(1))[3] || q{};
-    if ( $calling_sub !~ /cc_gen$/ ) {
-        $conf->append_configure_log($target);
-    }
 
     open my $in,  '<', $source       or die "Can't open $source: $!";
     open my $out, '>', "${target}_tmp" or die "Can't open ${target}_tmp: $!";
@@ -457,6 +453,13 @@ sub genfile {
 
     if ($target eq 'CFLAGS') {
         $options{conditioned_lines} = 1;
+    }
+
+    if ( $options{manifest} ) {
+        add_to_generated( $target, @{$options{manifest}} );
+    }
+    elsif ($target !~ /^(cc_gen|test_)/) {
+        add_to_generated( $target, "[]" );
     }
 
     # this loop can not be implemented as a foreach loop as the body
@@ -726,11 +729,24 @@ sub cond_eval {
     cond_eval_single($conf, $expr);
 }
 
+=item C<append_configure_log($path)>
+
+    $conf->append_configure_log($path)
+
+Adds $path to F<MANIFEST_configure.generated>.
+
+Deprecated, there is no MANIFEST_configure.generated anymore.
+Replaced by add_to_generated().
+
+=back
+
+=cut
+
 sub append_configure_log {
     my $conf = shift;
     my $target = shift;
     if ( $conf->{active_configuration} ) {
-        my $generated_log = 'MANIFEST_configure.generated';
+        my $generated_log = 'MANIFEST_configure.generated'; # TODO: MANIFEST.generated
         open my $GEN, '>>', $generated_log
             or die "Can't open $generated_log for appending: $!";
         print $GEN "$target\n";

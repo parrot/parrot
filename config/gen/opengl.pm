@@ -1,4 +1,4 @@
-# Copyright (C) 2008, Parrot Foundation.
+# Copyright (C) 2008-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -596,8 +596,8 @@ sub gen_opengl_defines {
                        $define, $api_defs->{$define};
         }
     }
-
-    $conf->append_configure_log($MACRO_FILE);
+    # $conf->append_configure_log($MACRO_FILE);
+    add_to_generated($MACRO_FILE, "[main]");
 
     return 1;
 }
@@ -782,7 +782,8 @@ HEADER
     }
 
     close $sigs;
-    $conf->append_configure_log($SIGS_FILE);
+    # $conf->append_configure_log($SIGS_FILE);
+    add_to_generated($SIGS_FILE, "[main]");
 
     # PHASE 3: Write function lists for each OpenGL-related library
 
@@ -928,7 +929,8 @@ SUB_FOOTER
     }
 
     close $funcs;
-    $conf->append_configure_log($FUNCS_FILE);
+    # $conf->append_configure_log($FUNCS_FILE);
+    add_to_generated($FUNCS_FILE, "[main]");
 
     # PHASE 4: Print statistical info on parse results if verbose
     if ($verbose) {
@@ -1246,8 +1248,8 @@ FOOTER
     print $c_file $std_cbs;
     print $c_file $footer;
 
-    $conf->append_configure_log($C_FILE);
-
+    # $conf->append_configure_log($C_FILE);
+    add_to_generated($C_FILE, "[devel]");
 
     return 1;
 }

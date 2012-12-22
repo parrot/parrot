@@ -115,6 +115,7 @@ LDFLAGS          = @ldflags@ @ld_debug@
 INNO_SETUP       = iscc
 TEMPDIR          = @tempdir@
 RPATH_BLIB       = @rpath_blib@
+ADDGENERATED     = $(PERL) $(BUILD_TOOLS_DIR)/addgenerated.pl
 #IF(darwin):export MACOSX_DEPLOYMENT_TARGET = @osx_version@
 
 ###############################################################################
@@ -225,6 +226,7 @@ CONFIGURE_GENERATED_FILES = \
 	$(GEN_CONFIGS) \
 	$(GEN_MAKEFILES) \
 	myconfig  \
+	MANIFEST.generated \
 	MANIFEST_configure.generated \
 	.configure_trace.sto \
 	.parrot_current_rev \
@@ -616,6 +618,7 @@ MAKE_C = @make_c@
 
 .pir.pbc : # suffix rule (limited support)
 	$(PARROT) -o $@ $<
+	@$(ADDGENERATED) "$@"
 
 # Note: Several rules in this makefile are tagged with a "SUFFIX OVERRIDE"
 # comment; this indicates that we have an explicit compilation rule for
@@ -656,7 +659,7 @@ all : \
 	$(WINXED) \
 #IF(has_dynamic_linking):    $(DYNOPLIBS_TARGETS) \
 #IF(has_dynamic_linking):    $(LIBNCI_TEST_SO) \
-	$(GEN_LIBRARY) \
+	gen_library \
 	src/install_config$(O)
 
 corevm : \
@@ -668,6 +671,8 @@ corevm : \
 	$(RUN_INC_DIR)/config.fpmc \
 #IF(has_dynamic_linking):    $(DYNPMC_TARGETS) \
 	$(LIBRARY_DIR)/Test/More.pbc
+
+gen_library : $(GEN_LIBRARY)
 
 $(GEN_LIBRARY) : $(PARROT) $(GEN_PASM_INCLUDES)
 
@@ -975,6 +980,7 @@ $(INSTALLABLEPARROT) : $(FRPTWO_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 	$(FRPTWO_DIR)/main$(O) src/install_config$(O) src/longopt$(O) \
 	$(FRPTWO_DIR)/prt0.pbc$(O) @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
+	$(ADDGENERATED) "$@" "[main]" bin
 
 $(INC_DIR)/context.h : $(INC_PMC_DIR)/pmc_callcontext.h
 
@@ -995,6 +1001,8 @@ src/null_config.c : myconfig $(BUILD_TOOLS_DIR)/parrot_config_c.pl
 install_config.fpmc : myconfig config_lib.pir $(PARROT)
 	@echo "Invoking Parrot to generate install_config.fpmc"
 	$(PARROT) config_lib.pir --install > $@
+	$(ADDGENERATED) "install_config$(O)" "[main]" lib
+	$(ADDGENERATED) "$@" "[main]" lib
 
 src/parrot_config$(O) : \
 	$(INC_DIR)/api.h \
@@ -1130,21 +1138,27 @@ PARROT_LIBS : \
 #IF(has_static_linking):  $(LIBPARROT_STATIC) \
 #IF(has_dynamic_linking): $(LIBPARROT_SHARED)
 
+#IF(cygwin):IMPORTLIB = libparrot.dll.a
+#IF(win32 and cc==gcc):IMPORTLIB = libparrot.lib
+
 $(LIBPARROT_STATIC) : $(O_FILES)
 	$(MKPATH) @blib_dir@
 	$(AR_CR) @ar_out@$@ @ar_extra@ $(O_FILES)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 	$(RANLIB) $@
+	$(ADDGENERATED) "$@" "[main]" lib
 
 $(LIBPARROT_SHARED) : $(O_FILES)
 	$(MKPATH) @blib_dir@
 	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) @ld_out@$@ @libparrot_soname@ \
 #IF(cygwin and optimize):		-s \
-#IF(cygwin):		-Wl,--out-implib=libparrot.dll.a \
-#IF(win32 and cc==gcc):		-Wl,--out-implib=libparrot.lib \
+#IF(cygwin or (win32 and cc==gcc)):		-Wl,--out-implib=$(IMPORTLIB) \
 		$(O_FILES) $(C_LIBS) $(ICU_SHARED)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(libparrot_shared_alias):	( cd @blib_dir@ ; ln -sf @libparrot_shared@ @libparrot_shared_alias@ )
+#IF(libparrot_shared_alias):	$(ADDGENERATED) "@blib_dir@/@libparrot_shared_alias@" "[main]" lib
+	$(ADDGENERATED) "$@" "[main]" lib
+#IF(cygwin or (win32 and cc==gcc)):	$(ADDGENERATED) "$(IMPORTLIB)" "[main]" lib
 	$(CP) tools/dev/gdb-pp-load.py @blib_dir@/@libparrot_shared@-gdb.py
 	$(CP) tools/dev/gdb-pp.py @blib_dir@/GDBPrettyPrint.py
 	@echo '' > @blib_dir@/__init__.py
@@ -1152,16 +1166,19 @@ $(LIBPARROT_SHARED) : $(O_FILES)
 $(INSTALLABLECONFIG) : src/install_config$(O) $(PARROT_CONFIG) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc $(DEV_TOOLS_DIR)/parrot-config.pir
 	$(PBC_TO_EXE) parrot_config.pbc --install
+	$(ADDGENERATED) "$@" "[main]" bin
 
 $(INSTALLABLEPBCTOEXE) : $(PBC_TO_EXE) src/install_config$(O)
 	$(PBC_TO_EXE) pbc_to_exe.pbc --install
+	$(ADDGENERATED) "$@" "[main]" bin
 
 $(INSTALLABLENCITHUNKGEN) : parrot_nci_thunk_gen.pbc $(PBC_TO_EXE) src/install_config$(O)
 	$(PBC_TO_EXE) parrot_nci_thunk_gen.pbc --install
+	$(ADDGENERATED) "$@" "[main]" bin
 
 $(INSTALLABLEPARROT_PROVE) : parrot-prove.pbc $(PBC_TO_EXE) src/install_config$(O)
 	$(PBC_TO_EXE) parrot-prove.pbc --install
-
+	$(ADDGENERATED) "$@" "[main]" bin
 #
 # Parrot Debugger
 #
@@ -1173,18 +1190,19 @@ $(FR_DIR)/parrot_debugger/main$(O) : \
 
 $(PDB) : $(FR_DIR)/parrot_debugger/main$(O) src/parrot_config$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
-	$(FR_DIR)/parrot_debugger/main$(O) \
-	src/parrot_config$(O) \
+	  $(FR_DIR)/parrot_debugger/main$(O) \
+	  src/parrot_config$(O) \
 	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 #IF(cygwin and optimize):$(INSTALLABLEPDB) : LINK += -s
 $(INSTALLABLEPDB) : $(FR_DIR)/parrot_debugger/main$(O) $(LIBPARROT) src/install_config$(O)
 	$(LINK) @ld_out@$@ \
-	$(FR_DIR)/parrot_debugger/main$(O) \
-	src/install_config$(O) \
-	@rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
+	  $(FR_DIR)/parrot_debugger/main$(O) \
+	  src/install_config$(O) \
+	  @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
+	$(ADDGENERATED) "$@" "[main]" bin
 
 #
 # Parrot Disassembler
@@ -1198,19 +1216,20 @@ $(FR_DIR)/pbc_disassemble/main$(O) : \
 
 $(DIS) : $(FR_DIR)/pbc_disassemble/main$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
-	$(FR_DIR)/pbc_disassemble/main$(O) \
-	src/longopt$(O) \
-	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
+	  $(FR_DIR)/pbc_disassemble/main$(O) \
+	  src/longopt$(O) \
+	  $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 #IF(cygwin and optimize):$(INSTALLABLEDIS) : LINK += -s
 $(INSTALLABLEDIS) : $(FR_DIR)/pbc_disassemble/main$(O) \
   src/install_config$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
-	$(FR_DIR)/pbc_disassemble/main$(O) \
-	src/longopt$(O) \
-	@rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
+	  $(FR_DIR)/pbc_disassemble/main$(O) \
+	  src/longopt$(O) \
+	  @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
+	$(ADDGENERATED) "$@" "[main]" bin
 
 #
 # Parrot Dump
@@ -1243,6 +1262,7 @@ $(INSTALLABLEPDUMP) : $(FR_DIR)/pbc_dump/main$(O) $(FR_DIR)/pbc_dump/packdump$(O
 	  src/longopt$(O) \
 	  $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
+	$(ADDGENERATED) "$@" "[main]" bin
 
 #
 # Parrot Bytecode File Merger
@@ -1250,20 +1270,21 @@ $(INSTALLABLEPDUMP) : $(FR_DIR)/pbc_dump/main$(O) $(FR_DIR)/pbc_dump/packdump$(O
 
 $(PBC_MERGE) : $(FR_DIR)/pbc_merge/main$(O) $(LIBPARROT) src/parrot_config$(O)
 	$(LINK) @ld_out@$@ \
-	$(FR_DIR)/pbc_merge/main$(O) \
-	src/parrot_config$(O) \
-	src/longopt$(O) \
-	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINK_DYNAMIC) $(LINKFLAGS)
+	  $(FR_DIR)/pbc_merge/main$(O) \
+	  src/parrot_config$(O) \
+	  src/longopt$(O) \
+	  $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINK_DYNAMIC) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 #IF(cygwin and optimize):$(INSTALLABLEPBC_MERGE) : LINK += -s
 $(INSTALLABLEPBC_MERGE) : $(FR_DIR)/pbc_merge/main$(O) $(LIBPARROT) $(INSTALLABLECONFIG)
 	$(LINK) @ld_out@$@ \
-	$(FR_DIR)/pbc_merge/main$(O) \
-	src/install_config$(O) \
-	src/longopt$(O) \
-	@rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
+	  $(FR_DIR)/pbc_merge/main$(O) \
+	  src/install_config$(O) \
+	  src/longopt$(O) \
+	  @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
+	$(ADDGENERATED) "$@" "[main]" bin
 
 #
 # Profiling runcore test supporting code
@@ -1275,30 +1296,39 @@ $(LIBRARY_DIR)/ProfTest.pbc: $(LIBRARY_DIR)/ProfTest/PIRProfile.pbc \
 	$(PBC_MERGE) -o $@ $(LIBRARY_DIR)/ProfTest/PIRProfile.pbc \
 	  $(LIBRARY_DIR)/ProfTest/NQPProfile.pbc $(LIBRARY_DIR)/ProfTest/Matcher.pbc \
 	  $(LIBRARY_DIR)/ProfTest/Want.pbc
+	$(ADDGENERATED) "$@"
 
 $(LIBRARY_DIR)/ProfTest/PIRProfile.pbc: $(LIBRARY_DIR)/ProfTest/PIRProfile.pir
 	$(PARROT) -o $@ $(LIBRARY_DIR)/ProfTest/PIRProfile.pir
+	$(ADDGENERATED) "$@"
 
 $(LIBRARY_DIR)/ProfTest/PIRProfile.pir: $(LIBRARY_DIR)/ProfTest/PIRProfile.nqp $(NQP_RX)
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/PIRProfile.nqp > $@
+	$(ADDGENERATED) "$@"
 
 $(LIBRARY_DIR)/ProfTest/NQPProfile.pbc: $(LIBRARY_DIR)/ProfTest/NQPProfile.pir
 	$(PARROT) -o $@ $(LIBRARY_DIR)/ProfTest/NQPProfile.pir
+	$(ADDGENERATED) "$@"
 
 $(LIBRARY_DIR)/ProfTest/NQPProfile.pir: $(LIBRARY_DIR)/ProfTest/NQPProfile.nqp $(NQP_RX)
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/NQPProfile.nqp > $@
+	$(ADDGENERATED) "$@"
 
 $(LIBRARY_DIR)/ProfTest/Want.pbc: $(LIBRARY_DIR)/ProfTest/Want.pir
 	$(PARROT) -o $@ $(LIBRARY_DIR)/ProfTest/Want.pir
+	$(ADDGENERATED) "$@"
 
 $(LIBRARY_DIR)/ProfTest/Want.pir: $(LIBRARY_DIR)/ProfTest/Want.nqp $(NQP_RX)
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/Want.nqp > $@
+	$(ADDGENERATED) "$@"
 
 $(LIBRARY_DIR)/ProfTest/Matcher.pbc: $(LIBRARY_DIR)/ProfTest/Matcher.pir
 	$(PARROT) -o $@ $(LIBRARY_DIR)/ProfTest/Matcher.pir
+	$(ADDGENERATED) "$@"
 
 $(LIBRARY_DIR)/ProfTest/Matcher.pir: $(LIBRARY_DIR)/ProfTest/Matcher.nqp $(NQP_RX)
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/Matcher.nqp > $@
+	$(ADDGENERATED) "$@"
 
 #
 # YAML::Tiny
@@ -1306,9 +1336,11 @@ $(LIBRARY_DIR)/ProfTest/Matcher.pir: $(LIBRARY_DIR)/ProfTest/Matcher.nqp $(NQP_R
 
 $(LIBRARY_DIR)/YAML/Tiny.pir: $(LIBRARY_DIR)/YAML/Tiny.pm $(NQP_RX)
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/YAML/Tiny.pm > $@
+	$(ADDGENERATED) "$@"
 
 $(LIBRARY_DIR)/YAML/Tiny.pbc: $(LIBRARY_DIR)/YAML/Tiny.pir
 	$(PARROT) -o $@ $(LIBRARY_DIR)/YAML/Tiny.pir
+	$(ADDGENERATED) "$@"
 
 ###############################################################################
 #
@@ -1319,67 +1351,96 @@ $(LIBRARY_DIR)/YAML/Tiny.pbc: $(LIBRARY_DIR)/YAML/Tiny.pir
 
 $(RUN_INC_DIR)/interpflags.pasm : $(INC_DIR)/interpreter.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/interpreter.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/interpdebug.pasm : $(INC_DIR)/interpreter.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/interpreter.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/interptrace.pasm : $(INC_DIR)/interpreter.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/interpreter.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/interpcores.pasm : $(INC_DIR)/interpreter.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/interpreter.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/cloneflags.pasm  : $(INC_DIR)/interpreter.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/interpreter.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/iglobals.pasm    : $(INC_DIR)/interpreter.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/interpreter.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/sysinfo.pasm     : $(INC_DIR)/interpreter.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/interpreter.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/interpinfo.pasm : $(INC_DIR)/gc_api.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/gc_api.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/timer.pasm : $(INC_DIR)/scheduler.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/scheduler.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/pmctypes.pasm : $(INC_DIR)/core_pmcs.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/core_pmcs.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/stdio.pasm  : $(INC_DIR)/io.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/io.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/socket.pasm : $(INC_DIR)/io.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/io.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/hash_key_type.pasm : $(INC_DIR)/hash.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/hash.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/iterator.pasm : $(INC_DIR)/enums.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/enums.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/call_bits.pasm : $(INC_DIR)/enums.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/enums.h $@
+	$(ADDGENERATED) "$@" "[main]"
 lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm : $(INC_DIR)/enums.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/enums.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/libpaths.pasm : $(INC_DIR)/library.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/library.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/dlopenflags.pasm : $(INC_DIR)/platform_interface.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/platform_interface.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/datatypes.pasm : $(INC_DIR)/datatypes.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/datatypes.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/stat.pasm : $(INC_DIR)/platform_interface.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/platform_interface.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/stringinfo.pasm : $(INC_DIR)/string.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/string.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/longopt.pasm : $(INC_DIR)/longopt.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/longopt.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/cclass.pasm : $(INC_DIR)/cclass.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/cclass.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/packfile_segments.pasm : $(INC_DIR)/packfile.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/packfile.h $@
 $(RUN_INC_DIR)/packfile_annotation_keytype.pasm : $(INC_DIR)/packfile.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/packfile.h $@
+	$(ADDGENERATED) "$@" "[main]"
 # Old name, but never installed
 #$(RUN_INC_DIR)/packfile_annotation_key_type.pasm : $(INC_DIR)/packfile.h $(H2INC)
 #	$(PERL) $(H2INC) $(INC_DIR)/packfile.h $@
 $(RUN_INC_DIR)/except_types.pasm : $(INC_DIR)/exceptions.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/exceptions.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/except_severity.pasm : $(INC_DIR)/exceptions.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/exceptions.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/warnings.pasm : $(INC_DIR)/warnings.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/warnings.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/errors.pasm : $(INC_DIR)/warnings.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/warnings.h $@
+	$(ADDGENERATED) "$@" "[main]"
 $(RUN_INC_DIR)/tm.pasm : src/utils.c $(H2INC)
 	$(PERL) $(H2INC) src/utils.c $@
+	$(ADDGENERATED) "$@" "[main]"
 
 ###############################################################################
 #
@@ -1450,12 +1511,13 @@ src/packfile/object_serialization$(O) : $(PARROT_H_HEADERS) src/packfile/object_
 
 src/hash$(O) : $(PARROT_H_HEADERS) src/hash.c
 
-src/library$(O) : $(PARROT_H_HEADERS) src/library.str src/library.c\
+src/library$(O) : $(PARROT_H_HEADERS) src/library.str src/library.c \
 	$(INC_DIR)/dynext.h
 
 $(INC_DIR)/extend_vtable.h src/extend_vtable.c src/vtable.h : src/vtable.tbl \
   $(BUILD_TOOLS_DIR)/vtable_extend.pl lib/Parrot/Vtable.pm
 	$(PERL) $(BUILD_TOOLS_DIR)/vtable_extend.pl
+	$(ADDGENERATED) "$@" "[main]" include
 
 src/key$(O) : $(PARROT_H_HEADERS) src/key.str src/key.c \
 	$(INC_PMC_DIR)/pmc_key.h
@@ -2087,6 +2149,7 @@ src/ops/core_ops$(O) : src/ops/core_ops.c \
 
 $(INC_DIR)/vtable.h : src/vtable.tbl $(BUILD_TOOLS_DIR)/vtable_h.pl lib/Parrot/Vtable.pm
 	$(PERL) $(BUILD_TOOLS_DIR)/vtable_h.pl
+	$(ADDGENERATED) "$@" "[main]" include
 
 ###############################################################################
 #
@@ -2228,12 +2291,15 @@ pbctestfiles: $(PBC_TEST_FILES)
 
 t/pmc/testlib/number.pbc: $(PARROT) t/pmc/testlib/number.pasm
 	$(PARROT) -o t/pmc/testlib/number.pbc t/pmc/testlib/number.pasm
+	$(ADDGENERATED) "$@" "[test]"
 
 t/pmc/testlib/annotations.pbc: $(PARROT) t/pmc/testlib/annotations.pir
 	$(PARROT) -o t/pmc/testlib/annotations.pbc t/pmc/testlib/annotations.pir
+	$(ADDGENERATED) "$@" "[test]"
 
 t/op/testlib/test_strings.pbc: $(PARROT) t/op/testlib/test_strings.pir
 	$(PARROT) -o t/op/testlib/test_strings.pbc t/op/testlib/test_strings.pir
+	$(ADDGENERATED) "$@" "[test]"
 
 # Common prep for all test targets.
 # We probably need a complete build before running the tests.
@@ -3060,6 +3126,7 @@ install-bin: installable docs
 	MANIFEST MANIFEST.generated
 
 install-dev-only: installable
+	$(MAKE_C) docs man
 	$(PERL) $(DEV_TOOLS_DIR)/install_dev_files.pl \
 	--buildprefix=$(BUILDPREFIX) \
 	--prefix=$(PREFIX) \
@@ -3138,7 +3205,7 @@ src/glut_nci_thunks.c: $(NCI_THUNK_GEN)
 		--loader-name=Parrot_glut_nci_loader \
 		--loader-storage-class=PARROT_DYNEXT_EXPORT \
 		--output=src/glut_nci_thunks.c \
-		<src/glut_nci_thunks.nci
+		< src/glut_nci_thunks.nci
 
 src/glut_nci_thunks$(O) : $(PARROT_H_HEADERS) \
 	src/glut_nci_thunks.c \
@@ -3151,7 +3218,7 @@ $(LIBGLUTCB_SO): $(LIBPARROT) src/glut_callbacks$(O) src/glut_nci_thunks$(O)
 
 src/extra_nci_thunks.c : src/nci/extra_thunks.nci $(NCI_THUNK_GEN)
 	$(NCI_THUNK_GEN) --dynext --no-warn-dups \
-		--output=src/extra_nci_thunks.c <src/nci/extra_thunks.nci
+		--output=src/extra_nci_thunks.c < src/nci/extra_thunks.nci
 
 bootstrap-nci : src/nci/core_thunks.nci src/nci/extra_thunks.nci $(NCI_THUNK_GEN)
 	$(PERL) $(DEV_TOOLS_DIR)/mk_nci_thunks.pl

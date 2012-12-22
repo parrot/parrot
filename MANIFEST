@@ -16,7 +16,6 @@ DONORS.pod                                                  [main]doc
 LICENSE                                                     [main]doc
 MANIFEST                                                    []
 MANIFEST.SKIP                                               []
-MANIFEST.generated                                          []
 PBC_COMPAT                                                  [main]doc
 PLATFORMS                                                   [devel]doc
 README.pod                                                  [devel]doc

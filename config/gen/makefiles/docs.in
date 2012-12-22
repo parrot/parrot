@@ -7,9 +7,10 @@ MKPATH  = @mkpath@
 TOUCH   = @touch@
 RM_F    = @rm_f@
 RM_RF   = @rm_rf@
-PERLDOC_BIN = @perldoc@
+PERLDOC = @perldoc@
 POD2MAN = @pod2man@
 VERSION = @VERSION@@DEVEL@
+ADDGENERATED = cd .. && $(PERL) tools/build/addgenerated.pl
 
 # long list of .pod files
 POD = @TEMP_pod@
@@ -19,7 +20,7 @@ POD = @TEMP_pod@
 #
 
 # The default target
-all: packfile-c.pod $(POD) ops/index.pod man
+all: doc-prep packfile-c.pod $(POD) ops/index.pod man
 
 # This is a listing of all targets, that are meant to be called by users
 # Most of them are proxied in the root makefile parrot/Makefile
@@ -77,7 +78,10 @@ man.good: $(MAN_1)
 man.stub:
 	@echo "pod2man is required, but not detected."
 
-clean:
+man-clean:
+	$(RM_F) $(MAN_1)
+
+clean: man-clean html-clean pdf-clean htmlhelp-clean
 	$(RM_F) packfile-c.pod $(POD) doc-prep
 
 html:
@@ -93,6 +97,7 @@ pdf: ../tools/docs/filename_and_chapter.pl
 	$(MKPATH) build/modified_pod
 	$(PERL) ../tools/docs/filename_and_chapter.pl
 	cd build && pdflatex parrot-book.tex && pdflatex parrot-book.tex
+	$(ADDGENERATED) "docs/build/parrot-book.pdf" "[main]" doc
 
 #pdf-release: build/parrot-book.pdf
 #	cp build/parrot-book.pdf build/parrot-book-$$(date +"%Y.%m").pdf
@@ -103,6 +108,7 @@ pdf-clean:
 htmlhelp: html
 #IF(win32):	cd .. && $(PERL) tools/docs/mk_chm.pl
 #IF(win32):	-cd html && hhc parrot.hhp
+#IF(win32):	$(ADDGENERATED) "docs/html/parrot.chm" "[main]" doc
 
 htmlhelp-clean:
 #IF(win32):	$(RM_F) "html/*.hhc" "html/*.hhk" "html/*.hhp" "html/*.chm"

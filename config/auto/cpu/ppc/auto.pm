@@ -35,6 +35,8 @@ sub runstep {
                     "HAS_PPC_$suffix" => '1',
                 );
                 $conf->debug(" (\U$suffix) ");
+                $conf->add_to_generated( $f, "[]" );
+                # $conf->append_configure_log($f);
             }
         }
         $conf->cc_clean();
