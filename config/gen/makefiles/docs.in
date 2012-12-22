@@ -19,7 +19,7 @@ POD = @TEMP_pod@
 #
 
 # The default target
-all: packfile-c.pod $(POD) man
+all: packfile-c.pod $(POD) ops/index.pod man
 
 # This is a listing of all targets, that are meant to be called by users
 # Most of them are proxied in the root makefile parrot/Makefile
@@ -66,11 +66,13 @@ MAN_1 = binaries/parrot.1 \
 .pod.1 : # suffix rule (limited support)
 	$(POD2MAN) $< > $@
 
+ops/index.pod : $(POD)
+	$(PERL) ../tools/docs/ops_summary.pl > ops/index.pod
+
 #IF(has_pod2man):man: man.good
 #ELSE:man: man.stub
 
 man.good: $(MAN_1)
-	$(PERL) ../tools/docs/ops_summary.pl > ops/index.pod
 
 man.stub:
 	@echo "pod2man is required, but not detected."

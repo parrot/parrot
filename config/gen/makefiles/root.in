@@ -3042,7 +3042,7 @@ cover-clean:
 install: install-bin install-dev-only
 install-dev: install
 
-install-bin: installable man
+install-bin: installable docs
 	$(PERL) $(DEV_TOOLS_DIR)/install_files.pl \
 	--buildprefix=$(BUILDPREFIX) \
 	--prefix=$(PREFIX) \
