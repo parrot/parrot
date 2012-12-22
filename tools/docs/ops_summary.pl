@@ -59,9 +59,16 @@ sub textblock {
 
 die "OpsSummary is not meant to be used as a module" if caller;
 
-@ARGV = grep { $_ !~ /index\.pod$/ } <docs/ops/*.pod>
-    unless @ARGV;
-
+unless (@ARGV) {
+    if ( -d "docs/ops" ) {
+      @ARGV = grep { $_ !~ /index\.pod$/ } <docs/ops/*.pod>
+        ;
+    }
+    else {
+      @ARGV = grep { $_ !~ /index\.pod$/ } <ops/*.pod>
+        ;
+    }
+}
 my $parser = new OpsSummary;
 
 for (@ARGV) {

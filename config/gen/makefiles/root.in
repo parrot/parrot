@@ -604,7 +604,7 @@ MAKE_C = @make_c@
 # These need to be above lines that define suffix rules to be portable
 # (certainly FreeBSD make doesn't grok the pir.pbc rule otherwise)
 
-.SUFFIXES : .c .S .s .i .pmc .dump $(O) .str .pir .pbc .pod .1
+.SUFFIXES : .c .S .s .i .pmc .dump $(O) .str .pir .pbc
 
 .c$(O) : # suffix rule (limited support)
 	$(CC) $(CFLAGS) @optimize@ $(CC_WARN) -I$(@D) -Isrc/ @cc_o_out@$@ -c $<
@@ -2096,12 +2096,13 @@ $(INC_DIR)/vtable.h : src/vtable.tbl $(BUILD_TOOLS_DIR)/vtable_h.pl lib/Parrot/V
 
 docs.stub:
 	@echo "perldoc is required, but not detected."
+	$(MAKE_C) docs man
 
-docs.dummy :
-	$(MAKE) docs
+docs.dummy:
+	$(MAKE_C) docs
 
 docs-clean :
-	$(MAKE) docs clean
+	$(MAKE_C) docs clean
 
 #IF(has_perldoc):html : html.dummy
 #ELSE:html : html.stub
@@ -3038,26 +3039,10 @@ cover-clean:
 #
 ###############################################################################
 
-MAN_1   = docs/binaries/parrot.1 \
-	docs/binaries/ops2c.1 \
-	docs/binaries/parrotbug.1 \
-	docs/binaries/parrot_config.1 \
-	docs/binaries/parrot_nci_thunk_gen.1 \
-	docs/binaries/parrot-nqp.1 \
-	docs/binaries/parrot-prove.1 \
-	docs/binaries/pbc_to_exe.1 \
-	docs/binaries/plumage.1 \
-	docs/binaries/winxed.1
-
-.pod.1 : # suffix rule (limited support)
-	$(POD2MAN) $< > $@
-
 install: install-bin install-dev-only
 install-dev: install
-#IF(has_pod2man):install-man: $(MAN_1)
-#ELSE:install-man:
 
-install-bin: installable install-man
+install-bin: installable man
 	$(PERL) $(DEV_TOOLS_DIR)/install_files.pl \
 	--buildprefix=$(BUILDPREFIX) \
 	--prefix=$(PREFIX) \
@@ -3086,8 +3071,7 @@ install-dev-only: installable
 	--versiondir=$(VERSION_DIR) \
 	MANIFEST MANIFEST.generated
 
-#IF(win32):install-doc:
-#ELSE:install-doc: install-man
+install-doc: docs
 	$(PERL) $(DEV_TOOLS_DIR)/install_doc_files.pl \
 	--buildprefix=$(BUILDPREFIX) \
 	--prefix=$(PREFIX) \

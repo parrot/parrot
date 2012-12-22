@@ -8,6 +8,7 @@ TOUCH   = @touch@
 RM_F    = @rm_f@
 RM_RF   = @rm_rf@
 PERLDOC_BIN = @perldoc@
+POD2MAN = @pod2man@
 VERSION = @VERSION@@DEVEL@
 
 # long list of .pod files
@@ -18,7 +19,7 @@ POD = @TEMP_pod@
 #
 
 # The default target
-all: packfile-c.pod $(POD)
+all: packfile-c.pod $(POD) man
 
 # This is a listing of all targets, that are meant to be called by users
 # Most of them are proxied in the root makefile parrot/Makefile
@@ -29,13 +30,14 @@ help :
 	@echo "all:             Generate documentation from .pod files or from the sources."
 	@echo "                 This is the default target."
 	@echo ""
-	@echo "htmlhelp:        windows only, generate a .chm file."
+	@echo "man:             Generate man files (not on windows)"
+	@echo "htmlhelp:        generate a .chm file (windows only)."
 	@echo "htmlhelp-clean:  Remove generated .chm"
 	@echo ""
 	@echo "pdf:             Generate a PDF from the html docs"
 	@echo "pdf-clean:       Remove generated pdf"
 	@echo ""
-	@echo "   clean:        Remove the generated documentation."
+	@echo "clean:           Remove the generated documentation."
 	@echo ""
 
 $(POD): doc-prep
@@ -47,6 +49,31 @@ doc-prep:
 packfile-c.pod: ../src/packfile/api.c
 #IF(new_perldoc):	$(PERLDOC_BIN) -ud packfile-c.pod ../src/packfile/api.c
 #ELSE:	$(PERLDOC_BIN) -u ../src/packfile/api.c > packfile-c.pod
+
+MAN_1 = binaries/parrot.1 \
+	binaries/ops2c.1 \
+	binaries/parrotbug.1 \
+	binaries/parrot_config.1 \
+	binaries/parrot_nci_thunk_gen.1 \
+	binaries/parrot-nqp.1 \
+	binaries/parrot-prove.1 \
+	binaries/pbc_to_exe.1 \
+	binaries/plumage.1 \
+	binaries/winxed.1
+
+.SUFFIXES : .pod .1
+
+.pod.1 : # suffix rule (limited support)
+	$(POD2MAN) $< > $@
+
+#IF(has_pod2man):man: man.good
+#ELSE:man: man.stub
+
+man.good: $(MAN_1)
+	$(PERL) ../tools/docs/ops_summary.pl > ops/index.pod
+
+man.stub:
+	@echo "pod2man is required, but not detected."
 
 clean:
 	$(RM_F) packfile-c.pod $(POD) doc-prep
