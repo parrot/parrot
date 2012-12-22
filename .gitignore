@@ -129,6 +129,7 @@ cachegrind.out.*
 /compilers/tge/TGE/Parser.pir
 /docs/*.tmp
 /docs/Makefile
+/docs/binaries/*.1
 /docs/build
 /docs/doc-prep
 /docs/html
