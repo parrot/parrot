@@ -64,7 +64,9 @@ src/dynpmc/foo_group$(O): \
 src/dynpmc/foo_group.c: $(DYNPMC_FOO_OBJS)
 	$(PMC2C) --library foo_group --c $(DYNPMC_FOO)
 	$(MV) foo_group.c src/dynpmc/foo_group.c
+	$(ADDGENERATED) src/dynpmc/foo_group.c "[]"
 	$(MV) foo_group.h src/dynpmc/foo_group.h
+	$(ADDGENERATED) src/dynpmc/foo_group.h "[devel]" include
 
 src/dynpmc/pmc_foo.h : src/dynpmc/foo.c
 

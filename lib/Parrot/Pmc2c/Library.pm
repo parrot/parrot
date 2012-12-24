@@ -26,7 +26,6 @@ use warnings;
 use File::Basename qw(basename);
 use Parrot::Pmc2c::PMC ();
 use Parrot::Pmc2c::UtilFunctions qw(dont_edit dynext_load_code c_code_coda spew);
-use Parrot::BuildUtil  'add_to_generated';
 
 =item C<generate_library($library_name, $pmcs)>
 
@@ -39,8 +38,6 @@ sub generate_library {
 
     spew( $library_name . '.c', gen_c( $library_name, $pmcs ) );
     spew( $library_name . '.h', gen_h( $library_name, $pmcs ) );
-    # add_to_generated($library_name . '.c', "[]", "");
-    add_to_generated($library_name . '.h', "[devel]", "include");
 }
 
 =item C<gen_h($library_name, $pmcs)>
