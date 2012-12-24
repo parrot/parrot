@@ -13,6 +13,7 @@
         + Generate MANIFEST.generated, cleanup MANIFEST,
           removed MANIFEST_configure.generated, add installation of forgotten files
           [GH #890]
+        + Improved Configure.pl probes for --with-llvm
     - Documentation
         + Re-added docs/ops, the generated ops summary and docs/packfile-c.pod
 
