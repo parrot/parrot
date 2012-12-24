@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
 use warnings;
 use strict;
@@ -80,11 +80,7 @@ for (@ARGV) {
 print << "EOH";
 =head1 NAME
 
-docs/ops/index.pod
-
-=head1 DESCRIPTION
-
-Parrot opcodes summary
+docs/ops/index.pod - Parrot opcodes summary
 
 =head1 DESCRIPTION
 
