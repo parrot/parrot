@@ -140,3 +140,8 @@ src/dynoplibs/io_ops.h: src/dynoplibs/io_ops.c
 
 src/dynoplibs/io_ops.c: src/dynoplibs/io.ops $(OPS2C)
 	$(OPS2C) --dynamic src/dynoplibs/io.ops --quiet
+
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

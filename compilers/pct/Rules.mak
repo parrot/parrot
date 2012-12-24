@@ -51,3 +51,7 @@ compilers/pct/src/POST/Node.pbc : compilers/pct/src/POST/Node.pir $(PARROT)
 compilers/pct/src/POST/Compiler.pbc : compilers/pct/src/POST/Compiler.pir $(PARROT)
 	$(PARROT) -o $@ compilers/pct/src/POST/Compiler.pir
 
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

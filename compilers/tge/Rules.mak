@@ -16,3 +16,8 @@ compilers/tge/TGE/Parser.pir: $(PARROT) \
     compilers/tge/TGE/Parser.pg \
     $(LIBRARY_DIR)/PGE/Perl6Grammar.pbc 
 	$(PARROT) $(LIBRARY_DIR)/PGE/Perl6Grammar.pbc --output=$@ compilers/tge/TGE/Parser.pg
+
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:
