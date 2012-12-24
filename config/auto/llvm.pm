@@ -113,7 +113,7 @@ sub runstep {
         # Note: gcc and g++ with -c just skips over -emit-llvm and produce native code
         # without -c: ld: warning: cannot find entry symbol 'mit-llvm'
         my $err;
-        (undef,undef,$err) = capture_output( qq{$cc -emit-llvm -O3 $fullcfile -c -o $bcfile} );
+        (undef,undef,$err) = capture_output( qq{$cc $cflags -emit-llvm -O3 $fullcfile -c -o $bcfile} );
         if (!$err and -e $bcfile and $self->_check_bcfile($bcfile)) {
             $conf->data->set( llvm_gcc  => $cc );
             last;
