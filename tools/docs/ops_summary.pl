@@ -82,6 +82,10 @@ print << "EOH";
 
 Parrot opcodes summary
 
+=head1 DESCRIPTION
+
+Automatically generated opcodes index
+
 =head2 Parrot Opcodes by Category
 
 =over 4
