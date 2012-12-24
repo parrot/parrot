@@ -1,11 +1,11 @@
 #!perl
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 # auto/llvm-01.t
 
 use strict;
 use warnings;
 use File::Temp qw( tempdir );
-use Test::More tests =>  56;
+use Test::More tests =>  58;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::llvm');
@@ -252,9 +252,18 @@ my $output = '';
     local $@ = '';
     $output = 'hello world';
     $verbose = 0;
-    ok( $step->_handle_native_assembly_output( $conf, $output, $verbose ),
+    ok( $step->_handle_native_assembly_output( $conf, $output, $verbose, 1 ),
         "_handle_native_assembly_output() returned true value" );
     is( $step->result(), 'yes', "Got expected 'yes' result" );
+}
+
+{
+    local $@ = '';
+    $output = 'hello world';
+    $verbose = 0;
+    ok( $step->_handle_native_assembly_output( $conf, $output, $verbose, 2.7 ),
+        "_handle_native_assembly_output() returned true value" );
+    is( $step->result(), 'yes, 2.7', "Got expected 'yes' result" );
 }
 
 {
