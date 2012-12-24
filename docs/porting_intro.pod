@@ -27,17 +27,11 @@ Parrot.
 
 =head2 How to help
 
-At present Parrot implements support only for POSIX threads (pthreads).  Most
-modern UNIX-like operating systems have a pthreads implementation, and allowing
-Parrot to use these is frequently just a matter of finding the right compiler
-and linker flags.  Non-POSIX architectures with substantially different
-threading models will require more implementation and debugging to work with
-Parrot.
+At present Parrot has full native threads support, pthreads and windows threads.
+But running garbage collection together with allocation of memory in threaded
+code might lead to races or access violations, esp. on darwin, but also on linux.
 
-To assist with enhancing threading support, compare the threading primitives
-required by Parrot in F<thread.h> to those provided by your platform's
-threading model(s) and implement Parrot threads in terms of native threads. See
-F<thr_pthread.h> for an example of this.
+See L<https://github.com/parrot/parrot/issues?milestone=2&state=open>
 
 =head2 References
 
