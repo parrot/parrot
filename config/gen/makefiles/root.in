@@ -180,8 +180,8 @@ GEN_CONFIGS = \
 	lib/Parrot/PMC.pm \
 	$(RUN_INC_DIR)/config.fpmc \
 	$(LIBRARY_DIR)/config.pir \
-#IF(has_opengl):    src/glut_nci_thunks.nci \
-#IF(has_glut):    src/glut_callbacks.c \
+#IF(has_opengl):	src/glut_nci_thunks.nci \
+#IF(has_glut):	src/glut_callbacks.c \
 	src/core_pmcs.c \
 	config_lib.pir \
 	compilers/imcc/imcc.y.flag \
@@ -618,7 +618,7 @@ MAKE_C = @make_c@
 
 .pir.pbc : # suffix rule (limited support)
 	$(PARROT) -o $@ $<
-	@$(ADDGENERATED) "$@"
+	@$(ADDGENERATED) "$@" "[main]"
 
 # Note: Several rules in this makefile are tagged with a "SUFFIX OVERRIDE"
 # comment; this indicates that we have an explicit compilation rule for
@@ -766,6 +766,7 @@ PMC2CV = $(PERL) -Ilib $(BUILD_TOOLS_DIR)/pmc2c.pl --vtable @no_lines_flag@
 
 vtable.dump : src/vtable.tbl lib/Parrot/Pmc2c/VTable.pm lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm $(PMC2C_FILES)
 	$(PMC2CV)
+	@$(ADDGENERATED) "$@" "[devel]" src
 
 # This is a listing of all targets meant to be called by users
 help :
@@ -889,16 +890,18 @@ bootstrap-ops : $(OPS2C)
 
 $(RUN_INC_DIR)/parrotlib.pbc: $(LIBRARY_DIR)/parrotlib.pir $(PARROT) $(GEN_PASM_INCLUDES)
 	$(PARROT) -o $@ $(LIBRARY_DIR)/parrotlib.pir
+	@$(ADDGENERATED) "$@" "[main]"
 
 $(RUN_INC_DIR)/parrot_version.pir:
 	$(PERL) tools/build/gen_version.pl > $@
+	@$(ADDGENERATED) "$@" "[main]"
 
 $(RUN_INC_DIR)/config.fpmc : myconfig config_lib.pir \
   $(RUN_INC_DIR)/datatypes.pasm $(MINIPARROT)
 # always rebuild parrot_version.pir when building config.fpmc
 	$(PERL) tools/build/gen_version.pl >$(RUN_INC_DIR)/parrot_version.pir
 	$(MINIPARROT) -I$(RUN_INC_DIR) config_lib.pir > $@
-
+	@$(ADDGENERATED) "$@" "[]"
 
 bootstrap-prt0: $(WINXED) $(FRPTWO_DIR)/prt0.winxed
 	$(WINXED) --noan -c $(FRPTWO_DIR)/prt0.winxed
@@ -986,17 +989,21 @@ $(INC_DIR)/context.h : $(INC_PMC_DIR)/pmc_callcontext.h
 
 $(INC_DIR)/pbcversion.h : PBC_COMPAT
 	$(PERL) $(BUILD_TOOLS_DIR)/pbcversion_h.pl > $@
+	$(ADDGENERATED) "$@" "[main]" include
 
 src/parrot_config.c :  $(RUN_INC_DIR)/config.fpmc \
   $(BUILD_TOOLS_DIR)/parrot_config_c.pl
 	$(PERL) $(BUILD_TOOLS_DIR)/parrot_config_c.pl > $@
+	$(ADDGENERATED) "$@" "[]"
 
 src/install_config.c :  install_config.fpmc \
   $(BUILD_TOOLS_DIR)/parrot_config_c.pl
 	$(PERL) $(BUILD_TOOLS_DIR)/parrot_config_c.pl --install > $@
+	$(ADDGENERATED) "src/install_config$(O)" "[main]" lib
 
 src/null_config.c : myconfig $(BUILD_TOOLS_DIR)/parrot_config_c.pl
 	$(PERL) $(BUILD_TOOLS_DIR)/parrot_config_c.pl --mini > $@
+	$(ADDGENERATED) "$@" "[]"
 
 install_config.fpmc : myconfig config_lib.pir $(PARROT)
 	@echo "Invoking Parrot to generate install_config.fpmc"
@@ -1195,6 +1202,7 @@ $(PDB) : $(FR_DIR)/parrot_debugger/main$(O) src/parrot_config$(O) $(LIBPARROT)
 	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
+# broken. do not install
 #IF(cygwin and optimize):$(INSTALLABLEPDB) : LINK += -s
 $(INSTALLABLEPDB) : $(FR_DIR)/parrot_debugger/main$(O) $(LIBPARROT) src/install_config$(O)
 	$(LINK) @ld_out@$@ \
@@ -1202,7 +1210,7 @@ $(INSTALLABLEPDB) : $(FR_DIR)/parrot_debugger/main$(O) $(LIBPARROT) src/install_
 	  src/install_config$(O) \
 	  @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
-	$(ADDGENERATED) "$@" "[main]" bin
+	@echo $(ADDGENERATED) "$@" "[main]" bin
 
 #
 # Parrot Disassembler
@@ -1296,7 +1304,7 @@ $(LIBRARY_DIR)/ProfTest.pbc: $(LIBRARY_DIR)/ProfTest/PIRProfile.pbc \
 	$(PBC_MERGE) -o $@ $(LIBRARY_DIR)/ProfTest/PIRProfile.pbc \
 	  $(LIBRARY_DIR)/ProfTest/NQPProfile.pbc $(LIBRARY_DIR)/ProfTest/Matcher.pbc \
 	  $(LIBRARY_DIR)/ProfTest/Want.pbc
-	$(ADDGENERATED) "$@"
+	$(ADDGENERATED) "$@" "[main]"
 
 $(LIBRARY_DIR)/ProfTest/PIRProfile.pbc: $(LIBRARY_DIR)/ProfTest/PIRProfile.pir
 	$(PARROT) -o $@ $(LIBRARY_DIR)/ProfTest/PIRProfile.pir
@@ -1304,31 +1312,31 @@ $(LIBRARY_DIR)/ProfTest/PIRProfile.pbc: $(LIBRARY_DIR)/ProfTest/PIRProfile.pir
 
 $(LIBRARY_DIR)/ProfTest/PIRProfile.pir: $(LIBRARY_DIR)/ProfTest/PIRProfile.nqp $(NQP_RX)
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/PIRProfile.nqp > $@
-	$(ADDGENERATED) "$@"
+	$(ADDGENERATED) "$@" "[main]"
 
 $(LIBRARY_DIR)/ProfTest/NQPProfile.pbc: $(LIBRARY_DIR)/ProfTest/NQPProfile.pir
 	$(PARROT) -o $@ $(LIBRARY_DIR)/ProfTest/NQPProfile.pir
-	$(ADDGENERATED) "$@"
+	$(ADDGENERATED) "$@" "[main]"
 
 $(LIBRARY_DIR)/ProfTest/NQPProfile.pir: $(LIBRARY_DIR)/ProfTest/NQPProfile.nqp $(NQP_RX)
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/NQPProfile.nqp > $@
-	$(ADDGENERATED) "$@"
+	$(ADDGENERATED) "$@" "[main]"
 
 $(LIBRARY_DIR)/ProfTest/Want.pbc: $(LIBRARY_DIR)/ProfTest/Want.pir
 	$(PARROT) -o $@ $(LIBRARY_DIR)/ProfTest/Want.pir
-	$(ADDGENERATED) "$@"
+	$(ADDGENERATED) "$@" "[main]"
 
 $(LIBRARY_DIR)/ProfTest/Want.pir: $(LIBRARY_DIR)/ProfTest/Want.nqp $(NQP_RX)
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/Want.nqp > $@
-	$(ADDGENERATED) "$@"
+	$(ADDGENERATED) "$@" "[main]"
 
 $(LIBRARY_DIR)/ProfTest/Matcher.pbc: $(LIBRARY_DIR)/ProfTest/Matcher.pir
 	$(PARROT) -o $@ $(LIBRARY_DIR)/ProfTest/Matcher.pir
-	$(ADDGENERATED) "$@"
+	$(ADDGENERATED) "$@" "[main]"
 
 $(LIBRARY_DIR)/ProfTest/Matcher.pir: $(LIBRARY_DIR)/ProfTest/Matcher.nqp $(NQP_RX)
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/Matcher.nqp > $@
-	$(ADDGENERATED) "$@"
+	$(ADDGENERATED) "$@" "[main]"
 
 #
 # YAML::Tiny
@@ -1336,11 +1344,10 @@ $(LIBRARY_DIR)/ProfTest/Matcher.pir: $(LIBRARY_DIR)/ProfTest/Matcher.nqp $(NQP_R
 
 $(LIBRARY_DIR)/YAML/Tiny.pir: $(LIBRARY_DIR)/YAML/Tiny.pm $(NQP_RX)
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/YAML/Tiny.pm > $@
-	$(ADDGENERATED) "$@"
 
 $(LIBRARY_DIR)/YAML/Tiny.pbc: $(LIBRARY_DIR)/YAML/Tiny.pir
 	$(PARROT) -o $@ $(LIBRARY_DIR)/YAML/Tiny.pir
-	$(ADDGENERATED) "$@"
+	$(ADDGENERATED) "$@" "[main]"
 
 ###############################################################################
 #
@@ -1396,7 +1403,7 @@ $(RUN_INC_DIR)/call_bits.pasm : $(INC_DIR)/enums.h $(H2INC)
 	$(ADDGENERATED) "$@" "[main]"
 lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm : $(INC_DIR)/enums.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/enums.h $@
-	$(ADDGENERATED) "$@" "[main]"
+	$(ADDGENERATED) "$@" "[devel]" lib
 $(RUN_INC_DIR)/libpaths.pasm : $(INC_DIR)/library.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/library.h $@
 	$(ADDGENERATED) "$@" "[main]"
@@ -1514,10 +1521,9 @@ src/hash$(O) : $(PARROT_H_HEADERS) src/hash.c
 src/library$(O) : $(PARROT_H_HEADERS) src/library.str src/library.c \
 	$(INC_DIR)/dynext.h
 
-$(INC_DIR)/extend_vtable.h src/extend_vtable.c src/vtable.h : src/vtable.tbl \
+$(INC_DIR)/extend_vtable.h src/extend_vtable.c : src/vtable.tbl \
   $(BUILD_TOOLS_DIR)/vtable_extend.pl lib/Parrot/Vtable.pm
 	$(PERL) $(BUILD_TOOLS_DIR)/vtable_extend.pl
-	$(ADDGENERATED) "$@" "[main]" include
 
 src/key$(O) : $(PARROT_H_HEADERS) src/key.str src/key.c \
 	$(INC_PMC_DIR)/pmc_key.h
@@ -2170,6 +2176,9 @@ docs.dummy:
 docs-clean :
 	$(MAKE_C) docs clean
 
+man-clean :
+	$(MAKE_C) docs man-clean
+
 #IF(has_perldoc):html : html.dummy
 #ELSE:html : html.stub
 
@@ -2482,11 +2491,12 @@ clean : \
 	test-clean \
 	prog-clean \
 	dynext-clean \
-#IF(has_perldoc):    html-clean \
+	docs-clean \
+#IF(has_pod2man):	man-clean \
+#IF(has_perldoc):	html-clean \
 	examples-clean \
 	ext-clean \
-#IF(has_pod2man):    man-clean \
-#UNLESS(win32):    cover-clean \
+#UNLESS(win32):	cover-clean \
 	editor-clean
 	$(RM_F) chartypes "*.s" "*~"
 	$(RM_F) $(FLUID_FILES_1)
@@ -2655,9 +2665,6 @@ test-clean :
 	$(RM_F) \
 	 "t/archive/parrot_test_run.tar.gz" \
 	 ".pod_examinable*.sto"
-
-man-clean :
-	$(RM_F) $(MAN_1)
 
 # a failing step of cleaning, usually doesn't concern the following steps
 realclean : clean
@@ -3215,6 +3222,7 @@ $(LIBGLUTCB_SO): $(LIBPARROT) src/glut_callbacks$(O) src/glut_nci_thunks$(O)
 	$(LD) @ld_out@$@ \
 	  src/glut_callbacks$(O) src/glut_nci_thunks$(O) \
 	  $(LINKARGS) @opengl_lib@
+	$(ADDGENERATED) "$@" "[library]"
 
 src/extra_nci_thunks.c : src/nci/extra_thunks.nci $(NCI_THUNK_GEN)
 	$(NCI_THUNK_GEN) --dynext --no-warn-dups \

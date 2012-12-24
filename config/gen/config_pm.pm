@@ -44,7 +44,7 @@ sub runstep {
 
     my $template = $self->{templates}->{myconfig};
     $conf->genfile($template, 'myconfig',
-                   manifest => [ "[devel]" ]);
+                   manifest => [ "[devel]", "lib" ]);
 
     $template = $self->{templates}->{config_pir};
     my $gen_pir = q{runtime/parrot/library/config.pir};

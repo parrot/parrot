@@ -183,7 +183,7 @@ HEADER
 sub create_c_include {
     open my $OUT, '>', $string_private_h
         or die "Can't write '$string_private_h': $!";
-    add_to_generated($string_private_h, '[main]', 'include');
+    add_to_generated($string_private_h, '[]', '');
 
     print $OUT <<"HEADER";
 /* ex: set ro:

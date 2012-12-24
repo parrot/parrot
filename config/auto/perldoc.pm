@@ -67,16 +67,18 @@ E_NOTE
         if ( $new_perldoc ) {
             $TEMP_pod_build .= <<"END"
 ops/$pod: ../src/ops/$ops
-\t\$(PERLDOC_BIN) -ud ops/$pod ../src/ops/$ops
+\t\$(PERLDOC) -ud ops/$pod ../src/ops/$ops
 \t\$(CHMOD) 0644 ops/$pod
+\t\$(ADDGENERATED) "docs/\$\@" "[doc]"
 
 END
         }
         else {
             $TEMP_pod_build .= <<"END"
 ops/$pod: ../src/ops/$ops
-\t\$(PERLDOC_BIN) -u ../ops/$ops > ops/$pod
+\t\$(PERLDOC) -u ../ops/$ops > ops/$pod
 \t\$(CHMOD) 0644 ../ops/$pod
+\t\$(ADDGENERATED) "docs/\$\@" "[doc]"
 
 END
         }

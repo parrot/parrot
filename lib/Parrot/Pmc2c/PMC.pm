@@ -34,6 +34,7 @@ use Parrot::Pmc2c::UtilFunctions qw(
     gen_multi_name
 );
 use Parrot::Pmc2c::PMC::RO ();
+use Parrot::BuildUtil 'add_to_generated';
 
 sub create {
     my ( $this, $pmc_classname ) = @_;
@@ -70,8 +71,9 @@ sub dump {
 
     # gen_parent_lookup_info( $self, $pmc2cMain, $pmcs );
     # gen_parent_reverse_lookup_info( $self, $pmcs, $vtable_dump );
-
-    Storable::nstore( $self, $self->filename('.dump') );
+    my $filename = $self->filename('.dump');
+    Storable::nstore( $self, $filename );
+    add_to_generated( $filename, "[devel]", "src") unless $self->is_dynamic;
 }
 
 # methods
@@ -472,17 +474,20 @@ sub prep_for_emit {
 
 sub generate {
     my ($self) = @_;
-    my $c_emitter = $self->{emitter} =
-        Parrot::Pmc2c::Emitter->new( $self->filename(".c") );
 
+    my $c_file = $self->filename(".c");
+    my $c_emitter = $self->{emitter} =
+        Parrot::Pmc2c::Emitter->new( $c_file );
     $self->generate_c_file;
     $c_emitter->write_to_file;
+    # add_to_generated($c_file, "[]", "");
 
+    my $h_file = $self->filename(".h", $self->is_dynamic);
     my $h_emitter = $self->{emitter} =
-        Parrot::Pmc2c::Emitter->new( $self->filename(".h", $self->is_dynamic) );
-
+        Parrot::Pmc2c::Emitter->new( $h_file );
     $self->generate_h_file;
     $h_emitter->write_to_file;
+    add_to_generated($h_file, "[devel]", "include");
 }
 
 =over 4

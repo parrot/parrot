@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2008, Parrot Foundation.
+# Copyright (C) 2004-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -628,10 +628,10 @@ sub write_html {
     $self->{RESOURCES_URL} = "$rel_path/resources";
 
     $docs_file->write( $self->html_for_file($file) );
-    my $path = File::Spec->abs2rel(
-       File::Spec->catfile($docs_file->{PATH}), $PConfig{build_dir});
 
     unless ($self->{TESTING}) {
+        my $path = File::Spec->abs2rel(
+          File::Spec->catfile($docs_file->{PATH}), $PConfig{build_dir});
         chdir "..";
         add_to_generated($path, "[main]", "html");
         chdir "docs";

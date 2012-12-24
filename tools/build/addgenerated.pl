@@ -1,9 +1,9 @@
 #! perl
-# Copyright (C) 2008-2009, Parrot Foundation.
-# $Id$
+# Copyright (C) 2008-2012, Parrot Foundation.
+
 use warnings;
 use strict;
-use lib qw(lib ../../lib);
+use lib qw(lib ../lib ../../lib);
 use Parrot::BuildUtil;
 use Parrot::Config;
 use Cwd;

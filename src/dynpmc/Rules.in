@@ -6,6 +6,7 @@ $(DYNEXT_DIR)/dynlexpad$(LOAD_EXT): src/dynpmc/dynlexpad$(O)
 		src/dynpmc/dynlexpad$(O) $(LINKARGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):   $(CHMOD) 0775 $@
+	$(ADDGENERATED) "$@" "[library]"
 
 src/dynpmc/pmc_dynlexpad.h : src/dynpmc/dynlexpad.c
 
@@ -28,6 +29,7 @@ $(DYNEXT_DIR)/file$(LOAD_EXT): src/dynpmc/file$(O)
 		src/dynpmc/file$(O) $(LINKARGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):   $(CHMOD) 0775 $@
+	$(ADDGENERATED) "$@" "[library]"
 
 src/dynpmc/pmc_file.h : src/dynpmc/file.c
 
@@ -51,6 +53,7 @@ $(DYNEXT_DIR)/foo_group$(LOAD_EXT): $(DYNPMC_FOO_OBJS) src/dynpmc/foo_group$(O)
 		src/dynpmc/foo_group$(O) $(DYNPMC_FOO_OBJS) $(LINKARGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):   $(CHMOD) 0775 $@
+	$(ADDGENERATED) "$@" "[library]"
 
 src/dynpmc/foo_group$(O): \
     src/dynpmc/pmc_foo2.h \
@@ -102,6 +105,7 @@ $(DYNEXT_DIR)/gziphandle$(LOAD_EXT): src/dynpmc/gziphandle$(O)
 		src/dynpmc/gziphandle$(O) $(LINKARGS) $(LIB_ZLIB)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):   $(CHMOD) 0775 $@
+	$(ADDGENERATED) "$@" "[library]"
 
 src/dynpmc/pmc_gziphandle.h : src/dynpmc/gziphandle.c
 
@@ -126,6 +130,7 @@ $(DYNEXT_DIR)/os$(LOAD_EXT): src/dynpmc/osdummy$(O)
 		src/dynpmc/osdummy$(O) $(LINKARGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):   $(CHMOD) 0775 $@
+	$(ADDGENERATED) "$@" "[library]"
 
 src/dynpmc/pmc_osdummy.h : src/dynpmc/osdummy.c
 
@@ -147,6 +152,7 @@ $(DYNEXT_DIR)/pccmethod_test$(LOAD_EXT): src/dynpmc/pccmethod_test$(O)
 		src/dynpmc/pccmethod_test$(O) $(LINKARGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):   $(CHMOD) 0775 $@
+	$(ADDGENERATED) "$@" "[library]"
 
 src/dynpmc/pmc_pccmethod_test.h : src/dynpmc/pccmethod_test.c
 
@@ -170,6 +176,7 @@ $(DYNEXT_DIR)/rotest$(LOAD_EXT): src/dynpmc/rotest$(O)
 		src/dynpmc/rotest$(O) $(LINKARGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):   $(CHMOD) 0775 $@
+	$(ADDGENERATED) "$@" "[library]"
 
 src/dynpmc/pmc_rotest.h : src/dynpmc/rotest.c
 
@@ -195,6 +202,7 @@ $(DYNEXT_DIR)/rational$(LOAD_EXT): src/dynpmc/rational$(O)
 		src/dynpmc/rational$(O) $(LINKARGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):   $(CHMOD) 0775 $@
+	$(ADDGENERATED) "$@" "[library]"
 
 src/dynpmc/pmc_rational.h : src/dynpmc/rational.c
 
@@ -218,6 +226,7 @@ $(DYNEXT_DIR)/subproxy$(LOAD_EXT): src/dynpmc/subproxy$(O)
 		src/dynpmc/subproxy$(O) $(LINKARGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):   $(CHMOD) 0775 $@
+	$(ADDGENERATED) "$@" "[library]"
 
 src/dynpmc/pmc_subproxy.h : src/dynpmc/subproxy.c
 
@@ -240,6 +249,7 @@ $(DYNEXT_DIR)/select$(LOAD_EXT): src/dynpmc/select$(O)
 		src/dynpmc/select$(O) $(LINKARGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(cygwin or hpux):   $(CHMOD) 0775 $@
+	$(ADDGENERATED) "$@" "[library]"
 
 src/dynpmc/pmc_select.h : src/dynpmc/select.c
 

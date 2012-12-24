@@ -9,6 +9,7 @@ $(LIBRARY_DIR)/TGE.pbc:  \
     compilers/tge/TGE/Compiler.pir \
     compilers/tge/TGE/Tree.pir
 	$(PARROT) -o $@ compilers/tge/TGE.pir
+	$(ADDGENERATED) "$@" "[main]"
 
 compilers/tge/tgc.pbc : $(LIBRARY_DIR)/TGE.pbc $(LIBRARY_DIR)/Getopt/Obj.pbc
 

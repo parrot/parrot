@@ -7,7 +7,7 @@ use strict;
 package OpsSummary;
 
 use base 'Pod::Parser';
-use lib 'lib';
+use lib qw(lib ../lib);
 use Parrot::BuildUtil;
 
 my $current_file;

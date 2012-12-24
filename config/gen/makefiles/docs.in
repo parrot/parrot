@@ -10,10 +10,24 @@ RM_RF   = @rm_rf@
 PERLDOC = @perldoc@
 POD2MAN = @pod2man@
 VERSION = @VERSION@@DEVEL@
-ADDGENERATED = cd .. && $(PERL) tools/build/addgenerated.pl
+ADDGENERATED = $(PERL) ../tools/build/addgenerated.pl
+OPS_SUMMARY = ../tools/docs/ops_summary.pl
 
 # long list of .pod files
 POD = @TEMP_pod@
+
+MAN_1 = binaries/parrot.1 \
+	binaries/ops2c.1 \
+	binaries/parrotbug.1 \
+	binaries/parrot_config.1 \
+	binaries/parrot_nci_thunk_gen.1 \
+	binaries/parrot-nqp.1 \
+	binaries/parrot-prove.1 \
+	binaries/pbc_to_exe.1 \
+	binaries/plumage.1 \
+	binaries/winxed.1
+
+.SUFFIXES : .pod .1
 
 #
 # Targets
@@ -48,27 +62,17 @@ doc-prep:
 	$(TOUCH) doc-prep
 
 packfile-c.pod: ../src/packfile/api.c
-#IF(new_perldoc):	$(PERLDOC_BIN) -ud packfile-c.pod ../src/packfile/api.c
-#ELSE:	$(PERLDOC_BIN) -u ../src/packfile/api.c > packfile-c.pod
-
-MAN_1 = binaries/parrot.1 \
-	binaries/ops2c.1 \
-	binaries/parrotbug.1 \
-	binaries/parrot_config.1 \
-	binaries/parrot_nci_thunk_gen.1 \
-	binaries/parrot-nqp.1 \
-	binaries/parrot-prove.1 \
-	binaries/pbc_to_exe.1 \
-	binaries/plumage.1 \
-	binaries/winxed.1
-
-.SUFFIXES : .pod .1
+#IF(new_perldoc):	$(PERLDOC) -ud packfile-c.pod ../src/packfile/api.c
+#ELSE:	$(PERLDOC) -u ../src/packfile/api.c > packfile-c.pod
+	$(ADDGENERATED) "docs/$@" "[doc]"
 
 .pod.1 : # suffix rule (limited support)
 	$(POD2MAN) $< > $@
+	$(ADDGENERATED) "docs/$@" "[main]" man
 
-ops/index.pod : $(POD)
-	$(PERL) ../tools/docs/ops_summary.pl > ops/index.pod
+ops/index.pod : $(POD) $(OPS_SUMMARY)
+	$(PERL) $(OPS_SUMMARY) > ops/index.pod
+	$(ADDGENERATED) "docs/$@" "[doc]"
 
 #IF(has_pod2man):man: man.good
 #ELSE:man: man.stub
@@ -83,6 +87,7 @@ man-clean:
 
 clean: man-clean html-clean pdf-clean htmlhelp-clean
 	$(RM_F) packfile-c.pod $(POD) doc-prep
+	$(RM_RF) ops
 
 html:
 	$(PERL) -I../lib ../tools/docs/mk_html_docs.pl --version=$(VERSION)
