@@ -1,3 +1,13 @@
+2013-01-15    release 5.0.0
+    - Core
+        +
+    - Build
+        + Generate MANIFEST.generated, cleanup MANIFEST,
+          removed MANIFEST_configure.generated, add installation of forgotten files
+          [GH #890]
+    - Documentation
+        + Re-added docs/ops, the generated ops summary and docs/packfile-c.pod
+
 2012-12-18    release 4.11.0
     - Core
         + Parrot now supports fast and lightweight OS threads, based on Nat Tucks's
