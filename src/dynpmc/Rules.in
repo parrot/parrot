@@ -254,3 +254,8 @@ src/dynpmc/select.c: src/dynpmc/select.dump
 
 src/dynpmc/select.dump: src/dynpmc/select.pmc vtable.dump $(CLASS_O_FILES)
 	$(PMC2CD) src/dynpmc/select.pmc
+
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

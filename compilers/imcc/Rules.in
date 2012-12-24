@@ -283,3 +283,8 @@ compilers/imcc/imcc.l.flag compilers/imcc/imclexer.c : compilers/imcc/imcc.l
 compilers/imcc/imcparser.c : compilers/imcc/imcc.y.flag
 compilers/imcc/imcparser.h : compilers/imcc/imcparser.c
 compilers/imcc/imclexer.c : compilers/imcc/imcc.l.flag
+
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

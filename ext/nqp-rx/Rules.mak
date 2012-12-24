@@ -29,5 +29,7 @@ $(NQP_RX) : $(NQPRX_LIB_PBCS) $(PBC_TO_EXE) parrot-nqp.pbc
 $(INSTALLABLENQP) : $(NQPRX_LIB_PBCS) src/install_config$(O) $(PBC_TO_EXE) parrot-nqp.pbc
 	$(PBC_TO_EXE) parrot-nqp.pbc --install
 
-
-
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

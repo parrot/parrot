@@ -208,7 +208,7 @@ GEN_PASM_INCLUDES = \
 	$(RUN_INC_DIR)/dlopenflags.pasm \
 	$(RUN_INC_DIR)/longopt.pasm \
 	$(RUN_INC_DIR)/packfile_segments.pasm \
-	$(RUN_INC_DIR)/packfile_annotation_key_type.pasm \
+	$(RUN_INC_DIR)/packfile_annotation_keytype.pasm \
 	$(RUN_INC_DIR)/stat.pasm \
 	$(RUN_INC_DIR)/stringinfo.pasm \
 	$(RUN_INC_DIR)/warnings.pasm \
@@ -1365,8 +1365,11 @@ $(RUN_INC_DIR)/cclass.pasm : $(INC_DIR)/cclass.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/cclass.h $@
 $(RUN_INC_DIR)/packfile_segments.pasm : $(INC_DIR)/packfile.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/packfile.h $@
-$(RUN_INC_DIR)/packfile_annotation_key_type.pasm : $(INC_DIR)/packfile.h $(H2INC)
+$(RUN_INC_DIR)/packfile_annotation_keytype.pasm : $(INC_DIR)/packfile.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/packfile.h $@
+# Old name, but never installed
+#$(RUN_INC_DIR)/packfile_annotation_key_type.pasm : $(INC_DIR)/packfile.h $(H2INC)
+#	$(PERL) $(H2INC) $(INC_DIR)/packfile.h $@
 $(RUN_INC_DIR)/except_types.pasm : $(INC_DIR)/exceptions.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/exceptions.h $@
 $(RUN_INC_DIR)/except_severity.pasm : $(INC_DIR)/exceptions.h $(H2INC)
