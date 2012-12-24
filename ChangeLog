@@ -1,6 +1,14 @@
 2013-01-15    release 5.0.0
     - Core
-        +
+        + Install forgotten runtime include files:
+          cloneflags.pasm
+          packfile_annotation_keytype.pasm
+          packfile_segments.pasm
+        + Install include/parrot/pbcversion.h with the main package, not devel.
+        + Install headers for dynpmc files.
+        + Install libraries tgc.pbc, NCI/Utils.pbc, OpenGL/Math.pbc, PCT/Dumper.pbc,
+          postgres.pbc, ProfTest.pbc and ProfTest/*pbc, String/Utils.pbc, URI/Escape.pbc,
+          YAML/Dumper/Base.pbc, YAML/Dumper/Default.pbc
     - Build
         + Generate MANIFEST.generated, cleanup MANIFEST,
           removed MANIFEST_configure.generated, add installation of forgotten files
