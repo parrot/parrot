@@ -164,6 +164,8 @@
 ^/docs/.*\.tmp/
 ^/docs/Makefile$
 ^/docs/Makefile/
+^/docs/binaries/.*\.1$
+^/docs/binaries/.*\.1/
 ^/docs/book/.*\.html$
 ^/docs/book/.*\.html/
 ^/docs/build$
