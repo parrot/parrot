@@ -225,7 +225,7 @@ sub _get_manifest_entry {
 sub _get_special {
     my %special = qw(
         CREDITS                                         [main]doc
-        DEPRECATED.yaml                                  [devel]doc
+        DEPRECATED.yaml                                 [devel]doc
         DONORS.pod                                      [main]doc
         LICENSE                                         [main]doc
         PBC_COMPAT                                      [main]doc
@@ -238,7 +238,6 @@ sub _get_special {
         VERSION                                         [devel]
         languages/t/harness                             [test]
         lib/File/Which.pm                               [devel]lib
-        parrot-config                                   [main]bin
         src/vtable.tbl                                  [devel]src
         tools/build/ops2c.pl                            [devel]
         tools/build/pmc2c.pl                            [devel]
