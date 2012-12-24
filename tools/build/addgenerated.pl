@@ -40,7 +40,7 @@ tools/build/addgenerated.pl - Helper for build-time MANIFEST.generated
 
 This script is a simple front-end for C<Parrot::BuildUtil::add_to_generated>
 
-Default section: [library]
+Default section: [main]
 
 Default dir: ""
 

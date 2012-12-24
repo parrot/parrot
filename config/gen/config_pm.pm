@@ -44,12 +44,12 @@ sub runstep {
 
     my $template = $self->{templates}->{myconfig};
     $conf->genfile($template, 'myconfig',
-                   manifest => [ "[devel]", "lib" ]);
+                   manifest => [ "[devel]", "lib" ]); # [devel]src
 
     $template = $self->{templates}->{config_pir};
     my $gen_pir = q{runtime/parrot/library/config.pir};
     $conf->genfile($template, $gen_pir,
-                   manifest => [ "[main]" ]);
+                   manifest => [ "[]" ]);
 
     $template = $self->{templates}->{Config_pm};
     open( my $IN, "<", $template )
@@ -125,7 +125,7 @@ END
     $template = $self->{templates}->{config_lib};
     open( $IN,  "<", $template ) or die "Can't open '$template': $!";
     my $c_l_pir = q{config_lib.pir};
-    add_to_generated($c_l_pir, '[devel]', '');
+    add_to_generated($c_l_pir, '[devel]', 'src');
 
     open( $OUT, ">", $c_l_pir ) or die "Can't open $c_l_pir: $!";
     print {$OUT} <<"END";

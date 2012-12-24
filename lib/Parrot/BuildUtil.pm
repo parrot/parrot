@@ -171,6 +171,9 @@ sub get_bc_version {
 Adds the C<$filename> to MANIFEST.generated into the given C<$section>.
 C<$dir> is optional.
 
+Default section: [main]
+Default dir: ""
+
 Note that Parrot::Config might not be generated yet, so
 we must assure that the current directory is the the build_dir.
 This is the job of F<tools/build/addgenerated.pl>, but
@@ -190,7 +193,7 @@ sub add_to_generated {
 
     my $path = File::Spec->abs2rel($filename);
     $path =~ s/\\/\//g;
-    $section = "[library]" unless $section;
+    $section = "[main]" unless $section;
     $dir = "" unless $dir;
 
     open( my $M, '>>', "MANIFEST.generated" ) or die "open 'MANIFEST.generated': $!";
@@ -212,9 +215,7 @@ sub add_to_generated {
 =item C<add_list_to_generated( [$section,] @files)>
 
 Adds the list of filenames to MANIFEST.generated into $section,
-Default: '[library]'.
-
-$section is optional.
+Default main: '[main]'.
 
 =cut
 

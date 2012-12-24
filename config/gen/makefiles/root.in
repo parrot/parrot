@@ -1308,7 +1308,7 @@ $(LIBRARY_DIR)/ProfTest.pbc: $(LIBRARY_DIR)/ProfTest/PIRProfile.pbc \
 
 $(LIBRARY_DIR)/ProfTest/PIRProfile.pbc: $(LIBRARY_DIR)/ProfTest/PIRProfile.pir
 	$(PARROT) -o $@ $(LIBRARY_DIR)/ProfTest/PIRProfile.pir
-	$(ADDGENERATED) "$@"
+	$(ADDGENERATED) "$@" "[main]"
 
 $(LIBRARY_DIR)/ProfTest/PIRProfile.pir: $(LIBRARY_DIR)/ProfTest/PIRProfile.nqp $(NQP_RX)
 	$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/PIRProfile.nqp > $@

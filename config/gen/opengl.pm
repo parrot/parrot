@@ -781,7 +781,7 @@ HEADER
     }
 
     close $sigs;
-    add_to_generated($SIGS_FILE, "[main]");
+    add_to_generated($SIGS_FILE, "[]"); # [devel]src ?
 
     # PHASE 3: Write function lists for each OpenGL-related library
 
