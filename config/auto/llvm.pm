@@ -193,7 +193,7 @@ sub _check_bcfile {
     my ($self, $bcfile) = @_;
     open my $fh, '<', $bcfile or return;
     my $read = read $fh, my $bytes, 2;
-    my $result = 1 if $read == 2 and $bytes eq 'BC';
+    my $result = ($read == 2 and $bytes eq 'BC') ? 1 : '';
     close $fh;
     return $result;
 }
