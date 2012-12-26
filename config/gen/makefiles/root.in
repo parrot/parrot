@@ -641,7 +641,6 @@ MAKE_C = @make_c@
 
 all : \
 	corevm \
-	docs \
 #IF(has_glut):    $(LIBGLUTCB_SO) \
 	$(DIS) \
 	$(PARROT_CONFIG) \
@@ -799,6 +798,7 @@ help :
 	@echo "Documentation:"
 	@echo "  help:              Print this help message."
 	@echo "  docs:              Generate documentation from POD in the sources."
+	@echo "  docs-clean:        Remove all generated documentation files."
 	@echo "  html:              Generate HTML documentation from POD in the sources."
 	@echo "  html-clean:        Remove the HTML documentation."
 	@echo "  htmlhelp:          Compile HTML documentation (CHM format)."
@@ -880,7 +880,7 @@ world : parrot_utils
 parrot_utils : all $(PDUMP) $(DIS) $(PDB) $(PBC_MERGE) $(PBC_TO_EXE) $(PARROT_CONFIG) \
   src/install_config$(O) $(PARROT_PROVE) $(OPS2C)
 
-installable: all $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPDB) \
+installable: all docs $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPDB) \
   $(INSTALLABLEPBC_MERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG) $(INSTALLABLENQP) \
   $(INSTALLABLENCITHUNKGEN) $(INSTALLABLEPARROT_PROVE) $(INSTALLABLEOPS2C) $(INSTALLABLEWINXED)
 
