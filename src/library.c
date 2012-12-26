@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2011, Parrot Foundation.
+Copyright (C) 2004-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -155,8 +155,6 @@ parrot_init_library_paths(PARROT_INTERP)
         if (!STRING_IS_NULL(envvar) && !STRING_IS_EMPTY(envvar))
             VTABLE_push_string(interp, paths, envvar);
     }
-    entry = CONST_STRING(interp, "./");
-    VTABLE_push_string(interp, paths, entry);
 
     /* define library paths */
     paths = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
@@ -168,15 +166,11 @@ parrot_init_library_paths(PARROT_INTERP)
         if (!STRING_IS_NULL(envvar) && !STRING_IS_EMPTY(envvar))
             VTABLE_push_string(interp, paths, envvar);
     }
-    entry = CONST_STRING(interp, "./");
-    VTABLE_push_string(interp, paths, entry);
 
     /* define languages paths */
     paths = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
     VTABLE_set_pmc_keyed_int(interp, lib_paths,
             PARROT_LIB_PATH_LANG, paths);
-    entry = CONST_STRING(interp, "./");
-    VTABLE_push_string(interp, paths, entry);
 
     /* define dynext paths */
     paths = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
@@ -253,6 +247,8 @@ Parrot_lib_update_paths_from_config_hash(PARROT_INTERP)
         entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/include/"));
         VTABLE_push_string(interp, paths, entry);
     }
+    entry = CONST_STRING(interp, "./");
+    VTABLE_push_string(interp, paths, entry);
 
     paths = VTABLE_get_pmc_keyed_int(interp, lib_paths, PARROT_LIB_PATH_LIBRARY);
     if (!STRING_IS_NULL(builddir)) {
@@ -263,6 +259,8 @@ Parrot_lib_update_paths_from_config_hash(PARROT_INTERP)
         entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/library/"));
         VTABLE_push_string(interp, paths, entry);
     }
+    entry = CONST_STRING(interp, "./");
+    VTABLE_push_string(interp, paths, entry);
 
     paths = VTABLE_get_pmc_keyed_int(interp, lib_paths, PARROT_LIB_PATH_LANG);
     if (!STRING_IS_NULL(builddir)) {
@@ -273,6 +271,8 @@ Parrot_lib_update_paths_from_config_hash(PARROT_INTERP)
         entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/languages/"));
         VTABLE_push_string(interp, paths, entry);
     }
+    entry = CONST_STRING(interp, "./");
+    VTABLE_push_string(interp, paths, entry);
 
     paths = VTABLE_get_pmc_keyed_int(interp, lib_paths, PARROT_LIB_PATH_DYNEXT);
     if (!STRING_IS_NULL(builddir)) {

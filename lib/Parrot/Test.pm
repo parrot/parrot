@@ -584,7 +584,7 @@ sub pbc_postprocess_output_like {
 }
 
 sub _pir_stdin_output_slurp {
-    my ($input_string, $code, $expected_ouptut) = @_;
+    my ($input_string, $code) = @_;
 
     my $stuff = sub {
         # Put the string on a file.

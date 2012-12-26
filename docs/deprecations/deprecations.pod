@@ -27,7 +27,23 @@ lists may be incomplete.
 Notifications for the 2.6->2.9 transition and later will be complete.
 
 For instructions on how to deprecate Parrot code, please see:
- F<how-to-deprecate.pod>.
+ F<how_to_deprecate.pod>.
+
+=head2 Changes Between 4.9 and 4.12
+
+=over 4
+
+=item *
+
+Moved "." in the library search paths from the beginning to the end.
+
+- low impact expected:
+  load_bytecode and .include and load_language might load now different files,
+  if they exist in "./" AND in the proper library location.
+  To keep the old behavior set the environment variables PARROT_INCLUDE
+  and PARROT_LIBRARY to "./"
+
+=back
 
 =head2 Changes Between 3.3 and 3.6
 
