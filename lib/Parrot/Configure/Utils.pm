@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -32,20 +32,21 @@ use File::Copy ();
 use File::Spec;
 use File::Which;
 use lib ("lib");
-use Parrot::BuildUtil ();
+use Parrot::BuildUtil qw(add_to_generated);
 our @EXPORT    = ();
 our @EXPORT_OK = qw(
     prompt copy_if_diff move_if_diff integrate
     capture_output check_progs _slurp
     _run_command _build_compile_command
     print_to_cache read_from_cache
+    add_to_generated
 );
 our %EXPORT_TAGS = (
     inter => [qw(prompt integrate)],
     auto  => [
         qw(capture_output check_progs)
     ],
-    gen => [qw( copy_if_diff move_if_diff )],
+    gen => [qw( copy_if_diff move_if_diff add_to_generated )],
     cache => [qw( print_to_cache read_from_cache ) ],
 );
 

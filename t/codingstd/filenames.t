@@ -111,6 +111,14 @@ if (@too_long == 1 and $too_long[0] eq "installable_parrot_nci_thunk_gen.exe:36 
     # Only on Windows and Windows allows filename lengths > 36
     ok( @too_long == 1, "Filenames length - installable_parrot_nci_thunk_gen.exe:36 okay on Windows" );
 }
+elsif (@too_long == 1 and $too_long[0] eq "runtime/parrot/include/packfile_annotation_key_type.pasm:33 chars\n") {
+  TODO: {
+        local $TODO = 'GH #895 deprecate 1 overlong filename';
+        ok( !@too_long, "Filenames length" )
+          or diag( "Filename with more than 32 chars found in "
+                   . @too_long . " files:\n@too_long" );
+    };
+}
 else {
     ok( !@too_long, 'Filenames length' )
       or diag( "Filename with more than 32 chars found in "

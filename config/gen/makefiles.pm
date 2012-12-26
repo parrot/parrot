@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -56,9 +56,10 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     $self->makefiles($conf);
-
+    my $target = 'tools/dev/mk_language_shell.pl';
     $conf->shebang_mod( 'tools/dev/mk_language_shell.in'
-                         => 'tools/dev/mk_language_shell.pl', );
+                         => $target, );
+    add_to_generated( $target, '[devel]');
 
     return 1;
 }
@@ -76,7 +77,7 @@ sub makefiles {
         my $args   = $self->{makefiles}->{$target};
         my $source = delete $args->{SOURCE};
 
-        $conf->genfile($source => $target, %$args );
+        $conf->genfile($source => $target, %$args);
     }
     return;
 }

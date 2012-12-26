@@ -7,6 +7,8 @@ use strict;
 package OpsSummary;
 
 use base 'Pod::Parser';
+use lib qw(lib ../lib);
+use Parrot::BuildUtil;
 
 my $current_file;
 my $current_op;
@@ -75,6 +77,7 @@ for (@ARGV) {
     next if $_ eq 'index.pod';
     $current_file = $_;
     $parser->parse_from_file($_);
+    add_to_generated($_, "[main]", "doc");
 }
 
 print << "EOH";

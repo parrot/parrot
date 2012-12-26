@@ -1,5 +1,6 @@
 $(LIBRARY_DIR)/opsc.pbc: $(NQP_RX) $(OPSC_SOURCES) $(NQPRX_LIB_SETTING)
 	$(PARROT) -o $(LIBRARY_DIR)/opsc.pbc $(OPSC_DIR)/opsc.pir
+	@$(ADDGENERATED) "$@" "[main]"
 
 $(OPSC_DIR)/gen/Ops/Compiler.pir: $(OPSC_DIR)/src/Ops/Compiler.pm $(NQP_RX)
 	$(NQP_RX) --target=pir --output=$@  $(OPSC_DIR)/src/Ops/Compiler.pm
@@ -40,6 +41,7 @@ $(OPS2C): $(OPSC_DIR)/ops2c.nqp $(LIBRARY_DIR)/opsc.pbc $(NQP_RX) $(PBC_TO_EXE)
 
 $(INSTALLABLEOPS2C): $(OPS2C) src/install_config$(O)
 	$(PBC_TO_EXE) ops2c.pbc --install
+	@$(ADDGENERATED) "$@" "[main]" bin
 
 opsc: $(LIBRARY_DIR)/opsc.pbc
 

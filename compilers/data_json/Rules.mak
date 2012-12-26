@@ -5,6 +5,7 @@ runtime/parrot/languages/data_json/data_json.pbc: compilers/data_json/data_json.
 runtime/parrot/languages/JSON/JSON.pir: compilers/data_json/JSON.nqp $(NQP_RX)
 	$(MKPATH) runtime/parrot/languages/JSON
 	$(NQP_RX) --target=pir compilers/data_json/JSON.nqp > $@
+	@$(ADDGENERATED) "$@" "[data_json]"
 
 compilers/data_json/data_json.pbc : \
     $(LIBRARY_DIR)/PGE.pbc \
@@ -12,6 +13,8 @@ compilers/data_json/data_json.pbc : \
     $(LIBRARY_DIR)/TGE.pbc \
     compilers/data_json/data_json/grammar.pir \
     compilers/data_json/data_json/pge2pir.pir
+	$(PARROT) -o $@ compilers/data_json/data_json.pir
+	@$(ADDGENERATED) "$@" "[data_json]"
 
 compilers/data_json/data_json/grammar.pir : $(PARROT) \
     compilers/data_json/data_json/grammar.pg \
