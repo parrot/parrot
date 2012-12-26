@@ -16,6 +16,8 @@
           removed MANIFEST_configure.generated, add installation of forgotten files
           [GH #890]
         + Improved Configure.pl probes for --with-llvm
+        + Replace / slashes with \ on windows for all Makefiles automatically.
+          This improves cygwin interaction, like remote or cronjob smoking on windows.
     - Documentation
         + Re-added docs/ops, the generated ops summary and docs/packfile-c.pod
         + Improved pdd10_embedding
