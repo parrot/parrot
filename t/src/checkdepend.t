@@ -215,11 +215,12 @@ sub check_files {
         my ($active_makefile, $active_line_num);
         my $rule = $file;
         $rule =~ s/$src_ext$//;
+        $rule =~ s{/}{\\}g if $^O eq 'MSWin32';
 
         #find the applicable rule for this file
         my $rule_deps = '';
         for (@$rules) {
-            if ($_->{line} =~ /^$rule$obj_ext\s*:\s*(.*)\s*$/) {
+            if ($_->{line} =~ m{^\Q$rule$obj_ext\E\s*:\s*(.*)\s*$}) {
                 $rule_deps = $1;
                 $active_makefile = $_->{filename};
                 $active_line_num = $_->{line_num};
@@ -233,6 +234,7 @@ sub check_files {
         }
 
         my @rule_deps     = split /\s+/, $rule_deps;
+        @rule_deps  = grep {s{\\}{/}g} @rule_deps if  $^O eq 'MSWin32';
         my @expected_deps = (get_deps($file));
 
         is_list_same(\@rule_deps, \@expected_deps, "$file $extra_info.");
