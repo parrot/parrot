@@ -77,7 +77,6 @@ for (@ARGV) {
     next if $_ eq 'index.pod';
     $current_file = $_;
     $parser->parse_from_file($_);
-    add_to_generated($_, "[main]", "doc");
 }
 
 print << "EOH";
