@@ -85,7 +85,11 @@ sub test_native_pbc {
     }
     # check if skip or todo
   SKIP: {
-    if ( $skip->{$id} ) {
+    # TODO: -r requires -o *.pbc. We could add and run it
+    if ($ENV{TEST_PROG_ARGS} =~ /(--run-pbc|-r)\b/) {
+        skip "$cvt --run-pbc", 1;
+    }
+    elsif ( $skip->{$id} ) {
         my $skip_msg = $skip->{$id};
         if (length $skip_msg > 2) {
             skip "$cvt $skip_msg", 1;

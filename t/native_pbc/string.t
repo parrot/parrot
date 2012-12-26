@@ -6,7 +6,6 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 use t::native_pbc::Test;
 
-#use Parrot::Test skip_all => 'pending robust testing strategy, GH #394';
 use Parrot::Test tests => 4;
 
 # 4th string as utf8 "Ärger"

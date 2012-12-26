@@ -9,7 +9,6 @@ use Parrot::Config;
 use Parrot::BuildUtil;
 use t::native_pbc::Test;
 
-#use Parrot::Test skip_all => 'pending robust testing strategy, GH #394';
 use Parrot::Test tests => 7;
 
 # Testmatrix for coverage overview (GH #394)
