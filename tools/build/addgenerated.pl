@@ -16,7 +16,8 @@ if ($build_dir and ($pwd ne $build_dir)) {
 if ($ARGV[0] eq '-l' or $ARGV[0] eq '--list') {
     shift;
     Parrot::BuildUtil::add_list_to_generated(@ARGV);
-} else {
+}
+else {
     Parrot::BuildUtil::add_to_generated(@ARGV);
 }
 if ($pwd ne $build_dir) {
