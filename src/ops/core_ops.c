@@ -17033,21 +17033,31 @@ Parrot_say_s(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING  * const  s = SREG(1);
     STRING  * const  nl = Parrot_str_new_constant(interp, "\n");
 
-    if ((s && Parrot_str_byte_length(interp, s))) {
-        if (((!PObj_is_growable_TESTALL(s)) || (Buffer_buflen(s) <= (s->bufused + s->encoding->to_encoding(interp, nl)->bufused)))) {
-            Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
-            Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
+    #if defined(PARROT_HAS_THREADS)
+        if (s) {
+            int   len = STRING_IS_NULL(s) ? 0 : s->bufused;
+
+            if ((len < 80)) {
+                Parrot_io_putps(interp, _PIO_STDOUT(interp), Parrot_str_concat(interp, s, nl));
+            }
+            else {
+                Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
+                Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
+            }
+
         }
         else {
-            PARROT_ASSERT((s->strstart == Parrot_str_concat(interp, s, nl)->strstart));
-            Parrot_io_putps(interp, _PIO_STDOUT(interp), Parrot_str_concat(interp, s, nl));
+            Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
         }
 
-    }
-    else {
+#else
+        if (s) {
+            Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
+        }
         Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
-    }
 
+#endif
+;
     return cur_opcode + 2;
 }
 
@@ -17056,21 +17066,31 @@ Parrot_say_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING  * const  s = SCONST(1);
     STRING  * const  nl = Parrot_str_new_constant(interp, "\n");
 
-    if ((s && Parrot_str_byte_length(interp, s))) {
-        if (((!PObj_is_growable_TESTALL(s)) || (Buffer_buflen(s) <= (s->bufused + s->encoding->to_encoding(interp, nl)->bufused)))) {
-            Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
-            Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
+    #if defined(PARROT_HAS_THREADS)
+        if (s) {
+            int   len = STRING_IS_NULL(s) ? 0 : s->bufused;
+
+            if ((len < 80)) {
+                Parrot_io_putps(interp, _PIO_STDOUT(interp), Parrot_str_concat(interp, s, nl));
+            }
+            else {
+                Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
+                Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
+            }
+
         }
         else {
-            PARROT_ASSERT((s->strstart == Parrot_str_concat(interp, s, nl)->strstart));
-            Parrot_io_putps(interp, _PIO_STDOUT(interp), Parrot_str_concat(interp, s, nl));
+            Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
         }
 
-    }
-    else {
+#else
+        if (s) {
+            Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
+        }
         Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
-    }
 
+#endif
+;
     return cur_opcode + 2;
 }
 
@@ -17087,21 +17107,31 @@ Parrot_say_p(opcode_t *cur_opcode, PARROT_INTERP) {
         STRING  * const  s = VTABLE_get_string(interp, p);
         STRING  * const  nl = Parrot_str_new_constant(interp, "\n");
 
-        if (s) {
-            if (((!PObj_is_growable_TESTALL(s)) || (Buffer_buflen(s) <= (s->bufused + s->encoding->to_encoding(interp, nl)->bufused)))) {
-                Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
-                Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
+        #if defined(PARROT_HAS_THREADS)
+            if (s) {
+                int   len = STRING_IS_NULL(s) ? 0 : s->bufused;
+
+                if ((len < 80)) {
+                    Parrot_io_putps(interp, _PIO_STDOUT(interp), Parrot_str_concat(interp, s, nl));
+                }
+                else {
+                    Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
+                    Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
+                }
+
             }
             else {
-                PARROT_ASSERT((s->strstart == Parrot_str_concat(interp, s, nl)->strstart));
-                Parrot_io_putps(interp, _PIO_STDOUT(interp), Parrot_str_concat(interp, s, nl));
+                Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
             }
 
-        }
-        else {
+#else
+            if (s) {
+                Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
+            }
             Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
-        }
 
+#endif
+;
     }
 
     return cur_opcode + 2;

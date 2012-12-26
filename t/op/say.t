@@ -94,7 +94,10 @@ CODE
 /Null PMC in say/
 OUTPUT
 
-pir_output_unlike( <<'CODE', <<'OUTPUT', 'threaded say' );
+# [GH #893] 80% of threaded say should print the \n immediately after the string.
+my ($good, $fail) = (0,0);
+for (0..9) {
+    my $result = Parrot::Test::_pir_stdin_output_slurp('',<<'CODE');
 .sub main :main
     $P0 = get_global 'task'
     $P1 = new 'Task', $P0
@@ -109,16 +112,20 @@ pir_output_unlike( <<'CODE', <<'OUTPUT', 'threaded say' );
     wait $P2
     wait $P3
     wait $P4
-    sleep 0.2
+    sleep 0.1
 .end
 .sub task
     say "line"
 .end
 CODE
-/lineline/
-OUTPUT
 
-
+    if ($result =~ /lineline/) {
+        $fail++;
+    } else {
+        $good++;
+    }
+}
+ok($good >= 8, "threads: better atomic say. $good/10");
 
 # Local Variables:
 #   mode: cperl
