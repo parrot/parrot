@@ -2150,6 +2150,7 @@ t/tools/pmc2cutils/README.pod                               []doc
 t/tools/testdata                                            [test]
 tools/README.pod                                            []doc
 tools/build/README.pod                                      []doc
+tools/build/addgenerated.pl                                 []
 tools/build/c2str.pl                                        []
 tools/build/fixup_gen_file.pl                               []
 tools/build/gen_version.pl                                  []
