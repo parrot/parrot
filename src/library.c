@@ -305,6 +305,10 @@ Parrot_lib_update_paths_from_config_hash(PARROT_INTERP)
         entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/dynext/"));
         VTABLE_push_string(interp, paths, entry);
     }
+#ifdef WIN32
+    entry = CONST_STRING(interp, "./");
+    VTABLE_push_string(interp, paths, entry);
+#endif
     if (!STRING_IS_NULL(dynext_libs) && !STRING_IS_EMPTY(dynext_libs)) {
         add_env_paths(interp, paths, dynext_libs);
     }
@@ -514,7 +518,7 @@ add_env_paths(PARROT_INTERP, ARGIN(PMC *libpath),
 {
     ASSERT_ARGS(add_env_paths)
 
-    if (!STRING_IS_NULL(envstr)) {
+    if (!STRING_IS_NULL(envstr) && !STRING_IS_EMPTY(envstr)) {
 #ifdef WIN32
         STRING * const env_search_path_sep = CONST_STRING(interp, ";");
 #else
@@ -527,16 +531,20 @@ add_env_paths(PARROT_INTERP, ARGIN(PMC *libpath),
             STRING * entry;
             do {
                 entry = STRING_substr(interp, envstr, start, index - start);
-                if (!STRING_IS_EMPTY(entry)) /* skip empty, as in ":/path" */
-                    VTABLE_push_string(interp, libpath, entry);
+                if (!STRING_IS_EMPTY(entry)) { /* skip empty, as in ":/path" */
+                    VTABLE_push_string(interp, libpath,
+                                       path_guarantee_trailing_separator(interp, entry));
+                }
                 start = index + 1;
             } while ((index = STRING_index(interp, envstr, env_search_path_sep, start)) >= 0);
             entry = STRING_substr(interp, envstr, start, STRING_length(envstr) - start);
             if (!STRING_IS_EMPTY(entry))
-                VTABLE_push_string(interp, libpath, entry);
+                VTABLE_push_string(interp, libpath,
+                                   path_guarantee_trailing_separator(interp, entry));
         }
         else {
-            VTABLE_push_string(interp, libpath, envstr);
+            VTABLE_push_string(interp, libpath,
+                               path_guarantee_trailing_separator(interp, envstr));
         }
     }
 }

@@ -62,9 +62,10 @@ no duplicates
 
 =cut
 
+my $sep = $^O eq 'MSWin32' ? ';' : ':';
 local $ENV{PARROT_LIBRARY} = 'libenvdir';
 local $ENV{PARROT_INCLUDE} = 'incenvdir';
-local $ENV{PARROT_DYNEXT}  = '/dynenvdir1:/dynenvdir2';
+local $ENV{PARROT_DYNEXT}  = "/dynenvdir1$sep/dynenvdir2";
 
 my ($builddir, $versiondir, $libdir, $prefix) = @PConfig{qw(build_dir versiondir libdir)};
 my $versionlib = $libdir . $versiondir;
@@ -96,12 +97,13 @@ my $dynext = Parrot::Test::_pir_stdin_output_slurp('', $code);
 my $dynext_libs = $PConfig{dynext_libs};
 my $expected =
 "dynext/
-/dynenvdir1
-/dynenvdir2
+/dynenvdir1/
+/dynenvdir2/
 $builddir/runtime/parrot/dynext/
 $versionlib/dynext/
 ";
-$expected .= join("\n", split /:/, $dynext_libs)."\n" if $dynext_libs;
+$expected .= join("/\n", split /$sep/, $dynext_libs)."/\n" if $dynext_libs;
+$expected .= "./\n" if $^O eq 'MSWin32';
 is ($dynext, $expected, "dynext");
 
 my $library = $code;

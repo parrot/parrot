@@ -213,7 +213,7 @@ sub _probe_for_fink {
             linkflags => "-L$fink_lib_dir",
             ldflags   => "-L$fink_lib_dir",
             ccflags   => "-isystem $fink_include_dir",
-            dynext_libs => $fink_lib_dir,
+            dynext_libs => $fink_lib_dir."/",
         );
         return \%addl_flags;
     }
@@ -237,7 +237,7 @@ sub _probe_for_macports {
             linkflags => "-L$ports_lib_dir",
             ldflags   => "-L$ports_lib_dir",
             ccflags   => "-isystem $ports_include_dir",
-            dynext_libs => $ports_lib_dir,
+            dynext_libs => $ports_lib_dir."/",
         );
         return \%addl_flags;
     }

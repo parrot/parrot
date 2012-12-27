@@ -25,7 +25,7 @@ sub runstep {
     my $dynext_libs;
     if ( $ldflags !~ m|-L/usr/local/lib\b| ) {
         $ldflags .= ' -L/usr/local/lib';
-        $dynext_libs = '/usr/local/lib';
+        $dynext_libs = '/usr/local/lib/';
     }
 
     $conf->data->set(
