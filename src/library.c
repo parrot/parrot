@@ -28,6 +28,13 @@ dynext files (via C<loadlib>).
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+static void add_env_paths(PARROT_INTERP,
+    ARGIN(PMC *libpath),
+    ARGIN(const STRING *envstr))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING * cnv_to_win32_filesep(PARROT_INTERP,
@@ -73,6 +80,10 @@ static STRING* try_load_path(PARROT_INTERP, ARGIN(STRING* path))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_add_env_paths __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(libpath) \
+    , PARROT_ASSERT_ARG(envstr))
 #define ASSERT_ARGS_cnv_to_win32_filesep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(path))
@@ -178,6 +189,14 @@ parrot_init_library_paths(PARROT_INTERP)
             PARROT_LIB_PATH_DYNEXT, paths);
     entry = CONST_STRING(interp, "dynext/");
     VTABLE_push_string(interp, paths, entry);
+    { /* EXPERIMENTAL: add dynext path from environment */
+        STRING *dynext_libs = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_DYNEXT"));
+        Parrot_warn_experimental(interp, "PARROT_DYNEXT environment variable is experimental");
+        if (!STRING_IS_NULL(dynext_libs) && !STRING_IS_EMPTY(dynext_libs)) {
+            add_env_paths(interp, paths, dynext_libs);
+        }
+    }
+
 
     /* shared exts */
     paths = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
@@ -215,6 +234,7 @@ Parrot_lib_update_paths_from_config_hash(PARROT_INTERP)
     STRING * versionlib = NULL;
     STRING * entry = NULL;
     STRING * builddir = NULL;
+    STRING * dynext_libs = NULL;
     PMC * const lib_paths =
         VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_LIB_PATHS);
     PMC * const config_hash =
@@ -226,10 +246,12 @@ Parrot_lib_update_paths_from_config_hash(PARROT_INTERP)
         STRING * const verkey      = CONST_STRING(interp, "versiondir");
         STRING * const builddirkey = CONST_STRING(interp, "build_dir");
         STRING * const installed   = CONST_STRING(interp, "installed");
+        STRING * const dynextkey   = CONST_STRING(interp, "dynext_libs");
 
         versionlib = VTABLE_get_string_keyed_str(interp, config_hash, libkey);
         entry      = VTABLE_get_string_keyed_str(interp, config_hash, verkey);
         versionlib = Parrot_str_concat(interp, versionlib, entry);
+        dynext_libs = VTABLE_get_string_keyed_str(interp, config_hash, dynextkey);
 
         if (!VTABLE_get_integer_keyed_str(interp, config_hash, installed))
             builddir = VTABLE_get_string_keyed_str(interp,
@@ -282,6 +304,9 @@ Parrot_lib_update_paths_from_config_hash(PARROT_INTERP)
     if (!STRING_IS_NULL(versionlib)) {
         entry = Parrot_str_concat(interp, versionlib, CONST_STRING(interp, "/dynext/"));
         VTABLE_push_string(interp, paths, entry);
+    }
+    if (!STRING_IS_NULL(dynext_libs) && !STRING_IS_EMPTY(dynext_libs)) {
+        add_env_paths(interp, paths, dynext_libs);
     }
 }
 
@@ -470,6 +495,50 @@ path_concat(PARROT_INTERP, ARGIN(STRING *l_path),
     join = Parrot_str_concat(interp, join, r_path);
 
     return join;
+}
+
+/*
+
+=item C<static void add_env_paths(PARROT_INTERP, PMC *libpath, const STRING
+*envstr)>
+
+Split the env string into its components and add the entries to the libpath.
+
+=cut
+
+*/
+
+static void
+add_env_paths(PARROT_INTERP, ARGIN(PMC *libpath),
+              ARGIN(const STRING *envstr))
+{
+    ASSERT_ARGS(add_env_paths)
+
+    if (!STRING_IS_NULL(envstr)) {
+#ifdef WIN32
+        STRING * const env_search_path_sep = CONST_STRING(interp, ";");
+#else
+        STRING * const env_search_path_sep = CONST_STRING(interp, ":");
+#endif
+        INTVAL start = 0;
+        INTVAL index;
+
+        if ((index = STRING_index(interp, envstr, env_search_path_sep, start)) >= 0) {
+            STRING * entry;
+            do {
+                entry = STRING_substr(interp, envstr, start, index - start);
+                if (!STRING_IS_EMPTY(entry)) /* skip empty, as in ":/path" */
+                    VTABLE_push_string(interp, libpath, entry);
+                start = index + 1;
+            } while ((index = STRING_index(interp, envstr, env_search_path_sep, start)) >= 0);
+            entry = STRING_substr(interp, envstr, start, STRING_length(envstr) - start);
+            if (!STRING_IS_EMPTY(entry))
+                VTABLE_push_string(interp, libpath, entry);
+        }
+        else {
+            VTABLE_push_string(interp, libpath, envstr);
+        }
+    }
 }
 
 /*

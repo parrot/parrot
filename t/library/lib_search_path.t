@@ -28,15 +28,17 @@ Check for proper libpath order.
 dynext:
   if parrot is installed:
 
-    $ENV{PARROT_LIBRARY}
+    $ENV{PARROT_DYNEXT}
     dynext/
     $prefix/parrot/$ver/dynext/
+    $Config{dynext_libs}
 
   if not installed:
 
-    $ENV{PARROT_LIBRARY}
+    $ENV{PARROT_DYNEXT}
     dynext/
     $build_dir/runtime/parrot/dynext
+    $Config{dynext_libs}
 
 library (similar for include):
   if parrot is installed:
@@ -62,6 +64,7 @@ no duplicates
 
 local $ENV{PARROT_LIBRARY} = 'libenvdir';
 local $ENV{PARROT_INCLUDE} = 'incenvdir';
+local $ENV{PARROT_DYNEXT}  = '/dynenvdir1:/dynenvdir2';
 
 my ($builddir, $versiondir, $libdir, $prefix) = @PConfig{qw(build_dir versiondir libdir)};
 my $versionlib = $libdir . $versiondir;
@@ -90,11 +93,15 @@ my $code = <<"CODE";
 CODE
 
 my $dynext = Parrot::Test::_pir_stdin_output_slurp('', $code);
+my $dynext_libs = $PConfig{dynext_libs};
 my $expected =
 "dynext/
+/dynenvdir1
+/dynenvdir2
 $builddir/runtime/parrot/dynext/
 $versionlib/dynext/
 ";
+$expected .= join("\n", split /:/, $dynext_libs)."\n" if $dynext_libs;
 is ($dynext, $expected, "dynext");
 
 my $library = $code;
