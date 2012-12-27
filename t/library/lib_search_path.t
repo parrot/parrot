@@ -8,7 +8,7 @@ use lib qw(lib);
 use Test::More;
 use Parrot::Config;
 use Parrot::Test;
-plan tests => 5;
+plan tests => 7;
 
 =head1 NAME
 
@@ -102,9 +102,34 @@ my $expected =
 $builddir/runtime/parrot/dynext/
 $versionlib/dynext/
 ";
-$expected .= join("/\n", split /$sep/, $dynext_libs)."/\n" if $dynext_libs;
+$expected .= join("\n", split /$sep/, $dynext_libs)."\n" if $dynext_libs;
 $expected .= "./\n" if $^O eq 'MSWin32';
-is ($dynext, $expected, "dynext");
+is ($dynext, $expected, "dynext (multi ENV)");
+
+$ENV{PARROT_DYNEXT}  = "/dynenvdir";
+$dynext = Parrot::Test::_pir_stdin_output_slurp('', $code);
+$dynext_libs = $PConfig{dynext_libs};
+$expected =
+"dynext/
+/dynenvdir/
+$builddir/runtime/parrot/dynext/
+$versionlib/dynext/
+";
+$expected .= join("\n", split /$sep/, $dynext_libs)."\n" if $dynext_libs;
+$expected .= "./\n" if $^O eq 'MSWin32';
+is ($dynext, $expected, "dynext (single ENV)");
+
+undef $ENV{PARROT_DYNEXT};
+$dynext = Parrot::Test::_pir_stdin_output_slurp('', $code);
+$dynext_libs = $PConfig{dynext_libs};
+$expected =
+"dynext/
+$builddir/runtime/parrot/dynext/
+$versionlib/dynext/
+";
+$expected .= join("\n", split /$sep/, $dynext_libs)."\n" if $dynext_libs;
+$expected .= "./\n" if $^O eq 'MSWin32';
+is ($dynext, $expected, "dynext (no ENV)");
 
 my $library = $code;
 $library =~ s/DYNEXT/LIBRARY/;
