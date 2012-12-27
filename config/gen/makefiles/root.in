@@ -227,7 +227,6 @@ CONFIGURE_GENERATED_FILES = \
 	$(GEN_MAKEFILES) \
 	myconfig  \
 	MANIFEST.generated \
-	MANIFEST_configure.generated \
 	.configure_trace.sto \
 	.parrot_current_rev \
 	.parrot_current_sha1 \
@@ -2502,6 +2501,7 @@ clean : \
 	$(RM_F) chartypes "*.s" "*~"
 	$(RM_F) $(FLUID_FILES_1)
 	$(RM_F) $(FLUID_FILES_2)
+	$(RM_F) MANIFEST.generated
 	$(RM_RF) lib/Parrot/OpLib
 	$(RM_RF) runtime/parrot/languages/data_json
 	$(RM_F) runtime/parrot/languages/JSON/JSON.pir
