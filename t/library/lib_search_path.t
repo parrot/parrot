@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2011-2012, Parrot Foundation.
+# Copyright (C) 2011-2013, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -63,7 +63,7 @@ no duplicates
 =cut
 
 my $sep = $^O eq 'MSWin32' ? ';' : ':';
-local $ENV{PARROT_LIBRARY} = 'libenvdir';
+local $ENV{PARROT_LIBRARY} = "libenvdir$sep/lib2:";
 local $ENV{PARROT_INCLUDE} = 'incenvdir';
 local $ENV{PARROT_DYNEXT}  = "/dynenvdir1$sep/dynenvdir2";
 
@@ -135,7 +135,8 @@ my $library = $code;
 $library =~ s/DYNEXT/LIBRARY/;
 $library = Parrot::Test::_pir_stdin_output_slurp('', $library);
 $expected =
-"libenvdir
+"libenvdir/
+/lib2/
 $builddir/runtime/parrot/library/
 $versionlib/library/
 ./
@@ -146,7 +147,7 @@ my $include = $code;
 $include =~ s/DYNEXT/INCLUDE/;
 $include = Parrot::Test::_pir_stdin_output_slurp('', $include);
 $expected =
-"incenvdir
+"incenvdir/
 $builddir/
 $builddir/runtime/parrot/include/
 $versionlib/include/

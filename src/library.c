@@ -164,7 +164,7 @@ parrot_init_library_paths(PARROT_INTERP)
         STRING *envvar = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_INCLUDE"));
         Parrot_warn_experimental(interp, "PARROT_INCLUDE environment variable is experimental");
         if (!STRING_IS_NULL(envvar) && !STRING_IS_EMPTY(envvar))
-            VTABLE_push_string(interp, paths, envvar);
+            add_env_paths(interp, paths, envvar);
     }
 
     /* define library paths */
@@ -175,7 +175,7 @@ parrot_init_library_paths(PARROT_INTERP)
         STRING *envvar = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_LIBRARY"));
         Parrot_warn_experimental(interp, "PARROT_LIBRARY environment variable is experimental");
         if (!STRING_IS_NULL(envvar) && !STRING_IS_EMPTY(envvar))
-            VTABLE_push_string(interp, paths, envvar);
+            add_env_paths(interp, paths, envvar);
     }
 
     /* define languages paths */
