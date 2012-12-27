@@ -165,7 +165,7 @@ $versionlib/languages/
 is ($lang, $expected, "lang");
 
 
-pir_output_is( <<'CODE', <<'OUTPUT', ". at end of dynext search path" );
+pir_output_is( <<'CODE', <<'OUTPUT', ". at end of library search path" );
 .sub main :main
   load_bytecode 't/pir/testlib/loadtest.pbc'
 .end
