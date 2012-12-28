@@ -1,4 +1,7 @@
-This file is best viewed with "perldoc README.cygwin".
+# Copyright (C) 2008-2012, Parrot Foundation.
+# This file is best viewed with "perldoc README.cygwin".
+
+=pod
 
 =head1 NAME
 

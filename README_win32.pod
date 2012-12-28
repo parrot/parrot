@@ -1,5 +1,7 @@
+# Copyright (C) 2007-2012, Parrot Foundation.
+# This file is best viewed with "perldoc README_win32".
 
-This file is best viewed with "perldoc README_win32".
+=pod
 
 =head1 NAME
 
@@ -209,13 +211,13 @@ directories.
 
 =item Features
 
-Threads, Events, and Signals are missing.
+Signals are missing.
 
 =back
 
 =head1 ACKNOWLEDGEMENTS
 
-XXX
+Stefan "nine" Seifert implemented threads.
 
 =head1 AUTHORS
 
@@ -240,6 +242,6 @@ This document borrows heavily from Perl's README.win32.
 
 GCC/mingw32 support was added in 0.1.2 (François Perrad).
 
-Last updated: 20 Jan 2009
+Last updated: 28 Dec 2012
 
 =cut
