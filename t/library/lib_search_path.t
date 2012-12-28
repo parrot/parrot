@@ -28,15 +28,15 @@ Check for proper libpath order.
 dynext:
   if parrot is installed:
 
-    $ENV{PARROT_DYNEXT}
     dynext/
+    $ENV{PARROT_DYNEXT}
     $prefix/parrot/$ver/dynext/
     $Config{dynext_libs}
 
   if not installed:
 
-    $ENV{PARROT_DYNEXT}
     dynext/
+    $ENV{PARROT_DYNEXT}
     $build_dir/runtime/parrot/dynext
     $Config{dynext_libs}
 
@@ -58,7 +58,7 @@ LANG does not observe $ENV{PARROT_LIBRARY}
 
 no duplicates
 
-. at end (not for DYNEXT)
+. at the end, for DYNEXT only on windows
 
 =cut
 
