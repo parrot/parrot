@@ -12,6 +12,10 @@ examples/pir/libpaths.pir - Print the parrot library search paths
     $ ./parrot examples/pir/libpaths.pir
     $ ./installed_parrot examples/pir/libpaths.pir
 
+=head1 DESCRIPTION
+
+Print the list of parrot library search paths
+
 =cut
 
 .include 'iglobals.pasm'
