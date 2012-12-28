@@ -987,6 +987,11 @@ $(INSTALLABLEPARROT) : $(FRPTWO_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
 
 $(INC_DIR)/context.h : $(INC_PMC_DIR)/pmc_callcontext.h
 
+$(INC_DIR)/config.h : \
+  $(INC_DIR)/pbcversion.h \
+  $(INC_DIR)/has_header.h \
+  $(INC_DIR)/feature.h
+
 $(INC_DIR)/pbcversion.h : PBC_COMPAT
 	$(PERL) $(BUILD_TOOLS_DIR)/pbcversion_h.pl > $@
 	$(ADDGENERATED) "$@" "[main]" include
