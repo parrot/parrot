@@ -349,7 +349,7 @@ sub annotate_worker {
             $line = $self->{current_line} if $line == -1;
             if (!$Parrot::Pmc2c::Pmc2cMain::OPTIONS->{nolines}) {
                 ( my $filename_escaped = $filename ) =~ s|\\|/|g;
-                $data .= "/* LINE $line \"$filename_escaped\" */\n";
+                $data .= "#line $line \"$filename_escaped\"\n";
             }
             $data .= $it->{data};
         }
