@@ -1,4 +1,4 @@
-#! ./parrot-nqp
+#! parrot-nqp
 
 # workaround nqp-rx not generating :main
 Q:PIR {
@@ -65,7 +65,7 @@ sub MAIN() {
     my $emitter := Ops::Emitter.new(
         :ops_file($f), :trans($trans),
         :script('ops2c.nqp'), :file(@files[0]),
-        :flags( hash( core => $core, quiet => $quiet ) ),
+        :flags( hash( core => $core, quiet => $quiet, lines => $emit_lines, debug => $debug ) ),
     );
 
     unless $debug {
@@ -89,7 +89,7 @@ sub get_options() {
     # don't write to any files
     $getopts.add_option('debug', 'g');
 
-    # don't add line numbers to generated files (not implemented)
+    # don't add line numbers to generated files (not yet implemented)
     $getopts.add_option('no-lines', 'n');
 
     # print anemic usage information and exit
@@ -108,7 +108,7 @@ sub usage() {
     -d --dynamic <file.ops>  generate the C code for the dynamic ops in a single .ops file
     -q --quiet               don't report any non-error messages
     -h --help                print this usage information
-    -n --no-lines            do not print #line directives in generated C code (line numbers are not currently supported)
+    -n --no-lines            do not print #line directives in generated C code (line numbers not yet implemented)
 
     debugging options:
     -g --debug               perform all processing but do not write to any files

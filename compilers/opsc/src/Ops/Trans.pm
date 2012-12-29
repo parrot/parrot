@@ -1,4 +1,4 @@
-#! nqp
+#! parrot-nqp
 # Copyright (C) 2010, Parrot Foundation.
 
 class Ops::Trans is Hash;
@@ -35,7 +35,7 @@ method emit_op_lookup($fh) {
 }
 
 method init_func_init1() { '' }
-method init_func_disaptch() { '' }
+method init_func_dispatch() { '' }
 
 method op_info($emitter) { 'NULL' }
 method op_func($emitter) { 'NULL' }
@@ -55,3 +55,4 @@ method expr_address($addr) { die('...'); }
 method expr_offset($offset) { die('...'); }
 
 # vim: expandtab shiftwidth=4 ft=perl6:
+

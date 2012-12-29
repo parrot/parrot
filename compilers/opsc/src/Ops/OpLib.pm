@@ -1,4 +1,4 @@
-#! nqp
+#! parrot-nqp
 # Copyright (C) 2009-2010, Parrot Foundation.
 
 INIT {

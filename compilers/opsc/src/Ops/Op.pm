@@ -1,4 +1,4 @@
-#! nqp
+#! parrot-nqp
 # Copyright (C) 2010, Parrot Foundation.
 
 =begin
@@ -304,7 +304,7 @@ method get_body( $trans ) {
         level => 0,
     );
 
-    #work through the op_body tree
+    # work through the op_body tree
     self.join_children(self, %context);
 }
 

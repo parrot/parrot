@@ -1,4 +1,4 @@
-#! nqp
+#! parrot-nqp
 # Copyright (C) 2009-2010, Parrot Foundation.
 
 class Ops::Compiler::Actions is HLL::Actions;
@@ -180,6 +180,7 @@ Given an argument list, returns a list of all the possible argument
 combinations.
 
 =end
+
 sub expand_args(@args) {
 
     return list() unless @args;

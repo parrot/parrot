@@ -1,4 +1,4 @@
-#! nqp
+#! parrot-nqp
 # Copyright (C) 2010-2012, Parrot Foundation.
 
 class Ops::Emitter is Hash;
@@ -16,6 +16,7 @@ method new(:$ops_file!, :$trans!, :$script!, :$file, :%flags!) {
     self<file>      := $file;
     self<flags>     := %flags;
     self<quiet>     := %flags<quiet> // 0;
+    self<debug>     := %flags<debug> // 0;
 
     # Preparing various bits.
     my $suffix := $trans.suffix();
@@ -30,6 +31,8 @@ method new(:$ops_file!, :$trans!, :$script!, :$file, :%flags!) {
     my $base_ops_stub := $base ~ '_ops' ~ $suffix;
     my $base_ops_h    := $base_ops_stub ~ '.h';
 
+    self<fh>      := NULL;
+    self<lineno>  := 0;
     self<base>    := $base;
     self<suffix>  := $suffix;
     self<bs>      := $base ~ $suffix ~ '_';
@@ -72,6 +75,21 @@ method base()       { self<base> };
 method suffix()     { self<suffix> };
 method bs()         { self<bs> };
 
+method set_fh($fh)     { self<fh> := $fh; };
+
+method count_newlines($s) {
+  my $count := 0;
+  my $index := 0;
+  while $index >= 0 {
+    $index := pir::index__issi( $s, "\n", $index );
+    if $index >= 0 {
+      $index := $index + 1;
+      $count++;
+    }
+  }
+  $count
+};
+
 method print_c_header_files() {
 
     my $fh := pir::new__Ps('FileHandle');
@@ -92,29 +110,20 @@ method print_c_header_files() {
 method emit_c_op_func_header($fh) {
 
     self._emit_guard_prefix($fh, self<func_header>);
-
     self._emit_preamble($fh);
-
     self._emit_includes($fh);
-
     # Emit runcore specific part.
     self.trans.emit_c_op_funcs_header_part($fh);
-
     self._emit_guard_suffix($fh, self<func_header>);
-
     self._emit_coda($fh);
 }
 
 method emit_c_op_enum_header($fh) {
 
     self._emit_guard_prefix($fh, self<enum_header>);
-
     self._emit_preamble($fh);
-
     self._emit_c_op_enum_header_part($fh);
-
     self._emit_guard_suffix($fh, self<enum_header>);
-
     self._emit_coda($fh);
 }
 
@@ -131,13 +140,9 @@ method print_ops_num_files() {
 method emit_c_opsenum_header($fh, $file) {
 
     self._emit_guard_prefix($fh, $file);
-
     self._emit_preamble($fh);
-
     self.emit_opsenum_h_body($fh);
-
     self._emit_guard_suffix($fh, $file);
-
     self._emit_coda($fh);
 }
 
@@ -160,32 +165,50 @@ method emit_opsenum_h_body($fh) {
 }
 
 method print_c_source_file() {
-    # Build file in memeory
+    # Build file in memory
     my $fh := pir::new__Ps('StringHandle');
     $fh.open('dummy.c', 'w');
-    self.emit_c_source_file($fh);
-    $fh.close();
+    self.set_fh($fh);
+    self.emit_c_source_file;
+    $fh.close;
 
     # ... and write it to disk
     my $final := pir::new__Ps('FileHandle');
     $final.open(self<source>, 'w') || die("Can't open filehandle");
-    $final.print($fh.readall());
-    $final.close();
+    $final.print($fh.readall);
+    $final.close;
     return self<source>;
 }
 
-method emit_c_source_file($fh) {
-    self._emit_source_preamble($fh);
+method print($s) {
+    my $lines := self.count_newlines($s);
+    self<lineno> := self<lineno> + $lines;
+    self<fh>.print($s);
+}
 
-    self.trans.emit_source_part(self, $fh);
+method _emit_c_line() {
+    if self.flags<lines> {
+        my $line := self<lineno>;
+        self.print(qq|#line $line "{self<source>}"\n|);
+    }
+}
 
-    self._emit_op_lib_descriptor($fh);
+method _emit_ops_line() {
+    if self.flags<lines> {
+        #my $opsline := self.ops_file.lineof;
+        my $opsline := 6; # from Compiler.lineof
+        self.print(qq|#line $opsline "{self<file>}"\n|);
+    }
+}
 
-    self.trans.emit_op_lookup(self, $fh);
-
-    self._emit_init_func($fh);
-    self._emit_dymanic_lib_load($fh);
-    self._emit_coda($fh);
+method emit_c_source_file() {
+    self._emit_source_preamble;
+    self.trans.emit_source_part(self);
+    self._emit_op_lib_descriptor;
+    self.trans.emit_op_lookup(self);
+    self._emit_init_func;
+    self._emit_dynamic_lib_load;
+    self._emit_coda(self<fh>);
 }
 
 method _emit_c_op_enum_header_part($fh) {
@@ -207,10 +230,13 @@ typedef enum {
 |);
 }
 
-method _emit_source_preamble($fh) {
+method _emit_source_preamble() {
 
-    self._emit_preamble($fh);
-    $fh.print(qq|
+    if self.flags<lines> {
+        self.print(qq|#line 1 "{self<source>}"|);
+    }
+    self._emit_preamble(self<fh>);
+    self.print(qq|
 #include "{self<include>}"
 #include "parrot/pbcversion.h"
 #include "pmc/pmc_parrotlibrary.h"
@@ -222,14 +248,18 @@ method _emit_source_preamble($fh) {
 extern op_lib_t {self.bs}op_lib;
 
 |);
-
-    $fh.print(self.ops_file.preamble);
+    my $preamble := self.ops_file.preamble;
+    if $preamble {
+        self._emit_ops_line;
+        self.print($preamble);
+        self._emit_c_line;
+    }
 }
 
-method _emit_op_lib_descriptor($fh) {
+method _emit_op_lib_descriptor() {
 
     my $core_type := self.trans.core_type;
-    $fh.print(q|
+    self.print(q|
 /*
 ** op lib descriptor:
 */
@@ -250,13 +280,13 @@ op_lib_t | ~ self.bs ~ q|op_lib = {| ~ qq|
 |);
 }
 
-method _emit_init_func($fh) {
+method _emit_init_func() {
 
     my $init1    := self.trans.init_func_init1;
-    my $dispatch := self.trans.init_func_disaptch;
+    my $dispatch := self.trans.init_func_dispatch;
 
     # TODO There is a bug in NQP about \{
-    $fh.print(qq|\n\n| ~ (self.flags<core> ?? "PARROT_EXPORT\n" !! '')
+    self.print(qq|\n\n| ~ (self.flags<core> ?? "PARROT_EXPORT\n" !! '')
 ~ q|op_lib_t *
 | ~ self.init_func ~ q|(PARROT_INTERP, long init) {
     /* initialize and return op_lib ptr */
@@ -278,7 +308,7 @@ method _emit_init_func($fh) {
 |);
 }
 
-method _emit_dymanic_lib_load($fh) {
+method _emit_dynamic_lib_load() {
 
     if self.flags<core> {
         return;
@@ -286,7 +316,7 @@ method _emit_dymanic_lib_load($fh) {
 
     my $load_func := join('_',
             q{Parrot}, q{lib}, self.base, q{ops} ~ self.suffix, q{load}, );
-    $fh.print(qq|
+    self.print(qq|
 /*
  * dynamic lib load function - called once
  */
@@ -384,3 +414,4 @@ method _emit_preamble($fh) {
 }
 
 # vim: expandtab shiftwidth=4 ft=perl6:
+

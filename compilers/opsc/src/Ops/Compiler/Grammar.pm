@@ -1,4 +1,4 @@
-#! nqp
+#! parrot-nqp
 # Copyright (C) 2009-2011, Parrot Foundation.
 
 INIT { pir::load_bytecode('HLL.pbc'); }

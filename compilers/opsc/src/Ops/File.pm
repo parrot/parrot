@@ -1,4 +1,4 @@
-#! nqp
+#! parrot-nqp
 # Copyright (C) 2001-2012, Parrot Foundation.
 
 # XXX Better to put this into docs/ somewhere.
@@ -185,7 +185,9 @@ method new(*@files, :$oplib, :$core!, :$nolines, :$quiet? = 0) {
     self<files>   := @files;
     self<core>    := $core;
     self<ops>     := list(); # Ops
+    self<lineno>  := 0;
     self<preamble>:= '';
+    self<preamble_line> := 0;
     self<compiler>:= pir::compreg__Ps('Ops');
     self<op_order>:= 0;
     self<quiet>   := $quiet;
@@ -210,6 +212,8 @@ method new(*@files, :$oplib, :$core!, :$nolines, :$quiet? = 0) {
 method new_str($str, :$oplib) {
     self<ops>      := list(); # Ops
     self<preamble> := '';
+    self<lineno>   := 0;
+    self<preamble_line> := 0;
 
     self<compiler> := pir::compreg__Ps('Ops');
     self<oplib>    := $oplib;
@@ -259,10 +263,12 @@ method compile_ops($str, :$experimental? = 0) {
         $_.experimental($experimental);
         $_.deprecated($_.flags<deprecated> ?? 1 !! 0);
         self<ops>.push($_);
-        #say($_.full_name ~ " is number " ~ self<op_order>);
+        self<debug> &&
+          say($_.full_name ~ " is number " ~ self<op_order>);
         self<op_order>++;
     }
 
+    # self<preamble_line> := 
     for @( $past<preamble> ) {
         self<preamble> := self<preamble> ~ $_;
     }
@@ -274,6 +280,7 @@ method get_parse_tree($str) {
     $compiler.compile($str, :target('parse'));
 }
 
+method ops_line() { self<ops_line> };
 method preamble() { self<preamble> };
 method ops()      { self<ops> };
 method oplib()    { self<oplib> };

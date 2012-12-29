@@ -1,4 +1,4 @@
-#! nqp
+#! parrot-nqp
 # Copyright (C) 2010-2012, Parrot Foundation.
 
 class Ops::Trans::C is Ops::Trans;
@@ -129,15 +129,15 @@ method getop($emitter)   { 'get_op' };
 
 method body_prelude()    { '' }
 
-method emit_source_part($emitter, $fh) {
-    self._emit_op_func_table($emitter, $fh);
-    self._emit_op_info_table($emitter, $fh);
-    self._emit_op_function_definitions($emitter, $fh);
+method emit_source_part($emitter) {
+    self._emit_op_func_table($emitter);
+    self._emit_op_info_table($emitter);
+    self._emit_op_function_definitions($emitter);
 }
 
-method _emit_op_func_table($emitter, $fh) {
+method _emit_op_func_table($emitter) {
 
-        $fh.print(qq|
+        $emitter.print(qq|
 
 INTVAL {$emitter.bs}numops{self.suffix} = {self<num_entries>};
 
@@ -149,10 +149,10 @@ static op_func{self.suffix}_t {self.op_func($emitter)}[{self<num_entries>}] = | 
 );
 
         for self<op_func_table> {
-            $fh.print($_)
+            $emitter.print($_)
         }
 
-        $fh.print(q|
+        $emitter.print(q|
   NULL /* NULL function pointer */
 };
 
@@ -160,7 +160,7 @@ static op_func{self.suffix}_t {self.op_func($emitter)}[{self<num_entries>}] = | 
 }
 
 
-method _emit_op_info_table($emitter, $fh) {
+method _emit_op_info_table($emitter) {
 
     my %names           := self<names>;
     my %arg_dir_mapping := hash(
@@ -172,7 +172,7 @@ method _emit_op_info_table($emitter, $fh) {
     #
     # Op Info Table:
     #
-    $fh.print(qq|
+    $emitter.print(qq|
 
 /*
 ** Op Info Table:
@@ -211,7 +211,7 @@ static op_info_t {self.op_info($emitter)}[{self<num_entries>}] = | ~ q|{
             ) ~ ' }'
             !! '{ 0 }';
 
-        $fh.print('  { ' ~ qq|/* $index */
+        $emitter.print('  { ' ~ qq|/* $index */
     "$name",
     "$full_name",
     "$func_name",
@@ -227,14 +227,14 @@ static op_info_t {self.op_info($emitter)}[{self<num_entries>}] = | ~ q|{
 
             $index++;
         }
-        $fh.print(q|
+        $emitter.print(q|
 };
 
 |);
 }
 
-method _emit_op_function_definitions($emitter, $fh) {
-    $fh.print(q|
+method _emit_op_function_definitions($emitter) {
+    $emitter.print(q|
 /*
 ** Op Function Definitions:
 */
@@ -242,11 +242,11 @@ method _emit_op_function_definitions($emitter, $fh) {
 |);
 
     for self<op_funcs> -> $op {
-        $fh.print($op);
+        $emitter.print($op);
     }
 }
 
-method emit_op_lookup($emitter, $fh) {
+method emit_op_lookup($emitter) {
 
     if !$emitter.flags<core> {
         return;
@@ -381,7 +381,7 @@ static void hop_deinit(PARROT_INTERP)
     hop_buckets = NULL;
 }|;
 
-    $fh.print(subst($res, /'[[' BS ']]'/, $emitter.bs, :global));
+    $emitter.print(subst($res, /'[[' BS ']]'/, $emitter.bs, :global));
 }
 
 # vim: expandtab shiftwidth=4 ft=perl6:

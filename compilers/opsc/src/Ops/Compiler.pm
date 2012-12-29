@@ -1,4 +1,4 @@
-#! nqp
+#! parrot-nqp
 # Copyright (C) 2010, Parrot Foundation.
 
 class Ops::Compiler is HLL::Compiler;

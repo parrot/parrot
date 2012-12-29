@@ -54,10 +54,11 @@ ok($header ~~ /Parrot_err_s_ic/, 'We have proper names of ops functions');
 
 $fh := pir::new__Ps('StringHandle');
 $fh.open('core.c', 'w');
-$emitter.emit_c_source_file($fh);
+$emitter.set_fh($fh);
+$emitter.emit_c_source_file;
 
 $fh.close();
-my $source := $fh.readall();
+my $source := $fh.readall;
 
 ok($source ~~ /DO \s NOT \s EDIT \s THIS \s FILE/, 'Preamble generated');
 ok($source ~~ /Parrot_pcc_get_pmc_constants/, 'defines from Trans::C generated');
@@ -121,9 +122,10 @@ sub translate_op_body($trans, $body) {
 
     my $sh := pir::new__Ps('StringHandle');
     $sh.open('your_bank_account_information.txt', 'w');
-    $emitter.emit_c_source_file($sh);
-    $sh.close();
-    $sh.readall();
+    $emitter.set_fh($sh);
+    $emitter.emit_c_source_file;
+    $sh.close;
+    $sh.readall;
 }
 
 # vim: expandtab shiftwidth=4 ft=perl6:
