@@ -34,7 +34,7 @@ use Parrot::Pmc2c::UtilFunctions qw(
     gen_multi_name
 );
 use Parrot::Pmc2c::PMC::RO ();
-use Parrot::BuildUtil 'add_to_generated';
+use Parrot::BuildUtil;
 
 sub create {
     my ( $this, $pmc_classname ) = @_;
@@ -487,7 +487,8 @@ sub generate {
         Parrot::Pmc2c::Emitter->new( $h_file );
     $self->generate_h_file;
     $h_emitter->write_to_file;
-    add_to_generated($h_file, "[devel]", "include");
+    add_to_generated($h_file, "[devel]", "include")
+      unless $self->is_dynamic and $self->name =~ /^(foo|foo2|rotest|pccmethod_test)$/;
 }
 
 =over 4
