@@ -95,7 +95,7 @@ sub runstep {
             . $conf->data->get('share_ext')
             . '"'
     );
-    $darwin_selections{dynext_libs} = $flagsref->{dynext_libs} if $flagsref->{dynext_libs};
+    $darwin_selections{dynext_dirs} = $flagsref->{dynext_dirs} if $flagsref->{dynext_dirs};
     my $darwin_hints = "Darwin hints settings:\n";
     for my $k (sort keys %darwin_selections) {
         $darwin_hints .= sprintf("  %-24s => %s\n" => (
@@ -213,7 +213,7 @@ sub _probe_for_fink {
             linkflags => "-L$fink_lib_dir",
             ldflags   => "-L$fink_lib_dir",
             ccflags   => "-isystem $fink_include_dir",
-            dynext_libs => $fink_lib_dir."/",
+            dynext_dirs => $fink_lib_dir."/",
         );
         return \%addl_flags;
     }
@@ -237,7 +237,7 @@ sub _probe_for_macports {
             linkflags => "-L$ports_lib_dir",
             ldflags   => "-L$ports_lib_dir",
             ccflags   => "-isystem $ports_include_dir",
-            dynext_libs => $ports_lib_dir."/",
+            dynext_dirs => $ports_lib_dir."/",
         );
         return \%addl_flags;
     }

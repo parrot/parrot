@@ -31,14 +31,14 @@ dynext:
     dynext/
     $ENV{PARROT_DYNEXT}
     $prefix/parrot/$ver/dynext/
-    $Config{dynext_libs}
+    $Config{dynext_dirs}
 
   if not installed:
 
     dynext/
     $ENV{PARROT_DYNEXT}
     $build_dir/runtime/parrot/dynext
-    $Config{dynext_libs}
+    $Config{dynext_dirs}
 
 library (similar for include):
   if parrot is installed:
@@ -94,7 +94,7 @@ my $code = <<"CODE";
 CODE
 
 my $dynext = Parrot::Test::_pir_stdin_output_slurp('', $code);
-my $dynext_libs = $PConfig{dynext_libs};
+my $dynext_dirs = $PConfig{dynext_dirs};
 my $expected =
 "dynext/
 /dynenvdir1/
@@ -102,32 +102,32 @@ my $expected =
 $builddir/runtime/parrot/dynext/
 $versionlib/dynext/
 ";
-$expected .= join("\n", split /$sep/, $dynext_libs)."\n" if $dynext_libs;
+$expected .= join("\n", split /$sep/, $dynext_dirs)."\n" if $dynext_dirs;
 $expected .= "./\n" if $^O eq 'MSWin32';
 is ($dynext, $expected, "dynext (multi ENV)");
 
 $ENV{PARROT_DYNEXT}  = "/dynenvdir";
 $dynext = Parrot::Test::_pir_stdin_output_slurp('', $code);
-$dynext_libs = $PConfig{dynext_libs};
+$dynext_dirs = $PConfig{dynext_dirs};
 $expected =
 "dynext/
 /dynenvdir/
 $builddir/runtime/parrot/dynext/
 $versionlib/dynext/
 ";
-$expected .= join("\n", split /$sep/, $dynext_libs)."\n" if $dynext_libs;
+$expected .= join("\n", split /$sep/, $dynext_dirs)."\n" if $dynext_dirs;
 $expected .= "./\n" if $^O eq 'MSWin32';
 is ($dynext, $expected, "dynext (single ENV)");
 
 undef $ENV{PARROT_DYNEXT};
 $dynext = Parrot::Test::_pir_stdin_output_slurp('', $code);
-$dynext_libs = $PConfig{dynext_libs};
+$dynext_dirs = $PConfig{dynext_dirs};
 $expected =
 "dynext/
 $builddir/runtime/parrot/dynext/
 $versionlib/dynext/
 ";
-$expected .= join("\n", split /$sep/, $dynext_libs)."\n" if $dynext_libs;
+$expected .= join("\n", split /$sep/, $dynext_dirs)."\n" if $dynext_dirs;
 $expected .= "./\n" if $^O eq 'MSWin32';
 is ($dynext, $expected, "dynext (no ENV)");
 

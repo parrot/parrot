@@ -22,10 +22,10 @@ sub runstep {
     }
 
     my $ldflags = $conf->data->get('ldflags');
-    my $dynext_libs;
+    my $dynext_dirs;
     if ( $ldflags !~ m|-L/usr/local/lib\b| ) {
         $ldflags .= ' -L/usr/local/lib';
-        $dynext_libs = '/usr/local/lib/';
+        $dynext_dirs = '/usr/local/lib/';
     }
 
     $conf->data->set(
@@ -40,7 +40,7 @@ sub runstep {
         libparrot_shared_alias => "libparrot$share_ext",
         libparrot_soname       => "-Wl,-soname=libparrot$share_ext.$version",
     );
-    $conf->data->set( dynext_libs => $dynext_libs ) if $dynext_libs;
+    $conf->data->set( dynext_dirs => $dynext_dirs ) if $dynext_dirs;
 
     if ( ( split( m/-/, $conf->data->get('archname_provisional'), 2 ) )[0] eq 'powerpc' ) {
         $conf->data->set( as => 'as -mregnames' );

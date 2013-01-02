@@ -190,10 +190,10 @@ parrot_init_library_paths(PARROT_INTERP)
     entry = CONST_STRING(interp, "dynext/");
     VTABLE_push_string(interp, paths, entry);
     { /* EXPERIMENTAL: add dynext path from environment */
-        STRING *dynext_libs = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_DYNEXT"));
+        STRING *dynext_dirs = Parrot_getenv(interp, CONST_STRING(interp, "PARROT_DYNEXT"));
         Parrot_warn_experimental(interp, "PARROT_DYNEXT environment variable is experimental");
-        if (!STRING_IS_NULL(dynext_libs) && !STRING_IS_EMPTY(dynext_libs)) {
-            add_env_paths(interp, paths, dynext_libs);
+        if (!STRING_IS_NULL(dynext_dirs) && !STRING_IS_EMPTY(dynext_dirs)) {
+            add_env_paths(interp, paths, dynext_dirs);
         }
     }
 
@@ -234,7 +234,7 @@ Parrot_lib_update_paths_from_config_hash(PARROT_INTERP)
     STRING * versionlib = NULL;
     STRING * entry = NULL;
     STRING * builddir = NULL;
-    STRING * dynext_libs = NULL;
+    STRING * dynext_dirs = NULL;
     PMC * const lib_paths =
         VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_LIB_PATHS);
     PMC * const config_hash =
@@ -246,12 +246,12 @@ Parrot_lib_update_paths_from_config_hash(PARROT_INTERP)
         STRING * const verkey      = CONST_STRING(interp, "versiondir");
         STRING * const builddirkey = CONST_STRING(interp, "build_dir");
         STRING * const installed   = CONST_STRING(interp, "installed");
-        STRING * const dynextkey   = CONST_STRING(interp, "dynext_libs");
+        STRING * const dynextkey   = CONST_STRING(interp, "dynext_dirs");
 
         versionlib = VTABLE_get_string_keyed_str(interp, config_hash, libkey);
         entry      = VTABLE_get_string_keyed_str(interp, config_hash, verkey);
         versionlib = Parrot_str_concat(interp, versionlib, entry);
-        dynext_libs = VTABLE_get_string_keyed_str(interp, config_hash, dynextkey);
+        dynext_dirs = VTABLE_get_string_keyed_str(interp, config_hash, dynextkey);
 
         if (!VTABLE_get_integer_keyed_str(interp, config_hash, installed))
             builddir = VTABLE_get_string_keyed_str(interp,
@@ -309,8 +309,8 @@ Parrot_lib_update_paths_from_config_hash(PARROT_INTERP)
     entry = CONST_STRING(interp, "./");
     VTABLE_push_string(interp, paths, entry);
 #endif
-    if (!STRING_IS_NULL(dynext_libs) && !STRING_IS_EMPTY(dynext_libs)) {
-        add_env_paths(interp, paths, dynext_libs);
+    if (!STRING_IS_NULL(dynext_dirs) && !STRING_IS_EMPTY(dynext_dirs)) {
+        add_env_paths(interp, paths, dynext_dirs);
     }
 }
 
