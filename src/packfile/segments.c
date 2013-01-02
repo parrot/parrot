@@ -1914,13 +1914,13 @@ byte_code_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opco
                                                 NULL);
                 typedef op_lib_t *(*oplib_init_t)(PARROT_INTERP, long init);
                 void *oplib_init;
-                oplib_init_t oplib_init_f;
+                oplib_init_t fn;
                 if (!VTABLE_get_bool(interp, lib_pmc))
                     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
                         "Could not load oplib `%s'", lib_name);
                 GETATTR_ParrotLibrary_oplib_init(interp, lib_pmc, oplib_init);
-                oplib_init_f = (oplib_init_t)D2FPTR(oplib_init);
-                entry->lib = oplib_init_f(interp, 1);
+                fn = (oplib_init_t)D2FPTR(oplib_init);
+                entry->lib = fn(interp, 1);
             }
 
 
