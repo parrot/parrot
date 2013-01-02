@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2011, Parrot Foundation.
+# Copyright (C) 2005-2013, Parrot Foundation.
 
 package init::hints::darwin;
 
@@ -24,7 +24,7 @@ sub runstep {
     my $share_ext = $conf->option_or_data('share_ext');
     my $version   = $conf->option_or_data('VERSION');
 
-    # The hash referenced by $flagsref is the list of options that have -arch
+    # The hash referenced by $flags is the list of options that have -arch
     # flags added to them implicitly through config/init/defaults.pm when
     # using Apple's Perl 5.8 build to run Configure.pl (it's a
     # multi-architecture build).  This doesn't play nice with getting parrot
@@ -32,7 +32,7 @@ sub runstep {
     # friends.  So, it's time to remove all -arch flags set in $conf->data and
     # force a single, native architecture to being the default build.
 
-    my $flagsref = _strip_arch_flags($conf);
+    my $flags = _strip_arch_flags($conf);
 
     # And now, after possibly losing a few undesired compiler and linker
     # flags, on to the main Darwin config.
@@ -42,22 +42,21 @@ sub runstep {
     my $deploy_target = _set_deployment_environment();
 
     my $lib_dir = $conf->data->get('build_dir') . "/blib/lib";
-    $flagsref->{ldflags} .= ' -L"' . $lib_dir . '"';
+    $flags->{ldflags} .= ' -L"' . $lib_dir . '"';
 
-    if ($deploy_target =~ /^10\.(5|6|7)$/) {
-        $flagsref->{ccflags} .= ' -pipe -fno-common ';
+    $flags->{ccflags} .= ' -pipe -fno-common ';
+    if ($deploy_target !~ /^10\.(5|6|7)$/ and !$conf->options->get('cc')) {
+        # Only apple cc understands -Wno-long-double, macports gcc not
+        $flags->{ccflags} .= '-Wno-long-double ';
     }
-    else {
-        $flagsref->{ccflags} .= ' -pipe -fno-common -Wno-long-double ';
-    }
 
-    $flagsref->{linkflags} .= " -undefined dynamic_lookup";
+    $flags->{linkflags} .= " -undefined dynamic_lookup";
 
-    _probe_for_libraries($conf, $flagsref, 'fink');
-    _probe_for_libraries($conf, $flagsref, 'macports');
+    _probe_for_libraries($conf, $flags, 'fink');
+    _probe_for_libraries($conf, $flags, 'macports');
 
-    for my $flag ( keys %$flagsref ) {
-        $flagsref->{$flag} =~ s/^\s+//;
+    for my $flag ( keys %$flags ) {
+        $flags->{$flag} =~ s/^\s+//;
     }
 
     my $osvers = `/usr/sbin/sysctl -n kern.osrelease`;
@@ -67,14 +66,14 @@ sub runstep {
         darwin              => 1,
         osx_version         => $deploy_target,
         osvers              => $osvers,
-        ccflags             => $flagsref->{ccflags},
-        ldflags             => $flagsref->{ldflags},
+        ccflags             => $flags->{ccflags},
+        ldflags             => $flags->{ldflags},
         ccwarn              => "-Wno-shadow",
         libs                => $libs,
         share_ext           => '.dylib',
         load_ext            => '.bundle',
         link                => 'c++',
-        linkflags           => $flagsref->{linkflags},
+        linkflags           => $flags->{linkflags},
         ld                  => 'c++',
         ld_share_flags      => '-dynamiclib -undefined dynamic_lookup',
         ld_load_flags       => '-undefined dynamic_lookup -bundle',
@@ -117,38 +116,38 @@ sub _precheck {
 }
 
 sub _strip_arch_flags_engine {
-    my ($arches, $stored, $flagsref, $flag) = @_;
+    my ($arches, $stored, $flags, $flag) = @_;
     for my $arch ( @{ $arches } ) {
         $stored =~ s/-arch\s+$arch//g;
         $stored =~ s/\s+/ /g;
-        $flagsref->{$flag} = $stored;
+        $flags->{$flag} = $stored;
     }
-    return $flagsref;
+    return $flags;
 }
 
 sub _postcheck {
-    my ($conf, $flagsref, $flag) = @_;
-    my $f = $flagsref->{$flag} || '(nil)';
+    my ($conf, $flags, $flag) = @_;
+    my $f = $flags->{$flag} || '(nil)';
     $conf->debug("Post-check: $f\n");
 }
 
 sub _strip_arch_flags {
     my ($conf) = @_;
-    my $flagsref  = { map { $_ => '' } @{ $defaults{problem_flags} } };
+    my $flags  = { map { $_ => '' } @{ $defaults{problem_flags} } };
 
     $conf->debug("\nStripping -arch flags due to Apple multi-architecture build problems:\n");
-    for my $flag ( keys %{ $flagsref } ) {
+    for my $flag ( keys %{ $flags } ) {
         my $stored = $conf->data->get($flag) || '';
 
         _precheck($conf, $flag, $stored);
 
-        $flagsref = _strip_arch_flags_engine(
-            $defaults{architectures}, $stored, $flagsref, $flag
+        $flags = _strip_arch_flags_engine(
+            $defaults{architectures}, $stored, $flags, $flag
         );
 
-        _postcheck($conf, $flagsref, $flag);
+        _postcheck($conf, $flags, $flag);
     }
-    return $flagsref;
+    return $flags;
 }
 
 sub _strip_ldl_as_needed {
@@ -242,7 +241,7 @@ sub _probe_for_macports {
 }
 
 sub _probe_for_libraries {
-    my ($conf, $flagsref, $library) = @_;
+    my ($conf, $flags, $library) = @_;
     my $no_library_option = "darwin_no_$library";
     my $title = ucfirst(lc($library));
     unless ($conf->options->get( $no_library_option ) ) {
@@ -253,22 +252,22 @@ sub _probe_for_libraries {
         if ($library eq 'macports') {
             $addl_flags_ref = _probe_for_macports($conf);
         }
-        my $rv = _add_to_flags( $conf, $addl_flags_ref, $flagsref, $title );
+        my $rv = _add_to_flags( $conf, $addl_flags_ref, $flags, $title );
         return $rv;
     }
     return;
 }
 
 sub _add_to_flags {
-    my ( $conf, $addl_flags_ref, $flagsref, $title ) = @_;
+    my ( $conf, $addl_flags_ref, $flags, $title ) = @_;
     if ( defined $addl_flags_ref ) {
         foreach my $addl ( keys %{ $addl_flags_ref } ) {
             my %seen;
-            if ( defined $flagsref->{$addl} ) {
-                my @elements = split /\s+/, $flagsref->{$addl};
+            if ( defined $flags->{$addl} ) {
+                my @elements = split /\s+/, $flags->{$addl};
                 %seen = map {$_, 1} @elements;
             }
-            $flagsref->{$addl} .= " $addl_flags_ref->{$addl}"
+            $flags->{$addl} .= " $addl_flags_ref->{$addl}"
                 unless $seen{ $addl_flags_ref->{$addl} };
         }
         $conf->debug("Probe for $title successful\n");
