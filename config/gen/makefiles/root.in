@@ -3216,9 +3216,10 @@ src/glut_callbacks$(O): \
 
 src/glut_nci_thunks.c: $(NCI_THUNK_GEN)
 	$(NCI_THUNK_GEN) \
+		--dynext \
 		--loader-name=Parrot_glut_nci_loader \
-		--loader-storage-class=PARROT_DYNEXT_EXPORT \
 		--output=src/glut_nci_thunks.c \
+		--no-warn-dups \
 		< src/glut_nci_thunks.nci
 
 src/glut_nci_thunks$(O) : $(PARROT_H_HEADERS) \

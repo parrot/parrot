@@ -70,9 +70,14 @@ F<docs/pdds/pdd16_native_call.pod>.
   all:
     $S0 = 'get_head'(sigs)
     say $S0
-    $S0 = 'get_loader_decl'(sigs)
-    print $S0
-    say ";"
+    .local string core
+    core = 'read_from_opts'('core')
+    unless core goto end_core
+        # core decl already in include/parrot/nci.h
+        $S0 = 'get_loader_decl'(sigs)
+        print $S0
+        say ";"
+    end_core:
     $S0 = 'end_head'(sigs)
     say $S0
     $S0 = 'get_thunks'(sigs)
@@ -420,8 +425,7 @@ LOADER
 
     $S0 = 'get_dynext_loader_decl'(sigs)
     $S1 = 'get_loader_body'(sigs)
-    $S2 = 'sprintf'(<<'LOADER', $S0, $S0, $S1)
-%s;
+    $S2 = 'sprintf'(<<'LOADER', $S0, $S1)
 %s {
 %s
 }
