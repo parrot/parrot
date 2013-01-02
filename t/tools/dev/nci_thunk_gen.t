@@ -29,7 +29,7 @@ t/tools/dev/nci_thunk_gen.t - test bugs in tools/dev/nci_thunk_gen.pir
 
 =head1 SYNOPSIS
 
-    % prove t/tools/dev/nci_thunk_gen.t 
+    % prove t/tools/dev/nci_thunk_gen.t
 
 =head1 DESCRIPTION
 

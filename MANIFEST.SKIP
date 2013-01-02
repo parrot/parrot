@@ -670,8 +670,6 @@
 ^/src/exec_dep\.h/
 ^/src/extend_vtable\.c$
 ^/src/extend_vtable\.c/
-^/src/extra_nci_thunks\.c$
-^/src/extra_nci_thunks\.c/
 ^/src/fingerprint\.c$
 ^/src/fingerprint\.c/
 ^/src/gc/.*\.gcda$
