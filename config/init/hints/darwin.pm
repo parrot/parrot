@@ -95,7 +95,7 @@ sub runstep {
             . $conf->data->get('share_ext')
             . '"'
     );
-    $darwin_selections{dynext_dirs} = $flagsref->{dynext_dirs} if $flagsref->{dynext_dirs};
+    $darwin_selections{dynext_dirs} = $flags->{dynext_dirs} if $flags->{dynext_dirs};
     my $darwin_hints = "Darwin hints settings:\n";
     for my $k (sort keys %darwin_selections) {
         $darwin_hints .= sprintf("  %-24s => %s\n" => (
