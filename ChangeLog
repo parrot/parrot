@@ -11,6 +11,8 @@
         + Install libraries tgc.pbc, NCI/Utils.pbc, OpenGL/Math.pbc, PCT/Dumper.pbc,
           postgres.pbc, ProfTest.pbc and ProfTest/*pbc, String/Utils.pbc, URI/Escape.pbc,
           YAML/Dumper/Base.pbc, YAML/Dumper/Default.pbc
+        + New experimental PARROT_DYNEXT environment variable
+        + New experimental dynext_libs config entry (same as PARROT_DYNEXT)
     - Build
         + Generate MANIFEST.generated, cleanup MANIFEST,
           removed MANIFEST_configure.generated, add installation of forgotten files

@@ -8,7 +8,7 @@ use lib qw(lib);
 use Test::More;
 use Parrot::Config;
 use Parrot::Test;
-plan tests => 5;
+plan tests => 7;
 
 =head1 NAME
 
@@ -28,15 +28,17 @@ Check for proper libpath order.
 dynext:
   if parrot is installed:
 
-    $ENV{PARROT_LIBRARY}
     dynext/
+    $ENV{PARROT_DYNEXT}
     $prefix/parrot/$ver/dynext/
+    $Config{dynext_libs}
 
   if not installed:
 
-    $ENV{PARROT_LIBRARY}
     dynext/
+    $ENV{PARROT_DYNEXT}
     $build_dir/runtime/parrot/dynext
+    $Config{dynext_libs}
 
 library (similar for include):
   if parrot is installed:
@@ -56,12 +58,14 @@ LANG does not observe $ENV{PARROT_LIBRARY}
 
 no duplicates
 
-. at end (not for DYNEXT)
+. at the end, for DYNEXT only on windows
 
 =cut
 
+my $sep = $^O eq 'MSWin32' ? ';' : ':';
 local $ENV{PARROT_LIBRARY} = 'libenvdir';
 local $ENV{PARROT_INCLUDE} = 'incenvdir';
+local $ENV{PARROT_DYNEXT}  = "/dynenvdir1$sep/dynenvdir2";
 
 my ($builddir, $versiondir, $libdir, $prefix) = @PConfig{qw(build_dir versiondir libdir)};
 my $versionlib = $libdir . $versiondir;
@@ -90,12 +94,42 @@ my $code = <<"CODE";
 CODE
 
 my $dynext = Parrot::Test::_pir_stdin_output_slurp('', $code);
+my $dynext_libs = $PConfig{dynext_libs};
 my $expected =
+"dynext/
+/dynenvdir1/
+/dynenvdir2/
+$builddir/runtime/parrot/dynext/
+$versionlib/dynext/
+";
+$expected .= join("\n", split /$sep/, $dynext_libs)."\n" if $dynext_libs;
+$expected .= "./\n" if $^O eq 'MSWin32';
+is ($dynext, $expected, "dynext (multi ENV)");
+
+$ENV{PARROT_DYNEXT}  = "/dynenvdir";
+$dynext = Parrot::Test::_pir_stdin_output_slurp('', $code);
+$dynext_libs = $PConfig{dynext_libs};
+$expected =
+"dynext/
+/dynenvdir/
+$builddir/runtime/parrot/dynext/
+$versionlib/dynext/
+";
+$expected .= join("\n", split /$sep/, $dynext_libs)."\n" if $dynext_libs;
+$expected .= "./\n" if $^O eq 'MSWin32';
+is ($dynext, $expected, "dynext (single ENV)");
+
+undef $ENV{PARROT_DYNEXT};
+$dynext = Parrot::Test::_pir_stdin_output_slurp('', $code);
+$dynext_libs = $PConfig{dynext_libs};
+$expected =
 "dynext/
 $builddir/runtime/parrot/dynext/
 $versionlib/dynext/
 ";
-is ($dynext, $expected, "dynext");
+$expected .= join("\n", split /$sep/, $dynext_libs)."\n" if $dynext_libs;
+$expected .= "./\n" if $^O eq 'MSWin32';
+is ($dynext, $expected, "dynext (no ENV)");
 
 my $library = $code;
 $library =~ s/DYNEXT/LIBRARY/;
@@ -131,7 +165,7 @@ $versionlib/languages/
 is ($lang, $expected, "lang");
 
 
-pir_output_is( <<'CODE', <<'OUTPUT', ". at end of dynext search path" );
+pir_output_is( <<'CODE', <<'OUTPUT', ". at end of library search path" );
 .sub main :main
   load_bytecode 't/pir/testlib/loadtest.pbc'
 .end
