@@ -1,6 +1,6 @@
 /*
 
-# Copyright (C) 2001-2003, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -12,18 +12,18 @@ Compile with:
 
 *NIX:
 
-    $ g++ -fPIC -I$QTDIR/include -I$QTDIR/include/QtGui -L$QTDIR -c PQt.cpp
+    $ g++ -fPIC -I$QTDIR/include -I$QTDIR/include/QtGui -L$QTDIR examples/nci/PQt.cpp -shared -o runtime/parrot/dynext/libPQt.so $QTDIR/lib/libQtCore4.so $QTDIR/lib/libQtGui4.so
 
-    $ gcc -shared -o libPQt.so PQt.o $QTDIR/lib/libQtCore4.so $QTDIR/lib/libQtGui4.so
+Debian:
+
+    $ apt-get install libqt4-dev
+    $ g++ -shared -fPIC -o runtime/parrot/dynext/libPQt.so examples/nci/PQt.cpp -I/usr/include/qt4/QtGui -I/usr/include/qt4 -lQtGui -lQtCore
 
 Windows:
 
     > "%VS90COMNTOOLS%\vsvars32.bat"
-
     > set INCLUDE=%QTDIR%\include;%QTDIR%\include\QtGui;%INCLUDE%
-    
     > set LIB=%QTDIR%\lib;%LIB%
-
     > cl /LD PQt.cpp QtGui4.lib QtCore4.lib
 
 Or something like that...

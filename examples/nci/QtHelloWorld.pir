@@ -45,7 +45,7 @@ rebuilding Parrot.
     .local pmc QLabel_new, pLabel
     .local string caption
     caption = "Hello, world!"
-    dlfunc QLabel_new, libpqt, "QLabel_new", "pt"
+    dlfunc QLabel_new, libpqt, "QLabel_new", "pS"
     pLabel = QLabel_new(caption)
 
     .local pmc QLabel_resize
@@ -64,7 +64,8 @@ rebuilding Parrot.
 
 =head1 SEE ALSO
 
-F<examples/nci/PQt.C>, F<docs/pdds/pdd03_calling_conventions.pod>.
+F<examples/nci/PQt.cpp>, F<docs/pdds/pdd03_calling_conventions.pod>,
+F<docs/pdds/draft/pdd16_native_call.pod>.
 
 =cut
 
