@@ -1,4 +1,4 @@
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -29,7 +29,7 @@ F<docs/pdds/pdd16_native_call.pod>.
 .include 'hash_key_type.pasm'
 .include 'datatypes.pasm'
 
-.macro_const VERSION 0.01
+.macro_const VERSION 0.02
 
 .macro_const SIG_TABLE_GLOBAL_NAME  'signature_table'
 .macro_const OPTS_GLOBAL_NAME       'options'
@@ -70,6 +70,16 @@ F<docs/pdds/pdd16_native_call.pod>.
   all:
     $S0 = 'get_head'(sigs)
     say $S0
+    .local string core
+    core = 'read_from_opts'('core')
+    unless core goto end_core
+        # core decl already in include/parrot/nci.h
+        $S0 = 'get_loader_decl'(sigs)
+        print $S0
+        say ";"
+    end_core:
+    $S0 = 'end_head'(sigs)
+    say $S0
     $S0 = 'get_thunks'(sigs)
     say $S0
     $S0 = 'get_loader'(sigs)
@@ -80,6 +90,11 @@ F<docs/pdds/pdd16_native_call.pod>.
 
   all_dynext:
     $S0 = 'get_head'(sigs)
+    say $S0
+    $S0 = 'get_dynext_loader_decl'(sigs)
+    print $S0
+    say ";"
+    $S0 = 'end_head'(sigs)
     say $S0
     $S0 = 'get_thunks'(sigs)
     say $S0
@@ -326,14 +341,10 @@ USAGE
  */
 
 /* %s
- *  Copyright (C) 2010, Parrot Foundation.
+ *  Copyright (C) 2010-2012, Parrot Foundation.
  *  Overview:
- *     Native Call Interface routines. The code needed to build a
- *     parrot to C call frame is in here
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
+ *     Native Call Interface routines.
+ *     Code to call C from parrot.
  */
 
 %s
@@ -350,10 +361,18 @@ USAGE
 #endif
 
 /* HEADERIZER HFILE: none */
+HEAD
+    .return (head)
+.end
+
+.sub 'end_head'
+    .param pmc ignored :slurpy
+
+    .local string head
+    head = 'sprintf'(<<'HEAD')
 /* HEADERIZER STOP */
 
-/* All our static functions that call in various ways. Yes, terribly
-   hackish, but that is just fine */
+/* All our static functions that call in various ways. */
 
 HEAD
     .return (head)
@@ -397,10 +416,7 @@ LOADER
     .param pmc sigs
     $S0 = 'read_from_opts'(.LOADER_STORAGE_CLASS)
     $S1 = 'read_from_opts'(.LOADER_NAME)
-    $S2 = 'sprintf'(<<'DECL', $S0, $S1)
-%s void
-%s(PARROT_INTERP)
-DECL
+    $S2 = 'sprintf'("%s void\n%s(PARROT_INTERP)", $S0, $S1)
     .return ($S2)
 .end
 
@@ -409,8 +425,7 @@ DECL
 
     $S0 = 'get_dynext_loader_decl'(sigs)
     $S1 = 'get_loader_body'(sigs)
-    $S2 = 'sprintf'(<<'LOADER', $S0, $S0, $S1)
-%s;
+    $S2 = 'sprintf'(<<'LOADER', $S0, $S1)
 %s {
 %s
 }
@@ -423,10 +438,7 @@ LOADER
 
     $S0 = 'read_from_opts'(.LOADER_STORAGE_CLASS)
     $S1 = 'read_from_opts'(.LOADER_NAME)
-    $S2 = 'sprintf'(<<'DECL', $S0, $S1)
-%s void
-%s(PARROT_INTERP, SHIM(PMC *lib))
-DECL
+    $S2 = 'sprintf'("%s void\n%s(PARROT_INTERP, SHIM(PMC *lib))", $S0, $S1)
     .return ($S2)
 .end
 
@@ -632,6 +644,14 @@ RET
     end_loop:
     call_params = join ', ', $P0
 
+    .local string pcc_sig
+    $P0     = 'map_from_sig_table'('sig_char', sig :flat)
+    $S0     = shift $P0
+    pcc_sig = join "", $P0
+    if pcc_sig != "v" goto end_call_params_void
+        call_params = ""
+    end_call_params_void:
+
     .local string call
     call = 'sprintf'(<<'TEMPLATE', return_assign, call_params)
     GETATTR_NCI_orig_func(interp, nci, orig_func);
@@ -644,10 +664,13 @@ TEMPLATE
 .sub 'sig_to_preamble'
     .param pmc sig
 
+    .local string preamble
+    preamble = ""
     .local string pcc_sig
     $P0     = 'map_from_sig_table'('sig_char', sig :flat)
     $S0     = shift $P0
     pcc_sig = join "", $P0
+    if pcc_sig == "v" goto return
 
     .local string fill_params
     $I0 = elements sig
@@ -662,7 +685,6 @@ TEMPLATE
     'fill_tmpls_ascending_ints'($P0, 1)
     extra_preamble = join ";\n    ", $P0
 
-    .local string preamble
     preamble = 'sprintf'(<<'TEMPLATE', pcc_sig, fill_params, extra_preamble)
     Parrot_pcc_fill_params_from_c_args(interp, call_object, "%s"%s);
     %s;

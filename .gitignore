@@ -283,7 +283,6 @@ cachegrind.out.*
 /src/exec_dep.c
 /src/exec_dep.h
 /src/extend_vtable.c
-/src/extra_nci_thunks.c
 /src/fingerprint.c
 /src/glut_callbacks.c
 /src/glut_nci_thunks.c

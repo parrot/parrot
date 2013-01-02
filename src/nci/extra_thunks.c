@@ -8,14 +8,10 @@
  */
 
 /* src/nci/extra_thunks.c
- *  Copyright (C) 2010, Parrot Foundation.
+ *  Copyright (C) 2010-2012, Parrot Foundation.
  *  Overview:
- *     Native Call Interface routines. The code needed to build a
- *     parrot to C call frame is in here
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
+ *     Native Call Interface routines.
+ *     Code to call C from parrot.
  */
 
 
@@ -32,10 +28,12 @@
 #endif
 
 /* HEADERIZER HFILE: none */
+
+ void
+Parrot_nci_load_extra_thunks(PARROT_INTERP);
 /* HEADERIZER STOP */
 
-/* All our static functions that call in various ways. Yes, terribly
-   hackish, but that is just fine */
+/* All our static functions that call in various ways. */
 
 
 static void
@@ -3293,10 +3291,30 @@ pcf_STRING_ptr_ptr_INTVAL(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     t_0 = v_0;
     Parrot_pcc_set_call_from_c_args(interp, call_object, "S", t_0);
 }
+static void
+pcf_ptr_void(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+{
+    typedef void *(* func_t)(void);
+    func_t fn_pointer;
+    void *orig_func;
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    PMC  * t_0; void * v_0;
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
+    fn_pointer = (func_t)D2FPTR(orig_func);
+    v_0 =  (*fn_pointer)();
+    if (v_0 != NULL) {
+          t_0 = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+          VTABLE_set_pointer(interp, t_0, v_0);
+       }
+       else {
+           t_0 = PMCNULL;
+       };
+    Parrot_pcc_set_call_from_c_args(interp, call_object, "P", t_0);
+}
 
  void
-Parrot_nci_load_extra_thunks(PARROT_INTERP)
- {
+Parrot_nci_load_extra_thunks(PARROT_INTERP) {
     PMC * const iglobals = interp->iglobals;
     PMC *nci_funcs;
     PMC *temp_pmc;
@@ -4935,6 +4953,18 @@ Parrot_nci_load_extra_thunks(PARROT_INTERP)
             VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
         temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
         VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_STRING_ptr_ptr_INTVAL);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
+
+    {
+        const int n = 2;
+        static const int sig[] = { 29, 28, };
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_ptr_void);
         VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
     }
 

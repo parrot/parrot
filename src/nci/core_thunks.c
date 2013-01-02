@@ -8,14 +8,10 @@
  */
 
 /* src/nci/core_thunks.c
- *  Copyright (C) 2010, Parrot Foundation.
+ *  Copyright (C) 2010-2012, Parrot Foundation.
  *  Overview:
- *     Native Call Interface routines. The code needed to build a
- *     parrot to C call frame is in here
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
+ *     Native Call Interface routines.
+ *     Code to call C from parrot.
  */
 
 
@@ -32,18 +28,20 @@
 #endif
 
 /* HEADERIZER HFILE: none */
+
+ void
+Parrot_nci_load_core_thunks(PARROT_INTERP);
 /* HEADERIZER STOP */
 
-/* All our static functions that call in various ways. Yes, terribly
-   hackish, but that is just fine */
+/* All our static functions that call in various ways. */
 
 
 
  void
-Parrot_nci_load_core_thunks(PARROT_INTERP)
- {
+Parrot_nci_load_core_thunks(PARROT_INTERP) {
     PMC * const iglobals = interp->iglobals;
     PMC *nci_funcs;
+    PMC *temp_pmc;
 
     PARROT_ASSERT(!(PMC_IS_NULL(iglobals)));
 

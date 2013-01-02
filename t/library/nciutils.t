@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -11,7 +11,7 @@ t/library/nciutils.t -- Tests for NCI::Utils
 
 =head1 DESCRIPTION
 
-Testing Perl 6 objects.
+Testing NCI::Utils calls to libc and libnci_test.
 
 =cut
 
