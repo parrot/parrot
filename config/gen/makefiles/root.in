@@ -3231,11 +3231,13 @@ $(LIBGLUTCB_SO): $(LIBPARROT) src/glut_callbacks$(O) src/glut_nci_thunks$(O)
 	  $(LINKARGS) @opengl_lib@
 	$(ADDGENERATED) "$@" "[library]"
 
-src/extra_nci_thunks.c : src/nci/extra_thunks.nci $(NCI_THUNK_GEN)
-	$(NCI_THUNK_GEN) --dynext --no-warn-dups \
-		--output=src/extra_nci_thunks.c < src/nci/extra_thunks.nci
+src/nci/extra_thunks.c : src/nci/extra_thunks.nci $(DEV_TOOLS_DIR)/nci_thunk_gen.pir
+	$(PERL) $(DEV_TOOLS_DIR)/mk_nci_thunks.pl
 
-bootstrap-nci : src/nci/core_thunks.nci src/nci/extra_thunks.nci $(NCI_THUNK_GEN)
+src/nci/core_thunks.c : src/nci/core_thunks.nci $(DEV_TOOLS_DIR)/nci_thunk_gen.pir
+	$(PERL) $(DEV_TOOLS_DIR)/mk_nci_thunks.pl
+
+bootstrap-nci : src/nci/core_thunks.nci src/nci/extra_thunks.nci
 	$(PERL) $(DEV_TOOLS_DIR)/mk_nci_thunks.pl
 
 ## SUFFIX OVERRIDE
