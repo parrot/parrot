@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2013, Parrot Foundation.
 
 =head1 NAME
 
@@ -59,7 +59,6 @@ sub runstep {
                 );
                 $conf->debug(" (\U$suffix) ");
                 $conf->data->add( ' ', TEMP_atomic_o => 'src/atomic/sparc_v9.o' );
-                # $conf->append_configure_log($f);
                 $conf->add_to_generated( $f, "[]" );
             }
         }
