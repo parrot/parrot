@@ -30,7 +30,7 @@ dynext:
 
     dynext/
     $ENV{PARROT_DYNEXT}
-    $prefix/parrot/$ver/dynext/
+    $libdir/$versiondir/dynext/
     $Config{dynext_dirs}
 
   if not installed:
@@ -44,14 +44,14 @@ library (similar for include):
   if parrot is installed:
 
     $ENV{PARROT_LIBRARY}
-    $prefix/parrot/$ver/library/
+    $libdir/$versiondir/library/
     ./
 
   if not installed:
 
     $ENV{PARROT_LIBRARY}
     $build_dir/runtime/parrot/library/
-    $prefix/parrot/$ver/library/
+    $libdir/$versiondir/library/
     ./
 
 LANG does not observe $ENV{PARROT_LIBRARY}
