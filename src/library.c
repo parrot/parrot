@@ -543,8 +543,9 @@ add_env_paths(PARROT_INTERP, ARGIN(PMC *libpath),
                                    path_guarantee_trailing_separator(interp, entry));
         }
         else {
+            STRING * env = Parrot_str_clone(interp, envstr);
             VTABLE_push_string(interp, libpath,
-                               path_guarantee_trailing_separator(interp, envstr));
+                               path_guarantee_trailing_separator(interp, env));
         }
     }
 }
