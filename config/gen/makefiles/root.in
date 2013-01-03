@@ -259,7 +259,7 @@ GEN_SOURCES = \
 	src/null_config.c \
 	src/install_config.c \
 	src/extend_vtable.c \
-	src/extra_nci_thunks.c
+	src/nci/extra_thunks.c
 
 GEN_MODULES = \
 
@@ -3232,11 +3232,14 @@ $(LIBGLUTCB_SO): $(LIBPARROT) src/glut_callbacks$(O) src/glut_nci_thunks$(O)
 	  $(LINKARGS) @opengl_lib@
 	$(ADDGENERATED) "$@" "[library]"
 
-src/nci/extra_thunks.c : src/nci/extra_thunks.nci $(DEV_TOOLS_DIR)/nci_thunk_gen.pir
-	$(PERL) $(DEV_TOOLS_DIR)/mk_nci_thunks.pl
+# Cyclic dependency to parrot
+#src/nci/core_thunks.c : src/nci/core_thunks.nci $(DEV_TOOLS_DIR)/nci_thunk_gen.pir $(PARROT)
+#	$(PARROT) $(DEV_TOOLS_DIR)/nci_thunk_gen.pir --core --output=$@ --nowarn-dups \
+#	  <src/nci/core_thunks.nci
 
-src/nci/core_thunks.c : src/nci/core_thunks.nci $(DEV_TOOLS_DIR)/nci_thunk_gen.pir
-	$(PERL) $(DEV_TOOLS_DIR)/mk_nci_thunks.pl
+#src/nci/extra_thunks.c : src/nci/extra_thunks.nci $(DEV_TOOLS_DIR)/nci_thunk_gen.pir $(PARROT)
+#	$(PARROT) $(DEV_TOOLS_DIR)/nci_thunk_gen.pir --core --output=$@ --nowarn-dups \
+#	  <src/nci/extra_thunks.nci
 
 bootstrap-nci : src/nci/core_thunks.nci src/nci/extra_thunks.nci
 	$(PERL) $(DEV_TOOLS_DIR)/mk_nci_thunks.pl
