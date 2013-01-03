@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2013, Parrot Foundation.
 # auto/libffi-01.t
 
 use strict;
@@ -78,7 +78,7 @@ $conf->data->set( has_libffi => undef );
 
 $conf->options->set(%{$args});
 $step->runstep($conf);
-is( $step->result(), q{no}, "Got expected result" );
+is( $step->result(), q{skipped}, "Got expected result" );
 is( $conf->data->get( 'HAS_LIBFFI' ), 0,
     "'libffi' set to false value as expected" );
 

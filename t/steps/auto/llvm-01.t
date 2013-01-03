@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2009-2013, Parrot Foundation.
 # auto/llvm-01.t
 
 use strict;
@@ -36,8 +36,8 @@ $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
 my $ret = $step->runstep($conf);
 ok( $ret, "runstep() returned true value" );
-like( $step->result(), qr/no/,
-  "LLVM not requested; hence result is 'no'" );
+like( $step->result(), qr/skipped/,
+  "LLVM not requested; hence result is 'skipped'" );
 ok( ! $conf->data->get( 'has_llvm' ),
     "'has_llvm' set to false value, as expected" );
 
@@ -58,11 +58,11 @@ $step = test_step_constructor_and_description($conf);
         \$stdout
     );
     ok( $ret, "runstep() returned true value" );
-    like( $step->result(), qr/no/,
-      "LLVM not requested; hence result is 'no'" );
+    like( $step->result(), qr/skipped/,
+      "LLVM not requested; hence result is 'skipped'" );
     ok( ! $conf->data->get( 'has_llvm' ),
         "'has_llvm' set to false value, as expected" );
-    like( $stdout, qr/LLVM not requested/s,
+    like( $stdout, qr/--with-llvm not requested/s,
         "LLVM not requested; got expected verbose output" );
 }
 

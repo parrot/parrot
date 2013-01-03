@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2013, Parrot Foundation.
 # auto/icu-01.t
 
 use strict;
@@ -51,7 +51,7 @@ is( $conf->data->get('icu_shared'), q{},
     "Got expected value for 'icu_shared'" );
 is( $conf->data->get('icu_dir'), q{},
     "Got expected value for 'icu_dir'" );
-is( $step->result(), 'not requested', "Got expected result" );
+is( $step->result(), 'skipped', "Got expected result" );
 $step->set_result(q{});  # prepare for subsequent tests
 
 ########## _handle_icuconfig_opt() ##########
@@ -493,7 +493,7 @@ is( $conf->data->get('icu_shared'), q{},
     "Got expected value for 'icu_shared'" );
 is( $conf->data->get('icu_dir'), q{},
     "Got expected value for 'icu_dir'" );
-is( $step->result(), 'not requested', "Got expected result" );
+is( $step->result(), 'skipped', "Got expected result" );
 
 $conf->replenish($serialized);
 
