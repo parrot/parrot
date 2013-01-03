@@ -21,8 +21,8 @@
         + Replace / slashes with \ on windows for all Makefiles automatically.
           This improves cygwin interaction, like remote or cronjob smoking on windows.
     - Tools
-	+ Improved nci_thunk_gen (v0.02): handle void sig, add declaration
-	+ Fixed nci examples
+        + Improved nci_thunk_gen (v0.02): handle void sig, add declaration
+        + Fixed nci examples
     - Documentation
         + Re-added docs/ops, the generated ops summary and docs/packfile-c.pod
         + Improved pdd10_embedding
