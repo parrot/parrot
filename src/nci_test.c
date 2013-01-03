@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2013, Parrot Foundation.
 
 =head1 NAME
 
@@ -98,6 +98,7 @@ PARROT_DYNEXT_EXPORT void   nci_vP(void *);
 PARROT_DYNEXT_EXPORT void   nci_vpii(ARGMOD(Outer *), int, int);
 PARROT_DYNEXT_EXPORT void   nci_vv(void);
 PARROT_DYNEXT_EXPORT void   nci_vp(ARGIN(const Opaque*));
+PARROT_DYNEXT_EXPORT void * nci_pv(void);
 PARROT_DYNEXT_EXPORT void   nci_vfff(float, float, float);
 PARROT_DYNEXT_EXPORT char * nci_cstring_cstring(const char *);
 
@@ -991,6 +992,23 @@ nci_vp(ARGIN(const Opaque *inOpaque))
         printf("got %d\n", inOpaque->x);
     else
         printf("got null\n");
+}
+
+/*
+
+=item C<PARROT_DYNEXT_EXPORT void * nci_pv(void)>
+
+Return the pointer to the global variable C<nci_dlvar_int>.
+
+=cut
+
+*/
+
+PARROT_DYNEXT_EXPORT
+void*
+nci_pv(void)
+{
+    return &nci_dlvar_int;
 }
 
 /*

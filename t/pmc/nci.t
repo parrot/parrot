@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2013, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -38,7 +38,7 @@ SKIP: {
     unless ( -e "runtime/parrot/dynext/libnci_test$PConfig{load_ext}" ) {
         plan skip_all => "Please make libnci_test$PConfig{load_ext}";
     }
-    plan tests => 60;
+    plan tests => 61;
 
     pir_output_is( << 'CODE', << 'OUTPUT', 'load library fails' );
 .sub test :main
@@ -485,6 +485,44 @@ libnci_test was successfully loaded
 -44440000
 OUTPUT
     }
+
+        pir_output_is( << 'CODE', << 'OUTPUT', "nci_pv" );
+
+.include "datatypes.pasm"
+
+.sub test :main
+
+    # load libnci_test.so
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib library_name
+    unless libnci_test goto NOT_LOADED
+    print library_name
+    say " was successfully loaded"
+
+    # address of nci_dlvar_int
+    .local pmc nci_dlvar_int
+    nci_dlvar_int = dlvar libnci_test, "nci_dlvar_int"
+
+    .local pmc nci_pv
+    nci_pv = dlfunc libnci_test, "nci_pv", "pv"
+    $P0 = nci_pv()
+    unless nci_dlvar_int goto NOT_LOADED
+    say "nci_dlvar_int is a ptr"
+    unless $P0 goto NOT_LOADED
+    say "nci_pv returned non-NULL ptr"
+    if $P0 != nci_dlvar_int goto NOT_LOADED
+    say "nci_pv same ptr as nci_dlvar_int"
+
+NOT_LOADED:
+.end
+CODE
+libnci_test was successfully loaded
+nci_dlvar_int is a ptr
+nci_pv returned non-NULL ptr
+nci_pv same ptr as nci_dlvar_int
+OUTPUT
 
     pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_dd - PASM' );
 .pcc_sub :main main:

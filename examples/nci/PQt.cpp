@@ -1,6 +1,6 @@
 /*
 
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2013, Parrot Foundation.
 
 =head1 NAME
 
@@ -18,6 +18,11 @@ Debian:
 
     $ apt-get install libqt4-dev
     $ g++ -shared -fPIC -o runtime/parrot/dynext/libPQt.so examples/nci/PQt.cpp -I/usr/include/qt4/QtGui -I/usr/include/qt4 -lQtGui -lQtCore
+
+Macports:
+
+    $ sudo port install qt4-mac
+    $ c++ -I/opt/local/include -I/opt/local/Library/Frameworks/QtGui.framework/Header -undefined dynamic_lookup -o runtime/parrot/dynext/libPQt.dylib examples/nci/PQt.cpps -L/opt/local/lib -lQtGui -lQtCore
 
 Windows:
 

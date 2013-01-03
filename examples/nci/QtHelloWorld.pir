@@ -1,4 +1,4 @@
-# Copyright (C) 2009, Parrot Foundation.
+# Copyright (C) 2009-2013, Parrot Foundation.
 
 =head1 NAME
 
@@ -14,9 +14,10 @@ Sample "Hello World" with Qt, via Parrot Native Call Interface (NCI). See
 F<docs/pdds/pdd03_calling_conventions.pod>.
 
 Qt - A cross-platform application and UI framework
-(L<http://www.qtsoftware.com/about/news/lgpl-license-option-added-to-qt>). You'll need to build
-F<libPQt.so> or F<PQt.dll> and install it in F<runtime/parrot/dynext> for this to
-work, see F<examples/nci/PQt.C> for more information.
+(L<http://www.qtsoftware.com/about/news/lgpl-license-option-added-to-qt>).
+You'll need to build F<libPQt.so> or F<PQt.dll> and install it in
+F<runtime/parrot/dynext> for this to work, see F<examples/nci/PQt.cpp>
+for more information.
 
 Note that this will either need JIT for building the NCI-functions on
 the fly. If this is not available try adding missing signatures to
@@ -38,26 +39,30 @@ rebuilding Parrot.
   loaded:
     print "Loaded\n"
 
+    load_bytecode 'NCI/Utils.pbc'
+    .local pmc dlfancy
+    dlfancy = get_hll_global ['NCI';'Utils'], 'dlfancy'
+
     .local pmc QApplication_new, pApp
-    dlfunc QApplication_new, libpqt, "QApplication_new", "pv"
+    QApplication_new = dlfunc libpqt, "QApplication_new", "pv"
     pApp = QApplication_new()
 
     .local pmc QLabel_new, pLabel
     .local string caption
     caption = "Hello, world!"
-    dlfunc QLabel_new, libpqt, "QLabel_new", "pS"
+    QLabel_new = dlfancy(libpqt, "QLabel_new", "pt")
     pLabel = QLabel_new(caption)
 
     .local pmc QLabel_resize
-    dlfunc QLabel_resize, libpqt, "QLabel_resize", "vpii"
+    QLabel_resize = dlfunc libpqt, "QLabel_resize", "vpii"
     QLabel_resize(pLabel, 120, 30)
 
     .local pmc QLabel_show
-    dlfunc QLabel_show, libpqt, "QLabel_show", "vp"
+    QLabel_show = dlfunc libpqt, "QLabel_show", "vp"
     QLabel_show(pLabel)
 
     .local pmc QApplication_exec
-    dlfunc QApplication_exec, libpqt,"QApplication_exec", "vp"
+    QApplication_exec = dlfunc libpqt, "QApplication_exec", "vp"
     QApplication_exec(pApp)
 
 .end

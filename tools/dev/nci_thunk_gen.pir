@@ -670,8 +670,13 @@ TEMPLATE
     $P0     = 'map_from_sig_table'('sig_char', sig :flat)
     $S0     = shift $P0
     pcc_sig = join "", $P0
-    if pcc_sig == "v" goto return
+    if pcc_sig != "v" goto end_handle_v
+        preamble = 'sprintf'(<<'TEMPLATE')
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "");
+TEMPLATE
+        goto return
 
+    end_handle_v:
     .local string fill_params
     $I0 = elements sig
     dec $I0

@@ -3300,6 +3300,7 @@ pcf_ptr_void(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     PMC  * t_0; void * v_0;
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "");
     GETATTR_NCI_orig_func(interp, nci, orig_func);
     fn_pointer = (func_t)D2FPTR(orig_func);
     v_0 =  (*fn_pointer)();
