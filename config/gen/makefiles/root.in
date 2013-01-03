@@ -258,8 +258,7 @@ GEN_SOURCES = \
 	src/parrot_config.c \
 	src/null_config.c \
 	src/install_config.c \
-	src/extend_vtable.c \
-	src/nci/extra_thunks.c
+	src/extend_vtable.c
 
 GEN_MODULES = \
 
