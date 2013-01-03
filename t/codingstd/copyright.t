@@ -77,7 +77,7 @@ foreach my $file (@files) {
 
     # is the copyright text correct?
     # If so, remove it...
-    if ( $buf !~ s/$copyright_parrot// and $path !~ m{lib/Pod/.*\.pod$} ) {
+    if ( $buf !~ s/$copyright_parrot// and $path !~ m{(ext/|lib/Pod/).*\.pod$} ) {
         push @bad_format_copyright_files, $path;
     }
     # ... and then see if any other copyright notices exist.
