@@ -1005,7 +1005,7 @@ Return the pointer to the global variable C<nci_dlvar_int>.
 */
 
 PARROT_DYNEXT_EXPORT
-void*
+void *
 nci_pv(void)
 {
     return &nci_dlvar_int;
