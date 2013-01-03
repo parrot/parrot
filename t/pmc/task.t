@@ -110,6 +110,12 @@ ok:
     pass
     task.'kill'()
     wait task
+
+    # busy wait for signal to arrive at the other thread
+    $I0 = 0
+    loop:
+        $I0 = $I0 + 1
+    if $I0 < 5000 goto loop
 .end
 
 .sub task_to_kill
