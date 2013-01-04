@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2013, Parrot Foundation.
 
 =head1 NAME
 
@@ -469,9 +469,14 @@ io_filehandle_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTV
 
     os_handle = Parrot_io_internal_open(interp, path, flags);
 
-    if (os_handle == PIO_INVALID_HANDLE)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-            "Unable to open filehandle from path '%Ss'", path);
+    if (os_handle == PIO_INVALID_HANDLE) {
+        if (errno)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Unable to open filehandle from path '%Ss': %s(%d)", path, strerror(errno), errno);
+        else
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "Unable to open filehandle from path '%Ss'", path);
+    }
 
     /* Set generic flag here if is a terminal then
      * FileHandle can know how to setup buffering.

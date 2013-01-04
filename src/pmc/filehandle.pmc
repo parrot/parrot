@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008-2011, Parrot Foundation.
+Copyright (C) 2008-2013, Parrot Foundation.
 
 =head1 NAME
 
@@ -249,6 +249,30 @@ invocant is modified and becomes an open filehandle. A copy of the invocant is
 also returned by the method (some subclasses may create this as the primary
 filehandle, rather than modifying the invocant).
 
+Exceptions:
+
+EXCEPTION_PIO_ERROR with the following messages:
+
+Empty filename
+
+    "Cannot open FileHandle, no path"
+
+Already open filehandle
+
+    "Cannot reopen already open FileHandle"
+
+Invalid handle, no errno as with ISDIR:
+
+    "Unable to open filehandle from path '$path'"
+
+Invalid handle (fd < 0), or other error:
+
+    "Unable to open filehandle from path '$path': $strerror($errno)"
+
+EXCEPTION_INVALID_OPERATION with:
+
+    "Invalid mode for file open"
+
 =cut
 
 */
@@ -259,7 +283,7 @@ filehandle, rather than modifying the invocant).
 
         if (!Parrot_io_is_closed(INTERP, SELF))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
-                                "Cannot reopen already open filehandle");
+                                "Cannot reopen already open FileHandle");
 
         if (!got_mode || STRING_IS_NULL(mode))
             GET_ATTR_mode(INTERP, SELF, mode);
