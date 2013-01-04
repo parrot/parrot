@@ -602,7 +602,7 @@ sub _pir_stdin_output_slurp {
     my $input_file = $stuff->($input_string);
     my $code_file = $stuff->($code);
 
-    my $parrot = ".$PConfig{slash}parrot$PConfig{exe}";
+    my $parrot = File::Spec->join( File::Spec->curdir(), 'parrot' . $PConfig{exe} );
     # Slurp and compare the output.
     my $result = do {
         local $/;
