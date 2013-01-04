@@ -14,7 +14,9 @@ examples/pir/libpaths.pir - Print the parrot library search paths
 
 =head1 DESCRIPTION
 
-Print the list of parrot library search paths
+Print the list of parrot library search paths.
+
+See also F<t/library/lib_search_path.t>
 
 =cut
 
