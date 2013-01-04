@@ -56,9 +56,6 @@ Initialize a concurrency task object.
         Parrot_Scheduler_attributes * const sched_data =
                 PARROT_SCHEDULER(interp->scheduler);
 
-        /* Set flags for custom GC mark. */
-        PObj_custom_mark_SET(SELF);
-
         /* Set up the core struct. */
         core_struct->birthtime = Parrot_floatval_time();
         core_struct->code      = PMCNULL;
@@ -82,6 +79,8 @@ Initialize a concurrency task object.
         TASK_active_CLEAR(SELF);
         TASK_in_preempt_CLEAR(SELF);
         TASK_recv_block_CLEAR(SELF);
+        /* Set flags for custom GC mark. */
+        PObj_custom_mark_SET(SELF);
     }
 
 /*
