@@ -708,11 +708,13 @@ Schedules the given task on the proxy's interpreter.
         /* don't run GC from the wrong thread since GC involves stack walking and we
          * don't want the foreign GC to find our objects */
         Parrot_block_GC_mark_locked(proxied_interp);
+        Parrot_block_GC_sweep(proxied_interp);
 
         Parrot_cx_schedule_immediate(proxied_interp,
             Parrot_thread_create_local_task(INTERP, proxied_interp, task));
 
         Parrot_unblock_GC_mark_locked(proxied_interp);
+        Parrot_unblock_GC_sweep(proxied_interp);
 #else
         Parrot_cx_schedule_immediate(interp, task);
 #endif
