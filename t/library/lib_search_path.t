@@ -63,7 +63,7 @@ no duplicates
 =cut
 
 my $sep = $^O eq 'MSWin32' ? ';' : ':';
-local $ENV{PARROT_LIBRARY} = "libenvdir$sep/lib2:";
+local $ENV{PARROT_LIBRARY} = "libenvdir$sep/lib2$sep";
 local $ENV{PARROT_INCLUDE} = 'incenvdir';
 local $ENV{PARROT_DYNEXT}  = "/dynenvdir1$sep/dynenvdir2";
 
