@@ -13,7 +13,10 @@ t/stress/threads.t - Threads with Garbage Collection
 
 Tests threads stability under garbage collection.
 
-Also IO stress: Large -t trace pir output segfaults in GC (strings problem). see gc.t
+Also IO stress: Large -t trace pir output segfaults in GC (strings problem). See F<gc.t>
+
+Some errors rely on -DTHREAD_DEBUG or -DMEMORY_DEBUG in --ccflags and --debugging
+to get detected.
 
 =cut
 
