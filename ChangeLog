@@ -41,6 +41,7 @@
     - Documentation
         + Document .lex "name" limitations. Use .lex 'name' w/ single-quotes #1095
         + Fixed 6.9 manpage regressions on BSD make #1125
+        + Better newclass example code in pirbook #802
     - Tests
         + Fixed make smoke, uploading to smolder with changed YAML::Tiny
           quoting. #1078

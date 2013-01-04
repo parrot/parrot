@@ -119,6 +119,9 @@ object: C<init> and C<init_pmc>. The former is called when a new PMC is
 created, the later is called when a new PMC is created with an initialization
 argument.
 
+In order to iterate over the init_pmc args, you must also provide a
+get_iter method.
+
 =begin PIR
 
     .namespace ["Foo"]
@@ -132,9 +135,18 @@ argument.
         say args
     .end
 
+    .sub 'get_iter' :vtable
+        .param pmc self
+        .local pmc args, iter
+        args = new ['FixedPMCArray'], 1
+        iter = new ['ArrayIterator'], args
+        .return(iter)
+    .end
+
     .namespace[]
     .sub 'main' :main
-        $P1 = new ['Foo']       # init
+        $P0 = newclass 'Foo'    # instantiate class
+        $P1 = new ['Foo']       # init object
         $P2 = new ['Foo'], $P1  # init_pmc
     .end
 
