@@ -967,7 +967,7 @@ return current Sub
 
 =item handlers
 
-return list of ExceptioHandlers
+return list of ExceptionHandlers
 
 =item current_cont
 
