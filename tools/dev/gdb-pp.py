@@ -120,7 +120,7 @@ class ParrotPrinter(PrettyPrinter):
 
                     return nv_chain
                 except RuntimeError as e:
-                    return [ ( "__ERROR__", "Unable to resolve attribute struct." ) ].__iter__()
+                    return [ ( "__ERROR__", "" ) ].__iter__()
 
             def display_hint(self):
                 """
@@ -153,14 +153,18 @@ def _parrot_str_to_str(val):
     """
     Encoding-safe way of turning a Parrot string into a Python string.
     """
+    length = val['bufused']
     encoding = val['encoding'].dereference()
     encoding_name = encoding['name'].string()
+    if encoding_name == 'null':
+        return val['strstart'].string(encoding='ascii',errors='ignore',length=length)
     name = encoding_name
     if name == 'ascii':
         name = ''
     if name == 'iso-8859-1':
         name = ''
-    length = val['bufused']
+    if name == '':
+        return val['strstart'].string(encoding=encoding_name,errors='replace',length=length)
 
     # See http://docs.python.org/library/codecs.html#standard-encodings
     if encoding_name == 'binary':
@@ -169,9 +173,6 @@ def _parrot_str_to_str(val):
         encoding_name='utf_16'
     if encoding_name == 'ucs4':
         encoding_name=='utf_32'
-    if name == '':
-        return val['strstart'].string(encoding=encoding_name,errors='replace',length=length)
-    else:
-        return '%s:%s [%d/%d]' % \
-            (name, val['strstart'].string(encoding=encoding_name,errors='replace',length=length), \
-             val['strlen'], length)
+    return '%s:%s [%d/%d]' % \
+        (name, val['strstart'].string(encoding=encoding_name,errors='replace',length=length), \
+         val['strlen'], length)
