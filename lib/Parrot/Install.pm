@@ -1,5 +1,5 @@
 package Parrot::Install;
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2013, Parrot Foundation.
 use strict;
 use warnings;
 use File::Basename qw( dirname );
@@ -12,6 +12,8 @@ our @EXPORT_OK = qw(
     create_directories
     install_files
 );
+use lib 'lib';
+use Parrot::BuildUtil;
 
 #################### DOCUMENTATION ####################
 
@@ -29,10 +31,10 @@ Parrot::Install - Functionality for installation programs
 
 =head1 DESCRIPTION
 
-This module exports on demand only three subroutines used in the Parrot
+This module exports on demand some subroutines used in the Parrot
 installation programs F<tools/dev/install_files.pl> and
-F<tools/dev/install_dev_files.pl>.  The subroutines are tested by tests found
-in F<t/tools/install/>.
+F<tools/dev/install_dev_files.pl>.
+The subroutines are tested by tests found in F<t/tools/install/>.
 
 =head1 SUBROUTINES
 
@@ -183,6 +185,56 @@ sub create_directories {
     my @dirs_created = mkpath( \@dirs_to_create, $print_the_dirs, $mode );
 
     return 1;
+}
+
+=head2 C<sanitycheck_install()>
+
+Check if the generated MANIFEST.generated contains some typically
+needed files. Dies if not ok.
+
+If you update your repo and rebuild parrot without perl Configure.PL
+which deletes MANIFEST.generated anew, MANIFEST.generated might not
+contain already up-to-date targets, thus not creating the required
+MANIFEST.generated lines.
+
+=cut
+
+sub sanitycheck_install {
+    my $fname = "MANIFEST.generated";
+    my $manifest = Parrot::BuildUtil::slurp_file($fname);
+    die "$fname not found.\n" unless $manifest;
+    my $win = $^O eq 'MSWin32';
+    # configure generated:
+    for my $file (qw
+    (
+        lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm
+        include/parrot/config.h
+        include/parrot/pbcversion.h
+        include/parrot/vtable.h
+        include/parrot/core_pmcs.h
+        lib/Parrot/Config/Generated.pm
+        runtime/parrot/library/config.pir
+    )) {
+        $file =~ s{/}{\\}g if $win;
+        die "Error: configure generated $file missing in $fname.\n"
+          . "make reconfig before make install.\n"
+            unless $manifest =~ /^\Q$file\E/m;
+    }
+    # make generated
+    for my $file (qw
+    (
+        vtable.dump
+        runtime/parrot/dynext/dynlexpad
+        runtime/parrot/dynext/os
+        runtime/parrot/dynext/file
+        runtime/parrot/dynext/bit_ops
+        installable_parrot
+    )) {
+        $file =~ s{/}{\\}g if $win;
+        die "Error: make generated $file missing in $fname.\n"
+          . "make clean before make install.\n"
+            unless $manifest =~ /^\Q$file\E/m;
+    }
 }
 
 =head2 C<install_files()>
