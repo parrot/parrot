@@ -1,5 +1,5 @@
 #! nqp
-# Copyright (C) 2010-2012, Parrot Foundation.
+# Copyright (C) 2010-2013, Parrot Foundation.
 
 class Ops::Emitter is Hash;
 
@@ -8,6 +8,8 @@ class Ops::Emitter is Hash;
 Emitter.
 
 =end
+
+pir::load_bytecode('config.pbc');
 
 method new(:$ops_file!, :$trans!, :$script!, :$file, :%flags!) {
     self<ops_file>  := $ops_file;
@@ -309,6 +311,11 @@ $load_func(PARROT_INTERP)
 # returns a string like "PARROT_OPLIB_CORE_OPS_H_GUARD"
 method _generate_guard_macro_name($filename) {
     $filename := subst($filename, /.h$/, '');
+    my $config := _config();
+    my $osname := $config<osname>;
+    if ($osname eq 'MSWin32') {
+        $filename := subst($filename, /\\/, '/', :global);
+    }
     #my @path = File::Spec->splitdir($filename);
     my @path := split('/', $filename);
     @path.shift if @path[0]~'/' eq self<flags><dir>;
