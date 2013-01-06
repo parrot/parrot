@@ -461,7 +461,12 @@ io_socket_close(PARROT_INTERP, ARGMOD(PMC *handle))
 =item C<static void io_socket_set_flags(PARROT_INTERP, PMC *handle, const INTVAL
 flags)>
 
-Do nothing.
+Set a single socket option via setsockopt() by a bitmasked value of
+level, option_name and option_value.
+
+4 bits for level,
+4 bits for option_name,
+the rest 24-56 bits for the option_value.
 
 =item C<static INTVAL io_socket_get_flags(PARROT_INTERP, const PMC *handle)>
 
@@ -475,8 +480,11 @@ static void
 io_socket_set_flags(SHIM_INTERP, ARGMOD_NULLOK(PMC *handle), SHIM(const INTVAL flags))
 {
     ASSERT_ARGS(io_socket_set_flags)
-    UNUSED(handle);
-    /* Ignore, for now */
+    PIOHANDLE os_handle;
+    UNUSED(flags);
+    GETATTR_Socket_os_handle(interp, handle, os_handle);
+    /* dissect level, name, value */
+    Parrot_io_internal_setsockopt(interp, os_handle, 0, 0, 0);
 }
 
 static INTVAL

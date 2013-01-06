@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2012, Parrot Foundation.
+ * Copyright (C) 2003-2013, Parrot Foundation.
  */
 
 #ifndef PARROT_PLATFORM_INTERFACE_H_GUARD
@@ -119,6 +119,11 @@ INTVAL Parrot_io_internal_send(PARROT_INTERP, PIOHANDLE handle, ARGIN(const char
         size_t len);
 INTVAL Parrot_io_internal_recv(PARROT_INTERP, PIOHANDLE handle, ARGOUT(char *buf), size_t len);
 INTVAL Parrot_io_internal_poll(PARROT_INTERP, PIOHANDLE handle, int which, int sec, int usec);
+INTVAL Parrot_io_internal_getsockopt(PARROT_INTERP, PIOHANDLE handle,
+              ARGIN(INTVAL level), ARGIN(void *option_name), ARGMOD(INTVAL *value));
+INTVAL Parrot_io_internal_setsockopt(PARROT_INTERP, PIOHANDLE handle,
+              ARGIN(INTVAL level), ARGIN(void *option_name), ARGIN(INTVAL value));
+void *Parrot_io_internal_socket_optionname(PARROT_INTERP, ARGIN(STRING *name));
 INTVAL Parrot_io_internal_close_socket(PARROT_INTERP, PIOHANDLE handle);
 
 /*
