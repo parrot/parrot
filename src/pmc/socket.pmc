@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008-2012, Parrot Foundation.
+Copyright (C) 2008-2013, Parrot Foundation.
 
 =head1 NAME
 
@@ -316,6 +316,9 @@ argument, and only returns a status object. When the recv operation is
 complete, it invokes the callback, passing it a status object and a
 string containing the received message.
 
+If the socket is closed or on other errors, it throws an .EXCEPTION_PIO_ERROR
+Exception.
+
 =cut
 
 */
@@ -415,9 +418,19 @@ but continues to send new connection events until the socket is closed.]
 
 =item C<METHOD read(INTVAL bytes)>
 
-Read the given number of bytes from the socket and return them in a string.
+Read up to the given number of bytes from the socket and return them in a string.
+
+This method behaves always the same as recv(). Only if the socket is already closed
+return an empty string.
 
 =cut
+
+TODO: add setsockopt(level, option, value) for the pre-parrot 4.10 behavior, to receive larger buffers.
+
+The receive low-water mark (the SO_RCVLOWAT setsockopt option) determines the minimum amount of data
+that must be received before the read function is completed. If the read function times out, any
+data that was received is returned to the application even if the amount of data received is less
+than the receive low-water mark value.
 
 */
 
