@@ -18,10 +18,10 @@ function for FixedIntegetArray
 .loadlib 'math_ops'
 
 .sub main :main
-
+  .param pmc argv
   .local int N, i, j
         
-  N = 10000
+  N = argv[1]
   $P0 = new ['FixedIntegerArray'], N
   i = 0
   j = 0
