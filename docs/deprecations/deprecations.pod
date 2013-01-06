@@ -37,11 +37,13 @@ For instructions on how to deprecate Parrot code, please see:
 
 Moved "." in the library search paths from the beginning to the end.
 
-- low impact expected:
-  load_bytecode and .include and load_language might load now different files,
+- moderate impact expected:
+  build systems which override installed parrot libraries need to change their build.
+  (nqp, rakudo)
+  load_bytecode, .include and load_language might load now different files,
   if they exist in "./" AND in the proper library location.
-  To keep the old behavior set the environment variables PARROT_INCLUDE
-  and PARROT_LIBRARY to "./"
+  To keep the old behavior use parrot -L./ -X./ or set the environment variables
+  PARROT_INCLUDE and PARROT_LIBRARY to "./"
 
 =back
 
