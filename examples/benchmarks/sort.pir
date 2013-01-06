@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-examples/benchmarks/sort.pir - Sort an FixedIntegetArray of 10000 integers
+examples/benchmarks/sort.pir - Sort an FixedIntegetArray of N integers
 
 =head1 SYNOPSIS
 
@@ -10,8 +10,9 @@ examples/benchmarks/sort.pir - Sort an FixedIntegetArray of 10000 integers
 
 =head1 DESCRIPTION
 
-Sorts an FixedIntegetArray of 10000 random integers using builtin sort
-function for FixedIntegetArray
+Sorts an FixedIntegetArray of N random integers using builtin sort
+function for FixedIntegetArray. The argument N is specified from the 
+command line.
 
 =cut
 
