@@ -1,6 +1,6 @@
 #! perl
 ################################################################################
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2013, Parrot Foundation.
 ################################################################################
 
 =head1 TITLE
@@ -42,6 +42,14 @@ The library directory. Defaults to '/usr/lib'.
 =item C<includedir>
 
 The header directory. Defaults to '/usr/include'.
+
+=item C<datadir>
+
+The data directory. Defaults to '/usr/share'.
+
+=item C<srcdir>
+
+The src directory. Defaults to '/usr/src'.
 
 =back
 
@@ -93,9 +101,7 @@ foreach (@ARGV) {
 }
 
 my $parrotdir = $options{versiondir};
-
-# #GH 910
-Parrot::Install::sanitycheck_install();
+Parrot::Install::sanitycheck_install(); # GH #910
 
 # Set up transforms on filenames
 my(@transformorder) = (qw(lib share include bin src doc), '^(tools|VERSION)', '^compilers');
@@ -185,9 +191,10 @@ my($filehashes, $directories) = lines_to_files(
 );
 
 unless ( $options{'dry-run'} ) {
+    $directories->{File::Spec->catdir( $options{datadir}, $parrotdir)} = 1;
     create_directories($options{destdir}, $directories);
 }
-install_files($options{destdir}, $options{'dry-run'}, $filehashes);
+install_files(\%options, 'dev', $filehashes);
 
 print "Finished install_dev_files.pl\n";
 

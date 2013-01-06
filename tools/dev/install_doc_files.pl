@@ -1,6 +1,6 @@
 #! perl
 ################################################################################
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2013, Parrot Foundation.
 ################################################################################
 
 =head1 TITLE
@@ -47,6 +47,10 @@ The header directory. Defaults to '/usr/include'.
 
 The man directory. Defaults to '/usr/share/man'.
 
+=item C<datadir>
+
+The data directory. Defaults to '/usr/share'.
+
 =back
 
 =head1 SEE ALSO
@@ -81,7 +85,6 @@ my %options = (
     docdir      => '/usr/share/doc', # parrot/ subdir added below
     datadir     => '/usr/share/',    # parrot/ subdir added below
     mandir      => '/usr/share/man',
-    srcdir      => '/usr/src/',      # parrot/ subdir added below
     versiondir  => '',
     'dry-run'   => 0,
     packages    => 'doc|examples',
@@ -137,9 +140,10 @@ my($filehashes, $directories) = lines_to_files(
 );
 
 unless ( $options{'dry-run'} ) {
+    $directories->{File::Spec->catdir( $options{datadir}, $parrotdir)} = 1;
     create_directories($options{destdir}, $directories);
 }
-install_files($options{destdir}, $options{'dry-run'}, $filehashes);
+install_files(\%options, 'doc', $filehashes);
 
 print "Finished install_doc_files.pl\n";
 

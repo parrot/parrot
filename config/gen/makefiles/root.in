@@ -3132,6 +3132,7 @@ install-bin: installable docs
 	--libdir=$(LIB_DIR) \
 	--includedir=$(INCLUDE_DIR) \
 	--destdir=$(DESTDIR) \
+	--datadir=$(DATA_DIR) \
 	--docdir=$(DOC_DIR) \
 	--mandir=$(MAN_DIR) \
 	--versiondir=$(VERSION_DIR) \
@@ -3160,6 +3161,7 @@ install-doc: docs
 	--docdir=$(DOC_DIR) \
 	--mandir=$(MAN_DIR) \
 	--destdir=$(DESTDIR) \
+	--datadir=$(DATA_DIR) \
 	--versiondir=$(VERSION_DIR) \
 	MANIFEST MANIFEST.generated
 

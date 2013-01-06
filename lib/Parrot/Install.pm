@@ -198,6 +198,10 @@ which deletes MANIFEST.generated anew, MANIFEST.generated might not
 contain already up-to-date targets, thus not creating the required
 MANIFEST.generated lines.
 
+TODO: Keep a manual list of all to be installed files, merge it with
+MANIFEST.generated and die if a file in the merged list does not exist,
+i.e. cannot be installed.
+
 =cut
 
 sub _check_manifest {
@@ -279,16 +283,24 @@ list consisting of hashes.
 
 B<Return Value:>  True value.
 
-B<Comment:>
+B<Comment:> Adds all installed files to datadir/parrotdir/MANIFEST
 
 =cut
 
 sub install_files {
-    my($destdir, $dryrun, $files) = @_;
-    my($src, $dest, $mode);
+    my ($options, $type, $files) = @_;
+    my ($destdir, $datadir, $versiondir, $dryrun) =
+      @$options{qw(destdir datadir versiondir dryrun)};
+    my ($src, $dest, $mode, $manifest);
 
     ref($files) eq 'ARRAY' or die "Error: parameter \$files must be an array\n";
     print("Installing ...\n");
+    if (!$dryrun) {
+        my $destdatadir= File::Spec->catdir( $destdir, $datadir, $versiondir);
+        my $fname = File::Spec->catdir( $destdatadir, "MANIFEST" . ($type ? ".".$type : '') );
+        open $manifest, ">", $fname or die "Could not create $fname\n";
+        print "$fname\n";
+    }
     foreach my $el ( @$files ) {
         unless(ref($el) eq 'HASH') {
             my($ref) = ref($el);
@@ -316,16 +328,19 @@ sub install_files {
                     # this loop
                     if (-e $dest) {
                         print "$dest\n";
+                        print $manifest "$dest\n" unless $dryrun;
                         next;
                     }
                 }
             }
             cp( $src, $dest ) or die "Error: couldn't copy $src to $dest: $!\n";
             print "$dest\n";
+            print $manifest "$dest\n" unless $dryrun;
         }
         $mode = ( stat($src) )[2];
         chmod $mode, $dest;
     }
+    close $manifest unless $dryrun;
     return 1;
 }
 

@@ -47,6 +47,10 @@ The header directory. Defaults to '/usr/include'.
 
 The man directory. Defaults to '/usr/share/man'.
 
+=item C<datadir>
+
+The data directory. Defaults to '/usr/share'.
+
 =back
 
 =head1 SEE ALSO
@@ -80,6 +84,7 @@ my %options = (
     includedir  => '/usr/include',   # parrot/ subdir added below
     docdir      => '/usr/share/doc', # parrot/ subdir added below
     mandir      => '/usr/share/man', # man1/ subdir added below
+    datadir     => '/usr/share/',    # parrot/ subdir added below
     versiondir  => '',
     'dry-run'   => 0,
     packages    => 'main|library|pge',
@@ -96,9 +101,7 @@ foreach (@ARGV) {
 }
 
 my $parrotdir = $options{versiondir};
-
-# #GH 910
-Parrot::Install::sanitycheck_install();
+Parrot::Install::sanitycheck_install(); # GH #910
 
 # Set up transforms on filenames
 my(@transformorder) = qw(lib bin include doc man ^compilers);
@@ -183,6 +186,7 @@ my($filehashes, $directories) = lines_to_files(
 );
 
 unless ( $options{'dry-run'} ) {
+    $directories->{File::Spec->catdir( $options{datadir}, $parrotdir)} = 1;
     create_directories($options{destdir}, $directories);
 }
 
@@ -214,7 +218,7 @@ foreach $filehash (grep { ! $_->{Installable} } @$filehashes ) {
     }
 }
 
-install_files($options{destdir}, $options{'dry-run'}, $filehashes);
+install_files(\%options, '', $filehashes);
 
 print "Finished install_files.pl\n";
 
