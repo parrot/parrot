@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2006-2011, Parrot Foundation.
+# Copyright (C) 2006-2013, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -137,9 +137,32 @@ pir_output_is( <<'CODE', <<'OUT', 'wrong open' );
     finalize eh
   reportreopen:
     say i
+
+    i = 0
+    set_label eh, catchother
+    fh.'open'('noREADME.pod')
+    goto reportother
+  catchother:
+    i = 1
+    finalize eh
+  reportother:
+    say i
+
+    i = 0
+    set_label eh, catchdir
+    fh.'open'('t')
+    goto reportdir
+  catchdir:
+    i = 1
+    finalize eh
+  reportdir:
+    say i
+
     pop_eh
 .end
 CODE
+1
+1
 1
 1
 OUT
