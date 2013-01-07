@@ -17,6 +17,7 @@
         + Generate MANIFEST.generated, cleanup MANIFEST,
           removed MANIFEST_configure.generated, add installation of forgotten files
           [GH #890]
+        + Generate datadir/MANIFEST* for all installed files [GH #899]
         + Improved Configure.pl probes for --with-llvm
         + Replace / slashes with \ on windows for all Makefiles automatically.
           This improves cygwin interaction, like remote or cronjob smoking on windows.
