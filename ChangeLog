@@ -1,7 +1,7 @@
 2013-01-15    release 5.0.0
     - Core
         + Remove duplicate library search path entries, move "." from the beginning to
-          the end. [GH 368]
+          the end. [GH #368]
         + Install forgotten runtime include files:
           cloneflags.pasm
           packfile_annotation_keytype.pasm
@@ -13,6 +13,7 @@
           YAML/Dumper/Base.pbc, YAML/Dumper/Default.pbc
         + New experimental PARROT_DYNEXT environment variable
         + New experimental dynext_dirs config entry (same as PARROT_DYNEXT and -X)
+        + Add OS error messages to FileHandle.open() error messages [GH #911]
     - Build
         + Generate MANIFEST.generated, cleanup MANIFEST,
           removed MANIFEST_configure.generated, add installation of forgotten files
@@ -27,6 +28,7 @@
     - Documentation
         + Re-added docs/ops, the generated ops summary and docs/packfile-c.pod
         + Improved pdd10_embedding
+        + Document FileHandle.open() exceptions and error messages
     - Tests
         + Added t/library/lib_search_path.t
 
