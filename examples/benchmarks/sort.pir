@@ -23,6 +23,13 @@ command line.
   .local int N, i, j
         
   N = argv[1]
+  if N < 1 goto USE_DEFAULT_SIZE
+  goto USE_DEFINED_SIZE
+
+USE_DEFAULT_SIZE:
+  N = 10000
+
+USE_DEFINED_SIZE:
   $P0 = new ['FixedIntegerArray'], N
   i = 0
   j = 0
