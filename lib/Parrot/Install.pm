@@ -289,11 +289,13 @@ B<Comment:> Adds all installed files to datadir/parrotdir/MANIFEST
 
 sub install_files {
     my ($options, $type, $files) = @_;
+    ref($options) eq 'HASH' or die "Error: parameter \$options must be a hashref\n";
+
     my ($destdir, $datadir, $versiondir, $dryrun) =
       @$options{qw(destdir datadir versiondir dryrun)};
-    my ($src, $dest, $mode, $manifest);
+    ref($files) eq 'ARRAY' or die "Error: parameter \$files must be an arrayref\n";
 
-    ref($files) eq 'ARRAY' or die "Error: parameter \$files must be an array\n";
+    my ($src, $dest, $mode, $manifest);
     print("Installing ...\n");
     if (!$dryrun) {
         my $destdatadir= File::Spec->catdir( $destdir, $datadir, $versiondir);
