@@ -1012,7 +1012,6 @@ src/null_config.c : myconfig $(BUILD_TOOLS_DIR)/parrot_config_c.pl
 install_config.fpmc : myconfig config_lib.pir $(PARROT)
 	@echo "Invoking Parrot to generate install_config.fpmc"
 	$(PARROT) config_lib.pir --install > $@
-	$(ADDGENERATED) "install_config$(O)" "[main]" lib
 	$(ADDGENERATED) "$@" "[main]" lib
 
 src/parrot_config$(O) : \

@@ -1,6 +1,6 @@
 #! perl
 ################################################################################
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2013, Parrot Foundation.
 ################################################################################
 
 =head1 NAME
@@ -96,6 +96,9 @@ foreach (@ARGV) {
 }
 
 my $parrotdir = $options{versiondir};
+
+# #GH 910
+Parrot::Install::sanitycheck_install();
 
 # Set up transforms on filenames
 my(@transformorder) = qw(lib bin include doc man ^compilers);

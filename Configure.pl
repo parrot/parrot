@@ -79,7 +79,19 @@ $conf->data->set(configure_args => @ARGV
 
 # Log files created by Configure.pl in MANIFEST.generated
 $conf->{active_configuration} = 1;
+
+# Create a fresh MANIFEST for make install
 unlink 'MANIFEST.generated';
+if (do 'lib/Parrot/Config/Generated.pm') {
+    my $make = $Parrot::Config::Generated::PConfig{make};
+    if ($make and -f 'Makefile') {
+        $Parrot::Config::Generated::PConfig{gmake_version}
+          ? system ($make, '-s', 'clean') : system ($make, 'clean');
+    }
+}
+elsif (-f 'Makefile' and $^O =~ /(linux|darwin)/) {
+    system ('make', '-s', 'clean');
+}
 
 # Run the actual steps from Parrot::Configure
 $conf->runsteps or exit(1);

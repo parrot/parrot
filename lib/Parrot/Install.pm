@@ -1,5 +1,5 @@
 package Parrot::Install;
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2013, Parrot Foundation.
 use strict;
 use warnings;
 use File::Basename qw( dirname );
@@ -12,6 +12,9 @@ our @EXPORT_OK = qw(
     create_directories
     install_files
 );
+use lib 'lib';
+use Parrot::Config;
+use Parrot::BuildUtil;
 
 #################### DOCUMENTATION ####################
 
@@ -29,10 +32,10 @@ Parrot::Install - Functionality for installation programs
 
 =head1 DESCRIPTION
 
-This module exports on demand only three subroutines used in the Parrot
+This module exports on demand some subroutines used in the Parrot
 installation programs F<tools/dev/install_files.pl> and
-F<tools/dev/install_dev_files.pl>.  The subroutines are tested by tests found
-in F<t/tools/install/>.
+F<tools/dev/install_dev_files.pl>.
+The subroutines are tested by tests found in F<t/tools/install/>.
 
 =head1 SUBROUTINES
 
@@ -183,6 +186,82 @@ sub create_directories {
     my @dirs_created = mkpath( \@dirs_to_create, $print_the_dirs, $mode );
 
     return 1;
+}
+
+=head2 C<sanitycheck_install()>
+
+Check if the generated F<MANIFEST.generated> contains some typically
+needed files. Dies if not ok.
+
+If you update your repo and rebuild parrot without perl Configure.PL
+which deletes MANIFEST.generated anew, MANIFEST.generated might not
+contain already up-to-date targets, thus not creating the required
+MANIFEST.generated lines.
+
+=cut
+
+sub _check_manifest {
+    my ($file,$gen) = @_;
+    my $manifest = $_[2];
+    my $fname = "MANIFEST.generated";
+    unless ($manifest =~ /^\Q$file\E/m) {
+        if ($^O eq 'MSWin32') { # Windows has mixed paths
+            $file =~ s{/}{\\}g;
+            return if $manifest =~ /^\Q$file\E/m;
+        }
+        if ($gen)  {
+            die "Error: configure generated $file missing in $fname.\n"
+              . "make reconfig before make install.\n";
+        }
+        else {
+            die "Error: make generated $file missing in $fname.\n"
+              . "make clean before make install.\n";
+        }
+    }
+}
+
+sub sanitycheck_install {
+    my $fname = "MANIFEST.generated";
+    my $manifest = Parrot::BuildUtil::slurp_file($fname);
+    die "$fname not found.\n" unless $manifest;
+    # configure generated
+    _check_manifest($_, 1, $manifest) for qw(
+        lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm
+        include/parrot/config.h
+        include/parrot/pbcversion.h
+        include/parrot/vtable.h
+        include/parrot/core_pmcs.h
+        lib/Parrot/PMC.pm
+        myconfig
+        lib/Parrot/Config/Generated.pm
+        runtime/parrot/library/config.pir
+    );
+    # make generated
+    my @MAKE_gen = qw(
+        vtable.dump
+        include/parrot/extend_vtable.h
+        runtime/parrot/include/datatypes.pasm
+        runtime/parrot/library/Test/More.pbc
+        compilers/tge/TGE/Parser.pir
+        runtime/parrot/library/P6Regex.pbc
+        runtime/parrot/languages/winxed/winxed.pbc
+        runtime/parrot/library/nqp-setting.pbc
+        runtime/parrot/library/config.pbc
+        runtime/parrot/library/opsc.pbc
+        install_config.fpmc
+        runtime/parrot/library/pcre.pbc
+        runtime/parrot/library/PCT/Grammar.pbc
+    );
+    my @dynext = qw(dynlexpad os file rational subproxy);
+    push @dynext, map {$_."_ops"} qw(bit io sys obscure math trans debug);
+    push @dynext, "select" if $^O !~ /^(MSWin32|msys)$/;
+    push @dynext, "gziphandle" if $PConfig{has_zlib};
+    push @MAKE_gen, "src/install_config".$PConfig{o};
+    push @MAKE_gen, map { "runtime/parrot/dynext/".$_.$PConfig{load_ext} } @dynext;
+    push @MAKE_gen, map { "installable_".$_.$PConfig{exe} }
+      qw(parrot pbc_dump pbc_disassemble parrot_config pbc_merge
+         pbc_to_exe parrot_nci_thunk_gen ops2c winxed);
+    _check_manifest($_, 0, $manifest) for @MAKE_gen;
 }
 
 =head2 C<install_files()>

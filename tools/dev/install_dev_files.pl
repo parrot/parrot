@@ -94,6 +94,9 @@ foreach (@ARGV) {
 
 my $parrotdir = $options{versiondir};
 
+# #GH 910
+Parrot::Install::sanitycheck_install();
+
 # Set up transforms on filenames
 my(@transformorder) = (qw(lib share include bin src doc), '^(tools|VERSION)', '^compilers');
 my(%metatransforms) = (
