@@ -500,44 +500,44 @@ Print the string to the socket.
 Set a single socket option via setsockopt() by a bitmasked value of
 level, option_name and option_value.
 
-4 bits for level,
-4 bits for option_name,
+x bits for level,
+x bits for option_name,
 the rest 24-56 bits for the option_value.
 
-=item C<METHOD set_flags(INTVAL level, STRING *name, INTVAL value)>
+Unimplemented.
 
-Set a single socket option via setsockopt() by level, name and value.
+=item C<METHOD setsockopt(INTVAL level, INTVAL option, INTVAL value)>
+
+Set a single socket option via setsockopt() by level, option name and value.
 
 =item C<METHOD get_flags(INTVAL level)>
 
 Returns C<PIO_F_WRITE | PIO_F_READ>. Sockets are always flagged r/w.
 
-=item C<METHOD get_flags(INTVAL level, STRING *name)>
+=item C<METHOD getsockopt(INTVAL level, INTVAL option)>
 
-Get a single socket option via getsockopt() by level and name.
+Get a single socket option via getsockopt() by level and option.
 
 =cut
 
 */
 
-    METHOD set_flags(INTVAL level, STRING * name, INTVAL value) {
+    METHOD setsockopt(INTVAL level, INTVAL option, INTVAL value) {
         PIOHANDLE os_handle;
         INTVAL res;
-        void *option_name = Parrot_io_internal_socket_optionname(INTERP, name);
         GETATTR_Socket_os_handle(INTERP, SELF, os_handle);
-        res = Parrot_io_internal_setsockopt(INTERP, os_handle, level, option_name, value);
+        res = Parrot_io_internal_setsockopt(INTERP, os_handle, level, option, value);
         if (res != 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
                                         "setsockopt error: %s", strerror(errno));
     }
 
-    METHOD get_flags(INTVAL level, STRING * name) {
+    METHOD getsockopt(INTVAL level, INTVAL option) {
         PIOHANDLE os_handle;
         INTVAL res;
         INTVAL *option_value;
-        void *option_name = Parrot_io_internal_socket_optionname(INTERP, name);
         GETATTR_Socket_os_handle(INTERP, SELF, os_handle);
-        res = Parrot_io_internal_getsockopt(INTERP, os_handle, level, option_name,
+        res = Parrot_io_internal_getsockopt(INTERP, os_handle, level, option,
                                             option_value);
         if (res != 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,

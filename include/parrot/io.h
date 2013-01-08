@@ -78,7 +78,7 @@
  * Enum definition of constants for Socket.socket.
  * Note that these are the *parrot* values for these defines; the system
  * values vary from one platform to the next.  See the lookup tables in
- * socket_unix.c and socket_win32.c for the mappings.
+ * src/platform/generic/socket.c for the mappings.
  */
 
 /* &gen_from_enum(socket.pasm) */
@@ -104,6 +104,109 @@ typedef enum {
     PIO_PROTO_TCP   = 6,
     PIO_PROTO_UDP   = 17 /* last element */
 } Socket_Protocol;
+
+typedef enum {
+    PIO_SOL_IP      = 0,
+    PIO_SOL_SOCKET  = 1,       /* linux, bsd: to the socket itself */
+    PIO_SOL_TCP     = 6,       /* bsd, cygwin, linux */
+    PIO_SOL_UDP     = 17,      /* bsd, cygwin, linux */
+    PIO_SOL_IPV6    = 41,      /* bsd, cygwin, linux */
+    PIO_SOL_ICMPV6  = 58,      /* linux */
+    PIO_SOL_IRLMP,             /* w32api */
+    PIO_SOL_RFCOMM,            /* w32api */
+    PIO_SOL_L2CAP,             /* w32api */
+    PIO_SOL_SDP,               /* w32api */
+    PIO_SOL_APPLETALK,         /* w32api. see SOL_ATALK on bsd,cygwin */
+    PIO_SOL_FILTER  = 252,     /* solaris: for socket filter level */
+    PIO_SOL_ROUTE   = 253,     /* solaris: for routing socket level */
+    PIO_SOL_IPX     = 254,     /* bsd, cygwin, linux */
+    PIO_SOL_RAW     = 255,     /* linux */
+    PIO_SOL_AX25    = 256,     /* bsd, cygwin, linux */
+    PIO_SOL_ATALK   = 257,     /* bsd, cygwin, linux. in w32api called SOL_APPLETALK */
+    PIO_SOL_NETROM  = 259,     /* bsd, cygwin, linux */
+    PIO_SOL_DECNET  = 261,     /* linux */
+    PIO_SOL_X25     = 262,     /* linux */
+    PIO_SOL_PACKET  = 263,     /* solaris: for packet level */
+    PIO_SOL_ATM     = 264,     /* linux */
+    PIO_SOL_AAL     = 265,     /* linux */
+    PIO_SOL_IRDA    = 266,     /* linux */
+    PIO_SOL_TIPC    = 271,     /* linux */
+
+    PIO_SOL_MAX     = 272      /* last element */
+} Socket_Option_Level;
+
+typedef enum {
+    /* POSIX */
+    PIO_SO_DEBUG      = 1,
+    PIO_SO_BROADCAST,		/* permit sending of broadcast msgs. SOCK_DGRAM sockets only */
+    PIO_SO_REUSEADDR,		/* allow local address reuse */
+    PIO_SO_KEEPALIVE,		/* keep connections alive */
+    PIO_SO_LINGER,		/* linger on close if data present (in ticks) */
+    PIO_SO_OOBINLINE,		/* leave received OOB data in line */
+    PIO_SO_SNDBUF,		/* send buffer size */
+    PIO_SO_RCVBUF,		/* receive buffer size */
+    PIO_SO_DONTROUTE,		/* just use interface addresses */
+    PIO_SO_SNDLOWAT,		/* send low-water mark */
+    PIO_SO_RCVLOWAT,		/* receive low-water mark */
+    PIO_SO_SNDTIMEO,		/* send timeout */
+    PIO_SO_RCVTIMEO,		/* receive timeout */
+    PIO_SO_TYPE,                /* get socket type */
+    PIO_SO_ERROR,		/* get error status and clear */
+    /* all other */
+    PIO_SO_ACCEPTCONN,		/* socket has had listen() */
+    PIO_SO_USELOOPBACK,		/* bypass hardware when possible */
+    PIO_SO_REUSEPORT,		/* allow local address & port reuse */
+    /* solaris */
+    PIO_SO_DGRAM_ERRIND,	/* Solaris: Application wants delayed error */
+    PIO_SO_RECVUCRED,		/* Solaris: Application wants ucred of sender */
+    PIO_SO_RCVPSH,		/* receive interval to push data */
+    PIO_SO_PROTOTYPE,		/* get/set protocol type */
+    PIO_SO_ANON_MLP,		/* create MLP on anonymous bind */
+    PIO_SO_MAC_EXEMPT,		/* allow dominated unlabeled peers */
+    PIO_SO_PASSIVE_CONNECT,	/* do passive connect */
+    PIO_SO_SECATTR,		/* socket's security attributes */
+    PIO_SO_ALLZONES,		/* bind in all zones */
+    PIO_SO_EXCLBIND,		/* exclusive binding */
+    PIO_SO_MAC_IMPLICIT,	/* hide mac labels on wire */
+    PIO_SO_VRRP,		/* VRRP control socket */
+    /* bsd */
+    PIO_SO_JUMBO,		/* try to use jumbograms */
+    PIO_SO_BINDANY,		/* allow bind to any address */
+    PIO_SO_NETPROC,		/* multiplex; network processing */
+    PIO_SO_RTABLE,		/* routing table to be used */
+    PIO_SO_SPLICE,		/* splice data to other socket */
+    /* solaris+linux */
+    PIO_SO_DOMAIN,		/* get socket domain */
+    PIO_SO_TIMESTAMP,		/* timestamp received dgram traffic, also bsd */
+    PIO_SO_TIMESTAMP_MONOTONIC, /* Monotonically increasing timestamp on rcvd dgram */
+    PIO_SO_ACCEPTFILTER,	/* there is an accept filter */
+    /* apple+linux */
+    PIO_SO_DONTTRUNC,		/* Retain unread data */
+    PIO_SO_WANTMORE,		/* Give hint when more data ready */
+    PIO_SO_WANTOOBFLAG,		/* Want OOB in MSG_FLAG on receive */
+    /* linux */
+    PIO_SO_NO_CHECK,
+    PIO_SO_PRIORITY,
+    PIO_SO_BSDCOMPAT,
+    PIO_SO_SECURITY_AUTHENTICATION,
+    PIO_SO_SECURITY_ENCRYPTION_TRANSPORT,
+    PIO_SO_SECURITY_ENCRYPTION_NETWORK,
+    PIO_SO_BINDTODEVICE,
+    PIO_SO_ATTACH_FILTER,
+    PIO_SO_DETACH_FILTER,
+    PIO_SO_PEERNAME,
+    PIO_SO_PEERSEC,
+    PIO_SO_PASSSEC,
+    PIO_SO_TIMESTAMPNS,
+    PIO_SO_MARK,
+    PIO_SO_TIMESTAMPING,
+    PIO_SO_PROTOCOL,
+    PIO_SO_RXQ_OVFL,
+    PIO_SO_PASSCRED,
+    PIO_SO_PEERCRED,            /* also bsd: get connect-time credentials */
+
+    PIO_SO_MAX,			/* last element */
+}  Socket_Option;
 /* &end_gen */
 
 extern PIOOFF_T piooffsetzero;

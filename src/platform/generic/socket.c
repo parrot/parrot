@@ -188,6 +188,437 @@ static int pio_sock[PIO_SOCK_MAX+1] = {
 #endif
 };
 
+/*
+ * Mapping between PIO_SOL_* constants and system-specific SOL_* option constants.
+ * Uses -1 for unsupported socket level options.
+ */
+
+static int pio_sol[PIO_SOL_MAX+1] = {
+#ifdef SOL_IP
+    SOL_IP,         /* PIO_SOL_IP */
+#else
+    -1,             /* PIO_SOL_IP */
+#endif
+#ifdef SOL_SOCKET
+    SOL_SOCKET,     /* PIO_SOL_SOCKET */
+#else
+    -1,             /* PIO_SOL_SOCKET */
+#endif
+#ifdef SOL_TCP
+    SOL_TCP,        /* PIO_SOL_TCP */
+#else
+    -1,             /* PIO_SOL_TCP */
+#endif
+#ifdef SOL_UDP
+    SOL_UDP,        /* PIO_SOL_UDP */
+#else
+    -1,             /* PIO_SOL_UDP */
+#endif
+#ifdef SOL_IPV6
+    SOL_IPV6,       /* PIO_SOL_IPV6 */
+#else
+    -1,             /* PIO_SOL_IPV6 */
+#endif
+#ifdef SOL_ICMPV6
+    SOL_ICMPV6,       /* PIO_SOL_ICMPV6 */
+#else
+    -1,             /* PIO_SOL_ICMPV6 */
+#endif
+#ifdef SOL_IRLMP
+    SOL_IRLMP,       /* PIO_SOL_IRLMP */
+#else
+    -1,             /* PIO_SOL_IRLMP */
+#endif
+#ifdef SOL_RFCOMM
+    SOL_RFCOMM,       /* PIO_SOL_RFCOMM */
+#else
+    -1,             /* PIO_SOL_RFCOMM */
+#endif
+#ifdef SOL_L2CAP
+    SOL_L2CAP,       /* PIO_SOL_L2CAP */
+#else
+    -1,             /* PIO_SOL_L2CAP */
+#endif
+#ifdef SOL_SDP
+    SOL_SDP,       /* PIO_SOL_SDP */
+#else
+    -1,             /* PIO_SOL_SDP */
+#endif
+#ifdef SOL_APPLETALK
+    SOL_APPLETALK,       /* PIO_SOL_APPLETALK */
+#else
+    -1,             /* PIO_SOL_APPLETALK */
+#endif
+#ifdef SOL_FILTER
+    SOL_FILTER,     /* PIO_SOL_FILTER */
+#else
+    -1,             /* PIO_SOL_FILTER */
+#endif
+#ifdef SOL_ROUTE
+    SOL_ROUTE,      /* PIO_SOL_ROUTE */
+#else
+    -1,             /* PIO_SOL_ROUTE */
+#endif
+#ifdef SOL_IPX
+    SOL_IPX,        /* PIO_SOL_IPX */
+#else
+    -1,             /* PIO_SOL_IPX */
+#endif
+#ifdef SOL_RAW
+    SOL_RAW,       /* PIO_SOL_RAW */
+#else
+    -1,             /* PIO_SOL_RAW */
+#endif
+#ifdef SOL_AX25
+    SOL_AX25,       /* PIO_SOL_AX25 */
+#else
+    -1,             /* PIO_SOL_AX25 */
+#endif
+#ifdef SOL_ATALK
+    SOL_ATALK,      /* PIO_SOL_ATALK */
+#else
+    -1,             /* PIO_SOL_ATALK */
+#endif
+#ifdef SOL_NETROM
+    SOL_NETROM,     /* PIO_SOL_NETROM */
+#else
+    -1,             /* PIO_SOL_NETROM */
+#endif
+#ifdef SOL_DECNET
+    SOL_DECNET,       /* PIO_SOL_DECNET */
+#else
+    -1,             /* PIO_SOL_DECNET */
+#endif
+#ifdef SOL_X25
+    SOL_X25,       /* PIO_SOL_X25 */
+#else
+    -1,             /* PIO_SOL_X25 */
+#endif
+#ifdef SOL_PACKET
+    SOL_PACKET,       /* PIO_SOL_PACKET */
+#else
+    -1,             /* PIO_SOL_PACKET */
+#endif
+#ifdef SOL_ATM
+    SOL_ATM,       /* PIO_SOL_ATM */
+#else
+    -1,             /* PIO_SOL_ATM */
+#endif
+#ifdef SOL_AAL
+    SOL_AAL,       /* PIO_SOL_AAL */
+#else
+    -1,             /* PIO_SOL_AAL */
+#endif
+#ifdef SOL_IRDA
+    SOL_IRDA,       /* PIO_SOL_IRDA */
+#else
+    -1,             /* PIO_SOL_IRDA */
+#endif
+#ifdef SOL_TIPC
+    SOL_TIPC,       /* PIO_SOL_TIPC */
+#else
+    -1,             /* PIO_SOL_TIPC */
+#endif
+};
+
+/*
+ * Mapping between PIO_SO_* constants and system-specific SO_* option constants.
+ * These vary wildly between bsd/apple/linux/windows.
+ * Uses -1 for unsupported socket options.
+ */
+
+static int pio_so[PIO_SO_MAX+1] = {
+#ifdef SO_DEBUG
+    SO_DEBUG,       /* PIO_SO_DEBUG */
+#else
+    -1,             /* PIO_SO_DEBUG */
+#endif
+#ifdef SO_BROADCAST
+    SO_BROADCAST,   /* PIO_SO_BROADCAST */
+#else
+    -1,             /* PIO_SO_BROADCAST */
+#endif
+#ifdef SO_REUSEADDR
+    SO_REUSEADDR,   /* PIO_SO_REUSEADDR */
+#else
+    -1,		    /* PIO_SO_REUSEADDR */
+#endif
+#ifdef SO_KEEPALIVE
+    SO_KEEPALIVE,   /* PIO_SO_KEEPALIVE */
+#else
+    -1,		    /* PIO_SO_KEEPALIVE */
+#endif
+#ifdef SO_LINGER
+    SO_LINGER,      /* PIO_SO_LINGER */
+#else
+    -1,             /* PIO_SO_LINGER */
+#endif
+#ifdef SO_OOBINLINE
+    SO_OOBINLINE,   /* PIO_SO_OOBINLINE */
+#else
+    -1,		    /* PIO_SO_OOBINLINE */
+#endif
+#ifdef SO_SNDBUF
+    SO_SNDBUF,	    /* PIO_SO_SNDBUF */
+#else
+    -1,		    /* PIO_SO_SNDBUF */
+#endif
+#ifdef SO_RCVBUF
+    SO_RCVBUF,	    /* PIO_SO_RCVBUF */
+#else
+    -1,		    /* PIO_SO_RCVBUF */
+#endif
+#ifdef SO_DONTROUTE
+    SO_DONTROUTE,   /* PIO_SO_DONTROUTE */
+#else
+    -1,		    /* PIO_SO_DONTROUTE */
+#endif
+#ifdef SO_SNDLOWAT
+    SO_SNDLOWAT,    /* PIO_SO_SNDLOWAT */
+#else
+    -1,		    /* PIO_SO_SNDLOWAT */
+#endif
+#ifdef SO_RCVLOWAT
+    SO_RCVLOWAT,    /* PIO_SO_RCVLOWAT */
+#else
+    -1,		    /* PIO_SO_RCVLOWAT */
+#endif
+#ifdef SO_SNDTIMEO
+    SO_SNDTIMEO,    /* PIO_SO_SNDTIMEO */
+#else
+    -1,		    /* PIO_SO_SNDTIMEO */
+#endif
+#ifdef SO_RCVTIMEO
+    SO_RCVTIMEO,    /* PIO_SO_RCVTIMEO */
+#else
+    -1,		    /* PIO_SO_RCVTIMEO */
+#endif
+#ifdef SO_TYPE
+    SO_TYPE,	    /* PIO_SO_TYPE */
+#else
+    -1,		    /* PIO_SO_TYPE */
+#endif
+#ifdef SO_ERROR
+    SO_ERROR,	    /* PIO_SO_ERROR */
+#else
+    -1,		    /* PIO_SO_ERROR */
+#endif
+#ifdef SO_ACCEPTCONN
+    SO_ACCEPTCONN,  /* PIO_SO_ACCEPTCONN */
+#else
+    -1,		    /* PIO_SO_ACCEPTCONN */
+#endif
+#ifdef SO_USELOOPBACK
+    SO_USELOOPBACK, /* PIO_SO_USELOOPBACK */
+#else
+    -1,		    /* PIO_SO_USELOOPBACK */
+#endif
+#ifdef SO_REUSEPORT
+    SO_REUSEPORT,   /* PIO_SO_REUSEPORT */
+#else
+    -1,		    /* PIO_SO_REUSEPORT */
+#endif
+#ifdef SO_DGRAM_ERRIND
+    SO_DGRAM_ERRIND,/* PIO_SO_DGRAM_ERRIND */
+#else
+    -1,		    /* PIO_SO_DGRAM_ERRIND */
+#endif
+#ifdef SO_RECVUCRED
+    SO_RECVUCRED,   /* PIO_SO_RECVUCRED */
+#else
+    -1,		    /* PIO_SO_RECVUCRED */
+#endif
+#ifdef SO_RCVPSH
+    SO_RCVPSH,	    /* PIO_SO_RCVPSH */
+#else
+    -1,		    /* PIO_SO_RCVPSH */
+#endif
+#ifdef SO_PROTOTYPE
+    SO_PROTOTYPE,   /* PIO_SO_PROTOTYPE */
+#else
+    -1,		    /* PIO_SO_PROTOTYPE */
+#endif
+#ifdef SO_ANON_MLP
+    SO_ANON_MLP,    /* PIO_SO_ANON_MLP */
+#else
+    -1,		    /* PIO_SO_ANON_MLP */
+#endif
+#ifdef SO_MAC_EXEMPT
+    SO_MAC_EXEMPT,  /* PIO_SO_MAC_EXEMPT */
+#else
+    -1,		    /* PIO_SO_MAC_EXEMPT */
+#endif
+#ifdef SO_PASSIVE_CONNECT
+    SO_PASSIVE_CONNECT,/* PIO_SO_PASSIVE_CONNECT */
+#else
+    -1,		    /* PIO_SO_PASSIVE_CONNECT */
+#endif
+#ifdef SO_SECATTR
+    SO_SECATTR,	    /* PIO_SO_SECATTR */
+#else
+    -1,		    /* PIO_SO_SECATTR */
+#endif
+#ifdef SO_ALLZONES
+    SO_ALLZONES,    /* PIO_SO_ALLZONES */
+#else
+    -1,		    /* PIO_SO_ALLZONES */
+#endif
+#ifdef SO_EXCLBIND
+    SO_EXCLBIND,    /* PIO_SO_EXCLBIND */
+#else
+    -1,		    /* PIO_SO_EXCLBIND */
+#endif
+#ifdef SO_MAC_IMPLICIT
+    SO_MAC_IMPLICIT,/* PIO_SO_MAC_IMPLICIT */
+#else
+    -1,		    /* PIO_SO_MAC_IMPLICIT */
+#endif
+#ifdef SO_VRRP
+    SO_VRRP,	    /* PIO_SO_VRRP */
+#else
+    -1,		    /* PIO_SO_VRRP */
+#endif
+#ifdef SO_JUMBO
+    SO_JUMBO,       /* PIO_SO_JUMBO */
+#else
+    -1,             /* PIO_SO_JUMBO */
+#endif
+#ifdef SO_BINDANY
+    SO_BINDANY,     /* PIO_SO_BINDANY */
+#else
+    -1,             /* PIO_SO_BINDANY */
+#endif
+#ifdef SO_DOMAIN
+    SO_DOMAIN,	    /* PIO_SO_DOMAIN */
+#else
+    -1,		    /* PIO_SO_DOMAIN */
+#endif
+#ifdef SO_TIMESTAMP
+    SO_TIMESTAMP,   /* PIO_SO_TIMESTAMP */
+#else
+    -1,		    /* PIO_SO_TIMESTAMP */
+#endif
+#ifdef SO_TIMESTAMP_MONOTONIC
+    SO_TIMESTAMP_MONOTONIC, /* PIO_SO_TIMESTAMP_MONOTONIC */
+#else
+    -1,		    /* PIO_SO_TIMESTAMP_MONOTONIC */
+#endif
+#ifdef SO_ACCEPTFILTER
+    SO_ACCEPTFILTER,/* PIO_SO_ACCEPTFILTER */
+#else
+    -1,		    /* PIO_SO_ACCEPTFILTER */
+#endif
+#ifdef SO_DONTTRUNC
+    SO_DONTTRUNC,   /* PIO_SO_DONTTRUNC */
+#else
+    -1,		    /* PIO_SO_DONTTRUNC */
+#endif
+#ifdef SO_WANTMORE
+    SO_WANTMORE,    /* PIO_SO_WANTMORE */
+#else
+    -1,		    /* PIO_SO_WANTMORE */
+#endif
+#ifdef SO_WANTOOBFLAG
+    SO_WANTOOBFLAG, /* PIO_SO_WANTOOBFLAG */
+#else
+    -1,		    /* PIO_SO_WANTOOBFLAG */
+#endif
+#ifdef SO_NO_CHECK
+    SO_NO_CHECK,    /* PIO_SO_NO_CHECK */
+#else
+    -1,		    /* PIO_SO_NO_CHECK */
+#endif
+#ifdef SO_PRIORITY
+    SO_PRIORITY,    /* PIO_SO_PRIORITY */
+#else
+    -1,		    /* PIO_SO_PRIORITY */
+#endif
+#ifdef SO_BSDCOMPAT
+    SO_BSDCOMPAT,   /* PIO_SO_BSDCOMPAT */
+#else
+    -1,		    /* PIO_SO_BSDCOMPAT */
+#endif
+#ifdef SO_SECURITY_AUTHENTICATION
+    SO_SECURITY_AUTHENTICATION,	/* PIO_SO_SECURITY_AUTHENTICATION */
+#else
+    -1,		    /* PIO_SO_SECURITY_AUTHENTICATION */
+#endif
+#ifdef SO_SECURITY_ENCRYPTION_TRANSPORT
+    SO_SECURITY_ENCRYPTION_TRANSPORT, /* PIO_SO_SECURITY_ENCRYPTION_TRANSPORT */
+#else
+    -1,		    /* PIO_SO_SECURITY_ENCRYPTION_TRANSPORT */
+#endif
+#ifdef SO_SECURITY_ENCRYPTION_NETWORK
+    SO_SECURITY_ENCRYPTION_NETWORK,	  /* PIO_SO_SECURITY_ENCRYPTION_NETWORK */
+#else
+    -1,		    /* PIO_SO_SECURITY_ENCRYPTION_NETWORK */
+#endif
+#ifdef SO_BINDTODEVICE
+    SO_BINDTODEVICE,/* PIO_SO_BINDTODEVICE */
+#else
+    -1,		    /* PIO_SO_BINDTODEVICE */
+#endif
+#ifdef SO_ATTACH_FILTER
+    SO_ATTACH_FILTER,/* PIO_SO_ATTACH_FILTER */
+#else
+    -1,		    /* PIO_SO_ATTACH_FILTER */
+#endif
+#ifdef SO_DETACH_FILTER
+    SO_DETACH_FILTER,/* PIO_SO_DETACH_FILTER */
+#else
+    -1,		    /* PIO_SO_DETACH_FILTER */
+#endif
+#ifdef SO_PEERNAME
+    SO_PEERNAME,    /* PIO_SO_PEERNAME */
+#else
+    -1,		    /* PIO_SO_PEERNAME */
+#endif
+#ifdef SO_PEERSEC
+    SO_PEERSEC,	    /* PIO_SO_PEERSEC */
+#else
+    -1,		    /* PIO_SO_PEERSEC */
+#endif
+#ifdef SO_PASSSEC
+    SO_PASSSEC,	    /* PIO_SO_PASSSEC */
+#else
+    -1,		    /* PIO_SO_PASSSEC */
+#endif
+#ifdef SO_TIMESTAMPNS
+    SO_TIMESTAMPNS, /* PIO_SO_TIMESTAMPNS */
+#else
+    -1,		    /* PIO_SO_TIMESTAMPNS */
+#endif
+#ifdef SO_MARK
+    SO_MARK,	    /* PIO_SO_MARK */
+#else
+    -1,		    /* PIO_SO_MARK */
+#endif
+#ifdef SO_TIMESTAMPING
+    SO_TIMESTAMPING,/* PIO_SO_TIMESTAMPING */
+#else
+    -1,		    /* PIO_SO_TIMESTAMPING */
+#endif
+#ifdef SO_PROTOCOL
+    SO_PROTOCOL,    /* PIO_SO_PROTOCOL */
+#else
+    -1,		    /* PIO_SO_PROTOCOL */
+#endif
+#ifdef SO_RXQ_OVFL
+    SO_RXQ_OVFL,    /* PIO_SO_RXQ_OVFL */
+#else
+    -1,		    /* PIO_SO_RXQ_OVFL */
+#endif
+#ifdef SO_PASSCRED
+    SO_PASSCRED,    /* PIO_SO_PASSCRED */
+#else
+    -1,		    /* PIO_SO_PASSCRED */
+#endif
+#ifdef SO_PEERCRED
+    SO_PEERCRED,    /* PIO_SO_PEERCRED */
+#else
+    -1,		    /* PIO_SO_PEERCRED */
+#endif
+};
 
 /* HEADERIZER HFILE: none */
 
@@ -874,29 +1305,44 @@ Parrot_io_internal_close_socket(SHIM_INTERP, PIOHANDLE handle)
 #endif
 }
 
+#define PARROT_SOL_LEVEL(level)                        \
+    /* convert Parrot's socket level to system SOL_ */ \
+    if (level < 0                                      \
+        ||  level >= PIO_SOL_MAX                       \
+        || (level = pio_sol[level]) < 0)                                \
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,  \
+                "unsupported socket level: %ld", level)
+
+#define PARROT_SO_OPTION(option)                                        \
+    /* convert Parrot's socket option to system SO_ */                  \
+    if (option < 0                                                      \
+        ||  option >= PIO_SO_MAX                                        \
+        || (option = pio_so[option]) < 0)                               \
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,  \
+                "unsupported socket option: %ld", option)
+
 INTVAL
 Parrot_io_internal_getsockopt(PARROT_INTERP, PIOHANDLE handle,
-                              ARGIN(INTVAL level), ARGIN(void *option_name),
+                              ARGIN(INTVAL level), ARGIN(INTVAL option),
                               ARGMOD(INTVAL *value))
 {
     /* Error handling upwards in src/io/socket.c */
-    return getsockopt((PIOSOCKET)handle, level, option_name, value, sizeof(value));
+    socklen_t sz = sizeof(value);
+    PARROT_SOL_LEVEL(level);
+    PARROT_SO_OPTION(option);
+    return getsockopt((PIOSOCKET)handle, (int)level, (int)option, value, &sz);
 }
 
 
 INTVAL
 Parrot_io_internal_setsockopt(PARROT_INTERP, PIOHANDLE handle,
-                              ARGIN(INTVAL level), ARGIN(void *option_name),
+                              ARGIN(INTVAL level), ARGIN(INTVAL option),
                               ARGIN(INTVAL value))
 {
-    return setsockopt((PIOSOCKET)handle, level, option_name, &value, sizeof(value));
-}
-
-PARROT_CANNOT_RETURN_NULL
-void *
-Parrot_io_internal_socket_optionname(PARROT_INTERP, ARGIN(STRING *name))
-{
-    return NULL;
+    socklen_t sz = sizeof(value);
+    PARROT_SOL_LEVEL(level);
+    PARROT_SO_OPTION(option);
+    return setsockopt((PIOSOCKET)handle, (int)level, (int)option, &value, sz);
 }
 
 /*

@@ -464,8 +464,8 @@ flags)>
 Set a single socket option via setsockopt() by a bitmasked value of
 level, option_name and option_value.
 
-4 bits for level,
-4 bits for option_name,
+x bits for level,
+x bits for option_name,
 the rest 24-56 bits for the option_value.
 
 =item C<static INTVAL io_socket_get_flags(PARROT_INTERP, const PMC *handle)>
@@ -485,6 +485,8 @@ io_socket_set_flags(SHIM_INTERP, ARGMOD_NULLOK(PMC *handle), SHIM(const INTVAL f
     GETATTR_Socket_os_handle(interp, handle, os_handle);
     /* dissect level, name, value */
     Parrot_io_internal_setsockopt(interp, os_handle, 0, 0, 0);
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_NOT_IMPLEMENTED,
+        "set_flags via single bitmask not available");
 }
 
 static INTVAL
