@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2011, Parrot Foundation.
+# Copyright (C) 2006-2013, Parrot Foundation.
 
 =head1 NAME
 
@@ -24,7 +24,7 @@ stack, so we don't need to check if this parrot is IPv6-aware.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(23)
+    plan(25)
 
     test_init()
     test_get_fd()
@@ -196,8 +196,30 @@ CODE
     is(status, '12', 'send')
     str = sock.'recv'()
     is(str, 'test message', 'recv')
-    sock.'close'()
 
+    .local int i, len, oldlen, readlen
+    i = 0
+  loop:
+    str = concat str, "a"
+    i = i + 1
+    if i < 2048 goto loop
+    oldlen = length str
+    status = sock.'send'(str)
+    is(status, oldlen, 'send() big')
+    str = ""
+    .local string tmpstr
+  loop1:
+    tmpstr = sock.'read'(1024)
+    readlen = length tmpstr
+    str = concat str, tmpstr
+    len = length str
+    # diag(len)
+    if len == 0 goto bigger
+    if len < oldlen goto loop1
+  bigger:
+    is(len, oldlen, 'read(1024) chunked')
+
+    sock.'close'()
     server.'close'()
     status = server.'exit_status'()
     nok(status, 'Exit status of server process')
