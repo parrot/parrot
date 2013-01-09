@@ -649,3 +649,11 @@
     - 'library'
     - 'experimental'
   ticket:  'https://github.com/parrot/parrot/issues/302'
+-
+  name : 'Socket.read(nb) with nb > 512'
+  eligible : '4.8'
+  note :
+    The Socket .read method with an nb argument greater than the current SO_RCVBUF buffer size (typically 512) will since 4.8 behave like POSIX read() and recv(), returning only up to nb bytes. You need to loop until the wanted number of bytes is received.'
+  tags :
+    - api
+  ticket : 'https://github.com/parrot/parrot/issues/909'
