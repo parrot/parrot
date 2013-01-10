@@ -425,12 +425,13 @@ return an empty string.
 
 =cut
 
-TODO: add setsockopt(level, option, value) for the pre-parrot 4.10 behavior, to receive larger buffers.
+TODO: add setsockopt(level, option, value) for the pre-parrot 4.10 behavior, to receive
+larger buffers.
 
-The receive low-water mark (the SO_RCVLOWAT setsockopt option) determines the minimum amount of data
-that must be received before the read function is completed. If the read function times out, any
-data that was received is returned to the application even if the amount of data received is less
-than the receive low-water mark value.
+The receive low-water mark (the SO_RCVLOWAT setsockopt option) determines the minimum
+amount of data that must be received before the read function is completed. If the read
+function times out, any data that was received is returned to the application even if the
+amount of data received is less than the receive low-water mark value.
 
 */
 
