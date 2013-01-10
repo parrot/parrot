@@ -298,7 +298,9 @@ sub install_files {
     my ($src, $dest, $mode, $manifest);
     print("Installing ...\n");
     if (!$dryrun) {
-        my $destdatadir= File::Spec->catdir( $destdir, $datadir, $versiondir);
+        my $destdatadir = $destdir
+          ? File::Spec->catdir( $destdir, $datadir, $versiondir)
+          : File::Spec->catdir( $datadir, $versiondir);
         my $fname = File::Spec->catdir( $destdatadir, "MANIFEST" . ($type ? ".".$type : '') );
         open $manifest, ">", $fname or die "Could not create $fname\n";
         print "$fname\n";
