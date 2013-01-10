@@ -1,12 +1,12 @@
 #!perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 8;
+use Parrot::Test tests => 9;
 
 =head1 NAME
 
@@ -93,6 +93,39 @@ pir_error_output_like( <<'CODE', <<'OUTPUT', 'say with PMCNULL argument' );
 CODE
 /Null PMC in say/
 OUTPUT
+
+# [GH #893] 80% of threaded say should print the \n immediately after the string.
+my ($good, $fail) = (0,0);
+for (0..9) {
+    my $result = Parrot::Test::_pir_stdin_output_slurp('',<<'CODE');
+.sub main :main
+    $P0 = get_global 'task'
+    $P1 = new 'Task', $P0
+    schedule $P1
+    $P2 = new 'Task', $P0
+    schedule $P2
+    $P3 = new 'Task', $P0
+    schedule $P3
+    $P4 = new 'Task', $P0
+    schedule $P4
+    wait $P1
+    wait $P2
+    wait $P3
+    wait $P4
+    sleep 0.1
+.end
+.sub task
+    say "line"
+.end
+CODE
+
+    if ($result =~ /lineline/) {
+        $fail++;
+    } else {
+        $good++;
+    }
+}
+ok($good >= 8, "threads: better atomic say. $good/10");
 
 # Local Variables:
 #   mode: cperl
