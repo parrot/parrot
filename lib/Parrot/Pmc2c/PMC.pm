@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2012, Parrot Foundation.
+# Copyright (C) 2004-2013, Parrot Foundation.
 
 =head1 NAME
 
@@ -487,8 +487,8 @@ sub generate {
         Parrot::Pmc2c::Emitter->new( $h_file );
     $self->generate_h_file;
     $h_emitter->write_to_file;
-    add_to_generated($h_file, "[devel]", "include")
-      unless $self->is_dynamic and $self->name =~ /^(foo|foo2|rotest|pccmethod_test)$/;
+    #add_to_generated($h_file, "[devel]", "include")
+    #  unless $self->is_dynamic and $self->name =~ /^(foo|foo2|rotest|pccmethod_test)$/;
 }
 
 =over 4
