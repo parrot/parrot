@@ -121,7 +121,8 @@ CODE
 
     if ($result =~ /lineline/) {
         $fail++;
-    } else {
+    }
+    else {
         $good++;
     }
 }
