@@ -258,8 +258,10 @@ mark_interp(PARROT_INTERP)
     if (!PMC_IS_NULL(interp->final_exception))
         Parrot_gc_mark_PMC_alive(interp, interp->final_exception);
 
+#ifndef PARROT_HAS_THREADS
     if (interp->parent_interpreter)
         mark_interp(interp->parent_interpreter);
+#endif
 
     /* code should be read only and is currently not cloned into other threads
      * so only mark it in the main thread */
