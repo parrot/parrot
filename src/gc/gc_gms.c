@@ -2422,7 +2422,7 @@ gc_gms_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
             (unsigned long)self->string_gc.constant_string_pool->total_allocated);
     fprintf(stderr, ", attrs: %6lu",
             (unsigned long)Parrot_gc_fixed_allocator_allocated_memory(interp,
-              self->fixed_size_allocator));
+            self->fixed_size_allocator));
     if (interp->parent_interpreter) {
         fprintf(stderr, ", parent: 0x%lx, tid: %3d",
                 (unsigned long)interp->parent_interpreter,
