@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2010-2012, Parrot Foundation.
+# Copyright (C) 2010-2013, Parrot Foundation.
 
 .include 'sysinfo.pasm'
 .loadlib 'sys_ops'
@@ -15,6 +15,9 @@
 
     tasks_run()
     task_send_recv()
+
+    print "ok 7 #SKIP task.kill - no reliable test yet [GH #907]\n"
+    goto post_kill
 
     $S0 = sysinfo .SYSINFO_PARROT_OS
     if $S0 == 'MSWin32' goto skip_kill
