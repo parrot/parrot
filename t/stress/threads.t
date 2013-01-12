@@ -39,7 +39,7 @@ use Parrot::Config;
     system($parrot, '-o', $pbc, $src);
     my $todo = $PConfig{ccflags} =~ /-DTHREAD_DEBUG/;
     pbc_exit_code_is( $pbc, 0, 'chameneos',
-	$todo ? (todo => 'GH880 GC walks into thread interp') : ());
+        $todo ? (todo => 'GH880 GC walks into thread interp') : ());
     unlink $pbc;
 }
 
