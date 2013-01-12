@@ -2415,7 +2415,8 @@ gc_gms_validate_objects(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_validate_objects)
 
-#if defined(PARROT_GC_VALIDATE) || !defined(NDEBUG)
+/* GH #880 validate is not thread-safe, problematic only on darwin */
+#if defined(THREAD_DEBUG) && !defined(__APPLE__)
     INTVAL i;
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 

@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2012, Parrot Foundation.
+# Copyright (C) 2012-2013, Parrot Foundation.
 
 =head1 NAME
 
@@ -28,11 +28,18 @@ use Parrot::Config;
 # Segfault #880
 {
     $ENV{TEST_PROG_ARGS} ||= '';
+    if ($^O eq 'darwin') {
+        my $cwd = `pwd`;
+        chomp($cwd);
+        $ENV{DYLD_LIBRARY_PATH} = $cwd."/blib/lib";
+    }
     my $parrot = File::Spec->join( File::Spec->curdir(), 'parrot' . $PConfig{exe} );
     my $src = 'examples/threads/chameneos.pir';
     my $pbc = 'examples/threads/chameneos.pbc';
     system($parrot, '-o', $pbc, $src);
-    pbc_exit_code_is( $pbc, 0, 'chameneos', todo => 'GH880 GC walks into thread interp' );
+    my $todo = $PConfig{ccflags} =~ /-DTHREAD_DEBUG/;
+    pbc_exit_code_is( $pbc, 0, 'chameneos',
+	$todo ? (todo => 'GH880 GC walks into thread interp') : ());
     unlink $pbc;
 }
 
