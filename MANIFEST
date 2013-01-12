@@ -16,7 +16,6 @@ DONORS.pod                                                  [main]doc
 LICENSE                                                     [main]doc
 MANIFEST                                                    []
 MANIFEST.SKIP                                               []
-MANIFEST.generated                                          []
 PBC_COMPAT                                                  [main]doc
 PLATFORMS                                                   [devel]doc
 README.pod                                                  [devel]doc
@@ -2194,7 +2193,6 @@ tools/dev/mk_language_shell.in                              []
 tools/dev/mk_manifest_and_skip.pl                           []
 tools/dev/mk_native_pbc                                     []
 tools/dev/mk_nci_thunks.pl                                  []
-tools/dev/mk_packfile_pbc                                   []
 tools/dev/mk_rpm_manifests.pl                               []
 tools/dev/mk_testnumbers.pl                                 []
 tools/dev/nci_test_gen.pl                                   []
