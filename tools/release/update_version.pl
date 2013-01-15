@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2011-2012, Parrot Foundation.
+# Copyright (C) 2011-2013, Parrot Foundation.
 use strict;
 use warnings;
 use Carp;
@@ -16,10 +16,9 @@ tools/release/update_version.pl - Update version numbers in a few files
 =head1 DESCRIPTION
 
 This program is meant to be used by the Parrot release manager.  It will
-change the version numbers found in B<these 5 files only>:
+change the version numbers found in B<these 4 files only>:
 
     VERSION
-    MANIFEST.generated
     README.pod
     include/parrot/oplib/core_ops.h
     src/ops/core_ops.c
@@ -55,7 +54,6 @@ croak "'$new_version' is not a proper version number; must be n.n.n"
 
 my @simple_files = (
     'VERSION',
-    'MANIFEST.generated',
     'README.pod',
 );
 
