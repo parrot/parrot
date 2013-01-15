@@ -1,4 +1,3 @@
-
     Following in the steps of other open source projects that
     eventually take over the world, here is the partial list
     of people who have contributed to Parrot and its supporting
@@ -858,7 +857,10 @@ E: moritz@faui2k3.org
 U: moritz
 D: Test infrastructure for languages/perl6/ and Perl 6 in general
 
-N: mrshu
+N: Marek Šuppa
+E: marek@suppa.sk
+U: mrshu
+W: http://shu.io
 D: Benchmarks
 
 N: Nat Tuck
