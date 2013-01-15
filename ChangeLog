@@ -1,11 +1,12 @@
 2013-01-15    release 5.0.0
     - Core
         + Remove duplicate library search path entries, move "." from the beginning to
-          the end. [GH #368]
+          the end. This is a non-backward compatible change, but emulating the old
+          behavior is possible. [GH #368]
         + Install forgotten runtime include files:
-          cloneflags.pasm
-          packfile_annotation_keytype.pasm
-          packfile_segments.pasm
+            cloneflags.pasm
+            packfile_annotation_keytype.pasm
+            packfile_segments.pasm
         + Install include/parrot/pbcversion.h with the main package, not devel.
         + Install headers for dynpmc files.
         + Install libraries tgc.pbc, NCI/Utils.pbc, OpenGL/Math.pbc, PCT/Dumper.pbc,
@@ -14,6 +15,7 @@
         + New experimental PARROT_DYNEXT environment variable
         + New experimental dynext_dirs config entry (same as PARROT_DYNEXT and -X)
         + Add OS error messages to FileHandle.open() error messages [GH #911]
+        + Add a .sort method to FixedFloatArrays [GH #925]
     - Build
         + Generate MANIFEST.generated, cleanup MANIFEST,
           removed MANIFEST_configure.generated, add installation of forgotten files
@@ -33,6 +35,7 @@
         + Document FileHandle.open() exceptions and error messages
     - Tests
         + Added t/library/lib_search_path.t
+        + Added tests to t/pmc/fixedfloatarrays.t
 
 2012-12-18    release 4.11.0
     - Core
