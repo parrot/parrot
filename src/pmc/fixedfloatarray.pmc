@@ -23,7 +23,7 @@ stored FLOATVALs.  It uses Float PMCs to do all necessary conversions.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_PURE_FUNCTION
-static int auxcmpfunc(ARGIN(const INTVAL *i), ARGIN(const INTVAL *j))
+static int auxcmpfunc(ARGIN(const FLOATVAL *i), ARGIN(const FLOATVAL *j))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -581,7 +581,7 @@ Reverse the contents of the array.
 
 =over 4
 
-=item C<static int auxcmpfunc(const INTVAL *i, const INTVAL *j)>
+=item C<static int auxcmpfunc(const FLOATVAL *i, const FLOATVAL *j)>
 
 INTVAL compare function for qsort usage.
 
@@ -591,10 +591,10 @@ INTVAL compare function for qsort usage.
 
 PARROT_PURE_FUNCTION
 static int
-auxcmpfunc(ARGIN(const INTVAL *i), ARGIN(const INTVAL *j))
+auxcmpfunc(ARGIN(const FLOATVAL *i), ARGIN(const FLOATVAL *j))
 {
     ASSERT_ARGS(auxcmpfunc)
-    return (int) *i - *j;
+    return (int) (*i - *j);
 }
 
 /*
