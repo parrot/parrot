@@ -6,7 +6,11 @@ examples/benchmarks/sort_ffa.pir - Sort an FixedFloatArray of N floats
 
 =head1 SYNOPSIS
 
-    % time ./parrot examples/benchmarks/sort_ffa.pir
+    % time ./parrot examples/benchmarks/sort_ffa.pir 100000
+
+Or use the default number of iterations:
+
+    % time ./parrot examples/benchmarks/sort.pir
 
 =head1 DESCRIPTION
 
@@ -27,7 +31,7 @@ command line.
   goto USE_DEFINED_SIZE
 
 USE_DEFAULT_SIZE:
-  N = 10000
+  N = 1000000
 
 USE_DEFINED_SIZE:
   $P0 = new ['FixedFloatArray'], N
