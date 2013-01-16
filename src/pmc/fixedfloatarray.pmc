@@ -583,7 +583,7 @@ Reverse the contents of the array.
 
 =item C<static int auxcmpfunc(const FLOATVAL *i, const FLOATVAL *j)>
 
-INTVAL compare function for qsort usage.
+FLOATVAL compare function for qsort usage.
 
 =cut
 
@@ -594,7 +594,9 @@ static int
 auxcmpfunc(ARGIN(const FLOATVAL *i), ARGIN(const FLOATVAL *j))
 {
     ASSERT_ARGS(auxcmpfunc)
-    return (int) (*i - *j);
+    if (*i == *j) return 0;
+    if (*i <  *j) return -1;
+    else          return 1;
 }
 
 /*
