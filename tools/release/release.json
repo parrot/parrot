@@ -1,8 +1,8 @@
 {
-    "release.version"  : "4.11.0",
-    "release.name"     : "All together - Happy Birthday Lovebird",
-    "release.day"      : "Tuesday",
-    "release.nextdate" : "15 January 2013",
+    "release.version"  : "5.0.0",
+    "release.name"     : "Johnny Five Alive",
+    "release.day"      : "Thursday",
+    "release.nextdate" : "19 Feb 2013",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -16,5 +16,5 @@
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
     "wiki.bugday"      : "bug_day_2013_01_12",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/4.11.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/5.0.0/"
 }

@@ -551,7 +551,6 @@ The calendar of releases is available at the C<comp.lang.parrot> Google
 calendar, visible at
 L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.calendar.google.com>.
 
-    - Jan 15, 2013 - 5.0.0   - dukeleto
     - Feb 19, 2013 - 5.1.0   - ??
     - Mar 19, 2013 - 5.2.0   - ??
     - Apr 16, 2013 - 5.3.0   - ??

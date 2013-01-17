@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2012, Parrot Foundation.
+# Copyright (C) 2006-2013, Parrot Foundation.
 
 =pod
 
@@ -154,5 +154,7 @@ Starred release numbers indicate supported releases.
  dukeleto    4.9.0 *        2012-Oct-16     "Proto-Hydra"
  rurban      4.10.0         2012-Nov-21     "Red-eared Parakeet"
  rurban      4.11.0         2012-Dec-18     "All together - Happy Birthday Lovebird"
+
+ dukeleto    5.0.0 *        2013-Jan-17     "Johnny Five Alive"
 
 =cut
