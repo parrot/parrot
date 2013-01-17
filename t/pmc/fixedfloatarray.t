@@ -19,7 +19,7 @@ out-of-bounds test. Checks INT and PMC keys.
 .sub main :main
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
-    plan(36)
+    plan(32)
 
     array_size_tests()
     element_set_tests()
@@ -32,24 +32,6 @@ out-of-bounds test. Checks INT and PMC keys.
     test_new_style_init()
     test_invalid_init_tt1509()
     test_get_string()
-    test_sort()
-.end
-
-.sub test_sort
-    $P0 = new ['FixedFloatArray'], 4
-    set $P0[0],10.0
-    set $P0[1],5.0
-    set $P0[2],3.0
-    set $P0[3],1.0
-    $P0.'sort'()
-    $I0 = $P0[0]
-    is($I0,1,'sort works')
-    $I1 = $P0[1]
-    is($I1,3,'sort works')
-    $I2 = $P0[2]
-    is($I2,5,'sort works')
-    $I3 = $P0[3]
-    is($I3,10,'sort works')
 .end
 
 .sub array_size_tests
