@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010-2012, Parrot Foundation.
+ * Copyright (C) 2010-2013, Parrot Foundation.
  */
 
 /*
@@ -69,7 +69,8 @@ Parrot_sysmem_amount(PARROT_INTERP)
      */
     memsize = sysconf(_SC_PHYS_PAGES) * sysconf(_SC_PAGESIZE);
 
-#elif defined(PARROT_HAS_HEADER_SYSSYSCTL) && defined(CTL_HW) && defined(HW_PHYSMEM)
+#elif defined(PARROT_HAS_HEADER_SYSSYSCTL) && defined(CTL_HW) && \
+    (defined(HW_MEMSIZE) || defined(HW_PHYSMEM))
 
     /* Method 2:  sysctl().  Works on BSD-derived systems.  Darwin is
      * slightly different, and has its own implementation.
@@ -77,10 +78,16 @@ Parrot_sysmem_amount(PARROT_INTERP)
      * the header sys/sysctl.h and the appropriate constants.
      */
 
+#  if defined(HW_MEMSIZE)
+    int memchk = HW_MEMSIZE; /* uint64_t: >2G RAM */
+#  elif defined(HW_PHYSMEM)
+    int memchk = HW_PHYSMEM; /* sint32_t: max 2G RAM only */
+#  endif
+
     int err;
     size_t length = sizeof (memsize);
 
-    int selection[2] = { CTL_HW, HW_PHYSMEM };
+    int selection[2] = { CTL_HW, memchk };
 
     err = sysctl(selection, 2, &memsize, &length, NULL, 0);
 
