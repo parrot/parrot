@@ -1,7 +1,7 @@
 {
     "release.version"  : "5.0.0",
     "release.name"     : "Johnny Five Alive",
-    "release.day"      : "Thursday",
+    "release.day"      : "Tuesday",
     "release.nextdate" : "19 Feb 2013",
 
     "web.root"         : "http://parrot.org/",
