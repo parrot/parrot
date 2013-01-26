@@ -12,12 +12,25 @@ stored FLOATVALs.  It uses Float PMCs to do all necessary conversions.
 
 =head2 Functions
 
+=over 4
+
 =cut
 
 */
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_PURE_FUNCTION
+static int auxcmpfunc(ARGIN(const FLOATVAL *i), ARGIN(const FLOATVAL *j))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_auxcmpfunc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(i) \
+    , PARROT_ASSERT_ARG(j))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 pmclass FixedFloatArray auto_attrs provides array {
@@ -26,7 +39,40 @@ pmclass FixedFloatArray auto_attrs provides array {
 
 /*
 
+=back
+
 =head2 Methods
+
+=over 4
+
+=item C<PMC *sort()>
+
+Sort the array and return self.
+
+=cut
+
+*/
+
+    METHOD sort(PMC *cmp_func :optional) {
+        UINTVAL n;
+        INTVAL  size;
+
+        GET_ATTR_size(INTERP, SELF, size);
+        n = (UINTVAL)size;
+
+        if (n > 1) {
+            FLOATVAL *float_array;
+            GET_ATTR_float_array(INTERP, SELF, float_array);
+            if (PMC_IS_NULL(cmp_func))
+                qsort(float_array, n, sizeof (INTVAL),
+                        (int (*)(const void *, const void*))auxcmpfunc);
+            else
+                Parrot_util_quicksort(INTERP, (void**)float_array, n, cmp_func, "NN->N");
+        }
+        RETURN(PMC *SELF);
+    }
+
+/*
 
 =over 4
 
@@ -525,6 +571,30 @@ Reverse the contents of the array.
         }
     }
 
+}
+
+/*
+
+=back
+
+=head2 Auxiliary functions
+
+=over 4
+
+=item C<static int auxcmpfunc(const FLOATVAL *i, const FLOATVAL *j)>
+
+INTVAL compare function for qsort usage.
+
+=cut
+
+*/
+
+PARROT_PURE_FUNCTION
+static int
+auxcmpfunc(ARGIN(const FLOATVAL *i), ARGIN(const FLOATVAL *j))
+{
+    ASSERT_ARGS(auxcmpfunc)
+    return (int) (*i - *j);
 }
 
 /*
