@@ -594,9 +594,8 @@ static int
 auxcmpfunc(ARGIN(const FLOATVAL *i), ARGIN(const FLOATVAL *j))
 {
     ASSERT_ARGS(auxcmpfunc)
-    if (*i == *j) return 0;
-    if (*i <  *j) return -1;
-    else          return 1;
+
+    return (*i < *j) ? -1 : (*i > *j);
 }
 
 /*
