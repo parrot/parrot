@@ -64,7 +64,7 @@ Sort the array and return self.
             FLOATVAL *float_array;
             GET_ATTR_float_array(INTERP, SELF, float_array);
             if (PMC_IS_NULL(cmp_func))
-                qsort(float_array, n, sizeof (INTVAL),
+                qsort(float_array, n, sizeof (FLOATVAL),
                         (int (*)(const void *, const void*))auxcmpfunc);
             else
                 Parrot_util_quicksort(INTERP, (void**)float_array, n, cmp_func, "NN->N");
