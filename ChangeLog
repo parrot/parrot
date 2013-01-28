@@ -1,3 +1,9 @@
+2013-02-XX    release 5.1.0
+    - Core
+    - Documentation
+    - Tests
+    - Community
+
 2013-01-22    release 5.0.0
     - Core
         + Remove duplicate library search path entries, move "." from the beginning to
