@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2012, Parrot Foundation.
+# Copyright (C) 2007-2013, Parrot Foundation.
 
 =pod
 
@@ -500,6 +500,8 @@ Send a text email to C<parrot-dev>, C<parrot-users>, C<perl6-language>,
 C<perl6-announce>, C<perl5-porters>, etc. You should also include L<lwn.net> in
 this mailing; email to C<lwn> at that domain.
 
+Also, notify Perl Weekly at perlweekly@perlweekly.com .
+
 =item 2
 
 Submit the announcement story to use Perl, Perl Monks, Slashdot, Newsforge,
@@ -508,11 +510,13 @@ client lets you.
 
 =item 3
 
-Modify the topic on C<#parrot>, for example,
+If you are an IRC op, modify the topic on C<#parrot>, for example,
 
     /topic #parrot Parrot 4.0.0 "[Name of Parrot Release]" |
     http://parrot.org/ | Log: http://irclog.perlgeek.de/parrot |
     #parrotsketch meeting Tuesday 19:30 UTC
+
+If not, ask someone to do this.
 
 =item 4
 
