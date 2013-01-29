@@ -1,4 +1,12 @@
-=head1 PIR tutorial
+# Copyright (C) 2007-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+examples/tutorial/00_README.pod - A PIR tutorial.
+
+=head1 DESCRIPTION
 
 Each of the files in this directory contains valid PIR code and POD
 (Perl 5's Plain Old Documentation) and can be read as plain text.

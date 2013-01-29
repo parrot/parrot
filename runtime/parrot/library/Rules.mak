@@ -21,3 +21,8 @@ $(LIBRARY_DIR)/Tcl/Glob.pbc : \
 
 $(LIBRARY_DIR)/P6Object.pbc : \
     $(LIBRARY_DIR)/dumper.pbc
+
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

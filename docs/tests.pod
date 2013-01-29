@@ -1,17 +1,19 @@
 # Copyright (C) 2001-2012, Parrot Foundation.
 
+=pod
+
 =head1 NAME
 
 docs/tests.pod - Testing Parrot
 
-=head1 A basic guide to writing and running tests for Parrot
+=head1 DESCRIPTION
 
 This is quick and dirty primer on to how the Parrot test suite is executed and
 to how new tests for Parrot should be written.  The testing system is liable to
 change in the future, but tests written following the guidelines below should be
 easy to port into a new test suite.
 
-=head1 How to test parrot
+=head1 HOW TO TEST PARROT
 
 The easy way to test parrot is running C<make test>. If you have updated your
 code recently and tests began failing, go for a C<make realclean> and recompile
@@ -28,7 +30,7 @@ You can supply new tests results by just running C<make smoke>.  It will run the
 same tests as C<make test> would, but will upload the test results to the
 website.
 
-=head1 Location of the test files
+=head1 LOCATION OF THE TEST FILES
 
 The parrot test files, the F<*.t> files, can be found in the F<t> directory.
 A quick overview about each test directory in F<t> can be found in F<t/README>.
@@ -38,7 +40,7 @@ feature is tested, it might also make sense to create a new F<*.t> file. You
 may also see tests named like foo-old.t, which are Perl tests that are in the
 process of being translated to PIR.
 
-=head1 How to write a test
+=head1 HOW TO WRITE A TEST
 
 Test scripts must emit text that conforms to the C<Test Anything Protocol>.
 Test scripts are currently usually written in PIR or Perl 5.  The Perl 5 module
@@ -189,7 +191,7 @@ errors if make has completed.)  You can run them with any of the following:
 Language implementations are usually tested with
 C<language_output_is> and friends.
 
-=head1 Ideal tests:
+=head1 IDEAL TESTS:
 
 =over 4
 
@@ -216,13 +218,13 @@ Are a chunk of assembler and a chunk of expected output.
 
 =back
 
-=head1 TODO tests
+=head1 TODO TESTS
 
 In test driven development, tests are implemented first.  So the tests are
 initially expected to fail.  This can be expressed by marking the tests as
 TODO. See L<Test::More> on how to do that.
 
-=head1 SKIP tests
+=head1 SKIP TESTS
 
 TODO test actually executed, so that unexpected success can be detected.
 In the case of missing requirements and in the case of serious breakdowns

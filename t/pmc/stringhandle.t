@@ -36,7 +36,7 @@ OUT
 pir_output_is( <<"CODE", <<'OUT', 'open and close - synchronous' );
 .sub 'test' :main
     \$P1 = new ['StringHandle']
-    \$P1.'open'('README')
+    \$P1.'open'('README.pod')
     say 'ok 1 - \$P1.open(\$S1)'
 
     \$P1.'close'()
@@ -111,20 +111,20 @@ CODE
 OUT
 
 SKIP: {
-    skip 'no asynch calls yet' => 1;
+    skip 'no async calls yet' => 1;
 
     pir_output_is( <<'CODE', <<'OUT', 'open and close - asynchronous' );
 .sub 'test' :main
     $P1 = # GH #535 create a callback here
     $P0 = new ['StringHandle']
 
-    $P0.'open'('README')
+    $P0.'open'('README.pod')
     say 'ok 1 - $P0.open($S1)'
 
     $P0.'close'()
     say 'ok 2 - $P0.close($P1)'
 
-    $P0.'open'('README', 'rw')
+    $P0.'open'('README.pod', 'rw')
     say 'ok 3 - $P0.open($S1, $S2)'
 
     $P0.'close'()
@@ -147,22 +147,23 @@ pir_output_is(
     <<'CODE', <<'OUT', 'read - synchronous' );
 .sub 'test' :main
     $P0 = new ['StringHandle']
-    $P0.'open'('README', 'w')
+    $P0.'open'('README.pod', 'w')
 
-    $P0.'print'("This is Parrot, version")
+    $P0.'print'("# Copyright (C) 2001-2012, Parrot Foundation.")
 
     $P0.'close'()
 
-    $P0.'open'('README')
+    $P0.'open'('README.pod')
 
-    $S0 = $P0.'read'(14) # bytes
-    if $S0 == 'This is Parrot' goto ok_1
+    $S0 = $P0.'read'(15) # bytes
+    if $S0 == '# Copyright (C)' goto ok_1
     print 'not '
   ok_1:
     say 'ok 1 - $S0 = $P1.read($I2)'
 
-    $S0 = $P0.'read'(9)  # bytes
-    if $S0 == ', version' goto ok_2
+    $S0 = $P0.'read'(12)  # throw away bytes
+    $S0 = $P0.'read'(17)  # bytes
+    if $S0 == 'Parrot Foundation' goto ok_2
     print 'not '
   ok_2:
     say 'ok 2 - $S0 = $P1.read($I2) # again on same stream'
@@ -176,21 +177,22 @@ pir_output_is(
     <<'CODE', <<'OUT', 'read opcode' );
 .sub 'test' :main
     $P0 = new ['StringHandle']
-    $P0.'open'('README', 'w')
+    $P0.'open'('README.pod', 'w')
 
-    print $P0, "This is Parrot, version"
+    print $P0, "# Copyright (C) 2001-2012, Parrot Foundation."
     $P0.'close'()
 
-    $P0.'open'('README')
+    $P0.'open'('README.pod')
 
-    $S0 = $P0.'read'(14) # bytes
-    if $S0 == 'This is Parrot' goto ok_1
+    $S0 = $P0.'read'(15) # bytes
+    if $S0 == '# Copyright (C)' goto ok_1
     print 'not '
   ok_1:
     say 'ok 1 - $S0 = $P1.read($I2)'
 
-    $S0 = $P0.'read'(9)  # bytes
-    if $S0 == ', version' goto ok_2
+    $S0 = $P0.'read'(12)  # throw away bytes
+    $S0 = $P0.'read'(17)  # bytes
+    if $S0 == 'Parrot Foundation' goto ok_2
     print 'not '
   ok_2:
     say 'ok 2 - $S0 = $P1.read($I2) # again on same stream'
@@ -477,7 +479,7 @@ pir_output_is( <<"CODE", <<'OUT', 'buffer_size' );
     # The set buffer size is a minimum, the I/O subsystem may scale it upward
     # to a round block, so test that the buffer size is equal or greater than
     # the set size.
-    if \$I0 == 10 goto ok_2
+    if \$I0 >= 10 goto ok_2
     print 'not '
   ok_2:
     say 'ok 2 - \$I0 = \$P0.buffer_size() # get buffer size'
@@ -528,6 +530,8 @@ pir_output_is( <<"CODE", <<'OUT', 'encoding - read/write' );
     \$P0.'print'(1234567890)
     \$P0.'print'("\\n")
     \$S0 = iso-8859-1:"TÖTSCH"
+    \$I9 = find_encoding "utf8"
+    \$S9 = trans_encoding \$S0, \$I9
     \$P0.'print'(\$S0)
     \$P0.'close'()
 
@@ -535,14 +539,14 @@ pir_output_is( <<"CODE", <<'OUT', 'encoding - read/write' );
 
     \$S1 = \$P0.'readline'()
     if \$S1 == "1234567890\\n" goto ok_1
-print \$S1
+
     print 'not '
   ok_1:
     say 'ok 1 - \$S1 = \$P0.readline() # read with utf8 encoding on'
 
     \$S2 = \$P0.'readline'()
-    if \$S2 == \$S0 goto ok_2
-print \$S2
+    if \$S2 == \$S9 goto ok_2
+
     print 'not '
   ok_2:
     say 'ok 2 - \$S2 = \$P0.readline() # read iso-8859-1 string'
@@ -561,7 +565,7 @@ pir_output_is( <<'CODE', <<'OUT', 'mode' );
 .sub 'test' :main
     $P0 = new ['StringHandle']
 
-    $P0.'open'('README')
+    $P0.'open'('README.pod')
     $S0 = $P0.'mode'()
 
     if $S0 == 'r' goto ok_1

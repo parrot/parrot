@@ -1,5 +1,5 @@
 #! nqp
-# Copyright (C) 2010-2011, Parrot Foundation.
+# Copyright (C) 2010-2012, Parrot Foundation.
 
 class Ops::Trans::C is Ops::Trans;
 
@@ -90,7 +90,7 @@ method restart_offset($offset) {
 
 method goto_address($addr) { "return (opcode_t *)$addr"; }
 
-method goto_offset($offset) { "return (opcode_t *)cur_opcode + $offset"; }
+method goto_offset($offset) { "return cur_opcode + $offset"; }
 
 method expr_address($addr) { $addr; }
 
@@ -350,14 +350,15 @@ static int get_op(PARROT_INTERP, ARGIN(const char *name), int full)
 static void hop_init(PARROT_INTERP)
 {
     op_info_t * const info = [[BS]]op_lib.op_info_table;
+    opcode_t i;
 
     /* allocate the storage all in one chunk
      * yes, this is profligate, but we can tighten it later */
-    HOP * const hop_buckets =
-        mem_gc_allocate_n_zeroed_typed(interp, [[BS]]op_lib.op_count * 2, HOP );
-    HOP *hops = hop_buckets;
+    HOP *hops;
 
-    opcode_t i;
+    hop_buckets = mem_gc_allocate_n_zeroed_typed(interp, [[BS]]op_lib.op_count * 2, HOP );
+    hops        = hop_buckets;
+
 
     /* store full names */
     for (i = 0; i < [[BS]]op_lib.op_count; i++) {

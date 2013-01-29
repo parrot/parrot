@@ -439,6 +439,7 @@ add_const_table_pmc(ARGMOD(imc_info_t * imcc), ARGIN(PMC *pmc))
             mem_gc_realloc_n_typed_zeroed(imcc->interp, ct->pmc.constants,
                 ct->pmc.const_count + 1, ct->pmc.const_count, PMC *);
 
+    PObj_is_shared_SET(pmc); /* packfile constants will be shared among threads */
 
     ct->pmc.constants[ct->pmc.const_count++] = pmc;
 
@@ -1779,7 +1780,10 @@ build_key(ARGMOD(imc_info_t * imcc), ARGIN(SymReg *key_reg),
                 Parrot_key_set_register(imcc->interp, tail, regno, KEY_pmc_FLAG);
                 break;
               default:
-                IMCC_fatal(imcc, 1, "build_key: wrong register set\n");
+                IMCC_fatal(imcc, 1,
+                    "build_key: wrong register set '%c' (%d) in keyed access. "
+                    "Expects one of 'I', 'S' or 'P'\n",
+                    r->set, r->set);
             }
 
             IMCC_debug(imcc, DEBUG_PBC_CONST, " keypart reg %s %c%d\n",
@@ -1903,8 +1907,8 @@ init_fixedintegerarray_from_string(ARGMOD(imc_info_t * imcc), ARGIN(PMC *p),
         ARGIN(STRING *s))
 {
     ASSERT_ARGS(init_fixedintegerarray_from_string)
-    INTVAL  n, elem, i, l;
-    char   *src, *chr, *start;
+    INTVAL  n, elem, l;
+    char   *src, *chr, *start, *end;
     int     base;
 
     if (STRING_max_bytes_per_codepoint(s) != 1)
@@ -1916,68 +1920,97 @@ init_fixedintegerarray_from_string(ARGMOD(imc_info_t * imcc), ARGIN(PMC *p),
     if (!l)
         return;
 
-    chr = src = Parrot_str_to_cstring(imcc->interp, s);
+    start = src = Parrot_str_to_cstring(imcc->interp, s);
+    end = src + l - 1;
 
-    /* "()" - no args */
-    if (l <= 2 && *src == '(') {
+    /* Skip leading whitespace and ( */
+    while (*start == ' ' || *start == '\t' || *start == '(') { ++start; }
+
+    /* Skip trailing whitespace and ) */
+    while (end >= start && (*end == ' ' || *end == '\t' || *end == ')')) {
+        --end;
+    }
+    ++end;
+
+    /* no content */
+    if (start == end) {
         Parrot_str_free_cstring(src);
         return;
     }
 
     /* count commas */
-    n = 0;
-    while (*chr) {
+    for (chr = start, n = 0; chr < end; chr++) {
         if (*chr == ',')
             n++;
-        chr++;
     }
 
     /* presize the array */
     VTABLE_set_integer_native(imcc->interp, p, n + 1);
 
     /* parse string */
-    chr = src;
+    for (chr = start, n = 0; chr < end;) {
+        /* Check for comma */
+        if (n > 0) {
+            if (*chr == ',') {
+                ++chr;
+            }
+            else {
+                Parrot_ex_throw_from_c_args(imcc->interp, NULL,
+                        EXCEPTION_INVALID_STRING_REPRESENTATION,
+                        "expected ',' in FixedIntegerArray initialization");
+            }
+        }
 
-    for (i = l, n = 0; i; --i, ++chr) {
+        /* Skip value-leading whitespace */
+        while (*chr == ' ' || *chr == '\t') { ++chr; }
+
+        /* Leading 0, 0b, 0x */
+        base = 10;
+        if (*chr == '0') {
+            ++chr;
+            switch (*chr) {
+              case 'b':
+              case 'B':
+                base = 2;
+                ++chr;
+                break;
+              case 'x':
+              case 'X':
+                base = 16;
+                ++chr;
+                break;
+              default:
+                base = 8;
+            }
+        }
+
+        /* Store value */
+        elem = strtoul(chr, &chr, base);
+        VTABLE_set_integer_keyed_int(imcc->interp, p, n++, elem);
+
+        /* See if there are any garbage characters after the number */
         switch (*chr) {
           case ' ':
-            continue;
           case '\t':
-            continue;
-          case '(':
-            continue;
           case ')':
+            ++chr;
+            /* Fallthrough */
+          case '\0':
             break;
           case ',':
-            n++;
+            /* Hold onto the , for the test at the start of the loop */
             break;
           default:
-            base = 10;
-            if (*chr == '0') {
-                ++chr;
-                --i;
-                if (*chr == 'b' || *chr == 'B') {
-                    base = 2;
-                    ++chr;
-                    --i;
-                }
-                else if (*chr == 'x' || *chr == 'X') {
-                    base = 16;
-                    ++chr;
-                    --i;
-                }
-            }
-            start = chr;
-            elem  = strtoul(chr, &chr, base);
-            --chr;
-            i -= (chr - start);
-            VTABLE_set_integer_keyed_int(imcc->interp, p, n, elem);
-            break;
+            Parrot_ex_throw_from_c_args(imcc->interp, NULL,
+                    EXCEPTION_INVALID_STRING_REPRESENTATION,
+                    "invalid number in FixedIntegerArray initialization");
         }
+
+        /* Skip value-trailing whitespace */
+        while (*chr == ' ' || *chr == '\t') { ++chr; }
     }
 
     Parrot_str_free_cstring(src);
-
 }
 
 /*
@@ -2393,18 +2426,8 @@ e_pbc_emit(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(const IMC_Unit *u
         int annotation_type;
 
         /* Add annotations seg if we're missing one. */
-        if (!interp_code->annotations) {
-            /* Create segment. "_ANN" is added to the name */
-            STRING *name = Parrot_sprintf_c(imcc->interp, "%Ss_ANN",
-                interp_code->base.name);
-            int      add = interp_code->base.dir ? 1 : 0;
-            PackFile_Directory * const dir  = add ? interp_code->base.dir :
-                    &interp_pf->directory;
-            interp_code->annotations = (PackFile_Annotations *)
-                    PackFile_Segment_new_seg(imcc->interp, dir,
-                        PF_ANNOTATIONS_SEG, name, 1);
-            interp_code->annotations->code = interp_code;
-        }
+        if (!interp_code->annotations)
+            Parrot_pf_get_annotations_segment(imcc->interp, interp_pf, interp_code);
 
         /* Add annotation. */
         switch (ins->symregs[1]->set) {

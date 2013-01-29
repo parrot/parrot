@@ -572,6 +572,7 @@ also calls C<exit>.
     number = count
     inc number
 
+    # TODO make this thread-safe
     test_args['number'] = number
 
     push results, test

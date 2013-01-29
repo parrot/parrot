@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's cloning operations.
+
+=head1 CLONING WITH PMC STRINGS
 
 This code example illustrates cloning with PMC strings. Simple copying
 operations create two pointers to the same underlying memory structure.

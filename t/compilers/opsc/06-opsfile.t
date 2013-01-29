@@ -1,5 +1,5 @@
 #!./parrot-nqp
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2012, Parrot Foundation.
 
 pir::load_bytecode("opsc.pbc");
 pir::load_bytecode("nqp-setting.pbc");
@@ -32,7 +32,7 @@ $op := @ops[(+@ops)-1];
 ok($op<code> > 84 + 116,    "Last op has non zero code");
 
 my $version := join(' ', |$f.version);
-ok( $version ~~ /^\d+ \s \d+ \s \d+$/, "Version parsed");
+ok( $version ~~ /^\d+ \s \d+$/, "Version parsed");
 diag($version);
 
 ok( $f.preamble ~~ /pmc_parrotlibrary.h/, "Preamble preserved");

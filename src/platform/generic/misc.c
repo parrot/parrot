@@ -12,9 +12,11 @@ src/platform/generic/misc.c
 
 Miscellaneous helper functions.
 
-=head2 Functions
+Please avoid adding to this file.  Individual families of functions
+should normally go in individual files.  Platform-specific overrides
+then go in the platform-specific directories.
 
-=over 4
+=head2 Functions
 
 =cut
 
@@ -25,6 +27,8 @@ Miscellaneous helper functions.
 /* HEADERIZER HFILE: none */
 
 /*
+
+=over 4
 
 =item C<void Parrot_platform_init_code(void)>
 
@@ -38,14 +42,6 @@ void
 Parrot_platform_init_code(void)
 {
 }
-
-/*
-
-=back
-
-=cut
-
-*/
 
 /*
  * Local variables:

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011, Parrot Foundation.
+ * Copyright (C) 2011-2012, Parrot Foundation.
  */
 
 /*
@@ -39,7 +39,7 @@ the OS, to an appropriate value.
 */
 
 void
-Parrot_init_platform_encoding(PARROT_INTERP)
+Parrot_init_platform_encoding(SHIM_INTERP)
 {
     const char *orig  = setlocale(LC_CTYPE, NULL); /* store original locale */
     setlocale(LC_CTYPE, "");                       /* set locale to environment specification */

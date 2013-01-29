@@ -46,7 +46,7 @@ it to become ready for an I/O operation.
     test_update()
     test_read()
     test_write()
-    test_select()
+    test_select(osname)
   end:
 .end
 
@@ -61,13 +61,13 @@ it to become ready for an I/O operation.
     $P9 = 'FH1'
 
     $P0 = new ['FileHandle']
-    $P0.'open'('README')
+    $P0.'open'('README.pod')
 
     $P1 = new ['Select']
     $P1.'update'($P0, $P9, 5)
 
     $P3 = new ['FileHandle']
-    $P3.'open'('README')
+    $P3.'open'('README.pod')
 
     $P9 = new 'String'
     $P9 = 'FH2'
@@ -108,18 +108,18 @@ it to become ready for an I/O operation.
     $P9 = 'FH1'
 
     $P0 = new ['FileHandle']
-    $P0.'open'('README')
+    $P0.'open'('README.pod')
 
     $P1 = new ['Select']
     $P1.'update'($P0, $P9, 5)
 
     $P6 = $P1.'can_read'(1)
     $I0 = $P6
-    is($I0, 1, 'Test can_read() for README')
+    is($I0, 1, 'Test can_read() for README.pod')
 
     $P6 = $P1.'can_write'(0)
     $I0 = $P6
-    is($I0, 0, 'Test can_write() for README')
+    is($I0, 0, 'Test can_write() for README.pod')
 .end
 
 .sub 'test_write'
@@ -151,12 +151,13 @@ it to become ready for an I/O operation.
 .end
 
 .sub 'test_select'
+    .param string osname
     $S0 = 'README2'
     $P9 = new 'String'
     $P9 = 'FH1'
 
     $P0 = new ['FileHandle']
-    $P0.'open'('README', 'r')
+    $P0.'open'('README.pod', 'r')
 
     $P1 = new ['Select']
     $P1.'update'($P0, $P9, 5)
@@ -180,8 +181,16 @@ it to become ready for an I/O operation.
 
     $P7 = $P6[2]
     $I0 = $P7
-    is($I0, 0, 'Test has_exception() for README2 (array index)', 'varies across OSes' :named('todo'))
 
+    if osname == 'linux' goto good
+    if osname == 'cygwin' goto good
+    if osname == 'freebsd' goto good
+  todo:
+    is($I0, 0, 'Test has_exception() for README2 (array index)', 'varies across OSes' :named('todo'))
+    goto out
+  good:
+    is($I0, 0, 'Test has_exception() for README2 (array index)')
+  out:
     unlink($S0)
 .end
 

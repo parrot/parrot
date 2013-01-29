@@ -1,0 +1,62 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+docs/book/draft/README.pod - Readme to a series of draft documents on Parrot
+development. 
+
+=head1 DESCRIPTION
+
+The book will contain the following chapters:
+
+=over 4
+
+=item 1.  Overview
+
+=item 2.  Getting Started
+
+=item 3.  Parrot Intermediate Representation (PIR)
+
+=item 4.  Compiler Tools (PCT)
+
+=item 5.  Grammar Engine (PGE)
+
+=item 6.  Grammar Actions (NQP)
+
+=item 7.  Dynamic C-level Objects (PMCs)
+
+=item 8.  Dynamic Opcodes
+
+=item 9.  Parrot Assembly Language (PASM)
+
+=item 10. Instruction Reference
+
+=item 11. Directive Reference
+
+=item 12. Operator Reference
+
+=item Appendix A. Glossary
+
+=item Appendix B. Patch Submission
+
+=item Appendix C. Command-Line Options
+
+=item Appendix D. Build Options
+
+=item Appendix E. Source Code
+
+=back
+
+=head1 NOTE
+
+Top-level headings in each chapter (the chapter title) are level 1 headings.
+All sub-headings in the chapter are level 2 and below. All chapter files should
+contain the VIM suffix (which is a codingstd for all of the Parrot repo).
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2012, Parrot Foundation.
+
+=cut

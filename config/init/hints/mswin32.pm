@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007, Parrot Foundation.
+# Copyright (C) 2005-2012, Parrot Foundation.
 
 package init::hints::mswin32;
 
@@ -19,16 +19,16 @@ sub runstep {
     # We do one bit of its work early here, because we need the result now.
     $cc = $conf->options->get('cc') if defined $conf->options->get('cc');
 
-    my $is_msvc  = $cc =~ m/\bcl(?:\.exe)?/i;
-    my $is_intel = $cc =~ m/\bicl(?:\.exe)?/i;
-    my $is_mingw = $cc =~ m/\bgcc(?:\.exe)?/i;
-    my $is_bcc   = $cc =~ m/\bbcc32(?:\.exe)?/i;
+    my $is_msvc  = $cc =~ m/\bcl\b/i;
+    my $is_intel = $cc =~ m/\bicl\b/i;
+    my $is_mingw = $cc =~ m/\b(?:gcc|g\+\+|clang)\b/i;
+    my $is_bcc   = $cc =~ m/\bbcc32\b/i;
 
     $conf->data->set(
         win32  => 1,
         PQ     => '"',
         make_c => '$(PERL) -e "chdir shift @ARGV; system \'$(MAKE)\', @ARGV; exit $$? >> 8;"',
-        ncilib_link_extra => '-def:src/libnci_test.def',
+        ncilib_link_extra => '-def:src\libnci_test.def',
     );
 
     my $build_dir = $conf->data->get('build_dir');
@@ -44,6 +44,10 @@ sub runstep {
     }
 
     $conf->data->set( clock_best => ' ' );
+
+    my $mt_output = `mt.exe /? 2>null` || '';
+    my $has_mt = $mt_output =~ m/manifest/;
+    $conf->data->set( has_mt => $has_mt ? 1 : 0);
 
     if ($is_msvc) {
         my $msvcversion = $conf->data->get('msvcversion');
@@ -235,6 +239,14 @@ sub runstep {
                 optimize  => '',
             );
         }
+        elsif ( $make =~ /gmake/i ) {
+            # also Strawberry Perl
+            $conf->data->set(
+                ccflags   => "-DWINVER=$winver ",
+                make      => 'gmake',
+                make_c    => 'gmake -C',
+            );
+        }
         elsif ( $make =~ /mingw32-make/i ) {
             ; # Vanilla Perl
             $conf->data->set(
@@ -261,7 +273,7 @@ sub runstep {
             inst_libparrot_ldflags => "\"$bindir\\libparrot.dll\"",
             libparrot_linkflags   => "\"$build_dir\\libparrot.dll\"",
             inst_libparrot_linkflags => "\"$bindir\\libparrot.dll\"",
-            ncilib_link_extra   => 'src/libnci_test.def',
+            ncilib_link_extra   => 'src\libnci_test.def',
             sym_export          => '__declspec(dllexport)',
             sym_import          => '__declspec(dllimport)',
             slash               => '\\',

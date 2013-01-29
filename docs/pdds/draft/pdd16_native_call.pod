@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 [DRAFT] PDD 16: Native Call Interface (NCI)
 
@@ -6,10 +6,6 @@
 
 This PDD describes the native call interface, and the function signatures used
 to describe those functions.
-
-
-
-
 
 =head2 Description
 
@@ -201,7 +197,7 @@ any C type that Parrot supports as NCI value.
 The position of the C<user_data> is specified with the C<U> function
 signature, when creating the callback PMC:
 
-  cb_PMC = new_callback cb_Sub, user_data, "tU"
+  cb_PMC = new_callback cb_Sub, user_data, "SU"
 
 Given a Parrot function C<cb_Sub>, and a C<user_data> PMC, this creates a
 callback PMC C<cb_PMC>, which expects the user data as the second argument.
@@ -277,7 +273,7 @@ it call back into Parrot.
     userdata = 42
 
     .local pmc callback_sub
-    callback_sub = new_callback sub, userdata, "vtU"
+    callback_sub = new_callback sub, userdata, "vSU"
 
     # set up NCI
 

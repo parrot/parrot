@@ -1,5 +1,4 @@
-# Copyright (C) 2004-2011, Parrot Foundation.
-#
+# Copyright (C) 2004-2012, Parrot Foundation.
 
 package Parrot::Headerizer;
 
@@ -123,10 +122,14 @@ sub new {
         PARROT_COLD
 
         PARROT_API
+
+        PARROT_NO_ADDRESS_SAFETY_ANALYSIS
         )
     };
     return bless $args, $class;
 }
+
+=head2 C<get_sources()>
 
 =over 4
 
@@ -163,7 +166,7 @@ sub get_sources {
         next if $ofile =~ m/^\Qsrc$PConfig{slash}ops\E/ || # if run by hand...
                 $ofile =~ m{^src/ops};                     # ... or by makefile
 
-        $ofile =~ s/\\/\//g;
+        $ofile =~ s{\\}{/}g; # Normalize path separators
 
         my $is_yacc = ($ofile =~ /\.y$/);
         if ( !$is_yacc ) {

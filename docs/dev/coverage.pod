@@ -1,10 +1,10 @@
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 Make Cover
 
 docs/dev/coverage.pod - Make Cover Documentation.
 
-=head1 Overview
+=head1 DESCRIPTION
 
 "make cover" is a very useful tool which generates reports on how well tested
 parrot code is. The coverage reports are outputted in various formats in
@@ -12,7 +12,7 @@ cover_db/ after C<make cover> has run. The final result of make cover is a
 listing of parrot's source files and a matching percentage of how well covered
 that file is by the tests.
 
-=head1 Dependencies
+=head1 DEPENDENCIES
 
 Obviously, the first step would be to get parrot and build it. See
 F<docs/intro.pod> for more information. To run "make cover" you must first
@@ -30,7 +30,7 @@ and that will install the required module. Other OSes may have this packaged
 as well, so try to find it. If you do not have a packaged version of this
 module, head over to http://search.cpan.org/dist/Devel-Cover/ and install it.
 
-=head1 Process
+=head1 PROCESS
 
 Next, make sure your working parrot directory is as clean as can be. Any left
 over files can cause problems when generating the coverage reports.
@@ -46,7 +46,7 @@ type in C<make cover> and leave to make a sandwich and something to drink
 because it's probably going to take a I<long> time to run. If you run into
 trouble, C<make fulltest> may be of some assistance.
 
-=head1 Cover
+=head1 COVER
 
 If you have run C<make fullcover> before, you know how long it takes to execute
 that command. Recently a new tool C<make cover> has been added that is

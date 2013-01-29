@@ -14,7 +14,7 @@ my $parrot_config = "parrot_config" . $PConfig{o};
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
 
 
-plan tests => 137;
+plan tests => 134;
 
 =head1 NAME
 
@@ -186,6 +186,36 @@ CODE
 
 }
 # actual tests start here
+
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pointer");
+
+    integer = (Parrot_Int) Parrot_PMC_get_pointer(interp, pmc);
+    if (integer != NULL)
+        Parrot_printf(interp,"get_pointer on Integer PMC is non-null!\n");
+
+    integer = (Parrot_Int) Parrot_PMC_get_pointer(interp, pmc_float);
+    if (integer != NULL)
+        Parrot_printf(interp,"get_pointer on Float PMC is non-null!\n");
+
+    /* Now give them values and verify stuff still works */
+
+    Parrot_PMC_set_integer_native(interp, pmc, 42);
+    Parrot_PMC_set_number_native(interp, pmc_float, 42.0);
+
+    integer = (Parrot_Int) Parrot_PMC_get_pointer(interp, pmc);
+    if (integer != NULL)
+        Parrot_printf(interp,"get_pointer on Integer PMC is non-null!\n");
+
+    integer = (Parrot_Int) Parrot_PMC_get_pointer(interp, pmc_float);
+    if (integer != NULL)
+        Parrot_printf(interp,"get_pointer on Float PMC is non-null!\n");
+CODE
+get_pointer on Integer PMC is non-null!
+get_pointer on Float PMC is non-null!
+get_pointer on Integer PMC is non-null!
+get_pointer on Float PMC is non-null!
+Done!
+OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_ext_try coverage");
     type         = Parrot_PMC_typenum(interp, "Object");
@@ -400,13 +430,6 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_isa");
 CODE
 1
 0
-Done!
-OUTPUT
-
-# TODO: Improve this test
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_getprops");
-    pmc = Parrot_PMC_getprops(interp, continuation);
-CODE
 Done!
 OUTPUT
 
@@ -894,26 +917,6 @@ CODE
 Done!
 OUTPUT
 
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_setprop");
-    string = createstring(interp, "_struct");
-    Parrot_PMC_set_integer_native(interp, pmc, 42);
-    Parrot_PMC_setprop(interp,continuation , string, pmc);
-    pmc2 = Parrot_PMC_getprop(interp,continuation ,string);
-    Parrot_printf(interp,"%P\n",pmc2);
-CODE
-42
-Done!
-OUTPUT
-
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_delprop");
-    type   = Parrot_PMC_typenum(interp, "Class");
-    pmc    = Parrot_pmc_new(interp, type);
-
-    Parrot_PMC_delprop(interp, pmc, string);
-CODE
-Done!
-OUTPUT
-
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(add|remove)_parent");
     type   = Parrot_PMC_typenum(interp, "Class");
     pmc    = Parrot_pmc_new(interp, type);
@@ -940,6 +943,7 @@ CODE
 Got non-zero hash value!
 Done!
 OUTPUT
+
 
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pointer_keyed");
@@ -1934,22 +1938,6 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_class" );
     Parrot_printf(interp,"%P\n", pmc_string);
 CODE
 Integer
-Done!
-OUTPUT
-
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_can" );
-    Parrot_PMC_set_integer_native(interp, pmc, -42);
-
-    string = createstring(interp, "foo");
-    integer = Parrot_PMC_can(interp,pmc,string);
-    printf("%d\n", (int) integer);
-
-    string = createstring(interp, "add");
-    integer = Parrot_PMC_can(interp,pmc,string);
-    printf("%d\n", (int) integer);
-CODE
-0
-1
 Done!
 OUTPUT
 

@@ -1,8 +1,8 @@
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2013, Parrot Foundation.
 
 =head1 NAME
 
-config/auto/cpu/i386/auto.pm
+config/auto/cpu/ppc/auto.pm
 
 =head1 DESCRIPTION
 
@@ -35,6 +35,7 @@ sub runstep {
                     "HAS_PPC_$suffix" => '1',
                 );
                 $conf->debug(" (\U$suffix) ");
+                $conf->add_to_generated( $f, "[]" );
             }
         }
         $conf->cc_clean();

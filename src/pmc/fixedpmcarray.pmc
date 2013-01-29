@@ -181,6 +181,7 @@ fixed sized array).
 */
 
     VTABLE INTVAL elements() {
+        UNUSED(INTERP)
         return PMC_size(SELF);
     }
 

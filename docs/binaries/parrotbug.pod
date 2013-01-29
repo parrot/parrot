@@ -1,20 +1,20 @@
 # Copyright (C) 2001-2011, Parrot Foundation.
 
-=head1 Name
+=head1 NAME
 
 parrotbug.pod - Parrot bug report
 
-=head1 Description
+=head1 SYNOPSIS
+
+parrotbug [option] [action]
+
+=head1 DESCRIPTION
 
 A program to help generate bug reports about parrot, and mail them.
 It is designed to be used interactively. Normally no arguments will
 be needed.
 
-=head1 Usage
-
-parrotbug [option] [action]
-
-=head2 Comman line Options
+=head2 Command line Options
 
 To report successful build on this system to parrot developers use :
 
@@ -81,7 +81,7 @@ To print version information and exit after that use :
 
     --version
 
-=head1 Help
+=head1 HELP
 
 For more help or any other question you go to L<http://parrot.org> or
 L<http://github.com/parrot/parrot>.Or you can send email to 'parrot-dev@parrot.org'.

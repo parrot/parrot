@@ -1,9 +1,9 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/structview.pmc - C struct view for pointers.
+src/pmc/structview.pmc - View pointers as C structs
 
 =head1 DESCRIPTION
 
@@ -594,8 +594,8 @@ Get/Set an integer-type element from a struct-pointer PMC.
             {
                 UINTVAL        ux = x;
                 size_t         bits, n;
-                unsigned char  tempc;
-                unsigned char *cptr = (unsigned char *)ptr;
+                unsigned char  tempc = 0;
+                unsigned char *cptr  = (unsigned char *)ptr;
 
                 switch (elts[i].type) {
                   case enum_type_uint1:
@@ -610,7 +610,9 @@ Get/Set an integer-type element from a struct-pointer PMC.
                 }
 
                 /* cache last byte (for restoring hi bits) */
-                tempc    = cptr[(bits + elts[i].bit_offset)/8];
+                if (bits > 1) {
+                   tempc    = cptr[(bits + elts[i].bit_offset - 1)/8];
+                }
 
                 /* write hi bits of first byte */
                 n        = 8 - elts[i].bit_offset;
@@ -1118,7 +1120,7 @@ Implement the freeze/thaw API.
 
 =back
 
-=head2 Auxiliar functions
+=head2 Auxiliary functions
 
 =over 4
 
@@ -1128,15 +1130,21 @@ Deallocation function to be attached to allocated instances.
 
 =item C<static void dereference_null(PARROT_INTERP)>
 
+Throw an exception relating to attempting to derefence a NULL pointer.
+
 =item C<static void index_out_of_bounds(PARROT_INTERP, INTVAL i)>
+
+Throw an exception about attempting to index outside the data.
 
 =item C<static void buffer_too_small(PARROT_INTERP, size_t self_size, size_t
 buf_size)>
 
+Throw an exception about a buffer being too small.
+
 =item C<static void dereference_unaligned(PARROT_INTERP, const void *base_ptr,
 size_t align)>
 
-Throw the appropiate exception.
+Throw an exception relating to attempting to derefence an un-aligned pointer.
 
 =cut
 

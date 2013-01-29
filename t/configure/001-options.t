@@ -11,7 +11,7 @@ BEGIN {
     our $topdir = realpath($Bin) . "/../..";
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 51;
+use Test::More tests => 52;
 use Carp;
 use Parrot::Configure::Options qw| process_options |;
 use Parrot::Configure::Options::Conf::CLI ();
@@ -86,6 +86,16 @@ like(
     $@,
     qr/Invalid value for 'mode' argument to process_options\(\)/,
     "process_options() failed due to invalid 'mode' argument"
+);
+
+eval { ($args, $step_list_ref) = process_options( {
+    argv => [ '--prefix=my/relative/path' ],
+    mode => q{configure}, } );
+};
+like(
+    $@,
+    qr/Relative path given to --prefix, please pass an absolute path/,
+    "process_options() failed due to relative path as value of 'prefix'",
 );
 
 ($args, $step_list_ref) = process_options(

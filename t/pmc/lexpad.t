@@ -18,12 +18,14 @@ Tests the LexPad PMC.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(9)
+    plan(17)
 
     new_test()
     test_keyed()
     test_keyed_empty()
     test_iter()
+    test_iter2()
+    test_register_type()
 .end
 
 .sub new_test
@@ -100,6 +102,56 @@ iter_loop:
     is(value, 'pants', "Got value from iterator")
     goto iter_loop
 iter_done:
+.end
+
+.sub 'test_iter2'
+    .lex '$a', $P99
+    $P99 = box 54321
+
+    .local pmc lexpad, lexiter
+    $P0 = getinterp
+    lexpad = $P0['lexpad']
+
+    lexiter = iter lexpad
+  loop:
+    unless lexiter goto done
+    .local pmc item, key, value
+    item = shift lexiter
+    key = item.'key'()
+    value = item.'value'()
+    is (key, '$a', 'got lex name')
+    is (value, 54321, 'got lex value')
+    $P0 = lexpad[key]
+    is ($P0, 54321, 'got lex value the other way')
+    goto loop
+  done:
+.end
+
+
+.sub 'test_register_type'
+    .local int i
+    .local num n, type
+    .local string s
+    .local pmc pad, p
+
+    .lex 'I', i
+    .lex 'N', n
+    .lex 'S', s
+    .lex 'P', p
+
+    pad = getinterp
+    pad = pad['lexpad']
+
+    type = pad.'register_type'('?')
+    is(type, -1, 'type for non-existant lexical')
+    type = pad.'register_type'('I')
+    is(type,  0, 'type for integer lexical')
+    type = pad.'register_type'('N')
+    is(type,  1, 'type for num lexical')
+    type = pad.'register_type'('S')
+    is(type,  2, 'type for string lexical')
+    type = pad.'register_type'('P')
+    is(type,  3, 'type for PMC lexical')
 .end
 
 # Local Variables:

@@ -1,5 +1,5 @@
 /* api.h
- *  Copyright (C) 2001-2010, Parrot Foundation.
+ *  Copyright (C) 2001-2012, Parrot Foundation.
  *  Overview:
  *     Parrot's external embedding API. This functionality is only to be used
  *     by embedding applications, and only this functionality may be used by
@@ -16,6 +16,16 @@
 #include "parrot/core_types.h"
 
 typedef Parrot_PMC (*imcc_hack_func_t)(Parrot_PMC, Parrot_String, int, const char **);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CONST_FUNCTION
+const unsigned char * get_program_code(void);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CONST_FUNCTION
+size_t get_program_code_size(void);
 
 /* Forward declaration of Parrot_confess. We can't include exceptions.h yet */
 PARROT_EXPORT
@@ -54,6 +64,11 @@ Parrot_confess(ARGIN(const char *cond), ARGIN(const char *file), unsigned int li
 
 #endif /* NDEBUG */
 
+/* Static assertions are checked at compile type */
+#define PARROT_STATIC_ASSERT_HELPER(COND, MSG)  typedef char static_assertion_##MSG[(!!(COND))*2-1]
+#define PARROT_STATIC_ASSERT3(X, L)             PARROT_STATIC_ASSERT_HELPER(X, at_line_##L)
+#define PARROT_STATIC_ASSERT2(X, L)             PARROT_STATIC_ASSERT3(X, L)
+#define PARROT_STATIC_ASSERT(X)                 PARROT_STATIC_ASSERT2((X), __LINE__)
 
 typedef struct _Parrot_Init_Args {
     void *stacktop;
@@ -62,6 +77,7 @@ typedef struct _Parrot_Init_Args {
     Parrot_Int gc_dynamic_threshold;
     Parrot_Int gc_min_threshold;
     Parrot_UInt hash_seed;
+    Parrot_UInt numthreads;
 } Parrot_Init_Args;
 
 #define GET_INIT_STRUCT(i) do {\
@@ -119,25 +135,25 @@ PARROT_API
 Parrot_Int Parrot_api_get_exception_backtrace(
     Parrot_PMC interp_pmc,
     Parrot_PMC exception,
-    ARGOUT(Parrot_String * bt))
+    ARGOUT(Parrot_String *bt))
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(* bt);
+        FUNC_MODIFIES(*bt);
 
 PARROT_API
 Parrot_Int Parrot_api_get_result(
     Parrot_PMC interp_pmc,
     ARGOUT(Parrot_Int *is_error),
-    ARGOUT(Parrot_PMC * exception),
+    ARGOUT(Parrot_PMC *exception),
     ARGOUT(Parrot_Int *exit_code),
-    ARGOUT(Parrot_String * errmsg))
+    ARGOUT(Parrot_String *errmsg))
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
         FUNC_MODIFIES(*is_error)
-        FUNC_MODIFIES(* exception)
+        FUNC_MODIFIES(*exception)
         FUNC_MODIFIES(*exit_code)
-        FUNC_MODIFIES(* errmsg);
+        FUNC_MODIFIES(*errmsg);
 
 PARROT_API
 Parrot_Int Parrot_api_get_runtime_path(
@@ -184,7 +200,7 @@ Parrot_Int Parrot_api_set_configuration_hash(
 PARROT_API
 Parrot_Int Parrot_api_set_executable_name(
     Parrot_PMC interp_pmc,
-    ARGIN(const char * name))
+    ARGIN(const char *name))
         __attribute__nonnull__(2);
 
 PARROT_API
@@ -193,6 +209,15 @@ Parrot_Int Parrot_api_set_runcore(
     ARGIN(const char * corename),
     Parrot_UInt trace)
         __attribute__nonnull__(2);
+
+PARROT_API
+Parrot_Int Parrot_api_set_stdhandle(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC handle,
+    Parrot_Int fileno,
+    ARGOUT(Parrot_PMC *old_handle))
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*old_handle);
 
 PARROT_API
 Parrot_Int Parrot_api_set_warnings(Parrot_PMC interp_pmc, Parrot_Int flags);
@@ -263,6 +288,8 @@ Parrot_Int Parrot_api_wrap_pointer(
        PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_Parrot_api_set_runcore __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(corename))
+#define ASSERT_ARGS_Parrot_api_set_stdhandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(old_handle))
 #define ASSERT_ARGS_Parrot_api_set_warnings __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_toggle_gc __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_unwrap_pointer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -628,6 +655,13 @@ Parrot_Int Parrot_api_pmc_keep_alive(
     Parrot_Int alive);
 
 PARROT_API
+Parrot_Int Parrot_api_pmc_new_call_object(
+    Parrot_PMC interp_pmc,
+    ARGOUT(Parrot_PMC *cc))
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*cc);
+
+PARROT_API
 Parrot_Int Parrot_api_pmc_new_from_class(
     ARGIN(Parrot_PMC interp_pmc),
     ARGIN(Parrot_PMC class_pmc),
@@ -714,6 +748,14 @@ Parrot_Int Parrot_api_pmc_set_string(
         __attribute__nonnull__(3);
 
 PARROT_API
+Parrot_Int Parrot_api_pmc_setup_signature(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC callcontext,
+    ARGIN(const char * const signature),
+    ...)
+        __attribute__nonnull__(3);
+
+PARROT_API
 Parrot_Int Parrot_api_pmc_wrap_string_array(
     ARGIN(Parrot_PMC interp_pmc),
     Parrot_Int argc,
@@ -776,6 +818,9 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
     , PARROT_ASSERT_ARG(sub) \
     , PARROT_ASSERT_ARG(signature))
 #define ASSERT_ARGS_Parrot_api_pmc_keep_alive __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_api_pmc_new_call_object \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(cc))
 #define ASSERT_ARGS_Parrot_api_pmc_new_from_class __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(class_pmc) \
@@ -807,6 +852,9 @@ Parrot_Int Parrot_api_pmc_wrap_string_array(
        PARROT_ASSERT_ARG(interp_pmc) \
     , PARROT_ASSERT_ARG(pmc) \
     , PARROT_ASSERT_ARG(value))
+#define ASSERT_ARGS_Parrot_api_pmc_setup_signature \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(signature))
 #define ASSERT_ARGS_Parrot_api_pmc_wrap_string_array \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp_pmc) \

@@ -1,5 +1,5 @@
 #! ./parrot-nqp
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2012, Parrot Foundation.
 
 pir::load_bytecode("opsc.pbc");
 
@@ -46,7 +46,7 @@ my $header := $fh.readall();
 ok($header ~~ /define \s PARROT_OPLIB_CORE_OPS_H_GUARD/, 'Guard generated');
 ok($header ~~ /endif/, 'Close guard generated');
 ok($header ~~ /DO \s NOT \s EDIT \s THIS \s FILE/, 'Preamble generated');
-ok($header ~~ /Parrot_DynOp_core_ \d+ _ \d+ _ \d+/, '... and contains init_func');
+ok($header ~~ /PARROT_CORE_OPLIB_INIT/, '... and contains init_func');
 ok($header ~~ /Parrot_err_s_ic/, 'We have proper names of ops functions');
 
 # Testing C emitting.
@@ -88,7 +88,7 @@ inline op branch(in LABEL) :base_loop :flow {
     goto OFFSET($1);
 }';
 $new_body := translate_op_body($trans, $op_body);
-$restart_addr_ok := $new_body ~~ /'return (opcode_t *)cur_opcode + IREG(1);'/;
+$restart_addr_ok := $new_body ~~ /'return cur_opcode + IREG(1);'/;
 ok($restart_addr_ok, "goto OFFSET() and \$1 translated ok");
 ok($new_body ~~ /'PARROT_JUMP_RELATIVE'/, "jump flags generated");
 

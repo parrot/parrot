@@ -24,7 +24,7 @@ This file implements various functions for creating and writing packfiles.
 #include "pf_private.h"
 #include "pmc/pmc_key.h"
 
-/* HEADERIZER HFILE: src/packfile/pf_private.h */
+/* HEADERIZER HFILE: include/parrot/packfile.h */
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
@@ -46,7 +46,7 @@ static void update_backref_hash(PARROT_INTERP,
 
 /*
 
-=item C<opcode_t PackFile_pack_size(PARROT_INTERP, PackFile *self)>
+=item C<size_t PackFile_pack_size(PARROT_INTERP, PackFile *self)>
 
 Determine the size of the buffer needed in order to pack the PackFile
 into a contiguous region of memory.
@@ -59,12 +59,12 @@ buffer.
 */
 
 PARROT_EXPORT
-opcode_t
+size_t
 PackFile_pack_size(PARROT_INTERP, ARGMOD(PackFile *self))
 {
     ASSERT_ARGS(PackFile_pack_size)
     size_t size;
-    size_t header_size = 0;
+    size_t header_size;
     PackFile_Directory * const dir = &self->directory;
 
     header_size = PACKFILE_HEADER_BYTES;
@@ -118,12 +118,12 @@ PackFile_pack(PARROT_INTERP, ARGMOD(PackFile *self), ARGOUT(opcode_t *cursor))
     self->src = cursor;
 
     /* Pack the fixed part of the header */
-    mem_sys_memcopy(cursor, self->header, PACKFILE_HEADER_BYTES);
+    memcpy(cursor, self->header, PACKFILE_HEADER_BYTES);
     byte_cursor += PACKFILE_HEADER_BYTES;
 
     /* Pack the UUID. */
     if (self->header->uuid_size > 0)
-        mem_sys_memcopy(byte_cursor, self->header->uuid_data,
+        memcpy(byte_cursor, self->header->uuid_data,
             self->header->uuid_size);
 
     /* Padding. */

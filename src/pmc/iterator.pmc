@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -73,6 +73,7 @@ Raises an exception. Use C<init_pmc()>.
 */
 
     VTABLE void init() {
+        UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Iterator init without aggregate");
     }
@@ -89,6 +90,8 @@ Defaults iteration mode to iterate from start.
 */
 
     VTABLE void init_pmc(PMC *aggregate) {
+        UNUSED(SELF)
+        UNUSED(aggregate)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Direct creation of Iterator");
     }
@@ -207,6 +210,8 @@ Restart iterator
 
 */
     VTABLE void set_integer_native(INTVAL value) {
+        UNUSED(SELF)
+        UNUSED(value)
         PARROT_FAILURE("Iterator: implementation have to override this method");
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                 "Iterator: unimplemented method");

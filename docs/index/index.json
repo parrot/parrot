@@ -56,6 +56,26 @@
             "docs/book/pct/*"
          ],
          "title" : "PCT Book"
+      },
+      {
+         "source" : [
+             "docs/book/draft/ch01_introduction.pod",
+             "docs/book/draft/ch02_getting_started.pod",
+             "docs/book/draft/ch07_dynpmcs.pod",
+             "docs/book/draft/ch08_dynops.pod",
+             "docs/book/draft/ch10_opcode_reference.pod",
+             "docs/book/draft/ch11_directive_reference.pod",
+             "docs/book/draft/ch12_operator_reference.pod",
+             "docs/book/draft/chXX_hlls.pod",
+             "docs/book/draft/chXX_library.pod",
+             "docs/book/draft/chXX_testing_and_debugging.pod",
+             "docs/book/draft/appa_glossary.pod",
+             "docs/book/draft/appb_patch_submission.pod",
+             "docs/book/draft/appc_command_line_options.pod",
+             "docs/book/draft/appd_build_options.pod",
+             "docs/book/draft/appe_source_code.pod"
+         ],
+         "title" : "Parrot Developer's Guide: PIR (draft)"
       }
    ],
    "title" : "Home"

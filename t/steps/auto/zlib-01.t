@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2013, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -38,7 +38,7 @@ my $ret = $step->runstep($conf);
 ok( $ret, "runstep() returned true value" );
 is($conf->data->get('has_zlib'), 0,
     "Got expected value for 'has_zlib'");
-is($step->result(), q{no}, "Expected result was set");
+is($step->result(), q{skipped}, "Expected result was set");
 
 $conf->replenish($serialized);
 

@@ -1,13 +1,18 @@
-# Copyright (C) 2009, Parrot Foundation.
+# Copyright (C) 2012, Parrot Foundation.
 
-    set S1, "abc"
-    set S2, "EE"
-    concat S0, S1, S2
+    set S1, binary:"%Ec"
+    set S2, binary:"\xC2\x80"
+    set S3, binary:"ABCX"
+    set S4, utf8:"\xC4rger"
     print S0
     print "\n"
     print S1
     print "\n"
     print S2
+    print "\n"
+    print S3
+    print "\n"
+    print S4
     print "\n"
     end
 

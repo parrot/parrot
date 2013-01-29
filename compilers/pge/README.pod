@@ -1,5 +1,12 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
 
-=head1 Parrot Grammar Engine (PGE)
+=pod
+
+=head1 NAME
+
+compiler/pge/README.pod - Readme to the 'compilers/pge' directory. 
+
+=head1 DESCRIPTION
 
 This is a regular expression/rules/grammar engine/parser designed to
 run in Parrot.  It's still a work in progress, but has a lot of
@@ -141,4 +148,3 @@ Patches and suggestions should be sent to the Perl 6 compiler list
 (perl6-compiler@perl.org).
 
 =cut
-

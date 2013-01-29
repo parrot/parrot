@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2011, Parrot Foundation.
+Copyright (C) 2010-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -325,7 +325,7 @@ Parrot_gc_pool_destroy(SHIM_INTERP, ARGMOD(Pool_Allocator *pool))
     Pool_Allocator_Arena *arena = pool->top_arena;
 
     while (arena) {
-        Pool_Allocator_Arena *next = arena->next;
+        Pool_Allocator_Arena * const next = arena->next;
         mem_internal_free(arena);
         arena = next;
     }
@@ -608,7 +608,6 @@ arena_size(ARGIN(const Pool_Allocator *self))
 =back
 
 =cut
-
 
 */
 

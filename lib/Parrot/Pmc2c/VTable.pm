@@ -6,6 +6,7 @@ use warnings;
 use Storable ();
 use Parrot::Vtable ();
 use Parrot::Pmc2c::Method ();
+use File::Spec ();
 use File::Basename;
 use Cwd qw(cwd);
 
@@ -51,8 +52,9 @@ sub dump {
     my ($self) = @_;
 
     my $dump_filename =
-          cwd() . q{/}
-        . basename( Parrot::Pmc2c::UtilFunctions::filename( $self->filename, '.dump' ) );
+          File::Spec->catfile( cwd(),
+            basename( Parrot::Pmc2c::UtilFunctions::filename( $self->filename, '.dump' ) )
+          );
     Storable::nstore( $self, $dump_filename );
     return $dump_filename;
 }

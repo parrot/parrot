@@ -1,11 +1,13 @@
 /*
-Copyright (C) 2010-2011, Parrot Foundation.
+Copyright (C) 2010-2012, Parrot Foundation.
 
 =head1 NAME
 
 src/pointer_array.c - Implementation Pointer Array storage.
 
 =head1 DESCRIPTION
+
+This compilation unit implements pointer array storage.
 
 =cut
 
@@ -33,10 +35,10 @@ PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Parrot_Pointer_Array *
-Parrot_pa_new(PARROT_INTERP)
+Parrot_pa_new(SHIM_INTERP)
 {
     ASSERT_ARGS(Parrot_pa_new)
-    Parrot_Pointer_Array * const res = mem_allocate_zeroed_typed(Parrot_Pointer_Array);
+    Parrot_Pointer_Array * const res = mem_internal_allocate_zeroed_typed(Parrot_Pointer_Array);
     return res;
 }
 
@@ -52,7 +54,7 @@ Destroy Pointer_Arra and free allocated memory.
 
 PARROT_EXPORT
 void
-Parrot_pa_destroy(PARROT_INTERP, ARGFREE(Parrot_Pointer_Array *self))
+Parrot_pa_destroy(SHIM_INTERP, ARGFREE(Parrot_Pointer_Array *self))
 {
     ASSERT_ARGS(Parrot_pa_destroy)
     size_t i;
@@ -75,7 +77,7 @@ Get count of allocated objects.
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 size_t
-Parrot_pa_count_allocated(PARROT_INTERP, ARGIN(const Parrot_Pointer_Array *self))
+Parrot_pa_count_allocated(SHIM_INTERP, ARGIN(const Parrot_Pointer_Array *self))
 {
     ASSERT_ARGS(Parrot_pa_count_allocated)
     return self->total_chunks * CELL_PER_CHUNK;
@@ -93,7 +95,7 @@ Get count of allocated objects.
 */
 PARROT_WARN_UNUSED_RESULT
 size_t
-Parrot_pa_count_used(PARROT_INTERP, ARGIN(const Parrot_Pointer_Array *self))
+Parrot_pa_count_used(SHIM_INTERP, ARGIN(const Parrot_Pointer_Array *self))
 {
     ASSERT_ARGS(Parrot_pa_count_used)
     size_t count = 0;
@@ -104,8 +106,8 @@ Parrot_pa_count_used(PARROT_INTERP, ARGIN(const Parrot_Pointer_Array *self))
 
 /*
 
-=item C<int Parrot_pa_is_owned(PARROT_INTERP, Parrot_Pointer_Array *self, void
-*orig, void *ref)>
+=item C<int Parrot_pa_is_owned(const Parrot_Pointer_Array *self, const void
+*orig, const void *ref)>
 
 Check that C<orig> pointer is stored in C<ref> cell. Used during system stack t
 
@@ -113,9 +115,10 @@ Check that C<orig> pointer is stored in C<ref> cell. Used during system stack t
 
 */
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 int
-Parrot_pa_is_owned(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self),
-        ARGIN(void *orig), ARGIN_NULLOK(void *ref))
+Parrot_pa_is_owned(ARGIN(const Parrot_Pointer_Array *self),
+        ARGIN(const void *orig), ARGIN_NULLOK(const void *ref))
 {
     ASSERT_ARGS(Parrot_pa_is_owned)
     size_t i;
@@ -132,7 +135,7 @@ Parrot_pa_is_owned(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self),
             continue;
         if (PTR2UINTVAL(ref) > PTR2UINTVAL(chunk) + CHUNK_SIZE)
             continue;
-        return (*(void **)ref == orig);
+        return (*(void * const *)ref == orig);
     }
 
     return 0;

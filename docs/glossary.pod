@@ -1,16 +1,16 @@
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
 docs/glossary.pod - Parrot Glossary
 
-=head1 SUMMARY
+=head1 DESCRIPTION
 
 Short descriptions of words and acronyms found in Parrot development.
 
 =head1 VERSION
 
-LAST UPDATED: 14 FEB 2011
+LAST UPDATED: 24 MAY 2012
 
 glossary.pod is updated and maintained from Parrot's GitHub repository.
 You may get the most up-to-date version at:
@@ -257,27 +257,12 @@ Parrot Grammar Engine.
 
 See also L<"PCT">.
 
-=item PIL
-
-Pugs' Intermediate Language.
-
 =item PIR
 
 Parrot Intermediate Representation: A medium-level assembly language for Parrot
 that hides messy details like register allocation so language compiler writers
 who target Parrot don't have to roll their own. Files have the
 extension C<.pir>.
-
-=item PIRATE
-
-PIRATE is Parrot's next generation compiler, and is currently under development.  
-IMCC is still the current compiler.
-
-=item PIRC
-
-Parrot Intermediate Representation Compiler.  It is an experimental attempt
-to replace IMCC, but could the PIR for IMCC.  Work on PIRC is incomplete,
-and the next generation compiler is PIRATE.
 
 =item PMC
 

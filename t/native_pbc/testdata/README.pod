@@ -1,0 +1,17 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+t/native_pbc/testdata/README.pod - Readme file for 't/native_pbc' directory. 
+
+=head1 DESCRIPTION
+
+This directory contains various PIR files for generating PBC in t/native_pbc.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2012, Parrot Foundation.
+
+=cut

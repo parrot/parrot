@@ -1,10 +1,10 @@
+# Copyright (C) 2003-2012, Parrot Foundation.
+
+=pod
+
 =head1 NAME
 
 Parrot Subroutines
-
-=head1 VERSION
-
-$Revision$
 
 =head1 ABSTRACT
 

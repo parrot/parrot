@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 exists
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's exists opcode.
+
+=head1 EXISTS
 
 The C<exists> opcode tells you whether an element of a container PMC
 (array or hash for example) exists. It differs from C<defined>, because

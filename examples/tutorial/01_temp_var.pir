@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 Simple Variables
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's register variables.
+
+=head1 SIMPLE VARIABLES
 
 PIR has two kinds of variables. The most simple kind are
 Parrot register variables. Register variables are named with

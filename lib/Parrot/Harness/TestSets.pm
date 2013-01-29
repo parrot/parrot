@@ -25,6 +25,7 @@ our %test_groups = (
         t/compilers/tge/*.t
         t/compilers/opsc/*.t
         t/compilers/data_json/*.t
+        ext/nqp-rx/t/nqp/*.t
     ) ],
     configure => [ qw(
         t/configure/*.t

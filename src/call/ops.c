@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -27,9 +27,6 @@ B<Calling Ops>:  Various functions that call the run loop.
 
 #define STACKED_EXCEPTIONS 1
 #define RUNLOOP_TRACE      0
-
-static int
-runloop_id_counter = 0;          /* for synthesizing runloop ids. */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -91,7 +88,7 @@ runops(PARROT_INTERP, size_t offs)
   reenter:
         interp->current_runloop->handler_start = NULL;
         switch (setjmp(interp->current_runloop->resume)) {
-          case 1:
+          case PARROT_JMP_EXCEPTION_HANDLED:
             /* an exception was handled */
             if (STACKED_EXCEPTIONS)
                 free_runloop_jump_point(interp);
@@ -104,7 +101,7 @@ runops(PARROT_INTERP, size_t offs)
                         interp->current_runloop_id, interp->current_runloop_level);
 #endif
             return;
-          case 2:
+          case PARROT_JMP_EXCEPTION_FROM_C:
             /* Reenter the runloop from a exception thrown from C
              * with a pir handler */
             free_runloops_until(interp, our_runloop_id);
@@ -112,7 +109,7 @@ runops(PARROT_INTERP, size_t offs)
             offset = interp->current_runloop->handler_start - interp->code->base.data;
             /* Prevent incorrect reuse */
             goto reenter;
-          case 3:
+          case PARROT_JMP_EXCEPTION_FINALIZED:
             /* Reenter the runloop when finished the handling of a
              * exception */
             free_runloops_until(interp, our_runloop_id);
@@ -151,7 +148,8 @@ void
 reset_runloop_id_counter(PARROT_INTERP)
 {
     ASSERT_ARGS(reset_runloop_id_counter)
-    runloop_id_counter = 0;
+    UNUSED(interp);
+    interp->runloop_id_counter = 0;
 }
 
 
@@ -187,7 +185,7 @@ new_runloop_jump_point(PARROT_INTERP)
         jump_point = mem_gc_allocate_zeroed_typed(interp, Parrot_runloop);
 
     jump_point->prev           = interp->current_runloop;
-    jump_point->id             = ++runloop_id_counter;
+    jump_point->id             = ++interp->runloop_id_counter;
     interp->current_runloop    = jump_point;
     interp->current_runloop_id = jump_point->id;
     ++interp->current_runloop_level;

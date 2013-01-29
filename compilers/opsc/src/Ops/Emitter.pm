@@ -1,5 +1,5 @@
 #! nqp
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2013, Parrot Foundation.
 
 class Ops::Emitter is Hash;
 
@@ -8,6 +8,8 @@ class Ops::Emitter is Hash;
 Emitter.
 
 =end
+
+pir::load_bytecode('config.pbc');
 
 method new(:$ops_file!, :$trans!, :$script!, :$file, :%flags!) {
     self<ops_file>  := $ops_file;
@@ -23,7 +25,8 @@ method new(:$ops_file!, :$trans!, :$script!, :$file, :%flags!) {
 
     if !%flags<core> {
         $base := subst( $file, /.ops$$/, '');
-        $base := subst( $base, /.*\//, '');
+        $base := subst( $base, /.*\//, ''); # Unix slash
+        $base := subst( $base, /.*\\/, ''); # Win backslash
     }
 
     my $base_ops_stub := $base ~ '_ops' ~ $suffix;
@@ -38,20 +41,20 @@ method new(:$ops_file!, :$trans!, :$script!, :$file, :%flags!) {
         self<func_header> := (~%flags<dir>) ~ "include/" ~ self<include>;
         self<enum_header> := (~%flags<dir>) ~ "include/parrot/oplib/ops.h";
         self<source>  := (~%flags<dir>) ~ "src/ops/$base_ops_stub.c";
+        self<init_func>  := join('_', 'PARROT', 'CORE', 'OPLIB', 'INIT' );
     }
     else {
         my $dynops_dir := subst( $file, /\w+\.ops$$/, '');
         self<include> := $base ~ "_ops.h";
         self<func_header>  := $dynops_dir ~ self<include>;
         self<source>  := $dynops_dir ~ $base ~ "_ops.c";
+        self<init_func>  := join('_', 'PARROT', 'DYNOP', uc($base ~ $suffix), 'INIT' );
     }
 
     self<sym_export> := %flags<core>
                         ?? ''
                         !! 'PARROT_DYNEXT_EXPORT';
 
-    self<init_func>  := join('_',
-        'Parrot', 'DynOp', $base ~ $suffix, |$ops_file.version );
 
     # Prepare ops
     $trans.prepare_ops(self, $ops_file);
@@ -211,6 +214,7 @@ method _emit_source_preamble($fh) {
     self._emit_preamble($fh);
     $fh.print(qq|
 #include "{self<include>}"
+#include "parrot/pbcversion.h"
 #include "pmc/pmc_parrotlibrary.h"
 #include "pmc/pmc_callcontext.h"
 
@@ -238,9 +242,8 @@ op_lib_t | ~ self.bs ~ q|op_lib = {| ~ qq|
   "{self.suffix}",                  /* suffix */
   $core_type,                       /* core_type = PARROT_XX_CORE */
   0,                                /* flags */
-  {self.ops_file.version_major},    /* major_version */
-  {self.ops_file.version_minor},    /* minor_version */
-  {self.ops_file.version_patch},    /* patch_version */
+  PARROT_PBC_MAJOR,
+  PARROT_PBC_MINOR,
   {+self.ops_file.ops},             /* op_count */
   {self.trans.op_info(self)},       /* op_info_table */
   {self.trans.op_func(self)},       /* op_func_table */
@@ -255,8 +258,8 @@ method _emit_init_func($fh) {
     my $dispatch := self.trans.init_func_disaptch;
 
     # TODO There is a bug in NQP about \{
-    $fh.print((self.flags<core> ?? 'PARROT_EXPORT' !! '') ~ q|
-op_lib_t *
+    $fh.print(qq|\n\n| ~ (self.flags<core> ?? "PARROT_EXPORT\n" !! '')
+~ q|op_lib_t *
 | ~ self.init_func ~ q|(PARROT_INTERP, long init) {
     /* initialize and return op_lib ptr */
     if (init == 1) {
@@ -308,6 +311,11 @@ $load_func(PARROT_INTERP)
 # returns a string like "PARROT_OPLIB_CORE_OPS_H_GUARD"
 method _generate_guard_macro_name($filename) {
     $filename := subst($filename, /.h$/, '');
+    my $config := _config();
+    my $osname := $config<osname>;
+    if ($osname eq 'MSWin32') {
+        $filename := subst($filename, /\\/, '/', :global);
+    }
     #my @path = File::Spec->splitdir($filename);
     my @path := split('/', $filename);
     @path.shift if @path[0]~'/' eq self<flags><dir>;

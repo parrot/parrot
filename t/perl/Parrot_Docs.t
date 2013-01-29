@@ -110,6 +110,8 @@ ok( $s, 'new section' );
 
 my $tgt = Parrot::Docs::Directory->new( tmp_dir_path('tgt') );
 
+# hack to omit adding the files to MANIFEST.generated
+$s->{TESTING} = 1;
 $s->write_html( $src, $tgt, 1 );
 
 $f = $tgt->file_with_name('index.html');

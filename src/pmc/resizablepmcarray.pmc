@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -66,7 +66,7 @@ do_shift(ARGIN(PMC *arr))
     PMC ** const item = PMC_array(arr);
 
     PMC_size(arr) = --size;
-    mem_sys_memmove(item, item + 1, size * sizeof (PMC *));
+    memmove(item, item + 1, size * sizeof (PMC *));
     item[size] = PMCNULL;
 }
 
@@ -80,7 +80,7 @@ do_unshift(PARROT_INTERP, ARGIN(PMC *arr), ARGIN(PMC *val))
 
     VTABLE_set_integer_native(interp, arr, size + 1);
     item = PMC_array(arr);
-    mem_sys_memmove(item + 1, item, size * sizeof (PMC *));
+    memmove(item + 1, item, size * sizeof (PMC *));
     item[0] = val;
 }
 
@@ -331,9 +331,9 @@ Sets the PMC value of the element keyed by C<key> to C<*src>.
 
 /*
 
-=item C<void delete_pmc_keyed_int(INTVAL key)>
+=item C<void delete_keyed_int(INTVAL key)>
 
-=item C<void delete_pmc_keyed(PMC *key)>
+=item C<void delete_keyed(PMC *key)>
 
 Delete the element at index C<key>.
 
@@ -347,6 +347,7 @@ Delete the element at index C<key>.
     }
 
     VTABLE void delete_keyed_int(INTVAL key) {
+        UNUSED(INTERP)
         PMC ** const data = PMC_array(SELF);
         const INTVAL  n   = PMC_size(SELF);
         INTVAL  i;
@@ -361,7 +362,7 @@ Delete the element at index C<key>.
 
 =item C<INTVAL exists_keyed_int(INTVAL key)>
 
-=item C<INTVAL exists_keyed_int(PMC *key)>
+=item C<INTVAL exists_keyed(PMC *key)>
 
 Returns TRUE is the element at C<key> exists; otherwise returns false.
 
@@ -369,6 +370,7 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
 
 */
     VTABLE INTVAL exists_keyed_int(INTVAL key) {
+        UNUSED(INTERP)
         PMC **data;
 
         if (key < 0)
@@ -670,7 +672,7 @@ Note that the C<from> PMC can be of any of the various array types.
         item = PMC_array(SELF);
         if (tail > 0 && count > elems1) {
             /* we're shrinking the array, so first move the tail left */
-            mem_sys_memmove(item + offset + elems1, item + offset + count,
+            memmove(item + offset + elems1, item + offset + count,
                  tail * sizeof (PMC *));
         }
 
@@ -680,7 +682,7 @@ Note that the C<from> PMC can be of any of the various array types.
         item = PMC_array(SELF);
         if (tail > 0 && count < elems1) {
             /* the array grew, so move the tail to the right */
-            mem_sys_memmove(item + offset + elems1, item + offset + count,
+            memmove(item + offset + elems1, item + offset + count,
                  tail * sizeof (PMC *));
         }
 

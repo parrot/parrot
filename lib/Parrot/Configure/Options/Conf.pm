@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2011, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 package Parrot::Configure::Options::Conf;
 
 use strict;
@@ -86,7 +86,7 @@ Parrot Options:
    --opcode=(type)      Use the given type for opcodes
    --ops=(files)        Use the given ops files
 
-   --without-threads    Build parrot without thread support
+   --without-threads    Build parrot without OS thread support
    --without-core-nci-thunks
                         Build parrot without core-required
                         statically compiled NCI call frames

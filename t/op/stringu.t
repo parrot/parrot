@@ -1,11 +1,11 @@
 #!perl
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 47;
+use Parrot::Test tests => 48;
 use Parrot::Config;
 
 =head1 NAME
@@ -21,6 +21,27 @@ t/op/stringu.t - Unicode String Test
 Tests Parrot unicode string system.
 
 =cut
+
+pir_output_is(<<'CODE',<<'OUTPUT', 'non-ascii immc optimizer GH#837');
+.sub main
+    $S1 = utf8:"\x{a2}"
+    say $S1
+
+    concat $S1, unicode:"\x{a2}", unicode:"\x{a2}"
+    say $S1
+
+    concat $S2, unicode:"\x{a2}", "c"
+    say $S2
+
+    concat $S3, unicode:"\x{62}", unicode:"\x{62}"
+    say $S3
+.end
+CODE
+¢
+¢¢
+¢c
+bb
+OUTPUT
 
 pir_output_is( <<'CODE', <<OUTPUT, "angstrom" );
 .sub main :main
@@ -310,8 +331,6 @@ CODE
 AAAAAAAAAA\xd9\xa6
 OUTPUT
 
-SKIP: {
-    skip( 'no ICU lib', 3 ) unless $PConfig{has_icu};
     pir_output_is( <<'CODE', <<OUTPUT, "downcase changes string behind scenes" );
 .sub main :main
     .local string str
@@ -363,7 +382,6 @@ OUTPUT
 CODE
 T\x{d6}TSCH
 OUTPUT
-}
 
 # Tests for .CCLASS_WHITESPACE
 pir_output_is( <<'CODE', <<'OUTPUT', "CCLASS_WHITESPACE in unicode" );

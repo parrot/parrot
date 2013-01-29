@@ -1,10 +1,10 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
 docs/memory_internals.pod - Memory Internals
 
-=head1 ABSTRACT
+=head1 DESCRIPTION
 
 This document tries to explain the internals of the Parrot memory subsystem,
 and the data structures related to memory management and garbage collection.
@@ -44,7 +44,7 @@ considered dead and are collected.
 
 See F<docs/pdds/pdd09_gc.pod> for details about the garbage collector system.
 
-=head1 Top down: the interpreter
+=head1 TOP DOWN: THE INTERPRETER
 
 A overall layout of the interpreter's memory management looks like so:
 
@@ -58,7 +58,7 @@ All object-like things that get allocated during the execution of parrot
 bytecode are managed from the C<mem_pools> member of the interpreter
 structure.
 
-=head1 Memory Pools
+=head1 MEMORY POOLS
 
 C<struct Memory_Pools> holds pointers to a variety of different kinds of managed
 memory. A simplification looks similar to this:
@@ -77,7 +77,7 @@ C<struct Var_Size_Pool> are for variable-size objects, such as constant string
 buffers. Pools of type C<struct Fixed_Size_Pool> are for fixed-size objects
 such as headers or PMCs.
 
-=head1 Fixed sized items
+=head1 FIXED SIZED ITEMS
 
 Fixed-size items are either objects by themselves, like a C<PMC>, or are
 header structures of variable-sized objects like C<STRING>.  The general
@@ -138,7 +138,7 @@ F<pobj.h> provides macros to facilitate referencing individual object flags:
 C<gc_flag_SET>, C<gc_flag_CLEAR> and C<gc_flag_TEST>. They make up a portable
 way of manipulating the GC-relevant object flags.
 
-=head1 Variable sized items
+=head1 VARIABLE SIZE ITEMS
 
 Variable-sized items do not exist by themselves, they are always wrapped by
 a buffer structure that contains a pointer to the data information about them.
@@ -215,7 +215,7 @@ mark phase all dead users increment the refcount, living users set it to an
 huge value.  When freeing the buffer, the string is only freed if the refcount
 reaches zero.
 
-=head1 Simplified Figure
+=head1 SIMPLIFIED FIGURE
 
                          +--------------+
       +--------------<---| Memory Pools |<---------+
@@ -261,3 +261,5 @@ Leopold Tötsch C<lt@toetsch.at>
 =head1 VERSION
 
 0.1.1 June 2008
+
+=cut

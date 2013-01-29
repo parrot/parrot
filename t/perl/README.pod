@@ -1,0 +1,22 @@
+# Copyright (C) 2003-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+t/perl/README.pod - Readme file for the 't/perl/' directory. 
+
+=head1 DESCRIPTION
+
+This directory contains test code for Perl5 modules used as helpers for Parrot.
+
+I<See also> the documentation in F<../../docs/tests.pod>.
+
+Test of the Perl5 modules used for Parrot configuration are in
+'../t/configure'.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2003-2012, Parrot Foundation.
+
+=cut

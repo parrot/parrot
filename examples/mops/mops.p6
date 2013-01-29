@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =begin pod
 
@@ -88,4 +88,3 @@ print "M op/s:        ",$N1,"\n"; # print  "M op/s:        "
                                   # print  "\n"
                                   #
 }                                 # end
-

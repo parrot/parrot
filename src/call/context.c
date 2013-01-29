@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2009-2011, Parrot Foundation.
+Copyright (C) 2009-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -18,6 +18,7 @@ Parrot_Context functions.
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
 #include "pmc/pmc_continuation.h"
+#include "pmc/pmc_proxy.h"
 
 /*
 
@@ -175,6 +176,12 @@ Parrot_pcc_set_sub(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *sub))
 
         c->current_pc        = subattr->seg->base.data + subattr->start_offs;
         c->current_HLL       = subattr->HLL_id;
+#ifdef THREAD_DEBUG
+        PARROT_ASSERT(
+            PObj_is_shared_TEST(sub)
+            || subattr->namespace_stash == NULL
+            || subattr->namespace_stash->orig_interp == interp);
+#endif
         c->current_namespace = subattr->namespace_stash;
     }
 }
@@ -244,7 +251,6 @@ init_context(ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
     ctx->lex_pad           = PMCNULL;
     ctx->outer_ctx         = NULL;
     ctx->current_cont      = NULL;
-    ctx->current_object    = NULL;
     ctx->handlers          = PMCNULL;
     ctx->caller_ctx        = NULL;
     ctx->current_sig       = PMCNULL;
@@ -271,6 +277,7 @@ init_context(ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
         ctx->errors            = old->errors;
         ctx->trace_flags       = old->trace_flags;
         ctx->current_HLL       = old->current_HLL;
+        PARROT_ASSERT_INTERP(old->current_namespace, pmcctx->orig_interp);
         ctx->current_namespace = old->current_namespace;
         /* end COW */
         ctx->recursion_depth   = old->recursion_depth;
@@ -625,6 +632,12 @@ UINTVAL idx)>
 
 Get pointer to INTVAL register.
 
+Notice that this pointer IS NOT intended for long term use. This pointer is
+tied to the lifetime of the Context, and if the Context is destroyed the
+memory for the registers will be freed and possibly even recycled. This
+pointer should be used for an immediate set or fetch and should not be
+cached.
+
 =cut
 
 */
@@ -646,6 +659,12 @@ Parrot_pcc_get_INTVAL_reg(PARROT_INTERP, ARGIN(const PMC *ctx), UINTVAL idx)
 UINTVAL idx)>
 
 Get pointer to FLOATVAL register.
+
+Notice that this pointer IS NOT intended for long term use. This pointer is
+tied to the lifetime of the Context, and if the Context is destroyed the
+memory for the registers will be freed and possibly even recycled. This
+pointer should be used for an immediate set or fetch and should not be
+cached.
 
 =cut
 
@@ -669,6 +688,12 @@ idx)>
 
 Get pointer to STRING register.
 
+Notice that this pointer IS NOT intended for long term use. This pointer is
+tied to the lifetime of the Context, and if the Context is destroyed the
+memory for the registers will be freed and possibly even recycled. This
+pointer should be used for an immediate set or fetch and should not be
+cached.
+
 =cut
 
 */
@@ -690,6 +715,12 @@ Parrot_pcc_get_STRING_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
 =item C<PMC ** Parrot_pcc_get_PMC_reg(PARROT_INTERP, PMC *ctx, UINTVAL idx)>
 
 Get pointer to PMC register.
+
+Notice that this pointer IS NOT intended for long term use. This pointer is
+tied to the lifetime of the Context, and if the Context is destroyed the
+memory for the registers will be freed and possibly even recycled. This
+pointer should be used for an immediate set or fetch and should not be
+cached.
 
 =cut
 
@@ -720,6 +751,7 @@ Return number of used registers of particular type.
 =cut
 
 */
+
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 UINTVAL
@@ -738,6 +770,7 @@ Get pointer to FLOANFAL and INTVAL registers.
 =cut
 
 */
+
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
@@ -757,6 +790,7 @@ Copy Regs_ni into Context.
 =cut
 
 */
+
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void
@@ -775,6 +809,7 @@ Get pointer to PMC and STRING registers.
 =cut
 
 */
+
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
@@ -794,6 +829,7 @@ Copy Regs_ps into Context.
 =cut
 
 */
+
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 void
@@ -838,10 +874,11 @@ void
 Parrot_pcc_reuse_continuation(PARROT_INTERP, ARGIN(PMC *call_context), ARGIN_NULLOK(opcode_t *next))
 {
     ASSERT_ARGS(Parrot_pcc_reuse_continuation)
-    Parrot_CallContext_attributes *c = CONTEXT_STRUCT(call_context);
+    Parrot_CallContext_attributes * const c = CONTEXT_STRUCT(call_context);
     INTVAL reuse = 0;
+
     if (!PMC_IS_NULL(c->continuation)) {
-        PMC     *cont = c->continuation;
+        PMC * const cont = c->continuation;
         INTVAL   invoked;
         GETATTR_Continuation_invoked(interp, cont, invoked);
         /* Reuse if invoked. And not tailcalled? */
@@ -872,6 +909,43 @@ set_context(PARROT_INTERP, ARGIN(PMC *ctx))
     ASSERT_ARGS(set_context)
 
     CURRENT_CONTEXT(interp) = ctx;
+}
+
+/*
+
+=item C<PMC * Parrot_pcc_unproxy_context(PARROT_INTERP, PMC * proxy)>
+
+CallContext cannot be properly proxied across threads because of direct field
+accesses. Instead, create a new CallContext which acts like a proxy but can
+be used with direct accesses.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_pcc_unproxy_context(PARROT_INTERP, ARGIN(PMC * proxy))
+{
+    ASSERT_ARGS(Parrot_pcc_unproxy_context)
+    PMC * const ctx_pmc = Parrot_pcc_allocate_empty_context(interp, PMCNULL);
+    PMC * const target_ctx_pmc = PARROT_PROXY(proxy)->target;
+    Parrot_Context * const ctx = CONTEXT_STRUCT(ctx_pmc);
+    Parrot_Context * const target_ctx = CONTEXT_STRUCT(target_ctx_pmc);
+    Parrot_Interp const target_interp = PARROT_PROXY(proxy)->interp;
+
+    ctx->caller_ctx = PMCNULL;      /* TODO: Double-check this */
+    ctx->outer_ctx = PMCNULL;
+    ctx->lex_pad = Parrot_thread_create_proxy(target_interp, interp, target_ctx->lex_pad);
+    ctx->handlers = Parrot_thread_create_proxy(target_interp, interp, target_ctx->handlers);
+    ctx->current_cont = PMCNULL;
+    ctx->current_namespace = PMCNULL;
+    ctx->current_sig = PMCNULL;
+    ctx->type_tuple = PMCNULL;
+    ctx->arg_flags = PMCNULL;
+    ctx->return_flags = PMCNULL;
+    return ctx_pmc;
 }
 
 /*

@@ -2,10 +2,6 @@
 
 =head1 PDD 7: Conventions and Guidelines for Parrot Source Code
 
-
-
-
-
 =head2 Abstract
 
 This document describes the various rules, guidelines and advice for those
@@ -506,9 +502,10 @@ C<i> that's visible after it's used, which is confusing at best.
 Filenames must be assumed to be case-insensitive, in the sense that you
 may not have two different files called F<Foo> and F<foo>. Normal source-code
 filenames should be all lower-case; filenames with upper-case letters in them
-are reserved for notice-me-first files such as F<README>, and for files which
-need some sort of pre-processing applied to them or which do the preprocessing
-- e.g. a script F<foo.SH> might read F<foo.TEMPLATE> and output F<foo.c>.
+are reserved for notice-me-first files such as F<README.pod>, and for files
+which need some sort of pre-processing applied to them or which do the
+preprocessing - e.g. a script F<foo.SH> might read F<foo.TEMPLATE> and output
+F<foo.c>.
 
 The characters making up filenames must be chosen from the ASCII set
 A-Z,a-z,0-9 plus .-_

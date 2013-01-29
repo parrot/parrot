@@ -1,0 +1,68 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+examples/README.pod - Readme file for the directory. 
+
+=head1 DESCRIPTION
+
+The directory 'examples' provides examples of proper, and sometimes
+silly, programs for Parrot. Most of these examples are tested by test
+scripts in 't/examples'.
+
+=over 4
+
+=over 8
+
+=item benchmarks - Contains benchmarks. Run them with 'make benchmark_tests'
+     
+=item c          - Examples in C
+
+=item compilers  - Examples for parrot compilers
+
+=item io         - Examples how PIR and PASM programs talk with the world
+
+=item japh       - Say 'Just another Parrot hacker' in various ways
+
+=item library    - Examples on how to use PIR libraries
+
+=item mops       - Million ops per second
+
+=item nci        - Native call interface
+
+=item pasm       - Examples in Parrot Assembler, PASM
+
+=item past       - Examples of PAST, Parrot Abstract Syntax Tree, see pdd26_ast
+
+=item pge        - Parrot grammar engine
+
+=item pir        - Examples in Parrot Intermediate Representation, PIR
+
+=item sdl        - SDL
+
+=item shootout   - PIR[*]
+
+=item streams    - Examples for the streams library
+
+=item subs       - calling subroutines in PIR and PASM
+
+=item tge        - usage of TGE, see compilers/tge
+
+=item tutorial   - a PIR tutorial
+
+=back
+
+=back
+
+=head1 NOTE
+
+[*] For the great computer languages shootout at
+http://shootout.alioth.debian.org/
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2012, Parrot Foundation.
+
+=cut

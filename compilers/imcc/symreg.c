@@ -319,11 +319,9 @@ mk_temp_reg(ARGMOD(imc_info_t * imcc), int t)
 {
     ASSERT_ARGS(mk_temp_reg)
     char       buf[30];
-    /* XXX non-reentrant */
-    /* TODO: Fix this */
-    static int temp;
 
-    snprintf(buf, sizeof (buf), "__imcc_temp_%d", ++temp);
+    ++imcc->unique_count;
+    snprintf(buf, sizeof (buf), "__imcc_temp_%d", imcc->unique_count);
     return mk_symreg(imcc, buf, t);
 }
 

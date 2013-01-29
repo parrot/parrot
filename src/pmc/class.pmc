@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -178,6 +178,10 @@ static STRING * make_class_name(PARROT_INTERP, ARGIN(PMC *SELF))
 =item C<static int cache_class_attribs(PARROT_INTERP, PMC *cur_class, PMC
 *attrib_index, PMC *cache, int cur_index)>
 
+Create a cached map of all attributes (including those inherited from parent
+types), where the name of each attribute is mapped to an integer index into
+a storage array.
+
 =cut
 
 */
@@ -279,13 +283,14 @@ init_class_from_hash(PARROT_INTERP, ARGMOD(PMC *self), ARGIN_NULLOK(PMC *info))
 {
     ASSERT_ARGS(init_class_from_hash)
     Parrot_Class_attributes * const _class      = PARROT_CLASS(self);
-    STRING       * const name_str    = CONST_STRING(interp, "name");
-    STRING       * const parents_str = CONST_STRING(interp, "parents");
-    STRING       * const methods_str = CONST_STRING(interp, "methods");
-    STRING       * const roles_str   = CONST_STRING(interp, "roles");
-    STRING       * const attrs_str   = CONST_STRING(interp, "attributes");
-    PMC          *old_ns;
-    STRING       *resolve_method_str;
+    STRING  * const name_str    = CONST_STRING(interp, "name");
+    STRING  * const parents_str = CONST_STRING(interp, "parents");
+    STRING  * const methods_str = CONST_STRING(interp, "methods");
+    STRING  * const roles_str   = CONST_STRING(interp, "roles");
+    STRING  * const attrs_str   = CONST_STRING(interp, "attributes");
+    STRING  * const resolve_method_str = CONST_STRING(interp, "resolve_method");
+    STRING  * const set_class_str = CONST_STRING(interp, "set_class");
+    PMC     *old_ns;
 
     /* Ensure we actually have some initialization info. */
     if (PMC_IS_NULL(info))
@@ -355,17 +360,18 @@ init_class_from_hash(PARROT_INTERP, ARGMOD(PMC *self), ARGIN_NULLOK(PMC *info))
     /* If we were attached to a namespace and are now attached to a new one,
      * need to unset ourselves in the old namespace. */
     if (!PMC_IS_NULL(old_ns) && _class->_namespace != old_ns)
-        Parrot_pcc_invoke_method_from_c_args(interp, old_ns, CONST_STRING(interp, "set_class"), "P->", PMCNULL);
+        Parrot_pcc_invoke_method_from_c_args(interp, old_ns,
+                                             set_class_str,
+                                             "P->", PMCNULL);
 
     /* Link namespace to this class, if there is one. */
     if (!PMC_IS_NULL(_class->_namespace)) {
-        STRING * const set_class_str = CONST_STRING(interp, "set_class");
-        Parrot_pcc_invoke_method_from_c_args(interp, _class->_namespace, set_class_str, "P->",
-                                             self);
+        Parrot_pcc_invoke_method_from_c_args(interp, _class->_namespace,
+                                             set_class_str,
+                                             "P->", self);
     }
 
     /* Initialize resolve_method. */
-    resolve_method_str = CONST_STRING(interp, "resolve_method");
     if (VTABLE_exists_keyed_str(interp, info, resolve_method_str)) {
         /* Set it. */
         _class->resolve_method =
@@ -440,6 +446,9 @@ init_class_from_hash(PARROT_INTERP, ARGMOD(PMC *self), ARGIN_NULLOK(PMC *info))
 =item C<static void initialize_parents(PARROT_INTERP, PMC *object, PMC
 *all_parents)>
 
+Loop over all parents in the MRO, setting up delegate objects if necessary and
+calling C<init> vtables on them, if necessary.
+
 =cut
 
 */
@@ -477,6 +486,9 @@ initialize_parents(PARROT_INTERP, ARGIN(PMC *object), ARGIN(PMC *all_parents))
 
 =item C<static void initialize_parents_pmc(PARROT_INTERP, PMC *object, PMC
 *all_parents, PMC *init)>
+
+Loop over all parents in the MRO, setting up delegate objects if necessary and
+calling C<init_pmc> vtables on them, if necessary.
 
 =cut
 
@@ -1593,8 +1605,8 @@ Returns whether the class does the given C<*role>.
         return VTABLE_isa_pmc(INTERP, SELF, role);
     }
 
-    VTABLE INTVAL is_equal(PMC * p)
-    {
+    VTABLE INTVAL is_equal(PMC * p) {
+        UNUSED(INTERP)
         return p == SELF;
     }
 
@@ -1609,6 +1621,7 @@ Returns the integer type of the class.
 */
 
     VTABLE INTVAL type() {
+        UNUSED(INTERP)
         Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
         return _class->id;
     }
@@ -1738,6 +1751,7 @@ with functions like Parrot_pmc_new and pmc_reuse, which take type ID numbers sti
 */
 
     VTABLE INTVAL get_integer() {
+        UNUSED(INTERP)
         return PARROT_CLASS(SELF)->id;
     }
 
@@ -1752,8 +1766,8 @@ Called after the class has been thawed.
 */
 
     VTABLE void thawfinish(PMC *info) {
-        Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
         UNUSED(info)
+        Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
 
         /* Recalculate full MRO from thawed parents */
         _class->all_parents         = Parrot_ComputeMRO_C3(INTERP, SELF);

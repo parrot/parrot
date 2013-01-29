@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2010, Parrot Foundation.
+# Copyright (C) 2004-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -45,8 +45,8 @@ Searches up the file system tree from the current working directory
 looking for the distribution directory, and returns it if it finds it.
 The search is only performed once.
 
-The criterion is that there should be a F<README> file beginning with
-the words "This is Parrot" in the directory.
+The criterion is that there should be a F<README.pod> file beginning with
+the words "# Copyright (C) 2001-2012, Parrot Foundation." in the directory.
 
 Raises an exception if the distribution root is not found.
 
@@ -68,12 +68,12 @@ Raises an exception if the distribution root is not found.
     sub _initialize {
         my ($self) = @_;
 
-        my $file = 'README';
+        my $file = 'README.pod';
         my $path = '.';
 
         while ( $self = $self->SUPER::new($path) ) {
             if (    $self->file_exists_with_name($file)
-                and $self->file_with_name($file)->read =~ m/^This is Parrot/os )
+                and $self->file_with_name($file)->read =~ m/^\# Copyright \(C\) 2001-2012, Parrot Foundation\./s )
             {
                 $dist = $self;
                 last;
@@ -147,6 +147,8 @@ BEGIN {
 
 =item C<pmc_source_file_directories()>
 
+=item C<pod_source_file_directories()()>
+
 =item C<python_source_file_directories()>
 
 =item C<yacc_source_file_directories()>
@@ -167,6 +169,8 @@ Returns the directories which contain source files of the appropriate filetype.
 
 =item C<pmc_source_file_with_name()>
 
+=item C<pod_source_file_with_name()()>
+
 =item C<python_source_file_with_name()>
 
 =item C<yacc_source_file_with_name()>
@@ -186,6 +190,8 @@ Returns the source file with the specified name and of the appropriate filetype.
 =item C<pir_source_files()>
 
 =item C<pmc_source_files()>
+
+=item C<pod_source_files()>
 
 =item C<python_source_files()>
 
@@ -208,10 +214,11 @@ BEGIN {
                 except_dirs => [qw{ examples/library }],
             },
             yacc => { file_exts => ['y'] },
+            pod  => { file_exts => ['pod'] },
             perl => {
                 file_exts   => [ 'pl', 'pm', 't' ],
                 shebang     => qr/^#!\s*perl/,
-                shebang_ext => qr/.t$/,
+                shebang_ext => qr/\.t$/,
             },
             python => { file_exts => ['py'] },
         },
@@ -299,6 +306,20 @@ BEGIN {
             };
         }
     }
+}
+
+=item C<get_all_files()>
+
+Returns all the files in the distro.
+
+=cut
+
+sub get_all_files {
+    my ($self) = @_;
+
+    return sort
+        map  { $self->file_with_name($_) }
+        $self->_dist_files;
 }
 
 =item C<get_make_language_files()>
@@ -645,7 +666,7 @@ sub perl_script_file_with_name {
     my $self = shift;
     my $name = shift || return;
 
-    $name .= '.pl' unless $name =~ /\.pl$/o;
+    $name .= '.pl' unless $name =~ /\.pl$/;
 
     foreach my $dir ( $self->perl_script_file_directories ) {
         return $dir->file_with_name($name)
@@ -692,7 +713,7 @@ sub perl_module_file_with_name {
     my $self = shift;
     my $name = shift || return;
 
-    $name .= '.pm' unless $name =~ /\.pm$/o;
+    $name .= '.pm' unless $name =~ /\.pm$/;
 
     foreach my $dir ( $self->perl_module_file_directories ) {
         return $dir->file_with_name($name)

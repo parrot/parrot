@@ -57,7 +57,7 @@ sub _evaluate_byteorder {
         );
         $self->set_result('little-endian');
     }
-    elsif ( $byteorder =~ /^(8765|4321)/ ) {
+    elsif ( $byteorder =~ /^(?:8765|4321)/ ) {
         $conf->data->set(
             byteorder => $byteorder,
             bigendian => 1

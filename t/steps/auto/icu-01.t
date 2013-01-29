@@ -1,10 +1,10 @@
 #! perl
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2013, Parrot Foundation.
 # auto/icu-01.t
 
 use strict;
 use warnings;
-use Test::More tests => 136;
+use Test::More tests => 134;
 use Carp;
 use Cwd;
 use File::Path qw( mkpath );
@@ -51,7 +51,7 @@ is( $conf->data->get('icu_shared'), q{},
     "Got expected value for 'icu_shared'" );
 is( $conf->data->get('icu_dir'), q{},
     "Got expected value for 'icu_dir'" );
-is( $step->result(), 'not requested', "Got expected result" );
+is( $step->result(), 'skipped', "Got expected result" );
 $step->set_result(q{});  # prepare for subsequent tests
 
 ########## _handle_icuconfig_opt() ##########
@@ -379,6 +379,7 @@ like($die, qr/Something is wrong with your ICU installation/s,
 
 $icuheaders = q{alpha};
 my $status = $conf->data->get( 'ccflags' );
+my $gccversion = $conf->data->get( 'gccversion' );
 
 {
     $conf->options->set(verbose => 1);
@@ -399,10 +400,10 @@ my $status = $conf->data->get( 'ccflags' );
    like($stdout, qr/Your compiler found the icu headers/,
        "Got expected verbose output");
 }
-$conf->data->set( ccflags => $status ); # re-set for next test
 
 {
     $conf->options->set(verbose => 1);
+    $conf->data->set(gccversion => '4.2');
     my ($stdout, $stderr);
     capture(
         sub {
@@ -417,32 +418,18 @@ $conf->data->set( ccflags => $status ); # re-set for next test
        \$stdout,
        \$stderr,
    );
-
-   if ($icuheaders =~ /\s/) {
-       like($stdout, qr/Adding -I \"\Q$icuheaders\E\" to ccflags for icu headers/,
-           "Got expected verbose output");
-   }
-   else {
-       like($stdout, qr/Adding -I \Q$icuheaders\E to ccflags for icu headers/,
-           "Got expected verbose output");
-   }
-}
-if ($icuheaders =~ /\s/) {
-    like($conf->data->get( 'ccflags' ),
-        qr/-I \"\Q$icuheaders\E\"/,
-        "ccflags augmented as expected"
-    );
-}
-else {
-    like($conf->data->get( 'ccflags' ),
-        qr/-I \Q$icuheaders\E/,
-        "ccflags augmented as expected"
-    );
+   like(
+       $stdout,
+       qr/Adding -isystem \"\Q$icuheaders\E\" to ccflags for icu headers/,
+       "Got expected verbose output"
+   );
 }
 $conf->data->set( ccflags => $status ); # re-set for next test
+$conf->data->set( gccversion => $gccversion ); # re-set for next test
 
 {
-    $conf->options->set( verbose => undef );
+    $conf->options->set(verbose => 1);
+    $conf->data->set(gccversion => undef);
     my ($stdout, $stderr);
     capture(
         sub {
@@ -457,23 +444,14 @@ $conf->data->set( ccflags => $status ); # re-set for next test
        \$stdout,
        \$stderr,
    );
-
-   ok(! $stdout, "No verbose output, as expected");
-}
-
-if ($icuheaders =~ /\s/) {
-    like($conf->data->get( 'ccflags'),
-        qr/-I \"\Q$icuheaders\E\"/,
-        "ccflags augmented as expected"
-    );
-}
-else {
-    like($conf->data->get( 'ccflags'),
-        qr/-I \Q$icuheaders\E/,
-        "ccflags augmented as expected"
-    );
+   like(
+       $stdout,
+       qr/Adding -I \"\Q$icuheaders\E\" to ccflags for icu headers/,
+       "Got expected verbose output"
+   );
 }
 $conf->data->set( ccflags => $status ); # re-set for next test
+$conf->data->set( gccversion => $gccversion ); # re-set for next test
 
 ########## _set_no_configure_with_icu() ##########
 
@@ -515,7 +493,7 @@ is( $conf->data->get('icu_shared'), q{},
     "Got expected value for 'icu_shared'" );
 is( $conf->data->get('icu_dir'), q{},
     "Got expected value for 'icu_dir'" );
-is( $step->result(), 'not requested', "Got expected result" );
+is( $step->result(), 'skipped', "Got expected result" );
 
 $conf->replenish($serialized);
 
@@ -687,7 +665,7 @@ $conf->replenish($serialized);
                 \$stdout,
                 \$stderr,
             );
-            like($stdout, qr/Trying $icuconfig with '--ldflags'/s,
+            like($stdout, qr/Trying $icuconfig with '--ldflags/s,
                 "Got expected verbose output re --ldflags");
             like($stdout, qr/icushared:  captured/s,
                 "Got expected verbose output re icushared");

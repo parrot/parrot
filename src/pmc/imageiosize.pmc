@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2011, Parrot Foundation.
+Copyright (C) 2010-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -170,6 +170,8 @@ Returns the flags describing the visit action
 */
 
     VTABLE INTVAL get_integer() {
+        UNUSED(INTERP)
+        UNUSED(SELF)
         return VISIT_FREEZE_NORMAL;
     }
 
@@ -179,11 +181,15 @@ Returns the flags describing the visit action
 
 Pushes the integer C<v> onto the end of the image.
 
+The argument C<v> is currently ignored.
+
 =cut
 
 */
 
     VTABLE void push_integer(INTVAL v) {
+        UNUSED(INTERP)
+        UNUSED(v)
         const size_t len = PF_size_integer() * sizeof (opcode_t);
         PARROT_IMAGEIOSIZE(SELF)->size += len;
     }
@@ -195,12 +201,16 @@ Pushes the integer C<v> onto the end of the image.
 
 Pushes the float C<v> onto the end of the image.
 
+The argument C<v> is currently ignored.
+
 =cut
 
 */
 
     VTABLE void push_float(FLOATVAL v)
     {
+        UNUSED(INTERP)
+        UNUSED(v)
         const size_t len = PF_size_number() * sizeof (opcode_t);
         PARROT_IMAGEIOSIZE(SELF)->size += len;
     }

@@ -342,6 +342,26 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
 
 /*
 
+=item C<PMC * Parrot_pcc_new_call_object(PARROT_INTERP)>
+
+Returns a new CallContext object, suitable for making a Sub call.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC *
+Parrot_pcc_new_call_object(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_pcc_new_call_object)
+    return Parrot_pmc_new(interp, enum_class_CallContext);
+}
+
+/*
+
 =back
 
 =head1 SEE ALSO

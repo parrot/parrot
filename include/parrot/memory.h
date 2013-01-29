@@ -40,8 +40,8 @@
 #define mem_internal_realloc_n_zeroed_typed(p, x, y, type) \
   (type *)mem_sys_realloc_zeroed((p), (x) * sizeof (type), (y) * sizeof (type))
 
+#define mem_internal_realloc_n_typed(p, n, type)     (p) = (type *)mem_sys_realloc((p), (n) * sizeof (type))
 #define mem_internal_free(x) mem_sys_free(x)
-
 
 #define mem_sys_memcopy memcpy
 #define mem_sys_memmove memmove

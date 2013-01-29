@@ -86,6 +86,12 @@ PARROT_PURE_FUNCTION
 PMC* Parrot_cx_current_task(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+void Parrot_cx_disable_preemption(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+void Parrot_cx_enable_preemption(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 void Parrot_cx_init_scheduler(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -96,16 +102,13 @@ void Parrot_cx_next_task(PARROT_INTERP, ARGIN(PMC *scheduler))
 void Parrot_cx_outer_runloop(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 opcode_t* Parrot_cx_preempt_task(PARROT_INTERP,
     ARGIN(PMC *scheduler),
     ARGIN(opcode_t *next))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
-
-void Parrot_cx_runloop_end(PARROT_INTERP)
-        __attribute__nonnull__(1);
 
 void Parrot_cx_runloop_wake(PARROT_INTERP, ARGIN(PMC *scheduler))
         __attribute__nonnull__(1)
@@ -152,6 +155,10 @@ void Parrot_cx_set_scheduler_alarm(PARROT_INTERP)
     , PARROT_ASSERT_ARG(next))
 #define ASSERT_ARGS_Parrot_cx_current_task __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_cx_disable_preemption __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_cx_enable_preemption __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_cx_init_scheduler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_cx_next_task __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -163,8 +170,6 @@ void Parrot_cx_set_scheduler_alarm(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(scheduler) \
     , PARROT_ASSERT_ARG(next))
-#define ASSERT_ARGS_Parrot_cx_runloop_end __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_cx_runloop_wake __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(scheduler))

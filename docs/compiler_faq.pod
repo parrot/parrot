@@ -1,10 +1,15 @@
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
 docs/compiler_faq.pod - Parrot FAQ for compiler writers in PIR
 
-=head1 General Questions
+=head1 DESCRIPTION
+
+This is the FAQ for anyone interested in writing compilers in PIR, targeting
+the Parrot Virtual Machine.
+
+=head1 GENERAL QUESTIONS
 
 =head2 Which C compilers can I use with Parrot?
 
@@ -12,19 +17,19 @@ Whoa, there--you're looking at the wrong FAQ.  This document is for people
 writing compilers that target Parrot.
 
 To answer your question, though, Parrot should theoretically work with any
-C89-compliant C compiler. See the F<README> files in the root directory for
-more information about building Parrot.
+C89-compliant C compiler. See the F<README.pod> files in the root directory
+for more information about building Parrot.
 
 =head2 How can I implement a compiler to use as a compiler object from within
 Parrot?
 
-See L<http://www.parrotblog.org/2008/03/targeting-parrot-vm.html>.
+See L<http://parrot.github.com/html/examples/languages/squaak/doc/tutorial_episode_1.pod.html>.
 
 =head2 How do I embed source locations in my code for debugging?
 
 Use C<.line 42 "file.pir"> for this.
 
-=head1 Subroutines
+=head1 SUBROUTINES
 
 =head2 How do I generate a sub call in PIR?
 
@@ -256,7 +261,7 @@ Please refer to
 L<docs/pdds/pdd20_lexical_vars.pod/Nested Subroutines Have Outies; the ":outer" attribute>
 for details.
 
-=head1 Variables
+=head1 VARIABLES
 
 =head2 How do I fetch a variable from the global namespace?
 
@@ -359,7 +364,7 @@ doesn't know the variable. You can always just use the register that was
 defined in the C<.lex> directive as an alias to that lexical, if you are in
 the same scope.
 
-=head1 Modules, Classes, and Objects
+=head1 MODULES, CLASSES, and OBJECTS
 
 =head2 How do I create a module?
 
@@ -571,7 +576,7 @@ XXX
 
 XXX
 
-=head1 Exceptions
+=head1 EXCEPTIONS
 
 =head2 How do I throw an exception in PIR?
 
@@ -664,7 +669,7 @@ Exception example:
 
 =end PIR_FRAGMENT
 
-=head1 C Extensions
+=head1 C EXTENSIONS
 
 =head2 How do I create PMCs for my compiler?
 
@@ -740,7 +745,7 @@ in that same C file, you should pass a null string to loadlib. Do that as follow
 
 Under Linux, the .c file must then be linked with the -export-dynamic option.
 
-=head1 Misc
+=head1 MISC.
 
 =head2 How can I access a program's environment?
 

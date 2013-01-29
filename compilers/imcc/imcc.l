@@ -86,7 +86,7 @@ static int handle_identifier(ARGMOD(imc_info_t *imcc), YYSTYPE *valp, ARGIN(cons
   } while (0)
 
 #define YY_INPUT(buf, result, max_size) \
-    (result) = PIO_READ((Interp *)yyextra->interp, (PIOHANDLE)yyin, (buf), (max_size))
+    (result) = Parrot_io_internal_read((Interp *)yyextra->interp, (PIOHANDLE)yyin, (buf), (max_size))
 
 %}
 
@@ -223,10 +223,6 @@ SP              [ ]
         yy_push_state(cmt4, yyscanner);
     }
 
-<*>setfile{SP}+["] { yy_push_state(cmt2, yyscanner); }
-
-<*>setline{SP}+ { yy_push_state(cmt1, yyscanner);  }
-
 <cmt1>{DIGITS} {
         yylineno = imcc->line = atoi(yytext);
         yy_pop_state(yyscanner);
@@ -284,8 +280,6 @@ SP              [ ]
 
 <pod>{EOL}      { /* ignore */ }
 
-<*>".line"               return TK_LINE;
-<*>".file"               return TK_FILE;
 <INITIAL,emit>".annotate" return ANNOTATE;
 <INITIAL,emit>".lex"     return LEXICAL;
 ".set_arg"               return ARG;
@@ -738,11 +732,10 @@ int yywrap(void* yyscanner) {
 
 static macro_frame_t *
 new_frame(ARGMOD(imc_info_t *imcc)) {
-    /* XXX non-reentrant */
-    static int label   = 0;
     macro_frame_t * const tmp = mem_gc_allocate_zeroed_typed(imcc->interp, macro_frame_t);
 
-    tmp->label         = ++label;
+    tmp->label         = imcc->unique_count;
+    imcc->unique_count++;
     tmp->s.line        = imcc->line;
     tmp->s.handle      = PIO_INVALID_HANDLE;
 
@@ -788,8 +781,10 @@ destroy_frame(struct macro_frame_t *frame, void *yyscanner)
     if (frame->heredoc_rest) {
         mem_sys_free(frame->heredoc_rest);
         frame->heredoc_rest = NULL;
-    } else
+    }
+    else {
         ret = frame->s.line;
+    }
 
     mem_sys_free(frame);
 
@@ -1198,7 +1193,7 @@ include_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *file_name), void *yyscanner
     PIOHANDLE  file;
 
     if (STRING_IS_NULL(s)
-    ||  (file = PIO_OPEN(imcc->interp, s, PIO_F_READ)) == PIO_INVALID_HANDLE) {
+    ||  (file = Parrot_io_internal_open(imcc->interp, s, PIO_F_READ)) == PIO_INVALID_HANDLE) {
         IMCC_fataly(imcc, EXCEPTION_EXTERNAL_ERROR,
             "No such file or directory '%Ss'", file_name);
     }
@@ -1263,7 +1258,7 @@ pop_parser_state(ARGMOD(imc_info_t *imcc), void *yyscanner)
     if (tmp) {
         int l;
         if (tmp->s.handle != PIO_INVALID_HANDLE)
-            PIO_CLOSE(imcc->interp, tmp->s.handle);
+            Parrot_io_internal_close(imcc->interp, tmp->s.handle);
 
         imcc->frames =
             (macro_frame_t *)imcc->frames->s.next;
@@ -1293,7 +1288,7 @@ determine_input_file_type(ARGMOD(imc_info_t * imcc), ARGIN(STRING *sourcefile))
 
     if (STRING_length(sourcefile) == 1
             && STRING_ord(imcc->interp, sourcefile, 0) ==  '-') {
-        handle = PIO_STDHANDLE(imcc->interp, PIO_STDIN_FILENO);
+        handle = Parrot_io_internal_std_os_handle(imcc->interp, PIO_STDIN_FILENO);
 
         if ((FILE *)handle == NULL) {
             /*
@@ -1301,7 +1296,7 @@ determine_input_file_type(ARGMOD(imc_info_t * imcc), ARGIN(STRING *sourcefile))
              * lex would think it's a NULL FILE pointer and reset it to the
              * stdin FILE pointer.
              */
-            handle = Parrot_io_dup(imcc->interp, handle);
+            handle = Parrot_io_internal_dup(imcc->interp, handle);
         }
     }
     else {
@@ -1309,7 +1304,7 @@ determine_input_file_type(ARGMOD(imc_info_t * imcc), ARGIN(STRING *sourcefile))
             Parrot_ex_throw_from_c_args(imcc->interp, NULL, EXCEPTION_EXTERNAL_ERROR,
                 "imcc_compile_file: '%Ss' is a directory\n", sourcefile);
 
-        handle = PIO_OPEN(imcc->interp, sourcefile, PIO_F_READ);
+        handle = Parrot_io_internal_open(imcc->interp, sourcefile, PIO_F_READ);
         if (handle == PIO_INVALID_HANDLE)
             IMCC_fatal_standalone(imcc, EXCEPTION_EXTERNAL_ERROR,
                                   "Error reading source file %Ss.\n",
@@ -1350,14 +1345,14 @@ imcc_cleanup_input(ARGMOD(imc_info_t * imcc), PIOHANDLE file,
         ARGIN(char *source_c), int is_file)
 {
     if (is_file)
-        PIO_CLOSE(imcc->interp, file);
+        Parrot_io_internal_close(imcc->interp, file);
 
     Parrot_str_free_cstring(source_c);
 }
 
 INTVAL
 imcc_compile_buffer_safe(ARGMOD(imc_info_t *imcc), yyscan_t yyscanner,
-        ARGIN(STRING *source), int is_file, int is_pasm)
+        ARGIN(STRING *source), int is_file, SHIM(int is_pasm))
 {
     yyguts_t * const yyg = (yyguts_t *)yyscanner;
     YY_BUFFER_STATE  volatile buffer;
@@ -1379,7 +1374,7 @@ imcc_compile_buffer_safe(ARGMOD(imc_info_t *imcc), yyscan_t yyscanner,
 }
 
 static void
-do_a_better_error_message(imc_info_t * imcc, void * yyscanner)
+do_a_better_error_message(imc_info_t * imcc, SHIM(void * yyscanner))
 {
     STRING * loc;
     imcc->error_code    = IMCC_PARSEFAIL_EXCEPTION;

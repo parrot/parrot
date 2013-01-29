@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 Math Operations
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's math operations.
+
+=head1 MATH OPERATIONS
 
 Many common math operations have simple operator syntax in
 PIR. Operators like C<+>, C<->, C</> and C<*> are all

@@ -9,6 +9,7 @@ our @EXPORT_OK = qw(
     process_options
 );
 use Carp;
+use File::Spec;
 use lib qw( lib );
 use Parrot::Configure::Options::Conf::CLI ();
 use Parrot::Configure::Options::Conf::File ();
@@ -91,6 +92,10 @@ sub _initial_pass {
 
         unless ( $valid_opts{$key} ) {
             die qq/Invalid option "$key". See "perl $script --help" for valid options\n/;
+        }
+        if ( $key eq 'prefix' and
+            ! File::Spec->file_name_is_absolute( $value) ) {
+            die qq/Relative path given to --prefix, please pass an absolute path/;
         }
         if ( $options_components->{short_circuits}{$key} ) {
             push @short_circuits_seen, $key;

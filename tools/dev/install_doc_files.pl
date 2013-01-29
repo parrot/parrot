@@ -1,6 +1,6 @@
 #! perl
 ################################################################################
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2013, Parrot Foundation.
 ################################################################################
 
 =head1 TITLE
@@ -43,6 +43,14 @@ The library directory. Defaults to '/usr/lib'.
 
 The header directory. Defaults to '/usr/include'.
 
+=item C<mandir>
+
+The man directory. Defaults to '/usr/share/man'.
+
+=item C<datadir>
+
+The data directory. Defaults to '/usr/share'.
+
 =back
 
 =head1 SEE ALSO
@@ -76,7 +84,7 @@ my %options = (
     includedir  => '/usr/include',   # parrot/ subdir added below
     docdir      => '/usr/share/doc', # parrot/ subdir added below
     datadir     => '/usr/share/',    # parrot/ subdir added below
-    srcdir      => '/usr/src/',      # parrot/ subdir added below
+    mandir      => '/usr/share/man',
     versiondir  => '',
     'dry-run'   => 0,
     packages    => 'doc|examples',
@@ -95,7 +103,7 @@ foreach (@ARGV) {
 my $parrotdir = $options{versiondir};
 
 # Set up transforms on filenames
-my(@transformorder) = (qw(doc examples));
+my(@transformorder) = (qw(doc man examples));
 my(%metatransforms) = (
     doc => {
         optiondir => 'doc',
@@ -104,6 +112,16 @@ my(%metatransforms) = (
             $filehash->{Dest} =~ s#^docs/resources#resources#; # resources go in the top level of docs
             $filehash->{Dest} =~ s/^docs/pod/; # other docs are actually raw Pod
             $filehash->{DestDirs} = [$parrotdir];
+            return($filehash);
+        },
+    },
+    man => {
+        ismeta => 1,
+        optiondir => 'man',
+        transform => sub {
+            my($filehash) = @_;
+            $filehash->{Dest} =~ s{^.*/}{}; # basedir only
+            $filehash->{Dest} =~ s{^(.+\.)(.+)$}{man$2/$1$2};
             return($filehash);
         },
     },
@@ -122,9 +140,10 @@ my($filehashes, $directories) = lines_to_files(
 );
 
 unless ( $options{'dry-run'} ) {
+    $directories->{File::Spec->catdir( $options{datadir}, $parrotdir)} = 1;
     create_directories($options{destdir}, $directories);
 }
-install_files($options{destdir}, $options{'dry-run'}, $filehashes);
+install_files(\%options, 'doc', $filehashes);
 
 print "Finished install_doc_files.pl\n";
 

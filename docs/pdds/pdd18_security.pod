@@ -6,10 +6,6 @@
 
 This PDD describes the security infrastructure of Parrot.
 
-
-
-
-
 =head2 Description
 
 Parrot will be used in a variety of different application contexts, each with

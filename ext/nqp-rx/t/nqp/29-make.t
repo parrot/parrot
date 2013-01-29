@@ -1,4 +1,4 @@
-#! nqp
+#!./parrot-nqp
 
 # Tests for 'make' builtin.
 

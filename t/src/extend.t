@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -16,7 +16,7 @@ my $parrot_config = "parrot_config" . $PConfig{o};
 
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
 
-plan tests => 20;
+plan tests => 19;
 
 =head1 NAME
 
@@ -204,7 +204,7 @@ main(int argc, const char *argv[])
 
     /* Interpreter set-up */
     if (interp) {
-        type    = Parrot_PMC_typenum(interp, "Integer");
+        type    = Parrot_pmc_get_type_str(interp, Parrot_str_new(interp, "Integer", 0));
         testpmc = Parrot_pmc_new(interp, type);
 
         Parrot_PMC_set_integer_native(interp, testpmc, value);
@@ -218,56 +218,6 @@ main(int argc, const char *argv[])
 }
 CODE
 101010
-OUTPUT
-
-c_output_is( linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_free_cstring');
-#include <stdio.h>
-#include "parrot/parrot.h"
-#include "parrot/parrot.h"
-#include "parrot/extend.h"
-
-static void fail(const char *msg);
-static Parrot_String createstring(Parrot_Interp interp, const char * value);
-static Parrot_Interp new_interp();
-
-static void fail(const char *msg)
-{
-    fprintf(stderr, "failed: %s\n", msg);
-    exit(EXIT_FAILURE);
-}
-
-static Parrot_String createstring(Parrot_Interp interp, const char * value)
-{
-    return Parrot_str_new(interp, value, strlen(value));
-}
-
-static Parrot_Interp new_interp()
-{
-    Parrot_Interp interp = Parrot_interp_new(NULL);
-    if (!interp)
-        fail("Cannot create parrot interpreter");
-    return interp;
-
-}
-
-int main(int argc, const char **argv)
-{
-    Parrot_Interp interp;
-    Parrot_String err, string;
-    Parrot_PMC func_pmc;
-    char *str;
-
-    interp = new_interp();
-
-    string = createstring(interp, "PIR");
-    str    = Parrot_str_to_cstring(interp, string);
-
-    Parrot_free_cstring(str);
-
-    Parrot_interp_destroy(interp);
-    return 0;
-}
-CODE
 OUTPUT
 
 c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_integer_keyed_int' );
@@ -284,7 +234,7 @@ main(int argc, const char *argv[])
 
     /* Interpreter set-up */
     if (interp) {
-        Parrot_Int type  = Parrot_PMC_typenum(interp, "ResizablePMCArray");
+        Parrot_Int type  = Parrot_pmc_get_type_str(interp, Parrot_str_new(interp, "ResizablePMCArray", 0));
         Parrot_PMC array = Parrot_pmc_new(interp, type);
         Parrot_Int value = 12345;
         Parrot_Int key   = 10;
@@ -320,7 +270,7 @@ main(int argc, const char *argv[])
 
     /* Interpreter set-up */
     if (interp) {
-        type    = Parrot_PMC_typenum(interp, "Float");
+        type    = Parrot_pmc_get_type_str(interp, Parrot_str_new(interp, "Float", 0));
         testpmc = Parrot_pmc_new(interp, type);
 
         Parrot_PMC_set_number_native(interp, testpmc, value);
@@ -352,7 +302,7 @@ main(int argc, const char *argv[])
 
     /* Interpreter set-up */
     if (interp) {
-        type    = Parrot_PMC_typenum(interp, "String");
+        type    = Parrot_pmc_get_type_str(interp, Parrot_str_new(interp, "String", 0));
         testpmc = Parrot_pmc_new(interp, type);
 
         value     = Parrot_str_new(interp, "Pumpking", 8/*, "iso-8859-1", 0*/);
@@ -654,6 +604,9 @@ close $TEMP;
 # compile to pbc
 system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pir);
 
+SKIP: {
+    skip "Outdated test with the old embed API [GH #829]", 2;
+
 c_output_is( <<"CODE", <<'OUTPUT', 'eval code through a parrot sub - #39669', todo => "Must explicitly set a PIR compreg");
 
 #include <parrot/parrot.h>
@@ -661,15 +614,25 @@ c_output_is( <<"CODE", <<'OUTPUT', 'eval code through a parrot sub - #39669', to
 int
 main(int argc, const char *argv[])
 {
-    PackFile* packfile;
+    Parrot_Interp interp = NULL;
+    Parrot_PMC pf = NULL;
+    Parrot_PMC args = NULL;
     const char * code[] = { ".sub foo\\nsay \\"Hello from foo!\\"\\n.end\\n" };
-    Parrot_PMC pbc;
 
+    if (!(Parrot_api_make_interpreter(NULL, NULL, 0, &interp)
+      && Parrot_api_load_bytecode_file(interp, "$temp_pbc", &pf)
+      && Parrot_api_pmc_wrap_string_array(interp, argc, argv, &args)
+      /* FIXME */
+      && Parrot_api_load_bytecode_bytes(interp, code, sizeof(code), &pf)))
+        exit(EXIT_FAILURE);
+
+    Parrot_api_destroy_interpreter(interp);
+    exit(EXIT_SUCCESS);
+
+#if 0
     Parrot_Interp interp = Parrot_interp_new(NULL);
     if (interp) {
-        Parrot_String   temp_pbc_str = Parrot_str_new(interp, "$temp_pbc", 0);
-        packfile   = Parrot_pf_read_pbc_file(interp, temp_pbc_str);
-
+        pf   = Parrot_pf_read_pbc_file(interp, Parrot_str_new(interp, "$temp_pbc", 0));
         if (packfile) {
             pbc  = Parrot_pf_get_packfile_pmc(interp, pf, STRINGNULL);
             Parrot_pf_set_current_packfile(interp, pbc);
@@ -679,6 +642,7 @@ main(int argc, const char *argv[])
         Parrot_interp_destroy( interp );
     }
     return 0;
+#endif
 }
 CODE
 Hello from foo!
@@ -715,6 +679,8 @@ main(int argc, const char *argv[])
 CODE
 Hello from foo!
 OUTPUT
+
+}
 
 c_output_is( <<"CODE", <<'OUTPUT', 'call multi sub from C - #41511' );
 #include <parrot/parrot.h>
@@ -774,7 +740,7 @@ CODE
 Result is 300.
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', 'multiple Parrot_interp_new/Parrot_x_exit cycles' );
+c_output_is( <<'CODE', <<'OUTPUT', 'multiple Parrot_interp_new/Parrot_x_exit cycles', $^O eq 'darwin' ? (todo => "GH #856 may fail on darwin threaded") : () );
 
 #include <stdio.h>
 #include "parrot/parrot.h"

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -158,7 +158,6 @@ Swaps the "context".
         PMC               *ctx;
         opcode_t          *dest;
         PackFile_ByteCode *wanted_seg;
-        opcode_t * const   next_op = (opcode_t *)next;
         PMC      * const signature = Parrot_pcc_get_signature(INTERP,
                                             CURRENT_CONTEXT(INTERP));
 
@@ -173,11 +172,11 @@ Swaps the "context".
             const UINTVAL     *n_regs_used;
             PMC               *lex_info;
             PMC * const        caller_ctx = CURRENT_CONTEXT(INTERP);
-            PMC               *ctx        = Parrot_pcc_get_signature(INTERP, caller_ctx);
             PMC               *ccont      = INTERP->current_cont;
 
             PARROT_ASSERT(!PMC_IS_NULL(ccont));
 
+            ctx        = Parrot_pcc_get_signature(INTERP, caller_ctx);
             if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL)
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                         "tail call to coroutine not allowed");
@@ -199,7 +198,6 @@ Swaps the "context".
 
             Parrot_pcc_set_sub(INTERP, ctx, SELF);
             Parrot_pcc_set_continuation(INTERP, ctx, ccont);
-            Parrot_pcc_set_object(INTERP, ctx, PMCNULL);
 
             INTERP->current_cont   = PMCNULL;
 
@@ -225,7 +223,6 @@ Swaps the "context".
         /* if calling the Coro we need the segment of the Coro */
         else if (!(PObj_get_FLAGS(SELF) & SUB_FLAG_CORO_FF)) {
             PackFile_ByteCode *seg;
-            PMC               *ctx;
             PMC               *ccont;
 
             GET_ATTR_ctx(INTERP, SELF, ctx);
@@ -250,7 +247,7 @@ Swaps the "context".
         }
         else {
             INTVAL             yield;
-            PMC               *ccont, *ctx, *to_ctx;
+            PMC               *ccont, *to_ctx;
             PackFile_ByteCode *caller_seg;
 
             GET_ATTR_yield(INTERP, SELF, yield);

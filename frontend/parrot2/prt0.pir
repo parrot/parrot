@@ -1,4 +1,6 @@
 # THIS IS A GENERATED FILE! DO NOT EDIT!
+# Compiled with Winxed 1.9.1
+# Source file: frontend/parrot2/prt0.winxed
 # Begin generated code
 
 .namespace [ ]
@@ -262,7 +264,7 @@
 
 .sub '__show_runtime_prefix_and_exit' :subid('WSubId_1') :anon
     null $S1
-    interpinfo $S1, 24
+    interpinfo $S1, 28
     say $S1
     exit 0
 
@@ -272,7 +274,7 @@
 .sub '__show_version_and_exit' :subid('WSubId_2') :anon
     getinterp $P3
     $P1 = $P3[8]
-    set $S1, "This is Parrot version %s%s built for %s-%s\nCopyright (C) 2001-2011, Parrot Foundation.\n\nThis code is distributed under the terms of the Artistic License 2.0.\nFor more details, see the full text of the license in the LICENSE file\nincluded in the Parrot source tree\n"
+    set $S1, "This is Parrot version %s%s built for %s-%s\nCopyright (C) 2001-2013, Parrot Foundation.\n\nThis code is distributed under the terms of the Artistic License 2.0.\nFor more details, see the full text of the license in the LICENSE file\nincluded in the Parrot source tree\n"
     root_new $P3, ['parrot';'ResizablePMCArray']
     assign $P3, 4
     $P4 = $P1["VERSION"]
@@ -292,7 +294,7 @@
 
 
 .sub '__show_help_and_exit' :subid('WSubId_3') :anon
-    set $S1, "parrot [Options] <file> [<program options...>]\n  Options:\n    -h --help\n    -V --version\n    -I --include add path to include search\n    -L --library add path to library search\n       --hash-seed F00F  specify hex value to use as hash seed\n    -X --dynext add path to dynamic extension search\n   <Run core options>\n    -R --runcore slow|bounds|fast|subprof\n    -R --runcore trace|profiling|gcdebug\n    -t --trace [flags]\n   <VM options>\n    -D --parrot-debug[=HEXFLAGS]\n       --help-debug\n    -w --warnings\n    -G --no-gc\n    -g --gc ms2|gms|ms|inf set GC type\n       <GC MS2 options>\n       --gc-dynamic-threshold=percentage    maximum memory wasted by GC\n       --gc-min-threshold=KB\n       <GC GMS options>\n       --gc-nursery-size=percent of sysmem  size of gen0 (default 2)\n       --gc-debug\n       --leak-test|--destroy-at-end\n    -. --wait    Read a keystroke before starting\n       --runtime-prefix\n   <Compiler options>\n    -d --imcc-debug[=HEXFLAGS]\n    -v --verbose\n    -E --pre-process-only\n    -o --output=FILE\n       --output-pbc\n    -O --optimize[=LEVEL]\n    -a --pasm\n    -c --pbc\n    -r --run-pbc\n    -y --yydebug\n   <Language options>\nsee docs/running.pod for more\n"
+    set $S1, "parrot [Options] <file> [<program options...>]\n  Options:\n    -h --help\n    -V --version\n    -I --include add path to include search\n    -L --library add path to library search\n       --hash-seed F00F  specify hex value to use as hash seed\n    -X --dynext add path to dynamic extension search\n   <Run core options>\n    -R --runcore slow|bounds|fast|subprof\n    -R --runcore trace|profiling|gcdebug\n    -t --trace [flags]\n   <VM options>\n    -D --parrot-debug[=HEXFLAGS]\n       --help-debug\n    -w --warnings\n    -G --no-gc\n    -g --gc ms2|gms|ms|inf set GC type\n       <GC MS2 options>\n       --gc-dynamic-threshold=percentage    maximum memory wasted by GC\n       --gc-min-threshold=KB\n       <GC GMS options>\n       --gc-nursery-size=percent of sysmem  size of gen0 (default 2)\n       --gc-debug\n       --leak-test|--destroy-at-end\n    -. --wait    Read a keystroke before starting\n       --runtime-prefix\n   <Compiler options>\n    -E --pre-process-only\n    -o --output=FILE\n       --output-pbc\n    -a --pasm\n    -c --pbc\n    -r --run-pbc\n    -y --yydebug\n   <Language options>\nsee docs/running.pod for more\n"
     say $S1
     exit 0
 
@@ -315,8 +317,8 @@
     concat $S1, __ARG_1, "\n"
     $P1.'print'($S1)
   __label_1: # endif
-    $P1.'print'("parrot -[acEGhrtvVwy.] [-d [FLAGS]] [-D [FLAGS]] ")
-    $P1.'print'("[-O [level]] [-[LIX] path] [-R runcore] [-o FILE] <file> <args>\n")
+    $P1.'print'("parrot -[acEGhrtVwy.] [-D [FLAGS]] ")
+    $P1.'print'("[-[LIX] path] [-R runcore] [-o FILE] <file> <args>\n")
     exit 1
 
 .end # __usage_and_exit

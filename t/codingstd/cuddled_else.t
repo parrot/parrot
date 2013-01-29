@@ -41,7 +41,7 @@ my @files = @ARGV ? <@ARGV> : (
 Parrot::Test::Util::Runloop->testloop(
     name        => 'no cuddled elses',
     files       => [@files],
-    per_line    => sub { $_[0] !~ /}\s*else\s*{/ },
+    per_line    => sub { $_[0] !~ /}\s*else/ },
     diag_prefix => 'Cuddled else found'
 );
 

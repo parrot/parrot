@@ -36,6 +36,14 @@ This file implements a native call frame (thunk) factory using libffi.
 #  define ffi_type_parrot_numval ffi_type_double
 #elif(NUMVAL_SIZE == 12)
 #  define ffi_type_parrot_numval ffi_type_longdouble
+#elif(NUMVAL_SIZE == 16)
+#  if PARROT_HAS_LONGLONG
+#    if (LONGLONG_SIZE == 8)
+#      define ffi_type_parrot_numval ffi_type_sint64
+#    else
+#      error "unhandled long long size"
+#    endif
+#  endif
 #else
 #  error "unhandled NUMVAL_SIZE value"
 #endif
@@ -101,10 +109,9 @@ static void call_ffi_thunk(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 static PMC * clone_ffi_thunk(PARROT_INTERP,
-    ARGIN(PMC *thunk),
+    PMC *thunk,
     ARGIN(void *_thunk_data))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 static void free_ffi_thunk(PARROT_INTERP,
@@ -119,8 +126,7 @@ static PMC * init_thunk_pmc(PARROT_INTERP, ARGMOD(ffi_thunk_t *thunk_data))
         FUNC_MODIFIES(*thunk_data);
 
 PARROT_CAN_RETURN_NULL
-static ffi_type * nci_to_ffi_type(PARROT_INTERP, PARROT_DATA_TYPE nci_t)
-        __attribute__nonnull__(1);
+static ffi_type * nci_to_ffi_type(PARROT_INTERP, PARROT_DATA_TYPE nci_t);
 
 #define ASSERT_ARGS_build_ffi_thunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -131,15 +137,13 @@ static ffi_type * nci_to_ffi_type(PARROT_INTERP, PARROT_DATA_TYPE nci_t)
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_clone_ffi_thunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(thunk) \
     , PARROT_ASSERT_ARG(_thunk_data))
 #define ASSERT_ARGS_free_ffi_thunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_init_thunk_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(thunk_data))
-#define ASSERT_ARGS_nci_to_ffi_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_nci_to_ffi_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -309,7 +313,7 @@ Convert an NCI type specification into the corresponding LibFFI type.
 
 PARROT_CAN_RETURN_NULL
 static ffi_type *
-nci_to_ffi_type(PARROT_INTERP, PARROT_DATA_TYPE nci_t)
+nci_to_ffi_type(SHIM_INTERP, PARROT_DATA_TYPE nci_t)
 {
     ASSERT_ARGS(nci_to_ffi_type)
     switch (nci_t) {
@@ -472,7 +476,7 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
     parrot_var_t  *pcc_arg;     /* values of pcc arguments */
     nci_var_t     *nci_val;     /* values of nci arguments */
     void         **nci_arg;     /* pointers for pass-by-ref arguments */
-    void         **nci_arg_ptr; /* pointers to arguments for libffi */
+    void         **nci_arg_ptr = NULL; /* pointers to arguments for libffi */
 
     void *return_data; /* Holds return data from FFI call */
     int i;
@@ -645,8 +649,8 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
         parrot_var_t  *pcc_retv    = mem_gc_allocate_n_zeroed_typed(interp, pcc_retc, parrot_var_t);
 
         PARROT_DATA_TYPE arg_t;
-        int              i = 0;
         int              j;
+        i = 0;
 
         call_arg[0] = &interp;
         call_arg[1] = &call_object;
@@ -695,13 +699,15 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
 Clone a C<ManagedStruct> containing a C<ffi_thunk_t>. Suitable to be used by
 C<ManagedStruct> as a C<custom_clone_func> callback.
 
+The C<thunk> argument is currently unused.
+
 =cut
 
 */
 
 PARROT_CANNOT_RETURN_NULL
 static PMC *
-clone_ffi_thunk(PARROT_INTERP, ARGIN(PMC *thunk), ARGIN(void *_thunk_data))
+clone_ffi_thunk(PARROT_INTERP, SHIM(PMC *thunk), ARGIN(void *_thunk_data))
 {
     ASSERT_ARGS(clone_ffi_thunk)
     ffi_thunk_t *thunk_data = (ffi_thunk_t *)_thunk_data;

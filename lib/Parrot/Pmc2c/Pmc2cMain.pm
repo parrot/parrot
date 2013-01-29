@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2011, Parrot Foundation.
+# Copyright (C) 2004-2012, Parrot Foundation.
 
 package Parrot::Pmc2c::Pmc2cMain;
 
@@ -17,6 +17,7 @@ use Parrot::Pmc2c::UtilFunctions 'filename';
 use Parrot::Pmc2c::PMC::default ();
 use Parrot::Pmc2c::PMC::Null ();
 use Parrot::Pmc2c::PMC::Object ();
+use Parrot::Pmc2c::PMC::Proxy ();
 
 # put the options in a package var so it can be accessed from
 # Parrot::Pmc2c::Emitter.
@@ -76,6 +77,8 @@ C<@ARGV> remaining after options processing.
 B<Return Values:>  Parrot::Pmc2c::Pmc2cMain object.  Will C<die> with error
 message if arguments are defective.
 
+B<Comment:>  Tested in:  F<t/tools/pmc2cutils/01-pmc2cutils.t>.
+
 =cut
 
 sub new {
@@ -89,8 +92,9 @@ sub new {
     die "Must have key 'args' which is a reference to a list of the remaining arguments"
         unless ( defined $allargsref->{args} and ref( $allargsref->{args} ) eq q{ARRAY} );
 
+    my $base = File::Spec->catdir($allargsref->{bin},'..','..');
     unshift @{ $allargsref->{include} },
-        '.', "$allargsref->{bin}/../..", "$allargsref->{bin}/../../src/pmc", "$allargsref->{bin}/../../src/dynpmc";
+      '.', $base, File::Spec->catdir($base,'src','pmc'), File::Spec->catdir($base,'src','dynpmc');
 
     foreach my $opt ( qw(nolines) ) {
         if ( !defined $allargsref->{opt}{$opt} ) {
@@ -123,6 +127,8 @@ tools -- then F<vtable.dump> will be created within that tempdir.
 Otherwise, F<vtable.dump> is created in the caller's working directory.
 When the caller is F<make>, that directory is the top-level Parrot directory.
 
+Tested in:  F<t/tools/pmc2cutils/03-dump_vtable.t>.
+
 =cut
 
 sub dump_vtable {
@@ -150,10 +156,12 @@ corresponding F<foo.dump> file.
 
 B<Return Values:>  Reference to hash holding recreated data structure.
 
-B<Comment:>  If the appropriate F<.dump> file cannot be located, program
+B<Comments:>  If the appropriate F<.dump> file cannot be located, program
 will die with error message (see C<find_file()> above).
 Called internally by C<gen_c()>, C<gen_parent_list()>,
 C<dump_pmc()>.
+
+Tested in:  F<t/tools/pmc2cutils/04-dump_pmc.t>.
 
 =cut
 
@@ -176,10 +184,12 @@ B<Arguments:>  None.
 
 B<Return Values:>  Returns C<1> upon success.
 
-B<Comment:>  Internally calls C<Parrot::Pmc2c::Library::new()> and
+B<Comments:>  Internally calls C<Parrot::Pmc2c::Library::new()> and
 C<write_all_files()>.  In earlier version of F<pmc2c.pl>, this
 subroutine returned C<undef> upon success.  This was changed to more
 Perl-ish C<1>.
+
+Tested in:  F<t/tools/pmc2cutils/05-gen_c.t>.
 
 =cut
 
@@ -201,11 +211,6 @@ sub gen_library {
     return 1;
 }
 
-=head2 Subroutines
-
-These are auxiliary subroutines called inside the methods described above.
-
-
 =head3 C<find_file()>
 
     $path = $self->find_file($file, $die_unless_found_flag);
@@ -223,7 +228,9 @@ B<Return Values:>  Upon success, string holding a path.  Upon failure,
 C<undef> (unless C<$die_unless_found_flag> is set to a true value, in which
 case program C<die>s).
 
-B<Comment:>  Called inside C<read_dump()> and C<dump_pmc()>.
+B<Comments:>  Called inside C<read_dump()> and C<dump_pmc()>.
+
+Tested in:  F<t/tools/pmc2cutils/02-find_file.t>.
 
 =cut
 
@@ -249,8 +256,8 @@ sub find_file {
 =head1 AUTHOR
 
 Leopold Toetsch wrote F<pmc2c.pl>.  It was cleaned up by Matt Diephouse.
-James E Keenan extracted the subroutines into F<lib/Parrot/Pmc2c/Pmc2cMain.pm> and
-wrote the accompanying test suite.
+James E Keenan extracted the subroutines into F<lib/Parrot/Pmc2c/Pmc2cMain.pm>
+and wrote the accompanying test suite.
 
 =head1 SEE ALSO
 

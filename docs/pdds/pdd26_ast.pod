@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2010, Parrot Foundation
+# Copyright (C) 2007-2010, Parrot Foundation.
 
 =head1 PDD 26: Compiler Tools - Abstract Syntax Tree
 
@@ -6,10 +6,6 @@
 
 This PDD describes the node types and semantics of the Parrot
 Abstract Syntax Tree representation.
-
-
-
-
 
 =head2 Description
 

@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -7,10 +7,12 @@ Parrot::Configure::Compiler - C-Related methods for configuration and more
 =head1 DESCRIPTION
 
 The Parrot::Configure::Compiler module provides methods inherited by
-Parrot::Configure which prepare and/or run C programs during compilation.
+Parrot::Configure which prepare and/or run C programs during configure probes.
 Other methods from this module will be used to generate makefiles and other
 files.  Template entries of the form C<@key@> will be replaced with C<key>'s
-value from the configuration system's data.
+value from the currently created configuration system's data.
+
+Beware that Parrot::Config is not available at configure time.
 
 =head2 Methods
 
@@ -32,6 +34,7 @@ use Parrot::Configure::Utils qw(
     _run_command _build_compile_command
     move_if_diff
 );
+use Parrot::BuildUtil qw( add_to_generated );
 
 # report the makefile and lineno
 sub makecroak {
@@ -208,7 +211,7 @@ sub shebang_mod {
     my ( $source, $target ) = @_;
 
     open my $in,  '<', $source       or die "Can't open $source: $!";
-    open my $out, '>', "$target.tmp" or die "Can't open $target.tmp: $!";
+    open my $out, '>', "${target}_tmp" or die "Can't open ${target}_tmp: $!";
 
     my $line = <$in>;
 
@@ -232,7 +235,7 @@ sub shebang_mod {
     close($in)  or die "Can't close $source: $!";
     close($out) or die "Can't close $target: $!";
 
-    move_if_diff( "$target.tmp", $target );
+    move_if_diff( "${target}_tmp", $target );
 }
 
 =item C<genfile()>
@@ -381,7 +384,26 @@ syntax works ok.
 
 =back
 
-=back
+=item replace_slashes
+
+If set to a true value, then filenames on a win32 platform will get their
+forward slashes '/' automatically converted to '\'.
+win32 can handle forward slashes finer (since XP), but cmd.exe tries to
+detect /c and more as argument.
+If you ssh into cygwin for remote testing, or for smoker cronjobs
+calling cmd /c "nmake" or dmake or mingw32-make will fail.
+
+For example:
+
+    POD2MAN          = C:\perl516\perl\bin/pod2man
+    CC_INC           = -I./include -I./include/pmc
+    DEV_TOOLS_DIR = tools/dev
+    $(PERL) $(DEV_TOOLS_DIR)/headerizer.pl
+=>
+    POD2MAN          = C:\perl516\perl\bin\pod2man
+    CC_INC           = -I.\include -I.\include\pmc
+    DEV_TOOLS_DIR = tools\dev
+    $(PERL) $(DEV_TOOLS_DIR)\headerizer.pl
 
 =back
 
@@ -392,12 +414,9 @@ sub genfile {
     my ( $source, $target, %options ) = @_;
 
     my $calling_sub = (caller(1))[3] || q{};
-    if ( $calling_sub !~ /cc_gen$/ ) {
-        $conf->append_configure_log($target);
-    }
 
     open my $in,  '<', $source       or die "Can't open $source: $!";
-    open my $out, '>', "$target.tmp" or die "Can't open $target.tmp: $!";
+    open my $out, '>', "${target}_tmp" or die "Can't open ${target}_tmp: $!";
 
     if ( !exists $options{file_type}) {
         if ( $target =~ m/makefile$/i || $target =~ m/\.mak/) {
@@ -429,6 +448,7 @@ sub genfile {
         }
         if ( $options{file_type} eq 'makefile' ) {
             $options{conditioned_lines} = 1;
+            $options{replace_slashes} = 1 if $^O eq 'MSWin32';
         }
     }
 
@@ -457,6 +477,13 @@ sub genfile {
 
     if ($target eq 'CFLAGS') {
         $options{conditioned_lines} = 1;
+    }
+
+    if ( $options{manifest} ) {
+        add_to_generated( $target, @{$options{manifest}} );
+    }
+    elsif ($target !~ /^(cc_gen|test_)/) {
+        add_to_generated( $target, "[]" );
     }
 
     # this loop can not be implemented as a foreach loop as the body
@@ -602,13 +629,19 @@ sub genfile {
             }
         }egx;
 
+        my $warn_replace_slashes;
+        if ( $options{replace_slashes} and $^O eq 'MSWin32') {
+            # warn "option replace_slashes currently ignored\n" unless $warn_replace_slashes++;
+            $line =~ s{/}{\\}g;
+        }
+
         print $out $line;
     }
 
     close($in)  or die "Can't close $source: $!";
     close($out) or die "Can't close $target: $!";
 
-    move_if_diff( "$target.tmp", $target, $options{ignore_pattern} );
+    move_if_diff( "${target}_tmp", $target, $options{ignore_pattern} );
 }
 
 # Return the next subexpression from the expression in $_[0]
@@ -622,20 +655,20 @@ sub next_expr {
     my $s = $_[0];
     return "" unless $s;
     # start of a subexpression?
-    if ($s =~ /^\((.+)\)\s*(.*)/o) {    # longest match to matching closing paren
+    if ($s =~ /^\((.+)\)\s*(.*)/) {     # longest match to matching closing paren
         $_[0] = $2 ? $2 : "";           # modify the 2nd arg
         return $1;
     }
     else {
         $s =~ s/^\s+//;                 # left-trim to make it more robust
-        if ($s =~ m/^([-\w=]+)\s*(.*)?/o) { # shortest match to next non-word char
+        if ($s =~ /^([-\w=]+)\s*(.*)?/) { # shortest match to next non-word char
             # start with word expr
             $_[0] = $2 ? $2 : "";       # modify the 2nd arg expr in the caller
             return $1;
         }
         else {
             # special case: start with non-word op (perl-syntax only)
-            $s =~ m/^([|&!])\s*(.*)?/o; # shortest match to next word char
+            $s =~ /^([|&!])\s*(.*)?/;   # shortest match to next word char
             $_[0] = $2 ? $2 : "";       # modify the 2nd arg expr in the caller
             return $1;
         }
@@ -726,11 +759,24 @@ sub cond_eval {
     cond_eval_single($conf, $expr);
 }
 
+=item C<append_configure_log($path)>
+
+    $conf->append_configure_log($path)
+
+Adds $path to F<MANIFEST_configure.generated>.
+
+Deprecated, there is no MANIFEST_configure.generated anymore.
+Replaced by add_to_generated().
+
+=back
+
+=cut
+
 sub append_configure_log {
     my $conf = shift;
     my $target = shift;
     if ( $conf->{active_configuration} ) {
-        my $generated_log = 'MANIFEST.configure.generated';
+        my $generated_log = 'MANIFEST_configure.generated'; # TODO: MANIFEST.generated
         open my $GEN, '>>', $generated_log
             or die "Can't open $generated_log for appending: $!";
         print $GEN "$target\n";

@@ -8,7 +8,7 @@ use vars qw($TODO);
 
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 35;
+use Parrot::Test tests => 39;
 
 pir_output_is( <<'CODE', <<'OUT', "globalconst 1" );
 
@@ -602,6 +602,54 @@ pir_error_output_like( <<'CODE', <<'OUT', "" );
 CODE
 /^error:imcc:syntax error, duplicated IDENTIFIER/
 OUT
+
+pir_error_output_like( <<'CODE', <<'OUT', "invalid FixedIntegerArray" );
+.sub 'invalid'
+   .const 'FixedIntegerArray' $P0 = 'garbage'
+.end
+CODE
+/FixedIntegerArray initialization/
+OUT
+
+pir_error_output_like( <<'CODE', <<'OUT', "FixedIntegerArray: forgot a comma" );
+.sub 'invalid'
+   .const 'FixedIntegerArray' $P0 = '(1 2)'
+.end
+CODE
+/FixedIntegerArray initialization/
+OUT
+
+pir_error_output_like( <<'CODE', <<'OUT', "FixedIntegerArray: extra character" );
+.sub 'invalid'
+   .const 'FixedIntegerArray' $P0 = '(1d)'
+.end
+CODE
+/FixedIntegerArray initialization/
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', "valid FixedIntegerArray" );
+.sub 'main' :main
+   .const 'FixedIntegerArray' $P0 = ' (0, 1,0b10 , 010, 0x10 ) '
+   $I0 = $P0[0]
+   say $I0
+   $I0 = $P0[1]
+   say $I0
+   $I0 = $P0[2]
+   say $I0
+   $I0 = $P0[3]
+   say $I0
+   $I0 = $P0[4]
+   say $I0
+.end
+CODE
+0
+1
+2
+8
+16
+OUT
+
+
 
 # Local Variables:
 #   mode: cperl

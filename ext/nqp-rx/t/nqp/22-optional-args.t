@@ -1,4 +1,4 @@
-#! nqp
+#!./parrot-nqp
 
 # test optional arguments and parameters
 

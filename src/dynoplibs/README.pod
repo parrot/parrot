@@ -1,0 +1,27 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+src/dynoplibs/README.pod - Readme file for the dynamic opcode libs directory. 
+
+=head1 DESCRIPTION
+
+This directory is intended for building dynamic opcode libs.
+
+=over 4
+
+=item 1. edit/create your foo.ops source (s. myops.ops)
+
+=item 2. edit the .mak files and append your ops targets and rules.
+
+=back
+
+For tests and examples I<see> F<t/dynoplibs/*.t>.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2012, Parrot Foundation.
+
+=cut

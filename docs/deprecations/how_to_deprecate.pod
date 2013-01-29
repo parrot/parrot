@@ -1,13 +1,15 @@
-# Copyright (C) 2011, Parrot Foundation.
+# Copyright (C) 2011-2012, Parrot Foundation.
 
 =head1 NAME
 
 docs/deprecations/how_to_deprecate.pod - How to Deprecate Parrot Code
 
-=head1 How to Deprecate Parrot Code
+=head1 DESCRIPTION
 
-So you've found a crufty bit of code in Parrot that's just screaming to be
-removed.  Welcome to the club.  There's a lot of them.  This page documents
+How to Deprecate Parrot Code.
+
+You've found a crufty bit of code in Parrot that's just screaming to be
+removed. Welcome to the club. There's a lot of them. This page documents
 the proper procedure to go through to get that junk code out of Parrot while
 causing minimal pain to Parrot's users (i.e. people who develop HLLs or
 libraries on top of Parrot).

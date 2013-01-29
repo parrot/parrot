@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011, Parrot Foundation.
+Copyright (C) 2011-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -88,6 +88,8 @@ static opcode_t * default_pack(
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*dest);
 
+PARROT_PURE_FUNCTION
+PARROT_WARN_UNUSED_RESULT
 static size_t default_packed_size(ARGIN(const PackFile_Segment *self))
         __attribute__nonnull__(1);
 
@@ -418,6 +420,8 @@ PackFile_ConstTable_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
          * must dereference the first object into the constant slot */
         PMC      * const pmc  = self->pmc.constants[i]
                               = VTABLE_get_pmc_keyed_int(interp, self->pmc.constants[i], 0);
+
+        PObj_is_shared_SET(pmc); /* packfile constants will be shared among threads */
 
         /* magically place subs into namespace stashes
          * XXX make this explicit with :load subs in PBC */
@@ -791,7 +795,7 @@ default_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opcode
     }
 
     if (!self->pf->need_endianize && !self->pf->need_wordsize) {
-        mem_sys_memcopy(self->data, cursor, self->size * sizeof (opcode_t));
+        memcpy(self->data, cursor, self->size * sizeof (opcode_t));
         cursor += self->size;
     }
     else {
@@ -854,7 +858,7 @@ default_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
             Parrot_io_printf(interp, "\n %04x:  ", (int) i);
 
         Parrot_io_printf(interp, "%08lx ", (unsigned long)
-                self->data ? self->data[i] : self->pf->src[i]);
+                (self->data ? self->data[i] : self->pf->src[i]));
     }
 
     Parrot_io_printf(interp, "\n]\n");
@@ -1122,7 +1126,7 @@ PackFile_Segment_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self),
 
 /*
 
-=item C<void PackFile_Segment_dump(PARROT_INTERP, PackFile_Segment *self)>
+=item C<void PackFile_Segment_dump(PARROT_INTERP, const PackFile_Segment *self)>
 
 Dumps the segment C<self>.
 
@@ -1132,7 +1136,7 @@ Dumps the segment C<self>.
 
 PARROT_EXPORT
 void
-PackFile_Segment_dump(PARROT_INTERP, ARGIN(PackFile_Segment *self))
+PackFile_Segment_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 {
     ASSERT_ARGS(PackFile_Segment_dump)
     self->pf->PackFuncs[self->type].dump(interp, self);
@@ -1634,6 +1638,8 @@ Returns the default size of the segment C<self>.
 
 */
 
+PARROT_PURE_FUNCTION
+PARROT_WARN_UNUSED_RESULT
 static size_t
 default_packed_size(ARGIN(const PackFile_Segment *self))
 {
@@ -1779,7 +1785,7 @@ byte_code_packed_size(SHIM_INTERP, ARGMOD(PackFile_Segment *self))
 
         /* dynoplib data */
         size += PF_size_cstring(entry->lib->name);
-        size += 3; /* major + minor + patch */
+        size += 2; /* bc_major + bc_minor */
 
         /* op entries */
         size += 1;                /* n_ops */
@@ -1826,9 +1832,8 @@ byte_code_pack(SHIM_INTERP, ARGMOD(PackFile_Segment *self), ARGOUT(opcode_t *cur
 
         /* dynoplib data */
         cursor    = PF_store_cstring(cursor, entry->lib->name);
-        *cursor++ = entry->lib->major_version;
-        *cursor++ = entry->lib->minor_version;
-        *cursor++ = entry->lib->patch_version;
+        *cursor++ = entry->lib->bc_major_version;
+        *cursor++ = entry->lib->bc_minor_version;
 
         /* op entries */
         *cursor++ = entry->n_ops;
@@ -1894,9 +1899,8 @@ byte_code_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opco
         /* dynoplib data */
         {
             char * const    lib_name = PF_fetch_cstring(interp, self->pf, &cursor);
-            const opcode_t  major    = PF_fetch_opcode(self->pf, &cursor);
-            const opcode_t  minor    = PF_fetch_opcode(self->pf, &cursor);
-            const opcode_t  patch    = PF_fetch_opcode(self->pf, &cursor);
+            const opcode_t  bc_major = PF_fetch_opcode(self->pf, &cursor);
+            const opcode_t  bc_minor = PF_fetch_opcode(self->pf, &cursor);
 
             /* XXX
              * broken encapsulation => should make this data easier to access somehow
@@ -1910,27 +1914,26 @@ byte_code_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opco
                                                 NULL);
                 typedef op_lib_t *(*oplib_init_t)(PARROT_INTERP, long init);
                 void *oplib_init;
-                oplib_init_t oplib_init_f;
+                oplib_init_t fn;
                 if (!VTABLE_get_bool(interp, lib_pmc))
                     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
                         "Could not load oplib `%s'", lib_name);
                 GETATTR_ParrotLibrary_oplib_init(interp, lib_pmc, oplib_init);
-                oplib_init_f = (oplib_init_t)D2FPTR(oplib_init);
-                entry->lib = oplib_init_f(interp, 1);
+                fn = (oplib_init_t)D2FPTR(oplib_init);
+                entry->lib = fn(interp, 1);
             }
 
 
             mem_gc_free(interp, lib_name);
 
-            if (entry->lib->major_version != major
-            ||  entry->lib->minor_version != minor
-            ||  entry->lib->patch_version != patch)
+            if (entry->lib->bc_major_version != bc_major
+             || entry->lib->bc_minor_version != bc_minor)
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-                    "Incompatible versions of `%s' oplib, possibly due to "
+                    "Incompatible versions of `%s' bytecode, possibly due to "
                     "loading bytecode generated by an old version of Parrot. "
-                    "Found %d.%d.%d but loaded %d.%d.%d",
-                    entry->lib->name, major, minor, patch, entry->lib->major_version,
-                    entry->lib->minor_version, entry->lib->patch_version);
+                    "Found %d.%d but loaded %d.%d",
+                    entry->lib->name, bc_major, bc_minor,
+                    entry->lib->bc_major_version, entry->lib->bc_minor_version);
         }
 
         /* op entries */

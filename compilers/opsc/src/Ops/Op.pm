@@ -116,6 +116,14 @@ are appended to the name.
 
 The same as C<full_name()>, but with 'C<Parrot_>' prefixed.
 
+=item C<experimental()>
+
+Set or get "experimental" flag for Op.
+
+=item C<deprecated()>
+
+Set or get "deprecated" flag for Op.
+
 =end
 
 method code($code?) { self.attr('code', $code, defined($code)) }
@@ -125,6 +133,10 @@ method type($type?) { self.attr('type', $type, defined($type)) }
 method name($name?) { self.attr('name', $name, defined($name)) }
 
 method args($args?) { self.attr('args', $args, defined($args)) }
+
+method experimental($args?) { self.attr('experimental', $args, defined($args)) }
+
+method deprecated($args?) { self.attr('deprecated', $args, defined($args)) }
 
 method need_write_barrier() {
     my $need := 0;
@@ -173,7 +185,11 @@ flags (passed as ":flag") specified for the op.
 
 =end
 
-method flags(%flags?) { self.attr('flags', %flags, defined(%flags)) }
+method flags(%flags?) {
+    %flags := self.attr('flags', %flags, defined(%flags));
+    self.deprecated(%flags<deprecated> ?? 1 !! 0);
+    %flags;
+}
 
 =begin
 

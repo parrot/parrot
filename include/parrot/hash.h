@@ -133,6 +133,14 @@ void Parrot_hash_clone(PARROT_INTERP,
         FUNC_MODIFIES(*dest);
 
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+Hash * Parrot_hash_create(PARROT_INTERP,
+    PARROT_DATA_TYPE val_type,
+    Hash_key_type hkey_type)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 void Parrot_hash_delete(PARROT_INTERP,
     ARGMOD(Hash *hash),
     ARGIN_NULLOK(void *key))
@@ -262,24 +270,17 @@ void Parrot_hash_clone_prunable(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-Hash * Parrot_hash_create(PARROT_INTERP,
-    PARROT_DATA_TYPE val_type,
-    Hash_key_type hkey_type)
-        __attribute__nonnull__(1);
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
 Hash * Parrot_hash_create_sized(PARROT_INTERP,
     PARROT_DATA_TYPE val_type,
     Hash_key_type hkey_type,
     UINTVAL size)
         __attribute__nonnull__(1);
 
-void Parrot_hash_flatten_hash_into(PARROT_INTERP,
+void Parrot_hash_flatten_hash_into(
+     PARROT_INTERP,
     ARGIN(PMC * const dest),
     ARGIN(PMC * const src),
     INTVAL overwrite)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
@@ -406,6 +407,8 @@ STRING* Parrot_hash_value_to_string(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash) \
     , PARROT_ASSERT_ARG(dest))
+#define ASSERT_ARGS_Parrot_hash_create __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_hash_delete __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash))
@@ -458,13 +461,10 @@ STRING* Parrot_hash_value_to_string(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(hash) \
     , PARROT_ASSERT_ARG(dest))
-#define ASSERT_ARGS_Parrot_hash_create __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_hash_create_sized __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_hash_flatten_hash_into __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(dest) \
+       PARROT_ASSERT_ARG(dest) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_Parrot_hash_freeze __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

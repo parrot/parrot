@@ -33,7 +33,6 @@ utilities. Think of it as a watered down version of GNU coreutils for Parrot.
 .loadlib 'math_ops'
 
 .sub '' :init :load :anon
-    $P0 = loadlib 'os'
 .end
 
 =item B<system(string cmd, int :verbose(), int :ignore_error())>
@@ -489,7 +488,7 @@ will not affect the file that it points to.
     new $P0, 'OS'
 
     push_eh _handler
-    $P0.'rm'(filename)
+    $P0.'unlink'(filename)
     pop_eh
   L1:
     .return ()
@@ -576,12 +575,12 @@ be verbose. If given, the string I<rmtree C<path>> will be displayed.
     rmtree($S1)
     goto L3
   L5:
-    $P0.'rm'($S1)
+    $P0.'unlink'($S1)
     goto L3
   L4:
     push_eh _handler
     $S1 = path
-    $P0.'rm'($S1)
+    $P0.'rmdir'($S1)
     pop_eh
   L1:
     .return ()
@@ -1272,39 +1271,6 @@ directory, and filename portions. On systems that don't have the concept of
     directories = substr path, 0, $I0
   L4:
     .return (volume, directories, file)
-.end
-
-=item B<rindex(string str, string sstr, int :pos())>
-
-Returns an integer representing the index of the I<last> occurence of the
-string C<sstr> in C<str>.
-
-The C<:pos()> argument is an optional integer representing the index of C<str>
-to start searching at. Defaults to 0.
-
-=cut
-
-.sub 'rindex'
-    .param string str
-    .param string sstr
-    .param int    pos     :optional
-    .param int    has_pos :opt_flag
-
-    if has_pos goto L1
-    pos = 0
-  L1:
-    $I0 = index str, sstr, pos
-    unless $I0 < 0 goto L2
-
-    .return ($I0)
-  L2:
-    $I1 = $I0
-    inc $I0
-
-    $I0 = index str, sstr, $I0
-    unless $I0 < 0 goto L2
-
-    .return ($I1)
 .end
 
 =back

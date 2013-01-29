@@ -1,0 +1,18 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+config/README.pod - Readme file for the 'config/' top-level directory. 
+
+=head1 DESCRIPTION
+
+This directory, primarily, contains Perl5 modules which F<Configure.pl> uses,
+during the configuration of Parrot.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2012, Parrot Foundation.
+
+=cut

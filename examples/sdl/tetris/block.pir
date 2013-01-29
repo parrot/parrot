@@ -1,5 +1,5 @@
 
-=head1 TITLE
+=head1 DESCRIPTION
 
 block.pir - a tetris block class
 
@@ -592,7 +592,7 @@ Returns the application object associated with the block's board.
 .sub setXPosition :method
     .param int pos
 
-    getprop $P0, "xpos", self
+    getprop $P0, self, "xpos"
     $P0 = pos
 .end
 

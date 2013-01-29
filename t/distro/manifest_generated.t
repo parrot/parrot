@@ -1,12 +1,12 @@
 #! perl
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2012, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-plan(tests => 5);
+plan(tests => 4);
 
 =head1 NAME
 
@@ -18,7 +18,7 @@ t/distro/manifest_generated.t - check sanity of MANIFEST.generated file
 
 =head1 DESCRIPTION
 
-Checks that MANIFEST.generated is in the required format (eg: sorted) and that it
+Checks that MANIFEST.generated is in the required format and that it
 contains appropriate items (eg: PMC generated files).
 
 =cut
@@ -31,7 +31,7 @@ open my $fh, '<', 'MANIFEST.generated'
 my @contents = grep {!/^#/} map {chomp; $_} <$fh>;
 close $fh;
 
-is_deeply([sort @contents], \@contents, 'MANIFEST.generated is sorted');
+# is_deeply([sort @contents], \@contents, 'MANIFEST.generated is sorted');
 
 # parse records
 my @records;

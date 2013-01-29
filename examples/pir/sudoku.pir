@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2009, Parrot Foundation.
+# Copyright (C) 2005-2012, Parrot Foundation.
 
 =pod
 
@@ -15,7 +15,7 @@ simple backtracking algorithm continues to solve the sudoku.
 
 =head1 SYNOPSIS
 
-  parrot -Ot sudoku.pir [--options] [file]
+  parrot sudoku.pir [--options] [file]
 
 If no file is given a builtin game is run.
 

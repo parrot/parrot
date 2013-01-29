@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
 package Parrot::Pmc2c::PMC::Null;
 use base 'Parrot::Pmc2c::PMC';
@@ -42,8 +42,7 @@ sub pre_method_gen {
         # take care to mark the parameters as unused
         # to avoid compiler warnings
         my $body = <<"EOC";
-    UNUSED(interp)
-    UNUSED(_self)
+    UNUSED(SELF)
 EOC
 
         foreach my $param (split /,\s*/, $method->parameters) {

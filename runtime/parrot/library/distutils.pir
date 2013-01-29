@@ -1,10 +1,10 @@
-# Copyright (C) 2009-2011, Parrot Foundation.
+# Copyright (C) 2009-2012, Parrot Foundation.
 
 =head1 NAME
 
 distutils - Parrot Distribution Utilities
 
-=head2 DESCRIPTION
+=head1 DESCRIPTION
 
 This module is greatly inspired by Python Distribution Utilities
 (L<http://docs.python.org/distutils/>).
@@ -1326,7 +1326,7 @@ an array creates a PMC group
     .local string src
     src = shift $P1
     .local string ext
-    $I0 = rindex(src, '.')
+    $I0 = rindex src, '.'
     ext = substr src, $I0
     unless ext == '.pmc' goto L6
     push pmcs, src
@@ -1339,7 +1339,7 @@ an array creates a PMC group
   L7:
     unless $P1 goto L8
     src = shift $P1
-    $I0 = rindex(src, '.')
+    $I0 = rindex src, '.'
     ext = substr src, $I0
     if ext == '.h' goto L7
     $S0 = _mk_path_gen_dynpmc(src, obj)
@@ -1542,7 +1542,7 @@ an array creates a PMC group
 .sub '_mk_path_gen_dynpmc' :anon
     .param string src
     .param string ext
-    $I0 = rindex(src, '.')
+    $I0 = rindex src, '.'
     $S0 = substr src, 0, $I0
     $S0 .= ext
     unless ext == '.h' goto L1
@@ -1937,7 +1937,7 @@ the value is the POD pathname, for example 'src/prog.pir'
     .local string src
     src = shift $P1
     .local string ext
-    $I0 = rindex(src, '.')
+    $I0 = rindex src, '.'
     ext = substr src, $I0
     if ext == '.h' goto L3
     $S0 = _mk_path_gen_dynpmc(src, obj)
@@ -3843,29 +3843,29 @@ TEMPLATE
 
 configure: configure-stamp
 configure-stamp:
-	dh_testdir
-	touch configure-stamp
+    dh_testdir
+    touch configure-stamp
 
 build: build-stamp
 build-stamp: configure-stamp
-	dh_testdir
-	%s build
-	touch $@
+    dh_testdir
+    %s build
+    touch $@
 
 clean:
-	dh_testdir
-	dh_testroot
-	rm -f build-stamp configure-stamp
-	%s clean
-	dh_clean
+    dh_testdir
+    dh_testroot
+    rm -f build-stamp configure-stamp
+    %s clean
+    dh_clean
 
 install: build
-	dh_testdir
-	dh_testroot
-	dh_prep
-	dh_installdirs
-	%s --root $(CURDIR)/debian/tmp install
-	dh_install --sourcedir=$(CURDIR)/debian/tmp --list-missing
+    dh_testdir
+    dh_testroot
+    dh_prep
+    dh_installdirs
+    %s --root $(CURDIR)/debian/tmp install
+    dh_install --sourcedir=$(CURDIR)/debian/tmp --list-missing
 
 # Build architecture-independent files here.
 binary-indep: install
@@ -3873,21 +3873,21 @@ binary-indep: install
 
 # Build architecture-dependent files here.
 binary-arch: build install
-	dh_testdir
-	dh_testroot
-	dh_installchangelogs
-	dh_installdocs
-	dh_installexamples
-	dh_installman
-	dh_link
-	dh_strip
-	dh_compress
-	dh_fixperms
-	dh_installdeb
-	dh_shlibdeps
-	dh_gencontrol
-	dh_md5sums
-	dh_builddeb
+    dh_testdir
+    dh_testroot
+    dh_installchangelogs
+    dh_installdocs
+    dh_installexamples
+    dh_installman
+    dh_link
+    dh_strip
+    dh_compress
+    dh_fixperms
+    dh_installdeb
+    dh_shlibdeps
+    dh_gencontrol
+    dh_md5sums
+    dh_builddeb
 
 binary: binary-indep binary-arch
 .PHONY: build clean binary-indep binary-arch binary install configure

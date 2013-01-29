@@ -274,7 +274,7 @@ PackFile_destroy(PARROT_INTERP, ARGMOD(PackFile *pf))
 
 /*
 
-=item C<INTVAL Parrot_pf_serialized_size(PARROT_INTERP, PackFile * pf)>
+=item C<INTVAL Parrot_pf_serialized_size(PARROT_INTERP, PackFile *pf)>
 
 Returns the size, in bytes, that a packfile will be if serialized
 
@@ -292,7 +292,7 @@ Deserialize a packfile which is stored in a STRING buffer
 
 PARROT_EXPORT
 INTVAL
-Parrot_pf_serialized_size(PARROT_INTERP, ARGIN(PackFile * pf))
+Parrot_pf_serialized_size(PARROT_INTERP, ARGMOD(PackFile *pf))
 {
     ASSERT_ARGS(Parrot_pf_serialized_size)
     return PackFile_pack_size(interp, pf);
@@ -348,6 +348,7 @@ Tag a constant PMC with a constant STRING
 
 */
 
+PARROT_EXPORT
 void
 Parrot_pf_tag_constant(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct),
         const int tag_idx, const int const_idx)
@@ -387,7 +388,7 @@ Parrot_pf_tag_constant(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct),
         }
     }
 
-    mem_sys_memmove(&ct->tag_map[cur + 1], &ct->tag_map[cur],
+    memmove(&ct->tag_map[cur + 1], &ct->tag_map[cur],
                     ((ct->ntags - 1) - cur) * sizeof (PackFile_ConstTagPair));
     ct->tag_map[cur].tag_idx   = tag_idx;
     ct->tag_map[cur].const_idx = const_idx;
@@ -504,6 +505,122 @@ Parrot_pf_subs_by_tag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
     return subs;
 }
 
+/*
+
+=item C<PMC * Parrot_pf_all_tags_list(PARROT_INTERP, PMC * pfpmc)>
+
+Return a ResizableStringArray of all tags in the packfile.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC *
+Parrot_pf_all_tags_list(PARROT_INTERP, ARGIN(PMC * pfpmc))
+{
+    ASSERT_ARGS(Parrot_pf_all_tags_list)
+    PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
+    PMC * const tags = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
+
+    if (!pf || !pf->cur_cs || !pf->cur_cs->const_table)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "NULL or invalid packfile");
+    {
+        PackFile_ConstTable * const ct = pf->cur_cs->const_table;
+        const opcode_t ntags = ct->ntags;
+        opcode_t i = 0;
+        opcode_t last_seen = -1;
+        for (; i < ntags; i++) {
+            const opcode_t cur_tag = ct->tag_map[i].tag_idx;
+            if (cur_tag == last_seen)
+                continue;
+            VTABLE_push_string(interp, tags, ct->str.constants[cur_tag]);
+            last_seen = cur_tag;
+        }
+    }
+    return tags;
+}
+
+/*
+
+=item C<PMC * Parrot_pf_all_tagged_pmcs(PARROT_INTERP, PMC * pfpmc)>
+
+Return a hash of all tags in the packfile. Each tag is a key in the hash. Each
+value is a ResizablePMCArray of pmcs with that tag.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC *
+Parrot_pf_all_tagged_pmcs(PARROT_INTERP, ARGIN(PMC * pfpmc))
+{
+    ASSERT_ARGS(Parrot_pf_all_tagged_pmcs)
+    PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
+    PMC * const taghash = Parrot_pmc_new(interp, enum_class_Hash);
+
+    if (!pf || !pf->cur_cs || !pf->cur_cs->const_table)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "NULL or invalid packfile");
+    {
+        PackFile_ConstTable * const ct = pf->cur_cs->const_table;
+        const opcode_t ntags = ct->ntags;
+        opcode_t i = 0;
+        opcode_t last_seen = -1;
+        STRING * cur_tag_str = NULL;
+        PMC * cur_tag_list = NULL;
+        for (; i < ntags; i++) {
+            const opcode_t cur_tag = ct->tag_map[i].tag_idx;
+            if (cur_tag != last_seen) {
+                cur_tag_str = ct->str.constants[cur_tag];
+                cur_tag_list = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+                VTABLE_set_pmc_keyed_str(interp, taghash, cur_tag_str, cur_tag_list);
+                last_seen = cur_tag;
+            }
+            VTABLE_push_pmc(interp, cur_tag_list, ct->pmc.constants[ct->tag_map[i].const_idx]);
+        }
+    }
+    return taghash;
+}
+
+/*
+
+=item C<PMC * Parrot_pf_all_subs(PARROT_INTERP, PMC *pfpmc)>
+
+Return an array of all Sub PMCs from the packfile
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC *
+Parrot_pf_all_subs(PARROT_INTERP, ARGIN(PMC *pfpmc))
+{
+    ASSERT_ARGS(Parrot_pf_all_subs)
+    PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
+    if (!pf || !pf->cur_cs || !pf->cur_cs->const_table)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "NULL or invalid packfile");
+
+    {
+        PackFile_ConstTable * const ct = pf->cur_cs->const_table;
+        PMC * const array = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+        INTVAL i;
+        STRING * const SUB = CONST_STRING(interp, "Sub");
+        for (i = 0; i < ct->pmc.const_count; ++i) {
+            PMC * const x = ct->pmc.constants[i];
+            if (VTABLE_isa(interp, x, SUB))
+                VTABLE_push_pmc(interp, array, x);
+        }
+        return array;
+    }
+}
 /*
 
 =item C<static int sub_pragma(PARROT_INTERP, pbc_action_enum_t action, const PMC
@@ -789,6 +906,8 @@ packfile_main(ARGIN(PackFile_ByteCode *bc))
 {
     ASSERT_ARGS(packfile_main)
     const PackFile_ConstTable * const ct = bc->const_table;
+    if (!ct || !ct->pmc.constants || bc->main_sub < 0)
+        return PMCNULL;
     return ct->pmc.constants[bc->main_sub];
 }
 
@@ -806,8 +925,7 @@ These determine which subs get executed at this point. Some rules:
  :init subs execute when :main does
  :load subs execute on PBC_LOAD
 
-Also store the C<eval_pmc> in the sub structure, so that the eval PMC is kept
-alive by living subs.
+The argument C<eval_pmc> is ignored.
 
 This function and the entire underlying mechanism should be deprecated and
 removed. See GH #428 for details.
@@ -819,7 +937,7 @@ removed. See GH #428 for details.
 PARROT_EXPORT
 void
 do_sub_pragmas(PARROT_INTERP, ARGIN(PMC *pfpmc),
-               pbc_action_enum_t action, ARGIN_NULLOK(PMC *eval_pmc))
+               pbc_action_enum_t action, SHIM(PMC *eval_pmc))
 {
     ASSERT_ARGS(do_sub_pragmas)
     PackFile            * const pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
@@ -845,6 +963,7 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PMC *pfpmc),
 
                 /* replace Sub PMC with computation results */
                 if (action == PBC_IMMEDIATE && !PMC_IS_NULL(result)) {
+                    PObj_is_shared_SET(result); /* packfile constants are shared among threads */
                     ct->pmc.constants[i] = result;
                     PARROT_GC_WRITE_BARRIER(interp, pfpmc);
                 }
@@ -1262,9 +1381,10 @@ PackFile_set_header(ARGOUT(PackFile_Header *header))
 #    if (NUMVAL_SIZE == 16)
     header->floattype = FLOATTYPE_16;
 #    else
-    exit_fatal(1, "PackFile_set_header: Unsupported floattype NUMVAL_SIZE=%d,"
-               " PARROT_BIGENDIAN=%s\n", NUMVAL_SIZE,
-               PARROT_BIGENDIAN ? "big-endian" : "little-endian");
+    Parrot_x_force_error_exit(NULL, 1,
+        "PackFile_set_header: Unsupported floattype NUMVAL_SIZE=%d,"
+        " PARROT_BIGENDIAN=%s\n", NUMVAL_SIZE,
+        PARROT_BIGENDIAN ? "big-endian" : "little-endian");
 #    endif
 #  endif
 #endif
@@ -1877,7 +1997,7 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
     /* Extend segment data and shift subsequent data by 2. */
     self->base.data = (opcode_t *)mem_sys_realloc(self->base.data,
                             (self->base.size + 2) * sizeof (opcode_t));
-    mem_sys_memmove(&self->base.data[idx + 2], &self->base.data[idx],
+    memmove(&self->base.data[idx + 2], &self->base.data[idx],
             (self->base.size - idx) * sizeof (opcode_t));
     self->base.size += 2;
     for (i = key_id + 1; i < self->num_keys; i++)
@@ -1963,6 +2083,40 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
             Parrot_warn(interp, PARROT_WARNINGS_ALL_FLAG, "unexpected annotation type found");
             return PMCNULL;
         }
+    }
+}
+
+/*
+
+=item C<PackFile_Annotations * Parrot_pf_get_annotations_segment(PARROT_INTERP,
+PackFile *pf, PackFile_ByteCode *bc)>
+
+TK: Whiteknight please fill in.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PackFile_Annotations *
+Parrot_pf_get_annotations_segment(PARROT_INTERP, ARGMOD(PackFile *pf),
+        ARGMOD_NULLOK(PackFile_ByteCode *bc))
+{
+    ASSERT_ARGS(Parrot_pf_get_annotations_segment)
+    if (bc == NULL)
+        bc = pf->cur_cs;
+    if (bc->annotations != NULL)
+        return bc->annotations;
+    else {
+        STRING * const name = Parrot_str_concat(interp, bc->base.name, CONST_STRING(interp, "_ANN"));
+        PackFile_Directory * const dir = bc->base.dir ? bc->base.dir :
+                    &pf->directory;
+        PackFile_Annotations * const annotations = (PackFile_Annotations *)
+            PackFile_Segment_new_seg(interp, dir, PF_ANNOTATIONS_SEG, name, 1);
+        bc->annotations = annotations;
+        annotations->code = bc;
+        return annotations;
     }
 }
 
@@ -2378,7 +2532,7 @@ Parrot_pf_write_pbc_file(PARROT_INTERP, ARGIN(PMC *pf_pmc), ARGIN(STRING *filena
     else {
         PIOHANDLE fp;
         Parrot_block_GC_mark(interp);
-        fp = PIO_OPEN(interp, filename, PIO_F_WRITE);
+        fp = Parrot_io_internal_open(interp, filename, PIO_F_WRITE);
         if (fp == PIO_INVALID_HANDLE) {
             Parrot_unblock_GC_mark(interp);
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
@@ -2388,9 +2542,9 @@ Parrot_pf_write_pbc_file(PARROT_INTERP, ARGIN(PMC *pf_pmc), ARGIN(STRING *filena
             const Parrot_Int size = PackFile_pack_size(interp, pf) * sizeof (opcode_t);
             opcode_t * const packed = (opcode_t*)mem_sys_allocate(size);
             PackFile_pack(interp, pf, packed);
-            PIO_WRITE(interp, fp, (char *)packed, size);
+            Parrot_io_internal_write(interp, fp, (char *)packed, size);
         }
-        PIO_CLOSE(interp, fp);
+        Parrot_io_internal_close(interp, fp);
         Parrot_unblock_GC_mark(interp);
     }
 }
@@ -2405,7 +2559,7 @@ Parrot_pf_read_pbc_file(PARROT_INTERP, ARGIN_NULLOK(STRING * const fullname))
     INTVAL    program_size;
 
     if (fullname == NULL || STRING_length(fullname) == 0) {
-        PIOHANDLE stdin_h = PIO_STDHANDLE(interp, PIO_STDIN_FILENO);
+        PIOHANDLE stdin_h = Parrot_io_get_standard_piohandle(interp, PIO_STDIN_FILENO);
         STRING * const hname = CONST_STRING(interp, "standard input");
         pf = read_pbc_file_packfile_handle(interp, hname, stdin_h, 0);
     }
@@ -2484,7 +2638,7 @@ read_pbc_file_bytes_handle(PARROT_INTERP, PIOHANDLE io, INTVAL program_size)
     char  *cursor       = program_code;
     program_size        = 0;
 
-    while ((read_result = PIO_READ(interp, io, cursor, chunk_size)) > 0) {
+    while ((read_result = Parrot_io_internal_read(interp, io, cursor, chunk_size)) > 0) {
         program_size += read_result;
 
         if (program_size == wanted)
@@ -2495,12 +2649,12 @@ read_pbc_file_bytes_handle(PARROT_INTERP, PIOHANDLE io, INTVAL program_size)
                 program_size + chunk_size, char);
 
         if (!program_code) {
-            PIO_CLOSE(interp, io);
+            Parrot_io_internal_close(interp, io);
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                     "Could not reallocate buffer while reading packfile from PIO.\n");
         }
 
-        cursor = (char *)(program_code + program_size);
+        cursor = program_code + program_size;
     }
 
     return program_code;
@@ -2526,7 +2680,7 @@ read_pbc_file_packfile(PARROT_INTERP, ARGIN(STRING * const fullname),
     ASSERT_ARGS(read_pbc_file_packfile)
     char * program_code = NULL;
     PackFile * pf;
-    PIOHANDLE io = PIO_OPEN(interp, fullname, PIO_F_READ);
+    PIOHANDLE io = Parrot_io_internal_open(interp, fullname, PIO_F_READ);
     INTVAL is_mapped = 0;
 
     if (io == PIO_INVALID_HANDLE)
@@ -2567,7 +2721,7 @@ read_pbc_file_packfile(PARROT_INTERP, ARGIN(STRING * const fullname),
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Can't unpack packfile %Ss.\n", fullname);
 
-    PIO_CLOSE(interp, io);
+    Parrot_io_internal_close(interp, io);
     return pf;
 }
 

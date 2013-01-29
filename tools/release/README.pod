@@ -1,0 +1,18 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
+
+=head1 NAME
+
+tools/release/README.pod - Readme file for the 'tools/release/' directory. 
+
+=head1 DESCRIPTION
+
+This directory is intended to hold programs, templates and configuration files
+useful during the release process.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2001-2012, Parrot Foundation.
+
+=cut

@@ -1,5 +1,5 @@
 #! nqp
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 # XXX Better to put this into docs/ somewhere.
 
@@ -217,8 +217,6 @@ method new_str($str, :$oplib) {
 
     self._set_version();
 
-    self._set_version();
-
     self.compile_ops($str);
 
     self;
@@ -258,7 +256,8 @@ method compile_ops($str, :$experimental? = 0) {
     my $past     := $compiler.compile($str, :target('past'));
 
     for @($past<ops>) {
-        $_<experimental> := $experimental;
+        $_.experimental($experimental);
+        $_.deprecated($_.flags<deprecated> ?? 1 !! 0);
         self<ops>.push($_);
         #say($_.full_name ~ " is number " ~ self<op_order>);
         self<op_order>++;
@@ -280,9 +279,9 @@ method ops()      { self<ops> };
 method oplib()    { self<oplib> };
 method version()  { self<version>; }
 
-method version_major() { self<version_major> }
-method version_minor() { self<version_minor> }
-method version_patch() { self<version_patch> }
+# unused. Replaced by cpp macros from pbcversion.h
+method bytecode_major() { self<bytecode_major> }
+method bytecode_minor() { self<bytecode_minor> }
 
 method _calculate_op_codes() {
 
@@ -295,36 +294,11 @@ method _calculate_op_codes() {
 
 method _set_version() {
     my $config := _config();
-    my $version_filename;
-    if $config<installed> {
-        $version_filename :=
-            $config<libdir> ~
-            $config<versiondir> ~
-            $config<slash> ~
-            'VERSION';
-    }
-    else {
-        $version_filename :=
-            $config<prefix> ~
-            $config<slash> ~
-            'VERSION';
-    }
-
-    grammar VERSION {
-        rule TOP { <version> }
-        rule version { $<major>=(\d+) '.' $<minor>=(\d+) '.' $<patch>=(\d+) }
-    }
-
-    my $version       := slurp($version_filename);
-    my $version_match := VERSION.parse($version);
-    #say("# $version");
-    self<version_major> := +$version_match<version><major>;
-    self<version_minor> := +$version_match<version><minor>;
-    self<version_patch> := +$version_match<version><patch>;
+    self<bytecode_major> := +$config<PBC_MAJOR>;
+    self<bytecode_minor> := +$config<PBC_MINOR>;
     self<version>       := [
-        +self<version_major>,
-        +self<version_minor>,
-        +self<version_patch>,
+        +self<bytecode_major>,
+        +self<bytecode_minor>,
     ];
 }
 

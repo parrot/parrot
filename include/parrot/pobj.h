@@ -102,6 +102,9 @@ struct PMC {
     VTABLE         *vtable;             /* Pointer to vtable. */
     DPOINTER       *data;               /* Pointer to attribute structure. */
     PMC            *_metadata;          /* Pointer to metadata PMC. */
+#ifdef THREAD_DEBUG
+    Parrot_Interp  orig_interp;
+#endif
 };
 
 /* Use these macros to access the data and metadata. */
@@ -164,6 +167,9 @@ typedef enum PObj_enum {
     PObj_custom_destroy_FLAG    = POBJ_FLAG(19),
     /* For debugging, report when this buffer gets moved around */
     PObj_report_FLAG            = POBJ_FLAG(20),
+
+    /* used by Proxy PMC to identify PMCs created on the current interp */
+    PObj_is_new_FLAG            = POBJ_FLAG(21),
 
     /* Flags used by generation GC to determine generation object belong */
     PObj_GC_generation_0_FLAG   = POBJ_FLAG(22),
@@ -293,6 +299,10 @@ typedef enum PObj_enum {
 #define PObj_is_shared_SET(o)  PObj_flag_SET(is_shared, o)
 #define PObj_is_shared_CLEAR(o) PObj_flag_CLEAR(is_shared, o)
 
+#define PObj_is_new_TEST(o) PObj_flag_TEST(is_new, o)
+#define PObj_is_new_SET(o)  PObj_flag_SET(is_new, o)
+#define PObj_is_new_CLEAR(o) PObj_flag_CLEAR(is_new, o)
+
 #define PObj_GC_on_dirty_list_TEST(o)  PObj_flag_TEST(GC_on_dirty_list, o)
 #define PObj_GC_on_dirty_list_SET(o)   PObj_flag_SET(GC_on_dirty_list, o)
 #define PObj_GC_on_dirty_list_CLEAR(o) PObj_flag_CLEAR(GC_on_dirty_list, o)
@@ -333,6 +343,14 @@ typedef enum PObj_enum {
     &= ~PObj_custom_destroy_FLAG \
      & ~PObj_custom_mark_FLAG \
      & ~PObj_live_FLAG)
+
+/* Thread debugging aid for catching PMCs ending up on the wrong interp */
+
+#ifdef THREAD_DEBUG
+#  define PARROT_ASSERT_INTERP(pmc, interp) PARROT_ASSERT((pmc) == NULL || PMC_IS_NULL(pmc) || PObj_is_shared_TEST(pmc) || (pmc)->orig_interp == (interp))
+#else
+#  define PARROT_ASSERT_INTERP(pmc, interp)
+#endif
 
 #endif /* PARROT_POBJ_H_GUARD */
 
