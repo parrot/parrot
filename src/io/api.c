@@ -786,6 +786,7 @@ Parrot_io_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
             return s;
         }
         else {
+            total_size -= vtable->get_position(interp, handle);
             IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
             STRING * const s = io_get_new_empty_string(interp, encoding, -1, total_size);
 
