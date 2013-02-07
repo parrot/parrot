@@ -295,7 +295,7 @@ sub install_files {
       @$options{qw(destdir datadir versiondir dryrun)};
     ref($files) eq 'ARRAY' or die "Error: parameter \$files must be an arrayref\n";
 
-    my ($src, $dest, $mode, $manifest);
+    my ($src, $dest, $mdest, $mode, $manifest);
     print("Installing ...\n");
     if (!$dryrun) {
         my $destdatadir = $destdir
@@ -311,8 +311,8 @@ sub install_files {
             warn "Bad reference passed in \$files (want a HASH, got a '$ref')\n";
             next;
         }
-        ( $src, $dest ) = map { $el->{$_} } qw(Source Dest);
-        $dest = $destdir . $dest;
+        ( $src, $mdest ) = map { $el->{$_} } qw(Source Dest);
+        $dest = $destdir . $mdest;
         if ( $dryrun ) {
             print "$src -> $dest\n";
             next;
@@ -332,14 +332,14 @@ sub install_files {
                     # this loop
                     if (-e $dest) {
                         print "$dest\n";
-                        print $manifest "$dest\n" unless $dryrun;
+                        print $manifest "$mdest\n" unless $dryrun;
                         next;
                     }
                 }
             }
             cp( $src, $dest ) or die "Error: couldn't copy $src to $dest: $!\n";
             print "$dest\n";
-            print $manifest "$dest\n" unless $dryrun;
+            print $manifest "$mdest\n" unless $dryrun;
         }
         $mode = ( stat($src) )[2];
         chmod $mode, $dest;
