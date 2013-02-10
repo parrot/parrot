@@ -1022,7 +1022,6 @@ EOS
 =end PIR_TODO
 
 Using braces, { }, allows you to span multiple lines for an argument.
-See runtime/parrot/include/hllmacros.pir for examples and possible usage.
 A simple example is this:
 
 =begin PIR

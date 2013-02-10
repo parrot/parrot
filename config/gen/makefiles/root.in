@@ -333,7 +333,6 @@ GEN_LIBRARY = \
 	$(LIBRARY_DIR)/Test/Class.pbc \
 	$(LIBRARY_DIR)/Test/More.pbc \
 	$(LIBRARY_DIR)/Tcl/Glob.pbc \
-	$(LIBRARY_DIR)/TclLibrary.pbc \
 	$(LIBRARY_DIR)/URI.pbc \
 	$(LIBRARY_DIR)/URI/Escape.pbc \
 	$(LIBRARY_DIR)/uuid.pbc \

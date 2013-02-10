@@ -26,8 +26,6 @@ Additionally there are some snippets of PIR code:
 
 =over 4
 
-=item hllmacros.pir provides some nifty PIR macros
-
 =item test_more.pir provides boilerplate code for test scripts written in PIR
 
 =back
