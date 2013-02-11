@@ -802,26 +802,6 @@ Base of the natural logarithm, I<e>, to the power of R<VAL>.
 
 I<Arguments: NR, I or NR, N>
 
-=head3 exsec
-
-X<exsec opcode (PASM)>
-
-  exsec R<DEST>, R<VAL>
-
-The exsecant of R<VAL> in radians.
-
-I<Arguments: NR, N>
-
-=head3 fact
-
-X<fact opcode (PASM)>
-
-  fact R<DEST>, R<INT>
-
-Return the factorial of R<INT>.
-
-I<Arguments: IR, I or NR, I>
-
 =head3 fdopen
 
 X<fdopen opcode (PASM)>
@@ -1153,16 +1133,6 @@ X<gt_str opcode (PASM)>
 Jump to a label if R<VAL1> is stringwise greater than R<VAL2>.
 
 I<Arguments: P, P, IC>
-
-=head3 hav
-
-X<hav opcode (PASM)>
-
-  hav R<DEST>, R<VAL>
-
-The haversine of R<VAL> in radians.
-
-I<Arguments: NR, N>
 
 =head3 if
 
@@ -2852,16 +2822,6 @@ but before it's invoked.
 See also: C<invokecc>.
 
 I<Arguments: IR, I>
-
-=head3 vers
-
-X<vers opcode (PASM)>
-
-  vers R<DEST>, R<VAL>
-
-The versine of R<VAL> in radians.
-
-I<Arguments: NR, N>
 
 =head3 warningsoff
 

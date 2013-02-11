@@ -40,59 +40,6 @@ Reference:
 
 =cut
 
-
-########################################
-
-=item B<covers>(out NUM, in NUM)
-
-Set $1 to the coversine (in radians) of $2.
-
-=cut
-
-inline op covers(out NUM, in NUM) :advanced_math {
-    $1 = 1.0 - sin($2);
-}
-
-
-########################################
-
-=item B<exsec>(out NUM, in NUM)
-
-Set $1 to the exsecant of $2 (given in radians).
-
-=cut
-
-
-inline op exsec(out NUM, in NUM) :advanced_math {
-    $1 = (1.0 / cos($2)) - 1.0;
-}
-
-
-########################################
-
-=item B<hav>(out NUM, in NUM)
-
-Set $1 to the haversine (in radians) of $2.
-
-=cut
-
-inline op hav(out NUM, in NUM) {
-    $1 = 0.5 * (1.0 - cos($2));
-}
-
-
-########################################
-
-=item B<vers>(out NUM, in NUM)
-
-Set $1 to the versine (in radians) of $2.
-
-=cut
-
-inline op vers(out NUM, in NUM) :advanced_math {
-    $1 = 1.0 - cos($2);
-}
-
 ########################################
 
 =item B<gcd>(out INT, in INT, in INT)
@@ -160,42 +107,6 @@ inline op lcm(out INT, in INT, in INT) :advanced_math {
     saved_var1 /= gcd;
     $1 = saved_var1*saved_var2;
 }
-
-########################################
-
-=item B<fact>(out INT, in INT)
-
-=item B<fact>(out NUM, in INT)
-
-Factorial, n!. Calculates the product of 1 to N.
-
-=cut
-
-inline op fact(out INT, in INT) :advanced_math {
-    /* Coercing a negative to a UINT can get pretty ugly
-     * in this situation. */
-    INTVAL i = $2;
-    UINTVAL q = 1;
-    while (i>0) {
-        q = q*i;
-        i--;
-    }
-    $1 = q;
-}
-
-inline op fact(out NUM, in INT) :advanced_math {
-    /* Coercing a negative to a UINT can get pretty ugly
-     * in this situation. */
-    INTVAL i = $2;
-    FLOATVAL q = 1;
-    while (i>0) {
-        q = q*i;
-        i--;
-    }
-    $1 = q;
-}
-
-
 
 =back
 
