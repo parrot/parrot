@@ -22,7 +22,7 @@ Tests various transcendental operations
     .local num epsilon
     epsilon = _epsilon()
 
-    plan(111)
+    plan(110)
 
     test_sin_n(epsilon)
     test_sin_i(epsilon)
@@ -61,7 +61,6 @@ Tests various transcendental operations
     test_pow_p_p_n()
     test_pow_n_nc_i(epsilon)
     integer_overflow_with_pow()
-    e_raised_pi_time_i__plus_1_equal_0()
 .end
 
 .sub _pi
@@ -537,21 +536,6 @@ Tests various transcendental operations
     $S1 = .message
     is( $S0, $S1, $S1 )
 .endm
-
-.sub e_raised_pi_time_i__plus_1_equal_0
-    .local pmc c, c2, c3
-    c  = new ['Complex']
-    c2 = new ['Complex']
-    c3 = new ['Complex']
-    # e^(pi * i) + 1 = 0
-    $N0 = atan 1
-    $N0 *= 4
-    c[0] = 0.0
-    c[1] = $N0
-    c2 = c.'exp'()
-    c2 += 1.0
-    .sprintf_is( "%.3f%+.3fi", c2, "0.000+0.000i" )
-.end
 
 # Local Variables:
 #   mode: pir

@@ -24,7 +24,7 @@ Tests the Integer PMC.
 
     get_max_min()
 
-    plan(142)
+    plan(140)
     test_init()
     test_basic_math()
     test_truthiness_and_definedness()
@@ -483,12 +483,6 @@ fin:
    set $S0, $P2
    is($S0,50)
 
-   new $P0, ['Integer']
-   new $P1, ['Complex']
-   set $P0, 20
-   set $P1, 4
-   add $P0, $P1
-   is($P0, "4+0i", 'add complex number')
 
    new $P0, ['Integer']
    new $P1, ['Float']
@@ -558,13 +552,6 @@ fin:
     $P0 = 5
     sub $P0, 4.5
     is($P0, .5, 'i_subtract_float')
-
-    $P0 = new ['Integer']
-    $P1 = new ['Complex']
-    $P0 = 0
-    $P1 = "4+2i"
-    sub $P0, $P1
-    is($P0, "-4-2i", 'subtract Complex number')
 
     $P0 = new ['Integer']
     $P1 = new ['Float']

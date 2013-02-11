@@ -38,13 +38,12 @@ Tests automatically generated read-only PMC support.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(13)
+    plan(12)
 
     integer_set_read_only_is_not_writable() # 1 test
     integer_set_read_only_can_be_read()     # 6 tests
     integer_stays_integer()                 # 1 test
     integer_add()                           # 1 test
-    complex_i_add()                         # 1 test
     resizablepmcarray_non_recursive_part()  # 1 test
     objects()                               # 1 test
     resizablepmcarray_recursive()           # 1 test
@@ -134,32 +133,6 @@ Tests automatically generated read-only PMC support.
     .get_results($P0)
     message = $P0['message']
     is( message, "i_add_int() in read-only instance of 'Integer'", 'integer_add' )
-  end:
-.end
-
-.sub complex_i_add
-    .local pmc foo, eh
-
-    foo = new ['Complex']
-    foo[0] = 1.0
-    foo[1] = 1.0
-
-    eh = new ['ExceptionHandler']
-    eh.'handle_types'(.EXCEPTION_WRITE_TO_CONSTCLASS)
-    set_label eh, eh_label
-
-    make_readonly(foo)
-    push_eh eh
-    add foo, 4
-    pop_eh
-    ok( 0, 'complex_i_add')
-    goto end
-
-  eh_label:
-    .local string message
-    .get_results($P0)
-    message = $P0['message']
-    is( message, "i_add_int() in read-only instance of 'Complex'", 'complex_i_add' )
   end:
 .end
 

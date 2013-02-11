@@ -17,7 +17,7 @@ Tests for mathematical operations with Inf and Nan.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(42)
+    plan(41)
 
     test_basic_arith()
     test_sqrt()
@@ -26,7 +26,6 @@ Tests for mathematical operations with Inf and Nan.
     test_is_inf_or_nan()
     test_rounding_n()
     test_rounding_i()
-    test_nan_complex()
     test_fdiv_integer_pmc_nan()
     test_fdiv_float_pmc_nan()
     test_fdiv_float_integer_pmc_nan()
@@ -157,15 +156,6 @@ Tests for mathematical operations with Inf and Nan.
     $I0 = ceil $N0
     #is($I0, 'NaN', 'floor Inf')
     skip(1, 'rounding nan/inf gives something like -2147483648')
-.end
-
-.sub test_nan_complex
-    $P1 = new ["Complex"]
-    $N0 = 'NaN'
-    set $P1, "1 + i"
-    $P1 += $N0
-    #is($P1, 'NaN', '1+i + NaN')
-    skip(1, '1+i + NaN should be NaN')
 .end
 
 .sub test_fdiv_integer_pmc_nan

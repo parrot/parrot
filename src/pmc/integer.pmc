@@ -353,18 +353,6 @@ Adds C<value> to the integer and returns the result in C<*dest>.
     }
 
 
-    MULTI PMC *add(Complex value, PMC *dest) {
-        const INTVAL a = SELF.get_integer();
-        dest           = Parrot_pmc_new_init_int(INTERP,
-                            VTABLE_type(INTERP, value),
-                            a + VTABLE_get_number_keyed_int(INTERP, value, 0));
-        VTABLE_set_number_keyed_int(INTERP, dest, 1,
-                VTABLE_get_number_keyed_int(INTERP, value, 1));
-
-        return dest;
-    }
-
-
     MULTI PMC *add(BigInt value, PMC *dest) {
         PMC *temp;
         maybe_throw_overflow_error(INTERP);
@@ -414,16 +402,6 @@ Adds C<value> to C<SELF> inplace.
 
     MULTI void i_add(Integer value) {
         STATICSELF.i_add_int(VTABLE_get_integer(INTERP, value));
-    }
-
-
-    MULTI void i_add(Complex value) {
-        const INTVAL a = SELF.get_integer();
-        UNUSED(a);
-
-        Parrot_pmc_reuse(INTERP, SELF, enum_class_Complex, 0);
-        VTABLE_set_number_native(INTERP, SELF,
-                SELF.get_integer() + VTABLE_get_number(INTERP, value));
     }
 
 
@@ -481,19 +459,6 @@ C<get_integer> and C<set_integer_native> always.
             temp = Parrot_pmc_new_init_int(INTERP, enum_class_BigInt, a);
             return VTABLE_subtract(INTERP, temp, value, dest);
         }
-    }
-
-
-    MULTI PMC *subtract(Complex value, PMC *dest) {
-        const INTVAL a = SELF.get_integer();
-        dest           = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, value));
-
-        VTABLE_set_number_native(INTERP, dest,
-                a - VTABLE_get_number_keyed_int(INTERP, value, 0));
-        VTABLE_set_number_keyed_int(INTERP, dest, 1,
-                -VTABLE_get_number_keyed_int(INTERP, value, 1));
-
-        return dest;
     }
 
 
@@ -570,17 +535,6 @@ Subtracts C<value> from C<SELF> inplace.
     }
 
 
-    MULTI void i_subtract(Complex value) {
-        const INTVAL a = SELF.get_integer();
-
-        Parrot_pmc_reuse(INTERP, SELF, enum_class_Complex, 0);
-        VTABLE_set_number_native(INTERP, SELF,
-                (FLOATVAL)a - VTABLE_get_number_keyed_int(INTERP, value, 0));
-        VTABLE_set_number_keyed_int(INTERP, SELF, 1,
-                -VTABLE_get_number_keyed_int(INTERP, value, 1));
-    }
-
-
     MULTI void i_subtract(DEFAULT value) {
         VTABLE_set_number_native(INTERP, SELF,
                 SELF.get_integer() - VTABLE_get_number(INTERP, value));
@@ -634,11 +588,6 @@ Multiplies the integer by C<*value> and returns the result in C<*dest>.
             temp = Parrot_pmc_new_init_int(INTERP, enum_class_BigInt, a);
             return VTABLE_multiply(INTERP, temp, value, dest);
         }
-    }
-
-
-    MULTI PMC *multiply(Complex value, PMC *dest) {
-        return VTABLE_multiply(INTERP, value, SELF, dest);
     }
 
 
