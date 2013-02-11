@@ -87,7 +87,7 @@ my %options = (
     srcdir      => '/usr/src/',      # parrot/ subdir added below
     versiondir  => '',
     'dry-run'   => 0,
-    packages    => 'devel|pct|tge|nqp|data_json|winxed',
+    packages    => 'devel|pct|nqp|winxed',
 );
 
 my @manifests;

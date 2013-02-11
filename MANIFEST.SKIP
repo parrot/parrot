@@ -148,10 +148,6 @@
 ^/compilers/pge/PGE/builtins_gen\.pir/
 ^/compilers/pge/PGE\.pbc$
 ^/compilers/pge/PGE\.pbc/
-^/compilers/tge/TGE/Parser\.pir$
-^/compilers/tge/TGE/Parser\.pir/
-^/compilers/tge/tgc\.pbc$
-^/compilers/tge/tgc\.pbc/
 ^/config_lib\.pir$
 ^/config_lib\.pir/
 ^/core.*$
@@ -478,8 +474,6 @@
 ^/runtime/parrot/include/.*\.pir/
 ^/runtime/parrot/languages/JSON/JSON\.pir$
 ^/runtime/parrot/languages/JSON/JSON\.pir/
-^/runtime/parrot/languages/data_json$
-^/runtime/parrot/languages/data_json/
 ^/runtime/parrot/languages/winxed$
 ^/runtime/parrot/languages/winxed/
 ^/runtime/parrot/library/.*\.pbc$
@@ -832,12 +826,6 @@
 ^/t/benchmark/.*\.pasm/
 ^/t/benchmark/.*\.pir$
 ^/t/benchmark/.*\.pir/
-^/t/compilers/data_json/.*\.pbc$
-^/t/compilers/data_json/.*\.pbc/
-^/t/compilers/data_json/.*\.pir$
-^/t/compilers/data_json/.*\.pir/
-^/t/compilers/data_json/.*_pbcexe$
-^/t/compilers/data_json/.*_pbcexe/
 ^/t/compilers/imcc/.*\.pbc$
 ^/t/compilers/imcc/.*\.pbc/
 ^/t/compilers/imcc/reg/.*\.pasm$

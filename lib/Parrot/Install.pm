@@ -246,7 +246,6 @@ sub sanitycheck_install {
         include/parrot/extend_vtable.h
         runtime/parrot/include/datatypes.pasm
         runtime/parrot/library/Test/More.pbc
-        compilers/tge/TGE/Parser.pir
         runtime/parrot/library/P6Regex.pbc
         runtime/parrot/languages/winxed/winxed.pbc
         runtime/parrot/library/nqp-setting.pbc

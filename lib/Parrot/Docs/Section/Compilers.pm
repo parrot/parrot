@@ -42,7 +42,6 @@ sub new {
         '',
         $self->new_group( 'IMCC', 'the Intermediate Code Compiler for Parrot', 'compilers/imcc' ),
         $self->new_group( 'PGE',  'the Parrot Grammar Engine',                 'compilers/pge' ),
-        $self->new_group( 'TGE',  'the Tree Grammar Engine',                   'compilers/tge' ),
         $self->new_group( 'PCT',  'Parrot Compiler Toolkit',    'compilers/pct' ),
         $self->new_group( 'JSON', 'JavaScript Object Notation', 'compilers/data_json' ),
         $self->new_group( 'NCIGEN', 'Native Call Interface Generator', 'compilers/ncigen' ),

@@ -139,12 +139,10 @@ HEADERIZER       = $(PERL) $(DEV_TOOLS_DIR)/headerizer.pl
 include src/dynpmc/Defines.mak
 include src/dynoplibs/Defines.mak
 include compilers/imcc/Defines.mak
-include compilers/tge/Defines.mak
 include compilers/pge/Defines.mak
 include compilers/pct/Defines.mak
 include compilers/opsc/Defines.mak
 include ext/nqp-rx/Defines.mak
-include compilers/data_json/Defines.mak
 include ext/winxed/Defines.mak
 
 ###############################################################################
@@ -2507,7 +2505,6 @@ clean : \
 	$(RM_F) $(FLUID_FILES_2)
 	$(RM_F) MANIFEST.generated
 	$(RM_RF) lib/Parrot/OpLib
-	$(RM_RF) runtime/parrot/languages/data_json
 	$(RM_F) runtime/parrot/languages/JSON/JSON.pir
 	$(RM_F) $(NQP_CLEANUPS) $(PGE_CLEANUPS) $(TGE_CLEANUPS)
 	$(RM_F) $(PCT_CLEANUPS) $(DATA_JSON_CLEANUPS)
@@ -2622,13 +2619,11 @@ dynext-clean :
 # XXX Is there a danger of too long command lines in the $(RM_F) commands,
 # or is there an automatic xargs?
 test-clean :
-	$(RM_F) t/compilers/data_json/*.pir
 	$(RM_F) t/compilers/imcc/syn/*.pir t/compilers/imcc/syn/*.pasm t/compilers/imcc/syn/*.pbc
 	$(RM_F) t/compilers/imcc/reg/*.pir t/compilers/imcc/reg/*.pasm t/compilers/imcc/reg/*.pbc
 	$(RM_F) t/compilers/pct/*.pir
 	$(RM_F) t/compilers/pge/perl6regex/*.pir
 	$(RM_F) t/compilers/pge/*.pir
-	$(RM_F) t/compilers/tge/*.pir
 	$(RM_F) \
 	$(PBC_TEST_FILES) \
 	"t/*/*$(O)" \
@@ -3337,8 +3332,6 @@ include compilers/imcc/Rules.mak
 include compilers/pge/Rules.mak
 include compilers/pct/Rules.mak
 include compilers/opsc/Rules.mak
-include compilers/tge/Rules.mak
-include compilers/data_json/Rules.mak
 include ext/nqp-rx/Rules.mak
 include ext/winxed/Rules.mak
 

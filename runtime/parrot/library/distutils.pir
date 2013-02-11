@@ -216,8 +216,6 @@ L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
     register_step_after('build', _build_dynops)
     .const 'Sub' _build_pir_pge = '_build_pir_pge'
     register_step_after('build', _build_pir_pge)
-    .const 'Sub' _build_pir_tge = '_build_pir_tge'
-    register_step_after('build', _build_pir_tge)
     .const 'Sub' _build_pir_nqp_rx = '_build_pir_nqp_rx'
     register_step_after('build', _build_pir_nqp_rx)
     .const 'Sub' _build_pir_winxed = '_build_pir_winxed'
@@ -247,8 +245,6 @@ L<http://github.com/ekiru/tree-optimization/blob/master/setup.nqp>
     register_step_after('clean', _clean_dynops)
     .const 'Sub' _clean_pir_pge = '_clean_pir_pge'
     register_step_after('clean', _clean_pir_pge)
-    .const 'Sub' _clean_pir_tge = '_clean_pir_tge'
-    register_step_after('clean', _clean_pir_tge)
     .const 'Sub' _clean_pir_nqp_rx = '_clean_pir_nqp_rx'
     register_step_after('clean', _clean_pir_nqp_rx)
     .const 'Sub' _clean_pir_winxed = '_clean_pir_winxed'
@@ -669,54 +665,6 @@ the value is an array of PGE pathname or a single PGE pathname
     cmd .= flags
     cmd .= " "
     cmd .= src
-    push jobs, cmd
-    goto L1
-  L2:
-    .tailcall run_jobs(jobs)
-.end
-
-=item pir_tge
-
-hash
-
-the key is the PIR pathname
-
-the value is the TGE pathname
-
-=cut
-
-.sub '_build_pir_tge' :anon
-    .param pmc kv :slurpy :named
-    $I0 = exists kv['pir_tge']
-    unless $I0 goto L1
-    $P0 = kv['pir_tge']
-    build_pir_tge($P0)
-  L1:
-.end
-
-.sub 'build_pir_tge'
-    .param pmc hash
-    .local pmc jobs
-    jobs = new 'ResizableStringArray'
-    $P0 = iter hash
-  L1:
-    unless $P0 goto L2
-    .local string pir, tge
-    pir = shift $P0
-    tge = hash[pir]
-    $I0 = newer(pir, tge)
-    if $I0 goto L1
-    $S0 = dirname(pir)
-    mkpath($S0, 1 :named('verbose'))
-    .local string cmd
-    cmd = get_parrot()
-    cmd .= " "
-    $S0 = get_compiler('tge/tgc.pir')
-    cmd .= $S0
-    cmd .= " --output="
-    cmd .= pir
-    cmd .= " "
-    cmd .= tge
     push jobs, cmd
     goto L1
   L2:
@@ -1734,19 +1682,6 @@ the value is the POD pathname, for example 'src/prog.pir'
     $I0 = exists kv['pir_pge']
     unless $I0 goto L1
     $P0 = kv['pir_pge']
-    clean_key($P0)
-  L1:
-.end
-
-=item pir_tge
-
-=cut
-
-.sub '_clean_pir_tge' :anon
-    .param pmc kv :slurpy :named
-    $I0 = exists kv['pir_tge']
-    unless $I0 goto L1
-    $P0 = kv['pir_tge']
     clean_key($P0)
   L1:
 .end
@@ -3004,7 +2939,7 @@ array of pathname or a single pathname
 
 array of pathname or a single pathname
 
-=item pbc_pir, pir_pge, pir_tge, pir_nqp, pir_nqp-rx, pir_nqprx, inc_pir, pir_pir
+=item pbc_pir, pir_pge, pir_nqp, pir_nqp-rx, pir_nqprx, inc_pir, pir_pir
 pbc_pbc, exe_pbc, installable_pbc, dynops, dynpmc, html_pod
 
 =item inst_bin, inst_data, inst_dynext, inst_inc, inst_lang, inst_lib
@@ -3040,7 +2975,7 @@ the default value is setup.pir
     needed = new 'Hash'
     generated = new 'Hash'
 
-    $P0 = split ' ', 'pbc_pir pir_pge pir_tge pir_nqp pir_nqp-rx pir_nqprx inc_pir pir_pir pbc_pbc exe_pbc installable_pbc dynops dynpmc html_pod man_pod'
+    $P0 = split ' ', 'pbc_pir pir_pge pir_nqp pir_nqp-rx pir_nqprx inc_pir pir_pir pbc_pbc exe_pbc installable_pbc dynops dynpmc html_pod man_pod'
   L1:
     unless $P0 goto L2
     $S0 = shift $P0

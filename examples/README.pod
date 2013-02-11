@@ -48,8 +48,6 @@ scripts in 't/examples'.
 
 =item subs       - calling subroutines in PIR and PASM
 
-=item tge        - usage of TGE, see compilers/tge
-
 =item tutorial   - a PIR tutorial
 
 =back

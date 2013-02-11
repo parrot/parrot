@@ -236,7 +236,6 @@ None.
   http://www.ozonehouse.com/mark/blog/code/PeriodicTable.html
   http://perlcabal.org/syn/S03.html
 
-  compilers/tge
   compilers/past
 
 =cut

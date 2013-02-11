@@ -160,7 +160,6 @@ t/compilers/pct/*.t
 t/compilers/pge/*.t
 t/compilers/pge/p5regex/*.t
 t/compilers/pge/perl6regex/*.t
-t/compilers/tge/*.t
 t/compilers/opsc/*.t
 t/compilers/data_json/*.t
 ext/nqp-rx/t/nqp/*.t

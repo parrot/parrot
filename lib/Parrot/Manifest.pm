@@ -220,7 +220,6 @@ sub _get_manifest_entry {
             : m[^src/pmc/.*\.h]               ? '[devel]include'
             : m[^runtime/parrot/library/PCT]  ? '[pct]'
             : m[^runtime/parrot/library/PCT]  ? '[pge]'
-            : m[^runtime/parrot/library/TGE]  ? '[tge]'
             : m[^runtime/parrot/library/JSON] ? '[json]'
             :                                   '[]'; # default
     }

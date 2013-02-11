@@ -8,7 +8,7 @@ use 5.008;
 use Getopt::Long;
 use File::Spec::Functions;
 
-use Test::More tests => 6;
+use Test::More tests => 5;
 
 =head1 NAME
 
@@ -123,16 +123,6 @@ print $FH "say('hello world!');\n";
 close $FH;
 $out = `$nqp $filename`;
 ok($out eq "hello world!\n", "check nqp-rx");
-unlink($filename);
-
-# compilers/tge is typically not installed
-$filename = 'test.tg';
-open $FH, '>', $filename
-        or die "Can't open $filename ($!).\n";
-print $FH "transform past (ROOT) { }\n";
-close $FH;
-$out = `$parrot $compdir/tge/tgc.pir $filename`;
-ok($out =~ /^\n\.sub '_ROOT_past'/, "check TGE");
 unlink($filename);
 
 # Local Variables:
