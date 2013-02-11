@@ -1754,20 +1754,6 @@ Store the current lexical scope pad in a PMC.
 
 I<Arguments: P>
 
-=head3 pin
-
-X<pin opcode (PASM)>
-
-  pin R<DEST>
-
-Make the string in R<DEST> immobile. This prevents the garbage collector
-from moving it to a different location in memory (which it otherwise may
-choose to do).
-
-I<Arguments: SR>
-
-See also: C<unpin>.
-
 =head3 pop
 
 X<pop opcode (PASM)>
@@ -2758,19 +2744,6 @@ X<unless (conditional);opcode (PASM)>
 Jump to a label unless the condition is a true value.
 
 I<Arguments: I, IC or N, IC or S, IC or P, IC>
-
-=head3 unpin
-
-X<unpin opcode (PASM)>
-
-  unpin R<DEST>
-
-Make the string in R<DEST> movable again. This is the default, so
-C<unpin> is a no-op unless the string has been pinned with C<pin>.
-
-See also: C<pin>.
-
-I<Arguments: SR>
 
 =head3 unregister
 

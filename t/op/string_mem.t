@@ -20,10 +20,6 @@ Tests string ops related to low-level representation of strings, such as:
 
 stringinfo
 
-=item *
-
-pin/unpin
-
 =back
 
 =cut
@@ -41,7 +37,6 @@ pin/unpin
     test_stringinfo()
     $S0 = interpinfo .INTERPINFO_GC_SYS_NAME
     if $S0 != "ms" goto dont_run_hanging_tests
-    test_pin_unpin()
     goto test_end
   dont_run_hanging_tests:
     skip(2, "Test disabled on not GC MS")
@@ -69,68 +64,6 @@ pin/unpin
 
     $I2 = stringinfo $S2, .STRINGINFO_HEADER
     isnt($I0, $I2, "stringinfo - STRHEADER on different COW strings same value")
-.end
-
-.sub test_pin_unpin
-
-    .local int init, before, after
-
-    $S0 = 'life'
-    $S1 = 'life'
-    $S2 = 'life'
-    $S3 = 'life'
-    $S4 = 'life'
-    $S5 = 'life'
-    $S6 = 'love'
-    $S7 = 'life'
-    $S8 = 'life'
-    $S9 = 'life'
-
-    pin $S6
-    null $S0
-    null $S1
-    null $S2
-    null $S3
-    null $S4
-    null $S5
-    null $S7
-    null $S8
-    null $S9
-
-    init = stringinfo $S6, .STRINGINFO_STRSTART
-
-    $I0 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
-  loop1:
-    collect
-    $I1 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
-    eq $I0, $I1, loop1
-
-    before = stringinfo $S6, .STRINGINFO_STRSTART
-    unpin $S6
-
-    $I0 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
-  loop2:
-    collect
-    $I1 = interpinfo .INTERPINFO_GC_COLLECT_RUNS
-    eq $I0, $I1, loop1
-
-    after = stringinfo $S6, .STRINGINFO_STRSTART
-
-    is( init, before, "pin/collect didn't change memory address" )
-    $I0 = cmp after, before
-    print "# init: "
-    $S0 = init
-    print init
-    print ", before: "
-    $S0 = before
-    print before
-    print ", after: "
-    $S0 = after
-    print after
-    print ", cmp: "
-    $S0 = $I0
-    say $S0
-    ok( $I0, "location of string changed by unpin/collect" )
 .end
 
 #.constant STRINGINFO_STRSTART	2

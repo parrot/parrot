@@ -200,33 +200,6 @@ inline op bytelength(out INT, in STR) :base_mem {
 }
 
 
-=item B<pin>(inout STR)
-
-Make the memory in string $1 immobile. This memory will I<not> be moved
-by the Garbage Collector, and may be safely passed to external libraries.
-(Well, as long as they don't free it) Pinning a string will move the contents.
-
-$1 should be unpinned if it is used after pinning is no longer necessary.
-
-=cut
-
-op pin(inout STR) :base_mem {
-    Parrot_str_pin(interp, $1);
-}
-
-
-=item B<unpin>(inout STR)
-
-Make the memory in string $1 movable again.
-This will make the memory in $1 move.
-
-=cut
-
-op unpin(inout STR) :base_mem {
-    Parrot_str_unpin(interp, $1);
-}
-
-
 =item B<substr>(out STR, in STR, in INT)
 
 =item B<substr>(out STR, in STR, in INT, in INT)

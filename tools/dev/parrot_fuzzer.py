@@ -435,7 +435,6 @@ class OpfuncGenerator:
             'pic_infix__',
             'pic_inline_sub__',
             'pic_set_returns__',
-            'pin',
             'pop_eh',
             'prederef__',
             'profile',
@@ -452,7 +451,6 @@ class OpfuncGenerator:
             'trace',
             'trap',
             'unless',
-            'unpin',
             'yield',
             ]
 
