@@ -81,7 +81,6 @@ our @shared_valid_options = qw{
     without-opengl
     without-libffi
     without-readline
-    without-pcre
     without-threads
     without-zlib
     yacc

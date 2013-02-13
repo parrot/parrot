@@ -49,7 +49,6 @@ my @steps = qw(
     auto::thread
     auto::gmp
     auto::readline
-    auto::pcre
     auto::opengl
     auto::zlib
     auto::gettext

@@ -663,7 +663,6 @@ configuration file.
     auto::env
     auto::gmp
     auto::readline
-    auto::pcre
     auto::opengl
     auto::gettext
     auto::snprintf

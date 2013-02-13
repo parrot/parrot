@@ -253,7 +253,6 @@ sub sanitycheck_install {
         runtime/parrot/library/config.pbc
         runtime/parrot/library/opsc.pbc
         install_config.fpmc
-        runtime/parrot/library/pcre.pbc
         runtime/parrot/library/PCT/Grammar.pbc
     );
     my @dynext = qw(dynlexpad os file rational subproxy);

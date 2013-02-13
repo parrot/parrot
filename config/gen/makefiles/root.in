@@ -302,7 +302,6 @@ GEN_LIBRARY = \
 	$(LIBRARY_DIR)/YAML/Tiny.pir \
 	$(LIBRARY_DIR)/parrotlib.pbc \
 	$(LIBRARY_DIR)/pcore.pbc \
-	$(LIBRARY_DIR)/pcre.pbc \
 	$(LIBRARY_DIR)/Parrot/Coroutine.pbc \
 	$(LIBRARY_DIR)/Parrot/Exception.pbc \
 	$(LIBRARY_DIR)/PGE/Dumper.pbc \
@@ -340,7 +339,6 @@ GEN_LIBRARY = \
 	$(LIBRARY_DIR)/YAML/Dumper/Default.pbc \
 	$(LIBRARY_DIR)/YAML/Dumper.pbc \
 	$(LIBRARY_DIR)/STM.pbc \
-	$(LIBRARY_DIR)/libpcre.pbc \
 	$(LIBRARY_DIR)/postgres.pbc
 
 FLUID_FILES_1 = \
@@ -684,8 +682,6 @@ $(LIBRARY_DIR)/HTTP/Message.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT) $(DYNEXT_DIR)/
 
 $(LIBRARY_DIR)/distutils.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT) $(DYNEXT_DIR)/io_ops$(LOAD_EXT)
 
-$(LIBRARY_DIR)/pcre.pbc: $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
-
 $(LIBRARY_DIR)/uuid.pbc: $(DYNEXT_DIR)/math_ops$(LOAD_EXT)
 
 $(LIBRARY_DIR)/LWP/Protocol.pbc: $(DYNEXT_DIR)/io_ops$(LOAD_EXT) $(DYNEXT_DIR)/sys_ops$(LOAD_EXT)
@@ -949,7 +945,6 @@ parrot_nci_thunk_gen.pbc : \
   $(DEV_TOOLS_DIR)/nci_thunk_gen.pir \
   $(DATA_JSON_LIB_PBCS) $(PARROT) \
   $(DYNEXT_DIR)/bit_ops$(LOAD_EXT) \
-  $(LIBRARY_DIR)/pcre.pbc \
   $(RUN_INC_DIR)/hash_key_type.pasm \
   $(RUN_INC_DIR)/datatypes.pasm
 	$(PARROT) -o parrot_nci_thunk_gen.pbc $(DEV_TOOLS_DIR)/nci_thunk_gen.pir
