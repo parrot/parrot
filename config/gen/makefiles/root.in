@@ -288,7 +288,6 @@ GEN_LIBRARY = \
 	$(LIBRARY_DIR)/Math/Rand.pbc \
 	$(LIBRARY_DIR)/MIME/Base64.pbc \
 	$(LIBRARY_DIR)/NCI/Utils.pbc \
-	$(LIBRARY_DIR)/ncurses.pbc \
 #IF(has_opengl):    $(LIBRARY_DIR)/OpenGL.pbc \
 #IF(has_opengl):    $(LIBRARY_DIR)/OpenGL_funcs.pbc \
 #IF(has_opengl):    $(LIBRARY_DIR)/OpenGL/Math.pbc \
@@ -338,8 +337,7 @@ GEN_LIBRARY = \
 	$(LIBRARY_DIR)/YAML/Dumper/Base.pbc \
 	$(LIBRARY_DIR)/YAML/Dumper/Default.pbc \
 	$(LIBRARY_DIR)/YAML/Dumper.pbc \
-	$(LIBRARY_DIR)/STM.pbc \
-	$(LIBRARY_DIR)/postgres.pbc
+	$(LIBRARY_DIR)/STM.pbc
 
 FLUID_FILES_1 = \
 	$(GEN_HEADERS) \
