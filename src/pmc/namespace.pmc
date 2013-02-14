@@ -253,8 +253,7 @@ add_native_to_namespace(PARROT_INTERP, ARGIN(PMC *SELF), ARGIN(STRING *key),
     ASSERT_ARGS(add_native_to_namespace)
 
     if (!PMC_IS_NULL(value)
-    && (value->vtable->base_type == enum_class_NativePCCMethod ||
-        value->vtable->base_type == enum_class_NCI)) {
+    && (value->vtable->base_type == enum_class_NativePCCMethod )) {
         Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
         PMC * const classobj = VTABLE_get_class(interp, SELF);
 

@@ -551,40 +551,6 @@ Parrot_interp_clear_emergency_interpreter(void)
 }
 
 
-
-/*
-
-=item C<void Parrot_interp_register_nci_method(PARROT_INTERP, const int type,
-void *func, const char *name, const char *proto)>
-
-Create an entry in the C<nci_method_table> for the given NCI method of PMC
-class C<type>.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-void
-Parrot_interp_register_nci_method(PARROT_INTERP, const int type, ARGIN(void *func),
-                    ARGIN(const char *name), ARGIN(const char *proto))
-{
-    ASSERT_ARGS(Parrot_interp_register_nci_method)
-    PMC    * const method      = Parrot_pmc_new(interp, enum_class_NCI);
-    STRING * const method_name = Parrot_str_new_init(interp, name, strlen(name),
-        Parrot_default_encoding_ptr, PObj_constant_FLAG|PObj_external_FLAG);
-
-    /* create call func */
-    VTABLE_set_pointer_keyed_str(interp, method,
-            Parrot_str_new_init(interp, proto, strlen(proto),
-                Parrot_default_encoding_ptr, PObj_constant_FLAG|PObj_external_FLAG),
-            func);
-
-    /* insert it into namespace */
-    VTABLE_set_pmc_keyed_str(interp, interp->vtables[type]->_namespace,
-            method_name, method);
-}
-
 /*
 
 =item C<void Parrot_interp_register_native_pcc_method_in_ns(PARROT_INTERP, const
