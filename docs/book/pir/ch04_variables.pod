@@ -1169,8 +1169,8 @@ resize for the number of elements it stores.
 
 The core array types are C<FixedPMCArray>, C<ResizablePMCArray>,
 C<FixedIntegerArray>, C<ResizableIntegerArray>, C<FixedFloatArray>,
-C<ResizableFloatArray>, C<FixedStringArray>, C<ResizableStringArray>,
-C<FixedBooleanArray>, and C<ResizableBooleanArray>. The array
+C<ResizableFloatArray>, C<FixedStringArray>, C<ResizableStringArray>.
+The array
 types that start with "Fixed" have a fixed size and do not allow
 elements to be added outside their allocated size. The "Resizable"
 variants automatically extend themselves as more elements are

@@ -11,7 +11,7 @@
     .param int M
     .local pmc flags
     .local int i, count
-    flags = new 'FixedBooleanArray'
+    flags = new 'FixedIntegerArray'
     flags = M
     i = 2
 lp0:

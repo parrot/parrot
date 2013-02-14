@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 24;
 
 =head1 NAME
 
@@ -678,70 +678,6 @@ ok
 ok 1
 ok 2
 ok
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a ResizableBooleanArray" );
-.sub test :main
-    .local pmc original_arr, thawed_arr
-    .local string frozen_arr
-    original_arr = new ['ResizableBooleanArray']
-    set original_arr, 666
-    original_arr[555] = 777
-
-    # Dump some data before freezing
-    print "Before freezing:\n"
-    typeof $S10, original_arr   # type
-    print $S10
-    print "\n"
-    set $I12, original_arr  # elements
-    print $I12
-    print "\n"
-    $I12 = original_arr[554]
-    print $I12
-    print "\n"
-    $I12 = original_arr[555]
-    print $I12
-    print "\n"
-    $I12 = original_arr[556]
-    print $I12
-    print "\n"
-
-    frozen_arr = freeze original_arr
-    thawed_arr = thaw frozen_arr
-
-    # Dump the same data after freeze/thaw
-    print "\nAfter freeze/thaw:\n"
-    typeof $S10, thawed_arr # type
-    print $S10
-    print "\n"
-    set $I12, thawed_arr    # elements
-    print $I12
-    print "\n"
-    $I12 = thawed_arr[554]
-    print $I12
-    print "\n"
-    $I12 = thawed_arr[555]
-    print $I12
-    print "\n"
-    $I12 = thawed_arr[556]
-    print $I12
-    print "\n"
-
-.end
-CODE
-Before freezing:
-ResizableBooleanArray
-666
-0
-1
-0
-
-After freeze/thaw:
-ResizableBooleanArray
-666
-0
-1
-0
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a ResizablePMCArray" );
