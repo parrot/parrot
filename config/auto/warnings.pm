@@ -217,10 +217,6 @@ sub _init {
             src/spf_render.c
             compilers/imcc/optimizer.c
         ) ],
-        '-Wstrict-prototypes' => [ qw(
-            src/nci/extra_thunks.c
-            src/extra_nci_thunks.c
-        ) ],
     };
     # strip from the list
     $gcc->{'never'} = $gpp->{'never'} = {

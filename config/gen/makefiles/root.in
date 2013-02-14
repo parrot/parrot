@@ -500,8 +500,6 @@ INTERP_O_FILES = \
 	src/nci/api$(O) \
 	src/nci/signatures$(O) \
 #IF(has_libffi):    src/nci/libffi$(O) \
-#IF(has_core_nci_thunks):    src/nci/core_thunks$(O) \
-#IF(has_extra_nci_thunks):    src/nci/extra_thunks$(O) \
 	src/oo$(O) \
 	src/packfile/object_serialization$(O) \
 	src/pmc$(O) \
@@ -713,8 +711,6 @@ STR_FILES = \
 	src/multidispatch.str \
 	src/namespace.str \
 	src/nci/api.str \
-#IF(has_core_nci_thunks):    src/nci/core_thunks.str \
-#IF(has_extra_nci_thunks):    src/nci/extra_thunks.str \
 	src/nci/signatures.str \
 	src/packfile/api.str \
 	src/packfile/segments.str \
@@ -2533,7 +2529,6 @@ prog-clean :
 	src/glut_callbacks$(O) \
 	src/glut_nci_thunks$(O) \
 	$(LIBGLUTCB_SO) \
-	src/extra_nci_thunks$(O) \
 	install_config.fpmc
 	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl --init
 	$(RM_F) \
@@ -2571,7 +2566,6 @@ archclean: dynext-clean
 	$(LIBNCI_TEST_SO) \
 	src/glut_callbacks$(O) \
 	$(LIBGLUTCB_SO) \
-	src/extra_nci_thunks$(O) \
 	$(LIBPARROT_STATIC) \
 	$(LIBPARROT_SHARED)
 
@@ -3217,11 +3211,6 @@ $(LIBGLUTCB_SO): $(LIBPARROT) src/glut_callbacks$(O) src/glut_nci_thunks$(O)
 
 bootstrap-nci : src/nci/core_thunks.nci src/nci/extra_thunks.nci
 	$(PERL) $(DEV_TOOLS_DIR)/mk_nci_thunks.pl
-
-## SUFFIX OVERRIDE
-src/extra_nci_thunks$(O) : $(PARROT_H_HEADERS) src/extra_nci_thunks.c \
-	$(INC_PMC_DIR)/pmc_nci.h
-	$(CC) $(CFLAGS) @optimize::src/extra_nci_thunks.c@ @ccwarn::src/extra_nci_thunks.c@ @cc_shared@ -I$(@D)/. @cc_o_out@$@ -c src/extra_nci_thunks.c
 
 # emacs etags
 # this needs exuberant-ctags

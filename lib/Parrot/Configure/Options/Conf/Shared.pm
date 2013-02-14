@@ -72,8 +72,6 @@ our @shared_valid_options = qw{
     version
     with-llvm
     without-crypto
-    without-core-nci-thunks
-    without-extra-nci-thunks
     without-gdbm
     without-gettext
     without-gmp

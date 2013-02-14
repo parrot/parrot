@@ -87,13 +87,6 @@ Parrot Options:
    --ops=(files)        Use the given ops files
 
    --without-threads    Build parrot without OS thread support
-   --without-core-nci-thunks
-                        Build parrot without core-required
-                        statically compiled NCI call frames
-                        (useful for testing dynamic frame builders)
-   --without-extra-nci-thunks
-                        Build parrot without unnecessary
-                        statically compiled NCI call frames
 
 External Library Options:
 
