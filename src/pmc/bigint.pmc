@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2012, Parrot Foundation.
+Copyright (C) 2004-2013, Parrot Foundation.
 
 =head1 NAME
 
@@ -840,6 +840,8 @@ If C<value> is C<0>, throw an exception.
 static void
 int_check_divide_zero(PARROT_INTERP, INTVAL value)
 {
+    ASSERT_ARGS(int_check_divide_zero)
+
     if (value == 0)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
