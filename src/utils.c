@@ -681,11 +681,6 @@ COMPARE(PARROT_INTERP, ARGIN(void *_a), ARGIN(void *_b),
     if (PMC_IS_NULL(cmp))
         return VTABLE_cmp(interp, (PMC *)_a, (PMC *)_b);
 
-    if (cmp->vtable->base_type == enum_class_NCI) {
-        const sort_func_t f = (sort_func_t)D2FPTR(PARROT_NCI(cmp)->func);
-        return f(interp, _a, _b);
-    }
-
     Parrot_ext_call(interp, cmp, cmp_signature, _a, _b, &result);
     return result;
 }
