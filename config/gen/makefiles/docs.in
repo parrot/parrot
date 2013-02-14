@@ -20,7 +20,6 @@ MAN_1 = binaries/parrot.1 \
 	binaries/ops2c.1 \
 	binaries/parrotbug.1 \
 	binaries/parrot_config.1 \
-	binaries/parrot_nci_thunk_gen.1 \
 	binaries/parrot-nqp.1 \
 	binaries/parrot-prove.1 \
 	binaries/pbc_to_exe.1 \

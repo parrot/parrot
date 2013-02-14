@@ -1,8 +1,0 @@
-# Copyright (C) 2002-2010, Parrot Foundation.
-
-# This file contains the Parrot Native Call Interface signature
-# declarations required by Parrot's core. To add signatures for extensions,
-# add to F<src/nci/extra_thunks.nci>
-
-# The format of this file is explained in F<src/nci/extra_thunks.nci>
-
