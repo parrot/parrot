@@ -1298,20 +1298,6 @@ Make any symbols in the library accessible to other libraries loaded.
 
 =back
 
-=item B<dlfunc>(out PMC, invar PMC, in STR, in STR)
-
-=item B<dlfunc>(out PMC, invar PMC, in STR, invar PMC)
-
-Look up symbol $3 in library $2 with signature $4, and put the
-corresponding sub object in $1. Note that you need the signature so we
-can build or find an appropriate thunking function.
-
-=item B<dlvar>(out PMC, invar PMC, in STR)
-
-Look up symbol $3 in library $2. We assume that this is actually a
-variable address rather than a function address, and build an
-UnManagedStruct PMC and stick the address into its data pointer.
-
 =item B<compreg>(out PMC, in STR)
 
 Get the compiler object for source type $2.  The returned compiler
@@ -1341,84 +1327,6 @@ inline op loadlib(out PMC, in STR) {
 
 inline op loadlib(out PMC, in STR, in PMC) {
     $1 = Parrot_dyn_load_lib(interp, $2, $3);
-}
-
-op dlfunc(out PMC, invar PMC, in STR, in STR) {
-    void         *dl_handle = NULL;
-    void         *ptr;
-    funcptr_t     p;
-
-    if (!PMC_IS_NULL($2)
-    && $2->vtable->base_type == enum_class_ParrotLibrary
-    && VTABLE_defined(interp, $2)) {
-        dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data($2))->dl_handle;
-    }
-
-    ptr = Parrot_dyn_dlsym_str(interp, dl_handle, $3);
-    p = D2FPTR(ptr);
-
-    if (p == NULLfunc) {
-        const char * const err = Parrot_dlerror();
-        Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
-                "Symbol '%Ss' not found: %s\n", $3, err ? err : "unknown reason");
-        $1 = Parrot_pmc_new(interp, enum_class_Undef);
-    }
-    else {
-        $1 = Parrot_pmc_new(interp, enum_class_NCI);
-        VTABLE_set_pointer_keyed_str(interp, $1, $4, F2DPTR(p));
-    }
-}
-
-op dlfunc(out PMC, invar PMC, in STR, invar PMC) {
-    void         *dl_handle = NULL;
-    void         *ptr;
-    funcptr_t     p;
-
-    if (!PMC_IS_NULL($2)
-    && $2->vtable->base_type == enum_class_ParrotLibrary
-    && VTABLE_defined(interp, $2)) {
-        dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data($2))->dl_handle;
-    }
-
-    ptr = Parrot_dyn_dlsym_str(interp, dl_handle, $3);
-    p = D2FPTR(ptr);
-
-    if (p == NULLfunc) {
-        const char * const err = Parrot_dlerror();
-        Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
-                "Symbol '%Ss' not found: %s\n", $3, err ? err : "unknown reason");
-        $1 = Parrot_pmc_new(interp, enum_class_Undef);
-    }
-    else {
-        $1 = Parrot_pmc_new(interp, enum_class_NCI);
-        VTABLE_set_pointer_keyed(interp, $1, $4, F2DPTR(p));
-    }
-}
-
-op dlvar(out PMC, invar PMC, in STR) {
-    void *        dl_handle = NULL;
-    void *        p;
-
-    if (!PMC_IS_NULL($2)
-    && $2->vtable->base_type == enum_class_ParrotLibrary
-    && VTABLE_defined(interp, $2)) {
-        dl_handle = ((Parrot_ParrotLibrary_attributes*)PMC_data($2))->dl_handle;
-    }
-
-    p = Parrot_dyn_dlsym_str(interp, dl_handle, $3);
-
-    if (p == NULL) {
-        const char * const err = Parrot_dlerror();
-        Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
-                "Symbol '%Ss' not found: %s\n", $3, err ? err : "unknown reason");
-        $1 = Parrot_pmc_new(interp, enum_class_Undef);
-    }
-    else {
-        /* At this point we have the symbol's address. We just need to build
-           a PMC with it so we can get and set the value */
-        $1 = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
-        VTABLE_set_pointer(interp, $1, p);
-    }
 }
 
 inline op compreg(in STR, invar PMC) {

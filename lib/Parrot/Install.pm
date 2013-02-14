@@ -263,7 +263,7 @@ sub sanitycheck_install {
     push @MAKE_gen, map { "runtime/parrot/dynext/".$_.$PConfig{load_ext} } @dynext;
     push @MAKE_gen, map { "installable_".$_.$PConfig{exe} }
       qw(parrot pbc_dump pbc_disassemble parrot_config pbc_merge
-         pbc_to_exe parrot_nci_thunk_gen ops2c winxed);
+         pbc_to_exe ops2c winxed);
     _check_manifest($_, 0, $manifest) for @MAKE_gen;
 }
 
