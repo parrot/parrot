@@ -84,15 +84,15 @@ Tests OO features related to creating and using class proxies.
 .end
 
 .sub proxy_no_method_conflict
-    $P0 = new 'Complex'
-    $P0['real'] = 1
-    $P1 = $P0.'Complex'()
+    $P0 = new 'Float'
+    $P0 = 1.0
+    $P1 = $P0.'Float'()
     $S0 = $P1
-    is($S0, "1+0i", 'Complex method survived')
+    is($S0, "1", 'Float method survived')
 .end
 
-.namespace ['Complex']
-.sub 'Complex' :method :nsentry('Complex')
+.namespace ['Float']
+.sub 'Float' :method :nsentry('Float')
     .return (self)
 .end
 

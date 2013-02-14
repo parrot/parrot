@@ -597,8 +597,7 @@ try_find_op(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit), ARGIN(const char 
         /*
          * transcendentals  e.g. acos N, I
          */
-        if (!STREQ(name, "fact"))
-            changed = change_op_arg_to_num(imcc, unit, r, 1, emit);
+        changed = change_op_arg_to_num(imcc, unit, r, 1, emit);
     }
 
     if (changed) {

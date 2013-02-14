@@ -130,47 +130,6 @@ inline op fetch(out PMC, in PMC, in STR, in PMC)  {
     }
 }
 
-=item B<vivify>(out PMC, in PMC, in PMC, in PMC)
-
-Fetches a value from $2, keyed by $3 into $1.  If the resulting PMC is PMCNULL,
-uses the type in $4 to create and return a new PMC.
-
-=item B<vivify>(out PMC, in PMC, in INT, in PMC)
-
-=item B<vivify>(out PMC, in PMC, in STR, in PMC)
-
-=cut
-
-inline op vivify(out PMC, in PMC, in PMC, in PMC)  {
-    $1 = VTABLE_get_pmc_keyed(interp, $2, $3);
-
-    if (PMC_IS_NULL($1)) {
-        $1 = Parrot_pmc_new_from_type(interp, $4);
-
-        VTABLE_set_pmc_keyed(interp, $2, $3, $1);
-    }
-}
-
-inline op vivify(out PMC, in PMC, in INT, in PMC)  {
-    $1 = VTABLE_get_pmc_keyed_int(interp, $2, $3);
-
-    if (PMC_IS_NULL($1)) {
-        $1 = Parrot_pmc_new_from_type(interp, $4);
-
-        VTABLE_set_pmc_keyed_int(interp, $2, $3, $1);
-    }
-}
-
-inline op vivify(out PMC, in PMC, in STR, in PMC)  {
-    $1 = VTABLE_get_pmc_keyed_str(interp, $2, $3);
-
-    if (PMC_IS_NULL($1)) {
-        $1 = Parrot_pmc_new_from_type(interp, $4);
-
-        VTABLE_set_pmc_keyed_str(interp, $2, $3, $1);
-    }
-}
-
 =item B<new>(out PMC, in STR, in INT)
 
 =item B<new>(out PMC, in PMC, in INT)

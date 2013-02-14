@@ -43,7 +43,7 @@ not_p:
     $S0 = argv[1]
 	N = $S0
 default:
-    flags = new 'FixedBooleanArray'
+    flags = new 'FixedIntegerArray'
 	M = 1 << N
 	M *= 10000
 	flags = M

@@ -128,9 +128,8 @@ opcode> (tangent), C<sec>X<sec opcode> (secant), C<sinh>X<sinh opcode>
 (hyperbolic sine), C<cosh>X<cosh opcode> (hyperbolic cosine), C<tanh>X<tanh
 opcode> (hyperbolic tangent), C<sech>X<sech opcode> (hyperbolic secant),
 C<asin>X<asin opcode> (arc sine), C<acos>X<acos opcode> (arc cosine),
-C<atan>X<atan opcode> (arc tangent), C<asec>X<asec opcode> (arc secant),
-C<exsec>X<exsec opcode> (exsecant), C<hav>X<hav opcode> (haversine), and
-C<vers>X<vers opcode> (versine).  All angle arguments for the X<trigonometric
+C<atan>X<atan opcode> (arc tangent), and C<asec>X<asec opcode> (arc secant).
+All angle arguments for the X<trigonometric
 opcodes> trigonometric opcodes are in radians:
 
 =begin PIR_FRAGMENT_INVALID
@@ -1170,8 +1169,8 @@ resize for the number of elements it stores.
 
 The core array types are C<FixedPMCArray>, C<ResizablePMCArray>,
 C<FixedIntegerArray>, C<ResizableIntegerArray>, C<FixedFloatArray>,
-C<ResizableFloatArray>, C<FixedStringArray>, C<ResizableStringArray>,
-C<FixedBooleanArray>, and C<ResizableBooleanArray>. The array
+C<ResizableFloatArray>, C<FixedStringArray>, C<ResizableStringArray>.
+The array
 types that start with "Fixed" have a fixed size and do not allow
 elements to be added outside their allocated size. The "Resizable"
 variants automatically extend themselves as more elements are

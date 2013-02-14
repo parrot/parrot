@@ -292,11 +292,9 @@ PackFile_Constant_dump_pmc(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
         Parrot_io_printf(interp, "    [ 'PFC_PMC', {\n");
         pobj_flag_dump(interp, (long)PObj_get_FLAGS(self));
         switch (self->vtable->base_type) {
-            case enum_class_FixedBooleanArray:
             case enum_class_FixedFloatArray:
             case enum_class_FixedPMCArray:
             case enum_class_FixedStringArray:
-            case enum_class_ResizableBooleanArray:
             case enum_class_ResizableIntegerArray:
             case enum_class_ResizableFloatArray:
             case enum_class_ResizablePMCArray:

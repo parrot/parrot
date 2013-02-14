@@ -1645,14 +1645,6 @@ arbitrary type). New array types can be derived from the base Array.
 In user code it is recommended to use one of the specific array types
 below, rather than the base type.
 
-=item FixedBooleanArray
-
-A statically sized array which holds only Boolean values.
-
-=item ResizableBooleanArray
-
-A dynamically sized array which holds only Boolean values.
-
 =item FixedIntegerArray
 
 A statically sized array which holds only Integer values.

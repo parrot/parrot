@@ -36,7 +36,7 @@ not_p:
 	.local pmc flags
 	.local int argc, i, j, N, M, count
 
-	flags = new 'FixedBooleanArray'
+	flags = new 'FixedIntegerArray'
 	N = 2
 	argc = argv
 	if argc == 1 goto default

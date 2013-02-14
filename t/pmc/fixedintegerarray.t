@@ -251,7 +251,7 @@ out-of-bounds test. Checks INT and PMC keys.
     a2[1] = 84
     is(a1, a2, "Equal when second element same")
 
-    a3 = new ['Complex']
+    a3 = new ['Float']
     isnt(a1, a3, "Different PMC type is not equal")
 .end
 
