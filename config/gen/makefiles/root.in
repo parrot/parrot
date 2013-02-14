@@ -2507,7 +2507,6 @@ prog-clean :
 	$(INSTALLABLEWINXED) \
 	$(DEV_TOOLS_DIR)/pbc_to_exe.pir \
 	pbc_to_exe.pbc pbc_to_exe.c pbc_to_exe$(O) pbc_to_exe$(EXE) \
-	$(NCI_THUNK_GEN) parrot_nci_thunk_gen.c parrot_nci_thunk_gen$(O) parrot_nci_thunk_gen.pbc \
 	ops2c.pbc ops2c.c ops2c$(O) ops2c$(EXE) ops2c.pir \
 	parrot-prove.pbc parrot-prove.c parrot-prove$(O) parrot-prove$(EXE) \
 	parrot_config$(EXE) parrot_config.c parrot_config$(O) parrot_config.pbc \
