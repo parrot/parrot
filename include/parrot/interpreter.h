@@ -446,17 +446,6 @@ void Parrot_interp_register_native_pcc_method_in_ns(PARROT_INTERP,
         __attribute__nonnull__(5);
 
 PARROT_EXPORT
-void Parrot_interp_register_nci_method(PARROT_INTERP,
-    const int type,
-    ARGIN(void *func),
-    ARGIN(const char *name),
-    ARGIN(const char *proto))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
-
-PARROT_EXPORT
 void Parrot_interp_set_compiler(PARROT_INTERP,
     ARGIN(STRING *type),
     ARGIN(PMC *compiler))
@@ -561,12 +550,6 @@ void Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, void *arg)
     , PARROT_ASSERT_ARG(func) \
     , PARROT_ASSERT_ARG(name) \
     , PARROT_ASSERT_ARG(signature))
-#define ASSERT_ARGS_Parrot_interp_register_nci_method \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(func) \
-    , PARROT_ASSERT_ARG(name) \
-    , PARROT_ASSERT_ARG(proto))
 #define ASSERT_ARGS_Parrot_interp_set_compiler __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(type) \

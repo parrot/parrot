@@ -19,6 +19,8 @@ Container for native functions that handle PCC on their own.
 
 /* HEADERIZER HFILE: none */
 
+typedef void (*native_pcc_method_t)(PARROT_INTERP);
+
 pmclass NativePCCMethod auto_attrs provides invokable {
     ATTR STRING *signature;
     ATTR void   *func;

@@ -60,18 +60,6 @@ typedef struct _multi_func_list {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-void Parrot_mmd_add_multi_from_c_args(PARROT_INTERP,
-    ARGIN(const char *sub_name),
-    ARGIN(const char *short_sig),
-    ARGIN(const char *long_sig),
-    ARGIN(funcptr_t multi_func_ptr))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5);
-
-PARROT_EXPORT
 void Parrot_mmd_add_multi_from_long_sig(PARROT_INTERP,
     ARGIN(STRING *sub_name),
     ARGIN(STRING *long_sig),
@@ -80,13 +68,6 @@ void Parrot_mmd_add_multi_from_long_sig(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4);
-
-PARROT_EXPORT
-void Parrot_mmd_add_multi_list_from_c_args(PARROT_INTERP,
-    ARGIN(const multi_func_list *mmd_info),
-    INTVAL elements)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -199,23 +180,12 @@ PMC * Parrot_mmd_sort_manhattan_by_sig_pmc(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-#define ASSERT_ARGS_Parrot_mmd_add_multi_from_c_args \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(sub_name) \
-    , PARROT_ASSERT_ARG(short_sig) \
-    , PARROT_ASSERT_ARG(long_sig) \
-    , PARROT_ASSERT_ARG(multi_func_ptr))
 #define ASSERT_ARGS_Parrot_mmd_add_multi_from_long_sig \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sub_name) \
     , PARROT_ASSERT_ARG(long_sig) \
     , PARROT_ASSERT_ARG(sub_obj))
-#define ASSERT_ARGS_Parrot_mmd_add_multi_list_from_c_args \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(mmd_info))
 #define ASSERT_ARGS_Parrot_mmd_build_type_tuple_from_sig_obj \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
