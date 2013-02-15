@@ -180,8 +180,6 @@ GEN_CONFIGS = \
 	lib/Parrot/PMC.pm \
 	$(RUN_INC_DIR)/config.fpmc \
 	$(LIBRARY_DIR)/config.pir \
-#IF(has_opengl):	src/glut_nci_thunks.nci \
-#IF(has_glut):	src/glut_callbacks.c \
 	src/core_pmcs.c \
 	config_lib.pir \
 	compilers/imcc/imcc.y.flag \
@@ -253,7 +251,6 @@ GEN_HEADERS = \
 	$(INC_DIR)/pbcversion.h
 
 GEN_SOURCES = \
-	src/glut_nci_thunks.c \
 	src/parrot_config.c \
 	src/null_config.c \
 	src/install_config.c \
@@ -394,7 +391,6 @@ PARROT_H_HEADERS = \
 	$(INC_DIR)/call.h \
 	$(INC_DIR)/key.h \
 	$(INC_DIR)/exit.h \
-	$(INC_DIR)/nci.h \
 	$(INC_DIR)/scheduler.h \
 	$(INC_DIR)/thread.h \
 	$(INC_DIR)/thr_pthread.h \
@@ -573,7 +569,6 @@ ALL_PARROT_LIBS     = @libparrot_linkflags@ $(ICU_SHARED) $(C_LIBS)
 
 # dynamic extensions
 DYNEXT_DIR          = runtime/parrot/dynext
-LIBGLUTCB_SO        = $(DYNEXT_DIR)/libglutcb$(LOAD_EXT)
 
 ###############################################################################
 #
@@ -624,7 +619,6 @@ MAKE_C = @make_c@
 
 all : \
 	corevm \
-#IF(has_glut):    $(LIBGLUTCB_SO) \
 	$(DIS) \
 	$(PARROT_CONFIG) \
 	$(PBC_TO_EXE) \
@@ -1756,7 +1750,6 @@ src/multidispatch$(O) : \
 	$(INC_DIR)/oplib/ops.h \
 	$(PARROT_H_HEADERS) \
 	$(INC_PMC_DIR)/pmc_nativepccmethod.h \
-	$(INC_PMC_DIR)/pmc_nci.h \
 	$(INC_PMC_DIR)/pmc_sub.h
 
 src/packfile/api$(O) : \
@@ -1958,7 +1951,6 @@ src/warnings$(O) : $(PARROT_H_HEADERS) src/warnings.c
 
 src/utils$(O) : \
 	$(PARROT_H_HEADERS) \
-	$(INC_PMC_DIR)/pmc_nci.h \
 	src/utils.c \
 	$(EXTEND_HEADERS)
 
@@ -2479,9 +2471,6 @@ prog-clean :
 	src/null_config$(O) \
 	src/parrot_config$(O) \
 	src/install_config$(O) \
-	src/glut_callbacks$(O) \
-	src/glut_nci_thunks$(O) \
-	$(LIBGLUTCB_SO) \
 	install_config.fpmc
 	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl --init
 	$(RM_F) \
@@ -2515,14 +2504,11 @@ archclean: dynext-clean
 	src/parrot_config$(O) \
 	src/install_config$(O) \
 	install_config.fpmc \
-	src/glut_callbacks$(O) \
-	$(LIBGLUTCB_SO) \
 	$(LIBPARROT_STATIC) \
 	$(LIBPARROT_SHARED)
 
 dynext-clean :
 # shared libs (LOAD_EXT, SHARE_EXT)
-# win32 import library (.lib - shared object is deleted by LIBNCI_TEST_SO above)
 # win32 program data base - contains debugging info (.pdb)
 # win32 incremental link status files (.ilk)
 # win32 exported functions and data items (.exp)
@@ -3113,41 +3099,6 @@ win32-inno-installer : world installable
 
 exec : src/parrot_config$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$(EXEC)$(EXE) $(EXEC)$(O) src/parrot_config$(O) $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
-
-###### OS depend targets ##########
-
-# for use by $(LIBRARY_DIR)/OpenGL.pir
-src/glut_callbacks$(O): \
-	$(PARROT_H_HEADERS) \
-	$(EXTEND_HEADERS) \
-	src/glut_callbacks.c
-
-src/glut_nci_thunks.c: $(NCI_THUNK_GEN)
-	$(NCI_THUNK_GEN) \
-		--dynext \
-		--loader-name=Parrot_glut_nci_loader \
-		--output=src/glut_nci_thunks.c \
-		--no-warn-dups \
-		< src/glut_nci_thunks.nci
-
-src/glut_nci_thunks$(O) : $(PARROT_H_HEADERS) \
-	src/glut_nci_thunks.c \
-	$(INC_PMC_DIR)/pmc_nci.h
-
-$(LIBGLUTCB_SO): $(LIBPARROT) src/glut_callbacks$(O) src/glut_nci_thunks$(O)
-	$(LD) @ld_out@$@ \
-	  src/glut_callbacks$(O) src/glut_nci_thunks$(O) \
-	  $(LINKARGS) @opengl_lib@
-	$(ADDGENERATED) "$@" "[library]"
-
-# Cyclic dependency to parrot
-#src/nci/core_thunks.c : src/nci/core_thunks.nci $(DEV_TOOLS_DIR)/nci_thunk_gen.pir $(PARROT)
-#	$(PARROT) $(DEV_TOOLS_DIR)/nci_thunk_gen.pir --core --output=$@ --nowarn-dups \
-#	  <src/nci/core_thunks.nci
-
-#src/nci/extra_thunks.c : src/nci/extra_thunks.nci $(DEV_TOOLS_DIR)/nci_thunk_gen.pir $(PARROT)
-#	$(PARROT) $(DEV_TOOLS_DIR)/nci_thunk_gen.pir --core --output=$@ --nowarn-dups \
-#	  <src/nci/extra_thunks.nci
 
 # emacs etags
 # this needs exuberant-ctags

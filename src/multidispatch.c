@@ -41,7 +41,6 @@ them, with default behaviour.
 #include "parrot/multidispatch.h"
 #include "parrot/oplib/ops.h"
 #include "multidispatch.str"
-#include "pmc/pmc_nci.h"
 #include "pmc/pmc_nativepccmethod.h"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"

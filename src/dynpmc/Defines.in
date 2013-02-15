@@ -53,7 +53,6 @@ DYNPMC_H_FILES_MIN =                    \
     include/parrot/misc.h               \
     include/parrot/multidispatch.h      \
     include/parrot/namespace.h          \
-    include/parrot/nci.h                \
     include/parrot/oo.h                 \
     include/parrot/op.h                 \
     include/parrot/oplib.h              \

@@ -415,7 +415,6 @@ include/parrot/sub.h
 include/parrot/pmc_freeze.h
 include/parrot/global_setup.h
 include/parrot/gc_api.h
-include/parrot/nci.h
 include/parrot/vtables.h
 include/parrot/has_header.h
 include/parrot/warnings.h

@@ -529,18 +529,6 @@ ret_pmc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(char *p), int type, INTVAL idx)
         /* this is a raw function pointer - not a PMC */
         ret  = *(PMC**) p;
 
-        /* now check if initializer has a signature attached */
-        if (PMC_metadata(ptr)) {
-            STRING *signature_str = CONST_STRING(interp, "_signature");
-            PMC * const sig = Parrot_pmc_getprop(interp, ptr, signature_str);
-            if (VTABLE_defined(interp, sig)) {
-                STRING * const sig_str = VTABLE_get_string(interp, sig);
-                ret             = Parrot_pmc_new(interp, enum_class_NCI);
-                VTABLE_set_pointer_keyed_str(interp, ret, sig_str,
-                            *(PMC **)p);
-            }
-        }
-
         return ret;
       case enum_type_struct_ptr:
         /* check the metadata for an initializer */
