@@ -30,6 +30,12 @@ foreach my $file (keys %$manifest) {
   $files{$file}=undef;
 }
 
+# Some files in examples/tutorial/ may not actually have any examples in them.
+my @exceptions = ( qw|
+  12_math_ops_pasm.pir
+| );
+delete $files{$_} for map { "examples/tutorial/$_" } @exceptions;
+
 plan tests => scalar keys %files;
 
 # Set up expected output for examples
