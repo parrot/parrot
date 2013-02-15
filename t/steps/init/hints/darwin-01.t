@@ -257,7 +257,7 @@ my $stored = $conf->data->get($problematic_flag);
             \$stdout,
             \$stderr,
         );
-        like( $stdout, qr/Fink configuration file not located/,
+        like( $stdout, qr/Fink configuration file.*?not located/,
             "Got expected verbose output when Fink config not located" );
     }
     $conf->options->set( 'verbose' => 0 );
