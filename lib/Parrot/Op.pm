@@ -369,11 +369,7 @@ sub source {
         return qq{PANIC(interp, "How did you do that");\n};
     }
 
-    my $prelude = $trans->can( 'add_body_prelude' )
-                ? $trans->add_body_prelude()
-                : '';
-
-    return $self->rewrite_body( $prelude . $self->body, $trans );
+    return $self->rewrite_body( $self->body, $trans );
 }
 
 =item C<size()>

@@ -61,11 +61,6 @@ static int get_op(PARROT_INTERP, const char * name, int full);
 END
 }
 
-sub add_body_prelude {
-    my ($self) = @_;
-    return "    const Parrot_Context * const CUR_CTX = Parrot_pcc_get_context_struct(interp, interp->ctx);\n";
-}
-
 =item C<gen_goto($where)>
 
 Reimplements the superclass method so that C<$where> is suitably cast.
