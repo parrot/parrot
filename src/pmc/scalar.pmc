@@ -112,7 +112,7 @@ Adds C<value> to C<SELF> inplace.
 
 */
 
-    MULTI PMC *add(DEFAULT value, PMC *dest) {
+    VTABLE PMC *add(PMC *value, PMC *dest) {
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
@@ -136,7 +136,7 @@ Adds C<value> to C<SELF> inplace.
         return dest;
     }
 
-    MULTI void i_add(DEFAULT value) {
+    VTABLE void i_add(PMC *value) {
         VTABLE_set_number_native(INTERP, SELF,
             SELF.get_number() + VTABLE_get_number(INTERP, value));
     }
@@ -174,7 +174,7 @@ Subtracts C<value> from C<SELF> inplace.
 
 */
 
-    MULTI PMC *subtract(DEFAULT value, PMC *dest) {
+    VTABLE PMC *subtract(PMC *value, PMC *dest) {
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         VTABLE_set_number_native(INTERP, dest,
                 SELF.get_number() - VTABLE_get_number(INTERP, value));
@@ -197,7 +197,7 @@ Subtracts C<value> from C<SELF> inplace.
         return dest;
     }
 
-    MULTI void i_subtract(DEFAULT value) {
+    VTABLE void i_subtract(PMC *value) {
         VTABLE_set_number_native(INTERP, SELF,
             SELF.get_number() - VTABLE_get_number(INTERP, value));
     }
@@ -226,7 +226,7 @@ Multiplies the number by C<value> and returns the result in C<*dest>.
 
 */
 
-    MULTI PMC *multiply(DEFAULT value, PMC *dest) {
+    VTABLE PMC *multiply(PMC *value, PMC *dest) {
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
@@ -250,7 +250,7 @@ Multiplies the number by C<value> and returns the result in C<*dest>.
         return dest;
     }
 
-    MULTI void i_multiply(DEFAULT value) {
+    VTABLE void i_multiply(PMC *value) {
         VTABLE_set_number_native(INTERP, SELF,
             SELF.get_number() * VTABLE_get_number(INTERP, value));
     }
@@ -286,7 +286,7 @@ Divides C<SELF> by C<value> inplace.
 
 */
 
-    MULTI PMC *divide(PMC *value, PMC *dest) {
+    VTABLE PMC *divide(PMC *value, PMC *dest) {
         const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
@@ -369,7 +369,7 @@ Divides C<SELF> by C<value> inplace.
 
 */
 
-    MULTI PMC *floor_divide(PMC *value, PMC *dest) {
+    VTABLE PMC *floor_divide(PMC *value, PMC *dest) {
         FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
@@ -459,7 +459,7 @@ Calculates modulus inplace
 
 */
 
-    MULTI PMC *modulus(PMC *value, PMC *dest) {
+    VTABLE PMC *modulus(PMC *value, PMC *dest) {
         const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
@@ -678,7 +678,7 @@ and C<*value>.
 
 */
 
-    MULTI INTVAL cmp_num(PMC *value) {
+    VTABLE INTVAL cmp_num(PMC *value) {
         /* XXX - Floating-point precision errors possible? */
         const FLOATVAL diff = VTABLE_get_number(INTERP, value) - SELF.get_number();
 
@@ -696,7 +696,7 @@ C<*value>.
 
 */
 
-    MULTI INTVAL cmp_string(PMC *value) {
+    VTABLE INTVAL cmp_string(PMC *value) {
         return STRING_compare(INTERP, SELF.get_string(),
             VTABLE_get_string(INTERP, value));
     }
@@ -712,7 +712,7 @@ Returns whether the PMC is equal to C<*value>.
 */
 
 /*
-    MULTI INTVAL is_equal(PMC *value) {
+    VTABLE INTVAL is_equal(PMC *value) {
         return (SELF->vtable         == value->vtable
             &&  PMC_data(SELF)       == PMC_data(value));
     }
@@ -728,7 +728,7 @@ Returns whether the PMC is numerically equal to C<*value>.
 
 */
 
-    MULTI INTVAL is_equal_num(PMC *value) {
+    VTABLE INTVAL is_equal_num(PMC *value) {
         return (VTABLE_get_number(INTERP, SELF) ==
                 VTABLE_get_number(INTERP, value));
     }
@@ -743,7 +743,7 @@ Returns whether the PMC has string equality with C<*value>.
 
 */
 
-    MULTI INTVAL is_equal_string(PMC *value) {
+    VTABLE INTVAL is_equal_string(PMC *value) {
         return (0 != STRING_equal(INTERP, VTABLE_get_string(INTERP, SELF),
                                           VTABLE_get_string(INTERP, value)));
     }

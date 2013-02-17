@@ -764,14 +764,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "bound add method" );
     .local pmc d, l, r, m
     d = new ['Integer']
     l = new ['Integer']
-    r = new ['Float']
-    l = 3
-    r = 39.42
-    m = get_global ['scalar'], "add"
-    d = m(r, l, d)
-    print d
-    print "\n"
     r = new ['Integer']
+    l = 3
     r = 39
     m = get_global ['Integer'], "add"
     d = m(r, l, d)
@@ -780,7 +774,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "bound add method" );
     end
 .end
 CODE
-42.42
 42
 OUTPUT
 
@@ -923,15 +916,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "use a core func for an object");
     d = new ['AInt']
     l = new ['AInt']
     r = new ['AInt']
-    .local pmc func
-    .local string typ
-    func = find_multi "add", "Float,Float,PMC"
-    $S0 = typeof l
-    typ = $S0 . ","
-    typ .= $S0
-    typ .= ","
-    typ .= $S0
-    add_multi "add", typ, func
     l = 4
     r = 38
     print l
@@ -966,6 +950,14 @@ pir_output_is( <<'CODE', <<'OUTPUT', "use a core func for an object");
     $P0 = getattribute self, ".i"
     $N0 = $P0
     .return ($N0)
+.end
+.sub add :vtable :method
+    .param pmc l
+    .param pmc r
+    $P0 = getattribute self, ".i"
+    add $P0, l, r
+    setattribute self, ".i", $P0
+    .return(self)
 .end
 CODE
 4
