@@ -462,6 +462,10 @@ INTVAL unused = PARROT_WARNINGS_test(interp,PARROT_WARNINGS_DEPRECATED_FLAG) &&
   fprintf(stderr,"Warning: instruction '$short_name' is deprecated\\n");
 END_CODE
 }
+    if ($body =~ /goto\s+(OFFSET|NEXT)\(.*?\)/ || $short_name =~ /runinterp/) {
+        $branch = 1;
+    }
+
     unless (exists($$flags{flow})) {
         $body .= "\ngoto NEXT();";
     }
@@ -504,9 +508,6 @@ END_CODE
         # on the mode of operation (function calls, switch statements, gotos
         # with labels, etc.).
         #
-        if ($body =~ /(goto|restart)\s+OFFSET\(.*?\)/ || $short_name =~ /runinterp/) {
-            $branch = 1;
-        }
 
         $body =~ s/\bgoto\s+ADDRESS\(\( (.*?) \)\)/{{=$1}}/mg;
         $body =~ s/\bexpr\s+ADDRESS\(\( (.*?) \)\)/{{^$1}}/mg;
