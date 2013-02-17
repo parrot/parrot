@@ -716,8 +716,6 @@ sub _op_func_table {
         print $fh <<END_C;
 
 
-INTVAL $self->{bs}numops$self->{suffix} = $self->{num_ops};
-
 /*
 ** Op Function Table:
 */
