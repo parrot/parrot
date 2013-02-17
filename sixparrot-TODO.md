@@ -14,6 +14,8 @@ DONE
 PMCs
 ----
 * Complex
+* FixedBooleanArray 
+* ResizableBooleanArray
 
 opcodes
 -------
