@@ -35,9 +35,11 @@ sub runstep {
         sort {
             if ( $a =~ /core\.ops/ ) { return -1 }
             if ( $b =~ /core\.ops/ ) { return 1 }
+            if ( $a =~ /experimental\.ops/ ) { return 1 }
+            if ( $b =~ /experimental\.ops/ ) { return -1 }
             return ( $a cmp $b )
-            }
-            grep { !/vtable\.ops/ } glob "src/ops/*.ops"
+        }
+        grep { !/vtable\.ops/ } glob "src/ops/*.ops"
     );
 
     my $ops = join ' ', grep { !/obscure\.ops/ } @ops;
