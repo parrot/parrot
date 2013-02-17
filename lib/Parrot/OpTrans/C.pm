@@ -70,7 +70,7 @@ Reimplements the superclass method so that C<$where> is suitably cast.
 sub gen_goto {
     my ( $self, $where_str ) = @_;
 
-    return "return (opcode_t *)$where_str";
+    return "    return $where_str";
 }
 
 =item C<expr_address($address)>

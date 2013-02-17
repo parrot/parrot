@@ -613,7 +613,7 @@ sub _iterate_over_ops {
     foreach my $op ( $self->{ops}->ops ) {
         my $func_name = $op->func_name( $self->{trans} );
         my $prototype =
-          "$self->{sym_export} opcode_t * $func_name (opcode_t *, PARROT_INTERP)";
+          "$self->{sym_export} opcode_t * $func_name(opcode_t *, PARROT_INTERP)";
         my $definition;
         my $comment = '';
         my $one_op  = "";
@@ -627,7 +627,7 @@ sub _iterate_over_ops {
             $comment    = "/* " . $op->full_name() . " */";
         }
         else {
-            $definition = "opcode_t *\n$func_name (opcode_t *cur_opcode, PARROT_INTERP)";
+            $definition = "opcode_t *\n$func_name(opcode_t *cur_opcode, PARROT_INTERP)";
         }
 
         my $src = $op->source( $self->{trans} );
@@ -649,7 +649,7 @@ sub _iterate_over_ops {
             push @op_funcs, "$comment\n";
         }
         else {
-            $one_op .= "$definition $comment {\n$src}\n\n";
+            $one_op .= "$definition $comment\{\n$src}\n\n";
             push @op_funcs,  $one_op;
             push @op_protos, $prototype;
             $prev_index = $index;

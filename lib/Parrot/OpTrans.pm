@@ -154,7 +154,7 @@ value of an C<expr_I<X>> method (implemented in subclass).
 sub gen_goto {
     my ( $self, $where_str ) = @_;
 
-    return "return $where_str";
+    return "    return $where_str";
 }
 
 =item C<restart_address($address)>
