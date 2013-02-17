@@ -19,9 +19,9 @@ Test handling C<dest> arg in 3-args arithmetic.
     .include 'test_more.pir'
     .include "iglobals.pasm"
 
-    plan(40)
+    plan(30)
 
-    # Don't check BigInt or BigNum without gmp
+    # Don't check BigInt or without gmp
     .local pmc interp     # a handle to our interpreter object.
     interp = getinterp
     .local pmc config
@@ -33,12 +33,11 @@ Test handling C<dest> arg in 3-args arithmetic.
     run_tests_for('Float')
 
     if gmp goto do_big_ones
-        skip( 20, "will not test BigInt or BigNum without gmp" )
+        skip( 20, "will not test BigInt without gmp" )
         goto end
 
   do_big_ones:
     run_tests_for('BigInt')
-    run_tests_for('BigNum')
 
   end:
 .end

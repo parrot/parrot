@@ -13,6 +13,7 @@ DONE
 
 PMCs
 ----
+* Bignum
 * Complex
 * FixedBooleanArray 
 * ResizableBooleanArray

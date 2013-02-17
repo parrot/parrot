@@ -109,7 +109,7 @@ OldLibGMP:
 
 .sub test_set_pmc
     $P0 = new ['BigInt']
-    $P1 = new ['BigNum']
+    $P1 = new ['BigInt']
     $P1 = 12345
     assign $P0, $P1
     is($P0, "12345", "can set_pmc")

@@ -21,9 +21,9 @@ Test handling 3-arg C<pow> on PMCs.
     .include 'test_more.pir'
     .include 'iglobals.pasm'
 
-    plan (4)
+    plan (3)
 
-    # Don't check BigInt or BigNum without gmp
+    # Don't check BigInt without gmp
     .local pmc interp     # a handle to our interpreter object.
     interp = getinterp
     .local pmc config
@@ -35,12 +35,11 @@ Test handling 3-arg C<pow> on PMCs.
     test_pow('Float')
 
     if gmp goto do_big_ones
-        skip( 2, "will not test BigInt or BigNum without gmp" )
+        skip( 2, "will not test BigInt without gmp" )
         goto end
 
   do_big_ones:
     test_pow('BigInt')
-    test_pow('BigNum')
 
   end:
 .end
