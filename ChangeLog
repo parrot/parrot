@@ -9,6 +9,7 @@
 	  [GH #900]
 	+ Reenable parrot -t [flags] traceflags to enable the flags 2 find_method and
 	  4 invoke/retcc/yield again.
+	+ Enable >2GB RAM on darwin also [GH #268]
     - Build
 	+ Fix all -Wshadow instances
     - Documentation

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010, Parrot Foundation.
+ * Copyright (C) 2010-2014, Parrot Foundation.
  */
 
 /*
@@ -45,7 +45,13 @@ Parrot_sysmem_amount(PARROT_INTERP)
     char         *err_msg;
     unsigned long length = sizeof (memsize) ;
 
-    int selection[2] = { CTL_HW, HW_PHYSMEM } ;
+#if defined(HW_MEMSIZE)
+    int memchk = HW_MEMSIZE; /* uint64_t: >2G RAM */
+#elif defined(HW_PHYSMEM)
+    int memchk = HW_PHYSMEM; /* sint32_t: max 2G RAM only */
+#endif
+
+    int selection[2] = { CTL_HW, memchk };
 
     err = sysctl(selection, 2, &memsize, &length, NULL, 0) ;
 
