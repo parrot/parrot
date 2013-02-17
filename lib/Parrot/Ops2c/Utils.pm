@@ -362,17 +362,17 @@ sub print_c_source_top {
 
     $self->_print_preamble_source($SOURCE);
 
-    $self->_op_info_table($SOURCE);
-
     $self->_op_func_table($SOURCE);
 
-    $self->_print_op_lib_descriptor($SOURCE);
+    $self->_op_info_table($SOURCE);
 
     $self->_print_ops_addr_decl($SOURCE);
 
     $self->_print_run_core_func_decl_source($SOURCE);
 
     $self->_print_op_function_definitions($SOURCE);
+
+    $self->_print_op_lib_descriptor($SOURCE);
 }
 
 
@@ -549,11 +549,17 @@ sub _print_preamble_source {
 
     print $fh $self->{preamble};
     print $fh <<END_C;
+#define PARROT_IN_EXTENSION
+
 #include "$self->{include}"
+#include "parrot/pbcversion.h"
 #include "pmc/pmc_parrotlibrary.h"
 #include "pmc/pmc_callcontext.h"
 
 $self->{defines}
+
+/* XXX should be static, but C++ doesn't want to play ball */
+extern op_lib_t $self->{bs}op_lib;
 
 END_C
 
@@ -709,6 +715,7 @@ sub _op_func_table {
     if ( $self->{suffix} eq '' ) {
         print $fh <<END_C;
 
+
 INTVAL $self->{bs}numops$self->{suffix} = $self->{num_ops};
 
 /*
@@ -757,7 +764,6 @@ END_C
         $self->{index} = 0;
 
         foreach my $op ( $self->{ops}->ops ) {
-            my $type = sprintf( "PARROT_%s_OP", uc $op->type );
             my $name = $op->name;
             $names{$name} = 1;
             my $full_name = $op->full_name;
@@ -767,37 +773,33 @@ END_C
             my $arg_count = $op->size;
 
             ## 0 inserted if arrays are empty to prevent msvc compiler errors
-            my $arg_types = "{ "
-                . join( ", ",
+            my $arg_types = join( ", ",
                 scalar $op->arg_types
                 ? map { sprintf( "PARROT_ARG_%s", uc $_ ) } $op->arg_types
                 : '(arg_type_t) 0'
-                ) . " }";
-            my $arg_dirs = "{ "
-                . join(
+                );
+            my $arg_dirs = join(
                 ", ", scalar $op->arg_dirs
                 ? map { $arg_dir_mapping{$_} } $op->arg_dirs
                 : '(arg_dir_t) 0'
-                ) . " }";
-            my $labels = "{ "
-                . join(
+                );
+            my $labels = join(
                 ", ", scalar $op->labels
                 ? $op->labels
                 : 0
-                ) . " }";
+                );
 
             print $fh <<END_C;
   { /* $self->{index} */
-    /* type $type, */
     "$name",
     "$full_name",
     "$func_name",
-    /* "",  body */
     $jump,
     $arg_count,
-    $arg_types,
-    $arg_dirs,
-    $labels
+    { $arg_types },
+    { $arg_dirs },
+    { $labels },
+    &$self->{bs}op_lib
   },
 END_C
 
@@ -960,7 +962,8 @@ sub _print_op_lib_descriptor {
 ** op lib descriptor:
 */
 
-static op_lib_t $self->{bs}op_lib = {
+/* XXX should be static, but C++ doesn't want to play ball */
+op_lib_t $self->{bs}op_lib = {
   "$self->{base}",               /* name */
   "$self->{suffix}",             /* suffix */
   $core_type,                       /* core_type = PARROT_XX_CORE */

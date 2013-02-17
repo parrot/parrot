@@ -47,11 +47,17 @@ sub defines {
 #undef CONST
 #define REL_PC     ((size_t)(cur_opcode - (opcode_t *)interp->code->base.data))
 #define CUR_OPCODE cur_opcode
-#define IREG(i) (CUR_CTX->bp.regs_i[cur_opcode[i]])
-#define NREG(i) (CUR_CTX->bp.regs_n[-1L - cur_opcode[i]])
-#define PREG(i) (CUR_CTX->bp_ps.regs_p[-1L - cur_opcode[i]])
-#define SREG(i) (CUR_CTX->bp_ps.regs_s[cur_opcode[i]])
-#define CONST(i) Parrot_pcc_get_constants(interp, interp->ctx)[cur_opcode[i]]
+#define IREG(i) REG_INT(interp, cur_opcode[i])
+#define NREG(i) REG_NUM(interp, cur_opcode[i])
+#define PREG(i) REG_PMC(interp, cur_opcode[i])
+#define SREG(i) REG_STR(interp, cur_opcode[i])
+#define ICONST(i) cur_opcode[i]
+#define NCONST(i) Parrot_pcc_get_num_constants(interp, interp->ctx)[cur_opcode[i]]
+#define SCONST(i) Parrot_pcc_get_str_constants(interp, interp->ctx)[cur_opcode[i]]
+#undef  PCONST
+#define PCONST(i) Parrot_pcc_get_pmc_constants(interp, interp->ctx)[cur_opcode[i]]
+
+static int get_op(PARROT_INTERP, const char * name, int full);
 END
 }
 
