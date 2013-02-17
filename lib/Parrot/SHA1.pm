@@ -21,12 +21,14 @@ package Parrot::SHA1;
 use strict;
 use warnings;
 use lib qw( lib );
+use Parrot::Git qw/has_git/;
 
 our $current = _get_sha1();
 
 sub _get_sha1 {
     my $sha1 = 0;
-    if ( -d '.git') {
+
+    if ( -d '.git' && has_git()) {
         $sha1 = `git rev-parse HEAD`;
         chomp($sha1);
     }

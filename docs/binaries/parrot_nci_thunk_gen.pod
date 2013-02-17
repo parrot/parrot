@@ -1,16 +1,16 @@
 # Copyright (C) 2001-2011, Parrot Foundation.
 
-=head1 Name
+=head1 NAME
 
 parrot_nci_thunk_gen - Create Parrot NCI thunks
 
-=head1 Description
-
-This utility creates C file of routines suitable for use as Parrot Native Call Interface thunks.
-
-=head1 Usage
+=head1 SYNOPSIS
 
     parrot_nci_thunk_gen [option] -o output_c_file.c < input_signature_list.nci
+
+=head1 DESCRIPTION
+
+This utility creates C file of routines suitable for use as Parrot Native Call Interface thunks.
 
 =head2 Command line Options
 
@@ -64,7 +64,7 @@ To set the name used for the leader function (default value is 'Parrot_load_nci_
 
     --loader-name
 
-=head1 Help
+=head1 HELP
 
 For more help or any other question you go to L<http://parrot.org> or
 L<http://github.com/parrot/parrot>.Or you can send email to 'parrot-dev@parrot.org'.

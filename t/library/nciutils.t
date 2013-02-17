@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -11,7 +11,7 @@ t/library/nciutils.t -- Tests for NCI::Utils
 
 =head1 DESCRIPTION
 
-Testing Perl 6 objects.
+Testing NCI::Utils calls to libc and libnci_test.
 
 =cut
 
@@ -23,7 +23,7 @@ Testing Perl 6 objects.
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
     test_namespace = get_namespace ['Test';'More']
-    exports        = split ' ', 'plan diag ok nok is todo skip_all'
+    exports        = split ' ', 'plan diag ok nok is todo skip skip_all'
     test_namespace.'export_to'(curr_namespace, exports)
 
     $P0 = getinterp
@@ -59,7 +59,7 @@ Testing Perl 6 objects.
     ## try some builtin stdlib funcs
     $P0 = ncifunc(null_pmc, 'atoi', 'it')
     $I0 = defined $P0
-    unless $I0 goto check_atoi
+    unless $I0 goto skip_libc
     $S0 = "2468"
     ( $I0 ) = $P0($S0)
   check_atoi:
@@ -87,8 +87,12 @@ Testing Perl 6 objects.
     ( $S0 ) = $P0('hello', 'e')
   check_strstr:
     is($S0, 'ello', 'strstr("hello", "e")')
+    goto cont_libnci
 
+  skip_libc:
+    skip(4, 'atoi not found in default libc')
 
+  cont_libnci:
     ##  load a library
     .local pmc libnci_test
     libnci_test = loadlib "libnci_test"

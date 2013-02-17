@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011, Parrot Foundation.
+Copyright (C) 2011-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -609,7 +609,7 @@ Changes umask and return previous one
 */
 
 INTVAL
-Parrot_file_umask(PARROT_INTERP, INTVAL mask)
+Parrot_file_umask(SHIM_INTERP, INTVAL mask)
 {
     return umask((mode_t)mask);
 }

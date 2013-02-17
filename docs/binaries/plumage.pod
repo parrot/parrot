@@ -1,19 +1,19 @@
 # Copyright (C) 2001-2011, Parrot Foundation.
 
-=head1 Name
+=head1 NAME
 
 plumage.pod - Parrot Plumage 
 
-=head1 Description
+=head1 SYNOPSIS
+
+plumage [<options>] <command> [<arguments>]
+
+=head1 DESCRIPTION
 
 Parrot Plumage is the Parrot Virtual Machine module ecosystem.  It includes
 tools to search metadata, handle dependencies, install modules, and so forth.
 
-=head1 Usage
-
-plumage [<options>] <command> [<arguments>]
-
-=head1 Command line options
+=head2 Command line options
 
 For help about options and commands you can type:
 
@@ -46,7 +46,7 @@ Not to ignore fail in specific stage use :
 
     --ignore-fail=<stage>=0
 
-=head1 Command line commands
+=head2 Command line commands
 
 =head2 General commands
 
@@ -130,7 +130,7 @@ To remove all generated files during the build process for specific project use 
 
     reaclean    <project>
 
-=head1 Help
+=head1 HELP
 
 For more help or any other question you go to L<http://parrot.org> or
 L<http://github.com/parrot/parrot>.Or you can send email to 'parrot-dev@parrot.org'.

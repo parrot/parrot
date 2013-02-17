@@ -1,4 +1,4 @@
-/* Copyright (C) 2001-2009, Parrot Foundation.
+/* Copyright (C) 2001-2012, Parrot Foundation.
  */
 
 /* config.h
@@ -31,7 +31,7 @@ typedef @nv@                    Parrot_Float;
 typedef @opcode_t@              Parrot_Opcode;
 typedef void *                  Parrot_Pointer;
 
-typedef char                    Parrot_Int1;
+typedef signed char             Parrot_Int1;
 typedef unsigned char           Parrot_UInt1;
 typedef @int2_t@                Parrot_Int2;
 typedef unsigned @int2_t@       Parrot_UInt2;
@@ -132,14 +132,15 @@ typedef @hugefloatval@ HUGEFLOATVAL;
 #define DOUBLE_SIZE @doublesize@
 
 typedef Parrot_Opcode opcode_t;
-typedef size_t ptrcast_t;
+typedef @ptrcast@ ptrcast_t;
 
 typedef struct _vtable VTABLE;
 typedef void DPOINTER;
 
 /* Oplib and dynamic ops related. */
+#include "parrot/pbcversion.h"
 #define PARROT_CORE_OPLIB_NAME    "core_ops"
-#define PARROT_CORE_OPLIB_INIT    Parrot_DynOp_core_@MAJOR@_@MINOR@_@PATCH@
+#define PARROT_CORE_OPLIB_INIT    Parrot_DynOp_core_ ## PARROT_PBC_MAJOR ## _ ## PARROT_PBC_MINOR
 
 #define  PARROT_GET_CORE_OPLIB(i)  PARROT_CORE_OPLIB_INIT((i), 1)
 

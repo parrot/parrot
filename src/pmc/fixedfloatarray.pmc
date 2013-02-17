@@ -12,8 +12,6 @@ stored FLOATVALs.  It uses Float PMCs to do all necessary conversions.
 
 =head2 Functions
 
-=over 4
-
 =cut
 
 */
@@ -27,8 +25,6 @@ pmclass FixedFloatArray auto_attrs provides array {
     ATTR FLOATVAL *float_array;
 
 /*
-
-=back
 
 =head2 Methods
 

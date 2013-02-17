@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2013, Parrot Foundation.
 
 package Parrot::Configure;
 
@@ -43,6 +43,7 @@ use Carp qw(carp);
 use Storable qw(2.12 nstore retrieve nfreeze thaw);
 use Parrot::Configure::Data;
 use base qw(Parrot::Configure::Compiler);
+use Parrot::BuildUtil ();
 
 use Class::Struct;
 
@@ -568,6 +569,17 @@ sub debug {
         print join('' => @messages);
     }
     return 1;
+}
+
+=item * C<add_to_generated($path, $section [, $dir])>
+
+Forward this method to Parrot::BuildUtil.
+
+=cut
+
+sub add_to_generated {
+    my $conf = shift;
+    Parrot::BuildUtil::add_to_generated(@_);
 }
 
 =back

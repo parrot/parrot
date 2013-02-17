@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -42,6 +42,7 @@ Initializes the key.
 */
 
     VTABLE void init() {
+        UNUSED(INTERP)
         PObj_custom_mark_SET(SELF);
     }
 
@@ -186,7 +187,9 @@ Sets the value of the key to C<*value>.
 */
 
     VTABLE void set_pmc(PMC *value) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        UNUSED(SELF)
+        UNUSED(value)
+        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                 "this is broken - see TT #1683");
     }
 
@@ -245,6 +248,8 @@ Returns the key itself.
 */
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
+        UNUSED(INTERP)
+        UNUSED(SELF)
         return key;
     }
 
@@ -350,8 +355,8 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
     }
 
     VTABLE void thawfinish(PMC *info) {
-        PMC *key = SELF;
         UNUSED(info)
+        PMC *key = SELF;
 
         while (1) {
             PMC *next;
@@ -398,6 +403,7 @@ Aggregate interface.
 */
 
     VTABLE INTVAL elements() {
+        UNUSED(INTERP)
         INTVAL n = 0;
         for (; SELF; SELF = PARROT_KEY(SELF)->next_key)
             n++;
@@ -510,6 +516,27 @@ Aggregate interface.
             }
         }
 
+    }
+
+    /* returns integer, values taken from PCC */
+    METHOD get_type() {
+        INTVAL ret;
+        switch (KEY_get_FLAGS(SELF)) {
+            case KEY_integer_FLAG:
+            case KEY_integer_FLAG | KEY_register_FLAG:
+                ret = 0;
+                break;
+            case KEY_string_FLAG:
+            case KEY_string_FLAG | KEY_register_FLAG:
+                ret = 1;
+                break;
+            case KEY_pmc_FLAG:
+            case KEY_pmc_FLAG | KEY_register_FLAG:
+                ret = 2;
+                break;
+        }
+
+        RETURN(INTVAL ret);
     }
 }
 

@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1 Coroutines
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's coroutines.
+
+=head1 COROUTINES
 
 Coroutines are like special subroutines that use C<.yield> instead of
 C<.return>. In a normal subroutine, C<.return> passes results back to

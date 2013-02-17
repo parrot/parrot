@@ -630,8 +630,6 @@ The list may also be augmented if additional functionality is required.
 
 =item C<Parrot_cx_request_suspend_for_gc>
 
-=item C<Parrot_cx_runloop_end>
-
 =item C<Parrot_cx_schedule_callback>
 
 =item C<Parrot_cx_schedule_repeat>

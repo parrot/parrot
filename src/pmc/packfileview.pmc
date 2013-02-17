@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011, Parrot Foundation.
+Copyright (C) 2011-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -7,10 +7,15 @@ src/pmc/packfileview.pmc - PackfileView PMC
 
 =head1 DESCRIPTION
 
-This class implements a user-accessible wrapper for the PackFile* structure
-used internally by Parrot. It is essentially an interface for the user to call
-Packfile subsystem API calls, and work with the PackFile* structures output
-from utilities which generate them.
+This class implements a user-accessible, read-only wrapper for the PackFile*
+structure used internally by Parrot. It is essentially an interface for the user
+to call Packfile subsystem API calls, and work with the PackFile* structures
+output from utilities which generate them.
+
+NOTICE: This PMC should contain very little logic. It should be a thin wrapper
+around the public functions in src/packfile/api.c. This PMC should contain
+absolutely NO functionality for modifying the packfile. To create a new
+packfile or modify an existing one, use the PackFile PMC instead.
 
 =head2 VTABLES
 
@@ -42,7 +47,6 @@ static INTVAL find_called_tag(PARROT_INTERP,
 PARROT_CAN_RETURN_NULL
 static PackFile_ConstTable * get_const_table(PARROT_INTERP,
     ARGIN(PMC * self))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_add_called_tag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -54,8 +58,7 @@ static PackFile_ConstTable * get_const_table(PARROT_INTERP,
     , PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(tag))
 #define ASSERT_ARGS_get_const_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
+       PARROT_ASSERT_ARG(self))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -71,7 +74,7 @@ Get the constant table for the PackFile*. Return NULL if there's a problem.
 
 PARROT_CAN_RETURN_NULL
 static PackFile_ConstTable *
-get_const_table(PARROT_INTERP, ARGIN(PMC * self))
+get_const_table(SHIM_INTERP, ARGIN(PMC * self))
 {
     ASSERT_ARGS(get_const_table)
     Parrot_PackfileView_attributes * const attrs =
@@ -170,6 +173,7 @@ Mark the PMC and the PackFile* contents
     }
 
     VTABLE void init() {
+        UNUSED(INTERP)
         Parrot_PackfileView_attributes * const attrs =
                 PARROT_PACKFILEVIEW(SELF);
         attrs->pf = NULL;
@@ -219,15 +223,13 @@ otherwise.
     }
 
     VTABLE void *get_pointer() {
-        Parrot_PackfileView_attributes * const attrs =
-                PARROT_PACKFILEVIEW(SELF);
-        return attrs->pf;
+        UNUSED(INTERP)
+        return PARROT_PACKFILEVIEW(SELF)->pf;
     }
 
     VTABLE INTVAL get_bool() {
-        Parrot_PackfileView_attributes * const attrs =
-                PARROT_PACKFILEVIEW(SELF);
-        return (attrs->pf != NULL);
+        UNUSED(INTERP)
+        return (PARROT_PACKFILEVIEW(SELF)->pf != NULL);
     }
 
 /*
@@ -241,12 +243,12 @@ otherwise.
 */
 
     VTABLE void set_string_native(STRING * path) {
-        Parrot_PackfileView_attributes * const attrs =
-                PARROT_PACKFILEVIEW(SELF);
-        attrs->path = path;
+        UNUSED(INTERP)
+        PARROT_PACKFILEVIEW(SELF)->path = path;
     }
 
     VTABLE STRING * get_string() {
+        UNUSED(INTERP)
         Parrot_PackfileView_attributes * const attrs =
                 PARROT_PACKFILEVIEW(SELF);
         return attrs->path ? attrs->path : STRINGNULL;
@@ -341,14 +343,34 @@ and PMC constants in the respective constant tables.
 
 Get the :main sub from the packfile, if any.
 
+=item C<METHOD subs_by_tag(STRING *tag)>
+
+Get an array of all Subs with the given tag.
+
 =item C<METHOD trigger(STRING *flag)>
 
 Trigger subs with the given flag. Currently supported values are "load" and
 "init".
 
+=item C<METHOD all_tags()>
+
+Return an array of all tags.
+
+=item C<METHOD all_tagged_pmcs()>
+
+Return a hash map of all tags, and the lists of pmcs with those tags.
+
 =item C<METHOD all_subs()>
 
 Return a ResizablePMCArray with all Sub constants from the constant table.
+
+item C<METHOD mark_initialized(STRING *tag)>
+
+Mark a given tag as being initialized
+
+item C<METHOD is_initialized(STRING *tag)>
+
+Determine if the given tag has been marked initialized
 
 =cut
 
@@ -371,18 +393,18 @@ Return a ResizablePMCArray with all Sub constants from the constant table.
     }
 
     METHOD all_subs() {
-        PMC * const array = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-        PackFile_ConstTable * const ct = get_const_table(INTERP, SELF);
-        if (ct) {
-            INTVAL i;
-            STRING * const SUB = CONST_STRING(interp, "Sub");
-            for (i = 0; i < ct->pmc.const_count; ++i) {
-                PMC * const x = ct->pmc.constants[i];
-                if (VTABLE_isa(interp, x, SUB))
-                    VTABLE_push_pmc(INTERP, array, x);
-            }
-        }
+        PMC * const array = Parrot_pf_all_subs(INTERP, SELF);
         RETURN(PMC *array);
+    }
+
+    METHOD all_tags() {
+        PMC * const array = Parrot_pf_all_tags_list(INTERP, SELF);
+        RETURN(PMC *array);
+    }
+
+    METHOD all_tagged_pmcs() {
+        PMC * const hash = Parrot_pf_all_tagged_pmcs(INTERP, SELF);
+        RETURN(PMC *hash);
     }
 
     METHOD mark_initialized(STRING *tag) {

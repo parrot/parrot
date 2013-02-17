@@ -180,7 +180,7 @@ ok($error eq "invalid op \"bla\" in \"IF(bla)\" at \"(bla)\" at Makefile_$$.in l
 pass("Completed all tests in $0");
 
 END {
-    unlink "Makefile_$$.in", "Makefile_$$.out", "Makefile_$$.out.tmp";
+    unlink "Makefile_$$.in", "Makefile_$$.out", "Makefile_$$.out_tmp";
 }
 
 ################### DOCUMENTATION ###################

@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -13,11 +13,13 @@ t/compilers/data_json/from_parrot.t - test parrot to JSON conversion.
 
 Tests JSON->Parrot conversions.
 
+Note: This uses the old JSON.pbc not the new data_json compiler.
+
 =cut
 
 .sub main :main
     .include 'test_more.pir'
-    plan(39)
+    plan(40)
 
     load_bytecode 'JSON.pbc'
     test_create_json_of_an_empty_string()
@@ -356,7 +358,7 @@ OUTPUT
 .end
 
 
-# no. 24..27
+# no. 24..28
 .sub test_create_json_of_string_pmcs
     .local pmc s
 
@@ -373,10 +375,13 @@ OUTPUT
     is($S0, '"12345\"67890"', 'Create JSON of String PMCs')
     $S0 = _json( s, 1 )
     is($S0, "\"12345\\\"67890\"\n", 'Create JSON of String PMCs')
+    s = utf16:"\x{0}\u203e Pl\x{e4}ne"
+    $S0 = _json( s, 0 )
+    is($S0, '"\x{0}\u203e Pl\x{e4}ne"', 'Create JSON of String PMCs')
 .end
 
 
-# no. 28..31
+# no. 29..32
 .sub test_create_json_of_integer_pmcs
     .local pmc i
 
@@ -396,7 +401,7 @@ OUTPUT
 .end
 
 
-# no. 32..35
+# no. 33..36
 .sub test_create_json_of_boolean_pmcs
     .local pmc b
 
@@ -416,7 +421,7 @@ OUTPUT
 .end
 
 
-# no. 36..39
+# no. 37..40
 .sub test_create_json_of_null_and_undef
     .local pmc n
     null n

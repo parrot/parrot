@@ -43,10 +43,7 @@ Overrides the default to do nothing.
 
 */
 
-    VTABLE void init() {
-        UNUSED(INTERP)
-        UNUSED(SELF)
-    }
+    VTABLE void init() {}
 
     VTABLE void *get_pointer() {
         UNUSED(INTERP)

@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2011, Parrot Foundation.
+# Copyright (C) 2011-2013, Parrot Foundation.
 use strict;
 use warnings;
 use Carp;
@@ -16,10 +16,9 @@ tools/release/update_version.pl - Update version numbers in a few files
 =head1 DESCRIPTION
 
 This program is meant to be used by the Parrot release manager.  It will
-change the version numbers found in B<these 5 files only>:
+change the version numbers found in B<these 4 files only>:
 
     VERSION
-    MANIFEST.generated
     README.pod
     include/parrot/oplib/core_ops.h
     src/ops/core_ops.c
@@ -55,12 +54,11 @@ croak "'$new_version' is not a proper version number; must be n.n.n"
 
 my @simple_files = (
     'VERSION',
-    'MANIFEST.generated',
     'README.pod',
 );
 
 foreach my $f ( @simple_files ) {
-    my $new = "$f.tmp";
+    my $new = "${f}_tmp";
     open my $IN, '<', $f or croak "Unable to open $f for reading";
     open my $OUT, '>', $new or croak "Unable to open $new for writing";
     while (<$IN>) {
@@ -89,7 +87,7 @@ sub bump_gen_code_version {
     my $new_h_version = join("_", @new_version);
 
     open my $gen_c_in, '<', "$filename";
-    open my $gen_c_out, '>', "$filename.tmp";
+    open my $gen_c_out, '>', "${filename}_tmp";
     while(<$gen_c_in>) {
         s/$old_h_version/$new_h_version/g;
         s?\d+,    /\* major_version \*/?$new_version[0],    /* major_version */?;
@@ -99,7 +97,7 @@ sub bump_gen_code_version {
     }
     close $gen_c_in;
     close $gen_c_out;
-    rename "$filename.tmp", $filename;
+    rename "${filename}_tmp", $filename;
 }
 
 

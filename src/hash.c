@@ -850,7 +850,8 @@ expand_hash(PARROT_INTERP, ARGMOD(Hash *hash))
     const UINTVAL old_size   = hash->mask + 1;
     const UINTVAL new_size   = old_size  << 1; /* Double. Right-shift is 2x */
     const UINTVAL new_mask   = new_size   - 1;
-    size_t        offset, i;
+    size_t        i;
+    ptrdiff_t     offset;
 
     /*
        allocate some less buckets

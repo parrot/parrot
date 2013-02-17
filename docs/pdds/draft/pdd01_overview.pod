@@ -6,10 +6,6 @@
 
 A high-level overview of the Parrot virtual machine.
 
-
-
-
-
 =head2 Description
 
 Parrot is a virtual machine for dynamic languages like Python, PHP, Ruby, and

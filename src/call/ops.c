@@ -28,9 +28,6 @@ B<Calling Ops>:  Various functions that call the run loop.
 #define STACKED_EXCEPTIONS 1
 #define RUNLOOP_TRACE      0
 
-static int
-runloop_id_counter = 0;          /* for synthesizing runloop ids. */
-
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
@@ -152,7 +149,7 @@ reset_runloop_id_counter(PARROT_INTERP)
 {
     ASSERT_ARGS(reset_runloop_id_counter)
     UNUSED(interp);
-    runloop_id_counter = 0;
+    interp->runloop_id_counter = 0;
 }
 
 
@@ -188,7 +185,7 @@ new_runloop_jump_point(PARROT_INTERP)
         jump_point = mem_gc_allocate_zeroed_typed(interp, Parrot_runloop);
 
     jump_point->prev           = interp->current_runloop;
-    jump_point->id             = ++runloop_id_counter;
+    jump_point->id             = ++interp->runloop_id_counter;
     interp->current_runloop    = jump_point;
     interp->current_runloop_id = jump_point->id;
     ++interp->current_runloop_level;

@@ -236,7 +236,7 @@ typedef struct PackFile_Debug {
 #define ANN_ENTRY_OFF 0
 #define ANN_ENTRY_VAL 1
 
-/* &gen_from_def(packfile_annotation_key_type.pasm) */
+/* &gen_from_def(packfile_annotation_keytype.pasm) */
 
 /* Key types for annotation segment. */
 typedef enum {
@@ -497,7 +497,7 @@ PARROT_EXPORT
 void do_sub_pragmas(PARROT_INTERP,
     ARGIN(PMC *pfpmc),
     pbc_action_enum_t action,
-    ARGIN_NULLOK(PMC *eval_pmc))
+    PMC *eval_pmc)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -754,6 +754,24 @@ PMC * PackFile_Annotations_lookup(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC * Parrot_pf_all_subs(PARROT_INTERP, ARGIN(PMC *pfpmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC * Parrot_pf_all_tagged_pmcs(PARROT_INTERP, ARGIN(PMC * pfpmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC * Parrot_pf_all_tags_list(PARROT_INTERP, ARGIN(PMC * pfpmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
 PackFile_ByteCode * Parrot_pf_get_current_code_segment(PARROT_INTERP)
@@ -885,6 +903,15 @@ void Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD_NULLOK(PackFile * pf))
 #define ASSERT_ARGS_PackFile_Annotations_lookup __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_Parrot_pf_all_subs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pfpmc))
+#define ASSERT_ARGS_Parrot_pf_all_tagged_pmcs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pfpmc))
+#define ASSERT_ARGS_Parrot_pf_all_tags_list __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pfpmc))
 #define ASSERT_ARGS_Parrot_pf_get_current_code_segment \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))

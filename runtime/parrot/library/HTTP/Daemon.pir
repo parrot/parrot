@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2008, Parrot Foundation.
+# Copyright (C) 2006-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -14,9 +14,9 @@ HTTP;Daemon - A Simple HTTPD Server
   unless d goto err
   d.'run'()
 
-=head1 TODO
+=head1 DESCRIPTION
 
-A lot. The code is by now just an objectified version of httpd.pir.
+The code is by now just an objectified version of httpd.pir.
 
 =head1 SEE ALSO
 
@@ -84,7 +84,11 @@ at the pio.
 .const string CRCR     = "\r\r"
 
 .include "stat.pasm"
-.include 'io_thr_msg.pasm'
+.include 'except_types.pasm'
+.include 'socket.pasm'
+
+.loadlib 'io_ops'
+.loadlib 'sys_ops'
 
 =back
 
@@ -133,30 +137,31 @@ Redirect to and serve files from F<docs/html>.
     $P0 = '.'
     setattribute self, 'doc_root', $P0
 
-    # create socket
-    .local pmc sock
-    sock = socket 2, 1, 6 	# PF_INET, SOCK_STREAM, tcp
-    unless sock goto err_sock
-    setattribute self, 'socket', sock
+    # create listener socket
+    .local pmc listener
+    listener = new 'Socket'
+    listener.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
+    unless listener goto err_sock
+    setattribute self, 'socket', listener
 
     .local int port
-    .local string adr
+    .local string host
+    host = args['LocalAddr']
     port = args['LocalPort']
-    adr = args['LocalAddr']
 
     # bind
     .local string i_addr
     .local int res
-    i_addr = sockaddr port, adr
-    res = bind sock, i_addr
+    i_addr = listener.'sockaddr'(host, port)
+    res = listener.'bind'(i_addr)
     if res == -1 goto err_bind
 
     # listen
-    res = listen sock, 1
+    res = listener.'listen'(1)
     if res == -1 goto err_listen
 
     # add connection
-    self.'new_conn'(sock)
+    self.'new_conn'(listener)
     .return()
 
 err_listen:
@@ -165,7 +170,7 @@ err_bind:
     err $S0, $I0
     printerr $S0
     printerr "\n"
-    close sock
+    listener.'close'()
 err_sock:
     $P0 = new 'Undef'
     setattribute self, 'socket', $P0
@@ -298,7 +303,7 @@ Concat passed arguments and schedule the string for logging.
     n += 3
     now = time
     $S0 = gmtime now
-    chopn $S0, 1	# XXX why 1? asctime is \n terminated
+    $S0 = chopn $S0, 1	# XXX why 1? asctime is \n terminated
     unshift args, ", "
     unshift args, $S0
     push args, "\n"
@@ -340,7 +345,7 @@ add_lp:
 =item _del_stale_conns()
 
 Not yet used method to delete old connections for the active set.
-Called from server runnloop.
+Called from server runloop.
 
 =cut
 
@@ -387,7 +392,7 @@ Return true, if the given connection is already active.
 
 =cut
 
-# add coket to active connections
+# add socket to active connections
 .sub 'new_conn' :method
     .param pmc sock
     .local pmc active, conn
@@ -402,7 +407,7 @@ Return true, if the given connection is already active.
 .sub 'accept_conn' :method
     .local pmc orig, work
     orig   = getattribute self, 'socket'
-    accept work, orig
+    work.'accept'(orig)
     self.'new_conn'(work)
 .end
 
@@ -413,7 +418,7 @@ Return true, if the given connection is already active.
     .local pmc active, orig, sock
     .local int i, n
     sock = getattribute work, 'socket'
-    close sock
+    sock.'close'()
     active = getattribute self, 'active'
 loop:
     n = elements active
@@ -605,13 +610,13 @@ Internal method to read from the client. It returns a request string.
     # check method, read Content-Length if needed and read
     # until message is complete
 MORE:
-    res = recv sock, buf
+    res = sock.'recv'(buf)
     srv.'debug'("**read ", res, " bytes\n")
     if res > 0 goto not_empty
     do_close = 1
     if res <= 0 goto done
 not_empty:
-    concat req, buf
+    req = concat req, buf
     index pos, req, CRLFCRLF
     if pos >= 0 goto have_hdr
     index pos, req, LFLF
@@ -649,7 +654,7 @@ CGI invocation.
     .local pmc sock
     sock = self.'socket'()
     rep = resp.'as_string'()
-    $I0 = send sock, rep	# XXX don't ignore
+    $I0 = sock.'send'(rep)	# XXX don't ignore
 .end
 
 .sub 'send_file_response' :method
@@ -811,7 +816,7 @@ START:
     inc pos_in
 
 INC_IN:
-    concat out, char_out
+    out = concat out, char_out
     inc pos_in
     goto START
 END:

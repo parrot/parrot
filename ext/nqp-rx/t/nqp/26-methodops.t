@@ -1,4 +1,4 @@
-#! nqp
+#!./parrot-nqp
 
 # method ops (just method calls for now)
 

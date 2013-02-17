@@ -6,6 +6,8 @@ TGE::Compiler - A compiler for the grammar syntax of TGE.
 
 =head1 DESCRIPTION
 
+TGE::Compiler is a compiler for the grammar syntax of Tree Grammar Engine.
+
 =cut
 
 .namespace [ 'TGE'; 'Compiler' ]

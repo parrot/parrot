@@ -1,4 +1,4 @@
-#!./parrot nqp.pbc
+#!./parrot-nqp
 
 # combination of conditional modifier and loop modifier
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007-2011, Parrot Foundation.
+Copyright (C) 2007-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -203,6 +203,7 @@ pmclass LexPad provides hash no_ro auto_attrs {
     ATTR PMC *ctx;
 
     VTABLE void init() {
+        UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Cannot create a LexPad PMC without an initializer");
     }
@@ -446,7 +447,6 @@ Get iterator for declared lexicals.
         PMC    *ctx;
         PMC    *info_iter;
         PMC    *value_map = Parrot_pmc_new(INTERP, enum_class_Hash);
-        INTVAL  reg;
         Hash *  hash;
 
         GET_ATTR_lexinfo(INTERP, SELF, info);

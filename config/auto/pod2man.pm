@@ -1,4 +1,4 @@
-# Copyright (C) 2008, Parrot Foundation.
+# Copyright (C) 2008-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -32,8 +32,8 @@ sub _init {
 
 sub runstep {
     my ( $self, $conf ) = @_;
-
-    my $cmd = $conf->data->get('scriptdirexp_provisional') . q{/pod2man};
+    my $slash = $conf->data->get('slash');
+    my $cmd = $conf->data->get('scriptdirexp_provisional') . $slash . q{pod2man};
     my $content = capture_output("$cmd docs/parrot.pod") || undef;
 
     return 1 unless defined( $self->_initial_content_check($conf, $content) );

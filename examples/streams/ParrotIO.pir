@@ -1,4 +1,4 @@
-=head1 Filehandle Object Example
+=head1 DESCRIPTION
 
 This small example shows the usage of C<Stream::ParrotIO>.
 

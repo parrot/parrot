@@ -4,7 +4,7 @@
 
 PGE - the Parrot/Perl Grammar Engine
 
-=head2 Description
+=head1 DESCRIPTION
 
 This is the base file for the grammar engine.  It basically combines
 (via .include) each of the separate PGE modules into a single compilation

@@ -17,7 +17,6 @@ Instance Methods
 package Parrot::Pmc2c::PMC::default;
 use strict;
 use warnings;
-use Parrot::Pmc2c::UtilFunctions qw( return_statement );
 use base qw( Parrot::Pmc2c::PMC );
 
 =item C<pre_method_gen()>

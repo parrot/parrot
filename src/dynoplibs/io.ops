@@ -60,11 +60,11 @@ Read up to N bytes from IO PMC stream.
 =cut
 
 op read(out STR, in INT) :base_io {
-    $1 = Parrot_io_reads(interp, _PIO_STDIN(interp), (size_t)$2);
+    $1 = Parrot_io_read_s(interp, _PIO_STDIN(interp), (size_t)$2);
 }
 
 op read(out STR, invar PMC, in INT) :base_io {
-    $1 = Parrot_io_reads(interp, $2, (size_t)$3);
+    $1 = Parrot_io_read_s(interp, $2, (size_t)$3);
 }
 
 =item B<readline>(out STR, invar PMC)
@@ -103,14 +103,14 @@ op printerr(in NUM) :base_io {
 op printerr(in STR) :base_io {
     STRING * const s = $1;
     if (s && Parrot_str_byte_length(interp, s))
-        Parrot_io_putps(interp, _PIO_STDERR(interp), s);
+        Parrot_io_write_s(interp, _PIO_STDERR(interp), s);
 }
 
 op printerr(invar PMC) :base_io {
     PMC * const p = $1;
     STRING * const s = (VTABLE_get_string(interp, p));
     if (s)
-        Parrot_io_putps(interp, _PIO_STDERR(interp), s);
+        Parrot_io_write_s(interp, _PIO_STDERR(interp), s);
 }
 
 ##########################################
@@ -140,7 +140,7 @@ INTVALS.
 
 op seek(invar PMC, in INT, in INT) :base_io {
     if ($1) {
-        if (Parrot_io_seek_handle(interp, $1, Parrot_io_make_offset($2), $3) < 0) {
+        if (Parrot_io_seek(interp, $1, Parrot_io_make_offset($2), $3) < 0) {
             opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
                 EXCEPTION_PIO_ERROR,
                 "seek failed (32bit)");
@@ -151,7 +151,7 @@ op seek(invar PMC, in INT, in INT) :base_io {
 
 op seek(invar PMC, in INT, in INT, in INT) :base_io {
     if ($1) {
-        if (Parrot_io_seek_handle(interp, $1, Parrot_io_make_offset32($2, $3), $4) < 0) {
+        if (Parrot_io_seek(interp, $1, Parrot_io_make_offset32($2, $3), $4) < 0) {
             opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
                 EXCEPTION_PIO_ERROR,
                 "seek failed (64bit)");
@@ -177,12 +177,12 @@ Get the current file position of stream $3 in two parts of 32-bit each
 
 op tell(out INT, invar PMC) :base_io {
     if ($2)
-        $1 = (INTVAL)Parrot_io_tell_handle(interp, $2);
+        $1 = (INTVAL)Parrot_io_tell(interp, $2);
 }
 
 op tell(out INT, out INT, invar PMC) :base_io {
     if ($3) {
-        const PIOOFF_T pos = Parrot_io_tell_handle(interp, $3);
+        const PIOOFF_T pos = Parrot_io_tell(interp, $3);
         $1 = (INTVAL)(pos >> 31);
         $2 = (INTVAL)(pos & 0xffffffff);
     }
@@ -242,7 +242,7 @@ inline op open(out PMC, in STR, in STR) :filesys_open {
         goto ADDRESS(handler);
     }
     else {
-        $1 = Parrot_io_open_handle(interp, PMCNULL, $2, $3);
+        $1 = Parrot_io_open(interp, PMCNULL, $2, $3);
         PARROT_ASSERT(! PMC_IS_NULL($1));
     }
 }
@@ -254,7 +254,7 @@ inline op open(out PMC, in STR) :filesys_open {
         goto ADDRESS(handler);
     }
     else {
-        $1 = Parrot_io_open_handle(interp, PMCNULL, $2, STRINGNULL);
+        $1 = Parrot_io_open(interp, PMCNULL, $2, STRINGNULL);
         PARROT_ASSERT(! PMC_IS_NULL($1));
     }
 }
@@ -268,7 +268,7 @@ Close IO object $1
 =cut
 
 inline op close(invar PMC) :base_io {
-    Parrot_io_close_handle(interp, $1);
+    Parrot_io_close(interp, $1, -1);
 }
 
 ########################################

@@ -53,7 +53,7 @@ do {                                                                \
                                                                     \
         for (_j = 0; _j < CELL_PER_CHUNK - chunk->num_free; _j++) { \
             void *ptr = chunk->data[_j];                            \
-            if ((UINTVAL)(ptr) & 1)                                 \
+            if ((ptrcast_t)(ptr) & 1)                                 \
                 continue;                                           \
                                                                     \
             { _code }                                               \
@@ -89,10 +89,7 @@ Parrot_pa_insert(ARGMOD(Parrot_Pointer_Array *self), ARGIN(void *ptr))
 
     /* Reuse removed cell */
     if (self->next_free) {
-        /* FIXME. Cast to UINTVAL is wrong. */
-        /* We have to provide parrot version of uintptr_t due lack of it in C89 */
-        /* See GH #378 */
-        void **next      = (void**)((UINTVAL)*self->next_free & ~1);
+        void **next      = (void**)((ptrcast_t)*self->next_free & ~1);
         ret = self->next_free;
         *self->next_free = ptr;
         self->next_free = next;
@@ -138,10 +135,10 @@ Remove pointer from array.
 static
 PARROT_INLINE
 void
-Parrot_pa_remove(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *ptr))
+Parrot_pa_remove(SHIM_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *ptr))
 {
     /* Mark sell to avoid iterating over */
-    *(UINTVAL*)ptr = ((UINTVAL)self->next_free) | 1;
+    *(void**)ptr = (void*)((ptrcast_t)self->next_free | 1);
     self->next_free = (void**)ptr;
 }
 
@@ -150,8 +147,7 @@ Parrot_pa_remove(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *p
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-void Parrot_pa_destroy(PARROT_INTERP, ARGFREE(Parrot_Pointer_Array *self))
-        __attribute__nonnull__(1);
+void Parrot_pa_destroy(PARROT_INTERP, ARGFREE(Parrot_Pointer_Array *self));
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -165,35 +161,28 @@ int Parrot_pa_is_owned(
 PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-Parrot_Pointer_Array * Parrot_pa_new(PARROT_INTERP)
-        __attribute__nonnull__(1);
+Parrot_Pointer_Array * Parrot_pa_new(PARROT_INTERP);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 size_t Parrot_pa_count_allocated(PARROT_INTERP,
     ARGIN(const Parrot_Pointer_Array *self))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
 size_t Parrot_pa_count_used(PARROT_INTERP,
     ARGIN(const Parrot_Pointer_Array *self))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_Parrot_pa_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_pa_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_pa_is_owned __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(orig))
-#define ASSERT_ARGS_Parrot_pa_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_pa_new __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_pa_count_allocated __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
+       PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_Parrot_pa_count_used __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
+       PARROT_ASSERT_ARG(self))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/pointer_array.c */
 

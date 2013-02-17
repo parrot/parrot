@@ -1,10 +1,9 @@
 #!./parrot
-# Copyright (C) 2010-2011, Parrot Foundation.
+# Copyright (C) 2010-2012, Parrot Foundation.
 
-=head1 task_primes.t
+=head1 DESCRIPTION
 
-The classic threads/message passing prime checker
-is now a Parrot test.
+This PIR code implements the classic threads/message passing prime checker.
 
 =cut
 
@@ -24,6 +23,9 @@ is now a Parrot test.
     say "ok 1 - All tests skipped on Win32"
     exit 0
   run_unix_tests:
+    say "1..1"
+    say "ok 1 - All tests skipped since tasks may only communicate with their creator for now"
+    exit 0
 
     $P0 = get_global 'test_sub'
     tt  = new 'Task', $P0
@@ -132,7 +134,7 @@ maybe_prime:
     nt = make_checker()
 
 ship_it:
-    # More syncrhonous message passing to the
+    # More synchronous message passing to the
     # next task.
     nt.'send'(M)
     M = receive

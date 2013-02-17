@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2013, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -38,7 +38,7 @@ SKIP: {
     unless ( -e "runtime/parrot/dynext/libnci_test$PConfig{load_ext}" ) {
         plan skip_all => "Please make libnci_test$PConfig{load_ext}";
     }
-    plan tests => 60;
+    plan tests => 61;
 
     pir_output_is( << 'CODE', << 'OUTPUT', 'load library fails' );
 .sub test :main
@@ -69,7 +69,7 @@ OUTPUT
   .local pmc func
   .local int func_defined
   libnci_test = loadlib "no_such_library"
-  dlfunc func, libnci_test, "no_such_function", "v"
+  func = dlfunc libnci_test, "no_such_function", "v"
   func_defined = defined func
   if func_defined goto FUNC_DEFINED
   branch FUNC_UNDEFINED
@@ -96,7 +96,7 @@ OUTPUT
   unless libnci_test goto NOT_LOADED
   print "libnci_test was successfully loaded\n"
 
-  dlfunc func, libnci_test, "no_such_function", "v"
+  func = dlfunc libnci_test, "no_such_function", "v"
   func_defined = defined func
   if func_defined goto FUNC_DEFINED
   branch FUNC_UNDEFINED
@@ -485,6 +485,44 @@ libnci_test was successfully loaded
 -44440000
 OUTPUT
     }
+
+        pir_output_is( << 'CODE', << 'OUTPUT', "nci_pv" );
+
+.include "datatypes.pasm"
+
+.sub test :main
+
+    # load libnci_test.so
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib library_name
+    unless libnci_test goto NOT_LOADED
+    print library_name
+    say " was successfully loaded"
+
+    # address of nci_dlvar_int
+    .local pmc nci_dlvar_int
+    nci_dlvar_int = dlvar libnci_test, "nci_dlvar_int"
+
+    .local pmc nci_pv
+    nci_pv = dlfunc libnci_test, "nci_pv", "pv"
+    $P0 = nci_pv()
+    unless nci_dlvar_int goto NOT_LOADED
+    say "nci_dlvar_int is a ptr"
+    unless $P0 goto NOT_LOADED
+    say "nci_pv returned non-NULL ptr"
+    if $P0 != nci_dlvar_int goto NOT_LOADED
+    say "nci_pv same ptr as nci_dlvar_int"
+
+NOT_LOADED:
+.end
+CODE
+libnci_test was successfully loaded
+nci_dlvar_int is a ptr
+nci_pv returned non-NULL ptr
+nci_pv same ptr as nci_dlvar_int
+OUTPUT
 
     pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_dd - PASM' );
 .pcc_sub :main main:
@@ -1332,10 +1370,11 @@ OUTPUT
   set I20, 0
 loop:
   inc I20
-  sleep 0.01
+  # Avoid sleep deadlocks in threads branch [GH #808]
+  # sleep 0.01
   get_global P11, "cb_done"
   if P11, fin
-  gt I20, 10, err
+  gt I20, 10000, err
   branch loop
 fin:
   print "done.\n"
@@ -1402,11 +1441,10 @@ OUTPUT
     sleep_cnt = 0
 LOOP:
     sleep_cnt += 1
-    sleep 0.01
     .local pmc callback_has_run
     callback_has_run = get_global "cb_done"
     if callback_has_run goto FINISHED
-    if sleep_cnt > 10 goto ERROR
+    if sleep_cnt > 10000 goto ERROR
     goto LOOP
 FINISHED:
     print "the callback has run\n"
@@ -1465,10 +1503,10 @@ OUTPUT
   set I20, 0
 loop:
   inc I20
-  sleep 0.01
+  #sleep 0.01
   get_global P11, "cb_done"
   if P11, fin
-  gt I20, 10, err
+  gt I20, 10000, err
   branch loop
 fin:
   print "done.\n"
@@ -1539,11 +1577,11 @@ OUTPUT
     sleep_cnt = 0
 LOOP:
     sleep_cnt += 1
-    sleep 0.01
+    #sleep 0.01
     .local pmc callback_has_run
     callback_has_run = get_global "cb_done"
     if callback_has_run goto FINISHED
-    if sleep_cnt > 10 goto ERROR
+    if sleep_cnt > 10000 goto ERROR
     goto LOOP
 FINISHED:
     print "the callback has run\n"
@@ -1613,10 +1651,10 @@ OUTPUT
   set I20, 0
 loop:
   inc I20
-  sleep 0.01
+  #sleep 0.01
   get_global P11, "cb_done"
   if P11, fin
-  gt I20, 10, err
+  gt I20, 10000, err
   branch loop
 fin:
   print "done.\n"
@@ -1672,10 +1710,10 @@ OUTPUT
   set I20, 0
 loop:
   inc I20
-  sleep 0.01
+  #sleep 0.01
   get_global P11, "cb_done"
   if P11, fin
-  gt I20, 10, err
+  gt I20, 10000, err
   branch loop
 fin:
   print "done.\n"
@@ -1743,11 +1781,11 @@ OUTPUT
     sleep_cnt = 0
 LOOP:
     sleep_cnt += 1
-    sleep 0.01
+    #sleep 0.01
     .local pmc callback_has_run
     callback_has_run = get_global "cb_done"
     if callback_has_run goto FINISHED
-    if sleep_cnt > 10 goto ERROR
+    if sleep_cnt > 10000 goto ERROR
     goto LOOP
 FINISHED:
     print "the callback has run\n"
@@ -1820,11 +1858,11 @@ OUTPUT
     sleep_cnt = 0
 LOOP:
     sleep_cnt += 1
-    sleep 0.01
+    #sleep 0.01
     .local pmc callback_has_run
     callback_has_run = get_global "cb_done"
     if callback_has_run goto FINISHED
-    if sleep_cnt > 10 goto ERROR
+    if sleep_cnt > 10000 goto ERROR
     goto LOOP
 FINISHED:
     print "the callback has run\n"
@@ -1917,7 +1955,7 @@ OUTPUT
     .local int current
 wait:
     # Give the scheduler a point to interrupt this Task
-    # and switch to the asynchonous callback Task
+    # and switch to the asynchronous callback Task
     pass
 
     # Usually a single pass will be enough, but on a loaded system preemption

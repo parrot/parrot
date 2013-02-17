@@ -1,5 +1,6 @@
+# Copyright (C) 2001-2012, Parrot Foundation.
 
-=head1 TITLE
+=head1 NAME
 
 eventhandler.pir - a minesweeper event handler
 
@@ -11,7 +12,7 @@ eventhandler.pir - a minesweeper event handler
 
     $P0."process_events"( 0.1, $P1, field )
 
-=head1 CLASS INFORMATION
+=head1 DESCRIPTION
 
 This is a simple SDL event handler class.
 
@@ -143,10 +144,6 @@ EXIT:
 Jens Rieks E<lt>parrot at jensbeimsurfen dot deE<gt> is the author
 and maintainer.
 Please send patches and suggestions to the Perl 6 Internals mailing list.
-
-=head1 COPYRIGHT
-
-Copyright (C) 2004-2008, Parrot Foundation.
 
 =cut
 

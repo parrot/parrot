@@ -55,7 +55,7 @@ my %types_we_cant_test
         LexPad Object Handle Opcode OpLib StructView IMCCompiler),
 
     # Instances of these appear to have other types.
-    qw(PMCProxy Class) );
+    qw(Proxy PMCProxy Class) );
 while ( my ( $type, $id ) = each %pmc_types ) {
     next
         if $types_we_cant_test{$type};

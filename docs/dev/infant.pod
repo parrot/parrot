@@ -1,10 +1,15 @@
-# Copyright (C) 2001-2006, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
 docs/dev/infant.pod - Infant Mortality
 
-=head1 Overview
+=head1 DESCRIPTION
+
+This document compares and contrasts several proposals for Parrot's Garbage
+Collection system.
+
+=head1 OVERVIEW
 
 We have a garbage collector that needs to detect all dead objects (the process
 is called the mark phase of GC). Any Parrot operation that might allocate
@@ -33,10 +38,9 @@ referred to as the "infant mortality" problem.
 
 Peter Gibbs, Mike Lambert, Dan Sugalski and others have considered various
 solutions to this problem. Most of those solutions have been implemented in
-some form or other. This document is an attempt to compare and contrast all
-such proposals.
+some form or other.
 
-=head1 Solution 1: Stack Walking
+=head1 SOLUTION 1: STACK WALKING
 
 One possible solution is to add the C stack into the root set. This way,
 temporary PMCs that have not yet been anchored to the root set will be found on
@@ -71,7 +75,7 @@ calls. This is especially a problem for objects which need early destruction.
    pointer lying around on the stack or in a register, and all such
    pointers will be dereferenced.
 
-=head1 Solution 2: Neonate flag
+=head1 SOLUTION 2: NEONATE FLAG
 
 There are several possible variants of the neonate flag, but the basic idea is
 to set a flag on newly created objects that prevents them from being collected.
@@ -187,7 +191,7 @@ through longjmps and recursive run_cores.
  - Nested temporaries can survive if there is no mark run between two 
    function calls with increased generation count
 
-=head1 Solution 3: Explicit root set augmentation
+=head1 SOLUTION 3: EXPLICIT ROOT SET AUGMENTATION
 
 =head2 Variant 1: Temporarily anchor objects
 
@@ -314,3 +318,4 @@ This thread also includes Juergen Boemmels Variant 3 of Solution 3
 2002-Dec-30: Initial Version by Steve Fink 2003-Aug-04: Some extra variants
 added by Juergen Boemmels
 
+=cut

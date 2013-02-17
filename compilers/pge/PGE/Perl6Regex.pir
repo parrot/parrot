@@ -1,6 +1,6 @@
 # Copyright (C) 2006-2009, Parrot Foundation.
 
-=head1 TITLE
+=head1 DESCRIPTION
 
 Perl6Regex - compiler and parser for Perl 6 regex
 

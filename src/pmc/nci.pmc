@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -116,10 +116,12 @@ Initializes the NCI with a C<NULL> function pointer.
 */
 
     VTABLE void init() {
+        UNUSED(INTERP)
         PObj_custom_mark_SET(SELF);
     }
 
     VTABLE void *get_pointer() {
+        UNUSED(INTERP)
         return PARROT_NCI(SELF)->orig_func;
     }
 
@@ -233,6 +235,7 @@ Returns whether the NCI is defined.
 */
 
     VTABLE INTVAL defined() {
+        UNUSED(INTERP)
         const Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         return nci_info->orig_func != NULL;
     }
@@ -315,6 +318,7 @@ Returns the boolean value of the pointer.
 */
 
     VTABLE INTVAL get_bool() {
+        UNUSED(INTERP)
         const Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         return (0 != (INTVAL)nci_info->orig_func);
     }

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011, Parrot Foundation.
+Copyright (C) 2011-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -165,6 +165,8 @@ In this case, always returns C<0>, indicating undetermined length.
 */
 
     VTABLE INTVAL get_integer() {
+        UNUSED(INTERP)
+        UNUSED(SELF)
         return 0;
     }
 

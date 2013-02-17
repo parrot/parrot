@@ -338,7 +338,7 @@ foreach (@hlls) {
         print "Running: '@cmd' in $dir.\n";
         system(@cmd);
     }
-    if ($update_flag) {
+    if ($update_flag && -d $_->{name}) {
         chdir $_->{name};
         my @cmd = ( @{ $update_cmd{ $_->{scm} } } );
         my $dir = getcwd();

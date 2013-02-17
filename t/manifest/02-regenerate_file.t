@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007-2010, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 # 02-regenerate_file.t
 
 use strict;
@@ -43,7 +43,8 @@ SKIP: {
             or croak "Unable to copy $f to tempdir";
         ok( -f $f, "$f found in tempdir" );
         my $need_for_file = $mani->determine_need_for_manifest($manifest_lines_ref);
-        ok( !$need_for_file, "No need to regenerate $f" );
+        ok( !$need_for_file, "No need to regenerate $f" ) or
+          diag( join("\n",keys %{$need_for_file}) );
         chdir $cwd
             or croak "Unable to change back from temporary directory after testing";
         unlink qq{$tdir/$f} or croak "Unable to delete file from tempdir";

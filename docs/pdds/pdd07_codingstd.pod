@@ -2,10 +2,6 @@
 
 =head1 PDD 7: Conventions and Guidelines for Parrot Source Code
 
-
-
-
-
 =head2 Abstract
 
 This document describes the various rules, guidelines and advice for those

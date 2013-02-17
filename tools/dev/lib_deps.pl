@@ -59,6 +59,7 @@ if ( $mode !~ /^(source|object)$/ || !@files ) {
 while (<DATA>) {
     next if /^\s*#/;
     chomp;
+    next unless $_;
     my ( $symbol, $file ) = /(\S+)\s+(\S+)/;
     $ansi_c89_symbol{$symbol} = $file unless ( $symbol eq "UNDEF" );
     push @{ $ansi_c89_header{$file} }, $symbol;
@@ -96,11 +97,11 @@ sub do_source {
     # note: need to run this a second time so the database is built.
     # should just use the build process to do it the first time.
     my $devnull = File::Spec->devnull;
-    my $cmd     = "cxref -raw -Iinclude -xref @files";
+    my $cmd     = "cxref -raw -Iinclude -Iinclude/pmc -xref @files";
     print "Running cxref (pass 1)\n";
     system("$cmd > $devnull 2>$devnull");
     print "Running cxref (pass 2)\n";
-    open( my $F, '<', "$cmd 2>$devnull|" )
+    open( my $F, '-|', "$cmd 2>$devnull|" )
         || die "Can't run $cmd.\n";
 
     my %external_calls;
@@ -214,12 +215,12 @@ sub do_source {
 
 sub do_object {
     foreach my $obj (@files) {
-        open( my $F, '<', "nm -a $obj|" ) || die "Can't run nm on $obj\n";
+        open( my $F, '-|', "nm -a $obj" ) || die "Can't run nm -a $obj\n";
 
         while (<$F>) {
             chomp;
 
-            my ( $type, $symbol ) = /^........ (\S) (.*)/;
+            my ( $type, $symbol ) = /^.+ (\S) (.*)/;
 
             if ( $type eq 'U' ) {
                 $defined_in{$symbol} ||= undef;

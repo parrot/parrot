@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -17,7 +17,6 @@ Functions related to managing the Parrot interpreter
 
 */
 
-
 #include "parrot/parrot.h"
 #include "parrot/runcore_api.h"
 #include "parrot/oplib/core_ops.h"
@@ -27,6 +26,11 @@ Functions related to managing the Parrot interpreter
 #include "pmc/pmc_parrotinterpreter.h"
 #include "parrot/has_header.h"
 #include "imcc/embed.h"
+#include "parrot/thread.h"
+
+#ifdef PARROT_HAS_HEADER_SYSUTSNAME
+#  include <sys/utsname.h>
+#endif
 
 static Interp* emergency_interp = NULL;
 
@@ -82,6 +86,9 @@ Returns a new Parrot interpreter.
 
 The first created interpreter (C<parent> is C<NULL>) is the last one
 to get destroyed.
+
+Note that subsequently created interpreters with C<parent> C<NULL>
+will use the first interpreter as parent.
 
 =cut
 
@@ -187,9 +194,17 @@ Parrot_interp_allocate_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     if (parent)
         interp->parent_interpreter = parent;
     else {
-        interp->parent_interpreter = NULL;
-        if (!emergency_interp)
+        if (!emergency_interp) {
+            interp->parent_interpreter = NULL;
             emergency_interp = interp;
+        }
+#ifdef PARROT_HAS_THREADS
+        else {
+            interp->parent_interpreter = emergency_interp;
+        }
+#else
+        interp->parent_interpreter = NULL;
+#endif
 
         PMCNULL = NULL;
     }
@@ -233,6 +248,7 @@ Parrot_Interp
 Parrot_interp_initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 {
     ASSERT_ARGS(Parrot_interp_initialize_interpreter)
+    int numthr;
 
     /* Set up the memory allocation system */
     Parrot_gc_initialize(interp, args);
@@ -315,6 +331,17 @@ Parrot_interp_initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *a
     /* setup stdio PMCs */
     Parrot_io_init(interp);
 
+    /* all sys running, init the threads, event and signal stuff */
+    if (args->numthreads)
+        numthr = Parrot_set_num_threads(interp, args->numthreads);
+    Parrot_cx_init_scheduler(interp);
+
+#ifdef PARROT_HAS_THREADS
+    interp->wake_up = 0;
+    COND_INIT(interp->sleep_cond);
+    MUTEX_INIT(interp->sleep_mutex);
+#endif
+
     /* Done. Return and be done with it */
 
     /* Okay, we've finished doing anything that might trigger GC.
@@ -323,12 +350,6 @@ Parrot_interp_initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *a
      */
     Parrot_unblock_GC_mark(interp);
     Parrot_unblock_GC_sweep(interp);
-
-    /* all sys running, init the event and signal stuff
-     * the first or "master" interpreter is handling events and signals
-     */
-
-    Parrot_cx_init_scheduler(interp);
 
 #ifdef ATEXIT_DESTROY
     /*
@@ -376,19 +397,18 @@ Parrot_interp_destroy(PARROT_INTERP)
 Waits for any threads to complete, then frees all allocated memory, and
 closes any open file handles, etc.
 
+The arguments C<exit_code> and C<arg> are currently ignored.
+
 =cut
 
 */
 
 void
-Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, SHIM(void *arg))
+Parrot_interp_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 {
     ASSERT_ARGS(Parrot_interp_really_destroy)
 
-    /* wait for threads to complete if needed; terminate the event loop */
     if (!interp->parent_interpreter) {
-        Parrot_cx_runloop_end(interp);
-
         /* Don't bother trying to provide a pir backtrace on assertion failures
          * during global destruction.  It only works in movies. */
        Parrot_interp_clear_emergency_interpreter();
@@ -404,15 +424,6 @@ Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, SHIM(void *arg))
      * handles aren't closed
      */
     Parrot_gc_completely_unblock(interp);
-
-    /* Set non buffered mode in standard out and err handles, flushing
-     * the buffers and avoiding pending output gets confused or lost in
-     * case of errors during destruction.
-     */
-    Parrot_io_setbuf(interp,
-            Parrot_io_stdhandle(interp, PIO_STDOUT_FILENO, NULL), PIOCTL_NONBUF);
-    Parrot_io_setbuf(interp,
-            Parrot_io_stdhandle(interp, PIO_STDERR_FILENO, NULL), PIOCTL_NONBUF);
 
     if (Interp_trace_TEST(interp, ~0)) {
         Parrot_io_eprintf(interp, "FileHandle objects (like stdout and stderr)"
@@ -439,16 +450,18 @@ Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, SHIM(void *arg))
      * now all objects that need timely destruction should be finalized
      * so terminate the event loop
      */
- /*   if (!interp->parent_interpreter) {
+  /*  if (!interp->parent_interpreter) {
         PIO_internal_shutdown(interp);
         Parrot_kill_event_loop(interp);
     }
   */
 
     /* we destroy all child interpreters and the last one too,
-     * if the --leak-test commandline was given */
-    if (! (interp->parent_interpreter
-    ||    Interp_flags_TEST(interp, PARROT_DESTROY_FLAG)))
+     * if the --leak-test commandline was given, and there is no
+     * pending exception. */
+    if (! (interp->parent_interpreter)
+        || (Interp_flags_TEST(interp, PARROT_DESTROY_FLAG)
+            && !PMC_IS_NULL(interp->final_exception)))
         return;
 
     if (interp->parent_interpreter)
@@ -821,6 +834,26 @@ Parrot_interp_info(PARROT_INTERP, INTVAL what)
       case CURRENT_RUNCORE:
         ret = interp->run_core->id;
         break;
+        /*
+         * sysinfo attributes go here.
+         * We may deprecate sysinfo dynop in favour of interpinfo in future,
+         * or retain both.
+         */
+      case PARROT_INTSIZE:
+        ret = sizeof (INTVAL);
+        break;
+      case PARROT_FLOATSIZE:
+        ret = sizeof (FLOATVAL);
+        break;
+      case PARROT_POINTERSIZE:
+        ret = sizeof (void *);
+        break;
+      case PARROT_INTMIN:
+        ret = PARROT_INTVAL_MIN;
+        break;
+      case PARROT_INTMAX:
+        ret = PARROT_INTVAL_MAX;
+        break;
       default:        /* or a warning only? */
         ret = -1;
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
@@ -867,7 +900,7 @@ Parrot_interp_info_p(PARROT_INTERP, INTVAL what)
         break;
       default:        /* or a warning only? */
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-                "illegal argument in Parrot_interp_info");
+                "illegal argument in Parrot_interp_info_p");
     }
 
     /* Don't send NULL values to P registers */
@@ -938,10 +971,43 @@ Parrot_interp_info_s(PARROT_INTERP, INTVAL what)
         }
         case CURRENT_RUNCORE:
             return interp->run_core->name;
+            /*
+             * sysinfo attributes go here. we may deprecate these in favour of interpinfo ops
+             * in future.
+             */
+        case PARROT_OS:
+            return Parrot_str_new_constant(interp, BUILD_OS_NAME);
+        case CPU_ARCH:
+            return Parrot_str_new_init(interp, PARROT_CPU_ARCH,
+                    sizeof (PARROT_CPU_ARCH) - 1, Parrot_ascii_encoding_ptr, 0);
+        case CPU_TYPE:
+            return Parrot_get_cpu_type(interp);
+
+#ifdef PARROT_HAS_HEADER_SYSUTSNAME
+        case PARROT_OS_VERSION:
+            {
+                struct utsname info;
+                if (uname(&info) == 0) {
+                    return Parrot_str_new_init(interp, info.version,
+                        strlen(info.version),  Parrot_ascii_encoding_ptr, 0);
+                }
+            }
+            break;
+          case PARROT_OS_VERSION_NUMBER:
+            {
+                struct utsname info;
+                if (uname(&info) == 0) {
+                    return Parrot_str_new_init(interp, info.release,
+                        strlen(info.release),  Parrot_ascii_encoding_ptr, 0);
+                }
+            }
+            break;
+#endif
       default:
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-                "illegal argument in Parrot_interp_info");
+                "illegal argument in Parrot_interp_info_s");
     }
+    return CONST_STRING(interp, ""); /* in case of errors */
 }
 
 /*

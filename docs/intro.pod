@@ -1,17 +1,17 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
 docs/intro.pod - The Parrot Primer
 
-=head1 Welcome to Parrot
+=head1 DESCRIPTION
 
 This document provides a gentle introduction to the Parrot virtual machine for
 anyone considering writing code for Parrot by hand, writing a compiler that
 targets Parrot, getting involved with Parrot development or simply wondering
 what on earth Parrot is.
 
-=head1 What is Parrot?
+=head1 WHAT IS PARROT?
 
 =head2 Virtual Machines
 
@@ -160,7 +160,7 @@ from reporting test failures, using the same method as described for reporting
 build problems.
 
 
-=head1 Some simple Parrot programs
+=head1 SOME SIMPLE PARROT PROGRAMS
 
 =head2 Hello world!
 
@@ -418,7 +418,7 @@ the extension F<.pbc>.
 
   parrot -o factorial.pbc factorial.pir
 
-=head1 Where next?
+=head1 WHERE NEXT?
 
 =head2 Documentation
 

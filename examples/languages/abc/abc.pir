@@ -1,10 +1,10 @@
-# Copyright (C) 2006-2009, Parrot Foundation.
+# Copyright (C) 2006-2012, Parrot Foundation.
 
 =head1 TITLE
 
 abc.pir - A basic calculator.
 
-=head2 Description
+=head1 DESCRIPTION
 
 This is the base file for the basic calculator.
 

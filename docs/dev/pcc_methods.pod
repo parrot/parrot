@@ -1,8 +1,13 @@
-# Copyright (C) 2007-2011, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
 =head1 NAME
 
 docs/dev/pcc_methods.pod - Parrot Calling Conventions in C
+
+=head1 DESCRIPTION
+
+This document address issues relating to C<PCCMETHOD> and the Parrot
+Calling Conventions.
 
 =head1 OVERVIEW
 

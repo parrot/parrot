@@ -1,16 +1,14 @@
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
 =head1 NAME
 
 docs/dev/debugging_with_msvc.pod - Debugging Parrot with Microsoft
 Visual C++
 
-=head1 ABSTRACT
+=head1 DESCRIPTION
 
 This document describes how to get started with debugging on Microsoft
 Windows using Visual C++ 7 and later.
-
-=head1 DESCRIPTION
 
 =head2 Compiler Options
 

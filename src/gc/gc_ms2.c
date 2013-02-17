@@ -7,6 +7,8 @@ src/gc/gc_ms2.c - Non-recursive M&S
 
 =head1 DESCRIPTION
 
+This program implements a non-recursive M&S garbage collection.
+
 =cut
 
 */
@@ -627,11 +629,7 @@ Parrot_gc_ms2_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 
     interp->gc_sys->get_gc_info             = gc_ms2_get_gc_info;
 
-    if (interp->parent_interpreter && interp->parent_interpreter->gc_sys) {
-        /* This is a "child" interpreter. Just reuse parent one */
-        self = (MarkSweep_GC*)interp->parent_interpreter->gc_sys->gc_private;
-    }
-    else {
+    {
         self = mem_internal_allocate_zeroed_typed(MarkSweep_GC);
 
         self->pmc_allocator = Parrot_gc_pool_new(interp,

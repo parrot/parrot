@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -48,7 +48,10 @@ Initializes the library with a C<NULL> oplib init function.
 
 */
 
-    VTABLE void init() {}
+    VTABLE void init() {
+        UNUSED(INTERP)
+        UNUSED(SELF)
+    }
 
 /*
 
@@ -61,6 +64,7 @@ Destroys the library, closing the shared library.
 */
 
     VTABLE void destroy() {
+        UNUSED(INTERP)
         void *dl_handle = PMC_dlhandle(SELF);
         if (dl_handle)
             Parrot_dlclose(dl_handle);
@@ -105,6 +109,7 @@ Returns whether a library has been successfully loaded.
 */
 
     VTABLE INTVAL get_bool() {
+        UNUSED(INTERP)
         return (PMC_dlhandle(SELF) != NULL);
     }
 
@@ -136,6 +141,7 @@ Gets the pointer to the shared library handle.
 */
 
     VTABLE void *get_pointer() {
+        UNUSED(INTERP)
         return PMC_dlhandle(SELF);
     }
 
@@ -150,6 +156,7 @@ Sets the pointer to the shared library handle.
 */
 
     VTABLE void set_pointer(void *handle) {
+        UNUSED(INTERP)
         PMC_dlhandle(SELF) = handle;
         PObj_custom_destroy_SET(SELF);
     }
