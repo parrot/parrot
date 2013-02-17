@@ -15,21 +15,19 @@ pmclass Foo dynpmc group foo_group provides scalar extends Integer auto_attrs {
         return 42;
     }
 
-    MULTI PMC* subtract(Integer value, PMC *dest) {
-        UNUSED(value)
+    VTABLE PMC *subtract(PMC *value, PMC *dest) {
         if (!dest)
             dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
-        VTABLE_set_integer_native(INTERP, dest, 144);
+        switch (value->vtable->base_type) {
+            case enum_class_Integer:
+                VTABLE_set_integer_native(INTERP, dest, 144);
+                break;
+            default:
+                VTABLE_set_integer_native(INTERP, dest, 244);
+        }
         return dest;
     }
 
-    MULTI PMC* subtract(DEFAULT value, PMC *dest) {
-        UNUSED(value)
-        if (!dest)
-            dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
-        VTABLE_set_integer_native(INTERP, dest, 244);
-        return dest;
-    }
 }
 
 

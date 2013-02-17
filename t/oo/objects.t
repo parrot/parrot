@@ -20,7 +20,7 @@ Tests the object/class subsystem.
     .include "iglobals.pasm"
     .include "interpinfo.pasm"
 
-    plan(191)
+    plan(192)
 
     get_classname_from_class()
     test_get_class()
@@ -523,7 +523,7 @@ l1:
 
 .namespace ["MyInt1"]
 
-.sub add :multi(MyInt1, MyInt1, MyInt1)
+.sub add :vtable
     .param pmc self
     .param pmc right
     .param pmc dest
@@ -804,6 +804,18 @@ l1:
    .return ($S0)
 .end
 
+.sub multiply :vtable
+    .param pmc self
+    .param pmc right
+    .param pmc dest
+    $P0 = getattribute self, ['Integer'], "proxy"
+    $I0 = $P0
+    $I1 = right
+    $I2 = $I0 * $I1
+    dest = $I2
+    .return(dest)
+.end
+
 .namespace []       # Reset to root namespace for next test
 
 .sub PMC_as_classes__derived_1
@@ -1056,6 +1068,22 @@ l1:
     set $S0, a
     is( $S0, '1', 'multiply and reassign to subclassed Integer is 1' )
 .end
+
+.namespace ["LispInteger1"]
+
+.sub multiply :vtable
+    .param pmc self
+    .param pmc right
+    .param pmc dest
+    $P0 = getattribute self, ['Integer'], "proxy"
+    $I0 = $P0
+    $I1 = right
+    $I2 = $I0 * $I1
+    dest = $I2
+    .return(dest)
+.end
+
+.namespace []       # Reset to root namespace for next test
 
 .sub equality_of_subclassed_Integer
   .local pmc class

@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 47;
+use Parrot::Test tests => 43;
 
 =head1 NAME
 
@@ -692,40 +692,6 @@ Any    42
 Any    43
 OUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "add as function - Int, Float" );
-.sub main :main
-    .local pmc d, l, r, a
-    d = new ['Integer']
-    l = new ['Integer']
-    r = new ['Float']
-    l = 3
-    r = 39.42
-    a = get_root_global ["MULTI"], "add"
-    d = a(l, r, d)
-    print d
-    print "\n"
-    end
-.end
-CODE
-42.42
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "add as method" );
-.sub main :main
-    .local pmc d, l, r
-    l = new ['Integer']
-    r = new ['Integer']
-    l = 3
-    r = 39
-    d = l."add"(r, d)
-    print d
-    print "\n"
-    end
-.end
-CODE
-42
-OUTPUT
-
 pir_output_is( <<'CODE', <<'OUTPUT', "add as method - inherited", todo => 'GH #328' );
 .sub main :main
     .local pmc d, l, r
@@ -738,40 +704,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "add as method - inherited", todo => 'GH #3
     d = l."add"(r, d)
     print d
     print "\n"
-.end
-CODE
-42
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "add as method - Int, Float" );
-.sub main :main
-    .local pmc d, l, r
-    l = new ['Integer']
-    r = new ['Float']
-    l = 3
-    r = 39.42
-    d = l."add"(r, d)
-    print d
-    print "\n"
-    end
-.end
-CODE
-42.42
-OUTPUT
-
-pir_output_is( <<'CODE', <<'OUTPUT', "bound add method" );
-.sub main :main
-    .local pmc d, l, r, m
-    d = new ['Integer']
-    l = new ['Integer']
-    r = new ['Integer']
-    l = 3
-    r = 39
-    m = get_global ['Integer'], "add"
-    d = m(r, l, d)
-    print d
-    print "\n"
-    end
 .end
 CODE
 42
@@ -790,13 +722,33 @@ pir_output_is( <<'CODE', <<'OUTPUT', "Integer subclasses" );
     print "\n"
     print r
     print "\n"
-    # dispatches to Parrot_Integer_add_Integer
     add d, l, r
     print d
     print "\n"
     add l, r
     print l
     print "\n"
+.end
+
+.namespace ["AInt"]
+.sub add :vtable
+    .param pmc r
+    .param pmc d :optional
+    .param int have_d :opt_flag
+
+    .local pmc new_d
+    $I1 = self
+    $I2 = r
+
+    $I0 = $I1 + $I2
+
+    if have_d goto trivalent
+        new_d = new ['AInt']
+        new_d = $I0
+        .return(new_d)
+    trivalent:
+        d = $I0
+        .return(d)
 .end
 
 CODE
