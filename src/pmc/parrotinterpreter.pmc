@@ -647,19 +647,17 @@ have the same thread id.
 
 */
 
-    MULTI INTVAL is_equal(ParrotInterpreter val) {
-        UNUSED(INTERP)
-        Parrot_Interp self  = PMC_interp(SELF);
-        Parrot_Interp other = PMC_interp(val);
-        return self == other;
-    }
-
-    MULTI INTVAL is_equal(DEFAULT value) {
-        UNUSED(SELF)
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
-                EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-                "ParrotInterpreter: no multiple dispatch variant 'is_equal' for %Ss",
-                VTABLE_name(INTERP, value));
+    VTABLE INTVAL is_equal(PMC *val) {
+        if (val->vtable->base_type == enum_class_ParrotInterpreter) {
+            Parrot_Interp self  = PMC_interp(SELF);
+            Parrot_Interp other = PMC_interp(val);
+            return self == other;
+        } else {
+            Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
+                    "ParrotInterpreter: no multiple dispatch variant 'is_equal' for %Ss",
+                    VTABLE_name(INTERP, val));
+        }
     }
 
 /*
