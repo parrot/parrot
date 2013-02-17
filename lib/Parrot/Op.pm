@@ -363,12 +363,6 @@ sub source {
 
     my $flags = $self->flags;
 
-    if (exists($$flags{pic})
-        && !( ref($trans) eq 'Parrot::OpTrans::CGP' || ref($trans) eq 'Parrot::OpTrans::CSwitch' ) )
-    {
-        return qq{PANIC(interp, "How did you do that");\n};
-    }
-
     return $self->rewrite_body( $self->body, $trans );
 }
 
