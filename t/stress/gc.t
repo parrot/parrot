@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2003, Parrot Foundation.
+# Copyright (C) 2001-2013, Parrot Foundation.
 
 =head1 NAME
 
@@ -19,7 +19,7 @@ use strict;
 use warnings;
 
 use lib qw(lib . ../lib ../../lib);
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 3;
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 
@@ -31,6 +31,50 @@ pasm_output_is( <<'CODE', <<'OUTPUT', "arraystress" );
 CODE
 starting
 ending
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "GC stress" );
+.sub 'main' :main
+    .param pmc args
+
+    $I0 = 0
+    .local int N
+    N = args[1]
+    if N <= 0 goto loop
+      N = 10000
+
+  loop:
+    unless $I0 < N goto done
+    $P0 = new ['ResizablePMCArray']
+    inc $I0
+    goto loop
+  done:
+.end
+CODE
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "GC subs" );
+.sub 'main' :main
+    .param pmc args
+
+    $I0 = 0
+    .local int N
+    N = args[1]
+    if N <= 0 goto loop
+      N = 10000
+
+  loop:
+    unless $I0 < N goto done
+    'no-op'()
+    inc $I0
+    goto loop
+  done:
+.end
+
+.sub 'no-op'
+    noop
+.end
+CODE
 OUTPUT
 
 1;
