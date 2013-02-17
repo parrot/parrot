@@ -44,7 +44,6 @@ sub defines {
     return <<END;
 
 /* defines - $0 -> $type */
-#undef CONST
 #define REL_PC     ((size_t)(cur_opcode - (opcode_t *)interp->code->base.data))
 #define CUR_OPCODE cur_opcode
 #define IREG(i) REG_INT(interp, cur_opcode[i])
@@ -108,7 +107,7 @@ our %arg_maps = (
     'ki' => "IREG(%ld)",
 
     'ic'  => "cur_opcode[%ld]",
-    'nc'  => "CONST(%ld)->u.number",
+    'nc'  => "NCONST(%ld)",
     'pc'  => "CONST(%ld)->u.key",
     'sc'  => "CONST(%ld)->u.string",
     'kc'  => "CONST(%ld)->u.key",

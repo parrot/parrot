@@ -200,7 +200,7 @@ sub new {
 
     my ( $op_info, $op_func, $getop );
     $op_info = $op_func = 'NULL';
-    $getop = 'NULL';
+    $getop = 'get_op';
 
     if ($self->{suffix} eq '') {
         $op_func = $self->{bs} . "op_func_table";
@@ -814,7 +814,7 @@ END_C
 sub _op_lookup {
     my ( $self, $fh ) = @_;
 
-    if ( $self->{suffix} eq '' && !$self->{flag}->{dynamic} ) {
+    if ( $self->{suffix} eq '' ) {
         my $hash_size = 3041;
         my $tot       = $self->{index} + scalar keys( %{ $self->{names} } );
         if ( $hash_size < $tot * 1.2 ) {
@@ -822,14 +822,11 @@ sub _op_lookup {
                 . "to a prime number > ", $tot * 1.2, "\n";
         }
         print $fh <<END_C;
-
 /*
 ** Op lookup function:
 */
 
-#define NUM_OPS $self->{num_ops}
-
-#define OP_HASH_SIZE $hash_size
+#define OP_HASH_SIZE 3041
 
 /* we could calculate a prime somewhat bigger than
  * n of fullnames + n of names
@@ -845,11 +842,13 @@ typedef struct hop {
     op_info_t * info;
     struct hop *next;
 } HOP;
+
+static HOP *hop_buckets;
 static HOP **hop;
 
 static void hop_init(PARROT_INTERP);
-static size_t hash_str(ARGIN_NULLOK(const char *str));
-static void store_op(PARROT_INTERP, ARGIN(op_info_t *info), int full);
+static size_t hash_str(ARGIN(const char *str));
+static void store_op(ARGIN(op_info_t *info), ARGMOD(HOP *p), ARGIN(const char *name));
 
 /* XXX on changing interpreters, this should be called,
    through a hook */
@@ -865,8 +864,9 @@ static void hop_deinit(PARROT_INTERP);
  *
  * returns >= 0 (found idx into info_table), -1 if not
  */
-
-static size_t hash_str(ARGIN_NULLOK(const char *str))
+PARROT_PURE_FUNCTION
+static
+size_t hash_str(ARGIN(const char *str))
 {
     size_t      key = 0;
     const char *s   = str;
@@ -879,24 +879,23 @@ static size_t hash_str(ARGIN_NULLOK(const char *str))
     return key;
 }
 
-static void store_op(PARROT_INTERP, ARGIN(op_info_t *info), int full)
-{
-    HOP * const p     = mem_gc_allocate_typed(interp, HOP);
-    const size_t hidx =
-        hash_str(full ? info->full_name : info->name) % OP_HASH_SIZE;
 
-    p->info   = info;
-    p->next   = hop[hidx];
-    hop[hidx] = p;
+static void store_op(ARGIN(op_info_t *info), ARGMOD(HOP *p), ARGIN(const char *name))
+{
+    const size_t hidx = hash_str(name) % OP_HASH_SIZE;
+
+    p->info           = info;
+    p->next           = hop[hidx];
+    hop[hidx]         = p;
 }
 
-static int get_op(PARROT_INTERP, const char * name, int full) {
-    const HOP *p;
-
+static int get_op(PARROT_INTERP, ARGIN(const char *name), int full)
+{
+    const HOP   *p;
     const size_t hidx = hash_str(name) % OP_HASH_SIZE;
 
     if (!hop) {
-        hop = mem_gc_allocate_n_zeroed_typed(interp, OP_HASH_SIZE, HOP *);
+        hop = mem_gc_allocate_n_zeroed_typed(interp, OP_HASH_SIZE,HOP *);
         hop_init(interp);
     }
 
@@ -908,38 +907,40 @@ static int get_op(PARROT_INTERP, const char * name, int full) {
     return -1;
 }
 
+
 static void hop_init(PARROT_INTERP)
 {
-    size_t i;
     op_info_t * const info = $self->{bs}op_lib.op_info_table;
+    opcode_t i;
+
+    /* allocate the storage all in one chunk
+     * yes, this is profligate, but we can tighten it later */
+    HOP *hops;
+
+    hop_buckets = mem_gc_allocate_n_zeroed_typed(interp, $self->{bs}op_lib.op_count * 2, HOP );
+    hops        = hop_buckets;
+
 
     /* store full names */
-    for (i = 0; i < $self->{bs}op_lib.op_count; i++)
-        store_op(interp, info + i, 1);
+    for (i = 0; i < $self->{bs}op_lib.op_count; i++) {
+        store_op(info + i, hops++, info[i].full_name);
 
-    /* plus one short name */
-    for (i = 0; i < $self->{bs}op_lib.op_count; i++)
-        if (get_op(interp, info[i].name, 0) == -1)
-            store_op(interp, info + i, 0);
+        /* plus one short name */
+        if (i && info[i - 1].name != info[i].name)
+            store_op(info + i, hops++, info[i].name);
+    }
 }
 
 static void hop_deinit(PARROT_INTERP)
 {
-    if (hop) {
-        size_t i;
-        for (i = 0; i < OP_HASH_SIZE; i++) {
-            HOP *p = hop[i];
-            while (p) {
-                HOP * const next = p->next;
-                mem_gc_free(interp, p);
-                p = next;
-            }
-        }
+    if (hop)
         mem_sys_free(hop);
-        hop = NULL;
-    }
-}
+    if (hop_buckets)
+        mem_gc_free(interp, hop_buckets);
 
+    hop         = NULL;
+    hop_buckets = NULL;
+}
 END_C
     }
     else {
@@ -962,17 +963,16 @@ sub _print_op_lib_descriptor {
 
 /* XXX should be static, but C++ doesn't want to play ball */
 op_lib_t $self->{bs}op_lib = {
-  "$self->{base}",               /* name */
-  "$self->{suffix}",             /* suffix */
+  "$self->{base}_ops",                /* name */
+  "$self->{suffix}",                  /* suffix */
   $core_type,                       /* core_type = PARROT_XX_CORE */
   0,                                /* flags */
-  $self->{versions}->{major},    /* major_version */
-  $self->{versions}->{minor},    /* minor_version */
-  $self->{versions}->{patch},    /* patch_version */
-  $self->{num_ops},              /* op_count */
-  $self->{op_info},              /* op_info_table */
-  $self->{op_func},              /* op_func_table */
-  $self->{getop}                 /* op_code() */
+  PARROT_PBC_MAJOR,
+  PARROT_PBC_MINOR,
+  $self->{num_ops},             /* op_count */
+  $self->{op_info},       /* op_info_table */
+  $self->{op_func},       /* op_func_table */
+  $self->{getop}          /* op_code() */ 
 };
 
 END_C
