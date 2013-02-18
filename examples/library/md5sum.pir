@@ -23,7 +23,6 @@ Leopold Toetsch    - <lt@toetsch.at>
 
 =cut
 
-.loadlib 'os'       # OS object
 
 .sub _main :main
     .param pmc args

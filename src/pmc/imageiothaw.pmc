@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2011, Parrot Foundation.
+Copyright (C) 2010-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -199,6 +199,8 @@ Get the visit action.
 */
 
     VTABLE INTVAL get_integer() {
+        UNUSED(INTERP)
+        UNUSED(SELF)
         return VISIT_THAW_NORMAL;
     }
 
@@ -214,6 +216,7 @@ Set an exterior constant table to use for cross-referencing constants.
 */
 
     VTABLE void set_pointer(void *value) {
+        UNUSED(INTERP)
         PObj_flag_SET(private1, SELF);
         PARROT_IMAGEIOTHAW(SELF)->pf_ct = (PackFile_ConstTable *)value;
     }
@@ -253,9 +256,9 @@ Retrieve a float as the next item from the image.
 */
 
     VTABLE FLOATVAL shift_float() {
-        PackFile * const pf = PARROT_IMAGEIOTHAW(SELF)->pf;
-        const opcode_t *curs           = PARROT_IMAGEIOTHAW(SELF)->curs;
-        const FLOATVAL f = PF_fetch_number(pf, &curs);
+        PackFile * const pf  = PARROT_IMAGEIOTHAW(SELF)->pf;
+        const opcode_t *curs = PARROT_IMAGEIOTHAW(SELF)->curs;
+        const FLOATVAL f     = PF_fetch_number(pf, &curs);
         DECL_CONST_CAST;
         PARROT_IMAGEIOTHAW(SELF)->curs = PARROT_const_cast(opcode_t *, curs);
         BYTECODE_SHIFT_OK(INTERP, SELF);

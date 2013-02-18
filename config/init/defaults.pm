@@ -214,7 +214,8 @@ sub runstep {
 
         # for Borland C
         ar_extra      => '',
-        ranlib        => $Config{ranlib},
+        # rem is an invalid command for dmake
+        ranlib        => $Config{ranlib} eq 'rem' ? 'echo' : $Config{ranlib},
         rpath         => '',
         make          => $Config{make},
         make_set_make => $Config{make_set_make},

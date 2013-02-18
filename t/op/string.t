@@ -1283,19 +1283,34 @@ WHILE:
     local_branch $P4, NEWARYI
     local_branch $P4, PRINTF
 
+    load_bytecode 'config.pbc'
+    .local pmc config
+    .local string osname, gccversion
+    config = _config()
+    osname = config['osname']
+    gccversion = config['gccversion']
+    ne osname, 'MSWin32', nomingw
+    eq gccversion, '', nomingw
+    goto mingw
+  nomingw:
     set $S1, "1 == %+vu"
     set $I0, 1
     set $S99, "1 == 1"
     local_branch $P4, NEWARYI
     local_branch $P4, PRINTF
 
-    set $S1, "001 == %0.3u"
+    set $S1, "001 == %+0.3u"
     set $I0, 1
     set $S99, "001 == 001"
     local_branch $P4, NEWARYI
     local_branch $P4, PRINTF
+    goto nomingw2
 
-    set $S1, "001 == %+0.3u"
+  mingw:
+    say "196 # skip [GH #823] %+vu on mingw"
+    say "197 # skip [GH #823] %+0.3u on mingw"
+  nomingw2:
+    set $S1, "001 == %0.3u"
     set $I0, 1
     set $S99, "001 == 001"
     local_branch $P4, NEWARYI

@@ -296,6 +296,18 @@ tag C<all> is allowed for todo tests that should fail on any system.
     todo_info[153] = '%hf should be rejected'
     todo_info[187] = '%h alone is invalid'
     todo_info[191] = '%l alone is invalid'
+
+    # [GH #832] %+u fails on mingw only
+    load_bytecode 'config.pbc'
+    $P1 = _config()
+    .local string osname, gccversion
+    osname = $P1['osname']
+    gccversion = $P1['gccversion']
+    ne osname, 'MSWin32', mingw
+    eq gccversion, '', mingw
+    todo_info[217] = '%+u prints + on mingw [GH #832]'
+
+  mingw:
     todo_info[223] = '%v alone is invalid, but a valid parrot extension'
     todo_info[304] = 'undecided'
     todo_info[305] = 'undecided'

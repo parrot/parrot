@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2012, Parrot Foundation.
+# Copyright (C) 2004-2013, Parrot Foundation.
 
 =head1 NAME
 
@@ -34,6 +34,7 @@ use Parrot::Pmc2c::UtilFunctions qw(
     gen_multi_name
 );
 use Parrot::Pmc2c::PMC::RO ();
+use Parrot::BuildUtil;
 
 sub create {
     my ( $this, $pmc_classname ) = @_;
@@ -70,8 +71,9 @@ sub dump {
 
     # gen_parent_lookup_info( $self, $pmc2cMain, $pmcs );
     # gen_parent_reverse_lookup_info( $self, $pmcs, $vtable_dump );
-
-    Storable::nstore( $self, $self->filename('.dump') );
+    my $filename = $self->filename('.dump');
+    Storable::nstore( $self, $filename );
+    add_to_generated( $filename, "[devel]", "src") unless $self->is_dynamic;
 }
 
 # methods
@@ -472,17 +474,21 @@ sub prep_for_emit {
 
 sub generate {
     my ($self) = @_;
-    my $c_emitter = $self->{emitter} =
-        Parrot::Pmc2c::Emitter->new( $self->filename(".c") );
 
+    my $c_file = $self->filename(".c");
+    my $c_emitter = $self->{emitter} =
+        Parrot::Pmc2c::Emitter->new( $c_file );
     $self->generate_c_file;
     $c_emitter->write_to_file;
+    # add_to_generated($c_file, "[]", "");
 
+    my $h_file = $self->filename(".h", $self->is_dynamic);
     my $h_emitter = $self->{emitter} =
-        Parrot::Pmc2c::Emitter->new( $self->filename(".h", $self->is_dynamic) );
-
+        Parrot::Pmc2c::Emitter->new( $h_file );
     $self->generate_h_file;
     $h_emitter->write_to_file;
+    #add_to_generated($h_file, "[devel]", "include")
+    #  unless $self->is_dynamic and $self->name =~ /^(foo|foo2|rotest|pccmethod_test)$/;
 }
 
 =over 4
@@ -499,7 +505,9 @@ sub generate_c_file {
 
     $c->emit( dont_edit( $self->filename ) );
     if ($self->is_dynamic) {
+        my $uc_name = uc $self->name;
         $c->emit("#define PARROT_IN_EXTENSION\n");
+        $c->emit("#define PARROT_DYNPMC_CLASS_LOAD\n");
         $c->emit("#define CONST_STRING(i, s) Parrot_str_new_constant((i), s)\n");
         $c->emit("#define CONST_STRING_GEN(i, s) Parrot_str_new_constant((i), s)\n");
     }
@@ -509,6 +517,7 @@ sub generate_c_file {
     # The PCC code needs Continuation-related macros from these headers.
     $c->emit("#include \"pmc_continuation.h\"\n");
     $c->emit("#include \"pmc_callcontext.h\"\n");
+    $c->emit("#undef PARROT_DYNPMC_CLASS_LOAD\n") if $self->is_dynamic;
 
     $c->emit( $self->preamble );
 
@@ -545,6 +554,7 @@ sub generate_h_file {
     my ($self)  = @_;
     my $h       = $self->{emitter};
     my $uc_name = uc $self->name;
+    my $lc_name = lc $self->name;
     my $name    = $self->name;
 
     $h->emit( dont_edit( $self->filename ) );
@@ -577,8 +587,19 @@ EOH
     $h->emit("${export}PMC*    Parrot_${name}_get_mro(PARROT_INTERP, ARGMOD(PMC* mro));\n");
     $h->emit("${export}Hash*   Parrot_${name}_get_isa(PARROT_INTERP, ARGMOD_NULLOK(Hash* isa));\n");
 
-
     $self->gen_attributes;
+
+    if ($self->is_dynamic) {
+        $h->emit(<<"EOH");
+
+${export}Parrot_PMC Parrot_lib_${lc_name}_load(PARROT_INTERP);
+
+#ifndef PARROT_DYNPMC_CLASS_LOAD
+PARROT_DATA INTVAL dynpmc_class_${name};
+#endif
+EOH
+    }
+
     $h->emit(<<"EOH");
 
 #endif /* PARROT_PMC_${uc_name}_H_GUARD */
@@ -623,16 +644,15 @@ sub hdecls {
 
     $export = $self->is_dynamic ? 'PARROT_DYNEXT_EXPORT ' : 'PARROT_EXPORT ';
 
-    $hout .= "${export}VTABLE* Parrot_${lc_name}_update_vtable(ARGMOD(VTABLE*));\n"
+    $hout .= "${export}VTABLE* Parrot_${name}_update_vtable(ARGMOD(VTABLE*));\n"
         unless $name eq 'default';
 
-    $hout .= "${export}VTABLE* Parrot_${lc_name}_get_vtable(PARROT_INTERP);\n";
+    $hout .= "${export}VTABLE* Parrot_${name}_get_vtable(PARROT_INTERP);\n";
 
-    $hout .= "${export}VTABLE* Parrot_${lc_name}_get_vtable_pointer(PARROT_INTERP);\n"
+    $hout .= "${export}VTABLE* Parrot_${name}_get_vtable_pointer(PARROT_INTERP);\n"
         if ($self->is_dynamic);
 
     $self->{hdecls} .= $hout;
-
     return $self->{hdecls};
 }
 
@@ -722,6 +742,9 @@ sub post_method_gen {
 
         # Skip methods with manual WBs.
         next if $self->vtable_method_has_manual_wb($name);
+
+        # Skip unimplemented methods
+        next if $self->unimplemented_vtable($name);
 
         $method = $self->get_method($name);
 
@@ -1216,6 +1239,7 @@ EOC
         }
     } /* pass */
 } /* Parrot_${classname}_class_init */
+
 EOC
 
     if ( $self->is_dynamic ) {
@@ -1849,6 +1873,18 @@ EOA
     } while (0)
 
 EOA
+
+    #my $assertion = ($attrtype =~ $isptrtopmc and not $isfuncptr)
+    #    ? 'PARROT_ASSERT_INTERP((PMC *)(value), interp);'
+    #    : '';
+    #$decl .= <<"EOA";
+    #    } \\
+    #    else {\\
+    #        $assertion \\
+    #        ((Parrot_${pmcname}_attributes *)PMC_data(pmc))->$attrname = (value); \\
+    #    } \\
+    #} while (0)
+#EOA
 
     $attribute->{inherit} = $inherit;
 

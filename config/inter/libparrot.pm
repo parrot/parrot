@@ -43,16 +43,19 @@ sub runstep {
     $parrot_is_shared = 0 unless $conf->data->get('has_dynamic_linking');
 
     # Parrot can't necessarily handle a pre-existing installed shared
-    # libparrot.so. At this point, we don't know the actual name
-    # of the shared parrot library. So we try some candidates.
+    # libparrot.so without rpath.
+    # At this point, we don't know the actual name of the shared parrot
+    # library. So we try some candidates.
     my @libs = get_libs();
     my @libpaths = get_libpaths($conf);
-    foreach my $f (@libs) {
-        foreach my $d (@libpaths) {
-            my $oldversion = File::Spec->catfile($d, $f);
-            if (-e $oldversion) {
-                warn("\nWarning: Building a shared parrot library may conflict " .
-                     "with your previously-installed $oldversion\n");
+    if ($disable_rpath or !$conf->data->get('rpath')) {
+        foreach my $f (@libs) {
+            foreach my $d (@libpaths) {
+                my $oldversion = File::Spec->catfile($d, $f);
+                if (-e $oldversion) {
+                    warn("\nWarning: Building a shared parrot library may conflict " .
+                         "with your previously-installed $oldversion\n");
+                }
             }
         }
     }
@@ -133,9 +136,9 @@ sub runstep {
     # This version uses the installed -lparrot.
     unless ( defined( $conf->data->get('inst_libparrot_linkflags') ) ) {
         $conf->data->set(inst_libparrot_linkflags =>
-        '-L'
+        '-L"'
         . $conf->data->get('libdir')
-        . ' -lparrot'
+        . '" -lparrot'
         );
     }
 

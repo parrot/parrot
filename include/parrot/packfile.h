@@ -236,7 +236,7 @@ typedef struct PackFile_Debug {
 #define ANN_ENTRY_OFF 0
 #define ANN_ENTRY_VAL 1
 
-/* &gen_from_def(packfile_annotation_key_type.pir) */
+/* &gen_from_def(packfile_annotation_keytype.pasm) */
 
 /* Key types for annotation segment. */
 typedef enum {
@@ -497,7 +497,7 @@ PARROT_EXPORT
 void do_sub_pragmas(PARROT_INTERP,
     ARGIN(PMC *pfpmc),
     pbc_action_enum_t action,
-    ARGIN_NULLOK(PMC *eval_pmc))
+    PMC *eval_pmc)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -347,6 +347,7 @@ Delete the element at index C<key>.
     }
 
     VTABLE void delete_keyed_int(INTVAL key) {
+        UNUSED(INTERP)
         PMC ** const data = PMC_array(SELF);
         const INTVAL  n   = PMC_size(SELF);
         INTVAL  i;
@@ -369,6 +370,7 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
 
 */
     VTABLE INTVAL exists_keyed_int(INTVAL key) {
+        UNUSED(INTERP)
         PMC **data;
 
         if (key < 0)

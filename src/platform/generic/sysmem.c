@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010, Parrot Foundation.
+ * Copyright (C) 2010-2013, Parrot Foundation.
  */
 
 /*
@@ -40,6 +40,8 @@ Get system memory information.
 
 Get information about available physical memory.
 
+Returns available physical memory in bytes.
+
 =cut
 
 */
@@ -59,6 +61,7 @@ Parrot_sysmem_amount(PARROT_INTERP)
     size_t        memsize = 0;
 
 #if defined(_SC_PAGESIZE) && defined(_SC_AVPHYS_PAGES)
+    UNUSED(interp);
     /* Method 1:  sysconf().
      * Works on Linux and Solaris, and probably other SVR4-related systems.
      * This should really check for #ifdef HAS_SYSCONF, but Configure
@@ -66,7 +69,8 @@ Parrot_sysmem_amount(PARROT_INTERP)
      */
     memsize = sysconf(_SC_PHYS_PAGES) * sysconf(_SC_PAGESIZE);
 
-#elif defined(PARROT_HAS_HEADER_SYSSYSCTL) && defined(CTL_HW) && defined(HW_PHYSMEM)
+#elif defined(PARROT_HAS_HEADER_SYSSYSCTL) && defined(CTL_HW) && \
+    (defined(HW_MEMSIZE) || defined(HW_PHYSMEM))
 
     /* Method 2:  sysctl().  Works on BSD-derived systems.  Darwin is
      * slightly different, and has its own implementation.
@@ -74,10 +78,16 @@ Parrot_sysmem_amount(PARROT_INTERP)
      * the header sys/sysctl.h and the appropriate constants.
      */
 
+#  if defined(HW_MEMSIZE)
+    int memchk = HW_MEMSIZE; /* uint64_t: >2G RAM */
+#  elif defined(HW_PHYSMEM)
+    int memchk = HW_PHYSMEM; /* sint32_t: max 2G RAM only */
+#  endif
+
     int err;
     size_t length = sizeof (memsize);
 
-    int selection[2] = { CTL_HW, HW_PHYSMEM };
+    int selection[2] = { CTL_HW, memchk };
 
     err = sysctl(selection, 2, &memsize, &length, NULL, 0);
 
@@ -88,6 +98,7 @@ Parrot_sysmem_amount(PARROT_INTERP)
     }
 
 #else
+    UNUSED(interp);
     /* Method 3:  Random guess.  Simply guess 512 MB.  This way, parrot
      * will at least build.  Arguably, one could also just put an error
      * here and instruct the user to fix it manually.

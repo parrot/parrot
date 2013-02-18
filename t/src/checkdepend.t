@@ -1,6 +1,6 @@
 #! perl
 
-# Copyright (C) 2009-2010, Parrot Foundation.
+# Copyright (C) 2009-2012, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -60,9 +60,9 @@ foreach my $file (sort grep /\.[hc]$/, @incfiles) {
     # skip pmcs - we don't handle inheritance correctly
     next if $file =~ m{^src/(?:dyn)?pmc/};
     next if ($file eq 'src/nci/core_thunks.c' and
-        ! defined $Parrot::Config::PConfig_Temp{PARROT_HAS_CORE_NCI_THUNKS});
+        ! defined $Parrot::Config::PConfig{PARROT_HAS_CORE_NCI_THUNKS});
     next if ($file eq 'src/nci/extra_thunks.c' and
-        ! defined $Parrot::Config::PConfig_Temp{PARROT_HAS_EXTRA_NCI_THUNKS});
+        ! defined $Parrot::Config::PConfig{PARROT_HAS_EXTRA_NCI_THUNKS});
 
     open my $fh, '<', $file;
     my $guts;
@@ -98,8 +98,14 @@ foreach my $file (sort grep /\.[hc]$/, @incfiles) {
             }
         }
 
-        diag "couldn't find $include, included from $file"
-           unless $found;
+        # skip bogus warnings
+        if (!$found
+            and ($file ne 'src/gc/malloc.c' or $include ne '/usr/include/malloc.h'
+                 or defined $Parrot::Config::PConfig{HAVE_USR_INCLUDE_MALLOC_H})
+            and ($file ne 'src/glut_nci_thunks.c' or $include ne 'glut_nci_thunks.str'))
+        {
+            diag "couldn't find $include, included from $file";
+        }
     }
     # always require an explicit .o -> .c dep. This is lazy and not always
     # needed. However, missing it when it is needed causes pain.
@@ -209,11 +215,12 @@ sub check_files {
         my ($active_makefile, $active_line_num);
         my $rule = $file;
         $rule =~ s/$src_ext$//;
+        $rule =~ s{/}{\\}g if $^O eq 'MSWin32';
 
         #find the applicable rule for this file
         my $rule_deps = '';
         for (@$rules) {
-            if ($_->{line} =~ /^$rule$obj_ext\s*:\s*(.*)\s*$/) {
+            if ($_->{line} =~ m{^\Q$rule$obj_ext\E\s*:\s*(.*)\s*$}) {
                 $rule_deps = $1;
                 $active_makefile = $_->{filename};
                 $active_line_num = $_->{line_num};
@@ -227,6 +234,7 @@ sub check_files {
         }
 
         my @rule_deps     = split /\s+/, $rule_deps;
+        @rule_deps  = grep {s{\\}{/}g} @rule_deps if  $^O eq 'MSWin32';
         my @expected_deps = (get_deps($file));
 
         is_list_same(\@rule_deps, \@expected_deps, "$file $extra_info.");
@@ -242,27 +250,28 @@ sub collapse_path {
     # With a symlinked builddir need to collapse x/../y sections into y.
     # It is safe with our directory structure
     if ( -l $path ) {
-	my $up = File::Spec->updir();
-	my $upsep = File::Spec->catfile($up, '');
-	if (index($path, $upsep) > -1) {
-	    my ($vol,$dir,$fname) = File::Spec->splitpath($path);
-	    my @dirs = File::Spec->splitdir($dir);
-	    my @newdirs;
-	    while (@dirs) {
-		my $d = shift @dirs;
-		if ($d eq $up) {
-		    warn unless @newdirs;
-		    pop @newdirs;
-		} else {
-		    push @newdirs, $d;
-		}
-	    }
-	    my $newpath = File::Spec->catfile
-	      ($vol ? ($vol, File::Spec->catdir(@newdirs), $fname)
-	            : (File::Spec->catdir(@newdirs), $fname));
-	    return $newpath;
-	}
-	return File::Spec->abs2rel( $path, $cwd ) ;
+        my $up = File::Spec->updir();
+        my $upsep = File::Spec->catfile($up, '');
+        if (index($path, $upsep) > -1) {
+            my ($vol,$dir,$fname) = File::Spec->splitpath($path);
+            my @dirs = File::Spec->splitdir($dir);
+            my @newdirs;
+            while (@dirs) {
+                my $d = shift @dirs;
+                if ($d eq $up) {
+                    warn unless @newdirs;
+                    pop @newdirs;
+                }
+                else {
+                    push @newdirs, $d;
+                }
+            }
+            my $newpath = File::Spec->catfile
+              ($vol ? ($vol, File::Spec->catdir(@newdirs), $fname)
+                    : (File::Spec->catdir(@newdirs), $fname));
+            return $newpath;
+        }
+        return File::Spec->abs2rel( $path, $cwd ) ;
     }
     my $abspath = abs_path($path);
     return $path unless defined $abspath;

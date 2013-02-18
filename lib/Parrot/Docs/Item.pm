@@ -94,8 +94,9 @@ Accessors for the containing section/group for the item.
 
 sub set_parent {
     my $self = shift;
+    my $group = shift;
 
-    $self->{PARENT} = shift;
+    $self->{PARENT} = $group;
 }
 
 sub parent {
@@ -154,6 +155,7 @@ sub write_html {
 
             my $formatter = Parrot::Docs::POD2HTML->new;
             $formatter->no_errata_section(1); # don't dump errors into HTML output
+            $formatter->{TESTING} = 1 if $self->{TESTING};
             $formatter->write_html( $source, $target, $rel_path, $self );
 
             my $title = $self->{TITLE} || $file->short_description;

@@ -130,8 +130,7 @@ Returns the location of a dynamic extension.
     .local pmc    os
     .local string name
 
-    $P0 = loadlib 'os'
-    os = new ['OS']
+    os = new 'OS'
 
     name = request
     push_eh FILE_NOT_FOUND_1
@@ -200,8 +199,7 @@ END:
     path = $P0
 
     $S0 = concat path, name
-    $P0 = loadlib 'os'
-    $P0 = new ['OS']
+    $P0 = new 'OS'
     push_eh FILE_NOT_FOUND
         # OS.stat throws on file not found
         $P0.'stat'($S0)

@@ -158,7 +158,6 @@ Returns the number of remaining elements in the Hash.
     }
 
     VTABLE INTVAL get_integer() {
-        UNUSED(INTERP)
         return SELF.elements();
     }
 

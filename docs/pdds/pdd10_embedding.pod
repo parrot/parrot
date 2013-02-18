@@ -1,4 +1,4 @@
-# Copyright (c) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 PDD 10: Embedding
 
@@ -291,8 +291,31 @@ to through the following functions:
     Parrot_api_add_include_search_path
     Parrot_api_add_dynext_search_path
 
-There is currently no way to remove search paths once set, or to examine the
-complete list of search paths. This may be added later.
+or hooked via a custom defined:
+
+    #ifdef PARROT_PLATFORM_LIB_PATH_INIT_HOOK
+        PARROT_PLATFORM_LIB_PATH_INIT_HOOK(interp, lib_paths);
+    #endif
+
+The search paths are accessible via vtable calls to indexed string arrays
+from the ParrotInterpreter array, at the index C<interp[.IGLOBALS_LIB_PATHS]>.
+See F<include/libpaths.pasm> resp. F<parrot/library.h> for the indices.
+
+For example in pir:
+
+    .local pmc interp
+    getinterp interp
+    .local pmc lib_paths
+    lib_paths = interp[.IGLOBALS_LIB_PATHS]
+    .local pmc include_path
+    include_path = lib_paths[.PARROT_LIB_PATH_INCLUDE]
+    .local pmc library_path
+    library_path = lib_paths[.PARROT_LIB_PATH_LIBRARY]
+    .local pmc dynext_path
+    dynext_path = lib_paths[.PARROT_LIB_PATH_DYNEXT]
+    .local pmc lang_path
+    lang_path = lib_paths[.PARROT_LIB_PATH_LANG]
+
 
 =head3 Strings and PMCs
 

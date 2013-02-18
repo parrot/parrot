@@ -15,6 +15,9 @@ This is intended to be broadly usable. Feel free to use Test::More directly,
 of course, but this provides a handy shortcut for setting up simple test file
 written in parrot.
 
+This is not yet thread-safe. Calling ok or similar functions which update the
+counter from tasks will fail.
+
 =cut
 
     load_bytecode 'Test/More.pbc'

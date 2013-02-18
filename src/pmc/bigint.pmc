@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2011, Parrot Foundation.
+Copyright (C) 2004-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -1133,178 +1133,218 @@ typedef struct BIGINT {
     INTVAL b; /* bogus definition for users without libgmp*/
 } BIGINT;
 
+#  define THROW_NOGMP Parrot_ex_throw_from_c_args(interp, NULL, \
+                        EXCEPTION_LIBRARY_ERROR, "no bigint lib loaded")
+
 static void
 bigint_init(PARROT_INTERP, ARGIN(PMC *self)) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    THROW_NOGMP;
 }
 
 static void
 bigint_clear(PARROT_INTERP, ARGIN(PMC *self)) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    THROW_NOGMP;
 }
 
 static void
 bigint_set_long(PARROT_INTERP, ARGIN(PMC *self), long value) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    UNUSED(value)
+    THROW_NOGMP;
 }
 
 static void
 bigint_set(PARROT_INTERP, PMC *dest, PMC *src) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(dest)
+    UNUSED(src)
+    THROW_NOGMP;
 }
 
 static void
 bigint_set_double(PARROT_INTERP, ARGIN(PMC *self), double value) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    UNUSED(value)
+    THROW_NOGMP;
 }
 
 static void
 bigint_set_str(PARROT_INTERP, ARGIN(PMC *self), ARGIN(const STRING *value), int base) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    UNUSED(value)
+    UNUSED(base)
+    THROW_NOGMP;
 }
 
 static void
 bigint_set_self(PARROT_INTERP, ARGIN(PMC *self), BIGINT *value) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    UNUSED(value)
+    THROW_NOGMP;
 }
 
 static BIGINT*
 bigint_get_self(PARROT_INTERP, ARGIN(PMC *self)) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    THROW_NOGMP;
 }
 
 static char *
 bigint_get_string(PARROT_INTERP, ARGIN(PMC *self), int base) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    UNUSED(base)
+    THROW_NOGMP;
 }
 
 static long
 bigint_get_long(PARROT_INTERP, ARGIN(PMC *self)) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    THROW_NOGMP;
 }
 
 static int
 bigint_get_bool(PARROT_INTERP, ARGIN(PMC *self)) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    THROW_NOGMP;
 }
 
 static double
 bigint_get_double(PARROT_INTERP, ARGIN(PMC *self)) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    THROW_NOGMP;
 }
 
 static void
 bigint_add_bigint(PARROT_INTERP, ARGIN(PMC *self), PMC *value, PMC *dest) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    UNUSED(value)
+    UNUSED(dest)
+    THROW_NOGMP;
 }
 
 static void
 bigint_add_bigint_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, PMC *dest) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    UNUSED(value)
+    UNUSED(dest)
+    THROW_NOGMP;
 }
 
 static void
 bigint_sub_bigint(PARROT_INTERP, ARGIN(PMC *self), PMC *value, PMC *dest) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    UNUSED(value)
+    UNUSED(dest)
+    THROW_NOGMP;
 }
 
 static void
 bigint_sub_bigint_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, PMC *dest) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    UNUSED(value)
+    UNUSED(dest)
+    THROW_NOGMP;
 }
 
 static void
 bigint_mul_bigint(PARROT_INTERP, ARGIN(PMC *self), PMC *value, PMC *dest) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    UNUSED(value)
+    UNUSED(dest)
+    THROW_NOGMP;
 }
 
 static void
 bigint_mul_bigint_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, PMC *dest) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    UNUSED(value)
+    UNUSED(dest)
+    THROW_NOGMP;
 }
 
 static void
 bigint_pow_bigint_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, PMC *dest) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    UNUSED(value)
+    UNUSED(dest)
+    THROW_NOGMP;
 }
 
 static void
 bigint_div_bigint(PARROT_INTERP, ARGIN(PMC *self), PMC *value, PMC *dest) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    UNUSED(value)
+    UNUSED(dest)
+    THROW_NOGMP;
 }
 
 static void
 bigint_div_bigint_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, PMC *dest) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    UNUSED(value)
+    UNUSED(dest)
+    THROW_NOGMP;
 }
 
 static void
 bigint_fdiv_bigint(PARROT_INTERP, ARGIN(PMC *self), PMC *value, PMC *dest) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    UNUSED(value)
+    UNUSED(dest)
+    THROW_NOGMP;
 }
 
 static void
 bigint_fdiv_bigint_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, PMC *dest) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    UNUSED(value)
+    UNUSED(dest)
+    THROW_NOGMP;
 }
 
 static void
 bigint_mod_bigint(PARROT_INTERP, ARGIN(PMC *self), PMC *value, PMC *dest) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    UNUSED(value)
+    UNUSED(dest)
+    THROW_NOGMP;
 }
 
 static void
 bigint_mod_bigint_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, PMC *dest) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    UNUSED(value)
+    UNUSED(dest)
+    THROW_NOGMP;
 }
 
 static INTVAL
 bigint_cmp(PARROT_INTERP, ARGIN(PMC *self), PMC *value) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    UNUSED(value)
+    THROW_NOGMP;
 }
 
 static INTVAL
 bigint_cmp_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    UNUSED(value)
+    THROW_NOGMP;
 }
 
 static void
 bigint_abs(PARROT_INTERP, ARGIN(PMC *self), PMC *dest) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    UNUSED(dest)
+    THROW_NOGMP;
 }
 
 static void
 bigint_neg(PARROT_INTERP, ARGIN(PMC *self), PMC *dest) {
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
-        "no bigint lib loaded");
+    UNUSED(self)
+    UNUSED(dest)
+    THROW_NOGMP;
 }
 
 #endif /* ifdef PARROT_HAS_GMP */
@@ -1549,6 +1589,7 @@ Decrements the integer.
     }
 
     MULTI PMC *add(DEFAULT value, PMC *dest) {
+        UNUSED(SELF)
         UNUSED(dest)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
@@ -1572,6 +1613,7 @@ Decrements the integer.
     }
 
     MULTI void i_add(DEFAULT value) {
+        UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'i_add' for %Ss",
@@ -1583,12 +1625,12 @@ Decrements the integer.
     }
 
     VTABLE void i_add_float(FLOATVAL value) {
+        UNUSED(SELF)
         UNUSED(value)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'i_add_float' for FLOATVAL");
     }
-
 
     MULTI PMC *subtract(BigInt value, PMC *dest) {
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -1605,6 +1647,7 @@ Decrements the integer.
     }
 
     MULTI PMC *subtract(DEFAULT value, PMC *dest) {
+        UNUSED(SELF)
         UNUSED(dest)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
@@ -1628,6 +1671,7 @@ Decrements the integer.
     }
 
     MULTI void i_subtract(DEFAULT value) {
+        UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'i_subtract' for %Ss",
@@ -1639,6 +1683,7 @@ Decrements the integer.
     }
 
     VTABLE void i_subtract_float(FLOATVAL value) {
+        UNUSED(SELF)
         UNUSED(value)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
@@ -1661,8 +1706,9 @@ Decrements the integer.
     }
 
     MULTI PMC *multiply(DEFAULT value, PMC *dest) {
+        UNUSED(SELF)
         UNUSED(dest)
-         Parrot_ex_throw_from_c_args(INTERP, NULL,
+        Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'multiply' for %Ss",
             VTABLE_name(INTERP, value));
@@ -1682,6 +1728,7 @@ Decrements the integer.
         bigint_mul_bigint_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), SELF);
     }
     MULTI void i_multiply(DEFAULT value) {
+        UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'i_multiply' for %Ss",
@@ -1693,6 +1740,7 @@ Decrements the integer.
     }
 
     VTABLE void i_multiply_float(FLOATVAL value) {
+        UNUSED(SELF)
         UNUSED(value)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
@@ -1723,6 +1771,7 @@ Decrements the integer.
     }
 
     MULTI PMC *divide(DEFAULT value, PMC *dest) {
+        UNUSED(SELF)
         UNUSED(dest)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
@@ -1744,7 +1793,8 @@ Decrements the integer.
         bigint_div_bigint_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), SELF);
     }
     MULTI void i_divide(DEFAULT value) {
-         Parrot_ex_throw_from_c_args(INTERP, NULL,
+        UNUSED(SELF)
+        Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'i_divide' for %Ss",
             VTABLE_name(INTERP, value));
@@ -1769,6 +1819,7 @@ Decrements the integer.
     }
 
     MULTI PMC *floor_divide(DEFAULT value, PMC *dest) {
+        UNUSED(SELF)
         UNUSED(dest)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
@@ -1792,6 +1843,7 @@ Decrements the integer.
     }
 
     MULTI void i_floor_divide(DEFAULT value) {
+        UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'i_floor_divide' for %Ss",
@@ -1817,6 +1869,7 @@ Decrements the integer.
     }
 
     MULTI PMC *modulus(DEFAULT value, PMC *dest) {
+        UNUSED(SELF)
         UNUSED(dest)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
@@ -1831,6 +1884,7 @@ Decrements the integer.
         bigint_mod_bigint_int(INTERP, SELF, VTABLE_get_integer(INTERP, value), SELF);
     }
     MULTI void i_modulus(DEFAULT value) {
+        UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'i_modulus' for %Ss",
@@ -1846,6 +1900,7 @@ Decrements the integer.
     }
 
     MULTI INTVAL cmp(DEFAULT value) {
+        UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'cmp' for %Ss",
@@ -1861,6 +1916,7 @@ Decrements the integer.
     }
 
     MULTI INTVAL is_equal(DEFAULT value) {
+        UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "BigInt: no multiple dispatch variant 'is_equal' for %Ss",

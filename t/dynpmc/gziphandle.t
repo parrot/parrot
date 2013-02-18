@@ -106,7 +106,6 @@ Tests the C<GzipHandle> PMC, a zlib wrapper.
 
     # Clean up after ourselves
     file.'close'()
-    $P0 = loadlib 'os'
     $P0 = new 'OS'
     $P0.'rm'(filename)
 .end

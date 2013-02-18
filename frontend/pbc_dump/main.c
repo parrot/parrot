@@ -147,11 +147,10 @@ disas_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
         INTVAL j;
         const PackFile_ByteCode_OpMappingEntry * const entry = &map->libs[i];
         Parrot_io_printf(interp, "  map #%d => [\n", i);
-        Parrot_io_printf(interp, "    oplib: \"%s\" version %d.%d.%d (%d ops)\n",
+        Parrot_io_printf(interp, "    oplib: \"%s\" version %d.%d (%d ops)\n",
                 entry->lib->name,
-                entry->lib->major_version,
-                entry->lib->minor_version,
-                entry->lib->patch_version,
+                entry->lib->bc_major_version,
+                entry->lib->bc_minor_version,
                 entry->n_ops);
 
         for (j = 0; j < map->libs[i].n_ops; j++) {
@@ -431,6 +430,11 @@ main(int argc, const char **argv)
     if (pf == NULL) {
         printf("Can't read PBC\n");
         return 1;
+    }
+
+    if (options & PFOPT_HEADERONLY) {
+        PackFile_header_dump(interp, pf);
+        Parrot_x_exit(interp, 0);
     }
 
     pfpmc = Parrot_pf_get_packfile_pmc(interp, pf, infilename);

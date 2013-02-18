@@ -35,7 +35,7 @@ sub runstep {
 
     if ($without) {
         $conf->data->set( has_zlib => 0 );
-        $self->set_result('no');
+        $self->set_result('skipped');
         return 1;
     }
 

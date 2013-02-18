@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2011, Parrot Foundation.
+Copyright (C) 2010-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -35,7 +35,7 @@ PARROT_EXPORT
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
 Parrot_Pointer_Array *
-Parrot_pa_new(PARROT_INTERP)
+Parrot_pa_new(SHIM_INTERP)
 {
     ASSERT_ARGS(Parrot_pa_new)
     Parrot_Pointer_Array * const res = mem_internal_allocate_zeroed_typed(Parrot_Pointer_Array);
@@ -54,7 +54,7 @@ Destroy Pointer_Arra and free allocated memory.
 
 PARROT_EXPORT
 void
-Parrot_pa_destroy(PARROT_INTERP, ARGFREE(Parrot_Pointer_Array *self))
+Parrot_pa_destroy(SHIM_INTERP, ARGFREE(Parrot_Pointer_Array *self))
 {
     ASSERT_ARGS(Parrot_pa_destroy)
     size_t i;
@@ -77,7 +77,7 @@ Get count of allocated objects.
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 size_t
-Parrot_pa_count_allocated(PARROT_INTERP, ARGIN(const Parrot_Pointer_Array *self))
+Parrot_pa_count_allocated(SHIM_INTERP, ARGIN(const Parrot_Pointer_Array *self))
 {
     ASSERT_ARGS(Parrot_pa_count_allocated)
     return self->total_chunks * CELL_PER_CHUNK;
@@ -95,7 +95,7 @@ Get count of allocated objects.
 */
 PARROT_WARN_UNUSED_RESULT
 size_t
-Parrot_pa_count_used(PARROT_INTERP, ARGIN(const Parrot_Pointer_Array *self))
+Parrot_pa_count_used(SHIM_INTERP, ARGIN(const Parrot_Pointer_Array *self))
 {
     ASSERT_ARGS(Parrot_pa_count_used)
     size_t count = 0;

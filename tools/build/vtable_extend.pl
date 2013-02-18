@@ -5,6 +5,7 @@ use warnings;
 
 use lib 'lib';
 use Parrot::Vtable;
+use Parrot::BuildUtil;
 
 my $tbl = 'src/vtable.tbl';
 my $vtable = parse_vtable( $tbl );
@@ -21,6 +22,7 @@ my $header = <<"EOH";
 EOH
 
 open my $OUT, '>', 'include/parrot/extend_vtable.h' or die $!;
+add_to_generated('include/parrot/extend_vtable.h', '[main]', 'include');
 
 print $OUT $header, <<'EOF';
 

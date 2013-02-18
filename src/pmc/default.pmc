@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -893,7 +893,6 @@ Initializes the PMC during unarchiving.
 */
 
     VTABLE void thaw(PMC *info) {
-        UNUSED(INTERP);
         UNUSED(info);
         /* default - initialize the PMC */
         SELF.init();

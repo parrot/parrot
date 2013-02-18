@@ -1,11 +1,11 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2013, Parrot Foundation.
 # 02-install_files.t
 
 use strict;
 use warnings;
 
-use Test::More tests => 18;
+use Test::More tests => 19;
 use Carp;
 use Cwd;
 use File::Copy;
@@ -29,10 +29,29 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
 
     {
         my ( $stdout, $stderr, $rv );
-
         eval {
             capture(
-                sub { $rv = install_files($tdir, 1); },
+                sub { $rv = install_files("destdir", 1); },
+                \$stdout,
+                \$stderr,
+            );
+        };
+        like($@, qr/Error: parameter \$options must be a hashref/s, "Catches non-HASH \$options");
+    }
+}
+
+{
+    my $tdir = tempdir( CLEANUP => 1 );
+    $tdir .= '/';
+
+    my @dirs = qw(foo/bar foo/bar/baz);
+    create_directories($tdir, { map { $_ => 1 } @dirs });
+
+    {
+        my ( $stdout, $stderr, $rv );
+        eval {
+            capture(
+                sub { $rv = install_files({}); },
                 \$stdout,
                 \$stderr,
             );
@@ -53,11 +72,13 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
 
     {
         my ( $stdout, $stderr, $rv );
-        capture(
-            sub { $rv = install_files($tdir, 0, $files_ref); },
-            \$stdout,
-            \$stderr,
-        );
+        eval {
+            capture(
+                sub { $rv = install_files({dryrun=>1}, '', $files_ref); },
+                \$stdout,
+                \$stderr,
+            );
+        };
         like($stderr, qr/Bad reference passed in \$files/, "Catches non-HASH files");
 
         like( $stdout, qr/Installing \.\.\./,
@@ -81,7 +102,7 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
         my ( $stdout, $stderr, $rv );
 
         capture(
-            sub { $rv = install_files($tdir, 1, $files_ref); },
+            sub { $rv = install_files({dryrun=>1},'',$files_ref); },
             \$stdout,
             \$stderr,
         );
@@ -101,7 +122,7 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
     {
         my ( $stdout, $stderr, $rv );
         capture(
-            sub { $rv = install_files($tdir, 0, $files_ref); },
+            sub { $rv = install_files({destdir=>$tdir, dryrun=>0}, '', $files_ref); },
             \$stdout,
             \$stderr,
         );
@@ -146,7 +167,7 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
     {
         my ( $stdout, $stderr, $rv );
         capture(
-            sub { $rv = install_files($tdir, 0, $files_ref); },
+            sub { $rv = install_files({destdir=>$tdir, dryrun=>0}, '', $files_ref); },
             \$stdout,
             \$stderr,
         );
@@ -196,7 +217,7 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
     {
         my ( $stdout, $stderr, $rv );
         capture(
-            sub { $rv = install_files($tdir, 0, $files_ref); },
+            sub { $rv = install_files({destdir=>$tdir, dryrun=>0}, '', $files_ref); },
             \$stdout,
             \$stderr,
         );
@@ -234,7 +255,7 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
     {
         my ( $stdout, $stderr, $rv );
         capture(
-            sub { $rv = install_files($tdir, 0, $files_ref); },
+            sub { $rv = install_files({destdir=>$tdir, dryrun=>0}, '', $files_ref); },
             \$stdout,
             \$stderr,
         );

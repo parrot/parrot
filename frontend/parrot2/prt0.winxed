@@ -160,7 +160,7 @@ function __show_version_and_exit[anon]()
     var config = getinterp()[IGLOBALS_CONFIG_HASH];
     string msg_fmt = <<:
 This is Parrot version %s%s built for %s-%s
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2013, Parrot Foundation.
 
 This code is distributed under the terms of the Artistic License 2.0.
 For more details, see the full text of the license in the LICENSE file
@@ -203,12 +203,9 @@ parrot [Options] <file> [<program options...>]
     -. --wait    Read a keystroke before starting
        --runtime-prefix
    <Compiler options>
-    -d --imcc-debug[=HEXFLAGS]
-    -v --verbose
     -E --pre-process-only
     -o --output=FILE
        --output-pbc
-    -O --optimize[=LEVEL]
     -c --pbc
     -r --run-pbc
     -y --yydebug
@@ -231,7 +228,7 @@ function __usage_and_exit[anon](string msg [optional], int has_msg [opt_flag])
     var stderr = getstderr();
     if (has_msg)
         stderr.print(msg + "\n");
-    stderr.print("parrot -[acEGhrtvVwy.] [-d [FLAGS]] [-D [FLAGS]] ");
-    stderr.print("[-O [level]] [-[LIX] path] [-R runcore] [-o FILE] <file> <args>\n");
+    stderr.print("parrot -[acEGhrtVwy.] [-D [FLAGS]] ");
+    stderr.print("[-[LIX] path] [-R runcore] [-o FILE] <file> <args>\n");
     exit(1);
 }

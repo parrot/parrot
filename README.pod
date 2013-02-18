@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-README.pod - Readme to Parrot, version 4.6.0.
+README.pod - Readme to Parrot, version 5.0.0.
 
 =head1 DESCRIPTION
 
@@ -150,6 +150,7 @@ In addition, you may obtain an html-ized version of our docs -- which, in
 some respects, are more extensive than our POD documents -- with the following
 command:
 
+    cpan JSON       # Needed by the next command
     make html
 
 You may then view a local copy of the html documentation by navigating your

@@ -17,6 +17,7 @@ use Parrot::Pmc2c::UtilFunctions 'filename';
 use Parrot::Pmc2c::PMC::default ();
 use Parrot::Pmc2c::PMC::Null ();
 use Parrot::Pmc2c::PMC::Object ();
+use Parrot::Pmc2c::PMC::Proxy ();
 
 # put the options in a package var so it can be accessed from
 # Parrot::Pmc2c::Emitter.
@@ -91,8 +92,9 @@ sub new {
     die "Must have key 'args' which is a reference to a list of the remaining arguments"
         unless ( defined $allargsref->{args} and ref( $allargsref->{args} ) eq q{ARRAY} );
 
+    my $base = File::Spec->catdir($allargsref->{bin},'..','..');
     unshift @{ $allargsref->{include} },
-        '.', "$allargsref->{bin}/../..", "$allargsref->{bin}/../../src/pmc", "$allargsref->{bin}/../../src/dynpmc";
+      '.', $base, File::Spec->catdir($base,'src','pmc'), File::Spec->catdir($base,'src','dynpmc');
 
     foreach my $opt ( qw(nolines) ) {
         if ( !defined $allargsref->{opt}{$opt} ) {

@@ -47,6 +47,7 @@ sub _set_implementations {
         encoding.c
         env.c
         cpu_type.c
+        num_cpus.c
         dl.c
         math.c
         itimer.c

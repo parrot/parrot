@@ -1,6 +1,154 @@
+2013-02-19    release 5.1.0
+    - Core
+        + The .sort() method was added to the FixedFloatArray PMC
+        + Improved detection of system memory for machines with >2GB
+    - Documentation
+    - Tests
+    - Community
+
+2013-01-22    release 5.0.0
+    - Core
+        + Remove duplicate library search path entries, move "." from the beginning to
+          the end. [GH #368]
+        + Install forgotten runtime include files:
+          cloneflags.pasm
+          packfile_annotation_keytype.pasm
+          packfile_segments.pasm
+        + Install include/parrot/pbcversion.h with the main package, not devel.
+        + Install headers for dynpmc files.
+        + Install libraries tgc.pbc, NCI/Utils.pbc, OpenGL/Math.pbc, PCT/Dumper.pbc,
+          postgres.pbc, ProfTest.pbc and ProfTest/*pbc, String/Utils.pbc, URI/Escape.pbc,
+          YAML/Dumper/Base.pbc, YAML/Dumper/Default.pbc
+        + New experimental PARROT_DYNEXT environment variable
+        + New experimental dynext_dirs config entry (same as PARROT_DYNEXT and -X)
+        + Add OS error messages to FileHandle.open() error messages [GH #911]
+    - Build
+        + Generate MANIFEST.generated, cleanup MANIFEST,
+          removed MANIFEST_configure.generated, add installation of forgotten files
+          [GH #890]
+        + perl Configure.pl now calls make clean if possible
+        + Generate datadir/MANIFEST* for all installed files [GH #899]
+        + Improved Configure.pl probes for --with-llvm
+        + Replace / slashes with \ on windows for all Makefiles automatically.
+          This improves cygwin interaction, like remote or cronjob smoking on windows.
+        + Reenabled and fixed debugging line directives in pmc2c, ops2c not yet [GH #641]
+    - Tools
+        + Improved nci_thunk_gen (v0.02): handle void sig, add declaration
+        + Fixed nci examples
+    - Documentation
+        + Re-added docs/ops, the generated ops summary and docs/packfile-c.pod
+        + Improved pdd10_embedding
+        + Document FileHandle.open() exceptions and error messages
+    - Tests
+        + Added t/library/lib_search_path.t
+
+2012-12-18    release 4.11.0
+    - Core
+        + Parrot now supports fast and lightweight OS threads, based on Nat Tucks's
+          initial GSoC work on green threads and then Stefan Seifert's extension
+          to true parallel OS threads as hybrid threads.
+          See http://wknight8111.blogspot.co.at/2010/08/gsoc-threads-chandons-results.html
+          and http://niner.name/Hybrid_Threads_for_the_Parrot_VM.pdf
+          Summary: http://perl6advent.wordpress.com/2012/12/11/day-11-parrot-threads/
+        + New parrot cmdline option --numthreads
+        + Export new dynpmc_class_<ClassName> types [GH #870].
+        + Changed core_ops library format and ops2c to contain the PBC_COMPAT only,
+          not the parrot version triple. Removed the duplicate PARROT_DYNOP_CORE_INIT
+          cpp definition in include/parrot/oplib/core_ops.h, use only
+          PARROT_CORE_OPLIB_INIT from config.h
+        + Store PBC_MAJOR and PBC_MINOR in the config hash, stored by auto::revision
+        + Added getprotobyname method to the Socket PMC
+    - Documentation
+        + Marked unused API parameters
+        + Install man pages for all binaries
+    - Languages
+        + nqp-rx tests updated from perl6/nqp-rx.git, and enabled to run on make test
+    - Platforms
+        + More compilation fixes on Windows without working mt.exe or ranlib=rem,
+          enable smoking without git binary.
+    - Tools
+        + Re-enabled pbc_dump -h --header-only
+        + Improved pmc2c, added more UNUSED(arg) macros [GH #836]. Parrot is now almost
+          -Wunused-parameters safe.
+    - Tests
+        + failing Pod::Simple pod_todo.t tests are now skipped
+        + added nqp-rx tests
+        + removed duplicate ext/nqp-rx/t/p6regex tests
+        + rewrote and enabled native_pbc tests [GH #394],
+          renamed native_pbc testfiles
+
+2012-11-21    release 4.10.0
+    - Core
+        + Add PMCNULL check to result_info op
+        + Fixed record separator bug on io handles
+    - Build
+        + Add -fpermissive so that nqp builds under gcc 4.7.2
+        + Fixed warnings for old ICU 4.4
+    - Platforms
+        + More VMS fixes, but not yet done
+    - Branches
+        + The threads branch is ready to be merged, but nqp needs some changes,
+          so it will be merged with 4.11.0.
+    - Examples
+        + Parrot mini-web server fixes
+
+2012-10-16    release 4.9.0
+    - Core
+        + Keep encoding information in the imcc optimizer, which fixes the
+          concat op but probably many more cases with non-ascii encoded
+          constant strings. [GH #837]
+        + Fixed ByteBuffer set_string_native, which became out of sync with
+          two internal buffers. [GH #835]
+        + Preload Configure steps when called with perl -d Configure.pl [GH #833]
+        + Strip unneeded config keys from installed config hash. Saves 6360
+          bytes from every installed executable. [GH #824]
+        + Parrot_get_cpu_type returns now "unknown" for all unknown cpu types.
+          On non-windows it returned before 4.9.0 a null string. [GH #846]
+        + Fixed src/hash.c for platforms where size_t is unsigned (e.g. vms) [GH #854]
+    - Build
+        + Improved warnings for clang. [GH #843]
+        + Cleaned wrong UNUSED(arg) macros in all pmc's due to an improved
+          pmc2c compiler, which SHIMs all UNUSED args. [GH #836]
+        + Added clang++ support and a new auto::alignof Configure step. [GH #844]
+        + Fixed auto::inline for C++ compilers
+        + Improved auto::llvm
+    - Branches
+        + The threads branch is almost ready to be merged. Some remaining races
+          have been fixed. There are only some remaining platforms errors on
+          darwin/x86.
+    - Libraries
+        + Fixed Mime::Base64: Split long lines at 76 chars. [GH #826]
+          Support multi-byte codepoints. Use binary encoding,
+          encoded files are now endian specific [GH #813 + #814],
+          Added 2nd optional encoding arg to decode_base64().
+    - Documentation
+        + Cleaned up removed parrot cmdline options -D/-O/-v from --help output and
+          running.pod [GH #838]
+    - Tools
+        + Improved gdb pretty-printing for multi-byte strings
+
+2012-09-18    release 4.8.0
+    - Core
+        + Prevent interpreter from dying twice
+        + Complete rewrite of the IO system, including new unified IO PMC
+          semantics.
+        + The Integer and Float PMCs now have a get_pointer vtable which is
+          needed when using NCI to bind to Fortran libraries such as LAPACK
+    - Deprecations
+        + Moved dynpmc/os to pmc os. loadlib 'os' is not needed anymore.
+    - Platforms
+        + Fixed for the FileHandle open method the append mode on Windows.
+        + Fix compilation on Windows without working mt.exe
+        + Detect GNU/Hurd as linux proper.
+        + Fixed broken int3 trap on Solaris with gcc.
+        + Updated the vms port on a YAPC::EU hackathon with vaxman and mvorl.
+    - Tests
+        + Improve testability with valgrind or thread-sanitizer
+
 2012-08-21    release 4.7.0
     - Core
         + Added .all_tags() and .all_tagged_pmcs() methods to PackfileView PMC
+        + Several build and coding standards fixes
 
 2012-07-17    release 4.6.0
     - Core

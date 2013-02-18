@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2013, Parrot Foundation.
 # auto/opengl-01.t
 
 use strict;
@@ -35,7 +35,7 @@ $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 my $step = test_step_constructor_and_description($conf);
 ok( $step->runstep($conf), "runstep() returned true value");
-is( $step->result(), 'no', "Got expected result" );
+is( $step->result(), 'skipped', "Got expected result" );
 is( $conf->data->get( 'has_opengl' ), 0,
     "Got expected value for 'has_opengl'");
 

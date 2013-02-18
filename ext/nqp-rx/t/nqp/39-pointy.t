@@ -1,4 +1,4 @@
-#! nqp
+#!./parrot-nqp
 
 plan(6);
 

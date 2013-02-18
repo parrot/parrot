@@ -28,7 +28,7 @@ sub runstep {
         win32  => 1,
         PQ     => '"',
         make_c => '$(PERL) -e "chdir shift @ARGV; system \'$(MAKE)\', @ARGV; exit $$? >> 8;"',
-        ncilib_link_extra => '-def:src/libnci_test.def',
+        ncilib_link_extra => '-def:src\libnci_test.def',
     );
 
     my $build_dir = $conf->data->get('build_dir');
@@ -44,6 +44,10 @@ sub runstep {
     }
 
     $conf->data->set( clock_best => ' ' );
+
+    my $mt_output = `mt.exe /? 2>null` || '';
+    my $has_mt = $mt_output =~ m/manifest/;
+    $conf->data->set( has_mt => $has_mt ? 1 : 0);
 
     if ($is_msvc) {
         my $msvcversion = $conf->data->get('msvcversion');
@@ -269,7 +273,7 @@ sub runstep {
             inst_libparrot_ldflags => "\"$bindir\\libparrot.dll\"",
             libparrot_linkflags   => "\"$build_dir\\libparrot.dll\"",
             inst_libparrot_linkflags => "\"$bindir\\libparrot.dll\"",
-            ncilib_link_extra   => 'src/libnci_test.def',
+            ncilib_link_extra   => 'src\libnci_test.def',
             sym_export          => '__declspec(dllexport)',
             sym_import          => '__declspec(dllimport)',
             slash               => '\\',

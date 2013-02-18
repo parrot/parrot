@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2013, Parrot Foundation.
 
 =head1 NAME
 
@@ -66,6 +66,7 @@ PMC2C_FILES = \\
     lib/Parrot/Pmc2c/PMC/default.pm \\
     lib/Parrot/Pmc2c/PMC/Null.pm \\
     lib/Parrot/Pmc2c/PMC/RO.pm
+
 END
 
     my %universal_deps;
@@ -96,7 +97,6 @@ END
         $o_deps{"include/pmc/pmc_$pmc.h"} = 1;
 
         if (contains_pccmethod($pmc_fname)) {
-            $pccmethod_depend = 'lib/Parrot/Pmc2c/PCCMETHOD.pm';
             $o_deps{"include/pmc/pmc_fixedintegerarray.h"} = 1;
             if ($pmc ne 'fixedintegerarray') {
                 $pccmethod_depend .= ' include/pmc/pmc_fixedintegerarray.h';
@@ -127,6 +127,7 @@ END
         $TEMP_pmc_build .= <<END
 src/pmc/$pmc.c : src/pmc/$pmc.dump
 \t\$(PMC2CC) src/pmc/$pmc.pmc
+\t\@\$(ADDGENERATED) "include/pmc/pmc_$pmc.h" "[devel]" include
 
 src/pmc/$pmc.dump : vtable.dump $parent_dumps src/pmc/$pmc.pmc \$(PMC2C_FILES) $pccmethod_depend
 \t\$(PMC2CD) src/pmc/$pmc.pmc
@@ -136,7 +137,7 @@ include/pmc/pmc_$pmc.h: src/pmc/$pmc.c
 ## SUFFIX OVERRIDE -Warnings
 src/pmc/$pmc\$(O): \\
 $o_deps
-\t\$(CC) \$(CFLAGS) $optimize $cc_shared $warnings -I\$(\@D) $cc_o_out\$@ -c src/pmc/$pmc.c
+\t\$(CC) \$(CFLAGS) $optimize $cc_shared $warnings -I\$(\@D)/. $cc_o_out\$@ -c src/pmc/$pmc.c
 
 END
     }

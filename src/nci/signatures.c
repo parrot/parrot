@@ -159,6 +159,9 @@ ncidt_to_pcc(PARROT_INTERP, PARROT_DATA_TYPE t)
       case enum_type_PMC:
         return 'P';
 
+      case enum_type_void:
+        return 'v';
+
       default:
         Parrot_ex_throw_from_c_args(interp, NULL, 0, "Unhandled NCI type: `%Ss'",
                 Parrot_dt_get_datatype_name(interp, t));

@@ -76,8 +76,8 @@
 ^/.*\.vcproj.*/
 ^/CFLAGS$
 ^/CFLAGS/
-^/MANIFEST\.configure\.generated$
-^/MANIFEST\.configure\.generated/
+^/MANIFEST\.generated$
+^/MANIFEST\.generated/
 ^/Makefile$
 ^/Makefile/
 ^/TAGS$
@@ -164,6 +164,8 @@
 ^/docs/.*\.tmp/
 ^/docs/Makefile$
 ^/docs/Makefile/
+^/docs/binaries/.*\.1$
+^/docs/binaries/.*\.1/
 ^/docs/book/.*\.html$
 ^/docs/book/.*\.html/
 ^/docs/build$
@@ -642,6 +644,8 @@
 ^/src/dynpmc/.*\.pdb/
 ^/src/dynpmc/.*\.so$
 ^/src/dynpmc/.*\.so/
+^/src/dynpmc/.*\.str$
+^/src/dynpmc/.*\.str/
 ^/src/embed/.*\.o$
 ^/src/embed/.*\.o/
 ^/src/exec_cpu\.c$
@@ -652,8 +656,6 @@
 ^/src/exec_dep\.h/
 ^/src/extend_vtable\.c$
 ^/src/extend_vtable\.c/
-^/src/extra_nci_thunks\.c$
-^/src/extra_nci_thunks\.c/
 ^/src/fingerprint\.c$
 ^/src/fingerprint\.c/
 ^/src/gc/.*\.gcda$

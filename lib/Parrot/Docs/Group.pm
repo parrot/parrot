@@ -145,6 +145,7 @@ sub write_contents_html {
     print "\n\n", $self->name unless $silent;
 
     foreach my $content ( $self->contents_relative_to_source($source) ) {
+        $content->{TESTING} = 1 if $self->{TESTING};
         $index_html .= $content->write_html( $source, $target, $silent );
     }
 

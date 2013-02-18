@@ -617,7 +617,7 @@
     - deprecated
     - completed
   ticket: 'http://trac.parrot.org/parrot/ticket/443'
-
+-
   name : 'Introspection methods for Key PMC'
   note :
     Several methods for introspection and creation of register-reference Key
@@ -626,7 +626,7 @@
   tags:
     - experimental
   ticket: 'https://github.com/parrot/parrot/issues/717'
-
+-
   name : 'rindex opcode'
   note :
     The new rindex_i_s_s and rindex_i_s_s_i opcodes are experimental. They
@@ -634,7 +634,7 @@
   tags :
     - experimental
   ticket : 'https://github.com/parrot/parrot/issues/767'
-
+-
   name : 'write_bytes and read_bytes methods'
   note :
     The .write_bytes and .read_bytes methods for the Handle PMC (inherited
@@ -642,3 +642,18 @@
   tags :
     - experimental
   ticket : 'https://github.com/parrot/parrot/issues/610'
+-
+  name:  'PARROT_DYNEXT environment variable, dynext_dirs config entry'
+  note:  'A way to synchronize compiled-in -L libpaths with required -X run-time libpaths. Most prominently shared libs on macports or fink, missing /opt/local/lib.'
+  tags:
+    - 'library'
+    - 'experimental'
+  ticket:  'https://github.com/parrot/parrot/issues/302'
+-
+  name : 'Socket.read(nb) with nb > 512'
+  eligible : '4.8'
+  note :
+    The Socket .read method with an nb argument greater than the current SO_RCVBUF buffer size (typically 512) will since 4.8 behave like POSIX read() and recv(), returning only up to nb bytes. You need to loop until the wanted number of bytes is received.
+  tags :
+    - api
+  ticket : 'https://github.com/parrot/parrot/issues/909'

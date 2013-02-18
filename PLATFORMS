@@ -12,9 +12,9 @@ Supported platforms:
 Platform                     B8 Feature Comp Test Inst YYYYMMDD
                                 Thr Sig
 --------------------------------------------------------------------
-darwin10.7.0-x86-gcc4.2.1        ?   ?   Y    Y     Y  20110718
+darwin10.7.0-x86-gcc4.2.1        Y   ?   Y    Y     Y  20121121
 linux-sparc64-gcc-4.3.2      ?           Y    Y        20110114
-linux-x86-gcc4.5.2               Y   Y   Y    Y     ?  20110710
+linux-x86-gcc4.5.2               Y   Y   Y    Y     Y  20121121
 win32-x86-msvc_10.0              ?   -   Y    Y     Y  20110718
 
 

@@ -4,6 +4,8 @@
 use strict;
 use warnings;
 use Archive::Tar;
+use IO::Zlib;
+use IO::Compress::Bzip2;
 use ExtUtils::Manifest qw(maniread);
 
 =head1 DESCRIPTION
@@ -32,7 +34,8 @@ my $tarnifest = join "", grep { ! /^DEVELOPING /} <$mf>;
 
 $tar->replace_content("MANIFEST", $tarnifest);
 
-$tar->write("parrot-$VERSION.tar.gz",  COMPRESS_GZIP,  "parrot-$VERSION");
+$tar->write("parrot-$VERSION.tar.gz",  COMPRESS_GZIP, "parrot-$VERSION");
+# Warning: Beware that COMPRESS_BZIP may create a GZIP'ed tar! Check with file.
 $tar->write("parrot-$VERSION.tar.bz2", COMPRESS_BZIP, "parrot-$VERSION");
 
 # Local Variables:

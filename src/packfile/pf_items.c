@@ -377,14 +377,15 @@ Tested ok.
 
 */
 
+#if (NUMVAL_SIZE == 8)
 static void
 cvt_num12_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
     ASSERT_ARGS(cvt_num12_num8)
     int expo, i, s;
-#ifdef __LCC__
+#  ifdef __LCC__
     int expo2;
-#endif
+#  endif
 
     /*
        12-byte double (96 bits):
@@ -422,14 +423,14 @@ nul:
             dest[7] |= 0x80;
         return;
     }
-#ifdef __LCC__
+#  ifdef __LCC__
     /* Yet again, LCC blows up mysteriously until a temporary variable is
      * added. */
     expo2 = expo - 16383;
     expo  = expo2;
-#else
+#  else
     expo -= 16383;       /* - bias */
-#endif
+#  endif
     expo += 1023;       /* + bias 8byte */
     if (expo <= 0)       /* underflow */
         goto nul;
@@ -451,22 +452,23 @@ nul:
     }
     dest[0] |= src[1] >> 3;
 }
+#endif
 
 /*
 
 =item C<static void cvt_num16_num12(unsigned char *dest, const unsigned char
 *src)>
 
-Converts IEEE 754 LE 16-byte long double to i386 LE 12-byte long double .
+Converts IEEE 754 LE 16-byte long double to i386 LE 12-byte long double.
 See http://babbage.cs.qc.cuny.edu/IEEE-754/References.xhtml
 
-Untested.
+Tested ok.
 
 =cut
 
 */
 
-#if (NUMVAL_SIZE == 12) && !PARROT_BIGENDIAN
+#if (NUMVAL_SIZE == 12)
 static void
 cvt_num16_num12(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
@@ -502,10 +504,10 @@ cvt_num16_num12(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
     memset(dest, 0, 12);
     /* simply copy over sign + exp */
-    dest[11] = src[15];
-    dest[12] = src[14];
-    /* and trunc the rest */
-    memcpy(&dest[10], &src[13], 10);
+    dest[10] = src[15];
+    dest[11] = src[14];
+    /* and copy the rest */
+    memcpy(&dest[0], &src[0], 10);
 }
 #endif
 
@@ -557,16 +559,16 @@ cvt_num12_num16(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     +-------+-------+-------+-------+-------+-------+--...--+-------+
     1|<-----15----->|<----------------112 bits--------------------->|
     <---------------------------128 bits---------------------------->
-            16-byte LONG DOUBLE FLOATING-POINT (IA64 or BE 64-bit)
+            16-byte LONG DOUBLE FLOATING-POINT (x86_64 or BE 64-bit)
 
     */
 
     memset(dest, 0, 16);
     /* simply copy over sign + exp */
     dest[15] = src[11];
-    dest[14] = src[12];
-    /* and trunc the rest */
-    memcpy(&dest[13], &src[9], 10);
+    dest[14] = src[10];
+    /* and copy the rest */
+    memcpy(&dest[0], &src[0], 10);
 }
 #endif
 /*
@@ -582,6 +584,7 @@ First variant ok, 2nd not ok.
 
 */
 
+#if (NUMVAL_SIZE == 8)
 static void
 cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
@@ -600,9 +603,9 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     else {
         /* FIXME: This codepath fails */
         int expo, i, s;
-#ifdef __LCC__
+#  ifdef __LCC__
         int expo2;
-#endif
+#  endif
         Parrot_x_force_error_exit(NULL, 1, "cvt_num16_num8: long double conversion unsupported");
 
     /* Have only 12-byte long double, or no long double at all. Need to disect it */
@@ -645,14 +648,14 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
                 dest[7] |= 0x80;
             return;
         }
-#ifdef __LCC__
+#  ifdef __LCC__
         /* LCC blows up mysteriously until a temporary variable is
          * added. */
         expo2 = expo - 16383;
         expo  = expo2;
-#else
+#  else
         expo -= 16383;       /* - same bias as with 12-byte */
-#endif
+#  endif
         expo += 1023;       /* + bias 8byte */
         if (expo <= 0)       /* underflow */
             goto nul;
@@ -675,6 +678,7 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
         dest[0] |= src[1] >> 3;
     }
 }
+#endif
 
 /*
 
@@ -683,7 +687,7 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 Converts IEEE 754 8-byte double to IEEE 754 16 byte long double.
 
-Untested.
+Tested ok.
 
 =cut
 
@@ -761,7 +765,7 @@ cvt_num8_num12_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 Converts a little-endian IEEE 754 8-byte double to big-endian 16-byte long double.
 
-Untested.
+Yet untested.
 
 =cut
 
@@ -815,7 +819,7 @@ Tested nok.
 
 */
 
-#if PARROT_BIGENDIAN
+#if (NUMVAL_SIZE == 8) && PARROT_BIGENDIAN
 static void
 cvt_num12_num8_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
@@ -841,7 +845,7 @@ Tested nok. Produces all zeros.
 
 */
 
-#if PARROT_BIGENDIAN
+#if (NUMVAL_SIZE == 8) && PARROT_BIGENDIAN
 static void
 cvt_num16_num8_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
@@ -866,7 +870,7 @@ Untested.
 
 */
 
-#if !PARROT_BIGENDIAN
+#if (NUMVAL_SIZE == 8) && !PARROT_BIGENDIAN
 static void
 cvt_num16_num8_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {

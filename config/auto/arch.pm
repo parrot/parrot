@@ -95,6 +95,10 @@ sub runstep {
         chomp($archname = `uname -p`);
         $cpuarch = $archname;
     }
+    elsif ( $osname =~ /^VMS/ ) {
+        ($cpuarch = $osname) =~ s/^VMS_//;
+        $osname = 'VMS';
+    }
 
     if ( $archname =~ m/powerpc/ ) {
         $cpuarch = 'ppc';

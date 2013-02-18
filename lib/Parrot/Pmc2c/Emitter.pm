@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2012, Parrot Foundation.
+# Copyright (C) 2004-2013, Parrot Foundation.
 package Parrot::Pmc2c::Emitter;
 use strict;
 use warnings;
@@ -53,6 +53,7 @@ Examples:
 
     # lib/Parrot/Pmc2c/PCCMETHOD.pm
     my $e = Parrot::Pmc2c::Emitter->new( $pmc->filename );
+    my $e = Parrot::Pmc2c::Emitter->new( $pmc->filename(".c") );
 
 =back
 
@@ -341,7 +342,7 @@ sub annotate_worker {
         my $filename = $it->{filename} || $self->filename;
         my $line = $it->{bline};
 
-        #no need to emit unnecessary #line directive
+        # omit unnecessary #line directives
         if ( $line == -1 and $self->filename eq $self->{current_file} ) {
             $data = $it->{data};
         }
@@ -349,7 +350,8 @@ sub annotate_worker {
             $line = $self->{current_line} if $line == -1;
             if (!$Parrot::Pmc2c::Pmc2cMain::OPTIONS->{nolines}) {
                 ( my $filename_escaped = $filename ) =~ s|\\|/|g;
-                $data .= "/* LINE $line \"$filename_escaped\" */\n";
+                $data .= "#line $line \"$filename_escaped\"\n"
+                  unless $filename_escaped =~ m{\Qlib/Parrot/Pmc2c/PCCMETHOD.pm\E$};
             }
             $data .= $it->{data};
         }

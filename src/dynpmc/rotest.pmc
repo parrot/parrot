@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2008, Parrot Foundation.
+ * Copyright (C) 2006-2012, Parrot Foundation.
  */
 
 /*
@@ -8,9 +8,16 @@
  */
 
 pmclass ROTest dynpmc provides scalar extends Integer auto_attrs {
+
     VTABLE void set_integer_native(INTVAL value) :read {
+        UNUSED(INTERP)
+        UNUSED(SELF)
+        UNUSED(value)
     }
+
     VTABLE INTVAL get_integer() :write {
+        UNUSED(INTERP)
+        UNUSED(SELF)
         return 42;
     }
 

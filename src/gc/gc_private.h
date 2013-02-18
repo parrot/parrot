@@ -178,6 +178,8 @@ typedef struct GC_Subsystem {
 
     void (*block_mark)(PARROT_INTERP);
     void (*unblock_mark)(PARROT_INTERP);
+    void (*block_mark_locked)(PARROT_INTERP);
+    void (*unblock_mark_locked)(PARROT_INTERP);
     unsigned int (*is_blocked_mark)(PARROT_INTERP);
 
     void (*block_sweep)(PARROT_INTERP);

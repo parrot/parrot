@@ -560,10 +560,8 @@ CODE
 .end
 
 .sub stdout_tests
-    .local pmc oslib
     .local pmc os
-    oslib = loadlib 'os'
-    os = new ['OS']
+    os = new 'OS'
     $P0 = getstdout
     $P1 = open 'test_file', 'w'
     setstdout $P1

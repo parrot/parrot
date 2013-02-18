@@ -81,7 +81,7 @@ OUT
 unlink 'new_file';
 
 SKIP: {
-    skip 'no asynch calls yet' => 1;
+    skip 'no async calls yet' => 1;
 
     pir_output_is( <<'CODE', <<'OUT', 'open and close - asynchronous' );
 .sub 'test' :main

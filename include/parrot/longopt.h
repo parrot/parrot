@@ -1,5 +1,5 @@
 /* longopt.h
- *  Copyright (C) 2001-2010, Parrot Foundation.
+ *  Copyright (C) 2001-2012, Parrot Foundation.
  *  Overview:
  *     Command line option parsing (for pre-initialized code)
  */
@@ -49,6 +49,7 @@ struct longopt_opt_info {
 #define OPT_GC_DYNAMIC_THRESHOLD  134
 #define OPT_GC_MIN_THRESHOLD      135
 #define OPT_GC_NURSERY_SIZE       136
+#define OPT_NUMTHREADS            137
 
 /* HEADERIZER BEGIN: src/longopt.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003-2009, Parrot Foundation.
+Copyright (C) 2003-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -54,6 +54,22 @@ Make an exact copy of this PMC.
         GET_ATTR_fv(INTERP, SELF, fv);
         SET_ATTR_fv(INTERP, dest, fv);
         return dest;
+    }
+
+/*
+
+=item C<void *get_pointer()>
+
+Return the memory address of an Float PMC. This is needed for certain NCI
+applications and may be disabled in certain security contexts.
+
+=cut
+
+*/
+
+    VTABLE void *get_pointer() {
+        UNUSED(INTERP)
+        return &(PARROT_FLOAT(SELF)->fv);
     }
 
 /*

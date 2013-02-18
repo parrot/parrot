@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008-2011, Parrot Foundation.
+Copyright (C) 2008-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -42,6 +42,7 @@ Initializes the PMC.
 */
 
     VTABLE void init() {
+        UNUSED(INTERP)
         Parrot_Sockaddr_attributes * const attrs =
             (Parrot_Sockaddr_attributes *) PMC_data(SELF);
 
@@ -113,6 +114,7 @@ Returns true if the Sockaddr is defined.
 */
 
     VTABLE INTVAL get_bool() {
+        UNUSED(INTERP)
         const Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
 
         return data->pointer ? 1 : 0;
@@ -147,6 +149,7 @@ Returns a pointer to the C<sockaddr_in> or C<sockaddr_in6>.
 */
 
     VTABLE void *get_pointer() {
+        UNUSED(INTERP)
         const Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
         return data->pointer;
     }
@@ -164,9 +167,9 @@ Returns the string representation of this sockaddr by calling C<getnameinfo(3)>.
         const Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
 
         if (!data->pointer)
-            return Parrot_sprintf_c(interp, "(?)");
+            return Parrot_sprintf_c(INTERP, "(?)");
 
-        return Parrot_io_getnameinfo(INTERP, data->pointer, data->len);
+        return Parrot_io_internal_getnameinfo(INTERP, data->pointer, data->len);
     }
 
 /*
@@ -179,6 +182,7 @@ Returns family, type or protocol. Used for debugging.
 
 */
     VTABLE INTVAL get_integer_keyed_int(INTVAL what) {
+        UNUSED(INTERP)
         const Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
 
         switch (what) {

@@ -46,7 +46,7 @@ cachegrind.out.*
 /.parrot_current_sha1
 /.parrot_current_git_describe
 /CFLAGS
-/MANIFEST.configure.generated
+/MANIFEST.generated
 /Makefile
 /TAGS
 /all_cstring.str
@@ -129,6 +129,7 @@ cachegrind.out.*
 /compilers/tge/TGE/Parser.pir
 /docs/*.tmp
 /docs/Makefile
+/docs/binaries/*.1
 /docs/build
 /docs/doc-prep
 /docs/html
@@ -275,7 +276,6 @@ cachegrind.out.*
 /src/exec_dep.c
 /src/exec_dep.h
 /src/extend_vtable.c
-/src/extra_nci_thunks.c
 /src/fingerprint.c
 /src/glut_callbacks.c
 /src/glut_nci_thunks.c
@@ -328,6 +328,7 @@ cachegrind.out.*
 /src/dynpmc/*.obj
 /src/dynpmc/*.pdb
 /src/dynpmc/*.so
+/src/dynpmc/*.str
 /src/gc/*.o
 /src/gc/*.obj
 /src/interp/*.o

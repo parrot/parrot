@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2011, Parrot Foundation.
+# Copyright (C) 2006-2013, Parrot Foundation.
 
 =head1 NAME
 
@@ -24,12 +24,11 @@ stack, so we don't need to check if this parrot is IPv6-aware.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(20)
+    plan(25)
 
     test_init()
     test_get_fd()
     test_read()
-    test_readline()
     test_clone()
     test_bool()
     test_close()
@@ -38,6 +37,7 @@ stack, so we don't need to check if this parrot is IPv6-aware.
     test_tcp_socket6()
     test_udp_socket()
     test_udp_socket6()
+    test_getprotobyname()
     test_server()
 
 .end
@@ -62,12 +62,6 @@ stack, so we don't need to check if this parrot is IPv6-aware.
     is($N0, 0, 'Socket read returns 0 when not connected')
 .end
 
-.sub test_readline
-    new $P0, ['Socket']
-    $N0 = $P0.'readline'()
-    is($N0, 0, 'Socket readline returns 0 when not connected')
-.end
-
 .sub test_bool
     new $P0, ['Socket']
     nok($P0, 'get_bool on closed Socket')
@@ -85,6 +79,30 @@ stack, so we don't need to check if this parrot is IPv6-aware.
 
     $N0 = $P0.'is_closed'()
     is($N0, 1, 'Socket is_closed returned 1 to new socket')
+.end
+
+.sub test_getprotobyname
+    new $P0, ['Socket']
+    $I0 = $P0.'getprotobyname'("icmp")
+    is($I0, 1, 'Socket getprotobyname(icmp) returned 1')
+
+    $I0 = $P0.'getprotobyname'("tcp")
+    is($I0, 6, 'Socket getprotobyname(tcp) returned 6')
+
+    lives_ok(<<'CODE', "empty protocol name does not coredump")
+.sub main
+    new $P0, ['Socket']
+    $I0 = $P0.'getprotobyname'("")
+.end
+CODE
+
+    lives_ok(<<'CODE', "non-existent protocol name does not coredump")
+.sub main
+    new $P0, ['Socket']
+    $I0 = $P0.'getprotobyname'("junk")
+.end
+CODE
+
 .end
 
 .sub test_clone
@@ -178,8 +196,30 @@ stack, so we don't need to check if this parrot is IPv6-aware.
     is(status, '12', 'send')
     str = sock.'recv'()
     is(str, 'test message', 'recv')
-    sock.'close'()
 
+    .local int i, len, oldlen, readlen
+    i = 0
+  loop:
+    str = concat str, "a"
+    i = i + 1
+    if i < 2048 goto loop
+    oldlen = length str
+    status = sock.'send'(str)
+    is(status, oldlen, 'send() big')
+    str = ""
+    .local string tmpstr
+  loop1:
+    tmpstr = sock.'read'(1024)
+    readlen = length tmpstr
+    str = concat str, tmpstr
+    len = length str
+    # diag(len)
+    if len == 0 goto bigger
+    if len < oldlen goto loop1
+  bigger:
+    is(len, oldlen, 'read(1024) chunked')
+
+    sock.'close'()
     server.'close'()
     status = server.'exit_status'()
     nok(status, 'Exit status of server process')

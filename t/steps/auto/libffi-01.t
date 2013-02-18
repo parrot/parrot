@@ -1,10 +1,10 @@
 #!perl
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2013, Parrot Foundation.
 # auto/libffi-01.t
 
 use strict;
 use warnings;
-use Test::More tests => 28;
+use Test::More tests => 17;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::libffi');
@@ -78,7 +78,7 @@ $conf->data->set( has_libffi => undef );
 
 $conf->options->set(%{$args});
 $step->runstep($conf);
-is( $step->result(), q{no}, "Got expected result" );
+is( $step->result(), q{skipped}, "Got expected result" );
 is( $conf->data->get( 'HAS_LIBFFI' ), 0,
     "'libffi' set to false value as expected" );
 
@@ -92,43 +92,6 @@ ok(! auto::libffi::_evaluate_cc_run('libffi did not worked'),
 $step->set_result(undef);
 $conf->data->set( HAS_LIBFFI => undef );
 $conf->data->set( has_libffi => undef );
-
-##### _handle_pkgconfig_exec #####
-
-my ($pkgconfig_exec, $verbose);
-
-$pkgconfig_exec = 1;
-$verbose = 0;
-$ret = $step->_handle_pkgconfig_exec( $conf, $pkgconfig_exec, $verbose);
-ok( $ret, '_handle_pkgconfig_exec() returned true' );
-ok( ! defined($step->result), 'result undefined as expected' );
-
-$pkgconfig_exec = 0;
-$verbose = 0;
-$ret = $step->_handle_pkgconfig_exec( $conf, $pkgconfig_exec, $verbose);
-ok( ! defined($ret), '_handle_pkgconfig_exec() returned undefined value' );
-is( $step->result, 'lack pkg-config', 'Got expected result' );
-ok( ! defined($conf->data->get( 'HAS_LIBFFI')), 'HAS_LIBFFI undef as expected');
-ok( ! defined($conf->data->get( 'has_libffi')), 'has_libffi undef as expected');
-
-{
-    my ($stdout, $stderr);
-    $pkgconfig_exec = 0;
-    $verbose = 1;
-    capture(
-        sub { $ret =
-            $step->_handle_pkgconfig_exec( $conf, $pkgconfig_exec, $verbose);
-        },
-        \$stdout,
-        \$stderr,
-    );
-    ok( ! defined($ret), '_handle_pkgconfig_exec() returned undefined value' );
-    is( $step->result, 'lack pkg-config', 'Got expected result' );
-    ok( ! defined($conf->data->get( 'HAS_LIBFFI')), 'HAS_LIBFFI undef as expected');
-    ok( ! defined($conf->data->get( 'has_libffi')), 'has_libffi undef as expected');
-    like( $stdout, qr/Program 'pkg-config' needed for libffi/,
-        "Got expected verbose output when pkg-config not found" );
-}
 
 pass("Completed all tests in $0");
 

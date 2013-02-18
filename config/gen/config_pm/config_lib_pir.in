@@ -25,8 +25,9 @@ no_arg:
     branch freeze_config
 is_install:
     set $P0["installed"], "1"
-freeze_config:
+    @NOINSTALL@
 
+freeze_config:
     freeze $S0, $P0
     print $S0
 .end

@@ -5,8 +5,9 @@ use strict;
 use warnings;
 use Getopt::Long ();
 use FindBin qw($Bin);
-use lib "$Bin/../lib";    # install location
-use lib "$Bin/../../lib"; # build location
+use File::Spec ();
+use lib File::Spec->catdir($Bin,'..','lib');    # install location
+use lib File::Spec->catdir($Bin,'..','..','lib'); # build location
 use Parrot::Pmc2c::Pmc2cMain ();
 
 my ( %action, %options, @pmc_include_paths );
@@ -42,7 +43,7 @@ my $self = Parrot::Pmc2c::Pmc2cMain->new(
 );
 
 if ( $action{default} ) {
-    $self->dump_vtable("$Bin/../../src/vtable.tbl");
+    $self->dump_vtable(File::Spec->catfile($Bin,'..','..','src','vtable.tbl'));
     exit;
 }
 

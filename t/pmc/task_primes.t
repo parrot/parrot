@@ -23,6 +23,9 @@ This PIR code implements the classic threads/message passing prime checker.
     say "ok 1 - All tests skipped on Win32"
     exit 0
   run_unix_tests:
+    say "1..1"
+    say "ok 1 - All tests skipped since tasks may only communicate with their creator for now"
+    exit 0
 
     $P0 = get_global 'test_sub'
     tt  = new 'Task', $P0
@@ -131,7 +134,7 @@ maybe_prime:
     nt = make_checker()
 
 ship_it:
-    # More syncrhonous message passing to the
+    # More synchronous message passing to the
     # next task.
     nt.'send'(M)
     M = receive

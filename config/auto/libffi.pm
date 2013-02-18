@@ -46,7 +46,7 @@ sub runstep {
     if ($without) {
         $conf->data->set( HAS_LIBFFI => 0 );
         $conf->data->set( has_libffi => 0 );
-        $self->set_result('no');
+        $self->set_result('skipped');
         return 1;
     }
 
@@ -55,13 +55,11 @@ sub runstep {
     my $pkgconfig_exec = check_progs([ @pkgconfig_variations ], $verbose);
     unless ($pkgconfig_exec) {
         print "Program 'pkg-config' needed for libffi\n" if $verbose;
-        $conf->data->set( HAS_LIBFFI => undef );
-        $conf->data->set( has_libffi => undef );
+        $conf->data->set( HAS_LIBFFI => 0 );
+        $conf->data->set( has_libffi => 0 );
         $self->set_result('lack pkg-config');
         return 1;
     }
-    my $rv = $self->_handle_pkgconfig_exec($conf, $pkgconfig_exec, $verbose);
-    return 1 unless $rv;
 
     my $libffi_options_cflags = '';
     my $libffi_options_libs = '';
@@ -116,20 +114,6 @@ sub _evaluate_cc_run {
     my ($output) = @_;
     my $has_libffi = ( $output =~ m/libffi worked/ ) ? 1 : 0;
     return $has_libffi;
-}
-
-sub _handle_pkgconfig_exec {
-    my ($self, $conf, $pkgconfig_exec, $verbose) = @_;
-    if (! $pkgconfig_exec) {
-        print "Program 'pkg-config' needed for libffi\n" if $verbose;
-        $conf->data->set( HAS_LIBFFI => undef );
-        $conf->data->set( has_libffi => undef );
-        $self->set_result('lack pkg-config');
-        return;
-    }
-    else {
-        return 1;
-    }
 }
 
 1;

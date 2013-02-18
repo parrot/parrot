@@ -1,4 +1,4 @@
-#! nqp
+#!./parrot-nqp
 
 # test protoregexes in grammars
 

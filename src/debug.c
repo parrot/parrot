@@ -2597,9 +2597,11 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
     size_t     size = 0;
     int        specialop = 0;
     op_lib_t  *core_ops = PARROT_GET_CORE_OPLIB(interp);
-
     /* Write the opcode name */
     const char * p = full_name ? info->full_name : info->name;
+#if !defined(PARROT_ASSERTS_ON)
+    UNUSED(space)
+#endif
 
     TRACEDEB_MSG("PDB_disassemble_op");
 

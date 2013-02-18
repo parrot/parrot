@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -204,6 +204,7 @@ Assigns context.
 
 */
     VTABLE void set_pmc(PMC *src) {
+        UNUSED(INTERP)
         STRUCT_COPY(PMC_data_typed(SELF, Parrot_Continuation_attributes *),
                     PMC_data_typed(src,  Parrot_Continuation_attributes *));
     }
@@ -283,10 +284,10 @@ destination to continue execution.
 */
 
     VTABLE opcode_t *invoke(void *next) {
+        UNUSED(next)
         PMC * const        from_obj = Parrot_pcc_get_signature(INTERP, CURRENT_CONTEXT(INTERP));
         opcode_t          *pc;
         PackFile_ByteCode *seg;
-        UNUSED(next)
 
         GET_ATTR_seg(INTERP, SELF, seg);
         GET_ATTR_address(INTERP, SELF, pc);

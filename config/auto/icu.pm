@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2006, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -90,7 +90,7 @@ sub runstep {
 
     # 1st possible return point
     if ( $without_opt ) {
-        $self->_set_no_configure_with_icu($conf, q{not requested});
+        $self->_set_no_configure_with_icu($conf, q{skipped});
         return 1;
     }
 

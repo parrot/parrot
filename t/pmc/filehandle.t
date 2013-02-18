@@ -1,12 +1,12 @@
 #!perl
-# Copyright (C) 2006-2011, Parrot Foundation.
+# Copyright (C) 2006-2013, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 32;
+use Parrot::Test tests => 33;
 use Parrot::Test::Util 'create_tempfile';
 
 =head1 NAME
@@ -137,9 +137,32 @@ pir_output_is( <<'CODE', <<'OUT', 'wrong open' );
     finalize eh
   reportreopen:
     say i
+
+    i = 0
+    set_label eh, catchother
+    fh.'open'('noREADME.pod')
+    goto reportother
+  catchother:
+    i = 1
+    finalize eh
+  reportother:
+    say i
+
+    i = 0
+    set_label eh, catchdir
+    fh.'open'('t')
+    goto reportdir
+  catchdir:
+    i = 1
+    finalize eh
+  reportdir:
+    say i
+
     pop_eh
 .end
 CODE
+1
+1
 1
 1
 OUT
@@ -163,7 +186,7 @@ CODE
 OUT
 
 SKIP: {
-    skip 'no asynch calls yet' => 1;
+    skip 'no async calls yet' => 1;
 
     pir_output_is( <<'CODE', <<'OUT', 'open and close - asynchronous' );
 .sub 'test' :main
@@ -408,7 +431,7 @@ pir_output_is( <<"CODE", <<'OUT', 'record_separator' );
     if \$S0 == \$S99 goto ok_2
     print 'not '
   ok_2:
-    say 'ok 2 - \$P0.record_separator(\$S1)'
+    say 'ok 2 - \$P0.record_separator("a")'
 
     \$P0.'print'(123)
     \$S0 = \$P0.'record_separator'()
@@ -424,36 +447,38 @@ pir_output_is( <<"CODE", <<'OUT', 'record_separator' );
 .end
 CODE
 ok 1 - $S0 = $P1.record_separator() # default
-ok 2 - $P0.record_separator($S1)
+ok 2 - $P0.record_separator("a")
 ok 3 - $P0.record_separator() # .readline works as expected
 OUT
 
 # L<PDD22/I\/O PMC API/=item record_separator>
-pir_output_is( <<'CODE', <<'OUT', 'record_separator, multiple chars', todo => 'not yet implemented' );
+pir_output_is( <<"CODE", <<'OUT', 'record_separator, multiple chars' );
 .sub 'test' :main
-    $P0 = new ['FileHandle']
+    \$P0 = new ['FileHandle']
 
-    $S99 = 'abc'
-    $P0.'record_separator'($S99)
-    $S0 = $P0.'record_separator'()
-    if $S0 == $S99 goto ok_2
+    \$S99 = 'abc'
+    \$P0.'record_separator'(\$S99)
+    \$S0 = \$P0.'record_separator'()
+    if \$S0 == \$S99 goto ok_2
     print 'not '
   ok_2:
-    say 'ok 1 - $P0.record_separator($S1)'
+    say 'ok 1 - \$P0.record_separator("abc")'
 
-    $P0.'print'(123)
-    $S0 = $P0.'record_separator'()
-    $P0.'print'($S0)
-    $P0.'print'(456)
+    \$P0.'open'('$temp_file', 'rw')
+    \$P0.'print'(123)
+    \$S0 = \$P0.'record_separator'()
+    \$P0.'print'(\$S0)
+    \$P0.'print'(456)
 
-    $S0 = $P0.'readline'()
-    if $S0 == '123abc' goto ok_3
+    \$P0.'seek'(0, 0)
+    \$S0 = \$P0.'readline'()
+    if \$S0 == '123abc' goto ok_3
     print 'not '
   ok_3:
-    say 'ok 2 - $P0.record_separator() # .readline works as expected'
+    say 'ok 2 - \$P0.record_separator() # .readline works as expected'
 .end
 CODE
-ok 1 - $P0.record_separator($S1)
+ok 1 - $P0.record_separator("abc")
 ok 2 - $P0.record_separator() # .readline works as expected
 OUT
 
@@ -1098,6 +1123,19 @@ pir_output_is( <<'CODE', <<'OUTPUT', ".read_bytes" );
 
 CODE
 # Copyright (C)
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'No null byte in .readall after readline' );
+.sub main :main
+    $P0 = new ['FileHandle']
+    $P0.'open'('README.pod')
+    $P0.'readline'()
+    $S0 = $P0.'readall'()
+    $I0 = index $S0, "\0"
+    say $I0
+.end
+CODE
+-1
 OUTPUT
 
 # GH #465

@@ -910,8 +910,10 @@ C<TAP;Parser> is designed to produce a proper parse of TAP output.
     push_eh _handler
     $P0.'open'(filename, 'r')
     pop_eh
-    $P0.'encoding'('utf8')
+    $P0.'encoding'('binary')
     $S0 = $P0.'readline'()
+    $I0 = find_encoding 'utf8'
+    $S0 = trans_encoding $S0, $I0
     $I0 = index $S0, '#!'
     unless $I0 == 0 goto L1
     $P0.'close'()
@@ -919,6 +921,7 @@ C<TAP;Parser> is designed to produce a proper parse of TAP output.
     .tailcall self.'exec'($S0, filename)
   L1:
     $P0.'seek'(0, 0)
+    $P0.'encoding'('utf8')
     setattribute self, 'stream', $P0
     .return ()
   _handler:

@@ -182,10 +182,10 @@ sub rewrite_RETURNs {
         $matched =~ /$signature_re/;
         my ( $match, $returns ) = ( $1, $2 );
 
-        my $e = Parrot::Pmc2c::Emitter->new( $pmc->filename );
+        my $e = Parrot::Pmc2c::Emitter->new( $pmc->filename(".c") );
 
         if ($returns eq 'void') {
-            $e->emit( <<"END", __FILE__, __LINE__ + 1 );
+            $e->emit( <<"END" );
     {
     /*BEGIN RETURN $returns */
     $wb
@@ -202,11 +202,11 @@ END
             process_pccmethod_args( parse_p_args_string($returns), 'return' );
 
         if ($returns_signature) {
-        $e->emit( <<"END", __FILE__, __LINE__ + 1 );
+        $e->emit( <<"END" );
     {
     /*BEGIN RETURN $returns */
 END
-        $e->emit( <<"END", __FILE__, __LINE__ + 1 );
+        $e->emit( <<"END" );
     Parrot_pcc_set_call_from_c_args(interp, _call_object,
         "$returns_signature", $returns_varargs);
     $wb
@@ -216,7 +216,7 @@ END
 END
         }
         else { # if ($returns_signature)
-            $e->emit( <<"END", __FILE__, __LINE__ + 1 );
+            $e->emit( <<"END" );
     {
     /*BEGIN RETURN $returns */
     $wb
@@ -330,8 +330,8 @@ sub process_pccmethod_args {
 sub rewrite_pccmethod {
     my ( $method, $pmc ) = @_;
 
-    my $e      = Parrot::Pmc2c::Emitter->new( $pmc->filename );
-    my $e_post = Parrot::Pmc2c::Emitter->new( $pmc->filename );
+    my $e      = Parrot::Pmc2c::Emitter->new( $pmc->filename(".c") );
+    my $e_post = Parrot::Pmc2c::Emitter->new( $pmc->filename(".c") );
 
     # parse pccmethod parameters, then unshift the PMC arg for the invocant
     my $linear_args = parse_p_args_string( $method->parameters );
@@ -355,7 +355,7 @@ sub rewrite_pccmethod {
     rewrite_RETURNs( $method, $pmc );
     rewrite_pccinvoke( $method, $pmc );
 
-    $e->emit( <<"END", __FILE__, __LINE__ + 1 );
+    $e->emit( <<"END");
     PMC * const _ctx         = CURRENT_CONTEXT(interp);
     PMC * const _call_object = Parrot_pcc_get_signature(interp, _ctx);
 
@@ -365,16 +365,16 @@ END
 $params_declarations
 END
     if ($params_signature) {
-        $e->emit( <<"END", __FILE__, __LINE__ + 1 );
+        $e->emit( <<"END");
         Parrot_pcc_fill_params_from_c_args(interp, _call_object, "$params_signature",
             $params_varargs);
 END
     }
-    $e->emit( <<'END', __FILE__, __LINE__ + 1 );
+    $e->emit( <<'END' );
     { /* BEGIN PMETHOD BODY */
 END
 
-    $e_post->emit( <<"END", __FILE__, __LINE__ + 1 );
+    $e_post->emit( <<"END");
 
     } /* END PMETHOD BODY */
 

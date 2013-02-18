@@ -32,7 +32,6 @@
     .param string dir
     .local pmc files, filtered_files, os, it
 
-    $P0            = loadlib 'os'
     os             = new ['OS']
     files          = os.'readdir'(dir)
     filtered_files = new ['ResizablePMCArray']

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -270,6 +270,9 @@ Multiplies the number by C<value> and returns the result in C<*dest>.
 */
 
     MULTI PMC *multiply(Complex value, PMC *dest) {
+        UNUSED(SELF)
+        UNUSED(value)
+        UNUSED(dest)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED, "TODO mul<Float, Complex>");
     }
@@ -299,6 +302,8 @@ Multiplies the number by C<value> and returns the result in C<*dest>.
     }
 
     MULTI void i_multiply(Complex value) {
+        UNUSED(SELF)
+        UNUSED(value)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "TODO i_mul<Float, Complex>");

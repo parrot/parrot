@@ -60,7 +60,7 @@ load_error:
     .return()
 .end
 
-# Programatically create PBC same as t/native_pbc/annotations.pbc and check unpack of it.
+# Programatically create PBC same as t/pmc/testlib/annotations.pbc and check unpack of it.
 .sub 'test_pack_unpack'
     .local pmc pf, pfdir
     pf = new 'Packfile'

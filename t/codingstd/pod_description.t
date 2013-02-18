@@ -39,7 +39,8 @@ my @empty_description;
 foreach my $file ( @{ $need_testing_ref } ) {
     # check DESCRIPTION section on valid POD files
     if ( file_pod_ok($file) and empty_description($file) ) {
-        push @empty_description, $file;
+        # Pod::Simple cannot handle perl6 pod yet (=begin pod/=end pod)
+        push @empty_description, $file unless $file =~ /\.p6$/;
     }
 }
 

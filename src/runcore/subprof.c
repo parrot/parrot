@@ -54,17 +54,15 @@ static void dump_profile_data(PARROT_INTERP, ARGIN(subprofiledata *spdata))
 
 PARROT_CAN_RETURN_NULL
 static opcode_t * findlineannotations(PARROT_INTERP,
-    ARGIN(subprofiledata *spdata),
+    subprofiledata *spdata,
     ARGIN(subprofile *sp),
     ARGOUT(size_t *cntp))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*cntp);
 
 static void finishcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void free_profile_data(PARROT_INTERP, ARGIN(subprofiledata *spdata))
@@ -72,7 +70,6 @@ static void free_profile_data(PARROT_INTERP, ARGIN(subprofiledata *spdata))
         __attribute__nonnull__(2);
 
 static void free_subprofile(PARROT_INTERP, ARGIN(subprofile *sp))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
@@ -96,14 +93,12 @@ static void Parrot_runcore_subprof_sub_init(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 static void popcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void printspname(PARROT_INTERP,
-    ARGIN(const subprofiledata *spdata),
+    const subprofiledata *spdata,
     ARGIN(const subprofile *sp))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 static void runops_subprof_destroy(PARROT_INTERP,
@@ -155,11 +150,10 @@ static char * str2cs(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 PARROT_CANNOT_RETURN_NULL
 static subprofile * sub2subprofile(PARROT_INTERP,
     ARGIN(subprofiledata *spdata),
-    ARGIN(PMC *ctx),
+    PMC *ctx,
     ARGIN(PMC *subpmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
         __attribute__nonnull__(4);
 
 static void sync_callchainchange(PARROT_INTERP,
@@ -174,7 +168,6 @@ PARROT_CANNOT_RETURN_NULL
 static lineinfo * sync_hll_linechange(PARROT_INTERP,
     ARGIN(subprofiledata *spdata),
     ARGIN_NULLOK(opcode_t *pc_op))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_buildcallchain __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -189,18 +182,15 @@ static lineinfo * sync_hll_linechange(PARROT_INTERP,
     , PARROT_ASSERT_ARG(spdata))
 #define ASSERT_ARGS_findlineannotations __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(spdata) \
     , PARROT_ASSERT_ARG(sp) \
     , PARROT_ASSERT_ARG(cntp))
 #define ASSERT_ARGS_finishcallchain __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(spdata))
+       PARROT_ASSERT_ARG(spdata))
 #define ASSERT_ARGS_free_profile_data __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(spdata))
 #define ASSERT_ARGS_free_subprofile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(sp))
+       PARROT_ASSERT_ARG(sp))
 #define ASSERT_ARGS_get_subprofiledata __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(runcore))
@@ -215,11 +205,9 @@ static lineinfo * sync_hll_linechange(PARROT_INTERP,
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_popcallchain __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(spdata))
+       PARROT_ASSERT_ARG(spdata))
 #define ASSERT_ARGS_printspname __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(spdata) \
     , PARROT_ASSERT_ARG(sp))
 #define ASSERT_ARGS_runops_subprof_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -245,15 +233,13 @@ static lineinfo * sync_hll_linechange(PARROT_INTERP,
 #define ASSERT_ARGS_sub2subprofile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(spdata) \
-    , PARROT_ASSERT_ARG(ctx) \
     , PARROT_ASSERT_ARG(subpmc))
 #define ASSERT_ARGS_sync_callchainchange __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(spdata) \
     , PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_sync_hll_linechange __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(spdata))
+       PARROT_ASSERT_ARG(spdata))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -341,6 +327,7 @@ str2cs(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 Return a pointer to the first line annotation of the sub and the number
 of line annotations for this sub.
 
+The C<spdata> argument is currently unused.
 =cut
 
 */
@@ -348,7 +335,7 @@ of line annotations for this sub.
 PARROT_CAN_RETURN_NULL
 static opcode_t *
 findlineannotations(PARROT_INTERP,
-                    ARGIN(subprofiledata *spdata),
+                    SHIM(subprofiledata *spdata),
                     ARGIN(subprofile *sp),
                     ARGOUT(size_t *cntp))
 {
@@ -524,13 +511,15 @@ createlines(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
 
 ...
 
+The C<ctx> argument is currently unused.
+
 =cut
 
 */
 
 PARROT_CANNOT_RETURN_NULL
 static subprofile *
-sub2subprofile(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(PMC *ctx), ARGIN(PMC *subpmc))
+sub2subprofile(PARROT_INTERP, ARGIN(subprofiledata *spdata), SHIM(PMC *ctx), ARGIN(PMC *subpmc))
 {
     ASSERT_ARGS(sub2subprofile)
 
@@ -577,7 +566,7 @@ sub2subprofile(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(PMC *ctx), AR
 */
 
 static void
-popcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata))
+popcallchain(SHIM_INTERP, ARGIN(subprofiledata *spdata))
 {
     ASSERT_ARGS(popcallchain)
 
@@ -617,7 +606,7 @@ the process.
 */
 
 static void
-finishcallchain(PARROT_INTERP, ARGIN(subprofiledata *spdata))
+finishcallchain(SHIM_INTERP, ARGIN(subprofiledata *spdata))
 {
     ASSERT_ARGS(finishcallchain)
 
@@ -794,12 +783,14 @@ const subprofile *sp)>
 
 Prints the name of the subprofile given in C<sp>.
 
+The C<spdata> argument is currently unused.
+
 =cut
 
 */
 
 static void
-printspname(PARROT_INTERP, ARGIN(const subprofiledata *spdata), ARGIN(const subprofile *sp))
+printspname(PARROT_INTERP, SHIM(const subprofiledata *spdata), ARGIN(const subprofile *sp))
 {
     ASSERT_ARGS(printspname)
 
@@ -967,7 +958,7 @@ free memory we allocated for this subprofile
 */
 
 static void
-free_subprofile(PARROT_INTERP, ARGIN(subprofile *sp))
+free_subprofile(SHIM_INTERP, ARGIN(subprofile *sp))
 {
     ASSERT_ARGS(free_subprofile)
 
@@ -1134,7 +1125,7 @@ bring the line data in sync with the pc
 
 PARROT_CANNOT_RETURN_NULL
 static lineinfo *
-sync_hll_linechange(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN_NULLOK(opcode_t *pc_op))
+sync_hll_linechange(SHIM_INTERP, ARGIN(subprofiledata *spdata), ARGIN_NULLOK(opcode_t *pc_op))
 {
     ASSERT_ARGS(sync_hll_linechange)
 

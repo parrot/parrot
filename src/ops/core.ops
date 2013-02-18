@@ -58,6 +58,8 @@ Halts the interpreter. See also B<exit>.
 =cut
 
 inline op end()  :check_event :flow {
+    UNUSED(interp);
+    UNUSED(cur_opcode);
     goto ADDRESS(0);
 }
 
@@ -97,7 +99,6 @@ actions on it.
 
 inline op noop()  {
     UNUSED(interp);
-    UNUSED(CUR_OPCODE);
 }
 
 inline op check_events()  :flow {
@@ -566,7 +567,7 @@ inline op result_info(out PMC) {
             Parrot_str_new_constant(interp, "return_flags"));
 
     /* If no elements, hand back empty array; otherwise PMC. */
-    if (!sig)
+    if (PMC_IS_NULL(sig))
         $1 = Parrot_pmc_new(interp, enum_class_FixedIntegerArray);
     else
         $1 = sig;
@@ -636,6 +637,16 @@ stored within the task PMC.
 
 inline op schedule(invar PMC) {
     Parrot_cx_schedule_task(interp, $1);
+}
+
+=item B<schedule_local>(invar PMC)
+
+Like schedule but execute it on the current thread.
+
+=cut
+
+inline op schedule_local(invar PMC) {
+    Parrot_cx_schedule_immediate(interp, $1);
 }
 
 =item B<addhandler>(invar PMC)

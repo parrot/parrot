@@ -1,4 +1,4 @@
-# Copyright (C) 2011-2012, Parrot Foundation.
+# Copyright (C) 2011-2013, Parrot Foundation.
 
 =head1 NAME
 
@@ -27,7 +27,25 @@ lists may be incomplete.
 Notifications for the 2.6->2.9 transition and later will be complete.
 
 For instructions on how to deprecate Parrot code, please see:
- F<how-to-deprecate.pod>.
+ F<how_to_deprecate.pod>.
+
+=head2 Changes Between 4.9 and 5.0
+
+=over 4
+
+=item *
+
+Moved "." in the library search paths from the beginning to the end.
+
+- high impact expected:
+  build systems need to change their build and tests to favor their new libraries
+  over already installed ones, to use absolute paths or add -L./ -X./.
+  load_bytecode, .include and load_language might load now different files,
+  if they exist in "./" AND in the proper library location.
+  To keep the old behavior use parrot -L./ -X./ or set the environment variables
+  PARROT_INCLUDE and PARROT_LIBRARY to "./"
+
+=back
 
 =head2 Changes Between 3.3 and 3.6
 
@@ -166,6 +184,7 @@ Remove ParrotPCCINVOKE.
   this function has been deprecated for a long time.
 
 =item *
+
 Remove Parrot_find_global_s and Parrot_store_global_s  TT #1660
 
 - low impact expected: these functions were used rarely outside Parrot.
@@ -188,6 +207,7 @@ Eliminate Raw NCI.
 Remove Parrot_get_runtime_prefix.  TT #1191
 
 - Zero impact expected, it's been unused since long time.
+
 =item *
 
 RemoveIsTty Remove is_tty methods.  #1689

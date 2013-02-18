@@ -161,6 +161,7 @@ Parrot_str_init(PARROT_INTERP)
 
     interp->const_cstring_table =
         mem_gc_allocate_n_zeroed_typed(interp, n_parrot_cstrings, STRING *);
+    PARROT_ASSERT(interp->const_cstring_table != NULL);
 
     for (i = 0; i < n_parrot_cstrings; ++i) {
         DECL_CONST_CAST;
@@ -700,7 +701,7 @@ STRING *encodingname)>
 Given a buffer and an encoding, creates and returns a new string. If buffer is
 NULL the result is a null string. Otherwise, the buffer should be a zero
 terminated c-style string and its content must be valid for the encoding
-specified. If encoding is null, assume plaftorm encoding.
+specified. If encoding is null, assume platform encoding.
 
 =cut
 

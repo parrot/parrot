@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011, Parrot Foundation.
+Copyright (C) 2011-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -47,7 +47,6 @@ static INTVAL find_called_tag(PARROT_INTERP,
 PARROT_CAN_RETURN_NULL
 static PackFile_ConstTable * get_const_table(PARROT_INTERP,
     ARGIN(PMC * self))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_add_called_tag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -59,8 +58,7 @@ static PackFile_ConstTable * get_const_table(PARROT_INTERP,
     , PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(tag))
 #define ASSERT_ARGS_get_const_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
+       PARROT_ASSERT_ARG(self))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -76,7 +74,7 @@ Get the constant table for the PackFile*. Return NULL if there's a problem.
 
 PARROT_CAN_RETURN_NULL
 static PackFile_ConstTable *
-get_const_table(PARROT_INTERP, ARGIN(PMC * self))
+get_const_table(SHIM_INTERP, ARGIN(PMC * self))
 {
     ASSERT_ARGS(get_const_table)
     Parrot_PackfileView_attributes * const attrs =
@@ -175,6 +173,7 @@ Mark the PMC and the PackFile* contents
     }
 
     VTABLE void init() {
+        UNUSED(INTERP)
         Parrot_PackfileView_attributes * const attrs =
                 PARROT_PACKFILEVIEW(SELF);
         attrs->pf = NULL;
@@ -224,10 +223,12 @@ otherwise.
     }
 
     VTABLE void *get_pointer() {
+        UNUSED(INTERP)
         return PARROT_PACKFILEVIEW(SELF)->pf;
     }
 
     VTABLE INTVAL get_bool() {
+        UNUSED(INTERP)
         return (PARROT_PACKFILEVIEW(SELF)->pf != NULL);
     }
 
@@ -242,10 +243,12 @@ otherwise.
 */
 
     VTABLE void set_string_native(STRING * path) {
+        UNUSED(INTERP)
         PARROT_PACKFILEVIEW(SELF)->path = path;
     }
 
     VTABLE STRING * get_string() {
+        UNUSED(INTERP)
         Parrot_PackfileView_attributes * const attrs =
                 PARROT_PACKFILEVIEW(SELF);
         return attrs->path ? attrs->path : STRINGNULL;
@@ -395,7 +398,7 @@ Determine if the given tag has been marked initialized
     }
 
     METHOD all_tags() {
-        PMC * const array = Parrot_pf_all_tags_list(interp, SELF);
+        PMC * const array = Parrot_pf_all_tags_list(INTERP, SELF);
         RETURN(PMC *array);
     }
 
