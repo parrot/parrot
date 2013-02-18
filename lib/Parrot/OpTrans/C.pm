@@ -109,9 +109,9 @@ our %arg_maps = (
 
     'ic'  => "cur_opcode[%ld]",
     'nc'  => "NCONST(%ld)",
-    'pc'  => "CONST(%ld)->u.key",
+    'pc'  => "PCONST(%ld)",
     'sc'  => "SCONST(%ld)",
-    'kc'  => "CONST(%ld)->u.key",
+    'kc'  => "PCONST(%ld)",
     'kic' => "cur_opcode[%ld]"
 );
 
