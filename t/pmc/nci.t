@@ -38,7 +38,7 @@ SKIP: {
     unless ( -e "runtime/parrot/dynext/libnci_test$PConfig{load_ext}" ) {
         plan skip_all => "Please make libnci_test$PConfig{load_ext}";
     }
-    plan tests => 61;
+    plan tests => 60;
 
     pir_output_is( << 'CODE', << 'OUTPUT', 'load library fails' );
 .sub test :main
@@ -522,30 +522,6 @@ libnci_test was successfully loaded
 nci_dlvar_int is a ptr
 nci_pv returned non-NULL ptr
 nci_pv same ptr as nci_dlvar_int
-OUTPUT
-
-    pir_output_is( <<'CODE', <<'OUTPUT', 'nci_dd - PASM' );
-
-.sub test :main
-  loadlib P1, "libnci_test"
-  print "loaded\n"
-  dlfunc $P0, $P1, "nci_dd", "dd"
-  print "dlfunced\n"
-  set_args "0", 4.0
-  invokecc $P0
-  get_results "0", $N5
-  ne $N5, 8.0, nok_1
-  print "ok 1\n"
-  end
-nok_1: print "nok 1\n"
-  print $N5
-  print "\n"
-  end
-.end
-CODE
-loaded
-dlfunced
-ok 1
 OUTPUT
 
     pir_output_is( << 'CODE', << 'OUTPUT', 'nci_dd - PIR' );
@@ -1389,20 +1365,12 @@ OUTPUT
   # so spin a bit
   set $I20, 0
 loop:
-<<<<<<< HEAD
   inc $I20
-  sleep 0.01
+  # Avoid sleep deadlocks in threads branch [GH #808]
+  # sleep 0.01
   get_global $P11, "cb_done"
   if $P11, fin
   gt $I20, 10, err
-=======
-  inc I20
-  # Avoid sleep deadlocks in threads branch [GH #808]
-  # sleep 0.01
-  get_global P11, "cb_done"
-  if P11, fin
-  gt I20, 10000, err
->>>>>>> master
   branch loop
 fin:
   print "done.\n"
@@ -1532,19 +1500,11 @@ OUTPUT
   # so spin a bit
   set $I20, 0
 loop:
-<<<<<<< HEAD
   inc $I20
-  sleep 0.01
+  #sleep 0.01
   get_global $P11, "cb_done"
   if $P11, fin
   gt $I20, 10, err
-=======
-  inc I20
-  #sleep 0.01
-  get_global P11, "cb_done"
-  if P11, fin
-  gt I20, 10000, err
->>>>>>> master
   branch loop
 fin:
   print "done.\n"
@@ -1689,19 +1649,11 @@ OUTPUT
   # so spin a bit
   set $I20, 0
 loop:
-<<<<<<< HEAD
   inc $I20
-  sleep 0.01
+  #sleep 0.01
   get_global $P11, "cb_done"
   if $P11, fin
   gt $I20, 10, err
-=======
-  inc I20
-  #sleep 0.01
-  get_global P11, "cb_done"
-  if P11, fin
-  gt I20, 10000, err
->>>>>>> master
   branch loop
 fin:
   print "done.\n"
@@ -1758,19 +1710,11 @@ OUTPUT
   # so spin a bit
   set $I20, 0
 loop:
-<<<<<<< HEAD
   inc $I20
-  sleep 0.01
+  #sleep 0.01
   get_global $P11, "cb_done"
   if $P11, fin
   gt $I20, 10, err
-=======
-  inc I20
-  #sleep 0.01
-  get_global P11, "cb_done"
-  if P11, fin
-  gt I20, 10000, err
->>>>>>> master
   branch loop
 fin:
   print "done.\n"
