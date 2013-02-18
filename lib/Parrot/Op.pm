@@ -280,6 +280,26 @@ sub body {
     return $self->{BODY};
 }
 
+=item C<needs_write_barrier>
+
+Return true if this op needs a write barrier.  This is true for ops with
+inout/out PMC/STR params.
+
+=cut
+
+sub needs_write_barrier {
+    my ($self) = shift;
+    my $need = 0;
+    # We need write barriers only for (in)out PMC|STR
+    foreach my $i (0 .. @{$self->{ARGS}} - 1) {
+        my ($arg, $argdir) = ($self->{ARGS}[$i], $self->{ARGDIRS}[$i]);
+        return 1 if (
+            ($arg eq 's' || $arg eq 'p') &&
+            ($argdir eq 'o' || $argdir eq 'io'));
+    }
+    return 0;
+}
+
 =item C<jump($jump)>
 
 =item C<jump()>

@@ -467,7 +467,7 @@ END_CODE
     }
 
     unless (exists($$flags{flow})) {
-        $body .= "\ngoto NEXT();";
+        $body .= "\ngoto NEXT();\n";
     }
 
     foreach my $variant ( expand_args(@$args) ) {
@@ -528,13 +528,18 @@ END_CODE
 
         $body =~ s/\$(\d+)/{{\@$1}}/mg;
 
+        # add write barriers
+        if ($op->needs_write_barrier && !exists($$flags{flow})) {
+            my $barrier = "    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));\n";
+            $body =~ s/({{[+=])/$barrier$1/mg;
+        }
+
         # We can only reference as many parameters as we declare
         my $max_arg_num = @$args;
         my @found_args = ($body =~ m/{{@(\d+)}}/g);
         foreach my $arg (@found_args) {
             die "opcode '$short_name' uses '\$$arg' but only has $max_arg_num parameters.\n" if $arg > $max_arg_num;
         }
-
 
         my $file_escaped = $file;
         $file_escaped =~ s|(\\)|$1$1|g;    # escape backslashes
