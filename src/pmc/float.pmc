@@ -248,19 +248,11 @@ The C<==> operation.
 
 */
 
-    MULTI INTVAL is_equal(Float value) {
+    VTABLE INTVAL is_equal(PMC *value) {
         return (INTVAL)(SELF.get_number() == VTABLE_get_number(INTERP, value));
     }
 
-    MULTI INTVAL is_equal(DEFAULT *value) {
-        return (INTVAL)(SELF.get_number() == VTABLE_get_number(INTERP, value));
-    }
-
-    MULTI INTVAL is_equal_num(Float value) {
-        return (INTVAL)(SELF.get_number() == VTABLE_get_number(INTERP, value));
-    }
-
-    MULTI INTVAL is_equal_num(DEFAULT value) {
+    VTABLE INTVAL is_equal_num(PMC *value) {
         return (INTVAL)(SELF.get_number() == VTABLE_get_number(INTERP, value));
     }
 
@@ -274,14 +266,8 @@ The C<cmp> operation.
 
 */
 
-    MULTI INTVAL cmp(Float value) {
+    VTABLE INTVAL cmp(PMC *value) {
         const FLOATVAL diff = SELF.get_number() - VTABLE_get_number(INTERP, value);
-        return diff > 0 ? 1 : diff < 0 ? -1 : 0;
-    }
-
-    MULTI INTVAL cmp(DEFAULT value) {
-        const FLOATVAL diff =
-                SELF.get_number() - VTABLE_get_number(INTERP, value);
         return diff > 0 ? 1 : diff < 0 ? -1 : 0;
     }
 
@@ -295,19 +281,24 @@ Returns the result of comparing the number with C<*value>.
 
 */
 
-    MULTI INTVAL cmp_num(Float value) {
-        const FLOATVAL diff = SELF.get_number() - VTABLE_get_number(INTERP, value);
-        return diff > 0 ? 1 : diff < 0 ? -1 : 0;
-    }
-
-    MULTI INTVAL cmp_num(DEFAULT value) {
-        /* fix an apparent gcc 4.4.x and 4.5.x bug that manifests itself when
-         * using g++ and an optimized build. See TT #1978.
-         */
-        volatile FLOATVAL n1 = SELF.get_number();
-        volatile FLOATVAL n2 = VTABLE_get_number(INTERP, value);
-        const FLOATVAL diff = n1 - n2;
-        return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+    VTABLE INTVAL cmp_num(PMC *value) {
+        switch (value->vtable->base_type) {
+            case enum_class_Float:
+                {
+                    const FLOATVAL diff = SELF.get_number() - VTABLE_get_number(INTERP, value);
+                    return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+                }
+            default:
+                {
+                    /* fix an apparent gcc 4.4.x and 4.5.x bug that manifests itself when
+                     * using g++ and an optimized build. See TT #1978.
+                     */
+                    volatile FLOATVAL n1 = SELF.get_number();
+                    volatile FLOATVAL n2 = VTABLE_get_number(INTERP, value);
+                    const FLOATVAL diff = n1 - n2;
+                    return diff > 0 ? 1 : diff < 0 ? -1 : 0;
+                }
+        }
     }
 
 /*
