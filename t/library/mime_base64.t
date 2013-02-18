@@ -419,7 +419,7 @@ CODE
     .param string base64
     .param string comment
 
-    .include "iglobals.pasm"
+    .include "iglobals.pir"
     .local pmc interp
     interp = getinterp
     .local pmc config

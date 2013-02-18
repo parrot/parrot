@@ -98,7 +98,7 @@ perl -MMIME::Base64 -e'for ([qq(a2)],[qq(c2a2)],[qw(203e)],[qw(3e 20)],[qw(1000)
     .local string plain, base64, comment, comment_count, enc, esc_plain, hex_str
     hex_str = ''
 
-    .include "iglobals.pasm"
+    .include "iglobals.pir"
     .local pmc interp
     interp = getinterp
     .local pmc config
@@ -227,7 +227,7 @@ loop_1:
     .param string base64
     .param string comment
 
-    .include "iglobals.pasm"
+    .include "iglobals.pir"
     .local pmc interp
     interp = getinterp
     .local pmc config

@@ -71,8 +71,8 @@ my ($builddir, $versiondir, $libdir, $prefix) = @PConfig{qw(build_dir versiondir
 my $versionlib = $libdir . $versiondir;
 my $what = 'DYNEXT';
 my $code = <<"CODE";
-.include 'iglobals.pasm'
-.include 'libpaths.pasm'
+.include 'iglobals.pir'
+.include 'libpaths.pir'
 
 .sub main :main
     .local pmc interp
