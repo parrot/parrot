@@ -507,6 +507,31 @@ Parrot_pf_subs_by_tag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
 
 /*
 
+=item C<PMC * Parrot_pf_first_sub_by_tag(PARROT_INTERP, PMC * pfpmc, STRING *
+flag)>
+
+Get the first Sub in the packfile by named flag.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_pf_first_sub_by_tag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
+{
+    ASSERT_ARGS(Parrot_pf_first_sub_by_tag)
+
+    /* XXX if this turns out 'hot', use custom implementation */
+    PMC * const subs = Parrot_pf_subs_by_tag(interp, pfpmc, flag);
+    return PMC_IS_NULL(subs)
+        ? PMCNULL
+        : VTABLE_get_pmc_keyed_int(interp, subs, 0);
+}
+
+/*
+
 =item C<PMC * Parrot_pf_all_tags_list(PARROT_INTERP, PMC * pfpmc)>
 
 Return a ResizableStringArray of all tags in the packfile.
@@ -621,6 +646,41 @@ Parrot_pf_all_subs(PARROT_INTERP, ARGIN(PMC *pfpmc))
         return array;
     }
 }
+
+/*
+
+=item C<PMC * Parrot_pf_first_sub(PARROT_INTERP, PMC *pfpmc)>
+
+Returns the first Sub PMC from the packfile
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
+PMC *
+Parrot_pf_first_sub(PARROT_INTERP, ARGIN(PMC *pfpmc))
+{
+    ASSERT_ARGS(Parrot_pf_first_sub)
+    PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
+    if (!pf || !pf->cur_cs || !pf->cur_cs->const_table)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "NULL or invalid packfile");
+
+    {
+        PackFile_ConstTable * const ct = pf->cur_cs->const_table;
+        INTVAL i;
+        STRING * const SUB = CONST_STRING(interp, "Sub");
+        for (i = 0; i < ct->pmc.const_count; ++i) {
+            PMC * const x = ct->pmc.constants[i];
+            if (VTABLE_isa(interp, x, SUB))
+                return x;
+        }
+        return PMCNULL;
+    }
+}
+
 /*
 
 =item C<static int sub_pragma(PARROT_INTERP, pbc_action_enum_t action, const PMC

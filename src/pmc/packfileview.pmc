@@ -347,6 +347,10 @@ Get the :main sub from the packfile, if any.
 
 Get an array of all Subs with the given tag.
 
+=item C<METHOD first_sub_by_tag(STRING *tag)>
+
+Get the first Sub with the given tag.
+
 =item C<METHOD trigger(STRING *flag)>
 
 Trigger subs with the given flag. Currently supported values are "load" and
@@ -364,11 +368,15 @@ Return a hash map of all tags, and the lists of pmcs with those tags.
 
 Return a ResizablePMCArray with all Sub constants from the constant table.
 
-item C<METHOD mark_initialized(STRING *tag)>
+=item C<METHOD first_sub()>
+
+Returns the first Sub constant from the constant table.
+
+=item C<METHOD mark_initialized(STRING *tag)>
 
 Mark a given tag as being initialized
 
-item C<METHOD is_initialized(STRING *tag)>
+=item C<METHOD is_initialized(STRING *tag)>
 
 Determine if the given tag has been marked initialized
 
@@ -392,9 +400,19 @@ Determine if the given tag has been marked initialized
         RETURN(PMC *subs);
     }
 
+    METHOD first_sub_by_tag(STRING *flag) {
+        PMC * const sub = Parrot_pf_first_sub_by_tag(INTERP, SELF, flag);
+        RETURN(PMC *sub);
+    }
+
     METHOD all_subs() {
         PMC * const array = Parrot_pf_all_subs(INTERP, SELF);
         RETURN(PMC *array);
+    }
+
+    METHOD first_sub() {
+        PMC * const sub = Parrot_pf_first_sub(INTERP, SELF);
+        RETURN(PMC *sub);
     }
 
     METHOD all_tags() {
