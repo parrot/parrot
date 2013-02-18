@@ -1,5 +1,7 @@
-2013-02-XX    release 5.1.0
+2013-02-19    release 5.1.0
     - Core
+        + The .sort() method was added to the FixedFloatArray PMC
+        + Improved detection of system memory for machines with >2GB
     - Documentation
     - Tests
     - Community
