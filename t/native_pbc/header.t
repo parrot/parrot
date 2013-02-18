@@ -28,7 +28,9 @@ Tests the layout of the PBC header.
 # idea stolen from t/pmc/sub.t
 my $tmppir = File::Temp->new( UNLINK => 1, SUFFIX => '.pir', CLEANUP => 1 );
 print $tmppir <<END;
+.sub main :main
 set \$I0, 0
+.end
 END
 $tmppir->flush;
 my $out_f = File::Temp->new( UNLINK => 1, SUFFIX => '.pbc', CLEANUP => 1 );
