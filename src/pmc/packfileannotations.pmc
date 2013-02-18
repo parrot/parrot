@@ -143,20 +143,19 @@ thrown unless all of the following criteria are met:
         const Parrot_PackfileAnnotation_attributes  * const entity_attrs =
                 PARROT_PACKFILEANNOTATION(annotation);
         INTVAL dummy;
+        STRING * const constant_str = CONST_STRING(INTERP, "get_or_create_constant_str");
 
         /* TODO: add checks desribed above */
         VTABLE_set_pmc_keyed_int(INTERP, attrs->annotations, index, annotation);
 
         /* Add required constants */
-        Parrot_mmd_multi_dispatch_from_c_args(INTERP,
-            "get_or_create_constant", "PS->I", attrs->const_table,
-            entity_attrs->name, &dummy);
+        Parrot_pcc_invoke_method_from_c_args(INTERP, attrs->const_table,
+            constant_str, "S->I", entity_attrs->name, &dummy);
 
         switch (entity_attrs->value_type) {
             case PF_ANNOTATION_KEY_TYPE_STR:
-                Parrot_mmd_multi_dispatch_from_c_args(INTERP,
-                    "get_or_create_constant", "PS->I", attrs->const_table,
-                    entity_attrs->str_value, &dummy);
+                Parrot_pcc_invoke_method_from_c_args(INTERP, attrs->const_table,
+                    constant_str, "S->I", entity_attrs->str_value, &dummy);
                 break;
 
             default:
@@ -302,6 +301,8 @@ Create PackFile_Annotations* from self.
             PMC  * const entity = VTABLE_get_pmc_keyed_int(INTERP, attrs->annotations, i);
             const Parrot_PackfileAnnotation_attributes * const entity_attrs =
                 PARROT_PACKFILEANNOTATION(entity);
+            STRING * const constant_str = CONST_STRING(INTERP, "get_or_create_constant_str");
+            STRING * const constant_pmc = CONST_STRING(INTERP, "get_or_create_constant_pmc");
 
             /* Handle creating of Key */
             PMC * key_array = VTABLE_get_pmc_keyed_str(INTERP, keys, entity_attrs->name);
@@ -316,8 +317,8 @@ Create PackFile_Annotations* from self.
             }
 
             /* lookup constant for name. */
-            Parrot_mmd_multi_dispatch_from_c_args(INTERP, "get_or_create_constant",
-                        "PS->I", attrs->const_table, entity_attrs->name, &name_id);
+            Parrot_pcc_invoke_method_from_c_args(INTERP, attrs->const_table,
+                constant_str, "S->I", entity_attrs->name, &name_id);
 
             /* lookup value */
             switch (entity_attrs->value_type) {
@@ -325,14 +326,12 @@ Create PackFile_Annotations* from self.
                     value_id = entity_attrs->int_value;
                     break;
                 case PF_ANNOTATION_KEY_TYPE_STR:
-                    Parrot_mmd_multi_dispatch_from_c_args(INTERP, "get_or_create_constant",
-                            "PS->I", attrs->const_table, entity_attrs->str_value,
-                            &value_id);
+                    Parrot_pcc_invoke_method_from_c_args(INTERP, attrs->const_table,
+                        constant_str, "S->I", entity_attrs->str_value, &value_id);
                     break;
                 case PF_ANNOTATION_KEY_TYPE_PMC:
-                    Parrot_mmd_multi_dispatch_from_c_args(INTERP, "get_or_create_constant",
-                            "PP->I", attrs->const_table, entity_attrs->pmc_value,
-                            &value_id);
+                    Parrot_pcc_invoke_method_from_c_args(INTERP, attrs->const_table,
+                        constant_str, "P->I", entity_attrs->pmc_value, &value_id);
                     break;
                 default:
                     Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_MALFORMED_PACKFILE,

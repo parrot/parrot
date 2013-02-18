@@ -351,7 +351,7 @@ Get or create constant for passed value.
 =cut
 
 */
-    MULTI INTVAL get_or_create_constant(STRING *value) {
+    METHOD INTVAL get_or_create_constant_str(STRING *value) {
         Parrot_PackfileConstantTable_attributes * const attrs =
                 PARROT_PACKFILECONSTANTTABLE(SELF);
         const INTVAL num = VTABLE_elements(INTERP, attrs->str_constants);
@@ -360,15 +360,15 @@ Get or create constant for passed value.
         for (i=0; i < num; ++i) {
             STRING * const str = VTABLE_get_string_keyed_int(INTERP, attrs->str_constants, i);
             if (STRING_equal(INTERP, value, str))
-                return i;
+                RETURN(INTVAL i);
         }
 
         /* Constant not found. Add new one */
         SELF.set_string_keyed_int(i, value);
-        return i;
+        RETURN(INTVAL i);
     }
 
-    MULTI INTVAL get_or_create_constant(FLOATVAL value) {
+    METHOD INTVAL get_or_create_constant_num(FLOATVAL value) {
         Parrot_PackfileConstantTable_attributes * const attrs =
                 PARROT_PACKFILECONSTANTTABLE(SELF);
         const INTVAL num = VTABLE_elements(INTERP, attrs->num_constants);
@@ -377,15 +377,15 @@ Get or create constant for passed value.
         for (i=0; i < num; ++i) {
             const FLOATVAL val = VTABLE_get_number_keyed_int(INTERP, attrs->num_constants, i);
             if (FLOAT_IS_ZERO(fabs(val - value)))
-                return i;
+                RETURN(INTVAL i);
         }
 
         /* Constant not found. Add new one */
         SELF.set_number_keyed_int(i, value);
-        return i;
+        RETURN(INTVAL i);
     }
 
-    MULTI INTVAL get_or_create_constant(PMC *value) {
+    METHOD INTVAL get_or_create_constant_pmc(PMC *value) {
         Parrot_PackfileConstantTable_attributes * const attrs =
                 PARROT_PACKFILECONSTANTTABLE(SELF);
         const INTVAL   num = VTABLE_elements(INTERP, attrs->pmc_constants);
@@ -394,12 +394,12 @@ Get or create constant for passed value.
         for (i=0; i < num; ++i) {
             PMC * const val = VTABLE_get_pmc_keyed_int(INTERP, attrs->pmc_constants, i);
             if (VTABLE_is_equal(INTERP, value, val))
-                return i;
+                RETURN(INTVAL i);
         }
 
         /* Constant not found. Add new one */
         SELF.set_pmc_keyed_int(i, value);
-        return i;
+        RETURN(INTVAL i);
     }
 
 /*

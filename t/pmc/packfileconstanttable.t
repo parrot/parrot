@@ -157,20 +157,20 @@ load_error:
 .sub 'test_get_or_create'
     .local pmc pfc
     pfc = new 'PackfileConstantTable'
-    $I1 = pfc.'get_or_create_constant'('foo')
-    $I2 = pfc.'get_or_create_constant'('foo')
+    $I1 = pfc.'get_or_create_constant_str'('foo')
+    $I2 = pfc.'get_or_create_constant_str'('foo')
     is($I1, $I2, "get_or_create_constant returs same string value for same key")
 
-    $I2 = pfc.'get_or_create_constant'('bar')
+    $I2 = pfc.'get_or_create_constant_str'('bar')
     $I0 = $I1 != $I2
     ok($I0, "get_or_create_constant returs different string values for different keys")
 
 
-    $I1 = pfc.'get_or_create_constant'(1.0)
-    $I2 = pfc.'get_or_create_constant'(1.0)
+    $I1 = pfc.'get_or_create_constant_num'(1.0)
+    $I2 = pfc.'get_or_create_constant_num'(1.0)
     is($I1, $I2, "get_or_create_constant returs same number value for same key")
 
-    $I2 = pfc.'get_or_create_constant'(42.1)
+    $I2 = pfc.'get_or_create_constant_num'(42.1)
     $I0 = $I1 != $I2
     ok($I0, "get_or_create_constant returs different number values for different keys")
 
@@ -184,10 +184,10 @@ load_error:
     $P2 = 1
     $P2[0] = 84
 
-    $I0 = pfc.'get_or_create_constant'($P0)
-    $I1 = pfc.'get_or_create_constant'($P1)
+    $I0 = pfc.'get_or_create_constant_pmc'($P0)
+    $I1 = pfc.'get_or_create_constant_pmc'($P1)
     is($I0, $I1, "get_or_create_constant returns same index for equal PMCs")
-    $I2 = pfc.'get_or_create_constant'($P2)
+    $I2 = pfc.'get_or_create_constant_pmc'($P2)
     isnt($I0, $I2, "get_or_create_constant returns different index for different PMCs")
 .end
 
