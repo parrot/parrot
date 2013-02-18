@@ -148,7 +148,6 @@ const string C_MAIN = <<:MAIN
         {
             Parrot_PMC class_pmc = get_class_pmc(interp, "IMCCompiler");
             get_imcc_compiler_pmc(interp, class_pmc, 0);
-            get_imcc_compiler_pmc(interp, class_pmc, 1);
         }
 
         PARROT_CANNOT_RETURN_NULL
@@ -169,6 +168,7 @@ const string C_MAIN = <<:MAIN
         static void
         get_imcc_compiler_pmc(Parrot_PMC interp, Parrot_PMC class_pmc, Parrot_Int is_pasm)
         {
+            /* is_pasm is only used here for error checking */
             Parrot_PMC is_pasm_pmc = NULL;
             Parrot_PMC compiler_pmc = NULL;
             const char * const name = is_pasm ? "PASM" : "PIR";

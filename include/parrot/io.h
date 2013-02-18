@@ -79,31 +79,6 @@
  * socket_unix.c and socket_win32.c for the mappings.
  */
 
-/* &gen_from_enum(socket.pasm) */
-typedef enum {
-    PIO_PF_LOCAL    = 0,
-    PIO_PF_UNIX     = 1,
-    PIO_PF_INET     = 2,
-    PIO_PF_INET6    = 3,
-    PIO_PF_MAX      = 4     /* last elem */
-} Socket_Protocol_Family;
-
-typedef enum {
-    PIO_SOCK_PACKET     = 0,
-    PIO_SOCK_STREAM     = 1,
-    PIO_SOCK_DGRAM      = 2,
-    PIO_SOCK_RAW        = 3,
-    PIO_SOCK_RDM        = 4,
-    PIO_SOCK_SEQPACKET  = 5,
-    PIO_SOCK_MAX        = 6 /* last element */
-} Socket_Socket_Type;
-
-typedef enum {
-    PIO_PROTO_TCP   = 6,
-    PIO_PROTO_UDP   = 17 /* last element */
-} Socket_Protocol;
-/* &end_gen */
-
 extern PIOOFF_T piooffsetzero;
 
 typedef struct _ParrotIOData ParrotIOData;

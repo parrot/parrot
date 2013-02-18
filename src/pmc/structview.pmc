@@ -169,7 +169,7 @@ size and alignment in bytes respectively.
 
 The remainder of the initializer is interpreted as a description of the
 elements of the view. For struct and union views, elements are described
-by a single integer flag from C<datatypes.pasm>, with layout being determined
+by a single integer flag from C<datatypes.pir>, with layout being determined
 automatically identical to what your C compiler would have done. For custom
 views, elements are represented by a 3-tuple of
 C<{type, byte-offset, bit-offset}>, which can be used for arbitrary layouts.

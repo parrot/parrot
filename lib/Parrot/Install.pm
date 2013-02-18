@@ -244,7 +244,7 @@ sub sanitycheck_install {
     my @MAKE_gen = qw(
         vtable.dump
         include/parrot/extend_vtable.h
-        runtime/parrot/include/datatypes.pasm
+        runtime/parrot/include/datatypes.pir
         runtime/parrot/library/Test/More.pbc
         compilers/tge/TGE/Parser.pir
         runtime/parrot/library/P6Regex.pbc

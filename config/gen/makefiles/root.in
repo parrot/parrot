@@ -209,7 +209,7 @@ GEN_PIR_INCLUDES = \
 	$(RUN_INC_DIR)/dlopenflags.pir \
 	$(RUN_INC_DIR)/longopt.pir \
 	$(RUN_INC_DIR)/packfile_segments.pir \
-	$(RUN_INC_DIR)/packfile_annotation_keytype.pir \
+	$(RUN_INC_DIR)/packfile_annotation_key_type.pir \
 	$(RUN_INC_DIR)/stat.pir \
 	$(RUN_INC_DIR)/stringinfo.pir \
 	$(RUN_INC_DIR)/warnings.pir \
@@ -217,13 +217,6 @@ GEN_PIR_INCLUDES = \
 	$(RUN_INC_DIR)/interpinfo.pir \
 	$(RUN_INC_DIR)/tm.pir \
 	$(RUN_INC_DIR)/pmctypes.pir \
-	$(RUN_INC_DIR)/stat.pasm \
-	$(RUN_INC_DIR)/stringinfo.pasm \
-	$(RUN_INC_DIR)/warnings.pasm \
-	$(RUN_INC_DIR)/errors.pasm \
-	$(RUN_INC_DIR)/interpinfo.pasm \
-	$(RUN_INC_DIR)/tm.pasm \
-	$(RUN_INC_DIR)/pmctypes.pasm \
 	$(RUN_INC_DIR)/parrot_version.pir
 
 GEN_PM_INCLUDES = \
@@ -238,9 +231,9 @@ CONFIGURE_GENERATED_FILES = \
 	.parrot_current_rev \
 	.parrot_current_sha1 \
 	.parrot_current_git_describe \
-#IF(has_opengl):    $(RUN_INC_DIR)/opengl_defines.pasm \
+#IF(has_opengl):    $(RUN_INC_DIR)/opengl_defines.pir \
 #IF(has_opengl):    $(LIBRARY_DIR)/OpenGL_funcs.pir \
-	$(RUN_INC_DIR)/signal.pasm \
+	$(RUN_INC_DIR)/signal.pir \
 	tools/dev/mk_language_shell.pl
 
 
@@ -679,7 +672,7 @@ corevm : \
 
 gen_library : $(GEN_LIBRARY)
 
-$(GEN_LIBRARY) : $(PARROT) $(GEN_PASM_INCLUDES)
+$(GEN_LIBRARY) : $(PARROT) $(GEN_PIR_INCLUDES)
 
 $(LIBRARY_DIR)/Digest/MD5.pbc: $(DYNEXT_DIR)/bit_ops$(LOAD_EXT)
 
@@ -1418,44 +1411,62 @@ $(RUN_INC_DIR)/iterator.pir : $(INC_DIR)/enums.h $(H2INC)
 $(RUN_INC_DIR)/call_bits.pir : $(INC_DIR)/enums.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/enums.h $@
 	$(ADDGENERATED) "$@" "[main]"
+
 lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm : $(INC_DIR)/enums.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/enums.h $@
+	$(ADDGENERATED) "$@" "[devel]"
 
 $(RUN_INC_DIR)/libpaths.pir : $(INC_DIR)/library.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/library.h $@
+	$(ADDGENERATED) "$@" "[main]"
 
 $(RUN_INC_DIR)/dlopenflags.pir : $(INC_DIR)/platform_interface.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/platform_interface.h $@
+	$(ADDGENERATED) "$@" "[main]"
 
 $(RUN_INC_DIR)/datatypes.pir : $(INC_DIR)/datatypes.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/datatypes.h $@
+	$(ADDGENERATED) "$@" "[main]"
 
 $(RUN_INC_DIR)/stat.pir : $(INC_DIR)/platform_interface.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/platform_interface.h $@
+	$(ADDGENERATED) "$@" "[main]"
 
 $(RUN_INC_DIR)/stringinfo.pir : $(INC_DIR)/string.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/string.h $@
+	$(ADDGENERATED) "$@" "[main]"
 
 $(RUN_INC_DIR)/longopt.pir : $(INC_DIR)/longopt.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/longopt.h $@
+	$(ADDGENERATED) "$@" "[main]"
 
 $(RUN_INC_DIR)/cclass.pir : $(INC_DIR)/cclass.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/cclass.h $@
+	$(ADDGENERATED) "$@" "[main]"
 
 $(RUN_INC_DIR)/packfile_segments.pir : $(INC_DIR)/packfile.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/packfile.h $@
+	$(ADDGENERATED) "$@" "[main]"
+
 $(RUN_INC_DIR)/packfile_annotation_key_type.pir : $(INC_DIR)/packfile.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/packfile.h $@
+	$(ADDGENERATED) "$@" "[main]"
 
 $(RUN_INC_DIR)/except_types.pir : $(INC_DIR)/exceptions.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/exceptions.h $@
+	$(ADDGENERATED) "$@" "[main]"
+
 $(RUN_INC_DIR)/except_severity.pir : $(INC_DIR)/exceptions.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/exceptions.h $@
+	$(ADDGENERATED) "$@" "[main]"
 
 $(RUN_INC_DIR)/warnings.pir : $(INC_DIR)/warnings.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/warnings.h $@
+	$(ADDGENERATED) "$@" "[main]"
+
 $(RUN_INC_DIR)/errors.pir : $(INC_DIR)/warnings.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/warnings.h $@
+	$(ADDGENERATED) "$@" "[main]"
 
 $(RUN_INC_DIR)/tm.pir : src/utils.c $(H2INC)
 	$(PERL) $(H2INC) src/utils.c $@
@@ -2438,10 +2449,6 @@ moretests: test_prep \
 benchmark_tests : test_prep
 	$(PERL) t/harness $(BENCHMARK_TEST_FILES)
 
-# Running a benchmark
-mopsbench : test_prep
-	$(PARROT) examples/benchmarks/mops_intval.pasm
-
 # distro tests
 distro_tests : test_prep
 	$(PERL) t/harness $(DISTRO_TEST_FILES)
@@ -2471,7 +2478,6 @@ clean : \
 	docs-clean \
 #IF(has_pod2man):	man-clean \
 #IF(has_perldoc):	html-clean \
-	examples-clean \
 	ext-clean \
 #UNLESS(win32):	cover-clean \
 	editor-clean
@@ -2596,8 +2602,8 @@ dynext-clean :
 # or is there an automatic xargs?
 test-clean :
 	$(RM_F) t/compilers/data_json/*.pir
-	$(RM_F) t/compilers/imcc/syn/*.pir t/compilers/imcc/syn/*.pasm t/compilers/imcc/syn/*.pbc
-	$(RM_F) t/compilers/imcc/reg/*.pir t/compilers/imcc/reg/*.pasm t/compilers/imcc/reg/*.pbc
+	$(RM_F) t/compilers/imcc/syn/*.pir t/compilers/imcc/syn/*.pbc
+	$(RM_F) t/compilers/imcc/reg/*.pir t/compilers/imcc/reg/*.pbc
 	$(RM_F) t/compilers/pct/*.pir
 	$(RM_F) t/compilers/pge/perl6regex/*.pir
 	$(RM_F) t/compilers/pge/*.pir
@@ -2606,7 +2612,6 @@ test-clean :
 	$(PBC_TEST_FILES) \
 	"t/*/*$(O)" \
 	"t/*/*.out" \
-	"t/*/*.pasm" \
 	"t/*/*_pbcexe*" \
 	"t/*/*.pir" \
 	"t/*/*.stabs.s" \

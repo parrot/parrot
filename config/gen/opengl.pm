@@ -10,7 +10,7 @@ Generates several files used by the OpenGL binding.  These include:
 
 =over 4
 
-=item F<runtime/parrot/include/opengl_defines.pasm>
+=item F<runtime/parrot/include/opengl_defines.pir>
 
 =item F<runtime/parrot/library/OpenGL_funcs.pir>
 
@@ -403,7 +403,7 @@ my @SKIP = (
     'glfw.h',
 );
 
-my $MACRO_FILE = 'runtime/parrot/include/opengl_defines.pasm';
+my $MACRO_FILE = 'runtime/parrot/include/opengl_defines.pir';
 my $FUNCS_FILE = 'runtime/parrot/library/OpenGL_funcs.pir';
 my $SIGS_FILE  = 'src/glut_nci_thunks.nci';
 my $C_FILE     = 'src/glut_callbacks.c';
