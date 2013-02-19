@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2009, Parrot Foundation.
+# Copyright (C) 2009-2013, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -37,7 +37,7 @@ my $ret = $step->runstep($conf);
 ok( $ret, "runstep() returned true value" );
 is($conf->data->get('HAS_THREADS'), 0,
     "Got expected value for 'HAS_THREADS'");
-is($step->result(), q{no}, "Expected result was set");
+is($step->result(), q{skipped}, "Expected result was set");
 
 $conf->replenish($serialized);
 

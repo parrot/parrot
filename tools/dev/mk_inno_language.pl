@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2009, Parrot Foundation.
+# Copyright (C) 2009-2012, Parrot Foundation.
 
 =head1 TITLE
 
@@ -90,9 +90,10 @@ Source: ".\nqp\nqp.exe"; DestDir: "{app}\bin"; Flags:
 Source: ".\nqp\src\pmc\*.dll"; DestDir: "{app}\lib\parrot\dynext"; Flags:
 Source: ".\nqp\src\ops\*.dll"; DestDir: "{app}\lib\parrot\dynext"; Flags:
 Source: ".\nqp\ModuleLoader.pbc"; DestDir: "{app}\lib\parrot\library"; Flags:
-Source: ".\nqp\PASTRegex.pbc"; DestDir: "{app}\lib\parrot\library"; Flags:
-Source: ".\nqp\NQPP6Regex.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
-Source: ".\nqp\NQPRegex.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
+Source: ".\nqp\QAST.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
+Source: ".\nqp\QASTNode.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
+Source: ".\nqp\NQPP6QRegex.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
+Source: ".\nqp\NQPP5QRegex.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
 Source: ".\nqp\NQPHLL.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
 Source: ".\nqp\NQPCORE.setting.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
 Source: ".\nqp\nqpmo.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
@@ -103,6 +104,7 @@ Source: ".\blib\Perl6\*.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib\Perl6
 Source: ".\perl6.pbc"; DestDir: "{app}\lib\parrot\languages\perl6"; Flags:
 Source: ".\*.setting.pbc"; DestDir: "{app}\lib\parrot\languages\perl6\lib"; Flags:
 Source: ".\lib\Test.pm"; DestDir: "{app}\lib\parrot\languages\perl6\lib"; Flags:
+Source: ".\lib\lib.pm6"; DestDir: "{app}\lib\parrot\languages\perl6\lib"; Flags:
 Source: ".\lib\Pod\To\Text.pm"; DestDir: "{app}\lib\parrot\languages\perl6\lib\Pod\To"; Flags:
 RAKUDO
 

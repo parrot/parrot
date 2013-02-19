@@ -16,7 +16,9 @@ src/pmc/alarm.pmc - Alarm
 
 =head1 DESCRIPTION
 
-Sometime after N_time, P_sub will be called exactly once.
+Sometime after N_time, P_sub will be called exactly once. Notice that due to
+various factors, the alarm is not guaranteed to execute at N_time, but only
+a short time thereafter. The length of "a short time" is very system dependent.
 
 =head2 Functions
 
@@ -33,8 +35,8 @@ Sometime after N_time, P_sub will be called exactly once.
 /* HEADERIZER END: static */
 
 pmclass Alarm provides invokable auto_attrs {
-    ATTR FLOATVAL alarm_time;
-    ATTR PMC     *alarm_task;
+    ATTR FLOATVAL alarm_time;       /* The time when the alarm should trigger */
+    ATTR PMC     *alarm_task;       /* The Task or Sub PMC to execute */
 
 /*
 
@@ -47,9 +49,8 @@ Initializes the alarm.
 */
 
     VTABLE void init() {
+        UNUSED(INTERP)
         Parrot_Alarm_attributes * const data = PARROT_ALARM(SELF);
-        UNUSED(INTERP);
-
         data->alarm_time = 0.0;
         data->alarm_task = PMCNULL;
 
@@ -70,10 +71,10 @@ Create a copy of the alarm.
         PMC * const copy = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         Parrot_Alarm_attributes * const new_struct = PARROT_ALARM(copy);
-        const Parrot_Alarm_attributes * const old_struct = PARROT_ALARM(SELF);
+        Parrot_Alarm_attributes * const old_struct = PARROT_ALARM(SELF);
 
         new_struct->alarm_time = old_struct->alarm_time;
-        new_struct->alarm_task  = old_struct->alarm_task;
+        new_struct->alarm_task = old_struct->alarm_task;
 
         return copy;
     }
@@ -89,13 +90,17 @@ Returns the PMC associated with C<key>.
 */
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
-        UNUSED(INTERP);
-        if (key == PARROT_ALARM_TASK) {
-            const Parrot_Alarm_attributes * const data = PARROT_ALARM(SELF);
-            return data->alarm_task;
+        switch (key) {
+            case PARROT_ALARM_TASK:
+                return PARROT_ALARM(SELF)->alarm_task;
+            case PARROT_ALARM_TIME: {
+                PMC * const floatval = Parrot_pmc_new(INTERP, enum_class_Float);
+                VTABLE_set_number_native(INTERP, floatval, PARROT_ALARM(SELF)->alarm_time);
+                return floatval;
+            }
+            default:
+                return PMCNULL;
         }
-
-        return PMCNULL;
     }
 
 /*
@@ -109,11 +114,9 @@ Returns the number associated with C<key>.
 */
 
     VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
-        UNUSED(INTERP);
-        if (key == PARROT_ALARM_TIME) {
-            const Parrot_Alarm_attributes * const data = PARROT_ALARM(SELF);
-            return data->alarm_time;
-        }
+        UNUSED(INTERP)
+        if (key == PARROT_ALARM_TIME)
+            return PARROT_ALARM(SELF)->alarm_time;
 
         return 0.0;
     }
@@ -129,9 +132,8 @@ Having the alarm numify to the time is convienient for sorting.
 */
 
     VTABLE FLOATVAL get_number() {
-        const Parrot_Alarm_attributes * const data = PARROT_ALARM(SELF);
-        UNUSED(INTERP);
-        return data->alarm_time;
+        UNUSED(INTERP)
+        return PARROT_ALARM(SELF)->alarm_time;
     }
 
 /*
@@ -145,9 +147,8 @@ Sets the PMC associated with C<key> to C<*value>.
 */
 
     VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
-        if (key == PARROT_ALARM_TASK) {
+        if (key == PARROT_ALARM_TASK)
             SET_ATTR_alarm_task(INTERP, SELF, value);
-        }
     }
 
 /*
@@ -176,9 +177,8 @@ Sets the floating-point value associated with C<key> to C<value>.
 */
 
     VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-        if (key == PARROT_ALARM_TIME) {
+        if (key == PARROT_ALARM_TIME)
             SET_ATTR_alarm_time(INTERP, SELF, value);
-        }
     }
 
 /*
@@ -210,10 +210,6 @@ Required functions for GC and Freeze / Thaw.
         SELF.set_integer_native(VTABLE_shift_integer(INTERP, info));
     }
 }
-
-
-
-
 
 /*
 

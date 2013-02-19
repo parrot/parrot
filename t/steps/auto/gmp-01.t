@@ -45,8 +45,9 @@ my $step = test_step_constructor_and_description($conf);
 my $ret = $step->runstep($conf);
 ok( $ret, "runstep() returned true value" );
 is($conf->data->get('has_gmp'), 0,
-    "Got expected value for 'has_gmp'");
-is($step->result(), q{no}, "Expected result was set");
+    "Configuring '--without-gmp': got expected value for 'has_gmp'");
+is($step->result(), q{skipped},
+    "Configuring '--without-gmp': expected result was set");
 
 $conf->replenish($serialized);
 
@@ -115,9 +116,11 @@ $test = $step->{cc_run_expected};
 $has_gmp = 0;
 $conf->options->set(verbose => undef);
 $has_gmp = $step->_evaluate_cc_run($conf, $test, $has_gmp);
-is($step->result, 'yes', "Got expected result");
-is($conf->data->get('gmp'), 'define', "Expected value set for 'gmp'");
-is($conf->data->get('HAS_GMP'), 1, "Expected value set for 'HAS_GMP'");
+is($step->result, 'yes', "_evaluate_cc_run(): got expected result");
+is($conf->data->get('gmp'), 'define',
+    "_evaluate_cc_run(): expected value set for 'gmp'");
+is($conf->data->get('HAS_GMP'), 1,
+    "_evaluate_cc_run(): expected value set for 'HAS_GMP'");
 # prepare for next test
 $conf->data->set('gmp' => undef);
 $conf->data->set('HAS_GMP' => undef);
@@ -127,7 +130,7 @@ $test = '12345';
 $has_gmp = 0;
 $conf->options->set(verbose => undef);
 $has_gmp = $step->_evaluate_cc_run($conf, $test, $has_gmp);
-ok(! defined($step->result), "Result undefined as expected");
+ok(! defined($step->result), "_evaluate_cc_run(): result undefined as expected");
 is($has_gmp, 0, "gmp status unchanged");
 
 {
@@ -140,9 +143,12 @@ is($has_gmp, 0, "gmp status unchanged");
             $step->_evaluate_cc_run($conf, $test, $has_gmp); },
         \$stdout,
     );
-    is($step->result, 'yes', "Got expected result");
-    is($conf->data->get('gmp'), 'define', "Expected value set for 'gmp'");
-    is($conf->data->get('HAS_GMP'), 1, "Expected value set for 'HAS_GMP'");
+    is($step->result, 'yes',
+        "_evaluate_cc_run() verbose: got expected result");
+    is($conf->data->get('gmp'), 'define',
+        "_evaluate_cc_run() verbose: Expected value set for 'gmp'");
+    is($conf->data->get('HAS_GMP'), 1,
+        "_evaluate_cc_run() verbose: Expected value set for 'HAS_GMP'");
     like($stdout, qr/\(yes\)/, "Got expected verbose output");
     # prepare for next test
     $conf->data->set('gmp' => undef);

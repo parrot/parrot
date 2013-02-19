@@ -1,10 +1,10 @@
 # Copyright (C) 2010-2012, Parrot Foundation.
 
-=head1 green_threads.pir
+=head1 DESCRIPTION
 
 Provides an implementation of preempting green threads in pure PIR.
 
-=head1 Summary
+=head1 SUMMARY
 
     include 'green_threads.pir'
 

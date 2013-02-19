@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011, Parrot Foundation.
+ * Copyright (C) 2012, Parrot Foundation.
  */
 
 /*
@@ -36,7 +36,7 @@ the OS, to an appropriate value.
 */
 
 void
-Parrot_init_platform_encoding(PARROT_INTERP)
+Parrot_init_platform_encoding(SHIM_INTERP)
 {
     Parrot_platform_encoding_ptr = Parrot_ascii_encoding_ptr;
 }
@@ -53,7 +53,7 @@ Get the length of a platform-encoded C string.
 */
 
 size_t
-Parrot_str_platform_strlen(PARROT_INTERP, const char *s)
+Parrot_str_platform_strlen(SHIM_INTERP, const char *s)
 {
     return strlen(s);
 }

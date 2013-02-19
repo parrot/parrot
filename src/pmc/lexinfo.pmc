@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008-2011, Parrot Foundation.
+Copyright (C) 2008-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -37,6 +37,8 @@ pmclass LexInfo extends Hash  provides hash no_ro auto_attrs {
 Initialize the LexInfo PMC and remember the associate
 subroutine.
 
+The C<sub> argument is currently ignored.
+
 =cut
 
 */
@@ -47,6 +49,7 @@ subroutine.
     }
 
     VTABLE void init_pmc(PMC *sub) {
+        UNUSED(sub)
         /* Set value type to INTVAL */
         SELF.init_int((INTVAL)enum_type_INTVAL);
     }

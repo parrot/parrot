@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2011, Parrot Foundation.
+# Copyright (C) 2002-2012, Parrot Foundation.
 
 This is a list of project roles, with a partial list of the folks who have
 taken responsibility for them.  This does not list all the people with
@@ -38,6 +38,7 @@ Release Manager                 Bob Rogers
                                 James E Keenan
                                 Kevin Polulak
                                 Alvis Yardley
+                                Reini Urban
 
 Metacommitter                   Allison Randal
                                 Jerry Gay
@@ -53,19 +54,23 @@ Metacommitter                   Allison Randal
 Committers
 ----------
 
-Core Developer                  Jonathan Worthington
+Core Developer
+                                Andrew Whitworth
+                                Reini Urban
                                 Bernhard Schmalhofer
                                 Kevin Tew
+                                Jonathan Worthington
                                 Bob Rogers
                                 Nuno Carvalho
                                 chromatic
                                 Allison Randal
-                                Andrew Whitworth
                                 Christoph Otto
                                 Julian Albo
                                 Mark Glines
                                 Vasily Chekalkin
                                 Jonathan "Duke" Leto
+                                Alvis Yardley
+                                Brian Gernhardt
 
 Compiler Developer              Patrick Michaud (PGE, PCT)
                                 Allison Randal (TGE)
@@ -77,8 +82,8 @@ Platform Porter                 Allison Randal (Debian, Ubuntu)
                                 Jerry Gay (Windows)
                                 Gerd Pokorra (Fedora)
 
-
 Patch Monster                   chromatic
+                                Reini Urban
                                 Jonathan Worthington
                                 Jerry Gay
                                 Will Coleda
@@ -101,5 +106,6 @@ Cage Cleaner                    James E Keenan
                                 Mark Glines
                                 Bruce Gray
                                 Michael Hind
+                                Alvis Yardley
 
 General Contributor             See CREDITS

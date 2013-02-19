@@ -47,10 +47,10 @@ sub new {
         $self->new_group( 'Examples Tests',         '', 't/examples' ),
         $self->new_group( 'Libraries Tests',        '', 't/library' ),
         $self->new_group( 'Native Bytecode Tests',  '', 't/native_pbc' ),
-        $self->new_group( 'Ops Tests',                           '', 't/op',  't/dynoplibs' ),
-        $self->new_group( 'PMC Tests',                           '', 't/pmc', 't/dynpmc' ),
-        $self->new_group( 'C Source Code Tests',                 '', 't/src' ),
-        $self->new_group( 'Stress Tests',                        '', 't/stress' ),
+        $self->new_group( 'Ops Tests',              '', 't/op',  't/dynoplibs' ),
+        $self->new_group( 'PMC Tests',              '', 't/pmc', 't/dynpmc' ),
+        $self->new_group( 'C Source Code Tests',    '', 't/src' ),
+        $self->new_group( 'Stress Tests',           '', 't/stress' ),
     );
 }
 

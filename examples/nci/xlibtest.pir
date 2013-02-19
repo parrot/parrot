@@ -1,12 +1,10 @@
 # Copyright (C) 2008, Parrot Foundation.
 
-=head1 TITLE
+=head1 NAME
 
 xlibtest.pir - Test NCI with libX11
 
 =head1 SYNOPSIS
-
-This is an initial version, be careful and not expect too much.
 
 Compile Xlib.pir to Xlib.pbc before usage:
 
@@ -15,6 +13,10 @@ Compile Xlib.pir to Xlib.pbc before usage:
 Press Escape key to exit.
 
 Press S to save to filename
+
+=head1 DESCRIPTION
+
+This is an initial version, be careful and not expect too much.
 
 =cut
 

@@ -153,7 +153,7 @@ compilers/imcc/imclexer$(O) : \
     include/imcc/embed.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS)
-	$(CC) $(CFLAGS) @optimize::compilers/imcc/imclexer.c@ @ccwarn::compilers/imcc/imclexer.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c compilers/imcc/imclexer.c
+	$(CC) $(CFLAGS) @optimize::compilers/imcc/imclexer.c@ @ccwarn::compilers/imcc/imclexer.c@ @cc_shared@ -I$(@D)/. @cc_o_out@$@ -c compilers/imcc/imclexer.c
 
 ## SUFFIX OVERRIDE - Warnings (This is generated code)
 compilers/imcc/imcparser$(O) : \
@@ -174,7 +174,7 @@ compilers/imcc/imcparser$(O) : \
     $(INC_DIR)/dynext.h \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS)
-	$(CC) $(CFLAGS) @optimize::compilers/imcc/imcparser.c@ @ccwarn::compilers/imcc/imcparser.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c compilers/imcc/imcparser.c
+	$(CC) $(CFLAGS) @optimize::compilers/imcc/imcparser.c@ @ccwarn::compilers/imcc/imcparser.c@ @cc_shared@ -I$(@D)/. @cc_o_out@$@ -c compilers/imcc/imcparser.c
 
 compilers/imcc/main$(O) : \
     include/imcc/embed.h \
@@ -216,7 +216,7 @@ compilers/imcc/optimizer$(O) : \
     $(INC_DIR)/oplib/core_ops.h \
     $(INC_DIR)/runcore_api.h \
     $(PARROT_H_HEADERS)
-	$(CC) $(CFLAGS) @optimize::compilers/imcc/optimizer.c@ @ccwarn::compilers/imcc/optimizer.c@ @cc_shared@ -I$(@D) @cc_o_out@$@ -c compilers/imcc/optimizer.c
+	$(CC) $(CFLAGS) @optimize::compilers/imcc/optimizer.c@ @ccwarn::compilers/imcc/optimizer.c@ @cc_shared@ -I$(@D)/. @cc_o_out@$@ -c compilers/imcc/optimizer.c
 
 compilers/imcc/reg_alloc$(O) : \
     compilers/imcc/reg_alloc.c \
@@ -283,3 +283,8 @@ compilers/imcc/imcc.l.flag compilers/imcc/imclexer.c : compilers/imcc/imcc.l
 compilers/imcc/imcparser.c : compilers/imcc/imcc.y.flag
 compilers/imcc/imcparser.h : compilers/imcc/imcparser.c
 compilers/imcc/imclexer.c : compilers/imcc/imcc.l.flag
+
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

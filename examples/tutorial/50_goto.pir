@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's control flow.
+
+=head1 GOTO
 
 The unconditional jump is the simplest of all flow control devices in any
 language, and PIR is no exception. Using the C<goto> command, control flow

@@ -77,6 +77,7 @@ typedef struct _Parrot_Init_Args {
     Parrot_Int gc_dynamic_threshold;
     Parrot_Int gc_min_threshold;
     Parrot_UInt hash_seed;
+    Parrot_UInt numthreads;
 } Parrot_Init_Args;
 
 #define GET_INIT_STRUCT(i) do {\
@@ -210,6 +211,15 @@ Parrot_Int Parrot_api_set_runcore(
         __attribute__nonnull__(2);
 
 PARROT_API
+Parrot_Int Parrot_api_set_stdhandle(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC handle,
+    Parrot_Int fileno,
+    ARGOUT(Parrot_PMC *old_handle))
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*old_handle);
+
+PARROT_API
 Parrot_Int Parrot_api_set_warnings(Parrot_PMC interp_pmc, Parrot_Int flags);
 
 PARROT_API
@@ -278,6 +288,8 @@ Parrot_Int Parrot_api_wrap_pointer(
        PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_Parrot_api_set_runcore __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(corename))
+#define ASSERT_ARGS_Parrot_api_set_stdhandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(old_handle))
 #define ASSERT_ARGS_Parrot_api_set_warnings __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_toggle_gc __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_api_unwrap_pointer __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

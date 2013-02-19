@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2013, Parrot Foundation.
 
 =head1 NAME
 
@@ -98,6 +98,7 @@ PARROT_DYNEXT_EXPORT void   nci_vP(void *);
 PARROT_DYNEXT_EXPORT void   nci_vpii(ARGMOD(Outer *), int, int);
 PARROT_DYNEXT_EXPORT void   nci_vv(void);
 PARROT_DYNEXT_EXPORT void   nci_vp(ARGIN(const Opaque*));
+PARROT_DYNEXT_EXPORT void * nci_pv(void);
 PARROT_DYNEXT_EXPORT void   nci_vfff(float, float, float);
 PARROT_DYNEXT_EXPORT char * nci_cstring_cstring(const char *);
 
@@ -125,25 +126,17 @@ typedef void (*cb_D4_func)(void*, void*);
 PARROT_DYNEXT_EXPORT void nci_cb_D4(cb_D4_func, void*);
 
 /* Variable definitions */
-
-PARROT_DYNEXT_EXPORT int    int_cb_D4;
-PARROT_DYNEXT_EXPORT int    nci_dlvar_char;
-PARROT_DYNEXT_EXPORT int    nci_dlvar_short;
-PARROT_DYNEXT_EXPORT int    nci_dlvar_int;
-PARROT_DYNEXT_EXPORT long   nci_dlvar_long;
-PARROT_DYNEXT_EXPORT float  nci_dlvar_float;
-PARROT_DYNEXT_EXPORT double nci_dlvar_double;
-PARROT_DYNEXT_EXPORT char   nci_dlvar_cstring[];
-
-int    int_cb_D4           = -55555;
-int    nci_dlvar_char      = 22;
-int    nci_dlvar_short     = 333;
-int    nci_dlvar_int       = -4444;
-long   nci_dlvar_long      = -7777777;
-float  nci_dlvar_float     = -333.0;
-double nci_dlvar_double    = -55555.55555;
-char   nci_dlvar_cstring[] = "This is a C-string.\n";
-
+/* Note that PARROT_DATA (i.e. extern) or static will not work with
+   our nci test. We want only one symbol, exported as visible.
+ */
+PARROT_DYNEXT_EXPORT int    int_cb_D4           = -55555;
+PARROT_DYNEXT_EXPORT int    nci_dlvar_char      = 22;
+PARROT_DYNEXT_EXPORT int    nci_dlvar_short     = 333;
+PARROT_DYNEXT_EXPORT int    nci_dlvar_int       = -4444;
+PARROT_DYNEXT_EXPORT long   nci_dlvar_long      = -7777777;
+PARROT_DYNEXT_EXPORT float  nci_dlvar_float     = -333.0;
+PARROT_DYNEXT_EXPORT double nci_dlvar_double    = -55555.55555;
+PARROT_DYNEXT_EXPORT char   nci_dlvar_cstring[] = "This is a C-string.\n";
 
 /* Function definitions */
 
@@ -411,7 +404,7 @@ writes the string C<str> to stdout and returns the value 4711.
 
 PARROT_DYNEXT_EXPORT
 int
-call_back(PARROT_INTERP, char *cstr)
+call_back(SHIM_INTERP, char *cstr)
 {
     puts(cstr);
     fflush(stdout);
@@ -615,7 +608,7 @@ Prints "ok" if C<PMC> is not null, prints "got null" otherwise.
 
 PARROT_DYNEXT_EXPORT
 void
-nci_vP(void *pmc)
+nci_vP(SHIM(void *pmc))
 {
     /* TODO:
      * Disable this test until someone figures a way to check for
@@ -991,6 +984,23 @@ nci_vp(ARGIN(const Opaque *inOpaque))
         printf("got %d\n", inOpaque->x);
     else
         printf("got null\n");
+}
+
+/*
+
+=item C<PARROT_DYNEXT_EXPORT void * nci_pv(void)>
+
+Return the pointer to the global variable C<nci_dlvar_int>.
+
+=cut
+
+*/
+
+PARROT_DYNEXT_EXPORT
+void *
+nci_pv(void)
+{
+    return &nci_dlvar_int;
 }
 
 /*

@@ -1,10 +1,10 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 # auto/memalign-01.t
 
 use strict;
 use warnings;
-use Test::More tests => 58;
+use Test::More tests => 54;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::memalign');
@@ -73,32 +73,6 @@ $step = test_step_constructor_and_description($conf);
     is($conf->data->get( 'malloc_header' ), 'stdlib.h',
         "malloc_header has expected value");
     $conf->data->set('i_malloc' => undef); # reset for next test
-}
-
-########### _set_ptrcast()  ###########
-
-{
-    $conf->data->set('ptrsize' => 2);
-    $conf->data->set('intsize' => 2);
-    ok(auto::memalign::_set_ptrcast($conf),
-        "_set_ptrcast() returned true value");
-    is($conf->data->get( 'ptrcast' ), 'int',
-        "ptrcast has expected value");
-    # reset for next test
-    $conf->data->set('ptrsize' => undef);
-    $conf->data->set('intsize' => undef);
-}
-
-{
-    $conf->data->set('ptrsize' => 2);
-    $conf->data->set('intsize' => 4);
-    ok(auto::memalign::_set_ptrcast($conf),
-        "_set_ptrcast() returned true value");
-    is($conf->data->get( 'ptrcast' ), 'long',
-        "ptrcast has expected value");
-    # reset for next test
-    $conf->data->set('ptrsize' => undef);
-    $conf->data->set('intsize' => undef);
 }
 
 ########### _set_memalign()  ###########

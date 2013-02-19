@@ -1,10 +1,13 @@
+# Copyright (C) 2012, Parrot Foundation.
 
-=head1 Parrot Testing Status
+=pod
 
-The primary goal of the Parrot testing effort is to provide complete coverage
-of the critical Parrot core subsystems on all targeted platforms. Secondary
-goals include testing of non-critical core subsystems, and non-core code.
-This document tracks the status of our effort.
+=head1 DESCRIPTION
+
+This is the Parrot testing status, the primary goal of which is to provide
+complete coverage of the critical Parrot core subsystems on all targeted
+platforms. Secondary goals include testing of non-critical core subsystems,
+and non-core code. This document tracks the status of our effort.
 
 Until we have an automated way of quantitatively tracking test coverage,
 coverage will be tracked quantitatively, using the scale described below:

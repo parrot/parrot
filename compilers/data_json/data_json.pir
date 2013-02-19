@@ -4,7 +4,7 @@
 
 data_json - parse JSON, a lightweight data-interchange format.
 
-=head1 SYNOPSIS
+=head1 DESCRIPTION
 
 Given a valid JSON (JavaScript Object Notation) string, the compiler will
 return a sub that when called will produce the appropriate values.  For

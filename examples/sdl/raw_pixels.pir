@@ -1,5 +1,5 @@
 
-=head1 TITLE
+=head1 DESCRIPTION
 
 raw_pixels.pir - paint the screen blue, pixel by pixel
 

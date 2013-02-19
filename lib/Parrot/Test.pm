@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2009, Parrot Foundation.
+# Copyright (C) 2004-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -425,11 +425,14 @@ sub convert_line_endings {
     return;
 }
 
+# Works only if not installed.
+# Using $PConfig{build_dir} would be much better
 sub path_to_parrot {
 
-    my $path = $INC{'Parrot/Config.pm'};
-    $path =~ s{ /lib/Parrot/Config.pm \z}{}xms;
-
+    my $path = __FILE__; # lib/Parrot/Test.pm
+    $path =~ s{\Qlib/Parrot/Test.pm\E$}{};
+    $path =~ s{/$}{};
+    $path = "." unless $path;
     return Cwd::realpath( $path );
 }
 
@@ -581,7 +584,7 @@ sub pbc_postprocess_output_like {
 }
 
 sub _pir_stdin_output_slurp {
-    my ($input_string, $code, $expected_ouptut) = @_;
+    my ($input_string, $code) = @_;
 
     my $stuff = sub {
         # Put the string on a file.
@@ -607,7 +610,7 @@ sub _pir_stdin_output_slurp {
             or die "Unable to pipe output to us: $!";
         <$in>;
     };
-
+    $result =~ s/(^==\d+==.*\n)//mg if defined $ENV{VALGRIND};
     return $result;
 }
 
@@ -685,6 +688,7 @@ sub _run_test_file {
     }
     elsif ( $func =~ m/^pbc_(exit_code|.*?output_)/ ) {
         $code_f = per_test( '.pbc', $test_no );
+        $code_f = $code if $code =~ /\.pbc$/ and -f $code;
     }
     else {
         die "Unknown test function: $func";
@@ -692,8 +696,8 @@ sub _run_test_file {
     $code_f = File::Spec->rel2abs($code_f);
     my $code_basef = basename($code_f);
 
-    # native tests are just run, others need to write code first
-    if ( $code_f !~ /\.pbc$/ ) {
+    # existing pbc test files are just run, need to write code first
+    if ( $code_f !~ /\.pbc$/ or ! -f $code_f ) {
         write_code_to_file( $code, $code_f );
     }
 
@@ -796,11 +800,7 @@ sub _generate_test_functions {
             my ( $code, $expected, $desc, %extra ) = @_;
             my $args                               = $ENV{TEST_PROG_ARGS} || '';
 
-            # Due to ongoing changes in PBC format, all tests in
-            # t/native_pbc/*.t are currently being SKIPped. This means we
-            # have no tests on which to model tests of the following block.
-            # Hence, test coverage will be lacking.
-            if ( $func =~ /^pbc_output_/ && $args =~ /-r / ) {
+            if ( $code =~ m|t/native_pbc/| && $func =~ /^pbc_output_/ && $args =~ /-r / ) {
                 # native tests with --run-pbc don't make sense
                 return $builder->skip("no native tests with -r");
             }
@@ -809,6 +809,8 @@ sub _generate_test_functions {
 
             my $meth        = $parrot_test_map{$func};
             my $real_output = slurp_file($out_f);
+            my $ori_output = $real_output;
+            $real_output =~ s/(^==\d+==.*\n)//mg if defined $ENV{VALGRIND};
 
             _unlink_or_retain( $out_f );
 
@@ -839,7 +841,8 @@ sub _generate_test_functions {
             elsif ($exit_code) {
                 $builder->ok( 0, $desc );
                 $builder->diag( "Exited with error code: $exit_code\n"
-                        . "Received:\n$real_output\nExpected:\n$expected\n" );
+                        . "Received:\n$real_output\nExpected:\n$expected\n"
+                        . $ori_output ne $real_output ? "$ori_output\n" : "");
                 return 0;
             }
             my $pass = $builder->$meth( $real_output, $expected, $desc );
@@ -998,7 +1001,7 @@ sub _generate_test_functions {
                 my $cmd =
                       "$PConfig{cc} $PConfig{ccflags} $PConfig{cc_debug} "
                     . ($^O =~ m/MSWin32/ and $PConfig{cc} eq 'cl' ? "-DPARROT_IN_EXTENSION" : "")
-                    . " -I./include -c "
+                    . ($^O eq 'VMS' ? "" : " -I./include -c ")
                     . "$PConfig{cc_o_out}$obj_f $source_f";
                 my $exit_code = run_command(
                     $cmd,
@@ -1059,16 +1062,20 @@ sub _generate_test_functions {
                     'STDERR' => $out_f
                 );
                 my $output = slurp_file($out_f);
+                my $ori_output = $output;
+                $output =~ s/(^==\d+==.*\n)//mg if defined $ENV{VALGRIND};
 
                 if ($exit_code) {
                     $pass = $builder->ok( 0, $desc );
                     $builder->diag( "Exited with error code: $exit_code\n"
-                            . "Received:\n$output\nExpected:\n$expected\n" );
+                            . "Received:\n$output\nExpected:\n$expected\n"
+                            . $ori_output ne $output ? "$ori_output\n" : "");
                 }
                 else {
                     my $meth = $c_test_map{$func};
                     $pass = $builder->$meth( $output, $expected, $desc );
-                    $builder->diag("'$cmd' failed with exit code $exit_code")
+                    $builder->diag("'$cmd' failed with exit code $exit_code.\n"
+                                   . $ori_output ne $output ? "$ori_output\n" : "")
                         unless $pass;
                 }
             }
@@ -1118,6 +1125,14 @@ sub _handle_blib_path {
     }
     elsif ($^O eq 'MSWin32') {
         $ENV{PATH} = $blib_path . ';' . $ENV{PATH};
+    }
+    elsif ($^O eq 'darwin') {
+        if (!$ENV{DYLD_LIBRARY_PATH}) {
+            $ENV{DYLD_LIBRARY_PATH} = $blib_path;
+        }
+        elsif ($ENV{DYLD_LIBRARY_PATH} !~ m|$blib_path|) {
+            $ENV{DYLD_LIBRARY_PATH} = "$blib_path:$ENV{DYLD_LIBRARY_PATH}";
+        }
     }
     else {
         $ENV{LD_RUN_PATH} = $blib_path;

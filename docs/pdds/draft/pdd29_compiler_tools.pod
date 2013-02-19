@@ -6,10 +6,6 @@
 
 This PDD specifies the Parrot Compiler Tools (PCT).
 
-
-
-
-
 =head2 Definitions
 
 =head3 Compiler

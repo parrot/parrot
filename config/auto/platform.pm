@@ -46,6 +46,8 @@ sub _set_implementations {
         time.c
         encoding.c
         env.c
+        cpu_type.c
+        num_cpus.c
         dl.c
         math.c
         itimer.c

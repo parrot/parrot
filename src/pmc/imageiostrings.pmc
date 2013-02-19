@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2011, Parrot Foundation.
+Copyright (C) 2010-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -79,6 +79,7 @@ Gets the result PMC after a thaw.
 */
 
     VTABLE PMC *get_pmc() {
+        UNUSED(INTERP)
         return PARROT_IMAGEIOSTRINGS(SELF)->list;
     }
 
@@ -93,6 +94,8 @@ Returns the flags describing the visit action
 */
 
     VTABLE INTVAL get_integer() {
+        UNUSED(INTERP)
+        UNUSED(SELF)
         return VISIT_FREEZE_NORMAL;
     }
 
@@ -107,7 +110,11 @@ Do nothing.
 
 */
 
-    VTABLE void push_integer(INTVAL v) { }
+    VTABLE void push_integer(INTVAL v) {
+        UNUSED(INTERP)
+        UNUSED(SELF)
+        UNUSED(v)
+    }
 
 
 /*
@@ -120,7 +127,11 @@ Do nothing.
 
 */
 
-    VTABLE void push_float(FLOATVAL v) { }
+    VTABLE void push_float(FLOATVAL v) {
+        UNUSED(INTERP)
+        UNUSED(SELF)
+        UNUSED(v)
+    }
 
 
 /*

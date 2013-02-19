@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -38,7 +38,7 @@ Initializes the pointer.
 */
 
     VTABLE void init() {
-        UNUSED(interp);
+        UNUSED(INTERP)
         PObj_custom_mark_SET(SELF);
     }
 
@@ -88,7 +88,7 @@ Sets the pointer value.
 */
 
     VTABLE void set_pointer(void *ptr) {
-        UNUSED(interp);
+        UNUSED(INTERP)
         PARROT_POINTER(SELF)->pointer = ptr;
     }
 
@@ -103,7 +103,7 @@ Returns the pointer value.
 */
 
     VTABLE void *get_pointer() {
-        UNUSED(interp);
+        UNUSED(INTERP)
         return PARROT_POINTER(SELF)->pointer;
     }
 
@@ -118,7 +118,7 @@ Returns the pointer value as an integer.
 */
 
     VTABLE INTVAL get_integer() {
-        UNUSED(interp);
+        UNUSED(INTERP)
         return (INTVAL)(PARROT_POINTER(SELF)->pointer);
     }
 
@@ -133,7 +133,7 @@ Returns the pointer value as a floating-point number.
 */
 
     VTABLE FLOATVAL get_number() {
-        UNUSED(interp);
+        UNUSED(INTERP)
         return (FLOATVAL)(INTVAL)(PARROT_POINTER(SELF)->pointer);
     }
 
@@ -148,7 +148,6 @@ Returns the pointer value as a Parrot string.
 */
 
     VTABLE STRING *get_repr() {
-        UNUSED(interp);
         return Parrot_sprintf_c(INTERP, "Pointer = 0x%p", PARROT_POINTER(SELF)->pointer);
     }
 
@@ -178,7 +177,7 @@ Returns whether the pointer is not C<NULL>.
 */
 
     VTABLE INTVAL get_bool() {
-        UNUSED(interp);
+        UNUSED(INTERP)
         return (INTVAL)(PMC_data(SELF) != NULL);
     }
 
@@ -193,7 +192,7 @@ Returns whether the pointer has the same value as C<*pmc2>.
 */
 
     VTABLE INTVAL is_same(PMC *pmc2) {
-        UNUSED(interp);
+        UNUSED(INTERP)
         return (INTVAL)(SELF->vtable   == pmc2->vtable &&
                         PARROT_POINTER(SELF)->pointer == PARROT_POINTER(pmc2)->pointer);
     }

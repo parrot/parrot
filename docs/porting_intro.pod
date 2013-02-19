@@ -1,10 +1,12 @@
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
+
+=pod
 
 =head1 NAME
 
 docs/porting_intro.pod - Parrot Subsystem Porting Introduction
 
-=head1 OVERVIEW
+=head1 DESCRIPTION
 
 This document is an introduction to porting the optional subsystems of Parrot
 onto a new architecture once the core successfully builds.  It assumes passing
@@ -12,7 +14,7 @@ familiarity with common VM techniques but relatively little knowledge of Parrot
 internals.  For each feature, a brief description of its purpose, hints on
 helping to port it, and pointers to more information are included.
 
-=head1 Threads
+=head1 THREADS
 
 =head2 What it is
 
@@ -25,17 +27,11 @@ Parrot.
 
 =head2 How to help
 
-At present Parrot implements support only for POSIX threads (pthreads).  Most
-modern UNIX-like operating systems have a pthreads implementation, and allowing
-Parrot to use these is frequently just a matter of finding the right compiler
-and linker flags.  Non-POSIX architectures with substantially different
-threading models will require more implementation and debugging to work with
-Parrot.
+At present Parrot has full native threads support, pthreads and windows threads.
+But running garbage collection together with allocation of memory in threaded
+code might lead to races or access violations, esp. on darwin, but also on linux.
 
-To assist with enhancing threading support, compare the threading primitives
-required by Parrot in F<thread.h> to those provided by your platform's
-threading model(s) and implement Parrot threads in terms of native threads. See
-F<thr_pthread.h> for an example of this.
+See L<https://github.com/parrot/parrot/issues?milestone=2&state=open>
 
 =head2 References
 
@@ -81,7 +77,7 @@ thereof are greatly needed.
 
 =back
 
-=head1 Dynloading
+=head1 DYNLOADING
 
 =head2 What it is
 
@@ -126,7 +122,7 @@ information.  The platform-specific source files implement memory allocation
 wrappers that hide these details, so wading deep into Parrot is probably not a
 prerequisite for this task.
 
-=head2 References
+=head1 REFERENCES
 
 =over 4
 

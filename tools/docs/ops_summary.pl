@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
 use warnings;
 use strict;
@@ -7,6 +7,8 @@ use strict;
 package OpsSummary;
 
 use base 'Pod::Parser';
+use lib qw(lib ../lib);
+use Parrot::BuildUtil;
 
 my $current_file;
 my $current_op;
@@ -59,9 +61,16 @@ sub textblock {
 
 die "OpsSummary is not meant to be used as a module" if caller;
 
-@ARGV = grep { $_ !~ /index\.pod$/ } <docs/ops/*.pod>
-    unless @ARGV;
-
+unless (@ARGV) {
+    if ( -d "docs/ops" ) {
+      @ARGV = grep { $_ !~ /index\.pod$/ } <docs/ops/*.pod>
+        ;
+    }
+    else {
+      @ARGV = grep { $_ !~ /index\.pod$/ } <ops/*.pod>
+        ;
+    }
+}
 my $parser = new OpsSummary;
 
 for (@ARGV) {
@@ -73,7 +82,11 @@ for (@ARGV) {
 print << "EOH";
 =head1 NAME
 
-Parrot opcodes summary
+docs/ops/index.pod - Parrot opcodes summary
+
+=head1 DESCRIPTION
+
+Automatically generated opcodes index
 
 =head2 Parrot Opcodes by Category
 

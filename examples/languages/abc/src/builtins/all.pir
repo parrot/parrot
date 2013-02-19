@@ -1,6 +1,6 @@
 # Copyright (C) 2006-2009, Parrot Foundation.
 
-=head1
+=head1 DESCRIPTION
 
 src/builtins/all.pir -- abc builtin functions
 

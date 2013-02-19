@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -47,8 +47,10 @@ sub _probe_for_gcc {
 sub _evaluate_gcc {
     my ($self, $conf, $gnucref) = @_;
 
-    # Set gccversion to undef.  This will also trigger any hints-file
-    # callbacks that depend on knowing whether or not we're using gcc.
+    # Set empty noonline and gccversion to undef.
+    # This will also trigger any hints-file callbacks that depend on
+    # knowing whether or not we're using gcc.
+    $conf->data->set( noinline => '' );
 
     # This key should always exist unless the program couldn't be run,
     # which should have been caught by the 'die' above.
@@ -88,10 +90,16 @@ sub _evaluate_gcc {
     $conf->data->set( noinline => '__attribute__ ((noinline))' );
 
     # sneaky check for g++
-    my $gpp = (index($conf->data->get('cc'), '++') > 0) ? 1 : 0;
+    my $cc = $conf->data->get('cc');
+    my $gpp = (index($cc, '++') > 0) ? 1 : 0;
 
     # even sneakier check for clang
     my $clang = $conf->data->get('cc') =~ /clang/ ? 1 : 0;
+
+    # and set -x c++ for clang++
+    if ($clang and $gpp and index($cc, '-x c++') < 1) {
+        $conf->data->set('cc' => $cc.' -x c++');
+    }
 
     $conf->data->set(
         gccversion => $gccversion,

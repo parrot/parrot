@@ -703,9 +703,11 @@ OUTPUT
         (undef, my $pir_filename) = create_tempfile( SUFFIX => '.pir', UNLINK => 1 );
         (undef, my $pbc_filename) = create_tempfile( SUFFIX => '.pbc', UNLINK => 1 );
         print $fh $code;
-        if (system(qw[./winxed --target=pir -o], $pir_filename, $wx_filename)
-        ||  system(qw[./parrot -o], $pbc_filename, $pir_filename)) {
-            die "couldn't compile winxed";
+        if (system(qw[./winxed --target=pir -o], $pir_filename, $wx_filename)) {
+            die "Couldn't compile winxed code";
+        }
+        if (system(qw[./parrot -o], $pbc_filename, $pir_filename)) {
+            die "couldn't compile PIR";
         }
         close $fh;
         return $pbc_filename;

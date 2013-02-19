@@ -1,0 +1,95 @@
+#!./parrot
+# Copyright (C) 2012, Parrot Foundation.
+
+function main() {
+    var multi_part_code = multi_part;
+    var matrix = new 'FixedPMCArray'(10000);
+    var vector = new 'FixedIntegerArray'(10000);
+    var results = new 'FixedIntegerArray'(10000);
+    ${set_global 'results', results};
+
+    for (int i = 0; i < 10000; i++) {
+        matrix[i] = new 'FixedIntegerArray'(10000);
+        for (int j = 0; j < 10000; j++)
+            matrix[i, j] = 1;
+
+        vector[i] = 1;
+        results[i] = 0;
+    }
+
+    var tasks = new 'FixedPMCArray'(4);
+    for (int i = 0; i < 4; i++) {
+        var task = new 'Task';
+        task.code = multi_part_code;
+        task.data = i;
+        ${ push task, matrix };
+        ${ push task, vector };
+
+        ${schedule task};
+        tasks[i] = task;
+    }
+
+    for (int i = 0; i < 4; i++)
+        ${wait tasks[i]};
+
+    for (int i = 0; i < 10000; i++)
+        if (results[i] != 10000) {
+            print("results[");
+            print(i);
+            print("]: ");
+            say(results[i]);
+            say("wrong result!");
+            exit(1);
+        }
+    exit(0);
+}
+
+function multi_part(var partition) {
+    var result = new 'FixedIntegerArray'(2500);
+    var interp;
+    ${getinterp interp};
+    var task = interp.current_task();
+    var vector;
+    ${ pop vector, task };
+    var matrix;
+    ${ pop matrix, task };
+
+    int start = partition * (10000 / 4);
+    for (int i = 0; i < (10000 / 4); i++) {
+        int r = 0;
+        var row = matrix[start + i];
+        for (int j = 0; j < 10000; j++)
+            r += (row[j] * vector[j]);
+        result[i] = r;
+    }
+
+    var res_task = new 'Task';
+    var set_result;
+    ${get_global set_result, 'set_result'};
+    res_task.code = set_result;
+    res_task.data = result;
+    ${ push res_task, partition };
+
+    interp.schedule_proxied(res_task, matrix);
+    ${wait res_task};
+}
+
+function set_result(var result) {
+    var interp;
+    ${getinterp interp};
+    var task = interp.current_task();
+    var partition;
+    ${ pop partition, task };
+    var results;
+    ${get_global results, 'results'};
+
+    int start = partition * (10000 / 4);
+    for (int i = 0; i < (10000 / 4); i++)
+        results[start + i] = result[i];
+}
+
+# Local Variables:
+#   mode: winxed
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4 ft=winxed:

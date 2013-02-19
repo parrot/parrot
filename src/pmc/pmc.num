@@ -79,3 +79,5 @@ parrotobject.pmc    50
 
 oplib.pmc    51
 opcode.pmc    52
+
+callcontext.pmc    53

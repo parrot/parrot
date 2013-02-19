@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -319,6 +319,7 @@ Returns the integer type of the class.
 
 
     VTABLE INTVAL type() {
+        UNUSED(INTERP)
         const Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
         return _class->id;
     }
@@ -466,6 +467,7 @@ Return the name of the low-level class (without the HLL namespace).
 */
 
     VTABLE STRING *get_string() {
+        UNUSED(INTERP)
         const Parrot_Class_attributes * const proxy_info = PARROT_CLASS(SELF);
         return proxy_info->name;
     }

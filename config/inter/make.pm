@@ -76,9 +76,7 @@ sub runstep {
     }
     else {
         $prog = check_progs( $candidates, $verbose );
-
         unless ($prog) {
-
             # fall back to default
             $self->set_result('no');
             return 1;

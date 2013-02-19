@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -35,7 +35,7 @@ rebuilding Parrot.
     set P2, P5  # remember pApp
 
 # get and invoke QLabel_new
-    dlfunc P0, P1, "QLabel_new", "pt"
+    dlfunc P0, P1, "QLabel_new", "pS"
     # if you need more labels, save P0 = QLabel_new() function
     set_args "0", "Hello, world!"
     get_results "0", P5
@@ -58,7 +58,8 @@ rebuilding Parrot.
 
 =head1 SEE ALSO
 
-F<examples/nci/PQt.C>, F<docs/pdds/pdd03_calling_conventions.pod>.
+F<examples/nci/QTHelloWorld.pir>,
+F<examples/nci/PQt.cpp>, F<docs/pdds/pdd03_calling_conventions.pod>.
 
 =cut
 

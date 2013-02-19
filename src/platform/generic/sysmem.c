@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010, Parrot Foundation.
+ * Copyright (C) 2010-2012, Parrot Foundation.
  */
 
 /*
@@ -40,6 +40,8 @@ Get system memory information.
 
 Get information about available physical memory.
 
+Returns available physical memory in bytes.
+
 =cut
 
 */
@@ -59,6 +61,7 @@ Parrot_sysmem_amount(PARROT_INTERP)
     size_t        memsize = 0;
 
 #if defined(_SC_PAGESIZE) && defined(_SC_AVPHYS_PAGES)
+    UNUSED(interp);
     /* Method 1:  sysconf().
      * Works on Linux and Solaris, and probably other SVR4-related systems.
      * This should really check for #ifdef HAS_SYSCONF, but Configure
@@ -88,6 +91,7 @@ Parrot_sysmem_amount(PARROT_INTERP)
     }
 
 #else
+    UNUSED(interp);
     /* Method 3:  Random guess.  Simply guess 512 MB.  This way, parrot
      * will at least build.  Arguably, one could also just put an error
      * here and instruct the user to fix it manually.

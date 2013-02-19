@@ -6,10 +6,6 @@
 
 The format of Parrot's bytecode assembly language.
 
-
-
-
-
 =head2 Description
 
 Parrot's bytecode can be thought of as a form of machine language for a

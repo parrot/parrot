@@ -1,5 +1,7 @@
 #!/usr/bin/env parrot-nqp
 
+# Copyright (C) 2011-2012, Parrot Foundation.
+
 =begin README
 dedepracator: find deprecations in your Parrot code
 
@@ -26,7 +28,6 @@ $ dedeprecator.nqp --help
 
 INIT {
     pir::load_bytecode("YAML/Tiny.pbc");
-    pir::loadlib("os");
 }
 
 sub check_pir($file, @regexes) {

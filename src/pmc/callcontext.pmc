@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008-2011, Parrot Foundation.
+Copyright (C) 2008-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -693,6 +693,7 @@ stored.)
 
 */
     VTABLE void morph(PMC *type) {
+        UNUSED(type)
         Hash     *hash;
 
         if (!PMC_data(SELF))
@@ -966,7 +967,7 @@ return current Sub
 
 =item handlers
 
-return list of ExceptioHandlers
+return list of ExceptionHandlers
 
 =item current_cont
 
@@ -1019,8 +1020,9 @@ return current Namespace
         else
             Parrot_ex_throw_from_c_args(INTERP, NULL,
                 EXCEPTION_ATTRIB_NOT_FOUND, "No such attribute '%S'", key);
-
-        return value;
+        if (value)
+            return value;
+        return PMCNULL;
     }
 
     VTABLE INTVAL elements() {

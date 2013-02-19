@@ -1,9 +1,9 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/schedulermessage.pmc - The concurrency scheduler
+src/pmc/schedulermessage.pmc - Scheduler messages
 
 =head1 DESCRIPTION
 
@@ -46,9 +46,9 @@ Initialize a concurrency scheduler message object.
         PObj_custom_mark_SET(SELF);
 
         /* Set up the core struct. */
-        core_struct->id          = 0;
-        core_struct->type        = CONST_STRING(INTERP, "");
-        core_struct->data        = PMCNULL;
+        core_struct->id   = 0;
+        core_struct->type = CONST_STRING(INTERP, "");
+        core_struct->data = PMCNULL;
     }
 
 /*
@@ -113,11 +113,9 @@ Retrieve the message ID.
 */
 
     VTABLE INTVAL get_integer() {
-        const Parrot_SchedulerMessage_attributes * const
-            core_struct = PARROT_SCHEDULERMESSAGE(SELF);
         UNUSED(INTERP);
 
-        return core_struct->id;
+        return PARROT_SCHEDULERMESSAGE(SELF)->id;
     }
 
 /*
@@ -131,9 +129,8 @@ Set the message ID.
 */
 
     VTABLE void set_integer_native(INTVAL value) {
-        Parrot_SchedulerMessage_attributes * const core_struct = PARROT_SCHEDULERMESSAGE(SELF);
         UNUSED(INTERP);
-        core_struct->id = value;
+        PARROT_SCHEDULERMESSAGE(SELF)->id = value;
     }
 
 
@@ -148,10 +145,8 @@ Retrieve the message type.
 */
 
     STRING *  get_string() {
-        const Parrot_SchedulerMessage_attributes * const core_struct =
-            PARROT_SCHEDULERMESSAGE(SELF);
         UNUSED(INTERP);
-        return core_struct->type;
+        return PARROT_SCHEDULERMESSAGE(SELF)->type;
     }
 
 /*
@@ -165,9 +160,8 @@ Set the message type.
 */
 
     VTABLE void set_string_native(STRING *value) {
-        Parrot_SchedulerMessage_attributes * const core_struct = PARROT_SCHEDULERMESSAGE(SELF);
         UNUSED(INTERP);
-        core_struct->type = value;
+        PARROT_SCHEDULERMESSAGE(SELF)->type = value;
     }
 
 /*

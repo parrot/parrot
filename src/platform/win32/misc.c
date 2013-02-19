@@ -56,14 +56,6 @@ Parrot_platform_init_code(void)
 }
 
 /*
-
-=back
-
-=cut
-
-*/
-
-/*
  * Local variables:
  *   c-file-style: "parrot"
  * End:

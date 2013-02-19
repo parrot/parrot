@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2011, Parrot Foundation.
+Copyright (C) 2010-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -38,6 +38,7 @@ Throws an error.  OpLib requires an argument to init.  See C<init_pmc>.
 */
 
     VTABLE void init() {
+        UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "OpLib must be initialized with an oplib name");
     }
@@ -236,8 +237,8 @@ share the given short name.
 
 =item C<PMC *version()>
 
-Returns an array containing the three version numbers (major, minor, patch) of
-the library.
+Returns an array containing the two bytecode version numbers (bc_major, bc_minor)
+of the library.
 
 =cut
 
@@ -246,14 +247,12 @@ the library.
     METHOD version() {
         const op_lib_t *oplib;
         PMC * const version_array = Parrot_pmc_new_init_int(INTERP,
-                enum_class_FixedIntegerArray, 3);
+                enum_class_FixedIntegerArray, 2);
         GET_ATTR_oplib(INTERP, SELF, oplib);
         VTABLE_set_integer_keyed_int(INTERP, version_array,
-                0, oplib->major_version);
+                0, oplib->bc_major_version);
         VTABLE_set_integer_keyed_int(INTERP, version_array,
-                1, oplib->minor_version);
-        VTABLE_set_integer_keyed_int(INTERP, version_array,
-                2, oplib->patch_version);
+                1, oplib->bc_minor_version);
         RETURN(PMC *version_array);
     }
 }

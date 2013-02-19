@@ -1,6 +1,6 @@
 #! perl
 ################################################################################
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2013, Parrot Foundation.
 ################################################################################
 
 =head1 NAME
@@ -43,6 +43,14 @@ The library directory. Defaults to '/usr/lib'.
 
 The header directory. Defaults to '/usr/include'.
 
+=item C<mandir>
+
+The man directory. Defaults to '/usr/share/man'.
+
+=item C<datadir>
+
+The data directory. Defaults to '/usr/share'.
+
 =back
 
 =head1 SEE ALSO
@@ -75,6 +83,8 @@ my %options = (
     libdir      => '/usr/lib',       # parrot/ subdir added below
     includedir  => '/usr/include',   # parrot/ subdir added below
     docdir      => '/usr/share/doc', # parrot/ subdir added below
+    mandir      => '/usr/share/man', # man1/ subdir added below
+    datadir     => '/usr/share/',    # parrot/ subdir added below
     versiondir  => '',
     'dry-run'   => 0,
     packages    => 'main|library|pge',
@@ -91,9 +101,10 @@ foreach (@ARGV) {
 }
 
 my $parrotdir = $options{versiondir};
+Parrot::Install::sanitycheck_install(); # GH #910
 
 # Set up transforms on filenames
-my(@transformorder) = qw(lib bin include doc ^compilers);
+my(@transformorder) = qw(lib bin include doc man ^compilers);
 my(%metatransforms) = (
     lib => {
         ismeta => 1,
@@ -149,6 +160,16 @@ my(%metatransforms) = (
             return($filehash);
         },
     },
+    man => {
+        ismeta => 1,
+        optiondir => 'man',
+        transform => sub {
+            my($filehash) = @_;
+            $filehash->{Dest} =~ s{^.*/}{}; # basedir only
+            $filehash->{Dest} =~ s{^(.+\.)(.+)$}{man$2/$1$2};
+            return($filehash);
+        },
+    },
     '^compilers' => {
         optiondir => 'lib',
         transform => sub {
@@ -165,6 +186,7 @@ my($filehashes, $directories) = lines_to_files(
 );
 
 unless ( $options{'dry-run'} ) {
+    $directories->{File::Spec->catdir( $options{datadir}, $parrotdir)} = 1;
     create_directories($options{destdir}, $directories);
 }
 
@@ -196,7 +218,7 @@ foreach $filehash (grep { ! $_->{Installable} } @$filehashes ) {
     }
 }
 
-install_files($options{destdir}, $options{'dry-run'}, $filehashes);
+install_files(\%options, '', $filehashes);
 
 print "Finished install_files.pl\n";
 

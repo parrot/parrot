@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2008, Parrot Foundation.
+# Copyright (C) 2004-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -33,6 +33,8 @@ our $VERSION = '1.0';
 
 use Parrot::Docs::HTMLPage;
 use Parrot::Distribution;
+use Parrot::BuildUtil;
+use Parrot::Config;
 
 =item C<new()>
 
@@ -626,6 +628,14 @@ sub write_html {
     $self->{RESOURCES_URL} = "$rel_path/resources";
 
     $docs_file->write( $self->html_for_file($file) );
+
+    unless ($self->{TESTING}) {
+        my $path = File::Spec->abs2rel(
+          File::Spec->catfile($docs_file->{PATH}), $PConfig{build_dir});
+        chdir "..";
+        add_to_generated($path, "[main]", "html");
+        chdir "docs";
+    }
 }
 
 =item C<append_html_suffix($path)>

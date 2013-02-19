@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2010, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -63,7 +63,7 @@ sub try_attr {
 
     $conf->debug("trying attribute '$attr'\n");
 
-    my $cc = $conf->option_or_data('cc');
+    my $cc = $conf->data->get('cc');
     $conf->cc_gen('config/auto/attributes/test_c.in');
 
     my $disable_warnings = '';

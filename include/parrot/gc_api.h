@@ -39,6 +39,7 @@ typedef struct _Parrot_GC_Init_Args {
     Parrot_Float4 nursery_size;
     Parrot_Int dynamic_threshold;
     Parrot_Int min_threshold;
+    Parrot_UInt numthreads;
 } Parrot_GC_Init_Args;
 
 typedef enum _gc_sys_type_enum {
@@ -94,6 +95,11 @@ typedef enum {
     GC_LAZY_MARK_RUNS,
     EXTENDED_PMCS,
     CURRENT_RUNCORE,
+    PARROT_INTSIZE,
+    PARROT_FLOATSIZE,
+    PARROT_POINTERSIZE,
+    PARROT_INTMAX,
+    PARROT_INTMIN,
 
     /* interpinfo_p constants */
     CURRENT_CTX,
@@ -106,7 +112,12 @@ typedef enum {
     EXECUTABLE_FULLNAME,
     EXECUTABLE_BASENAME,
     RUNTIME_PREFIX,
-    GC_SYS_NAME
+    GC_SYS_NAME,
+    PARROT_OS,
+    PARROT_OS_VERSION,
+    PARROT_OS_VERSION_NUMBER,
+    CPU_ARCH,
+    CPU_TYPE
 } Interpinfo_enum;
 
 /* &end_gen */
@@ -123,6 +134,10 @@ typedef enum {
 
 PARROT_EXPORT
 void Parrot_block_GC_mark(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+void Parrot_block_GC_mark_locked(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
@@ -381,10 +396,16 @@ void Parrot_unblock_GC_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+void Parrot_unblock_GC_mark_locked(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 void Parrot_unblock_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_Parrot_block_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_block_GC_mark_locked __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_block_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -517,6 +538,8 @@ void Parrot_unblock_GC_sweep(PARROT_INTERP)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_unblock_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_unblock_GC_mark_locked __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_unblock_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -525,9 +548,22 @@ void Parrot_unblock_GC_sweep(PARROT_INTERP)
 # define Parrot_gc_mark_STRING_alive(interp, obj) Parrot_gc_mark_STRING_alive_fun((interp), (obj))
 
 #if defined(PARROT_IN_CORE)
+#ifdef THREAD_DEBUG
 #  define Parrot_gc_mark_PMC_alive(interp, obj) \
-      do if (!PMC_IS_NULL(obj)) Parrot_gc_mark_PMC_alive_fun((interp), (obj)); \
+      do if (!PMC_IS_NULL(obj) \
+          && (!PObj_is_shared_TEST(obj) || !Interp_flags_TEST((interp), PARROT_IS_THREAD))) { \
+            PARROT_ASSERT((obj)->orig_interp == (interp)); \
+            Parrot_gc_mark_PMC_alive_fun((interp), (obj)); \
+        } \
       while (0)
+#else
+#  define Parrot_gc_mark_PMC_alive(interp, obj) \
+      do if (!PMC_IS_NULL(obj) \
+          && (!PObj_is_shared_TEST(obj) || !Interp_flags_TEST((interp), PARROT_IS_THREAD))) { \
+          Parrot_gc_mark_PMC_alive_fun((interp), (obj)); \
+        } \
+      while (0)
+#endif
 #else
 #  define Parrot_gc_mark_PMC_alive(interp, obj) Parrot_gc_mark_PMC_alive_fun((interp), (obj))
 #endif

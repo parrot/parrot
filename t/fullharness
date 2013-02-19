@@ -92,7 +92,7 @@ else {
         timer      => $ENV{HARNESS_TIMER} || 0,
     } );
     $aggregator = TAP::Parser::Aggregator->new;
-    
+
     $aggregator->start();
     foreach my $set (@targets) {
         # rewrite environment
@@ -137,7 +137,7 @@ sub set_alternate_runcore_target {
     return {
         label           => "test$alt",
         rule            => sub { set_alternate_runcore_env_args($alt) },
-        tests           => [ map { [ $_, "test${alt}__$_", ] } 
+        tests           => [ map { [ $_, "test${alt}__$_", ] }
                             ( $in_testing
                                 ? @testing_runcore_test_files
                                 : @runcore_test_files

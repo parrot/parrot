@@ -22,6 +22,7 @@ The base vtable calling functions
 #include "pmc/pmc_class.h"
 #include "pmc/pmc_integer.h"
 #include "pmc/pmc_callcontext.h"
+#include "pmc/pmc_proxy.h"
 
 /* HEADERIZER HFILE: include/parrot/pmc.h */
 
@@ -564,6 +565,9 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
     if (vtable_flags & VTABLE_IS_SHARED_FLAG)
         flags |= PObj_is_PMC_shared_FLAG;
 
+    if (Interp_flags_TEST(interp, PARROT_THR_FLAG_NEW_PMC))
+        flags |= PObj_is_new_FLAG;
+
     newpmc         = Parrot_gc_new_pmc_header(interp, flags);
     newpmc->vtable = vtable;
 
@@ -802,10 +806,13 @@ Parrot_pmc_get_type_str(PARROT_INTERP, ARGIN_NULLOK(STRING *name))
         return enum_type_undef;
     else {
         PMC * const classname_hash = interp->class_hash;
-        PMC * const item           =
+        PMC * item                 =
             (PMC *)VTABLE_get_pointer_keyed_str(interp, classname_hash, name);
 
         if (!PMC_IS_NULL(item)) {
+            if (PMC_IS_TYPE(item, Proxy))
+                item = PARROT_PROXY(item)->target;
+
             /* nested namespace with same name */
             if (PMC_IS_TYPE(item, NameSpace))
                 return enum_type_undef;

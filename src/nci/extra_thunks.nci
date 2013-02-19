@@ -285,3 +285,9 @@ STRING (ptr, INTVAL)
 
 # NCI::Utils
 STRING (ptr, ptr, INTVAL)
+
+# examples/nci/Qt
+p    v
+p    p
+v    pii
+v    p

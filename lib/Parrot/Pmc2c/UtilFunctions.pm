@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2011, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
 package Parrot::Pmc2c::UtilFunctions;
 use strict;
@@ -132,41 +132,36 @@ This function is exported.
 sub dynext_load_code {
     my ( $classname, %classes ) = @_;
     my $lc_libname = lc $classname;
+    my $type = "dynpmc_class_";
     my $cout;
 
+    while ( my ( $class, $info ) = each %classes ) {
+      next if $info->{flags}{no_init};
+      $cout .= <<"EOC";
+INTVAL ${type}${class};
+EOC
+    }
+
     $cout .= <<"EOC";
+
 /*
  * This load function will be called to do global (once) setup
  * whatever is needed to get this extension running
  */
 
-EOC
-    $cout .= <<"EOC";
-
-PARROT_DYNEXT_EXPORT Parrot_PMC Parrot_lib_${lc_libname}_load(PARROT_INTERP); /* don't warn */
 PARROT_DYNEXT_EXPORT Parrot_PMC Parrot_lib_${lc_libname}_load(PARROT_INTERP)
 {
     Parrot_String whoami;
     Parrot_PMC    pmc;
-EOC
-    while ( my ( $class, $info ) = each %classes ) {
-        next if $info->{flags}{no_init};
-        $cout .= <<"EOC";
-    Parrot_Int type${class};
-EOC
-    }
-    $cout .= <<"EOC";
     int pass;
 
     /* create a library PMC */
     pmc = Parrot_pmc_new(interp, enum_class_ParrotLibrary);
 
-    /* TODO: stuff some info into this PMC's props */
-
     /* for all PMCs we want to register: */
 EOC
     while ( my ( $class, $info ) = each %classes ) {
-        my $lhs = $info->{flags}{no_init} ? "" : "type$class = ";
+        my $lhs = $info->{flags}{no_init} ? "" : "${type}${class} = ";
         $cout .= <<"EOC";
     whoami = CONST_STRING_GEN(interp, "$class");
     ${lhs}Parrot_pmc_register_new_type(interp, whoami);
@@ -182,7 +177,7 @@ EOC
 
     for my $class (@init_order) {
         $cout .= <<"EOC";
-        Parrot_${class}_class_init(interp, type$class, pass);
+        Parrot_${class}_class_init(interp, ${type}${class}, pass);
 EOC
     }
     $cout .= <<"EOC";

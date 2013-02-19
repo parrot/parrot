@@ -12,4 +12,9 @@ $(LIBRARY_DIR)/PGE.pbc: $(PARROT) \
 	$(PARROT) -o $@ compilers/pge/PGE.pir
 	$(PARROT) $(LIBRARY_DIR)/PGE/Perl6Grammar.pir --output=compilers/pge/PGE/builtins_gen.pir compilers/pge/PGE/builtins.pg
 	$(PARROT) -o $@ compilers/pge/PGE.pir
+	$(ADDGENERATED) "$@" "[main]"
 
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

@@ -1,13 +1,12 @@
 #! perl
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 
-use Parrot::Test skip_all => 'pending robust testing strategy, GH #394';
-#use Parrot::Test tests => 9;
+use Parrot::Test tests => 9;
 
 use File::Temp;
 use Parrot::Config;
@@ -38,7 +37,7 @@ my $parrot = File::Spec->join( File::Spec->curdir(), 'parrot' . $PConfig{exe} );
 my $args = $ENV{TEST_PROG_ARGS} || '';
 Parrot::Test::run_command
   (
-   qq{$parrot $args -o $out_f $tmppasm},
+   qq{$parrot -o $out_f $tmppasm $args},
    CD     => $path_to_parrot,
    STDOUT => $out_f,
    STDERR => $out_f,

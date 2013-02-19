@@ -1,6 +1,12 @@
-# Copyright (C) 2007-2009, Parrot Foundation.
+# Copyright (C) 2007-2012, Parrot Foundation.
 
-=head1
+=pod
+
+=head1 DESCRIPTION
+
+A tutorial lesson about Parrot's arrays.
+
+=head1 ARRAYS
 
 PMC registers can contain array or hash data types, or more
 advanced types based on these two. If a PMC type implements

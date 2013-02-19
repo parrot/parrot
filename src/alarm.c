@@ -5,38 +5,32 @@ Copyright (C) 2010-2012, Parrot Foundation.
 
 src/alarm.c - Implements a mechanism for alarms, setting a flag after a delay.
 
+=head1 DESCRIPTION
+
+This program implements a mechanism for alarms, setting a flag after a delay.
+
 =cut
 
 */
 
 #include "parrot/parrot.h"
 #include "parrot/alarm.h"
+#include "parrot/thread.h"
 
 /* Some per-process state */
 static volatile UINTVAL  alarm_serial = 0;
 static volatile FLOATVAL alarm_set_to = 0.0;
-
-/* This file relies on POSIX. Probably need two other versions of it:
- *  one for Windows and one for platforms with no signals or threads. */
-
-#ifdef _WIN32
-#  include <time.h>
-#else
-#  include <sys/time.h>
-#  include <signal.h>
-#  ifdef PARROT_HAS_HEADER_PTHREAD
-#    include <pthread.h>
-#  endif
-#endif
-#include <errno.h>
+static volatile FLOATVAL current_alarm = 0.0;
 
 /* HEADERIZER HFILE: include/parrot/alarm.h */
 
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void posix_alarm_set(FLOATVAL wait);
-#define ASSERT_ARGS_posix_alarm_set __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+PARROT_CAN_RETURN_NULL
+static void* Parrot_alarm_runloop(void *arg);
+
+#define ASSERT_ARGS_Parrot_alarm_runloop __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -54,128 +48,100 @@ pthread. Any other pthreads should make sure to mask out SIGALRM.
 
 */
 
+static Parrot_mutex alarm_lock;
+static Parrot_cond sleep_cond;
+
 void
 Parrot_alarm_init(void)
 {
     ASSERT_ARGS(Parrot_alarm_init)
-#ifdef _WIN32
-    /* TODO: Implement on Windows */
-#else
-    struct sigaction sa;
-    memset(&sa, 0, sizeof (struct sigaction));
-    sa.sa_handler = Parrot_alarm_callback;
-    sa.sa_flags   = SA_RESTART;
-
-    if (sigaction(SIGALRM, &sa, 0) == -1)
-        Parrot_x_force_error_exit(NULL, 1, "sigaction failed in Parrot_timers_init");
-
-    Parrot_alarm_unmask(NULL);
-#endif
+    Parrot_thread thread;
+    MUTEX_INIT(alarm_lock);
+    COND_INIT(sleep_cond);
+    THREAD_CREATE_JOINABLE(thread, Parrot_alarm_runloop, NULL);
 }
 
 /*
 
-=item C<static void posix_alarm_set(FLOATVAL wait)>
+=over 4
 
-A helper function to set an alarm.
+=item C<static void* Parrot_alarm_runloop(void *arg)>
+
+The thread function handling alarms.
+
+The argument C<arg> is currently ignored.
 
 =cut
 
 */
 
-static void
-posix_alarm_set(FLOATVAL wait)
+PARROT_CAN_RETURN_NULL
+static void*
+Parrot_alarm_runloop(SHIM(void *arg))
 {
-    ASSERT_ARGS(posix_alarm_set)
-#ifdef _WIN32
-    /* TODO: Implement on Windows */
-#else
-    const int MIL = 1000000;
-    const int sec  = (int) wait;
-    const int usec = (int) ((wait - sec) * MIL);
+    ASSERT_ARGS(Parrot_alarm_runloop)
 
-    struct itimerval itmr;
+    while (1) {
+        int rc = 0;
+        INTVAL notify = 0;
 
-    itmr.it_value.tv_sec     = sec;
-    itmr.it_value.tv_usec    = usec;
-    itmr.it_interval.tv_sec  = 0;
-    itmr.it_interval.tv_usec = 0;
+        LOCK(alarm_lock);
 
-    if (setitimer(ITIMER_REAL, &itmr, 0) == -1) {
-        if (errno == EINVAL) {
-            Parrot_alarm_callback(SIGALRM);
+        /* First, check if we have any outstanding alarms, and wait for those. */
+        if (alarm_set_to > 0) {
+            struct timespec ts;
+            ts.tv_sec = (time_t)alarm_set_to;
+            ts.tv_nsec = (long)((alarm_set_to - ts.tv_sec) * 1000000000.0f);
+            current_alarm = alarm_set_to;
+            alarm_set_to = 0;
+            rc = 0;
+            while (alarm_set_to == 0 && rc == 0)
+                COND_TIMED_WAIT(sleep_cond, alarm_lock, &ts, rc);
         }
-        else
-            Parrot_x_force_error_exit(NULL, 1, "setitimer failed in set_posix_alarm");
+        else {
+            /* no alarms set, just wait for new alarms */
+            while (alarm_set_to == 0)
+                COND_WAIT(sleep_cond, alarm_lock);
+        }
+
+        /* Check if we need to notify threads. We need to notify threads if
+           an alarm time has passed, or if there has been a timeout error in
+           waiting for alarms. */
+        if (alarm_set_to > 0 && alarm_set_to <= Parrot_floatval_time()) {
+            /* New alarm is already in the past. Don't bother waiting, notify
+               immediately */
+            notify = 1;
+            alarm_set_to = 0;
+        }
+        else {
+            /* notify on timeout but not on setting new alarm */
+            notify = (rc != 0);
+        }
+
+        if (notify)
+            current_alarm = 0;
+
+        UNLOCK(alarm_lock);
+
+        /* If we need to notify, do that here. Otherwise, back to the top of
+           the loop*/
+        if (notify) {
+            /* possible racy write with read in Parrot_alarm_check */
+            LOCK(alarm_lock);
+            alarm_serial += 1;
+            UNLOCK(alarm_lock);
+            Parrot_thread_notify_threads(NULL);
+        }
     }
-#endif
-}
 
-/*
-
-=item C<void Parrot_alarm_mask(PARROT_INTERP)>
-
-=item C<void Parrot_alarm_unmask(PARROT_INTERP)>
-
-These block or unblock the signal for alarms. Any thread with signals
-unblocked should avoid waiting on a lock or condition variable.
-
-=cut
-
-*/
-
-void
-Parrot_alarm_mask(SHIM_INTERP)
-{
-    ASSERT_ARGS(Parrot_alarm_mask)
-#ifdef _WIN32
-    /* TODO: Implement on Windows */
-#else
-    sigset_t mask;
-    sigemptyset(&mask);
-    sigaddset(&mask, SIGALRM);
-    pthread_sigmask(SIG_BLOCK, &mask, 0);
-#endif
-}
-
-void
-Parrot_alarm_unmask(SHIM_INTERP)
-{
-    ASSERT_ARGS(Parrot_alarm_unmask)
-#ifdef _WIN32
-    /* TODO: Implement on Windows */
-#else
-    sigset_t mask;
-    sigemptyset(&mask);
-    sigaddset(&mask, SIGALRM);
-    pthread_sigmask(SIG_UNBLOCK, &mask, 0);
-#endif
-}
-
-/*
-
-=item C<void Parrot_alarm_callback(int sig_number)>
-
-Callback for SIGALRM. When this is called, a timer should be ready to fire.
-
-=cut
-
-*/
-
-void
-Parrot_alarm_callback(SHIM(int sig_number))
-{
-    ASSERT_ARGS(Parrot_alarm_callback)
-
-    /* Not atomic; only one thread ever writes this value */
-    alarm_serial += 1;
+    return NULL;
 }
 
 /*
 
 =item C<int Parrot_alarm_check(UINTVAL* last_serial)>
 
-Has any alarm triggered since we last checked?
+Determine if any alarms have passed since last checked.
 
 Possible design improvement: Alert only the thread that
 set the alarm.
@@ -190,13 +156,14 @@ Parrot_alarm_check(ARGMOD(UINTVAL* last_serial))
 {
     ASSERT_ARGS(Parrot_alarm_check)
 
-    if (*last_serial == alarm_serial) {
+#ifdef PARROT_HAS_THREADS
+    if (*last_serial == alarm_serial)
         return 0;
-    }
-    else {
-        *last_serial = alarm_serial;
-        return 1;
-    }
+    *last_serial = alarm_serial;
+    return 1;
+#else
+    return (alarm_set_to <= Parrot_floatval_time());
+#endif
 }
 
 /*
@@ -214,41 +181,44 @@ void
 Parrot_alarm_set(FLOATVAL when)
 {
     ASSERT_ARGS(Parrot_alarm_set)
-#ifdef _WIN32
-    /* TODO: Implement on Windows */
-#else
-    const FLOATVAL now = Parrot_floatval_time();
 
-    /* Better late than early */
-    when += 0.0001;
+    LOCK(alarm_lock);
+    {
+        if (current_alarm > 0 && current_alarm <= when) {
+            /* there's already an active alarm for an earlier point in time */
+            UNLOCK(alarm_lock);
+            return;
+        }
 
-    if (alarm_set_to > now && alarm_set_to < when)
-        return;
-
-    alarm_set_to = when;
-    posix_alarm_set(when - now);
-#endif
+        alarm_set_to = when;
+        COND_SIGNAL(sleep_cond);
+    }
+    UNLOCK(alarm_lock);
 }
 
 /*
 
-=item C<void Parrot_alarm_now(void)>
+=item C<void Parrot_alarm_wait_for_next_alarm(PARROT_INTERP)>
 
-Trigger an alarm wakeup.
+Sleep till the next alarm expires. This is a fallback function which is only
+used if we try to sleep the interp without threads support. If we have
+threading enabled, this function will not be used and the normal threads-based
+mechanism will be used instead.
 
 =cut
 
 */
 
+PARROT_EXPORT
 void
-Parrot_alarm_now(void)
+Parrot_alarm_wait_for_next_alarm(SHIM_INTERP)
 {
-    ASSERT_ARGS(Parrot_alarm_now)
-#ifdef _WIN32
-    /* TODO: Implement on Windows */
-#else
-    kill(getpid(), SIGALRM);
-#endif
+    ASSERT_ARGS(Parrot_alarm_wait_for_next_alarm)
+    const FLOATVAL now_time  = Parrot_floatval_time();
+    const FLOATVAL time = alarm_set_to - now_time;
+
+    if (time > 0)
+        Parrot_usleep(time * 1000000);
 }
 
 /*

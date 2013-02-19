@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2006, Parrot Foundation.
+# Copyright (C) 2001-2013, Parrot Foundation.
 
 =head1 NAME
 
@@ -33,6 +33,7 @@ sub runstep {
         else {
             if ( $conf->cc_run() =~ /ok/ ) {
                 _handle_cc_run_ok($conf, $suffix, $path_f);
+                $conf->add_to_generated( $path_f, "[]" );
             }
         }
         $conf->cc_clean();

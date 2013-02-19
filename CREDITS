@@ -1,6 +1,3 @@
-=pod
-
-
     Following in the steps of other open source projects that
     eventually take over the world, here is the partial list
     of people who have contributed to Parrot and its supporting
@@ -78,7 +75,7 @@ U: allison
 
 N: Alvis Yardley
 D: Documentation Shepherd (3.9.0 - Present)
-D: Release manger for 4.1.0
+D: Release manager for 4.1.0, 4.5.0 and 4.8.0
 E: ac.yardley@gmail.com
 U: alvis
 S: Ft. Worth, Texas
@@ -115,7 +112,7 @@ N: Andrew Whitworth
 D: Product Manager (2.9.0 - current)
 D: Internals development
 D: Documentation
-D: Release manager for 0.8.2, 1.3.0, 1.5.0, 2.4.0, 2.11.0, 3.3.0, 3.10.0, 4.0.0 and 4.4.0
+D: Release manager for 0.8.2, 1.3.0, 1.5.0, 2.4.0, 2.11.0, 3.3.0, 3.10.0, 4.0.0, 4.4.0 and 4.7.0
 E: wknight8111@gmail.com
 U: Whiteknight
 
@@ -517,6 +514,7 @@ D: various Pynie patches
 N: James E Keenan
 E: jkeenan@cpan.org
 U: jkeenan
+A: kid51
 D: Testing of configuration and build tools; release manager
 W: http://thenceforward.net/parrot/
 S: Brooklyn, NY, USA
@@ -697,7 +695,7 @@ D: clean-ups of compilers/imcc and its documentation.
 D: compilers/pirc and languages/PIR.
 D: various updates to PCT-based languages (C99,Punie,Cardinal,Ecmascript)
 D: languages/json, languages/squaak
-U: kj, kjs
+U: kjs
 E: parrotcode@gmail.com
 
 N: Klāvs Priedītis
@@ -859,6 +857,12 @@ E: moritz@faui2k3.org
 U: moritz
 D: Test infrastructure for languages/perl6/ and Perl 6 in general
 
+N: Marek Šuppa
+E: marek@suppa.sk
+U: mrshu
+W: http://shu.io
+D: Benchmarks
+
 N: Nat Tuck
 U: Chandon
 E: nat@ferrus.net
@@ -908,6 +912,11 @@ E: mestre.smash@gmail.com
 
 N: OOLLEY kj
 D: Miscellaneous cleanup and PDD07-conformance
+
+N: Oliver Charles
+D: Initial patch to add 'getprotobyname' to Socket PMC
+U: ocharles
+E: oliver@ocharles.org.uk
 
 N: Ovid
 D: Rename 'pbc_to_c' to 'pbc_to_exe'
@@ -967,7 +976,10 @@ D: Fixed typos
 N: Reini Urban
 U: rurban
 E: rurban@cpan.org
-D: cygwin, 64-bit pbc compat, float converters, bignum.pmc
+E: rurban@cpanel.net
+D: cygwin, install, native_pbc
+D: Release manager
+S: Houston, TX
 
 N: Richard Hainsworth
 U: finanalyst
@@ -1069,7 +1081,7 @@ U: sorear
 N: Stefan Seifert
 U: nine
 E: nine@detonation.org
-D: Continuation of Chandler's work on tasks
+D: Hybrid threads, continuation of Chandler's work on tasks
 S: Linz, Austria
 W: http://niner.name
 
@@ -1214,4 +1226,6 @@ N: svn
 U: svn
 E: svn@perl.org
 
-=cut
+N: Bart Wiegmans
+E: bartwiegmans@gmail.com
+D: mod_parrot

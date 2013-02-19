@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2011, Parrot Foundation.
+Copyright (C) 2005-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -710,8 +710,8 @@ Return the name of this namespace part.
 */
 
     VTABLE STRING *get_string() {
+        UNUSED(INTERP)
         const Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
-        UNUSED(INTERP);
         return nsinfo->name;
     }
 
@@ -1195,6 +1195,7 @@ Sets the class or role PMC that is associated with this namespace.
 */
 
     METHOD set_class(PMC *class_or_role) {
+        PARROT_ASSERT_INTERP(class_or_role, INTERP);
         PARROT_NAMESPACE(SELF)->_class = class_or_role;
     }
 

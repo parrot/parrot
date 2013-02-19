@@ -134,14 +134,21 @@ sub determine_need_for_manifest {
 
     my $current_files_ref        = $self->_get_current_files();
     my $different_patterns_count = 0;
+    my %missing;
     foreach my $cur ( keys %{$current_files_ref} ) {
-        $different_patterns_count++ unless $proposed_files_ref->{$cur};
+        unless ($proposed_files_ref->{$cur}) {
+            $different_patterns_count++;
+            $missing{"+".$cur}++;
+        }
     }
     foreach my $pro ( keys %{$proposed_files_ref} ) {
-        $different_patterns_count++ unless $current_files_ref->{$pro};
+        unless ($current_files_ref->{$pro}) {
+            $different_patterns_count++;
+            $missing{"-".$pro}++;
+        }
     }
 
-    $different_patterns_count ? return 1 : return;
+    $different_patterns_count ? return \%missing : return;
 }
 
 =head2 print_manifest
@@ -225,7 +232,7 @@ sub _get_manifest_entry {
 sub _get_special {
     my %special = qw(
         CREDITS                                         [main]doc
-        DEPRECATED.yaml                                  [devel]doc
+        DEPRECATED.yaml                                 [devel]doc
         DONORS.pod                                      [main]doc
         LICENSE                                         [main]doc
         PBC_COMPAT                                      [main]doc
@@ -238,7 +245,6 @@ sub _get_special {
         VERSION                                         [devel]
         languages/t/harness                             [test]
         lib/File/Which.pm                               [devel]lib
-        parrot-config                                   [main]bin
         src/vtable.tbl                                  [devel]src
         tools/build/ops2c.pl                            [devel]
         tools/build/pmc2c.pl                            [devel]

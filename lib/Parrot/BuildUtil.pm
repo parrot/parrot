@@ -1,9 +1,16 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 package Parrot::BuildUtil;
 
 use strict;
 use warnings;
+use vars qw( @ISA @EXPORT );
+use Exporter;
+@ISA = qw( Exporter );
+@EXPORT = qw( add_to_generated );
+
+use File::Basename qw/basename/;
+use File::Spec;
 
 =head1 NAME
 
@@ -13,7 +20,8 @@ Parrot::BuildUtil - Utilities for building Parrot
 
 This package holds pre-configure time subroutines, which are not exported
 and should not require Parrot::Config.
-Each must be requested by using a fully qualified name.
+
+One exception though: C<add_to_generated()> is exported.
 
 =head1 SUBROUTINES
 
@@ -108,7 +116,6 @@ sub generated_file_header {
     die qq{unknown style "$style"}
         unless ($style eq 'perl' or $style eq 'c');
 
-    require File::Spec;
     my $script = File::Spec->abs2rel($0);
     $script =~ s/\\/\//g;
 
@@ -157,6 +164,66 @@ sub get_bc_version {
         die "No bytecode version found in '$compat_file'.";
     }
     return ( $bc_major, $bc_minor );
+}
+
+=item C<add_to_generated($filename, $section, $dir)>
+
+Adds the C<$filename> to MANIFEST.generated into the given C<$section>.
+C<$dir> is optional.
+
+Default section: [main]
+Default dir: ""
+
+Note that Parrot::Config might not be generated yet, so
+we must assure that the current directory is the the build_dir.
+This is the job of F<tools/build/addgenerated.pl>, but
+within some perl5 modules you must take care by yourself.
+
+=cut
+
+sub add_to_generated {
+    my ($filename, $section, $dir) = @_;
+
+    # Support quirky Makefile invocation as
+    #   $(PERL) -Ilib -MParrot::BuildUtil -e add_to_generated "$@",'[main]','lib'
+    ($filename, $section, $dir) = @ARGV unless $filename;
+    if ($filename =~ /,/ and !$section) { # split it here, when the shell is fooled
+        ($filename, $section, $dir) = split /,/, $filename;
+    }
+
+    my $path = File::Spec->abs2rel($filename);
+    $path =~ s/\\/\//g;
+    $section = "[main]" unless $section;
+    $dir = "" unless $dir;
+
+    open( my $M, '>>', "MANIFEST.generated" ) or die "open 'MANIFEST.generated': $!";
+    printf $M "%-48s %s%s\n", $path, $section, $dir;
+
+    # Additional .manifest logic on windows and [main]bin
+    if ($section eq '[main]' and $dir eq 'bin' and $^O =~ /cygwin|MSWin32/) {
+        my $base = basename($filename,'.exe');
+        if (-e "$base.manifest") {
+            my $mpath = File::Spec->abs2rel($base) . ".manifest";
+            $mpath =~ s/\\/\//g;
+            printf $M "%-48s %s%s\n", $mpath, $section, $dir;
+        }
+    }
+    close $M;
+    ''
+}
+
+=item C<add_list_to_generated( [$section,] @files)>
+
+Adds the list of filenames to MANIFEST.generated into $section,
+Default main: '[main]'.
+
+=cut
+
+sub add_list_to_generated {
+    @_ = @ARGV unless @_;
+    my $section = '';
+    $section = shift @_ if $_[0] =~ /^\[/;
+    add_to_generated($_, $section) for @_;
 }
 
 1;

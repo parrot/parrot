@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 PDD 25: Concurrency
 
@@ -7,34 +7,31 @@
 This document defines the requirements and implementation strategy for
 Parrot's concurrency models.
 
-
-
-
-
 =head2 Description
 
 =over 4
 
-=item - Parrot supports multiple concurrency models, including POSIX
-threads, event-based programming, and asynchronous I/O.
+=item - Parrot supports multiple concurrency models, including
+green threads, Windows threads, POSIX threads, event-based programming,
+and asynchronous I/O.
 
-=item - A concurrency scheduler manages all concurrent tasks
+=item - A concurrency scheduler manages all concurrent tasks.
 
-=item - Each interpreter has its own concurrency scheduler
+=item - Each interpreter has its own concurrency scheduler.
 
 =item - Concurrency schedulers for different interpreters
-communicate and can share tasks
+communicate and can share tasks.
 
 =item - A concurrency scheduler may link to other schedulers as a
-parent, a child, or an equal
+parent, a child, or an equal.
 
-=item - A task is a concurrent unit of work
+=item - A task is a concurrent unit of work.
 
 =item - All tasks support a standard interface used by the concurrency
 scheduler, but otherwise have a great deal of flexibility in their
-implementation
+implementation.
 
-=item - Tasks can share PMC variables
+=item - Tasks can share PMC variables.
 
 =back
 
@@ -50,14 +47,13 @@ A task is a unit of code that can be executed concurrently.
 
 =head2 Implementation
 
-Rather than defining a single canonical threading model, Parrot defines
-an infrastructure that supports multiple concurrency models and provides
-for interaction between the various models. Parrot already uses multiple
-concurrency models for events, threads, async I/O, and exceptions, a
-trend that will only continue as we support multiple HLLs and external
-threading libraries like Intel's Threading Building Blocks. Designing
-for multiple concurrency models also gives Parrot more room to grow as
-future models are researched and developed.
+Rather than defining a single canonical threading model, Parrot defines an
+infrastructure that supports multiple concurrency models and provides for
+interaction between the various models. Parrot already uses multiple
+concurrency models for events, threads, async I/O, and exceptions, a trend
+that will only continue as we support multiple HLLs and external threading
+libraries. Designing for multiple concurrency models also gives Parrot more
+room to grow as future models are researched and developed.
 
 To avoid conflicts between concurrency models, Parrot provides a single
 central concurrency scheduler for each interpreter instance.  Each
@@ -66,15 +62,14 @@ interface. The scheduler can interact with tasks from different models
 without direct access to the details of each model.
 
 On multiprocessor systems, the scheduler is responsible for allocating
-tasks to processors, or for delegating that allocation to the underlying
-OS.
+tasks to processors by delegating that allocation to native OS threads.
 
 For the most part, when we talk about concurrency, we mean concurrency
 across an interpreter pool. An interpreter pool is a set of interpreter
 instances that share common resources: the memory pools, arenas, and
 global namespace--pretty much everything except what's in the
 interpreter structure itself. They're essentially threads in the OS
-sense.
+sense and implemented as OS threads.
 
 Another form of concurrency is between completely independent
 interpreter instances, each with their own memory pools, arenas,
@@ -114,7 +109,7 @@ address order). In this model only PMCs can be shared.
 
 =head4 STM Concurrency
 
-Parrot's preferred model of concurrency is based on Software
+Older Parrot's preferred a model of concurrency based on Software
 Transactional Memory. In this model, rather than locking a shared
 variable while performing a series of operations on it, the changes are
 bundled into a transaction that acts as an atomic unit.
@@ -136,31 +131,6 @@ safety mode, STM tasks may be configured to fail validation on any
 transaction attempting to commit to a variable locked by a mutex/lock
 task.
 
-=head4 POSIX Concurrency
-
-This is the POSIX "share-everything" style of threading, such as is used
-in Perl 5's "pthread" model, as well as the thread models for Ruby and
-Python. [Recommended reading: "Programming with POSIX Threads" by Dave
-Butenhof.]
-
-=head4 Process-type Concurrency
-
-This is the Perl 5 "iThreads" threading model. In this model no data is
-shared implicitly, and all sharing must be done on purpose and
-explicitly. It resembles the Unix
-fork-process-with-shared-memory-segment model, not a surprise as it was
-originally developed with emulation of Unix's fork system in mind.
-
-=head4 Independent Concurrency
-
-Independent tasks have no contact with the internal data of any other
-task in the current process. These are implemented as STM concurrency
-but only use transactions for the shared interpreter globals.
-
-Note that independent tasks may still communicate back and forth by
-passing either atomic things (ints, floats, and pointers) or static
-buffers that can become the property of the destination thread.
-
 =head4 Intel Threading Building Blocks
 
 Threading Building Blocks (TBB) is a library of tools for data-parallel
@@ -168,7 +138,7 @@ programming, dividing large data sets into small pieces so that
 operations on those data-sets can be parallelized across multiple
 processors.
 
-Parrot will provide two levels of integration with TBB: an interface for
+Parrot might provide two levels of integration with TBB: an interface for
 TBB's scheduling to interact with the central concurrency scheduler, and
 an interface for developers to access the TBB routines from within
 PIR/PASM.
@@ -181,6 +151,54 @@ variables with any other types of concurrent tasks in Parrot.
 
 Note that since TBB is a C++ library, it is only available when Parrot
 is compiled with a C++ compiler.
+
+=head4 POSIX Concurrency
+
+This is the POSIX "share-everything" style of threading, such as is used
+in Perl 5's "pthread" model, as well as the thread models for Ruby and
+Python. [Recommended reading: "Programming with POSIX Threads" by Dave
+Butenhof.]
+
+=head4 Process-type Concurrency
+
+This is the Perl 5 "iThreads" threading model. In this model no data is
+shared implicitly, and all sharing must be done on purpose and
+explicitly. It resembles the Unix fork process with shared memory segment
+model, not a surprise as it was originally developed with emulation of
+Unix's fork system in mind.
+
+=head4 Hybrid-thread Concurrency (current)
+
+Lightweight "green" threads (i.e. Task) are used as messages in a system
+where reading shared variables is allowed but only the one owner thread
+may write to it.
+
+With our current hybrid threads model all data sharing is implemented
+through Proxy PMCs. Reading foreign data is transparent, writing must
+be done via writer subs scheduled in the owners Task. To reduce latency,
+the task is flagged to run immediately. The data-owning interpreter will
+preempt the currently running task and process the new write task.
+Thus proxies allow a nearly lock-free multithreading implementation.
+
+Each task is assigned a fixed amount of execution time. After this time is
+up a timer callback sets a flag which is checked at execution of every
+branch operation. Since the interpreter's state is well defined at this
+point, its internal consistency is guaranteed. The same holds for the
+GC. Since task preemption is only done while executing user-level code, the
+GC can do its work undisturbed and without the need for measures like
+locking. Since user-level code is allowed to disable the scheduler, it can
+be guaranteed to run undisturbed through critical sections.
+
+
+=head4 Independent Concurrency
+
+Independent tasks have no contact with the internal data of any other
+task in the current process. These are implemented as STM concurrency
+but only use transactions for the shared interpreter globals.
+
+Note that independent tasks may still communicate back and forth by
+passing either atomic things (ints, floats, and pointers) or static
+buffers that can become the property of the destination thread.
 
 =head3 Concurrency Scheduler API
 
@@ -222,31 +240,27 @@ schedulers, both local to the current interpreter and remote.
 The task list is a simple unordered integer indexed data structure, currently
 implemented as a hash. Each task in the list has an integer ID assigned when
 it is first inserted into the list. A task retains the same ID throughout its
-lifetime, and the ID is not reused once a task is finalized. (The data
-structure is currently implemented as a hash so that it only takes up the
-memory required for currently living tasks. A task list for a particular
-program may use thousands of task IDs, but only need memory allocated for a
-handful of elements at any given moment.)
+lifetime, and the ID is not reused once a task is finalized. The data
+structure is currently implemented as pre-allocated array, the number of CPU's
+plus one, overridable by --numthreads <N>.
 
-The task rank index is calculated based on the type, priority rating, age of
-the tasks in the task list. The index is a simple array, and in general the
-top (zeroth) element in the array is the next one to receive attention. The
-index is recalculated regularly as new tasks are inserted into the task list,
-existing tasks are modified or completed, and as time progresses so the age of
-some tasks pushes them to a higher priority. Because of the regular
-recalculation, the rank index may cache some frequently-accessed and rarely
-changing data from the tasks (though it is not required to do so). (As a later
-optimization, some data structure other than an array may be used to speed up
-rank recalculation. For example, with a hash of hashes of arrays keyed on task
-attributes, the process of inserting new tasks at a relative priority to other
-existing tasks could be performed without shifting the rank of all lower
-ranked tasks.)
+Currently a task is implemented as OS thread so ranking is done by the OS.
+Prioritization is done with the interpreter method 'schedule_proxied'.
+Previous versions used a task rank index, calculated based on the type,
+priority rating, age of the tasks in the task list. The index is a simple
+array, and in general the top (zeroth) element in the array is the next one
+to receive attention. The index is recalculated regularly as new tasks are
+inserted into the task list, existing tasks are modified or completed, and
+as time progresses so the age of some tasks pushes them to a higher
+priority. Because of the regular recalculation, the rank index may cache
+some frequently-accessed and rarely changing data from the tasks (though it
+is not required to do so).
 
 The list of handlers is a simple stack of handler PMCs currently waiting for
 an appropriate task (event, exception). See PDD 24 on Events for more details
 on event handlers.
 
-=head4 Flags
+=head4 Flags (old)
 
 PMC flags 0-7 are reserved for private use by a PMC. The scheduler uses flag 0
 to indicate whether the priority index is currently valid or needs to be
@@ -424,24 +438,40 @@ Kill a task without waiting for it to complete.
 =head2 References
 
 Dec 2003 - (Dan ponders threads based on POSIX and Perl 5 experience)
-L<http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/e64b22ab7de0a7a6/889b5d8c4cd267b7?lnk=gst&q=threads&rnum=3#889b5d8c4cd267b7>
+
+L<https://groups.google.com/forum/?fromgroups=#!topic/perl.perl6.internals/5ksiq33gp6Y>
 
 Dec. 2003 - "threads and shared interpreter data structures"
-L<http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/e64ea4ff287e04fd/b71333e282d3d187?lnk=gst&q=threads&rnum=9#b71333e282d3d187>
+
+L<https://groups.google.com/forum/?fromgroups=#!topic/perl.perl6.internals/5k6k_yh-BP0>
 
 Jan. 2004 - "Threads Design. A Win32 perspective."
-L<http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/3209629b23306029/52ba9d37425ba015?lnk=gst&q=threads&rnum=8#52ba9d37425ba015>
+
+L<https://groups.google.com/forum/?fromgroups=#!topic/perl.perl6.internals/MglimyMwYCk>
 
 Jan. 2004 - "Start of threads proposal"
-L<http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/4c7de440da84d5c6/04cfb70b0d81dfba?tvc=1&q=threads#04cfb70b0d81dfba>
+
+L<https://groups.google.com/forum/?fromgroups#!topic/perl.perl6.internals/TH3kQNqE1cY>
 
 Sept. 2005 - "consider using OS threads"
-L<http://groups.google.com/group/perl.perl6.internals/browse_frm/thread/40b50e3aa9255f8e/036a87b5d2b5ed2c?lnk=gst&q=threads&rnum=2#036a87b5d2b5ed2c>
+
+L<https://groups.google.com/forum/?fromgroups=#!topic/perl.perl6.internals/QLUOOqklX44>
 
 Aug. 2007 - "multi-threading a work in progress"
+
 L<http://perlmonks.org/?node_id=636466>
 
-Concurrency as Futures -
+Aug. 2010 - "GSoC Threads: Chandon's Results" (green threads by Nat Tuck)
+
+L<http://wknight8111.blogspot.co.at/2010/08/gsoc-threads-chandons-results.html>
+
+Apr. 2012 - (hybrid threads implemented by Stefan Seifert)
+
+L<http://lists.parrot.org/pipermail/parrot-dev/2012-April/006855.html>
+L<http://niner.name/Hybrid_Threads_for_the_Parrot_VM.pdf>
+
+Concurrency as Futures
+
 L<http://www.cincomsmalltalk.com/userblogs/mls/blogView?showComments=true&entry=3336838959>
 
 Io language - L<http://www.iolanguage.com/about/>
@@ -452,6 +482,6 @@ Java memory and concurrency - L<http://www.cs.umd.edu/~pugh/java/memoryModel/>
 
 __END__
 Local Variables:
-  fill-column:78
+  fill-column:100
 End:
 vim: expandtab shiftwidth=4:

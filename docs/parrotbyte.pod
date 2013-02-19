@@ -1,12 +1,16 @@
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2012, Parrot Foundation.
 
 =head1 NAME
 
 docs/parrotbyte.pod - The Parrot Bytecode (PBC) Format
 
-=head1 Format of the Parrot bytecode
+=head1 DESCRIPTION
 
-The 18-byte header consists of:
+This document describes the Parrot bytecode format.
+
+=head1 THE HEADER
+
+The 18-byte header consists of,
 
   0                                           7
   +----------+----------+----------+----------+
@@ -331,3 +335,4 @@ mentioned in some of the early Parrot documents.
 F<packfile.c>, F<packfile.h>, F<packdump.c>, F<pf/*.c>, and the
 B<pbc_dump> utility F<pbc_dump.c>.
 
+=cut

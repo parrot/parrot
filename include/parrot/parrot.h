@@ -95,7 +95,11 @@ typedef jmp_buf Parrot_jump_buff;
 #endif
 
 #define NUM_REGISTERS 32
-#define PARROT_MAGIC 0x13155a1
+
+/* Make 'PARROT_MAGIC', at least, agree with the '*.pbc' files,
+   even though it's unused.
+ */
+#define PARROT_MAGIC  0xfe5042430a1a0a
 
 typedef void STRING_FUNCS;
 typedef struct parrot_interp_t Interp;
@@ -262,6 +266,7 @@ typedef struct PackFile_ByteCode PackFile_ByteCode;
 #include "parrot/key.h"
 #include "parrot/exit.h"
 #include "parrot/nci.h"
+#include "parrot/thread.h"
 #include "parrot/scheduler.h"
 #include "parrot/oo.h"
 #include "parrot/vtables.h"

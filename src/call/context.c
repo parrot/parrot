@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2009-2011, Parrot Foundation.
+Copyright (C) 2009-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -18,6 +18,7 @@ Parrot_Context functions.
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_callcontext.h"
 #include "pmc/pmc_continuation.h"
+#include "pmc/pmc_proxy.h"
 
 /*
 
@@ -175,6 +176,12 @@ Parrot_pcc_set_sub(PARROT_INTERP, ARGIN(PMC *ctx), ARGIN_NULLOK(PMC *sub))
 
         c->current_pc        = subattr->seg->base.data + subattr->start_offs;
         c->current_HLL       = subattr->HLL_id;
+#ifdef THREAD_DEBUG
+        PARROT_ASSERT(
+            PObj_is_shared_TEST(sub)
+            || subattr->namespace_stash == NULL
+            || subattr->namespace_stash->orig_interp == interp);
+#endif
         c->current_namespace = subattr->namespace_stash;
     }
 }
@@ -270,6 +277,7 @@ init_context(ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
         ctx->errors            = old->errors;
         ctx->trace_flags       = old->trace_flags;
         ctx->current_HLL       = old->current_HLL;
+        PARROT_ASSERT_INTERP(old->current_namespace, pmcctx->orig_interp);
         ctx->current_namespace = old->current_namespace;
         /* end COW */
         ctx->recursion_depth   = old->recursion_depth;
@@ -901,6 +909,43 @@ set_context(PARROT_INTERP, ARGIN(PMC *ctx))
     ASSERT_ARGS(set_context)
 
     CURRENT_CONTEXT(interp) = ctx;
+}
+
+/*
+
+=item C<PMC * Parrot_pcc_unproxy_context(PARROT_INTERP, PMC * proxy)>
+
+CallContext cannot be properly proxied across threads because of direct field
+accesses. Instead, create a new CallContext which acts like a proxy but can
+be used with direct accesses.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_pcc_unproxy_context(PARROT_INTERP, ARGIN(PMC * proxy))
+{
+    ASSERT_ARGS(Parrot_pcc_unproxy_context)
+    PMC * const ctx_pmc = Parrot_pcc_allocate_empty_context(interp, PMCNULL);
+    PMC * const target_ctx_pmc = PARROT_PROXY(proxy)->target;
+    Parrot_Context * const ctx = CONTEXT_STRUCT(ctx_pmc);
+    Parrot_Context * const target_ctx = CONTEXT_STRUCT(target_ctx_pmc);
+    Parrot_Interp const target_interp = PARROT_PROXY(proxy)->interp;
+
+    ctx->caller_ctx = PMCNULL;      /* TODO: Double-check this */
+    ctx->outer_ctx = PMCNULL;
+    ctx->lex_pad = Parrot_thread_create_proxy(target_interp, interp, target_ctx->lex_pad);
+    ctx->handlers = Parrot_thread_create_proxy(target_interp, interp, target_ctx->handlers);
+    ctx->current_cont = PMCNULL;
+    ctx->current_namespace = PMCNULL;
+    ctx->current_sig = PMCNULL;
+    ctx->type_tuple = PMCNULL;
+    ctx->arg_flags = PMCNULL;
+    ctx->return_flags = PMCNULL;
+    return ctx_pmc;
 }
 
 /*
