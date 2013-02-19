@@ -497,6 +497,8 @@ END_CODE
         #
         #   $X                 {{@X}}   Argument X    $0 is opcode, $1 is first arg
         #
+        #                      {{b}}    write barrier needed for GC
+        #
         # For ease of parsing, if the argument to one of the above
         # notations in a .ops file contains parentheses, then double the
         # enclosing parentheses and add a space around the argument,
@@ -509,29 +511,32 @@ END_CODE
         # with labels, etc.).
         #
 
-        $body =~ s/\bgoto\s+ADDRESS\(\( (.*?) \)\)/{{=$1}}/mg;
+        $body =~ s/\bgoto\s+ADDRESS\(\( (.*?) \)\)/{{b}}{{=$1}}/mg;
         $body =~ s/\bexpr\s+ADDRESS\(\( (.*?) \)\)/{{^$1}}/mg;
-        $body =~ s/\bgoto\s+ADDRESS\((.*?)\)/{{=$1}}/mg;
+        $body =~ s/\bgoto\s+ADDRESS\((.*?)\)/{{b}}{{=$1}}/mg;
         $body =~ s/\bexpr\s+ADDRESS\((.*?)\)/{{^$1}}/mg;
 
-        $body =~ s/\bgoto\s+OFFSET\(\( (.*?) \)\)/{{+=$1}}/mg;
+        $body =~ s/\bgoto\s+OFFSET\(\( (.*?) \)\)/{{b}}{{+=$1}}/mg;
         $body =~ s/\bexpr\s+OFFSET\(\( (.*?) \)\)/{{^+$1}}/mg;
-        $body =~ s/\bgoto\s+OFFSET\((.*?)\)/{{+=$1}}/mg;
+        $body =~ s/\bgoto\s+OFFSET\((.*?)\)/{{b}}{{+=$1}}/mg;
         $body =~ s/\bexpr\s+OFFSET\((.*?)\)/{{^+$1}}/mg;
 
+        $body =~ s/\bgoto\s+NEXT\(\)/{{b}}{{+=$op_size}}/mg;
         $body =~ s/\bexpr\s+NEXT\(\)/{{^+$op_size}}/mg;
-        $body =~ s/\bgoto\s+NEXT\(\)/{{+=$op_size}}/mg;
 
-        $body =~ s/\brestart\s+OFFSET\((.*?)\)/{{=0,+=$1}}/mg;
-        $body =~ s/\brestart\s+NEXT\(\)/{{=0,+=$op_size}}/mg;
-        $body =~ s/\brestart\s+ADDRESS\((.*?)\)/{{=$1}}/mg;
+        $body =~ s/\brestart\s+OFFSET\((.*?)\)/{{b}}{{=0,+=$1}}/mg;
+        $body =~ s/\brestart\s+NEXT\(\)/{{b}}{{=0,+=$op_size}}/mg;
+        $body =~ s/\brestart\s+ADDRESS\((.*?)\)/{{b}}{{=$1}}/mg;
 
         $body =~ s/\$(\d+)/{{\@$1}}/mg;
 
         # add write barriers
         if ($op->needs_write_barrier && !exists($$flags{flow})) {
             my $barrier = "    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));\n";
-            $body =~ s/({{[+=])/$barrier$1/mg;
+            $body =~ s/{{b}}/$barrier/mg;
+        }
+        else {
+            $body =~ s/{{b}}//mg;
         }
 
         # We can only reference as many parameters as we declare
