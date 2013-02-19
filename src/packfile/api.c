@@ -507,10 +507,11 @@ Parrot_pf_subs_by_tag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
 
 /*
 
-=item C<PMC * Parrot_pf_first_sub_by_tag(PARROT_INTERP, PMC * pfpmc, STRING *
+=item C<PMC * Parrot_pf_single_sub_by_tag(PARROT_INTERP, PMC * pfpmc, STRING *
 flag)>
 
-Get the first Sub in the packfile by named flag.
+Get a single Sub from the packfile by named flag. If there are more than one
+Subs with the given flag, it is unspecified which one is returned.
 
 =cut
 
@@ -519,11 +520,11 @@ Get the first Sub in the packfile by named flag.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_pf_first_sub_by_tag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
+Parrot_pf_single_sub_by_tag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
 {
-    ASSERT_ARGS(Parrot_pf_first_sub_by_tag)
+    ASSERT_ARGS(Parrot_pf_single_sub_by_tag)
 
-    /* XXX if this turns out 'hot', use custom implementation */
+    /* XXX use custom implementation */
     PMC * const subs = Parrot_pf_subs_by_tag(interp, pfpmc, flag);
     return PMC_IS_NULL(subs)
         ? PMCNULL
@@ -644,40 +645,6 @@ Parrot_pf_all_subs(PARROT_INTERP, ARGIN(PMC *pfpmc))
                 VTABLE_push_pmc(interp, array, x);
         }
         return array;
-    }
-}
-
-/*
-
-=item C<PMC * Parrot_pf_first_sub(PARROT_INTERP, PMC *pfpmc)>
-
-Returns the first Sub PMC from the packfile
-
-=cut
-
-*/
-
-PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
-PMC *
-Parrot_pf_first_sub(PARROT_INTERP, ARGIN(PMC *pfpmc))
-{
-    ASSERT_ARGS(Parrot_pf_first_sub)
-    PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
-    if (!pf || !pf->cur_cs || !pf->cur_cs->const_table)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
-            "NULL or invalid packfile");
-
-    {
-        PackFile_ConstTable * const ct = pf->cur_cs->const_table;
-        INTVAL i;
-        STRING * const SUB = CONST_STRING(interp, "Sub");
-        for (i = 0; i < ct->pmc.const_count; ++i) {
-            PMC * const x = ct->pmc.constants[i];
-            if (VTABLE_isa(interp, x, SUB))
-                return x;
-        }
-        return PMCNULL;
     }
 }
 
