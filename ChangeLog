@@ -2,9 +2,15 @@
     - Core
         + The .sort() method was added to the FixedFloatArray PMC
         + Improved detection of system memory for machines with >2GB
+        + Improved pbc_to_exe support for spacey paths
+        + Fixed Parrot_io_readall_s allocating too much string space
+    - Build
+        + Fixed generated MANIFEST files to omit $destdir
     - Documentation
     - Tests
+        + .readall now checks that prior reads are respected.
     - Community
+        + Weekly IRC meetings have resumed. #parrotsketch Tuesdays at 1930 UTC
 
 2013-01-22    release 5.0.0
     - Core

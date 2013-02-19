@@ -1,8 +1,8 @@
 {
-    "release.version"  : "5.0.0",
-    "release.name"     : "Johnny Five Alive",
+    "release.version"  : "5.1.0",
+    "release.name"     : "Zombie Parrot",
     "release.day"      : "Tuesday",
-    "release.nextdate" : "19 Feb 2013",
+    "release.nextdate" : "19 Mar 2013",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -11,10 +11,10 @@
     "web.org_root"    :  "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "12 January 2013",
+    "bugday.date"      : "16 March 2013",
 
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
-    "wiki.bugday"      : "bug_day_2013_01_12",
+    "wiki.bugday"      : "bug_day_2013_03_16",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/5.0.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/5.1.0/"
 }
