@@ -142,7 +142,6 @@ include compilers/imcc/Defines.mak
 include compilers/tge/Defines.mak
 include compilers/pge/Defines.mak
 include compilers/pct/Defines.mak
-include compilers/opsc/Defines.mak
 include ext/nqp-rx/Defines.mak
 include compilers/data_json/Defines.mak
 include ext/winxed/Defines.mak
@@ -881,11 +880,6 @@ parrot_utils : all $(PDUMP) $(DIS) $(PDB) $(PBC_MERGE) $(PBC_TO_EXE) $(PARROT_CO
 installable: all docs $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPDB) \
   $(INSTALLABLEPBC_MERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG) $(INSTALLABLENQP) \
   $(INSTALLABLENCITHUNKGEN) $(INSTALLABLEPARROT_PROVE) $(INSTALLABLEOPS2C) $(INSTALLABLEWINXED)
-
-# See compilers/opsc/Rules.mak
-bootstrap-ops : $(OPS2C)
-	$(OPS2C) --core --quiet
-	$(MAKE_C) .
 
 $(RUN_INC_DIR)/parrotlib.pbc: $(LIBRARY_DIR)/parrotlib.pir $(PARROT) $(GEN_PASM_INCLUDES)
 	$(PARROT) -o $@ $(LIBRARY_DIR)/parrotlib.pir
@@ -2312,8 +2306,7 @@ SRC_TEST_FILES = \
 	t/src/*.t \
 	t/src/embed/*.t
 TOOLS_TEST_FILES = $(TOOLS_TESTS_DIR)/tools/*.t
-GC_TEST_FILES = \
-	t/compilers/opsc/*.t
+GC_TEST_FILES =
 
 # pbc files used for several tests;
 # not needed for build, hence this target is not included in 'all'
@@ -3353,7 +3346,6 @@ include runtime/parrot/library/Rules.mak
 include compilers/imcc/Rules.mak
 include compilers/pge/Rules.mak
 include compilers/pct/Rules.mak
-include compilers/opsc/Rules.mak
 include compilers/tge/Rules.mak
 include compilers/data_json/Rules.mak
 include ext/nqp-rx/Rules.mak
