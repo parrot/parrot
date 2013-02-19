@@ -1414,7 +1414,7 @@ $(RUN_INC_DIR)/call_bits.pir : $(INC_DIR)/enums.h $(H2INC)
 
 lib/Parrot/Pmc2c/PCCMETHOD_BITS.pm : $(INC_DIR)/enums.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/enums.h $@
-	$(ADDGENERATED) "$@" "[devel]"
+	$(ADDGENERATED) "$@" "[devel]" lib
 
 $(RUN_INC_DIR)/libpaths.pir : $(INC_DIR)/library.h $(H2INC)
 	$(PERL) $(H2INC) $(INC_DIR)/library.h $@
