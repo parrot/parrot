@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-docs/project/release_manager_guid.pod - The Release Manager Guide.
+docs/project/release_manager_guide.pod - The Release Manager Guide.
 
 =head1 DESCRIPTION
 
