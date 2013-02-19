@@ -107,7 +107,7 @@ our %arg_maps = (
     'k'  => "PREG(%ld)",
     'ki' => "IREG(%ld)",
 
-    'ic'  => "cur_opcode[%ld]",
+    'ic'  => "ICONST(%ld)",
     'nc'  => "NCONST(%ld)",
     'pc'  => "PCONST(%ld)",
     'sc'  => "SCONST(%ld)",

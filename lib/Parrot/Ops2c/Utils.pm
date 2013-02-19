@@ -139,6 +139,11 @@ sub new {
         ? 'PARROT_DYNEXT_EXPORT'
         : '';
 
+    my $ini_export =
+        $flagref->{dynamic}
+        ? 'PARROT_DYNEXT_EXPORT'
+        : 'PARROT_EXPORT';
+
     my $ops;
     if ( $flagref->{core} ) {
         $ops = _prepare_core(
@@ -169,6 +174,9 @@ sub new {
     my $preamble    = _compose_preamble( $file, $argsref->{script} );
     my $init_func   = join '_',
         ( 'Parrot', 'DynOp', $base . $suffix, @versions{qw(major minor patch)}, );
+    if ( $flagref->{core} ) {
+        $init_func = 'PARROT_CORE_OPLIB_INIT';
+    }
 
     ##### Populate the object #####
     $argsref->{argv}       = \@argv;
@@ -181,6 +189,7 @@ sub new {
     $argsref->{header}     = $header;
     $argsref->{source}     = $source;
     $argsref->{sym_export} = $sym_export;
+    $argsref->{ini_export} = $ini_export;
 
     $argsref->{ops}         = $ops;
     $argsref->{versions}    = \%versions;
@@ -477,7 +486,8 @@ sub _print_preamble_header {
 #include "parrot/oplib.h"
 #include "parrot/runcore_api.h"
 
-$self->{sym_export} op_lib_t *$self->{init_func}(PARROT_INTERP, long init);
+$self->{ini_export}
+op_lib_t *PARROT_CORE_OPLIB_INIT(PARROT_INTERP, long init);
 
 END_C
     return 1;
@@ -548,8 +558,10 @@ sub _print_preamble_source {
     my ( $self, $fh ) = @_;
 
     print $fh $self->{preamble};
+    if ( $self->{flag}->{dynamic} ) {
+        print $fh "#define PARROT_IN_EXTENSION\n";
+    }
     print $fh <<END_C;
-#define PARROT_IN_EXTENSION
 
 #include "$self->{include}"
 #include "parrot/pbcversion.h"
@@ -993,6 +1005,7 @@ sub _generate_init_func {
     }
 
     print $fh <<END_C;
+PARROT_EXPORT
 op_lib_t *
 $self->{init_func}(PARROT_INTERP, long init) {
     /* initialize and return op_lib ptr */

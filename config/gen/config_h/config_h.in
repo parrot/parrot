@@ -140,7 +140,7 @@ typedef void DPOINTER;
 /* Oplib and dynamic ops related. */
 #include "parrot/pbcversion.h"
 #define PARROT_CORE_OPLIB_NAME    "core_ops"
-#define PARROT_CORE_OPLIB_INIT    Parrot_DynOp_core_ ## PARROT_PBC_MAJOR ## _ ## PARROT_PBC_MINOR
+#define PARROT_CORE_OPLIB_INIT    Parrot_DynOp_core_@MAJOR@_@MINOR@_@PATCH@
 
 #define  PARROT_GET_CORE_OPLIB(i)  PARROT_CORE_OPLIB_INIT((i), 1)
 
