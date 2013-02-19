@@ -26,7 +26,7 @@ src/dynoplibs/obscure_ops$(O): $(DYNOP_O_DEPS) \
 src/dynoplibs/obscure_ops.h: src/dynoplibs/obscure_ops.c
 
 src/dynoplibs/obscure_ops.c: src/dynoplibs/obscure.ops
-	 $(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --dynamic src/dynoplibs/obscure.ops --quiet
+	 $(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --dynamic src/dynoplibs/obscure.ops
 
 #########################
 
@@ -39,7 +39,7 @@ $(DYNEXT_DIR)/math_ops$(LOAD_EXT): src/dynoplibs/math_ops$(O) $(LIBPARROT)
 	$(ADDGENERATED) "$@" "[library]"
 
 src/dynoplibs/math_ops.c: src/dynoplibs/math.ops
-	 $(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --dynamic src/dynoplibs/math.ops --quiet
+	 $(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --dynamic src/dynoplibs/math.ops
 
 ## SUFFIX OVERRIDE - add -Wno-parentheses-equality for clang, with same rule as src/ops/core_ops.c
 src/dynoplibs/math_ops$(O): $(DYNOP_O_DEPS) \
@@ -66,7 +66,7 @@ src/dynoplibs/trans_ops$(O): $(DYNOP_O_DEPS) \
 src/dynoplibs/trans_ops.h: src/dynoplibs/trans_ops.c
 
 src/dynoplibs/trans_ops.c: src/dynoplibs/trans.ops
-	 $(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --dynamic src/dynoplibs/trans.ops --quiet
+	 $(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --dynamic src/dynoplibs/trans.ops
 
 #########################
 
@@ -86,7 +86,7 @@ src/dynoplibs/bit_ops$(O): $(DYNOP_O_DEPS) \
 src/dynoplibs/bit_ops.h: src/dynoplibs/bit_ops.c
 
 src/dynoplibs/bit_ops.c: src/dynoplibs/bit.ops
-	 $(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --dynamic src/dynoplibs/bit.ops --quiet
+	 $(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --dynamic src/dynoplibs/bit.ops
 
 #########################
 
@@ -106,7 +106,7 @@ src/dynoplibs/debug_ops$(O): $(DYNOP_O_DEPS) \
 src/dynoplibs/debug_ops.h: src/dynoplibs/debug_ops.c
 
 src/dynoplibs/debug_ops.c: src/dynoplibs/debug.ops
-	 $(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --dynamic src/dynoplibs/debug.ops --quiet
+	 $(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --dynamic src/dynoplibs/debug.ops
 
 #########################
 
@@ -126,7 +126,7 @@ src/dynoplibs/sys_ops$(O): $(DYNOP_O_DEPS) \
 src/dynoplibs/sys_ops.h: src/dynoplibs/sys_ops.c
 
 src/dynoplibs/sys_ops.c: src/dynoplibs/sys.ops
-	 $(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --dynamic src/dynoplibs/sys.ops --quiet
+	 $(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --dynamic src/dynoplibs/sys.ops
 
 #########################
 
@@ -146,7 +146,7 @@ src/dynoplibs/io_ops$(O): $(DYNOP_O_DEPS) \
 src/dynoplibs/io_ops.h: src/dynoplibs/io_ops.c
 
 src/dynoplibs/io_ops.c: src/dynoplibs/io.ops
-	 $(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --dynamic src/dynoplibs/io.ops --quiet
+	 $(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --dynamic src/dynoplibs/io.ops
 
 # Local variables:
 #   mode: makefile
