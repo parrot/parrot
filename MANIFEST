@@ -917,7 +917,6 @@ include/parrot/oo.h                                         [main]include
 include/parrot/oo_private.h                                 [main]include
 include/parrot/op.h                                         [main]include
 include/parrot/oplib.h                                      [main]include
-include/parrot/oplib/core_ops.h                             [main]include
 include/parrot/oplib/ops.h                                  [main]include
 include/parrot/opsenum.h                                    [main]include
 include/parrot/packfile.h                                   [main]include
@@ -1280,7 +1279,6 @@ src/oo.c                                                    []
 src/ops/bit.ops                                             []
 src/ops/cmp.ops                                             []
 src/ops/core.ops                                            []
-src/ops/core_ops.c                                          []
 src/ops/experimental.ops                                    []
 src/ops/io.ops                                              []
 src/ops/math.ops                                            []
