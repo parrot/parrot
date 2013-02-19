@@ -2160,6 +2160,14 @@ src/ops/core_ops$(O) : src/ops/core_ops.c \
 	src/io/io_private.h
 	$(CC) $(CFLAGS) @optimize::src/ops/core_ops.c@ @ccwarn::src/ops/core_ops.c@ @cc_shared@ -I$(@D)/. @cc_o_out@$@ -c src/ops/core_ops.c
 
+# .h files are built along with .c
+$(INC_DIR)/oplib/core_ops.h: src/ops/core_ops.c
+
+src/ops/core_ops.c : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2c.pl \
+	lib/Parrot/OpsFile.pm lib/Parrot/Op.pm $(INC_DIR)/config.h \
+	lib/Parrot/OpLib/core.pm lib/Parrot/OpTrans/C.pm \
+	include/pmc/pmc_continuation.h
+	$(PERL) $(BUILD_TOOLS_DIR)/ops2c.pl C --core
 
 @TEMP_pmc_build@
 
