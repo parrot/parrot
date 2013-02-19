@@ -1006,6 +1006,16 @@ lib/Parrot/IO/File.pm                                       [devel]lib
 lib/Parrot/IO/Path.pm                                       [devel]lib
 lib/Parrot/Install.pm                                       [devel]lib
 lib/Parrot/Manifest.pm                                      [devel]lib
+lib/Parrot/Op.pm                                            [devel]lib
+lib/Parrot/OpTrans.pm                                       [devel]lib
+lib/Parrot/OpTrans/C.pm                                     [devel]lib
+lib/Parrot/Ops2c/Auxiliary.pm                               [devel]lib
+lib/Parrot/Ops2c/Utils.pm                                   [devel]lib
+lib/Parrot/Ops2pm.pm                                        [devel]lib
+lib/Parrot/Ops2pm/Auxiliary.pm                              [devel]lib
+lib/Parrot/Ops2pm/Base.pm                                   [devel]lib
+lib/Parrot/OpsFile.pm                                       [devel]lib
+lib/Parrot/OpsRenumber.pm                                   [devel]lib
 lib/Parrot/Pmc2c/Dumper.pm                                  [devel]lib
 lib/Parrot/Pmc2c/Emitter.pm                                 [devel]lib
 lib/Parrot/Pmc2c/Library.pm                                 [devel]lib
@@ -1283,6 +1293,7 @@ src/ops/experimental.ops                                    []
 src/ops/io.ops                                              []
 src/ops/math.ops                                            []
 src/ops/object.ops                                          []
+src/ops/ops.num                                             []
 src/ops/ops.skip                                            []
 src/ops/pmc.ops                                             []
 src/ops/set.ops                                             []
@@ -2129,6 +2140,7 @@ tools/build/fixup_gen_file.pl                               []
 tools/build/gen_version.pl                                  []
 tools/build/h2inc.pl                                        []
 tools/build/ops2c.pl                                        [devel]
+tools/build/ops2pm.pl                                       []
 tools/build/parrot_config_c.pl                              []
 tools/build/pbcversion_h.pl                                 []
 tools/build/pmc2c.pl                                        [devel]
@@ -2174,6 +2186,7 @@ tools/dev/nci_thunk_gen.pir                                 []
 tools/dev/ncidef2pir.pl                                     []
 tools/dev/new_changelog_skeleton.pl                         []
 tools/dev/nopaste.pl                                        []
+tools/dev/opsrenumber.pl                                    []
 tools/dev/parrot-config.pir                                 []
 tools/dev/parrot.supp                                       []
 tools/dev/parrot_coverage.pl                                []
