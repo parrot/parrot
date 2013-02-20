@@ -793,10 +793,6 @@ pir_output_like( <<'CODE', <<'OUTPUT', 'add_sub() with error' );
     root_ns.'add_sub'( 'coroutine', child )
     print "Added coroutine\n"
 
-    child = new ['Eval']
-    root_ns.'add_sub'( 'eval', child )
-    print "Added eval\n"
-
     .local pmc not_a_sub
     not_a_sub = new ['Integer']
 
@@ -816,7 +812,6 @@ _invalid_sub:
 CODE
 /Added sub child
 Added coroutine
-Added eval
 Invalid type \d+ in add_sub\(\)/
 OUTPUT
 
