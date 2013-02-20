@@ -49,6 +49,11 @@ static PackFile_ConstTable * get_const_table(PARROT_INTERP,
     ARGIN(PMC * self))
         __attribute__nonnull__(2);
 
+PARROT_CANNOT_RETURN_NULL
+static PMC * get_first_sub(PARROT_INTERP, ARGIN(PMC *pfpmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 #define ASSERT_ARGS_add_called_tag __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \
@@ -59,6 +64,9 @@ static PackFile_ConstTable * get_const_table(PARROT_INTERP,
     , PARROT_ASSERT_ARG(tag))
 #define ASSERT_ARGS_get_const_table __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(self))
+#define ASSERT_ARGS_get_first_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pfpmc))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -347,6 +355,11 @@ Get the :main sub from the packfile, if any.
 
 Get an array of all Subs with the given tag.
 
+=item C<METHOD single_sub_by_tag(STRING *tag)>
+
+Get a single Sub with the given tag. If there are more than one Subs with this
+flag, it is unspecified which one is returned.
+
 =item C<METHOD trigger(STRING *flag)>
 
 Trigger subs with the given flag. Currently supported values are "load" and
@@ -364,11 +377,15 @@ Return a hash map of all tags, and the lists of pmcs with those tags.
 
 Return a ResizablePMCArray with all Sub constants from the constant table.
 
-item C<METHOD mark_initialized(STRING *tag)>
+=item C<METHOD first_sub_in_const_table()>
+
+Returns the first Sub constant from the constant table.
+
+=item C<METHOD mark_initialized(STRING *tag)>
 
 Mark a given tag as being initialized
 
-item C<METHOD is_initialized(STRING *tag)>
+=item C<METHOD is_initialized(STRING *tag)>
 
 Determine if the given tag has been marked initialized
 
@@ -392,9 +409,19 @@ Determine if the given tag has been marked initialized
         RETURN(PMC *subs);
     }
 
+    METHOD single_sub_by_tag(STRING *flag) {
+        PMC * const sub = Parrot_pf_single_sub_by_tag(INTERP, SELF, flag);
+        RETURN(PMC *sub);
+    }
+
     METHOD all_subs() {
         PMC * const array = Parrot_pf_all_subs(INTERP, SELF);
         RETURN(PMC *array);
+    }
+
+    METHOD first_sub_in_const_table() {
+        PMC * const sub = get_first_sub(INTERP, SELF);
+        RETURN(PMC *sub);
     }
 
     METHOD all_tags() {
@@ -500,6 +527,39 @@ Return a stringified version number of the packfile
     METHOD get_version() {
         STRING * const version = Parrot_pf_get_version_string(INTERP, SELF);
         RETURN(STRING * version);
+    }
+}
+
+/*
+
+=item C<static PMC * get_first_sub(PARROT_INTERP, PMC *pfpmc)>
+
+Returns the first Sub constant from the constant table.
+
+=cut
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+static PMC *
+get_first_sub(PARROT_INTERP, ARGIN(PMC *pfpmc))
+{
+    ASSERT_ARGS(get_first_sub)
+    PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
+    if (!pf || !pf->cur_cs || !pf->cur_cs->const_table)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+            "NULL or invalid packfile");
+
+    {
+        PackFile_ConstTable * const ct = pf->cur_cs->const_table;
+        INTVAL i;
+        STRING * const SUB = CONST_STRING(interp, "Sub");
+        for (i = 0; i < ct->pmc.const_count; ++i) {
+            PMC * const x = ct->pmc.constants[i];
+            if (VTABLE_isa(interp, x, SUB))
+                return x;
+        }
+        return PMCNULL;
     }
 }
 
