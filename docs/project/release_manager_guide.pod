@@ -318,6 +318,7 @@ Extract F<parrot-a.b.c.tar.gz> into another directory:
     cp parrot-a.b.c.tar.gz ~/another/directory
     cd ~/another/directory
     tar -xvzf parrot-a.b.c.tar.gz
+    cd parrot-a.b.c
 
 =item c.
 
@@ -388,7 +389,7 @@ the new directory:
         parrot-a.b.c.tar.bz2 \
         parrot-a.b.c.tar.gz.sha256 \
         parrot-a.b.c.tar.bz2.sha256 \
-        parrot@ftp-osl.osuosl.org:~/ftp/releases/devel/a.b.c
+        parrot@ftp-osl.osuosl.org:~/ftp/releases/devel/a.b.c/
 
 You don't necessarily have to use C<scp> for this step. You can use whichever
 tool you prefer.
