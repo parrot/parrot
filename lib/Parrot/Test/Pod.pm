@@ -84,7 +84,6 @@ our %second_analysis_subs = (
                         | t/configure/testlib/adefectivefoobar
                         | t/configure/testlib/cdefectivefoobar
                         | t/configure/testlib/bdefectivefoobar
-                        | compilers/opsc
                     }x
                 ) {
                     delete $files_needing_analysis->{ $file };

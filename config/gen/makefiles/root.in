@@ -553,7 +553,6 @@ PARROT_CONFIG       = .@slash@parrot_config$(EXE)
 NQP_RX              = .@slash@parrot-nqp$(EXE)
 NCI_THUNK_GEN       = .@slash@parrot_nci_thunk_gen$(EXE)
 PARROT_PROVE        = .@slash@parrot-prove$(EXE)
-OPS2C               = .@slash@ops2c$(EXE)
 WINXED              = .@slash@winxed$(EXE)
 
 # Installable executables
@@ -567,7 +566,6 @@ INSTALLABLECONFIG    = .@slash@installable_parrot_config$(EXE)
 INSTALLABLENQP       = .@slash@installable_parrot-nqp$(EXE)
 INSTALLABLENCITHUNKGEN  = .@slash@installable_parrot_nci_thunk_gen$(EXE)
 INSTALLABLEPARROT_PROVE = .@slash@installable_parrot-prove$(EXE)
-INSTALLABLEOPS2C    = .@slash@installable_ops2c$(EXE)
 INSTALLABLEWINXED   = .@slash@installable_winxed$(EXE)
 
 # Libraries
@@ -875,7 +873,7 @@ help :
 world : parrot_utils
 
 parrot_utils : all $(PDUMP) $(DIS) $(PDB) $(PBC_MERGE) $(PBC_TO_EXE) $(PARROT_CONFIG) \
-  src/install_config$(O) $(PARROT_PROVE) $(OPS2C)
+  src/install_config$(O) $(PARROT_PROVE)
 
 installable: all docs $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPDB) \
   $(INSTALLABLEPBC_MERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG) $(INSTALLABLENQP) \
@@ -1455,6 +1453,7 @@ $(BUILD_TOOLS_DIR)/ops2c.pl: lib/Parrot/OpLib/core.pm
 lib/Parrot/OpLib/core.pm : $(OPS_FILES) $(BUILD_TOOLS_DIR)/ops2pm.pl \
 	lib/Parrot/OpsFile.pm lib/Parrot/Op.pm src/ops/ops.num src/ops/ops.skip
 	$(PERL) $(BUILD_TOOLS_DIR)/ops2pm.pl  $(OPS_FILES)
+	$(ADDGENERATED) "$@" '[devel]' 'lib'
 
 ###############################################################################
 #
@@ -2548,7 +2547,6 @@ prog-clean :
 	$(DEV_TOOLS_DIR)/pbc_to_exe.pir \
 	pbc_to_exe.pbc pbc_to_exe.c pbc_to_exe$(O) pbc_to_exe$(EXE) \
 	$(NCI_THUNK_GEN) parrot_nci_thunk_gen.c parrot_nci_thunk_gen$(O) parrot_nci_thunk_gen.pbc \
-	ops2c.pbc ops2c.c ops2c$(O) ops2c$(EXE) ops2c.pir \
 	parrot-prove.pbc parrot-prove.c parrot-prove$(O) parrot-prove$(EXE) \
 	parrot_config$(EXE) parrot_config.c parrot_config$(O) parrot_config.pbc \
 	winxed.pbc winxed.c winxed$(O) $(WINXED) \

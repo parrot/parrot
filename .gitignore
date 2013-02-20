@@ -116,9 +116,6 @@ cachegrind.out.*
 /compilers/imcc/imcparser.c
 /compilers/imcc/imcparser.h
 /compilers/imcc/imcparser.output
-/compilers/opsc/gen/Ops/*.pir
-/compilers/opsc/gen/Ops/Compiler/*.pir
-/compilers/opsc/gen/Ops/Trans/*.pir
 /compilers/pct/src/PAST/*.pbc
 /compilers/pct/src/PCT/*.pbc
 /compilers/pct/src/POST/*.pbc
