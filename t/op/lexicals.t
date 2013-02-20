@@ -798,7 +798,7 @@ EOC
     .local pmc compiler
     compiler = compreg "PIR"
     $P1 = compiler(code)
-    $P2 = $P1[0]   # first sub of eval
+    $P2 = $P1.'main_sub'()
     $P3 = newclosure $P2
     .return($P3)
 .end

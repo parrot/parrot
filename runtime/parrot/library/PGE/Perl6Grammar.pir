@@ -227,7 +227,9 @@ the output to the correct output file.
 
   compile_pir:
     $P0 = compreg 'PIR'
-    .tailcall $P0(out)
+    $P1 = $P0(out)
+    $P2 = $P1.'first_sub_in_const_table'()
+    .return($P2)
 .end
 
 
