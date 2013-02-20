@@ -351,6 +351,10 @@ pir_output_is( <<'CODE', <<'OUTPUT', ".tailcall into an NCI" );
     say "A"
     $P0 = 'Foo'("C")
     $S0 = typeof $P0
+    $P9 = $P0.'subs_by_tag'('init')
+    $P8 = $P9[0]
+    $P8()
+    $P0 = $P0.'all_subs'()
     $P1 = $P0[0]
     $P1 = 'Bar'($P1, "F")
     say $P1

@@ -173,7 +173,7 @@ code
   .local pmc pir_compiler
   pir_compiler = compreg 'PIR'
   $P0 = pir_compiler($S0)
-  $P0 = $P0[0]
+  $P0 = $P0.'first_sub_in_const_table'()
   $P1 = new ['TclProc']
   assign $P1, $P0
   .local pmc ns_target

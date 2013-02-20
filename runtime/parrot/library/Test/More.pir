@@ -1114,7 +1114,8 @@ Otherwise, fail the test.
     .local string source
     source = invokable
     compiler = compreg 'PIR'
-    invokable = compiler(source)
+    $P9 = compiler(source)
+    invokable = $P9.'first_sub_in_const_table'()
     goto invokeit
 
   badinvoke:
@@ -1168,7 +1169,8 @@ Passes a test if the PIR code throws any exception, fails a test otherwise.
     push_eh eh
 
     compfun = compiler(target)
-    compfun()                       # eval the target code
+    $P9 = compfun.'first_sub_in_const_table'()
+    $P9()                           # eval the target code
 
     pop_eh
 
@@ -1229,7 +1231,8 @@ Passes a test if the PIR does not throw any exception, fails a test otherwise.
     push_eh eh
 
     compfun = compiler(target)
-    compfun()                       # eval the target code
+    $P9 = compfun.'first_sub_in_const_table'()
+    $P9()                           # eval the target code
 
     pop_eh
 
@@ -1293,7 +1296,8 @@ an exception that matches the pattern, fails the test otherwise.
     push_eh eh
 
     compfun = compiler(target)
-    compfun()                       # eval the target code
+    $P9 = compfun.'first_sub_in_const_table'()
+    $P9()                       # eval the target code
 
     pop_eh
 
@@ -1352,7 +1356,8 @@ an exception that matches the pattern, fails the test otherwise.
     push_eh eh
 
     compfun = compiler(target)
-    compfun()                       # eval the target code
+    $P9 = compfun.'first_sub_in_const_table'()
+    $P9()                           # eval the target code
 
     pop_eh
 

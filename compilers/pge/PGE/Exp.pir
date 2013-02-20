@@ -90,6 +90,7 @@ C<target> adverbs.
   bytecode:
     $P0 = compreg 'PIR'
     $P1 = $P0(code)
+    $P1 = $P1.'first_sub_in_const_table'()
   make_grammar:
     if grammar == '' goto end
     .local pmc p6meta
@@ -1525,6 +1526,7 @@ tree as a PIR code object that can be compiled.
           unless null $P1 goto %0_1
           $P1 = compreg %1
           $P1 = $P1($S1)
+          $P1 = $P1.'first_sub_in_const_table'()
           $P0[$S1] = $P1
         %0_1:
         CODE
