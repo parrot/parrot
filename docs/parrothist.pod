@@ -16,7 +16,7 @@ Simon Cozens, Jeff Goff, Steve Fink, Leo Toetsch, Chip Salzenberg, Jerry Gay,
 Patrick Michaud, Will "coke" Coleda, Matt Diephouse, chromatic, Allison Randal,
 Jonathan Worthington, Bob Rogers, Bernhard Schmalhofer, Andrew Whitworth,
 Francois Perrad, Jonathan "Duke" Leto, Michael Hind, James E Keenan, Alvis
-Yardley, Reini Urban.
+Yardley, Reini Urban, Bruce "Util" Gray.
 
 
 =head1 THE RECORDS
@@ -156,5 +156,6 @@ Starred release numbers indicate supported releases.
  rurban      4.11.0         2012-Dec-18     "All together - Happy Birthday Lovebird"
 
  dukeleto    5.0.0 *        2013-Jan-17     "Johnny Five Alive"
+ Util        5.1.0          2013-Feb-19     "Zombie Parrot"
 
 =cut

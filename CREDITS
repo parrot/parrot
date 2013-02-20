@@ -232,6 +232,7 @@ E: bruce.gray@acm.org
 D: Improvements to Config, Build, and Test sub-systems.
 D: Cage cleaning, codingstd, warnings, and doc corrections.
 D: Win32 platform fixes.
+D: Release manager for 5.1.0
 S: Auburn, AL, USA
 
 N: Bryan C. Warnock
