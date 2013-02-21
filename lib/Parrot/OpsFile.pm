@@ -255,7 +255,7 @@ sub read_ops {
         $seen_pod    = 1 if m|^=|;
         $in_preamble = 1 if s|^BEGIN_OPS_PREAMBLE||;
 
-        unless ( $seen_op or m|^(inline\s+)?op\s+| ) {
+        unless ( $seen_op or m|^(inline\s+)?op\s+.*\)| ) {
 
             if (m|^END_OPS_PREAMBLE|) {
                 $_ = '';
@@ -306,13 +306,14 @@ sub read_ops {
             (inline\s+)?  # optional keywords
             op
             \s+
-            ([a-zA-Z]\w*) # op name
+            ([a-zA-Z][\w_]*) # op name
             \s*
             \((.*)\)      # argument signature
             \s*
             ((?: \:\w+\s*)*)         # :flags
             \s*
             {
+            \s*
             $
         /x;
 
