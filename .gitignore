@@ -265,7 +265,6 @@ cachegrind.out.*
 /runtime/parrot/library/Stream/*.pbc
 /runtime/parrot/library/String/Utils.pbc
 /runtime/parrot/library/TAP/*.pbc
-/runtime/parrot/library/Tcl/*.pbc
 /runtime/parrot/library/Test/*.pbc
 /runtime/parrot/library/Test/Builder/*.pbc
 /runtime/parrot/library/URI/*.pbc
