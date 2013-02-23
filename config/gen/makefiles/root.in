@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2013, Parrot Foundation.
 
 ###############################################################################
 #
@@ -1271,7 +1271,7 @@ $(INSTALLABLEPDUMP) : $(FR_DIR)/pbc_dump/main$(O) $(FR_DIR)/pbc_dump/packdump$(O
 	  $(FR_DIR)/pbc_dump/main$(O) \
 	  $(FR_DIR)/pbc_dump/packdump$(O) \
 	  src/longopt$(O) \
-	  $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
+	  @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 	$(ADDGENERATED) "$@" "[main]" bin
 
