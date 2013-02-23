@@ -63,6 +63,8 @@
 #define PIO_VF_AWAYS_READABLE       0x0010  /* Handle can always be read               */
 #define PIO_VF_MULTI_READABLE       0x0020  /* Can perform multiple low-level read
                                                operations to satisfy a large request   */
+#define PIO_VF_SYNC_IO              0x0040  /* This type needs synchronization
+                                               before r/w operations due to buffering  */
 
 /*
  * pioctl argument constants. These don't have to

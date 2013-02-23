@@ -513,7 +513,7 @@ io_sync_buffers_for_read(PARROT_INTERP, ARGMOD(PMC *handle),
        and advance the cursor before we attempt to read. Otherwise we'll be
        reading data from the buffer that has already been overwritten, from a
        position several bytes before where we're supposed to be. */
-    if (write_buffer && !BUFFER_IS_EMPTY(write_buffer)) {
+    if (write_buffer && !BUFFER_IS_EMPTY(write_buffer) && (vtable->flags & PIO_VF_SYNC_IO)) {
         const size_t bytes_written = Parrot_io_buffer_flush(interp, write_buffer,
                                         handle, vtable);
         PARROT_ASSERT(BUFFER_IS_EMPTY(write_buffer));
@@ -548,7 +548,7 @@ io_sync_buffers_for_write(PARROT_INTERP, ARGMOD(PMC *handle),
        current cursor. We need to clear the read buffer and reset the on-disk
        position to match what we expect it to be, so the written data goes
        to the correct place */
-    if (read_buffer && !BUFFER_IS_EMPTY(read_buffer)) {
+    if (read_buffer && !BUFFER_IS_EMPTY(read_buffer) && (vtable->flags & PIO_VF_SYNC_IO)) {
         const size_t buffer_size = BUFFER_USED_SIZE(read_buffer);
         Parrot_io_buffer_clear(interp, read_buffer);
         vtable->seek(interp, handle, -(PIOOFF_T)buffer_size, SEEK_CUR);
