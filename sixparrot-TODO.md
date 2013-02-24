@@ -7,6 +7,7 @@ TODO
 * parrot-nqp
 * winxed
 * PASM
+* drop bundled version of perl5 Pod::Simple (part of core perl, use that instead)
 
 DONE
 ====
