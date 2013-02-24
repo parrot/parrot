@@ -374,6 +374,13 @@ F<~/ftp/releases/supported> instead:
 
     mkdir ~/ftp/releases/supported/a.b.c
 
+For both supported and developer releases, add a symlink from to so that
+scripts that want to download a Parrot release don't need to guess the
+location:
+
+    cd ftp/releases/all
+    ln -s ../supported/9.9.0 .
+
 Copy all the tarballs and their respective digest files from your machine into
 the new directory:
 
