@@ -652,7 +652,8 @@ have the same thread id.
             Parrot_Interp self  = PMC_interp(SELF);
             Parrot_Interp other = PMC_interp(val);
             return self == other;
-        } else {
+        }
+        else {
             Parrot_ex_throw_from_c_args(INTERP, NULL,
                     EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
                     "ParrotInterpreter: no multiple dispatch variant 'is_equal' for %Ss",
