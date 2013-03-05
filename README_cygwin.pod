@@ -96,11 +96,6 @@ or if C<libglut-devel> and C<libGL-devel> is not installed:
 
   w32api opengl
 
-=item SDL
-
-SDL references F<cygSDL-1-2-0.dll>, which is only in cygports
-L<http://news.gmane.org/gmane.os.cygwin.ports.announce>
-
 =item aio
 
 libaio-devel "Linux-native asynchronous I/O access" is not available
