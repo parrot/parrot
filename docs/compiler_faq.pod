@@ -355,7 +355,7 @@ That is still the same:
 This finds a C<foo> variable at any B<outer> depth starting from the top.
 
 If your language looks up variables differently, you have to walk the
-'caller' chain. See also F<t/dynpmc/dynlexpad.t>.
+'caller' chain.
 
 =head2 How can I produce more efficient code for lexicals?
 

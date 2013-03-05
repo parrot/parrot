@@ -4,7 +4,6 @@
 DYNPMC_TARGETS =                                      \
 #IF(has_zlib):    $(DYNEXT_DIR)/gziphandle$(LOAD_EXT) \
 #UNLESS(win32 or msys):    $(DYNEXT_DIR)/select$(LOAD_EXT)                   \
-    $(DYNEXT_DIR)/dynlexpad$(LOAD_EXT)                \
     $(DYNEXT_DIR)/file$(LOAD_EXT)                     \
     $(DYNEXT_DIR)/foo_group$(LOAD_EXT)                \
     $(DYNEXT_DIR)/os$(LOAD_EXT)                       \
