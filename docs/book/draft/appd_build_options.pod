@@ -65,14 +65,6 @@ do that on Linux you use the command:
 
 =item * PQ
 
-=item * GLUT
-
-GLUT is an interface to the OpenGL API. It enables programs running on Parrot
-to have access to 3D graphics. To get GLUT on Linux systems you can use the
-command:
-
-  sudo apt-get install libglut3-dev
-
 =back
 
 In addition to these build requirements listed above, there are a number

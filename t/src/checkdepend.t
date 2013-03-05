@@ -101,8 +101,7 @@ foreach my $file (sort grep /\.[hc]$/, @incfiles) {
         # skip bogus warnings
         if (!$found
             and ($file ne 'src/gc/malloc.c' or $include ne '/usr/include/malloc.h'
-                 or defined $Parrot::Config::PConfig{HAVE_USR_INCLUDE_MALLOC_H})
-            and ($file ne 'src/glut_nci_thunks.c' or $include ne 'glut_nci_thunks.str'))
+                 or defined $Parrot::Config::PConfig{HAVE_USR_INCLUDE_MALLOC_H}))
         {
             diag "couldn't find $include, included from $file";
         }

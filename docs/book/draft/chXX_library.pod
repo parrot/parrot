@@ -83,10 +83,6 @@ PCRE is a library that implements regular expressions using Perl 5 syntax.
 
 NCurses is a library for manipulating the console and the cursor.
 
-=head2 OpenGL
-
-OpenGL is a 3D graphics library.
-
 =head2 Postgres SQL
 
 =head2 SDL

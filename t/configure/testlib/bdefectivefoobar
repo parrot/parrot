@@ -57,7 +57,6 @@ auto::gmp
 auto::readline
 auto::gdbm
 auto::pcre
-auto::opengl
 auto::crypto
 auto::gettext
 auto::snprintf
@@ -69,7 +68,6 @@ auto::platform
 gen::config_h
 gen::core_pmcs
 gen::crypto
-gen::opengl
 gen::call_list
 gen::languages
 gen::makefiles
