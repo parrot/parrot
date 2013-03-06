@@ -33,7 +33,6 @@ foreach my $file (keys %$manifest) {
   next if $file =~ m{^examples/tutorial}; # all are tested in tutorial.t
   next if $file =~ m{^examples/pir/befunge}; # language, not testable here
   next if $file =~ m{^examples/languages}; # language, not testable here
-  next if $file =~ m{^examples/nci/sdl}; # depends on SDL install
   next if $file =~ m{^examples/nci/xlib}; # depends on libX11 install
   $files{$file}=undef;
 }
