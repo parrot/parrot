@@ -510,10 +510,6 @@
 ^/runtime/parrot/library/Math/.*\.pbc/
 ^/runtime/parrot/library/NCI/.*\.pbc$
 ^/runtime/parrot/library/NCI/.*\.pbc/
-^/runtime/parrot/library/OpenGL/.*\.pbc$
-^/runtime/parrot/library/OpenGL/.*\.pbc/
-^/runtime/parrot/library/OpenGL_funcs\.pir$
-^/runtime/parrot/library/OpenGL_funcs\.pir/
 ^/runtime/parrot/library/PAST$
 ^/runtime/parrot/library/PAST/
 ^/runtime/parrot/library/PCT/.*\.pbc$
@@ -682,12 +678,6 @@
 ^/src/gc/.*\.o/
 ^/src/gc/.*\.obj$
 ^/src/gc/.*\.obj/
-^/src/glut_callbacks\.c$
-^/src/glut_callbacks\.c/
-^/src/glut_nci_thunks\.c$
-^/src/glut_nci_thunks\.c/
-^/src/glut_nci_thunks\.nci$
-^/src/glut_nci_thunks\.nci/
 ^/src/install_config\.c$
 ^/src/install_config\.c/
 ^/src/interp/.*\.gcda$

@@ -34,8 +34,6 @@ Optional requirements:
 
   libicu38 libpq5
 
-  for opengl: w32api opengl or libglut3 xorg-x11-base xorg-x11-bin-dlls
-
 Build requirements:
 
   gcc make perl parrot readline libncurses-devel libgmp-devel
@@ -44,8 +42,6 @@ Build requirements:
 Optional build requirements:
 
   libicu-devel
-
-  for Cygwin/X opengl: freeglut libglut-devel xorg-x11-devel
 
 Optional perl packages for testing:
 
@@ -66,35 +62,6 @@ need Cygwin Perl rather than ActiveState or Strawberry Perl.
 
 Note that ICU is now optional, you can build Parrot without it,
 by not installing it or asking Parrot to ignore it (C<--without-icu>).
-
-=item opengl
-
-Building is tricky:
-
-If the freeglut package for the X Server is installed, this
-is used, otherwise the w32api and opengl packages for native
-Windows opengl support are tried.
-
-In order to use the w32api native GLUT there must be no
-F</usr/include/GL> directory.
-
-The problem is that the L<NCI|pdds/draft/pdd16_native_call.pod>
-tries the header files to create the imports and not the
-libraries, and if the /usr/include/GL headers are found
-these are used, despite the w32api GLUT libraries are
-defined.
-
-  Determining if your platform supports OpenGL.............yes, freeglut 3.4.
-  Determining if your platform supports OpenGL...................yes, GLUT 3.
-  Determining if your platform supports OpenGL............................no.
-
-Required packages:
-
-  libglut-devel libGL-devel libGLU-devel libglut3 ...
-
-or if C<libglut-devel> and C<libGL-devel> is not installed:
-
-  w32api opengl
 
 =item SDL
 

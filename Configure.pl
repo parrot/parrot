@@ -664,7 +664,6 @@ configuration file.
     auto::gmp
     auto::readline
     auto::pcre
-    auto::opengl
     auto::gettext
     auto::snprintf
     # auto::perldoc
@@ -674,7 +673,6 @@ configuration file.
     auto::platform
     gen::config_h
     gen::core_pmcs
-    gen::opengl
     gen::makefiles
     gen::config_pm
 
