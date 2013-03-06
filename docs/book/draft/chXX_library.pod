@@ -85,8 +85,6 @@ NCurses is a library for manipulating the console and the cursor.
 
 =head2 Postgres SQL
 
-=head2 SDL
-
 =head1 Mod_Parrot and CGI libraries
 
 Parrot is also available, through a related but separate development effort

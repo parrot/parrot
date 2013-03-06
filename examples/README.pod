@@ -40,8 +40,6 @@ scripts in 't/examples'.
 
 =item pir        - Examples in Parrot Intermediate Representation, PIR
 
-=item sdl        - SDL
-
 =item shootout   - PIR[*]
 
 =item streams    - Examples for the streams library
