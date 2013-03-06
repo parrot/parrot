@@ -256,7 +256,7 @@ sub sanitycheck_install {
         runtime/parrot/library/pcre.pbc
         runtime/parrot/library/PCT/Grammar.pbc
     );
-    my @dynext = qw(dynlexpad os file rational subproxy);
+    my @dynext = qw(os file rational subproxy);
     push @dynext, map {$_."_ops"} qw(bit io sys obscure math trans debug);
     push @dynext, "select" if $^O !~ /^(MSWin32|msys)$/;
     push @dynext, "gziphandle" if $PConfig{has_zlib};
