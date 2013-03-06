@@ -180,8 +180,6 @@ GEN_CONFIGS = \
 	lib/Parrot/PMC.pm \
 	$(RUN_INC_DIR)/config.fpmc \
 	$(LIBRARY_DIR)/config.pir \
-#IF(has_opengl):	src/glut_nci_thunks.nci \
-#IF(has_glut):	src/glut_callbacks.c \
 	src/core_pmcs.c \
 	config_lib.pir \
 	compilers/imcc/imcc.y.flag \
@@ -231,8 +229,6 @@ CONFIGURE_GENERATED_FILES = \
 	.parrot_current_rev \
 	.parrot_current_sha1 \
 	.parrot_current_git_describe \
-#IF(has_opengl):    $(RUN_INC_DIR)/opengl_defines.pasm \
-#IF(has_opengl):    $(LIBRARY_DIR)/OpenGL_funcs.pir \
 	$(RUN_INC_DIR)/signal.pasm \
 	tools/dev/mk_language_shell.pl
 
@@ -254,7 +250,6 @@ GEN_HEADERS = \
 
 GEN_SOURCES = \
 	src/nci.c \
-	src/glut_nci_thunks.c \
 	src/parrot_config.c \
 	src/null_config.c \
 	src/install_config.c \
@@ -289,9 +284,6 @@ GEN_LIBRARY = \
 	$(LIBRARY_DIR)/MIME/Base64.pbc \
 	$(LIBRARY_DIR)/NCI/Utils.pbc \
 	$(LIBRARY_DIR)/ncurses.pbc \
-#IF(has_opengl):    $(LIBRARY_DIR)/OpenGL.pbc \
-#IF(has_opengl):    $(LIBRARY_DIR)/OpenGL_funcs.pbc \
-#IF(has_opengl):    $(LIBRARY_DIR)/OpenGL/Math.pbc \
 	$(LIBRARY_DIR)/osutils.pbc \
 	$(LIBRARY_DIR)/P6object.pbc \
 	$(LIBRARY_DIR)/ProfTest.pbc \
@@ -587,7 +579,6 @@ ALL_PARROT_LIBS     = @libparrot_linkflags@ $(ICU_SHARED) $(C_LIBS)
 # dynamic extensions
 DYNEXT_DIR          = runtime/parrot/dynext
 LIBNCI_TEST_SO      = $(DYNEXT_DIR)/libnci_test$(LOAD_EXT)
-LIBGLUTCB_SO        = $(DYNEXT_DIR)/libglutcb$(LOAD_EXT)
 
 ###############################################################################
 #
@@ -638,7 +629,6 @@ MAKE_C = @make_c@
 
 all : \
 	corevm \
-#IF(has_glut):    $(LIBGLUTCB_SO) \
 	$(DIS) \
 	$(PARROT_CONFIG) \
 	$(PBC_TO_EXE) \
@@ -2555,9 +2545,6 @@ prog-clean :
 	src/install_config$(O) \
 	src/nci_test$(O) \
 	$(LIBNCI_TEST_SO) \
-	src/glut_callbacks$(O) \
-	src/glut_nci_thunks$(O) \
-	$(LIBGLUTCB_SO) \
 	src/extra_nci_thunks$(O) \
 	install_config.fpmc
 	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl --init
@@ -2594,8 +2581,6 @@ archclean: dynext-clean
 	install_config.fpmc \
 	src/nci_test$(O) \
 	$(LIBNCI_TEST_SO) \
-	src/glut_callbacks$(O) \
-	$(LIBGLUTCB_SO) \
 	src/extra_nci_thunks$(O) \
 	$(LIBPARROT_STATIC) \
 	$(LIBPARROT_SHARED)
@@ -3206,30 +3191,6 @@ src/nci_test$(O): $(PARROT_H_HEADERS) src/nci_test.c
 $(LIBNCI_TEST_SO): src/nci_test$(O)
 	$(LD) $(LD_LOAD_FLAGS) @ncilib_link_extra@ $(LDFLAGS) \
 	@ld_out@$@ src/nci_test$(O) $(C_LIBS)
-
-# for use by $(LIBRARY_DIR)/OpenGL.pir
-src/glut_callbacks$(O): \
-	$(PARROT_H_HEADERS) \
-	$(EXTEND_HEADERS) \
-	src/glut_callbacks.c
-
-src/glut_nci_thunks.c: $(NCI_THUNK_GEN)
-	$(NCI_THUNK_GEN) \
-		--dynext \
-		--loader-name=Parrot_glut_nci_loader \
-		--output=src/glut_nci_thunks.c \
-		--no-warn-dups \
-		< src/glut_nci_thunks.nci
-
-src/glut_nci_thunks$(O) : $(PARROT_H_HEADERS) \
-	src/glut_nci_thunks.c \
-	$(INC_PMC_DIR)/pmc_nci.h
-
-$(LIBGLUTCB_SO): $(LIBPARROT) src/glut_callbacks$(O) src/glut_nci_thunks$(O)
-	$(LD) @ld_out@$@ \
-	  src/glut_callbacks$(O) src/glut_nci_thunks$(O) \
-	  $(LINKARGS) @opengl_lib@
-	$(ADDGENERATED) "$@" "[library]"
 
 # Cyclic dependency to parrot
 #src/nci/core_thunks.c : src/nci/core_thunks.nci $(DEV_TOOLS_DIR)/nci_thunk_gen.pir $(PARROT)

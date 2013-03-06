@@ -50,7 +50,6 @@ my @steps = qw(
     auto::gmp
     auto::readline
     auto::pcre
-    auto::opengl
     auto::zlib
     auto::gettext
     auto::snprintf
@@ -66,7 +65,6 @@ my @steps = qw(
     auto::alignof
     gen::config_h
     gen::core_pmcs
-    gen::opengl
     gen::makefiles
     gen::config_pm
 );

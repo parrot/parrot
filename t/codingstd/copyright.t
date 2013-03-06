@@ -130,10 +130,6 @@ my @permitted_duplicate_copyright_files = (
         reason  => 'cite automake copyright statement',
     },
     {
-        file    => 'config/gen/opengl.pm',
-        reason  => 'heredoc text for generated file',
-    },
-    {
         file    => 'lib/Parrot/Configure/Messages.pm',
         reason  => 'heredoc for print_introduction()',
     },

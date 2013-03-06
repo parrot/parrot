@@ -191,10 +191,10 @@
     - 'experimental'
   ticket:  'https://github.com/parrot/parrot/issues/354'
 -
-  name:  'OpenGL bindings and libraries'
+  name:  'OpenGL bindings and libraries are deprecated'
   tags:
     - 'library'
-    - 'experimental'
+    - 'deprecated'
   ticket:  'https://trac.parrot.org/parrot/ticket/852'
 -
   name:  'Overriding vtable invoke in PIR objects'
