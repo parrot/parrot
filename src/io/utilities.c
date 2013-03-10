@@ -421,7 +421,10 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
     if (encoding == NULL)
         encoding = io_get_encoding(interp, handle, vtable, PIO_F_READ);
 
-    if (available_bytes < delim_size || available_bytes < encoding->max_bytes_per_codepoint)
+    /* FIXME: available_bytes < delim_size only makes sense if the
+              encodings agree
+    */
+    if (available_bytes < delim_size || available_bytes < encoding->bytes_per_unit)
         available_bytes = Parrot_io_buffer_fill(interp, buffer, handle, vtable);
 
     s->encoding = encoding;
