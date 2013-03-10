@@ -413,7 +413,9 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
     size_t total_bytes_read = 0;
     const size_t raw_reads = buffer->raw_reads;
     size_t available_bytes = BUFFER_USED_SIZE(buffer);
+    size_t prev_available_bytes = 0;
     const size_t delim_size = STRING_byte_length(rs);
+    INTVAL have_delim = 0;
 
     s->bufused  = 0;
     s->strlen   = 0;
@@ -421,39 +423,38 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
     if (encoding == NULL)
         encoding = io_get_encoding(interp, handle, vtable, PIO_F_READ);
 
-    /* FIXME: available_bytes < delim_size only makes sense if the
-              encodings agree
-    */
-    if (available_bytes < delim_size || available_bytes < encoding->bytes_per_unit)
-        available_bytes = Parrot_io_buffer_fill(interp, buffer, handle, vtable);
-
     s->encoding = encoding;
 
-    while (1) {
+    while (!have_delim) {
         Parrot_String_Bounds bounds;
-        INTVAL have_delim = 0;
-        const size_t bytes_to_read = io_buffer_find_string_marker(interp,
-                               buffer, handle, vtable, encoding, &bounds, rs, &have_delim);
+        size_t bytes_to_read;
 
-        /* Buffer is empty, so we're probably at EOF. */
-        if (bytes_to_read == 0)
+        /* FIXME: available_bytes < delim_size only makes sense if the
+                  encodings agree
+        */
+        if (available_bytes < delim_size || available_bytes < encoding->bytes_per_unit) {
+            prev_available_bytes = available_bytes;
+            available_bytes = Parrot_io_buffer_fill(interp, buffer, handle, vtable);
+        }
+
+        bytes_to_read = io_buffer_find_string_marker(interp, buffer, handle,
+            vtable, encoding, &bounds, rs, &have_delim);
+
+        /* Buffer contains only partial characters (if any) and as the last read
+           returned nothing, we're probably at EOF. */
+        if (bytes_to_read == 0 && prev_available_bytes == available_bytes)
             break;
 
         /* Append buffer to result */
         io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read);
         total_bytes_read += bytes_to_read;
-
-        if (have_delim)
-            break;
+        available_bytes -= bytes_to_read;
 
         /* Some types, like Socket, don't want to be read more than once in a
            single request because recv can hang waiting for data. In those
            cases, break out of the loop early. */
         if ((vtable->flags & PIO_VF_MULTI_READABLE) == 0 && buffer->raw_reads > raw_reads)
             break;
-        available_bytes -= bytes_to_read;
-        if (available_bytes < delim_size || available_bytes < encoding->max_bytes_per_codepoint)
-            available_bytes = Parrot_io_buffer_fill(interp, buffer, handle, vtable);
     }
 
     if (total_bytes_read == 0)
