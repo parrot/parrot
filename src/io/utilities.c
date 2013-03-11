@@ -295,6 +295,9 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
     /* When we have a request with PIO_READ_SIZE_ANY, we just want a big chunk
        of data. Fill the buffer up as full as it gets and read it out. */
     if (char_length == PIO_READ_SIZE_ANY) {
+        /* FIXME: see io_readline_encoded_string() why checking against
+                  encoding->max_bytes_per_codepoint is a bad idea
+        */
         if (BUFFER_USED_SIZE(buffer) < encoding->max_bytes_per_codepoint)
             Parrot_io_buffer_fill(interp, buffer, handle, vtable);
         bytes_to_read = io_buffer_find_num_characters(interp, buffer,
@@ -429,7 +432,14 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
         Parrot_String_Bounds bounds;
         size_t bytes_to_read;
 
-        /* FIXME: available_bytes < delim_size only makes sense if the
+        /* We used to check against encoding->max_bytes_per_codepoint
+           instead of encoding->bytes_per_unit.
+
+           In case of variable-length codings like UTF-8, this meant waiting
+           for more characters even if we already got all expected data and
+           possibly hanging indefinitely if there's no more input available.
+
+           FIXME: available_bytes < delim_size only makes sense if the
                   encodings agree
         */
         if (available_bytes < delim_size || available_bytes < encoding->bytes_per_unit) {
@@ -440,8 +450,15 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
         bytes_to_read = io_buffer_find_string_marker(interp, buffer, handle,
             vtable, encoding, &bounds, rs, &have_delim);
 
-        /* Buffer contains only partial characters (if any) and as the last read
-           returned nothing, we're probably at EOF. */
+        /* Check if the buffer contains no (full) characters.
+           If the last read returned nothing, assume we're at EOF and
+           break out of the loop.
+
+           This used to check bytes_to_read == 0 only. In case of
+           variable-length codings, the buffer may now contain a single
+           partial character after a successful read, whereas it used to
+           contain at least one full character.
+        */
         if (bytes_to_read == 0 && prev_available_bytes == available_bytes)
             break;
 
