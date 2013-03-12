@@ -135,7 +135,6 @@ typedef INTVAL      (*io_vtable_read_b)       (PARROT_INTERP, PMC *handle, ARGOU
 typedef INTVAL      (*io_vtable_write_b)      (PARROT_INTERP, PMC *handle, ARGIN(char * buffer), size_t byte_length);
 typedef INTVAL      (*io_vtable_flush)        (PARROT_INTERP, PMC *handle);
 typedef INTVAL      (*io_vtable_is_eof)       (PARROT_INTERP, PMC *handle);
-typedef void        (*io_vtable_set_eof)      (PARROT_INTERP, PMC *handle, INTVAL is_set);
 typedef PIOOFF_T    (*io_vtable_tell)         (PARROT_INTERP, PMC *handle);
 typedef PIOOFF_T    (*io_vtable_seek)         (PARROT_INTERP, PMC *handle, PIOOFF_T offset, INTVAL whence);
 typedef void        (*io_vtable_adv_position) (PARROT_INTERP, PMC *handle, size_t len);
@@ -158,7 +157,6 @@ typedef struct _io_vtable {
     io_vtable_write_b       write_b;        /* Write bytes to the handle */
     io_vtable_flush         flush;          /* Flush the handle */
     io_vtable_is_eof        is_eof;         /* Determine if at end-of-file */
-    io_vtable_set_eof       set_eof;        /* Set or clear the passed-EOF flag */
     io_vtable_open          open;           /* Open the handle */
     io_vtable_is_open       is_open;        /* Determine if the handle is open */
     io_vtable_close         close;          /* Close the handle */

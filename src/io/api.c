@@ -867,8 +867,6 @@ Parrot_io_read_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC *handle),
            account for whatever we read. */
         if (bytes_read != byte_length)
             VTABLE_set_integer_native(interp, buffer, bytes_read);
-        if (bytes_read == 0)
-            vtable->set_eof(interp, handle, 1);
         vtable->adv_position(interp, handle, bytes_read);
         return buffer;
     }

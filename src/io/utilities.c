@@ -337,9 +337,6 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
             break;
     }
 
-    if (total_bytes_read == 0)
-        vtable->set_eof(interp, handle, 1);
-
     return s;
 }
 
@@ -472,10 +469,6 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
         Parrot_io_buffer_fill(interp, buffer, handle, vtable);
         at_eof = BUFFER_FREE_END_SPACE(buffer) > 0;
     }
-
-    /* XXX: Hasn't this been already handled at a lower-level? */
-    if (total_bytes_read == 0)
-        vtable->set_eof(interp, handle, 1);
 
     return s;
 }
