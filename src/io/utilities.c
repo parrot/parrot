@@ -397,8 +397,13 @@ io_read_chars_append_string(PARROT_INTERP, ARGMOD(STRING * s),
 =item C<STRING * io_readline_encoded_string(PARROT_INTERP, PMC *handle, const
 IO_VTABLE *vtable, IO_BUFFER *buffer, const STR_VTABLE *encoding, STRING * rs)>
 
-Read a line, up to and including the terminator character rs, from the
-input handle
+Read a line, up to and including the terminator string rs from the
+input handle.
+
+If the terminator string cannot be found, read until EOF is reached.
+
+This may block handles like sockets until the connection gets closed, which is
+necessary to ensure we never return incomplete lines.
 
 =cut
 
@@ -414,11 +419,14 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
     ASSERT_ARGS(io_readline_encoded_string)
     STRING * const s = Parrot_gc_new_string_header(interp, 0);
     size_t total_bytes_read = 0;
-    const size_t raw_reads = buffer->raw_reads;
-    size_t available_bytes = BUFFER_USED_SIZE(buffer);
-    size_t prev_available_bytes = 0;
+
+    /* Checks BUFFER_FREE_END_SPACE() after calls to Parrot_io_buffer_fill()
+       instead of the actual EOF indicator, which isn't available on sockets.
+    */
+    INTVAL at_eof = 0;
+
+    /* XXX: What do we do if encoding and rs->encoding don't agree? */
     const size_t delim_size = STRING_byte_length(rs);
-    INTVAL have_delim = 0;
 
     s->bufused  = 0;
     s->strlen   = 0;
@@ -428,46 +436,44 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
 
     s->encoding = encoding;
 
-    while (!have_delim) {
-        Parrot_String_Bounds bounds;
-        size_t bytes_to_read;
+    /* XXX: Does this trigger in all cases we need it to trigger?
+            In particular, how does it interact with prior non-readline IO?
 
-        /* We used to check against encoding->max_bytes_per_codepoint
-           instead of encoding->bytes_per_unit.
-
-           In case of variable-length codings like UTF-8, this meant waiting
-           for more characters even if we already got all expected data and
-           possibly hanging indefinitely if there's no more input available.
-
-           FIXME: available_bytes < delim_size only makes sense if the
-                  encodings agree
-        */
-        if (available_bytes < delim_size || available_bytes < encoding->bytes_per_unit) {
-            prev_available_bytes = available_bytes;
-            available_bytes = Parrot_io_buffer_fill(interp, buffer, handle, vtable);
-        }
-
-        bytes_to_read = io_buffer_find_string_marker(interp, buffer, handle,
-            vtable, encoding, &bounds, rs, &have_delim);
-
-        /* Check if the buffer contains no (full) characters.
-           If the last read returned nothing, assume we're at EOF and
-           break out of the loop.
-
-           This used to check bytes_to_read == 0 only. In case of
-           variable-length codings, the buffer may now contain a single
-           partial character after a successful read, whereas it used to
-           contain at least one full character.
-        */
-        if (bytes_to_read == 0 && prev_available_bytes == available_bytes)
-            break;
-
-        /* Append buffer to result */
-        io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read);
-        total_bytes_read += bytes_to_read;
-        available_bytes -= bytes_to_read;
+            It might be necessary to de-normalize the buffer by moving its
+            contents to the end so io_buffer_find_string_marker() works
+            correctly (or fix io_buffer_find_string_marker(), if possible)...
+    */
+    if (BUFFER_USED_SIZE(buffer) < delim_size) {
+        Parrot_io_buffer_fill(interp, buffer, handle, vtable);
+        at_eof = BUFFER_FREE_END_SPACE(buffer) > 0;
     }
 
+    while (1) {
+        Parrot_String_Bounds bounds;
+        INTVAL have_delim = 0;
+
+        /* Look for terminator and get amount of complete character data */
+        const size_t bytes_to_read = io_buffer_find_string_marker(
+            interp, buffer, handle, vtable, encoding, &bounds, rs, &have_delim);
+
+        if (bytes_to_read != 0) {
+            /* Append buffer to result */
+            io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read);
+            total_bytes_read += bytes_to_read;
+
+            if (have_delim)
+                break;
+        }
+
+        if (bytes_to_read == 0 && at_eof)
+            break;
+
+        /* We haven't found the terminator yet, so get new input and try again */
+        Parrot_io_buffer_fill(interp, buffer, handle, vtable);
+        at_eof = BUFFER_FREE_END_SPACE(buffer) > 0;
+    }
+
+    /* XXX: Hasn't this been already handled at a lower-level? */
     if (total_bytes_read == 0)
         vtable->set_eof(interp, handle, 1);
 
