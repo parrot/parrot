@@ -466,12 +466,6 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
         io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read);
         total_bytes_read += bytes_to_read;
         available_bytes -= bytes_to_read;
-
-        /* Some types, like Socket, don't want to be read more than once in a
-           single request because recv can hang waiting for data. In those
-           cases, break out of the loop early. */
-        if ((vtable->flags & PIO_VF_MULTI_READABLE) == 0 && buffer->raw_reads > raw_reads)
-            break;
     }
 
     if (total_bytes_read == 0)
