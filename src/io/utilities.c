@@ -295,8 +295,8 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
     /* When we have a request with PIO_READ_SIZE_ANY, we just want a big chunk
        of data. Fill the buffer up as full as it gets and read it out. */
     if (char_length == PIO_READ_SIZE_ANY) {
-        /* FIXME: see io_readline_encoded_string() why checking against
-                  encoding->max_bytes_per_codepoint is a bad idea
+        /* FIXME: checking against encoding->max_bytes_per_codepoint is a
+                  bad idea - we never might get that many bytes
         */
         if (BUFFER_USED_SIZE(buffer) < encoding->max_bytes_per_codepoint)
             Parrot_io_buffer_fill(interp, buffer, handle, vtable);
