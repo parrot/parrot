@@ -32,10 +32,11 @@
 #endif
 
 /* Buffer flags */
-#define PIO_BF_MALLOC   0x0001        /* Buffer malloced              */
-#define PIO_BF_MMAP     0x0002        /* Buffer mmap()ed              */
-#define PIO_BF_LINEBUF  0x0004        /* Flushes on newline           */
-#define PIO_BF_BLKBUF   0x0008        /* Raw block-based buffering    */
+#define PIO_BF_MALLOC       0x0001      /* Buffer malloced              */
+#define PIO_BF_MMAP         0x0002      /* Buffer mmap()ed              */
+#define PIO_BF_LINEBUF      0x0004      /* Flushes on newline           */
+#define PIO_BF_BLKBUF       0x0008      /* Raw block-based buffering    */
+#define PIO_BF_UNDERFLOW    0x0010      /* Buffer failed to fill        */
 
 /* TODO: What is this? Figure it out and properly document it's use. */
 #define PIO_NR_OPEN 256                 /* Size of an "IO handle table" */
@@ -113,7 +114,6 @@ typedef struct _ParrotIOData ParrotIOData;
 /* BUFFERING */
 typedef struct _io_buffer {
     INTVAL flags;                   /* Flags on this buffer            */
-    size_t raw_reads;               /* Number of raw reads             */
     size_t buffer_size;             /* Current allocated size          */
     const STR_VTABLE *encoding;     /* Encoding used by this buffer    */
     char *buffer_ptr;               /* ptr to the buffer mem block     */
