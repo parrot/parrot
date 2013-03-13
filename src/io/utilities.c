@@ -415,12 +415,6 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
 {
     ASSERT_ARGS(io_readline_encoded_string)
     STRING * const s = Parrot_gc_new_string_header(interp, 0);
-    size_t total_bytes_read = 0;
-
-    /* Checks BUFFER_FREE_END_SPACE() after calls to Parrot_io_buffer_fill()
-       instead of the actual EOF indicator, which isn't available on sockets.
-    */
-    INTVAL at_eof = 0;
 
     /* XXX: What do we do if encoding and rs->encoding don't agree? */
     const size_t delim_size = STRING_byte_length(rs);
@@ -433,18 +427,6 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
 
     s->encoding = encoding;
 
-    /* XXX: Does this trigger in all cases we need it to trigger?
-            In particular, how does it interact with prior non-readline IO?
-
-            It might be necessary to de-normalize the buffer by moving its
-            contents to the end so io_buffer_find_string_marker() works
-            correctly (or fix io_buffer_find_string_marker(), if possible)...
-    */
-    if (BUFFER_USED_SIZE(buffer) < delim_size) {
-        Parrot_io_buffer_fill(interp, buffer, handle, vtable);
-        at_eof = BUFFER_FREE_END_SPACE(buffer) > 0;
-    }
-
     while (1) {
         Parrot_String_Bounds bounds;
         INTVAL have_delim = 0;
@@ -456,18 +438,21 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
         if (bytes_to_read != 0) {
             /* Append buffer to result */
             io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read);
-            total_bytes_read += bytes_to_read;
 
             if (have_delim)
                 break;
         }
 
-        if (bytes_to_read == 0 && at_eof)
+        /* XXX: Should we discard any partial characters so vtable->is_eof()
+                and Parrot_io_eof() (and thus the PMC method) will agree?
+
+                Imo keeping the partial characters is the right thing to do.
+        */
+        if (vtable->is_eof(interp, handle))
             break;
 
         /* We haven't found the terminator yet, so get new input and try again */
         Parrot_io_buffer_fill(interp, buffer, handle, vtable);
-        at_eof = BUFFER_FREE_END_SPACE(buffer) > 0;
     }
 
     return s;

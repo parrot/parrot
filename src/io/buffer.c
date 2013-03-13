@@ -753,12 +753,9 @@ io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
         if (delim_bytelen == 1)
             return bounds->bytes;
 
-        /* If the buffer did not fill completely, we can assume there's nothing
-           left for us to read because we tried to fill before we started this
-           loop. If so, just return all the bytes in the buffer. If we've hit
-           EOF and don't have the terminator, we'll never have it, so just
-           return everything also. */
-        if (BUFFER_FREE_END_SPACE(buffer) > 0 || vtable->is_eof(interp, handle))
+        /* If we've hit EOF and don't have the terminator, we'll never have it,
+           so just return all the bytes in the buffer. */
+        if (vtable->is_eof(interp, handle))
             return bounds->bytes;
 
         /* If the delimiter is multiple bytes, we might have part of it. We need
