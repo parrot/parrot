@@ -94,6 +94,22 @@ pmclass Handle provides Handle manual_attrs {
 
 /*
 
+=item C<INTVAL get_bool()>
+
+Returns whether the Handle is currently open.
+
+=cut
+
+*/
+
+    VTABLE INTVAL get_bool() {
+        const IO_VTABLE *io_vtable;
+        GET_ATTR_io_vtable(INTERP, SELF, io_vtable);
+        return io_vtable->is_open(INTERP, SELF);
+    }
+
+/*
+
 =back
 
 =head2 Methods
@@ -112,6 +128,39 @@ subtypes that are or can be tty.
 
     METHOD isatty() {
         RETURN(INTVAL 0);
+    }
+
+/*
+
+=item C<METHOD eof()>
+
+Return true if a previous read attempted to read past the end of the underlying
+os handle.  Note that this method may return false even if there are no bytes
+remaining if the most recent read requested the exact number of bytes remaining
+in the stream.
+
+=cut
+
+*/
+
+    METHOD eof() {
+        const INTVAL status = Parrot_io_eof(INTERP, SELF);
+        RETURN(INTVAL status);
+    }
+
+/*
+
+=item C<METHOD is_closed()>
+
+Test if the Handle is closed.
+
+=cut
+
+*/
+
+    METHOD is_closed() {
+        const INTVAL status = Parrot_io_is_closed(INTERP, SELF);
+        RETURN(INTVAL status);
     }
 
 /*
