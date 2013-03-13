@@ -258,6 +258,12 @@ io_filehandle_read_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGOUT(char *buffer), s
     ASSERT_ARGS(io_filehandle_read_b)
     const PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
     const size_t bytes_read = Parrot_io_internal_read(interp, os_handle, buffer, byte_length);
+    if (bytes_read == 0) {
+        INTVAL flags;
+        GETATTR_FileHandle_flags(interp, handle, flags);
+        flags |= PIO_F_EOF;
+        SETATTR_FileHandle_flags(interp, handle, flags);
+    }
     return bytes_read;
 }
 
