@@ -960,7 +960,7 @@ Parrot_io_readline_s(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING * terminat
         io_verify_is_open_for(interp, handle, vtable, PIO_F_READ);
 
         if (read_buffer == NULL)
-            read_buffer = io_verify_has_read_buffer(interp, handle, vtable, BUFFER_SIZE_ANY);
+            read_buffer = io_verify_has_read_buffer(interp, handle, vtable, BUFFER_FLAGS_ANY);
 
         /* Because of the way buffering works, the terminator sequence may be,
            at most, one character shorter than half the size of the buffer.
