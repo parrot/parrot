@@ -297,7 +297,8 @@ io_socket_flush(PARROT_INTERP, ARGMOD(PMC *handle))
 
 =item C<static INTVAL io_socket_is_eof(PARROT_INTERP, PMC *handle)>
 
-Sockets are not "passed-the-end" so long as the connection is open. Return 0.
+Sockets are considered at EOF if the last buffered read failed to fill the
+buffer. Always return 0 for unbuffered sockets.
 
 =cut
 
@@ -307,9 +308,11 @@ static INTVAL
 io_socket_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_socket_is_eof)
-    UNUSED(interp);
-    UNUSED(handle);
-    return 0;
+    IO_BUFFER * const buffer = IO_GET_READ_BUFFER(interp, handle);
+    if (!buffer)
+        return 0;
+
+    return !!(buffer->flags & PIO_BF_UNDERFLOW);
 }
 
 /*
