@@ -117,8 +117,6 @@ Parrot_io_buffer_allocate(PARROT_INTERP, ARGMOD(PMC *owner), INTVAL flags,
     buffer->buffer_end = buffer->buffer_ptr;
     PARROT_ASSERT(BUFFER_IS_EMPTY(buffer));
 
-    buffer->raw_reads = 0;
-
     buffer->flags = flags;
     return buffer;
 }
@@ -293,8 +291,12 @@ Parrot_io_buffer_read_b(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
         size_t length)
 {
     ASSERT_ARGS(Parrot_io_buffer_read_b)
+    if(length == 0)
+        return 0;
+
     if (!buffer)
         return vtable->read_b(interp, handle, s, length);
+
     {
         size_t bytes_read = io_buffer_transfer_to_mem(interp, buffer, s, length);
         PARROT_ASSERT(bytes_read <= length);
@@ -305,8 +307,11 @@ Parrot_io_buffer_read_b(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
         /* If we still need more data than the buffer can hold, just read it
            directly. */
         if (length > buffer->buffer_size) {
-            bytes_read += vtable->read_b(interp, handle, s + bytes_read, length);
-            buffer->raw_reads++;
+            const size_t count = vtable->read_b(interp, handle, s + bytes_read,
+                                                length);
+            bytes_read += count;
+            if (count == 0)
+                buffer->flags |= PIO_BF_UNDERFLOW;
         }
 
         /* Else, if we need to read an amount that the buffer can handle, fill
@@ -617,7 +622,9 @@ Parrot_io_buffer_fill(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
             return BUFFER_USED_SIZE(buffer);
         read_bytes = vtable->read_b(interp, handle, buffer->buffer_end,
                                     available_size);
-        buffer->raw_reads++;
+        if (read_bytes == 0)
+            buffer->flags |= PIO_BF_UNDERFLOW;
+
         buffer->buffer_end += read_bytes;
         BUFFER_ASSERT_SANITY(buffer);
         return BUFFER_USED_SIZE(buffer);
@@ -746,12 +753,9 @@ io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
         if (delim_bytelen == 1)
             return bounds->bytes;
 
-        /* If the buffer did not fill completely, we can assume there's nothing
-           left for us to read because we tried to fill before we started this
-           loop. If so, just return all the bytes in the buffer. If we've hit
-           EOF and don't have the terminator, we'll never have it, so just
-           return everything also. */
-        if (BUFFER_FREE_END_SPACE(buffer) > 0 || vtable->is_eof(interp, handle))
+        /* If we've hit EOF and don't have the terminator, we'll never have it,
+           so just return all the bytes in the buffer. */
+        if (vtable->is_eof(interp, handle))
             return bounds->bytes;
 
         /* If the delimiter is multiple bytes, we might have part of it. We need

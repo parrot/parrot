@@ -121,20 +121,6 @@ Free structures.
 
 /*
 
-=item C<INTVAL get_bool()>
-
-Returns whether the Socket is currently open.
-
-=cut
-
-*/
-
-    VTABLE INTVAL get_bool() {
-        return !Parrot_io_is_closed(INTERP, SELF);
-    }
-
-/*
-
 =back
 
 =head2 Methods
@@ -247,23 +233,6 @@ C<local_address> returns the local address of this socket PMC.
         PMC * const res = PARROT_SOCKET(SELF)->local;
         RETURN(PMC * res);
     }
-
-
-/*
-
-=item C<METHOD is_closed()>
-
-Test if the socket is closed.
-
-=cut
-
-*/
-
-    METHOD is_closed() {
-        const INTVAL status = !VTABLE_get_bool(INTERP, SELF);
-        RETURN(INTVAL status);
-    }
-
 
 /*
 

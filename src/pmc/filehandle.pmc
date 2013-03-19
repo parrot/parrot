@@ -214,26 +214,6 @@ For internal usage only, subject to change without notice.
         }
     }
 
-
-/*
-
-=item C<INTVAL get_bool()>
-
-Return false if a previous read attempted to read past the end of the underlying
-filehandle.  Note that this method may return true even if there are no bytes
-remaining if the most recent read requested the exact number of bytes remaining
-in the file.
-
-
-=cut
-
-*/
-
-    VTABLE INTVAL get_bool() {
-        return !Parrot_io_eof(INTERP, SELF);
-    }
-
-
 /*
 
 =back
@@ -310,23 +290,6 @@ Returns a boolean value indicating whether C<SELF> is a console/tty.
         const INTVAL isatty = Parrot_io_is_tty_handle(INTERP, SELF);
         RETURN(INTVAL isatty);
     }
-
-
-/*
-
-=item C<METHOD is_closed()>
-
-Test if the filehandle is closed.
-
-=cut
-
-*/
-
-    METHOD is_closed() {
-        const INTVAL status = Parrot_io_is_closed(INTERP, SELF);
-        RETURN(INTVAL status);
-    }
-
 
 /*
 
@@ -550,25 +513,6 @@ Retrieve the read mode string for the filehandle.
         GET_ATTR_mode(INTERP, SELF, mode);
         RETURN(STRING *mode);
     }
-
-/*
-
-=item C<METHOD eof()>
-
-Return true if a previous read attempted to read past the end of the underlying
-filehandle.  Note that this method may return false even if there are no bytes
-remaining if the most recent read requested the exact number of bytes remaining
-in the file.
-
-=cut
-
-*/
-
-    METHOD eof() {
-        const INTVAL flags = Parrot_io_eof(INTERP, SELF);
-        RETURN(INTVAL flags);
-    }
-
 
 /*
 
