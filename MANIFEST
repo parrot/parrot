@@ -186,7 +186,6 @@ config/auto/pmc.pm                                          []
 config/auto/pod2man.pm                                      []
 config/auto/readline.pm                                     []
 config/auto/readline/readline_c.in                          []
-config/auto/revision.pm                                     []
 config/auto/signal.pm                                       []
 config/auto/signal/test1_c.in                               []
 config/auto/signal/test2_c.in                               []
@@ -1041,7 +1040,6 @@ lib/Parrot/Pmc2c/Parser.pm                                  [devel]lib
 lib/Parrot/Pmc2c/Pmc2cMain.pm                               [devel]lib
 lib/Parrot/Pmc2c/UtilFunctions.pm                           [devel]lib
 lib/Parrot/Pmc2c/VTable.pm                                  [devel]lib
-lib/Parrot/Revision.pm                                      [devel]lib
 lib/Parrot/SHA1.pm                                          [devel]lib
 lib/Parrot/SearchOps.pm                                     [devel]lib
 lib/Parrot/Test.pm                                          [devel]lib
@@ -1613,8 +1611,6 @@ t/configure/012-verbose.t                                   [test]
 t/configure/013-die.t                                       [test]
 t/configure/015-no_return.t                                 [test]
 t/configure/016-no_return_but_result.t                      [test]
-t/configure/017-revision_from_cache.t                       [test]
-t/configure/018-revision_to_cache.t                         [test]
 t/configure/019-version.t                                   [test]
 t/configure/020-version.t                                   [test]
 t/configure/021-version.t                                   [test]
@@ -1647,7 +1643,6 @@ t/configure/049-options_test_prepare.t                      [test]
 t/configure/050-fatal.t                                     [test]
 t/configure/051-fatal_step.t                                [test]
 t/configure/059-silent.t                                    [test]
-t/configure/061-revision_from_cache.t                       [test]
 t/configure/062-sha1.t                                      [test]
 t/configure/063-git_describe.t                              [test]
 t/configure/testlib/Make_VERSION_File.pm                    [test]
@@ -2053,7 +2048,6 @@ t/steps/auto/pmc-01.t                                       [test]
 t/steps/auto/pod2man-01.t                                   [test]
 t/steps/auto/readline-01.t                                  [test]
 t/steps/auto/readline-02.t                                  [test]
-t/steps/auto/revision-01.t                                  [test]
 t/steps/auto/signal-01.t                                    [test]
 t/steps/auto/sizes-01.t                                     [test]
 t/steps/auto/snprintf-01.t                                  [test]

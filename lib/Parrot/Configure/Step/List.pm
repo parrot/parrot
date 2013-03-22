@@ -58,7 +58,6 @@ my @steps = qw(
     auto::coverage
     auto::pod2man
     auto::ctags
-    auto::revision
     auto::icu
     auto::libffi
     auto::ipv6

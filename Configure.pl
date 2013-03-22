@@ -18,7 +18,6 @@ use Parrot::Configure::Messages qw(
     print_introduction
     print_conclusion
 );
-use Parrot::Revision;
 
 $| = 1;    # $OUTPUT_AUTOFLUSH = 1;
 
@@ -62,9 +61,6 @@ my $parrot_version = $Parrot::Configure::Options::Conf::parrot_version;
 # from Parrot::Configure::Messages
 print_introduction($parrot_version)
     unless $args->{silent};
-
-# Update revision number if needed
-Parrot::Revision::update();
 
 my $conf = Parrot::Configure->new();
 
@@ -669,7 +665,6 @@ configuration file.
     auto::snprintf
     # auto::perldoc
     auto::ctags
-    auto::revision
     auto::icu
     auto::platform
     gen::config_h
