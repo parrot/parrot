@@ -63,7 +63,6 @@ auto::gettext
 auto::snprintf
 # auto::perldoc
 auto::ctags
-auto::revision
 auto::icu
 auto::platform
 gen::config_h
