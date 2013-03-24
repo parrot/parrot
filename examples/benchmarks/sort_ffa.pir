@@ -46,6 +46,10 @@ LOOP:
 
   $P0.'sort'()
 
+  print "Sorted "
+  print N
+  print " floats\n"
+
 .end
 
 
