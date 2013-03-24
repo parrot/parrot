@@ -14,11 +14,12 @@
 callgrind.out.*
 cachegrind.out.*
 
-# vim swap files
+# vim swap and backup files
 /\.*sw?
 /*/*.sw?
 /*/*/*.sw?
 /*/*/*/*.sw?
+*~
 
 # ports/ should not go into release tarballs
 *.obj
