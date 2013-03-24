@@ -3112,6 +3112,12 @@ cover-distro: cover.dummy
 cover-clean:
 	@echo "Deleting gcov-generated files"
 	$(PERL) -MCwd -e 'for my $$dir ( qw ( ./ $(COVER_DIRS) t/src t/src/embed ) ) {my $$cwd = cwd(); chdir $$dir; unlink glob( "*.gcda *.gcno *.gcov" ); chdir $$cwd;}'
+	@echo "Deleting cover-generated html files"
+	$(RM_F) cover.13 cover.css coverage.html compilers-*.html src-*.html\
+	    frontend-parrot2-prt0-pbc-c.html include-parrot-pointer_array-h.html\
+	    ops2c-c.html parrot-nqp-c.html pbc_to_exe-c.html winxed-c.html
+	$(RM_RF) structure/
+
 
 ###############################################################################
 #
