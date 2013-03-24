@@ -479,15 +479,15 @@ out-of-bounds test. Checks INT and PMC keys.
     push array, 3.5
     array.'sort'()
     $N0 = array[0]
-    is($N0, -1.7, 'sort works - 1st element correct after resize')
+    is($N0, -1.7, 'sort works - 1st element correct after push')
     $N1 = array[1]
-    is($N1, 3.0, 'sort works - 2nd element correct after resize')
+    is($N1, 3.0, 'sort works - 2nd element correct after push')
     $N2 = array[2]
-    is($N2, 3.5, 'sort works - 3rd element correct after resize')
+    is($N2, 3.5, 'sort works - 3rd element correct after push')
     $N3 = array[3]
-    is($N3, 5.85, 'sort works - 4th element correct after resize')
+    is($N3, 5.85, 'sort works - 4th element correct after push')
     $N4 = array[4]
-    is($N4, 10.2, 'sort works - 5th element correct after resize')
+    is($N4, 10.2, 'sort works - 5th element correct after push')
 .end
 
 .sub method_reverse
