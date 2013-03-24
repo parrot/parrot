@@ -166,6 +166,7 @@ FixedPMCArray:\s\d+\.\d+s\n
         last\sis:\s9973\nElapsed\stime:\s\d+\.\d+\n$/x,
     q{sort_ffa.pir} => qr/Sorted 1000000 floats/,
     q{sort_fia.pir} => qr/Sorted 1000000 integers/,
+    q{sort_rfa.pir} => qr/Sorted 1000000 floats/,
     q{sort_ria.pir} => qr/Sorted 1000000 integers/,
     q{stress.pasm}     => qr/^A\stotal\sof\s\d+\sGC\sruns\s
         were\smade\n$/x,
