@@ -2944,6 +2944,7 @@ FULLCOVER_DIRS = \
 	src/string/encoding \
 	$(FRPTWO_DIR) \
 	$(FR_DIR)/parrot_debugger \
+	$(FR_DIR)/pbc_disassemble \
 	$(FR_DIR)/pbc_dump \
 	$(FR_DIR)/pbc_merge \
 	$(BUILD_DIR) \
@@ -2992,6 +2993,7 @@ COVER_DIRS = \
 	src/string/encoding \
 	$(FRPTWO_DIR) \
 	$(FR_DIR)/parrot_debugger \
+	$(FR_DIR)/pbc_disassemble \
 	$(FR_DIR)/pbc_dump \
 	$(FR_DIR)/pbc_merge \
 	compilers/imcc
