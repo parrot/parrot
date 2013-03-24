@@ -16,7 +16,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 =cut
 
-.const int TESTS = 72
+.const int TESTS = 78
 .const num PRECISION = 1e-6
 
 .sub 'test' :main
@@ -488,6 +488,20 @@ out-of-bounds test. Checks INT and PMC keys.
     is($N3, 5.85, 'sort works - 4th element correct after push')
     $N4 = array[4]
     is($N4, 10.2, 'sort works - 5th element correct after push')
+    unshift array, 7.2
+    array.'sort'()
+    $N0 = array[0]
+    is($N0, -1.7, 'sort works - 1st element correct after unshift')
+    $N1 = array[1]
+    is($N1, 3.0, 'sort works - 2nd element correct after unshift')
+    $N2 = array[2]
+    is($N2, 3.5, 'sort works - 3rd element correct after unshift')
+    $N3 = array[3]
+    is($N3, 5.85, 'sort works - 4th element correct after unshift')
+    $N4 = array[4]
+    is($N4, 7.2, 'sort works - 5th element correct after unshift')
+    $N5 = array[5]
+    is($N5, 10.2, 'sort works - 6th element correct after unshift')
 .end
 
 .sub method_reverse
