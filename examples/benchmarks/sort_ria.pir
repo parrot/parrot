@@ -2,20 +2,20 @@
 
 =head1 NAME
 
-examples/benchmarks/sort_ffa.pir - Sort an FixedFloatArray of N floats
+examples/benchmarks/sort_ria.pir - Sort a ResizableIntegerArray of N integers
 
 =head1 SYNOPSIS
 
-    % time ./parrot examples/benchmarks/sort_ffa.pir 100000
+    % time ./parrot examples/benchmarks/sort_ria.pir 100000
 
 Or use the default number of iterations:
 
-    % time ./parrot examples/benchmarks/sort.pir
+    % time ./parrot examples/benchmarks/sort_ria.pir
 
 =head1 DESCRIPTION
 
-Sorts an FixedFloatArray of N random integers using builtin sort
-function for FixedFloatArray. The argument N is specified from the
+Sorts an ResizableIntegerArray of N random integers using builtin sort
+function for ResizableIntegerArray. The argument N is specified from the
 command line.
 
 =cut
@@ -34,7 +34,7 @@ USE_DEFAULT_SIZE:
   N = 1000000
 
 USE_DEFINED_SIZE:
-  $P0 = new ['FixedFloatArray'], N
+  $P0 = new ['ResizableIntegerArray'], N
   i = 0
   j = 0
 
@@ -48,7 +48,7 @@ LOOP:
 
   print "Sorted "
   print N
-  print " floats\n"
+  print " integers\n"
 
 .end
 

@@ -6,16 +6,16 @@ examples/benchmarks/sort.pir - Sort an FixedIntegerArray of N integers
 
 =head1 SYNOPSIS
 
-    % time ./parrot examples/benchmarks/sort.pir 100000
+    % time ./parrot examples/benchmarks/sort_fia.pir 100000
 
 Or use the default number of iterations:
 
-    % time ./parrot examples/benchmarks/sort.pir
+    % time ./parrot examples/benchmarks/sort_fia.pir
 
 =head1 DESCRIPTION
 
-Sorts an FixedIntegetArray of N random integers using builtin sort
-function for FixedIntegetArray. The argument N is specified from the
+Sorts an FixedIntegerArray of N random integers using builtin sort
+function for FixedIntegerArray. The argument N is specified from the
 command line.
 
 =cut
@@ -45,6 +45,10 @@ LOOP:
   if i < N goto LOOP
 
   $P0.'sort'()
+
+  print "Sorted "
+  print N
+  print " integers\n"
 
 .end
 
