@@ -14,8 +14,8 @@ Or use the default number of iterations:
 
 =head1 DESCRIPTION
 
-Sorts an FixedIntegetArray of N random integers using builtin sort
-function for FixedIntegetArray. The argument N is specified from the
+Sorts an FixedIntegerArray of N random integers using builtin sort
+function for FixedIntegerArray. The argument N is specified from the
 command line.
 
 =cut
