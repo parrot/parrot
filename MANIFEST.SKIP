@@ -16,6 +16,12 @@
 ^/
 ^.*\.diff$
 ^.*\.diff/
+^.*\.gcda$
+^.*\.gcda/
+^.*\.gcno$
+^.*\.gcno/
+^.*\.gcov$
+^.*\.gcov/
 ^.*\.obj$
 ^.*\.obj/
 ^.*\.orig$
@@ -28,6 +34,8 @@
 ^.*\.rej/
 ^.*\.res$
 ^.*\.res/
+^.*~$
+^.*~/
 ^/.*/.*/.*/.*\.sw?$
 ^/.*/.*/.*/.*\.sw?/
 ^/.*/.*/.*\.sw?$
@@ -1034,6 +1042,28 @@
 ^cachegrind\.out\..*/
 ^callgrind\.out\..*$
 ^callgrind\.out\..*/
+^compilers-.*\.html$
+^compilers-.*\.html/
+^cover\.13$
+^cover\.13/
+^cover\.css$
+^cover\.css/
+^coverage\.html$
+^coverage\.html/
+^frontend-parrot2-prt0-pbc-c\.html$
+^frontend-parrot2-prt0-pbc-c\.html/
+^include-parrot-pointer_array-h\.html$
+^include-parrot-pointer_array-h\.html/
+^ops2c-c\.html$
+^ops2c-c\.html/
+^parrot-nqp-c\.html$
+^parrot-nqp-c\.html/
+^pbc_to_exe-c\.html$
+^pbc_to_exe-c\.html/
+^src-.*\.html$
+^src-.*\.html/
+^winxed-c\.html$
+^winxed-c\.html/
 # Local variables:
 #   mode: text
 #   buffer-read-only: t
