@@ -157,5 +157,6 @@ Starred release numbers indicate supported releases.
 
  dukeleto    5.0.0 *        2013-Jan-17     "Johnny Five Alive"
  Util        5.1.0          2013-Feb-19     "Zombie Parrot"
+ Util        5.2.0          2013-Mar-19     "Stuffed Parrot"
 
 =cut

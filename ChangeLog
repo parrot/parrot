@@ -1,9 +1,23 @@
-2013-03-19    release 5.2.0
+2013-04-16    release 5.3.0
     - Core
     - Build
     - Documentation
     - Tests
     - Community
+
+2013-03-19    release 5.2.0
+    - Core
+        + IO now only syncs buffers for the IO types where syncing makes sense.
+            = PIO_VF_SYNC_IO flag added
+    - Build
+        + installable_pdump now has the correct rpath (blib corrected to lib).
+    - Libraries
+        + Tcl/Glob.pir has been removed. (PGE/Glob.pir remains intact)
+    - Ecosystem
+        + All Parrot tarballs are now symlinked to the 'all' directory,
+          regardless of their true homes ('devel' or 'stable'), to better
+          allow for automated downloads.
+            ftp://ftp.parrot.org/pub/parrot/releases/all/
 
 2013-02-19    release 5.1.0
     - Core

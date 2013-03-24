@@ -1,20 +1,20 @@
 {
-    "release.version"  : "5.1.0",
-    "release.name"     : "Zombie Parrot",
+    "release.version"  : "5.2.0",
+    "release.name"     : "Stuffed Parrot",
     "release.day"      : "Tuesday",
-    "release.nextdate" : "19 Mar 2013",
+    "release.nextdate" : "16 Apr 2013",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
     "web.openpatches"  : "openpatches.html",
     "web.repository"   : "https://github.com/parrot/parrot",
-    "web.org_root"    :  "https://github.com/parrot",
+    "web.org_root"     : "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "16 March 2013",
+    "bugday.date"      : "13 April 2013",
 
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
-    "wiki.bugday"      : "bug_day_2013_03_16",
+    "wiki.bugday"      : "bug_day_2013_04_13",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/5.1.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/5.2.0/"
 }
