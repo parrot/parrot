@@ -74,8 +74,6 @@ Sort the array and return self.
 
 /*
 
-=over 4
-
 =item C<void destroy()>
 
 Destroys the array.
