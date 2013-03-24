@@ -6,11 +6,11 @@ examples/benchmarks/sort.pir - Sort an FixedIntegerArray of N integers
 
 =head1 SYNOPSIS
 
-    % time ./parrot examples/benchmarks/sort.pir 100000
+    % time ./parrot examples/benchmarks/sort_fia.pir 100000
 
 Or use the default number of iterations:
 
-    % time ./parrot examples/benchmarks/sort.pir
+    % time ./parrot examples/benchmarks/sort_fia.pir
 
 =head1 DESCRIPTION
 
