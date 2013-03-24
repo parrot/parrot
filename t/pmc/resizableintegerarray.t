@@ -42,7 +42,7 @@ Coverage plan:
 
 .sub main :main
     .include 'test_more.pir'
-    plan(55)
+    plan(59)
 
     test_does_interfaces()
 
@@ -74,6 +74,7 @@ Coverage plan:
     test_iterator()
     test_clone()
     test_freeze()
+    test_sort()
     method_reverse()
 .end
 
@@ -606,6 +607,24 @@ k0:
     s = freeze ria
     th = thaw s
     is( ria, th, 'freeze/thaw copy is equal to original' )
+.end
+
+.sub test_sort
+    .local pmc array
+    array = new ['ResizableIntegerArray'], 4
+    set array[0],10
+    set array[1],3
+    set array[2],5
+    set array[3],1
+    array.'sort'()
+    $I0 = array[0]
+    is($I0,1,'sort works - 1st element correct')
+    $I1 = array[1]
+    is($I1,3,'sort works - 2nd element correct')
+    $I2 = array[2]
+    is($I2,5,'sort works - 3rd element correct')
+    $I3 = array[3]
+    is($I3,10,'sort works - 4th element correct')
 .end
 
 .sub method_reverse
