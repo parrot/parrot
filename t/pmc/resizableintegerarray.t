@@ -42,7 +42,7 @@ Coverage plan:
 
 .sub main :main
     .include 'test_more.pir'
-    plan(59)
+    plan(84)
 
     test_does_interfaces()
 
@@ -612,19 +612,78 @@ k0:
 .sub test_sort
     .local pmc array
     array = new ['ResizableIntegerArray'], 4
-    set array[0],10
-    set array[1],3
-    set array[2],5
-    set array[3],1
+    set array[0], 10
+    set array[1], 3
+    set array[2], 5
+    set array[3], 1
     array.'sort'()
     $I0 = array[0]
-    is($I0,1,'sort works - 1st element correct')
+    is($I0, 1, 'sort works - 1st element correct')
     $I1 = array[1]
-    is($I1,3,'sort works - 2nd element correct')
+    is($I1, 3, 'sort works - 2nd element correct')
     $I2 = array[2]
-    is($I2,5,'sort works - 3rd element correct')
+    is($I2, 5, 'sort works - 3rd element correct')
     $I3 = array[3]
-    is($I3,10,'sort works - 4th element correct')
+    is($I3, 10, 'sort works - 4th element correct')
+    push array, 7
+    array.'sort'()
+    $I0 = array[0]
+    is($I0, 1, 'sort works - 1st element correct after first push')
+    $I1 = array[1]
+    is($I1, 3, 'sort works - 2nd element correct after first push')
+    $I2 = array[2]
+    is($I2, 5, 'sort works - 3rd element correct after first push')
+    $I3 = array[3]
+    is($I3, 7, 'sort works - 4th element correct after first push')
+    $I4 = array[4]
+    is($I4, 10, 'sort works - 5th element correct after first push')
+    push array, -2
+    array.'sort'()
+    $I0 = array[0]
+    is($I0, -2, 'sort works - 1st element correct after second push')
+    $I1 = array[1]
+    is($I1, 1, 'sort works - 2nd element correct after second push')
+    $I2 = array[2]
+    is($I2, 3, 'sort works - 3rd element correct after second push')
+    $I3 = array[3]
+    is($I3, 5, 'sort works - 4th element correct after second push')
+    $I4 = array[4]
+    is($I4, 7, 'sort works - 5th element correct after second push')
+    $I5 = array[5]
+    is($I5, 10, 'sort works - 6th element correct after second push')
+    $I6 = pop array
+    $I0 = array[0]
+    is($I0, -2, 'sort works - 1st element correct after pop')
+    $I1 = array[1]
+    is($I1, 1, 'sort works - 2nd element correct after pop')
+    $I2 = array[2]
+    is($I2, 3, 'sort works - 3rd element correct after pop')
+    $I3 = array[3]
+    is($I3, 5, 'sort works - 4th element correct after pop')
+    $I4 = array[4]
+    is($I4, 7, 'sort works - 5th element correct after pop')
+    $I6 = shift array
+    array.'sort'()
+    $I0 = array[0]
+    is($I0, 1, 'sort works - 1st element correct after shift')
+    $I1 = array[1]
+    is($I1, 3, 'sort works - 2nd element correct after shift')
+    $I2 = array[2]
+    is($I2, 5, 'sort works - 3rd element correct after shift')
+    $I3 = array[3]
+    is($I3, 7, 'sort works - 4th element correct after shift')
+    unshift array, 4
+    array.'sort'()
+    $I0 = array[0]
+    is($I0, 1, 'sort works - 1st element correct after unshift')
+    $I1 = array[1]
+    is($I1, 3, 'sort works - 2nd element correct after unshift')
+    $I2 = array[2]
+    is($I2, 4, 'sort works - 3rd element correct after unshift')
+    $I3 = array[3]
+    is($I3, 5, 'sort works - 3rd element correct after unshift')
+    $I4 = array[4]
+    is($I4, 7, 'sort works - 5th element correct after unshift')
 .end
 
 .sub method_reverse
