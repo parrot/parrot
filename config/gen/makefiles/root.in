@@ -3111,7 +3111,7 @@ cover-distro: cover.dummy
 
 cover-clean:
 	@echo "Deleting gcov-generated files"
-	$(PERL) -MCwd -e 'for my $$dir ( qw ( $(COVER_DIRS) t/src t/src/embed ) ) {my $$cwd = cwd(); chdir $$dir; unlink glob( "*.gcda *.gcno *.gcov" ); chdir $$cwd;}'
+	$(PERL) -MCwd -e 'for my $$dir ( qw ( ./ $(COVER_DIRS) t/src t/src/embed ) ) {my $$cwd = cwd(); chdir $$dir; unlink glob( "*.gcda *.gcno *.gcov" ); chdir $$cwd;}'
 
 ###############################################################################
 #
