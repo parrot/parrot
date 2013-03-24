@@ -14,6 +14,14 @@
 callgrind.out.*
 cachegrind.out.*
 
+# Ignore generated files from 'make cover'
+*.gcov
+*.gcda
+*.gcno
+cover.13
+cover.css
+coverage.html
+
 # vim swap and backup files
 /\.*sw?
 /*/*.sw?
