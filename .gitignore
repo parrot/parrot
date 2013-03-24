@@ -14,6 +14,29 @@
 callgrind.out.*
 cachegrind.out.*
 
+# Ignore generated files from 'make cover'
+*.gcov
+*.gcda
+*.gcno
+cover.13
+cover.css
+coverage.html
+compilers-*.html
+src-*.html
+frontend-parrot2-prt0-pbc-c.html
+include-parrot-pointer_array-h.html
+ops2c-c.html
+parrot-nqp-c.html
+pbc_to_exe-c.html
+winxed-c.html
+
+# vim swap and backup files
+/\.*sw?
+/*/*.sw?
+/*/*/*.sw?
+/*/*/*/*.sw?
+*~
+
 # ports/ should not go into release tarballs
 *.obj
 *.rc
@@ -35,11 +58,6 @@ cachegrind.out.*
 /*.sto
 /*.suo
 /*.tmp
-# vim swap files
-/\.*sw?
-/*/*.sw?
-/*/*/*.sw?
-/*/*/*/*.sw?
 /*.vcproj*
 /.git
 /.parrot_current_rev
