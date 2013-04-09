@@ -692,10 +692,6 @@ Have $1 turn itself into a PMC of type $2. $2 should be a Class PMC.
 
 =cut
 
-inline op morph(invar PMC, in PMC) {
-    VTABLE_morph(interp, $1, $2);
-}
-
 =back
 
 =head1 COPYRIGHT
