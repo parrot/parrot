@@ -17,7 +17,7 @@ Tests the behavior of VTABLE interfaces that have been overriden from PIR.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(15)
+    plan(13)
 
     newclass_tests()
     subclass_tests()
@@ -54,19 +54,6 @@ CODE
     is ($I0, 1, "check second does, ok")
     $I0 = does $P1, 'it_better'
     is ($I0, 0, "no it doesn't")
-
-    # Test morph (doesn't actually perform a morph)
-    $P2 = get_class 'String'
-    morph $P1, $P2
-    $P0 = getattribute $P1, "message"
-    $S0 = $P0
-    is($S0, "Morphing [MyObject] to type String", "Morph VTABLE override 1")
-
-    $P2 = get_class 'Integer'
-    morph $P1, $P2
-    $P0 = getattribute $P1, "message"
-    $S0 = $P0
-    is($S0, "Morphing [MyObject] to type Integer", "Morph VTABLE override 1")
 
     # Test invoke. Doesn't currently work so we need to fix that.
     #$P0 = $P1("invoked!")
