@@ -251,9 +251,8 @@ sub runstep {
         # Extra flags needed for libnci_test.so
         ncilib_link_extra => '',
 
-        # Flag determines if pmc2c.pl and ops2c.pl also
-        # generate #line directives. These can confuse
-        # debugging internals.
+        # Flag determines if pmc2c.pl also generates #line directives.
+        # These can confuse debugging internals.
         no_lines_flag => $conf->options->get('no-line-directives') ? '--no-lines' : '',
 
         tempdir => File::Spec->tmpdir,
