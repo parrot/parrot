@@ -2335,18 +2335,18 @@ gc_gms_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
 
 #if 1
     fprintf(stderr, "parent: 0x%x, tid: %d\n", interp->parent_interpreter,
-            interp->thread_data ? interp->thread_data->tid : -1);
+            interp->thread_data ? (signed)interp->thread_data->tid : -1);
 
     fprintf(stderr, "PMC: %lu\n",
-            Parrot_gc_pool_allocated_size(interp, self->pmc_allocator));
+            (unsigned long)Parrot_gc_pool_allocated_size(interp, self->pmc_allocator));
     fprintf(stderr, "STRING: %lu\n",
-            Parrot_gc_pool_allocated_size(interp, self->string_allocator));
+            (unsigned long)Parrot_gc_pool_allocated_size(interp, self->string_allocator));
     fprintf(stderr, "buffers: %lu\n",
-            self->string_gc.memory_pool->total_allocated);
+            (unsigned long)self->string_gc.memory_pool->total_allocated);
     fprintf(stderr, "const buffers: %lu\n",
-            self->string_gc.constant_string_pool->total_allocated);
+            (unsigned long)self->string_gc.constant_string_pool->total_allocated);
     fprintf(stderr, "attrs: %lu\n",
-            Parrot_gc_fixed_allocator_allocated_memory(interp,
+            (unsigned long)Parrot_gc_fixed_allocator_allocated_memory(interp,
               self->fixed_size_allocator));
 #endif
     fprintf(stderr, "\n");
