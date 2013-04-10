@@ -123,18 +123,6 @@ CODE
     .return($S0)
 .end
 
-.sub 'morph' :vtable
-    .param pmc class
-    .local string type
-    $S0 = self
-    $S1 = "Morphing " . $S0
-    $S1 = $S1 . " to type "
-    type = class.'name'()
-    $S1 = $S1 . type
-    $P0 = box $S1
-    setattribute self, "message", $P0
-.end
-
 .sub 'does' :vtable
     .param string query
     $S0 = 'does I do '
