@@ -534,6 +534,8 @@ Aggregate interface.
             case KEY_pmc_FLAG | KEY_register_FLAG:
                 ret = 2;
                 break;
+            default:  /* keep compiler happy */
+                break;
         }
 
         RETURN(INTVAL ret);

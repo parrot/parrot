@@ -195,6 +195,8 @@ Get the type of the annotation.
           case PF_ANNOTATION_KEY_TYPE_PMC:
             ret = 2;
             break;
+          default:  /* keep the compiler happy */
+            break;
         }
 
         RETURN(INTVAL ret);
