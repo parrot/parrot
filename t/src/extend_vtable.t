@@ -14,7 +14,7 @@ my $parrot_config = "parrot_config" . $PConfig{o};
 plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
 
 
-plan tests => 134;
+plan tests => 133;
 
 =head1 NAME
 
@@ -293,16 +293,6 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_(set|get)_pmc_keyed_st
     Parrot_printf(interp, "%P\n", pmc2);
 CODE
 50
-Done!
-OUTPUT
-
-# TODO: Should it really return 'default' here?
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_morph");
-    Parrot_PMC_morph(interp, fpa, pmc);
-    string = Parrot_PMC_name(interp, fpa);
-    Parrot_printf(interp, "%S\n", string);
-CODE
-default
 Done!
 OUTPUT
 
