@@ -68,7 +68,7 @@ for my $dir (@old_directory_list) {
     my @perl_files = $d->get_perl_language_files();
     ok( @perl_files, 'Got some perl files' );
 
-    ok( $d->perl_source_file_with_name('ops2c.pl'),        'Perl source file (.pl)' );
+    ok( $d->perl_source_file_with_name('pmc2c.pl'),        'Perl source file (.pl)' );
     ok( $d->perl_source_file_with_name('Distribution.pm'), 'Perl source file (.pm)' );
     ok( $d->perl_source_file_with_name('perlcritic.t'),    'Perl source file (.t)' );
     ok( !$d->perl_source_file_with_name('p5rx.t'),         'Not a Perl source file (.t)' );

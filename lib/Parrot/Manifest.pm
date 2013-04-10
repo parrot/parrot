@@ -246,7 +246,6 @@ sub _get_special {
         languages/t/harness                             [test]
         lib/File/Which.pm                               [devel]lib
         src/vtable.tbl                                  [devel]src
-        tools/build/ops2c.pl                            [devel]
         tools/build/pmc2c.pl                            [devel]
         tools/dev/create_language.pl                    [devel]
         tools/dev/gen_makefile.pl                       [devel]

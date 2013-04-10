@@ -24,11 +24,6 @@ Ops are either I<auto> or I<manual>. Manual ops are responsible for
 having explicit next-op C<RETURN()> statements, while auto ops can count
 on an automatically generated next-op to be appended to the op body.
 
-Note that F<tools/build/ops2c.pl> supplies either 'inline' or 'function'
-as the op's type, depending on whether the C<inline> keyword is present
-in the op definition. This has the effect of causing all ops to be
-considered manual.
-
 =head2 Op Arguments
 
 Note that argument 0 is considered to be the op itself, with arguments
@@ -686,8 +681,6 @@ our multi sub indent(%c) {
 =item C<Ops::OpsFile>
 
 =item C<Ops::OpTrans>
-
-=item F<tools/build/ops2c.pl>
 
 =back
 

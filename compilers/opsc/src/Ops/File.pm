@@ -18,8 +18,6 @@ Ops::File - Ops To C Code Generation
 C<Ops::File> takes one or more files of op functions and
 creates real C code for them.
 
-This class is used by F<tools/build/ops2c.pl>.
-
 =head2 Op Functions
 
 For ops that have trivial bodies (such as just a call to some other
