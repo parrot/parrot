@@ -1,11 +1,11 @@
 #!perl
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2013, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 48;
+use Parrot::Test tests => 49;
 use Parrot::Config;
 
 =head1 NAME
@@ -21,6 +21,18 @@ t/op/stringu.t - Unicode String Test
 Tests Parrot unicode string system.
 
 =cut
+pir_output_is(<<'CODE',<<'OUTPUT', 'sprintf counts bytes instead of characters GH#956');
+.sub main :main
+    $S0 = unicode:"mäöüØ€p"
+    $P0 = new 'ResizablePMCArray'
+    push $P0, $S0
+    $S1 = sprintf unicode:"[%20s]", $P0
+    $I0 = length $S1
+    say $I0
+.end
+CODE
+22
+OUTPUT
 
 pir_output_is(<<'CODE',<<'OUTPUT', 'non-ascii immc optimizer GH#837');
 .sub main
