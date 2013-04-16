@@ -534,8 +534,9 @@ Aggregate interface.
             case KEY_pmc_FLAG | KEY_register_FLAG:
                 ret = 2;
                 break;
-            default:  /* keep compiler happy */
-                break;
+            default:
+                Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                    "Key: Unknown Key type %d", KEY_get_FLAGS(SELF));
         }
 
         RETURN(INTVAL ret);
