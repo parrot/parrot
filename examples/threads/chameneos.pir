@@ -1,4 +1,27 @@
-# Copyright (C) 2012, Parrot Foundation.
+# Copyright (C) 2012-2013, Parrot Foundation.
+
+=head1 NAME
+
+examples/threads/chameneos.pir - Example peer-to-peer multi-core cooperation algorithm
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/threads/chameneos.pir
+
+=head1 DESCRIPTION
+
+This is a Parrot example implementation of a P2P (peer-to-peer) cooperation
+algorithm.
+
+It uses Task PMCs to implement an algorithm that can utilize multiple cores in
+achieving the agreed-upon cooperative goal.
+
+=head1 REFERENCES
+
+[0] "Chameneos, a Concurrency Game for Java, Ada and Others" L<http://cedric.cnam.fr/PUBLIS/RC474.pdf>
+
+=cut
+
 
 .sub 'main' :main
     .local pmc colors, start_colors, at_most_two, at_most_two_waiters, mutex, sem_priv, first_call, a_color, b_color, chameneos, chameneo, code, data, number, color, dummy, count
