@@ -8,11 +8,15 @@ examples/threads/alloc_test.pir - Thread allocation examples
 =head1 SYNOPSIS
 
     % ./parrot examples/threads/alloc_test.pir
+    % sleep 10s
+    Ctrl-C
 
 =head1 DESCRIPTION
 
-If you can explain what this example does in plain English, be my
-guest.
+Create a task as native thread and repeatedly call small
+updater (proxy) tasks, until the memory is exhausted.
+
+This script does not return and will fail.
 
 =cut
 
