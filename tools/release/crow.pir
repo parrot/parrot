@@ -27,7 +27,7 @@ module, L<runtime/parrot/library/Crow.pir>.
     .local pmc exports, curr_namespace, test_namespace
     curr_namespace = get_namespace
     test_namespace = get_namespace ['Crow']
-    exports = split ' ', 'get_news get_args process'
+    exports = split ' ', 'get_news get_args get_message_digests process'
     test_namespace.'export_to'(curr_namespace, exports)
 
     .local pmc opts
@@ -65,6 +65,8 @@ got_type:
 
 
   process:
+    $S0 = 'get_message_digests'(version)
+    data['message_digests'] = $S0
     .local string result
     result = process(template, data)
     say result
