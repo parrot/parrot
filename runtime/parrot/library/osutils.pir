@@ -720,21 +720,37 @@ I<does not> change the working directory to the home directory.
 Behaves similar to the C<chomp()> function in Perl by removing any trailing
 newline characters from C<str>.
 
+Regardless of operating system, trims the last 2 chars if they are \r\n,
+or trims the last char if it is \n.
+
 =cut
 
 .include 'cclass.pasm'
 
 .sub 'chomp'
     .param string str
+    .local int len, pos_n, pos_r, pos_char_last, pos_char_next_to_last
 
-    $I0 = index str, "\r"
-    if $I0 < 0 goto L1
-    str = substr str, 0, $I0
-  L1:
-    $I1 = index str, "\n"
-    if $I1 < 0 goto L2
-    str = substr str, 0, $I1
-  L2:
+    len = length str
+    if len == 0    goto trim_0      # Return original empty string
+
+    pos_char_last         = len - 1
+    pos_char_next_to_last = len - 2
+
+    pos_n = index str, "\n", pos_char_last
+    if pos_n == -1 goto trim_0      # Does not end in \n; return original.
+    if len   ==  1 goto trim_1      # str eq "\n"; remove only char.
+    pos_r = index str, "\r", pos_char_next_to_last
+    if pos_r == -1 goto trim_1      # Ends in \n not \r\n; remove last 1 char.
+    goto trim_2                     # Ends in        \r\n; remove last 2 chars.
+
+  trim_0:
+    .return (str)
+  trim_1:
+    str = replace str, -1, 1, ""
+    .return (str)
+  trim_2:
+    str = replace str, -2, 2, ""
     .return (str)
 .end
 
