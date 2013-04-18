@@ -6,39 +6,21 @@ examples/threads/chameneos.pir - Example peer-to-peer multi-core cooperation alg
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/threads/chameneos.pir
-
-=head1 DESCRIPTION
-
-This is a Parrot example implementation of a P2P (peer-to-peer) cooperation
-algorithm.
-
-It uses Task PMCs to implement an algorithm that can utilize multiple cores in
-achieving the agreed-upon cooperative goal.
-
-=head1 REFERENCES
-
-[0] "Chameneos, a Concurrency Game for Java, Ada and Others" L<http://cedric.cnam.fr/PUBLIS/RC474.pdf>
-
-=cut
-
-
-=head1 NAME
-
-examples/threads/chameneos.pir - thread benchmark example
-
-=head1 SYNOPSIS
-
     % time ./parrot examples/threads/chameneos.pir
 
 =head1 DESCRIPTION
 
-Threaded PIR Implementation for the alioth shootout
+This is a Parrot example implementation of a P2P (peer-to-peer) cooperation
+algorithm used in the threads test in the alioth shootout benchmark game
 L<http://benchmarksgame.alioth.debian.org/u32/performance.php?test=chameneosredux>
-using parrot "hyper-threads", native threads with custom pre-emptive scheduler,
-non-blocking GC and threaded updater functions (proxies).
 
-This is also a good example how to use semaphores with parrot threads.
+It uses Task PMCs to implement an algorithm that can utilize multiple cores
+with non-blocking GC.
+It is also a good example how to use semaphores with parrot threads.
+
+=head1 REFERENCES
+
+[0] "Chameneos, a Concurrency Game for Java, Ada and Others" L<http://cedric.cnam.fr/PUBLIS/RC474.pdf>
 
 =cut
 
