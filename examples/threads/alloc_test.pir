@@ -1,5 +1,20 @@
 #!./parrot
-# Copyright (C) 2012, Parrot Foundation.
+# Copyright (C) 2012-2013, Parrot Foundation.
+
+=head1 NAME
+
+examples/threads/alloc_test.pir - Thread allocation examples
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/threads/alloc_test.pir
+
+=head1 DESCRIPTION
+
+If you can explain what this example does in plain English, be my
+guest.
+
+=cut
 
 .sub main :main
     .local pmc task, sayer, dummy
