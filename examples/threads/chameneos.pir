@@ -23,6 +23,25 @@ achieving the agreed-upon cooperative goal.
 =cut
 
 
+=head1 NAME
+
+examples/threads/chameneos.pir - thread benchmark example
+
+=head1 SYNOPSIS
+
+    % time ./parrot examples/threads/chameneos.pir
+
+=head1 DESCRIPTION
+
+Threaded PIR Implementation for the alioth shootout
+L<http://benchmarksgame.alioth.debian.org/u32/performance.php?test=chameneosredux>
+using parrot "hyper-threads", native threads with custom pre-emptive scheduler,
+non-blocking GC and threaded updater functions (proxies).
+
+This is also a good example how to use semaphores with parrot threads.
+
+=cut
+
 .sub 'main' :main
     .local pmc colors, start_colors, at_most_two, at_most_two_waiters, mutex, sem_priv, first_call, a_color, b_color, chameneos, chameneo, code, data, number, color, dummy, count
     .local int i
