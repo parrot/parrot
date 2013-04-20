@@ -1,4 +1,4 @@
-#! parrot-nqp
+#!./parrot-nqp
 
 class ABC {
     method () is pirflags<:vtable('get_number')> { 123.0 }

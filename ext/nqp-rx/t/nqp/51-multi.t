@@ -1,4 +1,4 @@
-#! parrot-nqp
+#!./parrot-nqp
 
 say("1..9");
 

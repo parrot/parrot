@@ -1,4 +1,4 @@
-#! parrot-nqp
+#!./parrot-nqp
 
 P6metaclass.register('Integer');
 P6metaclass.register('ResizablePMCArray');
