@@ -3005,20 +3005,6 @@ GCOV2PERL   = @gcov2perl@
 
 cover: \
 	cover.dummy \
-	cover-test_runcore
-	build_dir=$$PWD; \
-	$(COVER) -delete; \
-	for dir in $(COVER_DIRS); \
-	do \
-	cd $$dir; \
-	$(GCOV) *.c; \
-	cd $$build_dir; \
-	$(GCOV2PERL) -db $(COVERAGE_DIR) $$dir/*.gcov; \
-	done
-	$(COVER) $(COVERAGE_DIR) -ignore_re '^\/usr\/local\/bin'
-
-cover_new: \
-	cover.dummy \
 	cover-test_core
 	$(PERL) $(DEV_TOOLS_DIR)/make_cover.pl $(COVER_DIRS)
 
