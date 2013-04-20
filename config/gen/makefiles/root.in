@@ -2965,15 +2965,7 @@ fullcover: \
 	cover-manifest \
 	cover-examples \
 	cover-distro
-	build_dir=$$PWD; \
-	for dir in $(FULLCOVER_DIRS); \
-	do \
-	cd $$dir; \
-	gcov *.c; \
-	cd $$build_dir; \
-	gcov2perl $$dir/*.gcov; \
-	done
-	cover -ignore_re '^\/usr\/local\/bin'
+	$(PERL) $(DEV_TOOLS_DIR)/make_cover.pl $(FULLCOVER_DIRS)
 
 COVER_DIRS = \
 	src \
@@ -3007,22 +2999,6 @@ cover: \
 	cover.dummy \
 	cover-test_core
 	$(PERL) $(DEV_TOOLS_DIR)/make_cover.pl $(COVER_DIRS)
-
-fullcover_new: \
-	cover.dummy \
-	cover-testb \
-	cover-testf \
-	cover-testr \
-	cover-src \
-	cover-run \
-	cover-perl \
-	cover-extra \
-	cover-codingstd \
-	cover-benchmark \
-	cover-manifest \
-	cover-examples \
-	cover-distro
-	$(PERL) $(DEV_TOOLS_DIR)/make_cover.pl $(FULLCOVER_DIRS)
 
 cover.dummy: have-cover
 	$(PERL) Configure.pl --ccflags="$(CC_FLAGS) $(COVER_FLAGS)" \
