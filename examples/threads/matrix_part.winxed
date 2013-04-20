@@ -1,5 +1,19 @@
 #!./parrot
-# Copyright (C) 2012, Parrot Foundation.
+# Copyright (C) 2012-2013, Parrot Foundation.
+/*
+
+=head1 NAME
+
+examples/threads/matrix_part.winxed - Multiply matrices with multiple cores
+
+=head1 SYNOPSIS
+
+    % ./parrot examples/threads/matrix_part.winxed
+
+=head1 DESCRIPTION
+
+=cut
+*/
 
 function main() {
     var multi_part_code = multi_part;

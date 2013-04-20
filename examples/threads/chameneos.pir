@@ -1,3 +1,4 @@
+#!./parrot
 # Copyright (C) 2012-2013, Parrot Foundation.
 
 =head1 NAME
