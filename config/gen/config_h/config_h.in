@@ -105,6 +105,7 @@ typedef @float8_t@              Parrot_Float8;
 #include <stddef.h>
 
 #define PARROT_CPU_ARCH         "@cpuarch@"
+#define PARROT_CPU_TYPE         "@cputype@"
 #define PARROT_BYTEORDER        0x@byteorder@
 #define PARROT_BIGENDIAN        @bigendian@
 
