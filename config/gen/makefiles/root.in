@@ -3022,7 +3022,7 @@ fullcover_new: \
 	cover-manifest \
 	cover-examples \
 	cover-distro
-	$(PERL) $(DEV_TOOLS_DIR)/make_cover.pl $(COVER_DIRS)
+	$(PERL) $(DEV_TOOLS_DIR)/make_cover.pl $(FULLCOVER_DIRS)
 
 cover.dummy: have-cover
 	$(PERL) Configure.pl --ccflags="$(CC_FLAGS) $(COVER_FLAGS)" \
