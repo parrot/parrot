@@ -15,6 +15,8 @@ use strict;
 use warnings;
 
 require Devel::Cover; # Only to read version
+use lib qw(lib ../lib ../../lib);
+use Parrot::Config qw( %PConfig );
 
 # Get the source file from a gcov file
 sub get_source_path {
@@ -31,7 +33,8 @@ sub get_source_path {
     return $source_path;
 }
 
-system("cover -delete");
+my $cover = $PConfig{'cover'};
+system("$cover -delete");
 
 # Take a list of directories as arguments
 
@@ -40,10 +43,12 @@ for my $dir (@ARGV) {
 
     for my $path (glob("$dir/*.c")) {
         # Remove old gcov files
-        system("rm -f *.gcov");
+        my $rm_f = $PConfig{'rm_f'};
+        system("$rm_f *.gcov");
 
         # gcov must be run from build dir
-        system("gcov -o $dir $path") == 0 or next;
+        my $gcov = $PConfig{'gcov'};
+        system("$gcov -o $dir $path") == 0 or next;
 
         # Feed resulting gcov files to gcov2perl
 
@@ -57,6 +62,7 @@ for my $dir (@ARGV) {
                 next;
             }
 
+            my $gcov2perl = $PConfig{'gcov2perl'};
             if ($Devel::Cover::VERSION < 0.68) {
                 # Older versions of gcov2perl expect the source file in the
                 # same directory as the gcov file. So we move the gcov file
@@ -67,11 +73,11 @@ for my $dir (@ARGV) {
                 $source_dir =~ s'/[^/]+\z'' or $source_dir = '.';
 
                 rename($gcov_file, "$source_dir/$gcov_file");
-                system("cd $source_dir && gcov2perl $gcov_file");
+                system("cd $source_dir && $gcov2perl $gcov_file");
                 unlink("$source_dir/$gcov_file");
             }
             else {
-                system("gcov2perl $gcov_file");
+                system("$gcov2perl $gcov_file");
                 unlink($gcov_file);
             }
         }
@@ -79,7 +85,7 @@ for my $dir (@ARGV) {
 }
 
 # Generate HTML report
-system("cover -no-gcov");
+system("$cover -no-gcov");
 
 # Local Variables:
 #   mode: cperl
