@@ -406,6 +406,8 @@ Used to unarchive the number.
 
 =item C<METHOD PMC *acos()>
 
+=item C<METHOD PMC *acot()>
+
 =item C<METHOD PMC *asec()>
 
 =item C<METHOD PMC *asin()>
@@ -451,6 +453,12 @@ Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
     METHOD acos() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, acos(SELF.get_number()));
+        RETURN(PMC *d);
+    }
+
+    METHOD acot() {
+        PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        SET_ATTR_fv(INTERP, d, atan(1.0 / SELF.get_number()));
         RETURN(PMC *d);
     }
 
