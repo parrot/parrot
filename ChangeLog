@@ -1,8 +1,11 @@
 2013-05-21    release 5.4.0
     - Core
+        + Parrot now detects the CPU model on Linux systems
     - Build
     - Documentation
+        + Improvements to thread example docs
     - Tests
+        + Improved test coverage target "make cover"
     - Community
         + Parrot has been accepted to Google Summer of Code 2013!
 
