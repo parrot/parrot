@@ -19,7 +19,7 @@ Tests for C<Inf> and C<NaN> handling of transcendental ops in the C<trans_ops> d
 
 .sub main :main
     .include 'test_more.pir'
-    plan(70)
+    plan(68)
 
     test_exp()
     test_sin()
@@ -198,25 +198,14 @@ Tests for C<Inf> and C<NaN> handling of transcendental ops in the C<trans_ops> d
 
 .sub test_acot
     $N0 = 'Inf'
-    #$N1 = acot $N0
-    #is($N1, 'NaN', 'acot: acot Inf')
-    todo(0, 'acot Inf', 'acot not implemented for real numbers')
+    $N1 = acot $N0
+    is($N1, '0', 'acot: acot Inf')
     $N0 = '-Inf'
-    #$N1 = acot $N0
-    #is($N1, 'NaN', '... acot -Inf')
-    todo(0, 'acot -Inf', 'acot not implemented for real numbers')
+    $N1 = acot $N0
+    is($N1, '-0', '... acot -Inf')
     $N0 = 'NaN'
-    #$N1 = acot $N0
-    #is($N1, 'NaN', '... acot NaN')
-    todo(0, 'acot NaN', 'acot not implemented for real numbers')
-    $N0 = '-2'
-    #$N1 = acot $N0
-    #is($N1, 'NaN', '... acot -2')
-    todo(0, 'acot -2', 'acot not implemented for real numbers')
-    $N0 = '2'
-    #$N1 = acot $N0
-    #is($N1, 'NaN', '... acot 2')
-    todo(0, 'acot 2', 'acot not implemented for real numbers')
+    $N1 = acot $N0
+    is($N1, 'NaN', '... acot NaN')
 .end
 
 .sub test_sec
