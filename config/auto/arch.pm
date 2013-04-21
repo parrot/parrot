@@ -26,7 +26,7 @@ use base qw(Parrot::Configure::Step);
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determine CPU architecture and OS};
+    $data{description} = q{Determine CPU architecture and type, and OS};
     $data{result}      = q{};
     my $unamep;
     eval {
@@ -50,7 +50,7 @@ sub runstep {
 
 
     $conf->debug(
-        "determining operating system and cpu architecture\n",
+        "determining operating system, and cpu architecture and type\n",
         "archname: $archname\n")
     ;
 
@@ -109,9 +109,23 @@ sub runstep {
     $cpuarch =~ s/x86_64/amd64/i;
     $cpuarch =~ s/x86/i386/i;
 
+    my $cpu_type = "unknown";
+    eval {
+        if ( $^O eq 'linux' ) {
+            my $cpu_info;
+            chomp( $cpu_info = qx{ cat /proc/cpuinfo } );
+            my @cpu_info_lines = split '\n', $cpu_info;
+            my $model_name_line = (grep m/model name/, @cpu_info_lines)[0];
+            my $model_name = (split ':', $model_name_line)[1];
+            $model_name =~ s/^\s+//;
+            $cpu_type = $model_name;
+        }
+    };
+
     $conf->data->set(
         cpuarch  => $cpuarch,
-        osname   => $osname
+        cputype  => $cpu_type,
+        osname   => $osname,
     );
 
     $conf->data->set( 'platform' => $self->_get_platform( $conf ) );

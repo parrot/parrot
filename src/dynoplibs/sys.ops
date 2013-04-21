@@ -225,6 +225,10 @@ inline op sysinfo(out STR, in INT) {
         break;
 
       case CPU_TYPE:
+        $1 = Parrot_str_new_init(interp, PARROT_CPU_TYPE, sizeof (PARROT_CPU_TYPE) - 1,
+                Parrot_ascii_encoding_ptr, 0);
+        break;
+
       default:
         $1 = string_from_literal(interp, "");
         break;

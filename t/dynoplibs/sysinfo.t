@@ -10,7 +10,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Config;
 
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 17;
 use Parrot::Config;
 
 
@@ -91,7 +91,13 @@ my @setup = (
       pir_key     => 'SYSINFO_CPU_ARCH',
       desc        => 'CPU Arch Family',
       reg_type    => 'S',
-    }
+    },
+    { pconfig_key => 'cputype',
+      pasm_key    => 34,
+      pir_key     => 'SYSINFO_CPU_TYPE',
+      desc        => 'CPU Model',
+      reg_type    => 'S',
+    },
 );
 
 foreach ( @setup ) {
@@ -182,22 +188,6 @@ CODE
         } # END todo block
     } # END inner SKIP block
 } # END outer SKIP block
-
-TODO:
-{
-    local $TODO = "not currently implemented in parrot";
-
-    pasm_output_is( <<'CODE', "$PConfig{archname}$PConfig{archname}", "sysinfo CPU Model" );
-   .loadlib 'sys_ops'
-   .include 'sysinfo.pasm'
-   sysinfo_s_ic S1, .SYSINFO_CPU_TYPE
-   print S1
-   set I0, .SYSINFO_CPU_TYPE
-   sysinfo_s_i S1, I0
-   print S1
-end
-CODE
-}
 
 # 9, 10
 
