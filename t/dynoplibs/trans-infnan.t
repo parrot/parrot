@@ -184,17 +184,16 @@ Tests for C<Inf> and C<NaN> handling of transcendental ops in the C<trans_ops> d
 
 .sub test_coth
     $N0 = 'Inf'
-    #$N1 = coth $N0
-    #is($N1, 1, 'coth: coth Inf')
-    todo(0, 'coth Inf', 'coth not implemented for real numbers')
+    $N1 = coth $N0
+    $P1 = new 'Float'
+    $P1 = $N1
+    is($P1, 1, 'coth: coth Inf')
     $N0 = '-Inf'
-    #$N1 = coth $N0
-    #is($N1, -1, '... coth -Inf')
-    todo(0, 'coth -Inf', 'coth not implemented for real numbers')
+    $N1 = coth $N0
+    is($N1, -1, '... coth -Inf')
     $N0 = 'NaN'
-    #$N1 = coth $N0
-    #is($N1, 'NaN', '... coth NaN')
-    todo(0, 'coth NaN', 'coth not implemented for real numbers')
+    $N1 = coth $N0
+    is($N1, 'NaN', '... coth NaN')
 .end
 
 .sub test_acot
