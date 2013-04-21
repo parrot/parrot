@@ -915,8 +915,9 @@ IMCC_subst_constants(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
     };
     PARROT_OBSERVER const char * const ops2[] = {
         "abs", "neg", "not", "fact", "sqrt", "ceil", "floor"
-        "acos", "asec", "asin",
-        "atan", "cos", "cosh", "coth", "exp", "ln", "log10", "log2", "sec",
+        "acos", "acot", "asec", "asin", "atan",
+        "cos", "cosh", "coth",
+        "exp", "ln", "log10", "log2", "sec",
         "sech", "sin", "sinh", "tan", "tanh", "fact"
     };
     PARROT_OBSERVER const char * const ops3[] = {
