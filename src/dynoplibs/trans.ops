@@ -116,6 +116,18 @@ inline op cot(out NUM, in NUM) :base_math {
 
 ########################################
 
+=item B<coth>(out NUM, in NUM)
+
+Set $1 to the hyperbolic cotangent of $2 (given in radians).
+
+=cut
+
+inline op coth(out NUM, in NUM) :base_math {
+    $1 = ((FLOATVAL)1) / tanh((FLOATVAL)$2);
+}
+
+########################################
+
 =item B<csc>(out NUM, in NUM)
 
 Set $1 to the cosecant of $2 (given in radians).
