@@ -33,6 +33,18 @@ inline op acos(out NUM, in NUM) :base_math {
 
 ########################################
 
+=item B<acot>(out NUM, in NUM)
+
+Set $1 to the arc cotangent (in radians) of $2.
+
+=cut
+
+inline op acot(out NUM, in NUM) :base_math {
+    $1 = atan((FLOATVAL)1 / (FLOATVAL)$2);
+}
+
+########################################
+
 =item B<asec>(out NUM, in NUM)
 
 Set $1 to the arc secant (in radians) of $2.
