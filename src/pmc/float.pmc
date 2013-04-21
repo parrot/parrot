@@ -416,6 +416,8 @@ Used to unarchive the number.
 
 =item C<METHOD PMC *cot()>
 
+=item C<METHOD PMC *coth()>
+
 =item C<METHOD PMC *csc()>
 
 =item C<METHOD PMC *exp()>
@@ -492,6 +494,12 @@ Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
     METHOD cot() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, 1.0 / tan(SELF.get_number()));
+        RETURN(PMC *d);
+    }
+
+    METHOD coth() {
+        PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        SET_ATTR_fv(INTERP, d, 1.0 / tanh(SELF.get_number()));
         RETURN(PMC *d);
     }
 
