@@ -1998,6 +1998,7 @@ t/postconfigure/05-trace.t                                  [test]
 t/postconfigure/06-data_get_PConfig_Temp.t                  [test]
 t/profiling/profiling.t                                     [test]
 t/run/README.pod                                            []doc
+t/run/debugger_options.t                                    [test]
 t/run/exit.t                                                [test]
 t/run/options.t                                             [test]
 t/src/README.pod                                            []doc

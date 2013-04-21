@@ -206,7 +206,7 @@ main(int argc, const char *argv[])
         const char * const ext      = strrchr(filename, '.');
 
         if (*filename == '-') {
-            fprintf(stderr, "parrot_debugger takes no -x or --xxxx flag arguments");
+            fprintf(stderr, "parrot_debugger takes no -x or --xxxx flag arguments\n");
             exit(1);
         }
         else {
