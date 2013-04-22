@@ -116,9 +116,11 @@ sub runstep {
             chomp( $cpu_info = qx{ cat /proc/cpuinfo } );
             my @cpu_info_lines = split '\n', $cpu_info;
             my $model_name_line = (grep m/model name/, @cpu_info_lines)[0];
-            my $model_name = (split ':', $model_name_line)[1];
-            $model_name =~ s/^\s+//;
-            $cpu_type = $model_name;
+            if ( defined $model_name_line ) {
+                my $model_name = (split ':', $model_name_line)[1];
+                $model_name =~ s/^\s+//;
+                $cpu_type = $model_name;
+            }
         }
     };
 
