@@ -404,46 +404,12 @@ Used to unarchive the number.
 
 =over 4
 
+=cut
+
 =item C<METHOD PMC *acos()>
 
-
-=item C<METHOD PMC *asec()>
-
-=item C<METHOD PMC *asin()>
-
-=item C<METHOD PMC *cos()>
-
-=item C<METHOD PMC *cosh()>
-
-=item C<METHOD PMC *cot()>
-
-=item C<METHOD PMC *coth()>
-
-=item C<METHOD PMC *csc()>
-
-=item C<METHOD PMC *exp()>
-
-=item C<METHOD PMC *ln()>
-
-=item C<METHOD PMC *log10()>
-
-=item C<METHOD PMC *log2()>
-
-=item C<METHOD PMC *sec()>
-
-=item C<METHOD PMC *sech()>
-
-=item C<METHOD PMC *sin()>
-
-=item C<METHOD PMC *sinh()>
-
-=item C<METHOD PMC *tan()>
-
-=item C<METHOD PMC *tanh()>
-
-=item C<METHOD PMC *sqrt()>
-
-Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
+Calculate and return the inverse cosine (a.k.a. C<arccos>) of the input
+argument.
 
 =cut
 
@@ -472,11 +438,33 @@ argument.
         RETURN(PMC *d);
     }
 
+/*
+
+=item C<METHOD PMC *asec()>
+
+Calculate and return the inverse secant (a.k.a. C<arcsec>) of the input
+argument.
+
+=cut
+
+*/
+
     METHOD asec() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, acos(1.0 / SELF.get_number()));
         RETURN(PMC *d);
     }
+
+/*
+
+=item C<METHOD PMC *asin()>
+
+Calculate and return the inverse sine (a.k.a. C<arcsin>) of the input
+argument.
+
+=cut
+
+*/
 
     METHOD asin() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -484,17 +472,50 @@ argument.
         RETURN(PMC *d);
     }
 
+/*
+
+=item C<METHOD PMC *atan()>
+
+Calculate and return the inverse tangent (a.k.a. C<arctan>) of the input
+argument.
+
+=cut
+
+*/
+
     METHOD atan() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, atan(SELF.get_number()));
         RETURN(PMC *d);
     }
 
+/*
+
+=item C<METHOD PMC *atan2()>
+
+Calculate and return the two-argument inverse tangent of the input
+arguments.  This takes into account the quadrant of the angle given by the
+two arguments.
+
+=cut
+
+*/
+
     METHOD atan2(PMC *val) {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, atan2(SELF.get_number(), VTABLE_get_number(INTERP, val)));
         RETURN(PMC *d);
     }
+
+/*
+
+=item C<METHOD PMC *cos()>
+
+Calculate and return the cosine of the input argument.
+
+=cut
+
+*/
 
     METHOD cos() {
         PMC * const d  = Parrot_pmc_new(INTERP,
@@ -503,11 +524,31 @@ argument.
         RETURN(PMC *d);
     }
 
+/*
+
+=item C<METHOD PMC *cosh()>
+
+Calculate and return the hyperbolic cosine of the input argument.
+
+=cut
+
+*/
+
     METHOD cosh() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, cosh(SELF.get_number()));
         RETURN(PMC *d);
     }
+
+/*
+
+=item C<METHOD PMC *cot()>
+
+Calculate and return the cotangent of the input argument.
+
+=cut
+
+*/
 
     METHOD cot() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -531,11 +572,31 @@ Calculate and return the hyperbolic cotangent of the input argument.
         RETURN(PMC *d);
     }
 
+/*
+
+=item C<METHOD PMC *csc()>
+
+Calculate and return the cosecant of the input argument.
+
+=cut
+
+*/
+
     METHOD csc() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, 1.0 / sin(SELF.get_number()));
         RETURN(PMC *d);
     }
+
+/*
+
+=item C<METHOD PMC *exp()>
+
+Calculate and return the exponent of the input argument.
+
+=cut
+
+*/
 
     METHOD exp() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -543,11 +604,31 @@ Calculate and return the hyperbolic cotangent of the input argument.
         RETURN(PMC *d);
     }
 
+/*
+
+=item C<METHOD PMC *ln()>
+
+Calculate and return the natural logarithm (base C<e>) of the input argument.
+
+=cut
+
+*/
+
     METHOD ln() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, log(SELF.get_number()));
         RETURN(PMC *d);
     }
+
+/*
+
+=item C<METHOD PMC *log10()>
+
+Calculate and return the logarithm (base 10) of the input argument.
+
+=cut
+
+*/
 
     METHOD log10() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -555,11 +636,31 @@ Calculate and return the hyperbolic cotangent of the input argument.
         RETURN(PMC *d);
     }
 
+/*
+
+=item C<METHOD PMC *log2()>
+
+Calculate and return the logarithm (base 2) of the input argument.
+
+=cut
+
+*/
+
     METHOD log2() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, log(SELF.get_number()) / log(2.0));
         RETURN(PMC *d);
     }
+
+/*
+
+=item C<METHOD PMC *sec()>
+
+Calculate and return the secant of the input argument.
+
+=cut
+
+*/
 
     METHOD sec() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -567,11 +668,31 @@ Calculate and return the hyperbolic cotangent of the input argument.
         RETURN(PMC *d);
     }
 
+/*
+
+=item C<METHOD PMC *sech()>
+
+Calculate and return the hyperbolic secant of the input argument.
+
+=cut
+
+*/
+
     METHOD sech() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, 1.0 / cosh(SELF.get_number()));
         RETURN(PMC *d);
     }
+
+/*
+
+=item C<METHOD PMC *sin()>
+
+Calculate and return the sine of the input argument.
+
+=cut
+
+*/
 
     METHOD sin() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -579,11 +700,31 @@ Calculate and return the hyperbolic cotangent of the input argument.
         RETURN(PMC *d);
     }
 
+/*
+
+=item C<METHOD PMC *sinh()>
+
+Calculate and return the hyperbolic sine of the input argument.
+
+=cut
+
+*/
+
     METHOD sinh() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, sinh(SELF.get_number()));
         RETURN(PMC *d);
     }
+
+/*
+
+=item C<METHOD PMC *tan()>
+
+Calculate and return the tangent of the input argument.
+
+=cut
+
+*/
 
     METHOD tan() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -591,11 +732,31 @@ Calculate and return the hyperbolic cotangent of the input argument.
         RETURN(PMC *d);
     }
 
+/*
+
+=item C<METHOD PMC *tanh()>
+
+Calculate and return the hyperbolic tangent of the input argument.
+
+=cut
+
+*/
+
     METHOD tanh() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, tanh(SELF.get_number()));
         RETURN(PMC *d);
     }
+
+/*
+
+=item C<METHOD PMC *sqrt()>
+
+Calculate and return the square root of the input argument.
+
+=cut
+
+*/
 
     METHOD sqrt() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
