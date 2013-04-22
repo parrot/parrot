@@ -104,7 +104,7 @@ sub runstep {
         $cpuarch = 'ppc';
     }
 
-    $cpuarch =~ s/armv[34]l?/arm/i;
+    $cpuarch =~ s/armv[347]l?/arm/i;
     $cpuarch =~ s/i[456]86/i386/i;
     $cpuarch =~ s/x86_64/amd64/i;
     $cpuarch =~ s/x86/i386/i;
