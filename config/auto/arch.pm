@@ -121,7 +121,7 @@ sub runstep {
             $cpu_type = _cpu_type('/usr/sbin/system_profiler SPHardwareDataType',
                                   qr/Processor Name:/i);
         } elsif ($^O eq 'MSWin32' and defined $ENV{PROCESSOR_IDENTIFIER}) {
-            $cpu_type = $ENV{PROCESSOR_IDENTIFIER}
+            $cpu_type = $ENV{PROCESSOR_IDENTIFIER};
         }
     };
 
@@ -166,7 +166,8 @@ sub _parse_cpuinfo {
     if ( defined $model_name ) {
         $model_name =~ s/^\s+//;
         return $model_name;
-    } else {
+    }
+    else {
         return 'unknown';
     }
 }
