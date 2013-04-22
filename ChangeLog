@@ -1,11 +1,14 @@
 2013-05-21    release 5.4.0
     - Core
         + Parrot now detects the CPU model on Linux systems
+        + Implemented the coth() and acot() math functions
     - Build
     - Documentation
         + Improvements to thread example docs
     - Tests
         + Improved test coverage target "make cover"
+        + Corrected tests for acot()
+        + "un-todoed" tests for coth() and acot() math functions
     - Community
         + Parrot has been accepted to Google Summer of Code 2013!
 

@@ -406,6 +406,7 @@ Used to unarchive the number.
 
 =item C<METHOD PMC *acos()>
 
+
 =item C<METHOD PMC *asec()>
 
 =item C<METHOD PMC *asin()>
@@ -415,6 +416,8 @@ Used to unarchive the number.
 =item C<METHOD PMC *cosh()>
 
 =item C<METHOD PMC *cot()>
+
+=item C<METHOD PMC *coth()>
 
 =item C<METHOD PMC *csc()>
 
@@ -449,6 +452,23 @@ Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
     METHOD acos() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, acos(SELF.get_number()));
+        RETURN(PMC *d);
+    }
+
+/*
+
+=item C<METHOD PMC *acot()>
+
+Calculate and return the inverse cotangent (a.k.a. C<arccot>) of the input
+argument.
+
+=cut
+
+*/
+
+    METHOD acot() {
+        PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        SET_ATTR_fv(INTERP, d, atan(1.0 / SELF.get_number()));
         RETURN(PMC *d);
     }
 
@@ -492,6 +512,22 @@ Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
     METHOD cot() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, 1.0 / tan(SELF.get_number()));
+        RETURN(PMC *d);
+    }
+
+/*
+
+=item C<METHOD PMC *coth()>
+
+Calculate and return the hyperbolic cotangent of the input argument.
+
+=cut
+
+*/
+
+    METHOD coth() {
+        PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        SET_ATTR_fv(INTERP, d, 1.0 / tanh(SELF.get_number()));
         RETURN(PMC *d);
     }
 

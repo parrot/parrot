@@ -33,6 +33,18 @@ inline op acos(out NUM, in NUM) :base_math {
 
 ########################################
 
+=item B<acot>(out NUM, in NUM)
+
+Set $1 to the arc cotangent (in radians) of $2.
+
+=cut
+
+inline op acot(out NUM, in NUM) :base_math {
+    $1 = atan((FLOATVAL)1 / (FLOATVAL)$2);
+}
+
+########################################
+
 =item B<asec>(out NUM, in NUM)
 
 Set $1 to the arc secant (in radians) of $2.
@@ -112,6 +124,18 @@ Set $1 to the cotangent of $2 (given in radians).
 
 inline op cot(out NUM, in NUM) :base_math {
     $1 = ((FLOATVAL)1) / tan((FLOATVAL)$2);
+}
+
+########################################
+
+=item B<coth>(out NUM, in NUM)
+
+Set $1 to the hyperbolic cotangent of $2 (given in radians).
+
+=cut
+
+inline op coth(out NUM, in NUM) :base_math {
+    $1 = ((FLOATVAL)1) / tanh((FLOATVAL)$2);
 }
 
 ########################################
