@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2013, Parrot Foundation.
 
 =head1 NAME
 
@@ -111,16 +111,17 @@ sub runstep {
 
     my $cpu_type = "unknown";
     eval {
-        if ( $^O eq 'linux' ) {
-            my $cpu_info;
-            chomp( $cpu_info = qx{ cat /proc/cpuinfo } );
-            my @cpu_info_lines = split /\n/, $cpu_info;
-            my $model_name_line = (grep m/model name/, @cpu_info_lines)[0];
-            if ( defined $model_name_line ) {
-                my $model_name = (split /:/, $model_name_line)[1];
-                $model_name =~ s/^\s+//;
-                $cpu_type = $model_name;
-            }
+        if ( -e '/proc/cpuinfo' ) {
+            $cpu_type = _parse_cpuinfo('cat /proc/cpuinfo',
+                                       qr/model name\s+:/);
+        } elsif ($^O eq 'solaris' and -x '/usr/bin/kstat') {
+            $cpu_type = _cpu_type('/usr/bin/kstat -m cpu_info',
+                                  qr/brand/);
+        } elsif ($^O eq 'darwin' and -x '/usr/sbin/system_profiler') {
+            $cpu_type = _cpu_type('/usr/sbin/system_profiler SPHardwareDataType',
+                                  qr/Processor Name:/i);
+        } elsif ($^O eq 'MSWin32' and defined $ENV{PROCESSOR_IDENTIFIER}) {
+            $cpu_type = $ENV{PROCESSOR_IDENTIFIER}
         }
     };
 
@@ -154,6 +155,20 @@ sub _get_platform {
     $platform = 'generic' unless -d "src/platform/$platform";
 
     return $platform;
+}
+
+sub _parse_cpuinfo {
+    my ($cmd, $match) = @_;
+    my $cpu_info;
+    chomp( $cpu_info = qx{ $cmd } );
+    my @cpu_info_lines = split /\n/, $cpu_info;
+    my ($model_name) = map m/$match(.*)$/, @cpu_info_lines;
+    if ( defined $model_name ) {
+        $model_name =~ s/^\s+//;
+        return $model_name;
+    } else {
+        return 'unknown';
+    }
 }
 
 sub _report_verbose {
