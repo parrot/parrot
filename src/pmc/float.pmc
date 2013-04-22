@@ -488,11 +488,11 @@ Calculate and return the hyperbolic sine of the input argument.
 
 =item C<METHOD PMC *tan()>
 
-Calculate and return the tan of the input argument.
+Calculate and return the tangent of the input argument.
 
 =item C<METHOD PMC *tanh()>
 
-Calculate and return the hyperbolic tan of the input argument.
+Calculate and return the hyperbolic tangent of the input argument.
 
 =item C<METHOD PMC *sqrt()>
 
