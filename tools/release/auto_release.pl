@@ -544,6 +544,7 @@ sub _edit {
 
 sub run {
     my (@commands) = @_;
+    print "=== Running '@commands'\n";
     my $rc = system @commands;
     stop() if $rc != 0;
     return;
