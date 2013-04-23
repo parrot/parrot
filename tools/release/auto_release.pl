@@ -156,11 +156,11 @@ crow();
 sub build_and_run_tests {
     print "== BUILDING NEW VERSION ==\n";
 
-    system('make', 'realclean')              == 0 or stop();
-    system('perl', 'Configure.pl', '--test') == 0 or stop();
+    run( 'make', 'realclean' );
+    run( 'perl', 'Configure.pl', '--test' );
 
     # XXX Use separate filehandles to redirect stderr/stdout to log file
-    system('make', 'world', 'html') == 0 or stop();
+    run( 'make', 'world', 'html' );
 
     #_edit('make_world_html.log');
 
@@ -168,10 +168,10 @@ sub build_and_run_tests {
 
     # XXX Use separate filehandles to redirect stderr/stdout to log file
     if (defined $ENV{'TEST_JOBS'}) {
-        system('make', 'fulltest', $ENV{'TEST_JOBS'}) == 0 or stop();
+        run( 'make', 'fulltest', $ENV{'TEST_JOBS'} );
     }
     else {
-        system('make', 'fulltest', $test_jobs)        == 0 or stop();
+        run( 'make', 'fulltest', $test_jobs );
     }
 
     #_edit('make_fulltest.log');
@@ -181,8 +181,8 @@ sub build_and_run_tests {
 sub build_old_version {
     print "== REBUILDING PARROT ==\n";
 
-    system('perl', 'Configure.pl') == 0 or stop();
-    system('make')                 == 0 or stop();
+    run( 'perl', 'Configure.pl' );
+    run( 'make' );
 }
 
 # Verifies that there aren't any uncommitted local changes
@@ -206,7 +206,7 @@ sub commit_changes {
         chomp $answer;
 
         if ($answer eq 'y') {
-            system('git', 'diff') == 0 or stop();
+            run( 'git', 'diff' );
             last;
         }
         elsif ($answer eq 'n') {
@@ -228,7 +228,7 @@ sub commit_changes {
 
     print "== COMMITTING LOCAL CHANGES ==\n";
 
-    system('git', 'commit', '-a', "-m $msg") == 0 or stop();
+    run( 'git', 'commit', '-a', "-m $msg" );
 
     # Get SHA-1 digest for commit
     open my $REV_PARSE, '-|', 'git rev-parse master' or stop();
@@ -247,7 +247,7 @@ sub commit_changes {
         chomp $answer;
 
         if ($answer eq 'y') {
-            system('git', 'show') == 0 or stop();
+            run( 'git', 'show' );
             last;
         }
         elsif ($answer eq 'n') {
@@ -257,7 +257,7 @@ sub commit_changes {
 
     print "== PUSHING COMMIT TO MASTER BRANCH ==\n";
 
-    system('git', 'push', 'origin', 'master') == 0 or stop();
+    run( 'git', 'push', 'origin', 'master' );
 }
 
 # Generates release announcement using `crow.pir`
@@ -284,10 +284,10 @@ sub distro_tests {
     print "== RUNNING DISTRIBUTION TESTS ==\n";
 
     if (defined $ENV{'TEST_JOBS'}) {
-        system('make', 'distro_tests', $ENV{'TEST_JOBS'}) == 0 or stop();
+        run( 'make', 'distro_tests', $ENV{'TEST_JOBS'} );
     }
     else {
-        system('make', 'distro_tests', $test_jobs)        == 0 or stop();
+        run( 'make', 'distro_tests', $test_jobs );
     }
 }
 
@@ -295,15 +295,15 @@ sub distro_tests {
 sub get_recent_version {
     print "== CLONING MOST RECENT VERSION OF MASTER ==\n";
 
-    system('git', 'checkout', 'master')   == 0 or stop();
-    system('git', 'pull',     '--rebase') == 0 or stop();
+    run( 'git', 'checkout', 'master' );
+    run( 'git', 'pull',     '--rebase' );
 }
 
 # Creates release tarball and verifies that it builds properly after extracting
 sub prepare_tarball {
     # XXX Should this be `make reconfig` instead? If so, update guide
-    system('perl', 'Configure.pl')  == 0 or stop();
-    system('make', 'release_check') == 0 or stop();
+    run( 'perl', 'Configure.pl' );
+    run( 'make', 'release_check' );
 }
 
 # Opens an SSH connection parrot@ftp-osl.osuosl.org and copies tarball
@@ -454,8 +454,8 @@ sub tag_release {
     $ver = 'RELEASE_' . $ver;
     $ver =~ s/\./_/g;
 
-    system('git', 'tag',  "$ver")   == 0 or stop();
-    system('git', 'push', '--tags') == 0 or stop();
+    run( 'git', 'tag',  "$ver" );
+    run( 'git', 'push', '--tags' );
 }
 
 # Prompts user to edit PBC_COMPAT and regenerates bytecode
@@ -464,8 +464,8 @@ sub update_pbc_compat {
 
     print "== UPDATING PBC FILES ==\n";
 
-    system('sh', 'tools/dev/mk_packfile_pbc') == 0 or stop();
-    system('sh', 'tools/dev/mk_native_pbc')   == 0 or stop();
+    run( 'sh', 'tools/dev/mk_packfile_pbc' );
+    run( 'sh', 'tools/dev/mk_native_pbc' );
 }
 
 # Updates version-specific information in particular files
@@ -474,7 +474,7 @@ sub update_version {
 
     print "== UPDATING VERSION INFORMATION ==\n";
 
-    system('perl', 'tools/release/update_version.pl', "$ver") == 0 or stop();
+    run( 'perl', 'tools/release/update_version.pl', "$ver" );
 
     _edit('docs/parrothist.pod');
     _edit('docs/project/release_manager_guide.pod');
@@ -528,10 +528,10 @@ sub _edit {
         # XXX Use an OS-dependent solution (with $^O) for the default editor
         if ($answer eq 'y') {
             if (defined $ENV{'EDITOR'}) {
-                system("$ENV{'EDITOR'} $doc") == 0 or stop();
+                run( "$ENV{'EDITOR'} $doc" );
             }
             else {
-                system("vim $doc")            == 0 or stop();
+                run( "vim $doc" );
             }
 
             last;
@@ -540,6 +540,13 @@ sub _edit {
             last;
         }
     }
+}
+
+sub run {
+    my (@commands) = @_;
+    my $rc = system @commands;
+    stop() if $rc != 0;
+    return;
 }
 
 ###################
