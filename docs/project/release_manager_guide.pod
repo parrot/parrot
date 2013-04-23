@@ -19,7 +19,7 @@ ask for help if you need it.
 NOTE: You can use the newish/experimental script auto_release.pl to automate
 much of his guide (up to section IX):
 
-    perl tool/release/auto_release.pl X.Y.Z
+    perl tools/release/auto_release.pl X.Y.Z
 
 Run perldoc on the tool to get more documentation. This tool is new and
 experimental. Your mileage may vary. Be prepared to do things manually if you
