@@ -415,7 +415,7 @@ sub _init {
     return {
         description => q{Generating OpenGL bindings},
         result      => q{},
-    }
+    };
 }
 
 sub runstep {
@@ -951,7 +951,7 @@ SUB_FOOTER
         }
 
         printf "\n===> %d unique signatures successfully translated.\n",
-               scalar @sigs
+               scalar @sigs;
     }
 
     return 1;

@@ -393,7 +393,7 @@ END_PIR
 .end
 END_PIR
         close $FOO;
-        $enoent_err_msg = qx{$PARROT $temp_pir}
+        $enoent_err_msg = qx{$PARROT $temp_pir};
     }
 
     $err_msg =~ s/\r//g if $^O =~ /^(MSWin32|msys)$/i;

@@ -17,7 +17,7 @@ if ($ENV{TEST_PROG_ARGS} && $ENV{TEST_PROG_ARGS} !~ /\b--gc-debug\b/) {
 
 if (@ARGV) {
     # Someone specified tests for me to run.
-    @files = grep {-f $_} @ARGV
+    @files = grep {-f $_} @ARGV;
 } else {
     # Called with no args, run the full suite.
     @files = glob( File::Spec->catfile( "t", "*.t" ) );

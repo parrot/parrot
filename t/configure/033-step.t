@@ -148,7 +148,7 @@ like(
     chmod 0777, $fname;
     my $prog = basename($fname);
 
-    is( check_progs($prog), $prog, "check_progs() returns the proper program" )
+    is( check_progs($prog), $prog, "check_progs() returns the proper program" );
 }
 
 {
@@ -164,7 +164,7 @@ like(
     my $prog = basename($fname);
 
     is( check_progs( [$prog] ),
-        $prog, "check_progs() returns the proper program when passed an array ref" )
+        $prog, "check_progs() returns the proper program when passed an array ref" );
 }
 
 {

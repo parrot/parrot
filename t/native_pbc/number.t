@@ -61,7 +61,7 @@ sub generate_skip_list {
             $skip{$b."_".$pbc}++;
         }
     }
-    \%skip
+    return \%skip;
 }
 
 my $todo = generate_skip_list($arch, '?');

@@ -176,7 +176,7 @@ sub get_libpaths {
     if (defined $ENV{DYLD_LIBRARY_PATH}) {
         push @libpaths, (split /:/, $ENV{DYLD_LIBRARY_PATH});
     }
-    return @libpaths
+    return @libpaths;
 }
 
 1;

@@ -195,7 +195,7 @@ sub check_indent {
                 ) {
                     push @c_indent => "$path:$state{line_cnt}\n"
                         . "    apparent non-2 space outdenting ($indent spaces)\n";
-                    $c_failed{"$path\n"} = 1
+                    $c_failed{"$path\n"} = 1;
                 }
             }
             else {

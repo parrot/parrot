@@ -109,7 +109,7 @@ sub write_mod {
     # do the same as: sed -e '4,6c\=head0 $item_list_ref->[$i][1]'
     while( <$IN_FH> ) {
         if ( ($. < 3) || ($. > $upper_bound) ) {
-            print $OUT_FH $_
+            print $OUT_FH $_;
         }
         else {
             print $OUT_FH "=head0 $item_list_ref->[$_[0]][1]\n"
