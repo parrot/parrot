@@ -50,7 +50,7 @@ sub runstep {
 
 
     $conf->debug(
-        "determining operating system, and cpu architecture and type\n",
+        "determining operating system and cpu architecture and type\n",
         "archname: $archname\n")
     ;
 

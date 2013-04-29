@@ -55,7 +55,7 @@ $step = test_step_constructor_and_description($conf);
     ok( $ret, "runstep() returned true value" );
     is($step->result(), q{}, "Result was empty string as expected");
     like($stdout,
-        qr/determining operating system and cpu architecture/s,
+        qr/determining operating system and cpu architecture and type/s,
         "Got expected verbose output"
     );
 }
