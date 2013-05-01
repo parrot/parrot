@@ -576,6 +576,48 @@ Parrot_file_symlink(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to))
 
 /*
 
+=item C<STRING *Parrot_file_readlink(PARROT_INTERP, STRING *path)>
+
+Reads a symlink.
+
+=cut
+
+XXX Throws a exception even for EINVAL (The named file is not a symbolic link).
+Is this the best behavior?
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_file_readlink(PARROT_INTERP, ARGIN(STRING *path))
+{
+    char * const c_path = Parrot_str_to_platform_cstring(interp, path);
+    STRING      *str    = STRINGNULL;
+
+#if defined (PATH_MAX) && PATH_MAX > 0
+    const int buf_size = PATH_MAX;
+#else
+    const int buf_size = 1024;
+#endif
+
+    char * const buf = mem_internal_allocate_n_zeroed_typed(buf_size, char);
+
+    const ssize_t length_result = readlink(c_path, buf, buf_size);
+
+    if (length_result <= 0)
+        THROW("readlink");
+
+    Parrot_str_free_cstring(c_path);
+
+    str = Parrot_str_new_init(interp, buf, length_result,
+            Parrot_platform_encoding_ptr, 0);
+
+    mem_sys_free(buf);
+    return str;
+}
+
+/*
+
 =item C<void Parrot_file_link(PARROT_INTERP, STRING *from, STRING *to)>
 
 Creates a hard link

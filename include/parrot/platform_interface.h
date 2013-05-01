@@ -203,6 +203,9 @@ PARROT_EXPORT
 void Parrot_file_symlink(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to));
 
 PARROT_EXPORT
+STRING *Parrot_file_readlink(PARROT_INTERP, ARGIN(STRING *path));
+
+PARROT_EXPORT
 void Parrot_file_link(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to));
 
 PARROT_EXPORT

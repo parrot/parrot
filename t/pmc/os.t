@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 35;
+use Parrot::Test tests => 36;
 use Parrot::Config;
 use Cwd;
 use File::Spec;
@@ -541,6 +541,29 @@ OUT
 
     ok( -l "xpto", "symlink was really created" );
     unlink "xpto" if -f "xpto";
+}
+
+# Test readlink
+SKIP: {
+    skip "Admin rights and Vista needed for symlinks on Windows", 1 if $MSWin32;
+
+    my $real_path    = 'MANIFEST';
+    my $symlink_path = 'xpto';
+    symlink $real_path, $symlink_path
+        or warn "Failed to symlink: $!";
+
+    pir_output_is( <<'CODE', <<"OUT", 'Test readlink' );
+.sub main :main
+        $P1 = new ['OS']
+        $S1 = $P1."readlink"("xpto")
+        say $S1
+        end
+.end
+CODE
+$real_path
+OUT
+
+    unlink $symlink_path if -f $symlink_path;
 }
 
 # Test link to file. May require root permissions
