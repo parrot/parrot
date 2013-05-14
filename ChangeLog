@@ -4,13 +4,16 @@
         + Implemented the coth() and acot() math functions
     - Build
     - Documentation
-        + Improvements to thread example docs
+        + Threads examples now have proper POD sections and useful descriptions
+          with links to references.
     - Tests
         + Improved test coverage target "make cover"
-        + Corrected tests for acot()
-        + "un-todoed" tests for coth() and acot() math functions
+        + Improved tests for acot(), coth(), acot() math functions
     - Community
         + Parrot has been accepted to Google Summer of Code 2013!
+        + Currently there are two high-quality proposals being worked on:
+            https://gist.github.com/sa1/5468408        - parrot-libgit2
+            https://gist.github.com/denisboyun/5472762 - App::Parrot::Create
 
 2013-04-16    release 5.3.0
     - Build
