@@ -594,7 +594,7 @@ Parrot_file_readlink(PARROT_INTERP, ARGIN(STRING *path))
     char * const c_path = Parrot_str_to_platform_cstring(interp, path);
     STRING      *str    = STRINGNULL;
 
-#if defined (PATH_MAX) && PATH_MAX > 0
+#if defined(PATH_MAX) && PATH_MAX > 0
     const int buf_size = PATH_MAX;
 #else
     const int buf_size = 1024;
