@@ -767,7 +767,7 @@ Parrot_file_symlink(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to))
 
 /*
 
-=item C<STRING *Parrot_file_readlink(PARROT_INTERP, STRING *path)>
+=item C<STRING * Parrot_file_readlink(PARROT_INTERP, STRING *path)>
 
 Reads a symlink.
 
