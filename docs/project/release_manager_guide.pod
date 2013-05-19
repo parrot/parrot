@@ -576,6 +576,7 @@ that the next three releases are covered.)
     - Oct 15, 2013 - 5.9.0   - dukeleto
     - Nov 19, 2013 - 5.10.0  - ?
     - Dec 17, 2013 - 5.11.0  - ?
+    - Jan 21, 2014 - 6.0.0   - dukeleto
 
 =cut
 
