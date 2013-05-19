@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2012, Julián Albo "NotFound".
+# Copyright (C) 2009-2013, Julián Albo "NotFound".
 
 =pod
 
@@ -13,7 +13,7 @@ This is a snapshot of winxed compiler and driver.
 
 The pir files are generated from the winxed repository, copied here,
 and compiled to pbc during the parrot build process. I<See> The Winxed web
-site: http://winxed.org/
+site: http://winxed.net
 
 =head2 How to update the snapshot
 
@@ -44,6 +44,6 @@ I<See> the F<LICENSE> file contained within this directory.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2009-2012, JuliE<aacute>n Albo "NotFound".
+Copyright (C) 2009-2013, JuliE<aacute>n Albo "NotFound".
 
 =cut
