@@ -1,3 +1,10 @@
+2013-06-18    release 5.5.0
+    - Core
+    - Build
+    - Documentation
+    - Tests
+    - Community
+
 2013-05-21    release 5.4.0
     - Core
         + Parrot now detects the CPU model on Linux systems

@@ -1,8 +1,8 @@
 {
-    "release.version"  : "5.3.0",
-    "release.name"     : "W00tstock Parrot",
+    "release.version"  : "5.4.0",
+    "release.name"     : "Austin Parrot",
     "release.day"      : "Tuesday",
-    "release.nextdate" : "21 May 2013",
+    "release.nextdate" : "18 Jun 2013",
     "release.type"     : "devel",
 
     "web.root"         : "http://parrot.org/",
@@ -12,10 +12,10 @@
     "web.org_root"     : "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "18 May 2013",
+    "bugday.date"      : "15 Jun 2013",
 
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
-    "wiki.bugday"      : "bug_day_2013_05_18",
+    "wiki.bugday"      : "bug_day_2013_06_15",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/5.3.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/5.4.0/"
 }
