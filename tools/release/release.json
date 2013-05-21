@@ -3,6 +3,7 @@
     "release.name"     : "W00tstock Parrot",
     "release.day"      : "Tuesday",
     "release.nextdate" : "21 May 2013",
+    "release.type"     : "devel",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
