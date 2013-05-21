@@ -190,7 +190,7 @@ fields which must be updated at each release:
 
 =over 4
 
-=item C<release.*>
+=item C<release.nextdate>
 
 The date of the next release (I<see>
 L<Appendix 1|"Appendix 1 - Upcoming Releases">).
@@ -206,6 +206,11 @@ Enter the date part of the link to the wiki page for the next bugday.
 =item C<ftp.path>
 
 The URL of the FTP directory where the Parrot tarball can be found.
+
+=item C<release.type>
+
+Either "devel" for a regular development release, or "supported" for a
+long-term-support release.
 
 =back
 
