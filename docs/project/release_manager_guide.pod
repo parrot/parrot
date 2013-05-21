@@ -179,7 +179,8 @@ to update F<ChangeLog> with the new version number and a skeleton announcement.
 Add any other changes which have occurred since the last release. Hopefully,
 the committers are updating these files as they work. But, if not, then it's
 probably a good idea to gather the updates weekly rather than wait until the
-day of the release.
+day of the release. All commits since the last release can be see via:
+    git log RELEASE_A_B_C.. --date=short --pretty=%h%x09%ad%x09%an%x09%B
 
 =item 3
 
