@@ -31,6 +31,8 @@
         + Added in release.json: "release.type" can be "devel" or "supported".
         + Refactored common code to sub in auto_release.pl.
     - Community
+        + Parrot is part of the Hackathon at YAPC::NA::2013, in Austin, TX, USA!
+            http://www.yapcna.org/yn2013/wiki?node=Hackathons
         + Parrot has been accepted to Google Summer of Code 2013!
         + Currently there are two high-quality proposals being worked on:
             https://gist.github.com/sa1/5468408        - parrot-libgit2
