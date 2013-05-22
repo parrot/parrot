@@ -7,15 +7,29 @@
 
 2013-05-21    release 5.4.0
     - Core
-        + Parrot now detects the CPU model on Linux systems
-        + Implemented the coth() and acot() math functions
+        + Implemented the coth() and acot() math functions.
+        + Fixed chomp to only trim a newline when it ends the string. [GH #958]
+        + Added readlink() and Parrot_file_readlink(), with tests. [GH #967]
     - Build
+        + Parrot now detects the CPU model on Linux systems, as well as
+          detecting more CPU models on BSD, Cygwin, Solaris, Win32, and Darwin.
+          ARM v7 is also now recognized. [GH #962]
     - Documentation
         + Threads examples now have proper POD sections and useful descriptions
           with links to references.
+        + Added main description for Task PMC.
+        + Added descriptions to trig methods in Float PMC.
     - Tests
-        + Improved test coverage target "make cover"
-        + Improved tests for acot(), coth(), acot() math functions
+        + Added improved test coverage targets "cover_new" and "fullcover_new".
+        + Improved tests for acot(), coth(), acot() math functions.
+        + Added tests for options passed to debugger.
+        + Updated native PBC test files for string, number, and integer,
+          which resolved 11 TODOs in the test suite. [GH #959]
+        + Fixed test for the auto/arch config step.
+    - Release process
+        + Added message digests to crow.pir.
+        + Added in release.json: "release.type" can be "devel" or "supported".
+        + Refactored common code to sub in auto_release.pl.
     - Community
         + Parrot has been accepted to Google Summer of Code 2013!
         + Currently there are two high-quality proposals being worked on:
