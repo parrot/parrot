@@ -4,10 +4,18 @@
     - Documentation
     - Tests
     - Community
-        + Parrot has been awarded 5 student slots in Google Summer of Code 2013!
-          This means that 5 lucky students will be on a paid internship from
+        + Parrot has been awarded 3 student slots in Google Summer of Code 2013!
+          This means that 3 lucky students will be on a paid internship from
           Google to work on these accepted proposals:
-            - XXX: Fill in accepted proposals here.
+        + Saurabh Kumar "Update parrot-libgit2 to latest libgit2 release"
+            https://gist.github.com/sa1/5468408
+            http://www.google-melange.com/gsoc/proposal/review/google/gsoc2013/saurabh_kgp/11002
+        + Paweł Murias "A Javascript backend for Rakudo"
+            http://www.google-melange.com/gsoc/proposal/review/google/gsoc2013/pmurias/9002
+            # XXX pmurias please put the gist URL of the above proposal HERE
+        + Denis Boyun  "Improve Web UI of App::Parrot::Create"
+            https://gist.github.com/denisboyun/5472762
+            https://google-melange.appspot.com/gsoc/proposal/review/google/gsoc2013/chob_rock/9001
 
 2013-05-21    release 5.4.0
     - Core
