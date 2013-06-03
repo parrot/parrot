@@ -1,6 +1,7 @@
 # Copyright (C) 2001-2012, Parrot Foundation.
 
 # Setup of some commands
+#IF(win32):SHELL   = CMD
 PERL    = @perl@
 CHMOD   = @chmod@
 MKPATH  = @mkpath@
