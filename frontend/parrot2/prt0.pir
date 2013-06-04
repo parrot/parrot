@@ -145,6 +145,7 @@
     if __ARG_2 == 2 goto __label_3
     if __ARG_2 == 1 goto __label_4
     if __ARG_2 == 3 goto __label_5
+    if __ARG_2 == 4 goto __label_6
     goto __label_1
   __label_3: # case
     compreg $P1, "PIR"
@@ -157,9 +158,26 @@
     new $P4, [ 'PackfileView' ]
     $P4.'read_from_file'(__ARG_1)
     .return($P4)
+  __label_6: # case
+    loadlib $P5, 'gziphandle'
+    new $P6, [ 'GzipHandle' ]
+    $P6.'open'(__ARG_1)
+    null $S1
+  __label_8: # while
+    if_null $P6, __label_7
+    unless $P6 goto __label_7
+    $P7 = $P6.'read'(1024)
+    set $S2, $P7
+    concat $S1, $S1, $S2
+    goto __label_8
+  __label_7: # endwhile
+    $P6.'close'()
+    new $P4, [ 'PackfileView' ]
+    $P4.'deserialize'($S1)
+    .return($P4)
   __label_1: # default
-    null $P5
-    .return($P5)
+    null $P8
+    .return($P8)
   __label_2: # switch end
 
 .end # __default_get_packfile
@@ -187,6 +205,11 @@
     ne $S1, ".pasm", __label_6
     .return(1)
   __label_6: # endif
+    sub $I2, $I1, 3
+    substr $S1, __ARG_1, $I2
+    ne $S1, ".pbc.gz", __label_7
+    .return(4)
+  __label_7: # endif
   __label_5: # endif
     .return(2)
 

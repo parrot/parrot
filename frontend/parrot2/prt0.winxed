@@ -6,6 +6,7 @@ const int NO_FILE = 0;
 const int PASM_FILE = 1;
 const int PIR_FILE = 2;
 const int PBC_FILE = 3;
+const int PBC_GZ_FILE = 4;
 const int MODE_NORMAL = 0;
 const int MODE_PREPROCESS = 1;
 const int MODE_RUNFILE = 2;
@@ -106,6 +107,18 @@ function __default_get_packfile[anon](string file_name, int file_type)
             var packfile_pmc = new 'PackfileView';
             packfile_pmc.read_from_file(file_name);
             return packfile_pmc;
+        case PBC_GZ_FILE:
+            var lib = loadlib('gziphandle');
+            var gz = new 'GzipHandle';
+            gz.open(file_name);
+            // It would be nice if GzipHandle had readall or read_bytes(-1)
+            string pbc;
+            while(gz)
+                pbc += gz.read(1024);
+            gz.close();
+            packfile_pmc = new 'PackfileView';
+            packfile_pmc.deserialize(pbc);
+            return packfile_pmc;
         default:
             return null;
     }
@@ -120,6 +133,8 @@ function __get_input_file_type[anon](string file_name)
     if (len > 0) {
         ext = substr(file_name, len - 1);
         if (ext == ".pasm") return PASM_FILE;
+        ext = substr(file_name, len - 3 );
+        if (ext == ".pbc.gz") return PBC_GZ_FILE;
     }
     return PIR_FILE;
 }
