@@ -20,6 +20,7 @@ use warnings;
 use lib qw( lib . ../lib ../../lib );
 
 use Test::More;
+use autodie;
 use Parrot::Config;
 use File::Temp 0.13 qw/tempfile/;
 use File::Spec;
@@ -115,6 +116,25 @@ like( $output, qr/maximum GC nursery size is 50%/,
                  '--gc-nursery-size max warning' );
 is( $exit, 0, '... and should not crash' );
 
+test_pbc_gz();
+
+
+sub test_pbc_gz {
+    my $pbc = "parrot-nqp.pbc";
+    my $pbc_gz = "$pbc.gz";
+
+    SKIP: {
+        # TODO: Should we
+        #     commit the .gz?
+        # OR  gzip the PBC on the fly with GzipHandle?
+        if (!-e $pbc_gz) {
+            system("gzip parrot-nqp.pbc");
+        }
+        system("gzip $pbc");
+        my $output = qx{$PARROT 2>&1 $pbc_gz -e 'say("I like turtles")'};
+        like($output, qr/I like turtles/, 'Parrot can run gzipped PBC files');
+    }
+}
 
 sub numthreads_tests {
     my $output = qx{$PARROT 2>&1 --numthreads 0};
