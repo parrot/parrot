@@ -89,6 +89,7 @@ sub _initial_pass {
         }
         $key   = 'help' unless defined $key;
         $value = 1      unless defined $value;
+        $value =~ s/^(["'])(.*)$1$/$2/;
 
         unless ( $valid_opts{$key} ) {
             die qq/Invalid option "$key". See "perl $script --help" for valid options\n/;
