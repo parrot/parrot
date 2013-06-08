@@ -12,7 +12,7 @@ examples/threads/tasks.pir - Basic Task PMC examples
 =head1 DESCRIPTION
 
 This is a basic example of using the Task PMC. At a high level, each Task PMC
-can be assigned a bit of code to run as a "task", as well as it's own copy of
+can be assigned a bit of code to run as a "task", as well as its own copy of
 data to operate on.
 
 Calling the schedule opcode on a Task PMC object is what starts the chain of
