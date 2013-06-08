@@ -89,14 +89,14 @@ sub _initial_pass {
         }
         $key   = 'help' unless defined $key;
         $value = 1      unless defined $value;
-        $value =~ s/^(["'])(.*)$1$/$2/;
+        $value =~ s/^(["'])(.*)\1$/$2/;
 
         unless ( $valid_opts{$key} ) {
             die qq/Invalid option "$key". See "perl $script --help" for valid options\n/;
         }
         if ( $key eq 'prefix' and
             ! File::Spec->file_name_is_absolute( $value) ) {
-            die qq/Relative path given to --prefix, please pass an absolute path/;
+            die qq/Relative path given to --prefix ($value), please pass an absolute path/;
         }
         if ( $options_components->{short_circuits}{$key} ) {
             push @short_circuits_seen, $key;
