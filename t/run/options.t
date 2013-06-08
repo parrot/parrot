@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2005-2010, Parrot Foundation.
+# Copyright (C) 2005-2013, Parrot Foundation.
 
 =head1 NAME
 
@@ -19,7 +19,7 @@ use strict;
 use warnings;
 use lib qw( lib . ../lib ../../lib );
 
-use Test::More tests => 40;
+use Test::More;
 use Parrot::Config;
 use File::Temp 0.13 qw/tempfile/;
 use File::Spec;
@@ -167,6 +167,8 @@ my $file_version = <$version_fh>;
 chomp($file_version);
 close($version_fh);
 like( qx{$PARROT --version}, qr/.*${file_version}.*/, "VERSION matches --version" );
+
+done_testing;
 
 
 # Local Variables:
