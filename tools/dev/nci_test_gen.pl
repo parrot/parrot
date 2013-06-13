@@ -293,7 +293,7 @@ EOT
   $output = "\n$pirsigsay"  unless $pirsigsay eq "";
   unless ($pirretval eq "") {
     $output .= "\n" unless $output eq "";
-    $output .= "$pirretval"
+    $output .= "$pirretval";
   }
 
   return (gen_perl_test($sig, $pircode, $output), $ccode);

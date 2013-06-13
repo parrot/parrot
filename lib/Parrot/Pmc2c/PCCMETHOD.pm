@@ -309,7 +309,7 @@ sub process_pccmethod_args {
         if ( $arg_type eq 'arg' ) {
             my $tis  = $reg_type_info->{$type}{"s"};     #reg_type_info string
             $declarations .= "$tis $name;\n" unless $arg->{already_declared};
-            push @vararg_list, "&$name"
+            push @vararg_list, "&$name";
         }
         elsif ( $arg_type eq 'return' ) {
             my $typenamestr = $reg_type_info->{$type}{s};

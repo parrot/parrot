@@ -87,8 +87,8 @@ my $rakudo = $lang eq 'rakudo'
         ? <<'RAKUDO' : '';
 ; nqp is required by rakudo
 Source: ".\nqp\nqp.exe"; DestDir: "{app}\bin"; Flags:
-Source: ".\nqp\src\pmc\*.dll"; DestDir: "{app}\lib\parrot\dynext"; Flags:
-Source: ".\nqp\src\ops\*.dll"; DestDir: "{app}\lib\parrot\dynext"; Flags:
+Source: ".\nqp\src\vm\parrot\pmc\*.dll"; DestDir: "{app}\lib\parrot\dynext"; Flags:
+Source: ".\nqp\src\vm\parrot\ops\*.dll"; DestDir: "{app}\lib\parrot\dynext"; Flags:
 Source: ".\nqp\ModuleLoader.pbc"; DestDir: "{app}\lib\parrot\library"; Flags:
 Source: ".\nqp\QAST.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:
 Source: ".\nqp\QASTNode.pbc"; DestDir: "{app}\lib\parrot\languages\nqp\lib"; Flags:

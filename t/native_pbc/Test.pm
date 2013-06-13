@@ -103,10 +103,10 @@ sub test_native_pbc {
         local $TODO = $skip_msgv if $version ne $pbc_version;
         my $todo_msg = $todo->{$id};
         if (length $todo_msg > 2) {
-            $todo_msg = "$cvt $todo_msg"
+            $todo_msg = "$cvt $todo_msg";
         }
         else {
-            $todo_msg = "$cvt yet untested. Please report success."
+            $todo_msg = "$cvt yet untested. Please report success.";
         }
         Parrot::Test::pbc_output_is( $file, $expected, "$cvt $desc",
                        todo => "$todo_msg" );

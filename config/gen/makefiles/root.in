@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2013, Parrot Foundation.
 
 ###############################################################################
 #
@@ -332,7 +332,6 @@ GEN_LIBRARY = \
 	$(LIBRARY_DIR)/Test/Builder.pbc \
 	$(LIBRARY_DIR)/Test/Class.pbc \
 	$(LIBRARY_DIR)/Test/More.pbc \
-	$(LIBRARY_DIR)/Tcl/Glob.pbc \
 	$(LIBRARY_DIR)/TclLibrary.pbc \
 	$(LIBRARY_DIR)/URI.pbc \
 	$(LIBRARY_DIR)/URI/Escape.pbc \
@@ -1277,7 +1276,7 @@ $(INSTALLABLEPDUMP) : $(FR_DIR)/pbc_dump/main$(O) $(FR_DIR)/pbc_dump/packdump$(O
 	  $(FR_DIR)/pbc_dump/main$(O) \
 	  $(FR_DIR)/pbc_dump/packdump$(O) \
 	  src/longopt$(O) \
-	  $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
+	  @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 	$(ADDGENERATED) "$@" "[main]" bin
 
@@ -2972,6 +2971,7 @@ FULLCOVER_DIRS = \
 	src/string/encoding \
 	$(FRPTWO_DIR) \
 	$(FR_DIR)/parrot_debugger \
+	$(FR_DIR)/pbc_disassemble \
 	$(FR_DIR)/pbc_dump \
 	$(FR_DIR)/pbc_merge \
 	$(BUILD_DIR) \
@@ -2992,15 +2992,7 @@ fullcover: \
 	cover-manifest \
 	cover-examples \
 	cover-distro
-	build_dir=$$PWD; \
-	for dir in $(FULLCOVER_DIRS); \
-	do \
-	cd $$dir; \
-	gcov *.c; \
-	cd $$build_dir; \
-	gcov2perl $$dir/*.gcov; \
-	done
-	cover -ignore_re '^\/usr\/local\/bin'
+	$(PERL) $(DEV_TOOLS_DIR)/make_cover.pl $(FULLCOVER_DIRS)
 
 COVER_DIRS = \
 	src \
@@ -3020,6 +3012,7 @@ COVER_DIRS = \
 	src/string/encoding \
 	$(FRPTWO_DIR) \
 	$(FR_DIR)/parrot_debugger \
+	$(FR_DIR)/pbc_disassemble \
 	$(FR_DIR)/pbc_dump \
 	$(FR_DIR)/pbc_merge \
 	compilers/imcc
@@ -3031,37 +3024,7 @@ GCOV2PERL   = @gcov2perl@
 
 cover: \
 	cover.dummy \
-	cover-test_runcore
-	build_dir=$$PWD; \
-	$(COVER) -delete; \
-	for dir in $(COVER_DIRS); \
-	do \
-	cd $$dir; \
-	$(GCOV) *.c; \
-	cd $$build_dir; \
-	$(GCOV2PERL) -db $(COVERAGE_DIR) $$dir/*.gcov; \
-	done
-	$(COVER) $(COVERAGE_DIR) -ignore_re '^\/usr\/local\/bin'
-
-cover_new: \
-	cover.dummy \
 	cover-test_core
-	$(PERL) $(DEV_TOOLS_DIR)/make_cover.pl $(COVER_DIRS)
-
-fullcover_new: \
-	cover.dummy \
-	cover-testb \
-	cover-testf \
-	cover-testr \
-	cover-src \
-	cover-run \
-	cover-perl \
-	cover-extra \
-	cover-codingstd \
-	cover-benchmark \
-	cover-manifest \
-	cover-examples \
-	cover-distro
 	$(PERL) $(DEV_TOOLS_DIR)/make_cover.pl $(COVER_DIRS)
 
 cover.dummy: have-cover
@@ -3139,7 +3102,13 @@ cover-distro: cover.dummy
 
 cover-clean:
 	@echo "Deleting gcov-generated files"
-	$(PERL) -MCwd -e 'for my $$dir ( qw ( $(COVER_DIRS) t/src t/src/embed ) ) {my $$cwd = cwd(); chdir $$dir; unlink glob( "*.gcda *.gcno *.gcov" ); chdir $$cwd;}'
+	$(PERL) -MCwd -e 'for my $$dir ( qw ( ./ $(COVER_DIRS) t/src t/src/embed ) ) {my $$cwd = cwd(); chdir $$dir; unlink glob( "*.gcda *.gcno *.gcov" ); chdir $$cwd;}'
+	@echo "Deleting cover-generated html files"
+	$(RM_F) cover.13 cover.css coverage.html compilers-*.html src-*.html\
+	    frontend-parrot2-prt0-pbc-c.html include-parrot-pointer_array-h.html\
+	    ops2c-c.html parrot-nqp-c.html pbc_to_exe-c.html winxed-c.html
+	$(RM_RF) structure/
+
 
 ###############################################################################
 #

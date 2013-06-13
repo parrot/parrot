@@ -56,8 +56,8 @@ is( $conf->options->{c}->{debugging},
     like(
     $stdout,
     qr/$description\.\.\./s,
-    "Got STDOUT message expected upon running $step")
-};
+    "Got STDOUT message expected upon running $step");
+}
 
 pass("Completed all tests in $0");
 

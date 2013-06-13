@@ -786,11 +786,12 @@ Parrot_io_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
             return s;
         }
         else {
+            size_t remaining_size = total_size - vtable->get_position(interp, handle);
             IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
-            STRING * const s = io_get_new_empty_string(interp, encoding, -1, total_size);
+            STRING * const s = io_get_new_empty_string(interp, encoding, -1, remaining_size);
 
             io_sync_buffers_for_read(interp, handle, vtable, read_buffer, write_buffer);
-            io_read_chars_append_string(interp, s, handle, vtable, read_buffer, total_size);
+            io_read_chars_append_string(interp, s, handle, vtable, read_buffer, remaining_size);
             return s;
         }
     }

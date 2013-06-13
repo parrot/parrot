@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2012, Parrot Foundation.
+# Copyright (C) 2012-2013, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -56,6 +56,7 @@ sub run {
     my $skeleton =<<SKELETON;
 $year-$month-XX    release $x.$y.$z
     - Core
+    - Build
     - Documentation
     - Tests
     - Community

@@ -352,7 +352,7 @@ sub runstep {
     # --cage?
     if ($conf->options->get('cage')) {
         push @warnings, grep {$self->valid_warning($conf, $_)}
-            @{$self->{'warnings'}{$compiler}{'cage'}}
+            @{$self->{'warnings'}{$compiler}{'cage'}};
     }
 
     # -- only?

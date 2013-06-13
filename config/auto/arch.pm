@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2013, Parrot Foundation.
 
 =head1 NAME
 
@@ -26,7 +26,7 @@ use base qw(Parrot::Configure::Step);
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Determine CPU architecture and OS};
+    $data{description} = q{Determine CPU architecture and type, and OS};
     $data{result}      = q{};
     my $unamep;
     eval {
@@ -50,7 +50,7 @@ sub runstep {
 
 
     $conf->debug(
-        "determining operating system and cpu architecture\n",
+        "determining operating system and cpu architecture and type\n",
         "archname: $archname\n")
     ;
 
@@ -104,14 +104,31 @@ sub runstep {
         $cpuarch = 'ppc';
     }
 
-    $cpuarch =~ s/armv[34]l?/arm/i;
+    $cpuarch =~ s/armv[347]l?/arm/i;
     $cpuarch =~ s/i[456]86/i386/i;
     $cpuarch =~ s/x86_64/amd64/i;
     $cpuarch =~ s/x86/i386/i;
 
+    my $cpu_type = "unknown";
+    eval {
+        if ( -e '/proc/cpuinfo' ) {
+            $cpu_type = _parse_cpuinfo('cat /proc/cpuinfo',
+                                       qr/model name\s+:/);
+        } elsif ($^O eq 'solaris' and -x '/usr/bin/kstat') {
+            $cpu_type = _cpu_type('/usr/bin/kstat -m cpu_info',
+                                  qr/brand/);
+        } elsif ($^O eq 'darwin' and -x '/usr/sbin/system_profiler') {
+            $cpu_type = _cpu_type('/usr/sbin/system_profiler SPHardwareDataType',
+                                  qr/Processor Name:/i);
+        } elsif ($^O eq 'MSWin32' and defined $ENV{PROCESSOR_IDENTIFIER}) {
+            $cpu_type = $ENV{PROCESSOR_IDENTIFIER};
+        }
+    };
+
     $conf->data->set(
         cpuarch  => $cpuarch,
-        osname   => $osname
+        cputype  => $cpu_type,
+        osname   => $osname,
     );
 
     $conf->data->set( 'platform' => $self->_get_platform( $conf ) );
@@ -138,6 +155,21 @@ sub _get_platform {
     $platform = 'generic' unless -d "src/platform/$platform";
 
     return $platform;
+}
+
+sub _parse_cpuinfo {
+    my ($cmd, $match) = @_;
+    my $cpu_info;
+    chomp( $cpu_info = qx{ $cmd } );
+    my @cpu_info_lines = split /\n/, $cpu_info;
+    my ($model_name) = map m/$match(.*)$/, @cpu_info_lines;
+    if ( defined $model_name ) {
+        $model_name =~ s/^\s+//;
+        return $model_name;
+    }
+    else {
+        return 'unknown';
+    }
 }
 
 sub _report_verbose {

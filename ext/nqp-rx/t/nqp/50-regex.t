@@ -1,4 +1,4 @@
-#! parrot-nqp
+#!./parrot-nqp
 
 plan(7);
 

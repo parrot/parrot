@@ -136,9 +136,9 @@ sub runstep {
     # This version uses the installed -lparrot.
     unless ( defined( $conf->data->get('inst_libparrot_linkflags') ) ) {
         $conf->data->set(inst_libparrot_linkflags =>
-        '-L'
+        '-L"'
         . $conf->data->get('libdir')
-        . ' -lparrot'
+        . '" -lparrot'
         );
     }
 
@@ -176,7 +176,7 @@ sub get_libpaths {
     if (defined $ENV{DYLD_LIBRARY_PATH}) {
         push @libpaths, (split /:/, $ENV{DYLD_LIBRARY_PATH});
     }
-    return @libpaths
+    return @libpaths;
 }
 
 1;

@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 32;
+use Parrot::Test tests => 33;
 use Parrot::Test::Util 'create_tempfile';
 
 =head1 NAME
@@ -1123,6 +1123,19 @@ pir_output_is( <<'CODE', <<'OUTPUT', ".read_bytes" );
 
 CODE
 # Copyright (C)
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', 'No null byte in .readall after readline' );
+.sub main :main
+    $P0 = new ['FileHandle']
+    $P0.'open'('README.pod')
+    $P0.'readline'()
+    $S0 = $P0.'readall'()
+    $I0 = index $S0, "\0"
+    say $I0
+.end
+CODE
+-1
 OUTPUT
 
 # GH #465

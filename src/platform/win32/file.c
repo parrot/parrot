@@ -767,6 +767,40 @@ Parrot_file_symlink(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to))
 
 /*
 
+=item C<STRING * Parrot_file_readlink(PARROT_INTERP, STRING *path)>
+
+Reads a symlink.
+
+=cut
+
+Early research towards a Win32 implementation; it looks quite involved:
+http://us.generation-nt.com/answer/how-read-symbolic-link-there-posix-readlink-equivalent-help-118000931.html
+    Contains example code in the 2nd comment!
+    From 1st comment:
+        Read about "Hard Links", "Junctions",...also have a look at IOCTL's
+        like FSCTL_GET_REPARSE_POINT and familiar for more information.
+        You should also pass the symbolic link handle opened with CreateFile(...)
+        to GetFinalPathNameByHandle(...) to get the target file, that works Vista
+        and upper only. AFAIK this also works for UNC Paths (local only!),...
+http://msdn.microsoft.com/en-us/library/aa365682(VS.85).aspx    Symbolic Link Effects on File Systems Functions
+http://msdn.microsoft.com/en-us/library/aa365680(VS.85).aspx    Symbolic Links
+http://msdn.microsoft.com/en-us/library/windows/desktop/aa365006(v=vs.85).aspx  Hard Links and Junctions
+http://msdn.microsoft.com/en-us/library/windows/desktop/aa365503(v=vs.85).aspx  Reparse Points
+http://msdn.microsoft.com/en-us/library/ff552012.aspx   REPARSE_DATA_BUFFER structure (Windows Drivers)
+
+*/
+
+PARROT_CANNOT_RETURN_NULL
+STRING *
+Parrot_file_readlink(PARROT_INTERP, ARGIN(STRING *path))
+{
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+                "readlink error: Not yet implemented on Win32");
+}
+
+
+/*
+
 =item C<void Parrot_file_link(PARROT_INTERP, STRING *from, STRING *to)>
 
 Creates a symlink

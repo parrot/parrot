@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003-2012, Parrot Foundation.
+Copyright (C) 2003-2013, Parrot Foundation.
 
 =head1 NAME
 
@@ -7,7 +7,8 @@ src/pmc/float.pmc - Floating-point number
 
 =head1 DESCRIPTION
 
-C<Float> extends C<scalar> to provide floating-point number operations.
+C<Float> PMC extends the abstract C<Scalar> PMC to provide floating-point
+number operations.
 
 =head2 Functions
 
@@ -406,41 +407,96 @@ Used to unarchive the number.
 
 =item C<METHOD PMC *acos()>
 
+Calculate and return the inverse cosine (a.k.a C<arccos>) of the
+input argument.
+
+=item C<METHOD PMC *acot()>
+
+Calculate and return the inverse cotangent (a.k.a. C<arccot>) of the
+input argument.
+
 =item C<METHOD PMC *asec()>
+
+Calculate and return the inverse secant (a.k.a. C<arcsec>) of the input argument.
 
 =item C<METHOD PMC *asin()>
 
+Calculate and return the inverse sine (a.k.a. C<arcsin>) of the input
+argument.
+
+=item C<METHOD PMC *atan()>
+
+Calculate and return the inverse tangent (a.k.a. C<arctan>) of the
+input argument.
+
+=item C<METHOD PMC *atan2()>
+
+Calculate and return the two argument inverse tangent (a.k.a.
+C<arctan>) of the input argument.
+
 =item C<METHOD PMC *cos()>
+
+Calculate and return the cosine of the input argument.
 
 =item C<METHOD PMC *cosh()>
 
+Calculate and return the hyperbolic cosine of the input argument.
+
 =item C<METHOD PMC *cot()>
+
+Calculate and return the cotangent of the input argument.
+
+=item C<METHOD PMC *coth()>
+
+Calculate and return the hyperbolic cotangent of the input argument.
 
 =item C<METHOD PMC *csc()>
 
+Calculate and return the cosecant of the input argument.
+
 =item C<METHOD PMC *exp()>
+
+Calculate and return the exponential of the input argument.
 
 =item C<METHOD PMC *ln()>
 
+Calculate and return the natural log (logarithm with base C<e>) of the input argument.
+
 =item C<METHOD PMC *log10()>
+
+Calculate and return the base 10 logarithm of the input argument.
 
 =item C<METHOD PMC *log2()>
 
+Calculate and return the base 2 logarithm of the input argument.
+
 =item C<METHOD PMC *sec()>
+
+Calculate and return the secant of the input argument.
 
 =item C<METHOD PMC *sech()>
 
+Calculate and return the hyperbolic secant of the input argument.
+
 =item C<METHOD PMC *sin()>
+
+Calculate and return the sine of the input argument.
 
 =item C<METHOD PMC *sinh()>
 
+Calculate and return the hyperbolic sine of the input argument.
+
 =item C<METHOD PMC *tan()>
+
+Calculate and return the tangent of the input argument.
 
 =item C<METHOD PMC *tanh()>
 
+Calculate and return the hyperbolic tangent of the input argument.
+
 =item C<METHOD PMC *sqrt()>
 
-Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
+Calculate and return the square root of the input argument.
 
 =cut
 
@@ -449,6 +505,13 @@ Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
     METHOD acos() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, acos(SELF.get_number()));
+        RETURN(PMC *d);
+    }
+
+
+    METHOD acot() {
+        PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        SET_ATTR_fv(INTERP, d, atan(1.0 / SELF.get_number()));
         RETURN(PMC *d);
     }
 
@@ -492,6 +555,13 @@ Return a new PMC of the type of C<SELF> with I<FUNC>(value) of SELF.
     METHOD cot() {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, 1.0 / tan(SELF.get_number()));
+        RETURN(PMC *d);
+    }
+
+
+    METHOD coth() {
+        PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
+        SET_ATTR_fv(INTERP, d, 1.0 / tanh(SELF.get_number()));
         RETURN(PMC *d);
     }
 

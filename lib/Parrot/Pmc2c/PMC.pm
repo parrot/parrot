@@ -986,7 +986,7 @@ sub pmc_class_init_func {
 
         # fix indenting
         $class_init_code =~ s/^/    /mg;
-        $class_init_code = <<ENDOFCODE
+        $class_init_code = <<"ENDOFCODE";
 static void thispmc_class_init(PARROT_INTERP, int entry)
 {
 $class_init_code

@@ -107,6 +107,71 @@ END_HELP
 .end
 
 
+.sub 'get_a_message_digest'
+    .param string version
+    .param string type
+
+    .local string path
+    path = concat "parrot-", version
+    path .= ".tar."
+    path .= type
+    path .= ".sha256"
+
+    .local pmc fh
+    fh = new ['FileHandle']
+    fh.'open'(path, 'r')
+
+    .local string first_line, next_line
+    first_line = fh.'readline'()
+    $I0 = fh.'eof'()
+
+    next_line  = fh.'readline'()
+    $I1 = fh.'eof'()
+
+    fh.'close'()
+
+    # We expect exactly one line in the file.
+    # eof() is not set until after the first failed readline.
+    if     $I0 goto err_no_lines
+    unless $I1 goto err_more_than_one_line
+
+    .return (first_line)
+
+  err_no_lines:
+    $S1 = "no lines found"
+    goto throw_the_error
+
+  err_more_than_one_line:
+    $S1 = "more than one line found"
+    goto throw_the_error
+
+  throw_the_error:
+    $P0 = new 'Exception'
+    $S0 = concat "error: ", $S1
+    $S0 .= " in file '"
+    $S0 .= path
+    $S0 .= "'\n"
+    $P0 = $S0
+    throw $P0
+.end
+
+.sub 'get_message_digests'
+    .param string version
+    .local string lines, line_gz, line_bz2
+
+    line_gz  = 'get_a_message_digest'(version, "gz")
+    line_bz2 = 'get_a_message_digest'(version, "bz2")
+
+    lines = concat line_gz, line_bz2
+
+    # Remove final newline because template already has one after the variable.
+    load_bytecode 'osutils.pbc'
+    lines = chomp(lines)
+
+    .return (lines)
+.end
+
+
 .sub 'process'
     .param string template
     .param pmc    data

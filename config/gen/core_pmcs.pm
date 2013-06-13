@@ -201,7 +201,7 @@ sub coda {
     my $v = 'vim';
 
     # Translate it in code so vim doesn't think this file itself is readonly
-    return <<"HERE"
+    return <<"HERE";
 /*
  * Local variables:
  *   c-file-style: "parrot"

@@ -16,7 +16,7 @@ Parrot @release.version@ News:
 @NEWS@
 
 The SHA256 message digests for the downloadable tarballs are:
-@add corresponding lines@
+@message_digests@
 
 Many thanks to all our contributors for making this possible, and our sponsors
 for supporting this project.  Our next scheduled release is @release.nextdate@.
@@ -52,7 +52,7 @@ argument to clone:
 <pre>@NEWS@</pre></p>
 
 <p>The SHA256 message digests for the downloadable tarballs are:</p>
-<pre>@add corresponding lines@
+<pre>@message_digests@
 </pre>
 
 <p>Thanks to all our contributors for making this possible, and our sponsors

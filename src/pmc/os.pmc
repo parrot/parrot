@@ -254,6 +254,21 @@ Creates a symlink
 
 /*
 
+=item C<STRING *readlink(STRING *path)>
+
+Reads a symlink.
+
+=cut
+
+*/
+
+METHOD readlink(STRING *path) {
+    STRING * const link_path = Parrot_file_readlink(INTERP, path);
+    RETURN(STRING *link_path);
+}
+
+/*
+
 =item C<void link(STRING *from, STRING *to)>
 
 Creates a hard link

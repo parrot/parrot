@@ -1,4 +1,4 @@
-#! parrot-nqp
+#!./parrot-nqp
 
 # Tests for try and catch
 

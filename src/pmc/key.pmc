@@ -190,7 +190,7 @@ Sets the value of the key to C<*value>.
         UNUSED(SELF)
         UNUSED(value)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
-                "this is broken - see TT #1683");
+                "this is broken - see GH #499");
     }
 
 /*

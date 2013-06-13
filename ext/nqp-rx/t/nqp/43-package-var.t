@@ -1,4 +1,4 @@
-#! parrot-nqp
+#!./parrot-nqp
 
 # Accessing package variables directly
 

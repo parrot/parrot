@@ -29,7 +29,7 @@ Tests the C<osutils> runtime library.
     #       functions called before them!                                #
     ######################################################################
 
-    plan(26)
+    plan(35)
     test_basename()
     test_dirname()
     test_catfile()
@@ -42,6 +42,7 @@ Tests the C<osutils> runtime library.
     test_unlink()
     test_rmtree()
     test_slurp()
+    test_chomp()
 .end
 
 .sub 'test_basename'
@@ -163,6 +164,27 @@ Tests the C<osutils> runtime library.
 .sub 'test_slurp'
     $S0 = slurp('t/library/testlib/foo.txt')
     ok($S0, "slurp('testlib/foo.txt')")
+.end
+
+.sub 'test_chomp'
+    '__test_chomp'("abc", "abc")
+    '__test_chomp'("ab\nc", "ab\nc")
+    '__test_chomp'("abc\n", "abc")
+    '__test_chomp'("abc\r\n", "abc")
+    '__test_chomp'("abc\r", "abc\r")
+    '__test_chomp'("\r\n", "")
+    '__test_chomp'("\r"  , "\r")
+    '__test_chomp'("\n"  , "")
+    '__test_chomp'(""    , "")
+.end
+.sub '__test_chomp'
+    .param string original
+    .param string expected
+    .local string result, desc
+    desc = concat "chomp('", original
+    desc .= "')"
+    result = 'chomp'(original)
+    is( result, expected, desc )
 .end
 
 # Local Variables:
