@@ -116,11 +116,11 @@ like( $output, qr/maximum GC nursery size is 50%/,
                  '--gc-nursery-size max warning' );
 is( $exit, 0, '... and should not crash' );
 
-test_pbc_gz();
+test_pbc_gz("parrot-nqp.pbc");
 
 
 sub test_pbc_gz {
-    my $pbc = "parrot-nqp.pbc";
+    my ($pbc) = @_;
     my $pbc_gz = "$pbc.gz";
 
     SKIP: {
