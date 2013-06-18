@@ -1,4 +1,5 @@
-#!/usr/bin/env perl
+#! perl
+# Copyright (C) 2013, Parrot Foundation.
 use strict;
 use warnings;
 use JSON;
@@ -80,3 +81,10 @@ The commands for type '$type' and version '$version' are:
 END_OF_INSTRUCTIONS
 
 print "    $_\n" for @cmds;
+
+# Local Variables:
+#   mode: cperl
+#   cperl-indent-level: 4
+#   fill-column: 100
+# End:
+# vim: expandtab shiftwidth=4:
