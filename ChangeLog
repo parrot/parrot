@@ -1,3 +1,10 @@
+2013-07-16    release 5.6.0
+    - Core
+    - Build
+    - Documentation
+    - Tests
+    - Community
+
 2013-06-18    release 5.5.0
     - Build
         + Configure options are now allowed to be quoted.
