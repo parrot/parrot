@@ -1,21 +1,35 @@
 2013-06-18    release 5.5.0
-    - Core
     - Build
+        + Configure options are now allowed to be quoted.
+        + Fixed build on Win32.
+        + Updated location of NQP on Win32.
+        + Fixed Parrot::Distribution detection.
     - Documentation
+        + Noted that RESPONSIBLE_PARTIES is mostly out of date.
     - Tests
+        + Stopped testing native PBC on 64bit LE, due to lack of access to
+          such machine.
+    - Release
+        + Added tool: make_upload_commands.pl
     - Community
         + Parrot has been awarded 3 student slots in Google Summer of Code 2013!
           This means that 3 lucky students will be on a paid internship from
           Google to work on these accepted proposals:
-        + Saurabh Kumar "Update parrot-libgit2 to latest libgit2 release"
-            https://gist.github.com/sa1/5468408
-            http://www.google-melange.com/gsoc/proposal/review/google/gsoc2013/saurabh_kgp/11002
-        + Paweł Murias "A Javascript backend for Rakudo"
+          = Saurabh Kumar - "Update parrot-libgit2 to latest libgit2 release"
+              https://gist.github.com/sa1/5468408
+              http://www.google-melange.com/gsoc/proposal/review/google/gsoc2013/saurabh_kgp/11002
+          = Paweł Murias - "A Javascript backend for Rakudo"
             http://www.google-melange.com/gsoc/proposal/review/google/gsoc2013/pmurias/9002
-            # XXX pmurias please put the gist URL of the above proposal HERE
-        + Denis Boyun  "Improve Web UI of App::Parrot::Create"
-            https://gist.github.com/denisboyun/5472762
-            https://google-melange.appspot.com/gsoc/proposal/review/google/gsoc2013/chob_rock/9001
+          = Denis Boyun  - "Improve Web UI of App::Parrot::Create"
+              https://gist.github.com/denisboyun/5472762
+              https://google-melange.appspot.com/gsoc/proposal/review/google/gsoc2013/chob_rock/9001
+        + YAPC::NA::2013 hosted 4 days of Hackathon, focusing on the next
+          generation of Perl implementations.
+          = Huge Success! 
+        + MoarVM was unveiled:
+            https://github.com/MoarVM
+        + P2 on Potion was debuted:
+            http://perl11.org/p2/
 
 2013-05-21    release 5.4.0
     - Core
