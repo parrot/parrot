@@ -17,17 +17,13 @@ before_script:
 
 script: "echo \"M0_INTERP=$M0_INTERP\"; perl Configure.pl $PARROT_CONFIG_ARGS $PARROT_OPTIMIZE --cc=\"$CC\" --link=\"$CC\" --ld=\"$CC\" --ccflags='-g' ; make $PARROT_TEST"
 
-branches:
-   only:
-     - master
-     - /smoke-me/
-
 notifications:
   recipients:
     - parrot-ci@lists.parrot.org
+    - duke@leto.net
   email:
     on_success: change
-    on_failure: always
+    on_failure: change
   irc:
     channels:
       - "irc.parrot.org#parrot"
