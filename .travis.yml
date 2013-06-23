@@ -15,7 +15,7 @@ before_script:
 #    - sudo chown -R $CI_USER ~/.cpanm
 #    - sudo chown -R $CI_USER ~/perl5
 
-script: "perl Configure.pl $PARROT_CONFIG_ARGS $PARROT_OPTIMIZE --cc=\"$CC\" --link=\"$CC\" --ld=\"$CC\" --ccflags='-g' ; make $PARROT_TEST"
+script: "echo \"M0_INTERP=$M0_INTERP\"; perl Configure.pl $PARROT_CONFIG_ARGS $PARROT_OPTIMIZE --cc=\"$CC\" --link=\"$CC\" --ld=\"$CC\" --ccflags='-g' ; make $PARROT_TEST"
 
 branches:
    only:
