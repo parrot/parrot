@@ -1,6 +1,6 @@
 language: "perl"
 perl:
-    - "5.14"
+    - "5.16"
 install: "echo"
 before_script:
     - sudo apt-get install libffi-dev libicu-dev libgmp3-dev clang llvm-dev zlib1g-dev gcc-multilib
@@ -8,12 +8,6 @@ before_script:
     - gcc --version
     - g++ --version
     - clang --version
-# This stuff used to be required, but was rolled into the Travis CI perl support.
-#    - curl -L http://cpanmin.us | sudo perl - --self-upgrade
-#    - export CI_USER=$USER
-#    - mkdir ~/perl5 && perl -Mlocal::lib >> /tmp/local_lib_junk.sh && source /tmp/local_lib_junk.sh
-#    - sudo chown -R $CI_USER ~/.cpanm
-#    - sudo chown -R $CI_USER ~/perl5
 
 script: "echo \"M0_INTERP=$M0_INTERP\"; perl Configure.pl $PARROT_CONFIG_ARGS $PARROT_OPTIMIZE --cc=\"$CC\" --link=\"$CC\" --ld=\"$CC\" --ccflags='-g' ; make $PARROT_TEST"
 
