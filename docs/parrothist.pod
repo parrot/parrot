@@ -160,5 +160,6 @@ Starred release numbers indicate supported releases.
  Util        5.2.0          2013-Mar-19     "Stuffed Parrot"
  Util        5.3.0          2013-Apr-16     "W00tstock Parrot"
  Util        5.4.0          2013-May-21     "Austin Parrot"
+ Util        5.5.0          2013-Jun-18     "Salvadori's Fig Parrot"
 
 =cut
