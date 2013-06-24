@@ -1,9 +1,10 @@
-# Copyright (C) 2002-2012, Parrot Foundation.
+# Copyright (C) 2002-2013, Parrot Foundation.
 
 This is a list of project roles, with a partial list of the folks who have
 taken responsibility for them.  This does not list all the people with
 commit access, just those who have a role they've taken responsibility
-for. This document is mostly for historic purposes, and not up to date.
+for. This document is mostly for historic purposes, see CREDITS for the
+full details of all contributors.
 
 See docs/project/roles_responsibilities.pod for role definitions, and
 https://github.com/parrot/parrot/wiki/Languages for language authors/maintainers.
