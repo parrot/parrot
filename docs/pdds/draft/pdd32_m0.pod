@@ -160,7 +160,9 @@ chosen to better reflect common usage and hopefully reduce confusion.
 
 =head2 Registers
 
-An M0 VM has 256 registers, each of which is large enough to hold an INSP value.
+An M0 VM has 256 registers, each of which is large enough to hold any of the
+following types: Integer, Numeric , String, PMC (Object), which are known as "an
+INSP value" collectively.
 
 =head2 List of Ops
 
