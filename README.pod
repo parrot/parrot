@@ -120,7 +120,7 @@ Next, run 'make' or 'gmake'. ('Configure.pl' will tell you which version of
 'make' it recommends for your system.)
 
 If you are building the ICU library (this is the default on most systems), you
-npeed to use 'GNU make' instead (or something compatible with it).
+need to use 'GNU make' instead (or something compatible with it).
 
 You can test Parrot by running 'make test'. You can run the tests in parallel
 with 'make TEST_JOBS=3 test'.
