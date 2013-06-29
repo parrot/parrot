@@ -1,3 +1,5 @@
+/* Copyright (C) 2011-2013, Parrot Foundation */
+
 #include "m0.h"
 
 #include <stdio.h>

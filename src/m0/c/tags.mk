@@ -1,3 +1,5 @@
+# Copyright (C) 2011-2013, Parrot Foundation
+
 tags-emacs: tags.emacs.dummy
 	rm -f TAGS
 	ctags -e \

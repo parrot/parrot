@@ -1,3 +1,5 @@
+/* Copyright (C) 2011-2013, Parrot Foundation */
+
 #include "m0.h"
 
 #include <stdio.h>
@@ -159,7 +161,7 @@ parse_mob_dirseg( M0_Interp *interp, FILE *stream ) {
         }
     }
 
-    /* XXX: is m0b invalid if it has no chunks? */
+    /* A m0b file must have at least one chunk to be valid */
     return 1;
 }
 

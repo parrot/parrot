@@ -1,3 +1,5 @@
+/* Copyright (C) 2011-2013, Parrot Foundation */
+
 #ifndef M0_H_
 #define M0_H_
 
