@@ -519,7 +519,7 @@ approximately analogous to a function.
 =head3 Chunk Identifier
 
 A chunk identifier consists of a single line beginning with '.chunk', followed
-by a chunk name.  The name consists of a double quote-delimited utf-8 string
+by a chunk name.  The name consists of a double quote-delimited UTF-8 string
 which must be unique. The empty string is allowed as a chunk name.
 
   .chunk "chunk_name"
@@ -896,7 +896,7 @@ low-level strings used when interacting directly with external code.  The
 layout of a primitive string in M0 is as follows:
 
   int32  - number of bytes in the string body
-  int32  - encoding 
+  int32  - encoding
   char.. - string body
 
 =head4 Primitive String Encoding
@@ -904,37 +904,37 @@ layout of a primitive string in M0 is as follows:
 The encoding field of a primitive string can have the following values:
 * primitive string layout:
 
- 0 - special 1 - utf-8
+ 0 - special 1 - UTF-8
 
 In this context, "special" means that the value is used as chunk name constant.
 When a .m0b file is loaded, these constants are translated into chunk indicies.
 A primitive string with encoding 0 should never appear at runtime, only in
-bytecode.  This string body is assumed to be utf-8 encoded.
+bytecode.  This string body is assumed to be UTF-8 encoded.
 
-The default encoding is utf-8.  Other values have not yet been defined.
+The default encoding is UTF-8.  Other values have not yet been defined.
 
 =head2 Execution
 
 Execution of an binary M0 file beings with the first op in the bytecode segment
-of the first chunk.  Each op consists of a 1-byte op number and 3 byte-sized
+of the first chunk. Each op consists of a 1-byte op number and 3 byte-sized
 arguments.  The op number is used as an offset into a table of function
-pointers (or something equivalent).  The current call frame is passed as the
-first argument to all op functions.  The remaining three bytes of the op are
-passed to the op function directly.  It is up to the op function how to
+pointers (or something equivalent). The current call frame is passed as the
+first argument to all op functions. The remaining three bytes of the op are
+passed to the op function directly. Each op function can choose how it will
 interpret these values.
 
 =head3 M0 Runloop
 
 The runloop is the part of the interpreter that executes ops directly.  The
-runloop does need to accomplish the following:
+runloop needs to accomplish the following:
 
 =over
 
-=item * fetch the instruction at the current PC
+=item * fetch the instruction at the current PC (program counter)
 
 =item * execute the instruction
 
-=item * increment the pc by one, if needed
+=item * increment the PC by one, if applicable
 
 =back
 
@@ -950,13 +950,14 @@ chunks.
 =head3 Basic Building Blocks
 
 Control flow in M0 is based around C<goto> and C<goto_if> for intra-chunk
-control flow and C<goto_chunk> for moving between chunks.  While this is all
-that's strictly necessary for Turing completeness, a bit more complexity is
-needed to effectively implement constructs such as continuations, exceptions
-(and exception handlers), coroutines and so forth.  The recommended structure
-for non-trivial control flow is continuation-passing style, with M0's call
-frame structure serving as the continuation.  Members elements of a call frame
-may be manipulated using the C<set>, C<set_imm>, C<set_ref> and C<deref> ops.
+control flow and C<goto_chunk> for moving between chunks, i.e inter-chunk
+movement. While this is all that's strictly necessary for Turing completeness, a
+bit more complexity is needed to effectively implement constructs such as
+continuations, exceptions (and exception handlers), coroutines and so forth.
+The recommended structure for non-trivial control flow is continuation-passing
+style, with M0's call frame structure serving as the continuation.  Members
+elements of a call frame may be manipulated using the C<set>, C<set_imm>,
+C<set_ref> and C<deref> ops.
 
 This section will specify the following:
  * how to reliably transfer control flow between chunks
@@ -978,7 +979,7 @@ runtime cost when exceptions are thrown.  Exception handlers are attached to a
 call frame's EH register.
 
 Exception handlers must be chainable.  When a handler cannot handle an
-exception, it must invoke its parent handler (preferably tailcalling).  If it
+exception, it must invoke its parent handler (preferably tail-calling).  If it
 has no parent handler, it must look through previous call frames until it finds
 one.  There must be a default top-level exception handler that handles all
 exceptions.  This handler should print some debugging information to stderr and
@@ -988,7 +989,7 @@ and install the top-level default exception handler.
 An exception is a chunk that knows how to do a few things.  It needs to look
 through the call chain for the first exception handler and invoke it, passing
 any relevant data to the handler.  An exception may be resumed by invoking its
-parent call frame
+parent call frame.
 
 Throwing an exception means creating a context, looking up a handler and
 invoking the handler with the exception as an argument.  If an exception
@@ -1009,9 +1010,8 @@ Memory can be allocated with C<sys_alloc> and C<gc_alloc> and freed with
 C<sys_free>, if needed.  C<copy_mem> is used to copy values into and out of
 memory.
 
-{{{
-Will some memory be protected in M0?
-}}}
+The details of whether certain regions of memory will be protected or not,
+and in which ways, has not yet been defined.
 
 =head2 Register Spilling
 
@@ -1051,28 +1051,30 @@ the register in an M0 call frame's register set.  The proposed structure uses th
 first 8 registers for information specific to the call frame and has 61 of each primitive
 type:
 
-    number  type
-    0       CF - pointer to the current call frame
-    1       PCF - parent call frame
-    2       PC - current instruction within the current bytecode segment
-    3       RETPC - return PC
-    4       EH  - current exception handler
-    5       CHUNK - the index of the currently-executing chunk
-    6       CONSTS - pointer to constants segment
-    7       MDS - pointer to metadata segment
-    8       BCS - pointer to bytecode segment
-    9       INTERP - global interpreter data (see C<Interpreter Data>)
-    10      SPC4RENT - This register for rent.  No pets or smokers, please.
-    11      SPILLCF - overflow call frame (see C<Register Spilling>)
-    12-72   I0 - I60
-    73-133  N0 - N60
-    134-194 S0 - S60
-    195-255 P0 - P60
+    Number  Type        Description
+    -------------------------------
+    0       CF          Pointer to the current call frame
+    1       PCF         Parent call frame
+    2       PC          Current instruction within the current bytecode segment
+                        a.k.a the Program Counter (PC)
+    3       RETPC       Return PC
+    4       EH          Current exception handler
+    5       CHUNK       The index of the currently-executing chunk
+    6       CONSTS      Pointer to constants segment
+    7       MDS         Pointer to metadata segment
+    8       BCS         Pointer to bytecode segment
+    9       INTERP      Global interpreter data (see C<Interpreter Data>)
+    10      SPC4RENT    This register for rent.  No pets or smokers, please.
+    11      SPILLCF     Overflow call frame (see C<Register Spilling>)
+    12-72   I0 - I60    Integer registers
+    73-133  N0 - N60    Numeric registers
+    134-194 S0 - S60    String  registers
+    195-255 P0 - P60    PMC     registers
 
 This means that an op which is passed the wrong value could pretty easily cause
 chaos by clobbering the PC or changing the pointer to the current call frame.
 
-The first 12 registers must only be modified by the register and gc/memory ops.
+The first 12 registers must only be modified by the register and GC/memory ops.
 Using other ops to modify these registers is invalid.  Implementations are free
 to assume that it does not happen and may fail when it does.
 
