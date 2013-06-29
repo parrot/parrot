@@ -1,6 +1,6 @@
 language: "perl"
 perl:
-    - "5.16"
+    - "5.18"
 install: "echo"
 before_script:
     - sudo apt-get install libffi-dev libicu-dev libgmp3-dev clang llvm-dev zlib1g-dev gcc-multilib
@@ -9,7 +9,7 @@ before_script:
     - g++ --version
     - clang --version
 
-script: "echo \"M0_INTERP=$M0_INTERP\"; perl Configure.pl $PARROT_CONFIG_ARGS $PARROT_OPTIMIZE --cc=\"$CC\" --link=\"$CC\" --ld=\"$CC\" --ccflags='-g' && make m0 && make \"$PARROT_TEST\""
+script: "echo \"M0_INTERP=$M0_INTERP\"; perl Configure.pl $PARROT_CONFIG_ARGS $PARROT_OPTIMIZE --cc=\"$CC\" --link=\"$CC\" --ld=\"$CC\" --ccflags='-g' && make m0_debug && make \"$PARROT_TEST\""
 
 notifications:
   recipients:
@@ -24,5 +24,5 @@ notifications:
     on_success: change
     on_failure: change
 env:
-    - M0_INTERP=./src/m0/c/m0              PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="" PARROT_TEST="m0_tests" CC="clang"
-    - M0_INTERP=./src/m0/perl/m0_interp.pl PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="" PARROT_TEST="m0_tests" CC="clang"
+    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="" PARROT_TEST="m0_tests" CC="clang"
+    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="" PARROT_TEST="m0_c_tests" CC="clang"
