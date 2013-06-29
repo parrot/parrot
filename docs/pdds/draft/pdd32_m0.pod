@@ -1085,27 +1085,29 @@ it still make sense to store some data in a global interpreter data structure.
 This will include the following items, stored in the same way as call frame
 data.
 
-    number  name         description
-    0       OP_FUNCS     array of functions that implement ops
-    1       CHUNKS       array of all loaded chunks
-    2       CHUNK_INFO   array of chunk metadata (currently just names)
-    3       CHUNK_MAP
-    4       CALL_FRAMES  array of all initial call frames
-    5       CONFIG       static global config data
-    6       ARGC         number of elements in ARGV
-    7       ARGV         array of command-line arguments passed to the m0 program
+    Number  Name         Description
+    ----------------------------------
+    0       OP_FUNCS     Array of functions that implement ops
+    1       CHUNKS       Array of all loaded chunks
+    2       CHUNK_INFO   Array of chunk metadata (currently just names)
+    3       CHUNK_MAP    ???
+    4       CALL_FRAMES  Array of all initial call frames
+    5       CONFIG       Static global config data
+    6       ARGC         Number of elements in ARGV
+    7       ARGV         Array of command-line arguments passed to the m0 program
 
 C<CONFIG> should have at least the following values:
 
-    number  name            description
-    0       CFG_M0V         m0b version implemented by the running interpreter
-    1       CFG_REGSZ       size of a register in bytes
-    2       CFG_CFSZ        size of a call frame in bytes
-    3       CFG_IREGSZ      number of significant bytes in an I register
-    4       CFG_NREGSZ      number of significant bytes in an N register
-    5       CFG_OPCODESZ    number of bytes in an opcode
-    6       CFG_PTRSZ       number of bytes in a pointer
-    7       CFG_ENDIANNESS  host endianness (1 - big, 0 - little)
+    Number  Name            Description
+    ----------------------------------
+    0       CFG_M0V         Bytecode version implemented by the running interpreter
+    1       CFG_REGSZ       Size of a register in bytes
+    2       CFG_CFSZ        Size of a call frame in bytes
+    3       CFG_IREGSZ      Number of significant bytes in an I register
+    4       CFG_NREGSZ      Number of significant bytes in an N register
+    5       CFG_OPCODESZ    Number of bytes in an opcode
+    6       CFG_PTRSZ       Number of bytes in a pointer
+    7       CFG_ENDIANNESS  Host endianness (1 - big, 0 - little)
 
 =head2 MOP interaction
 
