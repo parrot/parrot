@@ -341,13 +341,13 @@ pointer returned by C<gc_alloc> does not need to be freed.
 Allocate C<*$2> bytes, store the pointer C<*$1>.  C<$3> is ignored.  The
 pointer returned by C<sys_alloc> must be released with C<sys_free> to avoid
 memory leaks.  This is a direct interface to the underlying implementation's
-C<malloc()> implementation (or equivalent) and does not go through ffi.
+C<malloc()> implementation (or equivalent) and does not go through FFI.
 
 =item * sys_free - free memory using free() or its equivalent
 
 Free the region of memory which C<*$1> points at.  C<$2> and C<$3> are ignored.
 This is a direct interface to the underlying implementation's C<free()>
-implementation (or equivalent) and does not go through ffi.
+implementation (or equivalent) and does not go through FFI.
 
 =item * copy_mem - copy data to/from memory
 
@@ -1122,13 +1122,13 @@ independently.
 
 M0's FFI should be amenable to interpretation both by interpreters implemented
 in C and high-level languages such as Python or Perl, to direct compilation to
-machine code, to jitting and to compilation to static C.  Where possible, M0's
+machine code, to JITing and to compilation to static C.  Where possible, M0's
 design should not impose any constraints that preclude efficient implementation
 of any of type of interpreter.
 
-M0 must be implemented such that only programs which make direct use of ffi
+M0 must be implemented such that only programs which make direct use of FFI
 require it to be presence.  An M0 program which does not make use of FFI should
-run without modification on an implementation that does not support ffi.
+run without modification on an implementation that does not support FFI.
 
 =head3 Implementation
 
