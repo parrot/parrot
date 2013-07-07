@@ -262,31 +262,34 @@ m0_op_ashr( M0_CallFrame *frame, const unsigned char *ops )
 static void
 m0_op_goto_chunk(M0_CallFrame *frame, const unsigned char *ops )
 {
-    uint64_t new_pc = frame->registers[ops[2]];
-    M0_Interp *interp = (M0_Interp *)frame->registers[INTERP];
-    M0_Chunk *chunk = (M0_Chunk*)((*interp)[CHUNKS]);
+    uint64_t *registers = frame->registers;
+    uint64_t new_pc     = registers[ops[2]];
+    M0_Interp *interp   = (M0_Interp *)registers[INTERP];
+    M0_Chunk *chunk     = (M0_Chunk*)((*interp)[CHUNKS]);
+
     while(chunk) {
-        if(strncmp( chunk->name, (char *)frame->registers[ops[1]], chunk->name_length) == 0
-            /* XXX: temporary fix, so t/fun.m1 runs fine. Per spec, when an m0b library is 
-               loaded, the interpreter must store the index of the named chunk in the 
+        if(strncmp( chunk->name, (char *)registers[ops[1]], chunk->name_length) == 0
+            /* XXX: temporary fix, so t/fun.m1 runs fine. Per spec, when an m0b library is
+               loaded, the interpreter must store the index of the named chunk in the
                constants segment slot for that constant. see:
                1) https://github.com/parrot/parrot/blob/m0/docs/pdds/draft/pdd32_m0.pod#Chunk_Name_Constants_and_Bytecode_Loading
                2) http://lists.parrot.org/pipermail/parrot-dev/2012-June/006961.html
                3) https://github.com/parrot/parrot/blob/m0/src/m0/perl5/m0_interp.pl
              */
-            || ( ((M0_Chunk *)(frame->registers[ops[1]]))->name
-                && strncmp( chunk->name, ((M0_Chunk *)(frame->registers[ops[1]]))->name, chunk->name_length ) == 0 ))  {
-            frame->registers[CHUNK]  = (uint64_t)chunk;
-            frame->registers[CONSTS] = (uint64_t)chunk->constants;
-            frame->registers[MDS]    = (uint64_t)chunk->metadata;
-            frame->registers[BCS]    = (uint64_t)chunk->bytecode;
-            frame->registers[PC]     = (uint64_t)new_pc;
+            || ( ((M0_Chunk *)(registers[ops[1]]))->name
+                && strncmp( chunk->name, ((M0_Chunk *)(registers[ops[1]]))->name, chunk->name_length ) == 0 ))  {
+            registers[CHUNK]  = (uint64_t)chunk;
+            registers[CONSTS] = (uint64_t)chunk->constants;
+            registers[MDS]    = (uint64_t)chunk->metadata;
+            registers[BCS]    = (uint64_t)chunk->bytecode;
+            registers[PC]     = (uint64_t)new_pc;
             break;
         }
         chunk = chunk->next;
     }
     if(chunk == NULL) {
         // TODO error handling
+        fprintf( stderr, "Cannot goto a NULL chunk!\n");
     }
 }
 
