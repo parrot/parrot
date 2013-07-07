@@ -21,25 +21,35 @@ m0_op_set_imm( M0_CallFrame *frame, const unsigned char *ops  )
     frame->registers[ops[1]] = (uint64_t)(ops[2] * 256 + ops[3]);
 }
 
+/*
+=item * deref - dereference a register
+
+Treat C<*$2> as an array and C<*$3> as an index into that array.  Set C<*$1> to
+whatever's at C<*$2[ *$3 ]>.
+
+=cut
+*/
+
 static void
 m0_op_deref( M0_CallFrame *frame, const unsigned char *ops )
 {
+    unsigned char reg = ops[1];
     unsigned char ref = ops[2];
+    unsigned char key = ops[3];
 
     switch (ref) {
         case CONSTS:
         {
-            M0_Constants_Segment *consts =
-                (M0_Constants_Segment *)frame->registers[ ref ];
-            unsigned long         offset = frame->registers[ ops[3] ];
-            frame->registers[ ops[1] ] = (uint64_t)consts->consts[offset];
+            M0_Constants_Segment *consts = (M0_Constants_Segment *)frame->registers[ ref ];
+            unsigned long         offset = frame->registers[ key ];
+            frame->registers[ reg ]      = (uint64_t)consts->consts[offset];
             break;
         }
         default:
         {
-            unsigned long         offset = frame->registers[ ops[3] ];
-            uint64_t * src = (uint64_t*)(frame->registers[ ops[2] ]);
-            frame->registers[ ops[1] ] = src[offset];
+            unsigned long         offset = frame->registers[ key ];
+            uint64_t * src               = (uint64_t*)(frame->registers[ ref ]);
+            frame->registers[ reg ]      = src[offset];
             /* XXX: the rest of the system has non-uniform array handling */
             break;
         }
@@ -383,9 +393,10 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
         const unsigned long        op_count = bytecode->op_count;
 
         /* XXX: access violation -- so produce an error? */
-        if (pc >= op_count)
+        if (pc >= op_count) {
+            fprintf( stderr, "M0: Invalid PC (Program Counter)!\n");
             return 0;
-        else {
+        } else {
             const unsigned char op = ops[4*pc];
             switch (op) {
                 case (M0_SET_IMM):
