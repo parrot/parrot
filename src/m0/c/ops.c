@@ -271,16 +271,31 @@ m0_op_ashr( M0_CallFrame *frame, const unsigned char *ops )
         frame->registers[ops[3]];
 }
 
+/*
+
+=item * goto_chunk - go to an offset in another chunk
+
+Unconditionally transfer control flow to an offset within another chunk's
+bytecode segment, updating the current call frame's C<CHUNK>, C<CONSTS>, C<MDS>
+and C<BCS> members to point at the new chunk's name and segments, respectively.
+C<*$1> is the index of the target chunk and C<*$2> is the PC within that chunk.
+Chunk indicies can be retrieved using chunk name constants.
+see also L<Chunk Name Constants and Bytecode Loading>
+
+*/
+
 static void
 m0_op_goto_chunk(M0_CallFrame *frame, const unsigned char *ops )
 {
-    uint64_t *registers = frame->registers;
-    uint64_t new_pc     = registers[ops[2]];
-    M0_Interp *interp   = (M0_Interp *)registers[INTERP];
-    M0_Chunk *chunk     = (M0_Chunk*)((*interp)[CHUNKS]);
+    uint64_t *registers       = frame->registers;
+    M0_Interp *interp         = (M0_Interp *)registers[INTERP];
+    M0_Chunk *chunk           = (M0_Chunk*)((*interp)[CHUNKS]);
+    unsigned char chunk_index = ops[1];
+    unsigned char chunk_pc    = ops[2];
+    uint64_t new_pc           = registers[chunk_pc];
 
     while(chunk) {
-        if(strncmp( chunk->name, (char *)registers[ops[1]], chunk->name_length) == 0
+        if(strncmp( chunk->name, (char *)registers[chunk_index], chunk->name_length) == 0
             /* XXX: temporary fix, so t/fun.m1 runs fine. Per spec, when an m0b library is
                loaded, the interpreter must store the index of the named chunk in the
                constants segment slot for that constant. see:
@@ -288,8 +303,8 @@ m0_op_goto_chunk(M0_CallFrame *frame, const unsigned char *ops )
                2) http://lists.parrot.org/pipermail/parrot-dev/2012-June/006961.html
                3) https://github.com/parrot/parrot/blob/m0/src/m0/perl5/m0_interp.pl
              */
-            || ( ((M0_Chunk *)(registers[ops[1]]))->name
-                && strncmp( chunk->name, ((M0_Chunk *)(registers[ops[1]]))->name, chunk->name_length ) == 0 ))  {
+            || ( ((M0_Chunk *)(registers[chunk_index]))->name
+                && strncmp( chunk->name, ((M0_Chunk *)(registers[chunk_index]))->name, chunk->name_length ) == 0 ))  {
             registers[CHUNK]  = (uint64_t)chunk;
             registers[CONSTS] = (uint64_t)chunk->constants;
             registers[MDS]    = (uint64_t)chunk->metadata;
