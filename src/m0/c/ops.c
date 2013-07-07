@@ -33,23 +33,25 @@ whatever's at C<*$2[ *$3 ]>.
 static void
 m0_op_deref( M0_CallFrame *frame, const unsigned char *ops )
 {
-    unsigned char reg = ops[1];
-    unsigned char ref = ops[2];
-    unsigned char key = ops[3];
+    uint64_t *registers = frame->registers;
+    unsigned char reg   = ops[1];
+    unsigned char ref   = ops[2];
+    unsigned char key   = ops[3];
 
     switch (ref) {
         case CONSTS:
         {
-            M0_Constants_Segment *consts = (M0_Constants_Segment *)frame->registers[ ref ];
-            unsigned long         offset = frame->registers[ key ];
-            frame->registers[ reg ]      = (uint64_t)consts->consts[offset];
+            M0_Constants_Segment *consts = (M0_Constants_Segment *)registers[ ref ];
+            unsigned long         offset = registers[ key ];
+            registers[ reg ]             = (uint64_t)consts->consts[offset];
             break;
         }
         default:
         {
-            unsigned long         offset = frame->registers[ key ];
-            uint64_t * src               = (uint64_t*)(frame->registers[ ref ]);
-            frame->registers[ reg ]      = src[offset];
+            unsigned long offset = registers[ key ];
+            uint64_t * src       = (uint64_t*)(registers[ ref ]);
+            registers[ reg ]     = src[offset];
+
             /* XXX: the rest of the system has non-uniform array handling */
             break;
         }
