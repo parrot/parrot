@@ -1167,8 +1167,9 @@ of the previously-called function into the register indicated by C<arg_dest>.
 =item * ccall fp
 
 C<ccall> uses an existing function pointer to call a C function.  It assumes
-that arguments have been set up correctly.  Hilarity and segfaults are likely
-to result from breaking this assumption.
+that arguments have been set up correctly. Hence, C<ccall> does not verify that
+the arguments given to it are valid pointers. Hilarity, segfaults and nasal demons
+are likely to result from breaking this assumption.
 
 =back
 
@@ -1181,11 +1182,11 @@ In actual M0 bytecode, the string would be an index into the constants table.
 
     dlopen_fp = csym "Parrot_dlopen"
     dlsym_fp  = csym "Parrot_dlsym"
-    ccall_arg FFI_POINTER, "libhello.so" #hand-waving
+    ccall_arg FFI_POINTER, "libhello.so" # hand-waving
     ccall     dlopen_fp
     ccall_ret FFI_POINTER, libhello
 
-    ccall_arg FFI_POINTER, "hello_func" #more hand-waving
+    ccall_arg FFI_POINTER, "hello_func" # more hand-waving
     ccall     dlsym_fp
     ccall_ret FFI_POINTER, hello_func
 
@@ -1193,11 +1194,11 @@ In actual M0 bytecode, the string would be an index into the constants table.
 
 This example shows how to call a function "multiply_int32" which take two
 32-bit int arguments and returns an value of the same type and lives in
-"libmath.so".  It assumes that dlsym_fp and dlopen_fp have been initialized as
+"libmath.so".  It assumes that C<dlsym_fp> and C<dlopen_fp> have been initialized as
 in the first example.
 
-    #dlsym_fp is a pointer to Parrot_dlsym
-    #dlopen_fp is a pointeer to Parrot_dlopen
+    # dlsym_fp is a pointer to Parrot_dlsym
+    # dlopen_fp is a pointeer to Parrot_dlopen
 
     ccall_arg FFI_POINTER, "libmath.so"
     ccall     dlopen_fp
@@ -1237,27 +1238,29 @@ live in an external shared library) with the same signature as above.
 These are the constants which an M0-compliant FFI implementation should deal
 with.  They are based on the types used by libffi.
 
-    FFI_VOID
-    FFI_UINT
-    FFI_SINT
-    FFI_UINT16
-    FFI_SINT16
-    FFI_UINT32
-    FFI_SINT32
-    FFI_UINT64
-    FFI_SINT64
-    FFI_FLOAT
-    FFI_DOUBLE
-    FFI_UCHAR
-    FFI_SCHAR
-    FFI_USHORT
-    FFI_SSHORT
-    FFI_UINT
-    FFI_SINT
-    FFI_ULONG
-    FFI_SLONG
-    FFI_LONGDOUBLE
-    FFI_POINTER
+    Constant Name   Description
+    ----------------------------
+    FFI_VOID        void
+    FFI_UINT        unsigned integer
+    FFI_SINT        signed  integer
+    FFI_UINT16      unsigned 16bit integer
+    FFI_SINT16      signed 16bit integer
+    FFI_UINT32      unsigned 32bit integer
+    FFI_SINT32      signed 32bit integer
+    FFI_UINT64      unsigned 64bit integer
+    FFI_SINT64      signed 64bit integer
+    FFI_FLOAT       IEEE754 floating point
+    FFI_DOUBLE      double precision
+    FFI_UCHAR       unsigned char
+    FFI_SCHAR       signed char
+    FFI_USHORT      unsigned short
+    FFI_SSHORT      signed short
+    FFI_ULONG       unsigned long
+    FFI_SLONG       signed long
+    FFI_LONGDOUBLE  long double
+    FFI_POINTER     pointer
+
+TODO: What about long longs and quads?
 
 =head2 Concurrency
 
