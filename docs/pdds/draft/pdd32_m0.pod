@@ -1124,19 +1124,22 @@ M0's FFI should be amenable to interpretation both by interpreters implemented
 in C and high-level languages such as Python or Perl, to direct compilation to
 machine code, to JITing and to compilation to static C.  Where possible, M0's
 design should not impose any constraints that preclude efficient implementation
-of any of type of interpreter.
+of any of type of dynamic language interpreter.
 
 M0 must be implemented such that only programs which make direct use of FFI
-require it to be presence.  An M0 program which does not make use of FFI should
-run without modification on an implementation that does not support FFI.
+require FFI support to be present.  An M0 program which does not make use of FFI
+should run without modification on an implementation that does not support FFI.
 
 =head3 Implementation
 
-M0's FFI will implement similar functionality to dlfunc and dlvar in the form
+M0's FFI will implement similar functionality to C<dlfunc> and C<dlvar> in the form
 of a minimal set of atoms which are sufficient to emulate that functionality.
 
 M0 will know enough about FFI to build a static call frame and call a C
-function pointer according to C calling conventions.  M0 will have four ops to
+function pointer according to ANSI89 C calling conventions. Other calling conventions
+may be implemented as the need arises. Currently, M0 will only support ANSI89 C.
+
+M0 will have four ops to
 support this: C<csym>, C<ccall_arg>, C<ccall_ret> and C<ccall>.  These are
 documented below.
 
