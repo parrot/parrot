@@ -1,10 +1,9 @@
 /*
-Copyright (C) 2007-2010, Parrot Foundation.
-$Id$
+Copyright (C) 2007-2013, Parrot Foundation.
 
 =head1 NAME
 
-src/events.c - Routines supporting the event handling mechanism.
+src/events.c - Event Handling
 
 =head1 DESCRIPTION
 
