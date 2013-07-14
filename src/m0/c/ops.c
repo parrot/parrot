@@ -409,9 +409,11 @@ run_ops( M0_Interp *interp, M0_CallFrame *cf ) {
             (const unsigned long)cf->registers[PC];
         const unsigned long        op_count = bytecode->op_count;
 
-        /* XXX: access violation -- so produce an error? */
-        if (pc >= op_count) {
+        if ((pc > op_count) || (pc < 0)) {
+            /* XXX TODO: Test this */
             fprintf( stderr, "M0: Invalid PC (Program Counter)!\n");
+            return 1;
+        } else if (pc == op_count) {
             return 0;
         } else {
             const unsigned char op = ops[4*pc];
