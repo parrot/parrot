@@ -16,10 +16,9 @@ tools/release/update_version.pl - Update version numbers in a few files
 =head1 DESCRIPTION
 
 This program is meant to be used by the Parrot release manager.  It will
-change the version numbers found in B<these 4 files only>:
+change the version numbers found in B<these 3 files only>:
 
     VERSION
-    README.pod
     include/parrot/oplib/core_ops.h
     src/ops/core_ops.c
 
@@ -54,7 +53,6 @@ croak "'$new_version' is not a proper version number; must be n.n.n"
 
 my @simple_files = (
     'VERSION',
-    'README.pod',
 );
 
 foreach my $f ( @simple_files ) {
