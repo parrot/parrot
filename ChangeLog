@@ -1,10 +1,9 @@
 2013-07-16    release 5.6.0
     - Core
     - Build
-        +  Makefile dependencies are now compatible with VMS make
+        + Makefile dependencies are now compatible with VMS make.
     - Documentation
-    - Tests
-    - Community
+        + The main README is now more helpful.
 
 2013-06-18    release 5.5.0
     - Build
