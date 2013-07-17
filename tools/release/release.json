@@ -1,8 +1,8 @@
 {
-    "release.version"  : "5.5.0",
-    "release.name"     : "Salvadori's Fig Parrot",
+    "release.version"  : "5.6.0",
+    "release.name"     : "Psittacosaurus",
     "release.day"      : "Tuesday",
-    "release.nextdate" : "16 Jul 2013",
+    "release.nextdate" : "20 Aug 2013",
     "release.type"     : "devel",
 
     "web.root"         : "http://parrot.org/",
@@ -12,10 +12,10 @@
     "web.org_root"     : "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "13 Jul 2013",
+    "bugday.date"      : "17 Aug 2013",
 
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
-    "wiki.bugday"      : "bug_day_2013_07_13",
+    "wiki.bugday"      : "bug_day_2013_08_17",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/5.5.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/5.6.0/"
 }
