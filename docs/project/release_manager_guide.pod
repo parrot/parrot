@@ -570,13 +570,12 @@ calendar, visible at
 L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.calendar.google.com>.
 
 (Note that Util's assignment as release manager is provisional; anyone
-who wants to take a turn as RM is free to do so for 5.4, 5.5, 5.6, or
+who wants to take a turn as RM is free to do so for 5.7, 5.8, or
 later releases; mentorship will be provided. Util is just making sure
-that the next three releases are covered.)
+that the next two releases are covered.)
 
-    - Jul 16, 2013 - 5.6.0   - Util
-    - Aug 20, 2013 - 5.7.0   - ?
-    - Sep 17, 2013 - 5.8.0   - ?
+    - Aug 20, 2013 - 5.7.0   - Util
+    - Sep 17, 2013 - 5.8.0   - Util
     - Oct 15, 2013 - 5.9.0   - dukeleto
     - Nov 19, 2013 - 5.10.0  - ?
     - Dec 17, 2013 - 5.11.0  - ?
