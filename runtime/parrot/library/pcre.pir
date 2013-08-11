@@ -78,6 +78,12 @@ LIB_DEFAULT:
     loaded = defined libpcre
     if loaded goto LIB_LOADED
 
+    # gentoo again issue: 976
+    loadlib libpcre, 'libpcre.so.1'
+    loaded = defined libpcre
+    if loaded goto LIB_LOADED
+
+
     branch LIB_FAILED
 
 LIB_WIN32:
