@@ -1,9 +1,10 @@
 2013-08-20    release 5.7.0
-    - Core
     - Build
-    - Documentation
-    - Tests
+        + Fixed GH#976 - Cannot load PCRE library during install on gentoo x64.
     - Community
+        + All three of our GSoC students passed their midterms, and are
+          on track to complete their Parrot and Perl 6 projects on time.
+          Congratulations to Saurabh Kumar, Paweł Murias, and Denis Boyun!
 
 2013-07-16    release 5.6.0
     - Build
