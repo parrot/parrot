@@ -574,7 +574,6 @@ who wants to take a turn as RM is free to do so for 5.7, 5.8, or
 later releases; mentorship will be provided. Util is just making sure
 that the next two releases are covered.)
 
-    - Aug 20, 2013 - 5.7.0   - Util
     - Sep 17, 2013 - 5.8.0   - Util
     - Oct 15, 2013 - 5.9.0   - dukeleto
     - Nov 19, 2013 - 5.10.0  - ?

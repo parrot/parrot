@@ -1,3 +1,10 @@
+2013-09-17    release 5.8.0
+    - Core
+    - Build
+    - Documentation
+    - Tests
+    - Community
+
 2013-08-20    release 5.7.0
     - Build
         + Fixed GH#976 - Cannot load PCRE library during install on gentoo x64.
