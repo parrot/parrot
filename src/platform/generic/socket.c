@@ -627,7 +627,7 @@ Parrot_io_internal_accept(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(PMC * remot
     /* XXX FIXME: Need to do a getsockname and getpeername here to
      * fill in the sockaddr_in structs for local and peer */
 
-    /* Optionally do a gethostyaddr() to resolve remote IP address.
+    /* Optionally do a gethostbyaddr() to resolve remote IP address.
      * This should be based on an option set in the master socket */
 
     return (PIOHANDLE)newsock;
