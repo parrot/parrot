@@ -2090,6 +2090,7 @@ src/string/encoding/binary$(O) : \
 
 src/string/encoding/utf8$(O) : \
 	$(PARROT_H_HEADERS) \
+	src/io/io_private.h \
 	src/string/encoding/shared.h \
 	src/string/encoding/utf8.c \
 	src/string/encoding/unicode.h

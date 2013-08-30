@@ -18,6 +18,7 @@ UTF-8 (L<http://www.utf-8.com/>).
 */
 
 #include "parrot/parrot.h"
+#include "../../src/io/io_private.h"
 #include "unicode.h"
 #include "shared.h"
 
@@ -219,7 +220,7 @@ utf8_scan(PARROT_INTERP, ARGMOD(STRING *src))
 
     res = utf8_partial_scan(interp, src->strstart, &bounds);
 
-    if (res == 0 && bounds.bytes != src->bufused)
+    if ((res == 0 || src->bufused < PIO_BUFFER_MIN_SIZE) && bounds.bytes != src->bufused)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
             "Unaligned end in UTF-8 string\n");
 
