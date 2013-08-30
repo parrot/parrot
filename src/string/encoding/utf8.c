@@ -211,14 +211,15 @@ utf8_scan(PARROT_INTERP, ARGMOD(STRING *src))
 {
     ASSERT_ARGS(utf8_scan)
     Parrot_String_Bounds bounds;
+    INTVAL res;
 
     bounds.bytes = src->bufused;
     bounds.chars = -1;
     bounds.delim = -1;
 
-    utf8_partial_scan(interp, src->strstart, &bounds);
+    res = utf8_partial_scan(interp, src->strstart, &bounds);
 
-    if (bounds.bytes != src->bufused)
+    if (res == 0 && bounds.bytes != src->bufused)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
             "Unaligned end in UTF-8 string\n");
 
@@ -261,6 +262,7 @@ utf8_partial_scan(PARROT_INTERP, ARGIN(const char *buf),
             UINTVAL len2 = Parrot_utf8skip[c];
             UINTVAL count;
 
+            /* partial utf8-character bytes at end of buffer (e.g. split by chunksize) */
             if (i + len2 > len) {
                 res = i + len2 - len;
                 break;
