@@ -1,5 +1,6 @@
 2013-09-17    release 5.8.0
     - Core
+        + Don't complain about utf8 multibyte characters split by chunk boundaries
     - Build
     - Documentation
     - Tests
