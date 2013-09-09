@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2013, Parrot Foundation.
 
 =head1 [DRAFT] PDD 16: Native Call Interface (NCI)
 
@@ -15,9 +15,9 @@ isn't designed to be a universal C-less interface--there will always be
 libraries that have some bizarre parameter list that requires that some C be
 written. It should, however, handle all the simple cases.
 
-Using the NCI, parrot automatically wraps the C functions and presents them
-as prototyped subroutines that follow normal parrot calling conventions, and
-can be called like any other parrot subroutine.
+Using the NCI, Parrot automatically wraps the C functions and presents them
+as prototyped subroutines that follow normal Parrot calling conventions, and
+can be called like any other Parrot subroutine.
 
 The NCI uses the platform native dynamic by-name function loading mechanism
 (dlopen/dlsym on unix and LoadLibrary/GetProcAddress on Win32, for example)
@@ -29,7 +29,7 @@ signatures (C header files are not always available (certainly not for
 libraries not designed for access from C) and not always reasonably
 parseable anyway, and there is no generic way to query a function for its
 signature) the signature must be passed in when the linkage between the C
-function and parrot is made.
+function and Parrot is made.
 
 =head2 Implementation
 
@@ -89,10 +89,10 @@ A PMC register.
 
 =item p
 
-PMC thingie. A generic pointer, taken from a PMC by using its
+PMC object. A generic pointer, taken from a PMC by using its
 get_pointer vtable function, or NULL for a PMCNULL.
 If this is a return type and the value is NULL, PMCNULL is returned,
-otherwise parrot will create a new UnManagedStruct PMC type, which
+otherwise Parrot will create a new UnManagedStruct PMC type, which
 is just a generic "pointer to something" PMC type which Parrot does
 I<no> management of.
 
@@ -125,7 +125,7 @@ A pointer to a long, taken from an P register of an int-like PMC.
 
 =item t
 
-string pointer. 
+string pointer.
 
 =back
 
@@ -180,7 +180,7 @@ what should be done.
 
 Unfortunately there's no good way to generically describe all possible
 callback parameter sets, so in some cases hand-written C will be necessary.
-However, many callback functions share a common signature, and parrot provides
+However, many callback functions share a common signature, and Parrot provides
 some ready-made functions for this purpose that should serve for most of the
 callback uses.
 
