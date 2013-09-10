@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2005, Parrot Foundation.
+# Copyright (C) 2001-2013, Parrot Foundation.
 
 =head1 NAME
 
@@ -297,13 +297,15 @@ a pointer to the structure is passed with the B<p> signature char:
   invoke
   # I5 is result
 
-=begin PIR
+=end PIR
 
 =head1 BUGS
 
 Not all datatypes are implemented. Alignment is barely tested on different
 machines. Arrays of structures aren't handled yet. Passing nested structures to
 C isn't finished.
+
+This document is sorely out of date and may need a fire-based cleaning.
 
 =head1 FILES
 
@@ -312,7 +314,3 @@ F<src/pmc/unmanagedstruct.pmc>, F<src/pmc/managedstruct.pmc>
 =head1 SEE ALSO
 
 F<docs/pdds/pdd03_calling_conventions.pod> F<t/pmc/nci.t>, F<src/nci_test.c>
-
-=head1 AUTHOR
-
-Leopold Toetsch <lt@toetsch.at>
