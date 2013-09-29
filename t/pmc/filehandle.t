@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 33;
+use Parrot::Test tests => 34;
 use Parrot::Test::Util 'create_tempfile';
 
 =head1 NAME
@@ -732,6 +732,38 @@ ok:
     say "ok"
 .end
 CODE
+ok
+OUTPUT
+
+
+pir_output_is( <<"CODE", <<"OUTPUT", "readall() - at eof GH #981" );
+.sub main :main
+    \$S0 = <<"EOS"
+line 1
+line 2
+line 3
+EOS
+    .local pmc pio, pio2
+    pio = new ['FileHandle']
+    pio.'open'("$temp_file", "w")
+    pio.'print'(\$S0)
+    pio.'close'()
+
+    pio2 = new ['FileHandle']
+    pio2.'open'("$temp_file", "r")
+    \$S1 = pio2.'readall'()
+    if \$S0 == \$S1 goto ok
+    print "not "
+ok:
+    say "ok"
+    \$S1 = pio2.'readall'()
+    if \$S1 == '' goto ok2
+    print "not "
+ok2:
+    say "ok"
+.end
+CODE
+ok
 ok
 OUTPUT
 
