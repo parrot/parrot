@@ -45,7 +45,7 @@ sub runstep {
     $flags->{ldflags} .= ' -L"' . $lib_dir . '"';
 
     $flags->{ccflags} .= ' -pipe -fno-common ';
-    if ($deploy_target !~ /^10\.(5|6|7)$/ and !$conf->options->get('cc')) {
+    if ($deploy_target =~ /^10\.[1234]$/ and !$conf->options->get('cc')) {
         # Only apple cc understands -Wno-long-double, macports gcc not
         $flags->{ccflags} .= '-Wno-long-double ';
     }
