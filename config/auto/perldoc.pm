@@ -38,10 +38,9 @@ sub runstep {
 
     my $cmd = File::Spec->catfile($conf->data->get('scriptdirexp_provisional'), q{perldoc});
     my ( $fh, $filename ) = tempfile( UNLINK => 1 );
-    # try to execute 'perldoc perldoc' || 'perldoc Pod::perldoc' to
+    # try to execute 'perldoc perldoc' || 'perldoc Pod::Perldoc' to
     # read the documentation of perldoc
-    my $content = capture_output("$cmd -ud $filename perldoc") || 
-                  capture_output("$cmd -ud $filename Pod::perldoc") || undef;
+    my $content = capture_output("$cmd -ud $filename perldoc") || capture_output("$cmd -ud $filename Pod::Perldoc") || undef;
 
     return 1 unless defined( $self->_initial_content_check($conf, $content) );
 
