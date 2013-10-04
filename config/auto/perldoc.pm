@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2013, Parrot Foundation.
 
 =head1 NAME
 
@@ -38,7 +38,10 @@ sub runstep {
 
     my $cmd = File::Spec->catfile($conf->data->get('scriptdirexp_provisional'), q{perldoc});
     my ( $fh, $filename ) = tempfile( UNLINK => 1 );
-    my $content = capture_output("$cmd -ud $filename perldoc") || undef;
+    # try to execute 'perldoc perldoc' || 'perldoc Pod::perldoc' to
+    # read the documentation of perldoc
+    my $content = capture_output("$cmd -ud $filename perldoc") || 
+                  capture_output("$cmd -ud $filename Pod::perldoc") || undef;
 
     return 1 unless defined( $self->_initial_content_check($conf, $content) );
 
