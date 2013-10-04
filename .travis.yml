@@ -6,7 +6,7 @@ install: "echo"
 before_script:
     - sudo apt-get install libffi-dev libicu-dev libgmp3-dev clang llvm-dev zlib1g-dev gcc-multilib
 # No, we are not going to run the tests for all these dependencies on every commit
-    - cpanm -n LWP::UserAgent TAP::Harness::Archive TAP::Harness::ReportByDescription
+    - cpanm -n LWP::UserAgent TAP::Harness::Archive TAP::Harness::ReportByDescription Test::Perl::Critic
     - gcc --version
     - g++ --version
     - clang --version
@@ -32,11 +32,7 @@ notifications:
   email:
     on_success: change
     on_failure: always
-  irc:
-    channels:
-      - "irc.parrot.org#parrot"
-    on_success: change
-    on_failure: change
+  irc: "irc.parrot.org#parrot"
 env:
     - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE=""           PARROT_TEST="smoke" CC="clang"
     - PARROT_CONFIG_ARGS="--without-gettext --without-gmp --without-libffi --without-extra-nci-thunks --without-opengl --without-readline --without-pcre --without-zlib --without-threads --without-icu" PARROT_OPTIMIZE="" PARROT_TEST="smoke" CC="clang"
@@ -47,7 +43,7 @@ env:
 # Use clang to run our coding standard and manifest tests, because it is the fastest
 # These will cause Travis to report a build failure when somebody breaks the manifest
 # tests by forgetting to add files to our manifest, or when they break our coding standards.
-# The reason we do not use smolder_fulltest is becuase it will intermittently trigger
-# the Travis CI time-out of 15 minutes
+# The reason we do not use smolder_fulltest is because it will intermittently trigger
+# the Travis CI time-out of 15 minutes.
     - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE=""           PARROT_TEST="codingstd_tests" CC="clang"
     - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE=""           PARROT_TEST="manifest_tests" CC="clang"
