@@ -343,10 +343,11 @@ Concatenate two strings. Takes two strings as arguments.
 
 =head4 Parrot_str_new(interp, str, len)
 
-Return a new string with the default encoding and character set. Accepts three
-arguments: A Parrot interpreter, a C string (C<char *>) to initialize the value
-of the string, and an integer length of the string (number of characters).
-If a length of zero is passed, it will be calculated automatically.
+Return a new string with the default encoding and character set. Accepts 
+three arguments: A Parrot interpreter, a C string (C<char *>) to initialize
+the value of the string, and an integer length of the string (number of
+characters).  If a length of zero is passed, it will be calculated
+automatically.
 
 =head4 Parrot_str_new_noinit (was string_make_empty)
 
@@ -368,9 +369,9 @@ character set structs. }}
 
 =head4 Parrot_str_new_constant(interp, str)
 
-Creates and returns a new Parrot constant string. Takes  an interpreter and one
-C string (a C<char *>) as an argument, the value of the constant string. The
-length of the C string is calculated internally.
+Creates and returns a new Parrot constant string. Takes  an interpreter and
+one C string (a C<char *>) as an argument, the value of the constant string.
+The length of the C string is calculated internally.
 
 =head4 Parrot_str_length (was string_compute_strlen)
 
