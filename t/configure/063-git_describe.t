@@ -27,9 +27,7 @@ my $cwd = cwd();
     my $libdir = qq{$tdir/lib};
     ok( (File::Path::mkpath( [ $libdir ], 0, 0777 )), "Able to make libdir");
 
-    # Cannot get it to work with this. Why do we need it?
-    #local @INC;
-
+    local @INC = @INC;
     unshift @INC, $libdir;
     ok( (File::Path::mkpath( [ qq{$libdir/Parrot/Git} ], 0, 0777 )), "Able to make Parrot dir");
     chdir $cwd;

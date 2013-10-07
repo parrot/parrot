@@ -26,7 +26,8 @@ my $cwd = cwd();
     ok( chdir $tdir, "Changed to temporary directory for testing" );
     my $libdir = qq{$tdir/lib};
     ok( (File::Path::mkpath( [ $libdir ], 0, 0777 )), "Able to make libdir");
-    local @INC;
+
+    local @INC = @INC;
     unshift @INC, $libdir;
     ok( (File::Path::mkpath( [ qq{$libdir/Parrot} ], 0, 0777 )), "Able to make Parrot dir");
     ok( (copy qq{$cwd/lib/Parrot/SHA1.pm},
