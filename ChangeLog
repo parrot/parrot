@@ -1,3 +1,14 @@
+2013-10-15    release 5.9.0
+    - Core
+        + Fixed readall SEGV at eof, e.g. when calling readall twice [GH #981]
+    - Build
+        + Fixed MacOSX -Wno-long-double warning [GH #980]
+    - Branches
+        + The new-packfile-api branch with the final removal of the EvalPMC
+          is ready and will most likely land in 5.10.0
+    - Community
+        + Zefram reported 31 issues. Thanks a lot!
+
 2013-09-17    release 5.8.0
     - Core
         + Don't complain about utf8 multibyte characters split by chunk boundaries
