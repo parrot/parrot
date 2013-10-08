@@ -289,7 +289,7 @@ For a shared library B<libnci_test.so> (or whatever) and a C function
 
 a pointer to the structure is passed with the B<p> signature char:
 
-=begin PIR
+=begin PASM_FRAGMENT_INVALID
 
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_ip", "ip"
@@ -297,7 +297,7 @@ a pointer to the structure is passed with the B<p> signature char:
   invoke
   # I5 is result
 
-=end PIR
+=end PASM_FRAGMENT_INVALID
 
 =head1 BUGS
 
