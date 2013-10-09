@@ -550,6 +550,15 @@ Transform PAST C<source> into POST.
 
     $P0 = compreg 'PIR'
     $P1 = $P0(source)
+    $P2 = $P1.'subs_by_tag'('init')
+    $P3 = iter $P2
+  loop_top:
+    unless $P3 goto loop_bottom
+    $P4 = shift $P3
+    $P4()
+    goto loop_top
+  loop_bottom:
+    $P1 = $P1.'first_sub_in_const_table'()
     .return($P1)
 .end
 
