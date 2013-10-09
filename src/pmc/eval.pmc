@@ -366,6 +366,35 @@ Return the main sub, if any, null PMC otherwise.
         RETURN(PMC * mainsub);
     }
 
+/*
+
+=item C<all_subs()>
+
+Return an object providing indexed access to all subs in the compilation
+unit (i.e., self).  Provides compability with new packfile_pmc API.
+
+=item C<is_initialized(STRING* tag)>
+
+Dummy method to emulate C<is_initialized> method of the PackFileView PMC.
+Returns true if C<tag> is equal to C<"init">, since C<:init> subs are
+automatically invoked when an EvalPMC is loaded, and false for all
+other tags.
+
+=cut
+
+*/
+
+    METHOD all_subs()
+    {
+        RETURN(PMC * SELF);
+    }
+
+    METHOD is_initialized(STRING *tag)
+    {
+        const INTVAL ret = STRING_equal(interp, tag, CONST_STRING(interp, "init"));
+        RETURN(INTVAL ret);
+    }
+
 }
 
 /*
