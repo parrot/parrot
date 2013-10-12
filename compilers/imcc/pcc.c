@@ -247,8 +247,11 @@ pcc_get_args(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
     for (i = 0; i < n; i++) {
         SymReg *arg = args[i];
 
-        if (arg->type & VT_CONSTP)
+        if (arg->type & VT_CONSTP) {
             arg = arg->reg;
+            if (! arg)
+                IMCC_fatal(imcc, 1, "wrong .const value");
+        }
 
         regs[i + 1] = arg;
         flags       = 0;
