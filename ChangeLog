@@ -1,23 +1,32 @@
 2013-10-15    release 5.9.0
     - Core
+        + Don't complain about utf8 multibyte characters split by chunk boundaries
         + Fixed readall SEGV at eof, e.g. when calling readall twice [GH #981]
+        + Fixed SEGV when .const not found. [GH #996]
+        + Added PackfileView-compatible methods to EvalPMC. [GH #937] (Temporary)
     - Build
         + Fixed MacOSX -Wno-long-double warning [GH #980]
+    - Testing
+        + Sorted hash keys to allow better diffs between runs of `make fulltest`.
     - Branches
         + The new-packfile-api branch with the final removal of the EvalPMC
           is ready and will most likely land in 5.10.0
+    - Documentation
+        + Fixed and improved the documentation about Parrot_str_new
     - Community
         + Zefram reported 31 issues. Thanks a lot!
+        + All three of our GSoC students completed their projects, and passed
+          their finals with flying colors. Congratulations! Their weekly reports
+          are available here:
+            = Saurabh Kumar - "Update parrot-libgit2 to latest libgit2 release"
+                http://www.parrot.org/tags/parrot-libgit2
+            = Paweł Murias - "A Javascript backend for Rakudo"
+                http://parrot.org/blog/1850
+            = Denis Boyun  - "Improve Web UI of App::Parrot::Create"
+                http://parrot.org/blog/1843
 
 2013-09-17    release 5.8.0
-    - Core
-        + Don't complain about utf8 multibyte characters split by chunk boundaries
-    - Build
-    - Documentation
-    - Tests
-    - Community
-        + Great progress has been made by our GSoC students...
-          XXX: Link to Student blog posts
+    This version was not released to the wild.
 
 2013-08-20    release 5.7.0
     - Build
