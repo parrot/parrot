@@ -280,7 +280,7 @@ sub identify_files_for_POD_testing {
         }
     }
 
-    return [ keys %{ $files_needing_analysis } ];
+    return [ sort keys %{ $files_needing_analysis } ];
 }
 
 =head2 C<oreilly_summary_malformed()>

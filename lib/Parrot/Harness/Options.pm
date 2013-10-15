@@ -57,7 +57,7 @@ sub get_test_prog_args {
     my ($optsref, $gc_debug, $run_exec) = @_;
 
     my %opts = remap_runcore_opts( $optsref );
-    my $args = join(' ', map { "-$_" } keys %opts );
+    my $args = join(' ', map { "-$_" } sort keys %opts );
 
     $args =~ s/-O/-O$opts{O}/ if exists $opts{O};
     $args =~ s/-D/-D$opts{D}/;
