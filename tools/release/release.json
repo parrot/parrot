@@ -3,7 +3,7 @@
     "release.name"     : "Fantastick Parrot",
     "release.day"      : "Tuesday",
     "release.nextdate" : "19 Nov 2013",
-    "release.type"     : "stable",
+    "release.type"     : "supported",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -17,5 +17,5 @@
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
     "wiki.bugday"      : "bug_day_2013_11_16",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/stable/5.9.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/5.9.0/"
 }
