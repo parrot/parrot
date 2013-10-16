@@ -1,9 +1,9 @@
 {
-    "release.version"  : "5.7.0",
-    "release.name"     : "Azure-rumped Parrot",
+    "release.version"  : "5.9.0",
+    "release.name"     : "Fantastick Parrot",
     "release.day"      : "Tuesday",
-    "release.nextdate" : "17 Sep 2013",
-    "release.type"     : "devel",
+    "release.nextdate" : "19 Nov 2013",
+    "release.type"     : "stable",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -12,10 +12,10 @@
     "web.org_root"     : "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "14 Sep 2013",
+    "bugday.date"      : "16 Nov 2013",
 
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
-    "wiki.bugday"      : "bug_day_2013_09_14",
+    "wiki.bugday"      : "bug_day_2013_11_16",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/5.7.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/stable/5.9.0/"
 }
