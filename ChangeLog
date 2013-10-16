@@ -1,3 +1,10 @@
+2013-11-19    release 5.10.0
+    - Core
+    - Build
+    - Documentation
+    - Tests
+    - Community
+
 2013-10-15    release 5.9.0
     - Core
         + Don't complain about utf8 multibyte characters split by chunk boundaries
