@@ -233,9 +233,6 @@ sub _init {
         '-Wcast-qual' => [ qw(
             compilers/imcc/imcparser.c
         ) ],
-        '-Wlogical-op' => [ qw(
-            compilers/imcc/imcparser.c
-        ) ],
     };
     # add at the end
     $gcc->{'override'} = $gpp->{'override'} = {

@@ -2124,10 +2124,10 @@ the_sub:
             /* disallow bareword method names; SREG name constants are fine */
             const char * const name = $3->name;
             if (!($3->type & VTREG)) {
-                if (*name != '\'' || *name != '\"')
+                if (*name != '\'' && *name != '\"')
                     IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
                         "Bareword method name '%s' not allowed in PIR",
-                        $3->name);
+                        $name);
             }
 
             imcc->cur_obj = $1;

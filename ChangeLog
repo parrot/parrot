@@ -1,6 +1,8 @@
 2013-11-19    release 5.10.0
     - Core
+        + Fixed bareword method names check for " in imcc [GH #1015]
     - Build
+	+ Removed wrong -Wlogical-op exception for imcparser.c [GH #1015]
     - Documentation
     - Tests
     - Community
