@@ -657,3 +657,12 @@
   tags :
     - api
   ticket : 'https://github.com/parrot/parrot/issues/909'
+-
+  name:  'Eval removed, new packfile API'
+  note:  'Use the new PackfileView instead of Eval. Eval PMC was deprecated with 3.6.0. This change is coordinated with nqp and rakudo only'
+  tags:
+    - 'PMC'
+    - 'api'
+    - 'completed'
+  ticket:  'https://github.com/parrot/parrot/issues/937'
+-
