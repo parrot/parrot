@@ -2127,7 +2127,7 @@ the_sub:
                 if (*name != '\'' && *name != '\"')
                     IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
                         "Bareword method name '%s' not allowed in PIR",
-                        $name);
+                        name);
             }
 
             imcc->cur_obj = $1;
