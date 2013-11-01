@@ -433,9 +433,14 @@ the sub.
     compiler = compreg $S0
     $I0 = isa compiler, 'Sub'
     if $I0 goto compiler_sub
+    $I0 = isa compiler, 'PackfileView'
+    if $I0 goto compiler_packfileview
     .tailcall compiler.'compile'(source, options :flat :named)
   compiler_sub:
     .tailcall compiler(source, options :flat :named)
+  compiler_packfileview:
+    $P0 = compiler.'first_sub_in_const_table'()
+    .tailcall $P0(source, options :flat :named)
 .end
 
 =back

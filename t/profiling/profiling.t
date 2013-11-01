@@ -2,10 +2,9 @@
 
 # Copyright (C) 2010, Parrot Foundation.
 
-INIT {
-    pir::load_bytecode('ProfTest.pbc');
-    Q:PIR{ .include "test_more.pir" };
-}
+my $lib := pir::load_bytecode__ps('ProfTest.pbc');
+for $lib.subs_by_tag('load') -> $sub { $sub(); }
+Q:PIR{ .include "test_more.pir" };
 
 plan(13);
 
@@ -178,6 +177,9 @@ CODE
     push_eh eh
 
     f = comp(s)
+    f = f."main_sub"()
+    $S0 = typeof f
+    say $S0
     f()
 
     pop_eh

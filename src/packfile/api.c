@@ -507,6 +507,32 @@ Parrot_pf_subs_by_tag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
 
 /*
 
+=item C<PMC * Parrot_pf_single_sub_by_tag(PARROT_INTERP, PMC * pfpmc, STRING *
+flag)>
+
+Get a single Sub from the packfile by named flag. If there are more than one
+Subs with the given flag, it is unspecified which one is returned.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_pf_single_sub_by_tag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
+{
+    ASSERT_ARGS(Parrot_pf_single_sub_by_tag)
+
+    /* XXX use custom implementation */
+    PMC * const subs = Parrot_pf_subs_by_tag(interp, pfpmc, flag);
+    return PMC_IS_NULL(subs)
+        ? PMCNULL
+        : VTABLE_get_pmc_keyed_int(interp, subs, 0);
+}
+
+/*
+
 =item C<PMC * Parrot_pf_all_tags_list(PARROT_INTERP, PMC * pfpmc)>
 
 Return a ResizableStringArray of all tags in the packfile.
@@ -621,6 +647,7 @@ Parrot_pf_all_subs(PARROT_INTERP, ARGIN(PMC *pfpmc))
         return array;
     }
 }
+
 /*
 
 =item C<static int sub_pragma(PARROT_INTERP, pbc_action_enum_t action, const PMC

@@ -85,6 +85,7 @@ the documentation at L<http://www.json.org/>.
     .local pmc pirc, result
     pirc = compreg 'PIR'
     result = pirc(pir)
+    result = result.'first_sub_in_const_table'()
     .return (result)
 
   failed:
