@@ -636,6 +636,7 @@ sub gen_opengl_wrappers {
             next unless /API/ or /\bextern\b/ or /\bmui[A-Z]/;
             next if     /^#/;
             next if     /\btypedef\b/;
+            next if     /extern gleGC \*_gle_gc /;
 
             # Work around bug in Mac OS X headers (glext.h as of 10.6.3, at least)
             next if /^\s*extern\s+\w+\s+\(\*\s+/;
@@ -653,6 +654,9 @@ sub gen_opengl_wrappers {
             # also do general cleanup to make parsing easier
             s/\b(?:AVAILABLE|DEPRECATED_(?:IN|FOR))_MAC_OS_X_VERSION_\d+_\d+_AND_LATER\b\s*//;
             s/\bAVAILABLE_MAC_OS_X_VERSION_\d+_\d+_AND_LATER_BUT_DEPRECATED_IN_MAC_OS_X_VERSION_\d+_\d+\b\s*//;
+            s/\bOPENGL_DEPRECATED\(10_\d+, 10_\d+\)\s*//;
+            s/\bOPENGL_DEPRECATED_MSG\(10_\d+, 10_\d+, "[^")]+"\)\s*//;
+            s/\bOPENGL_AVAILABLE\(10_\d+\)\s*//;
             s/\b__cdecl\b\s*//;
             s/\b__stdcall\b\s*//;
             s/\b_CRTIMP\b\s*//;
