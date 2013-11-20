@@ -501,8 +501,14 @@ sub runstep {
     my %skip = map {($_ => 1)} @SKIP;
     @header_files =
         grep {my ($file) = m{([^/]+)$}; !$skip{$file}} @header_files;
-    die "OpenGL enabled and detected, but no OpenGL headers found!"
-        unless @header_files;
+    if (!@header_files) {
+        my $err = "OpenGL enabled and detected, but no OpenGL headers found!";
+        if ( $^O eq 'darwin' ) {
+            $err .= "\nIf you are on OS X 10.9 (Mavericks) with XCode 5.0.1,"
+                 .  " see: https://github.com/parrot/parrot/issues/1016";
+        }
+        die $err;
+    }
 
     my $files_str = join("\n\t", @header_files) . "\n";
     $conf->debug(
