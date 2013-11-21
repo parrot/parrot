@@ -1,10 +1,24 @@
+2013-12-17    release 5.11.0
+    - Core
+    - Build
+    - Documentation
+    - Tests
+    - Community
+
 2013-11-19    release 5.10.0
     - Core
         + Fixed bareword method names check for " in imcc [GH #1015]
         + Moved eval from eval.pmc to HLLCompile and use new packfile API.
           This is a prerequisite for --target=pbc in the HLLCompiler [GH #937]
+        + Merged branch 'new-packfile-api' [GH #937]
+            = Removed Eval PMC
+            = IMCCompiler now returns PackfileView instead of Eval.
+            = Added Parrot_pf_single_sub_by_tag() to packfile API.
+            = Added first_sub_in_const_table() to PackfileView PMC as a
+              stopgap until properly tagged subs are generated.
     - Build
-	+ Removed wrong -Wlogical-op exception for imcparser.c [GH #1015]
+        + Removed wrong -Wlogical-op exception for imcparser.c [GH #1015]
+        + Fixed parsing for OpenGL 4.1 on OS X Mavericks. [GH #1016]
     - Documentation
     - Tests
     - Community

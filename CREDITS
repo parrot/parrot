@@ -231,8 +231,9 @@ U: util
 E: bruce.gray@acm.org
 D: Improvements to Config, Build, and Test sub-systems.
 D: Cage cleaning, codingstd, warnings, and doc corrections.
-D: Win32 platform fixes.
-D: Release manager (5.1.0 - 5.7.0)
+D: Darwin and Win32 platform fixes.
+D: Release manager (5.1.0 - 5.7.0, 5.10.0)
+D: GSoC 2013 Org Admin
 S: Auburn, AL, USA
 
 N: Bryan C. Warnock
