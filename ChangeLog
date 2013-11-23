@@ -23,6 +23,8 @@
           = Stop at yield or invokecc for possible push_eh/pop_eh non-local
             effects [GH #1044]
         + Fixed TT #1930, a floating point optimizer problem on PPC
+        + Added cache iterators in encoding_find_*cclass [GH #1027]
+          to speedup the utf8 pattern "scan a whole string for newlines".
     - Build
         + Set emacs buffer-read-only:t tags in generated files [GH #1034]
         + Provide coda for generated include/*.pasm files [GH #1032]

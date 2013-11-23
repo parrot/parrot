@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2012, Parrot Foundation.
+Copyright (C) 2004-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -605,8 +605,21 @@ encoding_find_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src),
     UINTVAL     codepoint;
     UINTVAL     end = offset + count;
 
-    STRING_ITER_INIT(interp, &iter);
-    STRING_iter_skip(interp, src, &iter, offset);
+    static UINTVAL last_char_offset;
+    static String_iter cached_iter;
+    static STRING *last_string = 0;
+
+    if (last_string == src && offset > last_char_offset) {
+        iter = cached_iter;
+        STRING_iter_skip(interp, src, &iter, offset - last_char_offset);
+    }
+    else if (last_string == src && offset == last_char_offset) {
+        iter = cached_iter;
+    }
+    else {
+        STRING_ITER_INIT(interp, &iter);
+        STRING_iter_skip(interp, src, &iter, offset);
+    }
 
     end = src->strlen < end ? src->strlen : end;
 
@@ -614,15 +627,22 @@ encoding_find_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src),
         codepoint = STRING_iter_get_and_advance(interp, src, &iter);
         if (codepoint >= 256) {
             if (u_iscclass(interp, codepoint, flags))
-                    return iter.charpos - 1;
+                goto return_and_cache;
         }
         else {
             if (Parrot_iso_8859_1_typetable[codepoint] & flags)
-                return iter.charpos - 1;
+                goto return_and_cache;
         }
     }
 
     return end;
+return_and_cache:
+    if (iter.charpos > 128) {
+        last_char_offset = iter.charpos;
+        cached_iter = iter;
+        last_string = src;
+    }
+    return iter.charpos - 1;
 }
 
 
@@ -648,15 +668,27 @@ encoding_find_not_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src),
     UINTVAL     end = offset + count;
     int         bit;
 
+    static UINTVAL last_char_offset;
+    static String_iter cached_iter;
+    static STRING *last_string = 0;
+
     if (offset > src->strlen) {
         /* XXX: Throw in this case? */
         return offset + count;
     }
 
-    STRING_ITER_INIT(interp, &iter);
-
-    if (offset)
-        STRING_iter_skip(interp, src, &iter, offset);
+    if (last_string == src && offset > last_char_offset) {
+        iter = cached_iter;
+        STRING_iter_skip(interp, src, &iter, offset - last_char_offset);
+    }
+    else if (last_string == src && offset == last_char_offset) {
+        iter = cached_iter;
+    }
+    else {
+        STRING_ITER_INIT(interp, &iter);
+        if (offset)
+            STRING_iter_skip(interp, src, &iter, offset);
+    }
 
     end = src->strlen < end ? src->strlen : end;
 
@@ -669,16 +701,23 @@ encoding_find_not_cclass(PARROT_INTERP, INTVAL flags, ARGIN(const STRING *src),
             for (bit = enum_cclass_uppercase;
                     bit <= enum_cclass_word ; bit <<= 1) {
                 if ((bit & flags) && !u_iscclass(interp, codepoint, bit))
-                    return iter.charpos - 1;
+                    goto return_and_cache;
             }
         }
         else {
             if (!(Parrot_iso_8859_1_typetable[codepoint] & flags))
-                return iter.charpos - 1;
+                goto return_and_cache;
         }
     }
 
     return end;
+return_and_cache:
+    if (iter.charpos > 128) {
+        last_char_offset = iter.charpos;
+        cached_iter = iter;
+        last_string = src;
+    }
+    return iter.charpos - 1;
 }
 
 
