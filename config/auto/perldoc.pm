@@ -66,24 +66,12 @@ E_NOTE
     foreach my $ops (@ops) {
         my $pod = $ops;
         $pod =~ s/\.ops$/.pod/;
-        if ( $new_perldoc ) {
-            $TEMP_pod_build .= <<"END";
+        $TEMP_pod_build .= <<"END";
 ops/$pod: ../src/ops/$ops
-\t\$(PERLDOC) -ud ops/$pod ../src/ops/$ops
+\t\$(PODEXTRACT) ../src/ops/$ops ops/$pod
 \t\$(CHMOD) 0644 ops/$pod
 \t\$(ADDGENERATED) "docs/\$\@" "[doc]"
-
 END
-        }
-        else {
-            $TEMP_pod_build .= <<"END";
-ops/$pod: ../src/ops/$ops
-\t\$(PERLDOC) -u ../ops/$ops > ops/$pod
-\t\$(CHMOD) 0644 ../ops/$pod
-\t\$(ADDGENERATED) "docs/\$\@" "[doc]"
-
-END
-        }
     }
 
     $conf->data->set(
