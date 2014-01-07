@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 PDD 22: I/O
 
@@ -1029,13 +1029,12 @@ The most important issues for Parrot to consider with IPv6 are:
 =item *
 
 Support 128 bit addresses. IPv6 addresses are colon-separated
-hexadecimal numbers, such as C<20a:95ff:fef5:7e5e>.
+hexadecimal numbers, such as C<2001:db8:cdbf:73bc:20a:95ff:fef5:7e5e">.
 
 =item *
 
 Any address parsing should be able to support the address separated from
-a port number or prefix/length by brackets: C<[20a:95ff:fef5:7e5e]:80>
-and C<[20a:95ff::]/64>.
+a port number or prefix/length by slash: C<2001:db8:cdbf:73bc::/64>.
 
 =item *
 
