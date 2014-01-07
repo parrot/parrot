@@ -75,6 +75,7 @@ extern op_lib_t core_op_lib;
 
 
 #include "parrot/scheduler_private.h"
+#include "pmc/pmc_proxy.h"
 #include "pmc/pmc_task.h"
 
 
@@ -23720,13 +23721,25 @@ Parrot_get_label_i_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_get_id_i_p(opcode_t *cur_opcode, PARROT_INTERP) {
-    IREG(1) = Parrot_hash_pointer((void *)PREG(2), interp->hash_seed);
+    PMC  *  pmc = PREG(2);
+
+    if (pmc->vtable->base_type == enum_class_Proxy) {
+        pmc = PARROT_PROXY(pmc)->target;
+    }
+
+    IREG(1) = Parrot_hash_pointer((void *)pmc, interp->hash_seed);
     return cur_opcode + 3;
 }
 
 opcode_t *
 Parrot_get_id_i_pc(opcode_t *cur_opcode, PARROT_INTERP) {
-    IREG(1) = Parrot_hash_pointer((void *)PCONST(2), interp->hash_seed);
+    PMC  *  pmc = PCONST(2);
+
+    if (pmc->vtable->base_type == enum_class_Proxy) {
+        pmc = PARROT_PROXY(pmc)->target;
+    }
+
+    IREG(1) = Parrot_hash_pointer((void *)pmc, interp->hash_seed);
     return cur_opcode + 3;
 }
 

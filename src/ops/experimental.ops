@@ -5,6 +5,7 @@
 BEGIN_OPS_PREAMBLE
 
 #include "parrot/scheduler_private.h"
+#include "pmc/pmc_proxy.h"
 #include "pmc/pmc_task.h"
 
 END_OPS_PREAMBLE
@@ -86,14 +87,24 @@ Gets a unique(*) ID for a PMC.
 This may or may not be based on the pointer of the PMC, but almost certainly is
 not the raw pointer value.
 
-(*) Uniqueness of these IDs is only guarranteed within code to which this PMC is
+Across shared threads the writable object and the non-writable proxied
+object do return the same id.
+
+(*) Uniqueness of these IDs is only guaranteed within code to which this PMC is
 currently visible (ie: not across processes, or share-nothing threads, and not
 beyond the lifetime of the PMC).
+
+Currently it is not even persistant across garbage collections. To be
+persistant across garbage collections it needs to be changed to
+weakrefs.
 
 =cut
 
 inline op get_id(out INT, in PMC) {
-    $1 = Parrot_hash_pointer((void *)$2, interp->hash_seed);
+    PMC * pmc = $2;
+    if (pmc->vtable->base_type == enum_class_Proxy)
+        pmc = PARROT_PROXY(pmc)->target;
+    $1 = Parrot_hash_pointer((void *)pmc, interp->hash_seed);
 }
 
 =item B<fetch>(out PMC, in PMC, in PMC, in PMC)

@@ -2181,6 +2181,7 @@ src/ops/core_ops$(O) : src/ops/core_ops.c \
 	$(INC_PMC_DIR)/pmc_exceptionhandler.h \
 	$(INC_PMC_DIR)/pmc_fixedintegerarray.h \
 	$(INC_PMC_DIR)/pmc_parrotlibrary.h \
+	$(INC_PMC_DIR)/pmc_proxy.h \
 	$(INC_PMC_DIR)/pmc_task.h \
 	$(INC_DIR)/events.h \
 	$(INC_DIR)/scheduler_private.h \

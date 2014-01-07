@@ -1,12 +1,12 @@
 #!perl
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 16;
 use Parrot::PMC '%pmc_types';
 
 =head1 NAME
@@ -263,6 +263,45 @@ pir_output_is( <<'CODE', <<'OUTPUT', "new_p_s" );
 CODE
 String
 42
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "get_id", todo => 'GH#1017' );
+.sub foo
+        $P0 = get_global "wibble"
+        $I0 = get_id $P0
+        $P1 = $I0
+        set_global 'id', $P1
+        .return ()
+.end
+.sub main :main
+        $P0 = new ['ResizablePMCArray']
+        set_global "wibble", $P0
+        $P1 = new ['Integer']
+        set_global "id", $P1
+
+        .const "Sub" foo = "foo"
+        $P2 = new "Task", foo
+        schedule $P2
+        sleep 0.1
+        wait $P2
+
+        $P3 = get_global 'id'
+        $I0 = $P3
+        $I1 = get_id $P0
+        eq $I0, $I1, ok1
+        print "not "
+ok1:
+        say "ok 1"
+
+        $I2 = get_id $P3
+        ne $I1, $I2, ok2
+        print "not "
+ok2:
+        say "ok 2"
+.end
+CODE
+ok 1
+ok 2
 OUTPUT
 
 # Local Variables:
