@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2013, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 package Parrot::Configure::Messages;
 
@@ -16,7 +16,7 @@ sub print_introduction {
     my $parrot_version = shift;
     print <<"END";
 Parrot Version $parrot_version Configure 2.0
-Copyright (C) 2001-2013, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 Hello, I'm Configure. My job is to poke and prod your system to figure out
 how to build Parrot. The process is completely automated, unless you passed in

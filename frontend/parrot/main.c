@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007-2013, Parrot Foundation.
+Copyright (C) 2007-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -622,7 +622,7 @@ Parrot_version(void)
     ASSERT_ARGS(Parrot_version)
     printf("This is Parrot version " PARROT_VERSION);
     printf(" built for " PARROT_ARCHNAME ".\n");
-    printf("Copyright (C) 2001-2013, Parrot Foundation.\n\
+    printf("Copyright (C) 2001-2014, Parrot Foundation.\n\
 \n\
 This code is distributed under the terms of the Artistic License 2.0.\
 \n\
