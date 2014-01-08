@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2005, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -283,7 +283,7 @@ my $ws = {
     horizontal_ascii   => [qw/ \u0009 \u0020 \u00a0 /],
     horizontal_unicode => [
         qw/
-            \u1680 \u180e \u2000 \u2001 \u2002 \u2003 \u2004 \u2005
+            \u1680 \u2000 \u2001 \u2002 \u2003 \u2004 \u2005
             \u2006 \u2007 \u2008 \u2009 \u200a \u202f \u205f \u3000
             /
     ],
@@ -340,7 +340,7 @@ ok:
    print "\\n"
 .end
 CODE
-11111111111111111111111111
+1111111111111111111111111
 OUT
 
     pir_output_is( <<"CODE", <<'OUT', "unicode find_ccclass whitespace" );
@@ -374,7 +374,7 @@ OUT
    print "\\n"
 .end
 CODE
-29 26
+28 25
 OUT
 }
 
