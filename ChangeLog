@@ -1,8 +1,10 @@
-2013-12-17    release 5.11.0
+2014-01-21    release 6.0.0
     - Core
     - Build
     - Documentation
     - Tests
+        + Updated to Unicode 6.3 (libicu5.2): U+180e Mongolian Vowel Separator
+          is no whitespace anymore [GH #1015]
     - Community
 
 2013-11-19    release 5.10.0
