@@ -1,9 +1,9 @@
 {
-    "release.version"  : "5.10.0",
-    "release.name"     : "Sun Conure",
+    "release.version"  : "6.0.0",
+    "release.name"     : "Red-necked Amazon",
     "release.day"      : "Tuesday",
-    "release.nextdate" : "17 Dec 2013",
-    "release.type"     : "devel",
+    "release.nextdate" : "18 Feb 2014",
+    "release.type"     : "supported",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -12,10 +12,10 @@
     "web.org_root"     : "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "14 Dec 2013",
+    "bugday.date"      : "15 Feb 2014",
 
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
-    "wiki.bugday"      : "bug_day_2013_12_14",
+    "wiki.bugday"      : "bug_day_2014_02_15",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/5.10.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/6.0.0/"
 }

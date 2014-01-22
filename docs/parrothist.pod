@@ -166,5 +166,8 @@ Starred release numbers indicate supported releases.
  Util        5.8.0          2013-Sep-17     (No release; pining for the fjords)
  dukeleto    5.9.0 *        2013-Oct-15     "Fantastick Parrot"
  Util        5.10.0         2013-Nov-19     "Sun Conure"
+ Util        5.11.0         2013-Dec-17     (No release; pining for the fjords)
+
+ Util        6.0.0 *        2014-Jan-21     "Red-necked Amazon"
 
 =cut
