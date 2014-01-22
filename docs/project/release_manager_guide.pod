@@ -514,7 +514,7 @@ Send a text email to C<parrot-dev>, C<parrot-users>, C<perl6-language>,
 C<perl6-announce>, etc. You should also include L<lwn.net> in
 this mailing; email to C<lwn> at that domain.
 
-Also, notify Perl Weekly at perlweekly@perlweekly.com .
+Also, notify Perl Weekly at C<szabgab@gmail.com> .
 
 =item 2
 
