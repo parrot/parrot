@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008-2010, Parrot Foundation.
+Copyright (C) 2008-2014, Parrot Foundation.
 
 
 seeing if libffi is installed
@@ -13,7 +13,7 @@ int main() {
     ffi_type *args[1];
     void *values[1];
     char *s;
-    int rc;
+    ffi_arg rc;
 
     /* Initialize the argument info vectors */
     args[0] = &ffi_type_pointer;
