@@ -385,6 +385,9 @@ Parrot_pf_tag_constant(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct),
           case 1:
             hi = cur;
             break;
+          default:
+             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                "Non POSIX strcmp");
         }
     }
 
@@ -452,6 +455,9 @@ Parrot_pf_subs_by_tag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
               case 1:
                 top_hi = cur;
                 break;
+              default:
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                    "Non POSIX strcmp");
             }
         }
 
