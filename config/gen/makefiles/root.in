@@ -115,6 +115,7 @@ LDFLAGS          = @ldflags@ @ld_debug@
 INNO_SETUP       = iscc
 TEMPDIR          = @tempdir@
 RPATH_BLIB       = @rpath_blib@
+PODEXTRACT       = $(PERL) $(BUILD_TOOLS_DIR)/podextract.pl
 ADDGENERATED     = $(PERL) $(BUILD_TOOLS_DIR)/addgenerated.pl
 #IF(darwin):export MACOSX_DEPLOYMENT_TARGET = @osx_version@
 

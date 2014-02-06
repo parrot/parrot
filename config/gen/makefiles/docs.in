@@ -11,6 +11,7 @@ RM_RF   = @rm_rf@
 PERLDOC = @perldoc@
 POD2MAN = @pod2man@
 VERSION = @VERSION@@DEVEL@
+PODEXTRACT   = $(PERL) ../tools/build/podextract.pl
 ADDGENERATED = $(PERL) ../tools/build/addgenerated.pl
 OPS_SUMMARY = ../tools/docs/ops_summary.pl
 
@@ -63,8 +64,7 @@ doc-prep:
 	$(TOUCH) doc-prep
 
 packfile-c.pod: ../src/packfile/api.c
-#IF(new_perldoc):	$(PERLDOC) -ud packfile-c.pod ../src/packfile/api.c
-#ELSE:	$(PERLDOC) -u ../src/packfile/api.c > packfile-c.pod
+	$(PODEXTRACT) ../src/packfile/api.c packfile-c.pod
 	$(ADDGENERATED) "docs/$@" "[doc]"
 
 .pod.1 : # suffix rule (limited support)
