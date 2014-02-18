@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -139,7 +139,7 @@ test_pbc_number('4_12_le', "i386 32 bit opcode_t, 4 byte intval, 12 byte long do
 # ]
 test_pbc_number('4_8_be', "big-endian 32 bit opcode_t, 4 byte intval, 8 byte double");
 
-# any ordinary 64-bit intel unix:
+# any ordinary 64-bit intel linux, cygwin, mingw, MSWin32, ...:
 # HEADER => [
 #         wordsize  = 8   (interpreter's wordsize/INTVAL = 8/8)
 #         byteorder = 0   (interpreter's byteorder       = 0)
@@ -151,7 +151,7 @@ test_pbc_number('4_8_be', "big-endian 32 bit opcode_t, 4 byte intval, 8 byte dou
 # ]
 test_pbc_number('8_8_le', "x86_64 64 bit opcode_t, 8 byte intval, 8 byte double");
 
-# i86_64 with floatval='long double'
+# x86_64 with floatval='long double'
 # HEADER => [
 #         wordsize  = 8   (interpreter's wordsize/INTVAL = 8/8)
 #         byteorder = 0   (interpreter's byteorder       = 0)
