@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -441,7 +441,7 @@ archive at L<http://groups.google.com/group/parrot-dev/>.
 
 =head2 IRC
 
-The Parrot IRC channel is hosted on irc.parrot.org and is named C<#parrot>.
-Alternative IRC servers are at irc.pobox.com and irc.rhizomatic.net.
+The Parrot IRC channel is hosted on L<irc.perl.org:6667> and is named C<#parrot>.
+This Perl server network is also called C<MagNET> or C<Rhizomatic>.
 
 =cut
