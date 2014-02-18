@@ -160,7 +160,7 @@ sub build_and_run_tests {
     run( 'perl', 'Configure.pl', '--test' );
 
     # XXX Use separate filehandles to redirect stderr/stdout to log file
-    run( 'make', 'world', 'html' );
+    run( 'make', 'world', 'installable', 'html' );
 
     #_edit('make_world_html.log');
 
@@ -464,7 +464,7 @@ sub update_pbc_compat {
 
     print "== UPDATING PBC FILES ==\n";
 
-    run( 'sh', 'tools/dev/mk_packfile_pbc' );
+    #run( 'sh', 'tools/dev/mk_packfile_pbc' );
     run( 'sh', 'tools/dev/mk_native_pbc' );
 }
 
