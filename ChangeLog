@@ -1,13 +1,10 @@
 2014-02-18    release 6.1.0
-    - Core
     - Build
         + Improve auto::libffi probe with -fstack-protector-all or
           -fstack-protector-strong with recent GCC and OpenBSD’s toolchains
     - Documentation
         + Replace perldoc by a new podextract.pl [GH #1028, #973, #520], which fixes
           problems with 'sudo make install' generated ops pods as root.
-    - Tests
-    - Community
 
 2014-01-21    release 6.0.0
     - Core
