@@ -1,4 +1,4 @@
-# Parrot is Copyright (C) 2001-2008, Parrot Foundation.
+# Parrot is Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -34,6 +34,14 @@ L<http://activestate.com>
 =item  * BBC
 
 L<http://bbc.co.uk>
+
+=item  * cPanel
+
+L<http://cpanel.net>
+
+=item  * Erin Schoenhals
+
+Provided her old Mac Powerbook G4 for big-endian testing and native_pbc updates.
 
 =back
 
