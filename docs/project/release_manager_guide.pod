@@ -253,7 +253,8 @@ Parrot versions to generate all native_pbc files.
 If F<PBC_COMPAT> was not updated and you got no updated native_pbc files,
 you need to update the native pbc headers with
 C<perl tools/dev/pbc_header.pl --update-fingerprint t/native_pbc/*.pbc>,
-so that the native_pbc tests will not be TODO'd.
+so that the native_pbc tests will not be TODO'd, but skip
+unreadable old PBC files for big endian 8 bit platforms F<*_8_be.pbc>.
 
 =item 8
 

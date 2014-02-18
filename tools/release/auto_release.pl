@@ -1,6 +1,6 @@
 #! perl
 
-# Copyright (C) 2011, Parrot Foundation.
+# Copyright (C) 2011-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -19,6 +19,8 @@ etc.
 If you are familiar with the Release Manager Guide
 (F<docs/project/release_manager_guide.pod>), this script can take care of
 everything up until section IX.
+
+It doesn't work in a Windows F<cmd.exe> shell.
 
 =head1 OPTIONS
 
@@ -458,14 +460,27 @@ sub tag_release {
     run( 'git', 'push', '--tags' );
 }
 
-# Prompts user to edit PBC_COMPAT and regenerates bytecode
+# Prompts user to edit PBC_COMPAT.
+# If the PBC_COMPAT was changed we need to regenerates native bytecode fully.
+# For supported releases also regenerate fully, for developer releases and no
+# PBC_COMPAT change just update the fingerprint.
 sub update_pbc_compat {
     _edit('PBC_COMPAT');
 
-    print "== UPDATING PBC FILES ==\n";
-
-    #run( 'sh', 'tools/dev/mk_packfile_pbc' );
-    run( 'sh', 'tools/dev/mk_native_pbc' );
+    if ($supported) {
+        print "== REGENERATING PBC FILES ==\n";
+        run( 'sh', 'tools/dev/mk_native_pbc' );
+    }
+    else {
+        print "== UPDATING PBC FILES ==\n";
+        for my $pbc (glob "t/native_pbc/*.pbc") {
+            # only of natively parsable, i.e. skip old BE endian files
+            my $rundump = $^O eq 'MSWin32' ? "pbc_dump.exe" : "./pbc_dump";
+            if (`$rundump $pbc`) {
+                run( 'perl', 'tools/dev/pbc_header.pl','--update-fingerprint', $pbc);
+            }
+        }
+    }
 }
 
 # Updates version-specific information in particular files
