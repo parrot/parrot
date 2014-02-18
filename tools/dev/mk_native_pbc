@@ -115,7 +115,7 @@ if [ "$1" != "--noconf" ]; then
     perl Configure.pl --debugging $conf --nomanicheck --without-icu --without-pcre --without-gmp --without-libffi
 fi
 tail myconfig
-make -s || exit 1
+make -s parrot parrot_config pbc_dump || exit 1
 
 for T in integer string
 do
