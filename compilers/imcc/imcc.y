@@ -5,7 +5,7 @@
  * Intermediate Code Compiler for Parrot.
  *
  * Copyright (C) 2002 Melvin Smith <melvin.smith@mindspring.com>
- * Copyright (C) 2002-2010, Parrot Foundation.
+ * Copyright (C) 2002-2014, Parrot Foundation.
  *
  * Grammar of the PIR language parser.
  *
@@ -45,7 +45,7 @@ This file contains the grammar of the PIR language parser.
 
 /* prevent declarations of malloc() and free() in the generated parser. */
 #define YYMALLOC
-#define YYFREE(Ptr) do { /* empty */; } while (YYID (0))
+#define YYFREE(Ptr) do { /* empty */; } while (0)
 
 #ifndef YYENABLE_NLS
 #  define YYENABLE_NLS 0
@@ -383,7 +383,7 @@ static void set_lexical(
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-
+#undef YYDEBUG
 #define YYDEBUG 1
 #define YYERROR_VERBOSE 1
 
@@ -1119,7 +1119,7 @@ do_loadlib(ARGMOD(imc_info_t *imcc), ARGIN(const char *lib))
 %nonassoc CONCAT DOT
 
  /* %locations */
-%pure_parser
+%pure-parser
 
 %parse-param {void *yyscanner}
 %lex-param   {void *yyscanner}
@@ -2195,7 +2195,16 @@ arglist:
            $$ = 0;
            add_pcc_named_arg_var(imcc, imcc->cur_call, $1, $3);
          }
-   | STRINGC ADV_ARROW var
+   | STRINGC ADV_ARROW var /* State 385 conflicts: 1 shift/reduce
+State 385
+  263 arglist: STRINGC . ADV_ARROW var
+  326 stringc: STRINGC .
+
+    ADV_ARROW  shift, and go to state 446
+
+    ADV_ARROW  [reduce using rule 326 (stringc)]
+    $default   reduce using rule 326 (stringc)
+*/
          {
            $$ = 0;
            add_pcc_named_arg(imcc, imcc->cur_call,
