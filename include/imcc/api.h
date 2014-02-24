@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011, Parrot Foundation.
+ * Copyright (C) 2011-2014, Parrot Foundation.
  */
 
 #ifndef PARROT_IMCC_API_H_GUARD
@@ -44,6 +44,14 @@ Parrot_Int imcc_preprocess_file_api(
     Parrot_PMC compiler,
     Parrot_String file);
 
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+Parrot_Int imcc_set_debug_api(
+    Parrot_PMC interp_pmc,
+    Parrot_PMC compiler,
+    Parrot_Int traceflags,
+    Parrot_Int yydebug);
+
 #define ASSERT_ARGS_imcc_compile_file_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pbc))
 #define ASSERT_ARGS_imcc_get_pasm_compreg_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -51,6 +59,7 @@ Parrot_Int imcc_preprocess_file_api(
 #define ASSERT_ARGS_imcc_get_pir_compreg_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(compiler))
 #define ASSERT_ARGS_imcc_preprocess_file_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_imcc_set_debug_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/api.c */
 

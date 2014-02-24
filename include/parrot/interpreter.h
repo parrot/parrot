@@ -1,5 +1,5 @@
 /* interpreter.h
- *  Copyright (C) 2001-2012, Parrot Foundation.
+ *  Copyright (C) 2001-2014, Parrot Foundation.
  *  Overview:
  *     The interpreter API handles running the operations
  */
@@ -38,6 +38,7 @@ typedef enum {
     PARROT_EVAL_DEBUG_FLAG          = 0x20,  /* create EVAL_n file */
     PARROT_REG_DEBUG_FLAG           = 0x40,  /* fill I,N with garbage */
     PARROT_CTX_DESTROY_DEBUG_FLAG   = 0x80,  /* ctx of a sub is gone */
+    PARROT_YYDEBUG_FLAG             = 0x100, /* debug imcc parsing */
     PARROT_ALL_DEBUG_FLAGS          = 0xffff
 } Parrot_debug_flags;
 /* &end_gen */
@@ -48,6 +49,11 @@ typedef enum {
     PARROT_TRACE_OPS_FLAG           = 0x01,  /* op execution trace */
     PARROT_TRACE_FIND_METH_FLAG     = 0x02,  /* find_method */
     PARROT_TRACE_SUB_CALL_FLAG      = 0x04,  /* invoke/retcc */
+    PARROT_TRACE_OPT_0              = 0x08,  /* TODO imcc -O0 or -O */
+    PARROT_TRACE_OPT_PRE            = 0x10,  /* TODO imcc -O1 */
+    PARROT_TRACE_OPT_CFG            = 0x20,  /* TODO imcc -O2 */
+    PARROT_TRACE_OPT_PASM           = 0x40,  /* TODO imcc OPT_PASM */
+    PARROT_TRACE_OPT_SUB            = 0x80,  /* TODO imcc OPT_SUB */
     PARROT_ALL_TRACE_FLAGS          = 0xffff
 } Parrot_trace_flags;
 /* &end_gen */

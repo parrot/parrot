@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2013, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 ###############################################################################
 #
@@ -1784,6 +1784,7 @@ $(FRP_DIR)/main$(O) : \
 	$(INC_DIR)/core_types.h \
 	$(INC_DIR)/feature.h \
 	$(INC_DIR)/has_header.h \
+	$(INC_DIR)/interpreter.h \
 	$(INC_DIR)/longopt.h \
 	$(INC_DIR)/pbcversion.h \
 	include/imcc/api.h \
@@ -2392,6 +2393,10 @@ testr : test_prep
 # normal core, optimization level 1
 testO1 : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -O1 $(RUNCORE_TEST_FILES)
+
+# optimization level 2 has some errors
+testO2 : test_prep
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) -O2 $(RUNCORE_TEST_FILES)
 
 # test the EXEC stuff
 testexec: test_prep

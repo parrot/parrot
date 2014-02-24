@@ -14,6 +14,7 @@ compilers/imcc/api$(O) : \
     compilers/imcc/debug.h \
     include/parrot/api.h \
     compilers/imcc/instructions.h \
+    include/pmc/pmc_imccompiler.h \
     $(PARROT_H_HEADERS)
 
 compilers/imcc/pcc$(O) : \

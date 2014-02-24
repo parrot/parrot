@@ -26,6 +26,7 @@ IMCC call-in routines for use with the Parrot embedding API
 #include "parrot/parrot.h"
 #include "parrot/extend.h"
 #include "imcc/api.h"
+#include "pmc/pmc_imccompiler.h"
 #include "imc.h"
 
 /* HEADERIZER HFILE: include/imcc/api.h */
@@ -199,6 +200,30 @@ imcc_preprocess_file_api(Parrot_PMC interp_pmc, Parrot_PMC compiler,
     STRING * const meth_name = Parrot_str_new(interp, "preprocess", 0);
     Parrot_pcc_invoke_method_from_c_args(interp, compiler, meth_name,
             "S->", file);
+    IMCC_API_CALLOUT(interp_pmc, interp)
+}
+
+/*
+
+=item C<Parrot_Int imcc_set_debug_api(Parrot_PMC interp_pmc, Parrot_PMC
+compiler, Parrot_Int traceflags, Parrot_Int yydebug)>
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+Parrot_Int
+imcc_set_debug_api(Parrot_PMC interp_pmc, Parrot_PMC compiler,
+        Parrot_Int traceflags, Parrot_Int yydebug)
+{
+    ASSERT_ARGS(imcc_set_debug_api)
+    IMCC_API_CALLIN(interp_pmc, interp)
+
+    struct imc_info_t * imcc = (struct imc_info_t *)VTABLE_get_pointer(interp, compiler);
+    imcc_set_debug_mode(imcc, traceflags, yydebug);
+
     IMCC_API_CALLOUT(interp_pmc, interp)
 }
 

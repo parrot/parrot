@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2007-2012, Parrot Foundation.
+Copyright (C) 2007-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -410,6 +410,7 @@ Parrot_cmd_options(void)
         { '\0', OPT_HASH_SEED, OPTION_required_FLAG, { "--hash-seed" } },
         { 'I', 'I', OPTION_required_FLAG, { "--include" } },
         { 'L', 'L', OPTION_required_FLAG, { "--library" } },
+        { 'O', 'O', OPTION_optional_FLAG, { "--optimize" } },
         { 'R', 'R', OPTION_required_FLAG, { "--runcore" } },
         { 'g', 'g', OPTION_required_FLAG, { "--gc" } },
         { '\0', OPT_GC_NURSERY_SIZE, OPTION_required_FLAG, { "--gc-nursery-size" } },
