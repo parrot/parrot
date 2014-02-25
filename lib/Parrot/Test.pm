@@ -677,6 +677,9 @@ sub _run_test_file {
     # Switch to a different extension when we are generating code.
     my $out_f = per_test( '.out', $test_no );
 
+    # honor opt* filename to actually run code with -Ox
+    my $args = $ENV{TEST_PROG_ARGS} || '';
+
     # Name of the file with test code.
     # This depends on which kind of code we are testing.
     my $code_f;
@@ -685,6 +688,7 @@ sub _run_test_file {
     }
     elsif ( $func =~ m/^pasm_(exit_code|.*?output_)/ ) {
         $code_f = per_test( '.pasm', $test_no );
+        $args .= " -a";
     }
     elsif ( $func =~ m/^pbc_(exit_code|.*?output_)/ ) {
         $code_f = per_test( '.pbc', $test_no );
@@ -701,8 +705,6 @@ sub _run_test_file {
         write_code_to_file( $code, $code_f );
     }
 
-    # honor opt* filename to actually run code with -Ox
-    my $args = $ENV{TEST_PROG_ARGS} || '';
     my $opt = $code_basef =~ m!opt(.)! ? "-O$1" : "";
     $args .= " $opt";
 

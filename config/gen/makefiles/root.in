@@ -1474,7 +1474,7 @@ hello: test_prep examples/pasm/hello$(EXE)
 	.@slash@examples@slash@pasm@slash@hello$(EXE) "from your friendly makefile"
 
 examples/pasm/hello.pbc: examples/pasm/hello.pasm
-	$(PARROT) -o examples/pasm/hello.pbc examples/pasm/hello.pasm
+	$(PARROT) -a -o examples/pasm/hello.pbc examples/pasm/hello.pasm
 
 # The -o option of parrot did not work with the object file extension ".o"
 # so as work around pbc_to_exe is used and the original commands are only
@@ -2305,7 +2305,7 @@ GC_TEST_FILES = \
 pbctestfiles: $(PBC_TEST_FILES)
 
 t/pmc/testlib/number.pbc: $(PARROT) t/pmc/testlib/number.pasm
-	$(PARROT) -o t/pmc/testlib/number.pbc t/pmc/testlib/number.pasm
+	$(PARROT) -a -o t/pmc/testlib/number.pbc t/pmc/testlib/number.pasm
 	$(ADDGENERATED) "$@" "[test]"
 
 t/pmc/testlib/annotations.pbc: $(PARROT) t/pmc/testlib/annotations.pir
@@ -2473,7 +2473,7 @@ benchmark_tests : test_prep
 
 # Running a benchmark
 mopsbench : test_prep
-	$(PARROT) examples/benchmarks/mops_intval.pasm
+	$(PARROT) -a examples/benchmarks/mops_intval.pasm
 
 # distro tests
 distro_tests : test_prep
