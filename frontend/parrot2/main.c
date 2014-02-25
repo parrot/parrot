@@ -706,8 +706,14 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
         usage(stderr);
         exit(EXIT_FAILURE);
     }
-    for (i = opt.opt_index; i < argc; i++)
+    for (i = opt.opt_index; i < argc; i++) {
+        if (!args->have_pasm_file) {
+            const char * const ext = strrchr(argv[i], '.');
+            if (ext && strcmp(ext, ".pasm") == 0)
+                args->have_pasm_file = 1;
+        }
         pargs[nargs++] = argv[i];
+    }
 
     /* Make sure we don't overrun the end of the array */
     PARROT_ASSERT(nargs <= pargs_size);
