@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -765,8 +765,8 @@ sub cond_eval {
 
 Adds $path to F<MANIFEST_configure.generated>.
 
-Deprecated, there is no MANIFEST_configure.generated anymore.
-Replaced by add_to_generated().
+Deprecated, there is no F<MANIFEST_configure.generated> anymore.
+Replaced by C<add_to_generated()>.
 
 =back
 
@@ -776,7 +776,9 @@ sub append_configure_log {
     my $conf = shift;
     my $target = shift;
     if ( $conf->{active_configuration} ) {
-        my $generated_log = 'MANIFEST_configure.generated'; # TODO: MANIFEST.generated
+        warn "append_configure_log() is DEPRECATED and ignored. Use add_to_generated() instead";
+
+        my $generated_log = 'MANIFEST_configure.generated';
         open my $GEN, '>>', $generated_log
             or die "Can't open $generated_log for appending: $!";
         print $GEN "$target\n";

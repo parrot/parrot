@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -42,7 +42,6 @@ sub generate_h {
     my ( $self, $conf ) = @_;
 
     my $file = 'include/parrot/core_pmcs.h';
-    # $conf->append_configure_log($file);
     add_to_generated($file, "[main]", "include");
     open( my $OUT, '>', "${file}_tmp" );
 
@@ -89,7 +88,6 @@ sub generate_c {
     my $file = "src/core_pmcs.c";
     my @pmcs = split( qr/ /, $conf->data->get('pmc_names') );
 
-    # $conf->append_configure_log($file);
     add_to_generated($file, "[]", "");
     open( my $OUT, '>', "${file}_tmp" );
 
@@ -157,7 +155,6 @@ sub generate_pm {
     my $file = "lib/Parrot/PMC.pm";
     my @pmcs = split( qr/ /, $conf->data->get('pmc_names') );
 
-    # $conf->append_configure_log($file);
     add_to_generated($file, "[devel]", "lib");
     open( my $OUT, '>', "${file}_tmp" );
 
@@ -205,6 +202,7 @@ sub coda {
 /*
  * Local variables:
  *   c-file-style: "parrot"
+ *   buffer-read-only: t
  * End:
  * ${v}: readonly expandtab shiftwidth=4:
  */
