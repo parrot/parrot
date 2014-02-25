@@ -24,12 +24,18 @@ Start Parrot, bootstrapping to PIR as early as possible.
 #include <ctype.h>
 #include "parrot/longopt.h"
 #include "parrot/api.h"
+#include "parrot/interpreter.h"
+#include "parrot/settings.h"
+#include "parrot/warnings.h"
 #include "imcc/api.h"
 
 struct init_args_t {
     const char *run_core_name;
     Parrot_Int trace;
+    Parrot_Int have_pasm_file;
     Parrot_Int turn_gc_off;
+    Parrot_Int yydebug;
+    Parrot_Int preprocess_only;
     const char ** argv;
     int argc;
 };
@@ -133,6 +139,7 @@ main(int argc, const char *argv[])
     Parrot_PMC interp, bytecodepmc, args;
     Parrot_Init_Args *initargs;
     struct init_args_t parsed_flags;
+    Parrot_PMC compiler = NULL;
 
     GET_INIT_STRUCT(initargs);
 
@@ -161,9 +168,18 @@ main(int argc, const char *argv[])
         show_last_error_and_exit(interp);
 
     Parrot_api_toggle_gc(interp, 0);
-    setup_imcc(interp);
+
+    if (!(parsed_flags.have_pasm_file
+          ? imcc_get_pasm_compreg_api(interp, 1, &compiler)
+          : imcc_get_pir_compreg_api(interp, 1, &compiler))) {
+        show_last_error_and_exit(interp);
+    }
     if (!parsed_flags.turn_gc_off)
         Parrot_api_toggle_gc(interp, 1);
+    if (parsed_flags.yydebug) {
+        if (!imcc_set_debug_api(interp, compiler, parsed_flags.trace, 1))
+            exit(EXIT_FAILURE);
+    }
 
     if (!(Parrot_api_pmc_wrap_string_array(interp, parsed_flags.argc, parsed_flags.argv,
                                             &args)
@@ -571,6 +587,9 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     args->run_core_name = "fast";
     args->trace = 0;
     args->turn_gc_off = 0;
+    args->have_pasm_file = 0;
+    args->preprocess_only = 0;
+    args->yydebug = 0;
     pargs[nargs++] = argv[0];
 
     while ((status = longopt_get(argc, argv, Parrot_cmd_options(), &opt)) > 0) {
@@ -595,15 +614,13 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
                 args->trace = _temp_flag;
             }
             else
-                args->trace = 0x01;
-                /* *trace = PARROT_TRACE_OPS_FLAG; */
+                args->trace = PARROT_TRACE_OPS_FLAG;
             break;
           case 'D':
             if (opt.opt_arg && is_all_hex_digits(opt.opt_arg))
                 result = Parrot_api_debug_flag(interp, strtoul(opt.opt_arg, NULL, 16), 1);
             else
-                /* Parrot_api_debug_flag(interp, PARROT_MEM_STAT_DEBUG_FLAG, 1); */
-                result = Parrot_api_debug_flag(interp, 0x01, 1);
+                result = Parrot_api_debug_flag(interp, PARROT_MEM_STAT_DEBUG_FLAG, 1);
             break;
 
           case '.':  /* Give Windows Parrot hackers an opportunity to
@@ -638,19 +655,21 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             pargs[nargs++] = "-c";
             break;
           case OPT_GC_DEBUG:
-          /*
 #if DISABLE_GC_DEBUG
             Parrot_warn(interp, 0xFFFF,
                 "PARROT_GC_DEBUG is set but the binary was compiled "
                 "with DISABLE_GC_DEBUG.");
 #endif
-            */
-            /* Parrot_api_flag(interp, PARROT_GC_DEBUG_FLAG, 1); */
-            result = Parrot_api_flag(interp, 0x10, 1);
+            result = Parrot_api_flag(interp, PARROT_GC_DEBUG_FLAG, 1);
             break;
           case OPT_DESTROY_FLAG:
-            /* Parrot_api_flag(interp, PARROT_DESTROY_FLAG, 1); */
-            result = Parrot_api_flag(interp, 0x200, 1);
+            result = Parrot_api_flag(interp, PARROT_DESTROY_FLAG, 1);
+            break;
+          case 'y':
+            args->yydebug = 1;
+            break;
+          case 'a':
+            args->have_pasm_file = 1;
             break;
 
             /* TODO: Can we do these in prt0.pir? */
@@ -664,12 +683,12 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             result = Parrot_api_add_dynext_search_path(interp, opt.opt_arg);
             break;
           case 'w':
-            /* result = Parrot_api_set_warnings(interp, PARROT_WARNINGS_ALL_FLAG); */
-            result = Parrot_api_set_warnings(interp, 0xFFFF);
+            result = Parrot_api_set_warnings(interp, PARROT_WARNINGS_ALL_FLAG);
             break;
 
           case 'E':
             pargs[nargs++] = "-E";
+            args->preprocess_only = 1;
             break;
           default:
             /* languages handle their arguments later (after being initialized) */

@@ -221,7 +221,7 @@ imcc_set_debug_api(Parrot_PMC interp_pmc, Parrot_PMC compiler,
     ASSERT_ARGS(imcc_set_debug_api)
     IMCC_API_CALLIN(interp_pmc, interp)
 
-    struct imc_info_t * imcc = (struct imc_info_t *)VTABLE_get_pointer(interp, compiler);
+    imc_info_t * imcc = (imc_info_t *)VTABLE_get_pointer(interp, compiler);
     imcc_set_debug_mode(imcc, traceflags, yydebug);
 
     IMCC_API_CALLOUT(interp_pmc, interp)
