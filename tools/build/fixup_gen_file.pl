@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2014, Parrot Foundation.
 
 =head1 NAME
 
