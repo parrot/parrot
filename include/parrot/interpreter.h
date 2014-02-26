@@ -38,9 +38,9 @@ typedef enum {
     PARROT_EVAL_DEBUG_FLAG          = 0x20,  /* create EVAL_n file */
     PARROT_REG_DEBUG_FLAG           = 0x40,  /* fill I,N with garbage */
     PARROT_CTX_DESTROY_DEBUG_FLAG   = 0x80,  /* ctx of a sub is gone */
-    PARROT_IMCC_YYDEBUG             = 0x100, /* imcc parsing */
+    PARROT_IMCC_VERBOSE             = 0x100, /* these appear at imcc >> 16 */
     PARROT_IMCC_LEXER               = 0x200,
-    PARROT_IMCC_PARSER              = 0x400,
+    PARROT_IMCC_PARSER              = 0x400,  /* sets yydebug */
     PARROT_IMCC_IMC                 = 0x800,
     PARROT_IMCC_CFG                 = 0x1000,
     PARROT_IMCC_OPT1                = 0x2000,

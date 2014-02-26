@@ -217,6 +217,7 @@ parrot [Options] <file> [<program options...>]
     -a --pasm
     -c --pbc
     -r --run-pbc
+    -v --verbose
     -y --yydebug
     -d --imcc-debug[=HEXFLAGS] (see --help-debug)
    <Language options>
@@ -238,7 +239,7 @@ function __usage_and_exit[anon](string msg [optional], int has_msg [opt_flag])
     var stderr = getstderr();
     if (has_msg)
         stderr.print(msg + "\n");
-    stderr.print("parrot -[acEGhrtVwy.] [-D [FLAGS]] ");
+    stderr.print("parrot -[acEGhrtVvwy.] [-D [FLAGS]] ");
     stderr.print("[-[LIX] path] [-R runcore] [-o FILE] <file> <args>\n");
     exit(1);
 }

@@ -2,7 +2,7 @@
  *
  * IMCC call-in routines for use with the Parrot embedding API
  *
- * Copyright (C) 2011, Parrot Foundation.
+ * Copyright (C) 2011-2014, Parrot Foundation.
  */
 
 /*
@@ -206,7 +206,7 @@ imcc_preprocess_file_api(Parrot_PMC interp_pmc, Parrot_PMC compiler,
 /*
 
 =item C<Parrot_Int imcc_set_debug_api(Parrot_PMC interp_pmc, Parrot_PMC
-compiler, Parrot_Int imcc_debug, Parrot_Int yydebug)>
+compiler, Parrot_Int imccflags)>
 
 =cut
 
@@ -216,13 +216,16 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 Parrot_Int
 imcc_set_debug_api(Parrot_PMC interp_pmc, Parrot_PMC compiler,
-        Parrot_Int imcc_debug, Parrot_Int yydebug)
+        Parrot_Int imccflags)
 {
     ASSERT_ARGS(imcc_set_debug_api)
     IMCC_API_CALLIN(interp_pmc, interp)
 
     imc_info_t * imcc = (imc_info_t *)VTABLE_get_pointer(interp, compiler);
-    imcc_set_debug_mode(imcc, imcc_debug, yydebug);
+    if (imccflags & PARROT_IMCC_VERBOSE)
+        imcc_set_verbosity(imcc, 1);
+    /* >> 16 translates public PARROT_IMCC_* flags to internal imcc->debug flags. */
+    imcc_set_debug_mode(imcc, imccflags >> 16, imccflags & PARROT_IMCC_PARSER);
 
     IMCC_API_CALLOUT(interp_pmc, interp)
 }
