@@ -46,10 +46,11 @@ Parrot_Int imcc_preprocess_file_api(
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-Parrot_Int imcc_set_debug_api(
+Parrot_Int imcc_set_flags_api(
     Parrot_PMC interp_pmc,
     Parrot_PMC compiler,
-    Parrot_Int imccflags);
+    Parrot_Int debug,
+    Parrot_Int opt);
 
 #define ASSERT_ARGS_imcc_compile_file_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pbc))
@@ -58,7 +59,7 @@ Parrot_Int imcc_set_debug_api(
 #define ASSERT_ARGS_imcc_get_pir_compreg_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(compiler))
 #define ASSERT_ARGS_imcc_preprocess_file_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_imcc_set_debug_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_imcc_set_flags_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/api.c */
 

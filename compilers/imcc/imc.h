@@ -385,11 +385,11 @@ SymReg* get_pasm_reg(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
 
 typedef enum _enum_opt {
     OPT_NONE,
-    OPT_PRE,/* 0x001 */
+    OPT_PRE, /*0x001 */
     OPT_CFG  = 0x002,
     OPT_SUB  = 0x004,
-    OPT_PASM = 0x100,
-    OPT_J    = 0x200
+    OPT_PASM = 0x100
+ /* OPT_J    = 0x200 */
 } enum_opt_t;
 
 struct nodeType_t;
@@ -483,7 +483,6 @@ struct _imc_info_t {
     AsmState              asm_state;
     SymHash               ghash;
     jmp_buf               jump_buf;          /* The jump for error  handling */
-    int                   IMCC_DEBUG;
     int                   cnr;
     int                   debug;
     int                   dont_optimize;

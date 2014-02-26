@@ -38,14 +38,6 @@ typedef enum {
     PARROT_EVAL_DEBUG_FLAG          = 0x20,  /* create EVAL_n file */
     PARROT_REG_DEBUG_FLAG           = 0x40,  /* fill I,N with garbage */
     PARROT_CTX_DESTROY_DEBUG_FLAG   = 0x80,  /* ctx of a sub is gone */
-    PARROT_IMCC_VERBOSE             = 0x100, /* these appear at imcc >> 16 */
-    PARROT_IMCC_LEXER               = 0x200,
-    PARROT_IMCC_PARSER              = 0x400,  /* sets yydebug */
-    PARROT_IMCC_IMC                 = 0x800,
-    PARROT_IMCC_CFG                 = 0x1000,
-    PARROT_IMCC_OPT1                = 0x2000,
-    PARROT_IMCC_OPT2                = 0x4000,
-    PARROT_IMCC_AST                 = 0x8000,
     PARROT_ALL_DEBUG_FLAGS          = 0xffff
 } Parrot_debug_flags;
 /* &end_gen */
@@ -59,6 +51,33 @@ typedef enum {
     PARROT_ALL_TRACE_FLAGS          = 0xffff
 } Parrot_trace_flags;
 /* &end_gen */
+
+typedef enum { /* sync with compilers/imcc/debug.h */
+    PARROT_IMCC_DEBUG_NONE          = 0x00,
+    PARROT_IMCC_VERBOSE             = 0x01,
+    PARROT_IMCC_DEBUG_LEXER         = 0x02,
+    PARROT_IMCC_DEBUG_PARSER        = 0x04,   /* sets yydebug */
+    PARROT_IMCC_DEBUG_IMC           = 0x08,   /* dump symreg, insns */
+    PARROT_IMCC_DEBUG_CFG           = 0x10,
+    PARROT_IMCC_DEBUG_OPT1          = 0x20,
+    PARROT_IMCC_DEBUG_OPT2          = 0x40,
+    PARROT_IMCC_DEBUG_SPILL         = 0x80,
+    PARROT_IMCC_DEBUG_AST           = 0x100,
+    PARROT_IMCC_DEBUG_REG           = 0x200,
+    PARROT_IMCC_DEBUG_REG2          = 0x400,
+    PARROT_IMCC_DEBUG_PBC           = 0x1000,
+    PARROT_IMCC_DEBUG_PBC_CONST     = 0x2000,
+    PARROT_IMCC_DEBUG_PBC_FIXUP     = 0x4000,
+    PARROT_IMCC_DEBUG_ALL           = 0xffff
+} Parrot_imcc_dflags;
+
+typedef enum { /* sync with compilers/imcc/imc.h */
+    PARROT_IMCC_OPT_NONE            = 0x000,
+    PARROT_IMCC_OPT_PRE             = 0x001,  /* -O1 */
+    PARROT_IMCC_OPT_CFG             = 0x002,  /* -O2 */
+    PARROT_IMCC_OPT_SUB             = 0x004,  /* -Oc */
+    PARROT_IMCC_OPT_PASM            = 0x100,  /* -Op */
+} Parrot_imcc_opt_flags;
 
 /* &gen_from_enum(interpcores.pasm) */
 typedef enum {

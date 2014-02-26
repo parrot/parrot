@@ -1669,6 +1669,7 @@ ok 1
 ok 2
 OUTPUT
 
+# TODO -O1
 pir_output_is( <<'CODE', <<'OUTPUT', "newclosure followed by tailcall" );
 ## regression test for newclosure followed by tailcall, which used to recycle
 ## the context too soon.  it looks awful because (a) the original version was
@@ -1712,6 +1713,7 @@ L3:
 .end
 
 
+# TODO -O1 error
 .sub _try_it
         .param int n
         .param pmc closure

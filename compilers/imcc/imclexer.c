@@ -5061,7 +5061,8 @@ determine_input_file_type(ARGMOD(imc_info_t * imcc), ARGIN(STRING *sourcefile))
     }
 
     if (imcc->verbose) {
-        IMCC_info(imcc, 1, "debug = 0x%x\n", imcc->debug);
+        IMCC_info(imcc, 1, "debug = 0x%x, optim = 0x%x\n", imcc->debug,
+                  imcc->optimizer_level);
         IMCC_info(imcc, 1, "Reading %Ss\n", sourcefile);
     }
 

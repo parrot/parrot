@@ -35,9 +35,29 @@ Turn on the I<--gc-debug> flag.
 
 =head1 OPTIONS
 
-=head2 Assembler options
+=head2 Assembler/compiler options
 
 =over 4
+
+=item -O[level]
+
+Valid optimizer levels: C<-O>, C<-O1>, C<-O2>, C<-Op>, C<-Oc>
+
+=item B<-O>[level]
+
+Valid optimizer levels: C<-O>, C<-O1>, C<-O2>
+
+C<-O1> enables the pre_optimizer, runs before control flow graph (CFG) is built.
+It includes strength reduction and rewrites certain if/branch/label constructs.
+
+C<-O2> runs afterwards, handles constant propagation, jump optimizations,
+removal of unused labels and dead code.
+
+C<-Op> applies C<-O2> to pasm files also.
+
+The old options C<-Oc> and C<-Oj> are currently ineffective.
+
+C<-O> defaults to C<-O1>.
 
 =item -a, --pasm
 
@@ -76,6 +96,16 @@ disc and run. This is mainly needed for tests.
 
 Turn on yydebug in F<yacc>/F<bison>.
 
+=item -v, --verbose
+
+Turn on compiler verbosity.
+
+=item B<-d>[=HEXFLAGS]
+
+=item B<--imcc-debug>[=HEXFLAGS]
+
+Turn on compiler debug flags.  I<See> C<parrot --help-debug> for available flag bits.
+
 =item -V, --version
 
 Print version information and exit.
@@ -101,11 +131,17 @@ debugging.  See L<About runcores> for details.
 Select the runcore. The following cores are available in Parrot, but not all
 may be available on your system:
 
-  slow, bounds  bounds checking core (default)
-  gcdebug       performs a full GC run before every op dispatch (good for
-                debugging GC problems)
+  fast          bare-bones core without bounds-checking or
+                context-updating (default)
+
+  slow, bounds  bounds checking core
+
   trace         bounds checking core w/ trace info (see 'parrot --help-debug')
+
   profiling     see F<docs/dev/profilling.pod>
+
+  subprof       subroutine-level profiler
+                (see POD in F<src/runcore/subprof.c>)
 
 The C<jit>, C<switch-jit>, and C<cgp-jit> options are currently aliases for the
 C<fast>, C<switch>, and C<cgp> options, respectively.  We do not recommend
@@ -203,7 +239,7 @@ no single runcore will perform optimally on all architectures (or even for all
 problems on a given architecture), and partly because some of the runcores have
 specific debugging and tracing capabilities.
 
-In the default "slow" runcore, each opcode is a separate C function.
+In the "slow" or "bounds" runcore, each opcode is a separate C function.
 That's pretty easy in pseudocode:
 
     slow_runcore( op ):
@@ -211,7 +247,7 @@ That's pretty easy in pseudocode:
             op = op_function( op )
             check_for_events()
 
-The GC debugging runcore is similar:
+The old GC debugging runcore was similar:
 
     gcdebug_runcore( op ):
         while ( op ):
@@ -250,6 +286,6 @@ full bounds checking, and also printing runtime information to stderr.
 
 =head1 FILES
 
-F<main.c>
+F<frontend/parrot/main.c>
 
 =cut

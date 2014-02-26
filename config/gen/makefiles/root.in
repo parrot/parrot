@@ -2379,7 +2379,7 @@ testj : test_prep
 testr : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -r $(RUNCORE_TEST_FILES)
 
-# normal core, optimization level 1
+# normal core, optimization level 1 (one error)
 testO1 : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -O1 $(RUNCORE_TEST_FILES)
 
@@ -2387,9 +2387,13 @@ testO1 : test_prep
 testO2 : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -O2 $(RUNCORE_TEST_FILES)
 
-# test the EXEC stuff
-testexec: test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) --run-exec $(RUNCORE_TEST_FILES)
+# -Op: -O2 for PASM
+testOp : test_prep
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) -Op $(RUNCORE_TEST_FILES)
+
+# test --run-exec
+#testexec: test_prep
+#	$(PERL) t/harness $(EXTRA_TEST_ARGS) --run-exec $(RUNCORE_TEST_FILES)
 
 # Test that need to be compiled by the C-compiler
 src_tests : test_prep

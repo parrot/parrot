@@ -70,12 +70,12 @@ information about these options, I<see> the "About runcores" section in F<docs/r
 Select the runcore. The following cores are available in Parrot, but not all
 may be available on your system:
 
-  slow, bounds   bounds checking core (default)
+  fast           bare-bones core without bounds-checking or
+                 context-updating (default)
 
-  fast           bare-bones core without bounds-checking or 
-                 context-updating
+  slow, bounds   bounds checking core
 
-  trace          bounds checking core with trace info 
+  trace          bounds checking core with trace info
                  (see 'parrot --help-debug')
 
   profiling      see F<docs/dev/profiling.pod>
@@ -185,6 +185,28 @@ number of OS threads. Minimum number: 2
 
 =over 4
 
+=item B<-O>[level]
+
+Valid optimizer levels: C<-O>, C<-O1>, C<-O2>, C<-Op>
+
+-O1 enables the pre_optimizer, runs before control flow graph (CFG) is built.
+It includes strength reduction and rewrites certain if/branch/label constructs.
+
+-O2 runs afterwards, handles constant propagation, jump optimizations,
+removal of unused labels and dead code.
+
+-Op> applies -O2 to pasm files also.
+
+The old options -Op, -Oc and -Oj are currently ineffective.
+
+-O defaults to -O1.
+
+=item B<-d>[=HEXFLAGS]
+
+=item B<--imcc-debug>[=HEXFLAGS]
+
+Turn on compiler debug flags.  I<See> C<parrot --help-debug> for available flag bits.
+
 =item B<-E>
 
 =item B<--pre-process-only>
@@ -228,6 +250,10 @@ primarily, for tests.
 =item B<-y>
 
 =item B<--yydebug>      Turn on yydebug in F<yacc>/F<bison>.
+
+=item B<-v>
+
+=item B<--verbose>      Turn on compiler verbosity.
 
 =back
 

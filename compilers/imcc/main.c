@@ -238,6 +238,8 @@ imcc_set_verbosity(ARGMOD(imc_info_t *imcc), INTVAL verbose)
 
 Set the optimization level. C<opts> is a string with character code flags.
 
+Unused.
+
 =cut
 
 */

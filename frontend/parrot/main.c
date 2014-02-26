@@ -39,7 +39,8 @@ struct init_args_t {
     Parrot_Int have_pasm_file;
     Parrot_Int turn_gc_off;
     Parrot_Int preprocess_only;
-    Parrot_Int imccflags;
+    Parrot_Int imcc_dflags;
+    Parrot_Int imcc_opts;
 };
 
 extern int Parrot_set_config_hash(Parrot_PMC interp_pmc);
@@ -260,9 +261,10 @@ run_imcc(Parrot_PMC interp, Parrot_String sourcefile, ARGIN(struct init_args_t *
           imcc_get_pasm_compreg_api(interp, 1, &pasm_compiler)))
         show_last_error_and_exit(interp);
     if (flags->preprocess_only) {
-        if (flags->imccflags) {
-            r = imcc_set_debug_api(interp, pir_compiler, flags->imccflags);
-            if (!r) exit(EXIT_FAILURE);
+        if (flags->imcc_dflags || flags->imcc_opts) {
+            if (!imcc_set_flags_api(interp, pir_compiler, flags->imcc_dflags,
+                                    flags->imcc_opts))
+                exit(EXIT_FAILURE);
         }
         r = imcc_preprocess_file_api(interp, pir_compiler, sourcefile);
         exit(r ? EXIT_SUCCESS : EXIT_FAILURE);
@@ -272,9 +274,9 @@ run_imcc(Parrot_PMC interp, Parrot_String sourcefile, ARGIN(struct init_args_t *
         const Parrot_PMC compiler = pasm_mode ? pasm_compiler : pir_compiler;
         Parrot_PMC pbc;
 
-        if (flags->imccflags) {
-            r = imcc_set_debug_api(interp, compiler, flags->imccflags);
-            if (!r) exit(EXIT_FAILURE);
+        if (flags->imcc_dflags || flags->imcc_opts) {
+            if (!imcc_set_flags_api(interp, compiler, flags->imcc_dflags, flags->imcc_opts))
+                exit(EXIT_FAILURE);
         }
         if (!imcc_compile_file_api(interp, compiler, sourcefile, &pbc))
             show_last_error_and_exit(interp);
@@ -758,7 +760,8 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     args->outfile = NULL;
     args->sourcefile = NULL;
     args->preprocess_only = 0;
-    args->imccflags = 0;
+    args->imcc_dflags = 0;
+    args->imcc_opts = 0;
 
     if (argc == 1) {
         usage(stderr);
@@ -794,24 +797,25 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             break;
           case 'd':
             if (opt.opt_arg && is_all_hex_digits(opt.opt_arg))
-                args->imccflags = (Parrot_Int)(strtoul(opt.opt_arg, NULL, 16) << 16);
+                args->imcc_dflags = (Parrot_Int)strtoul(opt.opt_arg, NULL, 16);
             else
-                args->imccflags = PARROT_IMCC_VERBOSE;
+                args->imcc_dflags = PARROT_IMCC_VERBOSE;
             break;
           case 'O':
             if (!opt.opt_arg || !*opt.opt_arg || opt.opt_arg[0] == '0') {
-                args->imccflags |= PARROT_IMCC_OPT1;
+                args->imcc_opts |= PARROT_IMCC_OPT_PRE;
                 break;
             }
             if (strchr(opt.opt_arg, 'p'))
-                args->imccflags |= PARROT_IMCC_OPT1;
+                args->imcc_opts |= PARROT_IMCC_OPT_PASM;
             if (strchr(opt.opt_arg, 'c'))
-                args->imccflags |= PARROT_IMCC_OPT2;
+                args->imcc_opts |= PARROT_IMCC_OPT_SUB;
             if (strchr(opt.opt_arg, '1'))
-                args->imccflags |= PARROT_IMCC_OPT1;
+                args->imcc_opts |= PARROT_IMCC_OPT_PRE;
             if (strchr(opt.opt_arg, '2'))
-                args->imccflags |= (PARROT_IMCC_OPT1|PARROT_IMCC_OPT2);
+                args->imcc_opts |= (PARROT_IMCC_OPT_PRE|PARROT_IMCC_OPT_CFG);
             break;
+
           case '.':  /* Give Windows Parrot hackers an opportunity to
                       * attach a debuggger. */
             fgetc(stdin);
@@ -858,7 +862,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             args->have_pbc_file = 1;
             break;
           case OPT_GC_DEBUG:
-#if DISABLE_GC_DEBUG
+#if 0 && DISABLE_GC_DEBUG
             Parrot_warn(interp, 0xFFFF,
                 "PARROT_GC_DEBUG is set but the binary was compiled "
                 "with DISABLE_GC_DEBUG.");
@@ -885,10 +889,10 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             args->preprocess_only = 1;
             break;
           case 'v': /* same as -d */
-            args->imccflags |= PARROT_IMCC_VERBOSE;
+            args->imcc_dflags |= PARROT_IMCC_VERBOSE;
             break;
-          case 'y': /* same as -d400 */
-            args->imccflags |= PARROT_IMCC_PARSER;
+          case 'y': /* same as -d4 */
+            args->imcc_dflags |= PARROT_IMCC_DEBUG_PARSER;
             break;
           default:
             /* languages handle their arguments later (after being initialized) */

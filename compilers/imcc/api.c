@@ -205,8 +205,11 @@ imcc_preprocess_file_api(Parrot_PMC interp_pmc, Parrot_PMC compiler,
 
 /*
 
-=item C<Parrot_Int imcc_set_debug_api(Parrot_PMC interp_pmc, Parrot_PMC
-compiler, Parrot_Int imccflags)>
+=item C<Parrot_Int imcc_set_flags_api(Parrot_PMC interp_pmc, Parrot_PMC
+compiler, Parrot_Int debug, Parrot_Int opt)>
+
+Public interface to imcc_set_verbosity, imcc_set_optimization_level and
+imcc_set_debug_mode. Overwrites the imcc flags.
 
 =cut
 
@@ -215,17 +218,17 @@ compiler, Parrot_Int imccflags)>
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 Parrot_Int
-imcc_set_debug_api(Parrot_PMC interp_pmc, Parrot_PMC compiler,
-        Parrot_Int imccflags)
+imcc_set_flags_api(Parrot_PMC interp_pmc, Parrot_PMC compiler,
+                   Parrot_Int debug, Parrot_Int opt)
 {
-    ASSERT_ARGS(imcc_set_debug_api)
+    ASSERT_ARGS(imcc_set_flags_api)
     IMCC_API_CALLIN(interp_pmc, interp)
 
     imc_info_t * imcc = (imc_info_t *)VTABLE_get_pointer(interp, compiler);
-    if (imccflags & PARROT_IMCC_VERBOSE)
+    if (debug & PARROT_IMCC_VERBOSE)
         imcc_set_verbosity(imcc, 1);
-    /* >> 16 translates public PARROT_IMCC_* flags to internal imcc->debug flags. */
-    imcc_set_debug_mode(imcc, imccflags >> 16, imccflags & PARROT_IMCC_PARSER);
+    imcc_set_debug_mode(imcc, debug, debug & PARROT_IMCC_DEBUG_PARSER); /* i.e. yydebug */
+    imcc->optimizer_level = opt;
 
     IMCC_API_CALLOUT(interp_pmc, interp)
 }
