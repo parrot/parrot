@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -1669,8 +1669,9 @@ ok 1
 ok 2
 OUTPUT
 
-# TODO -O1
-pir_output_is( <<'CODE', <<'OUTPUT', "newclosure followed by tailcall" );
+TODO: {
+  local $TODO = 'bad -O1 test 63' if $ENV{TEST_PROG_ARGS} =~ / -O[12]/;
+  pir_output_is( <<'CODE', <<'OUTPUT', "newclosure followed by tailcall" );
 ## regression test for newclosure followed by tailcall, which used to recycle
 ## the context too soon.  it looks awful because (a) the original version was
 ## produced by a compiler, and (b) in order to detect regression, we must force
@@ -1736,6 +1737,7 @@ not 2
 [in test]
 got 9.
 OUTPUT
+}
 
 pir_output_is( <<'CODE', <<'OUTPUT', "call evaled vtable code" );
 .sub main :main
