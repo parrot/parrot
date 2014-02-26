@@ -530,7 +530,7 @@ help(void)
     "    -X --dynext add path to dynamic extension search\n"
     "   <Run core options>\n"
     "    -R --runcore slow|bounds|fast\n"
-    "    -R --runcore trace|profiling|gcdebug\n"
+    "    -R --runcore trace|profiling|subprof\n"
     "    -t --trace [flags]\n"
     "   <VM options>\n"
     "    -D --parrot-debug[=HEXFLAGS]\n"
