@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2012, Parrot Foundation.
+# Copyright (C) 2012-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -31,7 +31,7 @@ my @runcore_test_files = glob("@{ $test_groups{runcore} }");
 my @testing_runcore_test_files = glob("@{ $test_groups{testing_runcore} }");
 
 my @targets = ();
-my @alternate_runcore_targets = ( qw| b f r | );
+my @alternate_runcore_targets = ( qw| b f O1 r | ); # O2 not yet
 foreach my $t (@alternate_runcore_targets) {
     push @targets, set_alternate_runcore_target($t);
 }
@@ -45,7 +45,7 @@ my @other_targets = ( qw|
 | );
 foreach my $t ( @other_targets ) {
   push @targets, set_usual_target($t);
-} 
+}
 if ($IN_TESTING) {
     @targets = (
         ( map { set_alternate_runcore_target($_, $IN_TESTING) }
