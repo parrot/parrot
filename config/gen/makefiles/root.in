@@ -1766,27 +1766,16 @@ src/io/buffer$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/buffer.c \
 src/gc/alloc_memory$(O) : $(PARROT_H_HEADERS) src/gc/alloc_memory.c
 
 $(FRPTWO_DIR)/main$(O) : \
+	$(PARROT_H_HEADERS) \
 	$(INC_DIR)/api.h \
-	$(INC_DIR)/compiler.h \
-	$(INC_DIR)/config.h \
-	$(INC_DIR)/core_types.h \
-	$(INC_DIR)/feature.h \
-	$(INC_DIR)/has_header.h \
 	$(INC_DIR)/longopt.h \
-	$(INC_DIR)/pbcversion.h \
 	include/imcc/api.h \
 	$(FRPTWO_DIR)/main.c
 
 $(FRP_DIR)/main$(O) : \
+	$(PARROT_H_HEADERS) \
 	$(INC_DIR)/api.h \
-	$(INC_DIR)/compiler.h \
-	$(INC_DIR)/config.h \
-	$(INC_DIR)/core_types.h \
-	$(INC_DIR)/feature.h \
-	$(INC_DIR)/has_header.h \
-	$(INC_DIR)/interpreter.h \
 	$(INC_DIR)/longopt.h \
-	$(INC_DIR)/pbcversion.h \
 	include/imcc/api.h \
 	$(FRP_DIR)/main.c
 
