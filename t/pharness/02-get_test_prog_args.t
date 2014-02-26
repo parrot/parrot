@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2014, Parrot Foundation.
 # 02-get_test_prog_args.t
 
 use strict;
@@ -12,7 +12,7 @@ eval {
 };
 plan( skip_all => 't/harness only runs once configuration has completed' )
     if $@;
-plan( tests => 12 );
+plan( tests => 11 );
 use Carp;
 use Parrot::Harness::Options qw( get_test_prog_args );
 
@@ -61,7 +61,7 @@ $optsref = {
 $args = get_test_prog_args($optsref, $gc_debug, $run_exec);
 like($args, qr/-d/, "Got expected option");
 like($args, qr/-D40/, "Got expected option");
-like($args, qr/\s--run-exec/, "Got expected option");
+#like($args, qr/\s--run-exec/, "Got expected option");
 
 pass("Completed all tests in $0");
 
