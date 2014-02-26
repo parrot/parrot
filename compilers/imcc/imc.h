@@ -385,7 +385,7 @@ SymReg* get_pasm_reg(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
 
 typedef enum _enum_opt {
     OPT_NONE,
-    OPT_PRE,
+    OPT_PRE,/* 0x001 */
     OPT_CFG  = 0x002,
     OPT_SUB  = 0x004,
     OPT_PASM = 0x100,

@@ -49,7 +49,7 @@ PARROT_WARN_UNUSED_RESULT
 Parrot_Int imcc_set_debug_api(
     Parrot_PMC interp_pmc,
     Parrot_PMC compiler,
-    Parrot_Int traceflags,
+    Parrot_Int imcc_debug,
     Parrot_Int yydebug);
 
 #define ASSERT_ARGS_imcc_compile_file_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

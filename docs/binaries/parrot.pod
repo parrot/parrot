@@ -1,4 +1,4 @@
-# Copyright (C) 2011-2012, Parrot Foundation.
+# Copyright (C) 2011-2014, Parrot Foundation.
 
 =pod
 
@@ -75,16 +75,13 @@ may be available on your system:
   fast           bare-bones core without bounds-checking or 
                  context-updating
 
-  subprof        subroutine-level profiler 
-                 (see POD in 'src/runcore/subprof.c') 
-
   trace          bounds checking core with trace info 
                  (see 'parrot --help-debug')
 
-  profiling      see 'docs/dev/profilling.pod'
+  profiling      see F<docs/dev/profiling.pod>
 
-  gcdebug        performs a full GC run before every op dispatch
-                 (good for debugging GC problems)
+  subprof        subroutine-level profiler
+                 (see POD in F<src/runcore/subprof.c>)
 
 =item B<-p>
 
@@ -286,6 +283,6 @@ most of these people, I<see> F<CREDITS>.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =cut

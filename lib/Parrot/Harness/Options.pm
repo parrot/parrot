@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2009, Parrot Foundation.
+# Copyright (C) 2006-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -32,7 +32,7 @@ sub handle_long_options {
         'runcore-tests'     => 'runcore_tests_only',
         'html'              => 'html',
         'code-tests'        => 'code',
-        'run-exec'          => 'run_exec',
+        #'run-exec'          => 'run_exec',
         'help'              => 'help',
         'archive'           => 'archive',
         'html'              => 'html',
@@ -65,7 +65,7 @@ sub get_test_prog_args {
     ## no critic qw(Bangs::ProhibitFlagComments)
     # XXX find better way
     # for passing run_exec to Parrot::Test
-    $args .= ' --run-exec'    if $run_exec;
+    # $args .= ' --run-exec'    if $run_exec;
 
     return $args;
 }
@@ -81,9 +81,10 @@ sub remap_runcore_opts
 
     my %remap      = (
         'j' => '-runcore=fast',
-        'G' => '-runcore=gcdebug',
-        'b' => '-runcore=bounds',
         'f' => '-runcore=fast',
+        'b' => '-runcore=bounds',
+        's' => '-runcore=bounds', # =slow
+        #'G' => '-runcore=gcdebug',
         'r' => '-run-pbc',
     );
 
@@ -100,13 +101,14 @@ sub remap_runcore_opts
 }
 
 sub Usage {
+    #--run-exec ... run exec core
     print <<"EOF";
 perl t/harness [options] [testfiles]
     -w         ... warnings on
-    -b         ... run bounds checked
-    --run-exec ... run exec core
     -f         ... run fast core
     -j         ... run fast core
+    -b         ... run bounds checked
+    -s         ... run slow (bounds checked) core
     -r         ... run the compiled pbc
     -v         ... run parrot with -v : This is NOT the same as prove -v
                    All tests run with this option will probably fail

@@ -40,6 +40,7 @@ struct init_args_t {
     Parrot_Int turn_gc_off;
     Parrot_Int preprocess_only;
     Parrot_Int yydebug;
+    Parrot_Int imcc_debug;
 };
 
 extern int Parrot_set_config_hash(Parrot_PMC interp_pmc);
@@ -260,9 +261,8 @@ run_imcc(Parrot_PMC interp, Parrot_String sourcefile, ARGIN(struct init_args_t *
           imcc_get_pasm_compreg_api(interp, 1, &pasm_compiler)))
         show_last_error_and_exit(interp);
     if (flags->preprocess_only) {
-        if (flags->yydebug) {
-            Parrot_api_debug_flag(interp, PARROT_YYDEBUG_FLAG, 1);
-            r = imcc_set_debug_api(interp, pir_compiler, 0, flags->yydebug);
+        if (flags->yydebug || flags->imcc_debug) {
+            r = imcc_set_debug_api(interp, pir_compiler, flags->imcc_debug, flags->yydebug);
             if (!r) exit(EXIT_FAILURE);
         }
         r = imcc_preprocess_file_api(interp, pir_compiler, sourcefile);
@@ -273,9 +273,8 @@ run_imcc(Parrot_PMC interp, Parrot_String sourcefile, ARGIN(struct init_args_t *
         const Parrot_PMC compiler = pasm_mode ? pasm_compiler : pir_compiler;
         Parrot_PMC pbc;
 
-        if (flags->yydebug) {
-            Parrot_api_debug_flag(interp, PARROT_YYDEBUG_FLAG, 1);
-            r = imcc_set_debug_api(interp, compiler, 0, flags->yydebug);
+        if (flags->yydebug || flags->imcc_debug) {
+            r = imcc_set_debug_api(interp, compiler, flags->imcc_debug, flags->yydebug);
             if (!r) exit(EXIT_FAILURE);
         }
         if (!imcc_compile_file_api(interp, compiler, sourcefile, &pbc))
@@ -475,23 +474,10 @@ help_debug(void)
     ASSERT_ARGS(help_debug)
     /* split printf for C89 compliance on string length */
     printf(
-    "--imcc-debug -d [Flags] ...\n"
-    "    0002    lexer\n"
-    "    0004    parser\n"
-    "    0008    imc\n"
-    "    0010    CFG\n"
-    "    0020    optimization 1\n"
-    "    0040    optimization 2\n"
-    "    0100    AST\n"
-    "    1000    PBC\n"
-    "    2000    PBC constants\n"
-    "    4000    PBC fixups\n"
-    "\n");
-    printf(
     "--parrot-debug -D [Flags] ...\n"
     "    0001    memory statistics\n"
     "    0002    print backtrace on exception\n"
-    "    0004    JIT debugging\n"
+    "    0004    JIT debugging (disabled)\n"
     "    0008    interpreter startup\n"
     "    0010    thread debugging\n"
     "    0020    eval/compile\n"
@@ -502,6 +488,17 @@ help_debug(void)
     "    0001    opcodes\n"
     "    0002    find_method\n"
     "    0004    function calls\n");
+    printf(
+    "\n"
+    "--imcc-debug -d [Flags] ...\n"
+    "    0002    lexer\n"
+    "    0004    parser\n"
+    "    0008    imc\n"
+    "    0010    CFG\n"
+    "    0020    optimization 1\n"
+    "    0040    optimization 2\n"
+    "    0100    AST\n"
+    "\n");
 }
 
 /*
@@ -529,7 +526,7 @@ help(void)
     "       --hash-seed F00F  specify hex value to use as hash seed\n"
     "    -X --dynext add path to dynamic extension search\n"
     "   <Run core options>\n"
-    "    -R --runcore slow|bounds|fast\n"
+    "    -R --runcore fast|slow|bounds\n"
     "    -R --runcore trace|profiling|subprof\n"
     "    -t --trace [flags]\n"
     "   <VM options>\n"
@@ -549,7 +546,7 @@ help(void)
     "    -. --wait    Read a keystroke before starting\n"
     "       --runtime-prefix\n"
     "   <Compiler options>\n"
-    "    -d --imcc-debug[=HEXFLAGS]\n"
+    "    -d --imcc-debug[=HEXFLAGS] (see --help-debug)\n"
     "    -v --verbose\n"
     "    -E --pre-process-only\n"
     "    -o --output=FILE\n"
@@ -761,6 +758,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     args->outfile = NULL;
     args->sourcefile = NULL;
     args->preprocess_only = 0;
+    args->imcc_debug = 0;
     args->yydebug = 0;
 
     if (argc == 1) {
@@ -795,20 +793,26 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             else
                 result = Parrot_api_debug_flag(interp, PARROT_MEM_STAT_DEBUG_FLAG, 1);
             break;
+          case 'd':
+            if (opt.opt_arg && is_all_hex_digits(opt.opt_arg))
+                args->imcc_debug = strtoul(opt.opt_arg, NULL, 16);
+            else
+                args->imcc_debug = 1;
+            break;
           case 'O':
             if (!opt.opt_arg || !*opt.opt_arg || opt.opt_arg[0] == '0') {
-                args->trace |= PARROT_TRACE_OPT_0;
+                args->imcc_debug |= PARROT_IMCC_OPT1;
                 break;
             }
             if (strchr(opt.opt_arg, 'p'))
-                args->trace |= PARROT_TRACE_OPT_PASM;
+                args->imcc_debug |= PARROT_IMCC_OPT1;
             if (strchr(opt.opt_arg, 'c'))
-                args->trace |= PARROT_TRACE_OPT_SUB;
+                args->imcc_debug |= PARROT_IMCC_OPT2;
             /* currently not ok due to different register allocation */
             if (strchr(opt.opt_arg, '1'))
-                args->trace |= PARROT_TRACE_OPT_PRE;
+                args->imcc_debug |= PARROT_IMCC_OPT1;
             if (strchr(opt.opt_arg, '2'))
-                args->trace |= (PARROT_TRACE_OPT_PRE|PARROT_TRACE_OPT_CFG);
+                args->imcc_debug |= (PARROT_IMCC_OPT1|PARROT_IMCC_OPT2);
           case '.':  /* Give Windows Parrot hackers an opportunity to
                       * attach a debuggger. */
             fgetc(stdin);

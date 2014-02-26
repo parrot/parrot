@@ -192,7 +192,7 @@ parrot [Options] <file> [<program options...>]
        --hash-seed F00F  specify hex value to use as hash seed
     -X --dynext add path to dynamic extension search
    <Run core options>
-    -R --runcore slow|bounds|fast
+    -R --runcore fast|slow|bounds
     -R --runcore trace|profiling|subprof
     -t --trace [flags]
    <VM options>
@@ -218,6 +218,7 @@ parrot [Options] <file> [<program options...>]
     -c --pbc
     -r --run-pbc
     -y --yydebug
+    -d --imcc-debug[=HEXFLAGS] (see --help-debug)
    <Language options>
 see docs/running.pod for more
 :>>

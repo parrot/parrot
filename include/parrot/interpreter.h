@@ -32,13 +32,20 @@ typedef enum {
     PARROT_NO_DEBUG                 = 0x00,
     PARROT_MEM_STAT_DEBUG_FLAG      = 0x01,  /* memory usage summary */
     PARROT_BACKTRACE_DEBUG_FLAG     = 0x02,  /* print bt in exception */
-    PARROT_JIT_DEBUG_FLAG           = 0x04,  /* create jit stabs file */
+    PARROT_JIT_DEBUG_FLAG           = 0x04,  /* create jit stabs file (unused) */
     PARROT_START_DEBUG_FLAG         = 0x08,
     PARROT_THREAD_DEBUG_FLAG        = 0x10,
     PARROT_EVAL_DEBUG_FLAG          = 0x20,  /* create EVAL_n file */
     PARROT_REG_DEBUG_FLAG           = 0x40,  /* fill I,N with garbage */
     PARROT_CTX_DESTROY_DEBUG_FLAG   = 0x80,  /* ctx of a sub is gone */
-    PARROT_YYDEBUG_FLAG             = 0x100, /* debug imcc parsing */
+    PARROT_IMCC_YYDEBUG             = 0x100, /* imcc parsing */
+    PARROT_IMCC_LEXER               = 0x200,
+    PARROT_IMCC_PARSER              = 0x400,
+    PARROT_IMCC_IMC                 = 0x800,
+    PARROT_IMCC_CFG                 = 0x1000,
+    PARROT_IMCC_OPT1                = 0x2000,
+    PARROT_IMCC_OPT2                = 0x4000,
+    PARROT_IMCC_AST                 = 0x8000,
     PARROT_ALL_DEBUG_FLAGS          = 0xffff
 } Parrot_debug_flags;
 /* &end_gen */
@@ -49,11 +56,6 @@ typedef enum {
     PARROT_TRACE_OPS_FLAG           = 0x01,  /* op execution trace */
     PARROT_TRACE_FIND_METH_FLAG     = 0x02,  /* find_method */
     PARROT_TRACE_SUB_CALL_FLAG      = 0x04,  /* invoke/retcc */
-    PARROT_TRACE_OPT_0              = 0x08,  /* TODO imcc -O0 or -O */
-    PARROT_TRACE_OPT_PRE            = 0x10,  /* TODO imcc -O1 */
-    PARROT_TRACE_OPT_CFG            = 0x20,  /* TODO imcc -O2 */
-    PARROT_TRACE_OPT_PASM           = 0x40,  /* TODO imcc OPT_PASM */
-    PARROT_TRACE_OPT_SUB            = 0x80,  /* TODO imcc OPT_SUB */
     PARROT_ALL_TRACE_FLAGS          = 0xffff
 } Parrot_trace_flags;
 /* &end_gen */

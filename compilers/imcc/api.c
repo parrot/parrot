@@ -206,7 +206,7 @@ imcc_preprocess_file_api(Parrot_PMC interp_pmc, Parrot_PMC compiler,
 /*
 
 =item C<Parrot_Int imcc_set_debug_api(Parrot_PMC interp_pmc, Parrot_PMC
-compiler, Parrot_Int traceflags, Parrot_Int yydebug)>
+compiler, Parrot_Int imcc_debug, Parrot_Int yydebug)>
 
 =cut
 
@@ -216,13 +216,13 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 Parrot_Int
 imcc_set_debug_api(Parrot_PMC interp_pmc, Parrot_PMC compiler,
-        Parrot_Int traceflags, Parrot_Int yydebug)
+        Parrot_Int imcc_debug, Parrot_Int yydebug)
 {
     ASSERT_ARGS(imcc_set_debug_api)
     IMCC_API_CALLIN(interp_pmc, interp)
 
     imc_info_t * imcc = (imc_info_t *)VTABLE_get_pointer(interp, compiler);
-    imcc_set_debug_mode(imcc, traceflags, yydebug);
+    imcc_set_debug_mode(imcc, imcc_debug, yydebug);
 
     IMCC_API_CALLOUT(interp_pmc, interp)
 }

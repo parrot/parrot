@@ -4,7 +4,7 @@ Copyright (C) 2007-2014, Parrot Foundation.
 
 =head1 NAME
 
-frontend/parrot2/main.c - The alternate PIR/PASM compiler frontend to libparrot
+frontend/parrot2/main.c - The new PIR/PASM compiler frontend to libparrot
 
 =head1 DESCRIPTION
 
@@ -34,8 +34,9 @@ struct init_args_t {
     Parrot_Int trace;
     Parrot_Int have_pasm_file;
     Parrot_Int turn_gc_off;
-    Parrot_Int yydebug;
     Parrot_Int preprocess_only;
+    Parrot_Int imcc_debug;
+    Parrot_Int yydebug; /* possibly merge with imcc_debug */
     const char ** argv;
     int argc;
 };
@@ -385,7 +386,7 @@ help_debug(void)
     "--parrot-debug -D [Flags] ...\n"
     "    0001    memory statistics\n"
     "    0002    print backtrace on exception\n"
-    "    0004    JIT debugging\n"
+    "    0004    JIT debugging (disabled)\n"
     "    0008    interpreter startup\n"
     "    0010    thread debugging\n"
     "    0020    eval/compile\n"
@@ -396,6 +397,17 @@ help_debug(void)
     "    0001    opcodes\n"
     "    0002    find_method\n"
     "    0004    function calls\n");
+    printf(
+    "\n"
+    "--imcc-debug -d [Flags] ...\n"
+    "    0002    lexer\n"
+    "    0004    parser\n"
+    "    0008    imc\n"
+    "    0010    CFG\n"
+    "    0020    optimization 1\n"
+    "    0040    optimization 2\n"
+    "    0100    AST\n"
+    "\n");
 }
 
 /*
@@ -449,6 +461,7 @@ Parrot_cmd_options(void)
         { 't', 't', OPTION_optional_FLAG, { "--trace" } },
         { 'w', 'w', (OPTION_flags)0, { "--warnings" } },
         { 'y', 'y', (OPTION_flags)0, { "--yydebug" } },
+        { 'd', 'd', OPTION_optional_FLAG, { "--imcc-debug" } },
         { 0, 0, (OPTION_flags)0, { NULL } }
     };
     return cmd_options;
@@ -589,6 +602,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     args->turn_gc_off = 0;
     args->have_pasm_file = 0;
     args->preprocess_only = 0;
+    args->imcc_debug = 0;
     args->yydebug = 0;
     pargs[nargs++] = argv[0];
 
@@ -621,6 +635,12 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
                 result = Parrot_api_debug_flag(interp, strtoul(opt.opt_arg, NULL, 16), 1);
             else
                 result = Parrot_api_debug_flag(interp, PARROT_MEM_STAT_DEBUG_FLAG, 1);
+            break;
+          case 'd':
+            if (opt.opt_arg && is_all_hex_digits(opt.opt_arg))
+                args->imcc_debug = (Parrot_Int)strtoul(opt.opt_arg, NULL, 16);
+            else
+                args->imcc_debug = 1;
             break;
 
           case '.':  /* Give Windows Parrot hackers an opportunity to
