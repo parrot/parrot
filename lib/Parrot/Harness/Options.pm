@@ -114,7 +114,7 @@ perl t/harness [options] [testfiles]
                    All tests run with this option will probably fail
     -d         ... run debug
     -r         ... assemble to PBC run PBC
-    -O[012]    ... optimize
+    -O[012p]   ... optimize
     -D[number] ... pass debug flags to parrot interpreter
     --gc-debug
     --core-tests

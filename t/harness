@@ -163,7 +163,7 @@ Run fast core.
 
 compile to Parrot bytecode and then run the bytecode.
 
-=item C<-O[012]>
+=item C<-O[012p]>
 
 Run optimized to the specified level.
 

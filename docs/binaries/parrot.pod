@@ -195,9 +195,9 @@ It includes strength reduction and rewrites certain if/branch/label constructs.
 -O2 runs afterwards, handles constant propagation, jump optimizations,
 removal of unused labels and dead code.
 
--Op> applies -O2 to pasm files also.
+-Op applies -O2 to pasm files also.
 
-The old options -Op, -Oc and -Oj are currently ineffective.
+The old options -Oc and -Oj are currently ineffective.
 
 -O defaults to -O1.
 
