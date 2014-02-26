@@ -21,7 +21,7 @@ t/src/checkdepend.t
 
 A script to check that every file has makefile deps on its includes.
 
- checkdepend.pl [--dump]
+    perl t/src/checkdepend.t [--dump] [files...]
 
 If called with C<--dump>, no tests are run, and the pre-processed makefile
 is dumped (in lieu of having C<cc>'s C<-E> for C<make>. This option is only
