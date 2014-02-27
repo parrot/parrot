@@ -1,3 +1,21 @@
+2014-03-18    release 6.2.0
+    - Core
+	+ Re-enable old immc flags for parrot and parrot_old, such as
+	  -On -a -v -y -E -dxx. [GH #1033]
+    - Build
+	+ Set emacs buffer-read-only:t tags in generated files [GH #1034]
+	+ Provide coda for generated include/*.pasm files [GH #1032]
+	+ Fix parser for bison 3 [GH #1031]
+    - Deprecations
+	+ Warn on deprecated usage of append_configure_log()
+    - Documentation
+	+ Updated pod for parrot and tools/build/c2str.pl
+    - Tests
+	+ Mark failing -O1 tests (only t/pmc/nci: 39, 41, 44-45)
+    - Community
+	+ Got accepted for GSOC. Got a candidate for "Improve performance
+	  of method signatures"
+
 2014-02-18    release 6.1.0
     - Build
         + Improve auto::libffi probe with -fstack-protector-all or
