@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2013, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -1405,6 +1405,9 @@ external data: succeeded
 done.
 OUTPUT
 
+TODO: {
+    local $TODO = '-O1 [GH #1037]' if $ENV{TEST_PROG_ARGS}
+        and $ENV{TEST_PROG_ARGS} =~ / -O[12]/;
     pir_output_is( <<'CODE', <<'OUTPUT', "nci_cb_C1 - PIR" );
 
 .sub test :main
@@ -1477,6 +1480,7 @@ user data: 42
 external data: succeeded
 the callback has run
 OUTPUT
+}
 
     pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_C2 - PASM' );
 .pcc_sub :main main:
@@ -1538,8 +1542,10 @@ external data: 77
 done.
 OUTPUT
 
+TODO: {
+    local $TODO = '-O1 [GH #1037]' if $ENV{TEST_PROG_ARGS}
+        and $ENV{TEST_PROG_ARGS} =~ / -O[12]/;
     pir_output_is( <<'CODE', <<'OUTPUT', "nci_cb_C3 - PIR" );
-
 
 .include "datatypes.pasm"
 
@@ -1624,6 +1630,7 @@ user data: 42
 external data: 99
 the callback has run
 OUTPUT
+}
 
     pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_D1 - PASM' );
 .pcc_sub :main main:
@@ -1745,6 +1752,9 @@ external data: 88
 done.
 OUTPUT
 
+TODO: {
+    local $TODO = '-O1 [GH #1037]' if $ENV{TEST_PROG_ARGS}
+        and $ENV{TEST_PROG_ARGS} =~ / -O[12]/;
     pir_output_is( <<'CODE', <<'OUTPUT', "nci_cb_D2 - PIR" );
 
 .sub test :main
@@ -1906,6 +1916,7 @@ user data: 42
 external data: 111
 the callback has run
 OUTPUT
+}
 
     pir_output_is( <<'CODE', <<'OUTPUT', "nci_cb_D4 - synchronous callbacks" );
 
