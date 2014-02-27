@@ -46,6 +46,9 @@ static STRING * IMCC_get_err_location(ARGMOD(imc_info_t *imcc))
 Prints out a fatal error message from IMCC and throws an
 IMCC_FATAL_EXCEPTION.
 
+The code argument, the exit code, is ignored, because the exception
+can be caught.
+
 =cut
 
 */
@@ -76,6 +79,9 @@ IMCC_fatal(ARGMOD(imc_info_t * imcc), SHIM(int code), ARGIN(const char *fmt), ..
 =item C<void IMCC_fataly(imc_info_t * imcc, int code, const char *fmt, ...)>
 
 Throws an IMCC_FATALY_EXCEPTION.
+
+The code argument, the exit code, is ignored, because the exception
+can be caught.
 
 =cut
 

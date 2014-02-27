@@ -211,6 +211,7 @@ static int used_once(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+/* TODO: move to debug.c. and possibly integrate into IMCC_debug as seperate %p handle */
 void IMCC_debug_ins(imc_info_t *imcc, int level, Instruction *ins);
 
 void IMCC_debug_ins(imc_info_t *imcc, int level, Instruction *ins) {
@@ -493,10 +494,13 @@ strength_reduce(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                 ins->op == &core_ops->op_info_table[PARROT_OP_mul_n_n_nc] ||
                 ins->op == &core_ops->op_info_table[PARROT_OP_mul_n_nc_n]) &&
              (ins->symregs[0] == ins->symregs[1] ||
-              ins->symregs[0] == ins->symregs[2]))) {
-            IMCC_debug(imcc, DEBUG_OPT1, "opt1 ");
-            IMCC_debug_ins(imcc, DEBUG_OPT1, ins);
-            IMCC_debug(imcc, DEBUG_OPT1, "  => ");
+              ins->symregs[0] == ins->symregs[2])))
+        {
+            if (DEBUG_OPT1 & imcc->debug) {
+                IMCC_debug(imcc, DEBUG_OPT1, "opt1 ");
+                IMCC_debug_ins(imcc, DEBUG_OPT1, ins);
+                IMCC_debug(imcc, DEBUG_OPT1, "  => ");
+            }
             if (ins->symregs[0] == ins->symregs[1]) {
                 ins->symregs[1] = ins->symregs[2];
             }
@@ -532,10 +536,13 @@ strength_reduce(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
           || ((ins->op  == &core_ops->op_info_table[PARROT_OP_mul_n_nc]  ||
                 ins->op == &core_ops->op_info_table[PARROT_OP_div_n_nc] ||
                 ins->op == &core_ops->op_info_table[PARROT_OP_fdiv_n_nc]) &&
-                      atof(ins->symregs[1]->name) == 1.0)) {
-            IMCC_debug(imcc, DEBUG_OPT1, "opt1 ");
-            IMCC_debug_ins(imcc, DEBUG_OPT1, ins);
-            IMCC_debug(imcc, DEBUG_OPT1, "  => ");
+                      atof(ins->symregs[1]->name) == 1.0))
+        {
+            if (DEBUG_OPT1 & imcc->debug) {
+                IMCC_debug(imcc, DEBUG_OPT1, "opt1 ");
+                IMCC_debug_ins(imcc, DEBUG_OPT1, ins);
+                IMCC_debug(imcc, DEBUG_OPT1, "  => ");
+            }
             ins = delete_ins(unit, ins);
             if (ins)
                 ins = ins->prev ? ins->prev : unit->instructions;
@@ -556,10 +563,13 @@ strength_reduce(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                       IMCC_int_from_reg(imcc, ins->symregs[1]) == 1)
           || ((ins->op == &core_ops->op_info_table[PARROT_OP_add_n_nc] ||
                 ins->op == &core_ops->op_info_table[PARROT_OP_sub_n_nc]) &&
-                      atof(ins->symregs[1]->name) == 1.0)) {
-            IMCC_debug(imcc, DEBUG_OPT1, "opt1 ", ins);
-            IMCC_debug_ins(imcc, DEBUG_OPT1, ins);
-            IMCC_debug(imcc, DEBUG_OPT1, "  => ");
+                      atof(ins->symregs[1]->name) == 1.0))
+        {
+            if (DEBUG_OPT1 & imcc->debug) {
+                IMCC_debug(imcc, DEBUG_OPT1, "opt1 ", ins);
+                IMCC_debug_ins(imcc, DEBUG_OPT1, ins);
+                IMCC_debug(imcc, DEBUG_OPT1, "  => ");
+            }
             --ins->symregs[1]->use_count;
             if (ins->op == &core_ops->op_info_table[PARROT_OP_add_i_ic] ||
                 ins->op == &core_ops->op_info_table[PARROT_OP_add_n_nc])
@@ -610,10 +620,13 @@ strength_reduce(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                 ins->op == &core_ops->op_info_table[PARROT_OP_fdiv_n_n_nc]) &&
                       atof(ins->symregs[2]->name) == 1.0)
           || (ins->op == &core_ops->op_info_table[PARROT_OP_mul_n_nc_n] &&
-                      atof(ins->symregs[1]->name) == 1.0)) {
-            IMCC_debug(imcc, DEBUG_OPT1, "opt1 ");
-            IMCC_debug_ins(imcc, DEBUG_OPT1, ins);
-            IMCC_debug(imcc, DEBUG_OPT1, "  => ");
+                      atof(ins->symregs[1]->name) == 1.0))
+        {
+            if (DEBUG_OPT1 & imcc->debug) {
+                IMCC_debug(imcc, DEBUG_OPT1, "opt1 ");
+                IMCC_debug_ins(imcc, DEBUG_OPT1, ins);
+                IMCC_debug(imcc, DEBUG_OPT1, "  => ");
+            }
             if (ins->symregs[1]->type == VTCONST) {
                 --ins->symregs[1]->use_count;
                 ins->symregs[1] = ins->symregs[2];
@@ -642,10 +655,13 @@ strength_reduce(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
              (f = atof(ins->symregs[2]->name), FLOAT_IS_ZERO(f)))
           || ((ins->op == &core_ops->op_info_table[PARROT_OP_mul_n_nc_n] ||
                 ins->op == &core_ops->op_info_table[PARROT_OP_mul_n_nc]) &&
-                (f = atof(ins->symregs[1]->name), FLOAT_IS_ZERO(f)))) {
-            IMCC_debug(imcc, DEBUG_OPT1, "opt1 ");
-            IMCC_debug_ins(imcc, DEBUG_OPT1, ins);
-            IMCC_debug(imcc, DEBUG_OPT1, "  => ");
+                (f = atof(ins->symregs[1]->name), FLOAT_IS_ZERO(f))))
+        {
+            if (DEBUG_OPT1 & imcc->debug) {
+                IMCC_debug(imcc, DEBUG_OPT1, "opt1 ");
+                IMCC_debug_ins(imcc, DEBUG_OPT1, ins);
+                IMCC_debug(imcc, DEBUG_OPT1, "  => ");
+            }
             r = mk_const(imcc, "0", ins->symregs[0]->set);
             --ins->symregs[1]->use_count;
             if (ins->opsize == 4)
@@ -665,10 +681,13 @@ strength_reduce(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                       IMCC_int_from_reg(imcc, ins->symregs[1]) == 0)
           || (ins->op == &core_ops->op_info_table[PARROT_OP_set_n_nc] &&
              (f = atof(ins->symregs[1]->name), FLOAT_IS_ZERO(f)) &&
-              ins->symregs[1]->name[0] != '-')) {
-            IMCC_debug(imcc, DEBUG_OPT1, "opt1 ");
-            IMCC_debug_ins(imcc, DEBUG_OPT1, ins);
-            IMCC_debug(imcc, DEBUG_OPT1, "  => ");
+              ins->symregs[1]->name[0] != '-'))
+        {
+            if (DEBUG_OPT1 & imcc->debug) {
+                IMCC_debug(imcc, DEBUG_OPT1, "opt1 ");
+                IMCC_debug_ins(imcc, DEBUG_OPT1, ins);
+                IMCC_debug(imcc, DEBUG_OPT1, "  => ");
+            }
             --ins->symregs[1]->use_count;
             tmp = INS(imcc, unit, "null", "", ins->symregs, 1, 0, 0);
             tmp->type = ITPUREFUNC;
