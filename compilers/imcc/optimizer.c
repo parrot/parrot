@@ -211,6 +211,18 @@ static int used_once(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+void IMCC_debug_ins(imc_info_t *imcc, int level, Instruction *ins);
+
+void IMCC_debug_ins(imc_info_t *imcc, int level, Instruction *ins) {
+    PIOHANDLE pstderr;
+    if (!(level & imcc->debug))
+        return;
+    pstderr = Parrot_io_internal_std_os_handle(imcc->interp, PIO_STDERR_FILENO);
+    Parrot_io_pprintf(imcc->interp, pstderr, "0x%x %s ", ins, ins->opname);
+    ins_print(imcc, pstderr, ins);
+    Parrot_io_pprintf(imcc->interp, pstderr, "\n");
+}
+
 /*
 
 =item C<int pre_optimize(imc_info_t *imcc, IMC_Unit *unit)>
@@ -482,12 +494,15 @@ strength_reduce(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                 ins->op == &core_ops->op_info_table[PARROT_OP_mul_n_nc_n]) &&
              (ins->symregs[0] == ins->symregs[1] ||
               ins->symregs[0] == ins->symregs[2]))) {
-            IMCC_debug(imcc, DEBUG_OPT1, "opt1 %d => ", ins);
+            IMCC_debug(imcc, DEBUG_OPT1, "opt1 ");
+            IMCC_debug_ins(imcc, DEBUG_OPT1, ins);
+            IMCC_debug(imcc, DEBUG_OPT1, "  => ");
             if (ins->symregs[0] == ins->symregs[1]) {
                 ins->symregs[1] = ins->symregs[2];
             }
             tmp = INS(imcc, unit, ins->opname, "", ins->symregs, 2, 0, 0);
-            IMCC_debug(imcc, DEBUG_OPT1, "%d\n", tmp);
+            tmp->type = ITPUREFUNC;
+            IMCC_debug_ins(imcc, DEBUG_OPT1, tmp);
             subst_ins(unit, ins, tmp, 1);
             ins = tmp;
             changes = 1;
@@ -518,7 +533,9 @@ strength_reduce(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                 ins->op == &core_ops->op_info_table[PARROT_OP_div_n_nc] ||
                 ins->op == &core_ops->op_info_table[PARROT_OP_fdiv_n_nc]) &&
                       atof(ins->symregs[1]->name) == 1.0)) {
-            IMCC_debug(imcc, DEBUG_OPT1, "opt1 %d => ", ins);
+            IMCC_debug(imcc, DEBUG_OPT1, "opt1 ");
+            IMCC_debug_ins(imcc, DEBUG_OPT1, ins);
+            IMCC_debug(imcc, DEBUG_OPT1, "  => ");
             ins = delete_ins(unit, ins);
             if (ins)
                 ins = ins->prev ? ins->prev : unit->instructions;
@@ -540,15 +557,18 @@ strength_reduce(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
           || ((ins->op == &core_ops->op_info_table[PARROT_OP_add_n_nc] ||
                 ins->op == &core_ops->op_info_table[PARROT_OP_sub_n_nc]) &&
                       atof(ins->symregs[1]->name) == 1.0)) {
-            IMCC_debug(imcc, DEBUG_OPT1, "opt1 %d => ", ins);
+            IMCC_debug(imcc, DEBUG_OPT1, "opt1 ", ins);
+            IMCC_debug_ins(imcc, DEBUG_OPT1, ins);
+            IMCC_debug(imcc, DEBUG_OPT1, "  => ");
             --ins->symregs[1]->use_count;
             if (ins->op == &core_ops->op_info_table[PARROT_OP_add_i_ic] ||
                 ins->op == &core_ops->op_info_table[PARROT_OP_add_n_nc])
                 tmp = INS(imcc, unit, "inc", "", ins->symregs, 1, 0, 0);
             else
                 tmp = INS(imcc, unit, "dec", "", ins->symregs, 1, 0, 0);
+            tmp->type = ITPUREFUNC;
             subst_ins(unit, ins, tmp, 1);
-            IMCC_debug(imcc, DEBUG_OPT1, "%d\n", tmp);
+            IMCC_debug_ins(imcc, DEBUG_OPT1, tmp);
             ins = tmp;
             changes = 1;
             continue;
@@ -591,7 +611,9 @@ strength_reduce(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                       atof(ins->symregs[2]->name) == 1.0)
           || (ins->op == &core_ops->op_info_table[PARROT_OP_mul_n_nc_n] &&
                       atof(ins->symregs[1]->name) == 1.0)) {
-            IMCC_debug(imcc, DEBUG_OPT1, "opt1 %d => ", ins);
+            IMCC_debug(imcc, DEBUG_OPT1, "opt1 ");
+            IMCC_debug_ins(imcc, DEBUG_OPT1, ins);
+            IMCC_debug(imcc, DEBUG_OPT1, "  => ");
             if (ins->symregs[1]->type == VTCONST) {
                 --ins->symregs[1]->use_count;
                 ins->symregs[1] = ins->symregs[2];
@@ -600,7 +622,7 @@ strength_reduce(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                 --ins->symregs[2]->use_count;
             }
             tmp = INS(imcc, unit, "set", "", ins->symregs, 2, 0, 0);
-            IMCC_debug(imcc, DEBUG_OPT1, "%d\n", tmp);
+            IMCC_debug_ins(imcc, DEBUG_OPT1, tmp);
             subst_ins(unit, ins, tmp, 1);
             ins = tmp;
             changes = 1;
@@ -621,14 +643,16 @@ strength_reduce(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
           || ((ins->op == &core_ops->op_info_table[PARROT_OP_mul_n_nc_n] ||
                 ins->op == &core_ops->op_info_table[PARROT_OP_mul_n_nc]) &&
                 (f = atof(ins->symregs[1]->name), FLOAT_IS_ZERO(f)))) {
-            IMCC_debug(imcc, DEBUG_OPT1, "opt1 %d => ", ins);
+            IMCC_debug(imcc, DEBUG_OPT1, "opt1 ");
+            IMCC_debug_ins(imcc, DEBUG_OPT1, ins);
+            IMCC_debug(imcc, DEBUG_OPT1, "  => ");
             r = mk_const(imcc, "0", ins->symregs[0]->set);
             --ins->symregs[1]->use_count;
             if (ins->opsize == 4)
                 --ins->symregs[2]->use_count;
             ins->symregs[1] = r;
             tmp = INS(imcc, unit, "set", "", ins->symregs, 2, 0, 0);
-            IMCC_debug(imcc, DEBUG_OPT1, "%d\n", tmp);
+            IMCC_debug_ins(imcc, DEBUG_OPT1, tmp);
             subst_ins(unit, ins, tmp, 1);
             ins = tmp;
             changes = 1;
@@ -642,11 +666,14 @@ strength_reduce(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
           || (ins->op == &core_ops->op_info_table[PARROT_OP_set_n_nc] &&
              (f = atof(ins->symregs[1]->name), FLOAT_IS_ZERO(f)) &&
               ins->symregs[1]->name[0] != '-')) {
-            IMCC_debug(imcc, DEBUG_OPT1, "opt1 %d => ", ins);
+            IMCC_debug(imcc, DEBUG_OPT1, "opt1 ");
+            IMCC_debug_ins(imcc, DEBUG_OPT1, ins);
+            IMCC_debug(imcc, DEBUG_OPT1, "  => ");
             --ins->symregs[1]->use_count;
             tmp = INS(imcc, unit, "null", "", ins->symregs, 1, 0, 0);
+            tmp->type = ITPUREFUNC;
             subst_ins(unit, ins, tmp, 1);
-            IMCC_debug(imcc, DEBUG_OPT1, "%d\n", tmp);
+            IMCC_debug_ins(imcc, DEBUG_OPT1, tmp);
             ins = tmp;
             changes = 1;
             continue;
@@ -698,15 +725,14 @@ constant_propagation(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
         if (found) {
             Instruction *ins2;
 
-            IMCC_debug(imcc, DEBUG_OPT2,
-                    "propagating constant %d => \n", ins);
+            IMCC_debug(imcc, DEBUG_OPT2, "propagating constant ");
+            IMCC_debug_ins(imcc, DEBUG_OPT2, ins);
             for (ins2 = ins->next; ins2; ins2 = ins2->next) {
                 int i;
                 if (ins2->bbindex != ins->bbindex)
                     /* restrict to within a basic block */
                     goto next_constant;
-                /* was opsize - 2, changed to n_r - 1
-                 */
+                /* was opsize - 2, changed to n_r - 1 */
                 for (i = ins2->symreg_count - 1; i >= 0; i--) {
                     if (STREQ(o->name, ins2->symregs[i]->name)) {
                         if (instruction_writes(ins2, ins2->symregs[i]))
@@ -715,12 +741,11 @@ constant_propagation(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                             Instruction *tmp;
                             SymReg *old;
 
-                            IMCC_debug(imcc, DEBUG_OPT2,
-                                    "\tpropagating into %d register %i",
-                                    ins2, i);
+                            IMCC_debug(imcc, DEBUG_OPT2, "\tpropagating into register %i: ", i);
+                            IMCC_debug_ins(imcc, DEBUG_OPT2, ins2);
                             old = ins2->symregs[i];
                             ins2->symregs[i] = c;
-                /* first we try subst_constants for e.g. if 10 < 5 goto next*/
+                            /* first we try subst_constants for e.g. if 10 < 5 goto next*/
                             tmp = IMCC_subst_constants(imcc,
                                 unit, ins2->opname, ins2->symregs, ins2->opsize,
                                 &found);
@@ -729,9 +754,12 @@ constant_propagation(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                                 if (prev) {
                                     subst_ins(unit, ins2, tmp, 1);
                                     any = 1;
-                                    IMCC_debug(imcc, DEBUG_OPT2,
-                                            " reduced to %d\n", tmp);
+                                    IMCC_debug(imcc, DEBUG_OPT2, " reduced to ");
+                                    IMCC_debug_ins(imcc, DEBUG_OPT2, tmp);
                                     ins2 = prev->next;
+                                }
+                                if (!ins2->op) {
+                                    IMCC_debug(imcc, DEBUG_OPT2, " no op!\n");
                                 }
                             }
                             else {
@@ -746,8 +774,8 @@ constant_propagation(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                                 else {
                                     --old->use_count;
                                     any = 1;
-                                    IMCC_debug(imcc, DEBUG_OPT2,
-                                            " -> %d\n", ins2);
+                                    IMCC_debug(imcc, DEBUG_OPT2, " -> ");
+                                    IMCC_debug_ins(imcc, DEBUG_OPT2, ins2);
                                 }
                             }
                         }
@@ -798,7 +826,7 @@ IMCC_subst_constants_umix(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
             strcpy(b, r[1]->name);
             r[1] = mk_const(imcc, b, 'N');
             tmp = INS(imcc, unit, name, "", r, 2, 0, 0);
-            IMCC_debug(imcc, DEBUG_OPT1, "%d\n", tmp);
+            IMCC_debug_ins(imcc, DEBUG_OPT1, tmp);
         }
     }
     return tmp;
@@ -903,7 +931,7 @@ IMCC_subst_constants(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
         ARGIN(const char *name), ARGMOD(SymReg **r), int n, ARGOUT(int *ok))
 {
     ASSERT_ARGS(IMCC_subst_constants)
-    Instruction *tmp;
+    Instruction *tmp = NULL;
     PARROT_OBSERVER const char * const ops[] = {
         "add", "sub", "mul", "div", "fdiv", "pow",
         "cmod", "mod", "atan",
@@ -932,7 +960,7 @@ IMCC_subst_constants(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
     const char *fmt;
     char op[20];
     const char *debug_fmt = NULL;   /* gcc -O uninit warn */
-    int found, branched;
+    int found = 0, branched;
 
     /* construct a FLOATVAL_FMT with needed precision.
       TT #308  XXX Should use Configure.pl to figure these out,
@@ -958,17 +986,13 @@ IMCC_subst_constants(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
        NUMVAL_SIZE);
 #endif
 
-    tmp = NULL;
-    found = 0;
     for (i = 0; i < N_ELEMENTS(ops); i++) {
         if (n == 4 &&
                 r[1]->type & (VTCONST|VT_CONSTP) &&
                 r[2]->type & (VTCONST|VT_CONSTP) &&
                 STREQ(name, ops[i])) {
             found = 4;
-            /*
-             * create instruction e.g. add_i_ic_ic => add_i_i_i
-             */
+            /* create instruction e.g. add_i_ic_ic => add_i_i_i */
             snprintf(op, sizeof (op), "%s_%c_%c_%c", name, tolower((unsigned char)r[0]->set),
                     tolower((unsigned char)r[1]->set), tolower((unsigned char)r[2]->set));
             debug_fmt = "opt %s_x_xc_xc => ";
@@ -976,9 +1000,7 @@ IMCC_subst_constants(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
         }
     }
     for (i = 0; !found && i < N_ELEMENTS(ops2); i++) {
-        /*
-         * abs_i_ic ...
-         */
+        /* abs_i_ic ... */
         if (n == 3) {
             PARROT_ASSERT(r[1]);
             if (r[1]->type & (VTCONST|VT_CONSTP) &&
@@ -992,9 +1014,7 @@ IMCC_subst_constants(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
         }
     }
     for (i = 0; !found && i < N_ELEMENTS(ops3); i++) {
-        /*
-         * eq_xc_xc_labelc ...
-         */
+        /* eq_xc_xc_labelc ... */
         if (n == 4 &&
                 r[0]->type & (VTCONST|VT_CONSTP) &&
                 r[1]->type & (VTCONST|VT_CONSTP)  &&
@@ -1007,9 +1027,7 @@ IMCC_subst_constants(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
         }
     }
     for (i = 0; !found && i < N_ELEMENTS(ops4); i++) {
-        /*
-         * if_xc_labelc, unless
-         */
+        /* if_xc_labelc, unless */
         if (n == 3 &&
                 r[0]->type & (VTCONST|VT_CONSTP) &&
                 STREQ(name, ops4[i])) {
@@ -1044,9 +1062,7 @@ IMCC_subst_constants(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
      * the return value
      */
     if (found <= 2) {
-        /*
-         * create a branch or delete instruction
-         */
+        /* create a branch or delete instruction */
         if (branched) {
             r[0] = r[found];
             tmp = INS(imcc, unit, "branch", "", r, 1, 0, 0);
@@ -1056,9 +1072,7 @@ IMCC_subst_constants(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
         }
     }
     else {
-        /*
-         * create set x, constant
-         */
+        /* create set x, constant */
         char b[128];
         switch (r[0]->set) {
           case 'I':
@@ -1088,7 +1102,7 @@ IMCC_subst_constants(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
         tmp = INS(imcc, unit, "set", "", r, 2, 0, 0);
     }
     if (tmp) {
-        IMCC_debug(imcc, DEBUG_OPT1, "%d\n", tmp);
+        IMCC_debug_ins(imcc, DEBUG_OPT1, tmp);
     }
     *ok = 1;
     return tmp;
@@ -1128,17 +1142,18 @@ branch_branch(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
 
             if (r && (r->type & VTADDRESS) && r->first_ins) {
                 Instruction * const next = r->first_ins->next;
-                /*                if (!next ||
-                                  STREQ(next->symregs[0]->name, get_branch_reg(ins)->name))
-                                  break;*/
+                /* if (!next ||
+                       STREQ(next->symregs[0]->name, get_branch_reg(ins)->name))
+                     break; */
                 if (next &&
                         (next->type & IF_goto) &&
                         STREQ(next->opname, "branch") &&
                         !STREQ(next->symregs[0]->name, get_branch_reg(ins)->name)) {
                     const int regno = get_branch_regno(ins);
                     IMCC_debug(imcc, DEBUG_OPT1,
-                            "found branch to branch '%s' %d\n",
-                            r->first_ins->symregs[0]->name, next);
+                            "found branch to branch '%s' ",
+                            r->first_ins->symregs[0]->name);
+                    IMCC_debug_ins(imcc, DEBUG_OPT1, next);
                     unit->ostat.branch_branch++;
                     if (regno < 0)
                         Parrot_ex_throw_from_c_args(imcc->interp, NULL, 1,
@@ -1230,8 +1245,9 @@ branch_reorg(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                         start->prev = ins;
 
                         IMCC_debug(imcc, DEBUG_OPT1,
-                                "found branch to reorganize '%s' %d\n",
-                                r->first_ins->symregs[0]->name, ins);
+                                "found branch to reorganize '%s' ",
+                                r->first_ins->symregs[0]->name);
+                        IMCC_debug_ins(imcc, DEBUG_OPT1, ins);
 
                         /* unconditional jump can be eliminated */
                         unit->ostat.deleted_ins++;
@@ -1529,7 +1545,8 @@ dead_code_remove(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
 
             for (ins = bb->start; ins && ins->bbindex == bbi;) {
                 IMCC_debug(imcc, DEBUG_OPT1,
-                        "\tins deleted (dead block) %d\n", ins);
+                        "\tins deleted (dead block) ");
+                IMCC_debug_ins(imcc, DEBUG_OPT1, ins);
                 ins = delete_ins(unit, ins);
                 unit->ostat.deleted_ins++;
                 changed++;
@@ -1547,7 +1564,8 @@ dead_code_remove(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
         if ((last->type & IF_goto) && !(ins->type & ITLABEL) &&
             STREQ(last->opname, "branch")) {
             IMCC_debug(imcc, DEBUG_OPT1,
-                    "unreachable ins deleted (after branch) %d\n", ins);
+                    "unreachable ins deleted (after branch) ");
+            IMCC_debug_ins(imcc, DEBUG_OPT1, ins);
             ins = delete_ins(unit, ins);
             unit->ostat.deleted_ins++;
             changed++;
@@ -1560,7 +1578,8 @@ dead_code_remove(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
         if (ins && last && (last->type & IF_goto) && (ins->type & ITLABEL) &&
                 STREQ(last->opname, "branch") &&
                 STREQ(last->symregs[0]->name, ins->symregs[0]->name)) {
-            IMCC_debug(imcc, DEBUG_OPT1, "dead branch deleted %d\n", ins);
+            IMCC_debug(imcc, DEBUG_OPT1, "dead branch deleted ");
+            IMCC_debug_ins(imcc, DEBUG_OPT1, ins);
             ins = delete_ins(unit, last);
             unit->ostat.deleted_ins++;
             changed++;
@@ -1577,7 +1596,8 @@ dead_code_remove(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
 
 =item C<static int used_once(imc_info_t *imcc, IMC_Unit *unit)>
 
-used_once ... deletes assignments, when LHS is unused
+used_once ... deletes assignments, when LHS is unused.
+Only for pure functional ops. Keep ops with sideeffects even if the LHS is never used.
 
 =cut
 
@@ -1596,7 +1616,9 @@ used_once(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
             /* GH 1036: keep side-effects: P0 = pop P1 vs pop P1 */
             if (r && ins->type & ITPUREFUNC
                   && (r->use_count == 1 && r->lhs_use_count == 1)) {
-                IMCC_debug(imcc, DEBUG_OPT2, "used once '%d' deleted\n", ins);
+                IMCC_debug(imcc, DEBUG_OPT2, "used once deleted ");
+                IMCC_debug_ins(imcc, DEBUG_OPT2, ins);
+
                 ins = delete_ins(unit, ins);
 
                 /* find previous instruction or first instruction of this CU

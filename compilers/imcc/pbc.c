@@ -695,7 +695,7 @@ get_code_size(ARGMOD(imc_info_t * imcc), ARGIN(const IMC_Unit *unit),
         (*src_lines)++;
         if (!ins->op)
             IMCC_fatal(imcc, 1, "get_code_size: "
-                    "no opnum ins#%d %d\n",
+                    "no opnum ins#%d 0x%x\n",
                     ins->index, ins);
 
         if (ins->op == &core_ops->op_info_table[PARROT_OP_set_p_pc]) {
