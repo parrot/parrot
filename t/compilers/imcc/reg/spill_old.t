@@ -1,9 +1,11 @@
 #!perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
+use Test::More;
 use Parrot::Test tests => 5;
 
 pir_output_is( <<'CODE', <<'OUT', "bug #32996" );

@@ -1,9 +1,11 @@
 #!perl
-# Copyright (C) 2005-2008, Parrot Foundation.
+# Copyright (C) 2005-2014, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
+
+use Test::More;
 use Parrot::Test tests => 10;
 
 pir_output_is( <<'CODE', <<'OUT', "alligator" );
@@ -44,6 +46,7 @@ pir_output_is( <<'CODE', <<'OUT', "alligator 2 - r9629" );
 
     $S0 = args[-1]
     if $S0 != "POPME" goto start
+    # P0 used_once falsely deleted [GH #1036]
     $P0 = pop args
   start:
     $I1 = elements args

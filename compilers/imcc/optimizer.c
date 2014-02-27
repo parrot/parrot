@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2012, Parrot Foundation.
+ * Copyright (C) 2002-2014, Parrot Foundation.
  */
 
 /*
@@ -277,7 +277,8 @@ cfg_optimize(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
 
 Runs after the CFG is built and handles constant propagation.
 
-used_once ... deletes assignments, when LHS is unused
+used_once ... deletes assignments, when LHS is unused and the
+op is purely functional, i.e. no side-effects.
 
 =cut
 
@@ -723,7 +724,7 @@ constant_propagation(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                             tmp = IMCC_subst_constants(imcc,
                                 unit, ins2->opname, ins2->symregs, ins2->opsize,
                                 &found);
-                            if (found) {
+                            if (found && tmp) { /* XXX syn/clash_1.pir */
                                 const Instruction * const prev = ins2->prev;
                                 if (prev) {
                                     subst_ins(unit, ins2, tmp, 1);
@@ -1592,7 +1593,9 @@ used_once(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
     for (ins = unit->instructions; ins; ins = ins->next) {
         if (ins->symregs) {
             SymReg * const r = ins->symregs[0];
-            if (r && (r->use_count == 1 && r->lhs_use_count == 1)) {
+            /* GH 1036: keep side-effects: P0 = pop P1 vs pop P1 */
+            if (r && ins->type & ITPUREFUNC
+                  && (r->use_count == 1 && r->lhs_use_count == 1)) {
                 IMCC_debug(imcc, DEBUG_OPT2, "used once '%d' deleted\n", ins);
                 ins = delete_ins(unit, ins);
 

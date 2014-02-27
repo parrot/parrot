@@ -1975,7 +1975,8 @@ labeled_inst:
                     imcc->keyvec, 1);
            mem_sys_free($1);
          }
-   | PNULL var    { $$ = MK_I(imcc, imcc->cur_unit, "null", 1, $2); }
+   | PNULL var    { $$ = MK_I(imcc, imcc->cur_unit, "null", 1, $2);
+                    $$->type = ITPUREFUNC; }
    | sub_call     { $$ = 0; imcc->cur_call = NULL; }
    | pcc_sub_call { $$ = 0; }
    | pcc_ret
@@ -1994,9 +1995,11 @@ assignment:
      target '=' var
             { $$ = MK_I(imcc, imcc->cur_unit, "set", 2, $1, $3);  }
    | target '=' un_op var
-            { $$ = MK_I(imcc, imcc->cur_unit, $3, 2, $1, $4);  }
+            { $$ = MK_I(imcc, imcc->cur_unit, $3, 2, $1, $4);
+              $$->type = ITPUREFUNC; }
    | target '=' var bin_op var
-            { $$ = MK_I(imcc, imcc->cur_unit, $4, 3, $1, $3, $5); }
+            { $$ = MK_I(imcc, imcc->cur_unit, $4, 3, $1, $3, $5);
+              $$->type = ITPUREFUNC; }
    | target '=' var '[' keylist ']'
             { $$ = iINDEXFETCH(imcc, imcc->cur_unit, $1, $3, $5); }
    | target '[' keylist ']' '=' var
@@ -2023,6 +2026,7 @@ assignment:
    | target '=' PNULL
          {
            $$ = MK_I(imcc, imcc->cur_unit, "null", 1, $1);
+           $$->type = ITPUREFUNC;
          }
    ;
 
@@ -2074,13 +2078,15 @@ get_results:
 
 op_assign:
      target assign_op var
-         { $$ = MK_I(imcc, imcc->cur_unit, $2, 2, $1, $3); }
+         { $$ = MK_I(imcc, imcc->cur_unit, $2, 2, $1, $3);
+           $$->type = ITPUREFUNC; }
    | target CONCAT_ASSIGN var
          {
              if ($1->set == 'P')
                  $$ = MK_I(imcc, imcc->cur_unit, "concat", 2, $1, $3);
              else
                  $$ = MK_I(imcc, imcc->cur_unit, "concat", 3, $1, $1, $3);
+             $$->type = ITPUREFUNC;
          }
    ;
 

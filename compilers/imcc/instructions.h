@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2010, Parrot Foundation.
+ * Copyright (C) 2002-2014, Parrot Foundation.
  */
 
 #ifndef PARROT_IMCC_INSTRUCTIONS_H_GUARD
@@ -7,12 +7,13 @@
 
 /* Types */
 
-enum INSTYPE {    /*instruction type can be   */
+enum INSTYPE {    /* instruction type can be   */
     ITBRANCH   =   0x10000, /*  branch        */
     ITPCCRET   =   0x20000, /*  PCC sub return */
     ITCALL     =   0x40000, /*  function call */
     ITLABEL    =   0x80000, /*  label         */
     ITPCCPARAM =  0x100000, /*  .get_params */
+    ITPUREFUNC =  0x200000, /*  purely functional, no sideeffects */
     ITRESULT   =  0x400000, /*  .get_results */
     ITPCCSUB   = 0x1000000, /*  PCC sub call */
     ITPCCYIELD = 0x2000000  /*  yield from PCC call instead of return */
