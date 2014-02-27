@@ -693,11 +693,10 @@ get_code_size(ARGMOD(imc_info_t * imcc), ARGIN(const IMC_Unit *unit),
             continue;
         }
         (*src_lines)++;
-        if (!ins->op) { /* caused by constant propagation */
-            if (!(imcc->optimizer_level & OPT_CFG))
-                IMCC_fatal(imcc, 1, "get_code_size: "
-                           "no opnum ins#%d 0x%x\n",
-                           ins->index, ins);
+        if (!ins->op) {
+            IMCC_fatal(imcc, 1, "get_code_size: "
+                       "no opnum ins#%d 0x%x\n",
+                       ins->index, ins);
         }
         else {
             if (ins->op == &core_ops->op_info_table[PARROT_OP_set_p_pc]) {
@@ -2473,18 +2472,8 @@ e_pbc_emit(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(const IMC_Unit *u
         /* Get the info for that opcode */
         op_info = ins->op;
 
-        if (!op_info) {
-#if 0
-            if (imcc->optimizer_level & OPT_CFG) { /* known issue GH #1039 */
-                IMCC_info(imcc, 0, "** e_emit_pbc: empty op %d 0x%x ", imcc->npc, ins);
-                IMCC_debug_ins(imcc, 0, ins);
-                IMCC_print_inc(imcc);
-                IMCC_info(imcc, 0, "\n");
-                return 0;
-            } else
-#endif
-                IMCC_fatal(imcc, 1, "e_emit_pbc: empty op %d 0x%x\n", imcc->npc, ins);
-        }
+        if (!op_info)
+            IMCC_fatal(imcc, 1, "e_emit_pbc: empty op %d 0x%x\n", imcc->npc, ins);
         IMCC_debug(imcc, DEBUG_PBC, "%d %s", imcc->npc, op_info->full_name);
 
         /* Start generating the bytecode */
