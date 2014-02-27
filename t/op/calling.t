@@ -1323,7 +1323,7 @@ CODE
 Foo!
 OUTPUT
 
-# bug - repeated calls to eval'd sub crashes (pmichaud, 2005.10.27)
+# fixed bug - repeated calls to eval'd sub crashes (pmichaud, 2005.10.27)
 pir_output_is( <<'CODE', <<'OUTPUT', "repeated calls to eval'd sub" );
 .sub main :main
     .local string s

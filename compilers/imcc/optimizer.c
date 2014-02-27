@@ -1291,6 +1291,8 @@ Converts conditional loops to post-test
 Returns TRUE if any optimizations were performed. Otherwise, returns
 FALSE.
 
+See L<https://github.com/parrot/parrot/issues/1037> for a problem with nci
+
 =cut
 
 */
@@ -1350,7 +1352,7 @@ branch_cond_loop_swap(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit), ARGMOD(I
             regs[reg_index] = mk_label_address(imcc, label);
             tmp = INS(imcc, unit, (const char*)neg_op, "", regs, args, 0, 0);
 
-            IMCC_debug(imcc, DEBUG_OPT1,
+            IMCC_debug(imcc, DEBUG_OPT1, /* XXX GH #1037 */
                 "loop %s -> %s converted to post-test, added label %s\n",
                 branch->symregs[0]->name, get_branch_reg(cond)->name, label);
 
@@ -1422,6 +1424,12 @@ branch_cond_loop(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                     }
                     else if ((cond->type & ITBRANCH) && (get_branch_regno(cond) >= 0)) {
                         found = 1;
+                        break;
+                    }
+                    else if (STREQ(cond->opname, "get_global")) {
+                        /* XXX GH 1037: avoid get_global in a loop which was initialized by nci */
+                        IMCC_debug(imcc, DEBUG_OPT1, "skip get_global for branch_cond_loop_swap ");
+                        IMCC_debug_ins(imcc, DEBUG_OPT1, cond);
                         break;
                     }
                 }

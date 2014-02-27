@@ -121,7 +121,6 @@ undefined
 OUTPUT
 
     pir_output_is( << 'CODE', << 'OUTPUT', "dlfunc function is defined" );
-
 .sub test :main
     .local string library_name
     library_name = 'libnci_test'
@@ -143,7 +142,6 @@ libnci_test was successfully loaded
 OUTPUT
 
     pir_output_is( << 'CODE', << 'OUTPUT', "dlfunc function pointer" );
-
 .sub test :main
     .local string library_name
     library_name = 'libnci_test'
@@ -183,7 +181,6 @@ libnci_test was successfully loaded
 OUTPUT
 
     pir_output_is( << 'CODE', << "OUTPUT", "nci_c - return a char in an INTEGER register" );
-
 .include "datatypes.pasm"
 
 .sub test :main
@@ -209,7 +206,6 @@ libnci_test was successfully loaded
 OUTPUT
 
     pir_output_is( << 'CODE', << 'OUTPUT', "nci_d and nci_dlvar_double" );
-
 .include "datatypes.pasm"
 
 .sub test :main
@@ -271,7 +267,6 @@ libnci_test was successfully loaded
 OUTPUT
 
     pir_output_is( << 'CODE', << 'OUTPUT', "nci_f and nci_dlvar_float" );
-
 .include "datatypes.pasm"
 
 .sub test :main
@@ -333,7 +328,6 @@ libnci_test was successfully loaded
 OUTPUT
 
     pir_output_is( << 'CODE', << "OUTPUT", "nci_l - return a long in an INTEGER register" );
-
 .include "datatypes.pasm"
 
 .sub test :main
@@ -359,7 +353,6 @@ libnci_test was successfully loaded
 OUTPUT
 
     pir_output_is( << 'CODE', << "OUTPUT", "nci_p - return a pointer to int" );
-
 .include "datatypes.pasm"
 
 .sub test :main
@@ -395,7 +388,6 @@ libnci_test was successfully loaded
 OUTPUT
 
     pir_output_is( << 'CODE', << 'OUTPUT', 'nci_s - return a short in an INTEGER register' );
-
 .include "datatypes.pasm"
 
 .sub test :main
@@ -426,7 +418,6 @@ SKIP:
         skip( "nci_dlvar_int hangs on HP-UX", 1 ) if $^O eq 'hpux';
 
         pir_output_is( << 'CODE', << 'OUTPUT', "nci_v and nci_dlvar_int" );
-
 .include "datatypes.pasm"
 
 .sub test :main
@@ -484,10 +475,9 @@ libnci_test was successfully loaded
 -4444000
 -44440000
 OUTPUT
-    }
+} #SKIP hpux
 
-        pir_output_is( << 'CODE', << 'OUTPUT', "nci_pv" );
-
+    pir_output_is( << 'CODE', << 'OUTPUT', "nci_pv" );
 .include "datatypes.pasm"
 
 .sub test :main
@@ -547,7 +537,6 @@ ok 1
 OUTPUT
 
     pir_output_is( << 'CODE', << 'OUTPUT', 'nci_dd - PIR' );
-
 .sub test :main
     .local string library_name
     library_name = 'libnci_test'
@@ -570,7 +559,6 @@ libnci_test was successfully loaded
 OUTPUT
 
     pir_output_is( << 'CODE', << 'OUTPUT', 'get_string()' );
-
 .sub test :main
     .local string library_name
     library_name = 'libnci_test'
@@ -1344,7 +1332,7 @@ ok
 got null
 OUTPUT
 
-  pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_C1 - PASM' );
+    pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_C1 - PASM' );
 .pcc_sub :main main:
 
   # we need a flag if the call_back is already done
@@ -1405,9 +1393,6 @@ external data: succeeded
 done.
 OUTPUT
 
-TODO: {
-    local $TODO = '-O1 [GH #1037]' if $ENV{TEST_PROG_ARGS}
-        and $ENV{TEST_PROG_ARGS} =~ / -O[12]/;
     pir_output_is( <<'CODE', <<'OUTPUT', "nci_cb_C1 - PIR" );
 
 .sub test :main
@@ -1480,7 +1465,6 @@ user data: 42
 external data: succeeded
 the callback has run
 OUTPUT
-}
 
     pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_C2 - PASM' );
 .pcc_sub :main main:
@@ -1542,9 +1526,6 @@ external data: 77
 done.
 OUTPUT
 
-TODO: {
-    local $TODO = '-O1 [GH #1037]' if $ENV{TEST_PROG_ARGS}
-        and $ENV{TEST_PROG_ARGS} =~ / -O[12]/;
     pir_output_is( <<'CODE', <<'OUTPUT', "nci_cb_C3 - PIR" );
 
 .include "datatypes.pasm"
@@ -1630,7 +1611,6 @@ user data: 42
 external data: 99
 the callback has run
 OUTPUT
-}
 
     pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_D1 - PASM' );
 .pcc_sub :main main:
@@ -1752,9 +1732,6 @@ external data: 88
 done.
 OUTPUT
 
-TODO: {
-    local $TODO = '-O1 [GH #1037]' if $ENV{TEST_PROG_ARGS}
-        and $ENV{TEST_PROG_ARGS} =~ / -O[12]/;
     pir_output_is( <<'CODE', <<'OUTPUT', "nci_cb_D2 - PIR" );
 
 .sub test :main
@@ -1916,7 +1893,6 @@ user data: 42
 external data: 111
 the callback has run
 OUTPUT
-}
 
     pir_output_is( <<'CODE', <<'OUTPUT', "nci_cb_D4 - synchronous callbacks" );
 
@@ -2105,7 +2081,7 @@ W: 420
 H: 430
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_vpii - nested structs' );
+        pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_vpii - nested structs' );
 .pcc_sub :main main:
 
 .include "datatypes.pasm"
@@ -2425,10 +2401,9 @@ ok 2
 ok 3
 OUTPUT
 
-}    # SKIP
+}    # SKIP hpux
 
 pir_output_is( << 'CODE', << 'OUTPUT', "opcode 'does'" );
-
 .sub test :main
     .local pmc pmc1
     pmc1 = new ['ParrotLibrary']
