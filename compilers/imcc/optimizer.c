@@ -759,15 +759,18 @@ constant_propagation(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                             if (found) {
                                 const Instruction * const prev = ins2->prev;
                                 if (prev) {
+                                    any = 1;
                                     if (tmp) { /* see syn/clash_1.pir or syn/const_31.pir */
                                         subst_ins(unit, ins2, tmp, 1);
-                                        any = 1;
                                         IMCC_debug(imcc, DEBUG_OPT2, " reduced to ");
                                         IMCC_debug_ins(imcc, DEBUG_OPT2, tmp);
                                     }
-                                    else {
-                                        ins2->op = oldop;
-                                        IMCC_debug(imcc, DEBUG_OPT2, " no const op for %s\n", ins2->opname);
+                                    else { /* see syn/macro_10.pir */
+                                        IMCC_debug(imcc, DEBUG_OPT2, " deleted ");
+                                        IMCC_debug_ins(imcc, DEBUG_OPT2, ins2);
+                                        --old->use_count;
+                                        unit->ostat.deleted_ins++;
+                                        ins2 = delete_ins(unit, ins2);
                                     }
                                     ins2 = prev->next;
                                 }
