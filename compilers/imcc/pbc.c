@@ -2474,13 +2474,16 @@ e_pbc_emit(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(const IMC_Unit *u
         op_info = ins->op;
 
         if (!op_info) {
+#if 0
             if (imcc->optimizer_level & OPT_CFG) { /* known issue GH #1039 */
-                IMCC_warning(imcc, "e_emit_pbc: empty op %d ", imcc->npc);
+                IMCC_info(imcc, 0, "** e_emit_pbc: empty op %d 0x%x ", imcc->npc, ins);
                 IMCC_debug_ins(imcc, 0, ins);
+                IMCC_print_inc(imcc);
+                IMCC_info(imcc, 0, "\n");
                 return 0;
-            } else {
-                IMCC_fatal(imcc, 1, "e_emit_pbc: empty op %d %x", imcc->npc, ins);
-            }
+            } else
+#endif
+                IMCC_fatal(imcc, 1, "e_emit_pbc: empty op %d 0x%x\n", imcc->npc, ins);
         }
         IMCC_debug(imcc, DEBUG_PBC, "%d %s", imcc->npc, op_info->full_name);
 
@@ -2553,7 +2556,8 @@ e_pbc_emit(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(const IMC_Unit *u
             }
         }
 
-        IMCC_debug(imcc, DEBUG_PBC, "\t%d\n", ins);
+        IMCC_debug(imcc, DEBUG_PBC, "\t");
+        IMCC_debug_ins(imcc, DEBUG_PBC, ins);
         imcc->npc += ins->opsize;
     }
 

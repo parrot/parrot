@@ -746,6 +746,7 @@ constant_propagation(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                         else if (instruction_reads(ins2, ins2->symregs[i])) {
                             Instruction *tmp;
                             SymReg *old;
+                            op_info_t *oldop = ins2->op;
 
                             IMCC_debug(imcc, DEBUG_OPT2, "\tpropagating into register %i: ", i);
                             IMCC_debug_ins(imcc, DEBUG_OPT2, ins2);
@@ -758,16 +759,15 @@ constant_propagation(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                             if (found) {
                                 const Instruction * const prev = ins2->prev;
                                 if (prev) {
-                                    if (tmp) /* see syn/clash_1.pir */
+                                    if (tmp) { /* see syn/clash_1.pir or syn/const_31.pir */
                                         subst_ins(unit, ins2, tmp, 1);
-                                    any = 1;
-                                    if (tmp) {
+                                        any = 1;
                                         IMCC_debug(imcc, DEBUG_OPT2, " reduced to ");
                                         IMCC_debug_ins(imcc, DEBUG_OPT2, tmp);
                                     }
                                     else {
-                                        --old->use_count;
-                                        IMCC_debug(imcc, DEBUG_OPT2, " deleted\n");
+                                        ins2->op = oldop;
+                                        IMCC_debug(imcc, DEBUG_OPT2, " no const op for %s\n", ins2->opname);
                                     }
                                     ins2 = prev->next;
                                 }
@@ -777,9 +777,11 @@ constant_propagation(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                                 check_op(imcc, &ins2->op, fullname, ins2->opname,
                                     ins2->symregs, ins2->symreg_count, ins2->keys);
                                 if (!ins2->op) {
+                                    ins2->op = oldop;
                                     ins2->symregs[i] = old;
                                     IMCC_debug(imcc, DEBUG_OPT2,
-                                            " - no %s\n", fullname);
+                                            "\t- no %s ", fullname);
+                                    IMCC_debug_ins(imcc, DEBUG_OPT2, ins2);
                                 }
                                 else {
                                     --old->use_count;
@@ -969,8 +971,9 @@ IMCC_subst_constants(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
     size_t i;
     const char *fmt;
     char op[20];
-    const char *debug_fmt = NULL;   /* gcc -O uninit warn */
+    const char *debug_fmt = NULL;
     int found = 0, branched;
+    *ok = 0;
 
     /* construct a FLOATVAL_FMT with needed precision.
       TT #308  XXX Should use Configure.pl to figure these out,
@@ -1049,7 +1052,6 @@ IMCC_subst_constants(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
     }
 
     if (!found) {
-        *ok = 0;
         return NULL;
     }
 
@@ -1058,13 +1060,13 @@ IMCC_subst_constants(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
     /* we construct a parrot instruction
      * here and let parrot do the calculation in a
      * separate context and make a constant
-     * from the result
+     * from the result.
      */
     branched = eval_ins(imcc, op, found, r);
     if (branched == -1) {
          /* Don't set ok
           * (See http://rt.perl.org/rt3/Ticket/Display.html?id=43048 for info) */
-         return NULL;
+        return NULL;
     }
     /*
      * for math ops result is in I0/N0
@@ -1076,9 +1078,12 @@ IMCC_subst_constants(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
         if (branched) {
             r[0] = r[found];
             tmp = INS(imcc, unit, "branch", "", r, 1, 0, 0);
+            if (tmp)
+                *ok = 1;
         }
         else {
             IMCC_debug(imcc, DEBUG_OPT1, "deleted\n");
+            *ok = 1;
         }
     }
     else {
@@ -1110,11 +1115,11 @@ IMCC_subst_constants(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
             break;
         }
         tmp = INS(imcc, unit, "set", "", r, 2, 0, 0);
+        if (tmp)
+            *ok = 1;
     }
-    if (tmp) {
+    if (tmp)
         IMCC_debug_ins(imcc, DEBUG_OPT1, tmp);
-    }
-    *ok = 1;
     return tmp;
 }
 
