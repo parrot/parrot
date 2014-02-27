@@ -53,18 +53,15 @@ typedef enum {
 /* &end_gen */
 
 typedef enum { /* sync with compilers/imcc/debug.h */
-    PARROT_IMCC_DEBUG_NONE          = 0x00,
-    PARROT_IMCC_VERBOSE             = 0x01,
-    PARROT_IMCC_DEBUG_LEXER         = 0x02,
-    PARROT_IMCC_DEBUG_PARSER        = 0x04,   /* sets yydebug */
-    PARROT_IMCC_DEBUG_IMC           = 0x08,   /* dump symreg, insns */
-    PARROT_IMCC_DEBUG_CFG           = 0x10,
-    PARROT_IMCC_DEBUG_OPT1          = 0x20,
-    PARROT_IMCC_DEBUG_OPT2          = 0x40,
-    PARROT_IMCC_DEBUG_SPILL         = 0x80,
-    PARROT_IMCC_DEBUG_AST           = 0x100,
-    PARROT_IMCC_DEBUG_REG           = 0x200,
-    PARROT_IMCC_DEBUG_REG2          = 0x400,
+    PARROT_IMCC_DEBUG_NONE          = 0x0000,
+    PARROT_IMCC_VERBOSE             = 0x0001,
+    PARROT_IMCC_DEBUG_PARSER        = 0x0004,   /* sets yydebug */
+    PARROT_IMCC_DEBUG_IMC           = 0x0008,   /* dump symreg, insns */
+    PARROT_IMCC_DEBUG_CFG           = 0x0010,
+    PARROT_IMCC_DEBUG_OPT1          = 0x0020,
+    PARROT_IMCC_DEBUG_OPT2          = 0x0040,
+    PARROT_IMCC_DEBUG_SPILL         = 0x0080,
+    PARROT_IMCC_DEBUG_AST           = 0x0100,
     PARROT_IMCC_DEBUG_PBC           = 0x1000,
     PARROT_IMCC_DEBUG_PBC_CONST     = 0x2000,
     PARROT_IMCC_DEBUG_PBC_FIXUP     = 0x4000,

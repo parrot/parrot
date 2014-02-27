@@ -243,6 +243,16 @@ IMCC_debug(ARGMOD(imc_info_t * imcc), int level, ARGIN(const char *fmt), ...)
     va_end(ap);
 }
 
+void IMCC_debug_ins(imc_info_t *imcc, int level, const Instruction *ins) {
+    PIOHANDLE pstderr;
+    if (!(level & imcc->debug))
+        return;
+    pstderr = Parrot_io_internal_std_os_handle(imcc->interp, PIO_STDERR_FILENO);
+    Parrot_io_pprintf(imcc->interp, pstderr, "0x%x %s ", ins, ins->opname);
+    ins_print(imcc, pstderr, ins);
+    Parrot_io_pprintf(imcc->interp, pstderr, "\n");
+}
+
 /*
 
 =item C<void dump_instructions(imc_info_t * imcc, const IMC_Unit *unit)>

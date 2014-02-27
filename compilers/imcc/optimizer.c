@@ -211,19 +211,6 @@ static int used_once(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
-/* TODO: move to debug.c. and possibly integrate into IMCC_debug as seperate %p handle */
-void IMCC_debug_ins(imc_info_t *imcc, int level, Instruction *ins);
-
-void IMCC_debug_ins(imc_info_t *imcc, int level, Instruction *ins) {
-    PIOHANDLE pstderr;
-    if (!(level & imcc->debug))
-        return;
-    pstderr = Parrot_io_internal_std_os_handle(imcc->interp, PIO_STDERR_FILENO);
-    Parrot_io_pprintf(imcc->interp, pstderr, "0x%x %s ", ins, ins->opname);
-    ins_print(imcc, pstderr, ins);
-    Parrot_io_pprintf(imcc->interp, pstderr, "\n");
-}
-
 /*
 
 =item C<int pre_optimize(imc_info_t *imcc, IMC_Unit *unit)>

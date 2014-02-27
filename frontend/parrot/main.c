@@ -493,13 +493,16 @@ help_debug(void)
     "\n"
     "--imcc-debug -d [Flags] ...\n"
     "    0001    verbose\n"
-    "    0002    lexer\n"
     "    0004    parser\n"
     "    0008    imc\n"
     "    0010    CFG\n"
     "    0020    optimization 1\n"
     "    0040    optimization 2\n"
+    "    0080    spill\n"
     "    0100    AST\n"
+    "    1000    PBC\n"
+    "    2000    PBC_CONST\n"
+    "    4000    PBC_FIXUP\n"
     "\n");
 }
 
