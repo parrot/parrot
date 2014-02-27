@@ -2,6 +2,8 @@
     - Core
 	+ Re-enable old immc flags for parrot and parrot_old, such as
 	  -On -a -v -y -E -dxx. [GH #1033]
+	+ Fix imcc part of -O2 to allow used_once elimination only for
+	  purely functional ops without side-effects [GH #1036]
     - Build
 	+ Set emacs buffer-read-only:t tags in generated files [GH #1034]
 	+ Provide coda for generated include/*.pasm files [GH #1032]
