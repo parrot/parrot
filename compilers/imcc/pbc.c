@@ -693,20 +693,22 @@ get_code_size(ARGMOD(imc_info_t * imcc), ARGIN(const IMC_Unit *unit),
             continue;
         }
         (*src_lines)++;
-        if (!ins->op)
-            IMCC_fatal(imcc, 1, "get_code_size: "
-                    "no opnum ins#%d 0x%x\n",
-                    ins->index, ins);
-
-        if (ins->op == &core_ops->op_info_table[PARROT_OP_set_p_pc]) {
-            /* set_p_pc opcode */
-            IMCC_debug(imcc, DEBUG_PBC_FIXUP, "PMC constant %s\n",
-                    ins->symregs[1]->name);
-
-            if (ins->symregs[1]->usage & U_FIXUP)
-                store_fixup(imcc, ins->symregs[1], code_size, 2);
+        if (!ins->op) { /* caused by constant propagation */
+            if (!(imcc->debug & DEBUG_OPT2))
+                IMCC_fatal(imcc, 1, "get_code_size: "
+                           "no opnum ins#%d 0x%x\n",
+                           ins->index, ins);
         }
+        else {
+            if (ins->op == &core_ops->op_info_table[PARROT_OP_set_p_pc]) {
+                /* set_p_pc opcode */
+                IMCC_debug(imcc, DEBUG_PBC_FIXUP, "PMC constant %s\n",
+                           ins->symregs[1]->name);
 
+                if (ins->symregs[1]->usage & U_FIXUP)
+                    store_fixup(imcc, ins->symregs[1], code_size, 2);
+            }
+        }
         code_size += opsize;
     }
 

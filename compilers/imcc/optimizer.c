@@ -768,17 +768,21 @@ constant_propagation(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                             tmp = IMCC_subst_constants(imcc,
                                 unit, ins2->opname, ins2->symregs, ins2->opsize,
                                 &found);
-                            if (found && tmp) { /* XXX syn/clash_1.pir */
+                            if (found) {
                                 const Instruction * const prev = ins2->prev;
                                 if (prev) {
-                                    subst_ins(unit, ins2, tmp, 1);
+                                    if (tmp) /* see syn/clash_1.pir */
+                                        subst_ins(unit, ins2, tmp, 1);
                                     any = 1;
-                                    IMCC_debug(imcc, DEBUG_OPT2, " reduced to ");
-                                    IMCC_debug_ins(imcc, DEBUG_OPT2, tmp);
+                                    if (tmp) {
+                                        IMCC_debug(imcc, DEBUG_OPT2, " reduced to ");
+                                        IMCC_debug_ins(imcc, DEBUG_OPT2, tmp);
+                                    }
+                                    else {
+                                        --old->use_count;
+                                        IMCC_debug(imcc, DEBUG_OPT2, " deleted\n");
+                                    }
                                     ins2 = prev->next;
-                                }
-                                if (!ins2->op) {
-                                    IMCC_debug(imcc, DEBUG_OPT2, " no op!\n");
                                 }
                             }
                             else {
