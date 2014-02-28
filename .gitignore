@@ -1,8 +1,10 @@
 # Ignore SVN, if people are using the SVN Github interface (danger!)
 /\B.svn\b
 
-# Ignore core files
+# Ignore core files and gdb helpers
 /core*
+/.gdbinit
+/.lldbinit
 
 # Ignore patch-related stuff
 *.rej
@@ -536,6 +538,7 @@ winxed-c.html
 /src/string/encoding/*.gcov
 /winxed
 /winxed.*
+
 # Local variables:
 #   mode: text
 #   buffer-read-only: t
