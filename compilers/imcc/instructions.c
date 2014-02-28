@@ -173,13 +173,14 @@ instruction_writes(ARGIN(const Instruction *ins), ARGIN(const SymReg *r))
     /* a get_results opcode occurs after the actual sub call */
     if (ins->op == &core_ops->op_info_table[PARROT_OP_get_results_pc]) {
         int i;
-
-        /* but only if it isn't the get_results opcode of
-         * an ExceptionHandler, which doesn't have
-         * a call next
-         */
+        /* Old assumption: But only if it isn't the get_results opcode
+         * of an ExceptionHandler, which doesn't have a call next.
+         *
+         * Not with GH #1041: invokecc vs exception handler:
+         * invokecc + get_results x, $I0 does write to $I0
         if (ins->prev && (ins->prev->type & ITPCCSUB))
             return 0;
+         */
 
         for (i = ins->symreg_count - 1; i >= 0; --i) {
             if (ins->symregs[i] == r)

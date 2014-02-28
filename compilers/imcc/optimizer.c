@@ -738,9 +738,17 @@ constant_propagation(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                 if (ins2->bbindex != ins->bbindex)
                     /* restrict to within a basic block */
                     goto next_constant;
+                if (imcc->verbose) {
+                    IMCC_debug(imcc, DEBUG_OPT2, "\tchecking op ");
+                    IMCC_debug_ins(imcc, DEBUG_OPT2, ins2);
+                }
                 /* was opsize - 2, changed to n_r - 1 */
                 for (i = ins2->symreg_count - 1; i >= 0; i--) {
                     if (STREQ(o->name, ins2->symregs[i]->name)) {
+                        if (imcc->verbose) {
+                            IMCC_debug(imcc, DEBUG_OPT2, " checking register %i ", i);
+                            IMCC_debug_ins(imcc, DEBUG_OPT2, ins2);
+                        }
                         if (instruction_writes(ins2, ins2->symregs[i]))
                             goto next_constant;
                         else if (instruction_reads(ins2, ins2->symregs[i])) {
