@@ -4,12 +4,15 @@
 	  -On -a -v -y -E -dxx. [GH #1033]
 	+ Fixed imcc -O1. Special-case get_global for branch_cond_loop_swap,
           which broke nci tests [GH #1037]
-	+ Fix imcc part of -O2 to allow used_once elimination only for
+	+ Fixed imcc for -O2 to allow used_once elimination only for
 	  purely functional ops without side-effects [GH #1036]
-	+ Fixed most imcc -O2 errors in constant propagation leading to
-          empty ins->op ptrs when deleting or skipping certain instruction
-          [GH #1039] and a wrong logic leading to missed detecting writes
-          from get_results [GH #1041]. Only 3 remaining -O2 test failures.
+	+ Fixed most imcc -O2 errors in constant propagation
+	  - leading to empty ins->op ptrs when deleting or skipping
+	  certain instruction [GH #1039],
+	  - a wrong logic leading to missed detecting writes
+          from get_results [GH #1041], and
+	  - propagate only matching types in setters [GH #1043].
+	  Only 2 remaining -O2 test failures.
     - Build
 	+ Set emacs buffer-read-only:t tags in generated files [GH #1034]
 	+ Provide coda for generated include/*.pasm files [GH #1032]

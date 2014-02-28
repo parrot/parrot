@@ -713,10 +713,13 @@ constant_propagation(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
     IMCC_info(imcc, 2, "\tconstant_propagation\n");
     for (ins = unit->instructions; ins; ins = ins->next) {
         int found = 0;
-        if (STREQ(ins->opname, "set") &&
-                ins->opsize == 3 &&             /* no keyed set */
-                ins->symregs[1]->type == VTCONST &&
-                ins->symregs[0]->set != 'P') {        /* no PMC consts */
+        if ((STREQ(ins->opname, "set") || (0 == memcmp(ins->opname, "set_", 4))) &&
+            ins->opsize == 3 &&             /* no keyed set */
+            ins->symregs[1]->type == VTCONST && /* const rhs */
+            ins->symregs[0]->set != 'P' &&  /* no PMC consts */
+            /* skip type coercions, only same type GH #1043 */
+            ins->symregs[0]->set == ins->symregs[1]->set)
+        {
             found = 1;
             c = ins->symregs[1];
             o = ins->symregs[0];
@@ -731,7 +734,7 @@ constant_propagation(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
         if (found) {
             Instruction *ins2;
 
-            IMCC_debug(imcc, DEBUG_OPT2, "propagating constant ");
+            IMCC_debug(imcc, DEBUG_OPT2, "propagating constant %s from ", c->name);
             IMCC_debug_ins(imcc, DEBUG_OPT2, ins);
             for (ins2 = ins->next; ins2; ins2 = ins2->next) {
                 int i;
@@ -746,7 +749,9 @@ constant_propagation(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                 for (i = ins2->symreg_count - 1; i >= 0; i--) {
                     if (STREQ(o->name, ins2->symregs[i]->name)) {
                         if (imcc->verbose) {
-                            IMCC_debug(imcc, DEBUG_OPT2, " checking register %i ", i);
+                            IMCC_debug(imcc, DEBUG_OPT2,
+                                       " checking %s in register %i of ",
+                                       o->name, i);
                             IMCC_debug_ins(imcc, DEBUG_OPT2, ins2);
                         }
                         if (instruction_writes(ins2, ins2->symregs[i]))
@@ -756,7 +761,8 @@ constant_propagation(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                             SymReg *old;
                             op_info_t *oldop = ins2->op;
 
-                            IMCC_debug(imcc, DEBUG_OPT2, "\tpropagating into register %i: ", i);
+                            IMCC_debug(imcc, DEBUG_OPT2,
+                                       "\tinto register %i of ", i);
                             IMCC_debug_ins(imcc, DEBUG_OPT2, ins2);
                             old = ins2->symregs[i];
                             ins2->symregs[i] = c;

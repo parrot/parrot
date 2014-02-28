@@ -309,10 +309,8 @@ CODE
 -10
 OUTPUT
 
-# rounding behavior, -O2 constant propagation type check
-TODO: {
-    local $TODO = 'missing -O2 type check [GH #1043]' if $ENV{TEST_PROG_ARGS} =~ / -O2/;
-    pir_output_is( <<'CODE', <<'OUT', "set_i_n testing" );
+# rounding behavior, -O2 constant propagation type check: GH #1043
+pir_output_is( <<'CODE', <<'OUT', "set_i_n testing" );
 .sub _main :main
     .local num n
     .local int i
@@ -335,7 +333,6 @@ TODO: {
 CODE
 123
 OUT
-}
 
 $output = $PConfig{numvalsize} < 16 ? "zero\n" : "not zero\n";
 pasm_output_is( <<'CODE', $output, "rounding due to mapped" );
