@@ -7,12 +7,12 @@
 	+ Fixed imcc for -O2 to allow used_once elimination only for
 	  purely functional ops without side-effects [GH #1036]
 	+ Fixed most imcc -O2 errors in constant propagation
-	  - leading to empty ins->op ptrs when deleting or skipping
+	  = leading to empty ins->op ptrs when deleting or skipping
 	  certain instruction [GH #1039],
-	  - a wrong logic leading to missed detecting writes
+	  = a wrong logic leading to missed detecting writes
           from get_results [GH #1041],
-	  - propagate only matching types in setters [GH #1042], and
-	  - empty ins->next in used_once deletion [GH #1044].
+	  = propagate only matching types in setters [GH #1042], and
+	  = empty ins->next in used_once deletion [GH #1044].
 	  Only 1 remaining -O2 test regression.
     - Build
 	+ Set emacs buffer-read-only:t tags in generated files [GH #1034]
@@ -23,7 +23,8 @@
     - Documentation
 	+ Updated pod for parrot and tools/build/c2str.pl
     - Tests
-	+ Mark failing -O2 tests
+	+ Added -O1 and -O2 to fulltest
+	+ Mark failing -O2 test
     - Community
 	+ Got accepted for GSOC. Got a candidate for "Improve performance
 	  of method signatures"
