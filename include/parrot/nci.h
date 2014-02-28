@@ -15,7 +15,7 @@
 
 typedef PMC *(*nci_fb_func_t)(PARROT_INTERP, PMC *user_data, PMC *signature);
 typedef void (*nci_thunk_t)(PARROT_INTERP, PMC *, PMC *);
-typedef void (*native_pcc_method_t)(PARROT_INTERP);
+typedef void (*native_pcc_method_t)(PARROT_INTERP, PMC *);
 
 void Parrot_nci_load_core_thunks(PARROT_INTERP);
 void Parrot_nci_load_extra_thunks(PARROT_INTERP);
