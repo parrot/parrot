@@ -90,8 +90,12 @@
 ^/Makefile/
 ^/TAGS$
 ^/TAGS/
+^/\.gdbinit$
+^/\.gdbinit/
 ^/\.git$
 ^/\.git/
+^/\.lldbinit$
+^/\.lldbinit/
 ^/\.parrot_current_git_describe$
 ^/\.parrot_current_git_describe/
 ^/\.parrot_current_rev$
