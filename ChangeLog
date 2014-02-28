@@ -1,33 +1,40 @@
 2014-03-18    release 6.2.0
     - Core
-	+ Re-enable old immc flags for parrot and parrot_old, such as
-	  -On -a -v -y -E -dxx. [GH #1033]
-	+ Fixed imcc -O1. Special-case get_global for branch_cond_loop_swap,
-          which broke nci tests [GH #1037]
-	+ Fixed imcc for -O2 to allow used_once elimination only for
-	  purely functional ops without side-effects [GH #1036]
-	+ Fixed most imcc -O2 errors in constant propagation
-	  = leading to empty ins->op ptrs when deleting or skipping
-	  certain instruction [GH #1039],
-	  = a wrong logic leading to missed detecting writes
-          from get_results [GH #1041],
-	  = propagate only matching types in setters [GH #1042], and
-	  = empty ins->next in used_once deletion [GH #1044].
-	  Only 1 remaining -O2 test regression.
+        + Re-enable old immc flags for parrot and parrot_old, such as
+          -On -a -v -y -E -dxx. [GH #1033]
+
+        + Fixed imcc -O1 and -O2.
+
+          -O1 fixes:
+          = Special-case get_global for branch_cond_loop_swap, which broke nci
+            tests [GH #1037]
+
+          -O2 used_once fixes:
+          = Allow used_once elimination only for purely functional ops
+            without side-effects [GH #1036]
+          = Empty ins->next in deletion [GH #1042].
+
+          -O2 constant propagation fixes:
+          = Empty ins->op ptrs when deleting or skipping certain instruction
+            [GH #1039],
+          = Wrong logic leading to missed detecting writes from get_results
+            [GH #1041],
+          = Propagate only matching types in setters [GH #1042],
+          = Stop at yield or invokecc for possible push_eh/pop_eh non-local
+            effects [GH #1044]
     - Build
-	+ Set emacs buffer-read-only:t tags in generated files [GH #1034]
-	+ Provide coda for generated include/*.pasm files [GH #1032]
-	+ Fix parser for bison 3 [GH #1031]
+        + Set emacs buffer-read-only:t tags in generated files [GH #1034]
+        + Provide coda for generated include/*.pasm files [GH #1032]
+        + Fix parser for bison 3 [GH #1031]
     - Deprecations
-	+ Warn on deprecated usage of append_configure_log()
+        + Warn on deprecated usage of append_configure_log()
     - Documentation
-	+ Updated pod for parrot and tools/build/c2str.pl
+        + Updated pod for parrot and tools/build/c2str.pl
     - Tests
-	+ Added -O1 and -O2 to fulltest
-	+ Mark failing -O2 test
+        + Added -O1 and -O2 to fulltest
     - Community
-	+ Got accepted for GSOC. Got a candidate for "Improve performance
-	  of method signatures"
+        + Parrot has been accepted to Google Summer of Code 2014
+        + Got a candidate for "Improve performance of method signatures"
 
 2014-02-18    release 6.1.0
     - Build

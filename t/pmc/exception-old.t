@@ -431,16 +431,17 @@ something broke
 current inst/
 OUTPUT
 
-TODO: {
-    local $TODO = '-O2 t/pmc/exception-old_19.pir regression #1044'
-      if $ENV{TEST_PROG_ARGS} =~ / -O2/;
-    pir_output_is(<<'CODE', <<'OUTPUT', "taking a continuation promotes RetCs");
+pir_output_is(<<'CODE', <<'OUTPUT', "taking a continuation promotes RetCs");
 ## This test creates a continuation in a inner sub and re-invokes it later.  The
 ## re-invocation signals an error, which is caught by an intermediate sub.
 ## Returning from the "test" sub the second time failed in r28794; invoking
 ## parrot with "-D80" shows clearly that the "test" context was being recycled
 ## prematurely.  For some reason, it is necessary to signal the error in order
 ## to expose the bug.
+## See also -O2 t/pmc/exception-old_19.pir regression [GH #1044]
+## cont = test() contains a push_eh, and the subsequent pop_eh at cont() changes
+## the value of the constant redux from 0 back to 1. So constant propagation for
+## redux=0 cannot delete "if redux goto done" and the done branch.
 .sub main :main
     .local int redux
     .local pmc cont
@@ -495,7 +496,6 @@ calling cont
 back from test
 done.
 OUTPUT
-}
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler" );
 .sub main :main

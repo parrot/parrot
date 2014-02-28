@@ -693,7 +693,8 @@ strength_reduce(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
 =item C<static int constant_propagation(imc_info_t *imcc, IMC_Unit *unit)>
 
 Does conservative constant propagation.
-This code will not propagate constants past labels or saves,
+
+This code will not propagate constants past labels, invokecc, yield or saves,
 even though sometimes it may be safe.
 
 =cut
@@ -734,6 +735,10 @@ constant_propagation(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
         if (found) {
             Instruction *ins2;
 
+            /* Propagate the constant into all subsequent ops in the same basic block.
+               But skip on the first write into this constant.
+               Also skip on invokecc or yield ops, as they can contain pop_eh and
+               undo the constant value. GH #1044 */
             IMCC_debug(imcc, DEBUG_OPT2, "propagating constant %s from ", c->name);
             IMCC_debug_ins(imcc, DEBUG_OPT2, ins);
             for (ins2 = ins->next; ins2; ins2 = ins2->next) {
@@ -745,6 +750,8 @@ constant_propagation(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                     IMCC_debug(imcc, DEBUG_OPT2, "\tchecking op ");
                     IMCC_debug_ins(imcc, DEBUG_OPT2, ins2);
                 }
+                if (ins2->type & ITPCCSUB || ins->type & ITPCCYIELD)
+                    goto next_constant;
                 /* was opsize - 2, changed to n_r - 1 */
                 for (i = ins2->symreg_count - 1; i >= 0; i--) {
                     if (STREQ(o->name, ins2->symregs[i]->name)) {
