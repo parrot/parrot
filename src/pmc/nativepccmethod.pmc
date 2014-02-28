@@ -117,7 +117,7 @@ Call the function pointer.
                     "attempt to call NULL native function");
 
         fptr = (native_pcc_method_t)D2FPTR(func);
-        fptr(INTERP);
+        fptr(INTERP, SELF);
 
         /*
          * If this function was tailcalled, the return result
