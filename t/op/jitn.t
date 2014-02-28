@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -24,6 +24,7 @@ registers.
 =cut
 
 my $output;
+$ENV{TEST_PROG_ARGS} ||= '';
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "sub_n_n_n 1,2,3 mapped" );
 .pcc_sub :main main:
@@ -308,8 +309,10 @@ CODE
 -10
 OUTPUT
 
-# rounding behavior
-pir_output_is( <<'CODE', <<'OUT', "set_i_n testing" );
+# rounding behavior, -O2 constant propagation type check
+TODO: {
+    local $TODO = 'missing -O2 type check [GH #1043]' if $ENV{TEST_PROG_ARGS} =~ / -O2/;
+    pir_output_is( <<'CODE', <<'OUT', "set_i_n testing" );
 .sub _main :main
     .local num n
     .local int i
@@ -332,6 +335,7 @@ pir_output_is( <<'CODE', <<'OUT', "set_i_n testing" );
 CODE
 123
 OUT
+}
 
 $output = $PConfig{numvalsize} < 16 ? "zero\n" : "not zero\n";
 pasm_output_is( <<'CODE', $output, "rounding due to mapped" );

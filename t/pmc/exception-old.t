@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -21,6 +21,7 @@ Tests C<Exception> and C<ExceptionHandler> PMCs.
 
 =cut
 
+$ENV{TEST_PROG_ARGS} ||= '';
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "get_results" );
 .pcc_sub :main main:
@@ -430,7 +431,10 @@ something broke
 current inst/
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "taking a continuation promotes RetCs");
+TODO: {
+    local $TODO = '-O2 t/pmc/exception-old_19.pir regression #1044'
+      if $ENV{TEST_PROG_ARGS} =~ / -O2/;
+    pir_output_is(<<'CODE', <<'OUTPUT', "taking a continuation promotes RetCs");
 ## This test creates a continuation in a inner sub and re-invokes it later.  The
 ## re-invocation signals an error, which is caught by an intermediate sub.
 ## Returning from the "test" sub the second time failed in r28794; invoking
@@ -491,6 +495,7 @@ calling cont
 back from test
 done.
 OUTPUT
+}
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "throw - no handler" );
 .sub main :main

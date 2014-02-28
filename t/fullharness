@@ -31,7 +31,7 @@ my @runcore_test_files = glob("@{ $test_groups{runcore} }");
 my @testing_runcore_test_files = glob("@{ $test_groups{testing_runcore} }");
 
 my @targets = ();
-my @alternate_runcore_targets = ( qw| b f O1 r | ); # O2 not yet
+my @alternate_runcore_targets = ( qw| b f O1 O2 r | );
 foreach my $t (@alternate_runcore_targets) {
     push @targets, set_alternate_runcore_target($t);
 }
