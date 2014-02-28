@@ -1670,6 +1670,9 @@ used_once(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                 unit->ostat.deleted_ins++;
                 unit->ostat.used_once++;
                 opt++;
+
+                if (!ins) /* if there's no next GH 1042 */
+                    break;
             }
         }
     }

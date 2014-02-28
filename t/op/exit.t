@@ -5,7 +5,6 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
-use Test::More;
 use Parrot::Test tests => 9;
 
 =head1 NAME
@@ -21,8 +20,6 @@ t/op/exit.t - Testing the exit pseudo-opcode
 Test both success and failure exit status.
 
 =cut
-
-$ENV{TEST_PROG_ARGS} ||= '';
 
 pir_exit_code_is( <<'CODE', 0, 'pir exit with success' );
 .sub main :main
@@ -54,14 +51,11 @@ pir_exit_code_is( <<'CODE', 0, 'pir exits with success by default' );
 .end
 CODE
 
-TODO: {
-    local $TODO = '-O2 used_once: empty ins [GH #1042]'
-      if $ENV{TEST_PROG_ARGS} =~ / -O2/;
-    pasm_exit_code_is( <<'CODE', 0, 'exit with success by default' );
+# empty ins->next in -O2 used_once fixed with [GH #1042]
+pasm_exit_code_is( <<'CODE', 0, 'exit with success by default' );
     set I0, 0
     end
 CODE
-}
 
 pir_exit_code_is( <<'CODE', 2, "pir exit code isn't exception type" );
 .sub main :main

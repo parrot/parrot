@@ -10,9 +10,10 @@
 	  - leading to empty ins->op ptrs when deleting or skipping
 	  certain instruction [GH #1039],
 	  - a wrong logic leading to missed detecting writes
-          from get_results [GH #1041], and
-	  - propagate only matching types in setters [GH #1043].
-	  Only 2 remaining -O2 test failures.
+          from get_results [GH #1041],
+	  - propagate only matching types in setters [GH #1042], and
+	  - empty ins->next in used_once deletion [GH #1044].
+	  Only 1 remaining -O2 test regression.
     - Build
 	+ Set emacs buffer-read-only:t tags in generated files [GH #1034]
 	+ Provide coda for generated include/*.pasm files [GH #1032]
