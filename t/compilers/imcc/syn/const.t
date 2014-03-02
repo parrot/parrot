@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -8,7 +8,7 @@ use vars qw($TODO);
 
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 39;
+use Parrot::Test tests => 41;
 
 pir_output_is( <<'CODE', <<'OUT', "globalconst 1" );
 
@@ -649,7 +649,26 @@ CODE
 16
 OUT
 
+pir_error_output_like( <<'CODE', <<'OUT', "const pmc SEGV [GH #996]" );
+.sub main
+  .const pmc a = "b"
+  .return(a)
+.end
+CODE
+/wrong .const value/
+OUT
 
+TODO: {
+  local $TODO = "SEGV with non-existent constant #1024";
+  pir_error_output_like( <<'CODE', <<'OUT', "const pmc [GH #1024]" );
+.sub baz :immediate :anon
+  .const "Sub" foo = "foo"
+  $P1 = foo."new"()
+.end
+CODE
+/wrong .const value/
+OUT
+}
 
 # Local Variables:
 #   mode: cperl
