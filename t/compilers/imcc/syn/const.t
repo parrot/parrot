@@ -649,7 +649,7 @@ CODE
 16
 OUT
 
-pir_error_output_like( <<'CODE', <<'OUT', "const pmc SEGV [GH #996]" );
+pir_error_output_like( <<'CODE', <<'OUT', "wrong const type [GH #996]" );
 .sub main
   .const pmc a = "b"
   .return(a)
@@ -660,7 +660,7 @@ OUT
 
 TODO: {
   local $TODO = "SEGV with non-existent constant #1024";
-  pir_error_output_like( <<'CODE', <<'OUT', "const pmc [GH #1024]" );
+  pir_error_output_like( <<'CODE', <<'OUT', "missing const Sub [GH #1024]" );
 .sub baz :immediate :anon
   .const "Sub" foo = "foo"
   $P1 = foo."new"()
