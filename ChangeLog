@@ -405,7 +405,7 @@
 
 2014-03-18    release 6.2.0
     - Core
-        + Re-enable old immc flags for parrot and parrot_old, such as
+        + Re-enable old imcc flags for parrot and parrot_old, such as
           -On -a -v -y -E -dxx. [GH #1033]
         + Fixed imcc -O1 and -O2
           -O1 fixes:

@@ -674,8 +674,8 @@ e_pasm_open(ARGMOD(imc_info_t * imcc), ARGIN(STRING *path))
     const Parrot_Interp interp = imcc->interp;
     PMC *handle = PMCNULL;
 
-    Parrot_io_open(interp, handle, path, Parrot_str_new_constant(interp, "w"));
-    imcc->write_pasm = Parrot_io_get_os_handle(interp, handle);
+    if (Parrot_io_open(interp, handle, path, Parrot_str_new_constant(interp, "w")))
+        imcc->write_pasm = Parrot_io_get_os_handle(interp, handle);
     if (!imcc->write_pasm)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                                     "Cannot open output file %Ss", path);
@@ -748,7 +748,7 @@ emit_flush(ARGMOD(imc_info_t * imcc), ARGIN_NULLOK(void *param),
     ASSERT_ARGS(emit_flush)
     Instruction *ins;
 
-    if (UNLIKELY(imcc->write_pasm)) {
+    if (0 && UNLIKELY(imcc->write_pasm)) {
         for (ins = unit->instructions; ins; ins = ins->next) {
             IMCC_debug(imcc, DEBUG_IMC, "emit %d\n", ins);
 
