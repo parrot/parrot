@@ -102,7 +102,12 @@ Instruction * delete_ins(ARGMOD(IMC_Unit *unit), ARGMOD(Instruction *ins))
         FUNC_MODIFIES(*unit)
         FUNC_MODIFIES(*ins);
 
-void emit_close(ARGMOD(imc_info_t *imcc), ARGIN_NULLOK(void *param))
+void e_pasm_out(ARGMOD(imc_info_t * imcc), ARGIN(const char *fmt), ...)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc);
+
+void emit_close(ARGMOD(imc_info_t *imcc))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*imcc);
 
@@ -114,8 +119,9 @@ void emit_flush(
         __attribute__nonnull__(3)
         FUNC_MODIFIES(* imcc);
 
-void emit_open(ARGMOD(imc_info_t * imcc))
+void emit_open(ARGMOD(imc_info_t * imcc), ARGIN(STRING *path))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         FUNC_MODIFIES(* imcc);
 
 PARROT_CAN_RETURN_NULL
@@ -213,13 +219,17 @@ void subst_ins(
 #define ASSERT_ARGS_delete_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(unit) \
     , PARROT_ASSERT_ARG(ins))
+#define ASSERT_ARGS_e_pasm_out __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(fmt))
 #define ASSERT_ARGS_emit_close __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_emit_flush __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_emit_open __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc))
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(path))
 #define ASSERT_ARGS_emitb __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_free_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

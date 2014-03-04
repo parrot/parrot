@@ -73,6 +73,11 @@ void imcc_set_optimization_level(
         FUNC_MODIFIES(*imcc);
 
 PARROT_EXPORT
+void imcc_set_to_pasm(ARGMOD(imc_info_t *imcc), Parrot_Int to_pasm)
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*imcc);
+
+PARROT_EXPORT
 void imcc_set_verbosity(ARGMOD(imc_info_t *imcc), INTVAL verbose)
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*imcc);
@@ -114,6 +119,8 @@ void imcc_destroy(ARGFREE(imc_info_t * imcc));
 #define ASSERT_ARGS_imcc_set_optimization_level __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(opts))
+#define ASSERT_ARGS_imcc_set_to_pasm __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_imcc_set_verbosity __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_exit_reentrant_compile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

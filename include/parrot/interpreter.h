@@ -539,7 +539,7 @@ Parrot_UInt Parrot_interp_test_debug(PARROT_INTERP, UINTVAL flag)
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
-Parrot_Int Parrot_interp_test_flag(PARROT_INTERP, INTVAL flag)
+Parrot_Int Parrot_interp_test_flag(PARROT_INTERP, UINTVAL flag)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT

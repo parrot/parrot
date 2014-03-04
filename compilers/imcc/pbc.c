@@ -2270,7 +2270,7 @@ e_pbc_end_sub(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(IMC_Unit *unit
 
     pragma = ins->symregs[0]->pcc_sub->pragma;
 
-    if (pragma & P_IMMEDIATE && (pragma & P_ANON)) {
+    if ((pragma & P_IMMEDIATE) && (pragma & P_ANON)) {
         /* clear global symbols temporarily -- TT #1324, for example */
         imcc_globals *g = imcc->globals;
         SymHash ghash;
@@ -2280,7 +2280,9 @@ e_pbc_end_sub(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(IMC_Unit *unit
         memmove(&ghash, &imcc->ghash, sizeof (SymHash));
         memset(&imcc->ghash, 0, sizeof (SymHash));
 
-        IMCC_debug(imcc, DEBUG_PBC, "immediate sub '%s'", ins->symregs[0]->name);
+        if (imcc->verbose)
+            IMCC_debug(imcc, DEBUG_PBC, ".pcc_sub :anon :immediate '%s':\n",
+                       ins->symregs[0]->name);
         /* TODO: Don't use this function, it is deprecated (TT #2140). We need
            to find a better mechanism to do this. */
         Parrot_pf_fixup_subs(imcc->interp, PBC_IMMEDIATE, NULL);
@@ -2400,8 +2402,9 @@ e_pbc_emit(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(const IMC_Unit *u
         const size_t code_size = get_code_size(imcc, unit, &ins_size);
         const size_t bytes     = (old_size + code_size) * sizeof (opcode_t);
 
-        IMCC_debug(imcc, DEBUG_PBC, "code_size(ops) %d  old_size %d\n",
-                code_size, old_size);
+        if ((imcc->debug & (DEBUG_PBC|DEBUG_PARROT)) == (DEBUG_PBC|DEBUG_PARROT))
+            IMCC_debug(imcc, DEBUG_PBC, "# code_size(ops) %d  old_size %d\n",
+                       code_size, old_size);
 
         constant_folding(imcc, unit, interp_code);
         store_sub_size(imcc, code_size, ins_size);
@@ -2415,7 +2418,7 @@ e_pbc_emit(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(const IMC_Unit *u
 
         interp_code->base.size = old_size + code_size;
 
-        imcc->pc   = interp_code->base.data + old_size;
+        imcc->pc   = (opcode_t) interp_code->base.data + old_size;
         imcc->npc  = 0;
 
         /* FIXME length and multiple subs */
@@ -2445,6 +2448,11 @@ e_pbc_emit(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(const IMC_Unit *u
         add_const_pmc_sub(imcc, ins->symregs[0], imcc->npc,
             imcc->npc);
     }
+    /* PBC dump a label if it's not a sub. i.e. pasm output */
+    else if ((ins->type & ITLABEL) && *ins->symregs[0]->name != '_') {
+        if (!(ins->symregs[0] && ins->symregs[0]->pcc_sub))
+            e_pasm_out(imcc, "%s:\n", ins->symregs[0]->name);
+    }
 
     if (ins->opname && strcmp(ins->opname, ".annotate") == 0) {
         /* It's an annotation. */
@@ -2465,6 +2473,7 @@ e_pbc_emit(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(const IMC_Unit *u
           default:
             IMCC_fatal(imcc, 1, "e_pbc_emit:invalid type for annotation value\n");
         }
+        e_pasm_out(imcc, ".annotate %s\n", ins->symregs[0]->color);
         Parrot_pf_annotations_add_entry(imcc->interp, interp_code->annotations,
                     imcc->pc - interp_code->base.data,
                     ins->symregs[0]->color, annotation_type, ins->symregs[1]->color);
@@ -2498,7 +2507,8 @@ e_pbc_emit(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(const IMC_Unit *u
 
         if (!op_info)
             IMCC_fatal(imcc, 1, "e_emit_pbc: empty op %d 0x%x\n", imcc->npc, ins);
-        IMCC_debug(imcc, DEBUG_PBC, "%d %s", imcc->npc, op_info->full_name);
+        if (imcc->verbose)
+            IMCC_debug(imcc, DEBUG_PBC, "%d %s", imcc->npc, op_info->full_name);
 
         /* Start generating the bytecode */
         *(imcc->pc)++ = bytecode_map_op(imcc, op_info);
@@ -2532,18 +2542,20 @@ e_pbc_emit(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(const IMC_Unit *u
                 if (r->type & VT_CONSTP)
                     r = r->reg;
 
-                *(imcc->pc)++ = r->color;
-                IMCC_debug(imcc, DEBUG_PBC, " %d", r->color);
+                *(imcc->pc)++ = (opcode_t) r->color;
+                if (imcc->verbose)
+                    IMCC_debug(imcc, DEBUG_PBC, " %d", r->color);
                 break;
               case PARROT_ARG_KC:
                 r = ins->symregs[i];
                 if (r->set == 'K') {
                     PARROT_ASSERT(r->color >= 0);
-                    *(imcc->pc)++ = r->color;
+                    *(imcc->pc)++ = (opcode_t) r->color;
                 }
                 else
                     *(imcc->pc)++ = build_key(imcc, r, interp_code);
-                IMCC_debug(imcc, DEBUG_PBC, " %d", imcc->pc[-1]);
+                if (imcc->verbose)
+                    IMCC_debug(imcc, DEBUG_PBC, " %d", imcc->pc[-1]);
                 break;
               default:
                 IMCC_fatal(imcc, 1, "e_pbc_emit:unknown argtype in parrot op\n");
@@ -2564,8 +2576,9 @@ e_pbc_emit(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(const IMC_Unit *u
                 r = ins->symregs[i];
                 if (r->type & VT_CONSTP)
                     r = r->reg;
-                *(imcc->pc)++ = r->color;
-                IMCC_debug(imcc, DEBUG_PBC, " %d", r->color);
+                *(imcc->pc)++ = (opcode_t) r->color;
+                if (imcc->verbose)
+                    IMCC_debug(imcc, DEBUG_PBC, " %d", r->color);
             }
         }
 
@@ -2580,16 +2593,16 @@ e_pbc_emit(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(const IMC_Unit *u
 
 /*
 
-=item C<void e_pbc_close(imc_info_t * imcc, void *param)>
+=item C<void e_pbc_close(imc_info_t * imcc)>
 
-Closes this PMC unit.
+Closes this PMC unit, i.e. fixup the globals.
 
 =cut
 
 */
 
 void
-e_pbc_close(ARGMOD(imc_info_t * imcc), SHIM(void *param))
+e_pbc_close(ARGMOD(imc_info_t * imcc))
 {
     ASSERT_ARGS(e_pbc_close)
     fixup_globals(imcc);

@@ -248,7 +248,8 @@ IMCC_debug(ARGMOD(imc_info_t * imcc), int level, ARGIN(const char *fmt), ...)
 =item C<void IMCC_debug_ins(imc_info_t *imcc, int level, const Instruction
 *ins)>
 
-Prints a instruction debug message to STDERR, if IMCC's debug mode is turned on.
+Prints a instruction debug message to STDERR, if IMCC's debug mode is turned on
+and -a, --pasm is off.
 
 =cut
 
@@ -259,12 +260,15 @@ IMCC_debug_ins(ARGMOD(imc_info_t *imcc), int level, ARGIN(const Instruction *ins
 {
     ASSERT_ARGS(IMCC_debug_ins)
     PIOHANDLE pstderr;
-    if (!(level & imcc->debug))
+
+    if (!((level & imcc->debug) || imcc->write_pasm))
         return;
     pstderr = Parrot_io_internal_std_os_handle(imcc->interp, PIO_STDERR_FILENO);
-    Parrot_io_pprintf(imcc->interp, pstderr, "0x%lx %s ", PTR2ULONG(ins), ins->opname);
+    if (imcc->verbose)
+        Parrot_io_eprintf(imcc->interp, "0x%lx ", PTR2ULONG(ins));
+    Parrot_io_eprintf(imcc->interp, "%s ", ins->opname);
     ins_print(imcc, pstderr, ins);
-    Parrot_io_pprintf(imcc->interp, pstderr, "\n");
+    Parrot_io_eprintf(imcc->interp, "\n");
 }
 
 /*
@@ -283,31 +287,33 @@ dump_instructions(ARGMOD(imc_info_t * imcc), ARGIN(const IMC_Unit *unit))
     ASSERT_ARGS(dump_instructions)
     const Instruction *ins;
     int                pc;
-    const PIOHANDLE pstderr =
+   const PIOHANDLE pstderr =
             Parrot_io_internal_std_os_handle(imcc->interp, PIO_STDERR_FILENO);
 
     Parrot_io_eprintf(imcc->interp,
             "\nDumping the instructions status:"
             "\n-------------------------------\n");
     Parrot_io_eprintf(imcc->interp,
-            "nins line blck deep flags\t    type opnr size   pc  X ins\n");
+            "nins line blck deep      flags\t    type opnr size   pc  X        ins\n");
 
     for (pc = 0, ins = unit->instructions; ins; ins = ins->next) {
         const Basic_block * const bb = unit->bb_list[ins->bbindex];
 
         if (bb) {
             Parrot_io_eprintf(imcc->interp,
-                    "%4i %4d %4d %4d\t%x\t%8x %4d %4d %4d  ",
+                    "%4i %4d %4d %4d\t%6x\t%8x %4d %4d %4d  ",
                      ins->index, ins->line, bb->index, bb->loop_depth,
                      ins->flags, ins->type, ins->op ? OP_INFO_OPNUM(ins->op) : 0,
                      ins->opsize, pc);
         }
         else {
-            Parrot_io_eprintf(imcc->interp, "\t");
+            Parrot_io_eprintf(imcc->interp, "                    \t        \t                            ");
         }
-
+        IMCC_debug_ins(imcc, 0xffff, ins);
+#if 0
         Parrot_io_eprintf(imcc->interp, "%s\n", ins->opname);
         ins_print(imcc, pstderr, ins);
+#endif
         pc += ins->opsize;
     }
 

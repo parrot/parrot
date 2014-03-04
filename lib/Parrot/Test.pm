@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2012, Parrot Foundation.
+# Copyright (C) 2004-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -197,6 +197,53 @@ non-zero exit code.
 
 Runs the Parrot bytecode and passes the test if the exit code equals $exit_code,
 fails the test otherwise.
+
+=item C<pir_2_pasm_is($code, $expected, $description)>
+
+Compile the Parrot Intermediate Representation and generate Parrot Assembler Code
+with -O1 or dependant on the test filename. Pass if the generated PASM is $expected.
+
+=item C<pir_2_pasm_like($code, $expected, $description)>
+
+Compile the Parrot Intermediate Representation and generate Parrot Assembler Code
+with -O1 or dependant on the test filename.
+Pass if the generated PASM matches $expected.
+
+=item C<pir_2_pasm_isnt($code, $unexpected, $description)>
+
+Compile the Parrot Intermediate Representation and generate Parrot Assembler Code
+with -O1 or dependant on the test filename.
+Pass unless the generated PASM is $expected.
+
+=item C<pir_2o1_pasm_is($code, $expected, $description)>
+
+Compile the Parrot Intermediate Representation and generate Parrot Assembler Code
+with -O1. Pass if the generated PASM is $expected.
+
+=item C<pir_2o1_pasm_like($code, $expected, $description)>
+
+Compile the Parrot Intermediate Representation and generate Parrot Assembler Code
+with -O1. Pass if the generated PASM matches $expected.
+
+=item C<pir_2o1_pasm_isnt($code, $unexpected, $description)>
+
+Compile the Parrot Intermediate Representation and generate Parrot Assembler Code
+with -O1. Pass unless the generated PASM is $expected.
+
+=item C<pir_2o1_pasm_is($code, $expected, $description)>
+
+Compile the Parrot Intermediate Representation and generate Parrot Assembler Code
+with -O2. Pass if the generated PASM is $expected.
+
+=item C<pir_2o2_pasm_like($code, $expected, $description)>
+
+Compile the Parrot Intermediate Representation and generate Parrot Assembler Code
+with -O2. Pass if the generated PASM matches $expected.
+
+=item C<pir_2o2_pasm_isnt($code, $unexpected, $description)>
+
+Compile the Parrot Intermediate Representation and generate Parrot Assembler Code
+with -O2. Pass unless the generated PASM is $expected.
 
 =item C<c_output_is($code, $expected, $description, %options)>
 
@@ -883,7 +930,118 @@ sub _generate_test_functions {
         create_sub($package, $func, $test_sub);
     }
 
-    ##### 2: Language test map #####
+    ##### 2: PIR-to-PASM test map #####
+    my %pir_2_pasm_test_map = (
+        pir_2_pasm_is        => 'is_eq',
+        pir_2_pasm_isnt      => 'isnt_eq',
+        pir_2_pasm_like      => 'like',
+        pir_2_pasm_unlike    => 'unlike',
+
+        pir_2o1_pasm_is      => 'is_eq',
+        pir_2o1_pasm_isnt    => 'isnt_eq',
+        pir_2o1_pasm_like    => 'like',
+        pir_2o1_pasm_unlike  => 'unlike',
+
+        pir_2o2_pasm_is      => 'is_eq',
+        pir_2o2_pasm_isnt    => 'isnt_eq',
+        pir_2o2_pasm_like    => 'like',
+        pir_2o2_pasm_unlike  => 'unlike',
+    );
+
+    foreach my $func ( keys %pir_2_pasm_test_map ) {
+        push @EXPORT, $func;
+        no strict 'refs';
+
+        my $test_sub = sub {
+            local *__ANON__                        = $func;
+            my ( $code, $expected, $desc, $opt, %extra );
+            if ($func =~ /^pir_2o1_/) {
+                ( $code, $expected, $desc, %extra ) = @_;
+                $opt = '-O1';
+            }
+            elsif ($func =~ /^pir_2o2_/) {
+                ( $code, $expected, $desc, %extra ) = @_;
+                $opt = '-O2';
+            }
+            elsif ($func =~ /^pir_2_/) {
+                ( $code, $expected, $desc, %extra ) = @_;
+            }
+            else {
+                die "invalid $func";
+            }
+
+            # set up default description
+            unless ($desc) {
+                ( undef, my $file, my $line ) = caller();
+                $desc = "($file line $line)";
+            }
+
+            # $test_no will be part of temporary file
+            my $test_no = $builder->current_test() + 1;
+
+            # Name of the file with test code.
+            my $code_f = File::Spec->rel2abs( per_test( '.pir', $test_no ) );
+            my $code_basef = basename($code_f);
+
+            # output file
+            my $out_f = per_test( '.pasm', $test_no );
+
+            my ($cmd, $pass);
+
+            # mangle windows line endings
+            convert_line_endings($expected);
+
+            if ($func =~ /^pir_2_/) {
+                $opt  = $code_basef =~ m!opt(.)! ? "-O$1" : "-O1";
+            }
+            my $args = $ENV{TEST_PROG_ARGS} || '';
+            $args   .= " $opt -d1000 -o $out_f.tmp";
+            $args    =~ s/--run-exec//;
+            $cmd       = qq{$parrot $args "$code_f"};
+            write_code_to_file( $code, $code_f );
+            my $exit_code = run_command
+              (
+               $cmd,
+               CD     => $path_to_parrot,
+               STDOUT => "/dev/null",
+               STDERR => $out_f
+              );
+
+            my $meth        = $pir_2_pasm_test_map{$func};
+            my $real_output = slurp_file($out_f);
+            {
+
+                # The parrot open '--outfile=file.pasm' seems to create unnecessary whitespace
+                $real_output =~ s/^\s*$//gm;
+                $real_output =~ s/[\t ]+/ /gm;
+                $real_output =~ s/\s+$//gm;
+                $real_output =~ s/^\s+//gm;
+
+                $expected =~ s/^\s+//gm;
+                $expected =~ s/\s+$//gm;
+            }
+
+            # set a todo-item for Test::Builder to find
+            my $call_pkg = $builder->exported_to() || '';
+
+            local *{ $call_pkg . '::TODO' } = ## no critic Variables::ProhibitConditionalDeclarations
+              \$extra{todo}
+                if defined $extra{todo};
+
+            $pass = $builder->$meth( $real_output, $expected, $opt.' '.$desc );
+            $builder->diag("'$cmd' failed with exit code $exit_code")
+              if $exit_code and not $pass;
+
+            _unlink_or_retain( $out_f );
+            _unlink_or_retain( $out_f.".tmp" );
+
+            return $pass;
+        };
+
+        create_sub($package, $func, $test_sub);
+    }
+
+    ##### 3: Language test map #####
     my %builtin_language_prefix = (
         PIR_IMCC  => 'pir',
         PASM_IMCC => 'pasm',
@@ -947,11 +1105,11 @@ sub _generate_test_functions {
         create_sub($package, $func, $test_sub);
     }
 
-    ##### 3:  Example test map #####
+    ##### 4:  Example test map #####
     my %example_test_map = (
-        example_output_is   => 'language_output_is',
-        example_output_like => 'language_output_like',
-        example_output_isnt => 'language_output_isnt',
+        example_output_is           => 'language_output_is',
+        example_output_like         => 'language_output_like',
+        example_output_isnt         => 'language_output_isnt',
         example_error_output_is     => 'language_error_output_is',
         example_error_output_isnt   => 'language_error_output_is',
         example_error_output_like   => 'language_error_output_like',
@@ -992,7 +1150,7 @@ sub _generate_test_functions {
         create_sub($package, $func, $test_sub);
     }
 
-    ##### 4: C test map #####
+    ##### 5: C test map #####
     my %c_test_map = (
         c_output_is     => 'is_eq',
         c_output_isnt   => 'isnt_eq',

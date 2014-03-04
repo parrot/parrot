@@ -35,6 +35,7 @@ struct init_args_t {
     Parrot_Int trace;
     Parrot_Int execute_packfile;
     Parrot_Int write_packfile;
+    Parrot_Int write_pasm;
     Parrot_Int have_pbc_file;
     Parrot_Int have_pasm_file;
     Parrot_Int turn_gc_off;
@@ -779,6 +780,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
 
     args->run_core_name = "fast";
     args->write_packfile = 0;
+    args->write_pasm = 0;
     args->execute_packfile = 1;
     args->have_pbc_file = 0;
     args->have_pasm_file = 0;
@@ -878,6 +880,13 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
             outfile = opt.opt_arg;
             if (!Parrot_api_string_import(interp, opt.opt_arg, &args->outfile))
                 show_last_error_and_exit(interp);
+            {
+                const char * const ext = strrchr(outfile, '.');
+                if (ext && ((strcmp(ext, ".pasm") == 0) || (strcmp(ext, ".pir") == 0))) {
+                    args->write_packfile = 0;
+                    args->write_pasm = 1;
+                }
+            }
             break;
           case 'r':
             args->write_packfile = 1;

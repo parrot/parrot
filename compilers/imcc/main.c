@@ -572,6 +572,32 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
 
 /*
 
+=item C<void imcc_set_to_pasm(imc_info_t *imcc, Parrot_Int to_pasm)>
+
+Public interface to initialize imcc->write_pasm with -1 or 0.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+imcc_set_to_pasm(ARGMOD(imc_info_t *imcc), Parrot_Int to_pasm)
+{
+    ASSERT_ARGS(imcc_set_to_pasm)
+
+    if (imcc->write_pasm) {
+        if (!to_pasm)
+            imcc->write_pasm = 0;
+        /* else already set to some filehandle */
+    }
+    else {
+        imcc->write_pasm = to_pasm ? -1 : 0;
+    }
+}
+
+/*
+
 =item C<static struct _imc_info_t* prepare_reentrant_compile(imc_info_t *imcc)>
 
 Prepare IMCC for a reentrant compile. Push a new imc_info_t structure onto the

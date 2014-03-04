@@ -38,6 +38,17 @@ These functions operate over this array and its contents.
 /* HEADERIZER HFILE: compilers/imcc/instructions.h */
 
 /* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+static int e_pasm_open(ARGMOD(imc_info_t * imcc), ARGIN(STRING *path))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(* imcc);
+
+#define ASSERT_ARGS_e_pasm_open __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(path))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
 /*
@@ -549,7 +560,7 @@ free_ins(ARGMOD(Instruction *ins))
 
 =item C<int ins_print(imc_info_t * imcc, PIOHANDLE io, const Instruction *ins)>
 
-Print details of instruction ins in file fd.
+Print details of instruction C<ins> into file fd.
 
 =cut
 
@@ -650,21 +661,73 @@ ins_print(ARGMOD(imc_info_t * imcc), PIOHANDLE io, ARGIN(const Instruction *ins)
 
 /*
 
-=item C<void emit_open(imc_info_t * imcc)>
+=item C<static int e_pasm_open(imc_info_t * imcc, STRING *path)>
 
-Opens the emitter function C<open> of the given C<type>. Passes
-the C<param> to the open function.
+=cut
+
+*/
+
+static int
+e_pasm_open(ARGMOD(imc_info_t * imcc), ARGIN(STRING *path))
+{
+    ASSERT_ARGS(e_pasm_open)
+    const Parrot_Interp interp = imcc->interp;
+    PMC *handle = PMCNULL;
+
+    Parrot_io_open(interp, handle, path, Parrot_str_new_constant(interp, "w"));
+    imcc->write_pasm = Parrot_io_get_os_handle(interp, handle);
+    if (!imcc->write_pasm)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                                    "Cannot open output file %Ss", path);
+
+    return 1;
+}
+
+/*
+
+=item C<void emit_open(imc_info_t * imcc, STRING *path)>
+
+Opens the output file for writing, either C<e_pbc_open> or C<e_pasm_open>.
 
 =cut
 
 */
 
 void
-emit_open(ARGMOD(imc_info_t * imcc))
+emit_open(ARGMOD(imc_info_t * imcc), ARGIN(STRING *path))
 {
     ASSERT_ARGS(emit_open)
     imcc->dont_optimize = 0;
-    e_pbc_open(imcc);
+    if (UNLIKELY(imcc->write_pasm))
+        e_pasm_open(imcc, path);
+    else
+        e_pbc_open(imcc);
+}
+
+/*
+
+=item C<void e_pasm_out(imc_info_t * imcc, const char *fmt, ...)>
+
+Writes a pasm line to global output fh, and prints DEBUG_PBC output to stderr.
+
+=cut
+
+*/
+
+void
+e_pasm_out(ARGMOD(imc_info_t * imcc), ARGIN(const char *fmt), ...)
+{
+    ASSERT_ARGS(e_pasm_out)
+    va_list ap;
+
+    if (!(imcc->write_pasm || (DEBUG_PBC & imcc->debug)))
+        return;
+    va_start(ap, fmt);
+    if (imcc->write_pasm)
+        Parrot_io_pprintf(imcc->interp, imcc->write_pasm, fmt, ap);
+    if (DEBUG_PBC & imcc->debug)
+        imcc_vfprintf(imcc, Parrot_io_STDERR(imcc->interp), fmt, ap);
+    va_end(ap);
 }
 
 /*
@@ -685,31 +748,47 @@ emit_flush(ARGMOD(imc_info_t * imcc), ARGIN_NULLOK(void *param),
     ASSERT_ARGS(emit_flush)
     Instruction *ins;
 
-    e_pbc_new_sub(imcc, param, unit);
+    if (UNLIKELY(imcc->write_pasm)) {
+        for (ins = unit->instructions; ins; ins = ins->next) {
+            IMCC_debug(imcc, DEBUG_IMC, "emit %d\n", ins);
 
-    for (ins = unit->instructions; ins; ins = ins->next) {
-        IMCC_debug(imcc, DEBUG_IMC, "emit %d\n", ins);
-        e_pbc_emit(imcc, param, unit, ins);
+            if ((ins->type & ITLABEL) || ! *ins->opname)
+                ins_print(imcc, imcc->write_pasm, ins);
+            else {
+                Parrot_io_pprintf(imcc->interp, imcc->write_pasm, "\t%s ", ins->opname);
+                ins_print(imcc, imcc->write_pasm, ins);
+            }
+            Parrot_io_pprintf(imcc->interp, imcc->write_pasm, "\n");
+        }
     }
+    else {
+        e_pbc_new_sub(imcc, param, unit);
 
-    e_pbc_end_sub(imcc, param, unit);
+        for (ins = unit->instructions; ins; ins = ins->next) {
+            IMCC_debug(imcc, DEBUG_IMC, "emit %d\n", ins);
+            e_pbc_emit(imcc, param, unit, ins);
+        }
+
+        e_pbc_end_sub(imcc, param, unit);
+    }
 }
 
 /*
 
-=item C<void emit_close(imc_info_t *imcc, void *param)>
+=item C<void emit_close(imc_info_t *imcc)>
 
 Closes the given emitter.
+Fixup globals in pasm or pbc output.
 
 =cut
 
 */
 
 void
-emit_close(ARGMOD(imc_info_t *imcc), ARGIN_NULLOK(void *param))
+emit_close(ARGMOD(imc_info_t *imcc))
 {
     ASSERT_ARGS(emit_close)
-    e_pbc_close(imcc, param);
+    e_pbc_close(imcc);
 }
 
 /*
