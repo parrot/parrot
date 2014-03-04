@@ -319,7 +319,9 @@ dump_instructions(ARGMOD(imc_info_t * imcc), ARGIN(const IMC_Unit *unit))
                      ins->opsize, pc);
         }
         else {
-            Parrot_io_eprintf(imcc->interp, "                    \t        \t                            ");
+            Parrot_io_eprintf(imcc->interp,
+                              "                    \t        \t"
+                              "                            ");
         }
         IMCC_debug_ins(imcc, 0xffff, ins);
         //Parrot_io_eprintf(imcc->interp, "%s\n", ins->opname);
