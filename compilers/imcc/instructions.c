@@ -665,6 +665,9 @@ ins_print(ARGMOD(imc_info_t * imcc), PIOHANDLE io, ARGIN(const Instruction *ins)
 
 =item C<static int e_pasm_open(imc_info_t * imcc, STRING *path)>
 
+Opens the path to an .pasm file for writing, and stores the os handle in
+C<imcc->write_pasm>.
+
 =cut
 
 */

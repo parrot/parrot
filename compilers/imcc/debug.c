@@ -324,8 +324,10 @@ dump_instructions(ARGMOD(imc_info_t * imcc), ARGIN(const IMC_Unit *unit))
                               "                            ");
         }
         IMCC_debug_ins(imcc, 0xffff, ins);
-        //Parrot_io_eprintf(imcc->interp, "%s\n", ins->opname);
-        //ins_print(imcc, pstderr, ins);
+#if 0
+        Parrot_io_eprintf(imcc->interp, "%s\n", ins->opname);
+        ins_print(imcc, pstderr, ins);
+#endif
         pc += ins->opsize;
     }
 
