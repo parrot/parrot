@@ -461,12 +461,12 @@ struct _imc_info_t {
     AsmState              asm_state;
     SymHash               ghash;
     jmp_buf               jump_buf;          /* The jump for error  handling */
+    PIOHANDLE             write_pasm;
     int                   cnr;
     int                   debug;
     int                   dont_optimize;
     int                   emitter;
     int                   error_code;        /* The Error code. */
-    int                   expect_pasm;
     int                   imcc_warn;
     int                   in_pod;
     int                   ins_line;

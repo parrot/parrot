@@ -396,6 +396,7 @@ winxed-c.html
 /t/compilers/data_json/*.pir
 /t/compilers/data_json/*_pbcexe
 /t/compilers/imcc/*.pbc
+/t/compilers/imcc/imcpasm/*.pir
 /t/compilers/imcc/reg/*.pasm
 /t/compilers/imcc/reg/*.pbc
 /t/compilers/imcc/reg/*.pir

@@ -230,6 +230,7 @@ for my $name (split / /,$alignof) {
 END_PRINT
     }
 }
+print OUT <<'END_PRINT';
 
 /* from config/auto/expect */
 END_PRINT

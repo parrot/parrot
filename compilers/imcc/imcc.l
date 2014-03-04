@@ -64,6 +64,8 @@ static void include_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *file_name), ARG
 
 static int handle_identifier(ARGMOD(imc_info_t *imcc), YYSTYPE *valp, ARGIN(const char *id));
 
+PIOHANDLE determine_input_file_type(ARGMOD(imc_info_t * imcc), ARGIN(STRING *sourcefile));
+
 #define YY_DECL int yylex(YYSTYPE *valp, yyscan_t yyscanner, ARGMOD(imc_info_t *imcc))
 
 #define YYCHOP() (yytext[--yyleng] = '\0')
@@ -132,8 +134,8 @@ SP              [ ]
 
 %%
         /* for emacs "*/
-        if (imcc->expect_pasm == 1 && !imcc->in_pod) {
-            imcc->expect_pasm = 2;
+        if (imcc->write_pasm == 1 && !imcc->in_pod) {
+            imcc->write_pasm = 2;
             BEGIN(emit);
         }
 
@@ -235,10 +237,10 @@ SP              [ ]
     }
 
 <INITIAL,emit>{EOL} {
-        if (imcc->expect_pasm == 2)
+        if (imcc->write_pasm == 2)
             BEGIN(INITIAL);
 
-        imcc->expect_pasm = 0;
+        imcc->write_pasm = 0;
 
         return '\n';
     }
@@ -248,12 +250,12 @@ SP              [ ]
     }
 
 <cmt5>.*{EOL} {
-        if (imcc->expect_pasm == 2)
+        if (imcc->write_pasm == 2)
             BEGIN(INITIAL);
         else
             yy_pop_state(yyscanner);
 
-        imcc->expect_pasm = 0;
+        imcc->write_pasm = 0;
 
         return '\n';
     }
@@ -1364,7 +1366,7 @@ imcc_compile_buffer_safe(ARGMOD(imc_info_t *imcc), yyscan_t yyscanner,
     buffer = YY_CURRENT_BUFFER;
 
     file = imcc_setup_input(imcc, yyscanner, source, source_c, is_file);
-    emit_open(imcc);
+    emit_open(imcc, source);
     success = imcc_run_compilation(imcc, yyscanner);
     imcc_cleanup_input(imcc, file, source_c, is_file);
 

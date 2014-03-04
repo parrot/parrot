@@ -184,6 +184,32 @@ imc_reg_alloc(ARGMOD(imc_info_t * imcc), ARGIN_NULLOK(IMC_Unit *unit))
     else
       function = "(not a sub)";
 
+    if (unit->instructions->symreg_count
+        && (imcc->verbose || imcc->debug & (DEBUG_IMC|DEBUG_PBC)))
+    {
+        Instruction *ins = unit->instructions;
+        int pragma = ins->symregs[0]->pcc_sub->pragma;
+
+        IMCC_info(imcc, 0, ".pcc_sub ");
+        if (pragma & P_IMMEDIATE)
+            IMCC_info(imcc, 0, ":immediate ");
+        if (pragma & P_ANON)
+            IMCC_info(imcc, 0, ":anon ");
+        if (pragma & P_MAIN)
+            IMCC_info(imcc, 0, ":main ");
+        if (pragma & P_VTABLE)
+            IMCC_info(imcc, 0, ":vtable ");
+        if (pragma & P_METHOD)
+            IMCC_info(imcc, 0, ":method ");
+        if (pragma & P_LOAD)
+            IMCC_info(imcc, 0, ":load ");
+        if (pragma & P_POSTCOMP)
+            IMCC_info(imcc, 0, ":postcomp ");
+        if (pragma & P_INIT)
+            IMCC_info(imcc, 0, ":init ");
+        IMCC_info(imcc, 0, "%s:\n", function);
+    }
+
     IMCC_debug(imcc, DEBUG_IMC, "\n------------------------\n");
     IMCC_debug(imcc, DEBUG_IMC, "processing sub %s\n", function);
     IMCC_debug(imcc, DEBUG_IMC, "------------------------\n\n");
@@ -229,7 +255,7 @@ imc_reg_alloc(ARGMOD(imc_info_t * imcc), ARGIN_NULLOK(IMC_Unit *unit))
         dump_instructions(imcc, unit);
 
   done:
-    if (imcc->verbose  || (imcc->debug & DEBUG_IMC))
+    if (imcc->verbose || imcc->debug & DEBUG_IMC)
         print_stat(imcc, unit);
     else
         make_stat(unit, NULL, unit->n_regs_used);
@@ -262,14 +288,15 @@ free_reglist(ARGMOD(IMC_Unit *unit))
 =item C<static void make_stat(IMC_Unit *unit, int *sets, int *cols)>
 
 some statistics about register usage
-printed with --verbose --verbose
+printed with --verbose or -d80
 
 =cut
 
 */
 
 static void
-make_stat(ARGMOD(IMC_Unit *unit), ARGMOD_NULLOK(int *sets), ARGMOD_NULLOK(int *cols))
+make_stat(ARGMOD(IMC_Unit *unit),
+          ARGMOD_NULLOK(int *sets), ARGMOD_NULLOK(int *cols))
 {
     ASSERT_ARGS(make_stat)
     /* register usage summary */
@@ -316,7 +343,7 @@ make_stat(ARGMOD(IMC_Unit *unit), ARGMOD_NULLOK(int *sets), ARGMOD_NULLOK(int *c
 
 =item C<static void imc_stat_init(IMC_Unit *unit)>
 
-registes usage of .pir
+initialize register usage counters
 
 =cut
 
@@ -354,15 +381,10 @@ print_stat(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit))
     ASSERT_ARGS(print_stat)
     int sets[4] = {0, 0, 0, 0};
 
-    const char * const function =
-        unit->instructions->symreg_count
-            ? unit->instructions->symregs[0]->name
-            : "(not a function)";
-
     make_stat(unit, sets, unit->n_regs_used);
+
     IMCC_info(imcc, 1,
-            "sub %s:\n\tregisters in .pir:\t I%d, N%d, S%d, P%d\n",
-            function,
+            "\tregisters in .pir:\t I%d, N%d, S%d, P%d\n",
             unit->n_vars_used[0], unit->n_vars_used[1],
             unit->n_vars_used[2], unit->n_vars_used[3]);
     IMCC_info(imcc, 1,

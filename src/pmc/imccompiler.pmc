@@ -50,6 +50,7 @@ A compiler object to wrap IMCC, the internal PIR and PASM compiler.
 pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
     ATTR void *imcc_info;
     ATTR INTVAL is_pasm; /* 0 = PIR, 1 = PASM */
+    ATTR INTVAL to_pasm; /* 0 = PBC */
     ATTR INTVAL current_eval;
 
     VTABLE void init() :no_wb {
@@ -69,6 +70,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                 "IMCCompiler: Must have type 0 (PIR) or 1 (PASM)");
         attrs->is_pasm = is_pasm;
+        attrs->to_pasm = 0;
         attrs->imcc_info = (void*) imcc_new(INTERP);
         attrs->current_eval = 0;
     }
@@ -244,6 +246,13 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
     /*METHOD get_exports(PMC *module) :no_wb {
 
     }*/
+
+    METHOD void set_to_pasm(INTVAL to_pasm) {
+        Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        imc_info_t * const imcc = (imc_info_t*)attrs->imcc_info;
+        attrs->to_pasm = to_pasm;
+        imcc_set_to_pasm(imcc, to_pasm);
+    }
 }
 
 /*

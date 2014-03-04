@@ -686,6 +686,8 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
           case 'o':
             pargs[nargs++] = "-o";
             pargs[nargs++] = opt.opt_arg;
+            if (strcmp(opt.opt_arg, ".pasm") == 0)
+                args->preprocess_only = 1;
             break;
           case 'r':
             pargs[nargs++] = "-r";

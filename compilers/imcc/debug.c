@@ -259,12 +259,28 @@ IMCC_debug_ins(ARGMOD(imc_info_t *imcc), int level, ARGIN(const Instruction *ins
 {
     ASSERT_ARGS(IMCC_debug_ins)
     PIOHANDLE pstderr;
-    if (!(level & imcc->debug))
+    if (!((level & imcc->debug) || imcc->write_pasm))
         return;
     pstderr = Parrot_io_internal_std_os_handle(imcc->interp, PIO_STDERR_FILENO);
     Parrot_io_pprintf(imcc->interp, pstderr, "0x%lx %s ", PTR2ULONG(ins), ins->opname);
     ins_print(imcc, pstderr, ins);
     Parrot_io_pprintf(imcc->interp, pstderr, "\n");
+    if (level & imcc->debug) {
+        PIOHANDLE pstderr;
+        pstderr = Parrot_io_internal_std_os_handle(imcc->interp, PIO_STDERR_FILENO);
+        if (imcc->verbose)
+            Parrot_io_eprintf(imcc->interp, "0x%x ", ins);
+        Parrot_io_eprintf(imcc->interp, "%s ", ins->opname);
+        ins_print(imcc, pstderr, ins);
+        Parrot_io_eprintf(imcc->interp, "\n");
+    }
+#if 0
+    if (imcc->write_pasm) {
+        Parrot_io_pprintf(imcc->interp, imcc->write_pasm, "%s ", ins->opname);
+        ins_print(imcc, imcc->write_pasm, ins);
+        Parrot_io_pprintf(imcc->interp, imcc->write_pasm, "\n");
+    }
+#endif
 }
 
 /*
@@ -283,14 +299,14 @@ dump_instructions(ARGMOD(imc_info_t * imcc), ARGIN(const IMC_Unit *unit))
     ASSERT_ARGS(dump_instructions)
     const Instruction *ins;
     int                pc;
-    const PIOHANDLE pstderr =
+   const PIOHANDLE pstderr =
             Parrot_io_internal_std_os_handle(imcc->interp, PIO_STDERR_FILENO);
 
     Parrot_io_eprintf(imcc->interp,
             "\nDumping the instructions status:"
             "\n-------------------------------\n");
     Parrot_io_eprintf(imcc->interp,
-            "nins line blck deep flags\t    type opnr size   pc  X ins\n");
+            "nins line blck deep      flags\t    type opnr size   pc  X        ins\n");
 
     for (pc = 0, ins = unit->instructions; ins; ins = ins->next) {
         const Basic_block * const bb = unit->bb_list[ins->bbindex];
@@ -303,11 +319,11 @@ dump_instructions(ARGMOD(imc_info_t * imcc), ARGIN(const IMC_Unit *unit))
                      ins->opsize, pc);
         }
         else {
-            Parrot_io_eprintf(imcc->interp, "\t");
+            Parrot_io_eprintf(imcc->interp, "                    \t        \t                            ");
         }
-
-        Parrot_io_eprintf(imcc->interp, "%s\n", ins->opname);
-        ins_print(imcc, pstderr, ins);
+        IMCC_debug_ins(imcc, 0xffff, ins);
+        //Parrot_io_eprintf(imcc->interp, "%s\n", ins->opname);
+        //ins_print(imcc, pstderr, ins);
         pc += ins->opsize;
     }
 

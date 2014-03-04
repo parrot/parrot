@@ -8,7 +8,7 @@
 /* HEADERIZER BEGIN: compilers/imcc/pbc.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void e_pbc_close(ARGMOD(imc_info_t * imcc), void *param)
+void e_pbc_close(ARGMOD(imc_info_t * imcc))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(* imcc);
 

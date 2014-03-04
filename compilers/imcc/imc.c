@@ -79,7 +79,7 @@ imc_compile_all_units(ARGMOD(imc_info_t * imcc))
     }
 #endif
 
-    emit_close(imcc, NULL);
+    emit_close(imcc);
 
     /* All done with compilation, now free all memory allocated
      * for instructions and other structures.  */

@@ -1768,6 +1768,8 @@ static void include_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *file_name), ARG
 
 static int handle_identifier(ARGMOD(imc_info_t *imcc), YYSTYPE *valp, ARGIN(const char *id));
 
+PIOHANDLE determine_input_file_type(ARGMOD(imc_info_t * imcc), ARGIN(STRING *sourcefile));
+
 #define YY_DECL int yylex(YYSTYPE *valp,yyscan_t yyscanner,ARGMOD(imc_info_t *imcc))
 
 #define YYCHOP() (yytext[--yyleng] = '\0')
@@ -1790,7 +1792,7 @@ static int handle_identifier(ARGMOD(imc_info_t *imcc), YYSTYPE *valp, ARGIN(cons
   } while (0)
 
 #define YY_INPUT(buf, result, max_size) \
-    (result) = Parrot_io_internal_read((Interp *)yyextra->interp, (PIOHANDLE)yyin, (buf), (max_size))
+    (result) = Parrot_io_internal_read(yyextra->interp, (PIOHANDLE)yyin, (buf), (max_size))
 
 
 
@@ -1802,7 +1804,7 @@ static int handle_identifier(ARGMOD(imc_info_t *imcc), YYSTYPE *valp, ARGIN(cons
 
 
 
-#line 1806 "compilers/imcc/imclexer.c"
+#line 1808 "compilers/imcc/imclexer.c"
 
 #define INITIAL 0
 #define emit 1
@@ -2078,11 +2080,11 @@ YY_DECL
 		}
 
 	{
-#line 133 "compilers/imcc/imcc.l"
+#line 135 "compilers/imcc/imcc.l"
 
         /* for emacs "*/
-        if (imcc->expect_pasm == 1 && !imcc->in_pod) {
-            imcc->expect_pasm = 2;
+        if (imcc->write_pasm == 1 && !imcc->in_pod) {
+            imcc->write_pasm = 2;
             BEGIN(emit);
         }
 
@@ -2097,7 +2099,7 @@ YY_DECL
             return 0;
         }
 
-#line 2101 "compilers/imcc/imclexer.c"
+#line 2103 "compilers/imcc/imclexer.c"
 
 	while ( 1 )		/* loops until end-of-file is reached */
 		{
@@ -2165,13 +2167,13 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 151 "compilers/imcc/imcc.l"
+#line 153 "compilers/imcc/imcc.l"
 { SET_LINE_NUMBER; }
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 153 "compilers/imcc/imcc.l"
+#line 155 "compilers/imcc/imcc.l"
 {
             SET_LINE_NUMBER;
             imcc->frames->heredoc_rest = mem_sys_strndup(yytext, yyleng);
@@ -2181,7 +2183,7 @@ YY_RULE_SETUP
 case 3:
 /* rule 3 can match eol */
 YY_RULE_SETUP
-#line 159 "compilers/imcc/imcc.l"
+#line 161 "compilers/imcc/imcc.l"
 {
         /* heredocs have highest priority
          * arrange them before all wildcard state matches */
@@ -2196,7 +2198,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 171 "compilers/imcc/imcc.l"
+#line 173 "compilers/imcc/imcc.l"
 {
         SET_LINE_NUMBER;
         /* Are we at the end of the heredoc? */
@@ -2237,7 +2239,7 @@ YY_RULE_SETUP
 case 5:
 /* rule 5 can match eol */
 YY_RULE_SETUP
-#line 208 "compilers/imcc/imcc.l"
+#line 210 "compilers/imcc/imcc.l"
 {
         STRING *str;
 
@@ -2253,7 +2255,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 221 "compilers/imcc/imcc.l"
+#line 223 "compilers/imcc/imcc.l"
 {
         yy_pop_state(yyscanner);
         yy_push_state(cmt4, yyscanner);
@@ -2261,7 +2263,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 226 "compilers/imcc/imcc.l"
+#line 228 "compilers/imcc/imcc.l"
 {
         yylineno = imcc->line = atoi(yytext);
         yy_pop_state(yyscanner);
@@ -2272,7 +2274,7 @@ YY_RULE_SETUP
 case 8:
 /* rule 8 can match eol */
 YY_RULE_SETUP
-#line 233 "compilers/imcc/imcc.l"
+#line 235 "compilers/imcc/imcc.l"
 {
         yy_pop_state(yyscanner);
     }
@@ -2280,19 +2282,19 @@ YY_RULE_SETUP
 case 9:
 /* rule 9 can match eol */
 YY_RULE_SETUP
-#line 237 "compilers/imcc/imcc.l"
+#line 239 "compilers/imcc/imcc.l"
 {
-        if (imcc->expect_pasm == 2)
+        if (imcc->write_pasm == 2)
             BEGIN(INITIAL);
 
-        imcc->expect_pasm = 0;
+        imcc->write_pasm = 0;
 
         return '\n';
     }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 246 "compilers/imcc/imcc.l"
+#line 248 "compilers/imcc/imcc.l"
 {
         yy_push_state(cmt5, yyscanner);
     }
@@ -2300,14 +2302,14 @@ YY_RULE_SETUP
 case 11:
 /* rule 11 can match eol */
 YY_RULE_SETUP
-#line 250 "compilers/imcc/imcc.l"
+#line 252 "compilers/imcc/imcc.l"
 {
-        if (imcc->expect_pasm == 2)
+        if (imcc->write_pasm == 2)
             BEGIN(INITIAL);
         else
             yy_pop_state(yyscanner);
 
-        imcc->expect_pasm = 0;
+        imcc->write_pasm = 0;
 
         return '\n';
     }
@@ -2315,7 +2317,7 @@ YY_RULE_SETUP
 case 12:
 /* rule 12 can match eol */
 YY_RULE_SETUP
-#line 262 "compilers/imcc/imcc.l"
+#line 264 "compilers/imcc/imcc.l"
 {
     /* this is a stand-alone =cut, but we're not in POD mode, so ignore.  */
     SET_LINE_NUMBER;
@@ -2324,7 +2326,7 @@ YY_RULE_SETUP
 case 13:
 /* rule 13 can match eol */
 YY_RULE_SETUP
-#line 267 "compilers/imcc/imcc.l"
+#line 269 "compilers/imcc/imcc.l"
 {
         SET_LINE_NUMBER;
         imcc->in_pod = 1;
@@ -2334,7 +2336,7 @@ YY_RULE_SETUP
 case 14:
 /* rule 14 can match eol */
 YY_RULE_SETUP
-#line 273 "compilers/imcc/imcc.l"
+#line 275 "compilers/imcc/imcc.l"
 {
         SET_LINE_NUMBER;
         imcc->in_pod = 0;
@@ -2343,458 +2345,458 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 279 "compilers/imcc/imcc.l"
+#line 281 "compilers/imcc/imcc.l"
 { SET_LINE_NUMBER; }
 	YY_BREAK
 case 16:
 /* rule 16 can match eol */
 YY_RULE_SETUP
-#line 281 "compilers/imcc/imcc.l"
+#line 283 "compilers/imcc/imcc.l"
 { /* ignore */ }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 283 "compilers/imcc/imcc.l"
+#line 285 "compilers/imcc/imcc.l"
 return ANNOTATE;
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 284 "compilers/imcc/imcc.l"
+#line 286 "compilers/imcc/imcc.l"
 return LEXICAL;
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 285 "compilers/imcc/imcc.l"
+#line 287 "compilers/imcc/imcc.l"
 return ARG;
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 286 "compilers/imcc/imcc.l"
+#line 288 "compilers/imcc/imcc.l"
 { SET_LINE_NUMBER; return SUB; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 287 "compilers/imcc/imcc.l"
+#line 289 "compilers/imcc/imcc.l"
 return ESUB;
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 288 "compilers/imcc/imcc.l"
+#line 290 "compilers/imcc/imcc.l"
 return PCC_BEGIN;
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 289 "compilers/imcc/imcc.l"
+#line 291 "compilers/imcc/imcc.l"
 return PCC_END;
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 290 "compilers/imcc/imcc.l"
+#line 292 "compilers/imcc/imcc.l"
 return PCC_CALL;
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 291 "compilers/imcc/imcc.l"
+#line 293 "compilers/imcc/imcc.l"
 return INVOCANT;
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 292 "compilers/imcc/imcc.l"
+#line 294 "compilers/imcc/imcc.l"
 return PCC_SUB;
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 293 "compilers/imcc/imcc.l"
+#line 295 "compilers/imcc/imcc.l"
 return PCC_BEGIN_RETURN;
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 294 "compilers/imcc/imcc.l"
+#line 296 "compilers/imcc/imcc.l"
 return PCC_END_RETURN;
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 295 "compilers/imcc/imcc.l"
+#line 297 "compilers/imcc/imcc.l"
 return PCC_BEGIN_YIELD;
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 296 "compilers/imcc/imcc.l"
+#line 298 "compilers/imcc/imcc.l"
 return PCC_END_YIELD;
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 298 "compilers/imcc/imcc.l"
+#line 300 "compilers/imcc/imcc.l"
 return METHOD;
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 299 "compilers/imcc/imcc.l"
+#line 301 "compilers/imcc/imcc.l"
 return MULTI;
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 300 "compilers/imcc/imcc.l"
+#line 302 "compilers/imcc/imcc.l"
 return MAIN;
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 301 "compilers/imcc/imcc.l"
+#line 303 "compilers/imcc/imcc.l"
 return LOAD;
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 302 "compilers/imcc/imcc.l"
+#line 304 "compilers/imcc/imcc.l"
 return INIT;
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 303 "compilers/imcc/imcc.l"
+#line 305 "compilers/imcc/imcc.l"
 return IMMEDIATE;
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 304 "compilers/imcc/imcc.l"
+#line 306 "compilers/imcc/imcc.l"
 return POSTCOMP;
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 305 "compilers/imcc/imcc.l"
+#line 307 "compilers/imcc/imcc.l"
 return SUBTAG;
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 306 "compilers/imcc/imcc.l"
+#line 308 "compilers/imcc/imcc.l"
 return ANON;
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 307 "compilers/imcc/imcc.l"
+#line 309 "compilers/imcc/imcc.l"
 return OUTER;
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 308 "compilers/imcc/imcc.l"
+#line 310 "compilers/imcc/imcc.l"
 return NEED_LEX;
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 309 "compilers/imcc/imcc.l"
+#line 311 "compilers/imcc/imcc.l"
 return VTABLE_METHOD;
 	YY_BREAK
 case 43:
 YY_RULE_SETUP
-#line 310 "compilers/imcc/imcc.l"
+#line 312 "compilers/imcc/imcc.l"
 return NS_ENTRY;
 	YY_BREAK
 case 44:
 YY_RULE_SETUP
-#line 311 "compilers/imcc/imcc.l"
+#line 313 "compilers/imcc/imcc.l"
 return SUB_INSTANCE_OF;
 	YY_BREAK
 case 45:
 YY_RULE_SETUP
-#line 312 "compilers/imcc/imcc.l"
+#line 314 "compilers/imcc/imcc.l"
 return SUBID;
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 314 "compilers/imcc/imcc.l"
+#line 316 "compilers/imcc/imcc.l"
 return RESULT;
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 315 "compilers/imcc/imcc.l"
+#line 317 "compilers/imcc/imcc.l"
 return GET_RESULTS;
 	YY_BREAK
 case 48:
 YY_RULE_SETUP
-#line 316 "compilers/imcc/imcc.l"
+#line 318 "compilers/imcc/imcc.l"
 return YIELDT;
 	YY_BREAK
 case 49:
 YY_RULE_SETUP
-#line 317 "compilers/imcc/imcc.l"
+#line 319 "compilers/imcc/imcc.l"
 return SET_YIELD;
 	YY_BREAK
 case 50:
 YY_RULE_SETUP
-#line 318 "compilers/imcc/imcc.l"
+#line 320 "compilers/imcc/imcc.l"
 return RETURN;
 	YY_BREAK
 case 51:
 YY_RULE_SETUP
-#line 319 "compilers/imcc/imcc.l"
+#line 321 "compilers/imcc/imcc.l"
 return SET_RETURN;
 	YY_BREAK
 case 52:
 YY_RULE_SETUP
-#line 320 "compilers/imcc/imcc.l"
+#line 322 "compilers/imcc/imcc.l"
 return TAILCALL;
 	YY_BREAK
 case 53:
 YY_RULE_SETUP
-#line 321 "compilers/imcc/imcc.l"
+#line 323 "compilers/imcc/imcc.l"
 return LOADLIB;
 	YY_BREAK
 case 54:
 YY_RULE_SETUP
-#line 323 "compilers/imcc/imcc.l"
+#line 325 "compilers/imcc/imcc.l"
 return ADV_FLAT;
 	YY_BREAK
 case 55:
 YY_RULE_SETUP
-#line 324 "compilers/imcc/imcc.l"
+#line 326 "compilers/imcc/imcc.l"
 return ADV_SLURPY;
 	YY_BREAK
 case 56:
 YY_RULE_SETUP
-#line 325 "compilers/imcc/imcc.l"
+#line 327 "compilers/imcc/imcc.l"
 return ADV_OPTIONAL;
 	YY_BREAK
 case 57:
 YY_RULE_SETUP
-#line 326 "compilers/imcc/imcc.l"
+#line 328 "compilers/imcc/imcc.l"
 return ADV_OPT_FLAG;
 	YY_BREAK
 case 58:
 YY_RULE_SETUP
-#line 327 "compilers/imcc/imcc.l"
+#line 329 "compilers/imcc/imcc.l"
 return ADV_NAMED;
 	YY_BREAK
 case 59:
 YY_RULE_SETUP
-#line 328 "compilers/imcc/imcc.l"
+#line 330 "compilers/imcc/imcc.l"
 return ADV_ARROW;
 	YY_BREAK
 case 60:
 YY_RULE_SETUP
-#line 329 "compilers/imcc/imcc.l"
+#line 331 "compilers/imcc/imcc.l"
 return ADV_INVOCANT;
 	YY_BREAK
 case 61:
 YY_RULE_SETUP
-#line 330 "compilers/imcc/imcc.l"
+#line 332 "compilers/imcc/imcc.l"
 return ADV_CALL_SIG;
 	YY_BREAK
 case 62:
 YY_RULE_SETUP
-#line 332 "compilers/imcc/imcc.l"
+#line 334 "compilers/imcc/imcc.l"
 return NAMESPACE;
 	YY_BREAK
 case 63:
 YY_RULE_SETUP
-#line 333 "compilers/imcc/imcc.l"
+#line 335 "compilers/imcc/imcc.l"
 return HLL;
 	YY_BREAK
 case 64:
 YY_RULE_SETUP
-#line 335 "compilers/imcc/imcc.l"
+#line 337 "compilers/imcc/imcc.l"
 return LOCAL;
 	YY_BREAK
 case 65:
 YY_RULE_SETUP
-#line 336 "compilers/imcc/imcc.l"
+#line 338 "compilers/imcc/imcc.l"
 return CONST;
 	YY_BREAK
 case 66:
 YY_RULE_SETUP
-#line 337 "compilers/imcc/imcc.l"
+#line 339 "compilers/imcc/imcc.l"
 return GLOBAL_CONST;
 	YY_BREAK
 case 67:
 YY_RULE_SETUP
-#line 338 "compilers/imcc/imcc.l"
+#line 340 "compilers/imcc/imcc.l"
 return PARAM;
 	YY_BREAK
 case 68:
 YY_RULE_SETUP
-#line 339 "compilers/imcc/imcc.l"
+#line 341 "compilers/imcc/imcc.l"
 return GOTO;
 	YY_BREAK
 case 69:
 YY_RULE_SETUP
-#line 340 "compilers/imcc/imcc.l"
+#line 342 "compilers/imcc/imcc.l"
 return IF;
 	YY_BREAK
 case 70:
 YY_RULE_SETUP
-#line 341 "compilers/imcc/imcc.l"
+#line 343 "compilers/imcc/imcc.l"
 return UNLESS;
 	YY_BREAK
 case 71:
 YY_RULE_SETUP
-#line 342 "compilers/imcc/imcc.l"
+#line 344 "compilers/imcc/imcc.l"
 return PNULL;
 	YY_BREAK
 case 72:
 YY_RULE_SETUP
-#line 343 "compilers/imcc/imcc.l"
+#line 345 "compilers/imcc/imcc.l"
 return INTV;
 	YY_BREAK
 case 73:
 YY_RULE_SETUP
-#line 344 "compilers/imcc/imcc.l"
+#line 346 "compilers/imcc/imcc.l"
 return FLOATV;
 	YY_BREAK
 case 74:
 YY_RULE_SETUP
-#line 346 "compilers/imcc/imcc.l"
+#line 348 "compilers/imcc/imcc.l"
 return PMCV;
 	YY_BREAK
 case 75:
 YY_RULE_SETUP
-#line 347 "compilers/imcc/imcc.l"
+#line 349 "compilers/imcc/imcc.l"
 return STRINGV;
 	YY_BREAK
 case 76:
 YY_RULE_SETUP
-#line 348 "compilers/imcc/imcc.l"
+#line 350 "compilers/imcc/imcc.l"
 return SHIFT_LEFT;
 	YY_BREAK
 case 77:
 YY_RULE_SETUP
-#line 349 "compilers/imcc/imcc.l"
+#line 351 "compilers/imcc/imcc.l"
 return SHIFT_RIGHT;
 	YY_BREAK
 case 78:
 YY_RULE_SETUP
-#line 350 "compilers/imcc/imcc.l"
+#line 352 "compilers/imcc/imcc.l"
 return SHIFT_RIGHT_U;
 	YY_BREAK
 case 79:
 YY_RULE_SETUP
-#line 351 "compilers/imcc/imcc.l"
+#line 353 "compilers/imcc/imcc.l"
 return LOG_AND;
 	YY_BREAK
 case 80:
 YY_RULE_SETUP
-#line 352 "compilers/imcc/imcc.l"
+#line 354 "compilers/imcc/imcc.l"
 return LOG_OR;
 	YY_BREAK
 case 81:
 YY_RULE_SETUP
-#line 353 "compilers/imcc/imcc.l"
+#line 355 "compilers/imcc/imcc.l"
 return LOG_XOR;
 	YY_BREAK
 case 82:
 YY_RULE_SETUP
-#line 354 "compilers/imcc/imcc.l"
+#line 356 "compilers/imcc/imcc.l"
 return RELOP_LT;
 	YY_BREAK
 case 83:
 YY_RULE_SETUP
-#line 355 "compilers/imcc/imcc.l"
+#line 357 "compilers/imcc/imcc.l"
 return RELOP_LTE;
 	YY_BREAK
 case 84:
 YY_RULE_SETUP
-#line 356 "compilers/imcc/imcc.l"
+#line 358 "compilers/imcc/imcc.l"
 return RELOP_GT;
 	YY_BREAK
 case 85:
 YY_RULE_SETUP
-#line 357 "compilers/imcc/imcc.l"
+#line 359 "compilers/imcc/imcc.l"
 return RELOP_GTE;
 	YY_BREAK
 case 86:
 YY_RULE_SETUP
-#line 358 "compilers/imcc/imcc.l"
+#line 360 "compilers/imcc/imcc.l"
 return RELOP_EQ;
 	YY_BREAK
 case 87:
 YY_RULE_SETUP
-#line 359 "compilers/imcc/imcc.l"
+#line 361 "compilers/imcc/imcc.l"
 return RELOP_NE;
 	YY_BREAK
 case 88:
 YY_RULE_SETUP
-#line 360 "compilers/imcc/imcc.l"
+#line 362 "compilers/imcc/imcc.l"
 return POW;
 	YY_BREAK
 case 89:
 YY_RULE_SETUP
-#line 362 "compilers/imcc/imcc.l"
+#line 364 "compilers/imcc/imcc.l"
 return CONCAT;
 	YY_BREAK
 case 90:
 YY_RULE_SETUP
-#line 363 "compilers/imcc/imcc.l"
+#line 365 "compilers/imcc/imcc.l"
 return DOT;
 	YY_BREAK
 case 91:
 YY_RULE_SETUP
-#line 365 "compilers/imcc/imcc.l"
+#line 367 "compilers/imcc/imcc.l"
 return PLUS_ASSIGN;
 	YY_BREAK
 case 92:
 YY_RULE_SETUP
-#line 366 "compilers/imcc/imcc.l"
+#line 368 "compilers/imcc/imcc.l"
 return MINUS_ASSIGN;
 	YY_BREAK
 case 93:
 YY_RULE_SETUP
-#line 367 "compilers/imcc/imcc.l"
+#line 369 "compilers/imcc/imcc.l"
 return MUL_ASSIGN;
 	YY_BREAK
 case 94:
 YY_RULE_SETUP
-#line 368 "compilers/imcc/imcc.l"
+#line 370 "compilers/imcc/imcc.l"
 return DIV_ASSIGN;
 	YY_BREAK
 case 95:
 YY_RULE_SETUP
-#line 369 "compilers/imcc/imcc.l"
+#line 371 "compilers/imcc/imcc.l"
 return MOD_ASSIGN;
 	YY_BREAK
 case 96:
 YY_RULE_SETUP
-#line 370 "compilers/imcc/imcc.l"
+#line 372 "compilers/imcc/imcc.l"
 return FDIV;
 	YY_BREAK
 case 97:
 YY_RULE_SETUP
-#line 371 "compilers/imcc/imcc.l"
+#line 373 "compilers/imcc/imcc.l"
 return FDIV_ASSIGN;
 	YY_BREAK
 case 98:
 YY_RULE_SETUP
-#line 372 "compilers/imcc/imcc.l"
+#line 374 "compilers/imcc/imcc.l"
 return BAND_ASSIGN;
 	YY_BREAK
 case 99:
 YY_RULE_SETUP
-#line 373 "compilers/imcc/imcc.l"
+#line 375 "compilers/imcc/imcc.l"
 return BOR_ASSIGN;
 	YY_BREAK
 case 100:
 YY_RULE_SETUP
-#line 374 "compilers/imcc/imcc.l"
+#line 376 "compilers/imcc/imcc.l"
 return BXOR_ASSIGN;
 	YY_BREAK
 case 101:
 YY_RULE_SETUP
-#line 375 "compilers/imcc/imcc.l"
+#line 377 "compilers/imcc/imcc.l"
 return SHR_ASSIGN;
 	YY_BREAK
 case 102:
 YY_RULE_SETUP
-#line 376 "compilers/imcc/imcc.l"
+#line 378 "compilers/imcc/imcc.l"
 return SHL_ASSIGN;
 	YY_BREAK
 case 103:
 YY_RULE_SETUP
-#line 377 "compilers/imcc/imcc.l"
+#line 379 "compilers/imcc/imcc.l"
 return SHR_U_ASSIGN;
 	YY_BREAK
 case 104:
 YY_RULE_SETUP
-#line 378 "compilers/imcc/imcc.l"
+#line 380 "compilers/imcc/imcc.l"
 return CONCAT_ASSIGN;
 	YY_BREAK
 case 105:
 YY_RULE_SETUP
-#line 380 "compilers/imcc/imcc.l"
+#line 382 "compilers/imcc/imcc.l"
 {
         char *macro_name   = NULL;
         int   start_cond   = YY_START;
@@ -2840,7 +2842,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 106:
 YY_RULE_SETUP
-#line 423 "compilers/imcc/imcc.l"
+#line 425 "compilers/imcc/imcc.l"
 {
         /* the initial whitespace catcher misses this one */
         SET_LINE_NUMBER;
@@ -2849,7 +2851,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 107:
 YY_RULE_SETUP
-#line 429 "compilers/imcc/imcc.l"
+#line 431 "compilers/imcc/imcc.l"
 {
         const int c = yylex(valp,yyscanner,imcc);
         STRING *filename;
@@ -2866,7 +2868,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 108:
 YY_RULE_SETUP
-#line 443 "compilers/imcc/imcc.l"
+#line 445 "compilers/imcc/imcc.l"
 {
         if (valp) {
             char *label;
@@ -2891,7 +2893,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 109:
 YY_RULE_SETUP
-#line 465 "compilers/imcc/imcc.l"
+#line 467 "compilers/imcc/imcc.l"
 {
         if (valp) {
             char *label;
@@ -2914,12 +2916,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 110:
 YY_RULE_SETUP
-#line 485 "compilers/imcc/imcc.l"
+#line 487 "compilers/imcc/imcc.l"
 return COMMA;
 	YY_BREAK
 case 111:
 YY_RULE_SETUP
-#line 487 "compilers/imcc/imcc.l"
+#line 489 "compilers/imcc/imcc.l"
 {
         /* trim last ':' */
         YYCHOP();
@@ -2932,7 +2934,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 112:
 YY_RULE_SETUP
-#line 497 "compilers/imcc/imcc.l"
+#line 499 "compilers/imcc/imcc.l"
 {
         char   * const macro_name = mem_sys_strndup(yytext + 1, yyleng - 1);
         int failed = expand_macro(imcc, macro_name, yyscanner);
@@ -2945,32 +2947,32 @@ YY_RULE_SETUP
 	YY_BREAK
 case 113:
 YY_RULE_SETUP
-#line 509 "compilers/imcc/imcc.l"
+#line 511 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, FLOATC);
 	YY_BREAK
 case 114:
 YY_RULE_SETUP
-#line 510 "compilers/imcc/imcc.l"
+#line 512 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, INTC);
 	YY_BREAK
 case 115:
 YY_RULE_SETUP
-#line 511 "compilers/imcc/imcc.l"
+#line 513 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, INTC);
 	YY_BREAK
 case 116:
 YY_RULE_SETUP
-#line 512 "compilers/imcc/imcc.l"
+#line 514 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, INTC);
 	YY_BREAK
 case 117:
 YY_RULE_SETUP
-#line 513 "compilers/imcc/imcc.l"
+#line 515 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, INTC);
 	YY_BREAK
 case 118:
 YY_RULE_SETUP
-#line 515 "compilers/imcc/imcc.l"
+#line 517 "compilers/imcc/imcc.l"
 {
         valp->s = mem_sys_strndup(yytext, yyleng);
 
@@ -2979,7 +2981,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 119:
 YY_RULE_SETUP
-#line 521 "compilers/imcc/imcc.l"
+#line 523 "compilers/imcc/imcc.l"
 {
         macro_frame_t *frame;
 
@@ -3010,7 +3012,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 120:
 YY_RULE_SETUP
-#line 549 "compilers/imcc/imcc.l"
+#line 551 "compilers/imcc/imcc.l"
 {
         /* charset:"..." */
         valp->s = mem_sys_strndup(yytext, yyleng);
@@ -3021,7 +3023,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 121:
 YY_RULE_SETUP
-#line 557 "compilers/imcc/imcc.l"
+#line 559 "compilers/imcc/imcc.l"
 {
         if (valp) (valp)->s = yytext;
         if (imcc->state->pasm_file)
@@ -3032,7 +3034,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 122:
 YY_RULE_SETUP
-#line 565 "compilers/imcc/imcc.l"
+#line 567 "compilers/imcc/imcc.l"
 {
         if (valp)
             (valp)->s = yytext;
@@ -3044,7 +3046,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 123:
 YY_RULE_SETUP
-#line 574 "compilers/imcc/imcc.l"
+#line 576 "compilers/imcc/imcc.l"
 {
         if (valp)
             (valp)->s = yytext;
@@ -3056,7 +3058,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 124:
 YY_RULE_SETUP
-#line 583 "compilers/imcc/imcc.l"
+#line 585 "compilers/imcc/imcc.l"
 {
         if (valp)
             (valp)->s = yytext;
@@ -3068,7 +3070,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 125:
 YY_RULE_SETUP
-#line 592 "compilers/imcc/imcc.l"
+#line 594 "compilers/imcc/imcc.l"
 {
         IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
             "'%s' is not a valid register name", yytext);
@@ -3076,7 +3078,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 126:
 YY_RULE_SETUP
-#line 597 "compilers/imcc/imcc.l"
+#line 599 "compilers/imcc/imcc.l"
 {
         if (imcc->state->pasm_file == 0)
             IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
@@ -3090,24 +3092,24 @@ YY_RULE_SETUP
 	YY_BREAK
 case 127:
 YY_RULE_SETUP
-#line 609 "compilers/imcc/imcc.l"
+#line 611 "compilers/imcc/imcc.l"
 { return handle_identifier(imcc, valp, yytext); }
 	YY_BREAK
 case 128:
 YY_RULE_SETUP
-#line 611 "compilers/imcc/imcc.l"
+#line 613 "compilers/imcc/imcc.l"
 /* skip */;
 	YY_BREAK
 case 129:
 YY_RULE_SETUP
-#line 613 "compilers/imcc/imcc.l"
+#line 615 "compilers/imcc/imcc.l"
 {
         /* catch all except for state macro */
         return yytext[0];
     }
 	YY_BREAK
 case YY_STATE_EOF(emit):
-#line 618 "compilers/imcc/imcc.l"
+#line 620 "compilers/imcc/imcc.l"
 {
         BEGIN(INITIAL);
 
@@ -3120,12 +3122,12 @@ case YY_STATE_EOF(emit):
     }
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
-#line 629 "compilers/imcc/imcc.l"
+#line 631 "compilers/imcc/imcc.l"
 yyterminate();
 	YY_BREAK
 case 130:
 YY_RULE_SETUP
-#line 631 "compilers/imcc/imcc.l"
+#line 633 "compilers/imcc/imcc.l"
 {
         /* the initial whitespace catcher misses this one */
         SET_LINE_NUMBER;
@@ -3135,19 +3137,19 @@ YY_RULE_SETUP
 case 131:
 /* rule 131 can match eol */
 YY_RULE_SETUP
-#line 637 "compilers/imcc/imcc.l"
+#line 639 "compilers/imcc/imcc.l"
 {
         DUP_AND_RET(valp, '\n');
     }
 	YY_BREAK
 case 132:
 YY_RULE_SETUP
-#line 641 "compilers/imcc/imcc.l"
+#line 643 "compilers/imcc/imcc.l"
 return LABEL;
 	YY_BREAK
 case 133:
 YY_RULE_SETUP
-#line 643 "compilers/imcc/imcc.l"
+#line 645 "compilers/imcc/imcc.l"
 {
 
         if (yylex(valp,yyscanner,imcc) != LABEL)
@@ -3174,7 +3176,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 134:
 YY_RULE_SETUP
-#line 667 "compilers/imcc/imcc.l"
+#line 669 "compilers/imcc/imcc.l"
 {
     if (valp) {
         if (!imcc->cur_macro_name) {
@@ -3205,44 +3207,44 @@ YY_RULE_SETUP
 	YY_BREAK
 case 135:
 YY_RULE_SETUP
-#line 695 "compilers/imcc/imcc.l"
+#line 697 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, ' ');
 	YY_BREAK
 case 136:
 YY_RULE_SETUP
-#line 696 "compilers/imcc/imcc.l"
+#line 698 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, REG);
 	YY_BREAK
 case 137:
 YY_RULE_SETUP
-#line 697 "compilers/imcc/imcc.l"
+#line 699 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, REG);
 	YY_BREAK
 case 138:
 YY_RULE_SETUP
-#line 698 "compilers/imcc/imcc.l"
+#line 700 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, IDENTIFIER);
 	YY_BREAK
 case 139:
 YY_RULE_SETUP
-#line 699 "compilers/imcc/imcc.l"
+#line 701 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, MACRO);
 	YY_BREAK
 case 140:
 YY_RULE_SETUP
-#line 700 "compilers/imcc/imcc.l"
+#line 702 "compilers/imcc/imcc.l"
 DUP_AND_RET(valp, yytext[0]);
 	YY_BREAK
 case YY_STATE_EOF(macro):
-#line 701 "compilers/imcc/imcc.l"
+#line 703 "compilers/imcc/imcc.l"
 yyterminate();
 	YY_BREAK
 case 141:
 YY_RULE_SETUP
-#line 703 "compilers/imcc/imcc.l"
+#line 705 "compilers/imcc/imcc.l"
 ECHO;
 	YY_BREAK
-#line 3246 "compilers/imcc/imclexer.c"
+#line 3248 "compilers/imcc/imclexer.c"
 case YY_STATE_EOF(pod):
 case YY_STATE_EOF(cmt1):
 case YY_STATE_EOF(cmt2):
@@ -4456,7 +4458,7 @@ void yyfree (void * ptr , yyscan_t yyscanner)
 
 #define YYTABLES_NAME "yytables"
 
-#line 702 "compilers/imcc/imcc.l"
+#line 704 "compilers/imcc/imcc.l"
 
 
 
@@ -5119,7 +5121,7 @@ imcc_compile_buffer_safe(ARGMOD(imc_info_t *imcc), yyscan_t yyscanner,
     buffer = YY_CURRENT_BUFFER;
 
     file = imcc_setup_input(imcc, yyscanner, source, source_c, is_file);
-    emit_open(imcc);
+    emit_open(imcc, source);
     success = imcc_run_compilation(imcc, yyscanner);
     imcc_cleanup_input(imcc, file, source_c, is_file);
 
