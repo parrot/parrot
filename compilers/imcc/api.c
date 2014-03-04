@@ -235,11 +235,22 @@ imcc_set_flags_api(Parrot_PMC interp_pmc, Parrot_PMC compiler,
     IMCC_API_CALLOUT(interp_pmc, interp)
 }
 
+/*
+
+=item C<void imcc_set_to_pasm_api(Parrot_PMC interp_pmc, Parrot_PMC compiler,
+Parrot_Int to_pasm)>
+
+Public interface to imcc_set_to_pasm, for writing to pasm, not pbc.
+
+=cut
+
+*/
+
 PARROT_EXPORT
 void
 imcc_set_to_pasm_api(Parrot_PMC interp_pmc, Parrot_PMC compiler, Parrot_Int to_pasm)
 {
-    ASSERT_ARGS(imcc_set_flags_api)
+    ASSERT_ARGS(imcc_set_to_pasm_api)
     IMCC_API_CALLIN(interp_pmc, interp)
 
     imc_info_t * imcc = (imc_info_t *)VTABLE_get_pointer(interp, compiler);
