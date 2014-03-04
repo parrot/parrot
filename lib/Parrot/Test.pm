@@ -991,10 +991,17 @@ sub _generate_test_functions {
             # mangle windows line endings
             convert_line_endings($expected);
 
+            my $args = $ENV{TEST_PROG_ARGS} || '';
             if ($func =~ /^pir_2_/) {
                 $opt  = $code_basef =~ m!opt(.)! ? "-O$1" : "-O1";
+                $args =~ s/-O[012pc]//;
+                if ($code_basef =~ m!opt(.)!) {
+                    $opt = "-O$1";
+                }
+                else {
+                    $opt = "-O1";
+                }
             }
-            my $args = $ENV{TEST_PROG_ARGS} || '';
             $args   .= " $opt -d1000 -o $out_f.tmp";
             $args    =~ s/--run-exec//;
             $cmd       = qq{$parrot $args "$code_f"};
