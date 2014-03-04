@@ -43,13 +43,23 @@ my $coda = <<'CODA';
  */
 CODA
 
+my $coda_in = <<'CODA';
+/*
+ * Local variables:
+ *   mode: c
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */
+CODA
+
 my $DIST = Parrot::Distribution->new;
 my @files = @ARGV ? <@ARGV> : $DIST->get_c_language_files();
 
 Parrot::Test::Util::Runloop->testloop(
     name        => 'every file has a coda',
     files       => [@files],
-    per_file    => sub { shift =~ m{\Q$coda\E\n*\z} },
+    per_file    => sub { $_[0] =~ m{\Q$coda\E\n*\z} or $_[0] =~ m{\Q$coda_in\E\n*\z} },
     diag_prefix => 'No coda found'
 );
 

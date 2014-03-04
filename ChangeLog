@@ -26,6 +26,8 @@
         + Set emacs buffer-read-only:t tags in generated files [GH #1034]
         + Provide coda for generated include/*.pasm files [GH #1032]
         + Fix parser for bison 3 [GH #1031]
+        + Add support for __builtin_expect LIKELY/UNLIKELY branch optimizations
+          in a new auto::expect step. [GH #1047]
     - Deprecations
         + Warn on deprecated usage of append_configure_log()
     - Documentation

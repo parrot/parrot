@@ -63,6 +63,7 @@ my @steps = qw(
     auto::ipv6
     auto::platform
     auto::alignof
+    auto::expect
     gen::config_h
     gen::core_pmcs
     gen::opengl
