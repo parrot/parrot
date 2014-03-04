@@ -231,6 +231,28 @@ END_PRINT
     }
 }
 
+/* from config/auto/expect */
+END_PRINT
+if (@has_builtin_expect@) {
+    print OUT <<'END_PRINT';
+#define PARROT_HAS_BUILTIN_EXPECT 1
+END_PRINT
+}
+else {
+    print OUT <<'END_PRINT';
+#undef PARROT_HAS_BUILTIN_EXPECT
+END_PRINT
+}
+print OUT <<'END_PRINT';
+#ifdef PARROT_HAS_BUILTIN_EXPECT
+#  define EXPECT(expr,val)                  __builtin_expect(expr,val)
+#else
+#  define EXPECT(expr,val)                  (expr)
+#endif
+#define LIKELY(cond)                        EXPECT((cond),1)
+#define UNLIKELY(cond)                      EXPECT((cond),0)
+END_PRINT
+
 print OUT <<'END_PRINT';
 
 /* from config/auto/expect */
