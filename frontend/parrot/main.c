@@ -25,6 +25,7 @@ Start Parrot
 #include "parrot/api.h"
 #include "parrot/interpreter.h"
 #include "parrot/settings.h"
+#include "parrot/string.h"
 #include "parrot/warnings.h"
 #include "imcc/api.h"
 
@@ -279,6 +280,8 @@ run_imcc(Parrot_PMC interp, Parrot_String sourcefile, ARGIN(struct init_args_t *
             if (!imcc_set_flags_api(interp, compiler, flags->imcc_dflags, flags->imcc_opts))
                 exit(EXIT_FAILURE);
         }
+        if (flags->write_pasm)
+            imcc_set_to_pasm_api(interp, compiler, flags->write_pasm);
         if (!imcc_compile_file_api(interp, compiler, sourcefile, &pbc))
             show_last_error_and_exit(interp);
         return pbc;

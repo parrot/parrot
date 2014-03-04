@@ -235,25 +235,24 @@ pir_2_pasm_like( <<'CODE', <<'OUT', "in P param" );
     print a
 .end
 CODE
-/\.sub _main
-  new (P\d), 'Undef'
-  set \1, 42
-@pcc_sub_call_\d:
-  set_args
-  set_p_pc (P\d+), foo
-  invokecc \2
-  get_results
-  noop
-  end
-\.end
-\.sub foo
-  get_params
-  print P0
-  set_returns
-  returncc
-\.end/
+/\.pcc_sub _main:
+new (P\d), 'Undef'
+set \1, 42
+set_args
+set_p_pc (P\d+), foo
+invokecc \2
+get_results
+noop
+end
+\.pcc_sub foo:
+get_params
+print P0
+set_returns
+returncc/
 OUT
 
+TODO: {
+local $TODO = "-Oc tailcall => set";
 pir_2_pasm_like( <<'CODE', <<'OUT', "tailcall 2" );
 .sub _main
     foo(1, 2)
@@ -264,10 +263,11 @@ pir_2_pasm_like( <<'CODE', <<'OUT', "tailcall 2" );
     .tailcall foo(j, i)
 .end
 CODE
-/ set I(\d), I(\d)
-  set I\2, I(\d)
-  set I\3, I\1/
+/set I(\d), I(\d)
+set I\2, I(\d)
+set I\3, I\1/
 OUT
+}
 
 pir_output_is( <<'CODE', <<'OUT', "tailcall 3 args" );
 .sub _main

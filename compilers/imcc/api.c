@@ -235,6 +235,19 @@ imcc_set_flags_api(Parrot_PMC interp_pmc, Parrot_PMC compiler,
     IMCC_API_CALLOUT(interp_pmc, interp)
 }
 
+PARROT_EXPORT
+void
+imcc_set_to_pasm_api(Parrot_PMC interp_pmc, Parrot_PMC compiler, Parrot_Int to_pasm)
+{
+    ASSERT_ARGS(imcc_set_flags_api)
+    IMCC_API_CALLIN(interp_pmc, interp)
+
+    imc_info_t * imcc = (imc_info_t *)VTABLE_get_pointer(interp, compiler);
+    STRING * const meth_name = Parrot_str_new(interp, "set_to_pasm", 0);
+    Parrot_pcc_invoke_method_from_c_args(interp, compiler, meth_name,
+                                         "I", to_pasm);
+    IMCC_API_CALLOUT(interp_pmc, interp);
+}
 /*
 
 =back

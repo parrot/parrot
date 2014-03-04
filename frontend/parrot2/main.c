@@ -35,6 +35,7 @@ struct init_args_t {
     Parrot_Int have_pasm_file;
     Parrot_Int turn_gc_off;
     Parrot_Int preprocess_only;
+    Parrot_Int write_pasm;
     Parrot_Int imcc_dflags;
     Parrot_Int imcc_opts;
     const char ** argv;
@@ -607,6 +608,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     args->turn_gc_off = 0;
     args->have_pasm_file = 0;
     args->preprocess_only = 0;
+    args->write_pasm = 0;
     args->imcc_dflags = 0;
     args->imcc_opts = 0;
     pargs[nargs++] = argv[0];
@@ -686,8 +688,11 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
           case 'o':
             pargs[nargs++] = "-o";
             pargs[nargs++] = opt.opt_arg;
-            if (strcmp(opt.opt_arg, ".pasm") == 0)
-                args->preprocess_only = 1;
+            {
+                const char * const ext = strrchr(opt.opt_arg, '.');
+                if (ext && ((strcmp(ext, ".pasm") == 0) || (strcmp(ext, ".pir") == 0)))
+                    args->write_pasm = 1;
+            }
             break;
           case 'r':
             pargs[nargs++] = "-r";
