@@ -94,9 +94,9 @@ already done that) and type
 OR
     perl Configure.pl --optimize
 
-to run the Configure script. If you want your Parrot to be as fast as possible,
-use --optimize. If you want to improve your chances in debugging programs and
-stacktraces, omit --optimize.
+to run the Configure script. For packagers or if you want your Parrot to run
+about 2x faster, use --optimize. If you want to improve your chances in debugging
+programs and stacktraces, omit --optimize and add --debugging instead.
 
 The 'Configure.pl' script extracts configuration information from the running
 perl5 program.  You  need to explicitly tell 'Configure.pl' which compiler
