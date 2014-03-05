@@ -78,7 +78,12 @@ if ($archive) {
     } );
     my $overall_aggregator = $archive->runtests(\@targets);
     $archive->summary($overall_aggregator);
-    send_archive_to_smolder(%env_data) if $smolder;
+    # smolder is currently (2014) too unstable to accept most reports: GH #1040
+    # osuosl blames their 32bit VM
+    eval { send_archive_to_smolder(%env_data); } if $smolder;
+    warn $@ if $@;
+    my $exit_value = ($overall_aggregator->get_status() eq 'PASS') ? 0 : 1;
+    exit($exit_value);
 }
 else {
     require TAP::Formatter::Console;
