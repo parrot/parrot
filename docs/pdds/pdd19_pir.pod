@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2010, Parrot Foundation.
+# Copyright (C) 2007-2014, Parrot Foundation.
 
 =head1 PDD 19: Parrot Intermediate Representation (PIR)
 
@@ -1275,7 +1275,7 @@ created.
 
 Below there are three different ways to invoke the subroutine C<sub_label>.
 The first retrieves a single return value, the second retrieves 3 return
-values, whereas the last discards any return values.
+values, whereas the last does not save any return values.
 
 =begin PIR_FRAGMENT
 
