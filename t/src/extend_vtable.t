@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2010-2011, Parrot Foundation.
+# Copyright (C) 2010-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -89,7 +89,6 @@ static void handler(Parrot_Interp interp, Parrot_PMC exception, void *unused)
                 type, severity, message);
     }
 }
-PMC* PMCNULL;
 
 #define NOT_NULL(pmc)  (!((pmc) == PMCNULL || (pmc) == NULL))
 
