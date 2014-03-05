@@ -14,12 +14,14 @@ The 18-byte header consists of,
 
   0                                           7
   +----------+----------+----------+----------+
-  |         Parrot Magic = 0x 13155a1         |
+  | Parrot Magic = fe:50:42:43:0d:0a:1a:0a    |
   +----------+----------+----------+----------+
 
-B<Magic> is stored in native byteorder. The loader uses the byteorder header to
-convert the Magic to verify. More specifically, ALL words (non-bytes) in the
-bytecode file are stored in native order, unless otherwise specified.
+which reads as C<"<fe>PBC\r\n<1a>\n">. The B<Magic> is stored as
+endian-less sequence of C<unsigned char magic[18]>. The loader uses
+the byteorder header to convert the rest to the host format. More
+specifically, ALL words (non-bytes) in the bytecode file are stored in
+native order, unless otherwise specified.
 
   8          9         10         11
   +----------+----------+----------+
@@ -35,7 +37,9 @@ information.
 B<Byteorder> currently supports two values: (0-Little Endian, 1-Big Endian)
 
 B<FloatType> 0 is IEEE 754 8 byte double, FloatType 1 is
-i386 little endian 12 byte long double.
+i386 little endian 12 byte long double, FloatType 2 is native
+16 byte long double, either powerpc double double, intel 12 byte
+padded long double or true IEEE 16 byte long double.
 
   11        12         13         14         15         16
   +----------+----------+----------+----------+----------+
