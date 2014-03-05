@@ -1,6 +1,5 @@
 /*
 
-
 pmc.ops
 
 */
@@ -688,19 +687,22 @@ inline op iter(out PMC, invar PMC)  {
 
 =item B<morph>(invar PMC, in PMC)
 
-Have $1 turn itself into a PMC of type $2. $2 should be a Class PMC.
+morph was deprecated with 6.2.0
 
 =cut
 
 inline op morph(invar PMC, in PMC) {
-    VTABLE_morph(interp, $1, $2);
+  Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+                              "morph was deprecated with 6.2.0");
 }
+
+
 
 =back
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 LICENSE
 
