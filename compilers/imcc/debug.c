@@ -299,7 +299,7 @@ dump_instructions(ARGMOD(imc_info_t * imcc), ARGIN(const IMC_Unit *unit))
     ASSERT_ARGS(dump_instructions)
     const Instruction *ins;
     int                pc;
-   const PIOHANDLE pstderr =
+    const PIOHANDLE pstderr =
             Parrot_io_internal_std_os_handle(imcc->interp, PIO_STDERR_FILENO);
 
     Parrot_io_eprintf(imcc->interp,

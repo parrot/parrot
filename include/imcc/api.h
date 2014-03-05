@@ -54,10 +54,10 @@ Parrot_Int imcc_set_flags_api(
     Parrot_Int opt);
 
 PARROT_EXPORT
-void imcc_set_to_pasm_api(
+void imcc_set_write_pasm_api(
     Parrot_PMC interp_pmc,
     Parrot_PMC compiler,
-    Parrot_Int to_pasm);
+    Parrot_String pasmfile);
 
 #define ASSERT_ARGS_imcc_compile_file_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pbc))
@@ -67,7 +67,7 @@ void imcc_set_to_pasm_api(
        PARROT_ASSERT_ARG(compiler))
 #define ASSERT_ARGS_imcc_preprocess_file_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_imcc_set_flags_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_imcc_set_to_pasm_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_imcc_set_write_pasm_api __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/api.c */
 

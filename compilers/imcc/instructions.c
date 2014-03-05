@@ -693,18 +693,23 @@ e_pasm_open(ARGMOD(imc_info_t * imcc), ARGIN(STRING *path))
 =item C<void emit_open(imc_info_t * imcc, STRING *path)>
 
 Opens the output file for writing, either C<e_pbc_open> or C<e_pasm_open>.
+Note that for pasm output the lexer can only pass a NULL path, so we
+initialize pasm output earlier (i.e. open the file for writing) and ignore
+C<e_pasm_open> when called from the lexer.
 
 =cut
 
 */
 
 void
-emit_open(ARGMOD(imc_info_t * imcc), ARGIN(STRING *path))
+emit_open(ARGMOD(imc_info_t * imcc), ARGIN_NULLOK(STRING *path))
 {
     ASSERT_ARGS(emit_open)
     imcc->dont_optimize = 0;
-    if (UNLIKELY(imcc->write_pasm))
-        e_pasm_open(imcc, path);
+    if (UNLIKELY(imcc->write_pasm)) {
+        if (path) /* maybe already set earlier. the lexer just passes NULL */
+            e_pasm_open(imcc, path);
+    }
     else
         e_pbc_open(imcc);
 }

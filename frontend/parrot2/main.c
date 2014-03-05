@@ -38,6 +38,7 @@ struct init_args_t {
     Parrot_Int write_pasm;
     Parrot_Int imcc_dflags;
     Parrot_Int imcc_opts;
+    Parrot_String outfile;
     const char ** argv;
     int argc;
 };
@@ -183,11 +184,13 @@ main(int argc, const char *argv[])
                                 parsed_flags.imcc_opts))
             exit(EXIT_FAILURE);
     }
+    if (parsed_flags.write_pasm)
+        imcc_set_write_pasm_api(interp, compiler, parsed_flags.outfile);
 
     if (!(Parrot_api_pmc_wrap_string_array(interp, parsed_flags.argc, parsed_flags.argv,
-                                            &args)
+                                           &args)
     && Parrot_api_load_bytecode_bytes(interp, get_program_code(), get_program_code_size(),
-                                        &bytecodepmc)
+                                      &bytecodepmc)
     && Parrot_api_run_bytecode(interp, bytecodepmc, args)))
         show_last_error_and_exit(interp);
 
@@ -609,6 +612,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     args->have_pasm_file = 0;
     args->preprocess_only = 0;
     args->write_pasm = 0;
+    args->outfile = NULL;
     args->imcc_dflags = 0;
     args->imcc_opts = 0;
     pargs[nargs++] = argv[0];
@@ -693,6 +697,8 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
                 if (ext && ((strcmp(ext, ".pasm") == 0) || (strcmp(ext, ".pir") == 0)))
                     args->write_pasm = 1;
             }
+            if (!Parrot_api_string_import(interp, opt.opt_arg, &args->outfile))
+                show_last_error_and_exit(interp);
             break;
           case 'r':
             pargs[nargs++] = "-r";

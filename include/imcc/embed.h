@@ -23,7 +23,7 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC * imcc_compile_file(
     ARGMOD(imc_info_t *imcc),
-    ARGIN(STRING *fullname),
+    ARGIN(STRING *sourcefile),
     int is_pasm)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -73,13 +73,14 @@ void imcc_set_optimization_level(
         FUNC_MODIFIES(*imcc);
 
 PARROT_EXPORT
-void imcc_set_to_pasm(ARGMOD(imc_info_t *imcc), INTVAL to_pasm)
+void imcc_set_verbosity(ARGMOD(imc_info_t *imcc), INTVAL verbose)
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*imcc);
 
 PARROT_EXPORT
-void imcc_set_verbosity(ARGMOD(imc_info_t *imcc), INTVAL verbose)
+void imcc_set_write_pasm(ARGMOD(imc_info_t *imcc), ARGIN(STRING *pasmfile))
         __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
         FUNC_MODIFIES(*imcc);
 
 PARROT_IGNORABLE_RESULT
@@ -102,7 +103,7 @@ PMC * imcc_compile_string(
 void imcc_destroy(ARGFREE(imc_info_t * imcc));
 #define ASSERT_ARGS_imcc_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
-    , PARROT_ASSERT_ARG(fullname))
+    , PARROT_ASSERT_ARG(sourcefile))
 #define ASSERT_ARGS_imcc_last_error_code __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_imcc_last_error_message __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -119,10 +120,11 @@ void imcc_destroy(ARGFREE(imc_info_t * imcc));
 #define ASSERT_ARGS_imcc_set_optimization_level __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(opts))
-#define ASSERT_ARGS_imcc_set_to_pasm __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_imcc_set_verbosity __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
+#define ASSERT_ARGS_imcc_set_write_pasm __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(pasmfile))
 #define ASSERT_ARGS_exit_reentrant_compile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_imcc_compile_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

@@ -119,9 +119,8 @@ void emit_flush(
         __attribute__nonnull__(3)
         FUNC_MODIFIES(* imcc);
 
-void emit_open(ARGMOD(imc_info_t * imcc), ARGIN(STRING *path))
+void emit_open(ARGMOD(imc_info_t * imcc), ARGIN_NULLOK(STRING *path))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         FUNC_MODIFIES(* imcc);
 
 PARROT_CAN_RETURN_NULL
@@ -228,8 +227,7 @@ void subst_ins(
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_emit_open __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc) \
-    , PARROT_ASSERT_ARG(path))
+       PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_emitb __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_free_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

@@ -76,7 +76,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC * imcc_run_compilation_reentrant(
     ARGMOD(imc_info_t *imcc),
-    ARGIN(STRING *fullname),
+    ARGIN(STRING *source),
     int is_file,
     int is_pasm)
         __attribute__nonnull__(1)
@@ -101,7 +101,7 @@ static struct _imc_info_t* prepare_reentrant_compile(
 #define ASSERT_ARGS_imcc_run_compilation_reentrant \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
-    , PARROT_ASSERT_ARG(fullname))
+    , PARROT_ASSERT_ARG(source))
 #define ASSERT_ARGS_prepare_reentrant_compile __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -456,7 +456,7 @@ imcc_compile_string(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source), int is_pasm
 
 /*
 
-=item C<PMC * imcc_compile_file(imc_info_t *imcc, STRING *fullname, int
+=item C<PMC * imcc_compile_file(imc_info_t *imcc, STRING *sourcefile, int
 is_pasm)>
 
 Compile a file containing PIR or PASM (set by C<is_pasm>).
@@ -468,18 +468,18 @@ Compile a file containing PIR or PASM (set by C<is_pasm>).
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-imcc_compile_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname), int is_pasm)
+imcc_compile_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *sourcefile), int is_pasm)
 {
     ASSERT_ARGS(imcc_compile_file)
-    return imcc_run_compilation_reentrant(imcc, fullname, 1, is_pasm);
+    return imcc_run_compilation_reentrant(imcc, sourcefile, 1, is_pasm);
 }
 
 /*
 
 =item C<static PMC * imcc_run_compilation_reentrant(imc_info_t *imcc, STRING
-*fullname, int is_file, int is_pasm)>
+*source, int is_file, int is_pasm)>
 
-run a compilation over an input sequence, allowing for some reentrancy. This
+Run a compilation over an input sequence, allowing for some reentrancy. This
 may be a recursive compilation inside an existing compilation sequence.
 
 =cut
@@ -489,12 +489,12 @@ may be a recursive compilation inside an existing compilation sequence.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static PMC *
-imcc_run_compilation_reentrant(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname),
+imcc_run_compilation_reentrant(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
         int is_file, int is_pasm)
 {
     ASSERT_ARGS(imcc_run_compilation_reentrant)
     struct _imc_info_t * const imcc_use = prepare_reentrant_compile(imcc);
-    PMC * const result = imcc_run_compilation_internal(imcc_use, fullname, is_file, is_pasm);
+    PMC * const result = imcc_run_compilation_internal(imcc_use, source, is_file, is_pasm);
     exit_reentrant_compile(imcc, imcc_use);
     return result;
 }
@@ -507,6 +507,7 @@ imcc_run_compilation_reentrant(ARGMOD(imc_info_t *imcc), ARGIN(STRING *fullname)
 Perform an actual compilation. The input is either a string or a file
 (determined by C<is_file>), and is in either PIR or PASM format (determined by
 C<is_pasm>).
+Returns a Packfile PMC.
 
 All compilations go through this function.
 
@@ -572,9 +573,10 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
 
 /*
 
-=item C<void imcc_set_to_pasm(imc_info_t *imcc, INTVAL to_pasm)>
+=item C<void imcc_set_write_pasm(imc_info_t *imcc, STRING *pasmfile)>
 
-Public interface to initialize imcc->write_pasm with -1 or 0.
+Public interface to initialize the internal imcc->write_pasm handle and
+set the output filename.
 
 =cut
 
@@ -582,18 +584,12 @@ Public interface to initialize imcc->write_pasm with -1 or 0.
 
 PARROT_EXPORT
 void
-imcc_set_to_pasm(ARGMOD(imc_info_t *imcc), INTVAL to_pasm)
+imcc_set_write_pasm(ARGMOD(imc_info_t *imcc), ARGIN(STRING *pasmfile))
 {
-    ASSERT_ARGS(imcc_set_to_pasm)
+    ASSERT_ARGS(imcc_set_write_pasm)
 
-    if (imcc->write_pasm) {
-        if (!to_pasm)
-            imcc->write_pasm = 0;
-        /* else already set to some filehandle */
-    }
-    else {
-        imcc->write_pasm = to_pasm ? -1 : 0;
-    }
+    imcc->write_pasm = -1;
+    emit_open(imcc, pasmfile);
 }
 
 /*
