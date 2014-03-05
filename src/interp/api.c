@@ -851,8 +851,8 @@ Parrot_interp_set_compiler(PARROT_INTERP, ARGIN(STRING *type), ARGIN(PMC *compil
 =item C<PMC * Parrot_interp_compile_file(PARROT_INTERP, PMC *compiler, STRING
 *fullname)>
 
-Compile code file. Take a reference to a compiler PMC. Currently only PIR and
-PASM compilers (IMCC-based) are supported
+Compiles a source file to a Packfile PMC. Take a reference to a compiler PMC.
+Currently only PIR and PASM compilers (IMCC-based) are supported.
 
 TODO: This should probably be deleted entirely, and higher-level compilation
 abstractions used instead.

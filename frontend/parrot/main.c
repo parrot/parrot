@@ -222,7 +222,7 @@ main(int argc, const char *argv[])
     }
 
     /* -o outputs the file. -r outputs it and reads it in again from .pbc */
-    if (parsed_flags.write_packfile) {
+    if (parsed_flags.write_packfile || parsed_flags.write_pasm) {
         if (!Parrot_api_write_bytecode_to_file(interp, bytecodepmc, output_str))
             show_last_error_and_exit(interp);
         if (parsed_flags.execute_packfile)
@@ -281,7 +281,7 @@ run_imcc(Parrot_PMC interp, Parrot_String sourcefile, ARGIN(struct init_args_t *
                 exit(EXIT_FAILURE);
         }
         if (flags->write_pasm)
-            imcc_set_to_pasm_api(interp, compiler, flags->write_pasm);
+            imcc_set_write_pasm_api(interp, compiler, flags->outfile);
         if (!imcc_compile_file_api(interp, compiler, sourcefile, &pbc))
             show_last_error_and_exit(interp);
         return pbc;
@@ -776,10 +776,10 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
 {
     ASSERT_ARGS(parseflags)
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
-    const char * outfile = NULL;
+    const char *outfile = NULL;
+    const char *sourcefile = NULL;
     int status;
     int result = 1;
-    const char *sourcefile;
 
     args->run_core_name = "fast";
     args->write_packfile = 0;

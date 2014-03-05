@@ -1366,7 +1366,7 @@ imcc_compile_buffer_safe(ARGMOD(imc_info_t *imcc), yyscan_t yyscanner,
     buffer = YY_CURRENT_BUFFER;
 
     file = imcc_setup_input(imcc, yyscanner, source, source_c, is_file);
-    emit_open(imcc, source);
+    emit_open(imcc, NULL);
     success = imcc_run_compilation(imcc, yyscanner);
     imcc_cleanup_input(imcc, file, source_c, is_file);
 
