@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -148,7 +148,8 @@ Parrot_util_intval_mod(INTVAL i2, INTVAL i3)
 
 Returns C<n2 mod n3>.
 
-Includes a workaround for buggy code generation in the C<lcc> compiler.
+Includes a workaround for floating point optimizers in the C<lcc>
+compiler and on PPC for n mod 0 => -0 (TT #1930)
 
 =cut
 
@@ -160,12 +161,12 @@ FLOATVAL
 Parrot_util_floatval_mod(FLOATVAL n2, FLOATVAL n3)
 {
     ASSERT_ARGS(Parrot_util_floatval_mod)
-#ifdef __LCC__
+#if defined(__LCC__) || defined(__POWERPC__)
 
-    /* Another workaround for buggy code generation in the lcc compiler-
-     * adding a temporary variable makes it pass the test.
+    /* Workaround for floating point optimizers.
+     * Adding a volatile temporary variable makes it pass the tests.
      */
-    const FLOATVAL temp = n3 * floor(n2 / n3);
+    const FLOATVAL volatile temp = n3 * floor(n2 / n3);
 
     return !FLOAT_IS_ZERO(n3)
       ? (n2 - temp)
