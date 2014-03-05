@@ -22,6 +22,7 @@
           = Propagate only matching types in setters [GH #1042],
           = Stop at yield or invokecc for possible push_eh/pop_eh non-local
             effects [GH #1044]
+        + Fixed TT #1930, a floating point optimizer problem on PPC
     - Build
         + Set emacs buffer-read-only:t tags in generated files [GH #1034]
         + Provide coda for generated include/*.pasm files [GH #1032]
