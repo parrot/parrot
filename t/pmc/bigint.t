@@ -1056,6 +1056,7 @@ OK2:
     inc max_1
     neg_min = box min
     neg neg_min                         # Use 1-operand form of neg.
+    # clang -O3: bigint_get_long: number too big [GH #744]
     is(neg_min, max_1, 'negate minimum native integer')
 .end
 
