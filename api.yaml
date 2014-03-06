@@ -666,3 +666,11 @@
     - 'completed'
   ticket:  'https://github.com/parrot/parrot/issues/937'
 -
+  name:  'morph ops deprecated'
+  note:  'Morphing of args are now done automatically. The rest should not be needed'
+  tags:
+    - 'PMC'
+    - 'api'
+    - 'deprecated'
+  ticket:  'https://github.com/parrot/parrot/issues/372'
+-
