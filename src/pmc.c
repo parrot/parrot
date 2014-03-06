@@ -1286,7 +1286,7 @@ check_set_std_props(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const STRING *key), A
         else if (!on && (pmc->vtable->flags & (VTABLE_IS_CONST_FLAG))) {
             /* this replaces a morph() and hopefully does the what was
              * previously intended */
-            pmc->vtable = interp->vtables[pmc->vtable->base_type - 1]->pmc_class;
+            pmc->vtable = (VTABLE*)interp->vtables[pmc->vtable->base_type - 1]->pmc_class;
         }
         else if (on && (pmc->vtable->flags & VTABLE_HAS_READONLY_FLAG)) {
             pmc->vtable = pmc->vtable->ro_variant_vtable;
