@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -173,9 +173,9 @@ consider these data as readonly.
   | label offset                              |
   +----------+----------+----------+----------+
 
-Fixup type B<enum_fixup_sub>, has a label symbol that is the name
-of the "sub" and an offset into the constant table, referencing a Sub, Closure
-or Coroutine PMC.
+The fixup type for constant or ascii strings has a label symbol that is the
+name of the "sub" and an offset into the constant table, referencing a
+Sub, Closure or Coroutine PMC.
 
 =head2 Debug Segment
 
