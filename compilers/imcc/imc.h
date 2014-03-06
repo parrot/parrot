@@ -227,6 +227,7 @@ int imcc_string_ends_with(
         FUNC_MODIFIES(* imcc);
 
 PARROT_IGNORABLE_RESULT
+PARROT_INLINE
 int /*@alt void@*/
 imcc_vfprintf(
     ARGMOD(imc_info_t * imcc),

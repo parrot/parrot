@@ -243,7 +243,20 @@ IMCC_debug(ARGMOD(imc_info_t * imcc), int level, ARGIN(const char *fmt), ...)
     va_end(ap);
 }
 
-void IMCC_debug_ins(imc_info_t *imcc, int level, const Instruction *ins) {
+/*
+
+=item C<void IMCC_debug_ins(imc_info_t *imcc, int level, const Instruction
+*ins)>
+
+Prints a instruction debug message to STDERR, if IMCC's debug mode is turned on.
+
+=cut
+
+*/
+
+void
+IMCC_debug_ins(ARGMOD(imc_info_t *imcc), int level, ARGIN(const Instruction *ins))
+{
     PIOHANDLE pstderr;
     if (!(level & imcc->debug))
         return;

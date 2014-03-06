@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2009, Parrot Foundation.
+ * Copyright (C) 2002-2014, Parrot Foundation.
  */
 
 #ifndef PARROT_IMCC_DEBUG_H_GUARD
@@ -23,7 +23,7 @@
 #define DEBUG_REG2   0x0400
 */
 
-#define DEBUG_PBC    0x1000
+#define DEBUG_PBC          0x1000
 #define DEBUG_PBC_CONST    0x2000
 #define DEBUG_PBC_FIXUP    0x4000
 
@@ -65,12 +65,12 @@ void IMCC_debug(
         FUNC_MODIFIES(* imcc);
 
 void IMCC_debug_ins(
-    ARGMOD(imc_info_t * imcc),
+    ARGMOD(imc_info_t *imcc),
     int level,
     ARGIN(const Instruction *ins))
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(* imcc);
+        FUNC_MODIFIES(*imcc);
 
 PARROT_DOES_NOT_RETURN
 void IMCC_fatal(
@@ -134,6 +134,9 @@ void IMCC_warning(ARGMOD(imc_info_t * imcc), ARGIN(const char *fmt), ...)
 #define ASSERT_ARGS_IMCC_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(fmt))
+#define ASSERT_ARGS_IMCC_debug_ins __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(ins))
 #define ASSERT_ARGS_IMCC_fatal __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(fmt))
@@ -151,7 +154,6 @@ void IMCC_warning(ARGMOD(imc_info_t * imcc), ARGIN(const char *fmt), ...)
     , PARROT_ASSERT_ARG(fmt))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: compilers/imcc/debug.c */
-
 
 #endif /* PARROT_IMCC_DEBUG_H_GUARD */
 
