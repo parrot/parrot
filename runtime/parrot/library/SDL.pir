@@ -93,6 +93,7 @@ In fact, don't count on it sticking around.  It may not.  Then again, it might.
     .local string sdlpath
     sdlpath = env['SDLLIBPATH']
     if sdlpath == '' goto default_locations
+    print "SDLLIBPATH="
     say sdlpath
     loadlib libsdl, sdlpath
     if libsdl goto OK
@@ -121,10 +122,10 @@ failed:
     throw $P0
     branch OK
   OK_HINT1:
-    printerr "Hint: create a link from libSDL-1.2.so to libSDL.so to disable the error messages.\n"
+    printerr "Hint: use -X or export SDLLIBPATH or create a link from libSDL-1.2.so to libSDL.so to disable the error messages.\n"
     branch OK
   OK_HINT2:
-    printerr "Hint: create a link from libSDL-1.2.so.0 to libSDL_image.so to disable the error messages.\n"
+    printerr "Hint: use -X or export SDLLIBPATH or create a link from libSDL-1.2.so.0 to libSDL_image.so to disable the error messages.\n"
   OK:
 
     .local string c_func_name
@@ -158,9 +159,11 @@ failed:
     set_hll_global ['SDL'; 'NCI'], 'WaitEvent', sdl_function
     dlfunc sdl_function, libsdl, 'SDL_PollEvent', 'ip'
     set_hll_global ['SDL'; 'NCI'], 'PollEvent', sdl_function
-    dlfunc sdl_function, libsdl, 'SDL_GetKeyName', 'ti'
+    #was 'ti'
+    dlfunc sdl_function, libsdl, 'SDL_GetKeyName', 'pi'
     set_hll_global ['SDL'; 'NCI'], 'GetKeyName', sdl_function
-    dlfunc sdl_function, libsdl, 'SDL_GetError', 'tv'
+    #was 'tv'
+    dlfunc sdl_function, libsdl, 'SDL_GetError', 'pv'
     set_hll_global ['SDL'; 'NCI'], 'GetError', sdl_function
     dlfunc sdl_function, libsdl, 'SDL_SetColorKey', 'ipii'
     set_hll_global ['SDL'; 'NCI'], 'SetColorKey', sdl_function

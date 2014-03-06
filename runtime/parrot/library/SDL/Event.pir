@@ -95,9 +95,7 @@ this directly, unless you're working with raw SDL calls.
 
     .local pmc layout
     .local string ename
-
-    ename = 'Event::'
-    concat ename, name
+    ename = concat 'Event::', name
 
     layout = fetch_layout( ename )
     assign event, layout
