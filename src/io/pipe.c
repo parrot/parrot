@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -29,7 +29,6 @@ This file implements the IO_VTABLE for pipes and helper functions.
 static void io_pipe_adv_position(PARROT_INTERP,
     ARGMOD(PMC *handle),
     size_t offset)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
@@ -51,7 +50,6 @@ static const STR_VTABLE * io_pipe_get_encoding(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 static INTVAL io_pipe_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static PIOHANDLE io_pipe_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
@@ -59,7 +57,6 @@ static PIOHANDLE io_pipe_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
         __attribute__nonnull__(2);
 
 static PIOOFF_T io_pipe_get_position(PARROT_INTERP, ARGMOD(PMC *handle))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
@@ -105,20 +102,17 @@ static PIOOFF_T io_pipe_seek(PARROT_INTERP,
 static void io_pipe_set_eof(PARROT_INTERP,
     ARGMOD(PMC *handle),
     INTVAL is_set)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
 static void io_pipe_set_flags(PARROT_INTERP,
     ARGIN(PMC *handle),
     INTVAL flags)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void io_pipe_set_position(PARROT_INTERP,
     ARGMOD(PMC *handle),
     PIOOFF_T pos)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
@@ -128,7 +122,6 @@ static PIOOFF_T io_pipe_tell(PARROT_INTERP, ARGMOD(PMC *handle))
         FUNC_MODIFIES(*handle);
 
 static size_t io_pipe_total_size(PARROT_INTERP, ARGIN(PMC *handle))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static INTVAL io_pipe_write_b(PARROT_INTERP,
@@ -141,8 +134,7 @@ static INTVAL io_pipe_write_b(PARROT_INTERP,
         FUNC_MODIFIES(*handle);
 
 #define ASSERT_ARGS_io_pipe_adv_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle))
+       PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_pipe_close __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -153,14 +145,12 @@ static INTVAL io_pipe_write_b(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_pipe_get_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle))
+       PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_pipe_get_piohandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_pipe_get_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle))
+       PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_pipe_is_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -180,20 +170,16 @@ static INTVAL io_pipe_write_b(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_pipe_set_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle))
+       PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_pipe_set_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle))
+       PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_pipe_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle))
+       PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_pipe_tell __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_pipe_total_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle))
+       PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_pipe_write_b __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \
@@ -332,7 +318,7 @@ io_pipe_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
 }
 
 static void
-io_pipe_set_eof(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL is_set)
+io_pipe_set_eof(SHIM_INTERP, ARGMOD(PMC *handle), INTVAL is_set)
 {
     ASSERT_ARGS(io_pipe_set_eof)
     if (is_set)
@@ -394,7 +380,7 @@ Pipes don't keep track of position. Ignore.
 */
 
 static void
-io_pipe_adv_position(PARROT_INTERP, ARGMOD(PMC *handle), size_t offset)
+io_pipe_adv_position(SHIM_INTERP, ARGMOD(PMC *handle), size_t offset)
 {
     ASSERT_ARGS(io_pipe_adv_position)
     UNUSED(handle);
@@ -414,7 +400,7 @@ Pipes don't keep track of position. Ignore.
 */
 
 static void
-io_pipe_set_position(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T pos)
+io_pipe_set_position(SHIM_INTERP, ARGMOD(PMC *handle), PIOOFF_T pos)
 {
     ASSERT_ARGS(io_pipe_set_position)
     UNUSED(handle);
@@ -433,9 +419,10 @@ Pipes don't keep track of position. Return 0.
 */
 
 static PIOOFF_T
-io_pipe_get_position(PARROT_INTERP, ARGMOD(PMC *handle))
+io_pipe_get_position(SHIM_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_pipe_get_position)
+    UNUSED(handle);
     /* Pipes don't keep track of file position internally. Return 0 */
     return (PIOOFF_T)0;
 }
@@ -577,7 +564,7 @@ Set flags on the Pipe.
 */
 
 static void
-io_pipe_set_flags(PARROT_INTERP, ARGIN(PMC *handle), INTVAL flags)
+io_pipe_set_flags(SHIM_INTERP, ARGIN(PMC *handle), INTVAL flags)
 {
     ASSERT_ARGS(io_pipe_set_flags)
     PARROT_FILEHANDLE(handle)->flags = flags;
@@ -594,7 +581,7 @@ Get the flags from the pipe.
 */
 
 static INTVAL
-io_pipe_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
+io_pipe_get_flags(SHIM_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_pipe_get_flags)
     return PARROT_FILEHANDLE(handle)->flags;
@@ -611,9 +598,10 @@ Pipes have an unknown total size.
 */
 
 static size_t
-io_pipe_total_size(PARROT_INTERP, ARGIN(PMC *handle))
+io_pipe_total_size(SHIM_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_pipe_total_size)
+    UNUSED(handle);
     return PIO_UNKNOWN_SIZE;
 }
 

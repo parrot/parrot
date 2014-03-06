@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -31,7 +31,6 @@ The StringHandle IO_VTABLE and helper methods.
 static void io_stringhandle_adv_position(PARROT_INTERP,
     ARGMOD(PMC *handle),
     size_t offset)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
@@ -53,7 +52,6 @@ static const STR_VTABLE * io_stringhandle_get_encoding(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 static INTVAL io_stringhandle_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static PIOHANDLE io_stringhandle_get_piohandle(PARROT_INTERP,
@@ -116,13 +114,11 @@ static void io_stringhandle_set_eof(PARROT_INTERP,
 static void io_stringhandle_set_flags(PARROT_INTERP,
     ARGIN(PMC *handle),
     INTVAL flags)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void io_stringhandle_set_position(PARROT_INTERP,
     ARGMOD(PMC *handle),
     PIOOFF_T pos)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
@@ -145,8 +141,7 @@ static INTVAL io_stringhandle_write_b(PARROT_INTERP,
         FUNC_MODIFIES(*handle);
 
 #define ASSERT_ARGS_io_stringhandle_adv_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle))
+       PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_stringhandle_close __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -157,8 +152,7 @@ static INTVAL io_stringhandle_write_b(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_stringhandle_get_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle))
+       PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_stringhandle_get_piohandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -187,11 +181,9 @@ static INTVAL io_stringhandle_write_b(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_stringhandle_set_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle))
+       PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_stringhandle_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle))
+       PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_stringhandle_tell __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -453,7 +445,7 @@ Fall back to io_stringhandle_tell;
 */
 
 static void
-io_stringhandle_adv_position(PARROT_INTERP, ARGMOD(PMC *handle), size_t offset)
+io_stringhandle_adv_position(SHIM_INTERP, ARGMOD(PMC *handle), size_t offset)
 {
     ASSERT_ARGS(io_stringhandle_adv_position)
     UNUSED(handle)
@@ -462,7 +454,7 @@ io_stringhandle_adv_position(PARROT_INTERP, ARGMOD(PMC *handle), size_t offset)
 }
 
 static void
-io_stringhandle_set_position(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T pos)
+io_stringhandle_set_position(SHIM_INTERP, ARGMOD(PMC *handle), PIOOFF_T pos)
 {
     ASSERT_ARGS(io_stringhandle_set_position)
     UNUSED(handle)
@@ -601,14 +593,14 @@ Get the flags from the StringHandle.
 */
 
 static void
-io_stringhandle_set_flags(PARROT_INTERP, ARGIN(PMC *handle), INTVAL flags)
+io_stringhandle_set_flags(SHIM_INTERP, ARGIN(PMC *handle), INTVAL flags)
 {
     ASSERT_ARGS(io_stringhandle_set_flags)
     PARROT_STRINGHANDLE(handle)->flags = flags;
 }
 
 static INTVAL
-io_stringhandle_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
+io_stringhandle_get_flags(SHIM_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_stringhandle_get_flags)
     return PARROT_STRINGHANDLE(handle)->flags;

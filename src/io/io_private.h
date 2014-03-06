@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -165,7 +165,7 @@ struct _ParrotIOData {
 
 /* Get an editable version of the IO_VTABLE structure, typically used during
    vtable initialization. */
-#define IO_EDITABLE_IO_VTABLE(i, idx) ((IO_VTABLE *)(void *)(&((i)->piodata->vtables[(idx)])))
+#define IO_EDITABLE_IO_VTABLE(i, idx) (IO_VTABLE *)(&((i)->piodata->vtables[(idx)]))
 
 
 /* HEADERIZER BEGIN: src/io/utilities.c */
