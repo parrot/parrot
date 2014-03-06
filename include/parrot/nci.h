@@ -1,5 +1,5 @@
 /* nci.h
- *  Copyright (C) 2001-2007, Parrot Foundation.
+ *  Copyright (C) 2001-2014, Parrot Foundation.
  *  Overview:
  *     The nci API handles building native call frames
  *  Data Structure and Algorithms:

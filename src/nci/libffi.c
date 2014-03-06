@@ -1,6 +1,4 @@
-/* Copyright (C) 2010, Parrot Foundation.
-
-
+/* Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -86,6 +84,7 @@ typedef union nci_var_t {
 #endif
     void   *p;
     INTVAL  I; FLOATVAL N; STRING *S; PMC *P;
+    char   *t;
 } nci_var_t;
 
 
@@ -340,6 +339,7 @@ nci_to_ffi_type(SHIM_INTERP, PARROT_DATA_TYPE nci_t)
       case enum_type_INTVAL:     return &ffi_type_parrot_intval;
 
       case enum_type_STRING:
+      case enum_type_cstr:
       case enum_type_ptr:
       case enum_type_PMC:
                                  return &ffi_type_pointer;
@@ -432,6 +432,13 @@ prep_pcc_ret_arg(PARROT_INTERP, PARROT_DATA_TYPE t, parrot_var_t *pv, void **rv,
         pv->s = *(STRING **)val;
         *rv   = &pv->s;
         break;
+      case enum_type_cstr:
+        {
+          char *s = *(char **)val;
+          pv->s = Parrot_str_new(interp, s, 0);
+          *rv   = &pv->s;
+        }
+        break;
       case enum_type_PMC:
         pv->p = *(PMC **)val;
         *rv   = &pv->p;
@@ -448,8 +455,7 @@ prep_pcc_ret_arg(PARROT_INTERP, PARROT_DATA_TYPE t, parrot_var_t *pv, void **rv,
         break;
 
       default:
-        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_KEY_NOT_FOUND,
-                "Impossible NCI signature code");
+        Parrot_ex_throw_from_c_args(interp, NULL, 0, "Invalid NCI signature code %c", (char)t);
     }
 }
 
@@ -522,7 +528,7 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
                     pcc_arg_ptr[i] = &pcc_arg[i].p;
                     break;
                 default:
-                    PARROT_ASSERT(!"Impossible PCC signature");
+                    PARROT_ASSERT(!"Invalid PCC signature");
                     break;
             }
 
@@ -622,6 +628,19 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
                                     VTABLE_get_pointer(interp, pcc_arg[i].p);
                 nci_arg_ptr[i] = &nci_val[i].p;
                 break;
+              case enum_type_cstr:
+                nci_val[i].t   = STRING_IS_NULL(pcc_arg[i].s) ?
+                                    (char *)NULL :
+                                    Parrot_str_to_cstring(interp, pcc_arg[i].s);
+                nci_arg_ptr[i] = &nci_val[i].t;
+#if 0
+                translation_pointers[i] = STRING_IS_NULL(pcc_arg[j].s) ?
+                    (char *)NULL :
+                    Parrot_str_to_cstring(interp, pcc_arg[j].s);
+                j++;
+                values[i] = &translation_pointers[i];
+#endif
+                break;
 
               default:
                 PARROT_ASSERT("Unhandled NCI signature");
@@ -668,6 +687,7 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
         for (j = 1; i < pcc_retc; j++) {
             arg_t = (PARROT_DATA_TYPE)VTABLE_get_integer_keyed_int(interp, nci->signature, j);
             if (arg_t & enum_type_ref_flag) {
+                /* TODO return t */
                 prep_pcc_ret_arg(interp, (PARROT_DATA_TYPE)(arg_t & ~enum_type_ref_flag),
                                     &pcc_retv[i], &call_arg[i + 3], nci_arg[j - 1]);
                 i++;
