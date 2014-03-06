@@ -44,6 +44,7 @@ extern INTVAL imcc_compile_buffer_safe(ARGMOD(imc_info_t *imcc),
         yyscan_t yyscanner, ARGIN(STRING *source), int is_file, int is_pasm);
 
 int at_eof(yyscan_t yyscanner);
+PIOHANDLE determine_input_file_type(imc_info_t * imcc, STRING *sourcefile);
 
 #endif /* PARROT_IMCC_PARSER_H_GUARD */
 

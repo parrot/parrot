@@ -5267,6 +5267,7 @@ handle_identifier(ARGMOD(imc_info_t *imcc), YYSTYPE *valp, const char *text)
 
 /*
  * Local variables:
+ *   mode: c
  *   c-file-style: "parrot"
  * End:
  * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :

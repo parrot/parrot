@@ -40,9 +40,6 @@ IMCC helpers.
 
 extern int yydebug;
 
-/* defined in imcc.l */
-PIOHANDLE determine_input_file_type(imc_info_t * imcc, STRING *sourcefile);
-
 /* HEADERIZER HFILE: include/imcc/embed.h */
 
 /* HEADERIZER BEGIN: static */
