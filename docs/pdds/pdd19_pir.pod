@@ -1077,9 +1077,9 @@ the value of a macro parameter, like so:
 
 =end PIR
 
-=head4 Unique local variables
+=head4 Unique local variables I<(not yet implemented)>
 
-B<Note: this is not yet implemented in IMCC>.
+B<Note: This is not yet implemented in IMCC>.
 
 Within the macro body, the user can declare a local variable with a unique
 name.
