@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -1008,6 +1008,7 @@ gc_gms_process_dirty_list(PARROT_INTERP,
         ARGIN(Parrot_Pointer_Array *dirty_list))
 {
     ASSERT_ARGS(gc_gms_process_dirty_list)
+    UNUSED(self);
 
     POINTER_ARRAY_ITER(dirty_list,
         PMC * const pmc = &((pmc_alloc_struct *)ptr)->pmc;
@@ -2161,6 +2162,8 @@ static size_t
 gc_gms_count_used_string_memory(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *list))
 {
     ASSERT_ARGS(gc_gms_count_used_string_memory)
+    UNUSED(interp);
+    UNUSED(list);
 
     size_t total_amount = 0;
 #if 0
@@ -2198,6 +2201,8 @@ static size_t
 gc_gms_count_used_pmc_memory(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *list))
 {
     ASSERT_ARGS(gc_gms_count_used_pmc_memory)
+    UNUSED(interp);
+    UNUSED(list);
 
     size_t total_amount = 0;
 #if 0

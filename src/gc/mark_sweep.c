@@ -502,6 +502,7 @@ Parrot_append_arena_in_pool(PARROT_INTERP,
         ARGMOD(Fixed_Size_Arena *new_arena), size_t size)
 {
     ASSERT_ARGS(Parrot_append_arena_in_pool)
+    UNUSED(mem_pools);
 
     /* Maintain the *_arena_memory invariant for stack walking code. Set it
      * regardless if we're the first pool to be added. */
