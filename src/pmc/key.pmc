@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -74,7 +74,7 @@ Creates and returns a clone of the key.
               case KEY_pmc_FLAG:
               case KEY_pmc_FLAG | KEY_register_FLAG:
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-                        "this is broken - see TT #1683");
+                        "Key.clone of pmc is broken - see TT #1683");
               default:
                 break;
             }
@@ -190,7 +190,7 @@ Sets the value of the key to C<*value>.
         UNUSED(SELF)
         UNUSED(value)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
-                "this is broken - see GH #499");
+                "Key.set_pmc is broken - see GH #499");
     }
 
 /*
@@ -520,12 +520,14 @@ Aggregate interface.
 
     /* returns integer, values taken from PCC */
     METHOD get_type() {
-        INTVAL ret;
+        INTVAL ret = 0;
         switch (KEY_get_FLAGS(SELF)) {
+#if 0
             case KEY_integer_FLAG:
             case KEY_integer_FLAG | KEY_register_FLAG:
                 ret = 0;
                 break;
+#endif
             case KEY_string_FLAG:
             case KEY_string_FLAG | KEY_register_FLAG:
                 ret = 1;
@@ -533,6 +535,8 @@ Aggregate interface.
             case KEY_pmc_FLAG:
             case KEY_pmc_FLAG | KEY_register_FLAG:
                 ret = 2;
+                break;
+            default:
                 break;
         }
 
