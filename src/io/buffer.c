@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -94,6 +94,7 @@ IO_BUFFER *
 Parrot_io_buffer_allocate(PARROT_INTERP, ARGMOD(PMC *owner), INTVAL flags,
         ARGIN_NULLOK(const STR_VTABLE *encoding), size_t init_size)
 {
+    UNUSED(owner)
     ASSERT_ARGS(Parrot_io_buffer_allocate)
     IO_BUFFER * const buffer =
             (IO_BUFFER *)Parrot_gc_allocate_fixed_size_storage(interp, sizeof (IO_BUFFER));
@@ -215,7 +216,7 @@ the buffer.
 */
 
 size_t
-Parrot_io_buffer_resize(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), size_t new_size)
+Parrot_io_buffer_resize(SHIM_INTERP, ARGMOD(IO_BUFFER *buffer), size_t new_size)
 {
     ASSERT_ARGS(Parrot_io_buffer_resize)
     if (new_size == BUFFER_SIZE_ANY)
@@ -263,7 +264,7 @@ Clear the buffer, erasing all data and normalizing all pointers.
 */
 
 void
-Parrot_io_buffer_clear(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
+Parrot_io_buffer_clear(SHIM_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
 {
     ASSERT_ARGS(Parrot_io_buffer_clear)
     if (!buffer)
@@ -513,7 +514,7 @@ writing.
 */
 
 static void
-io_buffer_add_bytes(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer), ARGIN(char *s),
+io_buffer_add_bytes(SHIM_INTERP, ARGMOD(IO_BUFFER *buffer), ARGIN(char *s),
         size_t length)
 {
     ASSERT_ARGS(io_buffer_add_bytes)

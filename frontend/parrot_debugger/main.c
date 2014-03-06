@@ -266,7 +266,8 @@ static void
 PDB_run_code(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
 {
     ASSERT_ARGS(PDB_run_code)
-    UNUSED(argc);
+    UNUSED(argc)
+    UNUSED(argv)
 
     new_runloop_jump_point(interp);
     if (setjmp(interp->current_runloop->resume)) {

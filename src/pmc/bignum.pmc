@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2012, Parrot Foundation.
+Copyright (C) 2004-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -1063,14 +1063,16 @@ bignum_neg(PARROT_INTERP, ARGIN(PMC *self), ARGMOD(PMC *dest)) {
 }
 
 static INTVAL
-bignum_get_default_prec(PARROT_INTERP, ARGIN(PMC *self)) {
+bignum_get_default_prec(SHIM_INTERP, ARGIN(PMC *self)) {
+    UNUSED(self)
     ASSERT_ARGS(bignum_get_default_prec)
 
     return mpf_get_default_prec();
 }
 
 static void
-bignum_set_default_prec(PARROT_INTERP, ARGIN(PMC *self), INTVAL prec) {
+bignum_set_default_prec(SHIM_INTERP, ARGIN(PMC *self), INTVAL prec) {
+    UNUSED(self)
     ASSERT_ARGS(bignum_set_default_prec)
 
     mpf_set_default_prec(prec);
