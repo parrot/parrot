@@ -675,7 +675,6 @@ the given Parrot IO PMC.
 */
 
 PARROT_IGNORABLE_RESULT
-PARROT_INLINE
 int
 imcc_vfprintf(ARGMOD(imc_info_t * imcc), ARGMOD(PMC *io),
         ARGIN(const char *format), va_list ap)
