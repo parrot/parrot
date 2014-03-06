@@ -1,11 +1,12 @@
 #!perl
-# Copyright (C) 2008-2009, Parrot Foundation.
+# Copyright (C) 2008-2014, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test tests => 21;
+$ENV{TEST_PROG_ARGS} ||= '';
 
 pir_error_output_like( <<'CODE', <<'OUT', 'invalid get_results syntax');
 .sub main :main
@@ -15,7 +16,9 @@ CODE
 /syntax error/
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'cannot constant fold div by 0');
+SKIP: {
+  skip "invalid -O2 test GH #1049", 1 if $ENV{TEST_PROG_ARGS} =~ / -O2/;
+  pir_output_is( <<'CODE', <<'OUT', 'cannot constant fold div by 0');
 .sub fold_by_zero :main
   push_eh ok1
     $I1 = 1/0
@@ -35,6 +38,7 @@ CODE
 ok 1 - caught div_i_ic_ic exception
 ok 2 - caught div_n_nc_nc exception
 OUT
+}
 
 pir_output_is( <<'CODE', <<'OUT', 'fold symbolic constants (GH #473)');
 .sub main :main
