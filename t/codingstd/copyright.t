@@ -82,12 +82,12 @@ foreach my $file (@files) {
         $endyear = $startyear unless $endyear;
         if ($path !~ m{(ext/|lib/Pod/).*\.pod$}) {
             # see if they are up-to-date
-            my $g1 = `git log "$path" | grep '^Date' | tail -n 1`;
-            my $g2 = `git log "$path" | grep '^Date' | head -n 1`;
-            my ($y1) = $g1 =~ /^Date:.* (20\d\d) /;
-            my ($y2) = $g2 =~ /^Date:.* (20\d\d) /;
+            my $g1 = `git log --reverse --format="%ai" "$path" | head -n 1`;
+            my $g2 = `git log -n 1 --format="%ai" "$path" | head -n 1`;
+            my ($y1) = $g1 =~ /^(\d\d\d\d)-/;
+            my ($y2) = $g2 =~ /^(\d\d\d\d)-/;
             push @wrong_date_copyright_files, [ $path, $startyear, $endyear, $y1, $y2 ]
-              if ($startyear and $y1 ne $startyear) or ($y2 ne $endyear);
+              if ($startyear and $y1 and $y1 ne $startyear) or ($endyear and $y2 and $y2 ne $endyear);
         }
     }
 
