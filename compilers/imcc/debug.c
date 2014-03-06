@@ -257,6 +257,7 @@ Prints a instruction debug message to STDERR, if IMCC's debug mode is turned on.
 void
 IMCC_debug_ins(ARGMOD(imc_info_t *imcc), int level, ARGIN(const Instruction *ins))
 {
+    ASSERT_ARGS(IMCC_debug_ins)
     PIOHANDLE pstderr;
     if (!(level & imcc->debug))
         return;
