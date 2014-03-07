@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2010, Parrot Foundation.
+Copyright (C) 2004-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -229,10 +229,9 @@ PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 PARROT_CANNOT_RETURN_NULL
 const STR_VTABLE *
-Parrot_load_encoding(PARROT_INTERP, ARGIN(const char *encodingname))
+Parrot_load_encoding(PARROT_INTERP, SHIM(const char *encodingname))
 {
     ASSERT_ARGS(Parrot_load_encoding)
-    UNUSED(encodingname);
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
         "Can't load encodings yet");
 }

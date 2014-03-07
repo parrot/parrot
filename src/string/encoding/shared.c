@@ -469,6 +469,7 @@ C<offset> is the wrong offset into the string C<s>.
 
 */
 
+PARROT_DOES_NOT_RETURN
 void
 encoding_ord_error(PARROT_INTERP, ARGIN(const STRING *s), INTVAL offset)
 {
@@ -1440,6 +1441,7 @@ convert_case_buf(PARROT_INTERP, ARGMOD_NULLOK(char *dest_buf), size_t dest_len,
 #if PARROT_HAS_ICU
     UErrorCode err = U_ZERO_ERROR;
     int        res;
+    UNUSED(interp);
 
     switch (mode) {
       case ENCODING_UPCASE:

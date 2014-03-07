@@ -29,10 +29,8 @@ The StringHandle IO_VTABLE and helper methods.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void io_stringhandle_adv_position(PARROT_INTERP,
-    ARGMOD(PMC *handle),
-    size_t offset)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*handle);
+    PMC *handle,
+    size_t offset);
 
 static INTVAL io_stringhandle_close(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(1)
@@ -105,11 +103,8 @@ static PIOOFF_T io_stringhandle_seek(PARROT_INTERP,
         FUNC_MODIFIES(*handle);
 
 static void io_stringhandle_set_eof(PARROT_INTERP,
-    ARGMOD(PMC *handle),
-    INTVAL is_set)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*handle);
+    PMC *handle,
+    INTVAL is_set);
 
 static void io_stringhandle_set_flags(PARROT_INTERP,
     ARGIN(PMC *handle),
@@ -117,10 +112,8 @@ static void io_stringhandle_set_flags(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 static void io_stringhandle_set_position(PARROT_INTERP,
-    ARGMOD(PMC *handle),
-    PIOOFF_T pos)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*handle);
+    PMC *handle,
+    PIOOFF_T pos);
 
 static PIOOFF_T io_stringhandle_tell(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(1)
@@ -140,8 +133,7 @@ static INTVAL io_stringhandle_write_b(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*handle);
 
-#define ASSERT_ARGS_io_stringhandle_adv_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_stringhandle_adv_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_io_stringhandle_close __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -177,13 +169,10 @@ static INTVAL io_stringhandle_write_b(PARROT_INTERP,
 #define ASSERT_ARGS_io_stringhandle_seek __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
-#define ASSERT_ARGS_io_stringhandle_set_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_stringhandle_set_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_io_stringhandle_set_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(handle))
-#define ASSERT_ARGS_io_stringhandle_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_stringhandle_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_io_stringhandle_tell __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -352,12 +341,9 @@ io_stringhandle_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
 }
 
 static void
-io_stringhandle_set_eof(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL is_set)
+io_stringhandle_set_eof(SHIM_INTERP, SHIM(PMC *handle), SHIM(INTVAL is_set))
 {
     ASSERT_ARGS(io_stringhandle_set_eof)
-    UNUSED(interp);
-    UNUSED(handle);
-    UNUSED(is_set);
 }
 
 /*
@@ -445,20 +431,16 @@ Fall back to io_stringhandle_tell;
 */
 
 static void
-io_stringhandle_adv_position(SHIM_INTERP, ARGMOD(PMC *handle), size_t offset)
+io_stringhandle_adv_position(SHIM_INTERP, SHIM(PMC *handle), SHIM(size_t offset))
 {
     ASSERT_ARGS(io_stringhandle_adv_position)
-    UNUSED(handle)
-    UNUSED(offset)
     /* StringHandle keeps track of position directly. Ignore this. */
 }
 
 static void
-io_stringhandle_set_position(SHIM_INTERP, ARGMOD(PMC *handle), PIOOFF_T pos)
+io_stringhandle_set_position(SHIM_INTERP, SHIM(PMC *handle), SHIM(PIOOFF_T pos))
 {
     ASSERT_ARGS(io_stringhandle_set_position)
-    UNUSED(handle)
-    UNUSED(pos)
     /* StringHandle keeps track of position directly. Ignore this. */
 }
 

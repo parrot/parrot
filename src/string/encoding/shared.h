@@ -85,6 +85,7 @@ INTVAL encoding_is_cclass(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(3);
 
+PARROT_DOES_NOT_RETURN
 void encoding_ord_error(PARROT_INTERP,
     ARGIN(const STRING *s),
     INTVAL offset)

@@ -1697,9 +1697,7 @@ pcc_result:
    | LOCAL { imcc->is_def = 1; } type id_list_id
          {
            IdList * const l = $4;
-           SymReg *ignored;
-           ignored = mk_ident(imcc, l->id, $3, VTIDENTIFIER);
-           UNUSED(ignored);
+           (void)mk_ident(imcc, l->id, $3, VTIDENTIFIER);
            imcc->is_def = 0;
            $$ = 0;
          }

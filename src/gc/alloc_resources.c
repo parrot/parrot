@@ -622,9 +622,11 @@ Parrot_gc_merge_memory_pools(ARGMOD(Interp *dest_interp),
 
         if (i >= dest_arena->num_sized
         || !dest_arena->sized_header_pools[i]) {
-            Fixed_Size_Pool *ignored = get_bufferlike_pool(dest_interp,
-                    dest_arena, i * sizeof (void *));
-            UNUSED(ignored);
+            /* XXX: What if a new pool get realloced at a different index?
+             *      Shouldn't we use the new pool instead?
+             */
+            (void)get_bufferlike_pool(dest_interp,
+                                      dest_arena, i * sizeof (void *));
             PARROT_ASSERT(dest_arena->sized_header_pools[i]);
         }
 

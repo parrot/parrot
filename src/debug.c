@@ -1,13 +1,13 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/debug.c - Parrot debugging
+src/debug.c - Parrot debugger support
 
 =head1 DESCRIPTION
 
-This file implements Parrot debugging and is used by C<parrot_debugger>,
+This file implements Parrot debugging and is used by C<parrot_debugger>
 the Parrot debugger, and the C<debug> ops.
 
 =head2 Functions
@@ -130,9 +130,8 @@ static void dbg_list(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void dbg_listbreakpoints(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+static void dbg_listbreakpoints(ARGIN(PDB_t *pdb), const char *cmd)
+        __attribute__nonnull__(1);
 
 static void dbg_load(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
         __attribute__nonnull__(1)
@@ -286,8 +285,7 @@ static const char * skip_whitespace(ARGIN(const char *cmd))
        PARROT_ASSERT_ARG(pdb) \
     , PARROT_ASSERT_ARG(cmd))
 #define ASSERT_ARGS_dbg_listbreakpoints __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(pdb) \
-    , PARROT_ASSERT_ARG(cmd))
+       PARROT_ASSERT_ARG(pdb))
 #define ASSERT_ARGS_dbg_load __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(pdb) \
     , PARROT_ASSERT_ARG(cmd))
@@ -575,11 +573,10 @@ dbg_list(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
 }
 
 static void
-dbg_listbreakpoints(ARGIN(PDB_t *pdb), ARGIN(const char *cmd))
+dbg_listbreakpoints(ARGIN(PDB_t *pdb), SHIM(const char *cmd))
 {
     ASSERT_ARGS(dbg_listbreakpoints)
 
-    UNUSED(cmd);
     TRACEDEB_MSG("dbg_list");
 
     list_breakpoints(pdb);
@@ -3435,14 +3432,14 @@ C<eval>s an instruction.
 */
 
 void
-PDB_eval(PARROT_INTERP, ARGIN(const char *command))
+PDB_eval(PARROT_INTERP, SHIM(const char *command))
 {
     ASSERT_ARGS(PDB_eval)
 
     Interp *warninterp = (interp->pdb && interp->pdb->debugger) ?
         interp->pdb->debugger : interp;
     TRACEDEB_MSG("PDB_eval");
-    UNUSED(command);
+
     Parrot_io_eprintf(warninterp, "The eval command is currently unimplemeneted\n");
 }
 

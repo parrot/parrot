@@ -31,9 +31,8 @@ This file implements the Socket IO_VTABLE and some helper routines.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void io_socket_adv_position(PARROT_INTERP,
-    ARGMOD(PMC *handle),
+    ARGMOD_NULLOK(PMC *handle),
     size_t offset)
-        __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
 static INTVAL io_socket_close(PARROT_INTERP, ARGMOD(PMC *handle))
@@ -41,10 +40,7 @@ static INTVAL io_socket_close(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
-static INTVAL io_socket_flush(PARROT_INTERP, ARGMOD(PMC *handle))
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*handle);
-
+static INTVAL io_socket_flush(PARROT_INTERP, ARGIN_NULLOK(PMC *handle));
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const STR_VTABLE * io_socket_get_encoding(PARROT_INTERP,
@@ -52,21 +48,16 @@ static const STR_VTABLE * io_socket_get_encoding(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static INTVAL io_socket_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
-        __attribute__nonnull__(2);
-
+static INTVAL io_socket_get_flags(PARROT_INTERP, ARGIN_NULLOK(PMC *handle));
 static PIOHANDLE io_socket_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static PIOOFF_T io_socket_get_position(PARROT_INTERP, ARGMOD(PMC *handle))
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*handle);
+static PIOOFF_T io_socket_get_position(PARROT_INTERP,
+    ARGIN_NULLOK(PMC *handle));
 
-static INTVAL io_socket_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*handle);
+static INTVAL io_socket_is_eof(PARROT_INTERP, ARGIN(PMC *handle))
+        __attribute__nonnull__(2);
 
 static INTVAL io_socket_is_open(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(1)
@@ -75,13 +66,11 @@ static INTVAL io_socket_is_open(PARROT_INTERP, ARGMOD(PMC *handle))
 
 static INTVAL io_socket_open(PARROT_INTERP,
     ARGMOD(PMC *handle),
-    ARGIN(STRING *path),
+    STRING *path,
     INTVAL flags,
-    ARGIN(STRING * mode))
+    STRING * mode)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(5)
         FUNC_MODIFIES(*handle);
 
 static INTVAL io_socket_read_b(PARROT_INTERP,
@@ -103,21 +92,16 @@ static PIOOFF_T io_socket_seek(PARROT_INTERP,
         FUNC_MODIFIES(*handle);
 
 static void io_socket_set_eof(PARROT_INTERP,
-    ARGMOD(PMC *handle),
-    INTVAL is_eof)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*handle);
+    ARGIN_NULLOK(PMC *handle),
+    INTVAL is_eof);
 
 static void io_socket_set_flags(PARROT_INTERP,
-    ARGIN(PMC *handle),
-    INTVAL flags)
-        __attribute__nonnull__(2);
+    ARGIN_NULLOK(PMC *handle),
+    INTVAL flags);
 
 static void io_socket_set_position(PARROT_INTERP,
-    ARGMOD(PMC *handle),
+    ARGMOD_NULLOK(PMC *handle),
     PIOOFF_T pos)
-        __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
 static PIOOFF_T io_socket_tell(PARROT_INTERP, ARGMOD(PMC *handle))
@@ -138,34 +122,27 @@ static INTVAL io_socket_write_b(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*handle);
 
-#define ASSERT_ARGS_io_socket_adv_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_socket_adv_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_io_socket_close __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
-#define ASSERT_ARGS_io_socket_flush __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_socket_flush __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_io_socket_get_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
-#define ASSERT_ARGS_io_socket_get_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_socket_get_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_io_socket_get_piohandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
-#define ASSERT_ARGS_io_socket_get_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_socket_get_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_io_socket_is_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle))
+       PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_socket_is_open __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_socket_open __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle) \
-    , PARROT_ASSERT_ARG(path) \
-    , PARROT_ASSERT_ARG(mode))
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_socket_read_b __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \
@@ -173,13 +150,9 @@ static INTVAL io_socket_write_b(PARROT_INTERP,
 #define ASSERT_ARGS_io_socket_seek __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
-#define ASSERT_ARGS_io_socket_set_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle))
-#define ASSERT_ARGS_io_socket_set_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(handle))
-#define ASSERT_ARGS_io_socket_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_socket_set_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_io_socket_set_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_io_socket_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_io_socket_tell __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -285,10 +258,10 @@ Flush the socket. Currently this does nothing.
 */
 
 static INTVAL
-io_socket_flush(SHIM_INTERP, ARGMOD(PMC *handle))
+io_socket_flush(SHIM_INTERP, ARGIN_NULLOK(PMC *handle))
 {
     ASSERT_ARGS(io_socket_flush)
-    UNUSED(handle)
+    UNUSED(handle);
     /* TODO: Do we need to fsync the socket? */
     return 0;
 }
@@ -309,21 +282,18 @@ Do nothing.
 */
 
 static INTVAL
-io_socket_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
+io_socket_is_eof(SHIM_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_socket_is_eof)
-    UNUSED(interp);
-    UNUSED(handle);
+    UNUSED(handle)
     return 0;
 }
 
 static void
-io_socket_set_eof(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL is_eof)
+io_socket_set_eof(SHIM_INTERP, ARGIN_NULLOK(PMC *handle), SHIM(INTVAL is_eof))
 {
     ASSERT_ARGS(io_socket_set_eof)
-    UNUSED(interp);
     UNUSED(handle);
-    UNUSED(is_eof);
 }
 
 /*
@@ -357,12 +327,11 @@ Sockets do not have a concept of seek. Throw an exception.
 */
 
 static PIOOFF_T
-io_socket_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL whence)
+io_socket_seek(PARROT_INTERP, ARGMOD(PMC *handle), SHIM(PIOOFF_T offset), SHIM(INTVAL whence))
 {
     ASSERT_ARGS(io_socket_seek)
     const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
-    UNUSED(offset);
-    UNUSED(whence);
+    UNUSED(handle)
     IO_VTABLE_UNIMPLEMENTED(interp, vtable, "seek");
     return 0;
 }
@@ -388,28 +357,26 @@ Do nothing. Sockets don't keep track of position.
 */
 
 static void
-io_socket_adv_position(SHIM_INTERP, ARGMOD(PMC *handle), size_t offset)
+io_socket_adv_position(SHIM_INTERP, ARGMOD_NULLOK(PMC *handle), SHIM(size_t offset))
 {
     ASSERT_ARGS(io_socket_adv_position)
-    UNUSED(handle)
-    UNUSED(offset)
+    UNUSED(handle);
     /* Socket doesn't keep track of position internally. Ignore this. */
 }
 
 static void
-io_socket_set_position(SHIM_INTERP, ARGMOD(PMC *handle), PIOOFF_T pos)
+io_socket_set_position(SHIM_INTERP, ARGMOD_NULLOK(PMC *handle), SHIM(PIOOFF_T pos))
 {
     ASSERT_ARGS(io_socket_set_position)
-    UNUSED(handle)
-    UNUSED(pos)
+    UNUSED(handle);
     /* Socket doesn't keep track of position internally. Ignore. */
 }
 
 static PIOOFF_T
-io_socket_get_position(SHIM_INTERP, ARGMOD(PMC *handle))
+io_socket_get_position(SHIM_INTERP, ARGIN_NULLOK(PMC *handle))
 {
     ASSERT_ARGS(io_socket_get_position)
-    UNUSED(handle)
+    UNUSED(handle);
     /* Socket doesn't keep track of position internally. Return 0 */
     return (PIOOFF_T)0;
 }
@@ -426,14 +393,11 @@ Do nothing. Sockets use connect and accept instead of open.
 */
 
 static INTVAL
-io_socket_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path),
-        INTVAL flags, ARGIN(STRING * mode))
+io_socket_open(PARROT_INTERP, ARGMOD(PMC *handle), SHIM(STRING *path),
+               SHIM(INTVAL flags), SHIM(STRING * mode))
 {
     ASSERT_ARGS(io_socket_open)
     PIOHANDLE os_handle;
-    UNUSED(path);
-    UNUSED(flags);
-    UNUSED(mode);
     GETATTR_Socket_os_handle(interp, handle, os_handle);
     return Parrot_io_internal_flush(interp, os_handle);
 }
@@ -497,19 +461,18 @@ Return C<PIO_F_WRITE | PIO_F_READ>. Sockets are always flagged r/w.
 */
 
 static void
-io_socket_set_flags(SHIM_INTERP, ARGIN(PMC *handle), INTVAL flags)
+io_socket_set_flags(SHIM_INTERP, ARGIN_NULLOK(PMC *handle), SHIM(INTVAL flags))
 {
     ASSERT_ARGS(io_socket_set_flags)
-    UNUSED(handle)
-    UNUSED(flags)
+    UNUSED(handle);
     /* Ignore, for now */
 }
 
 static INTVAL
-io_socket_get_flags(SHIM_INTERP, ARGIN(PMC *handle))
+io_socket_get_flags(SHIM_INTERP, ARGIN_NULLOK(PMC *handle))
 {
     ASSERT_ARGS(io_socket_get_flags)
-    UNUSED(handle)
+    UNUSED(handle);
     /* For now, just say that all sockets are read/write handles */
     return PIO_F_WRITE | PIO_F_READ;
 }

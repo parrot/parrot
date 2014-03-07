@@ -403,7 +403,7 @@ _srand48(long seed)
 =item C<FLOATVAL Parrot_util_float_rand(INTVAL how_random)>
 
 Returns a C<FLOATVAL> uniformly distributed in the in the interval
-C<[0.0, 1.0]>.
+C<[0.0, 1.0]> via drand48()
 
 C<how_random> is currently ignored.
 
@@ -414,10 +414,9 @@ C<how_random> is currently ignored.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 FLOATVAL
-Parrot_util_float_rand(INTVAL how_random)
+Parrot_util_float_rand(SHIM(INTVAL how_random))
 {
     ASSERT_ARGS(Parrot_util_float_rand)
-    UNUSED(how_random);
 
     return _drand48();          /* [0.0..1.0] */
 }
@@ -426,7 +425,8 @@ Parrot_util_float_rand(INTVAL how_random)
 
 =item C<INTVAL Parrot_util_uint_rand(INTVAL how_random)>
 
-Returns an C<INTVAL> uniformly distributed in the interval C<[0, 2^31)>.
+Returns an C<INTVAL> uniformly distributed in the interval C<[0, 2^31)>
+via lrand48()
 
 C<how_random> is ignored.
 
@@ -437,10 +437,9 @@ C<how_random> is ignored.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_util_uint_rand(INTVAL how_random)
+Parrot_util_uint_rand(SHIM(INTVAL how_random))
 {
     ASSERT_ARGS(Parrot_util_uint_rand)
-    UNUSED(how_random);
 
     return _lrand48();          /* [0..2^31] */
 }
@@ -449,7 +448,8 @@ Parrot_util_uint_rand(INTVAL how_random)
 
 =item C<INTVAL Parrot_util_int_rand(INTVAL how_random)>
 
-Returns an C<INTVAL> in the interval C<[-2^31, 2^31)>.
+Returns an C<INTVAL> in the interval C<[-2^31, 2^31)>
+via mrand48()
 
 C<how_random> is ignored.
 
@@ -460,10 +460,9 @@ C<how_random> is ignored.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_util_int_rand(INTVAL how_random)
+Parrot_util_int_rand(SHIM(INTVAL how_random))
 {
     ASSERT_ARGS(Parrot_util_int_rand)
-    UNUSED(how_random);
 
     return _mrand48();          /* [-2^31..2^31] */
 }

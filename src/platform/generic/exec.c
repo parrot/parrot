@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2010, Parrot Foundation.
+ * Copyright (C) 2004-2014, Parrot Foundation.
  */
 
 /*
@@ -103,8 +103,7 @@ Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)
     if (child) {
         /* parent */
         int status;
-        pid_t returnstat = waitpid(child, &status, 0);
-        UNUSED(returnstat);
+        (void)waitpid(child, &status, 0);
         return status;
     }
     else {

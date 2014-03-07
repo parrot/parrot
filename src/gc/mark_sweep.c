@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -497,12 +497,11 @@ arenas structure, such as the number of objects allocated in it.
 
 void
 Parrot_append_arena_in_pool(PARROT_INTERP,
-        ARGMOD(Memory_Pools *mem_pools),
+        SHIM(Memory_Pools *mem_pools),
         ARGMOD(Fixed_Size_Pool *pool),
         ARGMOD(Fixed_Size_Arena *new_arena), size_t size)
 {
     ASSERT_ARGS(Parrot_append_arena_in_pool)
-    UNUSED(mem_pools);
 
     /* Maintain the *_arena_memory invariant for stack walking code. Set it
      * regardless if we're the first pool to be added. */
@@ -717,7 +716,6 @@ the pointer to the existing pool is returned.
 
 */
 
-PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Fixed_Size_Pool *
 get_bufferlike_pool(PARROT_INTERP,

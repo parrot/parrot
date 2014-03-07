@@ -538,11 +538,9 @@ location using C<seek>.
 void
 io_sync_buffers_for_write(PARROT_INTERP, ARGMOD(PMC *handle),
         ARGIN(const IO_VTABLE *vtable), ARGMOD_NULLOK(IO_BUFFER *read_buffer),
-        ARGMOD_NULLOK(IO_BUFFER * write_buffer))
+        SHIM(IO_BUFFER * write_buffer))
 {
     ASSERT_ARGS(io_sync_buffers_for_write)
-
-    UNUSED(write_buffer);
 
     /* If we have a read buffer, the on-disk file position is ahead of the
        current cursor. We need to clear the read buffer and reset the on-disk

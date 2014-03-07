@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -382,10 +382,11 @@ void
 Parrot_interp_destroy(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_interp_destroy)
-#ifdef ATEXIT_DESTROY
-    UNUSED(interp);
+
+#ifndef ATEXIT_DESTROY
+    Parrot_interp_really_destroy(interp, 0);
 #else
-   Parrot_interp_really_destroy(interp, 0);
+    UNUSED(interp)
 #endif
 }
 

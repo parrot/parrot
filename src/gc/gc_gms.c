@@ -393,10 +393,9 @@ static void gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header))
         __attribute__nonnull__(2);
 
 static void gc_gms_process_dirty_list(PARROT_INTERP,
-    ARGIN(MarkSweep_GC *self),
+    MarkSweep_GC *self,
     ARGIN(Parrot_Pointer_Array *dirty_list))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
 static void gc_gms_process_work_list(PARROT_INTERP,
@@ -580,7 +579,6 @@ static int gen2flags(int gen);
     , PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_gc_gms_process_dirty_list __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(dirty_list))
 #define ASSERT_ARGS_gc_gms_process_work_list __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -1004,11 +1002,10 @@ children into "work_list".
 */
 static void
 gc_gms_process_dirty_list(PARROT_INTERP,
-        ARGIN(MarkSweep_GC *self),
+        SHIM(MarkSweep_GC *self),
         ARGIN(Parrot_Pointer_Array *dirty_list))
 {
     ASSERT_ARGS(gc_gms_process_dirty_list)
-    UNUSED(self);
 
     POINTER_ARRAY_ITER(dirty_list,
         PMC * const pmc = &((pmc_alloc_struct *)ptr)->pmc;
@@ -2156,7 +2153,7 @@ Parrot_Pointer_Array *list)>
 
 find amount of used string memory
 
-Currently disabled, returns always C<0>.
+Only enabled with C<-DMEMORY_DEBUG> in C<ccflags>.
 
 =cut
 
@@ -2168,9 +2165,10 @@ gc_gms_count_used_string_memory(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *list)
     ASSERT_ARGS(gc_gms_count_used_string_memory)
 
     size_t total_amount = 0;
+#ifndef MEMORY_DEBUG
     UNUSED(interp)
     UNUSED(list)
-#if 0
+#else
     List_Item_Header *tmp = list->first;
     while (tmp) {
         List_Item_Header *next = tmp->next;
@@ -2195,7 +2193,7 @@ Parrot_Pointer_Array *list)>
 
 find amount of used pmc memory
 
-Currently disabled, returns always C<0>.
+Only enabled with C<-DMEMORY_DEBUG> in C<ccflags>.
 
 =cut
 
@@ -2207,9 +2205,10 @@ gc_gms_count_used_pmc_memory(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *list))
     ASSERT_ARGS(gc_gms_count_used_pmc_memory)
 
     size_t total_amount = 0;
+#ifndef MEMORY_DEBUG
     UNUSED(interp)
     UNUSED(list)
-#if 0
+#else
     List_Item_Header *tmp = list->first;
     while (tmp) {
         List_Item_Header *next = tmp->next;
@@ -2268,7 +2267,9 @@ static void
 gc_gms_check_sanity(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_check_sanity)
-#ifdef MEMORY_DEBUG
+#ifndef MEMORY_DEBUG
+    UNUSED(interp)
+#else
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t            i;
 
@@ -2300,8 +2301,6 @@ gc_gms_check_sanity(PARROT_INTERP)
         PARROT_GC_ASSERT_INTERP(pmc, interp);
         PARROT_ASSERT(!PObj_GC_on_dirty_list_TEST(pmc)
             || !"Dirty object in work_list"););
-#else
-    UNUSED(interp);
 #endif
 }
 

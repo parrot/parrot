@@ -98,7 +98,7 @@ actions on it.
 =cut
 
 inline op noop()  {
-    UNUSED(interp);
+    UNUSED(interp)
 }
 
 inline op check_events()  :flow {
@@ -236,6 +236,8 @@ Jump to the address held in register $1.
 
 inline op jump(in LABEL) :base_loop :flow {
     opcode_t * const loc = INTVAL2PTR(opcode_t *, $1);
+    UNUSED(interp);
+    UNUSED(cur_opcode);
     goto ADDRESS(loc);
 }
 

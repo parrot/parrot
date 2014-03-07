@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2010, Parrot Foundation.
+ * Copyright (C) 2002-2014, Parrot Foundation.
  */
 
 #include "imc.h"
@@ -165,11 +165,10 @@ PARROT_CAN_RETURN_NULL
 static subs_t * find_sub_by_subid(
     ARGMOD(imc_info_t * imcc),
     ARGIN(const char *lookup),
-    ARGIN(const subs_t *sym),
+    const subs_t *sym,
     ARGOUT(int *pc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*pc);
@@ -324,7 +323,6 @@ static void verify_signature(
 #define ASSERT_ARGS_find_sub_by_subid __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(lookup) \
-    , PARROT_ASSERT_ARG(sym) \
     , PARROT_ASSERT_ARG(pc))
 #define ASSERT_ARGS_fixup_globals __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
@@ -879,11 +877,10 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static subs_t *
 find_sub_by_subid(ARGMOD(imc_info_t * imcc), ARGIN(const char *lookup),
-    ARGIN(const subs_t *sym), ARGOUT(int *pc))
+    SHIM(const subs_t *sym), ARGOUT(int *pc))
 {
     ASSERT_ARGS(find_sub_by_subid)
     subs_t *s;
-    UNUSED(sym);
 
     *pc = 0;
 

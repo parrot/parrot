@@ -66,7 +66,6 @@ static Instruction * insINS(
         FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*unit);
 
-PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static Instruction* pcc_get_args(
     ARGMOD(imc_info_t * imcc),
@@ -203,7 +202,6 @@ used by expand_pcc_sub_call and expand_pcc_sub
 
 */
 
-PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static Instruction*
 pcc_get_args(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
@@ -437,9 +435,8 @@ expand_pcc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit), ARGIN(Instruct
                 "NULL sub->pcc_sub detected");
 
         {
-            Instruction *unused_ins = pcc_get_args(imcc, unit, unit->last_ins,
+            (void)pcc_get_args(imcc, unit, unit->last_ins,
                     "set_returns", 0, NULL, NULL);
-            UNUSED(unused_ins);
             tmp = INS(imcc, unit, "returncc", NULL, regs, 0, 0, 0);
         }
 

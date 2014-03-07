@@ -97,9 +97,8 @@ PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 PARROT_CANNOT_RETURN_NULL
 const STR_VTABLE * Parrot_load_encoding(PARROT_INTERP,
-    ARGIN(const char *encodingname))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+    const char *encodingname)
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 INTVAL Parrot_make_default_encoding(PARROT_INTERP,
@@ -143,8 +142,7 @@ void Parrot_str_internal_register_encoding_names(PARROT_INTERP)
     , PARROT_ASSERT_ARG(encodingname))
 #define ASSERT_ARGS_Parrot_get_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_load_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(encodingname))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_make_default_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(encodingname_unused) \
     , PARROT_ASSERT_ARG(encoding))

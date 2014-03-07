@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -384,8 +384,7 @@ Parrot_io_socket_handle(PARROT_INTERP, ARGMOD_NULLOK(PMC *socket), INTVAL fam,
             INTVAL type, INTVAL proto)
 {
     ASSERT_ARGS(Parrot_io_socket_handle)
-    PMC * const dummy = Parrot_io_socket(interp, socket, fam, type, proto);
-    UNUSED(dummy);
+    (void)Parrot_io_socket(interp, socket, fam, type, proto);
     /* For historical reasons, this function always returns 0 to signal
        unconditional success */
     return 0;

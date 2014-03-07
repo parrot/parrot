@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2010, Parrot Foundation.
+ * Copyright (C) 2002-2014, Parrot Foundation.
  */
 
 /*
@@ -821,14 +821,10 @@ int_overflows(ARGIN(const SymReg *r))
 
     errno = 0;
 
-    if (base == 10) {
-        long int unused = strtol(digits, NULL, base);
-        UNUSED(unused);
-    }
-    else {
-        unsigned long int unused = strtoul(digits + 2, NULL, base);
-        UNUSED(unused);
-    }
+    if (base == 10)
+        (void)strtol(digits, NULL, base);
+    else
+        (void)strtoul(digits + 2, NULL, base);
 
     return errno ? 1 : 0;
 }

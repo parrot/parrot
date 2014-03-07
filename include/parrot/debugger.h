@@ -306,9 +306,8 @@ char * PDB_escape(PARROT_INTERP, ARGIN(const char *string), UINTVAL length)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void PDB_eval(PARROT_INTERP, ARGIN(const char *command))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+void PDB_eval(PARROT_INTERP, const char *command)
+        __attribute__nonnull__(1);
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
@@ -438,8 +437,7 @@ void PDB_watchpoint(PARROT_INTERP, ARGIN(const char *command))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(string))
 #define ASSERT_ARGS_PDB_eval __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(command))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_PDB_find_breakpoint __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(command))

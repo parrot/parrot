@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2011, Parrot Foundation.
+Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -539,7 +539,8 @@ pool. The given C<char *why> text is used for debugging.
 
 static void
 alloc_new_block(PARROT_INTERP, ARGMOD(GC_Statistics *stats),
-        size_t size, ARGMOD(Variable_Size_Pool *pool), ARGIN(const char *why))
+                size_t size, ARGMOD(Variable_Size_Pool *pool),
+                ARGIN(const char *why))
 {
     ASSERT_ARGS(alloc_new_block)
     Memory_Block *new_block;

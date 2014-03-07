@@ -196,10 +196,9 @@ Flags can be a combination of these values:
 */
 
 static void
-gc_inf_mark_and_sweep(SHIM_INTERP, UINTVAL flags)
+gc_inf_mark_and_sweep(SHIM_INTERP, SHIM(UINTVAL flags))
 {
     ASSERT_ARGS(gc_inf_mark_and_sweep)
-    UNUSED(flags);
 }
 
 /*

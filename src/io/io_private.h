@@ -272,13 +272,12 @@ void io_sync_buffers_for_write(PARROT_INTERP,
     ARGMOD(PMC *handle),
     ARGIN(const IO_VTABLE *vtable),
     ARGMOD_NULLOK(IO_BUFFER *read_buffer),
-    ARGMOD_NULLOK(IO_BUFFER * write_buffer))
+    IO_BUFFER * write_buffer)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*handle)
-        FUNC_MODIFIES(*read_buffer)
-        FUNC_MODIFIES(* write_buffer);
+        FUNC_MODIFIES(*read_buffer);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL

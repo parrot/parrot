@@ -27,9 +27,8 @@ This file implements the IO_VTABLE for pipes and helper functions.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void io_pipe_adv_position(PARROT_INTERP,
-    ARGMOD(PMC *handle),
+    ARGMOD_NULLOK(PMC *handle),
     size_t offset)
-        __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
 static INTVAL io_pipe_close(PARROT_INTERP, ARGMOD(PMC *handle))
@@ -56,8 +55,8 @@ static PIOHANDLE io_pipe_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static PIOOFF_T io_pipe_get_position(PARROT_INTERP, ARGMOD(PMC *handle))
-        __attribute__nonnull__(2)
+static PIOOFF_T io_pipe_get_position(PARROT_INTERP,
+    ARGMOD_NULLOK(PMC *handle))
         FUNC_MODIFIES(*handle);
 
 static INTVAL io_pipe_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
@@ -111,9 +110,8 @@ static void io_pipe_set_flags(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 static void io_pipe_set_position(PARROT_INTERP,
-    ARGMOD(PMC *handle),
+    ARGMOD_NULLOK(PMC *handle),
     PIOOFF_T pos)
-        __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
 static PIOOFF_T io_pipe_tell(PARROT_INTERP, ARGMOD(PMC *handle))
@@ -121,9 +119,7 @@ static PIOOFF_T io_pipe_tell(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
-static size_t io_pipe_total_size(PARROT_INTERP, ARGIN(PMC *handle))
-        __attribute__nonnull__(2);
-
+static size_t io_pipe_total_size(PARROT_INTERP, ARGIN_NULLOK(PMC *handle));
 static INTVAL io_pipe_write_b(PARROT_INTERP,
     ARGMOD(PMC *handle),
     ARGIN(char *buffer),
@@ -133,8 +129,7 @@ static INTVAL io_pipe_write_b(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*handle);
 
-#define ASSERT_ARGS_io_pipe_adv_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_pipe_adv_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_io_pipe_close __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -149,8 +144,7 @@ static INTVAL io_pipe_write_b(PARROT_INTERP,
 #define ASSERT_ARGS_io_pipe_get_piohandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
-#define ASSERT_ARGS_io_pipe_get_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_pipe_get_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_io_pipe_is_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -173,13 +167,11 @@ static INTVAL io_pipe_write_b(PARROT_INTERP,
        PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_pipe_set_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(handle))
-#define ASSERT_ARGS_io_pipe_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_pipe_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_io_pipe_tell __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
-#define ASSERT_ARGS_io_pipe_total_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_pipe_total_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_io_pipe_write_b __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle) \
@@ -358,13 +350,11 @@ Pipes don't seek. Throw an exception.
 */
 
 static PIOOFF_T
-io_pipe_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL whence)
+io_pipe_seek(PARROT_INTERP, ARGMOD(PMC *handle), SHIM(PIOOFF_T offset), SHIM(INTVAL whence))
 {
     ASSERT_ARGS(io_pipe_seek)
     const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
     IO_VTABLE_UNIMPLEMENTED(interp, vtable, "seek");
-    UNUSED(offset);
-    UNUSED(whence);
     return 0;
 }
 
@@ -380,11 +370,10 @@ Pipes don't keep track of position. Ignore.
 */
 
 static void
-io_pipe_adv_position(SHIM_INTERP, ARGMOD(PMC *handle), size_t offset)
+io_pipe_adv_position(SHIM_INTERP, ARGMOD_NULLOK(PMC *handle), SHIM(size_t offset))
 {
     ASSERT_ARGS(io_pipe_adv_position)
     UNUSED(handle);
-    UNUSED(offset);
     /* Pipes don't keep track of file position internally. Ignore this. */
 }
 
@@ -400,11 +389,10 @@ Pipes don't keep track of position. Ignore.
 */
 
 static void
-io_pipe_set_position(SHIM_INTERP, ARGMOD(PMC *handle), PIOOFF_T pos)
+io_pipe_set_position(SHIM_INTERP, ARGMOD_NULLOK(PMC *handle), SHIM(PIOOFF_T pos))
 {
     ASSERT_ARGS(io_pipe_set_position)
     UNUSED(handle);
-    UNUSED(pos);
     /* Pipes don't keep track of file position internally. Ignore. */
 }
 
@@ -419,7 +407,7 @@ Pipes don't keep track of position. Return 0.
 */
 
 static PIOOFF_T
-io_pipe_get_position(SHIM_INTERP, ARGMOD(PMC *handle))
+io_pipe_get_position(SHIM_INTERP, ARGMOD_NULLOK(PMC *handle))
 {
     ASSERT_ARGS(io_pipe_get_position)
     UNUSED(handle);
@@ -598,7 +586,7 @@ Pipes have an unknown total size.
 */
 
 static size_t
-io_pipe_total_size(SHIM_INTERP, ARGIN(PMC *handle))
+io_pipe_total_size(SHIM_INTERP, ARGIN_NULLOK(PMC *handle))
 {
     ASSERT_ARGS(io_pipe_total_size)
     UNUSED(handle);

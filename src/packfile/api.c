@@ -1197,7 +1197,6 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     PackFile_Header * const header = self->header;
     const opcode_t         *cursor;
     int                     header_read_length;
-    opcode_t                padding;
 
     self->src  = packed;
     self->size = packed_size;
@@ -1227,10 +1226,9 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     }
 
     /* Padding. */
-    padding = PF_fetch_opcode(self, &cursor);
-    padding = PF_fetch_opcode(self, &cursor);
-    padding = PF_fetch_opcode(self, &cursor);
-    UNUSED(padding);
+    (void)PF_fetch_opcode(self, &cursor);
+    (void)PF_fetch_opcode(self, &cursor);
+    (void)PF_fetch_opcode(self, &cursor);
 
     self->directory.base.file_offset = (INTVAL)cursor - (INTVAL)self->src;
     if (self->options & PFOPT_HEADERONLY)

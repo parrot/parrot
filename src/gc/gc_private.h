@@ -363,7 +363,6 @@ INTVAL contained_in_pool(
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 Fixed_Size_Pool * get_bufferlike_pool(PARROT_INTERP,
     ARGMOD(Memory_Pools *mem_pools),
@@ -403,15 +402,13 @@ void Parrot_add_to_free_list(PARROT_INTERP,
         FUNC_MODIFIES(*arena);
 
 void Parrot_append_arena_in_pool(PARROT_INTERP,
-    ARGMOD(Memory_Pools *mem_pools),
+    Memory_Pools *mem_pools,
     ARGMOD(Fixed_Size_Pool *pool),
     ARGMOD(Fixed_Size_Arena *new_arena),
     size_t size)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
-        FUNC_MODIFIES(*mem_pools)
         FUNC_MODIFIES(*pool)
         FUNC_MODIFIES(*new_arena);
 
@@ -459,7 +456,6 @@ int Parrot_gc_trace_root(PARROT_INTERP,
     , PARROT_ASSERT_ARG(arena))
 #define ASSERT_ARGS_Parrot_append_arena_in_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(mem_pools) \
     , PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(new_arena))
 #define ASSERT_ARGS_Parrot_gc_clear_live_bits __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
