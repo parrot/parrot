@@ -517,6 +517,7 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
     if (!vtable)
         PANIC(interp, "Null vtable used; did you add a new PMC?");
 
+    /* Biggest L1 data read miss */
     vtable_flags = vtable->flags;
 
     /* we only have one global Env object, living in the interp */
@@ -571,6 +572,7 @@ get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
     newpmc         = Parrot_gc_new_pmc_header(interp, flags);
     newpmc->vtable = vtable;
 
+    /* Another big L1 data read miss */
     if (vtable->attr_size)
         Parrot_gc_allocate_pmc_attributes(interp, newpmc);
 

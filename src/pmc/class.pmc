@@ -1374,6 +1374,7 @@ Creates a new PMC object of the type of the class and calls init().
             Parrot_Object_attributes * const objattr =
                 PMC_data_typed(object, Parrot_Object_attributes *);
             objattr->_class       = SELF;
+            /* Big L1 Instr fetch miss */
             objattr->attrib_store =
                 Parrot_pmc_new_init_int(INTERP, enum_class_ResizablePMCArray,
                         VTABLE_elements(INTERP, _class->attrib_index));

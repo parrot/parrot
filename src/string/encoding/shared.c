@@ -640,7 +640,7 @@ return_and_cache:
     if (iter.charpos > 128) {
         last_char_offset = iter.charpos;
         cached_iter = iter;
-        last_string = src;
+        last_string = (STRING*)src;
     }
     return iter.charpos - 1;
 }
@@ -715,7 +715,7 @@ return_and_cache:
     if (iter.charpos > 128) {
         last_char_offset = iter.charpos;
         cached_iter = iter;
-        last_string = src;
+        last_string = (STRING*)src;
     }
     return iter.charpos - 1;
 }

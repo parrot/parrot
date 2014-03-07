@@ -174,6 +174,7 @@ Returns the number of elements in the array.
 
     VTABLE INTVAL get_integer() {
         INTVAL size;
+        /* Big L1 instr fetch miss */
         GET_ATTR_size(INTERP, SELF, size);
         return size;
     }

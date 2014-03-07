@@ -2339,7 +2339,7 @@ gc_gms_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
                 (unsigned long)Parrot_pa_count_used(interp, self->strings[i]));
 
 #if 1
-    fprintf(stderr, "parent: 0x%x, tid: %d\n", (unsigned int)interp->parent_interpreter,
+    fprintf(stderr, "parent: 0x%lx, tid: %d\n", (unsigned long)interp->parent_interpreter,
             interp->thread_data ? (signed)interp->thread_data->tid : -1);
 
     fprintf(stderr, "PMC: %lu\n",

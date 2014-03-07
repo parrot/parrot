@@ -245,7 +245,7 @@ init_context(ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
      * FIXME Invoking corotine shouldn't initialise context. So just
      * check ctx->current_sub. If it's not null return from here
      */
-    if (!PMC_IS_NULL(ctx->current_sub))
+    if (LIKELY(!PMC_IS_NULL(ctx->current_sub)))
         return pmcctx;
 
     ctx->lex_pad           = PMCNULL;

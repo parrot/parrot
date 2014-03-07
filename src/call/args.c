@@ -339,7 +339,7 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
     INTVAL          arg_index = 0;
     INTVAL          arg_named_count = 0;
 
-    if (PMC_IS_NULL(signature))
+    if (UNLIKELY(PMC_IS_NULL(signature)))
         call_object = Parrot_pmc_new(interp, enum_class_CallContext);
     else {
         call_object = signature;
@@ -823,9 +823,9 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
     GETATTR_FixedIntegerArray_size(interp, raw_sig, param_count);
 
     /* Get number of positional args */
-    if (PMC_IS_NULL(call_object)) {
+    if (UNLIKELY(PMC_IS_NULL(call_object))) {
         /* A null call object is fine if there are no arguments and no returns. */
-        if (param_count == 0)
+        if (LIKELY(param_count == 0))
             return;
         if (err_check) {
             Parrot_ex_throw_from_c_args(interp, NULL,
@@ -845,7 +845,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
        callee side only. Does not add :call_sig arg support on the caller side.
        This is not the final form of the algorithm, but should provide the
        tools that HLL designers need in the interim. */
-    if (param_count > 2 || param_count == 0)
+    if (LIKELY(param_count > 2 || param_count == 0))
         /* help branch predictors */;
     else {
         const INTVAL second_flag = raw_params[param_count - 1];
@@ -928,6 +928,7 @@ fill_params(PARROT_INTERP, ARGMOD_NULLOK(PMC *call_object),
 
                 Parrot_hash_put(interp, named_used_list, param_name, (void *)1);
             }
+            /* XXX Big L1 instr fetch miss */
             else if (named_count > 0) {
                 if (named_used_list != NULL)
                     Parrot_hash_destroy(interp, named_used_list);
@@ -1472,7 +1473,7 @@ parse_signature_string(PARROT_INTERP, ARGIN(const char *signature),
         }
     }
 
-    if (PMC_IS_NULL(*arg_flags))
+    if (UNLIKELY(PMC_IS_NULL(*arg_flags)))
         current_array = *arg_flags
                       = Parrot_pmc_new_init_int(interp,
                             enum_class_ResizableIntegerArray, count);
@@ -1582,7 +1583,7 @@ void
 Parrot_pcc_merge_signature_for_tailcall(PARROT_INTERP, ARGMOD(PMC *parent), ARGMOD(PMC *tailcall))
 {
     ASSERT_ARGS(Parrot_pcc_merge_signature_for_tailcall)
-    if (PMC_IS_NULL(parent) || PMC_IS_NULL(tailcall) || (parent == tailcall))
+    if (LIKELY(PMC_IS_NULL(parent) || PMC_IS_NULL(tailcall) || (parent == tailcall)))
         return;
     else {
         /* Broke encapuslation. Direct poking into CallContext is much faster */

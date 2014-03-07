@@ -210,7 +210,7 @@ Parrot_pcc_invoke_method_from_c_args(PARROT_INTERP, ARGIN(PMC* pmc),
     /* Find the subroutine object as a named method on pmc */
     sub_obj = VTABLE_find_method(interp, pmc, method_name);
 
-    if (PMC_IS_NULL(sub_obj))
+    if (UNLIKELY(PMC_IS_NULL(sub_obj)))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_METHOD_NOT_FOUND,
             "Method '%Ss' not found", method_name);
 
@@ -317,7 +317,7 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
 
     opcode_t    *dest;
     PMC * const  ret_cont = Parrot_pmc_new(interp, enum_class_Continuation);
-    if (PMC_IS_NULL(call_object))
+    if (UNLIKELY(PMC_IS_NULL(call_object)))
         call_object = Parrot_pmc_new(interp, enum_class_CallContext);
 
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), call_object);
