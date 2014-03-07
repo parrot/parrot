@@ -190,7 +190,7 @@ will not have access to this core if it is built with a different compiler.
 
 =head2 Tracing Core
 
-To come.
+Essentially a slow core with added debugging output per op.
 
 =head2 Profiling Core
 
