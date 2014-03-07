@@ -2162,10 +2162,10 @@ static size_t
 gc_gms_count_used_string_memory(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *list))
 {
     ASSERT_ARGS(gc_gms_count_used_string_memory)
+    size_t total_amount = 0;
     UNUSED(interp);
     UNUSED(list);
 
-    size_t total_amount = 0;
 #if 0
     List_Item_Header *tmp = list->first;
     while (tmp) {
@@ -2201,10 +2201,10 @@ static size_t
 gc_gms_count_used_pmc_memory(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *list))
 {
     ASSERT_ARGS(gc_gms_count_used_pmc_memory)
+    size_t total_amount = 0;
     UNUSED(interp);
     UNUSED(list);
 
-    size_t total_amount = 0;
 #if 0
     List_Item_Header *tmp = list->first;
     while (tmp) {

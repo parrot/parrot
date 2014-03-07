@@ -1064,16 +1064,16 @@ bignum_neg(PARROT_INTERP, ARGIN(PMC *self), ARGMOD(PMC *dest)) {
 
 static INTVAL
 bignum_get_default_prec(SHIM_INTERP, ARGIN(PMC *self)) {
-    UNUSED(self)
     ASSERT_ARGS(bignum_get_default_prec)
+    UNUSED(self)
 
     return mpf_get_default_prec();
 }
 
 static void
 bignum_set_default_prec(SHIM_INTERP, ARGIN(PMC *self), INTVAL prec) {
-    UNUSED(self)
     ASSERT_ARGS(bignum_set_default_prec)
+    UNUSED(self)
 
     mpf_set_default_prec(prec);
 }

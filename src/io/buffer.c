@@ -94,10 +94,10 @@ IO_BUFFER *
 Parrot_io_buffer_allocate(PARROT_INTERP, ARGMOD(PMC *owner), INTVAL flags,
         ARGIN_NULLOK(const STR_VTABLE *encoding), size_t init_size)
 {
-    UNUSED(owner)
     ASSERT_ARGS(Parrot_io_buffer_allocate)
     IO_BUFFER * const buffer =
             (IO_BUFFER *)Parrot_gc_allocate_fixed_size_storage(interp, sizeof (IO_BUFFER));
+    UNUSED(owner)
     buffer->encoding = encoding;
     if (init_size == BUFFER_SIZE_ANY) {
         if (flags & PIO_BF_LINEBUF)
