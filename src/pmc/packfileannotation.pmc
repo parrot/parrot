@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -140,7 +140,7 @@ Fetch the PMC value of the annotation.
         const Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
         if (attrs->value_type != PF_ANNOTATION_KEY_TYPE_PMC)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                "Trying to fetch wrong type of value from annotation");
+                "Wrong type of value from annotation");
         RETURN(PMC * attrs->pmc_value);
     }
 
@@ -195,6 +195,10 @@ Get the type of the annotation.
           case PF_ANNOTATION_KEY_TYPE_PMC:
             ret = 2;
             break;
+          default:
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                "Wrong type of value from annotation");
+            break;
         }
 
         RETURN(INTVAL ret);
@@ -214,7 +218,7 @@ Fetch the integer value of the annotation.
         const Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
         if (attrs->value_type != PF_ANNOTATION_KEY_TYPE_INT)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                "Trying to fetch wrong type of value from annotation");
+                "Wrong type of value from annotation");
         return attrs->int_value;
     }
 
@@ -248,7 +252,7 @@ Fetch the string value of the annotation.
         Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
         if (attrs->value_type != PF_ANNOTATION_KEY_TYPE_STR)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                "Trying to fetch wrong type of value from annotation");
+                "Wrong type of value from annotation");
         return attrs->str_value;
     }
 

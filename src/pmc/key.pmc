@@ -76,6 +76,8 @@ Creates and returns a clone of the key.
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
                         "Key.clone of pmc is broken - see TT #1683");
               default:
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                                            "Key: Unknown Key type %d", KEY_get_FLAGS(SELF));
                 break;
             }
 
