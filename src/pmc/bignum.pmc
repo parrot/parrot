@@ -1063,7 +1063,7 @@ bignum_neg(PARROT_INTERP, ARGIN(PMC *self), ARGMOD(PMC *dest)) {
 }
 
 static INTVAL
-bignum_get_default_prec(SHIM_INTERP, ARGIN(PMC *self)) {
+bignum_get_default_prec(PARROT_INTERP, ARGIN(PMC *self)) {
     ASSERT_ARGS(bignum_get_default_prec)
     UNUSED(self)
 
@@ -1071,7 +1071,7 @@ bignum_get_default_prec(SHIM_INTERP, ARGIN(PMC *self)) {
 }
 
 static void
-bignum_set_default_prec(SHIM_INTERP, ARGIN(PMC *self), INTVAL prec) {
+bignum_set_default_prec(PARROT_INTERP, ARGIN(PMC *self), INTVAL prec) {
     ASSERT_ARGS(bignum_set_default_prec)
     UNUSED(self)
 

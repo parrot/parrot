@@ -338,7 +338,7 @@ io_filehandle_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
 }
 
 static void
-io_filehandle_set_eof(SHIM_INTERP, ARGMOD(PMC *handle), INTVAL is_set)
+io_filehandle_set_eof(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL is_set)
 {
     ASSERT_ARGS(io_filehandle_set_eof)
     if (is_set)
@@ -412,7 +412,7 @@ Get the current in-memory offset from the FileHandle.
 */
 
 static void
-io_filehandle_adv_position(SHIM_INTERP, ARGMOD(PMC *handle), size_t len)
+io_filehandle_adv_position(PARROT_INTERP, ARGMOD(PMC *handle), size_t len)
 {
     ASSERT_ARGS(io_filehandle_adv_position)
     Parrot_FileHandle_attributes * const attrs = PARROT_FILEHANDLE(handle);
@@ -421,7 +421,7 @@ io_filehandle_adv_position(SHIM_INTERP, ARGMOD(PMC *handle), size_t len)
 }
 
 static void
-io_filehandle_set_position(SHIM_INTERP, ARGMOD(PMC *handle), PIOOFF_T pos)
+io_filehandle_set_position(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T pos)
 {
     ASSERT_ARGS(io_filehandle_set_position)
     Parrot_FileHandle_attributes * const attrs = PARROT_FILEHANDLE(handle);
@@ -429,7 +429,7 @@ io_filehandle_set_position(SHIM_INTERP, ARGMOD(PMC *handle), PIOOFF_T pos)
 }
 
 static PIOOFF_T
-io_filehandle_get_position(SHIM_INTERP, ARGMOD(PMC *handle))
+io_filehandle_get_position(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_filehandle_get_position)
     Parrot_FileHandle_attributes * const attrs = PARROT_FILEHANDLE(handle);
@@ -586,14 +586,14 @@ Get the mode flags from the FileHandle.
 */
 
 static void
-io_filehandle_set_flags(SHIM_INTERP, ARGIN(PMC *handle), INTVAL flags)
+io_filehandle_set_flags(PARROT_INTERP, ARGIN(PMC *handle), INTVAL flags)
 {
     ASSERT_ARGS(io_filehandle_set_flags)
     PARROT_FILEHANDLE(handle)->flags = flags;
 }
 
 static INTVAL
-io_filehandle_get_flags(SHIM_INTERP, ARGIN(PMC *handle))
+io_filehandle_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_filehandle_get_flags)
     return PARROT_FILEHANDLE(handle)->flags;

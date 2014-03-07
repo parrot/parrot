@@ -488,7 +488,7 @@ Parrot_pcc_get_pc_func(SHIM_INTERP, ARGIN(const PMC *ctx))
 
 PARROT_EXPORT
 void
-Parrot_pcc_set_pc_func(SHIM_INTERP, ARGIN(const PMC *ctx), ARGIN_NULLOK(opcode_t *pc))
+Parrot_pcc_set_pc_func(PARROT_INTERP, ARGIN(const PMC *ctx), ARGIN_NULLOK(opcode_t *pc))
 {
     ASSERT_ARGS(Parrot_pcc_set_pc_func)
     PARROT_ASSERT(ctx->vtable->base_type == enum_class_CallContext);
