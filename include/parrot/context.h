@@ -265,7 +265,6 @@ PARROT_EXPORT
 void Parrot_pcc_set_pc_func(PARROT_INTERP,
     ARGIN(const PMC *ctx),
     ARGIN_NULLOK(opcode_t *pc))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
@@ -404,8 +403,7 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
     , PARROT_ASSERT_ARG(ctx) \
     , PARROT_ASSERT_ARG(outer_ctx))
 #define ASSERT_ARGS_Parrot_pcc_set_pc_func __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ctx))
+       PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_set_recursion_depth_func \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(ctx))

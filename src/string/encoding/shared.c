@@ -1214,8 +1214,8 @@ void
 fixed8_iter_skip(SHIM_INTERP,
     ARGIN(const STRING *str), ARGMOD(String_iter *iter), INTVAL skip)
 {
-    UNUSED(str)
     ASSERT_ARGS(fixed8_iter_skip)
+    UNUSED(str)
 
     iter->bytepos += skip;
     iter->charpos += skip;

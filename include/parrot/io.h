@@ -966,7 +966,6 @@ IO_BUFFER * Parrot_io_buffer_allocate(PARROT_INTERP,
         FUNC_MODIFIES(*owner);
 
 void Parrot_io_buffer_clear(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer))
-        __attribute__nonnull__(1)
         FUNC_MODIFIES(*buffer);
 
 PARROT_WARN_UNUSED_RESULT
@@ -1034,7 +1033,6 @@ void Parrot_io_buffer_remove_from_handle(PARROT_INTERP,
 size_t Parrot_io_buffer_resize(PARROT_INTERP,
     ARGMOD(IO_BUFFER *buffer),
     size_t new_size)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*buffer);
 
@@ -1100,8 +1098,7 @@ size_t Parrot_io_buffer_write_b(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_io_buffer_allocate __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(owner))
-#define ASSERT_ARGS_Parrot_io_buffer_clear __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_io_buffer_clear __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_io_buffer_content_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(buffer))
 #define ASSERT_ARGS_Parrot_io_buffer_fill __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -1130,8 +1127,7 @@ size_t Parrot_io_buffer_write_b(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_Parrot_io_buffer_resize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(buffer))
+       PARROT_ASSERT_ARG(buffer))
 #define ASSERT_ARGS_Parrot_io_buffer_seek __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(buffer) \

@@ -284,7 +284,6 @@ static void bignum_fdiv_bignum_int(PARROT_INTERP,
         FUNC_MODIFIES(*dest);
 
 static INTVAL bignum_get_default_prec(PARROT_INTERP, ARGIN(PMC *self))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
@@ -378,7 +377,6 @@ static void bignum_set(PARROT_INTERP, ARGMOD(PMC *dest), ARGIN(PMC *src))
 static void bignum_set_default_prec(PARROT_INTERP,
     ARGIN(PMC *self),
     INTVAL prec)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void bignum_set_double(PARROT_INTERP, ARGIN(PMC *self), double value)
@@ -493,8 +491,7 @@ static void bignum_sub_bignum_int(PARROT_INTERP,
     , PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(dest))
 #define ASSERT_ARGS_bignum_get_default_prec __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
+       PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_bignum_get_double __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
@@ -542,8 +539,7 @@ static void bignum_sub_bignum_int(PARROT_INTERP,
     , PARROT_ASSERT_ARG(dest) \
     , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_bignum_set_default_prec __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
+       PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_bignum_set_double __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
@@ -1064,16 +1060,16 @@ bignum_neg(PARROT_INTERP, ARGIN(PMC *self), ARGMOD(PMC *dest)) {
 
 static INTVAL
 bignum_get_default_prec(SHIM_INTERP, ARGIN(PMC *self)) {
-    UNUSED(self)
     ASSERT_ARGS(bignum_get_default_prec)
+    UNUSED(self)
 
     return mpf_get_default_prec();
 }
 
 static void
 bignum_set_default_prec(SHIM_INTERP, ARGIN(PMC *self), INTVAL prec) {
-    UNUSED(self)
     ASSERT_ARGS(bignum_set_default_prec)
+    UNUSED(self)
 
     mpf_set_default_prec(prec);
 }

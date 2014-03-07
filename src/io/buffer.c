@@ -31,7 +31,6 @@ static void io_buffer_add_bytes(PARROT_INTERP,
     ARGMOD(IO_BUFFER *buffer),
     ARGIN(char *s),
     size_t length)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*buffer);
@@ -58,8 +57,7 @@ static size_t io_buffer_transfer_to_mem(PARROT_INTERP,
         FUNC_MODIFIES(* s);
 
 #define ASSERT_ARGS_io_buffer_add_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(buffer) \
+       PARROT_ASSERT_ARG(buffer) \
     , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_io_buffer_normalize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -94,10 +92,10 @@ IO_BUFFER *
 Parrot_io_buffer_allocate(PARROT_INTERP, ARGMOD(PMC *owner), INTVAL flags,
         ARGIN_NULLOK(const STR_VTABLE *encoding), size_t init_size)
 {
-    UNUSED(owner)
     ASSERT_ARGS(Parrot_io_buffer_allocate)
     IO_BUFFER * const buffer =
             (IO_BUFFER *)Parrot_gc_allocate_fixed_size_storage(interp, sizeof (IO_BUFFER));
+    UNUSED(owner);
     buffer->encoding = encoding;
     if (init_size == BUFFER_SIZE_ANY) {
         if (flags & PIO_BF_LINEBUF)

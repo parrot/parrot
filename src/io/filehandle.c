@@ -33,7 +33,6 @@ src/platform/xxx/io.c.
 static void io_filehandle_adv_position(PARROT_INTERP,
     ARGMOD(PMC *handle),
     size_t len)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
@@ -55,7 +54,6 @@ static const STR_VTABLE * io_filehandle_get_encoding(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 static INTVAL io_filehandle_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static PIOHANDLE io_filehandle_get_piohandle(PARROT_INTERP,
@@ -65,7 +63,6 @@ static PIOHANDLE io_filehandle_get_piohandle(PARROT_INTERP,
 
 static PIOOFF_T io_filehandle_get_position(PARROT_INTERP,
     ARGMOD(PMC *handle))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
@@ -111,20 +108,17 @@ static PIOOFF_T io_filehandle_seek(PARROT_INTERP,
 static void io_filehandle_set_eof(PARROT_INTERP,
     ARGMOD(PMC *handle),
     INTVAL is_set)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
 static void io_filehandle_set_flags(PARROT_INTERP,
     ARGIN(PMC *handle),
     INTVAL flags)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static void io_filehandle_set_position(PARROT_INTERP,
     ARGMOD(PMC *handle),
     PIOOFF_T pos)
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
@@ -147,8 +141,7 @@ static INTVAL io_filehandle_write_b(PARROT_INTERP,
         FUNC_MODIFIES(*handle);
 
 #define ASSERT_ARGS_io_filehandle_adv_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle))
+       PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_filehandle_close __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -159,14 +152,12 @@ static INTVAL io_filehandle_write_b(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_filehandle_get_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle))
+       PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_filehandle_get_piohandle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_filehandle_get_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle))
+       PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_filehandle_is_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -186,14 +177,11 @@ static INTVAL io_filehandle_write_b(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_filehandle_set_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle))
+       PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_filehandle_set_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle))
+       PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_filehandle_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle))
+       PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_filehandle_tell __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
