@@ -2379,17 +2379,17 @@ testj : test_prep
 testr : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -r $(RUNCORE_TEST_FILES)
 
-# normal core, optimization level 1 (remaining errors: GH #1037)
+# normal core, optimization level 1
 testO1 : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -O1 $(RUNCORE_TEST_FILES)
 
-# optimization level 2 has some errors: GH #1038, #1039
+# optimization level 2
 testO2 : test_prep
 	$(PERL) t/harness $(EXTRA_TEST_ARGS) -O2 $(RUNCORE_TEST_FILES)
 
-# -Op: -O2 for PASM
-testOp : test_prep
-	$(PERL) t/harness $(EXTRA_TEST_ARGS) -Op $(RUNCORE_TEST_FILES)
+# -Oc: call optimization with -O2
+testOc : test_prep
+	$(PERL) t/harness $(EXTRA_TEST_ARGS) -O2 -Oc $(RUNCORE_TEST_FILES)
 
 # test --run-exec
 #testexec: test_prep
