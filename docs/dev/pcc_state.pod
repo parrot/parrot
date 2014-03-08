@@ -109,5 +109,6 @@ creating an exhaustive test suite for calling conventions.
   .param pmc two :named('two') ; .param pmc one :named('one')
   two = 1 ; one = 2
 
+=back
 
 =cut
