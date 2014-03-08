@@ -431,6 +431,7 @@ object.
 # vim: expandtab shiftwidth=4 ft=pir:
 
 __src/@lang@/Grammar.pm__
+
 =begin overview
 
 This is the grammar for @lang@ in Perl 6 rules.

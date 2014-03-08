@@ -331,7 +331,7 @@ MAIN: {
 
     if ($parrot_errors) {
         die <<"END";
-===SORRY!===
+###SORRY!###
 $parrot_errors
 To automatically checkout (svn) and build a copy of parrot r$reqsvn,
 try re-running Configure.pl with the '--gen-parrot' option.
@@ -406,7 +406,7 @@ sub verify_parrot {
         my $missing = join("\n", @missing);
         die <<"END";
 
-===SORRY!===
+###SORRY!###
 I'm missing some needed files from the Parrot installation:
 $missing
 (Perhaps you need to use Parrot's "make install" or
@@ -729,6 +729,7 @@ __src/@lang@.pir__
     .return ($P1)
 .end
 __src/@lang@/Grammar.pm__
+
 =begin overview
 
 This is the grammar for @lang@ in Perl 6 rules.
