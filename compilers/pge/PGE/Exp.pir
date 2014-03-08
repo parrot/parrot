@@ -1598,6 +1598,9 @@ tree as a PIR code object that can be compiled.
     .return ()
 .end
 
+=back
+
+=cut
 
 # Local Variables:
 #   mode: pir

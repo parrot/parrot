@@ -22,6 +22,8 @@ suitable for inclusion or compilation into other larger programs.
 
 Send the output to OUTFILE. By default, output is directed to STDOUT.
 
+=back
+
 =cut
 
 
