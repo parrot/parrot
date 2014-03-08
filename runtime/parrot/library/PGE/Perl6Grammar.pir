@@ -410,6 +410,8 @@ the output to the correct output file.
   .return ()
 .end
 
+=back
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100

@@ -236,7 +236,7 @@ done:
 .end
 
 
-=head2
+=head2 reverse
 
 Reverse the direction of the range.
 
