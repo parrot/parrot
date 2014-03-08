@@ -1194,6 +1194,12 @@ Adds Integer-, Float- or Rational-PMCs to SELF and stores them in dest.
 }
 
 /*
+
+=back
+
+*/
+
+/*
  * Local variables:
  *   c-file-style: "parrot"
  * End:
