@@ -1428,6 +1428,7 @@ gc_gms_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
 Finalize GC subsystem.
 
 =cut
+
 */
 static void
 gc_gms_finalize(PARROT_INTERP)
@@ -1734,6 +1735,7 @@ size)>
 Functions for allocating strings/buffers storage.
 
 =cut
+
 */
 
 static void
@@ -1785,6 +1787,7 @@ Iterate over live string invoking callback for each of them. Used during
 compacting of string pool.
 
 =cut
+
 */
 static void
 gc_gms_iterate_live_strings(PARROT_INTERP,
@@ -2053,6 +2056,7 @@ This is automatically added by pmc2c to all VTABLE function which are marked
 with C<:write> in src/vtable.tbl.
 
 =cut
+
 */
 static void
 gc_gms_write_barrier(PARROT_INTERP, ARGMOD(PMC *pmc))
@@ -2230,6 +2234,7 @@ gc_gms_count_used_pmc_memory(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *list))
 Seal/unseal object with write barrier.
 
 =cut
+
 */
 static void
 gc_gms_seal_object(SHIM_INTERP, ARGIN(PMC *pmc))

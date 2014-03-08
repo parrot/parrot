@@ -679,6 +679,7 @@ size_t size)>
 Functions for allocating strings/buffers storage.
 
 =cut
+
 */
 
 void
@@ -720,6 +721,7 @@ gc_ms_reallocate_buffer_storage(PARROT_INTERP, ARGIN(Parrot_Buffer *str), size_t
 Mark PMC special.
 
 =cut
+
 */
 static void
 gc_ms_mark_special(PARROT_INTERP, ARGIN(PMC *pmc))
@@ -1918,6 +1920,7 @@ Iterate over live string invoking callback for each of them. Used during
 compacting of string pool.
 
 =cut
+
 */
 static void
 gc_ms_iterate_live_strings(PARROT_INTERP,
