@@ -180,6 +180,11 @@ static STR_VTABLE Parrot_null_encoding = {
 
 STR_VTABLE *Parrot_null_encoding_ptr = &Parrot_null_encoding;
 
+/*
+
+=back
+
+*/
 
 /*
  * Local variables:

@@ -444,6 +444,11 @@ static STR_VTABLE Parrot_ascii_encoding = {
 
 STR_VTABLE *Parrot_ascii_encoding_ptr = &Parrot_ascii_encoding;
 
+/*
+
+=back
+
+*/
 
 /*
  * Local variables:

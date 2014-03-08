@@ -472,6 +472,11 @@ static STR_VTABLE Parrot_latin1_encoding = {
 
 STR_VTABLE *Parrot_latin1_encoding_ptr = &Parrot_latin1_encoding;
 
+/*
+
+=back
+
+*/
 
 /*
  * Local variables:

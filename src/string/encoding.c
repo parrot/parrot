@@ -498,6 +498,11 @@ Parrot_default_encoding(SHIM_INTERP)
     return Parrot_default_encoding_ptr;
 }
 
+/*
+
+=back
+
+*/
 
 /*
  * Local variables:
