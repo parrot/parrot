@@ -63,8 +63,6 @@ Parrot_alarm_init(void)
 
 /*
 
-=over 4
-
 =item C<static void* Parrot_alarm_runloop(void *arg)>
 
 The thread function handling alarms.
@@ -220,6 +218,12 @@ Parrot_alarm_wait_for_next_alarm(SHIM_INTERP)
     if (time > 0)
         Parrot_usleep(time * 1000000);
 }
+
+/*
+
+=back
+
+*/
 
 /*
  * Local variables:
