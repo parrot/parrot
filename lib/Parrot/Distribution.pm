@@ -821,6 +821,10 @@ sub slurp {
     return $buf;
 }
 
+=back
+
+=cut
+
 1;
 
 # Local Variables:

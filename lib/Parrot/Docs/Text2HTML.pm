@@ -86,6 +86,10 @@ sub html_for_file {
     return $string;
 }
 
+=back
+
+=cut
+
 1;
 
 # Local Variables:

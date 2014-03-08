@@ -33,7 +33,7 @@ use base qw( Parrot::Configure::Step::Methods );
 
 Basic constructor.
 
-Accepts no arguments and returns a L<Parrot::Configure::Step::> object.
+Accepts no arguments and returns a L<Parrot::Configure::Step> object.
 Requires user to define an C<_init()> method in the inheriting configuration
 class.  This initializer sets a C<description> attribute in the object's data
 structure and may set other attributes as well.  Should the initializer fail
