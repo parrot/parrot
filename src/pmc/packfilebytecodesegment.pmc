@@ -133,6 +133,7 @@ Return a pointer to a PackFile_ByteCode* built from this PMC's data.
 Initialize PackfileBytecodeSegment from PackFile_Bytecode*
 
 =cut
+
 */
     VTABLE void set_pointer(void *pointer) {
         const PackFile_ByteCode * const pfseg =
@@ -202,6 +203,7 @@ an op and the remaining PMCs being Integers.
 Return :main Sub for this segment.
 
 =cut
+
 */
 
 
@@ -219,6 +221,7 @@ Return :main Sub for this segment.
 Return PackfileOpMap for this BytecodeSegment.
 
 =cut
+
 */
 
     METHOD PMC* opmap() {

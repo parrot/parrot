@@ -383,6 +383,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
 Set key to hold particular register.
 
 =cut
+
 */
     METHOD set_register(INTVAL reg_no, INTVAL reg_type) {
         Parrot_key_set_register(INTERP, SELF, reg_no, reg_type);

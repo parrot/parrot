@@ -67,6 +67,7 @@ pmclass PMCList auto_attrs {
 Initializes the list.
 
 =cut
+
 */
 
     VTABLE void init() {
@@ -84,6 +85,7 @@ Initializes the list.
 Free all the list cells.
 
 =cut
+
 */
 
     VTABLE void destroy() {
@@ -106,6 +108,7 @@ Free all the list cells.
 Returns the size of the list.
 
 =cut
+
 */
 
     VTABLE INTVAL get_integer() {
@@ -126,6 +129,7 @@ Returns the size of the list.
 Removes and returns an item from the start of the array.
 
 =cut
+
 */
 
     VTABLE PMC *shift_pmc() {
@@ -213,6 +217,7 @@ the array.
 Removes and returns the last element in the array.
 
 =cut
+
 */
 
     VTABLE PMC *pop_pmc() {
@@ -263,6 +268,7 @@ Extends the array by adding an element of value C<*value> to the begin of
 the array.
 
 =cut
+
 */
 
     VTABLE void unshift_pmc(PMC *value) {
@@ -408,6 +414,7 @@ Used to unarchive the array.
 Mark the stuff.
 
 =cut
+
 */
 
     VTABLE void mark() {
@@ -476,6 +483,7 @@ Method forms to add a PMC to the beginning or end of the array.
 Inserts an item into an ordered list by it's number value.
 
 =cut
+
 */
 
     METHOD insert_by_number(PMC* value) {

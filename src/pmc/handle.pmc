@@ -263,6 +263,12 @@ scheme) for the filehandle.
 }
 
 /*
+
+=back
+
+*/
+
+/*
  * Local variables:
  *   c-file-style: "parrot"
  * End:

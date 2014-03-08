@@ -505,6 +505,8 @@ Line buffering, bytes are sent when a record separator is encountered.
 
 Full buffering, bytes are sent when the buffer is full.
 
+=back
+
 =cut
 
 */
@@ -691,8 +693,6 @@ Returns the next byte from the stream, but does not remove it.
 /*
 
 =back
-
-=cut
 
 */
 
