@@ -334,6 +334,12 @@ main(int argc, char *argv[])
 }
 
 /*
+
+=back
+
+*/
+
+/*
  * Local variables:
  *   c-file-style: "parrot"
  * End:
