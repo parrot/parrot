@@ -1,6 +1,6 @@
 package Perl::Critic::Policy::CodeLayout::UseParrotCoda;
 
-# Copyright (C) 2006-2007, Parrot Foundation.
+# Copyright (C) 2006-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -20,7 +20,7 @@ C<__DATA__> blocks are exempt from this policy.
 
 =cut
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 $VERSION = eval $VERSION;    ## no critic
 
 my $desc = q{Missing properly located perl coda for parrot source};
@@ -39,7 +39,7 @@ our $CODA = <<'END_CODA';
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
-#   fill-column: 100
+#   fill-column: (\d+)
 # End:
 # vim: expandtab shiftwidth=4:
 END_CODA
@@ -73,7 +73,19 @@ sub violates {
             my $last_coda_line   = $coda_lines[-1];
             my $last_actual_line = $last_node->content;
             chomp $last_actual_line;
-            last if ( $last_coda_line ne $last_actual_line );
+            # fill-column > 70 and <= 100
+            if ($last_coda_line eq '#   fill-column: (\d+)') {
+                if ($last_actual_line =~ m/$last_coda_line/
+                    and $1
+                    and ($1 == 100 or $1 == 78)) {
+                }
+                else {
+                    last;
+                }
+            }
+            elsif ( $last_coda_line ne $last_actual_line ) {
+                last;
+            }
             pop @coda_lines;
         }
     }

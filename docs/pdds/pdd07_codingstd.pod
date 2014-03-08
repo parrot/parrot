@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 PDD 7: Conventions and Guidelines for Parrot Source Code
 
@@ -366,6 +366,15 @@ Perl source files must end with this coda:
     #   mode: cperl
     #   cperl-indent-level: 4
     #   fill-column: 100
+    # End:
+    # vim: expandtab shiftwidth=4:
+
+or
+
+    # Local Variables:
+    #   mode: cperl
+    #   cperl-indent-level: 4
+    #   fill-column: 78
     # End:
     # vim: expandtab shiftwidth=4:
 
