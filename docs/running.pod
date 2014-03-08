@@ -1,22 +1,27 @@
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =pod
 
 =head1 NAME
 
-docs/running.pod - Running
+docs/running.pod - Parrot runcore, debugging and optimizer options
 
 =head1 SYNOPSIS
 
- parrot [-options] <file> [arguments ...]
+    parrot -R, --runcore <CORE> -O<level> -D<flags> -d<flags> -t<flags>
+
+    parrot -R fast
+    parrot -R slow
+    parrot -R trace | -t
+    parrot -R profiling
+    parrot -R subprof
+    parrot --gc-debug
+    parrot -R jit      I<(currently disabled)>
+    parrot -R exec     I<(currently disabled)>
 
 =head1 DESCRIPTION
 
-This document describes Parrot's command line options.
-
-=head1 VERSION
-
-$Revision$
+This document describes Parrot's runcore, debugging and optimizer options.
 
 =head1 ENVIRONMENT
 
@@ -39,13 +44,9 @@ Turn on the I<--gc-debug> flag.
 
 =over 4
 
-=item -O[level]
-
-Valid optimizer levels: C<-O>, C<-O1>, C<-O2>, C<-Op>, C<-Oc>
-
 =item B<-O>[level]
 
-Valid optimizer levels: C<-O>, C<-O1>, C<-O2>
+Valid optimizer levels: C<-O>, C<-O1>, C<-O2>, C<-Op>, C<-Oc>
 
 C<-O1> enables the pre_optimizer, runs before control flow graph (CFG) is built.
 It includes strength reduction and rewrites certain if/branch/label constructs.
@@ -55,46 +56,19 @@ removal of unused labels and dead code.
 
 C<-Op> applies C<-O2> to pasm files also.
 
+C<-Oc> does tailcall optimizations.
+
 The old options C<-Oc> and C<-Oj> are currently ineffective.
 
 C<-O> defaults to C<-O1>.
-
-=item -a, --pasm
-
-Assume PASM input on stdin.
-
-=item -c, --pbc
-
-Assume PBC file on stdin, run it.
-
-=item -h, --help
-
-Print command line option summary.
 
 =item --help-debug
 
 Print debugging and tracing flag bits summary.
 
-=item -o outputfile, --output=outputfile
-
-Act like an assembler. Don't run code, unless B<-r> is given too. If the
-outputfile ends with F<.pbc>, a PBC file is written. If it ends with F<.pasm>,
-a PASM output is generated, even from PASM input.
-
-=item --output-pbc
-
-Act like an assembler, but always output bytecode, even if the output file does
-not end in F<.pbc>
-
-=item -r, --run-pbc
-
-Only useful after C<-o> or C<--output-pbc>. Run the program from the compiled
-in-memory image. If two C<-r> options are given, the F<.pbc> file is read from
-disc and run. This is mainly needed for tests.
-
 =item -y, --yydebug
 
-Turn on yydebug in F<yacc>/F<bison>.
+Turn on yydebug in F<yacc>/F<bison>. Same as -d0004
 
 =item -v, --verbose
 
@@ -106,23 +80,12 @@ Turn on compiler verbosity.
 
 Turn on compiler debug flags.  I<See> C<parrot --help-debug> for available flag bits.
 
-=item -V, --version
-
-Print version information and exit.
-
-=item -E, --pre-process-only
-
-Preprocess source file (expand macros) and print result to stdout:
-
-  $ parrot -E t/op/macro_10.pasm
-  $ parrot -E t/op/macro_10.pasm | parrot -- -
-
 =back
 
 =head2 Runcore Options
 
 These options select the runcore, which is useful for performance tuning and
-debugging.  See L<About runcores> for details.
+debugging.  See L<ABOUT RUNCORES> for details.
 
 =over 4
 
@@ -136,17 +99,31 @@ may be available on your system:
 
   slow, bounds  bounds checking core
 
-  trace         bounds checking core w/ trace info (see 'parrot --help-debug')
+  trace         bounds checking core with trace info
 
-  profiling     see F<docs/dev/profilling.pod>
+  profiling     Rudimentary profiling support.
+                See L<docs/dev/profiling.pod>
 
-  subprof       subroutine-level profiler
-                (see POD in F<src/runcore/subprof.c>)
+  subprof       Better subroutine-level profilers
+  subprof_sub
+  subprof_hll
+  subprof_ops
+                See POD in F<src/runcore/subprof.c>
 
-The C<jit>, C<switch-jit>, and C<cgp-jit> options are currently aliases for the
-C<fast>, C<switch>, and C<cgp> options, respectively.  We do not recommend
-their use in new code; they will continue working for existing code per our
-deprecation policy.
+  gc_debug      Does a full GC on each op.
+
+Older currently ignored options include:
+
+  jit, switch-jit, cgp-jit, switch, cgp, function, exec
+
+We do not recommend their use in new code; they will continue working
+for existing code per our deprecation policy.  The options function,
+cgp, switch, and jit, switch-jit, cgp-jit are currently aliases for
+fast.
+
+The additional internal C<debugger> runcore is used by debugger frontends.
+
+See F<src/runcore/cores.c> for details.
 
 =item -p, --profile
 
@@ -154,8 +131,8 @@ Run with the slow core and print an execution profile.
 
 =item -t, --trace
 
-Run with the slow core and print trace information to B<stderr>. See C<parrot
---help-debug> for available flag bits.
+Run with the trace core and print trace information to B<stderr>.
+See C<parrot --help-debug> for available flag bits.
 
 =back
 
@@ -171,11 +148,6 @@ Turn on warnings. See C<parrot --help-debug> for available flag bits.
 
 Turn on interpreter debug flag. See C<parrot --help-debug> for available flag
 bits.
-
-=item --hash-seed <hexnum>
-
-Sets the hash seed to the provided value. Only useful for debugging
-intermittent failures, and harmful in production.
 
 =item --gc-debug
 
@@ -193,43 +165,7 @@ quickly become exhausted.
 Free all memory of the last interpreter.  This is useful when running leak
 checkers.
 
-=item -., --wait
-
-Read a keystroke before starting.  This is useful when you want to attach a
-debugger on platforms such as Windows.
-
-=item --runtime-prefix
-
-Print the runtime prefix path and exit.
-
-=item -L path
-
-Add C<path> to the library search path
-
-=item --numthreads <number>
-
-Overrides the automatically detected number of CPU cores to set the
-number of OS threads. Minimum number: 2
-
-
 =back
-
-=head2 <file>
-
-If the file ends in F<.pbc> it will be interpreted immediately.
-
-If the file ends in F<.pasm>, then it is parsed as PASM code. Otherwise, it is
-parsed as PIR code. In both cases, it will then be run, unless the C<-o> flag
-was given.
-
-If the C<file> is a single dash, input from C<stdin> is read.
-
-=head2 [arguments ...]
-
-Optional arguments passed to the running program as ARGV. The program is
-assumed to know what to do with these.
-
-=head1 GENERATED FILES
 
 =head1 ABOUT RUNCORES
 
@@ -283,9 +219,5 @@ full bounds checking, and also printing runtime information to stderr.
   run ... yes, run the program
   ass ... assemble sourcefile
   obj ..  produce native (ELF) object file for the EXEC subsystem
-
-=head1 FILES
-
-F<frontend/parrot/main.c>
 
 =cut

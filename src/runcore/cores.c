@@ -11,10 +11,10 @@ During execution, the runcore is like the heart of Parrot. The runcore
 controls calling the various opcodes with the correct data, and making
 sure that program flow moves properly. Some runcores, such as the
 I<precomputed C goto runcore> are optimized for speed and don't perform
-many tasks beyond finding and dispatching opcodes. Other runcores,
-such as the I<GC-Debug>, I<debug> and I<profiling> runcores help with
-typical software maintenance and analysis tasks. We'll talk about all
-of these throughout the chapter.
+many tasks beyond finding and dispatching opcodes. Other runcores, such as
+the I<trace>, I<gc_debug>, I<debugger> and I<profiling> runcores help with
+typical software maintenance and analysis tasks. We'll talk about all of
+these throughout the chapter.
 
 Runcores must pass execution to each opcode in the incoming bytecode
 stream. This is called I<dispatching> the opcodes. Because the different
@@ -211,24 +211,20 @@ printed to the STDERR output for later analysis.
 
 =head2 GC Debug Core
 
-Parrot's garbage collector has been known as a weakness in the system
-for several years. In fact, the garbage collector and memory management
-subsystem was one of the last systems to be improved and rewritten before
-the release of version 1.0. It's not that garbage collection isn't
-important, but instead that it was so hard to do earlier in the project.
+The older Parrot's garbage collectors has been known as weakness in the
+system for several years. Early on when the GC was such a weakness, and
+later when the GC was under active development, it was useful to have an
+operational mode that would really exercise the GC and find bugs that
+otherwise could hide by sheer chance. The GC debug runcore was this
+tool. The core executes a complete collection iteration between every
+single opcode. The throughput performance is terrible, but that's not the
+point: it's almost guaranteed to find problems in the memory system if
+they exist.
 
-Early on when the GC was such a weakness, and later when the GC was under
-active development, it was useful to have an operational mode that would
-really exercise the GC and find bugs that otherwise could hide by sheer
-chance. The GC debug runcore was this tool. The core executes a complete
-collection iteration between every single opcode. The throughput
-performance is terrible, but that's not the point: it's almost guaranteed
-to find problems in the memory system if they exist.
+=head2 Debugger Core
 
-=head2 Debug Core
-
-The debug core works like a normal software debugger, such as GDB. The
-debug core executes each opcode, and then prompts the user to enter a
+The debugger core works like a normal software debugger, such as GDB. The
+debugger core executes each opcode, and then prompts the user to enter a
 command. These commands can be used to continue execution, step to the
 next opcode, or examine and manipulate data from the executing program.
 
@@ -678,7 +674,7 @@ runops_gc_debug_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcod
 =item C<static opcode_t * runops_debugger_core(PARROT_INTERP, Parrot_runcore_t
 *runcore, opcode_t *pc)>
 
-Used by the debugger, under construction
+Used by the debugger, under construction.
 
 =cut
 
@@ -762,6 +758,7 @@ get_core_op_lib_init(SHIM_INTERP, ARGIN(Parrot_runcore_t *runcore))
 *runcore, opcode_t *pc)>
 
 Runs the native executable version of the specified opcode.
+Currently disabled.
 
 =cut
 

@@ -187,22 +187,31 @@ Parrot_api_set_runcore(Parrot_PMC interp_pmc, ARGIN(const char * corename),
     else {
         if (STREQ(corename, "slow") || STREQ(corename, "bounds"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
-        else if (STREQ(corename, "fast") || STREQ(corename, "jit") || STREQ(corename, "function"))
+        else if (STREQ(corename, "fast")
+                 || STREQ(corename, "function")
+                 || STREQ(corename, "cgp")
+                 || STREQ(corename, "switch"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "fast"));
         else if (STREQ(corename, "subprof_sub"))
-            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "subprof_sub"));
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, corename));
         else if (STREQ(corename, "subprof_hll") || STREQ(corename, "subprof"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "subprof_hll"));
         else if (STREQ(corename, "subprof_ops"))
-            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "subprof_ops"));
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, corename));
+#if 0
         else if (STREQ(corename, "exec"))
-            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "exec"));
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, corename));
+#endif
         else if (STREQ(corename, "trace"))
-            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, corename));
         else if (STREQ(corename, "profiling"))
-            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "profiling"));
-        else if (STREQ(corename, "gcdebug"))
-            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "gcdebug"));
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, corename));
+        else if (STREQ(corename, "gc_debug"))
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, corename));
+        else if (STREQ(corename, "jit")
+              || STREQ(corename, "cgp-jit")
+              || STREQ(corename, "switch-jit"))
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "fast"));
         else
             Parrot_ex_throw_from_c_args(interp, NULL, 1, "Invalid runcore type %s", corename);
     }
