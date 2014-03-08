@@ -2,7 +2,8 @@
 package Parrot::Test::Pod::Utils;
 use strict;
 use warnings;
-use Pod::Simple;
+use Pod::Checker;
+use Capture::Tiny 'capture';
 use Pod::Simple::PullParser;
 our (@ISA, @EXPORT_OK);
 @ISA       = qw( Exporter );
@@ -11,15 +12,16 @@ our (@ISA, @EXPORT_OK);
     empty_description
 );
 
-# Pulled from Test::Pod
 sub file_pod_ok {
     my $file    = shift;
-    my $checker = Pod::Simple->new;
+    my $checker = Pod::Checker->new;
 
-    $checker->output_string( \my $trash );      # Ignore any output
-    $checker->parse_file($file);
+    # ignore output; we just want to know if we have warnings/errors
+    my $trash = capture {
+        $checker->parse_from_file($file);
+    };
 
-    return !$checker->any_errata_seen;
+    return !$checker->num_errors;
 }
 
 sub empty_description {
