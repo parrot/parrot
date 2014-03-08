@@ -1684,6 +1684,12 @@ unicode_titlecase_first(PARROT_INTERP, SHIM(const STRING *src))
         "Unicode titlecase_first not implemented");
 }
 
+/*
+
+=back
+
+*/
+
 
 /*
  * Local variables:
