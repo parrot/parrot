@@ -380,6 +380,12 @@ Parrot_callback_D(ARGMOD(PMC *user_data), ARGMOD_NULLOK(char *external_data))
     verify_CD(external_data, user_data);
 }
 
+/*
+
+=back
+
+*/
+
 
 /*
  * Local variables:
