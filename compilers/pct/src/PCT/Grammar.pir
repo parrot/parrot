@@ -231,6 +231,10 @@ to enforce whitespace between lexical words.
     .return (mob)
 .end
 
+=back
+
+=cut
+
 # Local Variables:
 #   mode: pir
 #   fill-column: 100

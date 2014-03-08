@@ -132,6 +132,7 @@ Get an IMCC compiler PMC. Register it under its preferred name if
 C<add_compreg> is 1.
 
 =cut
+
 */
 
 PARROT_CANNOT_RETURN_NULL
@@ -232,6 +233,12 @@ imcc_set_flags_api(Parrot_PMC interp_pmc, Parrot_PMC compiler,
 
     IMCC_API_CALLOUT(interp_pmc, interp)
 }
+
+/*
+
+=back
+
+*/
 
 /*
  * Local variables:

@@ -1850,6 +1850,7 @@ by adding a ".sub" wrapper around the code if one isn't
 already present.
 
 =back
+
 =cut
 
 .namespace [ 'PGE';'Perl6Regex' ]
