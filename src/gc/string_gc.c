@@ -439,6 +439,7 @@ Parrot_gc_str_reallocate_string_storage(PARROT_INTERP,
 Compact string pool.
 
 =cut
+
 */
 void
 Parrot_gc_str_compact_pool(PARROT_INTERP, ARGIN(String_GC *gc))
@@ -805,6 +806,7 @@ compact_pool(PARROT_INTERP,
 Callback for live STRING/Buffer for compating.
 
 =cut
+
 */
 static void
 move_buffer_callback(PARROT_INTERP, ARGIN(Parrot_Buffer *b), ARGIN(void *data))

@@ -15,20 +15,20 @@ Tests the NameSpace PMC. Some things that it tests specifically:
 
 =over 4
 
-=item* Creating new NameSpace PMCs
+=item * Creating new NameSpace PMCs
 
-=item* Verify that things which are supposed to return a NameSpace actually
+=item * Verify that things which are supposed to return a NameSpace actually
 do.
 
-=item* Various forms of get_global opcode
+=item * Various forms of get_global opcode
 
-=item* Finding and calling Subs which are stored in the NameSpace
+=item * Finding and calling Subs which are stored in the NameSpace
 
-=item* Methods on the NameSpace PMC
+=item * Methods on the NameSpace PMC
 
-=item* Building NameSpace hierarchies on the fly
+=item * Building NameSpace hierarchies on the fly
 
-=item* HLL NameSpaces
+=item * HLL NameSpaces
 
 =back
 
@@ -37,13 +37,13 @@ of the NameSpace PMC:
 
 =over 4
 
-=item* methods: add_sub, del_sub, del_var, del_namespace
+=item * methods: add_sub, del_sub, del_var, del_namespace
 
-=item* Typed and Untyped interfaces
+=item * Typed and Untyped interfaces
 
-=item* Subclassing NameSpace (If it's possible)
+=item * Subclassing NameSpace (If it's possible)
 
-=item* .'export_to'()
+=item * .'export_to'()
 
 Although NameSpace.'export_to'() is used in test_more.pir.
 

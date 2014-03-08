@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
+Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -121,6 +121,8 @@ null_compare(SHIM_INTERP, SHIM(const STRING *lhs), ARGIN(const STRING *rhs))
 =item C<static size_t null_hash(PARROT_INTERP, const STRING *s, size_t hashval)>
 
 Returns the hashed value of the string, given a seed in hashval.
+
+=back
 
 =cut
 

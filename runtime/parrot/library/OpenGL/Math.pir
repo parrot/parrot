@@ -123,6 +123,7 @@ Return a four element array representing the current vector value.
 Set the current vector value to a four element array.
 
 =cut
+
 .sub set_vals :method
     .param pmc vals
 

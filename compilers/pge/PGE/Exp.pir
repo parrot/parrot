@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2009, Parrot Foundation.
+# Copyright (C) 2005-2014, Parrot Foundation.
 
 =head1 DESCRIPTION
 
@@ -110,6 +110,8 @@ C<target> adverbs.
 
 Return a StringBuilder object containing the entire expression
 tree as a PIR code object that can be compiled.
+
+=back
 
 =cut
 

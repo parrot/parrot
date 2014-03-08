@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2010, Parrot Foundation.
+Copyright (C) 2004-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -158,6 +158,8 @@ Parrot_String_Bounds *bounds)>
 
 Partial scan of binary string. Stops after C<count> bytes or if character
 C<delim> is found. Setting C<count> or C<delim> to -1 disables these tests.
+
+=back
 
 =cut
 

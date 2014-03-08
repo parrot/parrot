@@ -405,6 +405,8 @@ sub parse_params {
 
 =item F<tools/dev/gen_class.pl>
 
+=back
+
 =cut
 
 1;

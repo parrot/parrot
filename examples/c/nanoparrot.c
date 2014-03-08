@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2001-2008, Parrot Foundation.
+ * Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -289,6 +289,8 @@ init(Interp *interp, opcode_t *prog)
 =item C<int main(int argc, char *argv[])>
 
 Initialize a minimal Parrotesque interpreter and run some hard-coded bytecode.
+
+=back
 
 =cut
 

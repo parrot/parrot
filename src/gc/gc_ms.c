@@ -1,13 +1,14 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/gc/gc_ms.c - Implementation of the basic mark & sweep collector
+src/gc/gc_ms.c - Basic mark & sweep garbage collector
 
 =head1 DESCRIPTION
 
-This code implements the default mark and sweep garbage collector.
+This code implements the default mark and sweep garbage collector,
+without generations.
 
 =cut
 
@@ -679,6 +680,7 @@ size_t size)>
 Functions for allocating strings/buffers storage.
 
 =cut
+
 */
 
 void
@@ -720,6 +722,7 @@ gc_ms_reallocate_buffer_storage(PARROT_INTERP, ARGIN(Parrot_Buffer *str), size_t
 Mark PMC special.
 
 =cut
+
 */
 static void
 gc_ms_mark_special(PARROT_INTERP, ARGIN(PMC *pmc))
@@ -1918,6 +1921,7 @@ Iterate over live string invoking callback for each of them. Used during
 compacting of string pool.
 
 =cut
+
 */
 static void
 gc_ms_iterate_live_strings(PARROT_INTERP,

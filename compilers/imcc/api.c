@@ -132,6 +132,7 @@ Get an IMCC compiler PMC. Register it under its preferred name if
 C<add_compreg> is 1.
 
 =cut
+
 */
 
 PARROT_CANNOT_RETURN_NULL
@@ -210,6 +211,8 @@ compiler, Parrot_Int debug, Parrot_Int opt)>
 
 Public interface to imcc_set_verbosity, imcc_set_optimization_level and
 imcc_set_debug_mode. Overwrites the imcc flags.
+
+=back
 
 =cut
 

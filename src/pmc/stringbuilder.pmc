@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2011, Parrot Foundation.
+Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -449,6 +449,7 @@ key receives the value of the hash element.
 Returns length of currently built string.
 
 =cut
+
 */
 
     METHOD get_string_length() {

@@ -242,6 +242,8 @@ Close the handle.
 Set or retrieve the encoding attribute (a string name of the selected encoding
 scheme) for the filehandle.
 
+=back
+
 =cut
 
 */

@@ -1355,6 +1355,7 @@ Checks if we can infer the value of C<key> property from C<self> without
 looking at its prophash. Returns C<PMCNULL> if not, returns the value otherwise.
 
 =cut
+
 */
 
 PARROT_WARN_UNUSED_RESULT

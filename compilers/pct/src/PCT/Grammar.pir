@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -97,6 +97,8 @@ both "word characters".  This is roughly equivalent to
 C<< <?after \w><?before \w> >> except it's much quicker.
 In particular, C<< <!ww> >> can be used by :sigspace rules
 to enforce whitespace between lexical words.
+
+=back
 
 =cut
 

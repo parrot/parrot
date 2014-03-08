@@ -1670,6 +1670,8 @@ unicode_downcase_first(PARROT_INTERP, SHIM(const STRING *src))
 Converts the first grapheme in STRING C<src> to title case, if the
 string supports it. Not implemented.
 
+=back
+
 =cut
 
 */

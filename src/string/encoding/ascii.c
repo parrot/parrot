@@ -381,6 +381,8 @@ ascii_downcase_first(PARROT_INTERP, ARGIN(const STRING *src))
 Converts the first letter of STRING C<src> to upper case,
 but doesn't modify the rest of the string.
 
+=back
+
 =cut
 
 */

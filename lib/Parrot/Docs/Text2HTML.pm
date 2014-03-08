@@ -1,4 +1,4 @@
-# Copyright (C) 2009, Parrot Foundation.
+# Copyright (C) 2009-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -68,6 +68,8 @@ sub write_html {
 =item C<html_for_file($file)>
 
 Returns the HTML for the specified file.
+
+=back
 
 =cut
 

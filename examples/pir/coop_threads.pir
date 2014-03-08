@@ -83,7 +83,7 @@ again1:
 done:
 .end
 
-=head1
+=head1 main
 
 That's it. All we need now is some test threads and a main function to run them.
 

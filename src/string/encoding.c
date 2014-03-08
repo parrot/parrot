@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2010, Parrot Foundation.
+Copyright (C) 2004-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -482,6 +482,8 @@ Parrot_make_default_encoding(SHIM_INTERP, ARGIN(SHIM(const char *encodingname)),
 =item C<const STR_VTABLE * Parrot_default_encoding(PARROT_INTERP)>
 
 Gets the default encoding.
+
+=back
 
 =cut
 

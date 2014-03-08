@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -36,7 +36,7 @@ The special variable $? in Perl 5.
 
 =head1 AUTHOR
 
-Nigel Sandever - L<nigelsandever@btconnect.com>
+Nigel Sandever - C<nigelsandever@btconnect.com>
 
 =cut
 

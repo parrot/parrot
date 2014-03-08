@@ -56,6 +56,8 @@ Processes command line arguments, reads input files, dispatches
 to appropriate PIR-generating subroutines, and then sends
 the output to the correct output file.
 
+=back
+
 =cut
 
 .namespace [ 'PGE';'Perl6Grammar';'Compiler' ]

@@ -171,7 +171,7 @@ idx)>
 
 Setup the IO_VTABLE for custom user-defined types.
 
-=cut.
+=cut
 
 */
 

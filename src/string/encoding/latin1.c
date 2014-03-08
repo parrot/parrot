@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2011, Parrot Foundation.
+Copyright (C) 2004-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -414,6 +414,8 @@ latin1_downcase_first(PARROT_INTERP, ARGIN(const STRING *src))
 
 Converts the first grapheme in STRING C<src> to title case, if the grapheme
 supports case.
+
+=back
 
 =cut
 

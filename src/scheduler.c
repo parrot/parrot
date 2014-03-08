@@ -329,6 +329,7 @@ Parrot_cx_check_quantum(PARROT_INTERP, ARGIN(PMC *scheduler))
 Stop the current task and pack it up into a PMC what can be used to resume later.
 
 =cut
+
 */
 
 PARROT_EXPORT
@@ -364,6 +365,7 @@ Pre-empt the current task. It goes on the foot of the task queue,
 and then we jump all the way back to the task scheduling loop.
 
 =cut
+
 */
 
 PARROT_CAN_RETURN_NULL

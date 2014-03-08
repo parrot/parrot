@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2009, Parrot Foundation.
+# Copyright (C) 2006-2014, Parrot Foundation.
 
 =head1 TITLE
 
@@ -21,6 +21,8 @@ suitable for inclusion or compilation into other larger programs.
 =item --output OUTFILE
 
 Send the output to OUTFILE. By default, output is directed to STDOUT.
+
+=back
 
 =cut
 

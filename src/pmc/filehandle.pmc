@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008-2013, Parrot Foundation.
+Copyright (C) 2008-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -504,6 +504,8 @@ Line buffering, bytes are sent when a record separator is encountered.
 =item C<full-buffered>
 
 Full buffering, bytes are sent when the buffer is full.
+
+=back
 
 =cut
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2012, Parrot Foundation.
+Copyright (C) 2011-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -120,6 +120,8 @@ pmclass Proxy auto_attrs {
 =item C<void mark()>
 
 Don't mark target and interp since they belong to a different interpreter.
+
+=back
 
 =cut
 

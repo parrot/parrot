@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2009, Parrot Foundation.
+# Copyright (C) 2006-2014, Parrot Foundation.
 
 =head1 DESCRIPTION
 
@@ -1850,6 +1850,7 @@ by adding a ".sub" wrapper around the code if one isn't
 already present.
 
 =back
+
 =cut
 
 .namespace [ 'PGE';'Perl6Regex' ]

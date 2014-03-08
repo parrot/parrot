@@ -235,6 +235,8 @@ store it in $1
 Create a new ParrotIO object for the stderr file descriptor and
 store it in $1
 
+=back
+
 =cut
 
 inline op getstdin(out PMC) :base_io {

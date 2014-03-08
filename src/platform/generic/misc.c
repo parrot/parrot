@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011, Parrot Foundation.
+ * Copyright (C) 2011-2014, Parrot Foundation.
  */
 
 /*
@@ -34,6 +34,8 @@ then go in the platform-specific directories.
 
 Generic version is a no-op.
 
+=back
+
 =cut
 
 */
@@ -44,6 +46,7 @@ Parrot_platform_init_code(void)
 }
 
 /*
+ *
  * Local variables:
  *   c-file-style: "parrot"
  * End:

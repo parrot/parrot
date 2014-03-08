@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2012, Parrot Foundation.
+Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -62,8 +62,6 @@ Parrot_alarm_init(void)
 }
 
 /*
-
-=over 4
 
 =item C<static void* Parrot_alarm_runloop(void *arg)>
 
@@ -204,6 +202,8 @@ Sleep till the next alarm expires. This is a fallback function which is only
 used if we try to sleep the interp without threads support. If we have
 threading enabled, this function will not be used and the normal threads-based
 mechanism will be used instead.
+
+=back
 
 =cut
 

@@ -802,6 +802,8 @@ sub generated_files {
 
 Returns the text of the file at the given path
 
+=back
+
 =cut
 
 sub slurp {

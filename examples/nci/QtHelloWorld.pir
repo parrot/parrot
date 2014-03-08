@@ -25,6 +25,7 @@ F<src/nci/extra_thunks.nci>, running F<tools/dev/mk_nci_thunks.pl>, and
 rebuilding Parrot.
 
 =cut
+
 .sub main
 
     .local pmc libpqt

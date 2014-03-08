@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2006, Parrot Foundation.
+ * Copyright (C) 2004-2014, Parrot Foundation.
  */
 
 /*
@@ -33,6 +33,8 @@ Miscellaneous helper functions that are specific to Win32.
 
 Initialize Parrot for the Win32 platform. Turns off ugly crash dialog
 boxes on Win32.
+
+=back
 
 =cut
 

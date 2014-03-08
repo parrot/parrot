@@ -3,7 +3,7 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/gc/gc_gms.c - Generational M&S
+src/gc/gc_gms.c - Generational mark & sweep garbage collector
 
 =head1 DESCRIPTION
 
@@ -1423,11 +1423,13 @@ gc_gms_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
 
 
 /*
+
 =item C<static void gc_gms_finalize(PARROT_INTERP)>
 
 Finalize GC subsystem.
 
 =cut
+
 */
 static void
 gc_gms_finalize(PARROT_INTERP)
@@ -1734,6 +1736,7 @@ size)>
 Functions for allocating strings/buffers storage.
 
 =cut
+
 */
 
 static void
@@ -1777,7 +1780,6 @@ gc_gms_reallocate_buffer_storage(PARROT_INTERP, ARGIN(Parrot_Buffer *str), size_
 }
 
 /*
-
 =item C<static void gc_gms_iterate_live_strings(PARROT_INTERP,
 string_iterator_callback callback, void *data)>
 
@@ -1785,6 +1787,7 @@ Iterate over live string invoking callback for each of them. Used during
 compacting of string pool.
 
 =cut
+
 */
 static void
 gc_gms_iterate_live_strings(PARROT_INTERP,
@@ -2053,6 +2056,7 @@ This is automatically added by pmc2c to all VTABLE function which are marked
 with C<:write> in src/vtable.tbl.
 
 =cut
+
 */
 static void
 gc_gms_write_barrier(PARROT_INTERP, ARGMOD(PMC *pmc))
@@ -2230,6 +2234,7 @@ gc_gms_count_used_pmc_memory(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *list))
 Seal/unseal object with write barrier.
 
 =cut
+
 */
 static void
 gc_gms_seal_object(SHIM_INTERP, ARGIN(PMC *pmc))
