@@ -441,7 +441,7 @@ archive at L<http://groups.google.com/group/parrot-dev/>.
 
 =head2 IRC
 
-The Parrot IRC channel is hosted on L<irc.perl.org:6667> and is named C<#parrot>.
+The Parrot IRC channel is hosted on L<irc://irc.perl.org:6667> and is named C<#parrot>.
 This Perl server network is also called C<MagNET> or C<Rhizomatic>.
 
 =cut

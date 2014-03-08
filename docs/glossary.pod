@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -290,8 +290,8 @@ numbers and constant numbers in the arguments to the ops into pointers.
 =item run core
 
 aka run loop, aka runcore. The way Parrot executes PBCs.
-See running.pod for a list of available runcores, and how to tell
-parrot which one to use.  L<<  Running|http://docs.parrot.org/parrot/latest/html/docs/running.pod.html >>
+See L<docs/running.pod> for a list of available runcores, and how to tell
+parrot which one to use.
 
 =item SMOP
 

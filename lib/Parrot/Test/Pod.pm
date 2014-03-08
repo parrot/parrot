@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2012, Parrot Foundation.
+# Copyright (C) 2009-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -324,14 +324,6 @@ Path to build directory (currently, the top-level Parrot directory).
 
 B<Return Value:> Reference to hash of files meriting analysis, I<i.e.,> the
 results of the first pass minus the results of the second pass.
-
-=head1 AUTHOR
-
-James E Keenan, refactored from earlier code
-
-=head1 HISTORY
-
-* [2012-06-05] Updated by Alvis Yardley <ac.yardley@gmail.com>
 
 =cut
 

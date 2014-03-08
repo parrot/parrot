@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -22,7 +22,7 @@ plan tests => 2;
 my $self = Parrot::Test::Pod->new( {
     argv => [ @ARGV ],
 } );
-ok( defined $self, "Parrot::Test::Pod returned defined value" );
+ok( defined $self, "Parrot::Test::Pod loaded ok" );
 
 my $need_testing_ref = $self->identify_files_for_POD_testing( {
     second_analysis => 'oreilly_summary_malformed',
@@ -37,13 +37,16 @@ foreach my $file ( @{ $need_testing_ref } ) {
         push @failed_syntax, $file;
     }
 }
+diag join ' ',@{ $need_testing_ref } if $ENV{TEST_VERBOSE};
 
 my $bad_syntax_files        = join( "\n", @failed_syntax );
 
 # only ok if everything passed
-is( $bad_syntax_files, q{}, 'Pod syntax correct' );
+is( $bad_syntax_files, q{},
+    "Pod syntax of ".scalar @{ $need_testing_ref }." tested files" );
 
-diag("You should use podchecker to check the failed files.\n")
+diag("You should use podchecker to check the ".scalar @failed_syntax.
+     " failed files.\n".$bad_syntax_files )
     if $bad_syntax_files;
 
 #################### SUBROUTINES ####################
@@ -62,16 +65,20 @@ t/codingstd/pod_syntax.t - Pod document syntax tests
 
 =head1 DESCRIPTION
 
-Tests the Pod syntax for all files listed in F<MANIFEST> and
-F<MANIFEST.generated> that appear to contain Pod markup. If any files
-contain invalid POD markup, they are reported in the test output.
-Use C<podchecker> to ferret out individual issues.
+Tests the perl5 POD syntax with L<Pod::Simple> for all files listed in the
+MANIFESTs that appear to contain perl5 POD markup, besides the book which
+is O'Reilly specific extended POD and the pdds which are tested
+elsewhere. If any files contain invalid POD markup, they are reported in
+the test output.
+
+Use C<podchecker> to ferret out individual issues, but note that
+L<Pod::Checker> is stricter than L<Pod::Simple>.
 
 =cut
 
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
-#   fill-column: 100
+#   fill-column: 78
 # End:
 # vim: expandtab shiftwidth=4:
