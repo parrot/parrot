@@ -59,6 +59,7 @@ static STRING* trace_class_name(PARROT_INTERP, ARGIN(const PMC* pmc))
 Get debugger if available
 
 =cut
+
 */
 
 PARROT_CANNOT_RETURN_NULL
