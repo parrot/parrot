@@ -122,7 +122,7 @@ Preprocess source file (expand macros) and print result to stdout:
 =head2 Runcore Options
 
 These options select the runcore, which is useful for performance tuning and
-debugging.  See L<About runcores> for details.
+debugging.  See L<ABOUT RUNCORES> for details.
 
 =over 4
 
@@ -228,8 +228,6 @@ If the C<file> is a single dash, input from C<stdin> is read.
 
 Optional arguments passed to the running program as ARGV. The program is
 assumed to know what to do with these.
-
-=head1 GENERATED FILES
 
 =head1 ABOUT RUNCORES
 
