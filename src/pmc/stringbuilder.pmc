@@ -449,6 +449,7 @@ key receives the value of the hash element.
 Returns length of currently built string.
 
 =cut
+
 */
 
     METHOD get_string_length() {

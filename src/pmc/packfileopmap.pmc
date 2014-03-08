@@ -147,6 +147,7 @@ already in the map, a new map will be created.
 Get Op PMC by name.
 
 =cut
+
 */
 
     VTABLE PMC* get_pmc_keyed_str(STRING *name) {
@@ -182,6 +183,7 @@ Get Op PMC by name.
 Lookup op name by mapped id.
 
 =cut
+
 */
     VTABLE STRING* get_string_keyed_int(INTVAL key) {
         PMC *ops;
@@ -293,6 +295,7 @@ Ensure that an op library is loaded and accessible to this OpMap.
 Construct PackFile_ByteCode_OpMapping.
 
 =cut
+
 */
 
     VTABLE void *get_pointer() {
