@@ -11,7 +11,6 @@ void init() :write
 # init must be first for JITed vtable meths
 void init_pmc(PMC* initializer) :write
 PMC* instantiate(PMC* sig)
-void morph(PMC* type) :write
 void mark()
 void destroy()
 PMC* get_namespace()

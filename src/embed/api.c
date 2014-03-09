@@ -24,6 +24,37 @@ This file implements functions of the Parrot embedding interface.
 
 /* HEADERIZER HFILE: include/parrot/api.h */
 
+/* typedef and macros required to replace morph VTABLE */
+typedef struct Pcc_cell
+{
+    union u {
+        PMC     *p;
+        STRING  *s;
+        INTVAL   i;
+        FLOATVAL n;
+    } u;
+    INTVAL type;
+} Pcc_cell;
+
+#define FREE_CELL(i, c) \
+    Parrot_gc_free_fixed_size_storage((i), sizeof (Pcc_cell), (c))
+
+#define MORPH_REPLACE_NULL( caller ) \
+        if (PMC_data(caller)) {\
+            SETATTR_CallContext_short_sig(interp, caller, NULL);\
+            SETATTR_CallContext_arg_flags(interp, caller, PMCNULL);\
+            SETATTR_CallContext_return_flags(interp, caller, PMCNULL);\
+            SETATTR_CallContext_type_tuple(interp, caller, PMCNULL);\
+            SETATTR_CallContext_num_positionals(interp, caller, 0);\
+            GETATTR_CallContext_hash(interp, caller, hash);\
+            if (hash) {\
+                parrot_hash_iterate(hash,\
+                FREE_CELL(interp, (Pcc_cell *)_bucket->value););\
+                Parrot_hash_destroy(interp, hash);\
+                SETATTR_CallContext_hash(interp, caller, NULL);\
+            }\
+        }
+
 
 /*
 
@@ -631,12 +662,13 @@ Parrot_Int
 Parrot_api_reset_call_signature(Parrot_PMC interp_pmc, ARGMOD(Parrot_PMC ctx))
 {
     ASSERT_ARGS(Parrot_api_reset_call_signature)
+    Hash      *hash;
     EMBED_API_CALLIN(interp_pmc, interp)
     STRING * const callcontext = Parrot_str_new(interp, "CallContext", 0);
     if (!VTABLE_isa(interp, ctx, callcontext))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Not a valid CallContext");
-    VTABLE_morph(interp, ctx, PMCNULL);
+    MORPH_REPLACE_NULL(ctx);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
 

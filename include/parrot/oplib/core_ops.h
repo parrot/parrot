@@ -715,8 +715,6 @@ op_lib_t *PARROT_CORE_OPLIB_INIT(PARROT_INTERP, long init);
  opcode_t * Parrot_box_p_s(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_box_p_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_iter_p_p(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_morph_p_p(opcode_t *, PARROT_INTERP);
- opcode_t * Parrot_morph_p_pc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_clone_s_s(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_clone_s_sc(opcode_t *, PARROT_INTERP);
  opcode_t * Parrot_set_i_i(opcode_t *, PARROT_INTERP);

@@ -681,42 +681,6 @@ Mark any referenced strings and PMCs.
         }
     }
 
-/*
-
-=item C<void morph(PMC *type)>
-
-Morph the call signature into a return signature. (Currently ignores
-the type passed in, and resets the named and positional arguments
-stored.)
-
-=cut
-
-*/
-    VTABLE void morph(PMC *type) {
-        UNUSED(type)
-        Hash     *hash;
-
-        if (!PMC_data(SELF))
-            return;
-
-        SET_ATTR_short_sig(INTERP, SELF, NULL);
-        SET_ATTR_arg_flags(INTERP, SELF, PMCNULL);
-        SET_ATTR_return_flags(INTERP, SELF, PMCNULL);
-        SET_ATTR_type_tuple(INTERP, SELF, PMCNULL);
-
-        /* Don't free positionals. Just reuse them */
-        SET_ATTR_num_positionals(INTERP, SELF, 0);
-
-        GET_ATTR_hash(INTERP, SELF, hash);
-
-        if (hash) {
-            parrot_hash_iterate(hash,
-               FREE_CELL(INTERP, (Pcc_cell *)_bucket->value););
-            Parrot_hash_destroy(INTERP, hash);
-            SET_ATTR_hash(INTERP, SELF, NULL);
-        }
-    }
-
     VTABLE void destroy() {
         INTVAL    allocated_positionals;
         Hash     *hash;

@@ -1282,17 +1282,24 @@ check_set_std_props(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const STRING *key), A
         const INTVAL on = VTABLE_get_bool(interp, value);
 
         /* morph to Const/normal class or readonly class */
-        if (on && (pmc->vtable->flags & VTABLE_HAS_CONST_TOO))
+        if (on && (pmc->vtable->flags & VTABLE_HAS_CONST_TOO)) {
             pmc->vtable = interp->vtables[pmc->vtable->base_type + 1];
-        else if (!on && (pmc->vtable->flags & (VTABLE_IS_CONST_FLAG)))
-            VTABLE_morph(interp, pmc, interp->vtables[pmc->vtable->base_type - 1]->pmc_class);
-        else if (on && (pmc->vtable->flags & VTABLE_HAS_READONLY_FLAG))
+        }
+        else if (!on && (pmc->vtable->flags & (VTABLE_IS_CONST_FLAG))) {
+            /* this replaces a morph() and hopefully does the what was
+             * previously intended */
+            pmc->vtable = interp->vtables[pmc->vtable->base_type - 1]->pmc_class;
+        }
+        else if (on && (pmc->vtable->flags & VTABLE_HAS_READONLY_FLAG)) {
             pmc->vtable = pmc->vtable->ro_variant_vtable;
+        }
         else if (!on && (pmc->vtable->flags & VTABLE_IS_READONLY_FLAG)
-                && pmc->vtable->ro_variant_vtable)
+                && pmc->vtable->ro_variant_vtable) {
             pmc->vtable = pmc->vtable->ro_variant_vtable;
-        else
+        }
+        else {
             return 0;
+        }
 
         return 1;
     }

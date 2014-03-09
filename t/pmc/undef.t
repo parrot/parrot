@@ -18,7 +18,7 @@ Tests mainly morphing undef to other types.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(27)
+    plan(26)
 
     morph_to_string()
     undef_pmc_is_false()
@@ -27,7 +27,6 @@ Tests mainly morphing undef to other types.
     undef_pmc_morph_to_integer()
     undef_pmc_morph_to_float()
     verify_equality()
-    string_pmc_morph_to_undef()
     undef_pmc_set_to_integer_native()
     undef_pmc_set_to_number_native()
     undef_pmc_isa_after_assignment()
@@ -116,15 +115,6 @@ Tests mainly morphing undef to other types.
 
     $I0 = pmc1 == pmc2
     is( $I0, 0, 'PMC Undef and PMC String are unequal' )
-.end
-
-.sub string_pmc_morph_to_undef
-    .local pmc pmc1
-    pmc1 = new ['String']
-    $P0 = get_class 'Undef'
-    morph pmc1, $P0
-    $S1 = typeof pmc1
-    is( $S1, 'Undef', 'PMC String morph to undef' )
 .end
 
 .sub undef_pmc_set_to_integer_native

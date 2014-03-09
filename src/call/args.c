@@ -52,6 +52,37 @@ typedef struct pcc_funcs_ptr {
     pmc_func_t      pmc_constant;
 } pcc_funcs_ptr;
 
+/* typedef and macros required to replace morph VTABLE */
+typedef struct Pcc_cell
+{
+    union u {
+        PMC     *p;
+        STRING  *s;
+        INTVAL   i;
+        FLOATVAL n;
+    } u;
+    INTVAL type;
+} Pcc_cell;
+
+#define FREE_CELL(i, c) \
+    Parrot_gc_free_fixed_size_storage((i), sizeof (Pcc_cell), (c))
+
+#define MORPH_REPLACE_NULL( caller ) \
+        if (PMC_data(caller)) {\
+            SETATTR_CallContext_short_sig(interp, caller, NULL);\
+            SETATTR_CallContext_arg_flags(interp, caller, PMCNULL);\
+            SETATTR_CallContext_return_flags(interp, caller, PMCNULL);\
+            SETATTR_CallContext_type_tuple(interp, caller, PMCNULL);\
+            SETATTR_CallContext_num_positionals(interp, caller, 0);\
+            GETATTR_CallContext_hash(interp, caller, hash);\
+            if (hash) {\
+                parrot_hash_iterate(hash,\
+                FREE_CELL(interp, (Pcc_cell *)_bucket->value););\
+                Parrot_hash_destroy(interp, hash);\
+                SETATTR_CallContext_hash(interp, caller, NULL);\
+            }\
+        }
+
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
@@ -338,12 +369,13 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
     INTVAL          arg_count;
     INTVAL          arg_index = 0;
     INTVAL          arg_named_count = 0;
+    Hash           *hash;
 
     if (UNLIKELY(PMC_IS_NULL(signature)))
         call_object = Parrot_pmc_new(interp, enum_class_CallContext);
     else {
         call_object = signature;
-        VTABLE_morph(interp, call_object, PMCNULL);
+        MORPH_REPLACE_NULL(call_object);
     }
 
     /* this macro is much, much faster than the VTABLE STRING comparisons */
@@ -655,8 +687,9 @@ Parrot_pcc_set_call_from_varargs(PARROT_INTERP,
         ARGMOD(va_list *args))
 {
     ASSERT_ARGS(Parrot_pcc_set_call_from_varargs)
+    Hash        *hash;
     PARROT_ASSERT(PMCNULL != signature);
-    VTABLE_morph(interp, signature, PMCNULL);
+    MORPH_REPLACE_NULL(signature);
     set_call_from_varargs(interp, signature, sig, args);
 }
 
@@ -683,12 +716,13 @@ Parrot_pcc_build_call_from_varargs(PARROT_INTERP,
 {
     ASSERT_ARGS(Parrot_pcc_build_call_from_varargs)
     PMC         *call_object;
+    Hash        *hash;
 
     if (PMC_IS_NULL(signature))
         call_object = Parrot_pmc_new(interp, enum_class_CallContext);
     else {
         call_object = signature;
-        VTABLE_morph(interp, call_object, PMCNULL);
+        MORPH_REPLACE_NULL(call_object);
     }
 
     set_call_from_varargs(interp, call_object, sig, args);
