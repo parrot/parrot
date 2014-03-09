@@ -61,7 +61,8 @@ inline static void *parrot_ppc_cmpset(void * volatile *ptr,
                             /* "    sync\n" -- XXX needed on PPC 405, see
                              * http://www.kegel.com/xgcc3/ppc405erratum77.html */
                             "    stwcx. %3, 0, %1\n"    /* store new using reservation */
-                            "    bne- 1b\n"     /* spin on failure of reservation; - is branch prediction hint */
+                            "    bne- 1b\n"     /* spin on failure of reservation;
+                                                   - is branch prediction hint */
                             "    b 3f\n" "2:  stwcx. %0, 0, %1\n"       /* flush reservation */
                             "3:  \n"    /* end label */
                             :   /* output */
@@ -94,7 +95,8 @@ inline static long parrot_ppc_add(volatile long *val, long what)
                             /* "    sync\n" -- XXX needed on PPC 405, see
                              * http://www.kegel.com/xgcc3/ppc405erratum77.html */
                             "    stwcx. %0, 0, %1\n"    /* *val <- tmp using reservation */
-                            "    bne- 1b\n"     /* spin on failure of reservation; - is branch prediction hint */
+                            "    bne- 1b\n"     /* spin on failure of reservation;
+                                                   - is branch prediction hint */
                             "2:  \n"    /* end label */
                             :   /* output */
                             "=&r"(tmp)
