@@ -75,7 +75,6 @@ sub info_for_first_long_line {
         chomp $line;
         $line =~ s/\t/' ' x (1 + length($`) % 8)/eg;  # expand \t
         next if $line =~ m/https?:\/\//;              # skip long web addresses
-        next if $line =~ m/\$Id:/;
         next if $line =~ m/CONST_STRING\(/;
 
         return sprintf '%s:%d: %d cols', $file, $., length($line)
