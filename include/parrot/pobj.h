@@ -347,7 +347,9 @@ typedef enum PObj_enum {
 /* Thread debugging aid for catching PMCs ending up on the wrong interp */
 
 #ifdef THREAD_DEBUG
-#  define PARROT_ASSERT_INTERP(pmc, interp) PARROT_ASSERT((pmc) == NULL || PMC_IS_NULL(pmc) || PObj_is_shared_TEST(pmc) || (pmc)->orig_interp == (interp))
+#  define PARROT_ASSERT_INTERP(pmc, interp) \
+    PARROT_ASSERT((pmc) == NULL || PMC_IS_NULL(pmc) || \
+            PObj_is_shared_TEST(pmc) || (pmc)->orig_interp == (interp))
 #else
 #  define PARROT_ASSERT_INTERP(pmc, interp)
 #endif

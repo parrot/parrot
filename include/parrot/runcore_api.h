@@ -15,7 +15,8 @@ typedef struct runcore_t Parrot_runcore_t;
 
 #  define DO_OP(PC, INTERP) ((PC) = (((INTERP)->code->op_func_table)[*(PC)])((PC), (INTERP)))
 
-typedef opcode_t * (*runcore_runops_fn_type) (PARROT_INTERP, ARGIN(Parrot_runcore_t *), ARGIN(opcode_t *pc));
+typedef opcode_t * (*runcore_runops_fn_type) (PARROT_INTERP, ARGIN(Parrot_runcore_t *),
+                                                ARGIN(opcode_t *pc));
 typedef       void (*runcore_destroy_fn_type)(PARROT_INTERP, ARGIN(Parrot_runcore_t *));
 typedef     void * (*runcore_prepare_fn_type)(PARROT_INTERP, ARGIN(Parrot_runcore_t *));
 

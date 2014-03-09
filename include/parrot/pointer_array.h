@@ -104,7 +104,8 @@ Parrot_pa_insert(ARGMOD(Parrot_Pointer_Array *self), ARGIN(void *ptr))
             mem_internal_realloc_n_typed(self->chunks,
                     self->total_chunks,
                     Parrot_Pointer_Array_Chunk*);
-            self->chunks[self->current_chunk] = mem_internal_allocate_typed(Parrot_Pointer_Array_Chunk);
+            self->chunks[self->current_chunk] =
+                mem_internal_allocate_typed(Parrot_Pointer_Array_Chunk);
             self->chunks[self->current_chunk]->num_free  = CELL_PER_CHUNK;
             self->chunks[self->current_chunk]->next_free = 0;
         }

@@ -510,11 +510,13 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
 #  define Parrot_pcc_get_signature(i, c) Parrot_pcc_get_signature_func((i), (c))
 
 #  define Parrot_pcc_get_num_constant(i, c, idx) Parrot_pcc_get_num_constant_func((i), (c), (idx))
-#  define Parrot_pcc_get_string_constant(i, c, idx) Parrot_pcc_get_string_constant_func((i), (c), (idx))
+#  define Parrot_pcc_get_string_constant(i, c, idx) \
+            Parrot_pcc_get_string_constant_func((i), (c), (idx))
 #  define Parrot_pcc_get_pmc_constant(i, c, idx) Parrot_pcc_get_pmc_constant_func((i), (c), (idx))
 
 #  define Parrot_pcc_get_recursion_depth(i, c) Parrot_pcc_get_recursion_depth_func((i), (c))
-#  define Parrot_pcc_set_recursion_depth(i, c, d) Parrot_pcc_set_recursion_depth_func((i), (c), (d))
+#  define Parrot_pcc_set_recursion_depth(i, c, d) \
+            Parrot_pcc_set_recursion_depth_func((i), (c), (d))
 #  define Parrot_pcc_dec_recursion_depth(i, c) Parrot_pcc_dec_recursion_depth_func((i), (c))
 #  define Parrot_pcc_inc_recursion_depth(i, c) Parrot_pcc_inc_recursion_depth_func((i), (c))
 
@@ -527,8 +529,10 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
 #  define Parrot_pcc_errors_test(i, c, flags) Parrot_pcc_errors_test_func((i), (c), (flags))
 
 #  define Parrot_pcc_trace_flags_on(i, c, flags) Parrot_pcc_trace_flags_on_func((i), (c), (flags))
-#  define Parrot_pcc_trace_flags_off(i, c, flags) Parrot_pcc_trace_flags_off_func((i), (c), (flags))
-#  define Parrot_pcc_trace_flags_test(i, c, flags) Parrot_pcc_trace_flags_test_func((i), (c), (flags))
+#  define Parrot_pcc_trace_flags_off(i, c, flags) \
+            Parrot_pcc_trace_flags_off_func((i), (c), (flags))
+#  define Parrot_pcc_trace_flags_test(i, c, flags) \
+            Parrot_pcc_trace_flags_test_func((i), (c), (flags))
 
 #endif /* ifndef NDEBUG */
 
@@ -567,7 +571,8 @@ UINTVAL Parrot_pcc_warnings_test_func(PARROT_INTERP,
         CURRENT_CONTEXT(i) = (c);                       \
     } while (0)
 #else
-#  define Parrot_pcc_set_continuation(i, c, value) Parrot_pcc_set_continuation_func((i), (c), (value))
+#  define Parrot_pcc_set_continuation(i, c, value) \
+            Parrot_pcc_set_continuation_func((i), (c), (value))
 #  define Parrot_pcc_set_caller_ctx(i, c, value) Parrot_pcc_set_caller_ctx_func((i), (c), (value))
 #  define Parrot_pcc_set_namespace(i, c, value) Parrot_pcc_set_namespace_func((i), (c), (value))
 #  define Parrot_pcc_set_object(i, c, value) Parrot_pcc_set_object_func((i), (c), (value))
