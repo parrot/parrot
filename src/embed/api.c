@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2012, Parrot Foundation.
+Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -187,6 +187,8 @@ Parrot_api_set_runcore(Parrot_PMC interp_pmc, ARGIN(const char * corename),
     else {
         if (STREQ(corename, "slow") || STREQ(corename, "bounds"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
+        else if (STREQ(corename, "trace"))
+            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
         else if (STREQ(corename, "fast")
                  || STREQ(corename, "function")
                  || STREQ(corename, "cgp")
@@ -202,8 +204,6 @@ Parrot_api_set_runcore(Parrot_PMC interp_pmc, ARGIN(const char * corename),
         else if (STREQ(corename, "exec"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, corename));
 #endif
-        else if (STREQ(corename, "trace"))
-            Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, corename));
         else if (STREQ(corename, "profiling"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, corename));
         else if (STREQ(corename, "gc_debug"))

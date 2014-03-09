@@ -178,6 +178,7 @@ Assign a new value $2, to PMC $1. Same as the equivalent B<set> opcodes.
 =item B<assign>(invar PMC, invar PMC)
 
 Assign a new value $2, to PMC $1 by copying the value.
+Usually calls the set_pmc vtable method.
 
 =item B<assign>(out STR, in STR)
 
