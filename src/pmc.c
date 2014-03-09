@@ -305,6 +305,8 @@ and the PMC will be inited.
 Cannot currently handle converting a non-Object PMC into an Object. Use
 C<pmc_reuse_by_class> for that.
 
+The flags argument is currently ignored. The flags of the vtable of the
+new_type is used instead.
 
 =cut
 

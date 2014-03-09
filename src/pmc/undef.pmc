@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2012, Parrot Foundation.
+Copyright (C) 2004-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -87,6 +87,21 @@ appropriate type.
         /* don't want to call set_pmc if we're assigning an Undef to an Undef */
         if (other->vtable->base_type != enum_class_Undef)
             VTABLE_set_pmc(INTERP, SELF, other);
+    }
+
+/*
+
+=item C<void morph(PMC *new_type)>
+
+Same as assign_pmc.
+
+=cut
+
+*/
+
+    VTABLE void morph(PMC *new_type) {
+        if (new_type->vtable->base_type != enum_class_Undef)
+            VTABLE_set_pmc(INTERP, SELF, new_type);
     }
 
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -185,7 +185,8 @@ Removes and returns an item from the start of the array.
 
 =cut
 
-TODO: This always moves the array memory, which is not very performant
+TODO: This always moves the array memory, which is not very performant.
+      Store the offset.
 TODO: Check whether there is already an element that can be shifted
 
 */

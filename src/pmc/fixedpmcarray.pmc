@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -25,6 +25,9 @@ never be set for user arrays.
 
 #define PMC_size(x)  ((Parrot_FixedPMCArray_attributes *)PMC_data(x))->size
 #define PMC_array(x) ((Parrot_FixedPMCArray_attributes *)PMC_data(x))->pmc_array
+
+#include "pmc_fixedstringarray.h"
+#include "pmc_fixedintegerarray.h"
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
@@ -197,6 +200,54 @@ Returns the number of elements in the array.
 
     VTABLE INTVAL get_integer() {
         return SELF.elements();
+    }
+
+/*
+
+=item C<INTVAL morph(PMC *new_type)>
+
+Defined for String and Integer and other arrays.
+Not yet for hashes.
+
+=cut
+
+*/
+
+    VTABLE INTVAL morph(PMC *new_type) {
+        INTVAL retval = 1;
+        if (new_type->vtable->base_type == enum_class_Integer)
+            VTABLE_init_int(INTERP, SELF, SELF.elements());
+        else if (new_type->vtable->base_type == enum_class_String)
+            VTABLE_set_string_native(INTERP, SELF, SELF.get_string());
+        else if (VTABLE_isa(INTERP, new_type, CONST_STRING(INTERP, "ResizablePMCArray")))
+            PMC_data(SELF) = PMC_data(new_type);
+        else if (VTABLE_isa(INTERP, new_type, CONST_STRING(INTERP, "FixedStringArray"))
+              || VTABLE_isa(INTERP, new_type, CONST_STRING(INTERP, "ResizableStringArray"))) {
+            register int i;
+            STRING **to;
+            PMC **from = PMC_array(SELF);
+            GETATTR_FixedStringArray_str_array(INTERP, new_type, to);
+            for (i = 0; i < PMC_size(SELF); i++) {
+                to[i] = VTABLE_get_string(INTERP, from[i]);
+            }
+            PMC_size(new_type) = PMC_size(SELF);
+        }
+        else if (VTABLE_isa(INTERP, new_type, CONST_STRING(INTERP, "FixedIntegerArray"))
+              || VTABLE_isa(INTERP, new_type, CONST_STRING(INTERP, "ResizableIntegerArray"))) {
+            register int i;
+            INTVAL *to;
+            PMC **from = PMC_array(SELF);
+            GETATTR_FixedIntegerArray_int_array(INTERP, new_type, to);
+            for (i = 0; i < PMC_size(SELF); i++) {
+                to[i] = VTABLE_get_integer(INTERP, from[i]);
+            }
+            PMC_size(new_type) = PMC_size(SELF);
+        }
+        else
+            retval = 0;
+
+        Parrot_pmc_reuse(INTERP, SELF, new_type->vtable->base_type, 0);
+        return retval;
     }
 
 /*

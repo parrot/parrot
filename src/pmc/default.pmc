@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -433,16 +433,17 @@ Defaults fall back to C<set_pmc> and C<set_string_native>.
 
 /*
 
-=item C<void morph(PMC* type)>
+=item C<void morph(PMC* new_type)>
 
-Changes the PMC to a PMC of a new type
+Changes the PMC to a PMC of a new type, but we cannot transform
+the values generally.
 
 =cut
 
 */
 
-    VTABLE void morph(PMC* type) {
-        Parrot_pmc_reuse(INTERP, SELF, VTABLE_get_integer(INTERP, type), 0);
+    VTABLE void morph(PMC* new_type) {
+        Parrot_pmc_reuse_init(INTERP, SELF, new_type->vtable->base_type, new_type, 0);
     }
 
 /*

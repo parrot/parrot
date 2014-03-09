@@ -295,13 +295,16 @@ CODE
 Done!
 OUTPUT
 
-# TODO: Should it really return 'default' here?
-extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_morph");
+# TODO Should return 'Integer', not 'default' here, and the value should be the length
+# of the array fpa
+extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_morph", todo => 'GH #372 morph returns default');
+    Parrot_PMC_init_int(interp, fpa, 10);
     Parrot_PMC_morph(interp, fpa, pmc);
     string = Parrot_PMC_name(interp, fpa);
-    Parrot_printf(interp, "%S\n", string);
+    integer = Parrot_PMC_get_integer(interp, fpa);
+    Parrot_printf(interp, "%S %d\n", string, integer);
 CODE
-default
+Integer 10
 Done!
 OUTPUT
 
