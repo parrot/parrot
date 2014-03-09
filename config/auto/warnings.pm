@@ -141,7 +141,7 @@ sub _init {
         -Wjump-misses-init
         -Wlogical-op
         -Werror=missing-braces
-        -Wmissing-declarations
+        -Werror=missing-declarations
         -Wno-missing-format-attribute
         -Wmissing-include-dirs
         -Wmultichar
@@ -166,7 +166,7 @@ sub _init {
         -Wc++-compat
         -Werror=declaration-after-statement
         -Werror=implicit-function-declaration
-        -Wmissing-prototypes
+        -Werror=missing-prototypes
         -Werror=nested-externs
         -Werror=old-style-definition
         -Werror=strict-prototypes
