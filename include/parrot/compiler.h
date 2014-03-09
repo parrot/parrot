@@ -152,7 +152,8 @@
 */
 
 #define PARROT_CONST_FUNCTION       __attribute__const__ __attribute__warn_unused_result__
-/* Const functions are pure functions, and also do not examine targets of pointer args or globals. e.g. sqrt() */
+/* Const functions are pure functions, and also do not examine targets of
+   pointer args or globals. e.g. sqrt() */
 /* "Many functions do not examine any values except their arguments,
     and have no effects except the return value. Basically this is just
     slightly more strict class than the pure attribute below, since
@@ -166,7 +167,8 @@
 
 #define PARROT_DOES_NOT_RETURN              /*@noreturn@*/ __attribute__noreturn__
 #define PARROT_DOES_NOT_RETURN_WHEN_FALSE   /*@noreturnwhenfalse@*/
-#define PARROT_MALLOC                       /*@only@*/ __attribute__malloc__ __attribute__warn_unused_result__
+#define PARROT_MALLOC                       /*@only@*/ __attribute__malloc__ \
+                                                        __attribute__warn_unused_result__
 
 /* Hot functions can be optimized by the compiler. */
 #define PARROT_HOT                          __attribute__hot__

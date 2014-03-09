@@ -32,7 +32,8 @@
 /* NaN difference, but patches welcome */
 #define FLOATTYPE_16MIPS      3
 #define FLOATTYPE_16MIPS_NAME "MIPS 16 byte long double"
-/* See http://www.ncsa.uiuc.edu/UserInfo/Resources/Hardware/IBMp690/IBM/usr/share/man/info/en_US/a_doc_lib/aixprggd/genprogc/128bit_long_double_floating-point_datatype.htm */
+/* See http://www.ncsa.uiuc.edu/UserInfo/Resources/Hardware/IBMp690/IBM/usr/share/ ...
+ * man/info/en_US/a_doc_lib/aixprggd/genprogc/128bit_long_double_floating-point_datatype.htm */
 #define FLOATTYPE_16AIX       4
 #define FLOATTYPE_16AIX_NAME  "AIX 16 byte long double"
 /* IEEE-754 old and tiny, yet unsupported */
@@ -166,7 +167,8 @@ typedef struct PackFile_Segment {
     opcode_t           *data;           /* oparray e.g. bytecode */
 } PackFile_Segment;
 
-typedef INTVAL (*PackFile_map_segments_func_t)(PARROT_INTERP, ARGMOD(PackFile_Segment *seg), ARGIN_NULLOK(void *user_data));
+typedef INTVAL (*PackFile_map_segments_func_t)(PARROT_INTERP,
+        ARGMOD(PackFile_Segment *seg), ARGIN_NULLOK(void *user_data));
 
 typedef struct PackFile_ConstTagPair {
     opcode_t tag_idx;

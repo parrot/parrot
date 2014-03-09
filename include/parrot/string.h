@@ -29,19 +29,26 @@
 
 #define STRING_equal(interp, lhs, rhs) ((lhs)->encoding)->equal((interp), (lhs), (rhs))
 #define STRING_compare(interp, lhs, rhs) ((lhs)->encoding)->compare((interp), (lhs), (rhs))
-#define STRING_index(interp, src, search, offset) ((src)->encoding)->index((interp), (src), (search), (offset))
-#define STRING_rindex(interp, src, search, offset) ((src)->encoding)->rindex((interp), (src), (search), (offset))
+#define STRING_index(interp, src, search, offset) \
+    ((src)->encoding)->index((interp), (src), (search), (offset))
+#define STRING_rindex(interp, src, search, offset) \
+    ((src)->encoding)->rindex((interp), (src), (search), (offset))
 #define STRING_hash(i, src, seed) ((src)->encoding)->hash((i), (src), (seed))
 
 #define STRING_scan(i, src) ((src)->encoding)->scan((i), (src))
 #define STRING_ord(i, src, offset) ((src)->encoding)->ord((i), (src), (offset))
-#define STRING_substr(i, src, offset, count) ((src)->encoding)->substr((i), (src), (offset), (count))
+#define STRING_substr(i, src, offset, count) \
+    ((src)->encoding)->substr((i), (src), (offset), (count))
 
-#define STRING_is_cclass(interp, flags, src, offset) ((src)->encoding)->is_cclass((interp), (flags), (src), (offset))
-#define STRING_find_cclass(interp, flags, src, offset, count) ((src)->encoding)->find_cclass((interp), (flags), (src), (offset), (count))
-#define STRING_find_not_cclass(interp, flags, src, offset, count) ((src)->encoding)->find_not_cclass((interp), (flags), (src), (offset), (count))
+#define STRING_is_cclass(interp, flags, src, offset) \
+    ((src)->encoding)->is_cclass((interp), (flags), (src), (offset))
+#define STRING_find_cclass(interp, flags, src, offset, count) \
+    ((src)->encoding)->find_cclass((interp), (flags), (src), (offset), (count))
+#define STRING_find_not_cclass(interp, flags, src, offset, count) \
+    ((src)->encoding)->find_not_cclass((interp), (flags), (src), (offset), (count))
 
-#define STRING_get_graphemes(interp, src, offset, count) ((src)->encoding)->get_graphemes((interp), (src), (offset), (count))
+#define STRING_get_graphemes(interp, src, offset, count) \
+    ((src)->encoding)->get_graphemes((interp), (src), (offset), (count))
 #define STRING_compose(interp, src) ((src)->encoding)->compose((interp), (src))
 #define STRING_decompose(interp, src) ((src)->encoding)->decompose((interp), (src))
 
@@ -53,10 +60,14 @@
 #define STRING_titlecase_first(interp, src) ((src)->encoding)->titlecase_first((interp), (src))
 
 #define STRING_ITER_INIT(i, iter) (iter)->charpos = (iter)->bytepos = 0
-#define STRING_iter_get(i, str, iter, offset) ((str)->encoding)->iter_get((i), (str), (iter), (offset))
-#define STRING_iter_skip(i, str, iter, skip) ((str)->encoding)->iter_skip((i), (str), (iter), (skip))
-#define STRING_iter_get_and_advance(i, str, iter) ((str)->encoding)->iter_get_and_advance((i), (str), (iter))
-#define STRING_iter_set_and_advance(i, str, iter, c) ((str)->encoding)->iter_set_and_advance((i), (str), (iter), (c))
+#define STRING_iter_get(i, str, iter, offset) \
+    ((str)->encoding)->iter_get((i), (str), (iter), (offset))
+#define STRING_iter_skip(i, str, iter, skip) \
+    ((str)->encoding)->iter_skip((i), (str), (iter), (skip))
+#define STRING_iter_get_and_advance(i, str, iter) \
+    ((str)->encoding)->iter_get_and_advance((i), (str), (iter))
+#define STRING_iter_set_and_advance(i, str, iter, c) \
+    ((str)->encoding)->iter_set_and_advance((i), (str), (iter), (c))
 
 /* stringinfo parameters */
 
@@ -89,24 +100,36 @@ typedef struct _Parrot_String_Bounds {
 typedef STRING * (*str_vtable_to_encoding_t)(PARROT_INTERP, ARGIN(const STRING *src));
 typedef STRING * (*str_vtable_chr_t)(PARROT_INTERP, UINTVAL codepoint);
 
-typedef INTVAL   (*str_vtable_equal_t)(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs));
-typedef INTVAL   (*str_vtable_compare_t)(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs));
-typedef INTVAL   (*str_vtable_index_t)(PARROT_INTERP, ARGIN(const STRING *src), ARGIN(const STRING *search_string), INTVAL offset);
-typedef INTVAL   (*str_vtable_rindex_t)(PARROT_INTERP, ARGIN(const STRING *src), ARGIN(const STRING *search_string), INTVAL offset);
+typedef INTVAL   (*str_vtable_equal_t)(PARROT_INTERP, ARGIN(const STRING *lhs),
+                                            ARGIN(const STRING *rhs));
+typedef INTVAL   (*str_vtable_compare_t)(PARROT_INTERP, ARGIN(const STRING *lhs),
+                                            ARGIN(const STRING *rhs));
+typedef INTVAL   (*str_vtable_index_t)(PARROT_INTERP, ARGIN(const STRING *src),
+                                            ARGIN(const STRING *search_string), INTVAL offset);
+typedef INTVAL   (*str_vtable_rindex_t)(PARROT_INTERP, ARGIN(const STRING *src),
+                                            ARGIN(const STRING *search_string), INTVAL offset);
 typedef size_t   (*str_vtable_hash_t)(PARROT_INTERP, ARGIN(const STRING *s), size_t hashval);
 
 typedef void     (*str_vtable_scan_t)(PARROT_INTERP, ARGMOD(STRING *src));
-typedef INTVAL   (*str_vtable_partial_scan_t)(PARROT_INTERP, ARGIN(const char *buf), ARGMOD(Parrot_String_Bounds *bounds));
+typedef INTVAL   (*str_vtable_partial_scan_t)(PARROT_INTERP, ARGIN(const char *buf),
+                                            ARGMOD(Parrot_String_Bounds *bounds));
 typedef UINTVAL  (*str_vtable_ord_t)(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset);
-typedef STRING * (*str_vtable_substr_t)(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset, INTVAL count);
+typedef STRING * (*str_vtable_substr_t)(PARROT_INTERP, ARGIN(const STRING *src),
+                                            INTVAL offset, INTVAL count);
 
 /* character classes */
-typedef INTVAL   (*str_vtable_is_cclass_t)(PARROT_INTERP, INTVAL, ARGIN(const STRING *src), UINTVAL offset);
-typedef INTVAL   (*str_vtable_find_cclass_t)(PARROT_INTERP, INTVAL, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count);
-typedef INTVAL   (*str_vtable_find_not_cclass_t)(PARROT_INTERP, INTVAL, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count);
+typedef INTVAL   (*str_vtable_is_cclass_t)(PARROT_INTERP, INTVAL,
+                                            ARGIN(const STRING *src), UINTVAL offset);
+typedef INTVAL   (*str_vtable_find_cclass_t)(PARROT_INTERP, INTVAL,
+                                            ARGIN(const STRING *src), UINTVAL offset,
+                                            UINTVAL count);
+typedef INTVAL   (*str_vtable_find_not_cclass_t)(PARROT_INTERP, INTVAL,
+                                            ARGIN(const STRING *src), UINTVAL offset,
+                                            UINTVAL count);
 
 /* graphemes */
-typedef STRING * (*str_vtable_get_graphemes_t)(PARROT_INTERP, ARGIN(const STRING *src), UINTVAL offset, UINTVAL count);
+typedef STRING * (*str_vtable_get_graphemes_t)(PARROT_INTERP, ARGIN(const STRING *src),
+                                            UINTVAL offset, UINTVAL count);
 typedef STRING * (*str_vtable_compose_t)(PARROT_INTERP, ARGIN(const STRING *src));
 typedef STRING * (*str_vtable_decompose_t)(PARROT_INTERP, ARGIN(const STRING *src));
 

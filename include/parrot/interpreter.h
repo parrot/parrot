@@ -125,7 +125,8 @@ struct parrot_interp_t;
  * gets its own macro. */
 #define PARROT_INTERP /*@notnull@*/ /*@in@*/ ARGMOD(Parrot_Interp interp)
 #define NULLOK_INTERP /*@null@*/    /*@in@*/ ARGMOD(Parrot_Interp interp)
-#define SHIM_INTERP   /*@unused@*/ /*@notnull@*/ ARGIN(Parrot_Interp interp_unused) __attribute__unused__
+#define SHIM_INTERP   /*@unused@*/ /*@notnull@*/ ARGIN(Parrot_Interp interp_unused) \
+                                                    __attribute__unused__
 
 
 #ifdef PARROT_IN_CORE
