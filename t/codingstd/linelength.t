@@ -92,7 +92,7 @@ sub source_files {
         next if exists $skip_files{$file};
 
         push @files => $full_path
-            if $file =~ m{\.(c|pmc|ops|pod)$};
+            if $file =~ m{\.(c|h|pmc|ops|pod)$};
     }
     return @files;
 }

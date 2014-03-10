@@ -31,7 +31,8 @@
 
 #define ALIGNED_STRING_SIZE(len) (((len) + sizeof (void*) + WORD_ALIGN_1) & WORD_ALIGN_MASK)
 
-#define PARROT_GC_WRITE_BARRIER(i, p) do { if (PObj_GC_need_write_barrier_TEST((p))) Parrot_gc_write_barrier((i), (p)); } while(0)
+#define PARROT_GC_WRITE_BARRIER(i, p) \
+    do { if (PObj_GC_need_write_barrier_TEST((p))) Parrot_gc_write_barrier((i), (p)); } while(0)
 
 typedef struct _Parrot_GC_Init_Args {
     void *stacktop;
@@ -69,13 +70,16 @@ typedef enum {
     GC_TRACE_SYSTEM_ONLY = 3
 } Parrot_gc_trace_type;
 
-typedef int (*pool_iter_fn)(PARROT_INTERP, struct Memory_Pools *, struct Fixed_Size_Pool *, int, void*);
-typedef void (*add_free_object_fn_type)(PARROT_INTERP, struct Memory_Pools *, struct Fixed_Size_Pool *, void *);
-typedef void * (*get_free_object_fn_type)(PARROT_INTERP, struct Memory_Pools *, struct Fixed_Size_Pool *);
-typedef void (*alloc_objects_fn_type)(PARROT_INTERP, struct Memory_Pools *, struct Fixed_Size_Pool *);
+typedef int (*pool_iter_fn)(PARROT_INTERP, struct Memory_Pools *,
+                struct Fixed_Size_Pool *, int, void*);
+typedef void (*add_free_object_fn_type)(PARROT_INTERP, struct Memory_Pools *,
+                struct Fixed_Size_Pool *, void *);
+typedef void * (*get_free_object_fn_type)(PARROT_INTERP, struct Memory_Pools *,
+                struct Fixed_Size_Pool *);
+typedef void (*alloc_objects_fn_type)(PARROT_INTERP, struct Memory_Pools *,
+                struct Fixed_Size_Pool *);
 typedef void (*gc_object_fn_type)(PARROT_INTERP, ARGMOD(struct Memory_Pools *),
                 ARGIN(struct Fixed_Size_Pool *), ARGMOD(PObj *));
-
 
 /* &gen_from_enum(interpinfo.pasm) prefix(INTERPINFO_) */
 
@@ -125,8 +129,10 @@ typedef enum {
 #define GC_trace_stack_FLAG    (UINTVAL)(1 << 1)   /* trace system areas and stack */
 #define GC_trace_normal_FLAG   (UINTVAL)(1 << 1)   /* the same */
 #define GC_lazy_FLAG           (UINTVAL)(1 << 2)   /* timely destruction run */
-#define GC_finish_FLAG         (UINTVAL)(1 << 3)   /* on Parrot exit: mark (almost) all PMCs dead and */
-#define GC_strings_cb_FLAG     (UINTVAL)(1 << 4)   /* Invoked from String GC during mem_alloc to sweep dead strings */
+#define GC_finish_FLAG         (UINTVAL)(1 << 3)   /* on Parrot exit: mark (almost)
+                                                      all PMCs dead and */
+#define GC_strings_cb_FLAG     (UINTVAL)(1 << 4)   /* Invoked from String GC during
+                                                      mem_alloc to sweep dead strings */
                                                    /* garbage collect. */
 
 /* HEADERIZER BEGIN: src/gc/api.c */

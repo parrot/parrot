@@ -25,7 +25,8 @@ typedef enum {
 #define SCHEDULER_get_FLAGS(o) (PObj_get_FLAGS(o))
 #define SCHEDULER_flag_TEST(flag, o) (SCHEDULER_get_FLAGS(o) & SCHEDULER_ ## flag ## _FLAG)
 #define SCHEDULER_flag_SET(flag, o) (SCHEDULER_get_FLAGS(o) |= SCHEDULER_ ## flag ## _FLAG)
-#define SCHEDULER_flag_CLEAR(flag, o) (SCHEDULER_get_FLAGS(o) &= ~(UINTVAL)(SCHEDULER_ ## flag ## _FLAG))
+#define SCHEDULER_flag_CLEAR(flag, o) \
+    (SCHEDULER_get_FLAGS(o) &= ~(UINTVAL)(SCHEDULER_ ## flag ## _FLAG))
 
 /* Should the scheduler swap tasks at its next opportunity? */
 #define SCHEDULER_resched_requested_TEST(o)  SCHEDULER_flag_TEST(resched_requested, o)
