@@ -26,6 +26,7 @@ never be set for user arrays.
 #define PMC_size(x)  ((Parrot_FixedPMCArray_attributes *)PMC_data(x))->size
 #define PMC_array(x) ((Parrot_FixedPMCArray_attributes *)PMC_data(x))->pmc_array
 
+#include "pmc_resizablepmcarray.h"
 #include "pmc_fixedstringarray.h"
 #include "pmc_fixedintegerarray.h"
 
@@ -215,38 +216,56 @@ Not yet for hashes.
 
     VTABLE INTVAL morph(PMC *new_type) {
         INTVAL retval = 1;
-        if (new_type->vtable->base_type == enum_class_Integer)
-            VTABLE_init_int(INTERP, SELF, SELF.elements());
-        else if (new_type->vtable->base_type == enum_class_String)
-            VTABLE_set_string_native(INTERP, SELF, SELF.get_string());
-        else if (VTABLE_isa(INTERP, new_type, CONST_STRING(INTERP, "ResizablePMCArray")))
-            PMC_data(SELF) = PMC_data(new_type);
+        if (new_type->vtable->base_type == enum_class_Integer) {
+            INTVAL iv = SELF.elements();
+            Parrot_pmc_reuse(INTERP, SELF, new_type->vtable->base_type, 0);
+            VTABLE_init_int(INTERP, SELF, iv);
+        }
+        else if (new_type->vtable->base_type == enum_class_String) {
+            STRING *s = SELF.get_string();
+            Parrot_pmc_reuse(INTERP, SELF, new_type->vtable->base_type, 0);
+            VTABLE_set_string_native(INTERP, SELF, s);
+        }
+        else if (VTABLE_isa(INTERP, new_type, CONST_STRING(INTERP, "ResizablePMCArray"))) {
+            PMC **to;
+            PMC **from = PMC_array(SELF);
+            INTVAL size = PMC_size(SELF);
+            Parrot_pmc_reuse(INTERP, SELF, new_type->vtable->base_type, 0);
+            GETATTR_ResizablePMCArray_pmc_array(INTERP, new_type, to);
+            PMC_size(new_type) = size;
+            PMC_array(new_type) = to;
+        }
         else if (VTABLE_isa(INTERP, new_type, CONST_STRING(INTERP, "FixedStringArray"))
               || VTABLE_isa(INTERP, new_type, CONST_STRING(INTERP, "ResizableStringArray"))) {
             register int i;
             STRING **to;
             PMC **from = PMC_array(SELF);
+            INTVAL size = PMC_size(SELF);
             GETATTR_FixedStringArray_str_array(INTERP, new_type, to);
+            Parrot_pmc_reuse(INTERP, SELF, new_type->vtable->base_type, 0);
             for (i = 0; i < PMC_size(SELF); i++) {
                 to[i] = VTABLE_get_string(INTERP, from[i]);
             }
-            PMC_size(new_type) = PMC_size(SELF);
+            PMC_size(new_type) = size;
         }
         else if (VTABLE_isa(INTERP, new_type, CONST_STRING(INTERP, "FixedIntegerArray"))
               || VTABLE_isa(INTERP, new_type, CONST_STRING(INTERP, "ResizableIntegerArray"))) {
             register int i;
             INTVAL *to;
             PMC **from = PMC_array(SELF);
+            INTVAL size = PMC_size(SELF);
             GETATTR_FixedIntegerArray_int_array(INTERP, new_type, to);
+            Parrot_pmc_reuse(INTERP, SELF, new_type->vtable->base_type, 0);
             for (i = 0; i < PMC_size(SELF); i++) {
                 to[i] = VTABLE_get_integer(INTERP, from[i]);
             }
-            PMC_size(new_type) = PMC_size(SELF);
+            PMC_size(new_type) = size;
         }
-        else
+        else {
+            Parrot_pmc_reuse(INTERP, SELF, new_type->vtable->base_type, 0);
             retval = 0;
+        }
 
-        Parrot_pmc_reuse(INTERP, SELF, new_type->vtable->base_type, 0);
         return retval;
     }
 
