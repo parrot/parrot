@@ -67,6 +67,37 @@ up when optimization is enabled.  Use the C<--cage> option to
 C<Configure.pl> to enable extra warnings which are useful in keeping the
 cage clean.
 
+=head3 gcc fortify source macro
+
+In gcc it is possible to use the C<-D_FORTIFY_SOURCE=x> macro to provide "a
+lightweight buffer overflow protection to some memory and string functions"
+(C<http://gcc.gnu.org/ml/gcc-patches/2004-09/msg02055.html>).  Checks are
+implemented at compile- and run-time, thus it is also a good idea to run the
+test suite in combination with this compiler option.  There are two levels
+to this macro usage:
+
+=over 4
+
+=item C<-D_FORTIFY_SOURCE=1>
+
+This option is only available in combination with at least the C<-O1>
+optimisation option and performs security checks that shouldn't change the
+behaviour of conforming programs.  Add this option to the C<--ccflags>
+configure option to enable it, e.g.:
+
+  perl Configure.pl --ccflags="-D_FORTIFY_SOURCE=1 -O1"
+
+=item C<-D_FORTIFY_SOURCE=2>
+
+This option is only available in combination with at least the C<-O2>
+optimisation option and performs more checking which might cause conforming
+programs to fail.  It can be added to the C<--ccflags> configure option and
+used in combination with the C<--optimize> configure option like so:
+
+  perl Configure.pl --optimize --ccflags="-D_FORTIFY_SOURCE=2"
+
+=back
+
 =head2 splint
 
 Splint (L<http://www.splint.org>) is a very very picky lint tool, and
