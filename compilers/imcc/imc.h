@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2011, Parrot Foundation.
+ * Copyright (C) 2002-2014, Parrot Foundation.
  */
 
 #ifndef PARROT_IMCC_IMC_H_GUARD
@@ -173,29 +173,6 @@ void imc_reg_alloc(ARGMOD(imc_info_t * imcc), ARGIN_NULLOK(IMC_Unit *unit))
 #  define YY_TYPEDEF_YY_SCANNER_T
 typedef void* yyscan_t;
 #endif
-
-
-/* HEADERIZER BEGIN: compilers/imcc/imcparser.c */
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-Instruction * IMCC_create_itcall_label(imc_info_t *info)
-        __attribute__nonnull__(1);
-
-void IMCC_itcall_sub(imc_info_t *info, ARGIN(SymReg *sub))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-Instruction * INS_LABEL(imc_info_t *info,
-    ARGMOD_NULLOK(IMC_Unit *unit),
-    ARGIN(SymReg *r0),
-    int emit)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(3);
-
-/* HEADERIZER END: compilers/imcc/imcparser.c */
 
 /* HEADERIZER BEGIN: compilers/imcc/parser_util.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */

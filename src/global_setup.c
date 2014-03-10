@@ -28,8 +28,9 @@ I<What are these global variables?>
 
 /* These functions are defined in the auto-generated file core_pmcs.c */
 /* XXX Get it into some public place */
-extern void Parrot_gbl_initialize_core_pmcs(PARROT_INTERP, int pass);
-void Parrot_gbl_register_core_pmcs(PARROT_INTERP, PMC* registry);
+/* extern void Parrot_gbl_initialize_core_pmcs(PARROT_INTERP, int pass);
+   void Parrot_gbl_register_core_pmcs(PARROT_INTERP, PMC* registry);
+*/
 
 static const unsigned char* parrot_config_stored = NULL;
 static unsigned int parrot_config_size_stored = 0;
