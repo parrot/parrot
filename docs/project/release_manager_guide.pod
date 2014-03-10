@@ -192,7 +192,8 @@ fields which must be updated at each release:
 
 =item C<release.nextdate>
 
-The date of the next release.
+The date of the next release (I<see>
+L<Appendix 1|"APPENDIX 1 - UPCOMING RELEASES">).
 
 =item C<bugday.date>
 
@@ -375,8 +376,9 @@ F<~/ftp/releases/devel>:
 
     mkdir ~/ftp/releases/devel/a.b.c
 
-If this is a supported release, create the new directory in
-F<~/ftp/releases/supported> instead:
+If this is a supported release (I<see>
+L<Appendix 1|"APPENDIX 1 - UPCOMING RELEASES">), create the new directory
+in F<~/ftp/releases/supported> instead:
 
     mkdir ~/ftp/releases/supported/a.b.c
 
