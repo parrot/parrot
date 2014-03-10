@@ -3,7 +3,7 @@
         + Re-enable old immc flags for parrot and parrot_old, such as
           -On -a -v -y -E -dxx. [GH #1033]
 
-        + Fixed imcc -O1 and -O2.
+        + Fixed imcc -O1 and -O2, but at least one NQP problem remains [GH #1061].
 
           -O1 fixes:
           = Special-case get_global for branch_cond_loop_swap, which broke nci
