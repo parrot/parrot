@@ -1,4 +1,4 @@
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2014, Parrot Foundation.
 package Parrot::Test::Pod::Utils;
 use strict;
 use warnings;

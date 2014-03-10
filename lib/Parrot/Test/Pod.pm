@@ -85,6 +85,8 @@ our %second_analysis_subs = (
                         | t/configure/testlib/cdefectivefoobar
                         | t/configure/testlib/bdefectivefoobar
                         | compilers/opsc
+                        | tools/dev/mk_language_shell\.pl
+                        | lib/IO/CaptureOutput\.pm
                     }x
                 ) {
                     delete $files_needing_analysis->{ $file };

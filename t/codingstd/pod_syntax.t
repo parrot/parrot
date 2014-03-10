@@ -46,7 +46,7 @@ is( $bad_syntax_files, q{},
     "Pod syntax of ".scalar @{ $need_testing_ref }." tested files" );
 
 diag("You should use podchecker to check the ".scalar @failed_syntax.
-     " failed files.\n".$bad_syntax_files )
+     " failed files:\n".$bad_syntax_files )
     if $bad_syntax_files;
 
 #################### SUBROUTINES ####################
