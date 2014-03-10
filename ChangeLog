@@ -3,11 +3,13 @@
         + Re-enable old immc flags for parrot and parrot_old, such as
           -On -a -v -y -E -dxx. [GH #1033]
 
-        + Fixed imcc -O1 and -O2, but at least one NQP problem remains [GH #1061].
+        + Fixed imcc -O1 and -O2
 
           -O1 fixes:
           = Special-case get_global for branch_cond_loop_swap, which broke nci
             tests [GH #1037]
+          = set_addr label does mark a basic_block, dead_code_remove() needs the
+            label. Fixes nqp [GH #1061].
 
           -O2 used_once fixes:
           = Allow used_once elimination only for purely functional ops

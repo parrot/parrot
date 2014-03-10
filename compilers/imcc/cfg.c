@@ -344,9 +344,13 @@ find_basic_blocks(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit), int first)
             if (addr)
                 addr->last_ins = ins;
 
-            /* ignore set_addr - no new basic block */
-            if (STREQ(ins->opname, "set_addr"))
+            /* XXX: ignore set_addr - no new basic block.
+             * No, we need to mark the label. GH #1061 */
+#if 0
+            if (STREQ(ins->opname, "set_addr")) {
                 continue;
+            }
+#endif
 
             if (ins->next)
                 bb = make_basic_block(imcc, unit, ins->next);
