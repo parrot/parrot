@@ -420,7 +420,7 @@ sub valid_warning {
     # This should be using a temp file name.
     my $output_file = 'test.cco';
 
-    $conf->debug("trying attribute '$warning'\n");
+    $conf->debug("trying warning '$warning'\n");
 
     my $cc = $conf->data->get('cc');
     $conf->cc_gen('config/auto/warnings/test_c.in');
