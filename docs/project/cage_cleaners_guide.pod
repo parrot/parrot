@@ -62,8 +62,10 @@ Use as many compiler warnings as we possibly can.  The more warnings
 we enable, the less likely something will pass the watchful eye of
 the compiler.
 
-Note that warnings may not just be -W flags.  Some warnings in gcc
-only show up when optimization is enabled.
+Note that warnings may not just be -W flags.  Some warnings in gcc only show
+up when optimization is enabled.  Use the C<--cage> option to
+C<Configure.pl> to enable extra warnings which are useful in keeping the
+cage clean.
 
 =head2 splint
 
