@@ -159,11 +159,9 @@ failed:
     set_hll_global ['SDL'; 'NCI'], 'WaitEvent', sdl_function
     dlfunc sdl_function, libsdl, 'SDL_PollEvent', 'ip'
     set_hll_global ['SDL'; 'NCI'], 'PollEvent', sdl_function
-    #was 'ti'
-    dlfunc sdl_function, libsdl, 'SDL_GetKeyName', 'pi'
+    dlfunc sdl_function, libsdl, 'SDL_GetKeyName', 'ti'
     set_hll_global ['SDL'; 'NCI'], 'GetKeyName', sdl_function
-    #was 'tv'
-    dlfunc sdl_function, libsdl, 'SDL_GetError', 'pv'
+    dlfunc sdl_function, libsdl, 'SDL_GetError', 'tv'
     set_hll_global ['SDL'; 'NCI'], 'GetError', sdl_function
     dlfunc sdl_function, libsdl, 'SDL_SetColorKey', 'ipii'
     set_hll_global ['SDL'; 'NCI'], 'SetColorKey', sdl_function
