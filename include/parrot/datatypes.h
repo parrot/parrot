@@ -1,6 +1,6 @@
 /*
  * datatypes.h
- *  Copyright (C) 2002-2012, Parrot Foundation.
+ *  Copyright (C) 2002-2015, Parrot Foundation.
  *  License:  Artistic 2.0, see README.pod and LICENSE for details
  *  Overview:
  *     Parrot and native data types enums and type names.
@@ -40,6 +40,7 @@ typedef enum {
     enum_type_float,            /* native float types */
     enum_type_double,
     enum_type_longdouble,
+    enum_type_float128,
 
     enum_type_int8,             /* fixed size types */
     enum_type_int16,
@@ -57,11 +58,14 @@ typedef enum {
     enum_type_void,
 
     enum_type_ptr,              /* native pointer */
-    enum_type_cstr,             /* c string */
+    enum_type_cstr,             /* 't' c string */
     enum_type_struct_ptr,       /* pointer to another struct */
     enum_type_struct,           /* a struct */
     enum_type_union,            /* a union */
     enum_type_func_ptr,         /* a function pointer */
+    enum_type_pshort,           /* '2' Integer PMC -> short */
+    enum_type_pint,             /* '3' Integer PMC -> int */
+    enum_type_plong,            /* '4' Integer PMC -> long */
 
     enum_type_sized,
 
@@ -122,6 +126,8 @@ const struct _data_types data_types[] = {
     { "longdouble", sizeof (long double),        ALIGNOF(longdouble, long double)},
 #  ifdef PARROT_HAS_FLOAT128
     { "__float128", sizeof (__float128),         ALIGNOF1(__float128)},
+#  else
+    { "__float128", 0,         			0 },
 #  endif
 
     /* explicitly sized integer types */
@@ -146,7 +152,7 @@ const struct _data_types data_types[] = {
     { "uint64",     0,                           0 },
 #  endif
 
-    { "void",       0,                          0 },
+    { "void",       0,                           0 },
 
     { "ptr",        sizeof (void *),             ALIGNOF(voidptr, void *) },
     { "cstr",       sizeof (char *),             ALIGNOF(charptr, char *) },
@@ -154,6 +160,9 @@ const struct _data_types data_types[] = {
     { "struct",     0,                           0 },
     { "union",      0,                           0 },
     { "func_ptr",   sizeof (funcptr_t),          ALIGNOF1(funcptr_t) },
+    { "pshort",     sizeof (short),              ALIGNOF1(short) },
+    { "pint",       sizeof (int),                ALIGNOF1(int) },
+    { "plong",      sizeof (long),               ALIGNOF1(long) },
 
     { "sized",      0,                           0 },
 

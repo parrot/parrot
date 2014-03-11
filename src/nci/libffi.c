@@ -1,4 +1,4 @@
-/* Copyright (C) 2010-2014, Parrot Foundation.
+/* Copyright (C) 2010-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -417,12 +417,24 @@ prep_pcc_ret_arg(PARROT_INTERP, PARROT_DATA_TYPE t, parrot_var_t *pv, void **rv,
         pv->i = *(Parrot_Int4 *)val;
         *rv   = &pv->i;
         break;
-#if PARROT_HAS_INT64
-      case enum_type_int64:
-        pv->i = *(Parrot_Int8 *)val;
+      case enum_type_pshort:
+        pv->i = *(short *)val;
         *rv   = &pv->i;
         break;
+      case enum_type_pint:
+        pv->i = *(int *)val;
+        *rv   = &pv->i;
+        break;
+#if PARROT_HAS_INT64
+      case enum_type_int64:
+      case enum_type_plong:
+        pv->i = *(Parrot_Int8 *)val;
+#else
+      case enum_type_plong:
+        pv->i = *(long *)val;
 #endif
+        *rv   = &pv->i;
+        break;
       case enum_type_INTVAL:
         pv->i = *(INTVAL *)val;
         *rv   = &pv->i;
@@ -618,6 +630,21 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
                 nci_val[i].S   = pcc_arg[i].s;
                 nci_arg_ptr[i] = &nci_val[i].S;
                 break;
+              case enum_type_plong:
+#if PARROT_HAS_INT64
+                nci_val[i].i64 = (long)VTABLE_get_integer(interp, pcc_arg[i].p);
+                nci_arg_ptr[i] = &nci_val[i].i64;
+                break;
+#endif
+              case enum_type_pint:
+                nci_val[i].i32 = VTABLE_get_integer(interp, pcc_arg[i].p);
+                nci_arg_ptr[i] = &nci_val[i].i32;
+                break;
+              case enum_type_pshort:
+                nci_val[i].i16 = (short)VTABLE_get_integer(interp, pcc_arg[i].p);
+                nci_arg_ptr[i] = &nci_val[i].i16;
+                break;
+
               case enum_type_PMC:
                 nci_val[i].P   = pcc_arg[i].p;
                 nci_arg_ptr[i] = &nci_val[i].P;

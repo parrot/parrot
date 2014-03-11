@@ -7,8 +7,7 @@ src/nci/signatures.c - Native Call Interface signature processing routines
 
 =head1 DESCRIPTION
 
-This file implements functionality for parsing NCI signatures and generating PCC
-signatures.
+Parse NCI signatures and generate PCC signatures.
 
 =head2 Functions
 
@@ -95,6 +94,15 @@ Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
           case 'I':   /* INTVAL */
             e = enum_type_INTVAL;
             break;
+          case '2':   /* short PMC */
+            e = enum_type_pshort;
+            break;
+          case '3':   /* int PMC */
+            e = enum_type_pint;
+            break;
+          case '4':   /* long PMC */
+            e = enum_type_plong;
+            break;
 
           case 'S':
             e = enum_type_STRING;
@@ -153,17 +161,20 @@ ncidt_to_pcc(PARROT_INTERP, PARROT_DATA_TYPE t)
       case enum_type_int:
       case enum_type_long:
       case enum_type_INTVAL:
+      case enum_type_pshort:
+      case enum_type_pint:
+      case enum_type_plong:
         return 'I';
 
       case enum_type_STRING:
+      case enum_type_cstr:
         return 'S';
 
       case enum_type_ptr:
       case enum_type_PMC:
-        return 'P';
-
+      case enum_type_struct_ptr:
       case enum_type_void:
-        return 'v';
+        return 'P';
 
       default:
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_KEY_NOT_FOUND,
