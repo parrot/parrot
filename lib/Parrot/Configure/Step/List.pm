@@ -35,6 +35,7 @@ my @steps = qw(
     auto::va_ptr
     auto::format
     auto::isreg
+    auto::jit
     auto::llvm
     auto::inline
     auto::gc

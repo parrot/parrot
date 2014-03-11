@@ -21,6 +21,8 @@
 #define PARROT_MINOR_VERSION    @MINOR@
 #define PARROT_PATCH_VERSION    @PATCH@
 #define PARROT_ARCHNAME         "@cpuarch@-@osname@"
+#define PARROT_JIT_CAPABLE      @jitcapable@
+#define PARROT_EXEC_CAPABLE     @execcapable@
 #define PARROT_SHARE_EXT        "@share_ext@"
 #define PARROT_LOAD_EXT         "@load_ext@"
 #define PARROT_OBJ_EXT          "@o@"
@@ -106,6 +108,7 @@ typedef @float8_t@              Parrot_Float8;
 
 #define PARROT_CPU_ARCH         "@cpuarch@"
 #define PARROT_CPU_TYPE         "@cputype@"
+#define PARROT_OS_NAME          "@osname@"
 #define PARROT_BYTEORDER        0x@byteorder@
 #define PARROT_BIGENDIAN        @bigendian@
 
@@ -138,6 +141,15 @@ typedef @ptrcast@ ptrcast_t;
 typedef struct _vtable VTABLE;
 typedef void DPOINTER;
 
+/* JIT and exec cores. */
+#define JIT_CPUARCH  "@jitcpuarch@"
+#define JIT_OSNAME   "@osname@"
+#define JIT_ARCHNAME "@jitarchname@"
+#define JIT_CAPABLE  @jitcapable@
+#define EXEC_CAPABLE @execcapable@
+#define PARROT_EXEC_OS_@osname@    1
+#define PARROT_@jitcpu@            1
+
 /* Oplib and dynamic ops related. */
 #include "parrot/pbcversion.h"
 #define PARROT_CORE_OPLIB_NAME    "core_ops"
@@ -161,6 +173,7 @@ typedef void DPOINTER;
 
 /*
  * Local variables:
+ *   mode: c
  *   c-file-style: "parrot"
  * End:
  * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :

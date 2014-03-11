@@ -87,6 +87,8 @@ Parrot Options:
    --ops=(files)        Use the given ops files
 
    --without-threads    Build parrot without OS thread support
+   --without-jit        Without JIT
+   --without-exec       Do not use JIT to emit a native executable
    --without-core-nci-thunks
                         Build parrot without core-required
                         statically compiled NCI call frames

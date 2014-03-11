@@ -1,7 +1,7 @@
 Summary of my parrot @VERSION@ configuration:
   configdate='@configdate@'
   Platform:
-    osname=@osname@, archname=@archname@
+    osname=@osname, archname=@cpuarch@-@osname, jit=@jitcapable@, exec=@execcapable@
     perl=@perl@
   Compiler:
     cc='@cc@', ccflags='@ccflags@',

@@ -374,6 +374,14 @@ Use the given type for opcodes.
 
 Use the given ops files.
 
+=item C<--with{out}-jit>
+
+Do {not} use the JIT system.
+
+=item C<--with{out}-exec>
+
+Do {not} use the JIT to emit a native executable.
+
 =back
 
 =head2 International Components For Unicode (ICU) Options

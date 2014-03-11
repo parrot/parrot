@@ -16,7 +16,7 @@
 #include <stdarg.h>
 #include "parrot/parrot.h"
 #include "parrot/core_types.h"
-#include "parrot/config.h"      /* PARROT_VERSION... */
+#include "parrot/config.h"      /* PARROT_VERSION, PARROT_JIT_CAPABLE... */
 #include "parrot/interpreter.h" /* give us the interpreter flags */
 #include "parrot/warnings.h"    /* give us the warnings flags    */
 

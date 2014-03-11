@@ -719,6 +719,52 @@ Parrot_ex_build_complete_backtrace_string(PARROT_INTERP, ARGIN(PMC * ex))
     return VTABLE_get_string(interp, builder);
 }
 
+#if 0
+PARROT_EXPORT
+PARROT_DOES_NOT_RETURN
+PARROT_COLD
+void
+do_panic(NULLOK_INTERP, ARGIN_NULLOK(const char *message),
+         ARGIN_NULLOK(const char *file), unsigned int line)
+{
+    ASSERT_ARGS(do_panic)
+    /* Note: we can't format any floats in here--Parrot_sprintf
+    ** may panic because of floats.
+    ** and we don't use Parrot_sprintf or such, because we are
+    ** already in panic --leo
+    */
+    fprintf(stderr, "Parrot VM: PANIC: %s!\n",
+               message ? message : "(no message available)");
+
+    fprintf(stderr, "C file %s, line %u\n",
+               file ? file : "(not available)", line);
+
+    fprintf(stderr, "Parrot file (not available), ");
+    fprintf(stderr, "line (not available)\n");
+
+    fprintf(stderr, "\n\
+We highly suggest you notify the Parrot team if you have not been working on\n\
+Parrot.  Use parrotbug (located in parrot's root directory) or send an\n\
+e-mail to parrot-dev@lists.parrot.org.\n\
+Include the entire text of this error message and the text of the script that\n\
+generated the error.  If you've made any modifications to Parrot, please\n\
+describe them as well.\n\n");
+
+    fprintf(stderr, "Version     : %s\n", PARROT_VERSION);
+    fprintf(stderr, "Configured  : %s\n", PARROT_CONFIG_DATE);
+    fprintf(stderr, "Architecture: %s\n", PARROT_ARCHNAME);
+    fprintf(stderr, "JIT Capable : %s\n", JIT_CAPABLE ? "Yes" : "No");
+    if (interp)
+        fprintf(stderr, "Interp Flags: %#x\n", (unsigned int)interp->flags);
+    else
+        fprintf(stderr, "Interp Flags: (no interpreter)\n");
+    fprintf(stderr, "Exceptions  : %s\n", "(missing from core)");
+    fprintf(stderr, "\nDumping Core...\n");
+
+    DUMPCORE();
+}
+#endif
+
 
 /*
 
