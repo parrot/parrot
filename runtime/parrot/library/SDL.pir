@@ -228,6 +228,10 @@ SDL::Font library anyway, which calls this for you.
     if ttf_lib goto initialize
     loadlib ttf_lib, 'cygSDL_ttf-2-0-0'
 # RNH this is not trapping a non-existent libSDL_ttf library
+    if ttf_lib goto initialize
+    loadlib ttf_lib, 'libSDL_ttf-2.0'
+    if ttf_lib goto initialize
+    loadlib ttf_lib, 'libSDL_ttf-2.0.so.0'
     unless ttf_lib goto error
 
   initialize:
