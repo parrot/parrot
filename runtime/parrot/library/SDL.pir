@@ -93,10 +93,10 @@ In fact, don't count on it sticking around.  It may not.  Then again, it might.
     .local string sdlpath
     sdlpath = env['SDLLIBPATH']
     if sdlpath == '' goto default_locations
-    print "SDLLIBPATH="
-    say sdlpath
     loadlib libsdl, sdlpath
     if libsdl goto OK
+    print "SDLLIBPATH="
+    say sdlpath
     goto failed
 
 default_locations:
