@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2012-2013, Parrot Foundation.
+# Copyright (C) 2012-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -17,6 +17,11 @@ Create a task as native thread and repeatedly call small
 updater (proxy) tasks, until the memory is exhausted.
 
 This script does not return and will fail.
+
+It can be used to disprove some threads leakage claims
+with foreign writers.
+parrot threads do not leak as long as only the main task
+starts subtasks.
 
 =cut
 
