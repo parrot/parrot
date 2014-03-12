@@ -2,7 +2,7 @@
 
 =head1 NAME
 
-pgegrep - A simple grep using PGE for matching
+pgegrep - A simple grep using Perl6 PGE patterns for matching
 
 =head1 SYNOPSIS
 
@@ -11,8 +11,9 @@ B<pgegrep> [I<OPTIONS>] B<PATTERN> [I<FILE...>]
 =head1 DESCRIPTION
 
 pgegrep aims to be a small and easy to use program in replacement of the
-standard grep utility.  Regex support is whatever PGE will allow.  It
-searches through files line by line and tests if the given pattern matches.
+standard grep utility.  Regex support is whatever Perl6 PGE patterns will
+allow.  It searches through files line by line and tests if the given pattern
+matches.
 
 =head1 OPTIONS
 
@@ -158,7 +159,9 @@ print the filename for each match
 		$I1 = File.'is_file'(filename)
 		.IfElse($I1, {
 			# Is a file
-			handle = open filename, 'r'
+			handle = new ['FileHandle']
+			handle.'encoding'('utf8')
+			handle.'open'(filename)
 		},{
 			# Not a file, hopefully a directory
 			$I1 = File.'is_dir'(filename)
@@ -199,6 +202,7 @@ handler:
 	pmcmsg = getattribute exception, 'message'
 	pop_eh
         message = pmcmsg
+        eq message, "Malformed UTF-8 string\n", nextfor_0
         message  = "pgegrep: " . message
         die message
 .end
@@ -299,7 +303,7 @@ HELP
 
 .sub showversion
 	print <<'VERSION'
-pgegrep v0.0.1
+pgegrep v0.0.2
 VERSION
 	end
 .end
