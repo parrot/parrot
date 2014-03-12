@@ -210,8 +210,11 @@ typedef struct PackFile_ByteCode_OpMapping {
 
 struct PackFile_ByteCode {
     PackFile_Segment              base;
+    /*Prederef                    prederef;*/      /* predereferenced code and info */
+    struct Parrot_jit_info_t     *jit_info;        /* JIT data */
     struct PackFile_Debug        *debugs;
     PackFile_ConstTable          *const_table;
+    /*PackFile_FixupTable          *fixups;*/
     INTVAL                        main_sub;        /* index into constant table of main sub */
     struct PackFile_Annotations  *annotations;
     PackFile_ByteCode_OpMapping   op_mapping;      /* opcode mapping information */

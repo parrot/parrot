@@ -25,6 +25,10 @@ The runcore API handles running the operations.
 #include "parrot/oplib/ops.h"
 #include "main.str"
 
+#if JIT_CAPABLE
+#  include "parrot/exec.h"
+#  include "../jit.h"
+#endif
 #include "parrot/dynext.h"
 #include "pmc/pmc_parrotlibrary.h"
 #include "pmc/pmc_callcontext.h"
@@ -42,8 +46,13 @@ static oplib_init_f get_dynamic_op_lib_init(PARROT_INTERP,
     ARGIN(const PMC *lib))
         __attribute__nonnull__(2);
 
+static void stop_prederef(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 #define ASSERT_ARGS_get_dynamic_op_lib_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(lib))
+#define ASSERT_ARGS_stop_prederef __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -164,6 +173,121 @@ get_dynamic_op_lib_init(SHIM_INTERP, ARGIN(const PMC *lib))
     ASSERT_ARGS(get_dynamic_op_lib_init)
     return (oplib_init_f)D2FPTR(
             ((Parrot_ParrotLibrary_attributes *)PMC_data(lib))->oplib_init);
+}
+
+#ifdef JIT_CGP
+
+/*
+
+=item C<static void stop_prederef(PARROT_INTERP)>
+
+Restore the interpreter's op function tables to their initial state.
+Also recreate the event function pointers. This is only necessary
+for run-core changes, but we don't know the old run core.
+
+=cut
+
+*/
+
+static void
+stop_prederef(PARROT_INTERP)
+{
+    ASSERT_ARGS(stop_prederef)
+    interp->op_func_table = PARROT_CORE_OPLIB_INIT(1)->op_func_table;
+
+    if (interp->evc_func_table) {
+        mem_sys_free(interp->evc_func_table);
+        interp->evc_func_table = NULL;
+    }
+
+    Parrot_setup_event_func_ptrs(interp);
+}
+
+#if EXEC_CAPABLE
+
+/*
+
+=item C<void exec_init_prederef(PARROT_INTERP, void *prederef_arena)>
+
+C<< interp->op_lib >> = prederefed oplib
+
+The "normal" C<op_lib> has a copy in the interpreter structure - but get
+the C<op_code> lookup function from standard core prederef has no
+C<op_info_table>
+
+=cut
+
+*/
+
+void
+exec_init_prederef(PARROT_INTERP, ARGIN(void *prederef_arena))
+{
+    ASSERT_ARGS(exec_init_prederef)
+    Parrot_runcore_t *old_runcore = interp->run_core;
+    Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "cgp"));
+
+    load_prederef(interp, interp->run_core);
+    interp->run_core = old_runcore;
+
+    if (!interp->code->prederef.code) {
+        void ** const temp = (void **)prederef_arena;
+
+        interp->code->prederef.code = temp;
+        /* TODO */
+    }
+}
+
+#endif
+#endif
+
+
+/*
+
+=item C<void * init_jit(PARROT_INTERP, opcode_t *pc)>
+
+Initializes JIT function for the specified opcode and returns it.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+void *
+init_jit(PARROT_INTERP, SHIM(opcode_t *pc))
+{
+    ASSERT_ARGS(init_jit)
+#if JIT_CAPABLE
+    opcode_t          *code_start;
+    UINTVAL            code_size;          /* in opcodes */
+    opcode_t          *code_end;
+    Parrot_jit_info_t *jit_info;
+
+    if (interp->code->jit_info)
+        return ((Parrot_jit_info_t *)interp->code->jit_info)->arena.start;
+
+    code_start = interp->code->base.data;
+    code_size  = interp->code->base.size;
+    code_end   = code_start + code_size;
+
+#  if defined HAVE_COMPUTED_GOTO && PARROT_I386_JIT_CGP
+#    ifdef __GNUC__
+#      ifdef PARROT_I386
+    init_prederef(interp, PARROT_CGP_CORE);
+#      endif
+#    endif
+#  endif
+
+    interp->code->jit_info =
+        jit_info = parrot_build_asm(interp, code_start, code_end,
+            NULL, JIT_CODE_FILE);
+
+    return jit_info->arena.start;
+#else
+    UNUSED(interp);
+    return NULL;
+#endif
+
 }
 
 

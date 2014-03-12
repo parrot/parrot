@@ -43,10 +43,10 @@ Assume PBC file on C<stdin>. When Parrot runs a bytecode file with a
 F<.pbc> extension, it immediately executes the file. This option tells
 Parrot to immediately execute a bytecode file piped in on C<stdin>.
 
-=item -d,--debug [R<hexbits>]
+=item -d,--imcc-debug [R<hexbits>]
 
-Turn on debugging output. The C<-d> switch takes an optional argument,
-which is a hex value of debug bits. The individual bits are shown in
+Turn on debugging output for the compiler. The C<-d> switch takes an optional
+argument, which is a hex value of debug bits. The individual bits are shown in
 Table 11-3. When R<hexbits> isn't specified,
 the default debugging level is 0001. If R<hexbits> is separated
 from the C<-d> switch by whitespace, it has to start with a number.
@@ -152,6 +152,11 @@ source file, even if the input file was also PASM. This can be handy
 to check various optimizations when you run Parrot with the C<-Op>
 switch.
 
+If the extension is F<.o> or equivalent, Parrot generates an object
+file from the JITed program code, which can be used to create a
+standalone executable program. This isn't available on all platforms
+yet; see F<PLATFORMS> for which platforms support this.
+
 =item -r,--run-pbc
 
 Immediately execute bytecode. This is the default unless C<-o> is
@@ -227,7 +232,7 @@ Z<CHP-13-TABLE-4>
 
 =cell C<-Op>
 
-=cell Rearrange PASM registers with the most-used first.
+=cell Rearrange PASM registers with the most-used first. (currently ineffective)
 
 =end table
 
@@ -260,7 +265,16 @@ side effect.
 
 Run with the I<fast core>.
 
-=item -R gcdebug
+=item -R jit
+
+Run with the I<JIT core> if available.
+
+=item -R exec
+
+Run with the I<exec core>
+(uses JIT at compile time to generate native code)
+
+=item -R gc_debug
 
 Performs a full GC run before every op dispatch
 (good for debugging GC problems)

@@ -37,6 +37,7 @@ my @steps = qw(
     auto::isreg
     auto::jit
     auto::llvm
+    auto::cpu
     auto::inline
     auto::gc
     auto::memalign

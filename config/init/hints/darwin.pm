@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2013, Parrot Foundation.
+# Copyright (C) 2005-2014, Parrot Foundation.
 
 package init::hints::darwin;
 
@@ -50,8 +50,6 @@ sub runstep {
         $flags->{ccflags} .= '-Wno-long-double ';
     }
 
-    $flags->{linkflags} .= " -undefined dynamic_lookup";
-
     _probe_for_libraries($conf, $flags, 'fink');
     _probe_for_libraries($conf, $flags, 'macports');
 
@@ -75,8 +73,8 @@ sub runstep {
         link                => 'c++',
         linkflags           => $flags->{linkflags},
         ld                  => 'c++',
-        ld_share_flags      => '-dynamiclib -undefined dynamic_lookup',
-        ld_load_flags       => '-undefined dynamic_lookup -bundle',
+        ld_share_flags      => '-dynamiclib',
+        ld_load_flags       => '-bundle undefined dynamic_lookup',
         memalign            => 'some_memalign',
         has_dynamic_linking => 1,
 
@@ -287,7 +285,7 @@ sub _add_to_flags {
 
 =head1 NAME
 
-init::hints::Darwin - hints for the Darwin compiler
+init::hints::Darwin - hints for the compilers on Darwin (Xcode, macports, fink, brew)
 
 =head1 DESCRIPTION
 
@@ -308,6 +306,6 @@ The functionality is tested in F<t/steps/init/hints/darwin-01.t>.
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
-#   fill-column: 100
+#   fill-column: 78
 # End:
 # vim: expandtab shiftwidth=4:

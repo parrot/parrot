@@ -77,6 +77,15 @@ void Parrot_runcore_switch(PARROT_INTERP, ARGIN(STRING *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+void exec_init_prederef(PARROT_INTERP, ARGIN(void *prederef_arena))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+void * init_jit(PARROT_INTERP, opcode_t *pc)
+        __attribute__nonnull__(1);
+
 void parrot_hash_oplib(PARROT_INTERP, ARGIN(op_lib_t *lib))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -108,6 +117,11 @@ void runops_int(PARROT_INTERP, size_t offset)
 #define ASSERT_ARGS_Parrot_runcore_switch __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_exec_init_prederef __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(prederef_arena))
+#define ASSERT_ARGS_init_jit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_parrot_hash_oplib __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(lib))

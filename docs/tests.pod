@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =pod
 
@@ -18,6 +18,9 @@ easy to port into a new test suite.
 The easy way to test parrot is running C<make test>. If you have updated your
 code recently and tests began failing, go for a C<make realclean> and recompile
 parrot before complaining.
+
+C<make fulltest> runs the test suite for all known working runcores and
+optimizations levels and runs also several codingstd tests.
 
 C<make all_hll_test> runs the test suite for all known working HLLs and libraries.
 
@@ -44,7 +47,7 @@ process of being translated to PIR.
 
 Test scripts must emit text that conforms to the C<Test Anything Protocol>.
 Test scripts are currently usually written in PIR or Perl 5.  The Perl 5 module
-C<Parrot::Test> and the PIR module C<Test;More> help with writing tests.
+L<Parrot::Test> and the PIR module C<Test;More> help with writing tests.
 Writing tests in PIR is preferred, but there are some cases where the
 proper framework is not available. If you can, write your tests in PIR.
 
@@ -148,18 +151,18 @@ Those subroutines are then imported back into the program file.
 =item c
 
 Those subroutines are also imported into test files (F<*.t>) where are tests
-are run by Test::Builder-based modules such as Test::Simple and Test::More.
+are run by L<Test::Builder>-based modules such as L<Test::Simple> and L<Test::More>.
 
 =item d
 
-Those test files are run by Test::Harness-based functionality such as
-ExtUtils::MakeMaker's F<make test>, Module::Build's F<build test>, or
-Test::Harness's F<prove>.
+Those test files are run by L<Test::Harness>-based functionality such as
+L<ExtUtils::MakeMaker>'s F<make test>, L<Module::Build>'s F<build test>, or
+L<Test::Harness>'s F<prove>.
 
 =item e
 
 The extent to which the test files exercise all statements in the Perl modules
-being tested is measured in coverage analysis using CPAN module Devel::Cover.
+being tested is measured in coverage analysis using CPAN module L<Devel::Cover>.
 
 =item f
 
@@ -222,7 +225,7 @@ Are a chunk of assembler and a chunk of expected output.
 
 In test driven development, tests are implemented first.  So the tests are
 initially expected to fail.  This can be expressed by marking the tests as
-TODO. See L<Test::More> on how to do that.
+B<TODO>. See L<Test::More> on how to do that.
 
 =head1 SKIP TESTS
 

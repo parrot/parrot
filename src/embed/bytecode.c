@@ -19,6 +19,7 @@ with Parrot bytecode.
 */
 
 #include "parrot/parrot.h"
+#include "parrot/disassemble.h"
 #include "parrot/runcore_api.h"
 #include "parrot/api.h"
 #include "embed_private.h"

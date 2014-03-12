@@ -100,6 +100,8 @@ may be available on your system:
   slow, bounds  bounds checking core
 
   trace         bounds checking core with trace info
+  jit           generate native code at compile time
+  exec          exec core (uses JIT at compile time to generate native code)
 
   profiling     Rudimentary profiling support.
                 See L<docs/dev/profiling.pod>
@@ -114,11 +116,11 @@ may be available on your system:
 
 Older currently ignored options include:
 
-  jit, switch-jit, cgp-jit, switch, cgp, function, exec
+  switch, cgp, function, switch-jit, cgp-jit
 
 We do not recommend their use in new code; they will continue working
 for existing code per our deprecation policy.  The options function,
-cgp, switch, and jit, switch-jit, cgp-jit are currently aliases for
+cgp, switch, and switch-jit, cgp-jit are currently aliases for
 fast.
 
 The additional internal C<debugger> runcore is used by debugger frontends.
@@ -198,6 +200,10 @@ for more information.
 
 The trace and profile cores are also based on the "slow" core, doing
 full bounds checking, and also printing runtime information to stderr.
+
+Finally, the JIT runcore uses the "slow" core, but also creates and
+jumps to JIT-compiled native code for supported opcodes.
+
 
 =head1 OPERATION TABLE
 

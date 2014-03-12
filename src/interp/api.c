@@ -1316,6 +1316,48 @@ Parrot_interp_set_warnings(PARROT_INTERP, Parrot_warnclass wc)
     PARROT_WARNINGS_on(interp, wc);
 }
 
+
+/*
+
+=item C<void Parrot_run_native(PARROT_INTERP, native_func_t func)>
+
+Runs the C function C<func> through the program C<[enternative, end]>.  This
+ensures that the function runs with the same setup as in other run loops.
+
+This function is used in some of the source tests in F<t/src> which use
+the interpreter outside a runloop.
+
+=cut
+
+*/
+
+#if 0
+PARROT_EXPORT
+void
+Parrot_run_native(PARROT_INTERP, native_func_t func)
+{
+    PackFile * const pf = PackFile_new(interp, 0);
+    static opcode_t program_code[2];
+
+    program_code[0] = interp->op_lib->op_code("enternative", 0);
+    program_code[1] = 0; /* end */
+
+    pf->cur_cs = (PackFile_ByteCode *)
+        (pf->PackFuncs[PF_BYTEC_SEG].new_seg)(interp, pf, "code", 1);
+    pf->cur_cs->base.data = program_code;
+    pf->cur_cs->base.size = 2;
+
+    Parrot_pbc_load(interp, pf);
+
+    run_native = func;
+
+    if (interp->code && interp->code->const_table)
+        Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table->constants);
+
+    runops(interp, interp->resume_offset);
+}
+#endif
+
 /*
 
 =back

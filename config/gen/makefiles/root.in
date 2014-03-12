@@ -115,6 +115,7 @@ LDFLAGS          = @ldflags@ @ld_debug@
 INNO_SETUP       = iscc
 TEMPDIR          = @tempdir@
 RPATH_BLIB       = @rpath_blib@
+JIT_BUILD_TOOL   = $(BUILD_TOOLS_DIR)/jit2c.pl
 PODEXTRACT       = $(PERL) $(BUILD_TOOLS_DIR)/podextract.pl
 ADDGENERATED     = $(PERL) $(BUILD_TOOLS_DIR)/addgenerated.pl
 #IF(darwin):export MACOSX_DEPLOYMENT_TARGET = @osx_version@
@@ -133,6 +134,7 @@ A                = @a@
 LD_SHARE_FLAGS   = @ld_share_flags@
 LD_LOAD_FLAGS    = @ld_load_flags@
 LINKARGS         = $(LDFLAGS) $(LD_LOAD_FLAGS) @libparrot_ldflags@ @icu_shared@ @libs@
+DYNLINKARGS      = $(LINKARGS) $(LD_LOAD_FLAGS)
 
 # The headerizer
 HEADERIZER       = $(PERL) $(DEV_TOOLS_DIR)/headerizer.pl
@@ -181,6 +183,7 @@ GEN_CONFIGS = \
 	lib/Parrot/PMC.pm \
 	$(RUN_INC_DIR)/config.fpmc \
 	$(LIBRARY_DIR)/config.pir \
+#IF(platform_asm):	src/platform_asm.s \
 #IF(has_opengl):	src/glut_nci_thunks.nci \
 #IF(has_glut):	src/glut_callbacks.c \
 	src/core_pmcs.c \
@@ -256,6 +259,9 @@ GEN_HEADERS = \
 GEN_SOURCES = \
 	src/nci.c \
 	src/glut_nci_thunks.c \
+	src/jit_cpu.c \
+	src/exec_cpu.c \
+	src/jit_defs.c \
 	src/parrot_config.c \
 	src/null_config.c \
 	src/install_config.c \
@@ -348,6 +354,7 @@ FLUID_FILES_1 = \
 	$(GEN_HEADERS) \
 	$(GEN_SOURCES) \
 	$(GEN_MODULES) \
+	src/jit_emit.h
 
 FLUID_FILES_2 = \
 	$(GEN_LIBRARY) \
@@ -533,6 +540,9 @@ INTERP_O_FILES = \
 	src/longopt$(O) \
 	@TEMP_platform_o@ \
 	@TEMP_atomic_o@ \
+	@TEMP_exec_o@ \
+	@TEMP_jit_o@ \
+#IF(platform_asm):    src/platform_asm$(O) \
 
 OPS_FILES = @ops@
 
@@ -1049,6 +1059,37 @@ src/list$(O) : \
 	$(PARROT_H_HEADERS) \
 	src/list.c \
 	$(INC_DIR)/list.h
+
+src/jit$(O) : $(GENERAL_H_FILES) src/jit_emit.h include/pmc/pmc_sub.h include/pmc/pmc_managedstruct.h
+
+src/jit_debug$(O) : $(GENERAL_H_FILES) src/debug.str
+
+src/jit_debug_xcoff$(O) : $(GENERAL_H_FILES)
+
+src/jit_cpu$(O) : $(GENERAL_H_FILES) src/jit_emit.h
+
+src/exec$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@ src/jit_emit.h
+
+src/exec_dep$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@ src/jit_emit.h src/pmc/managedstruct.c
+
+src/exec_cpu$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@ src/jit_emit.h
+
+src/jit_defs$(O) : $(GENERAL_H_FILES) @TEMP_exec_h@ src/jit_emit.h \
+	include/pmc/pmc_fixedintegerarray.h include/pmc/pmc_unmanagedstruct.h include/pmc/pmc_pointer.h
+
+src/jit_emit.h : src/jit/@jitcpuarch@/jit_emit.h
+	$(CP) src/jit/@jitcpuarch@/jit_emit.h src/jit_emit.h
+src/exec_dep.h : src/jit/@jitcpuarch@/exec_dep.h
+	$(CP) src/jit/@jitcpuarch@/exec_dep.h src/exec_dep.h
+src/jit_cpu.c : src/jit_emit.h src/jit/@jitcpuarch@/core.jit $(JIT_BUILD_TOOL)
+	$(PERL) $(JIT_BUILD_TOOL) @jitcpuarch@ src/jit_cpu.c
+src/jit_defs.c : src/jit/@jitcpuarch@/jit_emit.h src/jit/@jitcpuarch@/jit_defs.c
+	$(CP) src/jit/@jitcpuarch@/jit_defs.c src/jit_defs.c
+src/exec_cpu.c : src/jit_emit.h src/jit/@jitcpuarch@/core.jit \
+  @TEMP_exec_h@ src/exec_dep.h $(JIT_BUILD_TOOL)
+	$(PERL) $(JIT_BUILD_TOOL) @jitcpuarch@ src/exec_cpu.c
+
+@TEMP_exec_dep@
 
 src/pointer_array$(O) : \
 	$(PARROT_H_HEADERS) \
@@ -1921,10 +1962,12 @@ src/platform/win32/uid$(O) : src/platform/win32/uid.c $(PARROT_H_HEADERS)
 
 src/runcore/cores$(O) : src/runcore/cores.str \
 	src/runcore/cores.c \
+	src/jit.h \
 	$(INC_PMC_DIR)/pmc_sub.h \
 	$(INC_DIR)/dynext.h $(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/oplib/ops.h \
 	$(INC_DIR)/runcore_api.h $(INC_DIR)/runcore_trace.h \
+	$(INC_DIR)/exec.h \
 	$(PARROT_H_HEADERS)
 
 src/disassemble$(O) : \
