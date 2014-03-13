@@ -22,6 +22,7 @@ use Parrot::Configure::Options::Conf qw(
 );
 use Parrot::Configure::Options::Conf::Shared qw(
     @shared_valid_options
+    %features
 );
 
 our @valid_options = qw{
@@ -38,6 +39,7 @@ my %short_circuits = (
 
 our %options_components = (
     'valid_options'  => \@valid_options,
+    'features'       => \%features,
     'script'         => $script,
     'short_circuits' => \%short_circuits,
     'conditionals'   => \&conditional_assignments,

@@ -1331,11 +1331,11 @@ the interpreter outside a runloop.
 
 */
 
-#if 0
 PARROT_EXPORT
 void
-Parrot_run_native(PARROT_INTERP, native_func_t func)
+Parrot_run_native(PARROT_INTERP, ARGIN(opcode_t *pc), ARGIN(opcode_t *code_start))
 {
+#if 0
     PackFile * const pf = PackFile_new(interp, 0);
     static opcode_t program_code[2];
 
@@ -1355,8 +1355,8 @@ Parrot_run_native(PARROT_INTERP, native_func_t func)
         Parrot_pcc_set_constants(interp, interp->ctx, interp->code->const_table->constants);
 
     runops(interp, interp->resume_offset);
-}
 #endif
+}
 
 /*
 

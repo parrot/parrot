@@ -1,5 +1,4 @@
-# Copyright (C) 2001-2004, Parrot Foundation.
-# $Id$
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -45,7 +44,7 @@ for a "Hello world" program.
 =head2 Platform support
 
 The exec subsystem is enabled if support is determined automatically by
-config/auto/jit.pl, or if the option --execcapable is explicitly specified to
+auto::jit, or if the option C<--with-exec> is explicitly specified to
 Configure.pl.  The platform must support the JIT core, and some additional
 scaffold in the exec* sources must be provided.  Implementation of such is
 beyond the scope of this document.

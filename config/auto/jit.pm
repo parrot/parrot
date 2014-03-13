@@ -71,8 +71,8 @@ sub runstep {
     } );
 
     # let developers override the default JIT capability
-    $jitcapable = $conf->options->get('jitcapable')
-        if defined $conf->options->get('jitcapable');
+    $jitcapable = 1 if $conf->options->get('with-jit');
+    $jitcapable = 0 if $conf->options->get('without-jit');
 
     if (! $jitcapable) {
         $conf->data->set(
@@ -80,8 +80,8 @@ sub runstep {
             jitcpuarch     => $cpuarch,
             jitcpu         => $cpuarch,
             jitosname      => $osname,
-            jitcapable     => 0,
-            execcapable    => 0,
+            has_jit        => 0,
+            has_exec       => 0,
             cc_hasjit      => '',
             TEMP_jit_o     => '',
             TEMP_exec_h    => '',
@@ -98,7 +98,7 @@ sub runstep {
         jitcpuarch  => $jitcpuarch,
         jitcpu      => uc($jitcpuarch),
         jitosname   => uc($jitosname),
-        jitcapable  => 1,
+        has_jit     => 1,
         cc_hasjit   => " -DHAS_JIT -D\U$jitcpuarch",
         TEMP_jit_o =>
 'src/jit$(O) src/jit_cpu$(O) src/jit_debug$(O) src/jit_debug_xcoff$(O) src/jit_defs$(O)'
@@ -106,8 +106,8 @@ sub runstep {
 
     my $execcapable = $self->_first_probe_for_exec(
         $jitcpuarch, $osname);
-    $execcapable = $conf->options->get('execcapable')
-        if defined $conf->options->get('execcapable');
+    $execcapable = 1 if $conf->options->get('with-exec');
+    $execcapable = 0 if $conf->options->get('without-exec');
     _handle_execcapable($conf, $execcapable);
 
     # test for executable malloced memory
@@ -215,7 +215,7 @@ sub _handle_execcapable {
             TEMP_exec_dep =>
                 "src/exec_dep.c : src/jit/$cpuarch/exec_dep.c\n"
                 . "\t\$(CP) src/jit/$cpuarch/exec_dep.c src/exec_dep.c",
-            execcapable => 1
+            has_exec => 1
         );
     }
     else {
@@ -223,7 +223,7 @@ sub _handle_execcapable {
             TEMP_exec_h   => '',
             TEMP_exec_o   => '',
             TEMP_exec_dep => '',
-            execcapable   => 0,
+            has_exec      => 0,
         );
     }
     return 1;

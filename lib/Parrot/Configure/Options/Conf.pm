@@ -55,7 +55,7 @@ Compile Options:
    --inline             Compiler supports inline
    --optimize           Optimized compile
    --optimize=flags     Add given optimizer flags
-   --parrot_is_shared   Link parrot dynamically
+   --parrot_is_shared=1 Link parrot dynamically
    --disable-rpath      Link without rpath (user must set LD_LIBRARY_PATH)
    --m=32               Build 32bit executable on 64-bit architecture.
    --profile            Turn on profiled compile (gcc only for now)
@@ -69,15 +69,15 @@ Compile Options:
    --linkflags=(flags)  Use the given linker flags
    --ar=(archiver)      Use the given librarian for static libraries
    --arflags=(flags)    Use the given flags for static libraries
-   --ld=(linker)        Use the given loader for shared libraries
-   --ldflags=(flags)    Use the given loader flags for shared libraries
+   --ld=(linker)        Use the given linker for shared libraries
+   --ldflags=(flags)    Use the given linker flags for shared libraries
    --lex=(lexer)        Use the given lexical analyzer generator
    --make=(make tool)   Use the given make utility
    --yacc=(parser)      Use the given parser generator
 
    --no-line-directives Disable creation of C #line directives
    --define=inet_aton   Quick hack to use inet_aton instead of inet_pton
-   --gc=(type)          Which implementation of GC to use. One of gms, ms, ms2 or inf.
+   --gc=(type)          Which GC implementation. One of gms (default), ms, ms2 or inf.
 
 Parrot Options:
 

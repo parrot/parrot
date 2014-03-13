@@ -531,7 +531,7 @@ Parrot_UInt Parrot_interp_test_trace(PARROT_INTERP, UINTVAL flag)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_run_native(PARROT_INTERP, native_func_t func)
+void Parrot_run_native(PARROT_INTERP, opcode_t *pc, opcode_t *code_start)
         __attribute__nonnull__(1);
 
 void Parrot_interp_clear_emergency_interpreter(void);

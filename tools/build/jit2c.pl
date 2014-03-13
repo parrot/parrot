@@ -20,7 +20,7 @@ use warnings;
 use strict;
 use lib 'lib';
 
-use Parrot::OpLib::core;
+#use Parrot::OpLib::core;
 use Parrot::Op;
 use Parrot::OpTrans::C;
 

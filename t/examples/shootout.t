@@ -69,7 +69,7 @@ foreach my $script (@shootouts) {
     if ( $shebang =~ /^\#.+parrot\s+(.+)$/ ) {
         $args = $1;    # parrot options
     }
-    unless ( $PConfig{jitcapable} ) {
+    unless ( $PConfig{has_jit} ) {
         $args =~ s/-j/-C/;
         $args =~ s/-Cj/-C/;
     }

@@ -1,11 +1,32 @@
-# Copyright (C) 2007-2012, Parrot Foundation.
+# Copyright (C) 2007-2014, Parrot Foundation.
 package Parrot::Configure::Options::Conf::Shared;
 
 use strict;
 use warnings;
 use base qw( Exporter );
 our @EXPORT_OK = qw(
+    %features
     @shared_valid_options
+);
+
+# --with- or --without-
+our %features = (
+    crypto   => 1,
+    'core-nci-thunks'  => 1,
+    exec     => 1,
+    'extra-nci-thunks' => 1,
+    gdbm     => 1,
+    gettext  => 1,
+    gmp      => 1,
+    icu      => 1,
+    jit      => 1,
+    libffi   => 1,
+    llvm     => 0,
+    opengl   => 1,
+    readline => 1,
+    pcre     => 1,
+    threads  => 1,
+    zlib     => 1
 );
 
 our @shared_valid_options = qw{
@@ -26,7 +47,6 @@ our @shared_valid_options = qw{
     define
     disable-rpath
     exec-prefix
-    without-exec
     fatal
     fatal-step
     floatval
@@ -40,7 +60,6 @@ our @shared_valid_options = qw{
     infodir
     inline
     intval
-    without-jit
     ld
     ldflags
     lex
@@ -72,20 +91,6 @@ our @shared_valid_options = qw{
     verbose
     verbose-step
     version
-    with-llvm
-    without-crypto
-    without-core-nci-thunks
-    without-extra-nci-thunks
-    without-gdbm
-    without-gettext
-    without-gmp
-    without-icu
-    without-opengl
-    without-libffi
-    without-readline
-    without-pcre
-    without-threads
-    without-zlib
     yacc
 };
 
@@ -105,7 +110,7 @@ both Command-Line and Configuration-File configuration modes
 
 =head1 DESCRIPTION
 
-This package exports a single variable, C<@shared_valid_options()>, which
+This package exports C<@shared_valid_options> and C<%features>, which
 holds the list of options which may be used either on:
 
 =over 4
@@ -140,6 +145,6 @@ Parrot::Configure::Options::Conf::File.  Configure.pl.
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4
-#   fill-column: 100
+#   fill-column: 78
 # End:
 # vim: expandtab shiftwidth=4:

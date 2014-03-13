@@ -80,6 +80,10 @@ sub _initial_pass {
     my ($argsref, $options_components, $script) = @_;
     my %valid_opts =
         map { $_, 1 } @{ $options_components->{valid_options} };
+    for my $el ( keys(%{$options_components->{features}}) ) {
+        $valid_opts{'with-'.$el} = 1;
+        $valid_opts{'without-'.$el} = 1;
+    }
     my $data = {};
     my @short_circuits_seen = ();
     for my $el ( @{ $argsref->{argv} } ) {

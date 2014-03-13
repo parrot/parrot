@@ -229,24 +229,24 @@ is(  $step->_first_probe_for_exec( 'i386', 'openbsd' ), 1,
 is(  $step->_first_probe_for_exec( 'foobar', 'openbsd' ), 0,
     "Got expected value for _first_probe_for_exec");
 
-########### _handle_execcapable() ###########
+########### _handle_has_exec() ###########
 
 if (! defined $conf->data->get('cpuarch') ) {
     $conf->data->set('cpuarch' => 1)
 }
 
-ok(auto::jit::_handle_execcapable($conf, 1),
-    "_handle_execcapable() returned true value");
-is($conf->data->get('execcapable'), 1,
-    "Got expected value for execcapable");
+ok(auto::jit::_handle_has_exec($conf, 1),
+    "_handle_has_exec() returned true value");
+is($conf->data->get('has_exec'), 1,
+    "Got expected value for has_exec");
 # prepare for next test
-$conf->data->set('execcapable' => undef);
+$conf->data->set('has_exec' => undef);
 
-ok(auto::jit::_handle_execcapable($conf, 0),
-    "_handle_execcapable() returned true value");
-is($conf->data->get('execcapable'), 0,
-    "Got expected value for execcapable");
-$conf->data->set('execcapable' => undef);
+ok(auto::jit::_handle_has_exec($conf, 0),
+    "_handle_has_exec() returned true value");
+is($conf->data->get('has_exec'), 0,
+    "Got expected value for has_exec");
+$conf->data->set('has_exec' => undef);
 
 ########### _handle_exec_protect() ###########
 
@@ -289,7 +289,7 @@ $conf->data->set( has_exec_protect => undef );
 $conf->replenish($serialized);
 
 ($args, $step_list_ref) = process_options( {
-    argv => [ q{--jitcapable=0}, q{--verbose}  ],
+    argv => [ q{--has_jit=0}, q{--verbose}  ],
     mode => q{configure},
 } );
 rerun_defaults_for_testing($conf, $args );
@@ -298,7 +298,7 @@ $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
 
 # Mock some values so that we can get to the point inside runstep() where the
-# command-line option for jitcapable is relevant.
+# command-line option for has_jit is relevant.
 
 $cwd = cwd();
 {
@@ -334,10 +334,10 @@ $cwd = cwd();
 
     is( $conf->data->get( 'jitarchname' ), 'nojit',
         "Got expected value for jitarchname");
-    is( $conf->data->get( 'jitcapable' ), 0,
-        "Got expected value for jitcapable");
-    is( $conf->data->get( 'execcapable' ), 0,
-        "Got expected value for execcapable");
+    is( $conf->data->get( 'has_jit' ), 0,
+        "Got expected value for has_jit");
+    is( $conf->data->get( 'has_exec' ), 0,
+        "Got expected value for has_exec");
     is( $conf->data->get( 'cc_hasjit' ), '',
         "Got expected value for cc_hasjit");
     is( $conf->data->get( 'TEMP_jit_o' ), '',
