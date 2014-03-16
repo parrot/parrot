@@ -43,7 +43,7 @@ for my $dir (@ARGV) {
 
     for my $path (glob("$dir/*.c")) {
         # Remove old gcov files
-        my $rm_f = $PConfig{'rm_f'};
+        my $rm_f = "$PConfig{'perl'} -MExtUtils::Command -e rm_f";
         system("$rm_f *.gcov");
 
         # gcov must be run from build dir
