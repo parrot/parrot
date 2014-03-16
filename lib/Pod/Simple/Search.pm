@@ -1004,6 +1004,7 @@ with default attribute values is used.
 
 Returns true if the supplied filename (not POD module) contains some Pod
 documentation.
+
 =head1 SUPPORT
 
 Questions or discussion about POD and Pod::Simple should be sent to the

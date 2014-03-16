@@ -504,6 +504,7 @@ OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', 'closure 4' );
 # code by Piers Cawley
+
 =pod
 
   ;;; Indicate that the computation has failed, and that the program

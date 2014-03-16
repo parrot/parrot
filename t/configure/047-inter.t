@@ -72,6 +72,7 @@ pass("Completed all tests in $0");
 =head1 NAME
 
 047-inter.t - test Parrot::Configure::_run_this_step()
+
 =head1 SYNOPSIS
 
     % prove t/configure/047-inter.t

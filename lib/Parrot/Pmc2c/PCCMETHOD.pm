@@ -73,7 +73,9 @@ use constant REGNO_STR => 2;
 use constant REGNO_PMC => 3;
 
 =head3
-    regtype to argtype conversion hash
+
+regtype to argtype conversion hash
+
 =cut
 
 our $reg_type_info = {
