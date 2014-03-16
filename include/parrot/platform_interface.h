@@ -328,13 +328,13 @@ char* Parrot_asctime_r(const struct tm*, char *);
  */
 
 PARROT_EXPORT
-void Parrot_setenv(PARROT_INTERP, STRING *name, STRING *value);
+void Parrot_setenv(PARROT_INTERP, const STRING *name, const STRING *value);
 
 PARROT_EXPORT
-void Parrot_unsetenv(PARROT_INTERP, STRING *name);
+void Parrot_unsetenv(PARROT_INTERP, const STRING *name);
 
 PARROT_EXPORT
-STRING * Parrot_getenv(PARROT_INTERP, STRING *name);
+STRING * Parrot_getenv(PARROT_INTERP, const STRING *name);
 
 /*
 ** Dynamic Loading:

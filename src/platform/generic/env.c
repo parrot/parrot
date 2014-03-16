@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2010, Parrot Foundation.
+ * Copyright (C) 2004-2014, Parrot Foundation.
  */
 
 /*
@@ -29,7 +29,8 @@ Environment manipulation stuff
 
 /*
 
-=item C<void Parrot_setenv(PARROT_INTERP, STRING *str_name, STRING *str_value)>
+=item C<void Parrot_setenv(PARROT_INTERP, const STRING *str_name, const STRING
+*str_value)>
 
 Set up Environment vars
 
@@ -38,7 +39,7 @@ Set up Environment vars
 */
 
 void
-Parrot_setenv(PARROT_INTERP, STRING *str_name, STRING *str_value)
+Parrot_setenv(PARROT_INTERP, const STRING *str_name, const STRING *str_value)
 {
 #ifdef PARROT_HAS_SETENV
     char * const name  = Parrot_str_to_platform_cstring(interp, str_name);
@@ -61,7 +62,7 @@ Parrot_setenv(PARROT_INTERP, STRING *str_name, STRING *str_value)
 
 /*
 
-=item C<void Parrot_unsetenv(PARROT_INTERP, STRING *str_name)>
+=item C<void Parrot_unsetenv(PARROT_INTERP, const STRING *str_name)>
 
 UnSet Environment vars
 
@@ -70,7 +71,7 @@ UnSet Environment vars
 */
 
 void
-Parrot_unsetenv(PARROT_INTERP, STRING *str_name)
+Parrot_unsetenv(PARROT_INTERP, const STRING *str_name)
 {
 #ifdef PARROT_HAS_UNSETENV
     char * const name = Parrot_str_to_platform_cstring(interp, str_name);
@@ -83,7 +84,7 @@ Parrot_unsetenv(PARROT_INTERP, STRING *str_name)
 
 /*
 
-=item C<STRING * Parrot_getenv(PARROT_INTERP, STRING *str_name)>
+=item C<STRING * Parrot_getenv(PARROT_INTERP, const STRING *str_name)>
 
 Get Environment vars
 
@@ -93,7 +94,7 @@ Get Environment vars
 
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_getenv(PARROT_INTERP, STRING *str_name)
+Parrot_getenv(PARROT_INTERP, const STRING *str_name)
 {
     char * const name  = Parrot_str_to_platform_cstring(interp, str_name);
     char        *value = getenv(name);

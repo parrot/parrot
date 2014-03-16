@@ -3,11 +3,13 @@
 	+ Add platform encoding functions for darwin, FreeBSD, OpenBSD and NetBSD,
 	  fixing rakudo problems with UTF-8 locales. [GH #1092]
 	+ Enable trap op (int3) on x86_64 also
+	+ Add const to env api STRING args
     - Build
     - Documentation
     - Tests
 	+ Run fulltests with the runcore=fast,-O1,-O2 fast, without -D040, --gc-debug [GH #1086]
 	+ Simplify smolder resend usage
+	+ Fix mingw issues with \r\n
     - Community
 
 2014-09-16    release 6.8.0

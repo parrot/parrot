@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -171,7 +171,7 @@ PARROT_CAN_RETURN_NULL
 PIOHANDLE
 Parrot_io_internal_open(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags)
 {
-    DWORD      fAcc, fShare, fCreat;
+    DWORD      fAcc = 0, fCreat = 0, fShare;
     PIOHANDLE  fd;
     char      *spath;
 

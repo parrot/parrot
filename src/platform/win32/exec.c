@@ -47,7 +47,8 @@ Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)
     PROCESS_INFORMATION pi;
     const STRING *comspec = Parrot_str_new(interp, "ComSpec", 0);
     char* const cmd       = (char *)mem_sys_allocate(command->strlen + 4);
-    char* const shell     = Parrot_str_to_cstring(interp, Parrot_getenv(interp, comspec));
+    char* const shell     = Parrot_str_to_cstring(interp,
+                              Parrot_getenv(interp, comspec));
     char* const cmdin     = Parrot_str_to_cstring(interp, command);
 
     strcpy(cmd, "/c ");
