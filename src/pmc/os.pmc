@@ -332,6 +332,7 @@ Reads entries from a directory.
     }
 
 /*
+
 =item C<rename(STRING *oldpath, STRING *newpath)>
 
 This method is a wrapper for rename(2). On error a SystemError exception is

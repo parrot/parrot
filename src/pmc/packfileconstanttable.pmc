@@ -122,6 +122,7 @@ Set pointer to underlying PackFile_ConstTable
 /*
 
 =item C<void *get_pointer()>
+
 =cut
 
 */

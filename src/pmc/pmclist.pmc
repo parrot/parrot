@@ -62,6 +62,7 @@ pmclass PMCList auto_attrs {
     ATTR INTVAL size;
 
 /*
+
 =item C<void init()>
 
 Initializes the list.
@@ -80,6 +81,7 @@ Initializes the list.
     }
 
 /*
+
 =item C<void destroy()>
 
 Free all the list cells.
@@ -103,6 +105,7 @@ Free all the list cells.
     }
 
 /*
+
 =item C<INTVAL get_integer()>
 
 Returns the size of the list.
@@ -124,6 +127,7 @@ Returns the size of the list.
     }
 
 /*
+
 =item C<PMC *shift_pmc()>
 
 Removes and returns an item from the start of the array.
@@ -173,6 +177,7 @@ Removes and returns an item from the start of the array.
     }
 
 /*
+
 =item C<void push_pmc(PMC *value)>
 
 Extends the array by adding an element of value C<*value> to the end of
@@ -212,6 +217,7 @@ the array.
     }
 
 /*
+
 =item C<PMC *pop_pmc()>
 
 Removes and returns the last element in the array.
@@ -409,6 +415,7 @@ Used to unarchive the array.
     }
 
 /*
+
 =item C<void mark()>
 
 Mark the stuff.
@@ -478,6 +485,7 @@ Method forms to add a PMC to the beginning or end of the array.
     }
 
 /*
+
 =item METHOD insert_by_number(PMC* value)
 
 Inserts an item into an ordered list by it's number value.

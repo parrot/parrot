@@ -128,6 +128,7 @@ Return a pointer to a PackFile_ByteCode* built from this PMC's data.
     }
 
 /*
+
 =item C<void set_pointer()>
 
 Initialize PackfileBytecodeSegment from PackFile_Bytecode*
@@ -198,6 +199,7 @@ an op and the remaining PMCs being Integers.
     }
 
 /*
+
 =item C<PMC* main_sub()>
 
 Return :main Sub for this segment.
@@ -216,6 +218,7 @@ Return :main Sub for this segment.
     }
 
 /*
+
 =item C<PMC* opmap()>
 
 Return PackfileOpMap for this BytecodeSegment.

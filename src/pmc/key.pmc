@@ -378,6 +378,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
     }
 
 /*
+
 =item C<set_register(reg_no, type)>
 
 Set key to hold particular register.

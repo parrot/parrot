@@ -1913,6 +1913,7 @@ gc_ms_total_sized_buffers(ARGIN(const Memory_Pools *mem_pools))
 }
 
 /*
+
 =item C<static void gc_ms_iterate_live_strings(PARROT_INTERP,
 string_iterator_callback callback, void *data)>
 

@@ -450,6 +450,7 @@ the next one.
     }
 
 /*
+
 =item C<PMC *get_pmc_keyed(PMC *key)>
 
 Returns the element for C<*key>.

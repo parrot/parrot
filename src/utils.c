@@ -698,6 +698,7 @@ COMPARE(PARROT_INTERP, ARGIN(void *_a), ARGIN(void *_b),
 Perform a quicksort on a PMC array.
 
 cmp_signature is PCC signature for C<cmp>. E.g. C<II->I> for FIA.
+
 =cut
 
 */

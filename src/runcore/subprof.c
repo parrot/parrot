@@ -328,6 +328,7 @@ Return a pointer to the first line annotation of the sub and the number
 of line annotations for this sub.
 
 The C<spdata> argument is currently unused.
+
 =cut
 
 */

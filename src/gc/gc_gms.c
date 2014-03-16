@@ -1420,6 +1420,7 @@ gc_gms_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
 
 
 /*
+
 =item C<static void gc_gms_finalize(PARROT_INTERP)>
 
 Finalize GC subsystem.
@@ -2046,6 +2047,7 @@ gc_gms_pmc_needs_early_collection(PARROT_INTERP, SHIM(PMC *pmc))
 }
 
 /*
+
 =item C<static void gc_gms_write_barrier(PARROT_INTERP, PMC *pmc)>
 
 WriteBarrier for PMC. Add to root_objects list for mandatory next collecting.

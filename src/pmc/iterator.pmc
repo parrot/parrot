@@ -135,6 +135,7 @@ Defaults iteration mode to iterate from start.
     }
 
 /*
+
 =item C<PMC *get_pmc_keyed(PMC *key)>
 
 Returns the element for C<*key>.

@@ -142,6 +142,7 @@ already in the map, a new map will be created.
 
 
 /*
+
 =item C<get_pmc_keyed_str()>
 
 Get Op PMC by name.
@@ -290,6 +291,7 @@ Ensure that an op library is loaded and accessible to this OpMap.
 
 
 /*
+
 =item C<get_pointer>
 
 Construct PackFile_ByteCode_OpMapping.

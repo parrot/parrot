@@ -90,6 +90,7 @@ consumption which should be resolved soon.
     $P0 = newclass ['Digest';'SHA256']
     $P0.'add_attribute'('context')
 .end
+
 =head2 C<sha256sum( str )>
 
 Pass in a string, returns an Integer array with the resulting SHA256, and

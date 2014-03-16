@@ -434,6 +434,7 @@ Parrot_gc_str_reallocate_string_storage(PARROT_INTERP,
 }
 
 /*
+
 =item C<void Parrot_gc_str_compact_pool(PARROT_INTERP, String_GC *gc)>
 
 Compact string pool.
@@ -494,6 +495,7 @@ Parrot_gc_str_free_buffer_storage(SHIM_INTERP,
 }
 
 /*
+
 =item C<static Variable_Size_Pool * new_memory_pool(size_t min_block, compact_f
 compact)>
 
@@ -720,6 +722,7 @@ buffer_location(PARROT_INTERP, ARGIN(const Parrot_Buffer *b))
 =item C<static void debug_print_buf(PARROT_INTERP, const Parrot_Buffer *b)>
 
 Prints a debug statement with information about the given PObj C<b>.
+
 =cut
 
 */
@@ -801,6 +804,7 @@ compact_pool(PARROT_INTERP,
 }
 
 /*
+
 =item C<static void move_buffer_callback(PARROT_INTERP, Parrot_Buffer *b, void
 *data)>
 

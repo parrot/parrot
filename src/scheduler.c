@@ -324,6 +324,7 @@ Parrot_cx_check_quantum(PARROT_INTERP, ARGIN(PMC *scheduler))
 }
 
 /*
+
 =item C<PMC* Parrot_cx_stop_task(PARROT_INTERP, opcode_t *next)>
 
 Stop the current task and pack it up into a PMC what can be used to resume later.
@@ -358,6 +359,7 @@ Parrot_cx_stop_task(PARROT_INTERP, ARGIN(opcode_t *next))
 }
 
 /*
+
 =item C<opcode_t* Parrot_cx_preempt_task(PARROT_INTERP, PMC *scheduler, opcode_t
 *next)>
 

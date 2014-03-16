@@ -396,6 +396,7 @@ is_all_digits(ARGIN(const char *s))
 }
 
 /*
+
 =item C<static int is_float(const char *s)>
 
 Tests all characters in a string are decimal digits or dot.

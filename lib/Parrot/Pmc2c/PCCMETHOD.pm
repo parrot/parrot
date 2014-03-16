@@ -72,9 +72,7 @@ use constant REGNO_NUM => 1;
 use constant REGNO_STR => 2;
 use constant REGNO_PMC => 3;
 
-=head3
-
-regtype to argtype conversion hash
+=head3 regtype to argtype conversion hash
 
 =cut
 
