@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2005-2013, Parrot Foundation.
+# Copyright (C) 2005-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -27,7 +27,7 @@ my $PARROT_DEBUGGER = ".$PConfig{slash}parrot_debugger";
 
 # looking at the no flag arguments error message
 my ( $stdout, $stderr, $success ) = qxx( "$PARROT_DEBUGGER --help" );
-is( $stderr, "parrot_debugger takes no -x or --xxxx flag arguments\n",
+is( $stderr, "parrot_debugger takes no -x or --xxxx flag arguments\r?\n",
     'Debugger flag argument error message' );
 
 # Local Variables:
