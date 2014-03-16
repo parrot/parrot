@@ -19,9 +19,9 @@ use strict;
 use warnings;
 use lib qw( lib . ../lib ../../lib );
 
-use Test::More tests => 40;
+use Test::More;
 use Parrot::Config;
-use Parrot::Test qw(convert_line_endings);
+use Parrot::Test tests => 40;
 use File::Temp 0.13 qw/tempfile/;
 use File::Spec;
 
@@ -60,7 +60,7 @@ say "first"
 .end
 
 END_PIR
-convert_line_endings($expected_preprocesses_pir);
+Parrot::Test::convert_line_endings($expected_preprocesses_pir);
 is( `"$PARROT" -E "$first_pir_file" $redir`, $expected_preprocesses_pir, 'option -E' );
 is( `"$PARROT" --pre-process-only "$first_pir_file" $redir`,
 $expected_preprocesses_pir, 'option --pre-process-only' );

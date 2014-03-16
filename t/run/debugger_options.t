@@ -19,15 +19,17 @@ use strict;
 use warnings;
 use lib qw( lib . ../lib ../../lib );
 
-use Test::More tests => 1;
+use Test::More;
 use Parrot::Config;
+use Parrot::Test tests => 1;
 use IO::CaptureOutput qw{ qxx };
 
 my $PARROT_DEBUGGER = ".$PConfig{slash}parrot_debugger";
 
 # looking at the no flag arguments error message
 my ( $stdout, $stderr, $success ) = qxx( "$PARROT_DEBUGGER --help" );
-is( $stderr, "parrot_debugger takes no -x or --xxxx flag arguments\r?\n",
+Parrot::Test::convert_line_endings($stderr);
+is( $stderr, "parrot_debugger takes no -x or --xxxx flag arguments\n",
     'Debugger flag argument error message' );
 
 # Local Variables:

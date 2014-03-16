@@ -11,7 +11,7 @@ use Cwd;
 use File::Spec;
 use File::Path;
 
-my $MSWin32 = $^O =~ m!MSWin32!;
+my $MSWin32 = $^O =~ m!MSWin32|msys!;
 my $cygwin  = $^O =~ m!cygwin!;
 my $solaris = $^O =~ m!solaris!;
 my $MSVC = $PConfig{cc} =~ m/\bcl(?:\.exe)?/i;
