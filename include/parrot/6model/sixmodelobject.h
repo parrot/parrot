@@ -28,6 +28,42 @@ typedef struct {
     PMC                 *fetch_method;
 } ContainerSpec;
 
+/* How do we invoke this thing? Specifies either an attribute to look at for
+ * an invokable thing, or alternatively a method to call. */
+typedef struct {
+    AttributeIdentifier  value_slot;
+    PMC                 *invocation_handler;
+} InvocationSpec;
+
+/* How do we turn something of this type into a boolean? */
+typedef struct {
+    INTVAL mode;
+    PMC *  method;
+} BoolificationSpec;
+
+/* Defines and struct we use to access inlined members. */
+#define NATIVE_VALUE_INT    1
+#define NATIVE_VALUE_FLOAT  2
+#define NATIVE_VALUE_STRING 3
+
+typedef struct {
+    union {
+        INTVAL    intval;
+        FLOATVAL  floatval;
+        STRING   *stringval;
+    } value;
+    INTVAL type;
+} NativeValue;
+
+/* Boolification mode flags. */
+#define BOOL_MODE_CALL_METHOD                   0
+#define BOOL_MODE_UNBOX_INT                     1
+#define BOOL_MODE_UNBOX_NUM                     2
+#define BOOL_MODE_UNBOX_STR_NOT_EMPTY           3
+#define BOOL_MODE_UNBOX_STR_NOT_EMPTY_OR_ZERO   4
+#define BOOL_MODE_NOT_TYPE_OBJECT               5
+#define BOOL_MODE_BIGINT                        6
+
 /* Controls the way that type checks are performed. By default, if there is
  * a type check cache we treat it as definitive. However, it's possible to
  * declare that in the case the type check cache has no entry we should fall
@@ -93,6 +129,18 @@ typedef struct {
      * be taken as a "not a container" indication. */
     ContainerSpec *container_spec;
     
+    /* Data that the container spec may need to function. */
+    /* Any data specific to this type that the REPR wants to keep. */
+    void *container_data;
+
+    /* If this is invokable, then this contains information needed to
+     * figure out how to invoke it. If not, it'll be null. */
+    InvocationSpec *invocation_spec;
+
+    /* Information - if any - about how we can turn something of this type
+     * into a boolean. */
+    BoolificationSpec *boolification_spec;
+
     /* The underlying package stash. */
     PMC *WHO;
 
@@ -100,8 +148,8 @@ typedef struct {
      * of Parrot v-table functions. */
     PMC **parrot_vtable_mapping;
 
-	/* Parrot-specific set of v-table to object method mappings. */
-	AttributeIdentifier *parrot_vtable_handler_mapping;
+    /* Parrot-specific set of v-table to object method mappings. */
+    AttributeIdentifier *parrot_vtable_handler_mapping;
 } STable;
 
 /* A representation is what controls the layout of an object and storage of

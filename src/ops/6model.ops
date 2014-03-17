@@ -2,6 +2,15 @@
 Copyright (C) 2011-2014, Parrot Foundation.
 */
 
+=head1 NAME
+
+6model.ops - NQP SixModel Opcodes
+
+=head1 DESCRIPTION
+
+6model and the KnowHOW core meta-object.
+All the NQP 6model ops as native parrot core ops.
+
 =over
 
 =item get_knowhow()
@@ -973,6 +982,80 @@ inline op set_container_spec(in PMC, in PMC, in STR, in PMC) :base_core {
     else {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "Can only use set_container_spec with a SixModelObject");
+    }
+}
+
+=item set_invocation_spec
+
+Sets the invocation spec for the type in $1 (it actually sets it on
+the s-table, so the type object or any instance of the type will do).
+
+Either set $2 and $3 to a class handle and an attribute name (which
+should contain a code ref when looked up), or set $4 to a code ref
+that will handle the invocation. $2/$3 take precedence over $4.
+
+=cut
+
+inline op set_invocation_spec(invar PMC, invar PMC, in STR, invar PMC) :base_core {
+    if ($1->vtable->base_type == enum_class_SixModelObject) {
+        STable *st = STABLE($1);
+
+        /* Allocate and populate new invocation spec. */
+        InvocationSpec * const new_spec = mem_allocate_zeroed_typed(InvocationSpec);
+        new_spec->value_slot.class_handle = $2;
+        new_spec->value_slot.attr_name    = $3;
+        new_spec->value_slot.hint    = NO_HINT;
+        new_spec->invocation_handler      = $4;
+
+        /* Free any existing spec and put the new one in place. */
+        if (st->invocation_spec)
+            mem_sys_free(st->invocation_spec);
+        st->invocation_spec = new_spec;
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC($1));
+        /*ST_SC_WRITE_BARRIER(st);*/
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Can only use set_invocation_spec with a SixModelObject");
+    }
+}
+
+
+=item set_boolification_spec
+
+Sets the boolification spec for the type in $1 (it actually sets it on
+the s-table, so the type object or any instance of the type will do).
+
+The first operand specifies the boolification mode. The second specifies
+the method to call, and is only applicable with boolification mode that
+will call it.
+
+=cut
+
+inline op set_boolification_spec(invar PMC, in INT, invar PMC) :base_core {
+    PMC *target = decontainerize(interp, $1);
+    if ($2 == BOOL_MODE_CALL_METHOD && PMC_IS_NULL($3)) {
+        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            "Boolification mode for type is set to 'call method', but method not specified");
+    }
+    if (target->vtable->base_type == enum_class_SixModelObject) {
+        STable *st = STABLE(target);
+
+        /* Allocate and populate new boolification spec. */
+        BoolificationSpec * const new_spec = mem_allocate_zeroed_typed(BoolificationSpec);
+        new_spec->mode = $2;
+        new_spec->method = $3;
+
+        /* Free any existing spec and put the new one in place. */
+        if (st->boolification_spec)
+            mem_sys_free(st->boolification_spec);
+        st->boolification_spec = new_spec;
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC($1));
+        /*ST_SC_WRITE_BARRIER(st);*/
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Can only use set_boolification_spec with a SixModelObject");
     }
 }
 

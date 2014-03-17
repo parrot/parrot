@@ -6,8 +6,6 @@
 
 math.ops - Mathematical Opcodes
 
-=cut
-
 =head1 DESCRIPTION
 
 Operations that perform basic mathematics. See F<src/dynoplibs/> for more
