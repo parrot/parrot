@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -430,7 +430,7 @@ Parrot_runcore_enable_event_checking(PARROT_INTERP)
 =head1 SEE ALSO
 
 F<include/parrot/interpreter.h>, F<src/interp/inter_cb.c>,
-F<src/interp/inter_create.c>, F<src/interp/inter_misc.c>, F<src/call/ops.c>.
+F<src/interp/api.c>, F<src/call/ops.c>.
 
 =cut
 

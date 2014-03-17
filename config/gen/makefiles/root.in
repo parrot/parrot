@@ -1793,6 +1793,7 @@ src/call/context$(O) : $(PARROT_H_HEADERS) \
 
 src/interp/inter_cb$(O) : $(PARROT_H_HEADERS) \
 	$(INC_PMC_DIR)/pmc_parrotinterpreter.h \
+	$(INC_PMC_DIR)/pmc_callback.h \
 	$(EXTEND_HEADERS) \
 	src/interp/inter_cb.str \
 	src/interp/inter_cb.c
