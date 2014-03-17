@@ -572,6 +572,14 @@
 ^/src/.*\.obj/
 ^/src/.*\.str$
 ^/src/.*\.str/
+^/src/6model/.*\.o$
+^/src/6model/.*\.o/
+^/src/6model/.*\.obj$
+^/src/6model/.*\.obj/
+^/src/6model/reprs/.*\.o$
+^/src/6model/reprs/.*\.o/
+^/src/6model/reprs/.*\.obj$
+^/src/6model/reprs/.*\.obj/
 ^/src/asmfun\..*$
 ^/src/asmfun\..*/
 ^/src/atomic/.*\.o$
