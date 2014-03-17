@@ -77,13 +77,13 @@ extern op_lib_t core_op_lib;
 
 
 
-INTVAL core_numops = 1130;
+INTVAL core_numops = 1330;
 
 /*
 ** Op Function Table:
 */
 
-static op_func_t core_op_func_table[1130] = {
+static op_func_t core_op_func_table[1330] = {
   Parrot_end,                                        /*      0 */
   Parrot_noop,                                       /*      1 */
   Parrot_check_events,                               /*      2 */
@@ -686,533 +686,733 @@ static op_func_t core_op_func_table[1130] = {
   Parrot_inspect_p_pc_s,                             /*    599 */
   Parrot_inspect_p_p_sc,                             /*    600 */
   Parrot_inspect_p_pc_sc,                            /*    601 */
-  Parrot_new_p_s,                                    /*    602 */
-  Parrot_new_p_sc,                                   /*    603 */
-  Parrot_new_p_s_p,                                  /*    604 */
-  Parrot_new_p_sc_p,                                 /*    605 */
-  Parrot_new_p_s_pc,                                 /*    606 */
-  Parrot_new_p_sc_pc,                                /*    607 */
-  Parrot_new_p_p,                                    /*    608 */
-  Parrot_new_p_pc,                                   /*    609 */
-  Parrot_new_p_p_p,                                  /*    610 */
-  Parrot_new_p_pc_p,                                 /*    611 */
-  Parrot_new_p_p_pc,                                 /*    612 */
-  Parrot_new_p_pc_pc,                                /*    613 */
-  Parrot_root_new_p_p,                               /*    614 */
-  Parrot_root_new_p_pc,                              /*    615 */
-  Parrot_root_new_p_p_p,                             /*    616 */
-  Parrot_root_new_p_pc_p,                            /*    617 */
-  Parrot_root_new_p_p_pc,                            /*    618 */
-  Parrot_root_new_p_pc_pc,                           /*    619 */
-  Parrot_typeof_s_p,                                 /*    620 */
-  Parrot_typeof_p_p,                                 /*    621 */
-  Parrot_get_repr_s_p,                               /*    622 */
-  Parrot_find_method_p_p_s,                          /*    623 */
-  Parrot_find_method_p_p_sc,                         /*    624 */
-  Parrot_defined_i_p,                                /*    625 */
-  Parrot_defined_i_p_ki,                             /*    626 */
-  Parrot_defined_i_p_kic,                            /*    627 */
-  Parrot_defined_i_p_k,                              /*    628 */
-  Parrot_defined_i_p_kc,                             /*    629 */
-  Parrot_exists_i_p_ki,                              /*    630 */
-  Parrot_exists_i_p_kic,                             /*    631 */
-  Parrot_exists_i_p_k,                               /*    632 */
-  Parrot_exists_i_p_kc,                              /*    633 */
-  Parrot_delete_p_k,                                 /*    634 */
-  Parrot_delete_p_kc,                                /*    635 */
-  Parrot_delete_p_ki,                                /*    636 */
-  Parrot_delete_p_kic,                               /*    637 */
-  Parrot_elements_i_p,                               /*    638 */
-  Parrot_push_p_i,                                   /*    639 */
-  Parrot_push_p_ic,                                  /*    640 */
-  Parrot_push_p_n,                                   /*    641 */
-  Parrot_push_p_nc,                                  /*    642 */
-  Parrot_push_p_s,                                   /*    643 */
-  Parrot_push_p_sc,                                  /*    644 */
-  Parrot_push_p_p,                                   /*    645 */
-  Parrot_pop_i_p,                                    /*    646 */
-  Parrot_pop_n_p,                                    /*    647 */
-  Parrot_pop_s_p,                                    /*    648 */
-  Parrot_pop_p_p,                                    /*    649 */
-  Parrot_unshift_p_i,                                /*    650 */
-  Parrot_unshift_p_ic,                               /*    651 */
-  Parrot_unshift_p_n,                                /*    652 */
-  Parrot_unshift_p_nc,                               /*    653 */
-  Parrot_unshift_p_s,                                /*    654 */
-  Parrot_unshift_p_sc,                               /*    655 */
-  Parrot_unshift_p_p,                                /*    656 */
-  Parrot_shift_i_p,                                  /*    657 */
-  Parrot_shift_n_p,                                  /*    658 */
-  Parrot_shift_s_p,                                  /*    659 */
-  Parrot_shift_p_p,                                  /*    660 */
-  Parrot_splice_p_p_i_i,                             /*    661 */
-  Parrot_splice_p_p_ic_i,                            /*    662 */
-  Parrot_splice_p_p_i_ic,                            /*    663 */
-  Parrot_splice_p_p_ic_ic,                           /*    664 */
-  Parrot_setprop_p_s_p,                              /*    665 */
-  Parrot_setprop_p_sc_p,                             /*    666 */
-  Parrot_getprop_p_s_p,                              /*    667 */
-  Parrot_getprop_p_sc_p,                             /*    668 */
-  Parrot_getprop_p_p_s,                              /*    669 */
-  Parrot_getprop_p_p_sc,                             /*    670 */
-  Parrot_delprop_p_s,                                /*    671 */
-  Parrot_delprop_p_sc,                               /*    672 */
-  Parrot_prophash_p_p,                               /*    673 */
-  Parrot_freeze_s_p,                                 /*    674 */
-  Parrot_thaw_p_s,                                   /*    675 */
-  Parrot_thaw_p_sc,                                  /*    676 */
-  Parrot_add_multi_s_s_p,                            /*    677 */
-  Parrot_add_multi_sc_s_p,                           /*    678 */
-  Parrot_add_multi_s_sc_p,                           /*    679 */
-  Parrot_add_multi_sc_sc_p,                          /*    680 */
-  Parrot_find_multi_p_s_s,                           /*    681 */
-  Parrot_find_multi_p_sc_s,                          /*    682 */
-  Parrot_find_multi_p_s_sc,                          /*    683 */
-  Parrot_find_multi_p_sc_sc,                         /*    684 */
-  Parrot_register_p,                                 /*    685 */
-  Parrot_unregister_p,                               /*    686 */
-  Parrot_box_p_i,                                    /*    687 */
-  Parrot_box_p_ic,                                   /*    688 */
-  Parrot_box_p_n,                                    /*    689 */
-  Parrot_box_p_nc,                                   /*    690 */
-  Parrot_box_p_s,                                    /*    691 */
-  Parrot_box_p_sc,                                   /*    692 */
-  Parrot_iter_p_p,                                   /*    693 */
-  Parrot_morph_p_p,                                  /*    694 */
-  Parrot_morph_p_pc,                                 /*    695 */
-  Parrot_clone_s_s,                                  /*    696 */
-  Parrot_clone_s_sc,                                 /*    697 */
-  Parrot_set_i_i,                                    /*    698 */
-  Parrot_set_i_ic,                                   /*    699 */
-  Parrot_set_i_n,                                    /*    700 */
-  Parrot_set_i_nc,                                   /*    701 */
-  Parrot_set_i_s,                                    /*    702 */
-  Parrot_set_i_sc,                                   /*    703 */
-  Parrot_set_n_n,                                    /*    704 */
-  Parrot_set_n_nc,                                   /*    705 */
-  Parrot_set_n_i,                                    /*    706 */
-  Parrot_set_n_ic,                                   /*    707 */
-  Parrot_set_n_s,                                    /*    708 */
-  Parrot_set_n_sc,                                   /*    709 */
-  Parrot_set_n_p,                                    /*    710 */
-  Parrot_set_s_p,                                    /*    711 */
-  Parrot_set_s_s,                                    /*    712 */
-  Parrot_set_s_sc,                                   /*    713 */
-  Parrot_set_s_i,                                    /*    714 */
-  Parrot_set_s_ic,                                   /*    715 */
-  Parrot_set_s_n,                                    /*    716 */
-  Parrot_set_s_nc,                                   /*    717 */
-  Parrot_set_p_pc,                                   /*    718 */
-  Parrot_set_p_p,                                    /*    719 */
-  Parrot_set_p_i,                                    /*    720 */
-  Parrot_set_p_ic,                                   /*    721 */
-  Parrot_set_p_n,                                    /*    722 */
-  Parrot_set_p_nc,                                   /*    723 */
-  Parrot_set_p_s,                                    /*    724 */
-  Parrot_set_p_sc,                                   /*    725 */
-  Parrot_set_i_p,                                    /*    726 */
-  Parrot_assign_p_p,                                 /*    727 */
-  Parrot_assign_p_i,                                 /*    728 */
-  Parrot_assign_p_ic,                                /*    729 */
-  Parrot_assign_p_n,                                 /*    730 */
-  Parrot_assign_p_nc,                                /*    731 */
-  Parrot_assign_p_s,                                 /*    732 */
-  Parrot_assign_p_sc,                                /*    733 */
-  Parrot_assign_s_s,                                 /*    734 */
-  Parrot_assign_s_sc,                                /*    735 */
-  Parrot_setref_p_p,                                 /*    736 */
-  Parrot_deref_p_p,                                  /*    737 */
-  Parrot_set_p_ki_i,                                 /*    738 */
-  Parrot_set_p_kic_i,                                /*    739 */
-  Parrot_set_p_ki_ic,                                /*    740 */
-  Parrot_set_p_kic_ic,                               /*    741 */
-  Parrot_set_p_ki_n,                                 /*    742 */
-  Parrot_set_p_kic_n,                                /*    743 */
-  Parrot_set_p_ki_nc,                                /*    744 */
-  Parrot_set_p_kic_nc,                               /*    745 */
-  Parrot_set_p_ki_s,                                 /*    746 */
-  Parrot_set_p_kic_s,                                /*    747 */
-  Parrot_set_p_ki_sc,                                /*    748 */
-  Parrot_set_p_kic_sc,                               /*    749 */
-  Parrot_set_p_ki_p,                                 /*    750 */
-  Parrot_set_p_kic_p,                                /*    751 */
-  Parrot_set_i_p_ki,                                 /*    752 */
-  Parrot_set_i_p_kic,                                /*    753 */
-  Parrot_set_n_p_ki,                                 /*    754 */
-  Parrot_set_n_p_kic,                                /*    755 */
-  Parrot_set_s_p_ki,                                 /*    756 */
-  Parrot_set_s_p_kic,                                /*    757 */
-  Parrot_set_p_p_ki,                                 /*    758 */
-  Parrot_set_p_p_kic,                                /*    759 */
-  Parrot_set_p_k_i,                                  /*    760 */
-  Parrot_set_p_kc_i,                                 /*    761 */
-  Parrot_set_p_k_ic,                                 /*    762 */
-  Parrot_set_p_kc_ic,                                /*    763 */
-  Parrot_set_p_k_n,                                  /*    764 */
-  Parrot_set_p_kc_n,                                 /*    765 */
-  Parrot_set_p_k_nc,                                 /*    766 */
-  Parrot_set_p_kc_nc,                                /*    767 */
-  Parrot_set_p_k_s,                                  /*    768 */
-  Parrot_set_p_kc_s,                                 /*    769 */
-  Parrot_set_p_k_sc,                                 /*    770 */
-  Parrot_set_p_kc_sc,                                /*    771 */
-  Parrot_set_p_k_p,                                  /*    772 */
-  Parrot_set_p_kc_p,                                 /*    773 */
-  Parrot_set_i_p_k,                                  /*    774 */
-  Parrot_set_i_p_kc,                                 /*    775 */
-  Parrot_set_n_p_k,                                  /*    776 */
-  Parrot_set_n_p_kc,                                 /*    777 */
-  Parrot_set_s_p_k,                                  /*    778 */
-  Parrot_set_s_p_kc,                                 /*    779 */
-  Parrot_set_p_p_k,                                  /*    780 */
-  Parrot_set_p_p_kc,                                 /*    781 */
-  Parrot_clone_p_p,                                  /*    782 */
-  Parrot_clone_p_p_p,                                /*    783 */
-  Parrot_clone_p_p_pc,                               /*    784 */
-  Parrot_copy_p_p,                                   /*    785 */
-  Parrot_null_s,                                     /*    786 */
-  Parrot_null_i,                                     /*    787 */
-  Parrot_null_p,                                     /*    788 */
-  Parrot_null_n,                                     /*    789 */
-  Parrot_ord_i_s,                                    /*    790 */
-  Parrot_ord_i_sc,                                   /*    791 */
-  Parrot_ord_i_s_i,                                  /*    792 */
-  Parrot_ord_i_sc_i,                                 /*    793 */
-  Parrot_ord_i_s_ic,                                 /*    794 */
-  Parrot_ord_i_sc_ic,                                /*    795 */
-  Parrot_chr_s_i,                                    /*    796 */
-  Parrot_chr_s_ic,                                   /*    797 */
-  Parrot_chopn_s_s_i,                                /*    798 */
-  Parrot_chopn_s_sc_i,                               /*    799 */
-  Parrot_chopn_s_s_ic,                               /*    800 */
-  Parrot_chopn_s_sc_ic,                              /*    801 */
-  Parrot_concat_p_p,                                 /*    802 */
-  Parrot_concat_p_s,                                 /*    803 */
-  Parrot_concat_p_sc,                                /*    804 */
-  Parrot_concat_s_s_s,                               /*    805 */
-  Parrot_concat_s_sc_s,                              /*    806 */
-  Parrot_concat_s_s_sc,                              /*    807 */
-  Parrot_concat_p_p_s,                               /*    808 */
-  Parrot_concat_p_p_sc,                              /*    809 */
-  Parrot_concat_p_p_p,                               /*    810 */
-  Parrot_repeat_s_s_i,                               /*    811 */
-  Parrot_repeat_s_sc_i,                              /*    812 */
-  Parrot_repeat_s_s_ic,                              /*    813 */
-  Parrot_repeat_s_sc_ic,                             /*    814 */
-  Parrot_repeat_p_p_i,                               /*    815 */
-  Parrot_repeat_p_p_ic,                              /*    816 */
-  Parrot_repeat_p_p_p,                               /*    817 */
-  Parrot_repeat_p_i,                                 /*    818 */
-  Parrot_repeat_p_ic,                                /*    819 */
-  Parrot_repeat_p_p,                                 /*    820 */
-  Parrot_length_i_s,                                 /*    821 */
-  Parrot_length_i_sc,                                /*    822 */
-  Parrot_bytelength_i_s,                             /*    823 */
-  Parrot_bytelength_i_sc,                            /*    824 */
-  Parrot_pin_s,                                      /*    825 */
-  Parrot_unpin_s,                                    /*    826 */
-  Parrot_substr_s_s_i,                               /*    827 */
-  Parrot_substr_s_sc_i,                              /*    828 */
-  Parrot_substr_s_s_ic,                              /*    829 */
-  Parrot_substr_s_sc_ic,                             /*    830 */
-  Parrot_substr_s_s_i_i,                             /*    831 */
-  Parrot_substr_s_sc_i_i,                            /*    832 */
-  Parrot_substr_s_s_ic_i,                            /*    833 */
-  Parrot_substr_s_sc_ic_i,                           /*    834 */
-  Parrot_substr_s_s_i_ic,                            /*    835 */
-  Parrot_substr_s_sc_i_ic,                           /*    836 */
-  Parrot_substr_s_s_ic_ic,                           /*    837 */
-  Parrot_substr_s_sc_ic_ic,                          /*    838 */
-  Parrot_substr_s_p_i_i,                             /*    839 */
-  Parrot_substr_s_p_ic_i,                            /*    840 */
-  Parrot_substr_s_p_i_ic,                            /*    841 */
-  Parrot_substr_s_p_ic_ic,                           /*    842 */
-  Parrot_replace_s_s_i_i_s,                          /*    843 */
-  Parrot_replace_s_sc_i_i_s,                         /*    844 */
-  Parrot_replace_s_s_ic_i_s,                         /*    845 */
-  Parrot_replace_s_sc_ic_i_s,                        /*    846 */
-  Parrot_replace_s_s_i_ic_s,                         /*    847 */
-  Parrot_replace_s_sc_i_ic_s,                        /*    848 */
-  Parrot_replace_s_s_ic_ic_s,                        /*    849 */
-  Parrot_replace_s_sc_ic_ic_s,                       /*    850 */
-  Parrot_replace_s_s_i_i_sc,                         /*    851 */
-  Parrot_replace_s_sc_i_i_sc,                        /*    852 */
-  Parrot_replace_s_s_ic_i_sc,                        /*    853 */
-  Parrot_replace_s_sc_ic_i_sc,                       /*    854 */
-  Parrot_replace_s_s_i_ic_sc,                        /*    855 */
-  Parrot_replace_s_sc_i_ic_sc,                       /*    856 */
-  Parrot_replace_s_s_ic_ic_sc,                       /*    857 */
-  Parrot_replace_s_sc_ic_ic_sc,                      /*    858 */
-  Parrot_index_i_s_s,                                /*    859 */
-  Parrot_index_i_sc_s,                               /*    860 */
-  Parrot_index_i_s_sc,                               /*    861 */
-  Parrot_index_i_sc_sc,                              /*    862 */
-  Parrot_index_i_s_s_i,                              /*    863 */
-  Parrot_index_i_sc_s_i,                             /*    864 */
-  Parrot_index_i_s_sc_i,                             /*    865 */
-  Parrot_index_i_sc_sc_i,                            /*    866 */
-  Parrot_index_i_s_s_ic,                             /*    867 */
-  Parrot_index_i_sc_s_ic,                            /*    868 */
-  Parrot_index_i_s_sc_ic,                            /*    869 */
-  Parrot_index_i_sc_sc_ic,                           /*    870 */
-  Parrot_rindex_i_s_s,                               /*    871 */
-  Parrot_rindex_i_sc_s,                              /*    872 */
-  Parrot_rindex_i_s_sc,                              /*    873 */
-  Parrot_rindex_i_sc_sc,                             /*    874 */
-  Parrot_rindex_i_s_s_i,                             /*    875 */
-  Parrot_rindex_i_sc_s_i,                            /*    876 */
-  Parrot_rindex_i_s_sc_i,                            /*    877 */
-  Parrot_rindex_i_sc_sc_i,                           /*    878 */
-  Parrot_rindex_i_s_s_ic,                            /*    879 */
-  Parrot_rindex_i_sc_s_ic,                           /*    880 */
-  Parrot_rindex_i_s_sc_ic,                           /*    881 */
-  Parrot_rindex_i_sc_sc_ic,                          /*    882 */
-  Parrot_sprintf_s_s_p,                              /*    883 */
-  Parrot_sprintf_s_sc_p,                             /*    884 */
-  Parrot_sprintf_p_p_p,                              /*    885 */
-  Parrot_new_s,                                      /*    886 */
-  Parrot_stringinfo_i_s_i,                           /*    887 */
-  Parrot_stringinfo_i_sc_i,                          /*    888 */
-  Parrot_stringinfo_i_s_ic,                          /*    889 */
-  Parrot_stringinfo_i_sc_ic,                         /*    890 */
-  Parrot_upcase_s_s,                                 /*    891 */
-  Parrot_upcase_s_sc,                                /*    892 */
-  Parrot_downcase_s_s,                               /*    893 */
-  Parrot_downcase_s_sc,                              /*    894 */
-  Parrot_titlecase_s_s,                              /*    895 */
-  Parrot_titlecase_s_sc,                             /*    896 */
-  Parrot_join_s_s_p,                                 /*    897 */
-  Parrot_join_s_sc_p,                                /*    898 */
-  Parrot_split_p_s_s,                                /*    899 */
-  Parrot_split_p_sc_s,                               /*    900 */
-  Parrot_split_p_s_sc,                               /*    901 */
-  Parrot_split_p_sc_sc,                              /*    902 */
-  Parrot_encoding_i_s,                               /*    903 */
-  Parrot_encoding_i_sc,                              /*    904 */
-  Parrot_encodingname_s_i,                           /*    905 */
-  Parrot_encodingname_s_ic,                          /*    906 */
-  Parrot_find_encoding_i_s,                          /*    907 */
-  Parrot_find_encoding_i_sc,                         /*    908 */
-  Parrot_trans_encoding_s_s_i,                       /*    909 */
-  Parrot_trans_encoding_s_sc_i,                      /*    910 */
-  Parrot_trans_encoding_s_s_ic,                      /*    911 */
-  Parrot_trans_encoding_s_sc_ic,                     /*    912 */
-  Parrot_is_cclass_i_i_s_i,                          /*    913 */
-  Parrot_is_cclass_i_ic_s_i,                         /*    914 */
-  Parrot_is_cclass_i_i_sc_i,                         /*    915 */
-  Parrot_is_cclass_i_ic_sc_i,                        /*    916 */
-  Parrot_is_cclass_i_i_s_ic,                         /*    917 */
-  Parrot_is_cclass_i_ic_s_ic,                        /*    918 */
-  Parrot_is_cclass_i_i_sc_ic,                        /*    919 */
-  Parrot_is_cclass_i_ic_sc_ic,                       /*    920 */
-  Parrot_find_cclass_i_i_s_i_i,                      /*    921 */
-  Parrot_find_cclass_i_ic_s_i_i,                     /*    922 */
-  Parrot_find_cclass_i_i_sc_i_i,                     /*    923 */
-  Parrot_find_cclass_i_ic_sc_i_i,                    /*    924 */
-  Parrot_find_cclass_i_i_s_ic_i,                     /*    925 */
-  Parrot_find_cclass_i_ic_s_ic_i,                    /*    926 */
-  Parrot_find_cclass_i_i_sc_ic_i,                    /*    927 */
-  Parrot_find_cclass_i_ic_sc_ic_i,                   /*    928 */
-  Parrot_find_cclass_i_i_s_i_ic,                     /*    929 */
-  Parrot_find_cclass_i_ic_s_i_ic,                    /*    930 */
-  Parrot_find_cclass_i_i_sc_i_ic,                    /*    931 */
-  Parrot_find_cclass_i_ic_sc_i_ic,                   /*    932 */
-  Parrot_find_cclass_i_i_s_ic_ic,                    /*    933 */
-  Parrot_find_cclass_i_ic_s_ic_ic,                   /*    934 */
-  Parrot_find_cclass_i_i_sc_ic_ic,                   /*    935 */
-  Parrot_find_cclass_i_ic_sc_ic_ic,                  /*    936 */
-  Parrot_find_not_cclass_i_i_s_i_i,                  /*    937 */
-  Parrot_find_not_cclass_i_ic_s_i_i,                 /*    938 */
-  Parrot_find_not_cclass_i_i_sc_i_i,                 /*    939 */
-  Parrot_find_not_cclass_i_ic_sc_i_i,                /*    940 */
-  Parrot_find_not_cclass_i_i_s_ic_i,                 /*    941 */
-  Parrot_find_not_cclass_i_ic_s_ic_i,                /*    942 */
-  Parrot_find_not_cclass_i_i_sc_ic_i,                /*    943 */
-  Parrot_find_not_cclass_i_ic_sc_ic_i,               /*    944 */
-  Parrot_find_not_cclass_i_i_s_i_ic,                 /*    945 */
-  Parrot_find_not_cclass_i_ic_s_i_ic,                /*    946 */
-  Parrot_find_not_cclass_i_i_sc_i_ic,                /*    947 */
-  Parrot_find_not_cclass_i_ic_sc_i_ic,               /*    948 */
-  Parrot_find_not_cclass_i_i_s_ic_ic,                /*    949 */
-  Parrot_find_not_cclass_i_ic_s_ic_ic,               /*    950 */
-  Parrot_find_not_cclass_i_i_sc_ic_ic,               /*    951 */
-  Parrot_find_not_cclass_i_ic_sc_ic_ic,              /*    952 */
-  Parrot_escape_s_s,                                 /*    953 */
-  Parrot_compose_s_s,                                /*    954 */
-  Parrot_compose_s_sc,                               /*    955 */
-  Parrot_find_codepoint_i_s,                         /*    956 */
-  Parrot_find_codepoint_i_sc,                        /*    957 */
-  Parrot_spawnw_i_s,                                 /*    958 */
-  Parrot_spawnw_i_sc,                                /*    959 */
-  Parrot_spawnw_i_p,                                 /*    960 */
-  Parrot_err_i,                                      /*    961 */
-  Parrot_err_s,                                      /*    962 */
-  Parrot_err_s_i,                                    /*    963 */
-  Parrot_err_s_ic,                                   /*    964 */
-  Parrot_time_i,                                     /*    965 */
-  Parrot_time_n,                                     /*    966 */
-  Parrot_sleep_i,                                    /*    967 */
-  Parrot_sleep_ic,                                   /*    968 */
-  Parrot_sleep_n,                                    /*    969 */
-  Parrot_sleep_nc,                                   /*    970 */
-  Parrot_store_lex_s_p,                              /*    971 */
-  Parrot_store_lex_sc_p,                             /*    972 */
-  Parrot_store_lex_s_s,                              /*    973 */
-  Parrot_store_lex_sc_s,                             /*    974 */
-  Parrot_store_lex_s_sc,                             /*    975 */
-  Parrot_store_lex_sc_sc,                            /*    976 */
-  Parrot_store_lex_s_i,                              /*    977 */
-  Parrot_store_lex_sc_i,                             /*    978 */
-  Parrot_store_lex_s_ic,                             /*    979 */
-  Parrot_store_lex_sc_ic,                            /*    980 */
-  Parrot_store_lex_s_n,                              /*    981 */
-  Parrot_store_lex_sc_n,                             /*    982 */
-  Parrot_store_lex_s_nc,                             /*    983 */
-  Parrot_store_lex_sc_nc,                            /*    984 */
-  Parrot_store_dynamic_lex_s_p,                      /*    985 */
-  Parrot_store_dynamic_lex_sc_p,                     /*    986 */
-  Parrot_find_lex_p_s,                               /*    987 */
-  Parrot_find_lex_p_sc,                              /*    988 */
-  Parrot_find_lex_s_s,                               /*    989 */
-  Parrot_find_lex_s_sc,                              /*    990 */
-  Parrot_find_lex_i_s,                               /*    991 */
-  Parrot_find_lex_i_sc,                              /*    992 */
-  Parrot_find_lex_n_s,                               /*    993 */
-  Parrot_find_lex_n_sc,                              /*    994 */
-  Parrot_find_dynamic_lex_p_s,                       /*    995 */
-  Parrot_find_dynamic_lex_p_sc,                      /*    996 */
-  Parrot_find_caller_lex_p_s,                        /*    997 */
-  Parrot_find_caller_lex_p_sc,                       /*    998 */
-  Parrot_get_namespace_p,                            /*    999 */
-  Parrot_get_namespace_p_p,                          /*   1000 */
-  Parrot_get_namespace_p_pc,                         /*   1001 */
-  Parrot_get_hll_namespace_p,                        /*   1002 */
-  Parrot_get_hll_namespace_p_p,                      /*   1003 */
-  Parrot_get_hll_namespace_p_pc,                     /*   1004 */
-  Parrot_get_root_namespace_p,                       /*   1005 */
-  Parrot_get_root_namespace_p_p,                     /*   1006 */
-  Parrot_get_root_namespace_p_pc,                    /*   1007 */
-  Parrot_get_global_p_s,                             /*   1008 */
-  Parrot_get_global_p_sc,                            /*   1009 */
-  Parrot_get_global_p_p_s,                           /*   1010 */
-  Parrot_get_global_p_pc_s,                          /*   1011 */
-  Parrot_get_global_p_p_sc,                          /*   1012 */
-  Parrot_get_global_p_pc_sc,                         /*   1013 */
-  Parrot_get_hll_global_p_s,                         /*   1014 */
-  Parrot_get_hll_global_p_sc,                        /*   1015 */
-  Parrot_get_hll_global_p_p_s,                       /*   1016 */
-  Parrot_get_hll_global_p_pc_s,                      /*   1017 */
-  Parrot_get_hll_global_p_p_sc,                      /*   1018 */
-  Parrot_get_hll_global_p_pc_sc,                     /*   1019 */
-  Parrot_get_root_global_p_s,                        /*   1020 */
-  Parrot_get_root_global_p_sc,                       /*   1021 */
-  Parrot_get_root_global_p_p_s,                      /*   1022 */
-  Parrot_get_root_global_p_pc_s,                     /*   1023 */
-  Parrot_get_root_global_p_p_sc,                     /*   1024 */
-  Parrot_get_root_global_p_pc_sc,                    /*   1025 */
-  Parrot_set_global_s_p,                             /*   1026 */
-  Parrot_set_global_sc_p,                            /*   1027 */
-  Parrot_set_global_p_s_p,                           /*   1028 */
-  Parrot_set_global_pc_s_p,                          /*   1029 */
-  Parrot_set_global_p_sc_p,                          /*   1030 */
-  Parrot_set_global_pc_sc_p,                         /*   1031 */
-  Parrot_set_hll_global_s_p,                         /*   1032 */
-  Parrot_set_hll_global_sc_p,                        /*   1033 */
-  Parrot_set_hll_global_p_s_p,                       /*   1034 */
-  Parrot_set_hll_global_pc_s_p,                      /*   1035 */
-  Parrot_set_hll_global_p_sc_p,                      /*   1036 */
-  Parrot_set_hll_global_pc_sc_p,                     /*   1037 */
-  Parrot_set_root_global_s_p,                        /*   1038 */
-  Parrot_set_root_global_sc_p,                       /*   1039 */
-  Parrot_set_root_global_p_s_p,                      /*   1040 */
-  Parrot_set_root_global_pc_s_p,                     /*   1041 */
-  Parrot_set_root_global_p_sc_p,                     /*   1042 */
-  Parrot_set_root_global_pc_sc_p,                    /*   1043 */
-  Parrot_find_name_p_s,                              /*   1044 */
-  Parrot_find_name_p_sc,                             /*   1045 */
-  Parrot_find_sub_not_null_p_s,                      /*   1046 */
-  Parrot_find_sub_not_null_p_sc,                     /*   1047 */
-  Parrot_trap,                                       /*   1048 */
-  Parrot_set_label_p_ic,                             /*   1049 */
-  Parrot_get_label_i_p,                              /*   1050 */
-  Parrot_get_id_i_p,                                 /*   1051 */
-  Parrot_get_id_i_pc,                                /*   1052 */
-  Parrot_fetch_p_p_p_p,                              /*   1053 */
-  Parrot_fetch_p_pc_p_p,                             /*   1054 */
-  Parrot_fetch_p_p_pc_p,                             /*   1055 */
-  Parrot_fetch_p_pc_pc_p,                            /*   1056 */
-  Parrot_fetch_p_p_p_pc,                             /*   1057 */
-  Parrot_fetch_p_pc_p_pc,                            /*   1058 */
-  Parrot_fetch_p_p_pc_pc,                            /*   1059 */
-  Parrot_fetch_p_pc_pc_pc,                           /*   1060 */
-  Parrot_fetch_p_p_i_p,                              /*   1061 */
-  Parrot_fetch_p_pc_i_p,                             /*   1062 */
-  Parrot_fetch_p_p_ic_p,                             /*   1063 */
-  Parrot_fetch_p_pc_ic_p,                            /*   1064 */
-  Parrot_fetch_p_p_i_pc,                             /*   1065 */
-  Parrot_fetch_p_pc_i_pc,                            /*   1066 */
-  Parrot_fetch_p_p_ic_pc,                            /*   1067 */
-  Parrot_fetch_p_pc_ic_pc,                           /*   1068 */
-  Parrot_fetch_p_p_s_p,                              /*   1069 */
-  Parrot_fetch_p_pc_s_p,                             /*   1070 */
-  Parrot_fetch_p_p_sc_p,                             /*   1071 */
-  Parrot_fetch_p_pc_sc_p,                            /*   1072 */
-  Parrot_fetch_p_p_s_pc,                             /*   1073 */
-  Parrot_fetch_p_pc_s_pc,                            /*   1074 */
-  Parrot_fetch_p_p_sc_pc,                            /*   1075 */
-  Parrot_fetch_p_pc_sc_pc,                           /*   1076 */
-  Parrot_vivify_p_p_p_p,                             /*   1077 */
-  Parrot_vivify_p_pc_p_p,                            /*   1078 */
-  Parrot_vivify_p_p_pc_p,                            /*   1079 */
-  Parrot_vivify_p_pc_pc_p,                           /*   1080 */
-  Parrot_vivify_p_p_p_pc,                            /*   1081 */
-  Parrot_vivify_p_pc_p_pc,                           /*   1082 */
-  Parrot_vivify_p_p_pc_pc,                           /*   1083 */
-  Parrot_vivify_p_pc_pc_pc,                          /*   1084 */
-  Parrot_vivify_p_p_i_p,                             /*   1085 */
-  Parrot_vivify_p_pc_i_p,                            /*   1086 */
-  Parrot_vivify_p_p_ic_p,                            /*   1087 */
-  Parrot_vivify_p_pc_ic_p,                           /*   1088 */
-  Parrot_vivify_p_p_i_pc,                            /*   1089 */
-  Parrot_vivify_p_pc_i_pc,                           /*   1090 */
-  Parrot_vivify_p_p_ic_pc,                           /*   1091 */
-  Parrot_vivify_p_pc_ic_pc,                          /*   1092 */
-  Parrot_vivify_p_p_s_p,                             /*   1093 */
-  Parrot_vivify_p_pc_s_p,                            /*   1094 */
-  Parrot_vivify_p_p_sc_p,                            /*   1095 */
-  Parrot_vivify_p_pc_sc_p,                           /*   1096 */
-  Parrot_vivify_p_p_s_pc,                            /*   1097 */
-  Parrot_vivify_p_pc_s_pc,                           /*   1098 */
-  Parrot_vivify_p_p_sc_pc,                           /*   1099 */
-  Parrot_vivify_p_pc_sc_pc,                          /*   1100 */
-  Parrot_new_p_s_i,                                  /*   1101 */
-  Parrot_new_p_sc_i,                                 /*   1102 */
-  Parrot_new_p_s_ic,                                 /*   1103 */
-  Parrot_new_p_sc_ic,                                /*   1104 */
-  Parrot_new_p_p_i,                                  /*   1105 */
-  Parrot_new_p_pc_i,                                 /*   1106 */
-  Parrot_new_p_p_ic,                                 /*   1107 */
-  Parrot_new_p_pc_ic,                                /*   1108 */
-  Parrot_root_new_p_p_i,                             /*   1109 */
-  Parrot_root_new_p_pc_i,                            /*   1110 */
-  Parrot_root_new_p_p_ic,                            /*   1111 */
-  Parrot_root_new_p_pc_ic,                           /*   1112 */
-  Parrot_get_context_p,                              /*   1113 */
-  Parrot_new_call_context_p,                         /*   1114 */
-  Parrot_invokecc_p_p,                               /*   1115 */
-  Parrot_flatten_array_into_p_p_i,                   /*   1116 */
-  Parrot_flatten_array_into_p_p_ic,                  /*   1117 */
-  Parrot_flatten_hash_into_p_p_i,                    /*   1118 */
-  Parrot_flatten_hash_into_p_p_ic,                   /*   1119 */
-  Parrot_slurp_array_from_p_p_i,                     /*   1120 */
-  Parrot_slurp_array_from_p_p_ic,                    /*   1121 */
-  Parrot_receive_p,                                  /*   1122 */
-  Parrot_wait_p,                                     /*   1123 */
-  Parrot_wait_pc,                                    /*   1124 */
-  Parrot_pass,                                       /*   1125 */
-  Parrot_disable_preemption,                         /*   1126 */
-  Parrot_enable_preemption,                          /*   1127 */
-  Parrot_terminate,                                  /*   1128 */
+  Parrot_get_knowhow_p,                              /*    602 */
+  Parrot_get_knowhow_attribute_p,                    /*    603 */
+  Parrot_get_how_p_p,                                /*    604 */
+  Parrot_get_how_p_pc,                               /*    605 */
+  Parrot_get_what_p_p,                               /*    606 */
+  Parrot_get_what_p_pc,                              /*    607 */
+  Parrot_what_or_null_p_p,                           /*    608 */
+  Parrot_what_or_null_p_pc,                          /*    609 */
+  Parrot_get_who_p_p,                                /*    610 */
+  Parrot_get_who_p_pc,                               /*    611 */
+  Parrot_set_who_p_p,                                /*    612 */
+  Parrot_set_who_pc_p,                               /*    613 */
+  Parrot_set_who_p_pc,                               /*    614 */
+  Parrot_set_who_pc_pc,                              /*    615 */
+  Parrot_repr_type_object_for_p_p_s,                 /*    616 */
+  Parrot_repr_type_object_for_p_pc_s,                /*    617 */
+  Parrot_repr_type_object_for_p_p_sc,                /*    618 */
+  Parrot_repr_type_object_for_p_pc_sc,               /*    619 */
+  Parrot_repr_instance_of_p_p,                       /*    620 */
+  Parrot_repr_instance_of_p_pc,                      /*    621 */
+  Parrot_repr_clone_p_p,                             /*    622 */
+  Parrot_repr_clone_p_pc,                            /*    623 */
+  Parrot_repr_defined_i_p,                           /*    624 */
+  Parrot_repr_defined_i_pc,                          /*    625 */
+  Parrot_repr_get_attr_int_i_p_p_s,                  /*    626 */
+  Parrot_repr_get_attr_int_i_pc_p_s,                 /*    627 */
+  Parrot_repr_get_attr_int_i_p_pc_s,                 /*    628 */
+  Parrot_repr_get_attr_int_i_pc_pc_s,                /*    629 */
+  Parrot_repr_get_attr_int_i_p_p_sc,                 /*    630 */
+  Parrot_repr_get_attr_int_i_pc_p_sc,                /*    631 */
+  Parrot_repr_get_attr_int_i_p_pc_sc,                /*    632 */
+  Parrot_repr_get_attr_int_i_pc_pc_sc,               /*    633 */
+  Parrot_repr_get_attr_num_n_p_p_s,                  /*    634 */
+  Parrot_repr_get_attr_num_n_pc_p_s,                 /*    635 */
+  Parrot_repr_get_attr_num_n_p_pc_s,                 /*    636 */
+  Parrot_repr_get_attr_num_n_pc_pc_s,                /*    637 */
+  Parrot_repr_get_attr_num_n_p_p_sc,                 /*    638 */
+  Parrot_repr_get_attr_num_n_pc_p_sc,                /*    639 */
+  Parrot_repr_get_attr_num_n_p_pc_sc,                /*    640 */
+  Parrot_repr_get_attr_num_n_pc_pc_sc,               /*    641 */
+  Parrot_repr_get_attr_str_s_p_p_s,                  /*    642 */
+  Parrot_repr_get_attr_str_s_pc_p_s,                 /*    643 */
+  Parrot_repr_get_attr_str_s_p_pc_s,                 /*    644 */
+  Parrot_repr_get_attr_str_s_pc_pc_s,                /*    645 */
+  Parrot_repr_get_attr_str_s_p_p_sc,                 /*    646 */
+  Parrot_repr_get_attr_str_s_pc_p_sc,                /*    647 */
+  Parrot_repr_get_attr_str_s_p_pc_sc,                /*    648 */
+  Parrot_repr_get_attr_str_s_pc_pc_sc,               /*    649 */
+  Parrot_repr_bind_attr_int_p_p_s_i,                 /*    650 */
+  Parrot_repr_bind_attr_int_pc_p_s_i,                /*    651 */
+  Parrot_repr_bind_attr_int_p_pc_s_i,                /*    652 */
+  Parrot_repr_bind_attr_int_pc_pc_s_i,               /*    653 */
+  Parrot_repr_bind_attr_int_p_p_sc_i,                /*    654 */
+  Parrot_repr_bind_attr_int_pc_p_sc_i,               /*    655 */
+  Parrot_repr_bind_attr_int_p_pc_sc_i,               /*    656 */
+  Parrot_repr_bind_attr_int_pc_pc_sc_i,              /*    657 */
+  Parrot_repr_bind_attr_int_p_p_s_ic,                /*    658 */
+  Parrot_repr_bind_attr_int_pc_p_s_ic,               /*    659 */
+  Parrot_repr_bind_attr_int_p_pc_s_ic,               /*    660 */
+  Parrot_repr_bind_attr_int_pc_pc_s_ic,              /*    661 */
+  Parrot_repr_bind_attr_int_p_p_sc_ic,               /*    662 */
+  Parrot_repr_bind_attr_int_pc_p_sc_ic,              /*    663 */
+  Parrot_repr_bind_attr_int_p_pc_sc_ic,              /*    664 */
+  Parrot_repr_bind_attr_int_pc_pc_sc_ic,             /*    665 */
+  Parrot_repr_bind_attr_num_p_p_s_n,                 /*    666 */
+  Parrot_repr_bind_attr_num_pc_p_s_n,                /*    667 */
+  Parrot_repr_bind_attr_num_p_pc_s_n,                /*    668 */
+  Parrot_repr_bind_attr_num_pc_pc_s_n,               /*    669 */
+  Parrot_repr_bind_attr_num_p_p_sc_n,                /*    670 */
+  Parrot_repr_bind_attr_num_pc_p_sc_n,               /*    671 */
+  Parrot_repr_bind_attr_num_p_pc_sc_n,               /*    672 */
+  Parrot_repr_bind_attr_num_pc_pc_sc_n,              /*    673 */
+  Parrot_repr_bind_attr_num_p_p_s_nc,                /*    674 */
+  Parrot_repr_bind_attr_num_pc_p_s_nc,               /*    675 */
+  Parrot_repr_bind_attr_num_p_pc_s_nc,               /*    676 */
+  Parrot_repr_bind_attr_num_pc_pc_s_nc,              /*    677 */
+  Parrot_repr_bind_attr_num_p_p_sc_nc,               /*    678 */
+  Parrot_repr_bind_attr_num_pc_p_sc_nc,              /*    679 */
+  Parrot_repr_bind_attr_num_p_pc_sc_nc,              /*    680 */
+  Parrot_repr_bind_attr_num_pc_pc_sc_nc,             /*    681 */
+  Parrot_repr_bind_attr_str_p_p_s_s,                 /*    682 */
+  Parrot_repr_bind_attr_str_pc_p_s_s,                /*    683 */
+  Parrot_repr_bind_attr_str_p_pc_s_s,                /*    684 */
+  Parrot_repr_bind_attr_str_pc_pc_s_s,               /*    685 */
+  Parrot_repr_bind_attr_str_p_p_sc_s,                /*    686 */
+  Parrot_repr_bind_attr_str_pc_p_sc_s,               /*    687 */
+  Parrot_repr_bind_attr_str_p_pc_sc_s,               /*    688 */
+  Parrot_repr_bind_attr_str_pc_pc_sc_s,              /*    689 */
+  Parrot_repr_bind_attr_str_p_p_s_sc,                /*    690 */
+  Parrot_repr_bind_attr_str_pc_p_s_sc,               /*    691 */
+  Parrot_repr_bind_attr_str_p_pc_s_sc,               /*    692 */
+  Parrot_repr_bind_attr_str_pc_pc_s_sc,              /*    693 */
+  Parrot_repr_bind_attr_str_p_p_sc_sc,               /*    694 */
+  Parrot_repr_bind_attr_str_pc_p_sc_sc,              /*    695 */
+  Parrot_repr_bind_attr_str_p_pc_sc_sc,              /*    696 */
+  Parrot_repr_bind_attr_str_pc_pc_sc_sc,             /*    697 */
+  Parrot_repr_is_attr_initialized_i_p_p_s,           /*    698 */
+  Parrot_repr_is_attr_initialized_i_pc_p_s,          /*    699 */
+  Parrot_repr_is_attr_initialized_i_p_pc_s,          /*    700 */
+  Parrot_repr_is_attr_initialized_i_pc_pc_s,         /*    701 */
+  Parrot_repr_is_attr_initialized_i_p_p_sc,          /*    702 */
+  Parrot_repr_is_attr_initialized_i_pc_p_sc,         /*    703 */
+  Parrot_repr_is_attr_initialized_i_p_pc_sc,         /*    704 */
+  Parrot_repr_is_attr_initialized_i_pc_pc_sc,        /*    705 */
+  Parrot_repr_change_type_p_p,                       /*    706 */
+  Parrot_repr_change_type_pc_p,                      /*    707 */
+  Parrot_repr_change_type_p_pc,                      /*    708 */
+  Parrot_repr_change_type_pc_pc,                     /*    709 */
+  Parrot_type_check_i_p_p,                           /*    710 */
+  Parrot_type_check_i_pc_p,                          /*    711 */
+  Parrot_type_check_i_p_pc,                          /*    712 */
+  Parrot_type_check_i_pc_pc,                         /*    713 */
+  Parrot_publish_type_check_cache_p_p,               /*    714 */
+  Parrot_publish_type_check_cache_pc_p,              /*    715 */
+  Parrot_publish_type_check_cache_p_pc,              /*    716 */
+  Parrot_publish_type_check_cache_pc_pc,             /*    717 */
+  Parrot_publish_method_cache_p_p,                   /*    718 */
+  Parrot_publish_method_cache_pc_p,                  /*    719 */
+  Parrot_publish_method_cache_p_pc,                  /*    720 */
+  Parrot_publish_method_cache_pc_pc,                 /*    721 */
+  Parrot_repr_unbox_str_s_p,                         /*    722 */
+  Parrot_repr_unbox_str_s_pc,                        /*    723 */
+  Parrot_repr_unbox_int_i_p,                         /*    724 */
+  Parrot_repr_unbox_int_i_pc,                        /*    725 */
+  Parrot_repr_unbox_num_n_p,                         /*    726 */
+  Parrot_repr_unbox_num_n_pc,                        /*    727 */
+  Parrot_repr_box_str_p_s_p,                         /*    728 */
+  Parrot_repr_box_str_p_sc_p,                        /*    729 */
+  Parrot_repr_box_str_p_s_pc,                        /*    730 */
+  Parrot_repr_box_str_p_sc_pc,                       /*    731 */
+  Parrot_repr_box_int_p_i_p,                         /*    732 */
+  Parrot_repr_box_int_p_ic_p,                        /*    733 */
+  Parrot_repr_box_int_p_i_pc,                        /*    734 */
+  Parrot_repr_box_int_p_ic_pc,                       /*    735 */
+  Parrot_repr_box_num_p_n_p,                         /*    736 */
+  Parrot_repr_box_num_p_nc_p,                        /*    737 */
+  Parrot_repr_box_num_p_n_pc,                        /*    738 */
+  Parrot_repr_box_num_p_nc_pc,                       /*    739 */
+  Parrot_stable_set_type_check_mode_p_i,             /*    740 */
+  Parrot_stable_set_type_check_mode_pc_i,            /*    741 */
+  Parrot_stable_set_type_check_mode_p_ic,            /*    742 */
+  Parrot_stable_set_type_check_mode_pc_ic,           /*    743 */
+  Parrot_stable_publish_vtable_mapping_p_p,          /*    744 */
+  Parrot_stable_publish_vtable_mapping_pc_p,         /*    745 */
+  Parrot_stable_publish_vtable_mapping_p_pc,         /*    746 */
+  Parrot_stable_publish_vtable_mapping_pc_pc,        /*    747 */
+  Parrot_stable_publish_vtable_handler_mapping_p_p,  /*    748 */
+  Parrot_stable_publish_vtable_handler_mapping_pc_p, /*    749 */
+  Parrot_stable_publish_vtable_handler_mapping_p_pc, /*    750 */
+  Parrot_stable_publish_vtable_handler_mapping_pc_pc, /*    751 */
+  Parrot_nqp_get_sc_object_p_s_i,                    /*    752 */
+  Parrot_nqp_get_sc_object_p_sc_i,                   /*    753 */
+  Parrot_nqp_get_sc_object_p_s_ic,                   /*    754 */
+  Parrot_nqp_get_sc_object_p_sc_ic,                  /*    755 */
+  Parrot_nqp_get_sc_p_s,                             /*    756 */
+  Parrot_nqp_get_sc_p_sc,                            /*    757 */
+  Parrot_nqp_create_sc_p_s,                          /*    758 */
+  Parrot_nqp_create_sc_p_sc,                         /*    759 */
+  Parrot_nqp_set_sc_object_s_i_p,                    /*    760 */
+  Parrot_nqp_set_sc_object_sc_i_p,                   /*    761 */
+  Parrot_nqp_set_sc_object_s_ic_p,                   /*    762 */
+  Parrot_nqp_set_sc_object_sc_ic_p,                  /*    763 */
+  Parrot_nqp_set_sc_object_s_i_pc,                   /*    764 */
+  Parrot_nqp_set_sc_object_sc_i_pc,                  /*    765 */
+  Parrot_nqp_set_sc_object_s_ic_pc,                  /*    766 */
+  Parrot_nqp_set_sc_object_sc_ic_pc,                 /*    767 */
+  Parrot_nqp_set_sc_for_object_p_p,                  /*    768 */
+  Parrot_nqp_set_sc_for_object_pc_p,                 /*    769 */
+  Parrot_nqp_set_sc_for_object_p_pc,                 /*    770 */
+  Parrot_nqp_set_sc_for_object_pc_pc,                /*    771 */
+  Parrot_nqp_get_sc_for_object_p_p,                  /*    772 */
+  Parrot_nqp_get_sc_for_object_p_pc,                 /*    773 */
+  Parrot_nqp_get_package_through_who_p_p_s,          /*    774 */
+  Parrot_nqp_get_package_through_who_p_pc_s,         /*    775 */
+  Parrot_nqp_get_package_through_who_p_p_sc,         /*    776 */
+  Parrot_nqp_get_package_through_who_p_pc_sc,        /*    777 */
+  Parrot_is_invokable_i_p,                           /*    778 */
+  Parrot_is_invokable_i_pc,                          /*    779 */
+  Parrot_repr_get_primitive_type_spec_i_p,           /*    780 */
+  Parrot_repr_get_primitive_type_spec_i_pc,          /*    781 */
+  Parrot_is_container_i_p,                           /*    782 */
+  Parrot_is_container_i_pc,                          /*    783 */
+  Parrot_nqp_decontainerize_p_p,                     /*    784 */
+  Parrot_nqp_decontainerize_p_pc,                    /*    785 */
+  Parrot_set_container_spec_p_p_s_p,                 /*    786 */
+  Parrot_set_container_spec_pc_p_s_p,                /*    787 */
+  Parrot_set_container_spec_p_pc_s_p,                /*    788 */
+  Parrot_set_container_spec_pc_pc_s_p,               /*    789 */
+  Parrot_set_container_spec_p_p_sc_p,                /*    790 */
+  Parrot_set_container_spec_pc_p_sc_p,               /*    791 */
+  Parrot_set_container_spec_p_pc_sc_p,               /*    792 */
+  Parrot_set_container_spec_pc_pc_sc_p,              /*    793 */
+  Parrot_set_container_spec_p_p_s_pc,                /*    794 */
+  Parrot_set_container_spec_pc_p_s_pc,               /*    795 */
+  Parrot_set_container_spec_p_pc_s_pc,               /*    796 */
+  Parrot_set_container_spec_pc_pc_s_pc,              /*    797 */
+  Parrot_set_container_spec_p_p_sc_pc,               /*    798 */
+  Parrot_set_container_spec_pc_p_sc_pc,              /*    799 */
+  Parrot_set_container_spec_p_pc_sc_pc,              /*    800 */
+  Parrot_set_container_spec_pc_pc_sc_pc,             /*    801 */
+  Parrot_new_p_s,                                    /*    802 */
+  Parrot_new_p_sc,                                   /*    803 */
+  Parrot_new_p_s_p,                                  /*    804 */
+  Parrot_new_p_sc_p,                                 /*    805 */
+  Parrot_new_p_s_pc,                                 /*    806 */
+  Parrot_new_p_sc_pc,                                /*    807 */
+  Parrot_new_p_p,                                    /*    808 */
+  Parrot_new_p_pc,                                   /*    809 */
+  Parrot_new_p_p_p,                                  /*    810 */
+  Parrot_new_p_pc_p,                                 /*    811 */
+  Parrot_new_p_p_pc,                                 /*    812 */
+  Parrot_new_p_pc_pc,                                /*    813 */
+  Parrot_root_new_p_p,                               /*    814 */
+  Parrot_root_new_p_pc,                              /*    815 */
+  Parrot_root_new_p_p_p,                             /*    816 */
+  Parrot_root_new_p_pc_p,                            /*    817 */
+  Parrot_root_new_p_p_pc,                            /*    818 */
+  Parrot_root_new_p_pc_pc,                           /*    819 */
+  Parrot_typeof_s_p,                                 /*    820 */
+  Parrot_typeof_p_p,                                 /*    821 */
+  Parrot_get_repr_s_p,                               /*    822 */
+  Parrot_find_method_p_p_s,                          /*    823 */
+  Parrot_find_method_p_p_sc,                         /*    824 */
+  Parrot_defined_i_p,                                /*    825 */
+  Parrot_defined_i_p_ki,                             /*    826 */
+  Parrot_defined_i_p_kic,                            /*    827 */
+  Parrot_defined_i_p_k,                              /*    828 */
+  Parrot_defined_i_p_kc,                             /*    829 */
+  Parrot_exists_i_p_ki,                              /*    830 */
+  Parrot_exists_i_p_kic,                             /*    831 */
+  Parrot_exists_i_p_k,                               /*    832 */
+  Parrot_exists_i_p_kc,                              /*    833 */
+  Parrot_delete_p_k,                                 /*    834 */
+  Parrot_delete_p_kc,                                /*    835 */
+  Parrot_delete_p_ki,                                /*    836 */
+  Parrot_delete_p_kic,                               /*    837 */
+  Parrot_elements_i_p,                               /*    838 */
+  Parrot_push_p_i,                                   /*    839 */
+  Parrot_push_p_ic,                                  /*    840 */
+  Parrot_push_p_n,                                   /*    841 */
+  Parrot_push_p_nc,                                  /*    842 */
+  Parrot_push_p_s,                                   /*    843 */
+  Parrot_push_p_sc,                                  /*    844 */
+  Parrot_push_p_p,                                   /*    845 */
+  Parrot_pop_i_p,                                    /*    846 */
+  Parrot_pop_n_p,                                    /*    847 */
+  Parrot_pop_s_p,                                    /*    848 */
+  Parrot_pop_p_p,                                    /*    849 */
+  Parrot_unshift_p_i,                                /*    850 */
+  Parrot_unshift_p_ic,                               /*    851 */
+  Parrot_unshift_p_n,                                /*    852 */
+  Parrot_unshift_p_nc,                               /*    853 */
+  Parrot_unshift_p_s,                                /*    854 */
+  Parrot_unshift_p_sc,                               /*    855 */
+  Parrot_unshift_p_p,                                /*    856 */
+  Parrot_shift_i_p,                                  /*    857 */
+  Parrot_shift_n_p,                                  /*    858 */
+  Parrot_shift_s_p,                                  /*    859 */
+  Parrot_shift_p_p,                                  /*    860 */
+  Parrot_splice_p_p_i_i,                             /*    861 */
+  Parrot_splice_p_p_ic_i,                            /*    862 */
+  Parrot_splice_p_p_i_ic,                            /*    863 */
+  Parrot_splice_p_p_ic_ic,                           /*    864 */
+  Parrot_setprop_p_s_p,                              /*    865 */
+  Parrot_setprop_p_sc_p,                             /*    866 */
+  Parrot_getprop_p_s_p,                              /*    867 */
+  Parrot_getprop_p_sc_p,                             /*    868 */
+  Parrot_getprop_p_p_s,                              /*    869 */
+  Parrot_getprop_p_p_sc,                             /*    870 */
+  Parrot_delprop_p_s,                                /*    871 */
+  Parrot_delprop_p_sc,                               /*    872 */
+  Parrot_prophash_p_p,                               /*    873 */
+  Parrot_freeze_s_p,                                 /*    874 */
+  Parrot_thaw_p_s,                                   /*    875 */
+  Parrot_thaw_p_sc,                                  /*    876 */
+  Parrot_add_multi_s_s_p,                            /*    877 */
+  Parrot_add_multi_sc_s_p,                           /*    878 */
+  Parrot_add_multi_s_sc_p,                           /*    879 */
+  Parrot_add_multi_sc_sc_p,                          /*    880 */
+  Parrot_find_multi_p_s_s,                           /*    881 */
+  Parrot_find_multi_p_sc_s,                          /*    882 */
+  Parrot_find_multi_p_s_sc,                          /*    883 */
+  Parrot_find_multi_p_sc_sc,                         /*    884 */
+  Parrot_register_p,                                 /*    885 */
+  Parrot_unregister_p,                               /*    886 */
+  Parrot_box_p_i,                                    /*    887 */
+  Parrot_box_p_ic,                                   /*    888 */
+  Parrot_box_p_n,                                    /*    889 */
+  Parrot_box_p_nc,                                   /*    890 */
+  Parrot_box_p_s,                                    /*    891 */
+  Parrot_box_p_sc,                                   /*    892 */
+  Parrot_iter_p_p,                                   /*    893 */
+  Parrot_morph_p_p,                                  /*    894 */
+  Parrot_morph_p_pc,                                 /*    895 */
+  Parrot_clone_s_s,                                  /*    896 */
+  Parrot_clone_s_sc,                                 /*    897 */
+  Parrot_set_i_i,                                    /*    898 */
+  Parrot_set_i_ic,                                   /*    899 */
+  Parrot_set_i_n,                                    /*    900 */
+  Parrot_set_i_nc,                                   /*    901 */
+  Parrot_set_i_s,                                    /*    902 */
+  Parrot_set_i_sc,                                   /*    903 */
+  Parrot_set_n_n,                                    /*    904 */
+  Parrot_set_n_nc,                                   /*    905 */
+  Parrot_set_n_i,                                    /*    906 */
+  Parrot_set_n_ic,                                   /*    907 */
+  Parrot_set_n_s,                                    /*    908 */
+  Parrot_set_n_sc,                                   /*    909 */
+  Parrot_set_n_p,                                    /*    910 */
+  Parrot_set_s_p,                                    /*    911 */
+  Parrot_set_s_s,                                    /*    912 */
+  Parrot_set_s_sc,                                   /*    913 */
+  Parrot_set_s_i,                                    /*    914 */
+  Parrot_set_s_ic,                                   /*    915 */
+  Parrot_set_s_n,                                    /*    916 */
+  Parrot_set_s_nc,                                   /*    917 */
+  Parrot_set_p_pc,                                   /*    918 */
+  Parrot_set_p_p,                                    /*    919 */
+  Parrot_set_p_i,                                    /*    920 */
+  Parrot_set_p_ic,                                   /*    921 */
+  Parrot_set_p_n,                                    /*    922 */
+  Parrot_set_p_nc,                                   /*    923 */
+  Parrot_set_p_s,                                    /*    924 */
+  Parrot_set_p_sc,                                   /*    925 */
+  Parrot_set_i_p,                                    /*    926 */
+  Parrot_assign_p_p,                                 /*    927 */
+  Parrot_assign_p_i,                                 /*    928 */
+  Parrot_assign_p_ic,                                /*    929 */
+  Parrot_assign_p_n,                                 /*    930 */
+  Parrot_assign_p_nc,                                /*    931 */
+  Parrot_assign_p_s,                                 /*    932 */
+  Parrot_assign_p_sc,                                /*    933 */
+  Parrot_assign_s_s,                                 /*    934 */
+  Parrot_assign_s_sc,                                /*    935 */
+  Parrot_setref_p_p,                                 /*    936 */
+  Parrot_deref_p_p,                                  /*    937 */
+  Parrot_set_p_ki_i,                                 /*    938 */
+  Parrot_set_p_kic_i,                                /*    939 */
+  Parrot_set_p_ki_ic,                                /*    940 */
+  Parrot_set_p_kic_ic,                               /*    941 */
+  Parrot_set_p_ki_n,                                 /*    942 */
+  Parrot_set_p_kic_n,                                /*    943 */
+  Parrot_set_p_ki_nc,                                /*    944 */
+  Parrot_set_p_kic_nc,                               /*    945 */
+  Parrot_set_p_ki_s,                                 /*    946 */
+  Parrot_set_p_kic_s,                                /*    947 */
+  Parrot_set_p_ki_sc,                                /*    948 */
+  Parrot_set_p_kic_sc,                               /*    949 */
+  Parrot_set_p_ki_p,                                 /*    950 */
+  Parrot_set_p_kic_p,                                /*    951 */
+  Parrot_set_i_p_ki,                                 /*    952 */
+  Parrot_set_i_p_kic,                                /*    953 */
+  Parrot_set_n_p_ki,                                 /*    954 */
+  Parrot_set_n_p_kic,                                /*    955 */
+  Parrot_set_s_p_ki,                                 /*    956 */
+  Parrot_set_s_p_kic,                                /*    957 */
+  Parrot_set_p_p_ki,                                 /*    958 */
+  Parrot_set_p_p_kic,                                /*    959 */
+  Parrot_set_p_k_i,                                  /*    960 */
+  Parrot_set_p_kc_i,                                 /*    961 */
+  Parrot_set_p_k_ic,                                 /*    962 */
+  Parrot_set_p_kc_ic,                                /*    963 */
+  Parrot_set_p_k_n,                                  /*    964 */
+  Parrot_set_p_kc_n,                                 /*    965 */
+  Parrot_set_p_k_nc,                                 /*    966 */
+  Parrot_set_p_kc_nc,                                /*    967 */
+  Parrot_set_p_k_s,                                  /*    968 */
+  Parrot_set_p_kc_s,                                 /*    969 */
+  Parrot_set_p_k_sc,                                 /*    970 */
+  Parrot_set_p_kc_sc,                                /*    971 */
+  Parrot_set_p_k_p,                                  /*    972 */
+  Parrot_set_p_kc_p,                                 /*    973 */
+  Parrot_set_i_p_k,                                  /*    974 */
+  Parrot_set_i_p_kc,                                 /*    975 */
+  Parrot_set_n_p_k,                                  /*    976 */
+  Parrot_set_n_p_kc,                                 /*    977 */
+  Parrot_set_s_p_k,                                  /*    978 */
+  Parrot_set_s_p_kc,                                 /*    979 */
+  Parrot_set_p_p_k,                                  /*    980 */
+  Parrot_set_p_p_kc,                                 /*    981 */
+  Parrot_clone_p_p,                                  /*    982 */
+  Parrot_clone_p_p_p,                                /*    983 */
+  Parrot_clone_p_p_pc,                               /*    984 */
+  Parrot_copy_p_p,                                   /*    985 */
+  Parrot_null_s,                                     /*    986 */
+  Parrot_null_i,                                     /*    987 */
+  Parrot_null_p,                                     /*    988 */
+  Parrot_null_n,                                     /*    989 */
+  Parrot_ord_i_s,                                    /*    990 */
+  Parrot_ord_i_sc,                                   /*    991 */
+  Parrot_ord_i_s_i,                                  /*    992 */
+  Parrot_ord_i_sc_i,                                 /*    993 */
+  Parrot_ord_i_s_ic,                                 /*    994 */
+  Parrot_ord_i_sc_ic,                                /*    995 */
+  Parrot_chr_s_i,                                    /*    996 */
+  Parrot_chr_s_ic,                                   /*    997 */
+  Parrot_chopn_s_s_i,                                /*    998 */
+  Parrot_chopn_s_sc_i,                               /*    999 */
+  Parrot_chopn_s_s_ic,                               /*   1000 */
+  Parrot_chopn_s_sc_ic,                              /*   1001 */
+  Parrot_concat_p_p,                                 /*   1002 */
+  Parrot_concat_p_s,                                 /*   1003 */
+  Parrot_concat_p_sc,                                /*   1004 */
+  Parrot_concat_s_s_s,                               /*   1005 */
+  Parrot_concat_s_sc_s,                              /*   1006 */
+  Parrot_concat_s_s_sc,                              /*   1007 */
+  Parrot_concat_p_p_s,                               /*   1008 */
+  Parrot_concat_p_p_sc,                              /*   1009 */
+  Parrot_concat_p_p_p,                               /*   1010 */
+  Parrot_repeat_s_s_i,                               /*   1011 */
+  Parrot_repeat_s_sc_i,                              /*   1012 */
+  Parrot_repeat_s_s_ic,                              /*   1013 */
+  Parrot_repeat_s_sc_ic,                             /*   1014 */
+  Parrot_repeat_p_p_i,                               /*   1015 */
+  Parrot_repeat_p_p_ic,                              /*   1016 */
+  Parrot_repeat_p_p_p,                               /*   1017 */
+  Parrot_repeat_p_i,                                 /*   1018 */
+  Parrot_repeat_p_ic,                                /*   1019 */
+  Parrot_repeat_p_p,                                 /*   1020 */
+  Parrot_length_i_s,                                 /*   1021 */
+  Parrot_length_i_sc,                                /*   1022 */
+  Parrot_bytelength_i_s,                             /*   1023 */
+  Parrot_bytelength_i_sc,                            /*   1024 */
+  Parrot_pin_s,                                      /*   1025 */
+  Parrot_unpin_s,                                    /*   1026 */
+  Parrot_substr_s_s_i,                               /*   1027 */
+  Parrot_substr_s_sc_i,                              /*   1028 */
+  Parrot_substr_s_s_ic,                              /*   1029 */
+  Parrot_substr_s_sc_ic,                             /*   1030 */
+  Parrot_substr_s_s_i_i,                             /*   1031 */
+  Parrot_substr_s_sc_i_i,                            /*   1032 */
+  Parrot_substr_s_s_ic_i,                            /*   1033 */
+  Parrot_substr_s_sc_ic_i,                           /*   1034 */
+  Parrot_substr_s_s_i_ic,                            /*   1035 */
+  Parrot_substr_s_sc_i_ic,                           /*   1036 */
+  Parrot_substr_s_s_ic_ic,                           /*   1037 */
+  Parrot_substr_s_sc_ic_ic,                          /*   1038 */
+  Parrot_substr_s_p_i_i,                             /*   1039 */
+  Parrot_substr_s_p_ic_i,                            /*   1040 */
+  Parrot_substr_s_p_i_ic,                            /*   1041 */
+  Parrot_substr_s_p_ic_ic,                           /*   1042 */
+  Parrot_replace_s_s_i_i_s,                          /*   1043 */
+  Parrot_replace_s_sc_i_i_s,                         /*   1044 */
+  Parrot_replace_s_s_ic_i_s,                         /*   1045 */
+  Parrot_replace_s_sc_ic_i_s,                        /*   1046 */
+  Parrot_replace_s_s_i_ic_s,                         /*   1047 */
+  Parrot_replace_s_sc_i_ic_s,                        /*   1048 */
+  Parrot_replace_s_s_ic_ic_s,                        /*   1049 */
+  Parrot_replace_s_sc_ic_ic_s,                       /*   1050 */
+  Parrot_replace_s_s_i_i_sc,                         /*   1051 */
+  Parrot_replace_s_sc_i_i_sc,                        /*   1052 */
+  Parrot_replace_s_s_ic_i_sc,                        /*   1053 */
+  Parrot_replace_s_sc_ic_i_sc,                       /*   1054 */
+  Parrot_replace_s_s_i_ic_sc,                        /*   1055 */
+  Parrot_replace_s_sc_i_ic_sc,                       /*   1056 */
+  Parrot_replace_s_s_ic_ic_sc,                       /*   1057 */
+  Parrot_replace_s_sc_ic_ic_sc,                      /*   1058 */
+  Parrot_index_i_s_s,                                /*   1059 */
+  Parrot_index_i_sc_s,                               /*   1060 */
+  Parrot_index_i_s_sc,                               /*   1061 */
+  Parrot_index_i_sc_sc,                              /*   1062 */
+  Parrot_index_i_s_s_i,                              /*   1063 */
+  Parrot_index_i_sc_s_i,                             /*   1064 */
+  Parrot_index_i_s_sc_i,                             /*   1065 */
+  Parrot_index_i_sc_sc_i,                            /*   1066 */
+  Parrot_index_i_s_s_ic,                             /*   1067 */
+  Parrot_index_i_sc_s_ic,                            /*   1068 */
+  Parrot_index_i_s_sc_ic,                            /*   1069 */
+  Parrot_index_i_sc_sc_ic,                           /*   1070 */
+  Parrot_rindex_i_s_s,                               /*   1071 */
+  Parrot_rindex_i_sc_s,                              /*   1072 */
+  Parrot_rindex_i_s_sc,                              /*   1073 */
+  Parrot_rindex_i_sc_sc,                             /*   1074 */
+  Parrot_rindex_i_s_s_i,                             /*   1075 */
+  Parrot_rindex_i_sc_s_i,                            /*   1076 */
+  Parrot_rindex_i_s_sc_i,                            /*   1077 */
+  Parrot_rindex_i_sc_sc_i,                           /*   1078 */
+  Parrot_rindex_i_s_s_ic,                            /*   1079 */
+  Parrot_rindex_i_sc_s_ic,                           /*   1080 */
+  Parrot_rindex_i_s_sc_ic,                           /*   1081 */
+  Parrot_rindex_i_sc_sc_ic,                          /*   1082 */
+  Parrot_sprintf_s_s_p,                              /*   1083 */
+  Parrot_sprintf_s_sc_p,                             /*   1084 */
+  Parrot_sprintf_p_p_p,                              /*   1085 */
+  Parrot_new_s,                                      /*   1086 */
+  Parrot_stringinfo_i_s_i,                           /*   1087 */
+  Parrot_stringinfo_i_sc_i,                          /*   1088 */
+  Parrot_stringinfo_i_s_ic,                          /*   1089 */
+  Parrot_stringinfo_i_sc_ic,                         /*   1090 */
+  Parrot_upcase_s_s,                                 /*   1091 */
+  Parrot_upcase_s_sc,                                /*   1092 */
+  Parrot_downcase_s_s,                               /*   1093 */
+  Parrot_downcase_s_sc,                              /*   1094 */
+  Parrot_titlecase_s_s,                              /*   1095 */
+  Parrot_titlecase_s_sc,                             /*   1096 */
+  Parrot_join_s_s_p,                                 /*   1097 */
+  Parrot_join_s_sc_p,                                /*   1098 */
+  Parrot_split_p_s_s,                                /*   1099 */
+  Parrot_split_p_sc_s,                               /*   1100 */
+  Parrot_split_p_s_sc,                               /*   1101 */
+  Parrot_split_p_sc_sc,                              /*   1102 */
+  Parrot_encoding_i_s,                               /*   1103 */
+  Parrot_encoding_i_sc,                              /*   1104 */
+  Parrot_encodingname_s_i,                           /*   1105 */
+  Parrot_encodingname_s_ic,                          /*   1106 */
+  Parrot_find_encoding_i_s,                          /*   1107 */
+  Parrot_find_encoding_i_sc,                         /*   1108 */
+  Parrot_trans_encoding_s_s_i,                       /*   1109 */
+  Parrot_trans_encoding_s_sc_i,                      /*   1110 */
+  Parrot_trans_encoding_s_s_ic,                      /*   1111 */
+  Parrot_trans_encoding_s_sc_ic,                     /*   1112 */
+  Parrot_is_cclass_i_i_s_i,                          /*   1113 */
+  Parrot_is_cclass_i_ic_s_i,                         /*   1114 */
+  Parrot_is_cclass_i_i_sc_i,                         /*   1115 */
+  Parrot_is_cclass_i_ic_sc_i,                        /*   1116 */
+  Parrot_is_cclass_i_i_s_ic,                         /*   1117 */
+  Parrot_is_cclass_i_ic_s_ic,                        /*   1118 */
+  Parrot_is_cclass_i_i_sc_ic,                        /*   1119 */
+  Parrot_is_cclass_i_ic_sc_ic,                       /*   1120 */
+  Parrot_find_cclass_i_i_s_i_i,                      /*   1121 */
+  Parrot_find_cclass_i_ic_s_i_i,                     /*   1122 */
+  Parrot_find_cclass_i_i_sc_i_i,                     /*   1123 */
+  Parrot_find_cclass_i_ic_sc_i_i,                    /*   1124 */
+  Parrot_find_cclass_i_i_s_ic_i,                     /*   1125 */
+  Parrot_find_cclass_i_ic_s_ic_i,                    /*   1126 */
+  Parrot_find_cclass_i_i_sc_ic_i,                    /*   1127 */
+  Parrot_find_cclass_i_ic_sc_ic_i,                   /*   1128 */
+  Parrot_find_cclass_i_i_s_i_ic,                     /*   1129 */
+  Parrot_find_cclass_i_ic_s_i_ic,                    /*   1130 */
+  Parrot_find_cclass_i_i_sc_i_ic,                    /*   1131 */
+  Parrot_find_cclass_i_ic_sc_i_ic,                   /*   1132 */
+  Parrot_find_cclass_i_i_s_ic_ic,                    /*   1133 */
+  Parrot_find_cclass_i_ic_s_ic_ic,                   /*   1134 */
+  Parrot_find_cclass_i_i_sc_ic_ic,                   /*   1135 */
+  Parrot_find_cclass_i_ic_sc_ic_ic,                  /*   1136 */
+  Parrot_find_not_cclass_i_i_s_i_i,                  /*   1137 */
+  Parrot_find_not_cclass_i_ic_s_i_i,                 /*   1138 */
+  Parrot_find_not_cclass_i_i_sc_i_i,                 /*   1139 */
+  Parrot_find_not_cclass_i_ic_sc_i_i,                /*   1140 */
+  Parrot_find_not_cclass_i_i_s_ic_i,                 /*   1141 */
+  Parrot_find_not_cclass_i_ic_s_ic_i,                /*   1142 */
+  Parrot_find_not_cclass_i_i_sc_ic_i,                /*   1143 */
+  Parrot_find_not_cclass_i_ic_sc_ic_i,               /*   1144 */
+  Parrot_find_not_cclass_i_i_s_i_ic,                 /*   1145 */
+  Parrot_find_not_cclass_i_ic_s_i_ic,                /*   1146 */
+  Parrot_find_not_cclass_i_i_sc_i_ic,                /*   1147 */
+  Parrot_find_not_cclass_i_ic_sc_i_ic,               /*   1148 */
+  Parrot_find_not_cclass_i_i_s_ic_ic,                /*   1149 */
+  Parrot_find_not_cclass_i_ic_s_ic_ic,               /*   1150 */
+  Parrot_find_not_cclass_i_i_sc_ic_ic,               /*   1151 */
+  Parrot_find_not_cclass_i_ic_sc_ic_ic,              /*   1152 */
+  Parrot_escape_s_s,                                 /*   1153 */
+  Parrot_compose_s_s,                                /*   1154 */
+  Parrot_compose_s_sc,                               /*   1155 */
+  Parrot_find_codepoint_i_s,                         /*   1156 */
+  Parrot_find_codepoint_i_sc,                        /*   1157 */
+  Parrot_spawnw_i_s,                                 /*   1158 */
+  Parrot_spawnw_i_sc,                                /*   1159 */
+  Parrot_spawnw_i_p,                                 /*   1160 */
+  Parrot_err_i,                                      /*   1161 */
+  Parrot_err_s,                                      /*   1162 */
+  Parrot_err_s_i,                                    /*   1163 */
+  Parrot_err_s_ic,                                   /*   1164 */
+  Parrot_time_i,                                     /*   1165 */
+  Parrot_time_n,                                     /*   1166 */
+  Parrot_sleep_i,                                    /*   1167 */
+  Parrot_sleep_ic,                                   /*   1168 */
+  Parrot_sleep_n,                                    /*   1169 */
+  Parrot_sleep_nc,                                   /*   1170 */
+  Parrot_store_lex_s_p,                              /*   1171 */
+  Parrot_store_lex_sc_p,                             /*   1172 */
+  Parrot_store_lex_s_s,                              /*   1173 */
+  Parrot_store_lex_sc_s,                             /*   1174 */
+  Parrot_store_lex_s_sc,                             /*   1175 */
+  Parrot_store_lex_sc_sc,                            /*   1176 */
+  Parrot_store_lex_s_i,                              /*   1177 */
+  Parrot_store_lex_sc_i,                             /*   1178 */
+  Parrot_store_lex_s_ic,                             /*   1179 */
+  Parrot_store_lex_sc_ic,                            /*   1180 */
+  Parrot_store_lex_s_n,                              /*   1181 */
+  Parrot_store_lex_sc_n,                             /*   1182 */
+  Parrot_store_lex_s_nc,                             /*   1183 */
+  Parrot_store_lex_sc_nc,                            /*   1184 */
+  Parrot_store_dynamic_lex_s_p,                      /*   1185 */
+  Parrot_store_dynamic_lex_sc_p,                     /*   1186 */
+  Parrot_find_lex_p_s,                               /*   1187 */
+  Parrot_find_lex_p_sc,                              /*   1188 */
+  Parrot_find_lex_s_s,                               /*   1189 */
+  Parrot_find_lex_s_sc,                              /*   1190 */
+  Parrot_find_lex_i_s,                               /*   1191 */
+  Parrot_find_lex_i_sc,                              /*   1192 */
+  Parrot_find_lex_n_s,                               /*   1193 */
+  Parrot_find_lex_n_sc,                              /*   1194 */
+  Parrot_find_dynamic_lex_p_s,                       /*   1195 */
+  Parrot_find_dynamic_lex_p_sc,                      /*   1196 */
+  Parrot_find_caller_lex_p_s,                        /*   1197 */
+  Parrot_find_caller_lex_p_sc,                       /*   1198 */
+  Parrot_get_namespace_p,                            /*   1199 */
+  Parrot_get_namespace_p_p,                          /*   1200 */
+  Parrot_get_namespace_p_pc,                         /*   1201 */
+  Parrot_get_hll_namespace_p,                        /*   1202 */
+  Parrot_get_hll_namespace_p_p,                      /*   1203 */
+  Parrot_get_hll_namespace_p_pc,                     /*   1204 */
+  Parrot_get_root_namespace_p,                       /*   1205 */
+  Parrot_get_root_namespace_p_p,                     /*   1206 */
+  Parrot_get_root_namespace_p_pc,                    /*   1207 */
+  Parrot_get_global_p_s,                             /*   1208 */
+  Parrot_get_global_p_sc,                            /*   1209 */
+  Parrot_get_global_p_p_s,                           /*   1210 */
+  Parrot_get_global_p_pc_s,                          /*   1211 */
+  Parrot_get_global_p_p_sc,                          /*   1212 */
+  Parrot_get_global_p_pc_sc,                         /*   1213 */
+  Parrot_get_hll_global_p_s,                         /*   1214 */
+  Parrot_get_hll_global_p_sc,                        /*   1215 */
+  Parrot_get_hll_global_p_p_s,                       /*   1216 */
+  Parrot_get_hll_global_p_pc_s,                      /*   1217 */
+  Parrot_get_hll_global_p_p_sc,                      /*   1218 */
+  Parrot_get_hll_global_p_pc_sc,                     /*   1219 */
+  Parrot_get_root_global_p_s,                        /*   1220 */
+  Parrot_get_root_global_p_sc,                       /*   1221 */
+  Parrot_get_root_global_p_p_s,                      /*   1222 */
+  Parrot_get_root_global_p_pc_s,                     /*   1223 */
+  Parrot_get_root_global_p_p_sc,                     /*   1224 */
+  Parrot_get_root_global_p_pc_sc,                    /*   1225 */
+  Parrot_set_global_s_p,                             /*   1226 */
+  Parrot_set_global_sc_p,                            /*   1227 */
+  Parrot_set_global_p_s_p,                           /*   1228 */
+  Parrot_set_global_pc_s_p,                          /*   1229 */
+  Parrot_set_global_p_sc_p,                          /*   1230 */
+  Parrot_set_global_pc_sc_p,                         /*   1231 */
+  Parrot_set_hll_global_s_p,                         /*   1232 */
+  Parrot_set_hll_global_sc_p,                        /*   1233 */
+  Parrot_set_hll_global_p_s_p,                       /*   1234 */
+  Parrot_set_hll_global_pc_s_p,                      /*   1235 */
+  Parrot_set_hll_global_p_sc_p,                      /*   1236 */
+  Parrot_set_hll_global_pc_sc_p,                     /*   1237 */
+  Parrot_set_root_global_s_p,                        /*   1238 */
+  Parrot_set_root_global_sc_p,                       /*   1239 */
+  Parrot_set_root_global_p_s_p,                      /*   1240 */
+  Parrot_set_root_global_pc_s_p,                     /*   1241 */
+  Parrot_set_root_global_p_sc_p,                     /*   1242 */
+  Parrot_set_root_global_pc_sc_p,                    /*   1243 */
+  Parrot_find_name_p_s,                              /*   1244 */
+  Parrot_find_name_p_sc,                             /*   1245 */
+  Parrot_find_sub_not_null_p_s,                      /*   1246 */
+  Parrot_find_sub_not_null_p_sc,                     /*   1247 */
+  Parrot_trap,                                       /*   1248 */
+  Parrot_set_label_p_ic,                             /*   1249 */
+  Parrot_get_label_i_p,                              /*   1250 */
+  Parrot_get_id_i_p,                                 /*   1251 */
+  Parrot_get_id_i_pc,                                /*   1252 */
+  Parrot_fetch_p_p_p_p,                              /*   1253 */
+  Parrot_fetch_p_pc_p_p,                             /*   1254 */
+  Parrot_fetch_p_p_pc_p,                             /*   1255 */
+  Parrot_fetch_p_pc_pc_p,                            /*   1256 */
+  Parrot_fetch_p_p_p_pc,                             /*   1257 */
+  Parrot_fetch_p_pc_p_pc,                            /*   1258 */
+  Parrot_fetch_p_p_pc_pc,                            /*   1259 */
+  Parrot_fetch_p_pc_pc_pc,                           /*   1260 */
+  Parrot_fetch_p_p_i_p,                              /*   1261 */
+  Parrot_fetch_p_pc_i_p,                             /*   1262 */
+  Parrot_fetch_p_p_ic_p,                             /*   1263 */
+  Parrot_fetch_p_pc_ic_p,                            /*   1264 */
+  Parrot_fetch_p_p_i_pc,                             /*   1265 */
+  Parrot_fetch_p_pc_i_pc,                            /*   1266 */
+  Parrot_fetch_p_p_ic_pc,                            /*   1267 */
+  Parrot_fetch_p_pc_ic_pc,                           /*   1268 */
+  Parrot_fetch_p_p_s_p,                              /*   1269 */
+  Parrot_fetch_p_pc_s_p,                             /*   1270 */
+  Parrot_fetch_p_p_sc_p,                             /*   1271 */
+  Parrot_fetch_p_pc_sc_p,                            /*   1272 */
+  Parrot_fetch_p_p_s_pc,                             /*   1273 */
+  Parrot_fetch_p_pc_s_pc,                            /*   1274 */
+  Parrot_fetch_p_p_sc_pc,                            /*   1275 */
+  Parrot_fetch_p_pc_sc_pc,                           /*   1276 */
+  Parrot_vivify_p_p_p_p,                             /*   1277 */
+  Parrot_vivify_p_pc_p_p,                            /*   1278 */
+  Parrot_vivify_p_p_pc_p,                            /*   1279 */
+  Parrot_vivify_p_pc_pc_p,                           /*   1280 */
+  Parrot_vivify_p_p_p_pc,                            /*   1281 */
+  Parrot_vivify_p_pc_p_pc,                           /*   1282 */
+  Parrot_vivify_p_p_pc_pc,                           /*   1283 */
+  Parrot_vivify_p_pc_pc_pc,                          /*   1284 */
+  Parrot_vivify_p_p_i_p,                             /*   1285 */
+  Parrot_vivify_p_pc_i_p,                            /*   1286 */
+  Parrot_vivify_p_p_ic_p,                            /*   1287 */
+  Parrot_vivify_p_pc_ic_p,                           /*   1288 */
+  Parrot_vivify_p_p_i_pc,                            /*   1289 */
+  Parrot_vivify_p_pc_i_pc,                           /*   1290 */
+  Parrot_vivify_p_p_ic_pc,                           /*   1291 */
+  Parrot_vivify_p_pc_ic_pc,                          /*   1292 */
+  Parrot_vivify_p_p_s_p,                             /*   1293 */
+  Parrot_vivify_p_pc_s_p,                            /*   1294 */
+  Parrot_vivify_p_p_sc_p,                            /*   1295 */
+  Parrot_vivify_p_pc_sc_p,                           /*   1296 */
+  Parrot_vivify_p_p_s_pc,                            /*   1297 */
+  Parrot_vivify_p_pc_s_pc,                           /*   1298 */
+  Parrot_vivify_p_p_sc_pc,                           /*   1299 */
+  Parrot_vivify_p_pc_sc_pc,                          /*   1300 */
+  Parrot_new_p_s_i,                                  /*   1301 */
+  Parrot_new_p_sc_i,                                 /*   1302 */
+  Parrot_new_p_s_ic,                                 /*   1303 */
+  Parrot_new_p_sc_ic,                                /*   1304 */
+  Parrot_new_p_p_i,                                  /*   1305 */
+  Parrot_new_p_pc_i,                                 /*   1306 */
+  Parrot_new_p_p_ic,                                 /*   1307 */
+  Parrot_new_p_pc_ic,                                /*   1308 */
+  Parrot_root_new_p_p_i,                             /*   1309 */
+  Parrot_root_new_p_pc_i,                            /*   1310 */
+  Parrot_root_new_p_p_ic,                            /*   1311 */
+  Parrot_root_new_p_pc_ic,                           /*   1312 */
+  Parrot_get_context_p,                              /*   1313 */
+  Parrot_new_call_context_p,                         /*   1314 */
+  Parrot_invokecc_p_p,                               /*   1315 */
+  Parrot_flatten_array_into_p_p_i,                   /*   1316 */
+  Parrot_flatten_array_into_p_p_ic,                  /*   1317 */
+  Parrot_flatten_hash_into_p_p_i,                    /*   1318 */
+  Parrot_flatten_hash_into_p_p_ic,                   /*   1319 */
+  Parrot_slurp_array_from_p_p_i,                     /*   1320 */
+  Parrot_slurp_array_from_p_p_ic,                    /*   1321 */
+  Parrot_receive_p,                                  /*   1322 */
+  Parrot_wait_p,                                     /*   1323 */
+  Parrot_wait_pc,                                    /*   1324 */
+  Parrot_pass,                                       /*   1325 */
+  Parrot_disable_preemption,                         /*   1326 */
+  Parrot_enable_preemption,                          /*   1327 */
+  Parrot_terminate,                                  /*   1328 */
 
   NULL /* NULL function pointer */
 };
@@ -1223,7 +1423,7 @@ static op_func_t core_op_func_table[1130] = {
 ** Op Info Table:
 */
 
-static op_info_t core_op_info_table[1130] = {
+static op_info_t core_op_info_table[1330] = {
   { /* 0 */
     "end",
     "end",
@@ -7847,6 +8047,2206 @@ static op_info_t core_op_info_table[1130] = {
     &core_op_lib
   },
   { /* 602 */
+    "get_knowhow",
+    "get_knowhow_p",
+    "Parrot_get_knowhow_p",
+    0,
+    2,
+    { PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT },
+    { 0 },
+    &core_op_lib
+  },
+  { /* 603 */
+    "get_knowhow_attribute",
+    "get_knowhow_attribute_p",
+    "Parrot_get_knowhow_attribute_p",
+    0,
+    2,
+    { PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT },
+    { 0 },
+    &core_op_lib
+  },
+  { /* 604 */
+    "get_how",
+    "get_how_p_p",
+    "Parrot_get_how_p_p",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 605 */
+    "get_how",
+    "get_how_p_pc",
+    "Parrot_get_how_p_pc",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_PC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 606 */
+    "get_what",
+    "get_what_p_p",
+    "Parrot_get_what_p_p",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 607 */
+    "get_what",
+    "get_what_p_pc",
+    "Parrot_get_what_p_pc",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_PC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 608 */
+    "what_or_null",
+    "what_or_null_p_p",
+    "Parrot_what_or_null_p_p",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 609 */
+    "what_or_null",
+    "what_or_null_p_pc",
+    "Parrot_what_or_null_p_pc",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_PC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 610 */
+    "get_who",
+    "get_who_p_p",
+    "Parrot_get_who_p_p",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 611 */
+    "get_who",
+    "get_who_p_pc",
+    "Parrot_get_who_p_pc",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_PC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 612 */
+    "set_who",
+    "set_who_p_p",
+    "Parrot_set_who_p_p",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 613 */
+    "set_who",
+    "set_who_pc_p",
+    "Parrot_set_who_pc_p",
+    0,
+    3,
+    { PARROT_ARG_PC, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 614 */
+    "set_who",
+    "set_who_p_pc",
+    "Parrot_set_who_p_pc",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 615 */
+    "set_who",
+    "set_who_pc_pc",
+    "Parrot_set_who_pc_pc",
+    0,
+    3,
+    { PARROT_ARG_PC, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 616 */
+    "repr_type_object_for",
+    "repr_type_object_for_p_p_s",
+    "Parrot_repr_type_object_for_p_p_s",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_S },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 617 */
+    "repr_type_object_for",
+    "repr_type_object_for_p_pc_s",
+    "Parrot_repr_type_object_for_p_pc_s",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_S },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 618 */
+    "repr_type_object_for",
+    "repr_type_object_for_p_p_sc",
+    "Parrot_repr_type_object_for_p_p_sc",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_SC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 619 */
+    "repr_type_object_for",
+    "repr_type_object_for_p_pc_sc",
+    "Parrot_repr_type_object_for_p_pc_sc",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_SC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 620 */
+    "repr_instance_of",
+    "repr_instance_of_p_p",
+    "Parrot_repr_instance_of_p_p",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 621 */
+    "repr_instance_of",
+    "repr_instance_of_p_pc",
+    "Parrot_repr_instance_of_p_pc",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_PC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 622 */
+    "repr_clone",
+    "repr_clone_p_p",
+    "Parrot_repr_clone_p_p",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 623 */
+    "repr_clone",
+    "repr_clone_p_pc",
+    "Parrot_repr_clone_p_pc",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_PC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 624 */
+    "repr_defined",
+    "repr_defined_i_p",
+    "Parrot_repr_defined_i_p",
+    0,
+    3,
+    { PARROT_ARG_I, PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 625 */
+    "repr_defined",
+    "repr_defined_i_pc",
+    "Parrot_repr_defined_i_pc",
+    0,
+    3,
+    { PARROT_ARG_I, PARROT_ARG_PC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 626 */
+    "repr_get_attr_int",
+    "repr_get_attr_int_i_p_p_s",
+    "Parrot_repr_get_attr_int_i_p_p_s",
+    0,
+    5,
+    { PARROT_ARG_I, PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_S },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 627 */
+    "repr_get_attr_int",
+    "repr_get_attr_int_i_pc_p_s",
+    "Parrot_repr_get_attr_int_i_pc_p_s",
+    0,
+    5,
+    { PARROT_ARG_I, PARROT_ARG_PC, PARROT_ARG_P, PARROT_ARG_S },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 628 */
+    "repr_get_attr_int",
+    "repr_get_attr_int_i_p_pc_s",
+    "Parrot_repr_get_attr_int_i_p_pc_s",
+    0,
+    5,
+    { PARROT_ARG_I, PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_S },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 629 */
+    "repr_get_attr_int",
+    "repr_get_attr_int_i_pc_pc_s",
+    "Parrot_repr_get_attr_int_i_pc_pc_s",
+    0,
+    5,
+    { PARROT_ARG_I, PARROT_ARG_PC, PARROT_ARG_PC, PARROT_ARG_S },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 630 */
+    "repr_get_attr_int",
+    "repr_get_attr_int_i_p_p_sc",
+    "Parrot_repr_get_attr_int_i_p_p_sc",
+    0,
+    5,
+    { PARROT_ARG_I, PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_SC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 631 */
+    "repr_get_attr_int",
+    "repr_get_attr_int_i_pc_p_sc",
+    "Parrot_repr_get_attr_int_i_pc_p_sc",
+    0,
+    5,
+    { PARROT_ARG_I, PARROT_ARG_PC, PARROT_ARG_P, PARROT_ARG_SC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 632 */
+    "repr_get_attr_int",
+    "repr_get_attr_int_i_p_pc_sc",
+    "Parrot_repr_get_attr_int_i_p_pc_sc",
+    0,
+    5,
+    { PARROT_ARG_I, PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_SC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 633 */
+    "repr_get_attr_int",
+    "repr_get_attr_int_i_pc_pc_sc",
+    "Parrot_repr_get_attr_int_i_pc_pc_sc",
+    0,
+    5,
+    { PARROT_ARG_I, PARROT_ARG_PC, PARROT_ARG_PC, PARROT_ARG_SC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 634 */
+    "repr_get_attr_num",
+    "repr_get_attr_num_n_p_p_s",
+    "Parrot_repr_get_attr_num_n_p_p_s",
+    0,
+    5,
+    { PARROT_ARG_N, PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_S },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 635 */
+    "repr_get_attr_num",
+    "repr_get_attr_num_n_pc_p_s",
+    "Parrot_repr_get_attr_num_n_pc_p_s",
+    0,
+    5,
+    { PARROT_ARG_N, PARROT_ARG_PC, PARROT_ARG_P, PARROT_ARG_S },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 636 */
+    "repr_get_attr_num",
+    "repr_get_attr_num_n_p_pc_s",
+    "Parrot_repr_get_attr_num_n_p_pc_s",
+    0,
+    5,
+    { PARROT_ARG_N, PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_S },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 637 */
+    "repr_get_attr_num",
+    "repr_get_attr_num_n_pc_pc_s",
+    "Parrot_repr_get_attr_num_n_pc_pc_s",
+    0,
+    5,
+    { PARROT_ARG_N, PARROT_ARG_PC, PARROT_ARG_PC, PARROT_ARG_S },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 638 */
+    "repr_get_attr_num",
+    "repr_get_attr_num_n_p_p_sc",
+    "Parrot_repr_get_attr_num_n_p_p_sc",
+    0,
+    5,
+    { PARROT_ARG_N, PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_SC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 639 */
+    "repr_get_attr_num",
+    "repr_get_attr_num_n_pc_p_sc",
+    "Parrot_repr_get_attr_num_n_pc_p_sc",
+    0,
+    5,
+    { PARROT_ARG_N, PARROT_ARG_PC, PARROT_ARG_P, PARROT_ARG_SC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 640 */
+    "repr_get_attr_num",
+    "repr_get_attr_num_n_p_pc_sc",
+    "Parrot_repr_get_attr_num_n_p_pc_sc",
+    0,
+    5,
+    { PARROT_ARG_N, PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_SC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 641 */
+    "repr_get_attr_num",
+    "repr_get_attr_num_n_pc_pc_sc",
+    "Parrot_repr_get_attr_num_n_pc_pc_sc",
+    0,
+    5,
+    { PARROT_ARG_N, PARROT_ARG_PC, PARROT_ARG_PC, PARROT_ARG_SC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 642 */
+    "repr_get_attr_str",
+    "repr_get_attr_str_s_p_p_s",
+    "Parrot_repr_get_attr_str_s_p_p_s",
+    0,
+    5,
+    { PARROT_ARG_S, PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_S },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 643 */
+    "repr_get_attr_str",
+    "repr_get_attr_str_s_pc_p_s",
+    "Parrot_repr_get_attr_str_s_pc_p_s",
+    0,
+    5,
+    { PARROT_ARG_S, PARROT_ARG_PC, PARROT_ARG_P, PARROT_ARG_S },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 644 */
+    "repr_get_attr_str",
+    "repr_get_attr_str_s_p_pc_s",
+    "Parrot_repr_get_attr_str_s_p_pc_s",
+    0,
+    5,
+    { PARROT_ARG_S, PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_S },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 645 */
+    "repr_get_attr_str",
+    "repr_get_attr_str_s_pc_pc_s",
+    "Parrot_repr_get_attr_str_s_pc_pc_s",
+    0,
+    5,
+    { PARROT_ARG_S, PARROT_ARG_PC, PARROT_ARG_PC, PARROT_ARG_S },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 646 */
+    "repr_get_attr_str",
+    "repr_get_attr_str_s_p_p_sc",
+    "Parrot_repr_get_attr_str_s_p_p_sc",
+    0,
+    5,
+    { PARROT_ARG_S, PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_SC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 647 */
+    "repr_get_attr_str",
+    "repr_get_attr_str_s_pc_p_sc",
+    "Parrot_repr_get_attr_str_s_pc_p_sc",
+    0,
+    5,
+    { PARROT_ARG_S, PARROT_ARG_PC, PARROT_ARG_P, PARROT_ARG_SC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 648 */
+    "repr_get_attr_str",
+    "repr_get_attr_str_s_p_pc_sc",
+    "Parrot_repr_get_attr_str_s_p_pc_sc",
+    0,
+    5,
+    { PARROT_ARG_S, PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_SC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 649 */
+    "repr_get_attr_str",
+    "repr_get_attr_str_s_pc_pc_sc",
+    "Parrot_repr_get_attr_str_s_pc_pc_sc",
+    0,
+    5,
+    { PARROT_ARG_S, PARROT_ARG_PC, PARROT_ARG_PC, PARROT_ARG_SC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 650 */
+    "repr_bind_attr_int",
+    "repr_bind_attr_int_p_p_s_i",
+    "Parrot_repr_bind_attr_int_p_p_s_i",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_S, PARROT_ARG_I },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 651 */
+    "repr_bind_attr_int",
+    "repr_bind_attr_int_pc_p_s_i",
+    "Parrot_repr_bind_attr_int_pc_p_s_i",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_P, PARROT_ARG_S, PARROT_ARG_I },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 652 */
+    "repr_bind_attr_int",
+    "repr_bind_attr_int_p_pc_s_i",
+    "Parrot_repr_bind_attr_int_p_pc_s_i",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_S, PARROT_ARG_I },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 653 */
+    "repr_bind_attr_int",
+    "repr_bind_attr_int_pc_pc_s_i",
+    "Parrot_repr_bind_attr_int_pc_pc_s_i",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_PC, PARROT_ARG_S, PARROT_ARG_I },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 654 */
+    "repr_bind_attr_int",
+    "repr_bind_attr_int_p_p_sc_i",
+    "Parrot_repr_bind_attr_int_p_p_sc_i",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_SC, PARROT_ARG_I },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 655 */
+    "repr_bind_attr_int",
+    "repr_bind_attr_int_pc_p_sc_i",
+    "Parrot_repr_bind_attr_int_pc_p_sc_i",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_P, PARROT_ARG_SC, PARROT_ARG_I },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 656 */
+    "repr_bind_attr_int",
+    "repr_bind_attr_int_p_pc_sc_i",
+    "Parrot_repr_bind_attr_int_p_pc_sc_i",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_SC, PARROT_ARG_I },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 657 */
+    "repr_bind_attr_int",
+    "repr_bind_attr_int_pc_pc_sc_i",
+    "Parrot_repr_bind_attr_int_pc_pc_sc_i",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_PC, PARROT_ARG_SC, PARROT_ARG_I },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 658 */
+    "repr_bind_attr_int",
+    "repr_bind_attr_int_p_p_s_ic",
+    "Parrot_repr_bind_attr_int_p_p_s_ic",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_S, PARROT_ARG_IC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 659 */
+    "repr_bind_attr_int",
+    "repr_bind_attr_int_pc_p_s_ic",
+    "Parrot_repr_bind_attr_int_pc_p_s_ic",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_P, PARROT_ARG_S, PARROT_ARG_IC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 660 */
+    "repr_bind_attr_int",
+    "repr_bind_attr_int_p_pc_s_ic",
+    "Parrot_repr_bind_attr_int_p_pc_s_ic",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_S, PARROT_ARG_IC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 661 */
+    "repr_bind_attr_int",
+    "repr_bind_attr_int_pc_pc_s_ic",
+    "Parrot_repr_bind_attr_int_pc_pc_s_ic",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_PC, PARROT_ARG_S, PARROT_ARG_IC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 662 */
+    "repr_bind_attr_int",
+    "repr_bind_attr_int_p_p_sc_ic",
+    "Parrot_repr_bind_attr_int_p_p_sc_ic",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_SC, PARROT_ARG_IC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 663 */
+    "repr_bind_attr_int",
+    "repr_bind_attr_int_pc_p_sc_ic",
+    "Parrot_repr_bind_attr_int_pc_p_sc_ic",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_P, PARROT_ARG_SC, PARROT_ARG_IC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 664 */
+    "repr_bind_attr_int",
+    "repr_bind_attr_int_p_pc_sc_ic",
+    "Parrot_repr_bind_attr_int_p_pc_sc_ic",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_SC, PARROT_ARG_IC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 665 */
+    "repr_bind_attr_int",
+    "repr_bind_attr_int_pc_pc_sc_ic",
+    "Parrot_repr_bind_attr_int_pc_pc_sc_ic",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_PC, PARROT_ARG_SC, PARROT_ARG_IC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 666 */
+    "repr_bind_attr_num",
+    "repr_bind_attr_num_p_p_s_n",
+    "Parrot_repr_bind_attr_num_p_p_s_n",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_S, PARROT_ARG_N },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 667 */
+    "repr_bind_attr_num",
+    "repr_bind_attr_num_pc_p_s_n",
+    "Parrot_repr_bind_attr_num_pc_p_s_n",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_P, PARROT_ARG_S, PARROT_ARG_N },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 668 */
+    "repr_bind_attr_num",
+    "repr_bind_attr_num_p_pc_s_n",
+    "Parrot_repr_bind_attr_num_p_pc_s_n",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_S, PARROT_ARG_N },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 669 */
+    "repr_bind_attr_num",
+    "repr_bind_attr_num_pc_pc_s_n",
+    "Parrot_repr_bind_attr_num_pc_pc_s_n",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_PC, PARROT_ARG_S, PARROT_ARG_N },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 670 */
+    "repr_bind_attr_num",
+    "repr_bind_attr_num_p_p_sc_n",
+    "Parrot_repr_bind_attr_num_p_p_sc_n",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_SC, PARROT_ARG_N },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 671 */
+    "repr_bind_attr_num",
+    "repr_bind_attr_num_pc_p_sc_n",
+    "Parrot_repr_bind_attr_num_pc_p_sc_n",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_P, PARROT_ARG_SC, PARROT_ARG_N },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 672 */
+    "repr_bind_attr_num",
+    "repr_bind_attr_num_p_pc_sc_n",
+    "Parrot_repr_bind_attr_num_p_pc_sc_n",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_SC, PARROT_ARG_N },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 673 */
+    "repr_bind_attr_num",
+    "repr_bind_attr_num_pc_pc_sc_n",
+    "Parrot_repr_bind_attr_num_pc_pc_sc_n",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_PC, PARROT_ARG_SC, PARROT_ARG_N },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 674 */
+    "repr_bind_attr_num",
+    "repr_bind_attr_num_p_p_s_nc",
+    "Parrot_repr_bind_attr_num_p_p_s_nc",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_S, PARROT_ARG_NC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 675 */
+    "repr_bind_attr_num",
+    "repr_bind_attr_num_pc_p_s_nc",
+    "Parrot_repr_bind_attr_num_pc_p_s_nc",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_P, PARROT_ARG_S, PARROT_ARG_NC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 676 */
+    "repr_bind_attr_num",
+    "repr_bind_attr_num_p_pc_s_nc",
+    "Parrot_repr_bind_attr_num_p_pc_s_nc",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_S, PARROT_ARG_NC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 677 */
+    "repr_bind_attr_num",
+    "repr_bind_attr_num_pc_pc_s_nc",
+    "Parrot_repr_bind_attr_num_pc_pc_s_nc",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_PC, PARROT_ARG_S, PARROT_ARG_NC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 678 */
+    "repr_bind_attr_num",
+    "repr_bind_attr_num_p_p_sc_nc",
+    "Parrot_repr_bind_attr_num_p_p_sc_nc",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_SC, PARROT_ARG_NC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 679 */
+    "repr_bind_attr_num",
+    "repr_bind_attr_num_pc_p_sc_nc",
+    "Parrot_repr_bind_attr_num_pc_p_sc_nc",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_P, PARROT_ARG_SC, PARROT_ARG_NC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 680 */
+    "repr_bind_attr_num",
+    "repr_bind_attr_num_p_pc_sc_nc",
+    "Parrot_repr_bind_attr_num_p_pc_sc_nc",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_SC, PARROT_ARG_NC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 681 */
+    "repr_bind_attr_num",
+    "repr_bind_attr_num_pc_pc_sc_nc",
+    "Parrot_repr_bind_attr_num_pc_pc_sc_nc",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_PC, PARROT_ARG_SC, PARROT_ARG_NC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 682 */
+    "repr_bind_attr_str",
+    "repr_bind_attr_str_p_p_s_s",
+    "Parrot_repr_bind_attr_str_p_p_s_s",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_S, PARROT_ARG_S },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 683 */
+    "repr_bind_attr_str",
+    "repr_bind_attr_str_pc_p_s_s",
+    "Parrot_repr_bind_attr_str_pc_p_s_s",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_P, PARROT_ARG_S, PARROT_ARG_S },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 684 */
+    "repr_bind_attr_str",
+    "repr_bind_attr_str_p_pc_s_s",
+    "Parrot_repr_bind_attr_str_p_pc_s_s",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_S, PARROT_ARG_S },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 685 */
+    "repr_bind_attr_str",
+    "repr_bind_attr_str_pc_pc_s_s",
+    "Parrot_repr_bind_attr_str_pc_pc_s_s",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_PC, PARROT_ARG_S, PARROT_ARG_S },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 686 */
+    "repr_bind_attr_str",
+    "repr_bind_attr_str_p_p_sc_s",
+    "Parrot_repr_bind_attr_str_p_p_sc_s",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_SC, PARROT_ARG_S },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 687 */
+    "repr_bind_attr_str",
+    "repr_bind_attr_str_pc_p_sc_s",
+    "Parrot_repr_bind_attr_str_pc_p_sc_s",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_P, PARROT_ARG_SC, PARROT_ARG_S },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 688 */
+    "repr_bind_attr_str",
+    "repr_bind_attr_str_p_pc_sc_s",
+    "Parrot_repr_bind_attr_str_p_pc_sc_s",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_SC, PARROT_ARG_S },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 689 */
+    "repr_bind_attr_str",
+    "repr_bind_attr_str_pc_pc_sc_s",
+    "Parrot_repr_bind_attr_str_pc_pc_sc_s",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_PC, PARROT_ARG_SC, PARROT_ARG_S },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 690 */
+    "repr_bind_attr_str",
+    "repr_bind_attr_str_p_p_s_sc",
+    "Parrot_repr_bind_attr_str_p_p_s_sc",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_S, PARROT_ARG_SC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 691 */
+    "repr_bind_attr_str",
+    "repr_bind_attr_str_pc_p_s_sc",
+    "Parrot_repr_bind_attr_str_pc_p_s_sc",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_P, PARROT_ARG_S, PARROT_ARG_SC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 692 */
+    "repr_bind_attr_str",
+    "repr_bind_attr_str_p_pc_s_sc",
+    "Parrot_repr_bind_attr_str_p_pc_s_sc",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_S, PARROT_ARG_SC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 693 */
+    "repr_bind_attr_str",
+    "repr_bind_attr_str_pc_pc_s_sc",
+    "Parrot_repr_bind_attr_str_pc_pc_s_sc",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_PC, PARROT_ARG_S, PARROT_ARG_SC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 694 */
+    "repr_bind_attr_str",
+    "repr_bind_attr_str_p_p_sc_sc",
+    "Parrot_repr_bind_attr_str_p_p_sc_sc",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_SC, PARROT_ARG_SC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 695 */
+    "repr_bind_attr_str",
+    "repr_bind_attr_str_pc_p_sc_sc",
+    "Parrot_repr_bind_attr_str_pc_p_sc_sc",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_P, PARROT_ARG_SC, PARROT_ARG_SC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 696 */
+    "repr_bind_attr_str",
+    "repr_bind_attr_str_p_pc_sc_sc",
+    "Parrot_repr_bind_attr_str_p_pc_sc_sc",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_SC, PARROT_ARG_SC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 697 */
+    "repr_bind_attr_str",
+    "repr_bind_attr_str_pc_pc_sc_sc",
+    "Parrot_repr_bind_attr_str_pc_pc_sc_sc",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_PC, PARROT_ARG_SC, PARROT_ARG_SC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 698 */
+    "repr_is_attr_initialized",
+    "repr_is_attr_initialized_i_p_p_s",
+    "Parrot_repr_is_attr_initialized_i_p_p_s",
+    0,
+    5,
+    { PARROT_ARG_I, PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_S },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 699 */
+    "repr_is_attr_initialized",
+    "repr_is_attr_initialized_i_pc_p_s",
+    "Parrot_repr_is_attr_initialized_i_pc_p_s",
+    0,
+    5,
+    { PARROT_ARG_I, PARROT_ARG_PC, PARROT_ARG_P, PARROT_ARG_S },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 700 */
+    "repr_is_attr_initialized",
+    "repr_is_attr_initialized_i_p_pc_s",
+    "Parrot_repr_is_attr_initialized_i_p_pc_s",
+    0,
+    5,
+    { PARROT_ARG_I, PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_S },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 701 */
+    "repr_is_attr_initialized",
+    "repr_is_attr_initialized_i_pc_pc_s",
+    "Parrot_repr_is_attr_initialized_i_pc_pc_s",
+    0,
+    5,
+    { PARROT_ARG_I, PARROT_ARG_PC, PARROT_ARG_PC, PARROT_ARG_S },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 702 */
+    "repr_is_attr_initialized",
+    "repr_is_attr_initialized_i_p_p_sc",
+    "Parrot_repr_is_attr_initialized_i_p_p_sc",
+    0,
+    5,
+    { PARROT_ARG_I, PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_SC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 703 */
+    "repr_is_attr_initialized",
+    "repr_is_attr_initialized_i_pc_p_sc",
+    "Parrot_repr_is_attr_initialized_i_pc_p_sc",
+    0,
+    5,
+    { PARROT_ARG_I, PARROT_ARG_PC, PARROT_ARG_P, PARROT_ARG_SC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 704 */
+    "repr_is_attr_initialized",
+    "repr_is_attr_initialized_i_p_pc_sc",
+    "Parrot_repr_is_attr_initialized_i_p_pc_sc",
+    0,
+    5,
+    { PARROT_ARG_I, PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_SC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 705 */
+    "repr_is_attr_initialized",
+    "repr_is_attr_initialized_i_pc_pc_sc",
+    "Parrot_repr_is_attr_initialized_i_pc_pc_sc",
+    0,
+    5,
+    { PARROT_ARG_I, PARROT_ARG_PC, PARROT_ARG_PC, PARROT_ARG_SC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 706 */
+    "repr_change_type",
+    "repr_change_type_p_p",
+    "Parrot_repr_change_type_p_p",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 707 */
+    "repr_change_type",
+    "repr_change_type_pc_p",
+    "Parrot_repr_change_type_pc_p",
+    0,
+    3,
+    { PARROT_ARG_PC, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 708 */
+    "repr_change_type",
+    "repr_change_type_p_pc",
+    "Parrot_repr_change_type_p_pc",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 709 */
+    "repr_change_type",
+    "repr_change_type_pc_pc",
+    "Parrot_repr_change_type_pc_pc",
+    0,
+    3,
+    { PARROT_ARG_PC, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 710 */
+    "type_check",
+    "type_check_i_p_p",
+    "Parrot_type_check_i_p_p",
+    0,
+    4,
+    { PARROT_ARG_I, PARROT_ARG_P, PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 711 */
+    "type_check",
+    "type_check_i_pc_p",
+    "Parrot_type_check_i_pc_p",
+    0,
+    4,
+    { PARROT_ARG_I, PARROT_ARG_PC, PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 712 */
+    "type_check",
+    "type_check_i_p_pc",
+    "Parrot_type_check_i_p_pc",
+    0,
+    4,
+    { PARROT_ARG_I, PARROT_ARG_P, PARROT_ARG_PC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 713 */
+    "type_check",
+    "type_check_i_pc_pc",
+    "Parrot_type_check_i_pc_pc",
+    0,
+    4,
+    { PARROT_ARG_I, PARROT_ARG_PC, PARROT_ARG_PC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 714 */
+    "publish_type_check_cache",
+    "publish_type_check_cache_p_p",
+    "Parrot_publish_type_check_cache_p_p",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 715 */
+    "publish_type_check_cache",
+    "publish_type_check_cache_pc_p",
+    "Parrot_publish_type_check_cache_pc_p",
+    0,
+    3,
+    { PARROT_ARG_PC, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 716 */
+    "publish_type_check_cache",
+    "publish_type_check_cache_p_pc",
+    "Parrot_publish_type_check_cache_p_pc",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 717 */
+    "publish_type_check_cache",
+    "publish_type_check_cache_pc_pc",
+    "Parrot_publish_type_check_cache_pc_pc",
+    0,
+    3,
+    { PARROT_ARG_PC, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 718 */
+    "publish_method_cache",
+    "publish_method_cache_p_p",
+    "Parrot_publish_method_cache_p_p",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 719 */
+    "publish_method_cache",
+    "publish_method_cache_pc_p",
+    "Parrot_publish_method_cache_pc_p",
+    0,
+    3,
+    { PARROT_ARG_PC, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 720 */
+    "publish_method_cache",
+    "publish_method_cache_p_pc",
+    "Parrot_publish_method_cache_p_pc",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 721 */
+    "publish_method_cache",
+    "publish_method_cache_pc_pc",
+    "Parrot_publish_method_cache_pc_pc",
+    0,
+    3,
+    { PARROT_ARG_PC, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 722 */
+    "repr_unbox_str",
+    "repr_unbox_str_s_p",
+    "Parrot_repr_unbox_str_s_p",
+    0,
+    3,
+    { PARROT_ARG_S, PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 723 */
+    "repr_unbox_str",
+    "repr_unbox_str_s_pc",
+    "Parrot_repr_unbox_str_s_pc",
+    0,
+    3,
+    { PARROT_ARG_S, PARROT_ARG_PC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 724 */
+    "repr_unbox_int",
+    "repr_unbox_int_i_p",
+    "Parrot_repr_unbox_int_i_p",
+    0,
+    3,
+    { PARROT_ARG_I, PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 725 */
+    "repr_unbox_int",
+    "repr_unbox_int_i_pc",
+    "Parrot_repr_unbox_int_i_pc",
+    0,
+    3,
+    { PARROT_ARG_I, PARROT_ARG_PC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 726 */
+    "repr_unbox_num",
+    "repr_unbox_num_n_p",
+    "Parrot_repr_unbox_num_n_p",
+    0,
+    3,
+    { PARROT_ARG_N, PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 727 */
+    "repr_unbox_num",
+    "repr_unbox_num_n_pc",
+    "Parrot_repr_unbox_num_n_pc",
+    0,
+    3,
+    { PARROT_ARG_N, PARROT_ARG_PC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 728 */
+    "repr_box_str",
+    "repr_box_str_p_s_p",
+    "Parrot_repr_box_str_p_s_p",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_S, PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 729 */
+    "repr_box_str",
+    "repr_box_str_p_sc_p",
+    "Parrot_repr_box_str_p_sc_p",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_SC, PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 730 */
+    "repr_box_str",
+    "repr_box_str_p_s_pc",
+    "Parrot_repr_box_str_p_s_pc",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_S, PARROT_ARG_PC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 731 */
+    "repr_box_str",
+    "repr_box_str_p_sc_pc",
+    "Parrot_repr_box_str_p_sc_pc",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_SC, PARROT_ARG_PC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 732 */
+    "repr_box_int",
+    "repr_box_int_p_i_p",
+    "Parrot_repr_box_int_p_i_p",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_I, PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 733 */
+    "repr_box_int",
+    "repr_box_int_p_ic_p",
+    "Parrot_repr_box_int_p_ic_p",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_IC, PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 734 */
+    "repr_box_int",
+    "repr_box_int_p_i_pc",
+    "Parrot_repr_box_int_p_i_pc",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_I, PARROT_ARG_PC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 735 */
+    "repr_box_int",
+    "repr_box_int_p_ic_pc",
+    "Parrot_repr_box_int_p_ic_pc",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_IC, PARROT_ARG_PC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 736 */
+    "repr_box_num",
+    "repr_box_num_p_n_p",
+    "Parrot_repr_box_num_p_n_p",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_N, PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 737 */
+    "repr_box_num",
+    "repr_box_num_p_nc_p",
+    "Parrot_repr_box_num_p_nc_p",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_NC, PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 738 */
+    "repr_box_num",
+    "repr_box_num_p_n_pc",
+    "Parrot_repr_box_num_p_n_pc",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_N, PARROT_ARG_PC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 739 */
+    "repr_box_num",
+    "repr_box_num_p_nc_pc",
+    "Parrot_repr_box_num_p_nc_pc",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_NC, PARROT_ARG_PC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 740 */
+    "stable_set_type_check_mode",
+    "stable_set_type_check_mode_p_i",
+    "Parrot_stable_set_type_check_mode_p_i",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_I },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 741 */
+    "stable_set_type_check_mode",
+    "stable_set_type_check_mode_pc_i",
+    "Parrot_stable_set_type_check_mode_pc_i",
+    0,
+    3,
+    { PARROT_ARG_PC, PARROT_ARG_I },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 742 */
+    "stable_set_type_check_mode",
+    "stable_set_type_check_mode_p_ic",
+    "Parrot_stable_set_type_check_mode_p_ic",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_IC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 743 */
+    "stable_set_type_check_mode",
+    "stable_set_type_check_mode_pc_ic",
+    "Parrot_stable_set_type_check_mode_pc_ic",
+    0,
+    3,
+    { PARROT_ARG_PC, PARROT_ARG_IC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 744 */
+    "stable_publish_vtable_mapping",
+    "stable_publish_vtable_mapping_p_p",
+    "Parrot_stable_publish_vtable_mapping_p_p",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 745 */
+    "stable_publish_vtable_mapping",
+    "stable_publish_vtable_mapping_pc_p",
+    "Parrot_stable_publish_vtable_mapping_pc_p",
+    0,
+    3,
+    { PARROT_ARG_PC, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 746 */
+    "stable_publish_vtable_mapping",
+    "stable_publish_vtable_mapping_p_pc",
+    "Parrot_stable_publish_vtable_mapping_p_pc",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 747 */
+    "stable_publish_vtable_mapping",
+    "stable_publish_vtable_mapping_pc_pc",
+    "Parrot_stable_publish_vtable_mapping_pc_pc",
+    0,
+    3,
+    { PARROT_ARG_PC, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 748 */
+    "stable_publish_vtable_handler_mapping",
+    "stable_publish_vtable_handler_mapping_p_p",
+    "Parrot_stable_publish_vtable_handler_mapping_p_p",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 749 */
+    "stable_publish_vtable_handler_mapping",
+    "stable_publish_vtable_handler_mapping_pc_p",
+    "Parrot_stable_publish_vtable_handler_mapping_pc_p",
+    0,
+    3,
+    { PARROT_ARG_PC, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 750 */
+    "stable_publish_vtable_handler_mapping",
+    "stable_publish_vtable_handler_mapping_p_pc",
+    "Parrot_stable_publish_vtable_handler_mapping_p_pc",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 751 */
+    "stable_publish_vtable_handler_mapping",
+    "stable_publish_vtable_handler_mapping_pc_pc",
+    "Parrot_stable_publish_vtable_handler_mapping_pc_pc",
+    0,
+    3,
+    { PARROT_ARG_PC, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 752 */
+    "nqp_get_sc_object",
+    "nqp_get_sc_object_p_s_i",
+    "Parrot_nqp_get_sc_object_p_s_i",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_S, PARROT_ARG_I },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 753 */
+    "nqp_get_sc_object",
+    "nqp_get_sc_object_p_sc_i",
+    "Parrot_nqp_get_sc_object_p_sc_i",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_SC, PARROT_ARG_I },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 754 */
+    "nqp_get_sc_object",
+    "nqp_get_sc_object_p_s_ic",
+    "Parrot_nqp_get_sc_object_p_s_ic",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_S, PARROT_ARG_IC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 755 */
+    "nqp_get_sc_object",
+    "nqp_get_sc_object_p_sc_ic",
+    "Parrot_nqp_get_sc_object_p_sc_ic",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_SC, PARROT_ARG_IC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 756 */
+    "nqp_get_sc",
+    "nqp_get_sc_p_s",
+    "Parrot_nqp_get_sc_p_s",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_S },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 757 */
+    "nqp_get_sc",
+    "nqp_get_sc_p_sc",
+    "Parrot_nqp_get_sc_p_sc",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_SC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 758 */
+    "nqp_create_sc",
+    "nqp_create_sc_p_s",
+    "Parrot_nqp_create_sc_p_s",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_S },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 759 */
+    "nqp_create_sc",
+    "nqp_create_sc_p_sc",
+    "Parrot_nqp_create_sc_p_sc",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_SC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 760 */
+    "nqp_set_sc_object",
+    "nqp_set_sc_object_s_i_p",
+    "Parrot_nqp_set_sc_object_s_i_p",
+    0,
+    4,
+    { PARROT_ARG_S, PARROT_ARG_I, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 761 */
+    "nqp_set_sc_object",
+    "nqp_set_sc_object_sc_i_p",
+    "Parrot_nqp_set_sc_object_sc_i_p",
+    0,
+    4,
+    { PARROT_ARG_SC, PARROT_ARG_I, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 762 */
+    "nqp_set_sc_object",
+    "nqp_set_sc_object_s_ic_p",
+    "Parrot_nqp_set_sc_object_s_ic_p",
+    0,
+    4,
+    { PARROT_ARG_S, PARROT_ARG_IC, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 763 */
+    "nqp_set_sc_object",
+    "nqp_set_sc_object_sc_ic_p",
+    "Parrot_nqp_set_sc_object_sc_ic_p",
+    0,
+    4,
+    { PARROT_ARG_SC, PARROT_ARG_IC, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 764 */
+    "nqp_set_sc_object",
+    "nqp_set_sc_object_s_i_pc",
+    "Parrot_nqp_set_sc_object_s_i_pc",
+    0,
+    4,
+    { PARROT_ARG_S, PARROT_ARG_I, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 765 */
+    "nqp_set_sc_object",
+    "nqp_set_sc_object_sc_i_pc",
+    "Parrot_nqp_set_sc_object_sc_i_pc",
+    0,
+    4,
+    { PARROT_ARG_SC, PARROT_ARG_I, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 766 */
+    "nqp_set_sc_object",
+    "nqp_set_sc_object_s_ic_pc",
+    "Parrot_nqp_set_sc_object_s_ic_pc",
+    0,
+    4,
+    { PARROT_ARG_S, PARROT_ARG_IC, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 767 */
+    "nqp_set_sc_object",
+    "nqp_set_sc_object_sc_ic_pc",
+    "Parrot_nqp_set_sc_object_sc_ic_pc",
+    0,
+    4,
+    { PARROT_ARG_SC, PARROT_ARG_IC, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 768 */
+    "nqp_set_sc_for_object",
+    "nqp_set_sc_for_object_p_p",
+    "Parrot_nqp_set_sc_for_object_p_p",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 769 */
+    "nqp_set_sc_for_object",
+    "nqp_set_sc_for_object_pc_p",
+    "Parrot_nqp_set_sc_for_object_pc_p",
+    0,
+    3,
+    { PARROT_ARG_PC, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 770 */
+    "nqp_set_sc_for_object",
+    "nqp_set_sc_for_object_p_pc",
+    "Parrot_nqp_set_sc_for_object_p_pc",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 771 */
+    "nqp_set_sc_for_object",
+    "nqp_set_sc_for_object_pc_pc",
+    "Parrot_nqp_set_sc_for_object_pc_pc",
+    0,
+    3,
+    { PARROT_ARG_PC, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 772 */
+    "nqp_get_sc_for_object",
+    "nqp_get_sc_for_object_p_p",
+    "Parrot_nqp_get_sc_for_object_p_p",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 773 */
+    "nqp_get_sc_for_object",
+    "nqp_get_sc_for_object_p_pc",
+    "Parrot_nqp_get_sc_for_object_p_pc",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_PC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 774 */
+    "nqp_get_package_through_who",
+    "nqp_get_package_through_who_p_p_s",
+    "Parrot_nqp_get_package_through_who_p_p_s",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_S },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 775 */
+    "nqp_get_package_through_who",
+    "nqp_get_package_through_who_p_pc_s",
+    "Parrot_nqp_get_package_through_who_p_pc_s",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_S },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 776 */
+    "nqp_get_package_through_who",
+    "nqp_get_package_through_who_p_p_sc",
+    "Parrot_nqp_get_package_through_who_p_p_sc",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_SC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 777 */
+    "nqp_get_package_through_who",
+    "nqp_get_package_through_who_p_pc_sc",
+    "Parrot_nqp_get_package_through_who_p_pc_sc",
+    0,
+    4,
+    { PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_SC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 778 */
+    "is_invokable",
+    "is_invokable_i_p",
+    "Parrot_is_invokable_i_p",
+    0,
+    3,
+    { PARROT_ARG_I, PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 779 */
+    "is_invokable",
+    "is_invokable_i_pc",
+    "Parrot_is_invokable_i_pc",
+    0,
+    3,
+    { PARROT_ARG_I, PARROT_ARG_PC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 780 */
+    "repr_get_primitive_type_spec",
+    "repr_get_primitive_type_spec_i_p",
+    "Parrot_repr_get_primitive_type_spec_i_p",
+    0,
+    3,
+    { PARROT_ARG_I, PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 781 */
+    "repr_get_primitive_type_spec",
+    "repr_get_primitive_type_spec_i_pc",
+    "Parrot_repr_get_primitive_type_spec_i_pc",
+    0,
+    3,
+    { PARROT_ARG_I, PARROT_ARG_PC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 782 */
+    "is_container",
+    "is_container_i_p",
+    "Parrot_is_container_i_p",
+    0,
+    3,
+    { PARROT_ARG_I, PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 783 */
+    "is_container",
+    "is_container_i_pc",
+    "Parrot_is_container_i_pc",
+    0,
+    3,
+    { PARROT_ARG_I, PARROT_ARG_PC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 784 */
+    "nqp_decontainerize",
+    "nqp_decontainerize_p_p",
+    "Parrot_nqp_decontainerize_p_p",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_P },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 785 */
+    "nqp_decontainerize",
+    "nqp_decontainerize_p_pc",
+    "Parrot_nqp_decontainerize_p_pc",
+    0,
+    3,
+    { PARROT_ARG_P, PARROT_ARG_PC },
+    { PARROT_ARGDIR_OUT, PARROT_ARGDIR_IN },
+    { 0, 0 },
+    &core_op_lib
+  },
+  { /* 786 */
+    "set_container_spec",
+    "set_container_spec_p_p_s_p",
+    "Parrot_set_container_spec_p_p_s_p",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_S, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 787 */
+    "set_container_spec",
+    "set_container_spec_pc_p_s_p",
+    "Parrot_set_container_spec_pc_p_s_p",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_P, PARROT_ARG_S, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 788 */
+    "set_container_spec",
+    "set_container_spec_p_pc_s_p",
+    "Parrot_set_container_spec_p_pc_s_p",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_S, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 789 */
+    "set_container_spec",
+    "set_container_spec_pc_pc_s_p",
+    "Parrot_set_container_spec_pc_pc_s_p",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_PC, PARROT_ARG_S, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 790 */
+    "set_container_spec",
+    "set_container_spec_p_p_sc_p",
+    "Parrot_set_container_spec_p_p_sc_p",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_SC, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 791 */
+    "set_container_spec",
+    "set_container_spec_pc_p_sc_p",
+    "Parrot_set_container_spec_pc_p_sc_p",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_P, PARROT_ARG_SC, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 792 */
+    "set_container_spec",
+    "set_container_spec_p_pc_sc_p",
+    "Parrot_set_container_spec_p_pc_sc_p",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_SC, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 793 */
+    "set_container_spec",
+    "set_container_spec_pc_pc_sc_p",
+    "Parrot_set_container_spec_pc_pc_sc_p",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_PC, PARROT_ARG_SC, PARROT_ARG_P },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 794 */
+    "set_container_spec",
+    "set_container_spec_p_p_s_pc",
+    "Parrot_set_container_spec_p_p_s_pc",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_S, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 795 */
+    "set_container_spec",
+    "set_container_spec_pc_p_s_pc",
+    "Parrot_set_container_spec_pc_p_s_pc",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_P, PARROT_ARG_S, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 796 */
+    "set_container_spec",
+    "set_container_spec_p_pc_s_pc",
+    "Parrot_set_container_spec_p_pc_s_pc",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_S, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 797 */
+    "set_container_spec",
+    "set_container_spec_pc_pc_s_pc",
+    "Parrot_set_container_spec_pc_pc_s_pc",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_PC, PARROT_ARG_S, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 798 */
+    "set_container_spec",
+    "set_container_spec_p_p_sc_pc",
+    "Parrot_set_container_spec_p_p_sc_pc",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_P, PARROT_ARG_SC, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 799 */
+    "set_container_spec",
+    "set_container_spec_pc_p_sc_pc",
+    "Parrot_set_container_spec_pc_p_sc_pc",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_P, PARROT_ARG_SC, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 800 */
+    "set_container_spec",
+    "set_container_spec_p_pc_sc_pc",
+    "Parrot_set_container_spec_p_pc_sc_pc",
+    0,
+    5,
+    { PARROT_ARG_P, PARROT_ARG_PC, PARROT_ARG_SC, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 801 */
+    "set_container_spec",
+    "set_container_spec_pc_pc_sc_pc",
+    "Parrot_set_container_spec_pc_pc_sc_pc",
+    0,
+    5,
+    { PARROT_ARG_PC, PARROT_ARG_PC, PARROT_ARG_SC, PARROT_ARG_PC },
+    { PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN, PARROT_ARGDIR_IN },
+    { 0, 0, 0, 0 },
+    &core_op_lib
+  },
+  { /* 802 */
     "new",
     "new_p_s",
     "Parrot_new_p_s",
@@ -7857,7 +10257,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 603 */
+  { /* 803 */
     "new",
     "new_p_sc",
     "Parrot_new_p_sc",
@@ -7868,7 +10268,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 604 */
+  { /* 804 */
     "new",
     "new_p_s_p",
     "Parrot_new_p_s_p",
@@ -7879,7 +10279,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 605 */
+  { /* 805 */
     "new",
     "new_p_sc_p",
     "Parrot_new_p_sc_p",
@@ -7890,7 +10290,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 606 */
+  { /* 806 */
     "new",
     "new_p_s_pc",
     "Parrot_new_p_s_pc",
@@ -7901,7 +10301,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 607 */
+  { /* 807 */
     "new",
     "new_p_sc_pc",
     "Parrot_new_p_sc_pc",
@@ -7912,7 +10312,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 608 */
+  { /* 808 */
     "new",
     "new_p_p",
     "Parrot_new_p_p",
@@ -7923,7 +10323,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 609 */
+  { /* 809 */
     "new",
     "new_p_pc",
     "Parrot_new_p_pc",
@@ -7934,7 +10334,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 610 */
+  { /* 810 */
     "new",
     "new_p_p_p",
     "Parrot_new_p_p_p",
@@ -7945,7 +10345,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 611 */
+  { /* 811 */
     "new",
     "new_p_pc_p",
     "Parrot_new_p_pc_p",
@@ -7956,7 +10356,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 612 */
+  { /* 812 */
     "new",
     "new_p_p_pc",
     "Parrot_new_p_p_pc",
@@ -7967,7 +10367,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 613 */
+  { /* 813 */
     "new",
     "new_p_pc_pc",
     "Parrot_new_p_pc_pc",
@@ -7978,7 +10378,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 614 */
+  { /* 814 */
     "root_new",
     "root_new_p_p",
     "Parrot_root_new_p_p",
@@ -7989,7 +10389,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 615 */
+  { /* 815 */
     "root_new",
     "root_new_p_pc",
     "Parrot_root_new_p_pc",
@@ -8000,7 +10400,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 616 */
+  { /* 816 */
     "root_new",
     "root_new_p_p_p",
     "Parrot_root_new_p_p_p",
@@ -8011,7 +10411,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 617 */
+  { /* 817 */
     "root_new",
     "root_new_p_pc_p",
     "Parrot_root_new_p_pc_p",
@@ -8022,7 +10422,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 618 */
+  { /* 818 */
     "root_new",
     "root_new_p_p_pc",
     "Parrot_root_new_p_p_pc",
@@ -8033,7 +10433,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 619 */
+  { /* 819 */
     "root_new",
     "root_new_p_pc_pc",
     "Parrot_root_new_p_pc_pc",
@@ -8044,7 +10444,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 620 */
+  { /* 820 */
     "typeof",
     "typeof_s_p",
     "Parrot_typeof_s_p",
@@ -8055,7 +10455,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 621 */
+  { /* 821 */
     "typeof",
     "typeof_p_p",
     "Parrot_typeof_p_p",
@@ -8066,7 +10466,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 622 */
+  { /* 822 */
     "get_repr",
     "get_repr_s_p",
     "Parrot_get_repr_s_p",
@@ -8077,7 +10477,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 623 */
+  { /* 823 */
     "find_method",
     "find_method_p_p_s",
     "Parrot_find_method_p_p_s",
@@ -8088,7 +10488,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 624 */
+  { /* 824 */
     "find_method",
     "find_method_p_p_sc",
     "Parrot_find_method_p_p_sc",
@@ -8099,7 +10499,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 625 */
+  { /* 825 */
     "defined",
     "defined_i_p",
     "Parrot_defined_i_p",
@@ -8110,7 +10510,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 626 */
+  { /* 826 */
     "defined",
     "defined_i_p_ki",
     "Parrot_defined_i_p_ki",
@@ -8121,7 +10521,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 627 */
+  { /* 827 */
     "defined",
     "defined_i_p_kic",
     "Parrot_defined_i_p_kic",
@@ -8132,7 +10532,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 628 */
+  { /* 828 */
     "defined",
     "defined_i_p_k",
     "Parrot_defined_i_p_k",
@@ -8143,7 +10543,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 629 */
+  { /* 829 */
     "defined",
     "defined_i_p_kc",
     "Parrot_defined_i_p_kc",
@@ -8154,7 +10554,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 630 */
+  { /* 830 */
     "exists",
     "exists_i_p_ki",
     "Parrot_exists_i_p_ki",
@@ -8165,7 +10565,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 631 */
+  { /* 831 */
     "exists",
     "exists_i_p_kic",
     "Parrot_exists_i_p_kic",
@@ -8176,7 +10576,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 632 */
+  { /* 832 */
     "exists",
     "exists_i_p_k",
     "Parrot_exists_i_p_k",
@@ -8187,7 +10587,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 633 */
+  { /* 833 */
     "exists",
     "exists_i_p_kc",
     "Parrot_exists_i_p_kc",
@@ -8198,7 +10598,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 634 */
+  { /* 834 */
     "delete",
     "delete_p_k",
     "Parrot_delete_p_k",
@@ -8209,7 +10609,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 635 */
+  { /* 835 */
     "delete",
     "delete_p_kc",
     "Parrot_delete_p_kc",
@@ -8220,7 +10620,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 636 */
+  { /* 836 */
     "delete",
     "delete_p_ki",
     "Parrot_delete_p_ki",
@@ -8231,7 +10631,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 637 */
+  { /* 837 */
     "delete",
     "delete_p_kic",
     "Parrot_delete_p_kic",
@@ -8242,7 +10642,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 638 */
+  { /* 838 */
     "elements",
     "elements_i_p",
     "Parrot_elements_i_p",
@@ -8253,7 +10653,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 639 */
+  { /* 839 */
     "push",
     "push_p_i",
     "Parrot_push_p_i",
@@ -8264,7 +10664,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 640 */
+  { /* 840 */
     "push",
     "push_p_ic",
     "Parrot_push_p_ic",
@@ -8275,7 +10675,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 641 */
+  { /* 841 */
     "push",
     "push_p_n",
     "Parrot_push_p_n",
@@ -8286,7 +10686,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 642 */
+  { /* 842 */
     "push",
     "push_p_nc",
     "Parrot_push_p_nc",
@@ -8297,7 +10697,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 643 */
+  { /* 843 */
     "push",
     "push_p_s",
     "Parrot_push_p_s",
@@ -8308,7 +10708,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 644 */
+  { /* 844 */
     "push",
     "push_p_sc",
     "Parrot_push_p_sc",
@@ -8319,7 +10719,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 645 */
+  { /* 845 */
     "push",
     "push_p_p",
     "Parrot_push_p_p",
@@ -8330,7 +10730,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 646 */
+  { /* 846 */
     "pop",
     "pop_i_p",
     "Parrot_pop_i_p",
@@ -8341,7 +10741,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 647 */
+  { /* 847 */
     "pop",
     "pop_n_p",
     "Parrot_pop_n_p",
@@ -8352,7 +10752,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 648 */
+  { /* 848 */
     "pop",
     "pop_s_p",
     "Parrot_pop_s_p",
@@ -8363,7 +10763,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 649 */
+  { /* 849 */
     "pop",
     "pop_p_p",
     "Parrot_pop_p_p",
@@ -8374,7 +10774,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 650 */
+  { /* 850 */
     "unshift",
     "unshift_p_i",
     "Parrot_unshift_p_i",
@@ -8385,7 +10785,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 651 */
+  { /* 851 */
     "unshift",
     "unshift_p_ic",
     "Parrot_unshift_p_ic",
@@ -8396,7 +10796,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 652 */
+  { /* 852 */
     "unshift",
     "unshift_p_n",
     "Parrot_unshift_p_n",
@@ -8407,7 +10807,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 653 */
+  { /* 853 */
     "unshift",
     "unshift_p_nc",
     "Parrot_unshift_p_nc",
@@ -8418,7 +10818,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 654 */
+  { /* 854 */
     "unshift",
     "unshift_p_s",
     "Parrot_unshift_p_s",
@@ -8429,7 +10829,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 655 */
+  { /* 855 */
     "unshift",
     "unshift_p_sc",
     "Parrot_unshift_p_sc",
@@ -8440,7 +10840,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 656 */
+  { /* 856 */
     "unshift",
     "unshift_p_p",
     "Parrot_unshift_p_p",
@@ -8451,7 +10851,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 657 */
+  { /* 857 */
     "shift",
     "shift_i_p",
     "Parrot_shift_i_p",
@@ -8462,7 +10862,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 658 */
+  { /* 858 */
     "shift",
     "shift_n_p",
     "Parrot_shift_n_p",
@@ -8473,7 +10873,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 659 */
+  { /* 859 */
     "shift",
     "shift_s_p",
     "Parrot_shift_s_p",
@@ -8484,7 +10884,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 660 */
+  { /* 860 */
     "shift",
     "shift_p_p",
     "Parrot_shift_p_p",
@@ -8495,7 +10895,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 661 */
+  { /* 861 */
     "splice",
     "splice_p_p_i_i",
     "Parrot_splice_p_p_i_i",
@@ -8506,7 +10906,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 662 */
+  { /* 862 */
     "splice",
     "splice_p_p_ic_i",
     "Parrot_splice_p_p_ic_i",
@@ -8517,7 +10917,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 663 */
+  { /* 863 */
     "splice",
     "splice_p_p_i_ic",
     "Parrot_splice_p_p_i_ic",
@@ -8528,7 +10928,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 664 */
+  { /* 864 */
     "splice",
     "splice_p_p_ic_ic",
     "Parrot_splice_p_p_ic_ic",
@@ -8539,7 +10939,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 665 */
+  { /* 865 */
     "setprop",
     "setprop_p_s_p",
     "Parrot_setprop_p_s_p",
@@ -8550,7 +10950,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 666 */
+  { /* 866 */
     "setprop",
     "setprop_p_sc_p",
     "Parrot_setprop_p_sc_p",
@@ -8561,7 +10961,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 667 */
+  { /* 867 */
     "getprop",
     "getprop_p_s_p",
     "Parrot_getprop_p_s_p",
@@ -8572,7 +10972,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 668 */
+  { /* 868 */
     "getprop",
     "getprop_p_sc_p",
     "Parrot_getprop_p_sc_p",
@@ -8583,7 +10983,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 669 */
+  { /* 869 */
     "getprop",
     "getprop_p_p_s",
     "Parrot_getprop_p_p_s",
@@ -8594,7 +10994,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 670 */
+  { /* 870 */
     "getprop",
     "getprop_p_p_sc",
     "Parrot_getprop_p_p_sc",
@@ -8605,7 +11005,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 671 */
+  { /* 871 */
     "delprop",
     "delprop_p_s",
     "Parrot_delprop_p_s",
@@ -8616,7 +11016,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 672 */
+  { /* 872 */
     "delprop",
     "delprop_p_sc",
     "Parrot_delprop_p_sc",
@@ -8627,7 +11027,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 673 */
+  { /* 873 */
     "prophash",
     "prophash_p_p",
     "Parrot_prophash_p_p",
@@ -8638,7 +11038,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 674 */
+  { /* 874 */
     "freeze",
     "freeze_s_p",
     "Parrot_freeze_s_p",
@@ -8649,7 +11049,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 675 */
+  { /* 875 */
     "thaw",
     "thaw_p_s",
     "Parrot_thaw_p_s",
@@ -8660,7 +11060,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 676 */
+  { /* 876 */
     "thaw",
     "thaw_p_sc",
     "Parrot_thaw_p_sc",
@@ -8671,7 +11071,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 677 */
+  { /* 877 */
     "add_multi",
     "add_multi_s_s_p",
     "Parrot_add_multi_s_s_p",
@@ -8682,7 +11082,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 678 */
+  { /* 878 */
     "add_multi",
     "add_multi_sc_s_p",
     "Parrot_add_multi_sc_s_p",
@@ -8693,7 +11093,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 679 */
+  { /* 879 */
     "add_multi",
     "add_multi_s_sc_p",
     "Parrot_add_multi_s_sc_p",
@@ -8704,7 +11104,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 680 */
+  { /* 880 */
     "add_multi",
     "add_multi_sc_sc_p",
     "Parrot_add_multi_sc_sc_p",
@@ -8715,7 +11115,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 681 */
+  { /* 881 */
     "find_multi",
     "find_multi_p_s_s",
     "Parrot_find_multi_p_s_s",
@@ -8726,7 +11126,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 682 */
+  { /* 882 */
     "find_multi",
     "find_multi_p_sc_s",
     "Parrot_find_multi_p_sc_s",
@@ -8737,7 +11137,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 683 */
+  { /* 883 */
     "find_multi",
     "find_multi_p_s_sc",
     "Parrot_find_multi_p_s_sc",
@@ -8748,7 +11148,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 684 */
+  { /* 884 */
     "find_multi",
     "find_multi_p_sc_sc",
     "Parrot_find_multi_p_sc_sc",
@@ -8759,7 +11159,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 685 */
+  { /* 885 */
     "register",
     "register_p",
     "Parrot_register_p",
@@ -8770,7 +11170,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 686 */
+  { /* 886 */
     "unregister",
     "unregister_p",
     "Parrot_unregister_p",
@@ -8781,7 +11181,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 687 */
+  { /* 887 */
     "box",
     "box_p_i",
     "Parrot_box_p_i",
@@ -8792,7 +11192,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 688 */
+  { /* 888 */
     "box",
     "box_p_ic",
     "Parrot_box_p_ic",
@@ -8803,7 +11203,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 689 */
+  { /* 889 */
     "box",
     "box_p_n",
     "Parrot_box_p_n",
@@ -8814,7 +11214,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 690 */
+  { /* 890 */
     "box",
     "box_p_nc",
     "Parrot_box_p_nc",
@@ -8825,7 +11225,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 691 */
+  { /* 891 */
     "box",
     "box_p_s",
     "Parrot_box_p_s",
@@ -8836,7 +11236,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 692 */
+  { /* 892 */
     "box",
     "box_p_sc",
     "Parrot_box_p_sc",
@@ -8847,7 +11247,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 693 */
+  { /* 893 */
     "iter",
     "iter_p_p",
     "Parrot_iter_p_p",
@@ -8858,7 +11258,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 694 */
+  { /* 894 */
     "morph",
     "morph_p_p",
     "Parrot_morph_p_p",
@@ -8869,7 +11269,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 695 */
+  { /* 895 */
     "morph",
     "morph_p_pc",
     "Parrot_morph_p_pc",
@@ -8880,7 +11280,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 696 */
+  { /* 896 */
     "clone",
     "clone_s_s",
     "Parrot_clone_s_s",
@@ -8891,7 +11291,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 697 */
+  { /* 897 */
     "clone",
     "clone_s_sc",
     "Parrot_clone_s_sc",
@@ -8902,7 +11302,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 698 */
+  { /* 898 */
     "set",
     "set_i_i",
     "Parrot_set_i_i",
@@ -8913,7 +11313,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 699 */
+  { /* 899 */
     "set",
     "set_i_ic",
     "Parrot_set_i_ic",
@@ -8924,7 +11324,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 700 */
+  { /* 900 */
     "set",
     "set_i_n",
     "Parrot_set_i_n",
@@ -8935,7 +11335,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 701 */
+  { /* 901 */
     "set",
     "set_i_nc",
     "Parrot_set_i_nc",
@@ -8946,7 +11346,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 702 */
+  { /* 902 */
     "set",
     "set_i_s",
     "Parrot_set_i_s",
@@ -8957,7 +11357,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 703 */
+  { /* 903 */
     "set",
     "set_i_sc",
     "Parrot_set_i_sc",
@@ -8968,7 +11368,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 704 */
+  { /* 904 */
     "set",
     "set_n_n",
     "Parrot_set_n_n",
@@ -8979,7 +11379,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 705 */
+  { /* 905 */
     "set",
     "set_n_nc",
     "Parrot_set_n_nc",
@@ -8990,7 +11390,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 706 */
+  { /* 906 */
     "set",
     "set_n_i",
     "Parrot_set_n_i",
@@ -9001,7 +11401,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 707 */
+  { /* 907 */
     "set",
     "set_n_ic",
     "Parrot_set_n_ic",
@@ -9012,7 +11412,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 708 */
+  { /* 908 */
     "set",
     "set_n_s",
     "Parrot_set_n_s",
@@ -9023,7 +11423,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 709 */
+  { /* 909 */
     "set",
     "set_n_sc",
     "Parrot_set_n_sc",
@@ -9034,7 +11434,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 710 */
+  { /* 910 */
     "set",
     "set_n_p",
     "Parrot_set_n_p",
@@ -9045,7 +11445,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 711 */
+  { /* 911 */
     "set",
     "set_s_p",
     "Parrot_set_s_p",
@@ -9056,7 +11456,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 712 */
+  { /* 912 */
     "set",
     "set_s_s",
     "Parrot_set_s_s",
@@ -9067,7 +11467,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 713 */
+  { /* 913 */
     "set",
     "set_s_sc",
     "Parrot_set_s_sc",
@@ -9078,7 +11478,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 714 */
+  { /* 914 */
     "set",
     "set_s_i",
     "Parrot_set_s_i",
@@ -9089,7 +11489,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 715 */
+  { /* 915 */
     "set",
     "set_s_ic",
     "Parrot_set_s_ic",
@@ -9100,7 +11500,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 716 */
+  { /* 916 */
     "set",
     "set_s_n",
     "Parrot_set_s_n",
@@ -9111,7 +11511,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 717 */
+  { /* 917 */
     "set",
     "set_s_nc",
     "Parrot_set_s_nc",
@@ -9122,7 +11522,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 718 */
+  { /* 918 */
     "set",
     "set_p_pc",
     "Parrot_set_p_pc",
@@ -9133,7 +11533,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 719 */
+  { /* 919 */
     "set",
     "set_p_p",
     "Parrot_set_p_p",
@@ -9144,7 +11544,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 720 */
+  { /* 920 */
     "set",
     "set_p_i",
     "Parrot_set_p_i",
@@ -9155,7 +11555,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 721 */
+  { /* 921 */
     "set",
     "set_p_ic",
     "Parrot_set_p_ic",
@@ -9166,7 +11566,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 722 */
+  { /* 922 */
     "set",
     "set_p_n",
     "Parrot_set_p_n",
@@ -9177,7 +11577,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 723 */
+  { /* 923 */
     "set",
     "set_p_nc",
     "Parrot_set_p_nc",
@@ -9188,7 +11588,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 724 */
+  { /* 924 */
     "set",
     "set_p_s",
     "Parrot_set_p_s",
@@ -9199,7 +11599,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 725 */
+  { /* 925 */
     "set",
     "set_p_sc",
     "Parrot_set_p_sc",
@@ -9210,7 +11610,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 726 */
+  { /* 926 */
     "set",
     "set_i_p",
     "Parrot_set_i_p",
@@ -9221,7 +11621,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 727 */
+  { /* 927 */
     "assign",
     "assign_p_p",
     "Parrot_assign_p_p",
@@ -9232,7 +11632,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 728 */
+  { /* 928 */
     "assign",
     "assign_p_i",
     "Parrot_assign_p_i",
@@ -9243,7 +11643,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 729 */
+  { /* 929 */
     "assign",
     "assign_p_ic",
     "Parrot_assign_p_ic",
@@ -9254,7 +11654,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 730 */
+  { /* 930 */
     "assign",
     "assign_p_n",
     "Parrot_assign_p_n",
@@ -9265,7 +11665,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 731 */
+  { /* 931 */
     "assign",
     "assign_p_nc",
     "Parrot_assign_p_nc",
@@ -9276,7 +11676,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 732 */
+  { /* 932 */
     "assign",
     "assign_p_s",
     "Parrot_assign_p_s",
@@ -9287,7 +11687,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 733 */
+  { /* 933 */
     "assign",
     "assign_p_sc",
     "Parrot_assign_p_sc",
@@ -9298,7 +11698,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 734 */
+  { /* 934 */
     "assign",
     "assign_s_s",
     "Parrot_assign_s_s",
@@ -9309,7 +11709,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 735 */
+  { /* 935 */
     "assign",
     "assign_s_sc",
     "Parrot_assign_s_sc",
@@ -9320,7 +11720,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 736 */
+  { /* 936 */
     "setref",
     "setref_p_p",
     "Parrot_setref_p_p",
@@ -9331,7 +11731,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 737 */
+  { /* 937 */
     "deref",
     "deref_p_p",
     "Parrot_deref_p_p",
@@ -9342,7 +11742,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 738 */
+  { /* 938 */
     "set",
     "set_p_ki_i",
     "Parrot_set_p_ki_i",
@@ -9353,7 +11753,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 739 */
+  { /* 939 */
     "set",
     "set_p_kic_i",
     "Parrot_set_p_kic_i",
@@ -9364,7 +11764,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 740 */
+  { /* 940 */
     "set",
     "set_p_ki_ic",
     "Parrot_set_p_ki_ic",
@@ -9375,7 +11775,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 741 */
+  { /* 941 */
     "set",
     "set_p_kic_ic",
     "Parrot_set_p_kic_ic",
@@ -9386,7 +11786,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 742 */
+  { /* 942 */
     "set",
     "set_p_ki_n",
     "Parrot_set_p_ki_n",
@@ -9397,7 +11797,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 743 */
+  { /* 943 */
     "set",
     "set_p_kic_n",
     "Parrot_set_p_kic_n",
@@ -9408,7 +11808,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 744 */
+  { /* 944 */
     "set",
     "set_p_ki_nc",
     "Parrot_set_p_ki_nc",
@@ -9419,7 +11819,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 745 */
+  { /* 945 */
     "set",
     "set_p_kic_nc",
     "Parrot_set_p_kic_nc",
@@ -9430,7 +11830,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 746 */
+  { /* 946 */
     "set",
     "set_p_ki_s",
     "Parrot_set_p_ki_s",
@@ -9441,7 +11841,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 747 */
+  { /* 947 */
     "set",
     "set_p_kic_s",
     "Parrot_set_p_kic_s",
@@ -9452,7 +11852,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 748 */
+  { /* 948 */
     "set",
     "set_p_ki_sc",
     "Parrot_set_p_ki_sc",
@@ -9463,7 +11863,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 749 */
+  { /* 949 */
     "set",
     "set_p_kic_sc",
     "Parrot_set_p_kic_sc",
@@ -9474,7 +11874,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 750 */
+  { /* 950 */
     "set",
     "set_p_ki_p",
     "Parrot_set_p_ki_p",
@@ -9485,7 +11885,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 751 */
+  { /* 951 */
     "set",
     "set_p_kic_p",
     "Parrot_set_p_kic_p",
@@ -9496,7 +11896,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 752 */
+  { /* 952 */
     "set",
     "set_i_p_ki",
     "Parrot_set_i_p_ki",
@@ -9507,7 +11907,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 753 */
+  { /* 953 */
     "set",
     "set_i_p_kic",
     "Parrot_set_i_p_kic",
@@ -9518,7 +11918,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 754 */
+  { /* 954 */
     "set",
     "set_n_p_ki",
     "Parrot_set_n_p_ki",
@@ -9529,7 +11929,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 755 */
+  { /* 955 */
     "set",
     "set_n_p_kic",
     "Parrot_set_n_p_kic",
@@ -9540,7 +11940,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 756 */
+  { /* 956 */
     "set",
     "set_s_p_ki",
     "Parrot_set_s_p_ki",
@@ -9551,7 +11951,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 757 */
+  { /* 957 */
     "set",
     "set_s_p_kic",
     "Parrot_set_s_p_kic",
@@ -9562,7 +11962,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 758 */
+  { /* 958 */
     "set",
     "set_p_p_ki",
     "Parrot_set_p_p_ki",
@@ -9573,7 +11973,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 759 */
+  { /* 959 */
     "set",
     "set_p_p_kic",
     "Parrot_set_p_p_kic",
@@ -9584,7 +11984,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 760 */
+  { /* 960 */
     "set",
     "set_p_k_i",
     "Parrot_set_p_k_i",
@@ -9595,7 +11995,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 761 */
+  { /* 961 */
     "set",
     "set_p_kc_i",
     "Parrot_set_p_kc_i",
@@ -9606,7 +12006,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 762 */
+  { /* 962 */
     "set",
     "set_p_k_ic",
     "Parrot_set_p_k_ic",
@@ -9617,7 +12017,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 763 */
+  { /* 963 */
     "set",
     "set_p_kc_ic",
     "Parrot_set_p_kc_ic",
@@ -9628,7 +12028,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 764 */
+  { /* 964 */
     "set",
     "set_p_k_n",
     "Parrot_set_p_k_n",
@@ -9639,7 +12039,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 765 */
+  { /* 965 */
     "set",
     "set_p_kc_n",
     "Parrot_set_p_kc_n",
@@ -9650,7 +12050,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 766 */
+  { /* 966 */
     "set",
     "set_p_k_nc",
     "Parrot_set_p_k_nc",
@@ -9661,7 +12061,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 767 */
+  { /* 967 */
     "set",
     "set_p_kc_nc",
     "Parrot_set_p_kc_nc",
@@ -9672,7 +12072,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 768 */
+  { /* 968 */
     "set",
     "set_p_k_s",
     "Parrot_set_p_k_s",
@@ -9683,7 +12083,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 769 */
+  { /* 969 */
     "set",
     "set_p_kc_s",
     "Parrot_set_p_kc_s",
@@ -9694,7 +12094,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 770 */
+  { /* 970 */
     "set",
     "set_p_k_sc",
     "Parrot_set_p_k_sc",
@@ -9705,7 +12105,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 771 */
+  { /* 971 */
     "set",
     "set_p_kc_sc",
     "Parrot_set_p_kc_sc",
@@ -9716,7 +12116,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 772 */
+  { /* 972 */
     "set",
     "set_p_k_p",
     "Parrot_set_p_k_p",
@@ -9727,7 +12127,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 773 */
+  { /* 973 */
     "set",
     "set_p_kc_p",
     "Parrot_set_p_kc_p",
@@ -9738,7 +12138,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 774 */
+  { /* 974 */
     "set",
     "set_i_p_k",
     "Parrot_set_i_p_k",
@@ -9749,7 +12149,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 775 */
+  { /* 975 */
     "set",
     "set_i_p_kc",
     "Parrot_set_i_p_kc",
@@ -9760,7 +12160,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 776 */
+  { /* 976 */
     "set",
     "set_n_p_k",
     "Parrot_set_n_p_k",
@@ -9771,7 +12171,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 777 */
+  { /* 977 */
     "set",
     "set_n_p_kc",
     "Parrot_set_n_p_kc",
@@ -9782,7 +12182,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 778 */
+  { /* 978 */
     "set",
     "set_s_p_k",
     "Parrot_set_s_p_k",
@@ -9793,7 +12193,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 779 */
+  { /* 979 */
     "set",
     "set_s_p_kc",
     "Parrot_set_s_p_kc",
@@ -9804,7 +12204,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 780 */
+  { /* 980 */
     "set",
     "set_p_p_k",
     "Parrot_set_p_p_k",
@@ -9815,7 +12215,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 781 */
+  { /* 981 */
     "set",
     "set_p_p_kc",
     "Parrot_set_p_p_kc",
@@ -9826,7 +12226,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 782 */
+  { /* 982 */
     "clone",
     "clone_p_p",
     "Parrot_clone_p_p",
@@ -9837,7 +12237,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 783 */
+  { /* 983 */
     "clone",
     "clone_p_p_p",
     "Parrot_clone_p_p_p",
@@ -9848,7 +12248,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 784 */
+  { /* 984 */
     "clone",
     "clone_p_p_pc",
     "Parrot_clone_p_p_pc",
@@ -9859,7 +12259,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 785 */
+  { /* 985 */
     "copy",
     "copy_p_p",
     "Parrot_copy_p_p",
@@ -9870,7 +12270,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 786 */
+  { /* 986 */
     "null",
     "null_s",
     "Parrot_null_s",
@@ -9881,7 +12281,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 787 */
+  { /* 987 */
     "null",
     "null_i",
     "Parrot_null_i",
@@ -9892,7 +12292,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 788 */
+  { /* 988 */
     "null",
     "null_p",
     "Parrot_null_p",
@@ -9903,7 +12303,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 789 */
+  { /* 989 */
     "null",
     "null_n",
     "Parrot_null_n",
@@ -9914,7 +12314,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 790 */
+  { /* 990 */
     "ord",
     "ord_i_s",
     "Parrot_ord_i_s",
@@ -9925,7 +12325,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 791 */
+  { /* 991 */
     "ord",
     "ord_i_sc",
     "Parrot_ord_i_sc",
@@ -9936,7 +12336,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 792 */
+  { /* 992 */
     "ord",
     "ord_i_s_i",
     "Parrot_ord_i_s_i",
@@ -9947,7 +12347,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 793 */
+  { /* 993 */
     "ord",
     "ord_i_sc_i",
     "Parrot_ord_i_sc_i",
@@ -9958,7 +12358,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 794 */
+  { /* 994 */
     "ord",
     "ord_i_s_ic",
     "Parrot_ord_i_s_ic",
@@ -9969,7 +12369,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 795 */
+  { /* 995 */
     "ord",
     "ord_i_sc_ic",
     "Parrot_ord_i_sc_ic",
@@ -9980,7 +12380,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 796 */
+  { /* 996 */
     "chr",
     "chr_s_i",
     "Parrot_chr_s_i",
@@ -9991,7 +12391,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 797 */
+  { /* 997 */
     "chr",
     "chr_s_ic",
     "Parrot_chr_s_ic",
@@ -10002,7 +12402,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 798 */
+  { /* 998 */
     "chopn",
     "chopn_s_s_i",
     "Parrot_chopn_s_s_i",
@@ -10013,7 +12413,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 799 */
+  { /* 999 */
     "chopn",
     "chopn_s_sc_i",
     "Parrot_chopn_s_sc_i",
@@ -10024,7 +12424,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 800 */
+  { /* 1000 */
     "chopn",
     "chopn_s_s_ic",
     "Parrot_chopn_s_s_ic",
@@ -10035,7 +12435,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 801 */
+  { /* 1001 */
     "chopn",
     "chopn_s_sc_ic",
     "Parrot_chopn_s_sc_ic",
@@ -10046,7 +12446,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 802 */
+  { /* 1002 */
     "concat",
     "concat_p_p",
     "Parrot_concat_p_p",
@@ -10057,7 +12457,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 803 */
+  { /* 1003 */
     "concat",
     "concat_p_s",
     "Parrot_concat_p_s",
@@ -10068,7 +12468,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 804 */
+  { /* 1004 */
     "concat",
     "concat_p_sc",
     "Parrot_concat_p_sc",
@@ -10079,7 +12479,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 805 */
+  { /* 1005 */
     "concat",
     "concat_s_s_s",
     "Parrot_concat_s_s_s",
@@ -10090,7 +12490,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 806 */
+  { /* 1006 */
     "concat",
     "concat_s_sc_s",
     "Parrot_concat_s_sc_s",
@@ -10101,7 +12501,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 807 */
+  { /* 1007 */
     "concat",
     "concat_s_s_sc",
     "Parrot_concat_s_s_sc",
@@ -10112,7 +12512,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 808 */
+  { /* 1008 */
     "concat",
     "concat_p_p_s",
     "Parrot_concat_p_p_s",
@@ -10123,7 +12523,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 809 */
+  { /* 1009 */
     "concat",
     "concat_p_p_sc",
     "Parrot_concat_p_p_sc",
@@ -10134,7 +12534,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 810 */
+  { /* 1010 */
     "concat",
     "concat_p_p_p",
     "Parrot_concat_p_p_p",
@@ -10145,7 +12545,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 811 */
+  { /* 1011 */
     "repeat",
     "repeat_s_s_i",
     "Parrot_repeat_s_s_i",
@@ -10156,7 +12556,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 812 */
+  { /* 1012 */
     "repeat",
     "repeat_s_sc_i",
     "Parrot_repeat_s_sc_i",
@@ -10167,7 +12567,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 813 */
+  { /* 1013 */
     "repeat",
     "repeat_s_s_ic",
     "Parrot_repeat_s_s_ic",
@@ -10178,7 +12578,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 814 */
+  { /* 1014 */
     "repeat",
     "repeat_s_sc_ic",
     "Parrot_repeat_s_sc_ic",
@@ -10189,7 +12589,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 815 */
+  { /* 1015 */
     "repeat",
     "repeat_p_p_i",
     "Parrot_repeat_p_p_i",
@@ -10200,7 +12600,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 816 */
+  { /* 1016 */
     "repeat",
     "repeat_p_p_ic",
     "Parrot_repeat_p_p_ic",
@@ -10211,7 +12611,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 817 */
+  { /* 1017 */
     "repeat",
     "repeat_p_p_p",
     "Parrot_repeat_p_p_p",
@@ -10222,7 +12622,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 818 */
+  { /* 1018 */
     "repeat",
     "repeat_p_i",
     "Parrot_repeat_p_i",
@@ -10233,7 +12633,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 819 */
+  { /* 1019 */
     "repeat",
     "repeat_p_ic",
     "Parrot_repeat_p_ic",
@@ -10244,7 +12644,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 820 */
+  { /* 1020 */
     "repeat",
     "repeat_p_p",
     "Parrot_repeat_p_p",
@@ -10255,7 +12655,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 821 */
+  { /* 1021 */
     "length",
     "length_i_s",
     "Parrot_length_i_s",
@@ -10266,7 +12666,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 822 */
+  { /* 1022 */
     "length",
     "length_i_sc",
     "Parrot_length_i_sc",
@@ -10277,7 +12677,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 823 */
+  { /* 1023 */
     "bytelength",
     "bytelength_i_s",
     "Parrot_bytelength_i_s",
@@ -10288,7 +12688,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 824 */
+  { /* 1024 */
     "bytelength",
     "bytelength_i_sc",
     "Parrot_bytelength_i_sc",
@@ -10299,7 +12699,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 825 */
+  { /* 1025 */
     "pin",
     "pin_s",
     "Parrot_pin_s",
@@ -10310,7 +12710,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 826 */
+  { /* 1026 */
     "unpin",
     "unpin_s",
     "Parrot_unpin_s",
@@ -10321,7 +12721,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 827 */
+  { /* 1027 */
     "substr",
     "substr_s_s_i",
     "Parrot_substr_s_s_i",
@@ -10332,7 +12732,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 828 */
+  { /* 1028 */
     "substr",
     "substr_s_sc_i",
     "Parrot_substr_s_sc_i",
@@ -10343,7 +12743,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 829 */
+  { /* 1029 */
     "substr",
     "substr_s_s_ic",
     "Parrot_substr_s_s_ic",
@@ -10354,7 +12754,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 830 */
+  { /* 1030 */
     "substr",
     "substr_s_sc_ic",
     "Parrot_substr_s_sc_ic",
@@ -10365,7 +12765,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 831 */
+  { /* 1031 */
     "substr",
     "substr_s_s_i_i",
     "Parrot_substr_s_s_i_i",
@@ -10376,7 +12776,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 832 */
+  { /* 1032 */
     "substr",
     "substr_s_sc_i_i",
     "Parrot_substr_s_sc_i_i",
@@ -10387,7 +12787,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 833 */
+  { /* 1033 */
     "substr",
     "substr_s_s_ic_i",
     "Parrot_substr_s_s_ic_i",
@@ -10398,7 +12798,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 834 */
+  { /* 1034 */
     "substr",
     "substr_s_sc_ic_i",
     "Parrot_substr_s_sc_ic_i",
@@ -10409,7 +12809,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 835 */
+  { /* 1035 */
     "substr",
     "substr_s_s_i_ic",
     "Parrot_substr_s_s_i_ic",
@@ -10420,7 +12820,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 836 */
+  { /* 1036 */
     "substr",
     "substr_s_sc_i_ic",
     "Parrot_substr_s_sc_i_ic",
@@ -10431,7 +12831,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 837 */
+  { /* 1037 */
     "substr",
     "substr_s_s_ic_ic",
     "Parrot_substr_s_s_ic_ic",
@@ -10442,7 +12842,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 838 */
+  { /* 1038 */
     "substr",
     "substr_s_sc_ic_ic",
     "Parrot_substr_s_sc_ic_ic",
@@ -10453,7 +12853,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 839 */
+  { /* 1039 */
     "substr",
     "substr_s_p_i_i",
     "Parrot_substr_s_p_i_i",
@@ -10464,7 +12864,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 840 */
+  { /* 1040 */
     "substr",
     "substr_s_p_ic_i",
     "Parrot_substr_s_p_ic_i",
@@ -10475,7 +12875,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 841 */
+  { /* 1041 */
     "substr",
     "substr_s_p_i_ic",
     "Parrot_substr_s_p_i_ic",
@@ -10486,7 +12886,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 842 */
+  { /* 1042 */
     "substr",
     "substr_s_p_ic_ic",
     "Parrot_substr_s_p_ic_ic",
@@ -10497,7 +12897,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 843 */
+  { /* 1043 */
     "replace",
     "replace_s_s_i_i_s",
     "Parrot_replace_s_s_i_i_s",
@@ -10508,7 +12908,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 844 */
+  { /* 1044 */
     "replace",
     "replace_s_sc_i_i_s",
     "Parrot_replace_s_sc_i_i_s",
@@ -10519,7 +12919,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 845 */
+  { /* 1045 */
     "replace",
     "replace_s_s_ic_i_s",
     "Parrot_replace_s_s_ic_i_s",
@@ -10530,7 +12930,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 846 */
+  { /* 1046 */
     "replace",
     "replace_s_sc_ic_i_s",
     "Parrot_replace_s_sc_ic_i_s",
@@ -10541,7 +12941,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 847 */
+  { /* 1047 */
     "replace",
     "replace_s_s_i_ic_s",
     "Parrot_replace_s_s_i_ic_s",
@@ -10552,7 +12952,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 848 */
+  { /* 1048 */
     "replace",
     "replace_s_sc_i_ic_s",
     "Parrot_replace_s_sc_i_ic_s",
@@ -10563,7 +12963,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 849 */
+  { /* 1049 */
     "replace",
     "replace_s_s_ic_ic_s",
     "Parrot_replace_s_s_ic_ic_s",
@@ -10574,7 +12974,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 850 */
+  { /* 1050 */
     "replace",
     "replace_s_sc_ic_ic_s",
     "Parrot_replace_s_sc_ic_ic_s",
@@ -10585,7 +12985,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 851 */
+  { /* 1051 */
     "replace",
     "replace_s_s_i_i_sc",
     "Parrot_replace_s_s_i_i_sc",
@@ -10596,7 +12996,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 852 */
+  { /* 1052 */
     "replace",
     "replace_s_sc_i_i_sc",
     "Parrot_replace_s_sc_i_i_sc",
@@ -10607,7 +13007,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 853 */
+  { /* 1053 */
     "replace",
     "replace_s_s_ic_i_sc",
     "Parrot_replace_s_s_ic_i_sc",
@@ -10618,7 +13018,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 854 */
+  { /* 1054 */
     "replace",
     "replace_s_sc_ic_i_sc",
     "Parrot_replace_s_sc_ic_i_sc",
@@ -10629,7 +13029,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 855 */
+  { /* 1055 */
     "replace",
     "replace_s_s_i_ic_sc",
     "Parrot_replace_s_s_i_ic_sc",
@@ -10640,7 +13040,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 856 */
+  { /* 1056 */
     "replace",
     "replace_s_sc_i_ic_sc",
     "Parrot_replace_s_sc_i_ic_sc",
@@ -10651,7 +13051,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 857 */
+  { /* 1057 */
     "replace",
     "replace_s_s_ic_ic_sc",
     "Parrot_replace_s_s_ic_ic_sc",
@@ -10662,7 +13062,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 858 */
+  { /* 1058 */
     "replace",
     "replace_s_sc_ic_ic_sc",
     "Parrot_replace_s_sc_ic_ic_sc",
@@ -10673,7 +13073,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 859 */
+  { /* 1059 */
     "index",
     "index_i_s_s",
     "Parrot_index_i_s_s",
@@ -10684,7 +13084,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 860 */
+  { /* 1060 */
     "index",
     "index_i_sc_s",
     "Parrot_index_i_sc_s",
@@ -10695,7 +13095,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 861 */
+  { /* 1061 */
     "index",
     "index_i_s_sc",
     "Parrot_index_i_s_sc",
@@ -10706,7 +13106,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 862 */
+  { /* 1062 */
     "index",
     "index_i_sc_sc",
     "Parrot_index_i_sc_sc",
@@ -10717,7 +13117,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 863 */
+  { /* 1063 */
     "index",
     "index_i_s_s_i",
     "Parrot_index_i_s_s_i",
@@ -10728,7 +13128,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 864 */
+  { /* 1064 */
     "index",
     "index_i_sc_s_i",
     "Parrot_index_i_sc_s_i",
@@ -10739,7 +13139,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 865 */
+  { /* 1065 */
     "index",
     "index_i_s_sc_i",
     "Parrot_index_i_s_sc_i",
@@ -10750,7 +13150,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 866 */
+  { /* 1066 */
     "index",
     "index_i_sc_sc_i",
     "Parrot_index_i_sc_sc_i",
@@ -10761,7 +13161,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 867 */
+  { /* 1067 */
     "index",
     "index_i_s_s_ic",
     "Parrot_index_i_s_s_ic",
@@ -10772,7 +13172,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 868 */
+  { /* 1068 */
     "index",
     "index_i_sc_s_ic",
     "Parrot_index_i_sc_s_ic",
@@ -10783,7 +13183,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 869 */
+  { /* 1069 */
     "index",
     "index_i_s_sc_ic",
     "Parrot_index_i_s_sc_ic",
@@ -10794,7 +13194,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 870 */
+  { /* 1070 */
     "index",
     "index_i_sc_sc_ic",
     "Parrot_index_i_sc_sc_ic",
@@ -10805,7 +13205,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 871 */
+  { /* 1071 */
     "rindex",
     "rindex_i_s_s",
     "Parrot_rindex_i_s_s",
@@ -10816,7 +13216,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 872 */
+  { /* 1072 */
     "rindex",
     "rindex_i_sc_s",
     "Parrot_rindex_i_sc_s",
@@ -10827,7 +13227,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 873 */
+  { /* 1073 */
     "rindex",
     "rindex_i_s_sc",
     "Parrot_rindex_i_s_sc",
@@ -10838,7 +13238,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 874 */
+  { /* 1074 */
     "rindex",
     "rindex_i_sc_sc",
     "Parrot_rindex_i_sc_sc",
@@ -10849,7 +13249,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 875 */
+  { /* 1075 */
     "rindex",
     "rindex_i_s_s_i",
     "Parrot_rindex_i_s_s_i",
@@ -10860,7 +13260,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 876 */
+  { /* 1076 */
     "rindex",
     "rindex_i_sc_s_i",
     "Parrot_rindex_i_sc_s_i",
@@ -10871,7 +13271,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 877 */
+  { /* 1077 */
     "rindex",
     "rindex_i_s_sc_i",
     "Parrot_rindex_i_s_sc_i",
@@ -10882,7 +13282,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 878 */
+  { /* 1078 */
     "rindex",
     "rindex_i_sc_sc_i",
     "Parrot_rindex_i_sc_sc_i",
@@ -10893,7 +13293,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 879 */
+  { /* 1079 */
     "rindex",
     "rindex_i_s_s_ic",
     "Parrot_rindex_i_s_s_ic",
@@ -10904,7 +13304,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 880 */
+  { /* 1080 */
     "rindex",
     "rindex_i_sc_s_ic",
     "Parrot_rindex_i_sc_s_ic",
@@ -10915,7 +13315,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 881 */
+  { /* 1081 */
     "rindex",
     "rindex_i_s_sc_ic",
     "Parrot_rindex_i_s_sc_ic",
@@ -10926,7 +13326,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 882 */
+  { /* 1082 */
     "rindex",
     "rindex_i_sc_sc_ic",
     "Parrot_rindex_i_sc_sc_ic",
@@ -10937,7 +13337,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 883 */
+  { /* 1083 */
     "sprintf",
     "sprintf_s_s_p",
     "Parrot_sprintf_s_s_p",
@@ -10948,7 +13348,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 884 */
+  { /* 1084 */
     "sprintf",
     "sprintf_s_sc_p",
     "Parrot_sprintf_s_sc_p",
@@ -10959,7 +13359,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 885 */
+  { /* 1085 */
     "sprintf",
     "sprintf_p_p_p",
     "Parrot_sprintf_p_p_p",
@@ -10970,7 +13370,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 886 */
+  { /* 1086 */
     "new",
     "new_s",
     "Parrot_new_s",
@@ -10981,7 +13381,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 887 */
+  { /* 1087 */
     "stringinfo",
     "stringinfo_i_s_i",
     "Parrot_stringinfo_i_s_i",
@@ -10992,7 +13392,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 888 */
+  { /* 1088 */
     "stringinfo",
     "stringinfo_i_sc_i",
     "Parrot_stringinfo_i_sc_i",
@@ -11003,7 +13403,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 889 */
+  { /* 1089 */
     "stringinfo",
     "stringinfo_i_s_ic",
     "Parrot_stringinfo_i_s_ic",
@@ -11014,7 +13414,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 890 */
+  { /* 1090 */
     "stringinfo",
     "stringinfo_i_sc_ic",
     "Parrot_stringinfo_i_sc_ic",
@@ -11025,7 +13425,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 891 */
+  { /* 1091 */
     "upcase",
     "upcase_s_s",
     "Parrot_upcase_s_s",
@@ -11036,7 +13436,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 892 */
+  { /* 1092 */
     "upcase",
     "upcase_s_sc",
     "Parrot_upcase_s_sc",
@@ -11047,7 +13447,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 893 */
+  { /* 1093 */
     "downcase",
     "downcase_s_s",
     "Parrot_downcase_s_s",
@@ -11058,7 +13458,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 894 */
+  { /* 1094 */
     "downcase",
     "downcase_s_sc",
     "Parrot_downcase_s_sc",
@@ -11069,7 +13469,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 895 */
+  { /* 1095 */
     "titlecase",
     "titlecase_s_s",
     "Parrot_titlecase_s_s",
@@ -11080,7 +13480,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 896 */
+  { /* 1096 */
     "titlecase",
     "titlecase_s_sc",
     "Parrot_titlecase_s_sc",
@@ -11091,7 +13491,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 897 */
+  { /* 1097 */
     "join",
     "join_s_s_p",
     "Parrot_join_s_s_p",
@@ -11102,7 +13502,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 898 */
+  { /* 1098 */
     "join",
     "join_s_sc_p",
     "Parrot_join_s_sc_p",
@@ -11113,7 +13513,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 899 */
+  { /* 1099 */
     "split",
     "split_p_s_s",
     "Parrot_split_p_s_s",
@@ -11124,7 +13524,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 900 */
+  { /* 1100 */
     "split",
     "split_p_sc_s",
     "Parrot_split_p_sc_s",
@@ -11135,7 +13535,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 901 */
+  { /* 1101 */
     "split",
     "split_p_s_sc",
     "Parrot_split_p_s_sc",
@@ -11146,7 +13546,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 902 */
+  { /* 1102 */
     "split",
     "split_p_sc_sc",
     "Parrot_split_p_sc_sc",
@@ -11157,7 +13557,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 903 */
+  { /* 1103 */
     "encoding",
     "encoding_i_s",
     "Parrot_encoding_i_s",
@@ -11168,7 +13568,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 904 */
+  { /* 1104 */
     "encoding",
     "encoding_i_sc",
     "Parrot_encoding_i_sc",
@@ -11179,7 +13579,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 905 */
+  { /* 1105 */
     "encodingname",
     "encodingname_s_i",
     "Parrot_encodingname_s_i",
@@ -11190,7 +13590,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 906 */
+  { /* 1106 */
     "encodingname",
     "encodingname_s_ic",
     "Parrot_encodingname_s_ic",
@@ -11201,7 +13601,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 907 */
+  { /* 1107 */
     "find_encoding",
     "find_encoding_i_s",
     "Parrot_find_encoding_i_s",
@@ -11212,7 +13612,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 908 */
+  { /* 1108 */
     "find_encoding",
     "find_encoding_i_sc",
     "Parrot_find_encoding_i_sc",
@@ -11223,7 +13623,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 909 */
+  { /* 1109 */
     "trans_encoding",
     "trans_encoding_s_s_i",
     "Parrot_trans_encoding_s_s_i",
@@ -11234,7 +13634,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 910 */
+  { /* 1110 */
     "trans_encoding",
     "trans_encoding_s_sc_i",
     "Parrot_trans_encoding_s_sc_i",
@@ -11245,7 +13645,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 911 */
+  { /* 1111 */
     "trans_encoding",
     "trans_encoding_s_s_ic",
     "Parrot_trans_encoding_s_s_ic",
@@ -11256,7 +13656,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 912 */
+  { /* 1112 */
     "trans_encoding",
     "trans_encoding_s_sc_ic",
     "Parrot_trans_encoding_s_sc_ic",
@@ -11267,7 +13667,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 913 */
+  { /* 1113 */
     "is_cclass",
     "is_cclass_i_i_s_i",
     "Parrot_is_cclass_i_i_s_i",
@@ -11278,7 +13678,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 914 */
+  { /* 1114 */
     "is_cclass",
     "is_cclass_i_ic_s_i",
     "Parrot_is_cclass_i_ic_s_i",
@@ -11289,7 +13689,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 915 */
+  { /* 1115 */
     "is_cclass",
     "is_cclass_i_i_sc_i",
     "Parrot_is_cclass_i_i_sc_i",
@@ -11300,7 +13700,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 916 */
+  { /* 1116 */
     "is_cclass",
     "is_cclass_i_ic_sc_i",
     "Parrot_is_cclass_i_ic_sc_i",
@@ -11311,7 +13711,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 917 */
+  { /* 1117 */
     "is_cclass",
     "is_cclass_i_i_s_ic",
     "Parrot_is_cclass_i_i_s_ic",
@@ -11322,7 +13722,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 918 */
+  { /* 1118 */
     "is_cclass",
     "is_cclass_i_ic_s_ic",
     "Parrot_is_cclass_i_ic_s_ic",
@@ -11333,7 +13733,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 919 */
+  { /* 1119 */
     "is_cclass",
     "is_cclass_i_i_sc_ic",
     "Parrot_is_cclass_i_i_sc_ic",
@@ -11344,7 +13744,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 920 */
+  { /* 1120 */
     "is_cclass",
     "is_cclass_i_ic_sc_ic",
     "Parrot_is_cclass_i_ic_sc_ic",
@@ -11355,7 +13755,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 921 */
+  { /* 1121 */
     "find_cclass",
     "find_cclass_i_i_s_i_i",
     "Parrot_find_cclass_i_i_s_i_i",
@@ -11366,7 +13766,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 922 */
+  { /* 1122 */
     "find_cclass",
     "find_cclass_i_ic_s_i_i",
     "Parrot_find_cclass_i_ic_s_i_i",
@@ -11377,7 +13777,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 923 */
+  { /* 1123 */
     "find_cclass",
     "find_cclass_i_i_sc_i_i",
     "Parrot_find_cclass_i_i_sc_i_i",
@@ -11388,7 +13788,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 924 */
+  { /* 1124 */
     "find_cclass",
     "find_cclass_i_ic_sc_i_i",
     "Parrot_find_cclass_i_ic_sc_i_i",
@@ -11399,7 +13799,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 925 */
+  { /* 1125 */
     "find_cclass",
     "find_cclass_i_i_s_ic_i",
     "Parrot_find_cclass_i_i_s_ic_i",
@@ -11410,7 +13810,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 926 */
+  { /* 1126 */
     "find_cclass",
     "find_cclass_i_ic_s_ic_i",
     "Parrot_find_cclass_i_ic_s_ic_i",
@@ -11421,7 +13821,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 927 */
+  { /* 1127 */
     "find_cclass",
     "find_cclass_i_i_sc_ic_i",
     "Parrot_find_cclass_i_i_sc_ic_i",
@@ -11432,7 +13832,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 928 */
+  { /* 1128 */
     "find_cclass",
     "find_cclass_i_ic_sc_ic_i",
     "Parrot_find_cclass_i_ic_sc_ic_i",
@@ -11443,7 +13843,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 929 */
+  { /* 1129 */
     "find_cclass",
     "find_cclass_i_i_s_i_ic",
     "Parrot_find_cclass_i_i_s_i_ic",
@@ -11454,7 +13854,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 930 */
+  { /* 1130 */
     "find_cclass",
     "find_cclass_i_ic_s_i_ic",
     "Parrot_find_cclass_i_ic_s_i_ic",
@@ -11465,7 +13865,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 931 */
+  { /* 1131 */
     "find_cclass",
     "find_cclass_i_i_sc_i_ic",
     "Parrot_find_cclass_i_i_sc_i_ic",
@@ -11476,7 +13876,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 932 */
+  { /* 1132 */
     "find_cclass",
     "find_cclass_i_ic_sc_i_ic",
     "Parrot_find_cclass_i_ic_sc_i_ic",
@@ -11487,7 +13887,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 933 */
+  { /* 1133 */
     "find_cclass",
     "find_cclass_i_i_s_ic_ic",
     "Parrot_find_cclass_i_i_s_ic_ic",
@@ -11498,7 +13898,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 934 */
+  { /* 1134 */
     "find_cclass",
     "find_cclass_i_ic_s_ic_ic",
     "Parrot_find_cclass_i_ic_s_ic_ic",
@@ -11509,7 +13909,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 935 */
+  { /* 1135 */
     "find_cclass",
     "find_cclass_i_i_sc_ic_ic",
     "Parrot_find_cclass_i_i_sc_ic_ic",
@@ -11520,7 +13920,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 936 */
+  { /* 1136 */
     "find_cclass",
     "find_cclass_i_ic_sc_ic_ic",
     "Parrot_find_cclass_i_ic_sc_ic_ic",
@@ -11531,7 +13931,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 937 */
+  { /* 1137 */
     "find_not_cclass",
     "find_not_cclass_i_i_s_i_i",
     "Parrot_find_not_cclass_i_i_s_i_i",
@@ -11542,7 +13942,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 938 */
+  { /* 1138 */
     "find_not_cclass",
     "find_not_cclass_i_ic_s_i_i",
     "Parrot_find_not_cclass_i_ic_s_i_i",
@@ -11553,7 +13953,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 939 */
+  { /* 1139 */
     "find_not_cclass",
     "find_not_cclass_i_i_sc_i_i",
     "Parrot_find_not_cclass_i_i_sc_i_i",
@@ -11564,7 +13964,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 940 */
+  { /* 1140 */
     "find_not_cclass",
     "find_not_cclass_i_ic_sc_i_i",
     "Parrot_find_not_cclass_i_ic_sc_i_i",
@@ -11575,7 +13975,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 941 */
+  { /* 1141 */
     "find_not_cclass",
     "find_not_cclass_i_i_s_ic_i",
     "Parrot_find_not_cclass_i_i_s_ic_i",
@@ -11586,7 +13986,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 942 */
+  { /* 1142 */
     "find_not_cclass",
     "find_not_cclass_i_ic_s_ic_i",
     "Parrot_find_not_cclass_i_ic_s_ic_i",
@@ -11597,7 +13997,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 943 */
+  { /* 1143 */
     "find_not_cclass",
     "find_not_cclass_i_i_sc_ic_i",
     "Parrot_find_not_cclass_i_i_sc_ic_i",
@@ -11608,7 +14008,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 944 */
+  { /* 1144 */
     "find_not_cclass",
     "find_not_cclass_i_ic_sc_ic_i",
     "Parrot_find_not_cclass_i_ic_sc_ic_i",
@@ -11619,7 +14019,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 945 */
+  { /* 1145 */
     "find_not_cclass",
     "find_not_cclass_i_i_s_i_ic",
     "Parrot_find_not_cclass_i_i_s_i_ic",
@@ -11630,7 +14030,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 946 */
+  { /* 1146 */
     "find_not_cclass",
     "find_not_cclass_i_ic_s_i_ic",
     "Parrot_find_not_cclass_i_ic_s_i_ic",
@@ -11641,7 +14041,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 947 */
+  { /* 1147 */
     "find_not_cclass",
     "find_not_cclass_i_i_sc_i_ic",
     "Parrot_find_not_cclass_i_i_sc_i_ic",
@@ -11652,7 +14052,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 948 */
+  { /* 1148 */
     "find_not_cclass",
     "find_not_cclass_i_ic_sc_i_ic",
     "Parrot_find_not_cclass_i_ic_sc_i_ic",
@@ -11663,7 +14063,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 949 */
+  { /* 1149 */
     "find_not_cclass",
     "find_not_cclass_i_i_s_ic_ic",
     "Parrot_find_not_cclass_i_i_s_ic_ic",
@@ -11674,7 +14074,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 950 */
+  { /* 1150 */
     "find_not_cclass",
     "find_not_cclass_i_ic_s_ic_ic",
     "Parrot_find_not_cclass_i_ic_s_ic_ic",
@@ -11685,7 +14085,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 951 */
+  { /* 1151 */
     "find_not_cclass",
     "find_not_cclass_i_i_sc_ic_ic",
     "Parrot_find_not_cclass_i_i_sc_ic_ic",
@@ -11696,7 +14096,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 952 */
+  { /* 1152 */
     "find_not_cclass",
     "find_not_cclass_i_ic_sc_ic_ic",
     "Parrot_find_not_cclass_i_ic_sc_ic_ic",
@@ -11707,7 +14107,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 953 */
+  { /* 1153 */
     "escape",
     "escape_s_s",
     "Parrot_escape_s_s",
@@ -11718,7 +14118,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 954 */
+  { /* 1154 */
     "compose",
     "compose_s_s",
     "Parrot_compose_s_s",
@@ -11729,7 +14129,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 955 */
+  { /* 1155 */
     "compose",
     "compose_s_sc",
     "Parrot_compose_s_sc",
@@ -11740,7 +14140,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 956 */
+  { /* 1156 */
     "find_codepoint",
     "find_codepoint_i_s",
     "Parrot_find_codepoint_i_s",
@@ -11751,7 +14151,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 957 */
+  { /* 1157 */
     "find_codepoint",
     "find_codepoint_i_sc",
     "Parrot_find_codepoint_i_sc",
@@ -11762,7 +14162,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 958 */
+  { /* 1158 */
     "spawnw",
     "spawnw_i_s",
     "Parrot_spawnw_i_s",
@@ -11773,7 +14173,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 959 */
+  { /* 1159 */
     "spawnw",
     "spawnw_i_sc",
     "Parrot_spawnw_i_sc",
@@ -11784,7 +14184,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 960 */
+  { /* 1160 */
     "spawnw",
     "spawnw_i_p",
     "Parrot_spawnw_i_p",
@@ -11795,7 +14195,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 961 */
+  { /* 1161 */
     "err",
     "err_i",
     "Parrot_err_i",
@@ -11806,7 +14206,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 962 */
+  { /* 1162 */
     "err",
     "err_s",
     "Parrot_err_s",
@@ -11817,7 +14217,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 963 */
+  { /* 1163 */
     "err",
     "err_s_i",
     "Parrot_err_s_i",
@@ -11828,7 +14228,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 964 */
+  { /* 1164 */
     "err",
     "err_s_ic",
     "Parrot_err_s_ic",
@@ -11839,7 +14239,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 965 */
+  { /* 1165 */
     "time",
     "time_i",
     "Parrot_time_i",
@@ -11850,7 +14250,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 966 */
+  { /* 1166 */
     "time",
     "time_n",
     "Parrot_time_n",
@@ -11861,7 +14261,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 967 */
+  { /* 1167 */
     "sleep",
     "sleep_i",
     "Parrot_sleep_i",
@@ -11872,7 +14272,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 968 */
+  { /* 1168 */
     "sleep",
     "sleep_ic",
     "Parrot_sleep_ic",
@@ -11883,7 +14283,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 969 */
+  { /* 1169 */
     "sleep",
     "sleep_n",
     "Parrot_sleep_n",
@@ -11894,7 +14294,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 970 */
+  { /* 1170 */
     "sleep",
     "sleep_nc",
     "Parrot_sleep_nc",
@@ -11905,7 +14305,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 971 */
+  { /* 1171 */
     "store_lex",
     "store_lex_s_p",
     "Parrot_store_lex_s_p",
@@ -11916,7 +14316,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 972 */
+  { /* 1172 */
     "store_lex",
     "store_lex_sc_p",
     "Parrot_store_lex_sc_p",
@@ -11927,7 +14327,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 973 */
+  { /* 1173 */
     "store_lex",
     "store_lex_s_s",
     "Parrot_store_lex_s_s",
@@ -11938,7 +14338,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 974 */
+  { /* 1174 */
     "store_lex",
     "store_lex_sc_s",
     "Parrot_store_lex_sc_s",
@@ -11949,7 +14349,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 975 */
+  { /* 1175 */
     "store_lex",
     "store_lex_s_sc",
     "Parrot_store_lex_s_sc",
@@ -11960,7 +14360,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 976 */
+  { /* 1176 */
     "store_lex",
     "store_lex_sc_sc",
     "Parrot_store_lex_sc_sc",
@@ -11971,7 +14371,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 977 */
+  { /* 1177 */
     "store_lex",
     "store_lex_s_i",
     "Parrot_store_lex_s_i",
@@ -11982,7 +14382,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 978 */
+  { /* 1178 */
     "store_lex",
     "store_lex_sc_i",
     "Parrot_store_lex_sc_i",
@@ -11993,7 +14393,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 979 */
+  { /* 1179 */
     "store_lex",
     "store_lex_s_ic",
     "Parrot_store_lex_s_ic",
@@ -12004,7 +14404,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 980 */
+  { /* 1180 */
     "store_lex",
     "store_lex_sc_ic",
     "Parrot_store_lex_sc_ic",
@@ -12015,7 +14415,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 981 */
+  { /* 1181 */
     "store_lex",
     "store_lex_s_n",
     "Parrot_store_lex_s_n",
@@ -12026,7 +14426,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 982 */
+  { /* 1182 */
     "store_lex",
     "store_lex_sc_n",
     "Parrot_store_lex_sc_n",
@@ -12037,7 +14437,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 983 */
+  { /* 1183 */
     "store_lex",
     "store_lex_s_nc",
     "Parrot_store_lex_s_nc",
@@ -12048,7 +14448,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 984 */
+  { /* 1184 */
     "store_lex",
     "store_lex_sc_nc",
     "Parrot_store_lex_sc_nc",
@@ -12059,7 +14459,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 985 */
+  { /* 1185 */
     "store_dynamic_lex",
     "store_dynamic_lex_s_p",
     "Parrot_store_dynamic_lex_s_p",
@@ -12070,7 +14470,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 986 */
+  { /* 1186 */
     "store_dynamic_lex",
     "store_dynamic_lex_sc_p",
     "Parrot_store_dynamic_lex_sc_p",
@@ -12081,7 +14481,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 987 */
+  { /* 1187 */
     "find_lex",
     "find_lex_p_s",
     "Parrot_find_lex_p_s",
@@ -12092,7 +14492,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 988 */
+  { /* 1188 */
     "find_lex",
     "find_lex_p_sc",
     "Parrot_find_lex_p_sc",
@@ -12103,7 +14503,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 989 */
+  { /* 1189 */
     "find_lex",
     "find_lex_s_s",
     "Parrot_find_lex_s_s",
@@ -12114,7 +14514,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 990 */
+  { /* 1190 */
     "find_lex",
     "find_lex_s_sc",
     "Parrot_find_lex_s_sc",
@@ -12125,7 +14525,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 991 */
+  { /* 1191 */
     "find_lex",
     "find_lex_i_s",
     "Parrot_find_lex_i_s",
@@ -12136,7 +14536,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 992 */
+  { /* 1192 */
     "find_lex",
     "find_lex_i_sc",
     "Parrot_find_lex_i_sc",
@@ -12147,7 +14547,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 993 */
+  { /* 1193 */
     "find_lex",
     "find_lex_n_s",
     "Parrot_find_lex_n_s",
@@ -12158,7 +14558,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 994 */
+  { /* 1194 */
     "find_lex",
     "find_lex_n_sc",
     "Parrot_find_lex_n_sc",
@@ -12169,7 +14569,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 995 */
+  { /* 1195 */
     "find_dynamic_lex",
     "find_dynamic_lex_p_s",
     "Parrot_find_dynamic_lex_p_s",
@@ -12180,7 +14580,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 996 */
+  { /* 1196 */
     "find_dynamic_lex",
     "find_dynamic_lex_p_sc",
     "Parrot_find_dynamic_lex_p_sc",
@@ -12191,7 +14591,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 997 */
+  { /* 1197 */
     "find_caller_lex",
     "find_caller_lex_p_s",
     "Parrot_find_caller_lex_p_s",
@@ -12202,7 +14602,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 998 */
+  { /* 1198 */
     "find_caller_lex",
     "find_caller_lex_p_sc",
     "Parrot_find_caller_lex_p_sc",
@@ -12213,7 +14613,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 999 */
+  { /* 1199 */
     "get_namespace",
     "get_namespace_p",
     "Parrot_get_namespace_p",
@@ -12224,7 +14624,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 1000 */
+  { /* 1200 */
     "get_namespace",
     "get_namespace_p_p",
     "Parrot_get_namespace_p_p",
@@ -12235,7 +14635,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1001 */
+  { /* 1201 */
     "get_namespace",
     "get_namespace_p_pc",
     "Parrot_get_namespace_p_pc",
@@ -12246,7 +14646,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1002 */
+  { /* 1202 */
     "get_hll_namespace",
     "get_hll_namespace_p",
     "Parrot_get_hll_namespace_p",
@@ -12257,7 +14657,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 1003 */
+  { /* 1203 */
     "get_hll_namespace",
     "get_hll_namespace_p_p",
     "Parrot_get_hll_namespace_p_p",
@@ -12268,7 +14668,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1004 */
+  { /* 1204 */
     "get_hll_namespace",
     "get_hll_namespace_p_pc",
     "Parrot_get_hll_namespace_p_pc",
@@ -12279,7 +14679,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1005 */
+  { /* 1205 */
     "get_root_namespace",
     "get_root_namespace_p",
     "Parrot_get_root_namespace_p",
@@ -12290,7 +14690,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 1006 */
+  { /* 1206 */
     "get_root_namespace",
     "get_root_namespace_p_p",
     "Parrot_get_root_namespace_p_p",
@@ -12301,7 +14701,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1007 */
+  { /* 1207 */
     "get_root_namespace",
     "get_root_namespace_p_pc",
     "Parrot_get_root_namespace_p_pc",
@@ -12312,7 +14712,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1008 */
+  { /* 1208 */
     "get_global",
     "get_global_p_s",
     "Parrot_get_global_p_s",
@@ -12323,7 +14723,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1009 */
+  { /* 1209 */
     "get_global",
     "get_global_p_sc",
     "Parrot_get_global_p_sc",
@@ -12334,7 +14734,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1010 */
+  { /* 1210 */
     "get_global",
     "get_global_p_p_s",
     "Parrot_get_global_p_p_s",
@@ -12345,7 +14745,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1011 */
+  { /* 1211 */
     "get_global",
     "get_global_p_pc_s",
     "Parrot_get_global_p_pc_s",
@@ -12356,7 +14756,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1012 */
+  { /* 1212 */
     "get_global",
     "get_global_p_p_sc",
     "Parrot_get_global_p_p_sc",
@@ -12367,7 +14767,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1013 */
+  { /* 1213 */
     "get_global",
     "get_global_p_pc_sc",
     "Parrot_get_global_p_pc_sc",
@@ -12378,7 +14778,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1014 */
+  { /* 1214 */
     "get_hll_global",
     "get_hll_global_p_s",
     "Parrot_get_hll_global_p_s",
@@ -12389,7 +14789,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1015 */
+  { /* 1215 */
     "get_hll_global",
     "get_hll_global_p_sc",
     "Parrot_get_hll_global_p_sc",
@@ -12400,7 +14800,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1016 */
+  { /* 1216 */
     "get_hll_global",
     "get_hll_global_p_p_s",
     "Parrot_get_hll_global_p_p_s",
@@ -12411,7 +14811,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1017 */
+  { /* 1217 */
     "get_hll_global",
     "get_hll_global_p_pc_s",
     "Parrot_get_hll_global_p_pc_s",
@@ -12422,7 +14822,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1018 */
+  { /* 1218 */
     "get_hll_global",
     "get_hll_global_p_p_sc",
     "Parrot_get_hll_global_p_p_sc",
@@ -12433,7 +14833,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1019 */
+  { /* 1219 */
     "get_hll_global",
     "get_hll_global_p_pc_sc",
     "Parrot_get_hll_global_p_pc_sc",
@@ -12444,7 +14844,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1020 */
+  { /* 1220 */
     "get_root_global",
     "get_root_global_p_s",
     "Parrot_get_root_global_p_s",
@@ -12455,7 +14855,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1021 */
+  { /* 1221 */
     "get_root_global",
     "get_root_global_p_sc",
     "Parrot_get_root_global_p_sc",
@@ -12466,7 +14866,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1022 */
+  { /* 1222 */
     "get_root_global",
     "get_root_global_p_p_s",
     "Parrot_get_root_global_p_p_s",
@@ -12477,7 +14877,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1023 */
+  { /* 1223 */
     "get_root_global",
     "get_root_global_p_pc_s",
     "Parrot_get_root_global_p_pc_s",
@@ -12488,7 +14888,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1024 */
+  { /* 1224 */
     "get_root_global",
     "get_root_global_p_p_sc",
     "Parrot_get_root_global_p_p_sc",
@@ -12499,7 +14899,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1025 */
+  { /* 1225 */
     "get_root_global",
     "get_root_global_p_pc_sc",
     "Parrot_get_root_global_p_pc_sc",
@@ -12510,7 +14910,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1026 */
+  { /* 1226 */
     "set_global",
     "set_global_s_p",
     "Parrot_set_global_s_p",
@@ -12521,7 +14921,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1027 */
+  { /* 1227 */
     "set_global",
     "set_global_sc_p",
     "Parrot_set_global_sc_p",
@@ -12532,7 +14932,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1028 */
+  { /* 1228 */
     "set_global",
     "set_global_p_s_p",
     "Parrot_set_global_p_s_p",
@@ -12543,7 +14943,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1029 */
+  { /* 1229 */
     "set_global",
     "set_global_pc_s_p",
     "Parrot_set_global_pc_s_p",
@@ -12554,7 +14954,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1030 */
+  { /* 1230 */
     "set_global",
     "set_global_p_sc_p",
     "Parrot_set_global_p_sc_p",
@@ -12565,7 +14965,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1031 */
+  { /* 1231 */
     "set_global",
     "set_global_pc_sc_p",
     "Parrot_set_global_pc_sc_p",
@@ -12576,7 +14976,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1032 */
+  { /* 1232 */
     "set_hll_global",
     "set_hll_global_s_p",
     "Parrot_set_hll_global_s_p",
@@ -12587,7 +14987,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1033 */
+  { /* 1233 */
     "set_hll_global",
     "set_hll_global_sc_p",
     "Parrot_set_hll_global_sc_p",
@@ -12598,7 +14998,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1034 */
+  { /* 1234 */
     "set_hll_global",
     "set_hll_global_p_s_p",
     "Parrot_set_hll_global_p_s_p",
@@ -12609,7 +15009,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1035 */
+  { /* 1235 */
     "set_hll_global",
     "set_hll_global_pc_s_p",
     "Parrot_set_hll_global_pc_s_p",
@@ -12620,7 +15020,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1036 */
+  { /* 1236 */
     "set_hll_global",
     "set_hll_global_p_sc_p",
     "Parrot_set_hll_global_p_sc_p",
@@ -12631,7 +15031,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1037 */
+  { /* 1237 */
     "set_hll_global",
     "set_hll_global_pc_sc_p",
     "Parrot_set_hll_global_pc_sc_p",
@@ -12642,7 +15042,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1038 */
+  { /* 1238 */
     "set_root_global",
     "set_root_global_s_p",
     "Parrot_set_root_global_s_p",
@@ -12653,7 +15053,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1039 */
+  { /* 1239 */
     "set_root_global",
     "set_root_global_sc_p",
     "Parrot_set_root_global_sc_p",
@@ -12664,7 +15064,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1040 */
+  { /* 1240 */
     "set_root_global",
     "set_root_global_p_s_p",
     "Parrot_set_root_global_p_s_p",
@@ -12675,7 +15075,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1041 */
+  { /* 1241 */
     "set_root_global",
     "set_root_global_pc_s_p",
     "Parrot_set_root_global_pc_s_p",
@@ -12686,7 +15086,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1042 */
+  { /* 1242 */
     "set_root_global",
     "set_root_global_p_sc_p",
     "Parrot_set_root_global_p_sc_p",
@@ -12697,7 +15097,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1043 */
+  { /* 1243 */
     "set_root_global",
     "set_root_global_pc_sc_p",
     "Parrot_set_root_global_pc_sc_p",
@@ -12708,7 +15108,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1044 */
+  { /* 1244 */
     "find_name",
     "find_name_p_s",
     "Parrot_find_name_p_s",
@@ -12719,7 +15119,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1045 */
+  { /* 1245 */
     "find_name",
     "find_name_p_sc",
     "Parrot_find_name_p_sc",
@@ -12730,7 +15130,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1046 */
+  { /* 1246 */
     "find_sub_not_null",
     "find_sub_not_null_p_s",
     "Parrot_find_sub_not_null_p_s",
@@ -12741,7 +15141,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1047 */
+  { /* 1247 */
     "find_sub_not_null",
     "find_sub_not_null_p_sc",
     "Parrot_find_sub_not_null_p_sc",
@@ -12752,7 +15152,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1048 */
+  { /* 1248 */
     "trap",
     "trap",
     "Parrot_trap",
@@ -12763,7 +15163,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 1049 */
+  { /* 1249 */
     "set_label",
     "set_label_p_ic",
     "Parrot_set_label_p_ic",
@@ -12774,7 +15174,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 1 },
     &core_op_lib
   },
-  { /* 1050 */
+  { /* 1250 */
     "get_label",
     "get_label_i_p",
     "Parrot_get_label_i_p",
@@ -12785,7 +15185,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1051 */
+  { /* 1251 */
     "get_id",
     "get_id_i_p",
     "Parrot_get_id_i_p",
@@ -12796,7 +15196,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1052 */
+  { /* 1252 */
     "get_id",
     "get_id_i_pc",
     "Parrot_get_id_i_pc",
@@ -12807,7 +15207,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1053 */
+  { /* 1253 */
     "fetch",
     "fetch_p_p_p_p",
     "Parrot_fetch_p_p_p_p",
@@ -12818,7 +15218,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1054 */
+  { /* 1254 */
     "fetch",
     "fetch_p_pc_p_p",
     "Parrot_fetch_p_pc_p_p",
@@ -12829,7 +15229,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1055 */
+  { /* 1255 */
     "fetch",
     "fetch_p_p_pc_p",
     "Parrot_fetch_p_p_pc_p",
@@ -12840,7 +15240,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1056 */
+  { /* 1256 */
     "fetch",
     "fetch_p_pc_pc_p",
     "Parrot_fetch_p_pc_pc_p",
@@ -12851,7 +15251,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1057 */
+  { /* 1257 */
     "fetch",
     "fetch_p_p_p_pc",
     "Parrot_fetch_p_p_p_pc",
@@ -12862,7 +15262,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1058 */
+  { /* 1258 */
     "fetch",
     "fetch_p_pc_p_pc",
     "Parrot_fetch_p_pc_p_pc",
@@ -12873,7 +15273,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1059 */
+  { /* 1259 */
     "fetch",
     "fetch_p_p_pc_pc",
     "Parrot_fetch_p_p_pc_pc",
@@ -12884,7 +15284,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1060 */
+  { /* 1260 */
     "fetch",
     "fetch_p_pc_pc_pc",
     "Parrot_fetch_p_pc_pc_pc",
@@ -12895,7 +15295,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1061 */
+  { /* 1261 */
     "fetch",
     "fetch_p_p_i_p",
     "Parrot_fetch_p_p_i_p",
@@ -12906,7 +15306,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1062 */
+  { /* 1262 */
     "fetch",
     "fetch_p_pc_i_p",
     "Parrot_fetch_p_pc_i_p",
@@ -12917,7 +15317,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1063 */
+  { /* 1263 */
     "fetch",
     "fetch_p_p_ic_p",
     "Parrot_fetch_p_p_ic_p",
@@ -12928,7 +15328,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1064 */
+  { /* 1264 */
     "fetch",
     "fetch_p_pc_ic_p",
     "Parrot_fetch_p_pc_ic_p",
@@ -12939,7 +15339,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1065 */
+  { /* 1265 */
     "fetch",
     "fetch_p_p_i_pc",
     "Parrot_fetch_p_p_i_pc",
@@ -12950,7 +15350,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1066 */
+  { /* 1266 */
     "fetch",
     "fetch_p_pc_i_pc",
     "Parrot_fetch_p_pc_i_pc",
@@ -12961,7 +15361,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1067 */
+  { /* 1267 */
     "fetch",
     "fetch_p_p_ic_pc",
     "Parrot_fetch_p_p_ic_pc",
@@ -12972,7 +15372,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1068 */
+  { /* 1268 */
     "fetch",
     "fetch_p_pc_ic_pc",
     "Parrot_fetch_p_pc_ic_pc",
@@ -12983,7 +15383,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1069 */
+  { /* 1269 */
     "fetch",
     "fetch_p_p_s_p",
     "Parrot_fetch_p_p_s_p",
@@ -12994,7 +15394,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1070 */
+  { /* 1270 */
     "fetch",
     "fetch_p_pc_s_p",
     "Parrot_fetch_p_pc_s_p",
@@ -13005,7 +15405,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1071 */
+  { /* 1271 */
     "fetch",
     "fetch_p_p_sc_p",
     "Parrot_fetch_p_p_sc_p",
@@ -13016,7 +15416,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1072 */
+  { /* 1272 */
     "fetch",
     "fetch_p_pc_sc_p",
     "Parrot_fetch_p_pc_sc_p",
@@ -13027,7 +15427,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1073 */
+  { /* 1273 */
     "fetch",
     "fetch_p_p_s_pc",
     "Parrot_fetch_p_p_s_pc",
@@ -13038,7 +15438,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1074 */
+  { /* 1274 */
     "fetch",
     "fetch_p_pc_s_pc",
     "Parrot_fetch_p_pc_s_pc",
@@ -13049,7 +15449,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1075 */
+  { /* 1275 */
     "fetch",
     "fetch_p_p_sc_pc",
     "Parrot_fetch_p_p_sc_pc",
@@ -13060,7 +15460,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1076 */
+  { /* 1276 */
     "fetch",
     "fetch_p_pc_sc_pc",
     "Parrot_fetch_p_pc_sc_pc",
@@ -13071,7 +15471,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1077 */
+  { /* 1277 */
     "vivify",
     "vivify_p_p_p_p",
     "Parrot_vivify_p_p_p_p",
@@ -13082,7 +15482,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1078 */
+  { /* 1278 */
     "vivify",
     "vivify_p_pc_p_p",
     "Parrot_vivify_p_pc_p_p",
@@ -13093,7 +15493,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1079 */
+  { /* 1279 */
     "vivify",
     "vivify_p_p_pc_p",
     "Parrot_vivify_p_p_pc_p",
@@ -13104,7 +15504,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1080 */
+  { /* 1280 */
     "vivify",
     "vivify_p_pc_pc_p",
     "Parrot_vivify_p_pc_pc_p",
@@ -13115,7 +15515,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1081 */
+  { /* 1281 */
     "vivify",
     "vivify_p_p_p_pc",
     "Parrot_vivify_p_p_p_pc",
@@ -13126,7 +15526,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1082 */
+  { /* 1282 */
     "vivify",
     "vivify_p_pc_p_pc",
     "Parrot_vivify_p_pc_p_pc",
@@ -13137,7 +15537,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1083 */
+  { /* 1283 */
     "vivify",
     "vivify_p_p_pc_pc",
     "Parrot_vivify_p_p_pc_pc",
@@ -13148,7 +15548,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1084 */
+  { /* 1284 */
     "vivify",
     "vivify_p_pc_pc_pc",
     "Parrot_vivify_p_pc_pc_pc",
@@ -13159,7 +15559,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1085 */
+  { /* 1285 */
     "vivify",
     "vivify_p_p_i_p",
     "Parrot_vivify_p_p_i_p",
@@ -13170,7 +15570,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1086 */
+  { /* 1286 */
     "vivify",
     "vivify_p_pc_i_p",
     "Parrot_vivify_p_pc_i_p",
@@ -13181,7 +15581,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1087 */
+  { /* 1287 */
     "vivify",
     "vivify_p_p_ic_p",
     "Parrot_vivify_p_p_ic_p",
@@ -13192,7 +15592,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1088 */
+  { /* 1288 */
     "vivify",
     "vivify_p_pc_ic_p",
     "Parrot_vivify_p_pc_ic_p",
@@ -13203,7 +15603,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1089 */
+  { /* 1289 */
     "vivify",
     "vivify_p_p_i_pc",
     "Parrot_vivify_p_p_i_pc",
@@ -13214,7 +15614,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1090 */
+  { /* 1290 */
     "vivify",
     "vivify_p_pc_i_pc",
     "Parrot_vivify_p_pc_i_pc",
@@ -13225,7 +15625,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1091 */
+  { /* 1291 */
     "vivify",
     "vivify_p_p_ic_pc",
     "Parrot_vivify_p_p_ic_pc",
@@ -13236,7 +15636,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1092 */
+  { /* 1292 */
     "vivify",
     "vivify_p_pc_ic_pc",
     "Parrot_vivify_p_pc_ic_pc",
@@ -13247,7 +15647,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1093 */
+  { /* 1293 */
     "vivify",
     "vivify_p_p_s_p",
     "Parrot_vivify_p_p_s_p",
@@ -13258,7 +15658,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1094 */
+  { /* 1294 */
     "vivify",
     "vivify_p_pc_s_p",
     "Parrot_vivify_p_pc_s_p",
@@ -13269,7 +15669,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1095 */
+  { /* 1295 */
     "vivify",
     "vivify_p_p_sc_p",
     "Parrot_vivify_p_p_sc_p",
@@ -13280,7 +15680,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1096 */
+  { /* 1296 */
     "vivify",
     "vivify_p_pc_sc_p",
     "Parrot_vivify_p_pc_sc_p",
@@ -13291,7 +15691,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1097 */
+  { /* 1297 */
     "vivify",
     "vivify_p_p_s_pc",
     "Parrot_vivify_p_p_s_pc",
@@ -13302,7 +15702,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1098 */
+  { /* 1298 */
     "vivify",
     "vivify_p_pc_s_pc",
     "Parrot_vivify_p_pc_s_pc",
@@ -13313,7 +15713,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1099 */
+  { /* 1299 */
     "vivify",
     "vivify_p_p_sc_pc",
     "Parrot_vivify_p_p_sc_pc",
@@ -13324,7 +15724,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1100 */
+  { /* 1300 */
     "vivify",
     "vivify_p_pc_sc_pc",
     "Parrot_vivify_p_pc_sc_pc",
@@ -13335,7 +15735,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1101 */
+  { /* 1301 */
     "new",
     "new_p_s_i",
     "Parrot_new_p_s_i",
@@ -13346,7 +15746,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1102 */
+  { /* 1302 */
     "new",
     "new_p_sc_i",
     "Parrot_new_p_sc_i",
@@ -13357,7 +15757,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1103 */
+  { /* 1303 */
     "new",
     "new_p_s_ic",
     "Parrot_new_p_s_ic",
@@ -13368,7 +15768,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1104 */
+  { /* 1304 */
     "new",
     "new_p_sc_ic",
     "Parrot_new_p_sc_ic",
@@ -13379,7 +15779,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1105 */
+  { /* 1305 */
     "new",
     "new_p_p_i",
     "Parrot_new_p_p_i",
@@ -13390,7 +15790,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1106 */
+  { /* 1306 */
     "new",
     "new_p_pc_i",
     "Parrot_new_p_pc_i",
@@ -13401,7 +15801,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1107 */
+  { /* 1307 */
     "new",
     "new_p_p_ic",
     "Parrot_new_p_p_ic",
@@ -13412,7 +15812,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1108 */
+  { /* 1308 */
     "new",
     "new_p_pc_ic",
     "Parrot_new_p_pc_ic",
@@ -13423,7 +15823,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1109 */
+  { /* 1309 */
     "root_new",
     "root_new_p_p_i",
     "Parrot_root_new_p_p_i",
@@ -13434,7 +15834,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1110 */
+  { /* 1310 */
     "root_new",
     "root_new_p_pc_i",
     "Parrot_root_new_p_pc_i",
@@ -13445,7 +15845,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1111 */
+  { /* 1311 */
     "root_new",
     "root_new_p_p_ic",
     "Parrot_root_new_p_p_ic",
@@ -13456,7 +15856,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1112 */
+  { /* 1312 */
     "root_new",
     "root_new_p_pc_ic",
     "Parrot_root_new_p_pc_ic",
@@ -13467,7 +15867,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1113 */
+  { /* 1313 */
     "get_context",
     "get_context_p",
     "Parrot_get_context_p",
@@ -13478,7 +15878,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 1114 */
+  { /* 1314 */
     "new_call_context",
     "new_call_context_p",
     "Parrot_new_call_context_p",
@@ -13489,7 +15889,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 1115 */
+  { /* 1315 */
     "invokecc",
     "invokecc_p_p",
     "Parrot_invokecc_p_p",
@@ -13500,7 +15900,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0 },
     &core_op_lib
   },
-  { /* 1116 */
+  { /* 1316 */
     "flatten_array_into",
     "flatten_array_into_p_p_i",
     "Parrot_flatten_array_into_p_p_i",
@@ -13511,7 +15911,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1117 */
+  { /* 1317 */
     "flatten_array_into",
     "flatten_array_into_p_p_ic",
     "Parrot_flatten_array_into_p_p_ic",
@@ -13522,7 +15922,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1118 */
+  { /* 1318 */
     "flatten_hash_into",
     "flatten_hash_into_p_p_i",
     "Parrot_flatten_hash_into_p_p_i",
@@ -13533,7 +15933,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1119 */
+  { /* 1319 */
     "flatten_hash_into",
     "flatten_hash_into_p_p_ic",
     "Parrot_flatten_hash_into_p_p_ic",
@@ -13544,7 +15944,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1120 */
+  { /* 1320 */
     "slurp_array_from",
     "slurp_array_from_p_p_i",
     "Parrot_slurp_array_from_p_p_i",
@@ -13555,7 +15955,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1121 */
+  { /* 1321 */
     "slurp_array_from",
     "slurp_array_from_p_p_ic",
     "Parrot_slurp_array_from_p_p_ic",
@@ -13566,7 +15966,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0, 0, 0 },
     &core_op_lib
   },
-  { /* 1122 */
+  { /* 1322 */
     "receive",
     "receive_p",
     "Parrot_receive_p",
@@ -13577,7 +15977,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 1123 */
+  { /* 1323 */
     "wait",
     "wait_p",
     "Parrot_wait_p",
@@ -13588,7 +15988,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 1124 */
+  { /* 1324 */
     "wait",
     "wait_pc",
     "Parrot_wait_pc",
@@ -13599,7 +15999,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 1125 */
+  { /* 1325 */
     "pass",
     "pass",
     "Parrot_pass",
@@ -13610,7 +16010,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 1126 */
+  { /* 1326 */
     "disable_preemption",
     "disable_preemption",
     "Parrot_disable_preemption",
@@ -13621,7 +16021,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 1127 */
+  { /* 1327 */
     "enable_preemption",
     "enable_preemption",
     "Parrot_enable_preemption",
@@ -13632,7 +16032,7 @@ static op_info_t core_op_info_table[1130] = {
     { 0 },
     &core_op_lib
   },
-  { /* 1128 */
+  { /* 1328 */
     "terminate",
     "terminate",
     "Parrot_terminate",
@@ -13795,7 +16195,8 @@ Parrot_local_return_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_jump_i(opcode_t *cur_opcode, PARROT_INTERP) {
-    opcode_t * const loc = INTVAL2PTR(opcode_t *, IREG(1));
+    opcode_t  * const  loc = INTVAL2PTR(opcode_t *, IREG(1));
+
     UNUSED(interp);
     UNUSED(cur_opcode);
     return (opcode_t *)loc;
@@ -13803,7 +16204,8 @@ Parrot_jump_i(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_jump_ic(opcode_t *cur_opcode, PARROT_INTERP) {
-    opcode_t * const loc = INTVAL2PTR(opcode_t *, ICONST(1));
+    opcode_t  * const  loc = INTVAL2PTR(opcode_t *, ICONST(1));
+
     UNUSED(interp);
     UNUSED(cur_opcode);
     return (opcode_t *)loc;
@@ -19230,6 +21632,3446 @@ Parrot_inspect_p_pc_sc(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
+Parrot_get_knowhow_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  KnowHOW = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_KNOWHOW);
+
+    if (KnowHOW) {
+        PREG(1) = KnowHOW;
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "6model not yet initialized; cannot use get_knowhow");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 2;
+}
+
+opcode_t *
+Parrot_get_knowhow_attribute_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  KnowHOWAttribute = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_KNOWHOWATTRIBUTE);
+
+    if (KnowHOWAttribute) {
+        PREG(1) = KnowHOWAttribute;
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "6model not yet initialized; cannot use get_knowhow_attribute");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 2;
+}
+
+opcode_t *
+Parrot_get_how_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  var = decontainerize(interp, PREG(2));
+
+    if ((var->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = STABLE(var)->HOW;
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use get_how on a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_get_how_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  var = decontainerize(interp, PCONST(2));
+
+    if ((var->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = STABLE(var)->HOW;
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use get_how on a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_get_what_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  var = decontainerize(interp, PREG(2));
+
+    if ((var->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = STABLE(var)->WHAT;
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use get_what on a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_get_what_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  var = decontainerize(interp, PCONST(2));
+
+    if ((var->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = STABLE(var)->WHAT;
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use get_what on a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_what_or_null_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  var = decontainerize(interp, PREG(2));
+
+    if ((var->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = STABLE(var)->WHAT;
+    }
+    else {
+        PREG(1) = PMCNULL;
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_what_or_null_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  var = decontainerize(interp, PCONST(2));
+
+    if ((var->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = STABLE(var)->WHAT;
+    }
+    else {
+        PREG(1) = PMCNULL;
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_get_who_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  var = decontainerize(interp, PREG(2));
+
+    if ((var->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = STABLE(var)->WHO;
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use get_who on a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_get_who_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  var = decontainerize(interp, PCONST(2));
+
+    if ((var->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = STABLE(var)->WHO;
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use get_who on a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_set_who_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  var = decontainerize(interp, PREG(1));
+
+    if ((var->vtable->base_type == enum_class_SixModelObject)) {
+        STABLE(var)->WHO = PREG(2);
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(var));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use set_who on a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_set_who_pc_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  var = decontainerize(interp, PCONST(1));
+
+    if ((var->vtable->base_type == enum_class_SixModelObject)) {
+        STABLE(var)->WHO = PREG(2);
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(var));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use set_who on a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_set_who_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  var = decontainerize(interp, PREG(1));
+
+    if ((var->vtable->base_type == enum_class_SixModelObject)) {
+        STABLE(var)->WHO = PCONST(2);
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(var));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use set_who on a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_set_who_pc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  var = decontainerize(interp, PCONST(1));
+
+    if ((var->vtable->base_type == enum_class_SixModelObject)) {
+        STABLE(var)->WHO = PCONST(2);
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(var));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use set_who on a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_repr_type_object_for_p_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    REPROps  *  REPR = REPR_get_by_name(interp, SREG(3));
+
+    PREG(1) = REPR->type_object_for(interp, decontainerize(interp, PREG(2)));
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_repr_type_object_for_p_pc_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    REPROps  *  REPR = REPR_get_by_name(interp, SREG(3));
+
+    PREG(1) = REPR->type_object_for(interp, decontainerize(interp, PCONST(2)));
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_repr_type_object_for_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    REPROps  *  REPR = REPR_get_by_name(interp, SCONST(3));
+
+    PREG(1) = REPR->type_object_for(interp, decontainerize(interp, PREG(2)));
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_repr_type_object_for_p_pc_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    REPROps  *  REPR = REPR_get_by_name(interp, SCONST(3));
+
+    PREG(1) = REPR->type_object_for(interp, decontainerize(interp, PCONST(2)));
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_repr_instance_of_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PREG(2)->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = REPR(PREG(2))->instance_of(interp, PREG(2));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_instance_of on a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_repr_instance_of_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PCONST(2)->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = REPR(PCONST(2))->instance_of(interp, PCONST(2));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_instance_of on a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_repr_clone_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  var = decontainerize(interp, PREG(2));
+
+    if ((var->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = REPR(var)->clone(interp, var);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_clone on a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_repr_clone_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  var = decontainerize(interp, PCONST(2));
+
+    if ((var->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = REPR(var)->clone(interp, var);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_clone on a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_repr_defined_i_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  var = decontainerize(interp, PREG(2));
+
+    if ((var->vtable->base_type == enum_class_SixModelObject)) {
+        IREG(1) = REPR(var)->defined(interp, var);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_defined on a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_repr_defined_i_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  var = decontainerize(interp, PCONST(2));
+
+    if ((var->vtable->base_type == enum_class_SixModelObject)) {
+        IREG(1) = REPR(var)->defined(interp, var);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_defined on a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_repr_get_attr_int_i_p_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(3));
+
+    if ((PREG(2)->vtable->base_type == enum_class_SixModelObject)) {
+        IREG(1) = REPR(PREG(2))->get_attribute_int(interp, PREG(2), ch, SREG(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_get_attr_int on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_get_attr_int_i_pc_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(3));
+
+    if ((PCONST(2)->vtable->base_type == enum_class_SixModelObject)) {
+        IREG(1) = REPR(PCONST(2))->get_attribute_int(interp, PCONST(2), ch, SREG(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_get_attr_int on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_get_attr_int_i_p_pc_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(3));
+
+    if ((PREG(2)->vtable->base_type == enum_class_SixModelObject)) {
+        IREG(1) = REPR(PREG(2))->get_attribute_int(interp, PREG(2), ch, SREG(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_get_attr_int on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_get_attr_int_i_pc_pc_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(3));
+
+    if ((PCONST(2)->vtable->base_type == enum_class_SixModelObject)) {
+        IREG(1) = REPR(PCONST(2))->get_attribute_int(interp, PCONST(2), ch, SREG(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_get_attr_int on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_get_attr_int_i_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(3));
+
+    if ((PREG(2)->vtable->base_type == enum_class_SixModelObject)) {
+        IREG(1) = REPR(PREG(2))->get_attribute_int(interp, PREG(2), ch, SCONST(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_get_attr_int on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_get_attr_int_i_pc_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(3));
+
+    if ((PCONST(2)->vtable->base_type == enum_class_SixModelObject)) {
+        IREG(1) = REPR(PCONST(2))->get_attribute_int(interp, PCONST(2), ch, SCONST(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_get_attr_int on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_get_attr_int_i_p_pc_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(3));
+
+    if ((PREG(2)->vtable->base_type == enum_class_SixModelObject)) {
+        IREG(1) = REPR(PREG(2))->get_attribute_int(interp, PREG(2), ch, SCONST(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_get_attr_int on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_get_attr_int_i_pc_pc_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(3));
+
+    if ((PCONST(2)->vtable->base_type == enum_class_SixModelObject)) {
+        IREG(1) = REPR(PCONST(2))->get_attribute_int(interp, PCONST(2), ch, SCONST(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_get_attr_int on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_get_attr_num_n_p_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(3));
+
+    if ((PREG(2)->vtable->base_type == enum_class_SixModelObject)) {
+        NREG(1) = REPR(PREG(2))->get_attribute_num(interp, PREG(2), ch, SREG(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_get_attr_num on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_get_attr_num_n_pc_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(3));
+
+    if ((PCONST(2)->vtable->base_type == enum_class_SixModelObject)) {
+        NREG(1) = REPR(PCONST(2))->get_attribute_num(interp, PCONST(2), ch, SREG(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_get_attr_num on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_get_attr_num_n_p_pc_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(3));
+
+    if ((PREG(2)->vtable->base_type == enum_class_SixModelObject)) {
+        NREG(1) = REPR(PREG(2))->get_attribute_num(interp, PREG(2), ch, SREG(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_get_attr_num on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_get_attr_num_n_pc_pc_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(3));
+
+    if ((PCONST(2)->vtable->base_type == enum_class_SixModelObject)) {
+        NREG(1) = REPR(PCONST(2))->get_attribute_num(interp, PCONST(2), ch, SREG(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_get_attr_num on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_get_attr_num_n_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(3));
+
+    if ((PREG(2)->vtable->base_type == enum_class_SixModelObject)) {
+        NREG(1) = REPR(PREG(2))->get_attribute_num(interp, PREG(2), ch, SCONST(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_get_attr_num on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_get_attr_num_n_pc_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(3));
+
+    if ((PCONST(2)->vtable->base_type == enum_class_SixModelObject)) {
+        NREG(1) = REPR(PCONST(2))->get_attribute_num(interp, PCONST(2), ch, SCONST(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_get_attr_num on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_get_attr_num_n_p_pc_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(3));
+
+    if ((PREG(2)->vtable->base_type == enum_class_SixModelObject)) {
+        NREG(1) = REPR(PREG(2))->get_attribute_num(interp, PREG(2), ch, SCONST(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_get_attr_num on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_get_attr_num_n_pc_pc_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(3));
+
+    if ((PCONST(2)->vtable->base_type == enum_class_SixModelObject)) {
+        NREG(1) = REPR(PCONST(2))->get_attribute_num(interp, PCONST(2), ch, SCONST(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_get_attr_num on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_get_attr_str_s_p_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(3));
+
+    if ((PREG(2)->vtable->base_type == enum_class_SixModelObject)) {
+        SREG(1) = REPR(PREG(2))->get_attribute_str(interp, PREG(2), ch, SREG(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_get_attr_str on a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_get_attr_str_s_pc_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(3));
+
+    if ((PCONST(2)->vtable->base_type == enum_class_SixModelObject)) {
+        SREG(1) = REPR(PCONST(2))->get_attribute_str(interp, PCONST(2), ch, SREG(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_get_attr_str on a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_get_attr_str_s_p_pc_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(3));
+
+    if ((PREG(2)->vtable->base_type == enum_class_SixModelObject)) {
+        SREG(1) = REPR(PREG(2))->get_attribute_str(interp, PREG(2), ch, SREG(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_get_attr_str on a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_get_attr_str_s_pc_pc_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(3));
+
+    if ((PCONST(2)->vtable->base_type == enum_class_SixModelObject)) {
+        SREG(1) = REPR(PCONST(2))->get_attribute_str(interp, PCONST(2), ch, SREG(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_get_attr_str on a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_get_attr_str_s_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(3));
+
+    if ((PREG(2)->vtable->base_type == enum_class_SixModelObject)) {
+        SREG(1) = REPR(PREG(2))->get_attribute_str(interp, PREG(2), ch, SCONST(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_get_attr_str on a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_get_attr_str_s_pc_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(3));
+
+    if ((PCONST(2)->vtable->base_type == enum_class_SixModelObject)) {
+        SREG(1) = REPR(PCONST(2))->get_attribute_str(interp, PCONST(2), ch, SCONST(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_get_attr_str on a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_get_attr_str_s_p_pc_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(3));
+
+    if ((PREG(2)->vtable->base_type == enum_class_SixModelObject)) {
+        SREG(1) = REPR(PREG(2))->get_attribute_str(interp, PREG(2), ch, SCONST(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_get_attr_str on a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_get_attr_str_s_pc_pc_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(3));
+
+    if ((PCONST(2)->vtable->base_type == enum_class_SixModelObject)) {
+        SREG(1) = REPR(PCONST(2))->get_attribute_str(interp, PCONST(2), ch, SCONST(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_get_attr_str on a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_int_p_p_s_i(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(2));
+
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PREG(1))->bind_attribute_int(interp, PREG(1), ch, SREG(3), NO_HINT, IREG(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_int on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_int_pc_p_s_i(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(2));
+
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PCONST(1))->bind_attribute_int(interp, PCONST(1), ch, SREG(3), NO_HINT, IREG(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_int on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_int_p_pc_s_i(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(2));
+
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PREG(1))->bind_attribute_int(interp, PREG(1), ch, SREG(3), NO_HINT, IREG(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_int on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_int_pc_pc_s_i(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(2));
+
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PCONST(1))->bind_attribute_int(interp, PCONST(1), ch, SREG(3), NO_HINT, IREG(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_int on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_int_p_p_sc_i(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(2));
+
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PREG(1))->bind_attribute_int(interp, PREG(1), ch, SCONST(3), NO_HINT, IREG(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_int on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_int_pc_p_sc_i(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(2));
+
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PCONST(1))->bind_attribute_int(interp, PCONST(1), ch, SCONST(3), NO_HINT, IREG(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_int on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_int_p_pc_sc_i(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(2));
+
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PREG(1))->bind_attribute_int(interp, PREG(1), ch, SCONST(3), NO_HINT, IREG(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_int on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_int_pc_pc_sc_i(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(2));
+
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PCONST(1))->bind_attribute_int(interp, PCONST(1), ch, SCONST(3), NO_HINT, IREG(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_int on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_int_p_p_s_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(2));
+
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PREG(1))->bind_attribute_int(interp, PREG(1), ch, SREG(3), NO_HINT, ICONST(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_int on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_int_pc_p_s_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(2));
+
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PCONST(1))->bind_attribute_int(interp, PCONST(1), ch, SREG(3), NO_HINT, ICONST(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_int on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_int_p_pc_s_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(2));
+
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PREG(1))->bind_attribute_int(interp, PREG(1), ch, SREG(3), NO_HINT, ICONST(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_int on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_int_pc_pc_s_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(2));
+
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PCONST(1))->bind_attribute_int(interp, PCONST(1), ch, SREG(3), NO_HINT, ICONST(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_int on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_int_p_p_sc_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(2));
+
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PREG(1))->bind_attribute_int(interp, PREG(1), ch, SCONST(3), NO_HINT, ICONST(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_int on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_int_pc_p_sc_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(2));
+
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PCONST(1))->bind_attribute_int(interp, PCONST(1), ch, SCONST(3), NO_HINT, ICONST(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_int on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_int_p_pc_sc_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(2));
+
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PREG(1))->bind_attribute_int(interp, PREG(1), ch, SCONST(3), NO_HINT, ICONST(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_int on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_int_pc_pc_sc_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(2));
+
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PCONST(1))->bind_attribute_int(interp, PCONST(1), ch, SCONST(3), NO_HINT, ICONST(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_int on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_num_p_p_s_n(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(2));
+
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PREG(1))->bind_attribute_num(interp, PREG(1), ch, SREG(3), NO_HINT, NREG(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_num on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_num_pc_p_s_n(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(2));
+
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PCONST(1))->bind_attribute_num(interp, PCONST(1), ch, SREG(3), NO_HINT, NREG(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_num on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_num_p_pc_s_n(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(2));
+
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PREG(1))->bind_attribute_num(interp, PREG(1), ch, SREG(3), NO_HINT, NREG(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_num on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_num_pc_pc_s_n(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(2));
+
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PCONST(1))->bind_attribute_num(interp, PCONST(1), ch, SREG(3), NO_HINT, NREG(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_num on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_num_p_p_sc_n(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(2));
+
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PREG(1))->bind_attribute_num(interp, PREG(1), ch, SCONST(3), NO_HINT, NREG(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_num on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_num_pc_p_sc_n(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(2));
+
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PCONST(1))->bind_attribute_num(interp, PCONST(1), ch, SCONST(3), NO_HINT, NREG(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_num on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_num_p_pc_sc_n(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(2));
+
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PREG(1))->bind_attribute_num(interp, PREG(1), ch, SCONST(3), NO_HINT, NREG(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_num on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_num_pc_pc_sc_n(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(2));
+
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PCONST(1))->bind_attribute_num(interp, PCONST(1), ch, SCONST(3), NO_HINT, NREG(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_num on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_num_p_p_s_nc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(2));
+
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PREG(1))->bind_attribute_num(interp, PREG(1), ch, SREG(3), NO_HINT, NCONST(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_num on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_num_pc_p_s_nc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(2));
+
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PCONST(1))->bind_attribute_num(interp, PCONST(1), ch, SREG(3), NO_HINT, NCONST(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_num on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_num_p_pc_s_nc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(2));
+
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PREG(1))->bind_attribute_num(interp, PREG(1), ch, SREG(3), NO_HINT, NCONST(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_num on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_num_pc_pc_s_nc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(2));
+
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PCONST(1))->bind_attribute_num(interp, PCONST(1), ch, SREG(3), NO_HINT, NCONST(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_num on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_num_p_p_sc_nc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(2));
+
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PREG(1))->bind_attribute_num(interp, PREG(1), ch, SCONST(3), NO_HINT, NCONST(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_num on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_num_pc_p_sc_nc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(2));
+
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PCONST(1))->bind_attribute_num(interp, PCONST(1), ch, SCONST(3), NO_HINT, NCONST(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_num on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_num_p_pc_sc_nc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(2));
+
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PREG(1))->bind_attribute_num(interp, PREG(1), ch, SCONST(3), NO_HINT, NCONST(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_num on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_num_pc_pc_sc_nc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(2));
+
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PCONST(1))->bind_attribute_num(interp, PCONST(1), ch, SCONST(3), NO_HINT, NCONST(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_num on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_str_p_p_s_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(2));
+
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PREG(1))->bind_attribute_str(interp, PREG(1), ch, SREG(3), NO_HINT, SREG(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_str on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_str_pc_p_s_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(2));
+
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PCONST(1))->bind_attribute_str(interp, PCONST(1), ch, SREG(3), NO_HINT, SREG(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_str on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_str_p_pc_s_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(2));
+
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PREG(1))->bind_attribute_str(interp, PREG(1), ch, SREG(3), NO_HINT, SREG(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_str on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_str_pc_pc_s_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(2));
+
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PCONST(1))->bind_attribute_str(interp, PCONST(1), ch, SREG(3), NO_HINT, SREG(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_str on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_str_p_p_sc_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(2));
+
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PREG(1))->bind_attribute_str(interp, PREG(1), ch, SCONST(3), NO_HINT, SREG(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_str on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_str_pc_p_sc_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(2));
+
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PCONST(1))->bind_attribute_str(interp, PCONST(1), ch, SCONST(3), NO_HINT, SREG(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_str on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_str_p_pc_sc_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(2));
+
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PREG(1))->bind_attribute_str(interp, PREG(1), ch, SCONST(3), NO_HINT, SREG(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_str on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_str_pc_pc_sc_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(2));
+
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PCONST(1))->bind_attribute_str(interp, PCONST(1), ch, SCONST(3), NO_HINT, SREG(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_str on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_str_p_p_s_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(2));
+
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PREG(1))->bind_attribute_str(interp, PREG(1), ch, SREG(3), NO_HINT, SCONST(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_str on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_str_pc_p_s_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(2));
+
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PCONST(1))->bind_attribute_str(interp, PCONST(1), ch, SREG(3), NO_HINT, SCONST(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_str on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_str_p_pc_s_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(2));
+
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PREG(1))->bind_attribute_str(interp, PREG(1), ch, SREG(3), NO_HINT, SCONST(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_str on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_str_pc_pc_s_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(2));
+
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PCONST(1))->bind_attribute_str(interp, PCONST(1), ch, SREG(3), NO_HINT, SCONST(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_str on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_str_p_p_sc_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(2));
+
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PREG(1))->bind_attribute_str(interp, PREG(1), ch, SCONST(3), NO_HINT, SCONST(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_str on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_str_pc_p_sc_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(2));
+
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PCONST(1))->bind_attribute_str(interp, PCONST(1), ch, SCONST(3), NO_HINT, SCONST(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_str on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_str_p_pc_sc_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(2));
+
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PREG(1))->bind_attribute_str(interp, PREG(1), ch, SCONST(3), NO_HINT, SCONST(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_str on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_bind_attr_str_pc_pc_sc_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(2));
+
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        REPR(PCONST(1))->bind_attribute_str(interp, PCONST(1), ch, SCONST(3), NO_HINT, SCONST(4));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_bind_attr_str on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_is_attr_initialized_i_p_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(3));
+
+    if ((PREG(2)->vtable->base_type == enum_class_SixModelObject)) {
+        IREG(1) = REPR(PREG(2))->is_attribute_initialized(interp, PREG(2), ch, SREG(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_is_attr_initialized on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_is_attr_initialized_i_pc_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(3));
+
+    if ((PCONST(2)->vtable->base_type == enum_class_SixModelObject)) {
+        IREG(1) = REPR(PCONST(2))->is_attribute_initialized(interp, PCONST(2), ch, SREG(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_is_attr_initialized on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_is_attr_initialized_i_p_pc_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(3));
+
+    if ((PREG(2)->vtable->base_type == enum_class_SixModelObject)) {
+        IREG(1) = REPR(PREG(2))->is_attribute_initialized(interp, PREG(2), ch, SREG(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_is_attr_initialized on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_is_attr_initialized_i_pc_pc_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(3));
+
+    if ((PCONST(2)->vtable->base_type == enum_class_SixModelObject)) {
+        IREG(1) = REPR(PCONST(2))->is_attribute_initialized(interp, PCONST(2), ch, SREG(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_is_attr_initialized on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_is_attr_initialized_i_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(3));
+
+    if ((PREG(2)->vtable->base_type == enum_class_SixModelObject)) {
+        IREG(1) = REPR(PREG(2))->is_attribute_initialized(interp, PREG(2), ch, SCONST(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_is_attr_initialized on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_is_attr_initialized_i_pc_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PREG(3));
+
+    if ((PCONST(2)->vtable->base_type == enum_class_SixModelObject)) {
+        IREG(1) = REPR(PCONST(2))->is_attribute_initialized(interp, PCONST(2), ch, SCONST(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_is_attr_initialized on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_is_attr_initialized_i_p_pc_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(3));
+
+    if ((PREG(2)->vtable->base_type == enum_class_SixModelObject)) {
+        IREG(1) = REPR(PREG(2))->is_attribute_initialized(interp, PREG(2), ch, SCONST(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_is_attr_initialized on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_is_attr_initialized_i_pc_pc_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  ch = decontainerize(interp, PCONST(3));
+
+    if ((PCONST(2)->vtable->base_type == enum_class_SixModelObject)) {
+        IREG(1) = REPR(PCONST(2))->is_attribute_initialized(interp, PCONST(2), ch, SCONST(4), NO_HINT);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_is_attr_initialized on a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_repr_change_type_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  obj = decontainerize(interp, PREG(1));
+    PMC  * const  new_type = decontainerize(interp, PREG(2));
+
+    if (((obj->vtable->base_type == enum_class_SixModelObject) && (new_type->vtable->base_type == enum_class_SixModelObject))) {
+        if (REPR(obj)->change_type) {
+            REPR(obj)->change_type(interp, obj, new_type);
+        }
+        else {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Representation does not implement change_type");
+        }
+
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_change_type on SixModelObjects");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_repr_change_type_pc_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  obj = decontainerize(interp, PCONST(1));
+    PMC  * const  new_type = decontainerize(interp, PREG(2));
+
+    if (((obj->vtable->base_type == enum_class_SixModelObject) && (new_type->vtable->base_type == enum_class_SixModelObject))) {
+        if (REPR(obj)->change_type) {
+            REPR(obj)->change_type(interp, obj, new_type);
+        }
+        else {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Representation does not implement change_type");
+        }
+
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_change_type on SixModelObjects");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_repr_change_type_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  obj = decontainerize(interp, PREG(1));
+    PMC  * const  new_type = decontainerize(interp, PCONST(2));
+
+    if (((obj->vtable->base_type == enum_class_SixModelObject) && (new_type->vtable->base_type == enum_class_SixModelObject))) {
+        if (REPR(obj)->change_type) {
+            REPR(obj)->change_type(interp, obj, new_type);
+        }
+        else {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Representation does not implement change_type");
+        }
+
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_change_type on SixModelObjects");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_repr_change_type_pc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  obj = decontainerize(interp, PCONST(1));
+    PMC  * const  new_type = decontainerize(interp, PCONST(2));
+
+    if (((obj->vtable->base_type == enum_class_SixModelObject) && (new_type->vtable->base_type == enum_class_SixModelObject))) {
+        if (REPR(obj)->change_type) {
+            REPR(obj)->change_type(interp, obj, new_type);
+        }
+        else {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Representation does not implement change_type");
+        }
+
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_change_type on SixModelObjects");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_type_check_i_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  val = decontainerize(interp, PREG(2));
+    PMC  * const  type = decontainerize(interp, PREG(3));
+
+    if (((val->vtable->base_type == enum_class_SixModelObject) && (type->vtable->base_type == enum_class_SixModelObject))) {
+        IREG(1) = STABLE(val)->type_check(interp, val, type);
+    }
+    else {
+        if ((type->vtable->base_type == enum_class_SixModelObject)) {
+            IREG(1) = 0;
+        }
+        else {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use type_check to check against a SixModelObject");
+        }
+
+    }
+
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_type_check_i_pc_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  val = decontainerize(interp, PCONST(2));
+    PMC  * const  type = decontainerize(interp, PREG(3));
+
+    if (((val->vtable->base_type == enum_class_SixModelObject) && (type->vtable->base_type == enum_class_SixModelObject))) {
+        IREG(1) = STABLE(val)->type_check(interp, val, type);
+    }
+    else {
+        if ((type->vtable->base_type == enum_class_SixModelObject)) {
+            IREG(1) = 0;
+        }
+        else {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use type_check to check against a SixModelObject");
+        }
+
+    }
+
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_type_check_i_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  val = decontainerize(interp, PREG(2));
+    PMC  * const  type = decontainerize(interp, PCONST(3));
+
+    if (((val->vtable->base_type == enum_class_SixModelObject) && (type->vtable->base_type == enum_class_SixModelObject))) {
+        IREG(1) = STABLE(val)->type_check(interp, val, type);
+    }
+    else {
+        if ((type->vtable->base_type == enum_class_SixModelObject)) {
+            IREG(1) = 0;
+        }
+        else {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use type_check to check against a SixModelObject");
+        }
+
+    }
+
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_type_check_i_pc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  val = decontainerize(interp, PCONST(2));
+    PMC  * const  type = decontainerize(interp, PCONST(3));
+
+    if (((val->vtable->base_type == enum_class_SixModelObject) && (type->vtable->base_type == enum_class_SixModelObject))) {
+        IREG(1) = STABLE(val)->type_check(interp, val, type);
+    }
+    else {
+        if ((type->vtable->base_type == enum_class_SixModelObject)) {
+            IREG(1) = 0;
+        }
+        else {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use type_check to check against a SixModelObject");
+        }
+
+    }
+
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_publish_type_check_cache_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  target = decontainerize(interp, PREG(1));
+
+    if ((target->vtable->base_type == enum_class_SixModelObject)) {
+        STable  * const  target_st = STABLE(target);
+        INTVAL   items = VTABLE_elements(interp, PREG(2));
+
+        if ((items > 0)) {
+            PMC  **  cache = (PMC **)mem_sys_allocate((sizeof(PMC *) * items));
+            INTVAL   i;
+
+            for (i = 0; (i < items); (i++)) {
+                cache[i] = decontainerize(interp, VTABLE_get_pmc_keyed_int(interp, PREG(2), i));
+            }
+
+            target_st->type_check_cache = cache;
+            target_st->type_check_cache_length = items;
+        }
+        else {
+            target_st->type_check_cache = NULL;
+            target_st->type_check_cache_length = 0;
+        }
+
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(target));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "First argument to publish_type_check_cache must be a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_publish_type_check_cache_pc_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  target = decontainerize(interp, PCONST(1));
+
+    if ((target->vtable->base_type == enum_class_SixModelObject)) {
+        STable  * const  target_st = STABLE(target);
+        INTVAL   items = VTABLE_elements(interp, PREG(2));
+
+        if ((items > 0)) {
+            PMC  **  cache = (PMC **)mem_sys_allocate((sizeof(PMC *) * items));
+            INTVAL   i;
+
+            for (i = 0; (i < items); (i++)) {
+                cache[i] = decontainerize(interp, VTABLE_get_pmc_keyed_int(interp, PREG(2), i));
+            }
+
+            target_st->type_check_cache = cache;
+            target_st->type_check_cache_length = items;
+        }
+        else {
+            target_st->type_check_cache = NULL;
+            target_st->type_check_cache_length = 0;
+        }
+
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(target));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "First argument to publish_type_check_cache must be a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_publish_type_check_cache_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  target = decontainerize(interp, PREG(1));
+
+    if ((target->vtable->base_type == enum_class_SixModelObject)) {
+        STable  * const  target_st = STABLE(target);
+        INTVAL   items = VTABLE_elements(interp, PCONST(2));
+
+        if ((items > 0)) {
+            PMC  **  cache = (PMC **)mem_sys_allocate((sizeof(PMC *) * items));
+            INTVAL   i;
+
+            for (i = 0; (i < items); (i++)) {
+                cache[i] = decontainerize(interp, VTABLE_get_pmc_keyed_int(interp, PCONST(2), i));
+            }
+
+            target_st->type_check_cache = cache;
+            target_st->type_check_cache_length = items;
+        }
+        else {
+            target_st->type_check_cache = NULL;
+            target_st->type_check_cache_length = 0;
+        }
+
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(target));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "First argument to publish_type_check_cache must be a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_publish_type_check_cache_pc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  target = decontainerize(interp, PCONST(1));
+
+    if ((target->vtable->base_type == enum_class_SixModelObject)) {
+        STable  * const  target_st = STABLE(target);
+        INTVAL   items = VTABLE_elements(interp, PCONST(2));
+
+        if ((items > 0)) {
+            PMC  **  cache = (PMC **)mem_sys_allocate((sizeof(PMC *) * items));
+            INTVAL   i;
+
+            for (i = 0; (i < items); (i++)) {
+                cache[i] = decontainerize(interp, VTABLE_get_pmc_keyed_int(interp, PCONST(2), i));
+            }
+
+            target_st->type_check_cache = cache;
+            target_st->type_check_cache_length = items;
+        }
+        else {
+            target_st->type_check_cache = NULL;
+            target_st->type_check_cache_length = 0;
+        }
+
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(target));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "First argument to publish_type_check_cache must be a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_publish_method_cache_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  target = decontainerize(interp, PREG(1));
+
+    if ((target->vtable->base_type == enum_class_SixModelObject)) {
+        STable  * const  target_st = STABLE(target);
+        PMC     * const  cache = Parrot_pmc_new(interp, enum_class_Hash);
+        PMC     * const  iter = VTABLE_get_iter(interp, PREG(2));
+
+        while (VTABLE_get_bool(interp, iter)) {
+            STRING  * const  name = VTABLE_shift_string(interp, iter);
+            PMC     * const  meth = VTABLE_get_pmc_keyed_str(interp, PREG(2), name);
+
+            VTABLE_set_pmc_keyed_str(interp, cache, name, meth);
+        }
+
+        target_st->method_cache = cache;
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(target));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "First argument to publish_method_cache must be a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_publish_method_cache_pc_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  target = decontainerize(interp, PCONST(1));
+
+    if ((target->vtable->base_type == enum_class_SixModelObject)) {
+        STable  * const  target_st = STABLE(target);
+        PMC     * const  cache = Parrot_pmc_new(interp, enum_class_Hash);
+        PMC     * const  iter = VTABLE_get_iter(interp, PREG(2));
+
+        while (VTABLE_get_bool(interp, iter)) {
+            STRING  * const  name = VTABLE_shift_string(interp, iter);
+            PMC     * const  meth = VTABLE_get_pmc_keyed_str(interp, PREG(2), name);
+
+            VTABLE_set_pmc_keyed_str(interp, cache, name, meth);
+        }
+
+        target_st->method_cache = cache;
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(target));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "First argument to publish_method_cache must be a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_publish_method_cache_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  target = decontainerize(interp, PREG(1));
+
+    if ((target->vtable->base_type == enum_class_SixModelObject)) {
+        STable  * const  target_st = STABLE(target);
+        PMC     * const  cache = Parrot_pmc_new(interp, enum_class_Hash);
+        PMC     * const  iter = VTABLE_get_iter(interp, PCONST(2));
+
+        while (VTABLE_get_bool(interp, iter)) {
+            STRING  * const  name = VTABLE_shift_string(interp, iter);
+            PMC     * const  meth = VTABLE_get_pmc_keyed_str(interp, PCONST(2), name);
+
+            VTABLE_set_pmc_keyed_str(interp, cache, name, meth);
+        }
+
+        target_st->method_cache = cache;
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(target));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "First argument to publish_method_cache must be a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_publish_method_cache_pc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  target = decontainerize(interp, PCONST(1));
+
+    if ((target->vtable->base_type == enum_class_SixModelObject)) {
+        STable  * const  target_st = STABLE(target);
+        PMC     * const  cache = Parrot_pmc_new(interp, enum_class_Hash);
+        PMC     * const  iter = VTABLE_get_iter(interp, PCONST(2));
+
+        while (VTABLE_get_bool(interp, iter)) {
+            STRING  * const  name = VTABLE_shift_string(interp, iter);
+            PMC     * const  meth = VTABLE_get_pmc_keyed_str(interp, PCONST(2), name);
+
+            VTABLE_set_pmc_keyed_str(interp, cache, name, meth);
+        }
+
+        target_st->method_cache = cache;
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(target));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "First argument to publish_method_cache must be a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_repr_unbox_str_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  var = decontainerize(interp, PREG(2));
+
+    if ((var->vtable->base_type == enum_class_SixModelObject)) {
+        SREG(1) = REPR(var)->get_str(interp, var);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_unbox_str on a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_repr_unbox_str_s_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  var = decontainerize(interp, PCONST(2));
+
+    if ((var->vtable->base_type == enum_class_SixModelObject)) {
+        SREG(1) = REPR(var)->get_str(interp, var);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_unbox_str on a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_repr_unbox_int_i_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  var = decontainerize(interp, PREG(2));
+
+    if ((var->vtable->base_type == enum_class_SixModelObject)) {
+        IREG(1) = REPR(var)->get_int(interp, var);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_unbox_int on a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_repr_unbox_int_i_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  var = decontainerize(interp, PCONST(2));
+
+    if ((var->vtable->base_type == enum_class_SixModelObject)) {
+        IREG(1) = REPR(var)->get_int(interp, var);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_unbox_int on a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_repr_unbox_num_n_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  var = decontainerize(interp, PREG(2));
+
+    if ((var->vtable->base_type == enum_class_SixModelObject)) {
+        NREG(1) = REPR(var)->get_num(interp, var);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_unbox_num on a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_repr_unbox_num_n_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  var = decontainerize(interp, PCONST(2));
+
+    if ((var->vtable->base_type == enum_class_SixModelObject)) {
+        NREG(1) = REPR(var)->get_num(interp, var);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_unbox_num on a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_repr_box_str_p_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  type = decontainerize(interp, PREG(3));
+
+    if ((type->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = REPR(type)->instance_of(interp, type);
+        REPR(PREG(1))->set_str(interp, PREG(1), SREG(2));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_box_str with a SixModelObject as the box target");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_repr_box_str_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  type = decontainerize(interp, PREG(3));
+
+    if ((type->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = REPR(type)->instance_of(interp, type);
+        REPR(PREG(1))->set_str(interp, PREG(1), SCONST(2));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_box_str with a SixModelObject as the box target");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_repr_box_str_p_s_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  type = decontainerize(interp, PCONST(3));
+
+    if ((type->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = REPR(type)->instance_of(interp, type);
+        REPR(PREG(1))->set_str(interp, PREG(1), SREG(2));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_box_str with a SixModelObject as the box target");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_repr_box_str_p_sc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  type = decontainerize(interp, PCONST(3));
+
+    if ((type->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = REPR(type)->instance_of(interp, type);
+        REPR(PREG(1))->set_str(interp, PREG(1), SCONST(2));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_box_str with a SixModelObject as the box target");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_repr_box_int_p_i_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  type = decontainerize(interp, PREG(3));
+
+    if ((type->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = REPR(type)->instance_of(interp, type);
+        REPR(PREG(1))->set_int(interp, PREG(1), IREG(2));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_box_int with a SixModelObject as the box target");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_repr_box_int_p_ic_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  type = decontainerize(interp, PREG(3));
+
+    if ((type->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = REPR(type)->instance_of(interp, type);
+        REPR(PREG(1))->set_int(interp, PREG(1), ICONST(2));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_box_int with a SixModelObject as the box target");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_repr_box_int_p_i_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  type = decontainerize(interp, PCONST(3));
+
+    if ((type->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = REPR(type)->instance_of(interp, type);
+        REPR(PREG(1))->set_int(interp, PREG(1), IREG(2));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_box_int with a SixModelObject as the box target");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_repr_box_int_p_ic_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  type = decontainerize(interp, PCONST(3));
+
+    if ((type->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = REPR(type)->instance_of(interp, type);
+        REPR(PREG(1))->set_int(interp, PREG(1), ICONST(2));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_box_int with a SixModelObject as the box target");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_repr_box_num_p_n_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  type = decontainerize(interp, PREG(3));
+
+    if ((type->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = REPR(type)->instance_of(interp, type);
+        REPR(PREG(1))->set_num(interp, PREG(1), NREG(2));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_box_num with a SixModelObject as the box target");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_repr_box_num_p_nc_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  type = decontainerize(interp, PREG(3));
+
+    if ((type->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = REPR(type)->instance_of(interp, type);
+        REPR(PREG(1))->set_num(interp, PREG(1), NCONST(2));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_box_num with a SixModelObject as the box target");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_repr_box_num_p_n_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  type = decontainerize(interp, PCONST(3));
+
+    if ((type->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = REPR(type)->instance_of(interp, type);
+        REPR(PREG(1))->set_num(interp, PREG(1), NREG(2));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_box_num with a SixModelObject as the box target");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_repr_box_num_p_nc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  type = decontainerize(interp, PCONST(3));
+
+    if ((type->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = REPR(type)->instance_of(interp, type);
+        REPR(PREG(1))->set_num(interp, PREG(1), NCONST(2));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use repr_box_num with a SixModelObject as the box target");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_stable_set_type_check_mode_p_i(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  target = decontainerize(interp, PREG(1));
+
+    if ((target->vtable->base_type == enum_class_SixModelObject)) {
+        STABLE(target)->type_check_mode = IREG(2);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use stable_set_type_check_mode with a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_stable_set_type_check_mode_pc_i(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  target = decontainerize(interp, PCONST(1));
+
+    if ((target->vtable->base_type == enum_class_SixModelObject)) {
+        STABLE(target)->type_check_mode = IREG(2);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use stable_set_type_check_mode with a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_stable_set_type_check_mode_p_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  target = decontainerize(interp, PREG(1));
+
+    if ((target->vtable->base_type == enum_class_SixModelObject)) {
+        STABLE(target)->type_check_mode = ICONST(2);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use stable_set_type_check_mode with a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_stable_set_type_check_mode_pc_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  target = decontainerize(interp, PCONST(1));
+
+    if ((target->vtable->base_type == enum_class_SixModelObject)) {
+        STABLE(target)->type_check_mode = ICONST(2);
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use stable_set_type_check_mode with a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_stable_publish_vtable_mapping_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  target = decontainerize(interp, PREG(1));
+
+    if ((target->vtable->base_type == enum_class_SixModelObject)) {
+        INTVAL   i;
+        STable  * const  st = STABLE(target);
+        PMC     * it = VTABLE_get_iter(interp, PREG(2));
+
+        if (st->parrot_vtable_mapping) {
+            mem_sys_free(st->parrot_vtable_mapping);
+        }
+
+        st->parrot_vtable_mapping = mem_allocate_n_zeroed_typed((NUM_VTABLE_FUNCTIONS + PARROT_VTABLE_LOW), PMC *);
+        while (VTABLE_get_bool(interp, it)) {
+            STRING  * name = VTABLE_shift_string(interp, it);
+            char    * c_name = Parrot_str_to_cstring(interp, name);
+            PMC     * meth = VTABLE_get_pmc_keyed_str(interp, PREG(2), name);
+            INTVAL    idx = (-1);
+
+            for (i = PARROT_VTABLE_LOW; (i < (NUM_VTABLE_FUNCTIONS + PARROT_VTABLE_LOW)); (i++)) {
+                if ((strcmp(Parrot_vtable_slot_names[i], c_name) == 0)) {
+                    idx = i;
+                    break;
+                }
+
+            }
+
+            if ((idx >= 0)) {
+                st->parrot_vtable_mapping[idx] = meth;
+            }
+            else {
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "No such Parrot v-table '%Ss'", name);
+            }
+
+        }
+
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(target));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use stable_publish_vtable_mapping with a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_stable_publish_vtable_mapping_pc_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  target = decontainerize(interp, PCONST(1));
+
+    if ((target->vtable->base_type == enum_class_SixModelObject)) {
+        INTVAL   i;
+        STable  * const  st = STABLE(target);
+        PMC     * it = VTABLE_get_iter(interp, PREG(2));
+
+        if (st->parrot_vtable_mapping) {
+            mem_sys_free(st->parrot_vtable_mapping);
+        }
+
+        st->parrot_vtable_mapping = mem_allocate_n_zeroed_typed((NUM_VTABLE_FUNCTIONS + PARROT_VTABLE_LOW), PMC *);
+        while (VTABLE_get_bool(interp, it)) {
+            STRING  * name = VTABLE_shift_string(interp, it);
+            char    * c_name = Parrot_str_to_cstring(interp, name);
+            PMC     * meth = VTABLE_get_pmc_keyed_str(interp, PREG(2), name);
+            INTVAL    idx = (-1);
+
+            for (i = PARROT_VTABLE_LOW; (i < (NUM_VTABLE_FUNCTIONS + PARROT_VTABLE_LOW)); (i++)) {
+                if ((strcmp(Parrot_vtable_slot_names[i], c_name) == 0)) {
+                    idx = i;
+                    break;
+                }
+
+            }
+
+            if ((idx >= 0)) {
+                st->parrot_vtable_mapping[idx] = meth;
+            }
+            else {
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "No such Parrot v-table '%Ss'", name);
+            }
+
+        }
+
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(target));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use stable_publish_vtable_mapping with a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_stable_publish_vtable_mapping_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  target = decontainerize(interp, PREG(1));
+
+    if ((target->vtable->base_type == enum_class_SixModelObject)) {
+        INTVAL   i;
+        STable  * const  st = STABLE(target);
+        PMC     * it = VTABLE_get_iter(interp, PCONST(2));
+
+        if (st->parrot_vtable_mapping) {
+            mem_sys_free(st->parrot_vtable_mapping);
+        }
+
+        st->parrot_vtable_mapping = mem_allocate_n_zeroed_typed((NUM_VTABLE_FUNCTIONS + PARROT_VTABLE_LOW), PMC *);
+        while (VTABLE_get_bool(interp, it)) {
+            STRING  * name = VTABLE_shift_string(interp, it);
+            char    * c_name = Parrot_str_to_cstring(interp, name);
+            PMC     * meth = VTABLE_get_pmc_keyed_str(interp, PCONST(2), name);
+            INTVAL    idx = (-1);
+
+            for (i = PARROT_VTABLE_LOW; (i < (NUM_VTABLE_FUNCTIONS + PARROT_VTABLE_LOW)); (i++)) {
+                if ((strcmp(Parrot_vtable_slot_names[i], c_name) == 0)) {
+                    idx = i;
+                    break;
+                }
+
+            }
+
+            if ((idx >= 0)) {
+                st->parrot_vtable_mapping[idx] = meth;
+            }
+            else {
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "No such Parrot v-table '%Ss'", name);
+            }
+
+        }
+
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(target));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use stable_publish_vtable_mapping with a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_stable_publish_vtable_mapping_pc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  target = decontainerize(interp, PCONST(1));
+
+    if ((target->vtable->base_type == enum_class_SixModelObject)) {
+        INTVAL   i;
+        STable  * const  st = STABLE(target);
+        PMC     * it = VTABLE_get_iter(interp, PCONST(2));
+
+        if (st->parrot_vtable_mapping) {
+            mem_sys_free(st->parrot_vtable_mapping);
+        }
+
+        st->parrot_vtable_mapping = mem_allocate_n_zeroed_typed((NUM_VTABLE_FUNCTIONS + PARROT_VTABLE_LOW), PMC *);
+        while (VTABLE_get_bool(interp, it)) {
+            STRING  * name = VTABLE_shift_string(interp, it);
+            char    * c_name = Parrot_str_to_cstring(interp, name);
+            PMC     * meth = VTABLE_get_pmc_keyed_str(interp, PCONST(2), name);
+            INTVAL    idx = (-1);
+
+            for (i = PARROT_VTABLE_LOW; (i < (NUM_VTABLE_FUNCTIONS + PARROT_VTABLE_LOW)); (i++)) {
+                if ((strcmp(Parrot_vtable_slot_names[i], c_name) == 0)) {
+                    idx = i;
+                    break;
+                }
+
+            }
+
+            if ((idx >= 0)) {
+                st->parrot_vtable_mapping[idx] = meth;
+            }
+            else {
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "No such Parrot v-table '%Ss'", name);
+            }
+
+        }
+
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(target));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use stable_publish_vtable_mapping with a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_stable_publish_vtable_handler_mapping_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  target = decontainerize(interp, PREG(1));
+
+    if ((target->vtable->base_type == enum_class_SixModelObject)) {
+        INTVAL   i;
+        STable  * const  st = STABLE(target);
+        PMC     * it = VTABLE_get_iter(interp, PREG(2));
+
+        if (st->parrot_vtable_handler_mapping) {
+            mem_sys_free(st->parrot_vtable_handler_mapping);
+        }
+
+        st->parrot_vtable_handler_mapping = mem_allocate_n_zeroed_typed((NUM_VTABLE_FUNCTIONS + PARROT_VTABLE_LOW), AttributeIdentifier);
+        while (VTABLE_get_bool(interp, it)) {
+            STRING  * name = VTABLE_shift_string(interp, it);
+            char    * c_name = Parrot_str_to_cstring(interp, name);
+            PMC     * slot = VTABLE_get_pmc_keyed_str(interp, PREG(2), name);
+            INTVAL    idx = (-1);
+
+            for (i = PARROT_VTABLE_LOW; (i < (NUM_VTABLE_FUNCTIONS + PARROT_VTABLE_LOW)); (i++)) {
+                if ((strcmp(Parrot_vtable_slot_names[i], c_name) == 0)) {
+                    idx = i;
+                    break;
+                }
+
+            }
+
+            if ((idx >= 0)) {
+                st->parrot_vtable_handler_mapping[idx].class_handle = VTABLE_get_pmc_keyed_int(interp, slot, 0);
+                st->parrot_vtable_handler_mapping[idx].attr_name = VTABLE_get_string_keyed_int(interp, slot, 1);
+            }
+            else {
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "No such Parrot v-table '%Ss'", name);
+            }
+
+        }
+
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(target));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use stable_publish_vtable_handler_mapping with a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_stable_publish_vtable_handler_mapping_pc_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  target = decontainerize(interp, PCONST(1));
+
+    if ((target->vtable->base_type == enum_class_SixModelObject)) {
+        INTVAL   i;
+        STable  * const  st = STABLE(target);
+        PMC     * it = VTABLE_get_iter(interp, PREG(2));
+
+        if (st->parrot_vtable_handler_mapping) {
+            mem_sys_free(st->parrot_vtable_handler_mapping);
+        }
+
+        st->parrot_vtable_handler_mapping = mem_allocate_n_zeroed_typed((NUM_VTABLE_FUNCTIONS + PARROT_VTABLE_LOW), AttributeIdentifier);
+        while (VTABLE_get_bool(interp, it)) {
+            STRING  * name = VTABLE_shift_string(interp, it);
+            char    * c_name = Parrot_str_to_cstring(interp, name);
+            PMC     * slot = VTABLE_get_pmc_keyed_str(interp, PREG(2), name);
+            INTVAL    idx = (-1);
+
+            for (i = PARROT_VTABLE_LOW; (i < (NUM_VTABLE_FUNCTIONS + PARROT_VTABLE_LOW)); (i++)) {
+                if ((strcmp(Parrot_vtable_slot_names[i], c_name) == 0)) {
+                    idx = i;
+                    break;
+                }
+
+            }
+
+            if ((idx >= 0)) {
+                st->parrot_vtable_handler_mapping[idx].class_handle = VTABLE_get_pmc_keyed_int(interp, slot, 0);
+                st->parrot_vtable_handler_mapping[idx].attr_name = VTABLE_get_string_keyed_int(interp, slot, 1);
+            }
+            else {
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "No such Parrot v-table '%Ss'", name);
+            }
+
+        }
+
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(target));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use stable_publish_vtable_handler_mapping with a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_stable_publish_vtable_handler_mapping_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  target = decontainerize(interp, PREG(1));
+
+    if ((target->vtable->base_type == enum_class_SixModelObject)) {
+        INTVAL   i;
+        STable  * const  st = STABLE(target);
+        PMC     * it = VTABLE_get_iter(interp, PCONST(2));
+
+        if (st->parrot_vtable_handler_mapping) {
+            mem_sys_free(st->parrot_vtable_handler_mapping);
+        }
+
+        st->parrot_vtable_handler_mapping = mem_allocate_n_zeroed_typed((NUM_VTABLE_FUNCTIONS + PARROT_VTABLE_LOW), AttributeIdentifier);
+        while (VTABLE_get_bool(interp, it)) {
+            STRING  * name = VTABLE_shift_string(interp, it);
+            char    * c_name = Parrot_str_to_cstring(interp, name);
+            PMC     * slot = VTABLE_get_pmc_keyed_str(interp, PCONST(2), name);
+            INTVAL    idx = (-1);
+
+            for (i = PARROT_VTABLE_LOW; (i < (NUM_VTABLE_FUNCTIONS + PARROT_VTABLE_LOW)); (i++)) {
+                if ((strcmp(Parrot_vtable_slot_names[i], c_name) == 0)) {
+                    idx = i;
+                    break;
+                }
+
+            }
+
+            if ((idx >= 0)) {
+                st->parrot_vtable_handler_mapping[idx].class_handle = VTABLE_get_pmc_keyed_int(interp, slot, 0);
+                st->parrot_vtable_handler_mapping[idx].attr_name = VTABLE_get_string_keyed_int(interp, slot, 1);
+            }
+            else {
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "No such Parrot v-table '%Ss'", name);
+            }
+
+        }
+
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(target));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use stable_publish_vtable_handler_mapping with a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_stable_publish_vtable_handler_mapping_pc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  target = decontainerize(interp, PCONST(1));
+
+    if ((target->vtable->base_type == enum_class_SixModelObject)) {
+        INTVAL   i;
+        STable  * const  st = STABLE(target);
+        PMC     * it = VTABLE_get_iter(interp, PCONST(2));
+
+        if (st->parrot_vtable_handler_mapping) {
+            mem_sys_free(st->parrot_vtable_handler_mapping);
+        }
+
+        st->parrot_vtable_handler_mapping = mem_allocate_n_zeroed_typed((NUM_VTABLE_FUNCTIONS + PARROT_VTABLE_LOW), AttributeIdentifier);
+        while (VTABLE_get_bool(interp, it)) {
+            STRING  * name = VTABLE_shift_string(interp, it);
+            char    * c_name = Parrot_str_to_cstring(interp, name);
+            PMC     * slot = VTABLE_get_pmc_keyed_str(interp, PCONST(2), name);
+            INTVAL    idx = (-1);
+
+            for (i = PARROT_VTABLE_LOW; (i < (NUM_VTABLE_FUNCTIONS + PARROT_VTABLE_LOW)); (i++)) {
+                if ((strcmp(Parrot_vtable_slot_names[i], c_name) == 0)) {
+                    idx = i;
+                    break;
+                }
+
+            }
+
+            if ((idx >= 0)) {
+                st->parrot_vtable_handler_mapping[idx].class_handle = VTABLE_get_pmc_keyed_int(interp, slot, 0);
+                st->parrot_vtable_handler_mapping[idx].attr_name = VTABLE_get_string_keyed_int(interp, slot, 1);
+            }
+            else {
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "No such Parrot v-table '%Ss'", name);
+            }
+
+        }
+
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(target));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use stable_publish_vtable_handler_mapping with a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_nqp_get_sc_object_p_s_i(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * sc = SC_get_sc(interp, SREG(2));
+
+    if ((!PMC_IS_NULL(sc))) {
+        PREG(1) = VTABLE_get_pmc_keyed_int(interp, sc, IREG(3));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Cannot fetch object from non-existant serialization context %Ss", SREG(2));
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_nqp_get_sc_object_p_sc_i(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * sc = SC_get_sc(interp, SCONST(2));
+
+    if ((!PMC_IS_NULL(sc))) {
+        PREG(1) = VTABLE_get_pmc_keyed_int(interp, sc, IREG(3));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Cannot fetch object from non-existant serialization context %Ss", SCONST(2));
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_nqp_get_sc_object_p_s_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * sc = SC_get_sc(interp, SREG(2));
+
+    if ((!PMC_IS_NULL(sc))) {
+        PREG(1) = VTABLE_get_pmc_keyed_int(interp, sc, ICONST(3));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Cannot fetch object from non-existant serialization context %Ss", SREG(2));
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_nqp_get_sc_object_p_sc_ic(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * sc = SC_get_sc(interp, SCONST(2));
+
+    if ((!PMC_IS_NULL(sc))) {
+        PREG(1) = VTABLE_get_pmc_keyed_int(interp, sc, ICONST(3));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Cannot fetch object from non-existant serialization context %Ss", SCONST(2));
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_nqp_get_sc_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PREG(1) = SC_get_sc(interp, SREG(2));
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_nqp_get_sc_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PREG(1) = SC_get_sc(interp, SCONST(2));
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_nqp_create_sc_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    PREG(1) = Parrot_pmc_new(interp, Parrot_pmc_get_type_str(interp, Parrot_str_new(interp, "SerializationContext", 0)));
+    VTABLE_set_string_native(interp, PREG(1), SREG(2));
+    SC_set_sc(interp, SREG(2), PREG(1));
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_nqp_create_sc_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PREG(1) = Parrot_pmc_new(interp, Parrot_pmc_get_type_str(interp, Parrot_str_new(interp, "SerializationContext", 0)));
+    VTABLE_set_string_native(interp, PREG(1), SCONST(2));
+    SC_set_sc(interp, SCONST(2), PREG(1));
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_nqp_set_sc_object_s_i_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * sc = SC_get_sc(interp, SREG(1));
+
+    if ((!PMC_IS_NULL(sc))) {
+        VTABLE_set_pmc_keyed_int(interp, sc, IREG(2), PREG(3));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Cannot fetch object from non-existant serialization context %Ss", SREG(1));
+    }
+
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_nqp_set_sc_object_sc_i_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * sc = SC_get_sc(interp, SCONST(1));
+
+    if ((!PMC_IS_NULL(sc))) {
+        VTABLE_set_pmc_keyed_int(interp, sc, IREG(2), PREG(3));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Cannot fetch object from non-existant serialization context %Ss", SCONST(1));
+    }
+
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_nqp_set_sc_object_s_ic_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * sc = SC_get_sc(interp, SREG(1));
+
+    if ((!PMC_IS_NULL(sc))) {
+        VTABLE_set_pmc_keyed_int(interp, sc, ICONST(2), PREG(3));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Cannot fetch object from non-existant serialization context %Ss", SREG(1));
+    }
+
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_nqp_set_sc_object_sc_ic_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * sc = SC_get_sc(interp, SCONST(1));
+
+    if ((!PMC_IS_NULL(sc))) {
+        VTABLE_set_pmc_keyed_int(interp, sc, ICONST(2), PREG(3));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Cannot fetch object from non-existant serialization context %Ss", SCONST(1));
+    }
+
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_nqp_set_sc_object_s_i_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * sc = SC_get_sc(interp, SREG(1));
+
+    if ((!PMC_IS_NULL(sc))) {
+        VTABLE_set_pmc_keyed_int(interp, sc, IREG(2), PCONST(3));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Cannot fetch object from non-existant serialization context %Ss", SREG(1));
+    }
+
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_nqp_set_sc_object_sc_i_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * sc = SC_get_sc(interp, SCONST(1));
+
+    if ((!PMC_IS_NULL(sc))) {
+        VTABLE_set_pmc_keyed_int(interp, sc, IREG(2), PCONST(3));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Cannot fetch object from non-existant serialization context %Ss", SCONST(1));
+    }
+
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_nqp_set_sc_object_s_ic_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * sc = SC_get_sc(interp, SREG(1));
+
+    if ((!PMC_IS_NULL(sc))) {
+        VTABLE_set_pmc_keyed_int(interp, sc, ICONST(2), PCONST(3));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Cannot fetch object from non-existant serialization context %Ss", SREG(1));
+    }
+
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_nqp_set_sc_object_sc_ic_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * sc = SC_get_sc(interp, SCONST(1));
+
+    if ((!PMC_IS_NULL(sc))) {
+        VTABLE_set_pmc_keyed_int(interp, sc, ICONST(2), PCONST(3));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Cannot fetch object from non-existant serialization context %Ss", SCONST(1));
+    }
+
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_nqp_set_sc_for_object_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        SC_PMC(PREG(1)) = PREG(2);
+        PARROT_GC_WRITE_BARRIER(interp, PREG(1));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use nqp_set_sc_for_object with a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_nqp_set_sc_for_object_pc_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        SC_PMC(PCONST(1)) = PREG(2);
+        PARROT_GC_WRITE_BARRIER(interp, PCONST(1));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use nqp_set_sc_for_object with a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_nqp_set_sc_for_object_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        SC_PMC(PREG(1)) = PCONST(2);
+        PARROT_GC_WRITE_BARRIER(interp, PREG(1));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use nqp_set_sc_for_object with a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_nqp_set_sc_for_object_pc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        SC_PMC(PCONST(1)) = PCONST(2);
+        PARROT_GC_WRITE_BARRIER(interp, PCONST(1));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use nqp_set_sc_for_object with a SixModelObject");
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_nqp_get_sc_for_object_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PREG(2)->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = SC_PMC(PREG(2));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use nqp_get_sc_for_object with a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_nqp_get_sc_for_object_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PCONST(2)->vtable->base_type == enum_class_SixModelObject)) {
+        PREG(1) = SC_PMC(PCONST(2));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use nqp_get_sc_for_object with a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_nqp_get_package_through_who_p_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PREG(2)->vtable->base_type == enum_class_SixModelObject)) {
+        PMC  * const  who = STABLE(PREG(2))->WHO;
+        PMC  * pkg = VTABLE_get_pmc_keyed_str(interp, who, SREG(3));
+
+        if (PMC_IS_NULL(pkg)) {
+            PMC  * const  old_ctx = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
+            PMC  * const  KnowHOW = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_KNOWHOW);
+            PMC  * const  meth = VTABLE_find_method(interp, KnowHOW, Parrot_str_new(interp, "new_type", 0));
+            PMC  * cappy = Parrot_pmc_new(interp, enum_class_CallContext);
+
+            VTABLE_push_pmc(interp, cappy, KnowHOW);
+            VTABLE_set_string_keyed_str(interp, cappy, Parrot_str_new(interp, "name", 0), SREG(3));
+            Parrot_pcc_invoke_from_sig_object(interp, meth, cappy);
+            cappy = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
+            Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), old_ctx);
+            pkg = VTABLE_get_pmc_keyed_int(interp, cappy, 0);
+            VTABLE_set_pmc_keyed_str(interp, who, SREG(3), pkg);
+        }
+
+        PREG(1) = pkg;
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use nqp_get_package_through_who with a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_nqp_get_package_through_who_p_pc_s(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PCONST(2)->vtable->base_type == enum_class_SixModelObject)) {
+        PMC  * const  who = STABLE(PCONST(2))->WHO;
+        PMC  * pkg = VTABLE_get_pmc_keyed_str(interp, who, SREG(3));
+
+        if (PMC_IS_NULL(pkg)) {
+            PMC  * const  old_ctx = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
+            PMC  * const  KnowHOW = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_KNOWHOW);
+            PMC  * const  meth = VTABLE_find_method(interp, KnowHOW, Parrot_str_new(interp, "new_type", 0));
+            PMC  * cappy = Parrot_pmc_new(interp, enum_class_CallContext);
+
+            VTABLE_push_pmc(interp, cappy, KnowHOW);
+            VTABLE_set_string_keyed_str(interp, cappy, Parrot_str_new(interp, "name", 0), SREG(3));
+            Parrot_pcc_invoke_from_sig_object(interp, meth, cappy);
+            cappy = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
+            Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), old_ctx);
+            pkg = VTABLE_get_pmc_keyed_int(interp, cappy, 0);
+            VTABLE_set_pmc_keyed_str(interp, who, SREG(3), pkg);
+        }
+
+        PREG(1) = pkg;
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use nqp_get_package_through_who with a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_nqp_get_package_through_who_p_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PREG(2)->vtable->base_type == enum_class_SixModelObject)) {
+        PMC  * const  who = STABLE(PREG(2))->WHO;
+        PMC  * pkg = VTABLE_get_pmc_keyed_str(interp, who, SCONST(3));
+
+        if (PMC_IS_NULL(pkg)) {
+            PMC  * const  old_ctx = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
+            PMC  * const  KnowHOW = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_KNOWHOW);
+            PMC  * const  meth = VTABLE_find_method(interp, KnowHOW, Parrot_str_new(interp, "new_type", 0));
+            PMC  * cappy = Parrot_pmc_new(interp, enum_class_CallContext);
+
+            VTABLE_push_pmc(interp, cappy, KnowHOW);
+            VTABLE_set_string_keyed_str(interp, cappy, Parrot_str_new(interp, "name", 0), SCONST(3));
+            Parrot_pcc_invoke_from_sig_object(interp, meth, cappy);
+            cappy = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
+            Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), old_ctx);
+            pkg = VTABLE_get_pmc_keyed_int(interp, cappy, 0);
+            VTABLE_set_pmc_keyed_str(interp, who, SCONST(3), pkg);
+        }
+
+        PREG(1) = pkg;
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use nqp_get_package_through_who with a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_nqp_get_package_through_who_p_pc_sc(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PCONST(2)->vtable->base_type == enum_class_SixModelObject)) {
+        PMC  * const  who = STABLE(PCONST(2))->WHO;
+        PMC  * pkg = VTABLE_get_pmc_keyed_str(interp, who, SCONST(3));
+
+        if (PMC_IS_NULL(pkg)) {
+            PMC  * const  old_ctx = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
+            PMC  * const  KnowHOW = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_KNOWHOW);
+            PMC  * const  meth = VTABLE_find_method(interp, KnowHOW, Parrot_str_new(interp, "new_type", 0));
+            PMC  * cappy = Parrot_pmc_new(interp, enum_class_CallContext);
+
+            VTABLE_push_pmc(interp, cappy, KnowHOW);
+            VTABLE_set_string_keyed_str(interp, cappy, Parrot_str_new(interp, "name", 0), SCONST(3));
+            Parrot_pcc_invoke_from_sig_object(interp, meth, cappy);
+            cappy = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
+            Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), old_ctx);
+            pkg = VTABLE_get_pmc_keyed_int(interp, cappy, 0);
+            VTABLE_set_pmc_keyed_str(interp, who, SCONST(3), pkg);
+        }
+
+        PREG(1) = pkg;
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use nqp_get_package_through_who with a SixModelObject");
+    }
+
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 4;
+}
+
+opcode_t *
+Parrot_is_invokable_i_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PREG(2)->vtable->base_type == enum_class_SixModelObject)) {
+        PMC  ** vt = STABLE(PREG(2))->parrot_vtable_mapping;
+
+        IREG(1) = (vt && (!PMC_IS_NULL(vt[PARROT_VTABLE_SLOT_INVOKE])));
+    }
+    else {
+        IREG(1) = VTABLE_does(interp, PREG(2), Parrot_str_new(interp, "invokable", 0));
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_is_invokable_i_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PCONST(2)->vtable->base_type == enum_class_SixModelObject)) {
+        PMC  ** vt = STABLE(PCONST(2))->parrot_vtable_mapping;
+
+        IREG(1) = (vt && (!PMC_IS_NULL(vt[PARROT_VTABLE_SLOT_INVOKE])));
+    }
+    else {
+        IREG(1) = VTABLE_does(interp, PCONST(2), Parrot_str_new(interp, "invokable", 0));
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_repr_get_primitive_type_spec_i_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  var = decontainerize(interp, PREG(2));
+
+    if ((var->vtable->base_type == enum_class_SixModelObject)) {
+        storage_spec   ss = REPR(var)->get_storage_spec(interp, STABLE(var));
+
+        IREG(1) = ss.inlineable ? ss.boxed_primitive : STORAGE_SPEC_BP_NONE;
+    }
+    else {
+        IREG(1) = STORAGE_SPEC_BP_NONE;
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_repr_get_primitive_type_spec_i_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PMC  * const  var = decontainerize(interp, PCONST(2));
+
+    if ((var->vtable->base_type == enum_class_SixModelObject)) {
+        storage_spec   ss = REPR(var)->get_storage_spec(interp, STABLE(var));
+
+        IREG(1) = ss.inlineable ? ss.boxed_primitive : STORAGE_SPEC_BP_NONE;
+    }
+    else {
+        IREG(1) = STORAGE_SPEC_BP_NONE;
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_is_container_i_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PREG(2)->vtable->base_type == enum_class_SixModelObject)) {
+        IREG(1) = (STABLE(PREG(2))->container_spec != NULL);
+    }
+    else {
+        IREG(1) = 0;
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_is_container_i_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PCONST(2)->vtable->base_type == enum_class_SixModelObject)) {
+        IREG(1) = (STABLE(PCONST(2))->container_spec != NULL);
+    }
+    else {
+        IREG(1) = 0;
+    }
+
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_nqp_decontainerize_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PREG(1) = decontainerize(interp, PREG(2));
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_nqp_decontainerize_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PREG(1) = decontainerize(interp, PCONST(2));
+    PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
+    return cur_opcode + 3;
+}
+
+opcode_t *
+Parrot_set_container_spec_p_p_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        STable  * const  st = STABLE(PREG(1));
+        ContainerSpec  * const  new_spec = mem_allocate_zeroed_typed(ContainerSpec);
+
+        new_spec->value_slot.class_handle = PREG(2);
+        new_spec->value_slot.attr_name = SREG(3);
+        new_spec->fetch_method = PREG(4);
+        if (st->container_spec) {
+            mem_sys_free(st->container_spec);
+        }
+
+        st->container_spec = new_spec;
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(PREG(1)));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use set_container_spec with a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_set_container_spec_pc_p_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        STable  * const  st = STABLE(PCONST(1));
+        ContainerSpec  * const  new_spec = mem_allocate_zeroed_typed(ContainerSpec);
+
+        new_spec->value_slot.class_handle = PREG(2);
+        new_spec->value_slot.attr_name = SREG(3);
+        new_spec->fetch_method = PREG(4);
+        if (st->container_spec) {
+            mem_sys_free(st->container_spec);
+        }
+
+        st->container_spec = new_spec;
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(PCONST(1)));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use set_container_spec with a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_set_container_spec_p_pc_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        STable  * const  st = STABLE(PREG(1));
+        ContainerSpec  * const  new_spec = mem_allocate_zeroed_typed(ContainerSpec);
+
+        new_spec->value_slot.class_handle = PCONST(2);
+        new_spec->value_slot.attr_name = SREG(3);
+        new_spec->fetch_method = PREG(4);
+        if (st->container_spec) {
+            mem_sys_free(st->container_spec);
+        }
+
+        st->container_spec = new_spec;
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(PREG(1)));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use set_container_spec with a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_set_container_spec_pc_pc_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        STable  * const  st = STABLE(PCONST(1));
+        ContainerSpec  * const  new_spec = mem_allocate_zeroed_typed(ContainerSpec);
+
+        new_spec->value_slot.class_handle = PCONST(2);
+        new_spec->value_slot.attr_name = SREG(3);
+        new_spec->fetch_method = PREG(4);
+        if (st->container_spec) {
+            mem_sys_free(st->container_spec);
+        }
+
+        st->container_spec = new_spec;
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(PCONST(1)));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use set_container_spec with a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_set_container_spec_p_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        STable  * const  st = STABLE(PREG(1));
+        ContainerSpec  * const  new_spec = mem_allocate_zeroed_typed(ContainerSpec);
+
+        new_spec->value_slot.class_handle = PREG(2);
+        new_spec->value_slot.attr_name = SCONST(3);
+        new_spec->fetch_method = PREG(4);
+        if (st->container_spec) {
+            mem_sys_free(st->container_spec);
+        }
+
+        st->container_spec = new_spec;
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(PREG(1)));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use set_container_spec with a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_set_container_spec_pc_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        STable  * const  st = STABLE(PCONST(1));
+        ContainerSpec  * const  new_spec = mem_allocate_zeroed_typed(ContainerSpec);
+
+        new_spec->value_slot.class_handle = PREG(2);
+        new_spec->value_slot.attr_name = SCONST(3);
+        new_spec->fetch_method = PREG(4);
+        if (st->container_spec) {
+            mem_sys_free(st->container_spec);
+        }
+
+        st->container_spec = new_spec;
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(PCONST(1)));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use set_container_spec with a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_set_container_spec_p_pc_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        STable  * const  st = STABLE(PREG(1));
+        ContainerSpec  * const  new_spec = mem_allocate_zeroed_typed(ContainerSpec);
+
+        new_spec->value_slot.class_handle = PCONST(2);
+        new_spec->value_slot.attr_name = SCONST(3);
+        new_spec->fetch_method = PREG(4);
+        if (st->container_spec) {
+            mem_sys_free(st->container_spec);
+        }
+
+        st->container_spec = new_spec;
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(PREG(1)));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use set_container_spec with a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_set_container_spec_pc_pc_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        STable  * const  st = STABLE(PCONST(1));
+        ContainerSpec  * const  new_spec = mem_allocate_zeroed_typed(ContainerSpec);
+
+        new_spec->value_slot.class_handle = PCONST(2);
+        new_spec->value_slot.attr_name = SCONST(3);
+        new_spec->fetch_method = PREG(4);
+        if (st->container_spec) {
+            mem_sys_free(st->container_spec);
+        }
+
+        st->container_spec = new_spec;
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(PCONST(1)));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use set_container_spec with a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_set_container_spec_p_p_s_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        STable  * const  st = STABLE(PREG(1));
+        ContainerSpec  * const  new_spec = mem_allocate_zeroed_typed(ContainerSpec);
+
+        new_spec->value_slot.class_handle = PREG(2);
+        new_spec->value_slot.attr_name = SREG(3);
+        new_spec->fetch_method = PCONST(4);
+        if (st->container_spec) {
+            mem_sys_free(st->container_spec);
+        }
+
+        st->container_spec = new_spec;
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(PREG(1)));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use set_container_spec with a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_set_container_spec_pc_p_s_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        STable  * const  st = STABLE(PCONST(1));
+        ContainerSpec  * const  new_spec = mem_allocate_zeroed_typed(ContainerSpec);
+
+        new_spec->value_slot.class_handle = PREG(2);
+        new_spec->value_slot.attr_name = SREG(3);
+        new_spec->fetch_method = PCONST(4);
+        if (st->container_spec) {
+            mem_sys_free(st->container_spec);
+        }
+
+        st->container_spec = new_spec;
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(PCONST(1)));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use set_container_spec with a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_set_container_spec_p_pc_s_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        STable  * const  st = STABLE(PREG(1));
+        ContainerSpec  * const  new_spec = mem_allocate_zeroed_typed(ContainerSpec);
+
+        new_spec->value_slot.class_handle = PCONST(2);
+        new_spec->value_slot.attr_name = SREG(3);
+        new_spec->fetch_method = PCONST(4);
+        if (st->container_spec) {
+            mem_sys_free(st->container_spec);
+        }
+
+        st->container_spec = new_spec;
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(PREG(1)));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use set_container_spec with a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_set_container_spec_pc_pc_s_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        STable  * const  st = STABLE(PCONST(1));
+        ContainerSpec  * const  new_spec = mem_allocate_zeroed_typed(ContainerSpec);
+
+        new_spec->value_slot.class_handle = PCONST(2);
+        new_spec->value_slot.attr_name = SREG(3);
+        new_spec->fetch_method = PCONST(4);
+        if (st->container_spec) {
+            mem_sys_free(st->container_spec);
+        }
+
+        st->container_spec = new_spec;
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(PCONST(1)));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use set_container_spec with a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_set_container_spec_p_p_sc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        STable  * const  st = STABLE(PREG(1));
+        ContainerSpec  * const  new_spec = mem_allocate_zeroed_typed(ContainerSpec);
+
+        new_spec->value_slot.class_handle = PREG(2);
+        new_spec->value_slot.attr_name = SCONST(3);
+        new_spec->fetch_method = PCONST(4);
+        if (st->container_spec) {
+            mem_sys_free(st->container_spec);
+        }
+
+        st->container_spec = new_spec;
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(PREG(1)));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use set_container_spec with a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_set_container_spec_pc_p_sc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        STable  * const  st = STABLE(PCONST(1));
+        ContainerSpec  * const  new_spec = mem_allocate_zeroed_typed(ContainerSpec);
+
+        new_spec->value_slot.class_handle = PREG(2);
+        new_spec->value_slot.attr_name = SCONST(3);
+        new_spec->fetch_method = PCONST(4);
+        if (st->container_spec) {
+            mem_sys_free(st->container_spec);
+        }
+
+        st->container_spec = new_spec;
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(PCONST(1)));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use set_container_spec with a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_set_container_spec_p_pc_sc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PREG(1)->vtable->base_type == enum_class_SixModelObject)) {
+        STable  * const  st = STABLE(PREG(1));
+        ContainerSpec  * const  new_spec = mem_allocate_zeroed_typed(ContainerSpec);
+
+        new_spec->value_slot.class_handle = PCONST(2);
+        new_spec->value_slot.attr_name = SCONST(3);
+        new_spec->fetch_method = PCONST(4);
+        if (st->container_spec) {
+            mem_sys_free(st->container_spec);
+        }
+
+        st->container_spec = new_spec;
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(PREG(1)));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use set_container_spec with a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
+Parrot_set_container_spec_pc_pc_sc_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    if ((PCONST(1)->vtable->base_type == enum_class_SixModelObject)) {
+        STable  * const  st = STABLE(PCONST(1));
+        ContainerSpec  * const  new_spec = mem_allocate_zeroed_typed(ContainerSpec);
+
+        new_spec->value_slot.class_handle = PCONST(2);
+        new_spec->value_slot.attr_name = SCONST(3);
+        new_spec->fetch_method = PCONST(4);
+        if (st->container_spec) {
+            mem_sys_free(st->container_spec);
+        }
+
+        st->container_spec = new_spec;
+        PARROT_GC_WRITE_BARRIER(interp, STABLE_PMC(PCONST(1)));
+    }
+    else {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Can only use set_container_spec with a SixModelObject");
+    }
+
+    return cur_opcode + 5;
+}
+
+opcode_t *
 Parrot_new_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING  * const  name = SREG(2);
     PMC     * const  _class = Parrot_pcc_get_HLL(interp, CURRENT_CONTEXT(interp)) ? Parrot_oo_get_class_str(interp, name) : PMCNULL;
@@ -24621,6 +30463,7 @@ Parrot_terminate(opcode_t *cur_opcode, PARROT_INTERP) {
     UNUSED(interp);
     UNUSED(cur_opcode);
     return (opcode_t *)0;
+    return cur_opcode + 1;
 }
 
 
@@ -24636,7 +30479,7 @@ op_lib_t core_op_lib = {
   0,                                /* flags */
   PARROT_PBC_MAJOR,
   PARROT_PBC_MINOR,
-  1129,             /* op_count */
+  1329,             /* op_count */
   core_op_info_table,       /* op_info_table */
   core_op_func_table,       /* op_func_table */
   get_op          /* op_code() */ 
