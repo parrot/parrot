@@ -1,8 +1,12 @@
-/* This file contains various structure definitions for the 6model object
+/* 6model/sixmodelobject.h
+ * Copyright (C) 2010-2011, The Perl Foundation.
+ * Copyright (C) 2014, Parrot Foundation.
+ *
+ * This file contains various structure definitions for the 6model object
  * meta-model implementation. */
 
-#ifndef SIXMODELOBJECT_H_GUARD
-#define SIXMODELOBJECT_H_GUARD
+#ifndef PARROT_SIXMODELOBJECT_H_GUARD
+#define PARROT_SIXMODELOBJECT_H_GUARD
 
 #include "storage_spec.h"
 
@@ -269,12 +273,52 @@ struct SixModel_REPROps {
 #define STABLE_STRUCT(p) ((STable *)PMC_data(p))
 #define REPR(o)          (STABLE(o)->REPR)
 
-/* Object model initialization. */
-void SixModelObject_initialize(PARROT_INTERP, PMC **knowhow, PMC **knowhow_attribute);
+/* HEADERIZER BEGIN: src/6model/sixmodelobject.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-/* Some utility functions. */
-PMC * wrap_object(PARROT_INTERP, void *obj);
-PMC * create_stable(PARROT_INTERP, REPROps *REPR, PMC *HOW);
-PMC * decontainerize(PARROT_INTERP, PMC *var);
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC * create_stable(PARROT_INTERP, ARGIN(REPROps *REPR), ARGIN(PMC *HOW))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC * decontainerize(PARROT_INTERP, ARGIN(PMC *var))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+void SixModelObject_initialize(PARROT_INTERP,
+    ARGOUT(PMC **knowhow),
+    ARGOUT(PMC **knowhow_attribute))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*knowhow)
+        FUNC_MODIFIES(*knowhow_attribute);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC * wrap_object(PARROT_INTERP, ARGIN(void *obj))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+#define ASSERT_ARGS_create_stable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(REPR) \
+    , PARROT_ASSERT_ARG(HOW))
+#define ASSERT_ARGS_decontainerize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(var))
+#define ASSERT_ARGS_SixModelObject_initialize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(knowhow) \
+    , PARROT_ASSERT_ARG(knowhow_attribute))
+#define ASSERT_ARGS_wrap_object __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(obj))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: src/6model/sixmodelobject.c */
 
 #endif

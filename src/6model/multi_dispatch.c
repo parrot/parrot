@@ -281,7 +281,7 @@ PMC *nqp_multi_dispatch(PARROT_INTERP, PMC *dispatcher, PMC *capture) {
 
     /* Ensure we know what is a 6model object and what is not. */
     if (!smo_id)
-        smo_id = pmc_type(interp, Parrot_str_new(interp, "SixModelObject", 0));
+        smo_id = pmc_type(interp, CONST_STRING(interp, "SixModelObject"));
 
     /* Iterate over the candidates and collect best ones; terminate
      * when we see two nulls (may break out earlier). */

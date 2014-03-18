@@ -513,7 +513,6 @@ PMC * Parrot_pcc_unproxy_context(PARROT_INTERP, ARGIN(PMC * proxy))
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-PARROT_WARN_UNUSED_RESULT
 PMC * Parrot_set_new_context(PARROT_INTERP,
     ARGIN(const UINTVAL *number_regs_used))
         __attribute__nonnull__(1)

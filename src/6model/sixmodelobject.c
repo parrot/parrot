@@ -1,31 +1,61 @@
 /*
-Copyright (C) 2011, Parrot Foundation.
-*/
+ * Copyright (C) 2010-2011, The Perl Foundation.
+ * Copyright (C) 2014, Parrot Foundation.
 
+=head1 NAME
+
+src/6model/sixmodelobject.c - bootstrap KnowHOW
+
+=head1 DESCRIPTION
+
+Initializes 6model and produces the KnowHOW core meta-object.
+
+=head2 Internal Functions
+
+=over 4
+
+=cut
+
+*/
 #include "parrot/parrot.h"
 #include "parrot/extend.h"
+#include "sixmodelobject.str"
 #include "parrot/6model/sixmodelobject.h"
 #include "parrot/6model/repr_registry.h"
 #include "parrot/6model/knowhow_bootstrapper.h"
 #include "parrot/6model/serialization_context.h"
 
-/* HEADERIZER HFILE: none */
+/* HEADERIZER HFILE: include/parrot/6model/sixmodelobject.h */
+
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PMC * default_find_method(PARROT_INTERP,
-    PMC *obj,
-    STRING *name,
+    ARGIN(PMC *obj),
+    ARGIN(STRING *name),
     INTVAL hint)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
-static INTVAL default_type_check(PARROT_INTERP, PMC *to_check, PMC *wanted)
-        __attribute__nonnull__(1);
+PARROT_WARN_UNUSED_RESULT
+static INTVAL default_type_check(PARROT_INTERP,
+    ARGIN(PMC *to_check),
+    ARGIN(PMC *wanted))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_default_find_method __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(obj) \
+    , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_default_type_check __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(to_check) \
+    , PARROT_ASSERT_ARG(wanted))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -34,49 +64,21 @@ static STRING *find_method_str = NULL;
 static STRING *type_check_str = NULL;
 static STRING *accepts_type_str = NULL;
 
-/* Initializes 6model and produces the KnowHOW core meta-object. */
-void
-SixModelObject_initialize(PARROT_INTERP, PMC **knowhow, PMC **knowhow_attribute)
-{
-    PMC    *initial_sc;
-    STRING *initial_sc_name;
+/*
 
-    /* Look up and cache some strings. */
-    find_method_str  = Parrot_str_new_constant(interp, "find_method");
-    type_check_str   = Parrot_str_new_constant(interp, "type_check");
-    accepts_type_str = Parrot_str_new_constant(interp, "accepts_type");
+=item C<static PMC * default_find_method(PARROT_INTERP, PMC *obj, STRING *name,
+INTVAL hint)>
 
-    /* Create initial core serialization context. */
-    initial_sc = Parrot_pmc_new(interp, enum_class_SerializationContext);
-    initial_sc_name = Parrot_str_new(interp, "__6MODEL_CORE__", 0);
-    VTABLE_set_string_native(interp, initial_sc, initial_sc_name);
-    SC_set_sc(interp, initial_sc_name, initial_sc);
+This is the default method dispatch code. It tries to use the
+v-table first, then falls back to a lookup
 
-    /* Build representations and initializes the representation registry. */
-    REPR_initialize_registry(interp);
+=cut
 
-    /* Bootstrap the KnowHOW. */
-    *knowhow = SixModelObject_bootstrap_knowhow(interp, initial_sc);
-
-    /* Set up the simple KnowHOWAttribute. */
-    *knowhow_attribute = SixModelObject_setup_knowhow_attribute(interp, initial_sc, *knowhow);
-}
-
-/* Takes an object and wraps it in a SixModelObject PMC. */
-PMC *
-wrap_object(PARROT_INTERP, void *obj)
-{
-    PMC *obj_pmc = Parrot_pmc_new_noinit(interp, enum_class_SixModelObject);
-    PObj_custom_mark_SET(obj_pmc);
-    PObj_custom_destroy_SET(obj_pmc);
-    PMC_data(obj_pmc) = obj;
-    return obj_pmc;
-}
-
-/* This is the default method dispatch code. It tries to use the
- * v-table first, then falls back to a lookup. */
+*/
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PMC *
-default_find_method(PARROT_INTERP, PMC *obj, STRING *name, INTVAL hint)
+default_find_method(PARROT_INTERP, ARGIN(PMC *obj), ARGIN(STRING *name), INTVAL hint)
 {
     ASSERT_ARGS(default_find_method)
     PMC *HOW, *meth, *result;
@@ -110,11 +112,21 @@ default_find_method(PARROT_INTERP, PMC *obj, STRING *name, INTVAL hint)
     return result;
 }
 
-/* This is the default type checking implementation. Note: it may also
- * be the only one we end up with since the HOW is the authority here.
- * So we may end up not calling this through the S-Table in the end. */
+/*
+
+=item C<static INTVAL default_type_check(PARROT_INTERP, PMC *to_check, PMC
+*wanted)>
+
+This is the default type checking implementation. Note: it may also
+be the only one we end up with since the HOW is the authority here.
+So we may end up not calling this through the S-Table in the end.
+
+=cut
+
+*/
+PARROT_WARN_UNUSED_RESULT
 static INTVAL
-default_type_check(PARROT_INTERP, PMC *to_check, PMC *wanted)
+default_type_check(PARROT_INTERP, ARGIN(PMC *to_check), ARGIN(PMC *wanted))
 {
     ASSERT_ARGS(default_type_check)
     PMC *HOW, *meth, *result;
@@ -170,9 +182,86 @@ default_type_check(PARROT_INTERP, PMC *to_check, PMC *wanted)
     return 0;
 }
 
-/* Creates an STable that references the given REPR and HOW. */
+/*
+
+=back
+
+=head2 Functions
+
+=over 4
+
+=item C<void SixModelObject_initialize(PARROT_INTERP, PMC **knowhow, PMC
+**knowhow_attribute)>
+
+Initializes 6model and produces the KnowHOW core meta-object.
+
+=cut
+
+*/
+void
+SixModelObject_initialize(PARROT_INTERP, ARGOUT(PMC **knowhow),
+                          ARGOUT(PMC **knowhow_attribute))
+{
+    ASSERT_ARGS(SixModelObject_initialize)
+    PMC    *initial_sc;
+    STRING *initial_sc_name;
+
+    /* Look up and cache some strings. */
+    find_method_str  = CONST_STRING(interp, "find_method");
+    type_check_str   = CONST_STRING(interp, "type_check");
+    accepts_type_str = CONST_STRING(interp, "accepts_type");
+
+    /* Create initial core serialization context. */
+    initial_sc = Parrot_pmc_new(interp, enum_class_SerializationContext);
+    initial_sc_name = Parrot_str_new(interp, "__6MODEL_CORE__", 0);
+    VTABLE_set_string_native(interp, initial_sc, initial_sc_name);
+    SC_set_sc(interp, initial_sc_name, initial_sc);
+
+    /* Build representations and initializes the representation registry. */
+    REPR_initialize_registry(interp);
+
+    /* Bootstrap the KnowHOW. */
+    *knowhow = SixModelObject_bootstrap_knowhow(interp, initial_sc);
+
+    /* Set up the simple KnowHOWAttribute. */
+    *knowhow_attribute = SixModelObject_setup_knowhow_attribute(interp, initial_sc, *knowhow);
+}
+
+/*
+
+=item C<PMC * wrap_object(PARROT_INTERP, void *obj)>
+
+Takes an object and wraps it in a SixModelObject PMC.
+
+=cut
+
+*/
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC *
-create_stable(PARROT_INTERP, REPROps *REPR, PMC *HOW)
+wrap_object(PARROT_INTERP, ARGIN(void *obj))
+{
+    ASSERT_ARGS(wrap_object)
+    PMC *obj_pmc = Parrot_pmc_new_noinit(interp, enum_class_SixModelObject);
+    PObj_custom_mark_SET(obj_pmc);
+    PObj_custom_destroy_SET(obj_pmc);
+    PMC_data(obj_pmc) = obj;
+    return obj_pmc;
+}
+
+/*
+
+=item C<PMC * create_stable(PARROT_INTERP, REPROps *REPR, PMC *HOW)>
+
+Creates an STable that references the given REPR and HOW.
+
+=cut
+
+*/
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+create_stable(PARROT_INTERP, ARGIN(REPROps *REPR), ARGIN(PMC *HOW))
 {
     PMC *st_pmc = Parrot_pmc_new_init(interp, enum_class_STable, HOW);
     STABLE_STRUCT(st_pmc)->REPR = REPR;
@@ -182,10 +271,20 @@ create_stable(PARROT_INTERP, REPROps *REPR, PMC *HOW)
     return st_pmc;
 }
 
-/* Performs a decontainerizing operation onf the passed variable, using
- * the 6model container API. */
+/*
+
+=item C<PMC * decontainerize(PARROT_INTERP, PMC *var)>
+
+Performs a decontainerizing operation on the passed variable, using
+the 6model container API
+
+=cut
+
+*/
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC *
-decontainerize(PARROT_INTERP, PMC *var)
+decontainerize(PARROT_INTERP, ARGIN(PMC *var))
 {
     if (var->vtable->base_type == enum_class_SixModelObject) {
         ContainerSpec *spec = STABLE(var)->container_spec;
@@ -210,6 +309,14 @@ decontainerize(PARROT_INTERP, PMC *var)
     }
     return var;
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

@@ -1546,23 +1546,49 @@ src/6model/repr_registry$(O) : $(PARROT_H_HEADERS) \
 	src/6model/repr_registry.str \
 	src/6model/repr_registry.c
 
-src/6model/serialization_context$(O) : $(PARROT_H_HEADERS) $(EXTEND_HEADERS) src/6model/serialization_context.c
+src/6model/serialization_context$(O) : $(PARROT_H_HEADERS) \
+	src/6model/serialization_context.str \
+	src/6model/serialization_context.c
 
-src/6model/sixmodelobject$(O) : $(PARROT_H_HEADERS) $(EXTEND_HEADERS) include/parrot/6model/knowhow_bootstrapper.h src/6model/sixmodelobject.c
+src/6model/sixmodelobject$(O) : $(PARROT_H_HEADERS) \
+	$(INC_DIR)/6model/knowhow_bootstrapper.h \
+	src/6model/sixmodelobject.str \
+	src/6model/sixmodelobject.c
 
-src/6model/reprs/HashAttrStore$(O) : $(PARROT_H_HEADERS) $(EXTEND_HEADERS) include/parrot/6model/repr/HashAttrStore.h src/6model/reprs/HashAttrStore.c
+src/6model/reprs/HashAttrStore$(O) : $(PARROT_H_HEADERS) \
+	$(INC_DIR)/6model/repr/HashAttrStore.h \
+	src/6model/reprs/HashAttrStore.str \
+	src/6model/reprs/HashAttrStore.c
 
-src/6model/reprs/KnowHOWREPR$(O) : $(PARROT_H_HEADERS) $(EXTEND_HEADERS) include/parrot/6model/repr/KnowHOWREPR.h src/6model/reprs/KnowHOWREPR.c
+src/6model/reprs/KnowHOWREPR$(O) : $(PARROT_H_HEADERS) \
+	$(INC_DIR)/6model/repr/KnowHOWREPR.h \
+	src/6model/reprs/KnowHOWREPR.str \
+	src/6model/reprs/KnowHOWREPR.c
 
-src/6model/reprs/P6int$(O) : $(PARROT_H_HEADERS) $(EXTEND_HEADERS) include/parrot/6model/repr/P6int.h src/6model/reprs/P6int.c
+src/6model/reprs/P6int$(O) : $(PARROT_H_HEADERS) \
+	$(INC_DIR)/6model/repr/P6int.h \
+	src/6model/reprs/P6int.str \
+	src/6model/reprs/P6int.c
 
-src/6model/reprs/P6num$(O) : $(PARROT_H_HEADERS) $(EXTEND_HEADERS) include/parrot/6model/repr/P6num.h src/6model/reprs/P6num.c
+src/6model/reprs/P6num$(O) : $(PARROT_H_HEADERS) \
+	$(INC_DIR)/6model/repr/P6num.h \
+	src/6model/reprs/P6num.str \
+	src/6model/reprs/P6num.c
 
-src/6model/reprs/P6opaque$(O) : $(PARROT_H_HEADERS) $(EXTEND_HEADERS) include/parrot/6model/repr/P6opaque.h src/6model/reprs/P6opaque.c
+src/6model/reprs/P6opaque$(O) : $(PARROT_H_HEADERS) \
+	$(INC_DIR)/6model/repr/P6opaque.h \
+	src/6model/reprs/P6opaque.str \
+	src/6model/reprs/P6opaque.c
 
-src/6model/reprs/P6str$(O) : $(PARROT_H_HEADERS) $(EXTEND_HEADERS) include/parrot/6model/repr/P6str.h src/6model/reprs/P6str.c
+src/6model/reprs/P6str$(O) : $(PARROT_H_HEADERS) \
+	$(INC_DIR)/6model/repr/P6str.h \
+	src/6model/reprs/P6str.str \
+	src/6model/reprs/P6str.c
 
-src/6model/reprs/Uninstantiable$(O) : $(PARROT_H_HEADERS) $(EXTEND_HEADERS) include/parrot/6model/repr/Uninstantiable.h src/6model/reprs/Uninstantiable.c
+src/6model/reprs/Uninstantiable$(O) : $(PARROT_H_HEADERS) \
+	$(INC_DIR)/6model/repr/Uninstantiable.h \
+	src/6model/reprs/Uninstantiable.str \
+	src/6model/reprs/Uninstantiable.c
 
 src/datatypes$(O) : $(PARROT_H_HEADERS) src/datatypes.c
 
@@ -1588,7 +1614,9 @@ src/pmc$(O) : \
 	src/pmc.c \
 	src/pmc.str
 
-src/packfile/object_serialization$(O) : $(PARROT_H_HEADERS) src/packfile/object_serialization.str src/packfile/object_serialization.c
+src/packfile/object_serialization$(O) : $(PARROT_H_HEADERS) \
+	src/packfile/object_serialization.str \
+	src/packfile/object_serialization.c
 
 src/hash$(O) : $(PARROT_H_HEADERS) src/hash.c
 
