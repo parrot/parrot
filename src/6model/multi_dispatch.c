@@ -9,9 +9,10 @@ src/6model/multi_dispatch.c - simplified Perl6-like multiple dispatch
 =head1 DESCRIPTION
 
 This file contains a somewhat simplified implementation of the Perl 6
-multiple dispatch algorithm, to the degree that NQP needs it.
+multiple dispatch algorithm, to the degree that NQP needs it and Parrot
+and anybody else can benefit from it.
 
-=head2 Functions
+=head2 Internal Functions
 
 =over 4
 
@@ -20,8 +21,8 @@ multiple dispatch algorithm, to the degree that NQP needs it.
 */
 #include "parrot/parrot.h"
 #include "multi_dispatch.str"
-#include "parrot/6model/sixmodelobject.h"
 #include "pmc/pmc_sub.h"
+#include "parrot/6model/sixmodelobject.h"
 #include "parrot/6model/multi_dispatch.h"
 
 /* Candidate info node in the sorted candidate lists. */
@@ -51,6 +52,36 @@ typedef struct candidate_graph_node {
 /* Special value we set arity to when we have a slurpy. */
 #define SLURPY_ARITY 1 << 30
 
+/* HEADERIZER HFILE: include/parrot/6model/multi_dispatch.h */
+
+/* HEADERIZER BEGIN: static */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_WARN_UNUSED_RESULT
+static INTVAL is_narrower(PARROT_INTERP,
+    ARGIN(candidate_info *a),
+    ARGIN(candidate_info *b))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+PARROT_WARN_UNUSED_RESULT
+static INTVAL is_narrower_type(PARROT_INTERP, ARGIN(PMC *a), ARGIN(PMC *b))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
+
+#define ASSERT_ARGS_is_narrower __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(a) \
+    , PARROT_ASSERT_ARG(b))
+#define ASSERT_ARGS_is_narrower_type __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(a) \
+    , PARROT_ASSERT_ARG(b))
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: static */
+
 /* Cached type ID for 6model Object. */
 static INTVAL smo_id = 0;
 
@@ -58,9 +89,20 @@ static INTVAL smo_id = 0;
 #define DEFINED_ONLY    1
 #define UNDEFINED_ONLY  2
 
+/*
 
-/* Compares two types to see if the first is narrower than the second. */
-static INTVAL is_narrower_type(PARROT_INTERP, PMC *a, PMC *b) {
+=item C<static INTVAL is_narrower_type(PARROT_INTERP, PMC *a, PMC *b)>
+
+Compares two types to see if the first is narrower than the second.
+
+=cut
+
+*/
+PARROT_WARN_UNUSED_RESULT
+static INTVAL
+is_narrower_type(PARROT_INTERP, ARGIN(PMC *a), ARGIN(PMC *b))
+{
+    ASSERT_ARGS(is_narrower_type)
     /* If one of the types is null, then we know that's automatically
      * wider than anything. Even wider than your mom! */
     if (PMC_IS_NULL(b) && !PMC_IS_NULL(a))
@@ -72,9 +114,24 @@ static INTVAL is_narrower_type(PARROT_INTERP, PMC *a, PMC *b) {
     return STABLE(a)->type_check(interp, a, b) != 0;
 }
 
-/* Takes two candidates and determines if the first one is narrower than the
- * second. Returns a true value if they are. */
-static INTVAL is_narrower(PARROT_INTERP, candidate_info *a, candidate_info *b) {
+/*
+
+=item C<static INTVAL is_narrower(PARROT_INTERP, candidate_info *a,
+candidate_info *b)>
+
+Takes two candidates and determines if the first one is narrower than the
+second. Returns a true value if they are.
+
+=cut
+
+*/
+PARROT_WARN_UNUSED_RESULT
+static INTVAL
+is_narrower(PARROT_INTERP,
+            ARGIN(candidate_info *a),
+            ARGIN(candidate_info *b))
+{
+    ASSERT_ARGS(is_narrower)
     INTVAL narrower = 0;
     INTVAL tied = 0;
     INTVAL i, types_to_check;
@@ -117,9 +174,21 @@ static INTVAL is_narrower(PARROT_INTERP, candidate_info *a, candidate_info *b) {
     return a->max_arity != SLURPY_ARITY && b->max_arity == SLURPY_ARITY;
 }
 
-/* Takes a ResizablePMCArray of the candidates, collects information about them
-* and then does a topological sort of them. */
-static candidate_info** sort_candidates(PARROT_INTERP, PMC *candidates) {
+/*
+
+=item C<static candidate_info** sort_candidates(PARROT_INTERP, PMC *candidates)>
+
+Takes a ResizablePMCArray of the candidates, collects information about them
+and then does a topological sort of them.
+
+=cut
+
+*/
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static candidate_info**
+sort_candidates(PARROT_INTERP, ARGIN(PMC *candidates)) {
+    ASSERT_ARGS(sort_candidates)
     INTVAL i, candidates_to_sort, result_pos;
     const char *error = NULL;
 
@@ -258,9 +327,31 @@ static candidate_info** sort_candidates(PARROT_INTERP, PMC *candidates) {
     return result;
 }
 
-/* Performs a multiple dispatch using the candidates held in the passed
- * DispatcherSub and using the arguments in the passed capture. */
-PMC *nqp_multi_dispatch(PARROT_INTERP, PMC *dispatcher, PMC *capture) {
+/*
+
+=back
+
+=head2 Functions
+
+=over 4
+
+=item C<PMC * Parrot_sixmodel_multi_dispatch(PARROT_INTERP, PMC *dispatcher, PMC
+*capture)>
+
+Performs a multiple dispatch using the candidates held in the passed
+DispatcherSub and using the arguments in the passed capture.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_sixmodel_multi_dispatch(PARROT_INTERP, ARGIN(PMC *dispatcher), ARGIN(PMC *capture))
+{
+    ASSERT_ARGS(nqp_multi_dispatch)
     /* Get list and number of dispatchees. */
     PMC *dispatchees = PARROT_DISPATCHERSUB(dispatcher)->dispatchees;
     const INTVAL num_candidates = VTABLE_elements(interp, dispatchees);
@@ -394,6 +485,14 @@ PMC *nqp_multi_dispatch(PARROT_INTERP, PMC *dispatcher, PMC *capture) {
                 VTABLE_get_string(interp, candidates[0]->sub), signatures);
     }
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:
