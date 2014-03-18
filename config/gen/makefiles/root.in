@@ -1529,11 +1529,22 @@ examples/pasm/hello$(EXE): examples/pasm/hello.pbc $(PBC_TO_EXE)
 #
 ###############################################################################
 
-src/6model/knowhow_bootstrapper$(O) : $(PARROT_H_HEADERS) $(EXTEND_HEADERS) include/parrot/6model/knowhow_bootstrapper.h include/parrot/6model/repr/KnowHOWREPR.h src/6model/knowhow_bootstrapper.c
+src/6model/knowhow_bootstrapper$(O) : $(PARROT_H_HEADERS) \
+	$(INC_DIR)/6model/knowhow_bootstrapper.h \
+	$(INC_DIR)/6model/repr/KnowHOWREPR.h \
+	src/6model/knowhow_bootstrapper.str \
+	src/6model/knowhow_bootstrapper.c
 
-src/6model/multi_dispatch$(O) : $(PARROT_H_HEADERS) $(EXTEND_HEADERS) include/parrot/6model/multi_dispatch.h include/pmc/pmc_sub.h src/6model/multi_dispatch.c
+src/6model/multi_dispatch$(O) : $(PARROT_H_HEADERS) \
+	$(INC_DIR)/6model/multi_dispatch.h \
+	$(INC_PMC_DIR)/pmc_sub.h \
+	src/6model/multi_dispatch.str \
+	src/6model/multi_dispatch.c
 
-src/6model/repr_registry$(O) : $(PARROT_H_HEADERS) $(SIX_MODEL_REPR_HEADERS) $(EXTEND_HEADERS) src/6model/repr_registry.c
+src/6model/repr_registry$(O) : $(PARROT_H_HEADERS) \
+	$(SIX_MODEL_REPR_HEADERS) \
+	src/6model/repr_registry.str \
+	src/6model/repr_registry.c
 
 src/6model/serialization_context$(O) : $(PARROT_H_HEADERS) $(EXTEND_HEADERS) src/6model/serialization_context.c
 

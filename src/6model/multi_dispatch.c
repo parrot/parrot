@@ -1,17 +1,28 @@
 /*
-Copyright (C) 2011, Parrot Foundation.
-*/
+ * Copyright (C) 2010-2011, The Perl Foundation.
+ * Copyright (C) 2014, Parrot Foundation.
 
+=head1 NAME
+
+src/6model/multi_dispatch.c - simplified Perl6-like multiple dispatch
+
+=head1 DESCRIPTION
+
+This file contains a somewhat simplified implementation of the Perl 6
+multiple dispatch algorithm, to the degree that NQP needs it.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
+*/
 #include "parrot/parrot.h"
-#include "parrot/extend.h"
+#include "multi_dispatch.str"
 #include "parrot/6model/sixmodelobject.h"
-#include "pmc/pmc_dispatchersub.h"
-#include "pmc/pmc_nqpmultisig.h"
 #include "pmc/pmc_sub.h"
 #include "parrot/6model/multi_dispatch.h"
-
-/* This file contains a somewhat simplified implementation of the Perl 6
- * multiple dispatch algorithm, to the degree that NQP needs it. */
 
 /* Candidate info node in the sorted candidate lists. */
 typedef struct candidate_info {

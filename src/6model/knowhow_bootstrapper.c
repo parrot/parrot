@@ -1,19 +1,33 @@
 /*
-Copyright (C) 2011, Parrot Foundation.
+ * Copyright (C) 2010-2011, The Perl Foundation.
+ * Copyright (C) 2014, Parrot Foundation.
+
+=head1 NAME
+
+src/6model/knowhow_bootstrapper.c - bootstrap KnowHOW
+
+=head1 DESCRIPTION
+
+Contains the logic that bootstraps KnowHOW, the foundation for implementing
+the various other bits of the object model. Works in conjunction with
+KnowHOWREPR.
+
+=head2 Functions
+
+=over 4
+
+=cut
+
 */
-
-/* Contains the logic that bootstraps KnowHOW, the foundation for implementing
- * the various other bits of the object model. Works in conjunction with
- * KnowHOWREPR. */
-
 #include "parrot/parrot.h"
-#include "parrot/extend.h"
+#include "knowhow_bootstrapper.str"
 #include "parrot/6model/sixmodelobject.h"
 #include "parrot/6model/repr_registry.h"
 #include "parrot/6model/repr/KnowHOWREPR.h"
 #include "parrot/6model/knowhow_bootstrapper.h"
 
-/* HEADERIZER HFILE: none */
+/* HEADERIZER HFILE: include/parrot/6model/knowhow_bootstrapper.h */
+
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
@@ -32,11 +46,15 @@ static void attr_new(PARROT_INTERP, PMC *nci)
 static void attributes(PARROT_INTERP, PMC *nci)
         __attribute__nonnull__(1);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PMC * bottom_find_method(PARROT_INTERP,
-    PMC *obj,
-    STRING *name,
+    ARGIN(PMC *obj),
+    ARGIN(STRING *name),
     INTVAL hint)
-        __attribute__nonnull__(1);
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 static void compose(PARROT_INTERP, PMC *nci)
         __attribute__nonnull__(1);
@@ -59,8 +77,11 @@ static void new_type(PARROT_INTERP, PMC *nci)
 static void parents(PARROT_INTERP, PMC *nci)
         __attribute__nonnull__(1);
 
-static PMC * wrap_c(PARROT_INTERP, void *func)
-        __attribute__nonnull__(1);
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static PMC * wrap_c(PARROT_INTERP, ARGIN(void *func))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_add_attribute __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -73,7 +94,9 @@ static PMC * wrap_c(PARROT_INTERP, void *func)
 #define ASSERT_ARGS_attributes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_bottom_find_method __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(obj) \
+    , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_compose __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_find_method __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -89,7 +112,8 @@ static PMC * wrap_c(PARROT_INTERP, void *func)
 #define ASSERT_ARGS_parents __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_wrap_c __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(func))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -101,7 +125,7 @@ static STRING *p6opaque_str = NULL;
 
 /* Creates a new type with this HOW as its meta-object. */
 static void
-new_type(PARROT_INTERP, PMC *nci)
+new_type(PARROT_INTERP, SHIM(PMC *nci))
 {
     ASSERT_ARGS(new_type)
     PMC * unused;
@@ -138,7 +162,7 @@ new_type(PARROT_INTERP, PMC *nci)
 
 /* Adds a method. */
 static void
-add_method(PARROT_INTERP, PMC *nci)
+add_method(PARROT_INTERP, SHIM(PMC *nci))
 {
     ASSERT_ARGS(add_method)
     PMC * unused;
@@ -158,7 +182,7 @@ add_method(PARROT_INTERP, PMC *nci)
 
 /* Adds an attribute meta-object to the list. */
 static void
-add_attribute(PARROT_INTERP, PMC *nci)
+add_attribute(PARROT_INTERP, SHIM(PMC *nci))
 {
     ASSERT_ARGS(add_attribute)
     PMC * unused;
@@ -175,7 +199,7 @@ add_attribute(PARROT_INTERP, PMC *nci)
 
 /* Finds a method. */
 static void
-find_method(PARROT_INTERP, PMC *nci)
+find_method(PARROT_INTERP, SHIM(PMC *nci))
 {
     ASSERT_ARGS(find_method)
     PMC * unused;
@@ -192,7 +216,7 @@ find_method(PARROT_INTERP, PMC *nci)
 
 /* Composes the meta-object. */
 static void
-compose(PARROT_INTERP, PMC *nci)
+compose(PARROT_INTERP, SHIM(PMC *nci))
 {
     ASSERT_ARGS(compose)
     PMC * unused;
@@ -204,7 +228,7 @@ compose(PARROT_INTERP, PMC *nci)
 /* Introspects the parents. Since a KnowHOW doesn't support inheritance,
  * just hand back an empty list. */
 static void
-parents(PARROT_INTERP, PMC *nci)
+parents(PARROT_INTERP, SHIM(PMC *nci))
 {
     ASSERT_ARGS(parents)
     PMC * unused;
@@ -215,7 +239,7 @@ parents(PARROT_INTERP, PMC *nci)
 
 /* Introspects the attributes. For now just hand back real list. */
 static void
-attributes(PARROT_INTERP, PMC *nci)
+attributes(PARROT_INTERP, SHIM(PMC *nci))
 {
     ASSERT_ARGS(attributes)
     PMC * unused;
@@ -227,7 +251,7 @@ attributes(PARROT_INTERP, PMC *nci)
 
 /* Introspects the methods. For now just hand back real method table. */
 static void
-methods(PARROT_INTERP, PMC *nci)
+methods(PARROT_INTERP, SHIM(PMC *nci))
 {
     ASSERT_ARGS(methods)
     PMC * unused;
@@ -239,7 +263,7 @@ methods(PARROT_INTERP, PMC *nci)
 
 /* Introspects the MRO. That's just a list with ourself. */
 static void
-mro(PARROT_INTERP, PMC *nci)
+mro(PARROT_INTERP, SHIM(PMC *nci))
 {
     ASSERT_ARGS(mro)
     PMC * unused;
@@ -252,7 +276,7 @@ mro(PARROT_INTERP, PMC *nci)
 
 /* Introspects the name. */
 static void
-name(PARROT_INTERP, PMC *nci)
+name(PARROT_INTERP, SHIM(PMC *nci))
 {
     ASSERT_ARGS(name)
     PMC * unused;
@@ -263,18 +287,22 @@ name(PARROT_INTERP, PMC *nci)
 }
 
 /* Wraps up a C function as a raw NCI method. */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PMC *
-wrap_c(PARROT_INTERP, void *func)
+wrap_c(PARROT_INTERP, ARGIN(void *func))
 {
     ASSERT_ARGS(wrap_c)
     PMC * const wrapped = Parrot_pmc_new(interp, enum_class_NativePCCMethod);
-    VTABLE_set_pointer_keyed_str(interp, wrapped, Parrot_str_new_constant(interp, "->"), func);
+    VTABLE_set_pointer_keyed_str(interp, wrapped, CONST_STRING(interp, "->"), func);
     return wrapped;
 }
 
 /* This is the find_method where things eventually bottom out. */
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PMC *
-bottom_find_method(PARROT_INTERP, PMC *obj, STRING *name, INTVAL hint)
+bottom_find_method(PARROT_INTERP, ARGIN(PMC *obj), ARGIN(STRING *name), SHIM(INTVAL hint))
 {
     ASSERT_ARGS(bottom_find_method)
     PMC *methods = ((KnowHOWREPRInstance *)PMC_data(obj))->methods;
@@ -286,88 +314,9 @@ bottom_find_method(PARROT_INTERP, PMC *obj, STRING *name, INTVAL hint)
     return method;
 }
 
-/* Bootstraps the KnowHOW. This is were things "bottom out" in the meta-model
- * so it's a tad loopy. Basically, we create a KnowHOW type object. We then
- * create an instance from that and add a bunch of methods to it. Returns the
- * bootstrapped object. */
-PMC *
-SixModelObject_bootstrap_knowhow(PARROT_INTERP, PMC *sc)
-{
-    /* Create our KnowHOW type object. Note we don't have a HOW just yet, so
-     * pass in null. */
-    REPROps *REPR        = REPR_get_by_name(interp, Parrot_str_new_constant(interp, "KnowHOWREPR"));
-    PMC     *knowhow_pmc = REPR->type_object_for(interp, PMCNULL);
-
-    /* We create a KnowHOW instance that can describe itself. This means
-     * .HOW.HOW.HOW.HOW etc will always return that, which closes the model
-     * up. Also pull out its underlying struct. */
-    PMC *knowhow_how_pmc = REPR->instance_of(interp, knowhow_pmc);
-    KnowHOWREPRInstance *knowhow_how = (KnowHOWREPRInstance *)PMC_data(knowhow_how_pmc);
-
-    /* Need to give the knowhow_how a twiddled STable with a different
-     * dispatcher, so things bottom out. */
-    PMC *st_copy = create_stable(interp, REPR, knowhow_how_pmc);
-    STABLE_STRUCT(st_copy)->WHAT = knowhow_pmc;
-    STABLE_STRUCT(st_copy)->find_method = bottom_find_method;
-    knowhow_how->common.stable = st_copy;
-
-    /* Add various methods to the KnowHOW's HOW. */
-    VTABLE_set_pmc_keyed_str(interp, knowhow_how->methods,
-        Parrot_str_new_constant(interp, "new_type"),
-        wrap_c(interp, F2DPTR(new_type)));
-    VTABLE_set_pmc_keyed_str(interp, knowhow_how->methods,
-        Parrot_str_new_constant(interp, "find_method"),
-        wrap_c(interp, F2DPTR(find_method)));
-    VTABLE_set_pmc_keyed_str(interp, knowhow_how->methods,
-        Parrot_str_new_constant(interp, "add_method"),
-        wrap_c(interp, F2DPTR(add_method)));
-    VTABLE_set_pmc_keyed_str(interp, knowhow_how->methods,
-        Parrot_str_new_constant(interp, "add_attribute"),
-        wrap_c(interp, F2DPTR(add_attribute)));
-    VTABLE_set_pmc_keyed_str(interp, knowhow_how->methods,
-        Parrot_str_new_constant(interp, "compose"),
-        wrap_c(interp, F2DPTR(compose)));
-    VTABLE_set_pmc_keyed_str(interp, knowhow_how->methods,
-        Parrot_str_new_constant(interp, "parents"),
-        wrap_c(interp, F2DPTR(parents)));
-    VTABLE_set_pmc_keyed_str(interp, knowhow_how->methods,
-        Parrot_str_new_constant(interp, "attributes"),
-        wrap_c(interp, F2DPTR(attributes)));
-    VTABLE_set_pmc_keyed_str(interp, knowhow_how->methods,
-        Parrot_str_new_constant(interp, "methods"),
-        wrap_c(interp, F2DPTR(methods)));
-    VTABLE_set_pmc_keyed_str(interp, knowhow_how->methods,
-        Parrot_str_new_constant(interp, "mro"),
-        wrap_c(interp, F2DPTR(mro)));
-    VTABLE_set_pmc_keyed_str(interp, knowhow_how->methods,
-        Parrot_str_new_constant(interp, "name"),
-        wrap_c(interp, F2DPTR(name)));
-
-    /* Set name KnowHOW for the KnowHOW's HOW. */
-    knowhow_how->name = Parrot_str_new_constant(interp, "KnowHOW");
-
-    /* Set this built up HOW as the KnowHOW's HOW. */
-    STABLE(knowhow_pmc)->HOW = knowhow_how_pmc;
-
-    /* Set up some string constants that the methods here use. */
-    repr_str     = Parrot_str_new_constant(interp, "repr");
-    name_str     = Parrot_str_new_constant(interp, "name");
-    empty_str    = Parrot_str_new_constant(interp, "");
-    p6opaque_str = Parrot_str_new_constant(interp, "P6opaque");
-
-    /* Associate the created objects with the intial core serialization
-     * context. */
-    VTABLE_set_pmc_keyed_int(interp, sc, 0, knowhow_pmc);
-    SC_PMC(knowhow_pmc) = sc;
-    VTABLE_set_pmc_keyed_int(interp, sc, 1, knowhow_how_pmc);
-    SC_PMC(knowhow_how_pmc) = sc;
-
-    return knowhow_pmc;
-}
-
 /* Attribute new method. */
 static void
-attr_new(PARROT_INTERP, PMC *nci)
+attr_new(PARROT_INTERP, SHIM(PMC *nci))
 {
     ASSERT_ARGS(attr_new)
     PMC * unused;
@@ -381,7 +330,7 @@ attr_new(PARROT_INTERP, PMC *nci)
 
 /* Attribute name introspection. */
 static void
-attr_name(PARROT_INTERP, PMC *nci)
+attr_name(PARROT_INTERP, SHIM(PMC *nci))
 {
     ASSERT_ARGS(attr_name)
     PMC * unused;
@@ -391,24 +340,127 @@ attr_name(PARROT_INTERP, PMC *nci)
     unused = Parrot_pcc_build_call_from_c_args(interp, capture, "S", name);
 }
 
-/* Sets up a very simple attribute meta-object. Just supports having a
- * name, and even uses the P6str representation to store it, so that's
- * really all that it supports. */
+/* 
+
+=item C<PMC * SixModelObject_bootstrap_knowhow(PARROT_INTERP, PMC *sc)>
+
+Bootstraps the KnowHOW. This is were things "bottom out" in the meta-model
+so it's a tad loopy. Basically, we create a KnowHOW type object. We then
+create an instance from that and add a bunch of methods to it. Returns the
+bootstrapped object.
+
+=cut
+
+*/
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 PMC *
-SixModelObject_setup_knowhow_attribute(PARROT_INTERP, PMC *sc, PMC *knowhow)
+SixModelObject_bootstrap_knowhow(PARROT_INTERP, ARGIN(PMC *sc))
 {
+    ASSERT_ARGS(SixModelObject_bootstrap_knowhow)
+    /* Create our KnowHOW type object. Note we don't have a HOW just yet, so
+     * pass in null. */
+    REPROps *REPR        = REPR_get_by_name(interp, CONST_STRING(interp, "KnowHOWREPR"));
+    PMC     *knowhow_pmc = REPR->type_object_for(interp, PMCNULL);
+
+    /* We create a KnowHOW instance that can describe itself. This means
+     * .HOW.HOW.HOW.HOW etc will always return that, which closes the model
+     * up. Also pull out its underlying struct. */
+    PMC *knowhow_how_pmc = REPR->instance_of(interp, knowhow_pmc);
+    KnowHOWREPRInstance *knowhow_how = (KnowHOWREPRInstance *)PMC_data(knowhow_how_pmc);
+
+    /* Need to give the knowhow_how a twiddled STable with a different
+     * dispatcher, so things bottom out. */
+    PMC *st_copy = create_stable(interp, REPR, knowhow_how_pmc);
+    const STRING * s_new_type      = CONST_STRING(interp, "new_type");
+    const STRING * s_find_method   = CONST_STRING(interp, "find_method");
+    const STRING * s_add_method    = CONST_STRING(interp, "add_method");
+    const STRING * s_add_attribute = CONST_STRING(interp, "add_attribute");
+    const STRING * s_compose       = CONST_STRING(interp, "compose");
+    const STRING * s_parents       = CONST_STRING(interp, "parents");
+    const STRING * s_attributes    = CONST_STRING(interp, "attributes");
+    const STRING * s_methods       = CONST_STRING(interp, "methods");
+    const STRING * s_mro           = CONST_STRING(interp, "mro");
+    const STRING * s_name          = CONST_STRING(interp, "name");
+
+    STABLE_STRUCT(st_copy)->WHAT = knowhow_pmc;
+    STABLE_STRUCT(st_copy)->find_method = bottom_find_method;
+    knowhow_how->common.stable = st_copy;
+
+    /* Add various methods to the KnowHOW's HOW. */
+    VTABLE_set_pmc_keyed_str(interp, knowhow_how->methods, s_new_type,
+        wrap_c(interp, F2DPTR(new_type)));
+    VTABLE_set_pmc_keyed_str(interp, knowhow_how->methods, s_find_method,
+        wrap_c(interp, F2DPTR(find_method)));
+    VTABLE_set_pmc_keyed_str(interp, knowhow_how->methods, s_add_method,
+        wrap_c(interp, F2DPTR(add_method)));
+    VTABLE_set_pmc_keyed_str(interp, knowhow_how->methods, s_add_attribute,
+        wrap_c(interp, F2DPTR(add_attribute)));
+    VTABLE_set_pmc_keyed_str(interp, knowhow_how->methods, s_compose,
+        wrap_c(interp, F2DPTR(compose)));
+    VTABLE_set_pmc_keyed_str(interp, knowhow_how->methods, s_parents,
+        wrap_c(interp, F2DPTR(parents)));
+    VTABLE_set_pmc_keyed_str(interp, knowhow_how->methods, s_attributes,
+        wrap_c(interp, F2DPTR(attributes)));
+    VTABLE_set_pmc_keyed_str(interp, knowhow_how->methods, s_methods,
+        wrap_c(interp, F2DPTR(methods)));
+    VTABLE_set_pmc_keyed_str(interp, knowhow_how->methods, s_mro,
+        wrap_c(interp, F2DPTR(mro)));
+    VTABLE_set_pmc_keyed_str(interp, knowhow_how->methods, s_name,
+        wrap_c(interp, F2DPTR(name)));
+
+    /* Set name KnowHOW for the KnowHOW's HOW. */
+    knowhow_how->name = CONST_STRING(interp, "KnowHOW");
+
+    /* Set this built up HOW as the KnowHOW's HOW. */
+    STABLE(knowhow_pmc)->HOW = knowhow_how_pmc;
+
+    /* Set up some string constants that the methods here use. */
+    repr_str     = CONST_STRING(interp, "repr");
+    name_str     = CONST_STRING(interp, "name");
+    empty_str    = CONST_STRING(interp, "");
+    p6opaque_str = CONST_STRING(interp, "P6opaque");
+
+    /* Associate the created objects with the intial core serialization
+     * context. */
+    VTABLE_set_pmc_keyed_int(interp, sc, 0, knowhow_pmc);
+    SC_PMC(knowhow_pmc) = sc;
+    VTABLE_set_pmc_keyed_int(interp, sc, 1, knowhow_how_pmc);
+    SC_PMC(knowhow_how_pmc) = sc;
+
+    return knowhow_pmc;
+}
+
+/* 
+
+=item C<PMC * SixModelObject_setup_knowhow_attribute(PARROT_INTERP, PMC *sc, PMC
+*knowhow)>
+
+Sets up a very simple attribute meta-object. Just supports having a
+name, and even uses the P6str representation to store it, so that's
+really all that it supports.
+
+=cut
+
+*/
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+SixModelObject_setup_knowhow_attribute(PARROT_INTERP, ARGIN(PMC *sc), ARGIN(PMC *knowhow))
+{
+    ASSERT_ARGS(SixModelObject_setup_knowhow_attribute)
     PMC *old_ctx, *cappy, *meth, *knowhow_attr, *how;
 
     /* Create a new KnowHOWAttribute type using P6str repr.. */
-    meth = STABLE(knowhow)->find_method(interp, knowhow,
-        Parrot_str_new_constant(interp, "new_type"), NO_HINT);
+    meth = STABLE(knowhow)->find_method(interp, knowhow, CONST_STRING(interp, "new_type"),
+                                        NO_HINT);
     old_ctx = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
     cappy   = Parrot_pmc_new(interp, enum_class_CallContext);
     VTABLE_push_pmc(interp, cappy, knowhow);
-    VTABLE_set_string_keyed_str(interp, cappy, name_str,
-        Parrot_str_new_constant(interp, "KnowHOWAttribute"));
-    VTABLE_set_string_keyed_str(interp, cappy, repr_str,
-        Parrot_str_new_constant(interp, "P6str"));
+    VTABLE_set_string_keyed_str(interp, cappy, name_str, CONST_STRING(interp, "KnowHOWAttribute"));
+    VTABLE_set_string_keyed_str(interp, cappy, repr_str, CONST_STRING(interp, "P6str"));
     Parrot_pcc_invoke_from_sig_object(interp, meth, cappy);
     cappy = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), old_ctx);
@@ -416,12 +468,12 @@ SixModelObject_setup_knowhow_attribute(PARROT_INTERP, PMC *sc, PMC *knowhow)
     how = STABLE(knowhow_attr)->HOW;
 
     /* Add new method. */
-    meth = STABLE(how)->find_method(interp, how,
-        Parrot_str_new_constant(interp, "add_method"), NO_HINT);
+    meth = STABLE(how)->find_method(interp, how, CONST_STRING(interp, "add_method"),
+                                    NO_HINT);
     cappy   = Parrot_pmc_new(interp, enum_class_CallContext);
     VTABLE_push_pmc(interp, cappy, how);
     VTABLE_push_pmc(interp, cappy, knowhow_attr);
-    VTABLE_push_string(interp, cappy, Parrot_str_new_constant(interp, "new"));
+    VTABLE_push_string(interp, cappy, CONST_STRING(interp, "new"));
     VTABLE_push_pmc(interp, cappy, wrap_c(interp, F2DPTR(attr_new)));
     Parrot_pcc_invoke_from_sig_object(interp, meth, cappy);
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), old_ctx);
@@ -436,8 +488,8 @@ SixModelObject_setup_knowhow_attribute(PARROT_INTERP, PMC *sc, PMC *knowhow)
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), old_ctx);
 
     /* Compose. */
-    meth = STABLE(knowhow)->find_method(interp, how,
-        Parrot_str_new_constant(interp, "compose"), NO_HINT);
+    meth = STABLE(knowhow)->find_method(interp, how, CONST_STRING(interp, "compose"),
+                                        NO_HINT);
     cappy   = Parrot_pmc_new(interp, enum_class_CallContext);
     VTABLE_push_pmc(interp, cappy, how);
     VTABLE_push_pmc(interp, cappy, knowhow_attr);
@@ -451,6 +503,22 @@ SixModelObject_setup_knowhow_attribute(PARROT_INTERP, PMC *sc, PMC *knowhow)
 
     return knowhow_attr;
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+=over
+
+=item F<src/6model/sixmodelobject.c>
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:
