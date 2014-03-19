@@ -169,6 +169,6 @@ Starred release numbers indicate supported releases.
  Util        5.11.0         2013-Dec-17     (No release; pining for the fjords)
 
  Util        6.0.0 *        2014-Jan-21     "Red-necked Amazon"
- rurban      6.0.1          2014-Feb-18     "Black-collared Lovebird"
+ rurban      6.1.0          2014-Feb-18     "Black-collared Lovebird"
 
 =cut
