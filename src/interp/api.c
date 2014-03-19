@@ -39,19 +39,19 @@ static Interp* emergency_interp = NULL;
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void intern_initialize_6model(PARROT_INTERP)
-        __attribute__nonnull__(1);
-
 PARROT_WARN_UNUSED_RESULT
 static int Parrot_interp_is_env_var_set(PARROT_INTERP, ARGIN(STRING* var))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_intern_initialize_6model __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+static void sixmodel_initialize(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 #define ASSERT_ARGS_Parrot_interp_is_env_var_set __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(var))
+#define ASSERT_ARGS_sixmodel_initialize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -366,24 +366,24 @@ Parrot_interp_initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *a
         Parrot_x_on_exit(interp, Parrot_interp_really_destroy, NULL);
 #endif
 
-    intern_initialize_6model(interp);
+    sixmodel_initialize(interp);
     return interp;
 }
 
 /*
 
-=item C<static void intern_initialize_6model(PARROT_INTERP)>
+=item C<static void sixmodel_initialize(PARROT_INTERP)>
 
-Initialize 6model
+Initializes 6model
 
 =cut
 
 */
 
 static void
-intern_initialize_6model(PARROT_INTERP)
+sixmodel_initialize(PARROT_INTERP)
 {
-    ASSERT_ARGS(intern_initialize_6model)
+    ASSERT_ARGS(sixmodel_initialize)
     PMC * KnowHOW, * KnowHOWAttribute;
     SixModelObject_initialize(interp, &KnowHOW, &KnowHOWAttribute);
     VTABLE_set_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_KNOWHOW, KnowHOW);
