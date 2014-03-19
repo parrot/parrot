@@ -1,12 +1,20 @@
-#ifndef STORAGE_SPEC_H_GUARD
-#define STORAGE_SPEC_H_GUARD
-
-/* This data structure describes what storage a given representation
+/* 6model/storage_spec.h
+ * Copyright (C) 2010-2011, The Perl Foundation.
+ * Copyright (C) 2014, Parrot Foundation.
+ *
+ * struct storage_spec:
+ *
+ * This data structure describes what storage a given representation
  * needs if something of that representation is to be embedded in
  * another place. For any representation that expects to be used
  * as a kind of reference type, it will just want to be a pointer.
  * But for other things, they would prefer to be "inlined" into
- * the object. */
+ * the object.
+ */
+
+#ifndef PARROT_STORAGE_SPEC_H_GUARD
+#define PARROT_STORAGE_SPEC_H_GUARD
+
 typedef struct {
     /* 0 if this is to be referenced, anything else otherwise. */
     INTVAL inlineable;
