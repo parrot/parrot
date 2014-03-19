@@ -180,28 +180,36 @@ struct SixModel_REPROps {
     INTVAL (*defined) (PARROT_INTERP, PMC *Obj);
 
     /* Gets the current value for an object attribute. */
-    PMC * (*get_attribute) (PARROT_INTERP, PMC *Object, PMC *ClassHandle, STRING *Name, INTVAL Hint);
+    PMC * (*get_attribute) (PARROT_INTERP, PMC *Object, PMC *ClassHandle,
+                            STRING *Name, INTVAL Hint);
 
     /* Gets the current value for a native int attribute. */
-    INTVAL (*get_attribute_int) (PARROT_INTERP, PMC *Object, PMC *ClassHandle, STRING *Name, INTVAL Hint);
+    INTVAL (*get_attribute_int) (PARROT_INTERP, PMC *Object, PMC *ClassHandle,
+                                 STRING *Name, INTVAL Hint);
 
     /* Gets the current value for a native num attribute. */
-    FLOATVAL (*get_attribute_num) (PARROT_INTERP, PMC *Object, PMC *ClassHandle, STRING *Name, INTVAL Hint);
+    FLOATVAL (*get_attribute_num) (PARROT_INTERP, PMC *Object, PMC *ClassHandle,
+                                   STRING *Name, INTVAL Hint);
 
     /* Gets the current value for a native str attribute. */
-    STRING * (*get_attribute_str) (PARROT_INTERP, PMC *Object, PMC *ClassHandle, STRING *Name, INTVAL Hint);
+    STRING * (*get_attribute_str) (PARROT_INTERP, PMC *Object, PMC *ClassHandle,
+                                   STRING *Name, INTVAL Hint);
 
     /* Binds the given object value to the specified attribute. */
-    void (*bind_attribute) (PARROT_INTERP, PMC *Object, PMC *ClassHandle, STRING *Name, INTVAL Hint, PMC *Value);
+    void (*bind_attribute) (PARROT_INTERP, PMC *Object, PMC *ClassHandle,
+                            STRING *Name, INTVAL Hint, PMC *Value);
 
     /* Binds the given int value to the specified attribute. */
-    void (*bind_attribute_int) (PARROT_INTERP, PMC *Object, PMC *ClassHandle, STRING *Name, INTVAL Hint, INTVAL Value);
+    void (*bind_attribute_int) (PARROT_INTERP, PMC *Object, PMC *ClassHandle,
+                                STRING *Name, INTVAL Hint, INTVAL Value);
 
     /* Binds the given num value to the specified attribute. */
-    void (*bind_attribute_num) (PARROT_INTERP, PMC *Object, PMC *ClassHandle, STRING *Name, INTVAL Hint, FLOATVAL Value);
+    void (*bind_attribute_num) (PARROT_INTERP, PMC *Object, PMC *ClassHandle,
+                                STRING *Name, INTVAL Hint, FLOATVAL Value);
 
     /* Binds the given str value to the specified attribute. */
-    void (*bind_attribute_str) (PARROT_INTERP, PMC *Object, PMC *ClassHandle, STRING *Name, INTVAL Hint, STRING *Value);
+    void (*bind_attribute_str) (PARROT_INTERP, PMC *Object, PMC *ClassHandle,
+                                STRING *Name, INTVAL Hint, STRING *Value);
 
     /* Gets the hint for the given attribute ID. */
     INTVAL (*hint_for) (PARROT_INTERP, PMC *ClassHandle, STRING *Name);
@@ -250,7 +258,8 @@ struct SixModel_REPROps {
     storage_spec (*get_storage_spec) (PARROT_INTERP, STable *st);
     
     /* Checks if an attribute has been initialized. */
-    INTVAL (*is_attribute_initialized) (PARROT_INTERP, PMC *Object, PMC *ClassHandle, STRING *Name, INTVAL Hint);
+    INTVAL (*is_attribute_initialized) (PARROT_INTERP, PMC *Object, PMC *ClassHandle,
+                                        STRING *Name, INTVAL Hint);
     
     /* Handles an object changing its type. The representation is responsible
      * for doing any changes to the underlying data structure, and may reject
@@ -321,4 +330,11 @@ PMC * wrap_object(PARROT_INTERP, ARGIN(void *obj))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/6model/sixmodelobject.c */
 
-#endif
+#endif /* PARROT_SIXMODELOBJECT_H_GUARD */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

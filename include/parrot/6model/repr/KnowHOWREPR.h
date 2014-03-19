@@ -37,4 +37,11 @@ REPROps * KnowHOWREPR_initialize(PARROT_INTERP)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/6model/reprs/KnowHOWREPR.c */
 
-#endif
+#endif /* PARROT_KNOWHOWREPR_H_GUARD */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

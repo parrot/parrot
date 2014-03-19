@@ -294,7 +294,15 @@ defined(PARROT_INTERP, ARGIN(PMC *obj))
     return !PMC_IS_NULL(((KnowHOWREPRInstance *)PMC_data(obj))->methods);
 }
 
-/* Helper to die because this type doesn't support attributes. */
+/*
+
+=item C<static void die_no_attrs(PARROT_INTERP)>
+
+Helper to die because this type doesn't support attributes.
+
+=cut
+
+*/
 static void
 die_no_attrs(PARROT_INTERP)
 {
@@ -303,7 +311,16 @@ die_no_attrs(PARROT_INTERP)
             "KnowHOWREPR representation does not support attribute storage");
 }
 
-/* Gets the current value for an attribute. */
+/*
+
+=item C<static PMC * get_attribute(PARROT_INTERP, PMC *obj, PMC *class_handle,
+STRING *name, INTVAL hint)>
+
+Gets the current PMC value for an attribute.
+
+=cut
+
+*/
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PMC *
@@ -314,6 +331,16 @@ get_attribute(PARROT_INTERP, SHIM(PMC *obj), SHIM(PMC *class_handle),
     die_no_attrs(interp);
     return PMCNULL;
 }
+/*
+
+=item C<static INTVAL get_attribute_int(PARROT_INTERP, PMC *obj, PMC
+*class_handle, STRING *name, INTVAL hint)>
+
+Gets the current int value for an attribute.
+
+=cut
+
+*/
 PARROT_WARN_UNUSED_RESULT
 static INTVAL
 get_attribute_int(PARROT_INTERP, SHIM(PMC *obj), SHIM(PMC *class_handle),
@@ -323,6 +350,16 @@ get_attribute_int(PARROT_INTERP, SHIM(PMC *obj), SHIM(PMC *class_handle),
     die_no_attrs(interp);
     return 0;
 }
+/*
+
+=item C<static FLOATVAL get_attribute_num(PARROT_INTERP, PMC *obj, PMC
+*class_handle, STRING *name, INTVAL hint)>
+
+Gets the current float value for an attribute.
+
+=cut
+
+*/
 PARROT_WARN_UNUSED_RESULT
 static FLOATVAL
 get_attribute_num(PARROT_INTERP, SHIM(PMC *obj), SHIM(PMC *class_handle),
@@ -332,6 +369,16 @@ get_attribute_num(PARROT_INTERP, SHIM(PMC *obj), SHIM(PMC *class_handle),
     die_no_attrs(interp);
     return 0.0;
 }
+/*
+
+=item C<static STRING * get_attribute_str(PARROT_INTERP, PMC *obj, PMC
+*class_handle, STRING *name, INTVAL hint)>
+
+Gets the current str value for an attribute.
+
+=cut
+
+*/
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static STRING *
@@ -343,7 +390,16 @@ get_attribute_str(PARROT_INTERP, SHIM(PMC *obj), SHIM(PMC *class_handle),
     return NULL;
 }
 
-/* Binds the given value to the specified attribute. */
+/*
+
+=item C<static void bind_attribute(PARROT_INTERP, PMC *obj, PMC *class_handle,
+STRING *name, INTVAL hint, PMC *value)>
+
+Binds the given PMC value to the specified attribute.
+
+=cut
+
+*/
 static void
 bind_attribute(PARROT_INTERP, SHIM(PMC *obj), SHIM(PMC *class_handle),
                SHIM(STRING *name), SHIM(INTVAL hint), SHIM(PMC *value))
@@ -351,6 +407,16 @@ bind_attribute(PARROT_INTERP, SHIM(PMC *obj), SHIM(PMC *class_handle),
     ASSERT_ARGS(bind_attribute)
     die_no_attrs(interp);
 }
+/*
+
+=item C<static void bind_attribute_int(PARROT_INTERP, PMC *obj, PMC
+*class_handle, STRING *name, INTVAL hint, INTVAL value)>
+
+Binds the given int value to the specified attribute.
+
+=cut
+
+*/
 static void
 bind_attribute_int(PARROT_INTERP, SHIM(PMC *obj), SHIM(PMC *class_handle),
                    SHIM(STRING *name), SHIM(INTVAL hint), SHIM(INTVAL value))
@@ -358,6 +424,16 @@ bind_attribute_int(PARROT_INTERP, SHIM(PMC *obj), SHIM(PMC *class_handle),
     ASSERT_ARGS(bind_attribute_int)
     die_no_attrs(interp);
 }
+/*
+
+=item C<static void bind_attribute_num(PARROT_INTERP, PMC *obj, PMC
+*class_handle, STRING *name, INTVAL hint, FLOATVAL value)>
+
+Binds the given float value to the specified attribute.
+
+=cut
+
+*/
 static void
 bind_attribute_num(PARROT_INTERP, SHIM(PMC *obj), SHIM(PMC *class_handle),
                    SHIM(STRING *name), SHIM(INTVAL hint), SHIM(FLOATVAL value))
@@ -365,6 +441,16 @@ bind_attribute_num(PARROT_INTERP, SHIM(PMC *obj), SHIM(PMC *class_handle),
     ASSERT_ARGS(bind_attribute_num)
     die_no_attrs(interp);
 }
+/*
+
+=item C<static void bind_attribute_str(PARROT_INTERP, PMC *obj, PMC
+*class_handle, STRING *name, INTVAL hint, STRING *value)>
+
+Binds the given str value to the specified attribute.
+
+=cut
+
+*/
 static void
 bind_attribute_str(PARROT_INTERP, SHIM(PMC *obj), SHIM(PMC *class_handle),
                    SHIM(STRING *name), SHIM(INTVAL hint), SHIM(STRING *value))
@@ -373,7 +459,15 @@ bind_attribute_str(PARROT_INTERP, SHIM(PMC *obj), SHIM(PMC *class_handle),
     die_no_attrs(interp);
 }
 
-/* Gets the hint for the given attribute ID. */
+/*
+
+=item C<static INTVAL hint_for(PARROT_INTERP, PMC *class_handle, STRING *name)>
+
+Gets the hint for the given attribute ID.
+
+=cut
+
+*/
 PARROT_WARN_UNUSED_RESULT
 static INTVAL
 hint_for(PARROT_INTERP, SHIM(PMC *class_handle), SHIM(STRING *name))
@@ -382,8 +476,16 @@ hint_for(PARROT_INTERP, SHIM(PMC *class_handle), SHIM(STRING *name))
     return NO_HINT;
 }
 
-/* Clones the current object. This involves cloning the method and
- * attribute lists and copying the (immutable string) name. */
+/*
+
+=item C<static PMC * repr_clone(PARROT_INTERP, PMC *to_clone)>
+
+Clones the current object. This involves cloning the method and
+attribute lists and copying the (immutable string) name.
+
+=cut
+
+*/
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PMC *
@@ -400,8 +502,16 @@ repr_clone(PARROT_INTERP, ARGIN(PMC *to_clone))
     return wrap_object(interp, obj);
 }
 
-/* Used with boxing. Sets an integer value, for representations that can hold
- * one. */
+/*
+
+=item C<static void set_int(PARROT_INTERP, PMC *obj, INTVAL value)>
+
+Used with boxing. Sets an integer value, for representations that can hold
+one.
+
+=cut
+
+*/
 static void
 set_int(PARROT_INTERP, SHIM(PMC *obj), SHIM(INTVAL value))
 {
@@ -410,8 +520,16 @@ set_int(PARROT_INTERP, SHIM(PMC *obj), SHIM(INTVAL value))
             "KnowHOWREPR cannot box a native int");
 }
 
-/* Used with boxing. Gets an integer value, for representations that can
- * hold one. */
+/*
+
+=item C<static INTVAL get_int(PARROT_INTERP, PMC *obj)>
+
+Used with boxing. Gets an integer value, for representations that can
+hold one.
+
+=cut
+
+*/
 static INTVAL
 get_int(PARROT_INTERP, SHIM(PMC *obj))
 {
@@ -420,8 +538,16 @@ get_int(PARROT_INTERP, SHIM(PMC *obj))
             "KnowHOWREPR cannot unbox to a native int");
 }
 
-/* Used with boxing. Sets a floating point value, for representations that can
- * hold one. */
+/*
+
+=item C<static void set_num(PARROT_INTERP, PMC *obj, FLOATVAL value)>
+
+Used with boxing. Sets a floating point value, for representations that can
+hold one.
+
+=cut
+
+*/
 static void
 set_num(PARROT_INTERP, SHIM(PMC *obj), SHIM(FLOATVAL value))
 {
@@ -430,8 +556,16 @@ set_num(PARROT_INTERP, SHIM(PMC *obj), SHIM(FLOATVAL value))
             "KnowHOWREPR cannot box a native num");
 }
 
-/* Used with boxing. Gets a floating point value, for representations that can
- * hold one. */
+/*
+
+=item C<static FLOATVAL get_num(PARROT_INTERP, PMC *obj)>
+
+Used with boxing. Gets a floating point value, for representations that can
+hold one.
+
+=cut
+
+*/
 static FLOATVAL
 get_num(PARROT_INTERP, SHIM(PMC *obj))
 {
@@ -440,8 +574,16 @@ get_num(PARROT_INTERP, SHIM(PMC *obj))
             "KnowHOWREPR cannot unbox to a native num");
 }
 
-/* Used with boxing. Sets a string value, for representations that can hold
- * one. */
+/*
+
+=item C<static void set_str(PARROT_INTERP, PMC *obj, STRING *value)>
+
+Used with boxing. Sets a string value, for representations that can hold
+one.
+
+=cut
+
+*/
 static void
 set_str(PARROT_INTERP, SHIM(PMC *obj), SHIM(STRING *value))
 {
@@ -450,8 +592,16 @@ set_str(PARROT_INTERP, SHIM(PMC *obj), SHIM(STRING *value))
             "KnowHOWREPR cannot box a native string");
 }
 
-/* Used with boxing. Gets a string value, for representations that can hold
- * one. */
+/*
+
+=item C<static STRING * get_str(PARROT_INTERP, PMC *obj)>
+
+Used with boxing. Gets a string value, for representations that can hold
+one.
+
+=cut
+
+*/
 PARROT_CAN_RETURN_NULL
 static STRING *
 get_str(PARROT_INTERP, SHIM(PMC *obj))
@@ -461,7 +611,16 @@ get_str(PARROT_INTERP, SHIM(PMC *obj))
             "KnowHOWREPR cannot unbox to a native string");
 }
 
-/* This Parrot-specific addition to the API is used to mark an object. */
+/*
+
+=item C<static void gc_mark(PARROT_INTERP, PMC *obj)>
+
+This Parrot-specific addition to the API is used to mark all members of
+the object, we need to know all pointers.
+
+=cut
+
+*/
 static void
 gc_mark(PARROT_INTERP, ARGIN(PMC *obj))
 {
@@ -477,7 +636,15 @@ gc_mark(PARROT_INTERP, ARGIN(PMC *obj))
         Parrot_gc_mark_PMC_alive(interp, instance->attributes);
 }
 
-/* This Parrot-specific addition to the API is used to free an object. */
+/*
+
+=item C<static void gc_free(PARROT_INTERP, PMC *obj)>
+
+This Parrot-specific addition to the API is used to free an object.
+
+=cut
+
+*/
 static void
 gc_free(PARROT_INTERP, ARGIN(PMC *obj))
 {
@@ -486,7 +653,15 @@ gc_free(PARROT_INTERP, ARGIN(PMC *obj))
     PMC_data(obj) = NULL;
 }
 
-/* Gets the storage specification for this representation. */
+/*
+
+=item C<static storage_spec get_storage_spec(PARROT_INTERP, STable *st)>
+
+Gets the storage specification for this representation.
+
+=cut
+
+*/
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static storage_spec
@@ -499,7 +674,16 @@ get_storage_spec(PARROT_INTERP, SHIM(STable *st))
     return spec;
 }
 
-/* Checks if an attribute has been initialized. */
+/*
+
+=item C<static INTVAL is_attribute_initialized(PARROT_INTERP, PMC *Object, PMC
+*ClassHandle, STRING *Name, INTVAL Hint)>
+
+Checks if an attribute has been initialized.
+
+=cut
+
+*/
 static INTVAL
 is_attribute_initialized(PARROT_INTERP, SHIM(PMC *Object), SHIM(PMC *ClassHandle),
                          SHIM(STRING *Name), SHIM(INTVAL Hint))
@@ -509,6 +693,9 @@ is_attribute_initialized(PARROT_INTERP, SHIM(PMC *Object), SHIM(PMC *ClassHandle
 }
 
 /*
+
+=back
+
 =head1 Functions
 
 =over 4

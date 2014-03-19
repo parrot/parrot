@@ -263,6 +263,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 create_stable(PARROT_INTERP, ARGIN(REPROps *REPR), ARGIN(PMC *HOW))
 {
+    ASSERT_ARGS(create_stable)
     PMC *st_pmc = Parrot_pmc_new_init(interp, enum_class_STable, HOW);
     STABLE_STRUCT(st_pmc)->REPR = REPR;
     STABLE_STRUCT(st_pmc)->WHO = PMCNULL;
@@ -286,6 +287,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 decontainerize(PARROT_INTERP, ARGIN(PMC *var))
 {
+    ASSERT_ARGS(decontainerize)
     if (var->vtable->base_type == enum_class_SixModelObject) {
         ContainerSpec *spec = STABLE(var)->container_spec;
         if (spec && REPR(var)->defined(interp, var)) {

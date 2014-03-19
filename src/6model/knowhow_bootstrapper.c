@@ -123,7 +123,15 @@ static STRING *name_str     = NULL;
 static STRING *empty_str    = NULL;
 static STRING *p6opaque_str = NULL;
 
-/* Creates a new type with this HOW as its meta-object. */
+/*
+
+=item C<static void new_type(PARROT_INTERP, PMC *nci)>
+
+Creates a new type with this HOW as its meta-object.
+
+=cut
+
+*/
 static void
 new_type(PARROT_INTERP, SHIM(PMC *nci))
 {
@@ -160,7 +168,15 @@ new_type(PARROT_INTERP, SHIM(PMC *nci))
     unused = Parrot_pcc_build_call_from_c_args(interp, capture, "P", type_object);
 }
 
-/* Adds a method. */
+/*
+
+=item C<static void add_method(PARROT_INTERP, PMC *nci)>
+
+Adds a method.
+
+=cut
+
+*/
 static void
 add_method(PARROT_INTERP, SHIM(PMC *nci))
 {
@@ -180,7 +196,15 @@ add_method(PARROT_INTERP, SHIM(PMC *nci))
     unused = Parrot_pcc_build_call_from_c_args(interp, capture, "P", method);
 }
 
-/* Adds an attribute meta-object to the list. */
+/*
+
+=item C<static void add_attribute(PARROT_INTERP, PMC *nci)>
+
+Adds an attribute meta-object to the list.
+
+=cut
+
+*/
 static void
 add_attribute(PARROT_INTERP, SHIM(PMC *nci))
 {
@@ -197,7 +221,15 @@ add_attribute(PARROT_INTERP, SHIM(PMC *nci))
     unused = Parrot_pcc_build_call_from_c_args(interp, capture, "P", meta_attr);
 }
 
-/* Finds a method. */
+/*
+
+=item C<static void find_method(PARROT_INTERP, PMC *nci)>
+
+Get methods table out of meta-object and look up method.
+
+=cut
+
+*/
 static void
 find_method(PARROT_INTERP, SHIM(PMC *nci))
 {
@@ -214,7 +246,15 @@ find_method(PARROT_INTERP, SHIM(PMC *nci))
     unused = Parrot_pcc_build_call_from_c_args(interp, capture, "P", method);
 }
 
-/* Composes the meta-object. */
+/*
+
+=item C<static void compose(PARROT_INTERP, PMC *nci)>
+
+Composes the meta-object.
+
+=cut
+
+*/
 static void
 compose(PARROT_INTERP, SHIM(PMC *nci))
 {
@@ -225,8 +265,16 @@ compose(PARROT_INTERP, SHIM(PMC *nci))
     unused = Parrot_pcc_build_call_from_c_args(interp, capture, "P", obj);
 }
 
-/* Introspects the parents. Since a KnowHOW doesn't support inheritance,
- * just hand back an empty list. */
+/*
+
+=item C<static void parents(PARROT_INTERP, PMC *nci)>
+
+Introspects the parents. Since a KnowHOW doesn't support inheritance,
+just hand back an empty list.
+
+=cut
+
+*/
 static void
 parents(PARROT_INTERP, SHIM(PMC *nci))
 {
@@ -237,7 +285,15 @@ parents(PARROT_INTERP, SHIM(PMC *nci))
     unused = Parrot_pcc_build_call_from_c_args(interp, capture, "P", empty);
 }
 
-/* Introspects the attributes. For now just hand back real list. */
+/*
+
+=item C<static void attributes(PARROT_INTERP, PMC *nci)>
+
+Introspects the attributes. For now just hand back real list.
+
+=cut
+
+*/
 static void
 attributes(PARROT_INTERP, SHIM(PMC *nci))
 {
@@ -249,7 +305,15 @@ attributes(PARROT_INTERP, SHIM(PMC *nci))
     unused = Parrot_pcc_build_call_from_c_args(interp, capture, "P", attrs);
 }
 
-/* Introspects the methods. For now just hand back real method table. */
+/*
+
+=item C<static void methods(PARROT_INTERP, PMC *nci)>
+
+Introspects the methods. For now just hand back real method table.
+
+=cut
+
+*/
 static void
 methods(PARROT_INTERP, SHIM(PMC *nci))
 {
@@ -261,7 +325,15 @@ methods(PARROT_INTERP, SHIM(PMC *nci))
     unused = Parrot_pcc_build_call_from_c_args(interp, capture, "P", meths);
 }
 
-/* Introspects the MRO. That's just a list with ourself. */
+/*
+
+=item C<static void mro(PARROT_INTERP, PMC *nci)>
+
+Introspects the MRO. That's just a list with ourself.
+
+=cut
+
+*/
 static void
 mro(PARROT_INTERP, SHIM(PMC *nci))
 {
@@ -274,7 +346,15 @@ mro(PARROT_INTERP, SHIM(PMC *nci))
     unused = Parrot_pcc_build_call_from_c_args(interp, capture, "P", mro);
 }
 
-/* Introspects the name. */
+/*
+
+=item C<static void name(PARROT_INTERP, PMC *nci)>
+
+Introspects the name.
+
+=cut
+
+*/
 static void
 name(PARROT_INTERP, SHIM(PMC *nci))
 {
@@ -286,7 +366,14 @@ name(PARROT_INTERP, SHIM(PMC *nci))
     unused = Parrot_pcc_build_call_from_c_args(interp, capture, "S", name);
 }
 
-/* Wraps up a C function as a raw NCI method. */
+/*
+=item C<static PMC * wrap_c(PARROT_INTERP, void *func)>
+
+Wraps up a C function as a raw NCI method.
+
+=cut
+
+*/
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PMC *
@@ -298,7 +385,16 @@ wrap_c(PARROT_INTERP, ARGIN(void *func))
     return wrapped;
 }
 
-/* This is the find_method where things eventually bottom out. */
+/*
+
+=item C<static PMC * bottom_find_method(PARROT_INTERP, PMC *obj, STRING *name,
+INTVAL hint)>
+
+This is the find_method where things eventually bottom out.
+
+=cut
+
+*/
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static PMC *
@@ -314,7 +410,15 @@ bottom_find_method(PARROT_INTERP, ARGIN(PMC *obj), ARGIN(STRING *name), SHIM(INT
     return method;
 }
 
-/* Attribute new method. */
+/*
+
+=item C<static void attr_new(PARROT_INTERP, PMC *nci)>
+
+Attribute new method.
+
+=cut
+
+*/
 static void
 attr_new(PARROT_INTERP, SHIM(PMC *nci))
 {
@@ -328,7 +432,15 @@ attr_new(PARROT_INTERP, SHIM(PMC *nci))
     unused = Parrot_pcc_build_call_from_c_args(interp, capture, "P", self);
 }
 
-/* Attribute name introspection. */
+/*
+
+=item C<static void attr_name(PARROT_INTERP, PMC *nci)>
+
+Attribute name introspection.
+
+=cut
+
+*/
 static void
 attr_name(PARROT_INTERP, SHIM(PMC *nci))
 {

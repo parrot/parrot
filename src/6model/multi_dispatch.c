@@ -351,7 +351,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_sixmodel_multi_dispatch(PARROT_INTERP, ARGIN(PMC *dispatcher), ARGIN(PMC *capture))
 {
-    ASSERT_ARGS(nqp_multi_dispatch)
+    ASSERT_ARGS(Parrot_sixmodel_multi_dispatch)
     /* Get list and number of dispatchees. */
     PMC *dispatchees = PARROT_DISPATCHERSUB(dispatcher)->dispatchees;
     const INTVAL num_candidates = VTABLE_elements(interp, dispatchees);

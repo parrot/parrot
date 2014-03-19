@@ -39,4 +39,11 @@ typedef struct {
 #define STORAGE_SPEC_BP_NUM     2
 #define STORAGE_SPEC_BP_STR     3
 
-#endif
+#endif /* PARROT_STORAGE_SPEC_H_GUARD */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

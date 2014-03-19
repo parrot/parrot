@@ -29,4 +29,11 @@ PMC * Parrot_sixmodel_multi_dispatch(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/6model/multi_dispatch.c */
 
-#endif
+#endif /* PARROT_MULTI_DISPATCH_H_GUARD */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */
