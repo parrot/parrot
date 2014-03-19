@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -44,7 +44,6 @@ Initialize PackfileSegment.
 
 */
     VTABLE void init() {
-        UNUSED(INTERP)
         Parrot_PackfileSegment_attributes * const attrs =
                 PMC_data_typed(SELF, Parrot_PackfileSegment_attributes*);
 
@@ -82,8 +81,6 @@ The C<ptr> argument is ignored.
 
 */
     VTABLE void set_pointer(void *ptr) {
-        UNUSED(INTERP)
-        UNUSED(SELF)
         UNUSED(ptr)
     }
 

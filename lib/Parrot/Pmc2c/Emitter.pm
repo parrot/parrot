@@ -102,8 +102,7 @@ Examples:
 
 =item * Return Value
 
-Parrot::Pmc2c::Emitter object, apparently suitable for using as value for a
-C<body> key in a Parrot::Pmc2c::Method object.  B<MUST VERIFY>.
+Parrot::Pmc2c::Emitter object, used as C<body> in a Parrot::Pmc2c::Method object.
 
 =item * Comment
 
@@ -291,6 +290,48 @@ sub replace {
     }
     return 1;
 }
+
+=head2 C<add_write_barrier($body, $method, $pmc)>
+
+find last return and add PARROT_GC_WRITE_BARRIER before it.
+
+If the return type is required and non-void it must be uppercase RETURN, so that
+Parrot::Pmc2c::PCCMETHOD::rewrite_RETURNs can rewrite it.
+
+=cut
+
+sub add_write_barrier {
+    my ( $body, $method, $pmc ) = @_;
+    my $need_result = $method->return_type && $method->return_type !~ /^void/;
+    return 0 if $method->attrs->{manual_wb};
+    if ($need_result) {
+        if (Parrot::Pmc2c::PCCMETHOD::rewrite_RETURNs($method, $pmc)) {
+            #warn "Transformed RETURN with GC write barrier to " . $pmc->name . "." . $method->name."\n";
+            ;
+        }
+        else {
+            # how many return lines? if only 1 add wb before
+            my $count;
+            $count++ while $body->{data} =~ /^\s+return /g;
+            if (!$count) {
+                $body->{data} .= "    PARROT_GC_WRITE_BARRIER(interp, _self);\n";
+            }
+            elsif ($count == 1) {
+                $body->{data} =~ s/^(\s+return )/    PARROT_GC_WRITE_BARRIER(interp, _self);\n$1/m;
+            }
+            else { # multiple returns. need manual_wb
+                warn "TODO manual_wb GC write barrier to " . $pmc->name . "." . $method->name."\n";
+                $body->{data} .= "    /* need PARROT_GC_WRITE_BARRIER(interp, _self); or uppercase RETURN */\n";
+            }
+        }
+    }
+    else {
+        #warn "Adding GC write barrier to " . $pmc->name . "." . $method->name."\n";
+        $body->{data} .= "    PARROT_GC_WRITE_BARRIER(interp, _self);\n";
+    }
+    return 1;
+}
+
 
 sub stringify {
     my ($self) = @_;

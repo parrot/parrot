@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -49,7 +49,6 @@ Initializes the alarm.
 */
 
     VTABLE void init() {
-        UNUSED(INTERP)
         Parrot_Alarm_attributes * const data = PARROT_ALARM(SELF);
         data->alarm_time = 0.0;
         data->alarm_task = PMCNULL;

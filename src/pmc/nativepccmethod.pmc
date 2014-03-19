@@ -38,7 +38,6 @@ Initializes the PMC with a C<NULL> function pointer.
 */
 
     VTABLE void init() {
-        UNUSED(INTERP)
         Parrot_NativePCCMethod_attributes * const attrs = PARROT_NATIVEPCCMETHOD(SELF);
 
         attrs->func               = NULL;
@@ -70,7 +69,6 @@ Set the pointer to the native function and the PCC signature.
     }
 
     VTABLE void set_pointer_keyed_str(STRING *sig, void *func) {
-        UNUSED(INTERP)
         PARROT_NATIVEPCCMETHOD(SELF)->signature = sig;
         PARROT_NATIVEPCCMETHOD(SELF)->func = func;
     }

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -87,7 +87,6 @@ Set pointers to Hash and HashBucket. Not really part of public API.
 
 */
     VTABLE void set_pointer_keyed_int(INTVAL key, void *value) {
-        UNUSED(INTERP)
         Parrot_HashIteratorKey_attributes *attrs =
                 PARROT_HASHITERATORKEY(SELF);
 

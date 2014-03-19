@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -38,7 +38,6 @@ Initializes the pointer.
 */
 
     VTABLE void init() {
-        UNUSED(INTERP)
         PObj_custom_mark_SET(SELF);
     }
 
@@ -88,7 +87,6 @@ Sets the pointer value.
 */
 
     VTABLE void set_pointer(void *ptr) {
-        UNUSED(INTERP)
         PARROT_POINTER(SELF)->pointer = ptr;
     }
 

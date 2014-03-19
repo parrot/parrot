@@ -115,6 +115,7 @@ sub parse_adverb_attributes {
     if ( defined $adverb_string ) {
         ++$result{$1} while $adverb_string =~ /:(\S+)/g;
     }
+    $result{manual_wb}++ if $result{no_wb};
     return \%result;
 }
 
@@ -160,6 +161,7 @@ sub rewrite_RETURNs {
     my $wb             = $method->attrs->{manual_wb}
                          ? ''
                          : 'PARROT_GC_WRITE_BARRIER(interp, _self);';
+    my $result;
 
     my $signature_re   = qr/
       (RETURN       #method name
@@ -169,7 +171,7 @@ sub rewrite_RETURNs {
     /sx;
 
     croak "return not allowed in pccmethods, use RETURN instead $body"
-        if $body and $body =~ m/\breturn\b.*?;\z/s;
+        if !$method->is_vtable and $wb and $body and $body =~ m/\breturn\b.*?;\z/s;
 
     while ($body) {
         my $matched;
@@ -186,14 +188,11 @@ sub rewrite_RETURNs {
 
         if ($returns eq 'void') {
             $e->emit( <<"END" );
-    {
-    /*BEGIN RETURN $returns */
     $wb
     return;
-    /*END RETURN $returns */
-    }
 END
             $matched->replace( $match, $e );
+            $result = 1;
             next;
         }
 
@@ -201,12 +200,12 @@ END
         my ( $returns_signature, $returns_varargs ) =
             process_pccmethod_args( parse_p_args_string($returns), 'return' );
 
-        if ($returns_signature) {
-        $e->emit( <<"END" );
+        if ($returns_signature and !$method->is_vtable) {
+            $e->emit( <<"END" );
     {
     /*BEGIN RETURN $returns */
 END
-        $e->emit( <<"END" );
+            $e->emit( <<"END" );
     Parrot_pcc_set_call_from_c_args(interp, _call_object,
         "$returns_signature", $returns_varargs);
     $wb
@@ -217,18 +216,15 @@ END
         }
         else { # if ($returns_signature)
             $e->emit( <<"END" );
-    {
-    /*BEGIN RETURN $returns */
     $wb
-    return;
-    }
-    /*END RETURN $returns */
+    return $returns_varargs;
 END
         }
 
         $matched->replace( $match, $e );
+        $result = 1;
     }
-
+    return $result;
 }
 
 sub parse_p_args_string {
@@ -343,7 +339,7 @@ sub rewrite_pccmethod {
             already_declared => 1,
         };
 
- # The invocant is already passed in the C signature, why pass it again?
+    # The invocant is already passed in the C signature, why pass it again?
 
     my ( $params_signature, $params_varargs, $params_declarations ) =
         process_pccmethod_args( $linear_args, 'arg' );

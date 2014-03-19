@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -289,7 +289,6 @@ Raises an exception; you can only instantiate objects from a class.
 */
 
     VTABLE void init() {
-        UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Object must be created by a class.");
     }
@@ -306,7 +305,6 @@ Raises an exception; you can only instantiate objects from a class.
 */
 
     VTABLE void init_pmc(PMC *worreva) {
-        UNUSED(SELF)
         UNUSED(worreva)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Object must be created by a class.");
@@ -932,8 +930,6 @@ The C<info> arguments are ignored.
     }
 
     VTABLE void thaw(PMC *info) {
-        UNUSED(INTERP)
-        UNUSED(SELF)
         UNUSED(info)
     }
 
@@ -949,7 +945,6 @@ Called after the object has been thawed.
 */
 
     VTABLE void thawfinish(PMC *info) {
-        UNUSED(INTERP)
         UNUSED(info)
         /* Set custom GC mark and destroy on the object. */
         PObj_custom_mark_SET(SELF);

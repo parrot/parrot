@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2012, Parrot Foundation.
+Copyright (C) 2011-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -36,7 +36,6 @@ C<PtrBuf> is always C<fat> and manages its own attributes. Let C<Ptr> know about
 */
 
     VTABLE void init() {
-        UNUSED(INTERP)
         PTR_FAT_SET(INTERP, SELF);
     }
 

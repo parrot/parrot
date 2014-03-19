@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -116,7 +116,6 @@ Initializes the NCI with a C<NULL> function pointer.
 */
 
     VTABLE void init() {
-        UNUSED(INTERP)
         PObj_custom_mark_SET(SELF);
     }
 

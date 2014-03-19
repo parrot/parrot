@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2012, Parrot Foundation.
+Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -38,7 +38,6 @@ Throws an error.  OpLib requires an argument to init.  See C<init_pmc>.
 */
 
     VTABLE void init() {
-        UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "OpLib must be initialized with an oplib name");
     }

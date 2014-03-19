@@ -110,7 +110,6 @@ Initializes the integer with a default value of C<0>.
 */
 
     VTABLE void init() {
-        UNUSED(INTERP)
         Parrot_Integer_attributes * const attrs =
             (Parrot_Integer_attributes *)PMC_data(SELF);
 
@@ -125,7 +124,6 @@ Initializes the integer with a default value of C<0>.
     }
 
     VTABLE void init_int(INTVAL init) {
-        UNUSED(INTERP)
         Parrot_Integer_attributes * const attrs =
             (Parrot_Integer_attributes *)PMC_data(SELF);
 

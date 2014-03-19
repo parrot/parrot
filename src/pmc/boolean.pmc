@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -69,7 +69,6 @@ as a Boolean.
     /* These init functions set the boolean flag directly. */
 
     VTABLE void init() {
-        UNUSED(INTERP)
         set_boolean_FLAG(SELF, 0);
     }
 
@@ -79,7 +78,6 @@ as a Boolean.
     }
 
     VTABLE void init_int(INTVAL value) {
-        UNUSED(INTERP)
         set_boolean_FLAG(SELF, value);
     }
 
@@ -150,7 +148,6 @@ C<FALSE>.
 */
 
     VTABLE void set_bool(INTVAL value) {
-        UNUSED(INTERP)
         set_boolean_FLAG(SELF, value);
     }
 

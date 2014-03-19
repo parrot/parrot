@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -81,7 +81,6 @@ Raises an exception. Use C<init_pmc()>.
 */
 
     VTABLE void init() {
-        UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "ArrayIterator init without aggregate");
     }

@@ -74,6 +74,7 @@ EOC
         $method_body_text .= "            key = clone_key_arg(interp, key);\n"
             if $vt_method_name =~ /_keyed$/;
 
+        # XXX: Parrot_ext_call is the slowest part. new runloop, recrate sig and callcontext
         $method_body_text .= <<"EOC";
             Parrot_ext_call(interp, meth, "Pi$pcc_sig", _self$pcc_args);
             $pcc_return_stmt

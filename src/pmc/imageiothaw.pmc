@@ -216,7 +216,6 @@ Set an exterior constant table to use for cross-referencing constants.
 */
 
     VTABLE void set_pointer(void *value) {
-        UNUSED(INTERP)
         PObj_flag_SET(private1, SELF);
         PARROT_IMAGEIOTHAW(SELF)->pf_ct = (PackFile_ConstTable *)value;
     }

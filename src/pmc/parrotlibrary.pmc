@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -49,8 +49,6 @@ Initializes the library with a C<NULL> oplib init function.
 */
 
     VTABLE void init() {
-        UNUSED(INTERP)
-        UNUSED(SELF)
     }
 
 /*
@@ -156,7 +154,6 @@ Sets the pointer to the shared library handle.
 */
 
     VTABLE void set_pointer(void *handle) {
-        UNUSED(INTERP)
         PMC_dlhandle(SELF) = handle;
         PObj_custom_destroy_SET(SELF);
     }

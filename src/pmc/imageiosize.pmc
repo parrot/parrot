@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2012, Parrot Foundation.
+Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -188,7 +188,6 @@ The argument C<v> is currently ignored.
 */
 
     VTABLE void push_integer(INTVAL v) {
-        UNUSED(INTERP)
         UNUSED(v)
         const size_t len = PF_size_integer() * sizeof (opcode_t);
         PARROT_IMAGEIOSIZE(SELF)->size += len;
@@ -209,7 +208,6 @@ The argument C<v> is currently ignored.
 
     VTABLE void push_float(FLOATVAL v)
     {
-        UNUSED(INTERP)
         UNUSED(v)
         const size_t len = PF_size_number() * sizeof (opcode_t);
         PARROT_IMAGEIOSIZE(SELF)->size += len;

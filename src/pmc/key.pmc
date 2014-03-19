@@ -42,7 +42,6 @@ Initializes the key.
 */
 
     VTABLE void init() {
-        UNUSED(INTERP)
         PObj_custom_mark_SET(SELF);
     }
 
@@ -189,7 +188,6 @@ Sets the value of the key to C<*value>.
 */
 
     VTABLE void set_pmc(PMC *value) {
-        UNUSED(SELF)
         UNUSED(value)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                 "Key.set_pmc is broken - see GH #499");

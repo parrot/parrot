@@ -349,8 +349,8 @@ Returns the id of the exception.
 */
 
     VTABLE INTVAL get_integer() {
-        UNUSED(INTERP)
         const Parrot_Exception_attributes * const exception = PARROT_EXCEPTION(SELF);
+        UNUSED(INTERP)
         return exception->id;
     }
 
@@ -591,7 +591,6 @@ Store a context for the handler iterator.
 */
 
     VTABLE void set_pointer(void *context) {
-        UNUSED(INTERP)
         Parrot_Exception_attributes * const core_struct = PARROT_EXCEPTION(SELF);
         core_struct->handler_ctx = (PMC*)context;
     }
@@ -607,8 +606,8 @@ Retrieve a context stored for the handler iterator.
 */
 
     VTABLE void *get_pointer() {
-        UNUSED(INTERP)
         const Parrot_Exception_attributes * const core_struct = PARROT_EXCEPTION(SELF);
+        UNUSED(INTERP)
         return core_struct->handler_ctx;
     }
 

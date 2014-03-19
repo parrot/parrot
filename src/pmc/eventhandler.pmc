@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007-2012, Parrot Foundation.
+Copyright (C) 2007-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -42,8 +42,8 @@ do anything.
 */
 
     VTABLE void init() {
-        UNUSED(INTERP)
         Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
+
         e->interp = PMCNULL;
         e->code = PMCNULL;
         e->type = STRINGNULL;
@@ -148,7 +148,6 @@ Sets the C<type> attribute of this event handler to the passed-in string.
 */
 
     VTABLE void set_string(STRING *type) {
-        UNUSED(INTERP)
         Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
 
         if (e)
@@ -184,7 +183,6 @@ Sets the minimum interesting priority for this event handler.
 
 */
     VTABLE void set_integer_native(INTVAL priority) {
-        UNUSED(INTERP)
         Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
 
         if (e)
@@ -202,7 +200,6 @@ handle the registered events.
 
 */
     VTABLE void set_pmc(PMC *interpreter) {
-        UNUSED(INTERP)
         Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
 
         if (e)

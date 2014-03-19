@@ -42,13 +42,11 @@ pmclass Handle provides Handle manual_attrs {
 
 
     VTABLE void init() {
-        UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Handle cannot be instantiated directly.");
     }
 
     VTABLE void init_pmc(PMC * init) {
-        UNUSED(SELF)
         UNUSED(init)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Handle cannot be instantiated directly.");

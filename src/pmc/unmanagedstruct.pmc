@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -954,7 +954,6 @@ Sets the size of the C<struct>.
 */
 
     VTABLE void set_integer_native(INTVAL size) {
-        UNUSED(INTERP);
         PARROT_UNMANAGEDSTRUCT(SELF)->size = size;
     }
 
@@ -1112,7 +1111,6 @@ Set the pointer to the actual C C<struct>.
 */
 
     VTABLE void set_pointer(void *value) {
-        UNUSED(INTERP);
         PARROT_UNMANAGEDSTRUCT(SELF)->ptr = value;
     }
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2012, Parrot Foundation.
+Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -501,7 +501,6 @@ Sets the constant table of this ImageIO PMC.
 */
 
     VTABLE void set_pointer(void *value) {
-        UNUSED(INTERP)
         PObj_flag_SET(private1, SELF);
         PARROT_IMAGEIOFREEZE(SELF)->pf_ct = (PackFile_ConstTable *)value;
     }

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -129,7 +129,6 @@ Set the message ID.
 */
 
     VTABLE void set_integer_native(INTVAL value) {
-        UNUSED(INTERP);
         PARROT_SCHEDULERMESSAGE(SELF)->id = value;
     }
 
@@ -160,7 +159,6 @@ Set the message type.
 */
 
     VTABLE void set_string_native(STRING *value) {
-        UNUSED(INTERP);
         PARROT_SCHEDULERMESSAGE(SELF)->type = value;
     }
 

@@ -337,7 +337,6 @@ Returns C<struct_val>.
 */
 
     VTABLE void *get_pointer() {
-        UNUSED(INTERP)
         return PMC_interp(SELF);
     }
 
@@ -353,7 +352,6 @@ Returns the thread id of the interpreter.
 
     VTABLE INTVAL get_integer() {
         const Parrot_Interp i = PMC_interp(SELF);
-        UNUSED(INTERP)
         if (i->thread_data)
             return (INTVAL)i->thread_data->tid;
         return 0;
@@ -408,7 +406,6 @@ Set this Thread's args.
 */
 
     VTABLE void set_pmc(PMC *args) {
-        UNUSED(INTERP)
         PMC_args(SELF) = args;
     }
 
@@ -424,8 +421,8 @@ Returns the PMC global value for C<key>.
 */
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
-        UNUSED(INTERP)
         Interp * const new_interp = PMC_interp(SELF);
+        UNUSED(INTERP)
 
         if (key >= 0 && key < IGLOBALS_SIZE) {
             PMC * const val = VTABLE_get_pmc_keyed_int(new_interp,
@@ -463,13 +460,13 @@ Introspection interface. C<key> can be:
 */
 
     VTABLE PMC *get_pmc_keyed(PMC *key) {
-        UNUSED(SELF)
         PMC    *nextkey;
         STRING *outer = NULL;
         STRING *item  = Parrot_key_string(INTERP, key);
         int     level = 0;
 
         PMC *ctx;
+        UNUSED(SELF)
 
         if (STRING_equal(INTERP, item, CONST_STRING(INTERP, "globals")))
             return INTERP->root_namespace;
@@ -582,7 +579,6 @@ Returns the interpreter info for C<key>.
 */
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
-        UNUSED(INTERP)
         Interp * const new_interp = PMC_interp(SELF);
 
         if (key == -1)
@@ -602,7 +598,6 @@ Sets the interpreter info for C<key> to C<val>.
 */
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL val) {
-        UNUSED(INTERP)
         Interp * const new_interp = PMC_interp(SELF);
 
         /* set interpreter flags */
@@ -628,8 +623,8 @@ XXX this should of course call C<Parrot_clone()> and use freeze/thaw.
 */
 
     VTABLE PMC *clone() {
-        UNUSED(INTERP)
         PMC * const dest = clone_interpreter(PMC_interp(SELF), PARROT_CLONE_DEFAULT);
+        UNUSED(INTERP)
 
         return dest;
     }

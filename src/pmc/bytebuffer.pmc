@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2012, Parrot Foundation.
+Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -83,7 +83,6 @@ Free the buffer when destroying.
 */
 
     VTABLE void init() {
-        UNUSED(INTERP)
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 

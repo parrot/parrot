@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2012, Parrot Foundation.
+Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -111,8 +111,6 @@ Do nothing.
 */
 
     VTABLE void push_integer(INTVAL v) {
-        UNUSED(INTERP)
-        UNUSED(SELF)
         UNUSED(v)
     }
 
@@ -128,8 +126,6 @@ Do nothing.
 */
 
     VTABLE void push_float(FLOATVAL v) {
-        UNUSED(INTERP)
-        UNUSED(SELF)
         UNUSED(v)
     }
 
@@ -144,8 +140,7 @@ Adds the string to the list of strings.
 
 */
 
-    VTABLE void push_string(STRING *v)
-    {
+    VTABLE void push_string(STRING *v) {
         VTABLE_push_string(INTERP, PARROT_IMAGEIOSTRINGS(SELF)->list, v);
     }
 
