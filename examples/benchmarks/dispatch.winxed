@@ -1,0 +1,101 @@
+#! winxed
+/*
+
+Copyright (C) 2011, Parrot Foundation.
+http://whiteknight.github.io/2011/05/10/timings_vtable_overrides.html
+
+=head1 SYNOPSIS
+
+    ./winxed -c --noan examples/benchmarks/dispatch.winxed
+    ./parrot examples/benchmarks/dispatch.pir
+
+=head1 DESCRIPTION
+
+    Starting no dispatch (base line)
+    Total time: 0.189244s
+    
+    Starting vtable calls
+    Total time: 0.257013s
+    
+    Starting method calls
+    Total time: 4.172381s
+    
+    Starting vtable_override calls
+    Total time: 8.376169s
+
+with callgrind:
+
+    475,004,380  fill_params
+    412,681,236  Parrot_gc_fixed_allocator_allocate
+    338,013,596  gc_gms_allocate_pmc_header
+    314,497,452  gc_gms_mark_and_sweep
+    275,002,531  runops_fast_core
+    260,081,808  Parrot_pmc_new
+
+In addition to the PCC and GC costs of the dispatch mechanisms, vtable
+overrides must recurse and create a new runloop. (ext_call)
+
+callgrind_annotate --inclusive=yes:
+
+    10,907,096,693  Parrot_ext_call'2
+     8,405,564,370  Parrot_pcc_invoke_from_sig_object'2
+     7,149,991,128  0x0000000000001180 [ld-2.18.so]
+     7,145,266,550  0x00000000004020aa [parrot]
+     7,145,263,511  libc-start.c:(below main) [libc-2.18.so]
+     7,145,263,303  main [parrot]
+     7,140,721,402  Parrot_api_run_bytecode
+
+=cut
+
+*/
+
+class MyTestClass {
+    function get_integer[vtable]() { return 1; }
+    function get_int() { return 1; }
+}
+
+function main[main]() {
+    var total_runs = 1000000; // one million times
+    var obj = new MyTestClass;
+    var myint = new 'Integer';
+    count_time("no dispatch (base line)", function() {
+        int count = total_runs;
+        int result = 0;
+        for (int i = 0; i < count; i++)
+            result = result + 1;
+    });
+    count_time("vtable calls", function() {
+        int count = total_runs;
+        myint = 1;
+        int result = 0;
+        for (int i = 0; i < count; i++)
+            result = result + myint;
+    });
+    count_time("method calls", function() {
+        int count = total_runs;
+        int result = 0;
+        for (int i = 0; i < count; i++)
+            result = result + obj.get_int();
+    });
+    count_time("vtable_override calls", function() {
+        int count = total_runs;
+        int result = 0;
+        for (int i = 0; i < count; i++)
+            result = result + obj;
+    });
+}
+
+function count_time(string description, var code)
+{
+    say(sprintf("Starting %s", [description]));
+    float starttime = floattime();
+    code();
+    float endtime = floattime();
+    say(sprintf("Total time: %fs\n", [endtime - starttime]));
+}
+
+# Local Variables:
+#   mode: winxed
+#   fill-column: 78
+# End:
+# vim: expandtab shiftwidth=4 ft=winxed:

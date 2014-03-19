@@ -1,4 +1,4 @@
-#!./parrot
+#! winxed
 # Copyright (C) 2012-2013, Parrot Foundation.
 /*
 
@@ -8,14 +8,16 @@ examples/threads/matrix_part.winxed - Multiply matrices with multiple cores
 
 =head1 SYNOPSIS
 
-    % ./parrot examples/threads/matrix_part.winxed
+    ./winxed -c --noan examples/threads/matrix_part.winxed
+    time ./parrot examples/threads/matrix_part.pir
 
 =head1 DESCRIPTION
 
-This is Winxed code which uses FixedPMCArrays and FixedIntegerArrays
-to multiply a large matrix with multiple CPU core via the Task PMC.
+This is Winxed code which uses FixedPMCArrays and FixedIntegerArrays to
+multiply a large matrix with multiple CPU core via the Task PMC.
 
-It uses 4 tasks to multiply the the 4 2500-length submatrices of a 10000x10000 matrix.
+It uses 4 tasks to multiply the the 4 2500-length submatrices of a 10000x10000
+matrix.
 
 =cut
 
@@ -110,6 +112,6 @@ function set_result(var result) {
 
 # Local Variables:
 #   mode: winxed
-#   fill-column: 100
+#   fill-column: 78
 # End:
 # vim: expandtab shiftwidth=4 ft=winxed:
