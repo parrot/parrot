@@ -37,15 +37,22 @@ TODO:
 #include "parrot/6model/repr/Uninstantiable.h"
 #include "parrot/6model/repr_registry.h"
 
-/* HEADERIZER HFILE: none */
+/* HEADERIZER HFILE: include/parrot/6model/repr_registry.h */
+
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void register_repr(PARROT_INTERP, const STRING *name, REPROps *repr)
-        __attribute__nonnull__(1);
+static void register_repr(PARROT_INTERP,
+    ARGIN(const STRING *name),
+    ARGIN(REPROps *repr))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_register_repr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(repr))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -71,7 +78,7 @@ TODO: make it public, make it thread-safe.
 
 */
 static void
-register_repr(PARROT_INTERP, const STRING *name, REPROps *repr)
+register_repr(PARROT_INTERP, ARGIN(const STRING *name), ARGIN(REPROps *repr))
 {
     ASSERT_ARGS(register_repr)
     INTVAL ID = num_reprs;
@@ -81,7 +88,7 @@ register_repr(PARROT_INTERP, const STRING *name, REPROps *repr)
     else
         repr_registry = mem_allocate_n_typed(num_reprs, REPROps *);
     repr_registry[ID] = repr;
-    VTABLE_set_integer_keyed_str(interp, repr_name_to_id_map, name, ID);
+    VTABLE_set_integer_keyed_str(interp, repr_name_to_id_map, (STRING*)name, ID);
 }
 
 /*
@@ -105,6 +112,7 @@ TODO: Allow other user-repr.
 void
 REPR_initialize_registry(PARROT_INTERP)
 {
+    ASSERT_ARGS(REPR_initialize_registry)
     const STRING * s_KnowHOWREPR = CONST_STRING(interp, "KnowHOWREPR");
     const STRING * s_P6opaque    = CONST_STRING(interp, "P6opaque");
     const STRING * s_P6int       = CONST_STRING(interp, "P6int");
@@ -137,10 +145,12 @@ it's best not to store references to them in e.g. the bytecode stream.
 =cut
 
 */
+PARROT_INLINE
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-REPR_name_to_id(PARROT_INTERP, STRING *name)
+REPR_name_to_id(PARROT_INTERP, ARGIN(STRING *name))
 {
+    ASSERT_ARGS(REPR_name_to_id)
     return VTABLE_get_integer_keyed_str(interp, repr_name_to_id_map, name);
 }
 
@@ -155,10 +165,13 @@ TODO: thread-safe (per interp)
 =cut
 
 */
+PARROT_INLINE
 PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 REPROps *
 REPR_get_by_id(SHIM_INTERP, INTVAL id)
 {
+    ASSERT_ARGS(REPR_get_by_id)
     return repr_registry[id];
 }
 
@@ -171,13 +184,23 @@ Gets a representation by name.
 =cut
 
 */
+PARROT_INLINE
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 REPROps *
-REPR_get_by_name(PARROT_INTERP, STRING *name)
+REPR_get_by_name(PARROT_INTERP, ARGIN(STRING *name))
 {
+    ASSERT_ARGS(REPR_get_by_name)
     return repr_registry[VTABLE_get_integer_keyed_str(interp, repr_name_to_id_map, name)];
 }
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:

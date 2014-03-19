@@ -35,10 +35,10 @@ typedef struct {
 
     /* Maps attribute position numbers to the byte offset in the object. */
     INTVAL *attribute_offsets;
-    
+
     /* Flags if we are MI or not. */
     INTVAL mi;
-    
+
     /* Instantiated objects are just a blank piece of memory that needs to
      * be set up. However, in some cases we'd like them to magically turn in
      * to some container type. */

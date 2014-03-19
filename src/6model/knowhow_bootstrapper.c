@@ -452,7 +452,7 @@ attr_name(PARROT_INTERP, SHIM(PMC *nci))
     unused = Parrot_pcc_build_call_from_c_args(interp, capture, "S", name);
 }
 
-/* 
+/*
 
 =item C<PMC * SixModelObject_bootstrap_knowhow(PARROT_INTERP, PMC *sc)>
 
@@ -544,7 +544,7 @@ SixModelObject_bootstrap_knowhow(PARROT_INTERP, ARGIN(PMC *sc))
     return knowhow_pmc;
 }
 
-/* 
+/*
 
 =item C<PMC * SixModelObject_setup_knowhow_attribute(PARROT_INTERP, PMC *sc, PMC
 *knowhow)>

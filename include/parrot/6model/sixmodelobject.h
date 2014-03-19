@@ -86,7 +86,7 @@ typedef struct SixModel_REPROps REPROps;
 typedef struct {
     /* The representation operation table. */
     REPROps *REPR;
-    
+
     /* Any data specific to this type that the REPR wants to keep. */
     void *REPR_data;
 
@@ -118,7 +118,7 @@ typedef struct {
 
     /* The length of the type check cache. */
     INTVAL type_check_cache_length;
-    
+
     /* The type checking mode (see flags for this above). */
     INTVAL type_check_mode;
 
@@ -127,12 +127,12 @@ typedef struct {
      * type directory based upon this ID. Otherwise you'll create memory
      * leaks for anonymous types, and other such screwups. */
     INTVAL type_cache_id;
-    
+
     /* If this is a container, then this contains information needed in
      * order to fetch the value in it. If not, it'll be null, which can
      * be taken as a "not a container" indication. */
     ContainerSpec *container_spec;
-    
+
     /* Data that the container spec may need to function. */
     /* Any data specific to this type that the REPR wants to keep. */
     void *container_data;
@@ -217,7 +217,7 @@ struct SixModel_REPROps {
     /* Clones the object, optionally cloning any containers in its
      * attributes. */
     PMC * (*clone) (PARROT_INTERP, PMC *to_clone);
-    
+
     /* Used with boxing. Sets an integer value, for representations that
      * can hold one. */
     void (*set_int) (PARROT_INTERP, PMC *Object, INTVAL Value);
@@ -256,11 +256,11 @@ struct SixModel_REPROps {
 
     /* Gets the storage specification for this representation. */
     storage_spec (*get_storage_spec) (PARROT_INTERP, STable *st);
-    
+
     /* Checks if an attribute has been initialized. */
     INTVAL (*is_attribute_initialized) (PARROT_INTERP, PMC *Object, PMC *ClassHandle,
                                         STRING *Name, INTVAL Hint);
-    
+
     /* Handles an object changing its type. The representation is responsible
      * for doing any changes to the underlying data structure, and may reject
      * changes that it's not willing to do (for example, a representation may
