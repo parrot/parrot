@@ -766,32 +766,32 @@ typedef enum {
     PARROT_OP_stable_publish_vtable_handler_mapping_pc_p,   /* 749 */
     PARROT_OP_stable_publish_vtable_handler_mapping_p_pc,   /* 750 */
     PARROT_OP_stable_publish_vtable_handler_mapping_pc_pc,   /* 751 */
-    PARROT_OP_nqp_get_sc_object_p_s_i,   /* 752 */
-    PARROT_OP_nqp_get_sc_object_p_sc_i,   /* 753 */
-    PARROT_OP_nqp_get_sc_object_p_s_ic,   /* 754 */
-    PARROT_OP_nqp_get_sc_object_p_sc_ic,   /* 755 */
-    PARROT_OP_nqp_get_sc_p_s,   /* 756 */
-    PARROT_OP_nqp_get_sc_p_sc,   /* 757 */
-    PARROT_OP_nqp_create_sc_p_s,   /* 758 */
-    PARROT_OP_nqp_create_sc_p_sc,   /* 759 */
-    PARROT_OP_nqp_set_sc_object_s_i_p,   /* 760 */
-    PARROT_OP_nqp_set_sc_object_sc_i_p,   /* 761 */
-    PARROT_OP_nqp_set_sc_object_s_ic_p,   /* 762 */
-    PARROT_OP_nqp_set_sc_object_sc_ic_p,   /* 763 */
-    PARROT_OP_nqp_set_sc_object_s_i_pc,   /* 764 */
-    PARROT_OP_nqp_set_sc_object_sc_i_pc,   /* 765 */
-    PARROT_OP_nqp_set_sc_object_s_ic_pc,   /* 766 */
-    PARROT_OP_nqp_set_sc_object_sc_ic_pc,   /* 767 */
-    PARROT_OP_nqp_set_sc_for_object_p_p,   /* 768 */
-    PARROT_OP_nqp_set_sc_for_object_pc_p,   /* 769 */
-    PARROT_OP_nqp_set_sc_for_object_p_pc,   /* 770 */
-    PARROT_OP_nqp_set_sc_for_object_pc_pc,   /* 771 */
-    PARROT_OP_nqp_get_sc_for_object_p_p,   /* 772 */
-    PARROT_OP_nqp_get_sc_for_object_p_pc,   /* 773 */
-    PARROT_OP_nqp_get_package_through_who_p_p_s,   /* 774 */
-    PARROT_OP_nqp_get_package_through_who_p_pc_s,   /* 775 */
-    PARROT_OP_nqp_get_package_through_who_p_p_sc,   /* 776 */
-    PARROT_OP_nqp_get_package_through_who_p_pc_sc,   /* 777 */
+    PARROT_OP_get_sc_object_p_s_i,   /* 752 */
+    PARROT_OP_get_sc_object_p_sc_i,   /* 753 */
+    PARROT_OP_get_sc_object_p_s_ic,   /* 754 */
+    PARROT_OP_get_sc_object_p_sc_ic,   /* 755 */
+    PARROT_OP_get_sc_p_s,   /* 756 */
+    PARROT_OP_get_sc_p_sc,   /* 757 */
+    PARROT_OP_create_sc_p_s,   /* 758 */
+    PARROT_OP_create_sc_p_sc,   /* 759 */
+    PARROT_OP_set_sc_object_s_i_p,   /* 760 */
+    PARROT_OP_set_sc_object_sc_i_p,   /* 761 */
+    PARROT_OP_set_sc_object_s_ic_p,   /* 762 */
+    PARROT_OP_set_sc_object_sc_ic_p,   /* 763 */
+    PARROT_OP_set_sc_object_s_i_pc,   /* 764 */
+    PARROT_OP_set_sc_object_sc_i_pc,   /* 765 */
+    PARROT_OP_set_sc_object_s_ic_pc,   /* 766 */
+    PARROT_OP_set_sc_object_sc_ic_pc,   /* 767 */
+    PARROT_OP_set_sc_for_object_p_p,   /* 768 */
+    PARROT_OP_set_sc_for_object_pc_p,   /* 769 */
+    PARROT_OP_set_sc_for_object_p_pc,   /* 770 */
+    PARROT_OP_set_sc_for_object_pc_pc,   /* 771 */
+    PARROT_OP_get_sc_for_object_p_p,   /* 772 */
+    PARROT_OP_get_sc_for_object_p_pc,   /* 773 */
+    PARROT_OP_get_package_through_who_p_p_s,   /* 774 */
+    PARROT_OP_get_package_through_who_p_pc_s,   /* 775 */
+    PARROT_OP_get_package_through_who_p_p_sc,   /* 776 */
+    PARROT_OP_get_package_through_who_p_pc_sc,   /* 777 */
     PARROT_OP_is_invokable_i_p,   /* 778 */
     PARROT_OP_is_invokable_i_pc,   /* 779 */
     PARROT_OP_repr_get_primitive_type_spec_i_p,   /* 780 */
