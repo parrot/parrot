@@ -170,5 +170,6 @@ Starred release numbers indicate supported releases.
 
  Util        6.0.0 *        2014-Jan-21     "Red-necked Amazon"
  rurban      6.1.0          2014-Feb-18     "Black-collared Lovebird"
+ Util        6.2.0          2014-Mar-18     "Imperial Amazon"
 
 =cut
