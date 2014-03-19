@@ -868,8 +868,8 @@ static op_func_t core_op_func_table[1334] = {
   Parrot_repr_get_primitive_type_spec_i_pc,          /*    781 */
   Parrot_is_container_i_p,                           /*    782 */
   Parrot_is_container_i_pc,                          /*    783 */
-  Parrot_nqp_decontainerize_p_p,                     /*    784 */
-  Parrot_nqp_decontainerize_p_pc,                    /*    785 */
+  Parrot_decontainerize_p_p,                     /*    784 */
+  Parrot_decontainerize_p_pc,                    /*    785 */
   Parrot_set_container_spec_p_p_s_p,                 /*    786 */
   Parrot_set_container_spec_pc_p_s_p,                /*    787 */
   Parrot_set_container_spec_p_pc_s_p,                /*    788 */
@@ -10053,9 +10053,9 @@ static op_info_t core_op_info_table[1334] = {
     &core_op_lib
   },
   { /* 784 */
-    "nqp_decontainerize",
-    "nqp_decontainerize_p_p",
-    "Parrot_nqp_decontainerize_p_p",
+    "decontainerize",
+    "decontainerize_p_p",
+    "Parrot_decontainerize_p_p",
     0,
     3,
     { PARROT_ARG_P, PARROT_ARG_P },
@@ -10064,9 +10064,9 @@ static op_info_t core_op_info_table[1334] = {
     &core_op_lib
   },
   { /* 785 */
-    "nqp_decontainerize",
-    "nqp_decontainerize_p_pc",
-    "Parrot_nqp_decontainerize_p_pc",
+    "decontainerize",
+    "decontainerize_p_pc",
+    "Parrot_decontainerize_p_pc",
     0,
     3,
     { PARROT_ARG_P, PARROT_ARG_PC },
@@ -24738,14 +24738,14 @@ Parrot_is_container_i_pc(opcode_t *cur_opcode, PARROT_INTERP) {
 }
 
 opcode_t *
-Parrot_nqp_decontainerize_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_decontainerize_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = decontainerize(interp, PREG(2));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return cur_opcode + 3;
 }
 
 opcode_t *
-Parrot_nqp_decontainerize_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+Parrot_decontainerize_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     PREG(1) = decontainerize(interp, PCONST(2));
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return cur_opcode + 3;

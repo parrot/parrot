@@ -935,7 +935,7 @@ inline op is_container(out INT, in PMC) :base_core {
 
 
 
-=item nqp_decontainerize
+=item decontainerize
 
 If the thing in $2 is a container, does a decontainerizing operation
 and puts the contained value in $1.
@@ -944,7 +944,7 @@ and puts the contained value in $1.
 
 
 
-inline op nqp_decontainerize(out PMC, in PMC) :base_core {
+inline op decontainerize(out PMC, in PMC) :base_core {
     $1 = decontainerize(interp, $2);
 }
 

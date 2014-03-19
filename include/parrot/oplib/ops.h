@@ -798,8 +798,8 @@ typedef enum {
     PARROT_OP_repr_get_primitive_type_spec_i_pc,   /* 781 */
     PARROT_OP_is_container_i_p,   /* 782 */
     PARROT_OP_is_container_i_pc,   /* 783 */
-    PARROT_OP_nqp_decontainerize_p_p,   /* 784 */
-    PARROT_OP_nqp_decontainerize_p_pc,   /* 785 */
+    PARROT_OP_decontainerize_p_p,   /* 784 */
+    PARROT_OP_decontainerize_p_pc,   /* 785 */
     PARROT_OP_set_container_spec_p_p_s_p,   /* 786 */
     PARROT_OP_set_container_spec_pc_p_s_p,   /* 787 */
     PARROT_OP_set_container_spec_p_pc_s_p,   /* 788 */
