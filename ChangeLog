@@ -9,28 +9,24 @@
     - Core
         + Re-enable old immc flags for parrot and parrot_old, such as
           -On -a -v -y -E -dxx. [GH #1033]
-
         + Fixed imcc -O1 and -O2
-
           -O1 fixes:
-          = Special-case get_global for branch_cond_loop_swap, which broke nci
-            tests [GH #1037]
-          = set_addr label does mark a basic_block, dead_code_remove() needs the
-            label. Fixes nqp [GH #1061].
-
+            = Special-case get_global for branch_cond_loop_swap, which broke
+              NCI tests [GH #1037]
+            = set_addr label does mark a basic_block, dead_code_remove() needs
+              the label. Fixes nqp [GH #1061].
           -O2 used_once fixes:
-          = Allow used_once elimination only for purely functional ops
-            without side-effects [GH #1036]
-          = Empty ins->next in deletion [GH #1042].
-
+            = Allow used_once elimination only for purely functional ops
+              without side-effects [GH #1036]
+            = Empty ins->next in deletion [GH #1042].
           -O2 constant propagation fixes:
-          = Empty ins->op ptrs when deleting or skipping certain instruction
-            [GH #1039],
-          = Wrong logic leading to missed detecting writes from get_results
-            [GH #1041],
-          = Propagate only matching types in setters [GH #1042],
-          = Stop at yield or invokecc for possible push_eh/pop_eh non-local
-            effects [GH #1044]
+            = Empty ins->op ptrs when deleting or skipping certain instruction
+              [GH #1039],
+            = Wrong logic leading to missed detecting writes from get_results
+              [GH #1041],
+            = Propagate only matching types in setters [GH #1042],
+            = Stop at yield or invokecc for possible push_eh/pop_eh non-local
+              effects [GH #1044]
         + Fixed TT #1930, a floating point optimizer problem on PPC
         + Added cache iterators in encoding_find_*cclass [GH #1027]
           to speedup the utf8 pattern "scan a whole string for newlines".
