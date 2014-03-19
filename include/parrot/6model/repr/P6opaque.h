@@ -1,5 +1,12 @@
-#ifndef P6OPAQUE_H_GUARD
-#define P6OPAQUE_H_GUARD
+/* 6model/P6opaque.h
+ * Copyright (C) 2010-2011, The Perl Foundation.
+ * Copyright (C) 2014, Parrot Foundation.
+ *
+ * struct P6opaqueInstance:
+ */
+
+#ifndef PARROT_P6OPAQUE_H_GUARD
+#define PARROT_P6OPAQUE_H_GUARD
 
 /* This is how an instance with the P6opaque representation starts. However, what
  * follows on from this depends on the declaration. For object attributes, it will
@@ -64,9 +71,29 @@ typedef struct {
     INTVAL *gc_str_mark_offsets;
 } P6opaqueREPRData;
 
-/* Initializes the P6opaque REPR. */
+/* HEADERIZER BEGIN: src/6model/reprs/P6opaque.c */
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PMC * index_mapping_and_flat_list(PARROT_INTERP,
+    PMC *WHAT,
+    P6opaqueREPRData *repr_data)
+        __attribute__nonnull__(1);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 REPROps * P6opaque_initialize(PARROT_INTERP);
 
-PMC *index_mapping_and_flat_list(PARROT_INTERP, PMC *WHAT, P6opaqueREPRData *repr_data);
+#define ASSERT_ARGS_index_mapping_and_flat_list __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_P6opaque_initialize __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+/* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+/* HEADERIZER END: src/6model/reprs/P6opaque.c */
 
-#endif
+#endif /* PARROT_P6OPAQUE_H_GUARD */
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */
