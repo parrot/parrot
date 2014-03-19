@@ -13,13 +13,13 @@ http://whiteknight.github.io/2011/05/10/timings_vtable_overrides.html
 
     Starting no dispatch (base line)
     Total time: 0.189244s
-    
+
     Starting vtable calls
     Total time: 0.257013s
-    
+
     Starting method calls
     Total time: 4.172381s
-    
+
     Starting vtable_override calls
     Total time: 8.376169s
 

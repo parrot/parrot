@@ -10,7 +10,7 @@ src/pmc/resizablepmcarray.pmc - resizable array for PMCs only
 This class, ResizablePMCArray, implements an resizable array which stores PMCs.
 It puts things into Integer, Float, or String PMCs as appropriate.
 
-=head2 Vtable Functions
+=head2 Internal Functions
 
 =over 4
 
@@ -57,6 +57,16 @@ static void throw_shift_empty(PARROT_INTERP)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
+/*
+
+=item C<inline static void do_shift(ARGIN(PMC *arr))>
+
+Removes and returns an item from the start of the array.
+Moves the whole rest of the array around.
+
+=cut
+
+*/
 PARROT_INLINE
 static void
 do_shift(ARGIN(PMC *arr))
@@ -70,6 +80,16 @@ do_shift(ARGIN(PMC *arr))
     item[size] = PMCNULL;
 }
 
+/*
+
+=item C<inline static void do_unshift(ARGIN(PMC *arr))>
+
+Adds an item at the start of the array.
+Moves the whole rest of the array around.
+
+=cut
+
+*/
 PARROT_INLINE
 static void
 do_unshift(PARROT_INTERP, ARGIN(PMC *arr), ARGIN(PMC *val))
@@ -83,7 +103,17 @@ do_unshift(PARROT_INTERP, ARGIN(PMC *arr), ARGIN(PMC *val))
     memmove(item + 1, item, size * sizeof (PMC *));
     item[0] = val;
 }
+/*
 
+=back
+
+=head1 Vtable Functions
+
+=over
+
+=cut
+
+*/
 
 pmclass ResizablePMCArray extends FixedPMCArray auto_attrs provides array {
     ATTR INTVAL resize_threshold; /* max size before array needs resizing */
