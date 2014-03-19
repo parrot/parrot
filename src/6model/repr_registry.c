@@ -12,6 +12,11 @@ This is an implementation of a representation registry. It keeps track of
 all of the available representations, and is responsible for building them
 at startup.
 
+TODO:
+- This should be a PMC,
+- made thread-safe,
+- allow registration of external representations, like all 4 P6xxx.
+
 =head2 Internal Functions
 
 =over 4
@@ -36,7 +41,7 @@ at startup.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static void register_repr(PARROT_INTERP, STRING *name, REPROps *repr)
+static void register_repr(PARROT_INTERP, const STRING *name, REPROps *repr)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_register_repr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -55,7 +60,8 @@ static PMC *repr_name_to_id_map = NULL;
 
 /*
 
-=item C<static void register_repr(PARROT_INTERP, STRING *name, REPROps *repr)>
+=item C<static void register_repr(PARROT_INTERP, const STRING *name, REPROps
+*repr)>
 
 Register a sixmodel representation.
 
@@ -65,7 +71,7 @@ TODO: make it public, make it thread-safe.
 
 */
 static void
-register_repr(PARROT_INTERP, STRING *name, REPROps *repr)
+register_repr(PARROT_INTERP, const STRING *name, REPROps *repr)
 {
     ASSERT_ARGS(register_repr)
     INTVAL ID = num_reprs;
