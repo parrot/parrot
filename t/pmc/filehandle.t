@@ -1180,7 +1180,7 @@ my $code = <<'CODE';
     $P1.'close'()
 .end
 CODE
-$code =~ s/\$AAAA/%AAAA%/ if $^O eq 'MSWin32';
+$code =~ s|echo \$AAAA|cmd /c echo %AAAA%| if $^O eq 'MSWin32';
 
 pir_output_is( $code, <<'OUTPUT', 'openpipe uses Env GH #1065' );
 ZZZZZZ
