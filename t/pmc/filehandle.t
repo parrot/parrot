@@ -1,12 +1,12 @@
 #!perl
-# Copyright (C) 2006-2013, Parrot Foundation.
+# Copyright (C) 2006-2014, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 34;
+use Parrot::Test tests => 35;
 use Parrot::Test::Util 'create_tempfile';
 
 =head1 NAME
@@ -1169,6 +1169,23 @@ pir_output_is( <<'CODE', <<'OUTPUT', 'No null byte in .readall after readline' )
 CODE
 -1
 OUTPUT
+
+{
+my $code = <<'CODE';
+.sub main :main
+    $P0 = new ['Env']
+    $P0['AAAA'] = 'ZZZZZZ'
+    $P1 = new ['FileHandle']
+    $P1.'open'("echo $AAAA", "wp")
+    $P1.'close'()
+.end
+CODE
+$code =~ s/\$AAAA/%AAAA%/ if $^O eq 'MSWin32';
+
+pir_output_is( $code, <<'OUTPUT', 'openpipe uses Env GH #1065' );
+ZZZZZZ
+OUTPUT
+}
 
 # GH #465
 # L<PDD22/I\/O PMC API/=item get_fd>
