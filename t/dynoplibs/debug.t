@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -96,7 +96,7 @@ CODE
 OUTPUT
 
 SKIP: {
-    skip("This test is failing for no apparent reason on windows", 1);
+    skip("debug_break fails for no apparent reasons on windows", 1) if $^O eq 'MSWin32';
     pir_stdin_output_like( <<'INPUT', <<'CODE', qr/[(]pdb[)] (print I0\n)?1/, "debug_break" );
 print I0
 quit
