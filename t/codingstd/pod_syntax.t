@@ -12,10 +12,13 @@ BEGIN {
         plan skip_all => 'Prerequisites for Parrot::Test::Pod not satisfied';
         exit;
     }
-    eval 'use Parrot::Test::Pod::Utils qw(
-        file_pod_ok
-    )';
+    eval 'use Capture::Tiny';
+    if ($@) {
+        plan skip_all => 'Prerequisite Capture::Tiny not installed';
+        exit;
+    }
 }
+use Parrot::Test::Pod::Utils qw(file_pod_ok);
 
 plan tests => 2;
 
