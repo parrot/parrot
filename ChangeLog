@@ -3,6 +3,8 @@
     - Build
     - Documentation
     - Tests
+        + Fixed tests for cygwin and cygwin64
+        + Added 2 new examples/benchmarks/ files
     - Community
 
 2014-03-18    release 6.2.0
