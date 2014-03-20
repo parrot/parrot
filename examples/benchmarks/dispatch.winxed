@@ -11,6 +11,8 @@ http://whiteknight.github.io/2011/05/10/timings_vtable_overrides.html
 
 =head1 DESCRIPTION
 
+Method dispatch benchmark
+
     Starting no dispatch (base line)
     Total time: 0.189244s
 
