@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -351,6 +351,7 @@ CODE
 else {
   SKIP: {
     skip 'broken test GH #457', 1 if $solaris;
+    skip 'cannot test stat on cygwin64 GH #1066', 1 if $cygwin and $PConfig{ptrsize} == 8;
 
     $stat = sprintf("0x%08x\n" x 13, @s);
     pir_output_is( <<'CODE', $stat, 'Test OS.stat' );
@@ -470,6 +471,7 @@ my $lstat;
 SKIP: {
     skip 'lstat not on Win32', 1 if $MSWin32;
     skip 'broken test GH #457', 1 if $solaris;
+    skip 'cannot test lstat on cygwin64 GH #1066', 1 if $cygwin and $PConfig{ptrsize} == 8;
 
     my @s = lstat('xpto');
     $s[6] = 0; # Parrot does this internally
