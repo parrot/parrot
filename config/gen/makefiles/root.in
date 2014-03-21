@@ -1180,7 +1180,7 @@ $(LIBPARROT_SHARED) : $(O_FILES)
 
 $(INSTALLABLELIBPARROT) : $(LIBPARROT_SHARED)
 	$(CP) $(LIBPARROT_SHARED) $(INSTALLABLELIBPARROT)
-#IF(darwin):	install_name_tool -id @libdir@/@libparrot_shared@ $(INSTALLABLELIBPARROT)
+#IF(darwin):	install_name_tool -id $(LIB_DIR)/@libparrot_shared@ $(INSTALLABLELIBPARROT)
 
 $(INSTALLABLECONFIG) : src/install_config$(O) $(PARROT_CONFIG) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc $(DEV_TOOLS_DIR)/parrot-config.pir
