@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2013, Parrot Foundation.
+# Copyright (C) 2006-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -13,8 +13,9 @@ t/pmc/socket.t - test the Socket PMC
 
 Tests the Socket PMC.
 
-The IPv6-related tests in this file do not actually require an IPv6 networking
-stack, so we don't need to check if this parrot is IPv6-aware.
+The IPv6-related tests are in F<t/pmc/socket_ipv6.t>.
+We sometimes cannot even create an IPv6 family socket without
+HAS_IPV6, see GH #1068.
 
 =cut
 
@@ -24,7 +25,7 @@ stack, so we don't need to check if this parrot is IPv6-aware.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(25)
+    plan(23)
 
     test_init()
     test_get_fd()
@@ -34,9 +35,7 @@ stack, so we don't need to check if this parrot is IPv6-aware.
     test_close()
     test_is_closed()
     test_tcp_socket()
-    test_tcp_socket6()
     test_udp_socket()
-    test_udp_socket6()
     test_getprotobyname()
     test_server()
 
@@ -146,14 +145,6 @@ CODE
 
 .sub test_tcp_socket
     test_create_socket(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP, 'Created a TCP Socket')
-.end
-
-.sub test_tcp_socket6
-    test_create_socket(.PIO_PF_INET6, .PIO_SOCK_STREAM, .PIO_PROTO_TCP, 'Created a IPv6 TCP Socket')
-.end
-
-.sub test_udp_socket6
-    test_create_socket(.PIO_PF_INET6, .PIO_SOCK_DGRAM, .PIO_PROTO_UDP, 'Created a IPv6 UDP Socket')
 .end
 
 .sub test_udp_socket
