@@ -5,6 +5,7 @@
     - Tests
         + Fixed tests for cygwin and cygwin64
         + Added 2 new examples/benchmarks/ files
+        + Fixed socket tests without IPv6 support at all [GH #1068]
     - Community
 
 2014-03-18    release 6.2.0
