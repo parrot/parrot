@@ -7,6 +7,8 @@
         + Added 2 new examples/benchmarks/ files and benchmarks/run.sh
         + Fixed socket tests without IPv6 support at all [GH #1068]
     - Community
+        + New Benchmark results at https://github.com/parrot/parrot-bench
+          for all releases from 1.8.0 - 6.2.0
 
 2014-03-18    release 6.2.0
     - Core

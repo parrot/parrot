@@ -1,9 +1,9 @@
 {
-    "release.version"  : "6.2.0",
-    "release.name"     : "Imperial Amazon",
+    "release.version"  : "6.3.0",
+    "release.name"     : "Black-cheeked Lovebird",
     "release.day"      : "Tuesday",
-    "release.nextdate" : "15 Apr 2014",
-    "release.type"     : "devel",
+    "release.nextdate" : "20 May 2014",
+    "release.type"     : "supported",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -12,10 +12,10 @@
     "web.org_root"     : "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "12 Apr 2014",
+    "bugday.date"      : "17 May 2014",
 
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
-    "wiki.bugday"      : "bug_day_2014_04_12",
+    "wiki.bugday"      : "bug_day_2014_05_17",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/6.2.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/6.3.0/"
 }
