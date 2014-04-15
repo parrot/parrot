@@ -4,7 +4,7 @@
     - Documentation
     - Tests
         + Fixed tests for cygwin and cygwin64
-        + Added 2 new examples/benchmarks/ files
+        + Added 2 new examples/benchmarks/ files and benchmarks/run.sh
         + Fixed socket tests without IPv6 support at all [GH #1068]
     - Community
 
