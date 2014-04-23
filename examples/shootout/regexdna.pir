@@ -1,10 +1,31 @@
-# Copyright (C) 2006-2010, Parrot Foundation.
+# Copyright (C) 2006-2014, Parrot Foundation.
+
+# SYNOPSIS:
+#  ./parrot examples/shootout/regexdna.pir < examples/shootout/regexdna.pir_input
+# or for easier debugging:
+#  ./parrot examples/shootout/regexdna.pir examples/shootout/regexdna.pir_input
+#
+# A good GC stress test for write barriers
 
 .sub main :main
+        .param pmc argv
 	load_bytecode "PGE.pbc"
 	.local pmc p6rule_compile, rulesub, match, variants, variants_p5, iub, it, matches, capt
 	.local string pattern, chunk, seq, key, replacement
 	.local int readlen, chunklen, seqlen, finallen, i, varnum, count
+
+        $P0      = getinterp
+        .local int argc
+        argc = argv
+        if argc <= 1 goto noarg
+        $P1 = new 'FileHandle'
+        .local string input
+        input = argv[1]
+        $P1.'open'(input, 'r')
+        goto stdin
+noarg:
+        $P1      = $P0.'stdin_handle'()
+stdin:
 	p6rule_compile = compreg "PGE::Perl6Regex"
 
 	# Store the regexes we need...
@@ -59,16 +80,14 @@
 
 	############################################
 	# Read in the file
-beginwhile:
-        $P0      = getinterp
-        $P1      = $P0.'stdin_handle'()
+process:
         chunk    = $P1.'read'(65535)
         chunklen = length chunk
 	unless chunklen goto endwhile
 	# They don't say you have to match case insenitive...
 	chunk = downcase chunk
 	seq .= chunk
-	goto beginwhile
+	goto process
 endwhile:
 	readlen = length seq
 
