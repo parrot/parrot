@@ -224,10 +224,12 @@ chain.
 
 */
 
-    VTABLE PMC *shift_pmc() {
+    VTABLE PMC *shift_pmc() :manual_wb {
         PMC *next_key;
 
         GET_ATTR_next_key(INTERP, SELF, next_key);
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+        
         return next_key;
     }
 
