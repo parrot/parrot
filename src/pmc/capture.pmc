@@ -94,28 +94,28 @@ Sets a value in the array component of the Capture.
 
 */
 
-    VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
+    VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_set_number_keyed_int(INTERP, array, key, value);
     }
 
-    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
+    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_set_integer_keyed_int(INTERP, array, key, value);
     }
 
-    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
+    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_set_pmc_keyed_int(INTERP, array, key, value);
     }
 
-    VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
+    VTABLE void set_string_keyed_int(INTVAL key, STRING *value) :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
@@ -142,6 +142,7 @@ Retrieves a value in the array component of the Capture.
         PMC *array;
 
         GET_ATTR_array(INTERP, SELF, array);
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
 
         if (!array)
             return 0.0;
@@ -153,6 +154,7 @@ Retrieves a value in the array component of the Capture.
         PMC *array;
 
         GET_ATTR_array(INTERP, SELF, array);
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
 
         if (!array)
             return 0;
@@ -164,6 +166,7 @@ Retrieves a value in the array component of the Capture.
         PMC *array;
 
         GET_ATTR_array(INTERP, SELF, array);
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
 
         if (!array)
             return PMCNULL;
@@ -175,6 +178,7 @@ Retrieves a value in the array component of the Capture.
         PMC *array;
 
         GET_ATTR_array(INTERP, SELF, array);
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
 
         if (!array)
             return CONST_STRING(INTERP, "");
@@ -208,35 +212,35 @@ Unshift a value onto the array component of the Capture.
 
 */
 
-    VTABLE void push_float(FLOATVAL value) {
+    VTABLE void push_float(FLOATVAL value) :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_push_float(INTERP, array, value);
     }
 
-    VTABLE void push_integer(INTVAL value) {
+    VTABLE void push_integer(INTVAL value) :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_push_integer(INTERP, array, value);
     }
 
-    VTABLE void push_pmc(PMC *value) {
+    VTABLE void push_pmc(PMC *value) :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_push_pmc(INTERP, array, value);
     }
 
-    VTABLE void push_string(STRING *value) {
+    VTABLE void push_string(STRING *value) :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_push_string(INTERP, array, value);
     }
 
-    VTABLE void unshift_float(FLOATVAL value) {
+    VTABLE void unshift_float(FLOATVAL value) :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
@@ -250,14 +254,14 @@ Unshift a value onto the array component of the Capture.
         VTABLE_unshift_integer(INTERP, array, value);
     }
 
-    VTABLE void unshift_pmc(PMC *value) {
+    VTABLE void unshift_pmc(PMC *value) :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_unshift_pmc(INTERP, array, value);
     }
 
-    VTABLE void unshift_string(STRING *value) {
+    VTABLE void unshift_string(STRING *value) :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
@@ -290,56 +294,56 @@ Shift a value from the array component of the Capture.
 
 */
 
-    VTABLE FLOATVAL pop_float() {
+    VTABLE FLOATVAL pop_float() :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
         return VTABLE_pop_float(INTERP, array);
     }
 
-    VTABLE INTVAL pop_integer() {
+    VTABLE INTVAL pop_integer() :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
         return VTABLE_pop_integer(INTERP, array);
     }
 
-    VTABLE PMC *pop_pmc() {
+    VTABLE PMC *pop_pmc() :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
         return VTABLE_pop_pmc(INTERP, array);
     }
 
-    VTABLE STRING *pop_string() {
+    VTABLE STRING *pop_string() :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
         return VTABLE_pop_string(INTERP, array);
     }
 
-    VTABLE FLOATVAL shift_float() {
+    VTABLE FLOATVAL shift_float() :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
         return VTABLE_shift_float(INTERP, array);
     }
 
-    VTABLE INTVAL shift_integer() {
+    VTABLE INTVAL shift_integer() :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
         return VTABLE_shift_integer(INTERP, array);
     }
 
-    VTABLE PMC *shift_pmc() {
+    VTABLE PMC *shift_pmc() :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
         return VTABLE_shift_pmc(INTERP, array);
     }
 
-    VTABLE STRING *shift_string() {
+    VTABLE STRING *shift_string() :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
@@ -368,7 +372,7 @@ Delete the element corresponding to C<key> in the array component.
 
 */
 
-    VTABLE INTVAL elements() {
+    VTABLE INTVAL elements() :no_wb {
         PMC *array;
 
         GET_ATTR_array(INTERP, SELF, array);
@@ -379,7 +383,7 @@ Delete the element corresponding to C<key> in the array component.
         return VTABLE_elements(INTERP, array);
     }
 
-    VTABLE INTVAL defined_keyed_int(INTVAL key) {
+    VTABLE INTVAL defined_keyed_int(INTVAL key) :no_wb {
         PMC *array;
 
         GET_ATTR_array(INTERP, SELF, array);
@@ -390,7 +394,7 @@ Delete the element corresponding to C<key> in the array component.
         return VTABLE_defined_keyed_int(INTERP, array, key);
     }
 
-    VTABLE INTVAL exists_keyed_int(INTVAL key) {
+    VTABLE INTVAL exists_keyed_int(INTVAL key) :no_wb {
         PMC *array;
 
         GET_ATTR_array(INTERP, SELF, array);
@@ -426,28 +430,28 @@ Sets a value in the hash component of the Capture.
 
 */
 
-    VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
+    VTABLE void set_number_keyed(PMC *key, FLOATVAL value) :manual_wb {
         PMC *hash;
 
         CAPTURE_hash_CREATE(INTERP, SELF, hash);
         VTABLE_set_number_keyed(INTERP, hash, key, value);
     }
 
-    VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
+    VTABLE void set_integer_keyed(PMC *key, INTVAL value) :manual_wb {
         PMC *hash;
 
         CAPTURE_hash_CREATE(INTERP, SELF, hash);
         VTABLE_set_integer_keyed(INTERP, hash, key, value);
     }
 
-    VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
+    VTABLE void set_pmc_keyed(PMC *key, PMC *value) :manual_wb {
         PMC *hash;
 
         CAPTURE_hash_CREATE(INTERP, SELF, hash);
         VTABLE_set_pmc_keyed(INTERP, hash, key, value);
     }
 
-    VTABLE void set_string_keyed(PMC *key, STRING *value) {
+    VTABLE void set_string_keyed(PMC *key, STRING *value) :manual_wb {
         PMC *hash;
 
         CAPTURE_hash_CREATE(INTERP, SELF, hash);
@@ -470,7 +474,7 @@ Retrieves a value from the hash component of the Capture.
 
 */
 
-    VTABLE FLOATVAL get_number_keyed(PMC *key) {
+    VTABLE FLOATVAL get_number_keyed(PMC *key) :no_wb {
         PMC *hash;
 
         GET_ATTR_hash(INTERP, SELF, hash);
@@ -481,7 +485,7 @@ Retrieves a value from the hash component of the Capture.
         return VTABLE_get_number_keyed(INTERP, hash, key);
     }
 
-    VTABLE INTVAL get_integer_keyed(PMC *key) {
+    VTABLE INTVAL get_integer_keyed(PMC *key) :no_wb {
         PMC *hash;
 
         GET_ATTR_hash(INTERP, SELF, hash);
@@ -492,7 +496,7 @@ Retrieves a value from the hash component of the Capture.
         return VTABLE_get_integer_keyed(INTERP, hash, key);
     }
 
-    VTABLE PMC *get_pmc_keyed(PMC *key) {
+    VTABLE PMC *get_pmc_keyed(PMC *key) :no_wb {
         PMC *hash;
 
         GET_ATTR_hash(INTERP, SELF, hash);
@@ -503,7 +507,7 @@ Retrieves a value from the hash component of the Capture.
         return VTABLE_get_pmc_keyed(INTERP, hash, key);
     }
 
-    VTABLE STRING *get_string_keyed(PMC *key) {
+    VTABLE STRING *get_string_keyed(PMC *key) :no_wb {
         PMC *hash;
 
         GET_ATTR_hash(INTERP, SELF, hash);
@@ -530,28 +534,28 @@ Sets a value in the hash component of the Capture.
 
 */
 
-    VTABLE void set_number_keyed_str(STRING *key, FLOATVAL value) {
+    VTABLE void set_number_keyed_str(STRING *key, FLOATVAL value) :manual_wb {
         PMC *hash;
 
         CAPTURE_hash_CREATE(INTERP, SELF, hash);
         VTABLE_set_number_keyed_str(INTERP, hash, key, value);
     }
 
-    VTABLE void set_integer_keyed_str(STRING *key, INTVAL value) {
+    VTABLE void set_integer_keyed_str(STRING *key, INTVAL value) :manual_wb {
         PMC *hash;
 
         CAPTURE_hash_CREATE(INTERP, SELF, hash);
         VTABLE_set_integer_keyed_str(INTERP, hash, key, value);
     }
 
-    VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
+    VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) :manual_wb {
         PMC *hash;
 
         CAPTURE_hash_CREATE(INTERP, SELF, hash);
         VTABLE_set_pmc_keyed_str(INTERP, hash, key, value);
     }
 
-    VTABLE void set_string_keyed_str(STRING *key, STRING *value) {
+    VTABLE void set_string_keyed_str(STRING *key, STRING *value) :manual_wb {
         PMC *hash;
 
         CAPTURE_hash_CREATE(INTERP, SELF, hash);
@@ -574,7 +578,7 @@ Retrieves a value in the hash component of the Capture.
 
 */
 
-    VTABLE FLOATVAL get_number_keyed_str(STRING *key) {
+    VTABLE FLOATVAL get_number_keyed_str(STRING *key) :no_wb {
         PMC *hash;
 
         GET_ATTR_hash(INTERP, SELF, hash);
@@ -585,7 +589,7 @@ Retrieves a value in the hash component of the Capture.
         return VTABLE_get_number_keyed_str(INTERP, hash, key);
     }
 
-    VTABLE INTVAL get_integer_keyed_str(STRING *key) {
+    VTABLE INTVAL get_integer_keyed_str(STRING *key) :no_wb {
         PMC *hash;
 
         GET_ATTR_hash(INTERP, SELF, hash);
@@ -596,7 +600,7 @@ Retrieves a value in the hash component of the Capture.
         return VTABLE_get_integer_keyed_str(INTERP, hash, key);
     }
 
-    VTABLE PMC *get_pmc_keyed_str(STRING *key) {
+    VTABLE PMC *get_pmc_keyed_str(STRING *key) :no_wb {
         PMC *hash;
 
         GET_ATTR_hash(INTERP, SELF, hash);
@@ -607,7 +611,7 @@ Retrieves a value in the hash component of the Capture.
         return VTABLE_get_pmc_keyed_str(INTERP, hash, key);
     }
 
-    VTABLE STRING *get_string_keyed_str(STRING *key) {
+    VTABLE STRING *get_string_keyed_str(STRING *key) :no_wb {
         PMC *hash;
 
         GET_ATTR_hash(INTERP, SELF, hash);
@@ -635,7 +639,7 @@ Delete the element corresponding to C<key> in the hash component.
 
 */
 
-    VTABLE INTVAL defined_keyed(PMC *key) {
+    VTABLE INTVAL defined_keyed(PMC *key) :no_wb {
         PMC *hash;
 
         GET_ATTR_hash(INTERP, SELF, hash);
@@ -646,7 +650,7 @@ Delete the element corresponding to C<key> in the hash component.
         return VTABLE_defined_keyed(INTERP, hash, key);
     }
 
-    VTABLE INTVAL exists_keyed(PMC *key) {
+    VTABLE INTVAL exists_keyed(PMC *key) :no_wb {
         PMC *hash;
 
         GET_ATTR_hash(INTERP, SELF, hash);
@@ -684,7 +688,7 @@ Delete the element corresponding to C<key> in the hash component.
 
 */
 
-    VTABLE INTVAL defined_keyed_str(STRING *key) {
+    VTABLE INTVAL defined_keyed_str(STRING *key) :no_wb {
         PMC *hash;
 
         GET_ATTR_hash(INTERP, SELF, hash);
@@ -694,7 +698,7 @@ Delete the element corresponding to C<key> in the hash component.
         return VTABLE_defined_keyed_str(INTERP, hash, key);
     }
 
-    VTABLE INTVAL exists_keyed_str(STRING *key) {
+    VTABLE INTVAL exists_keyed_str(STRING *key) :no_wb {
         PMC *hash;
 
         GET_ATTR_hash(INTERP, SELF, hash);
