@@ -241,7 +241,7 @@ Return the cell indexed by C<key>.
 
 PARROT_CANNOT_RETURN_NULL
 static Pcc_cell*
-get_cell_at(PARROT_INTERP, ARGIN(PMC *self), INTVAL key)
+get_cell_at(PARROT_INTERP, ARGIN(PMC *self), INTVAL key) :no_wb
 {
     ASSERT_ARGS(get_cell_at)
     Pcc_cell *cells;
@@ -261,7 +261,7 @@ Return C<cell> as an INTVAL.
 */
 
 static INTVAL
-autobox_intval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
+autobox_intval(PARROT_INTERP, ARGIN(const Pcc_cell *cell)) :no_wb
 {
     ASSERT_ARGS(autobox_intval)
     switch (CELL_TYPE_MASK(cell)) {
@@ -292,7 +292,7 @@ Return C<cell> as an FLOATVAL.
 */
 
 static FLOATVAL
-autobox_floatval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
+autobox_floatval(PARROT_INTERP, ARGIN(const Pcc_cell *cell)) :no_wb
 {
     ASSERT_ARGS(autobox_floatval)
     switch (CELL_TYPE_MASK(cell)) {
@@ -324,7 +324,7 @@ Return C<cell> as an STRING.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-autobox_string(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
+autobox_string(PARROT_INTERP, ARGIN(const Pcc_cell *cell)) :no_wb
 {
     ASSERT_ARGS(autobox_string)
     switch (CELL_TYPE_MASK(cell)) {
@@ -356,7 +356,7 @@ Return C<cell> as a PMC.
 
 PARROT_CANNOT_RETURN_NULL
 static PMC *
-autobox_pmc(PARROT_INTERP, ARGIN(Pcc_cell *cell), INTVAL type)
+autobox_pmc(PARROT_INTERP, ARGIN(Pcc_cell *cell), INTVAL type) :no_wb
 {
     ASSERT_ARGS(autobox_pmc)
     PMC *result = PMCNULL;
@@ -692,7 +692,7 @@ stored.)
 =cut
 
 */
-    VTABLE void morph(PMC *type) {
+    VTABLE void morph(PMC *type) :manual_wb {
         UNUSED(type)
         Hash     *hash;
 
@@ -717,7 +717,7 @@ stored.)
         }
     }
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         INTVAL    allocated_positionals;
         Hash     *hash;
 
@@ -757,7 +757,7 @@ Sets the short signature for the CallContext.
 
 */
 
-    VTABLE void set_string_native(STRING *value) {
+    VTABLE void set_string_native(STRING *value) :manual_wb {
         SET_ATTR_short_sig(INTERP, SELF, value);
     }
 
@@ -771,7 +771,7 @@ Returns the short signature for the CallContext.
 
 */
 
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         STRING   *res;
         Pcc_cell *c;
         INTVAL    num_positionals, i;
@@ -823,7 +823,7 @@ Sets a fixed-size array of integer types (a type tuple) for the CallContext.
 
 */
 
-    VTABLE void set_pmc(PMC *value) {
+    VTABLE void set_pmc(PMC *value) :manual_wb {
         SET_ATTR_type_tuple(INTERP, SELF, value);
     }
 
@@ -838,7 +838,7 @@ CallContext.
 
 */
 
-    VTABLE PMC *get_pmc() {
+    VTABLE PMC *get_pmc() :no_wb {
         PMC *type_tuple;
 
         GET_ATTR_type_tuple(INTERP, SELF, type_tuple);
@@ -910,7 +910,7 @@ of integers.
 
 */
 
-    VTABLE void set_attr_str(STRING *key, PMC *value) {
+    VTABLE void set_attr_str(STRING *key, PMC *value) :manual_wb {
 
         if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "arg_flags"))) {
             SET_ATTR_arg_flags(INTERP, SELF, value);
@@ -983,7 +983,7 @@ return current Namespace
 
 */
 
-    VTABLE PMC *get_attr_str(STRING *key) {
+    VTABLE PMC *get_attr_str(STRING *key) :no_wb {
         PMC    *value = PMCNULL;
         INTVAL  hll;
 
@@ -1025,7 +1025,7 @@ return current Namespace
         return PMCNULL;
     }
 
-    VTABLE INTVAL elements() {
+    VTABLE INTVAL elements() :no_wb {
         INTVAL num_positionals;
 
         if (!PMC_data(SELF))
@@ -1036,7 +1036,7 @@ return current Namespace
         return num_positionals;
     }
 
-    VTABLE void push_integer(INTVAL value) {
+    VTABLE void push_integer(INTVAL value) :manual_wb {
         Pcc_cell *cells;
         INTVAL    num_pos, allocated_positionals;
 
@@ -1052,7 +1052,7 @@ return current Namespace
         SET_ATTR_num_positionals(INTERP, SELF, num_pos + 1);
     }
 
-    VTABLE void push_float(FLOATVAL value) {
+    VTABLE void push_float(FLOATVAL value) :manual_wb {
         Pcc_cell *cells;
         INTVAL    num_pos;
 
@@ -1065,7 +1065,7 @@ return current Namespace
         SET_ATTR_num_positionals(INTERP, SELF, num_pos + 1);
     }
 
-    VTABLE void push_string(STRING *value) {
+    VTABLE void push_string(STRING *value) :manual_wb {
         Pcc_cell *cells;
         INTVAL    num_pos;
 
@@ -1078,7 +1078,7 @@ return current Namespace
         SET_ATTR_num_positionals(INTERP, SELF, num_pos + 1);
     }
 
-    VTABLE void push_pmc(PMC *value) {
+    VTABLE void push_pmc(PMC *value) :manual_wb {
         Pcc_cell *cells;
         INTVAL    num_pos, allocated_positionals;
 
@@ -1118,7 +1118,7 @@ return current Namespace
         SET_ATTR_num_positionals(INTERP, SELF, size + 1);
     }
 
-    VTABLE PMC * shift_pmc() :manual_wb {
+    VTABLE PMC * shift_pmc() {
         Pcc_cell *cells;
         PMC      *retval;
         const INTVAL size = STATICSELF.elements();
@@ -1143,7 +1143,7 @@ return current Namespace
         return retval;
     }
 
-    VTABLE STRING * shift_string() :manual_wb {
+    VTABLE STRING * shift_string() {
         Pcc_cell *cells;
         STRING   *retval;
         const INTVAL size = STATICSELF.elements();
@@ -1166,7 +1166,7 @@ return current Namespace
         return retval;
     }
 
-    VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
+    VTABLE INTVAL get_integer_keyed_int(INTVAL key) :no_wb {
         Pcc_cell *cells;
         INTVAL    num_pos;
 
@@ -1184,7 +1184,7 @@ return current Namespace
         }
     }
 
-    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
+    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) :no_wb {
         Pcc_cell *cells;
         INTVAL    num_pos;
 
@@ -1196,7 +1196,7 @@ return current Namespace
         return autobox_floatval(INTERP, &cells[key]);
     }
 
-    VTABLE STRING * get_string_keyed_int(INTVAL key) {
+    VTABLE STRING * get_string_keyed_int(INTVAL key) :no_wb {
         Pcc_cell *cells;
         INTVAL    num_pos;
 
@@ -1208,7 +1208,7 @@ return current Namespace
         return autobox_string(INTERP, &cells[key]);
     }
 
-    VTABLE PMC * get_pmc_keyed_int(INTVAL key) {
+    VTABLE PMC * get_pmc_keyed_int(INTVAL key) :no_wb {
         Pcc_cell *cells;
         INTVAL    num_pos, type;
 
@@ -1223,7 +1223,7 @@ return current Namespace
         return autobox_pmc(INTERP, &cells[key], type);
     }
 
-    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
+    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) :manual_wb {
         Pcc_cell * const cell = get_cell_at(INTERP, SELF, key);
         INTVAL    pos;
 
@@ -1235,7 +1235,7 @@ return current Namespace
             SET_ATTR_num_positionals(INTERP, SELF, key + 1);
     }
 
-    VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
+    VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) :manual_wb {
         Pcc_cell * const cell = get_cell_at(INTERP, SELF, key);
         INTVAL    pos;
 
@@ -1247,7 +1247,7 @@ return current Namespace
             SET_ATTR_num_positionals(INTERP, SELF, key + 1);
     }
 
-    VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
+    VTABLE void set_string_keyed_int(INTVAL key, STRING *value) :manual_wb {
         Pcc_cell * const cell = get_cell_at(INTERP, SELF, key);
         INTVAL    pos;
 
@@ -1259,7 +1259,7 @@ return current Namespace
             SET_ATTR_num_positionals(INTERP, SELF, key + 1);
     }
 
-    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
+    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) :manual_wb {
         INTVAL    pos;
         Pcc_cell * const cell = get_cell_at(INTERP, SELF, key);
 
@@ -1271,7 +1271,7 @@ return current Namespace
             SET_ATTR_num_positionals(INTERP, SELF, key + 1);
     }
 
-    VTABLE void set_integer_keyed_str(STRING *key, INTVAL value) {
+    VTABLE void set_integer_keyed_str(STRING *key, INTVAL value) :manual_wb {
         Hash     * const hash = get_hash(INTERP, SELF);
         Pcc_cell *cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, (void *)key);
 
@@ -1284,7 +1284,7 @@ return current Namespace
         cell->type      = INTCELL;
     }
 
-    VTABLE void set_number_keyed_str(STRING *key, FLOATVAL value) {
+    VTABLE void set_number_keyed_str(STRING *key, FLOATVAL value) :manual_wb {
         Hash     * const hash = get_hash(INTERP, SELF);
         Pcc_cell *cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, (void *)key);
 
@@ -1297,7 +1297,7 @@ return current Namespace
         cell->type      = FLOATCELL;
     }
 
-    VTABLE void set_string_keyed_str(STRING *key, STRING *value) {
+    VTABLE void set_string_keyed_str(STRING *key, STRING *value) :manual_wb {
         Hash     * const hash = get_hash(INTERP, SELF);
         Pcc_cell *cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, (void *)key);
 
@@ -1310,7 +1310,7 @@ return current Namespace
         cell->type      = STRINGCELL;
     }
 
-    VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
+    VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) :manual_wb {
         Hash     * const hash = get_hash(INTERP, SELF);
         Pcc_cell *cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, (void *)key);
 
@@ -1323,7 +1323,7 @@ return current Namespace
         cell->type      = PMCCELL;
     }
 
-    VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
+    VTABLE void set_integer_keyed(PMC *key, INTVAL value) :manual_wb {
         Hash     * const hash = get_hash(INTERP, SELF);
         void     * const k    = Parrot_hash_key_from_pmc(INTERP, hash, key);
         Pcc_cell *cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, k);
@@ -1337,7 +1337,7 @@ return current Namespace
         cell->type      = INTCELL;
     }
 
-    VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
+    VTABLE void set_number_keyed(PMC *key, FLOATVAL value) :manual_wb {
         Hash     * const hash = get_hash(INTERP, SELF);
         void     * const k    = Parrot_hash_key_from_pmc(INTERP, hash, key);
         Pcc_cell *cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, k);
@@ -1351,7 +1351,7 @@ return current Namespace
         cell->type      = FLOATCELL;
     }
 
-    VTABLE void set_string_keyed(PMC *key, STRING *value) {
+    VTABLE void set_string_keyed(PMC *key, STRING *value) :manual_wb {
         Hash     * const hash = get_hash(INTERP, SELF);
         void     * const k    = Parrot_hash_key_from_pmc(INTERP, hash, key);
         Pcc_cell *cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, k);
@@ -1365,7 +1365,7 @@ return current Namespace
         cell->type      = STRINGCELL;
     }
 
-    VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
+    VTABLE void set_pmc_keyed(PMC *key, PMC *value) :manual_wb {
         Hash     * const hash = get_hash(INTERP, SELF);
         void     * const k    = Parrot_hash_key_from_pmc(INTERP, hash, key);
         Pcc_cell *cell = (Pcc_cell *)Parrot_hash_get(INTERP, hash, k);
@@ -1379,7 +1379,7 @@ return current Namespace
         cell->type      = PMCCELL;
     }
 
-    VTABLE INTVAL get_integer_keyed_str(STRING *key) {
+    VTABLE INTVAL get_integer_keyed_str(STRING *key) :no_wb {
         Hash *hash;
         GETATTR_CallContext_hash(INTERP, SELF, hash);
 
@@ -1398,7 +1398,7 @@ return current Namespace
         return 0;
     }
 
-    VTABLE FLOATVAL get_number_keyed_str(STRING *key) {
+    VTABLE FLOATVAL get_number_keyed_str(STRING *key) :no_wb {
         Hash *hash;
         GETATTR_CallContext_hash(INTERP, SELF, hash);
 
@@ -1414,7 +1414,7 @@ return current Namespace
     }
 
 
-    VTABLE STRING * get_string_keyed_str(STRING *key) {
+    VTABLE STRING * get_string_keyed_str(STRING *key) :no_wb {
         Hash *hash;
         GETATTR_CallContext_hash(INTERP, SELF, hash);
 
@@ -1429,7 +1429,7 @@ return current Namespace
         return STRINGNULL;
     }
 
-    VTABLE PMC * get_pmc_keyed_str(STRING *key) {
+    VTABLE PMC * get_pmc_keyed_str(STRING *key) :no_wb {
         Hash *hash;
         GETATTR_CallContext_hash(INTERP, SELF, hash);
 
@@ -1448,7 +1448,7 @@ return current Namespace
         return PMCNULL;
     }
 
-    VTABLE INTVAL get_integer_keyed(PMC *key) {
+    VTABLE INTVAL get_integer_keyed(PMC *key) :no_wb {
         Hash *hash;
         GETATTR_CallContext_hash(INTERP, SELF, hash);
 
@@ -1466,7 +1466,7 @@ return current Namespace
         return 0;
     }
 
-    VTABLE FLOATVAL get_number_keyed(PMC *key) {
+    VTABLE FLOATVAL get_number_keyed(PMC *key) :no_wb {
         Hash *hash;
         GETATTR_CallContext_hash(INTERP, SELF, hash);
 
@@ -1481,7 +1481,7 @@ return current Namespace
         return 0.0;
     }
 
-    VTABLE STRING * get_string_keyed(PMC *key) {
+    VTABLE STRING * get_string_keyed(PMC *key) :no_wb {
         Hash *hash;
         GETATTR_CallContext_hash(INTERP, SELF, hash);
 
@@ -1496,7 +1496,7 @@ return current Namespace
         return STRINGNULL;
     }
 
-    VTABLE PMC * get_pmc_keyed(PMC *key) {
+    VTABLE PMC * get_pmc_keyed(PMC *key) :no_wb {
         Hash *hash;
         GETATTR_CallContext_hash(INTERP, SELF, hash);
 
@@ -1515,7 +1515,7 @@ return current Namespace
         return PMCNULL;
     }
 
-    VTABLE INTVAL exists_keyed(PMC *key) {
+    VTABLE INTVAL exists_keyed(PMC *key) :no_wb {
         Hash *hash;
         GETATTR_CallContext_hash(INTERP, SELF, hash);
 
@@ -1527,7 +1527,7 @@ return current Namespace
         return 0;
     }
 
-    VTABLE INTVAL exists_keyed_str(STRING *key) {
+    VTABLE INTVAL exists_keyed_str(STRING *key) :no_wb {
         Hash *hash;
         GETATTR_CallContext_hash(INTERP, SELF, hash);
 
@@ -1539,7 +1539,7 @@ return current Namespace
         return 0;
     }
 
-    VTABLE INTVAL exists_keyed_int(INTVAL key) {
+    VTABLE INTVAL exists_keyed_int(INTVAL key) :no_wb {
         INTVAL num_positionals;
 
         GET_ATTR_num_positionals(INTERP, SELF, num_positionals);
@@ -1559,7 +1559,7 @@ Creates and returns a clone of the signature.
 =cut
 
 */
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         STRING      *short_sig;
         PMC         *type_tuple, *arg_flags, *return_flags;
         PMC * const  dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
@@ -1621,7 +1621,7 @@ sub, or for the point of the call a level deeper for the rest.
 
 */
 
-    METHOD backtrace(PMC *resume :optional, INTVAL has_resume :opt_flag) {
+    METHOD backtrace(PMC *resume :optional, INTVAL has_resume :opt_flag) :manual_wb {
         PMC *result  = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
         PMC *cur_ctx = SELF;
         Parrot_Continuation_attributes * const cont = has_resume ? PMC_cont(resume) : NULL;

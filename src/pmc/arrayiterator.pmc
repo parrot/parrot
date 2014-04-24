@@ -159,7 +159,7 @@ Returns true if there is more elements to iterate over.
 
 */
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         return STATICSELF.elements() > 0;
     }
 
