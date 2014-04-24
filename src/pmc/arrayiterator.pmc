@@ -80,7 +80,7 @@ Raises an exception. Use C<init_pmc()>.
 
 */
 
-    VTABLE void init() {
+    VTABLE void init() :no_wb {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "ArrayIterator init without aggregate");
     }
@@ -96,7 +96,7 @@ Defaults iteration mode to iterate from start.
 
 */
 
-    VTABLE void init_pmc(PMC *array) {
+    VTABLE void init_pmc(PMC *array) :no_wb {
 
         SET_ATTR_array(INTERP, SELF, array);
 
