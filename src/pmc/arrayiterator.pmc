@@ -116,7 +116,7 @@ Marks the current idx/key and the aggregate as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         PMC *array;
 
         GET_ATTR_array(INTERP, SELF, array);
@@ -193,7 +193,7 @@ Returns the number of remaining elements in the array.
         }
     }
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :manual_wb {
         return STATICSELF.elements();
     }
 

@@ -50,7 +50,7 @@ Initialize a concurrency task object.
 
 */
 
-    VTABLE void init() {
+    VTABLE void init() :no_wb {
         Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
         Parrot_Scheduler_attributes * const sched_data =
                 PARROT_SCHEDULER(interp->scheduler);
@@ -118,6 +118,7 @@ Some data that will be passed to C<code> when invoked.
             core_struct->code = data;
         }
         else if (VTABLE_isa(INTERP, data, CONST_STRING(INTERP, "Hash"))) {
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             PMC * elem = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "birthtime"));
             if (! PMC_IS_NULL(elem))
                 core_struct->birthtime = VTABLE_get_number(INTERP, elem);
@@ -153,6 +154,8 @@ code as the first argument.
         Parrot_Task_attributes * const task = PARROT_TASK(SELF);
         Parrot_Scheduler_attributes * const sdata =
                 PARROT_SCHEDULER(interp->scheduler);
+                
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         PMC * const active_tasks = sdata->all_tasks;
 
         PARROT_ASSERT(! PMC_IS_NULL(task->code));
@@ -237,6 +240,8 @@ Create a copy of the task, resetting status, ID, and birthtime.
     VTABLE PMC *clone() {
         /* Create the new task PMC, of the same type of this one (we may
          * have been subclassed). */
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+        
         PMC * const copy  = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         Parrot_Task_attributes * const new_struct = PARROT_TASK(copy);
         const Parrot_Task_attributes * const old_struct = PARROT_TASK(SELF);
@@ -261,7 +266,8 @@ Gets the value of an attribute for this task.
     VTABLE PMC *get_attr_str(STRING *name) {
         Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
         PMC * value = PMCNULL;
-
+        
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "birthtime"))) {
             value = Parrot_pmc_new(INTERP, enum_class_Float);
             VTABLE_set_number_native(INTERP, value, core_struct->birthtime);
@@ -286,7 +292,7 @@ Sets the value of an attribute for this task.
 
 */
 
-    VTABLE void set_attr_str(STRING *name, PMC *value) {
+    VTABLE void set_attr_str(STRING *name, PMC *value) :no_wb {
         Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
 
         if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "birthtime"))) {
@@ -310,7 +316,7 @@ Add value to the list of PMCs shared with this task.
 
 */
 
-    VTABLE void push_pmc(PMC *value) {
+    VTABLE void push_pmc(PMC *value) :no_wb {
         VTABLE_push_pmc(interp, PARROT_TASK(SELF)->shared, value);
 
         return;
@@ -326,10 +332,10 @@ Return a proxy for the last shared PMC.
 
 */
 
-    VTABLE PMC *pop_pmc() :manual_wb {
+    VTABLE PMC *pop_pmc() {
         PMC *temp;
         temp = VTABLE_pop_pmc(interp, PARROT_TASK(SELF)->shared);
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+        PARROT_GC_WRITE_BARRIER(interp, SELF);
         
         return temp;
     }
@@ -343,7 +349,7 @@ Mark any referenced strings and PMCs.
 =cut
 
 */
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         if (PARROT_TASK(SELF)) {
             Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
 
@@ -368,7 +374,7 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
 
 */
 
-    VTABLE void visit(PMC *info) {
+    VTABLE void visit(PMC *info) :no_wb {
         /* 1) visit code block */
         VISIT_PMC_ATTR(INTERP, info, SELF, Task, code);
         VISIT_PMC_ATTR(INTERP, info, SELF, Task, data);
@@ -386,7 +392,7 @@ Used to archive the task.
 
 */
 
-    VTABLE void freeze(PMC *info) {
+    VTABLE void freeze(PMC *info) :no_wb {
         const Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
 
         VTABLE_push_float(INTERP, info, core_struct->birthtime);
@@ -402,7 +408,7 @@ Used to unarchive the task.
 
 */
 
-    VTABLE void thaw(PMC *info) {
+    VTABLE void thaw(PMC *info) :no_wb {
         const FLOATVAL birthtime = VTABLE_shift_float(INTERP, info);
 
         /* Allocate the task's core data struct and set custom flags. */
@@ -422,7 +428,7 @@ Called after the task has been thawed.
 
 */
 
-    VTABLE void thawfinish(PMC *info) {
+    VTABLE void thawfinish(PMC *info) :no_wb {
         UNUSED(info)
         /* Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF); */
     }
@@ -454,6 +460,7 @@ Send a message to this task.
         UNLOCK(tdata->mailbox_lock);
 
         if (tdata->partner) {
+            PARROT_GC_WRITE_BARRIER(interp, SELF);
             PMC *                    const partner = tdata->partner;
             Parrot_Task_attributes * const pdata = PARROT_TASK(partner);
             LOCK(tdata->mailbox_lock);
@@ -494,7 +501,7 @@ Reads or writes optional task-specific data, that will be passed to C<code> when
 
 */
 
-    METHOD code(PMC * code :optional, INTVAL has_code :opt_flag) {
+    METHOD code(PMC * code :optional, INTVAL has_code :opt_flag) :manual_wb {
         Parrot_Task_attributes * const tdata = PARROT_TASK(SELF);
         if (has_code) {
             tdata->code = code;
@@ -504,7 +511,7 @@ Reads or writes optional task-specific data, that will be passed to C<code> when
         RETURN(PMC *code);
     }
 
-    METHOD data(PMC * data :optional, INTVAL has_data :opt_flag) {
+    METHOD data(PMC * data :optional, INTVAL has_data :opt_flag) :manual_wb {
         Parrot_Task_attributes * const tdata = PARROT_TASK(SELF);
         if (has_data) {
             tdata->data = data;
@@ -524,7 +531,7 @@ Kill this task.
 
 */
 
-    METHOD kill() {
+    METHOD kill() :no_wb {
         Parrot_Task_attributes * const tdata = PARROT_TASK(SELF);
         tdata->killed = 1;
     }

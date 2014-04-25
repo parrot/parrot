@@ -55,7 +55,7 @@ Creates and returns a clone of the key.
 
 */
 
-    VTABLE PMC *clone() :no_wb {
+    VTABLE PMC *clone() {
         PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         PMC *dkey        = dest;
         PMC *key         = SELF;
@@ -79,7 +79,8 @@ Creates and returns a clone of the key.
                                             "Key: Unknown Key type %d", KEY_get_FLAGS(SELF));
                 break;
             }
-
+            
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             key = Parrot_key_next(INTERP, key);
 
             if (key) {
@@ -160,7 +161,7 @@ Returns the PMC value of the key.
 
 */
 
-    VTABLE void set_integer_native(INTVAL value) :manual_wb {
+    VTABLE void set_integer_native(INTVAL value) :no_wb {
         Parrot_key_set_integer(INTERP, SELF, value);
     }
 
@@ -173,7 +174,7 @@ Returns the PMC value of the key.
 
 */
 
-    VTABLE void set_string_native(STRING *value) :manual_wb {
+    VTABLE void set_string_native(STRING *value) :no_wb {
         Parrot_key_set_string(INTERP, SELF, value);
     }
 
@@ -187,7 +188,7 @@ Sets the value of the key to C<*value>.
 
 */
 
-    VTABLE void set_pmc(PMC *value) :manual_wb {
+    VTABLE void set_pmc(PMC *value) :no_wb {
         UNUSED(value)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                 "Key.set_pmc is broken - see GH #499");
@@ -203,7 +204,7 @@ Appends C<*value> to the key.
 
 */
 
-    void push_pmc(PMC *value) :manual_wb {
+    void push_pmc(PMC *value) :no_wb {
         if (value->vtable->base_type != enum_class_Key)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Can only push another Key onto a Key PMC.");
@@ -273,7 +274,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
 
 */
 
-    void freeze(PMC *info) :manual_wb {
+    void freeze(PMC *info) :no_wb {
         int size;
         PMC *k;
 
@@ -316,7 +317,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
         }
     }
 
-    void thaw(PMC *info) :manual_wb {
+    void thaw(PMC *info) :no_wb {
         int  size;
         PMC *k = SELF;
 
@@ -356,7 +357,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
         }
     }
 
-    VTABLE void thawfinish(PMC *info) :no_wb {
+    VTABLE void thawfinish(PMC *info) {
         UNUSED(info)
         PMC *key = SELF;
 
@@ -368,7 +369,8 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
                 SET_ATTR_next_key(INTERP, key, NULL);
                 break;
             }
-
+            
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             key = next;
         }
     }
@@ -386,7 +388,7 @@ Set key to hold particular register.
 =cut
 
 */
-    METHOD set_register(INTVAL reg_no, INTVAL reg_type) :manual_wb {
+    METHOD set_register(INTVAL reg_no, INTVAL reg_type) :no_wb {
         Parrot_key_set_register(INTERP, SELF, reg_no, reg_type);
     }
 
@@ -435,7 +437,7 @@ Aggregate interface.
         return Parrot_key_pmc(INTERP, SELF);
     }
 
-    METHOD make_register_key(STRING * set, INTVAL idx) :manual_wb 
+    METHOD make_register_key(STRING * set, INTVAL idx) :no_wb 
     {
         INTVAL first_char = Parrot_str_indexed(INTERP, set, 0);
         KEY_flags key_type;
