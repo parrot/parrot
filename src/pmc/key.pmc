@@ -41,7 +41,7 @@ Initializes the key.
 
 */
 
-    VTABLE void init() {
+    VTABLE void init() :manual_wb {
         PObj_custom_mark_SET(SELF);
     }
 
@@ -55,7 +55,7 @@ Creates and returns a clone of the key.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         PMC *dkey        = dest;
         PMC *key         = SELF;
@@ -102,7 +102,7 @@ Marks the key as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         Parrot_key_mark(INTERP, SELF);
     }
 
@@ -116,7 +116,7 @@ Returns the integer value of the key.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         return Parrot_key_integer(INTERP, SELF);
     }
 
@@ -130,7 +130,7 @@ Returns the Parrot string value of the key.
 
 */
 
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         /* Parrot_key_string() is only useful if this PMC has a key type */
         if (KEY_get_FLAGS(SELF))
             return Parrot_key_string(INTERP, SELF);
@@ -148,7 +148,7 @@ Returns the PMC value of the key.
 
 */
 
-    VTABLE PMC *get_pmc() {
+    VTABLE PMC *get_pmc() :no_wb {
         return Parrot_key_pmc(INTERP, SELF);
     }
 
@@ -160,7 +160,7 @@ Returns the PMC value of the key.
 
 */
 
-    VTABLE void set_integer_native(INTVAL value) {
+    VTABLE void set_integer_native(INTVAL value) :manual_wb {
         Parrot_key_set_integer(INTERP, SELF, value);
     }
 
@@ -173,7 +173,7 @@ Returns the PMC value of the key.
 
 */
 
-    VTABLE void set_string_native(STRING *value) {
+    VTABLE void set_string_native(STRING *value) :manual_wb {
         Parrot_key_set_string(INTERP, SELF, value);
     }
 
@@ -187,7 +187,7 @@ Sets the value of the key to C<*value>.
 
 */
 
-    VTABLE void set_pmc(PMC *value) {
+    VTABLE void set_pmc(PMC *value) :manual_wb {
         UNUSED(value)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                 "Key.set_pmc is broken - see GH #499");
@@ -203,7 +203,7 @@ Appends C<*value> to the key.
 
 */
 
-    void push_pmc(PMC *value) {
+    void push_pmc(PMC *value) :manual_wb {
         if (value->vtable->base_type != enum_class_Key)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Can only push another Key onto a Key PMC.");
@@ -224,7 +224,7 @@ chain.
 
 */
 
-    VTABLE PMC *shift_pmc() :manual_wb {
+    VTABLE PMC *shift_pmc() {
         PMC *next_key;
 
         GET_ATTR_next_key(INTERP, SELF, next_key);
@@ -249,7 +249,7 @@ Returns the key itself.
 
 */
 
-    VTABLE PMC *get_pmc_keyed(PMC *key) {
+    VTABLE PMC *get_pmc_keyed(PMC *key) :no_wb {
         UNUSED(INTERP)
         UNUSED(SELF)
         return key;
@@ -273,7 +273,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
 
 */
 
-    void freeze(PMC *info) {
+    void freeze(PMC *info) :manual_wb {
         int size;
         PMC *k;
 
@@ -316,7 +316,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
         }
     }
 
-    void thaw(PMC *info) {
+    void thaw(PMC *info) :manual_wb {
         int  size;
         PMC *k = SELF;
 
@@ -356,7 +356,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
         }
     }
 
-    VTABLE void thawfinish(PMC *info) {
+    VTABLE void thawfinish(PMC *info) :no_wb {
         UNUSED(info)
         PMC *key = SELF;
 
@@ -373,7 +373,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
         }
     }
 
-    VTABLE STRING* get_repr() {
+    VTABLE STRING* get_repr() :no_wb {
         return Parrot_key_set_to_string(INTERP, SELF);
     }
 
@@ -386,7 +386,7 @@ Set key to hold particular register.
 =cut
 
 */
-    METHOD set_register(INTVAL reg_no, INTVAL reg_type) {
+    METHOD set_register(INTVAL reg_no, INTVAL reg_type) :manual_wb {
         Parrot_key_set_register(INTERP, SELF, reg_no, reg_type);
     }
 
@@ -406,7 +406,7 @@ Aggregate interface.
 
 */
 
-    VTABLE INTVAL elements() {
+    VTABLE INTVAL elements() :no_wb {
         UNUSED(INTERP)
         INTVAL n = 0;
         for (; SELF; SELF = PARROT_KEY(SELF)->next_key)
@@ -414,28 +414,28 @@ Aggregate interface.
         return n;
     }
 
-    VTABLE INTVAL get_integer_keyed_int(INTVAL n) {
+    VTABLE INTVAL get_integer_keyed_int(INTVAL n) :no_wb {
         for (; SELF && n; SELF = PARROT_KEY(SELF)->next_key, n--);
         if (n)
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0, "Key access out of bounds");
         return Parrot_key_integer(INTERP, SELF);
     }
 
-    VTABLE STRING *get_string_keyed_int(INTVAL n) {
+    VTABLE STRING *get_string_keyed_int(INTVAL n) :no_wb {
         for (; SELF && n; SELF = PARROT_KEY(SELF)->next_key, n--);
         if (n)
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0, "Key access out of bounds");
         return Parrot_key_string(INTERP, SELF);
     }
 
-    VTABLE PMC *get_pmc_keyed_int(INTVAL n) {
+    VTABLE PMC *get_pmc_keyed_int(INTVAL n) :no_wb {
         for (; SELF && n; SELF = PARROT_KEY(SELF)->next_key, n--);
         if (n)
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0, "Key access out of bounds");
         return Parrot_key_pmc(INTERP, SELF);
     }
 
-    METHOD make_register_key(STRING * set, INTVAL idx)
+    METHOD make_register_key(STRING * set, INTVAL idx) :manual_wb 
     {
         INTVAL first_char = Parrot_str_indexed(INTERP, set, 0);
         KEY_flags key_type;
@@ -456,13 +456,13 @@ Aggregate interface.
         Parrot_key_set_register(INTERP, SELF, idx, (INTVAL)key_type);
     }
 
-    METHOD is_register_reference()
+    METHOD is_register_reference() :manual_wb 
     {
         INTVAL is_reg_ref = KEY_register_TEST(SELF) ? 1 : 0;
         RETURN(INTVAL is_reg_ref);
     }
 
-    METHOD get_register_idx()
+    METHOD get_register_idx() :manual_wb 
     {
         if (!KEY_register_TEST(SELF))
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
@@ -473,7 +473,7 @@ Aggregate interface.
         }
     }
 
-    METHOD get_register_contents(PMC *ctx :optional, INTVAL has_ctx :opt_flag)
+    METHOD get_register_contents(PMC *ctx :optional, INTVAL has_ctx :opt_flag) :manual_wb 
     {
         INTVAL int_key;
         if (!KEY_register_TEST(SELF))
@@ -523,7 +523,7 @@ Aggregate interface.
     }
 
     /* returns integer, values taken from PCC */
-    METHOD get_type() {
+    METHOD get_type() :manual_wb {
         INTVAL ret = 0;
         switch (KEY_get_FLAGS(SELF)) {
 #if 0
