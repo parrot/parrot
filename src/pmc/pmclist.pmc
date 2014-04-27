@@ -71,7 +71,7 @@ Initializes the list.
 
 */
 
-    VTABLE void init() {
+    VTABLE void init() :no_wb {
         PObj_custom_mark_SET(SELF);
         PObj_custom_destroy_SET(SELF);
 
@@ -90,7 +90,7 @@ Free all the list cells.
 
 */
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         void *tmp;
         PMC_List_Item *aa;
 
@@ -114,13 +114,13 @@ Returns the size of the list.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         INTVAL size;
         GET_ATTR_size(INTERP, SELF, size);
         return size;
     }
 
-    VTABLE INTVAL elements() {
+    VTABLE INTVAL elements() :no_wb {
         INTVAL size;
         GET_ATTR_size(INTERP, SELF, size);
         return size;
@@ -150,6 +150,8 @@ Removes and returns an item from the start of the array.
 
         GET_ATTR_head(INTERP, SELF, tmp);
         item = (PMC_List_Item*) tmp;
+        
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         data = item->data;
 
         size -= 1;
@@ -187,7 +189,7 @@ the array.
 
 */
 
-    VTABLE void push_pmc(PMC *value) {
+    VTABLE void push_pmc(PMC *value) :no_wb {
         INTVAL size;
         void *tmp;
         PMC_List_Item *foot;
@@ -240,6 +242,8 @@ Removes and returns the last element in the array.
 
         GET_ATTR_foot(INTERP, SELF, tmp);
         item = (PMC_List_Item*) tmp;
+        
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         data = item->data;
 
         size -= 1;
@@ -277,7 +281,7 @@ the array.
 
 */
 
-    VTABLE void unshift_pmc(PMC *value) {
+    VTABLE void unshift_pmc(PMC *value) :no_wb {
         INTVAL size;
         void *tmp;
         PMC_List_Item *head;
@@ -317,6 +321,7 @@ Creates and returns a copy of the list.
 */
 
     VTABLE PMC *clone() {
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         PMC * const copy = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         void* tmp;
         PMC_List_Item *it;
@@ -342,7 +347,7 @@ Returns the Parrot string representation C<ResizablePMCArray>.
 
 */
 
-    VTABLE STRING *get_repr() {
+    VTABLE STRING *get_repr() :no_wb {
         PMC_List_Item *it;
         void* tmp;
         STRING *res = CONST_STRING(INTERP, "[ ");
@@ -360,7 +365,7 @@ Returns the Parrot string representation C<ResizablePMCArray>.
         return Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, "]"));
     }
 
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         return VTABLE_get_repr(INTERP, SELF);
     }
 
@@ -385,7 +390,7 @@ Used to unarchive the array.
 
 */
 
-    VTABLE void visit(PMC *info) {
+    VTABLE void visit(PMC *info) :no_wb {
         void* tmp;
         PMC_List_Item *it;
 
@@ -399,12 +404,12 @@ Used to unarchive the array.
         SUPER(info);
     }
 
-    VTABLE void freeze(PMC *info) {
+    VTABLE void freeze(PMC *info) :no_wb {
         SUPER(info);
         VTABLE_push_integer(INTERP, info, VTABLE_get_integer(INTERP, SELF));
     }
 
-    VTABLE void thaw(PMC *info) {
+    VTABLE void thaw(PMC *info) :no_wb {
         int n, i;
         SUPER(info);
         n = VTABLE_shift_integer(INTERP, info);
@@ -424,7 +429,7 @@ Mark the stuff.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         void* tmp;
         PMC_List_Item *it;
 
@@ -454,12 +459,12 @@ end of the array.
 
 */
 
-    METHOD shift() {
+    METHOD shift() :manual_wb {
         PMC * const value = VTABLE_shift_pmc(INTERP, SELF);
         RETURN(PMC *value);
     }
 
-    METHOD pop() {
+    METHOD pop() :manual_wb {
         PMC * const value = VTABLE_pop_pmc(INTERP, SELF);
         RETURN(PMC *value);
     }
@@ -476,11 +481,11 @@ Method forms to add a PMC to the beginning or end of the array.
 
 */
 
-    METHOD unshift(PMC* value) {
+    METHOD unshift(PMC* value) :no_wb {
         VTABLE_unshift_pmc(INTERP, SELF, value);
     }
 
-    METHOD push(PMC* value) {
+    METHOD push(PMC* value) :no_wb {
         VTABLE_push_pmc(INTERP, SELF, value);
     }
 
@@ -494,7 +499,7 @@ Inserts an item into an ordered list by it's number value.
 
 */
 
-    METHOD insert_by_number(PMC* value) {
+    METHOD insert_by_number(PMC* value) :no_wb {
         Parrot_pmc_list_insert_by_number(INTERP, SELF, value);
     }
 
@@ -520,7 +525,7 @@ Insert an item into a sorted list by its num value.
 
 PARROT_EXPORT
 void
-Parrot_pmc_list_insert_by_number(PARROT_INTERP, PMC *list, PMC *value)
+Parrot_pmc_list_insert_by_number(PARROT_INTERP, PMC *list, PMC *value) :no_wb
 {
     void *tmp;
     PMC_List_Item *item;
@@ -576,7 +581,7 @@ Throws with the appropiate message.
 
 PARROT_DOES_NOT_RETURN
 static void
-throw_shift_empty(PARROT_INTERP)
+throw_shift_empty(PARROT_INTERP) :no_wb
 {
     ASSERT_ARGS(throw_shift_empty)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
@@ -585,7 +590,7 @@ throw_shift_empty(PARROT_INTERP)
 
 PARROT_DOES_NOT_RETURN
 static void
-throw_pop_empty(PARROT_INTERP)
+throw_pop_empty(PARROT_INTERP) :no_wb
 {
     ASSERT_ARGS(throw_pop_empty)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
