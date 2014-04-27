@@ -405,7 +405,7 @@ Delete the element corresponding to C<key> in the array component.
         return VTABLE_exists_keyed_int(INTERP, array, key);
     }
 
-    VTABLE void delete_keyed_int(INTVAL key) {
+    VTABLE void delete_keyed_int(INTVAL key) :no_wb {
         PMC *array;
 
         GET_ATTR_array(INTERP, SELF, array);
@@ -661,7 +661,7 @@ Delete the element corresponding to C<key> in the hash component.
         return VTABLE_exists_keyed(INTERP, hash, key);
     }
 
-    VTABLE void delete_keyed(PMC *key) {
+    VTABLE void delete_keyed(PMC *key) :no_wb {
         PMC *hash;
 
         GET_ATTR_hash(INTERP, SELF, hash);
@@ -708,7 +708,7 @@ Delete the element corresponding to C<key> in the hash component.
         return VTABLE_exists_keyed_str(INTERP, hash, key);
     }
 
-    VTABLE void delete_keyed_str(STRING *key) {
+    VTABLE void delete_keyed_str(STRING *key) :no_wb {
         PMC *hash;
 
         GET_ATTR_hash(INTERP, SELF, hash);
@@ -728,7 +728,7 @@ erase the contents of the array and hash components.
 
 */
 
-    VTABLE void set_pmc(PMC *capture) {
+    VTABLE void set_pmc(PMC *capture) :no_wb {
         if (PMC_IS_NULL(capture)) {
             SET_ATTR_array(INTERP, SELF, NULL);
             SET_ATTR_hash(INTERP, SELF, NULL);
@@ -758,7 +758,7 @@ and memory address.
 
 */
 
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         const STRING * const classname = VTABLE_name(INTERP, SELF);
         return Parrot_sprintf_c(INTERP, "%S[0x%x]", classname, SELF);
     }
@@ -773,7 +773,7 @@ Mark the array.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         PMC *array, *hash;
         GET_ATTR_array(INTERP, SELF, array);
         GET_ATTR_hash(INTERP, SELF, hash);
@@ -794,7 +794,7 @@ Freeze/thaw Capture
 
 */
 
-    VTABLE void freeze(PMC *info) {
+    VTABLE void freeze(PMC *info) :no_wb {
         PMC *array, *hash;
         GET_ATTR_array(INTERP, SELF, array);
         GET_ATTR_hash(INTERP, SELF, hash);
@@ -805,6 +805,8 @@ Freeze/thaw Capture
 
     VTABLE void thaw(PMC *info) {
         PMC *tmp;
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+        
         tmp = VTABLE_shift_pmc(INTERP, info);
         if (!PMC_IS_NULL(tmp)) {
             SET_ATTR_array(INTERP, SELF, tmp);
