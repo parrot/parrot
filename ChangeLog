@@ -2,6 +2,7 @@
     - Core
     - Build
         + Fixed wrong ICU header probes on multi-arch systems (debian) [GH #1014]
+        + Fix opengl on bsd which does not have __APPLE__ defined as 0 [GH #1070]
     - Documentation
     - Tests
     - Community

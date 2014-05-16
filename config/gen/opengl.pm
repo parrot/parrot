@@ -1,4 +1,4 @@
-# Copyright (C) 2008-2012, Parrot Foundation.
+# Copyright (C) 2008-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -1044,7 +1044,7 @@ sub gen_glut_callbacks {
 #
 # This file is generated automatically by config/gen/opengl.pm
 
-Copyright (C) 2008, Parrot Foundation.
+Copyright (C) 2008, 2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -1068,8 +1068,11 @@ cannot be used.
 
 #include "parrot/parrot.h"
 #include "parrot/extend.h"
+/* workaround freeglut problem from 2.0 to at least 2.8, see [GH #1070] */
+#ifndef __APPLE__
+# define __APPLE__ 0
+#endif
 #include <$glut_header>
-
 
 typedef enum {
 $enums
