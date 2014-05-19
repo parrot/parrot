@@ -168,7 +168,7 @@ Ensure that C<self> has enough storage space for C<size> positionals.
 */
 
 static void
-ensure_positionals_storage(PARROT_INTERP, ARGIN(PMC *self), INTVAL size) :no_wb
+ensure_positionals_storage(PARROT_INTERP, ARGIN(PMC *self), INTVAL size)
 {
     ASSERT_ARGS(ensure_positionals_storage)
     INTVAL allocated_positionals;
@@ -196,7 +196,7 @@ the the old chunk (if needed).
 
 static void
 ensure_positionals_storage_ap(PARROT_INTERP,
-                              ARGIN(PMC *self), INTVAL size, INTVAL allocated_positionals) :no_wb
+                              ARGIN(PMC *self), INTVAL size, INTVAL allocated_positionals)
 {
     ASSERT_ARGS(ensure_positionals_storage_ap)
     INTVAL num_positionals;
@@ -241,7 +241,7 @@ Return the cell indexed by C<key>.
 
 PARROT_CANNOT_RETURN_NULL
 static Pcc_cell*
-get_cell_at(PARROT_INTERP, ARGIN(PMC *self), INTVAL key) :no_wb
+get_cell_at(PARROT_INTERP, ARGIN(PMC *self), INTVAL key)
 {
     ASSERT_ARGS(get_cell_at)
     Pcc_cell *cells;
@@ -261,7 +261,7 @@ Return C<cell> as an INTVAL.
 */
 
 static INTVAL
-autobox_intval(PARROT_INTERP, ARGIN(const Pcc_cell *cell)) :no_wb
+autobox_intval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
 {
     ASSERT_ARGS(autobox_intval)
     switch (CELL_TYPE_MASK(cell)) {
@@ -292,7 +292,7 @@ Return C<cell> as an FLOATVAL.
 */
 
 static FLOATVAL
-autobox_floatval(PARROT_INTERP, ARGIN(const Pcc_cell *cell)) :no_wb
+autobox_floatval(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
 {
     ASSERT_ARGS(autobox_floatval)
     switch (CELL_TYPE_MASK(cell)) {
@@ -324,7 +324,7 @@ Return C<cell> as an STRING.
 
 PARROT_CANNOT_RETURN_NULL
 static STRING *
-autobox_string(PARROT_INTERP, ARGIN(const Pcc_cell *cell)) :no_wb
+autobox_string(PARROT_INTERP, ARGIN(const Pcc_cell *cell))
 {
     ASSERT_ARGS(autobox_string)
     switch (CELL_TYPE_MASK(cell)) {
@@ -360,8 +360,6 @@ autobox_pmc(PARROT_INTERP, ARGIN(Pcc_cell *cell), INTVAL type)
 {
     ASSERT_ARGS(autobox_pmc)
     PMC *result = PMCNULL;
-
-    PARROT_GC_WRITE_BARRIER(interp, SELF);
     
     switch (type) {
       case INTCELL:
@@ -397,7 +395,7 @@ Return the hash for this CallContext, creating a hash if necessary.
 
 PARROT_CANNOT_RETURN_NULL
 static Hash *
-get_hash(PARROT_INTERP, ARGIN(PMC *SELF)) :no_wb
+get_hash(PARROT_INTERP, ARGIN(PMC *SELF))
 {
     ASSERT_ARGS(get_hash)
     Hash   *hash;
@@ -426,7 +424,7 @@ Mark this cell's GCable, if needed.
 */
 
 static void
-mark_cell(PARROT_INTERP, ARGIN(Pcc_cell *c)) :no_wb
+mark_cell(PARROT_INTERP, ARGIN(Pcc_cell *c))
 {
     ASSERT_ARGS(mark_cell)
     switch (CELL_TYPE_MASK(c)) {
@@ -457,7 +455,7 @@ Mark this positional's GCables, if needed.
 */
 
 static void
-mark_positionals(PARROT_INTERP, ARGIN(PMC *self)) :no_wb
+mark_positionals(PARROT_INTERP, ARGIN(PMC *self))
 {
     ASSERT_ARGS(mark_positionals)
     INTVAL size;
@@ -486,7 +484,7 @@ Mark this hash's GCables, if needed.
 
 /* don't look now, but here goes encapsulation.... */
 static void
-mark_hash(PARROT_INTERP, ARGIN(Hash *h)) :no_wb
+mark_hash(PARROT_INTERP, ARGIN(Hash *h))
 {
     ASSERT_ARGS(mark_hash)
     parrot_hash_iterate(h,
@@ -1576,12 +1574,12 @@ Creates and returns a clone of the signature.
         STRING      *short_sig;
         PMC         *type_tuple, *arg_flags, *return_flags;
         
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
-        
         PMC * const  dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         INTVAL       num;
         Pcc_cell    *our_cells, *dest_cells;
         Hash        *hash;
+        
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
 
         GET_ATTR_num_positionals(INTERP, SELF, num);
         /* Copy positionals */

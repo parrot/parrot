@@ -72,7 +72,7 @@ Advance to next position. Return found (if any) HashBucket.
 */
 
 static void
-advance_to_next(ARGMOD(PMC *self)) :no_wb
+advance_to_next(ARGMOD(PMC *self))
 {
     ASSERT_ARGS(advance_to_next)
     Parrot_HashIterator_attributes * const attrs  = PARROT_HASHITERATOR(self);
@@ -162,8 +162,8 @@ Marks the hash as live.
 */
 
     VTABLE void mark() {
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         PMC * const hash = PARROT_HASHITERATOR(SELF)->pmc_hash;
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         Parrot_gc_mark_PMC_alive(INTERP, hash);
         /* We don't mark underlying parrot_hash. Hash PMC will mark it */
     }

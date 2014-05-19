@@ -321,10 +321,10 @@ Creates and returns a copy of the list.
 */
 
     VTABLE PMC *clone() {
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         PMC * const copy = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         void* tmp;
         PMC_List_Item *it;
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
 
         GET_ATTR_head(INTERP, SELF, tmp);
         it = (PMC_List_Item*) tmp;
@@ -499,7 +499,7 @@ Inserts an item into an ordered list by it's number value.
 
 */
 
-    METHOD insert_by_number(PMC* value) :no_wb {
+    METHOD insert_by_number(PMC* value) {
         Parrot_pmc_list_insert_by_number(INTERP, SELF, value);
     }
 
@@ -525,7 +525,7 @@ Insert an item into a sorted list by its num value.
 
 PARROT_EXPORT
 void
-Parrot_pmc_list_insert_by_number(PARROT_INTERP, PMC *list, PMC *value) :no_wb
+Parrot_pmc_list_insert_by_number(PARROT_INTERP, PMC *list, PMC *value)
 {
     void *tmp;
     PMC_List_Item *item;
@@ -581,7 +581,7 @@ Throws with the appropiate message.
 
 PARROT_DOES_NOT_RETURN
 static void
-throw_shift_empty(PARROT_INTERP) :no_wb
+throw_shift_empty(PARROT_INTERP)
 {
     ASSERT_ARGS(throw_shift_empty)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
@@ -590,7 +590,7 @@ throw_shift_empty(PARROT_INTERP) :no_wb
 
 PARROT_DOES_NOT_RETURN
 static void
-throw_pop_empty(PARROT_INTERP) :no_wb
+throw_pop_empty(PARROT_INTERP)
 {
     ASSERT_ARGS(throw_pop_empty)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,

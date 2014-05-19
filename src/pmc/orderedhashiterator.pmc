@@ -66,8 +66,8 @@ Marks the hash as live.
 */
 
     VTABLE void mark() {
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         PMC * const hash = PARROT_ORDEREDHASHITERATOR(SELF)->pmc_hash;
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         Parrot_gc_mark_PMC_alive(INTERP, hash);
     }
 
@@ -232,9 +232,9 @@ the next one for reverse iterator.
 
 */
 
-    VTABLE STRING* shift_string() {
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+    VTABLE STRING* shift_string() {    
         PMC * const key = SELF.shift_pmc();
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return VTABLE_get_string(INTERP, key);
     }
 }

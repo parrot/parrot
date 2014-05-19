@@ -134,11 +134,11 @@ Thaws the PMC contained in C<image>.
         STATICSELF.shift_pmc();
 
         {
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             PMC * const seen = PARROT_IMAGEIOTHAW(SELF)->seen;
             PMC * const todo = PARROT_IMAGEIOTHAW(SELF)->todo;
             INTVAL i, n;
-
+            
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             for (i = 0; i < VTABLE_elements(INTERP, todo); i++) {
                 const INTVAL idx = VTABLE_get_integer_keyed_int(INTERP, todo, i);
                 PMC * const current = VTABLE_get_pmc_keyed_int(INTERP, seen, idx);
@@ -322,11 +322,11 @@ Retrieve a PMC as the next item from the image.
         const INTVAL   id           = PackID_get_PMCID(n);
         const int      packid_flags = PackID_get_FLAGS(n);
         
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
-        
         PMC           *pmc          = PMCNULL;
         PMC           *seen         = PARROT_IMAGEIOTHAW(SELF)->seen;
         PMC           *todo         = PARROT_IMAGEIOTHAW(SELF)->todo;
+        
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
 
         switch (packid_flags) {
           case enum_PackID_seen:

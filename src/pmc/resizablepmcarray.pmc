@@ -74,7 +74,6 @@ do_shift(ARGIN(PMC *arr))
     ASSERT_ARGS(do_shift)
     INTVAL    size = PMC_size(arr);
     
-    PARROT_GC_WRITE_BARRIER(INTERP, SELF);
     PMC ** const item = PMC_array(arr);
 
     PMC_size(arr) = --size;
@@ -100,9 +99,7 @@ do_unshift(PARROT_INTERP, ARGIN(PMC *arr), ARGIN(PMC *val))
     const INTVAL size = PMC_size(arr);
     PMC        **item;
 
-    VTABLE_set_integer_native(interp, arr, size + 1);
-    PARROT_GC_WRITE_BARRIER(INTERP, SELF);
-    
+    VTABLE_set_integer_native(interp, arr, size + 1);    
     item = PMC_array(arr);
     memmove(item + 1, item, size * sizeof (PMC *));
     item[0] = val;
@@ -390,12 +387,11 @@ Delete the element at index C<key>.
     }
 
     VTABLE void delete_keyed_int(INTVAL key) {
-        
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         PMC ** const data = PMC_array(SELF);
         const INTVAL  n   = PMC_size(SELF);
         INTVAL  i;
 
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         for (i = key; i < n - 1; ++i)
             data[i] = data[i + 1];
 
@@ -414,16 +410,14 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
 
 */
     VTABLE INTVAL exists_keyed_int(INTVAL key) {
-        UNUSED(INTERP)
         PMC **data;
-
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         if (key < 0)
             key += PMC_size(SELF);
 
         if (key < 0 || key >= PMC_size(SELF))
             return 0;
 
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         data = PMC_array(SELF);
         return !PMC_IS_NULL(data[key]);
     }
@@ -481,10 +475,9 @@ the array.
     VTABLE void push_float(FLOATVAL value) {
 
         const INTVAL size = PMC_size(SELF);
+        PMC   * const val = Parrot_pmc_new(INTERP, enum_class_Float);
         
         PARROT_GC_WRITE_BARRIER(INTERP, SELF);
-        PMC   * const val = Parrot_pmc_new(INTERP, enum_class_Float);
-
         VTABLE_set_number_native(INTERP, val, value);
         SELF.set_pmc_keyed_int(size, val);
 
@@ -494,10 +487,9 @@ the array.
     VTABLE void push_integer(INTVAL value) {
 
         const INTVAL size = PMC_size(SELF);
-        
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         PMC   * const val = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, value);
         
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         SELF.set_pmc_keyed_int(size, val);
 
         return;
@@ -521,10 +513,9 @@ the array.
     VTABLE void push_string(STRING *value) {
 
         const INTVAL size = PMC_size(SELF);
-        
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         PMC   * const val = Parrot_pmc_new(INTERP, enum_class_String);
 
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         VTABLE_assign_string_native(INTERP, val, value);
         SELF.set_pmc_keyed_int(size, val);
 
@@ -625,29 +616,25 @@ the array.
 */
 
     VTABLE void unshift_float(FLOATVAL value) {
-        
+        PMC * const val = Parrot_pmc_new(INTERP, enum_class_Float);        
         PARROT_GC_WRITE_BARRIER(INTERP, SELF);
-        PMC * const val = Parrot_pmc_new(INTERP, enum_class_Float);
         VTABLE_set_number_native(INTERP, val, value);
         do_unshift(INTERP, SELF, val);
     }
 
     VTABLE void unshift_integer(INTVAL value) {
-        
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         PMC * const val = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, value);
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         do_unshift(INTERP, SELF, val);
     }
 
     VTABLE void unshift_pmc(PMC *value) :no_wb {
-
         do_unshift(INTERP, SELF, value);
     }
 
     VTABLE void unshift_string(STRING *value) {
-
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         PMC * const val = Parrot_pmc_new(INTERP, enum_class_String);
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         VTABLE_set_string_native(INTERP, val, value);
         do_unshift(INTERP, SELF, val);
     }
@@ -663,10 +650,9 @@ Creates and returns a copy of the array.
 */
 
     VTABLE PMC *clone() {
-    
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         PMC * const copy = SUPER();
-
+        
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         /* copy trimmed extra space */
         PMC_threshold(copy) = PMC_size(SELF);
 
@@ -718,10 +704,11 @@ Note that the C<from> PMC can be of any of the various array types.
         const INTVAL elems0 = VTABLE_elements(INTERP, SELF);
         const INTVAL elems1 = VTABLE_elements(INTERP, from);
         
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         PMC **item = 0;
         INTVAL tail;
         INTVAL i;
+        
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
 
         /* start from end? */
         if (offset < 0)
@@ -879,7 +866,7 @@ Throws with the appropriate message.
 
 PARROT_DOES_NOT_RETURN
 static void
-throw_shift_empty(PARROT_INTERP) :no_wb 
+throw_shift_empty(PARROT_INTERP)
 {
     ASSERT_ARGS(throw_shift_empty)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
@@ -888,7 +875,7 @@ throw_shift_empty(PARROT_INTERP) :no_wb
 
 PARROT_DOES_NOT_RETURN
 static void
-throw_pop_empty(PARROT_INTERP) :no_wb
+throw_pop_empty(PARROT_INTERP)
 {
     ASSERT_ARGS(throw_pop_empty)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
