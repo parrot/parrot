@@ -1,3 +1,9 @@
+2014-05-20    release 6.4.0
+    - Examples
+        + Enhance shootout/regexdna.pir to test GC write barrier crashes
+    - Community
+        + Our GSOC project did officially start. See https://github.com/ZYROz/parrot
+
 2014-04-15    release 6.3.0
     - Core
     - Build
