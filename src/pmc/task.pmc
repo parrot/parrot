@@ -114,11 +114,11 @@ Some data that will be passed to C<code> when invoked.
 
         SELF.init();
 
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         if (VTABLE_isa(INTERP, data, CONST_STRING(INTERP, "Sub"))) {
             core_struct->code = data;
         }
         else if (VTABLE_isa(INTERP, data, CONST_STRING(INTERP, "Hash"))) {
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             PMC * elem = VTABLE_get_pmc_keyed_str(INTERP, data, CONST_STRING(INTERP, "birthtime"));
             if (! PMC_IS_NULL(elem))
                 core_struct->birthtime = VTABLE_get_number(INTERP, elem);
@@ -155,9 +155,9 @@ code as the first argument.
         Parrot_Scheduler_attributes * const sdata =
                 PARROT_SCHEDULER(interp->scheduler);
                 
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         PMC * const active_tasks = sdata->all_tasks;
-
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+        
         PARROT_ASSERT(! PMC_IS_NULL(task->code));
 
         /* If a task is pre-empted, this will be set again. */
@@ -240,12 +240,11 @@ Create a copy of the task, resetting status, ID, and birthtime.
     VTABLE PMC *clone() {
         /* Create the new task PMC, of the same type of this one (we may
          * have been subclassed). */
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
-        
         PMC * const copy  = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         Parrot_Task_attributes * const new_struct = PARROT_TASK(copy);
         const Parrot_Task_attributes * const old_struct = PARROT_TASK(SELF);
-
+        
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         new_struct->code   = VTABLE_clone(INTERP, old_struct->code);
         new_struct->data   = VTABLE_clone(INTERP, old_struct->data);
         new_struct->shared = VTABLE_clone(INTERP, old_struct->shared);
@@ -460,9 +459,9 @@ Send a message to this task.
         UNLOCK(tdata->mailbox_lock);
 
         if (tdata->partner) {
-            PARROT_GC_WRITE_BARRIER(interp, SELF);
             PMC *                    const partner = tdata->partner;
             Parrot_Task_attributes * const pdata = PARROT_TASK(partner);
+            PARROT_GC_WRITE_BARRIER(interp, SELF);
             LOCK(tdata->mailbox_lock);
             Parrot_block_GC_mark_locked(pdata->interp);
             if (TASK_recv_block_TEST(partner)) {
