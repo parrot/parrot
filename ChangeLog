@@ -1,6 +1,7 @@
 2014-06-17    release 6.5.0
     - Core
     - Build
+        + Fixed wrong ICU header probes on multi-arch systems (debian) [GH #1014]
     - Documentation
     - Tests
     - Community

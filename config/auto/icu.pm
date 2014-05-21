@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -328,6 +328,8 @@ sub _handle_icuheaders {
         if (! -d $icuheaders) {
             $without = 1;
         }
+        # This will fails on multi-arch [GH #1014]
+        # so we rely on the cc probe then. No need to use pkg-config
         $icuheaders .= "/include";
         if (! -d $icuheaders) {
             $without = 1;
@@ -361,13 +363,6 @@ sub _handle_icuconfig_errors {
     }
     else {
         $arg->{icuheaders} =~ s![\\/]$!!;
-        foreach my $header ( @{ $self->{icu_headers} } ) {
-            $header = "$arg->{icuheaders}/unicode/$header";
-            if  ( ! -e $header ) {
-                $icuconfig_errors++;
-                warn "error: ICU header '$header' not found\n";
-            }
-        }
     }
 
     if ($icuconfig_errors) {
