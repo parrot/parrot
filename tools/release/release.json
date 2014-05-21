@@ -1,9 +1,9 @@
 {
-    "release.version"  : "6.3.0",
-    "release.name"     : "Black-cheeked Lovebird",
+    "release.version"  : "6.4.0",
+    "release.name"     : "Double-eyed Fig Parrot",
     "release.day"      : "Tuesday",
-    "release.nextdate" : "20 May 2014",
-    "release.type"     : "supported",
+    "release.nextdate" : "17 Jun 2014",
+    "release.type"     : "devel",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -12,10 +12,10 @@
     "web.org_root"     : "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "17 May 2014",
+    "bugday.date"      : "14 Jun 2014",
 
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
-    "wiki.bugday"      : "bug_day_2014_05_17",
+    "wiki.bugday"      : "bug_day_2014_06_14",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/6.3.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/6.4.0/"
 }

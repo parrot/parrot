@@ -172,5 +172,6 @@ Starred release numbers indicate supported releases.
  rurban      6.1.0          2014-Feb-18     "Black-collared Lovebird"
  Util        6.2.0          2014-Mar-18     "Imperial Amazon"
  rurban      6.3.0 *        2014-Apr-15     "Black-cheeked Lovebird"
+ Util        6.4.0          2014-May-20     "Double-eyed Fig Parrot"
 
 =cut

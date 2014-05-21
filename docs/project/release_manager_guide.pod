@@ -572,9 +572,11 @@ L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.cal
 
 Make sure that at least the next two releases are covered
 
-    - May 20, 2014 - 6.4.0   - Util
     - Jun 17, 2014 - 6.5.0   - rurban
-    - Jul 15, 2014 - 6.6.0   - 
+    - Jul 15, 2014 - 6.6.0   - Util
+    - Aug 19, 2014 - 6.7.0   - ??
+    - Sep 16, 2014 - 6.8.0   - ??
+    - Oct 21, 2014 - 6.9.0   - ??
 
 =cut
 

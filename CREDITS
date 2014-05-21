@@ -232,7 +232,7 @@ E: bruce.gray@acm.org
 D: Improvements to Config, Build, and Test sub-systems.
 D: Cage cleaning, codingstd, warnings, and doc corrections.
 D: Darwin and Win32 platform fixes.
-D: Release manager (5.1.0 - 5.7.0, 5.10.0, 6.0.0, 6.2.0)
+D: Release manager (5.1.0 - 5.7.0, 5.10.0, 6.0.0, 6.2.0, 6.4.0)
 D: GSoC 2013 Org Admin
 S: Auburn, AL, USA
 
