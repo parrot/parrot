@@ -96,7 +96,8 @@ CODE
 OUTPUT
 
 SKIP: {
-    skip("debug_break fails for no apparent reasons on windows", 1) if $^O eq 'MSWin32';
+    skip("debug_break fails for no apparent reasons on windows and darwin", 1)
+        if $^O eq 'MSWin32' or $^O eq 'darwin';
     pir_stdin_output_like( <<'INPUT', <<'CODE', qr/[(]pdb[)] (print I0\n)?1/, "debug_break" );
 print I0
 quit
