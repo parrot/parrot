@@ -409,7 +409,6 @@ Aggregate interface.
 */
 
     VTABLE INTVAL elements() :no_wb {
-        UNUSED(INTERP)
         INTVAL n = 0;
         for (; SELF; SELF = PARROT_KEY(SELF)->next_key)
             n++;

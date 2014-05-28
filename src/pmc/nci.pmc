@@ -220,7 +220,7 @@ Creates and returns a clone of the NCI.
         nci_info_ret->arity                 = nci_info_self->arity;
         PObj_get_FLAGS(ret)                 = PObj_get_FLAGS(SELF);
 
-        return ret;
+        RETURN(PMC *ret);
     }
 
 /*
@@ -233,9 +233,9 @@ Returns whether the NCI is defined.
 
 */
 
-    VTABLE INTVAL defined() {
-        UNUSED(INTERP)
+    VTABLE INTVAL defined() :no_wb {
         const Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
+        UNUSED(INTERP)
         return nci_info->orig_func != NULL;
     }
 
@@ -299,7 +299,7 @@ Returns the function pointer as an integer.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         if (!nci_info->func)
             build_func(INTERP, SELF, nci_info);
@@ -316,9 +316,9 @@ Returns the boolean value of the pointer.
 
 */
 
-    VTABLE INTVAL get_bool() {
-        UNUSED(INTERP)
+    VTABLE INTVAL get_bool() :no_wb {
         const Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
+        UNUSED(INTERP)
         return (0 != (INTVAL)nci_info->orig_func);
     }
 

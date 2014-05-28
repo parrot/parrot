@@ -112,9 +112,9 @@ Returns true if the Sockaddr is defined.
 
 */
 
-    VTABLE INTVAL get_bool() {
-        UNUSED(INTERP)
+    VTABLE INTVAL get_bool() :no_wb {
         const Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
+        UNUSED(INTERP)
 
         return data->pointer ? 1 : 0;
     }
@@ -129,11 +129,10 @@ Returns the length of the sockaddr struct.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         INTVAL len;
 
         GET_ATTR_len(INTERP, SELF, len);
-
         return len;
     }
 
@@ -147,9 +146,9 @@ Returns a pointer to the C<sockaddr_in> or C<sockaddr_in6>.
 
 */
 
-    VTABLE void *get_pointer() {
-        UNUSED(INTERP)
+    VTABLE void *get_pointer() :no_wb {
         const Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
+        UNUSED(INTERP)
         return data->pointer;
     }
 
@@ -162,7 +161,7 @@ Returns the string representation of this sockaddr by calling C<getnameinfo(3)>.
 =cut
 
 */
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         const Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
 
         if (!data->pointer)
@@ -180,9 +179,9 @@ Returns family, type or protocol. Used for debugging.
 =cut
 
 */
-    VTABLE INTVAL get_integer_keyed_int(INTVAL what) {
-        UNUSED(INTERP)
+    VTABLE INTVAL get_integer_keyed_int(INTVAL what) :no_wb {
         const Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
+        UNUSED(INTERP)
 
         switch (what) {
           case 0:

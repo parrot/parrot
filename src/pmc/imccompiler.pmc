@@ -115,15 +115,15 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         return (opcode_t*)next;
     }
 
-    VTABLE void *get_pointer() {
-        UNUSED(INTERP)
+    VTABLE void *get_pointer() :no_wb {
         const Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        UNUSED(INTERP)
         return attrs->imcc_info;
     }
 
-    VTABLE INTVAL get_integer() {
-        UNUSED(INTERP)
+    VTABLE INTVAL get_integer() :no_wb {
         const Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        UNUSED(INTERP)
         return attrs->is_pasm;
     }
 
@@ -136,8 +136,8 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
     }
 
     VTABLE void destroy() {
-        UNUSED(INTERP)
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
+        UNUSED(INTERP)
         imcc_destroy((imc_info_t*)(attrs->imcc_info));
         attrs->imcc_info = NULL;
     }

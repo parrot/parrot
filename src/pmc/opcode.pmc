@@ -74,15 +74,15 @@ Returns the opcode number.
 
 */
 
-    VTABLE INTVAL get_integer() {
-        UNUSED(INTERP)
+    VTABLE INTVAL get_integer() :no_wb {
         const Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        UNUSED(INTERP)
         if (!attrs->info)
             return -1;
         return attrs->op_number;
     }
 
-    VTABLE FLOATVAL get_number() {
+    VTABLE FLOATVAL get_number() :no_wb {
         return STATICSELF.get_integer();
     }
 
@@ -133,9 +133,9 @@ Returns the number of arguments for the opcode.
 
 */
 
-    VTABLE INTVAL elements() {
-        UNUSED(INTERP)
+    VTABLE INTVAL elements() :no_wb {
         const Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        UNUSED(INTERP)
         if (!attrs->info)
             return -1;
         return attrs->info->op_count - 1;
@@ -179,9 +179,9 @@ Flags:
 
 */
 
-    VTABLE INTVAL get_integer_keyed_int(INTVAL i) {
-        UNUSED(INTERP)
+    VTABLE INTVAL get_integer_keyed_int(INTVAL i) :no_wb {
         const Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
+        UNUSED(INTERP)
         return i < attrs->info->op_count - 1
                ? (INTVAL)attrs->info->types[i]
                : -1;

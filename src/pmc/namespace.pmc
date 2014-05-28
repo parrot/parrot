@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2012, Parrot Foundation.
+Copyright (C) 2005-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -396,7 +396,7 @@ Returns the class or role PMC that is associated with this namespace.
 
 */
 
-    PMC *get_class() {
+    PMC *get_class() :no_wb {
         UNUSED(INTERP);
         return PARROT_NAMESPACE(SELF)->_class;
     }
@@ -644,11 +644,12 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
         ns = (PMC *)Parrot_hash_get(INTERP, hash, key);
 
         if (ns && (PObj_get_FLAGS(ns) & FPA_is_ns_ext)
-        &&   ns->vtable->base_type == enum_class_FixedPMCArray)
+            && ns->vtable->base_type == enum_class_FixedPMCArray)
             ns = VTABLE_get_pmc_keyed_int(INTERP, ns, NS_slot_var_sub);
 
         /* Be extra careful about returning PMCNULL */
-        return ns ? ns : PMCNULL;
+        if (!ns) ns = PMCNULL;
+        RETURN(PMC *ns);
     }
 
     VTABLE void *get_pointer_keyed(PMC *key) {
@@ -709,9 +710,9 @@ Return the name of this namespace part.
 
 */
 
-    VTABLE STRING *get_string() {
-        UNUSED(INTERP)
+    VTABLE STRING *get_string() :no_wb {
         const Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
+        UNUSED(INTERP)
         return nsinfo->name;
     }
 

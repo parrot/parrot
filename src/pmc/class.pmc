@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -1580,15 +1580,17 @@ Returns whether the class does the given C<*role>.
         PMC * const role_list          = _class->roles;
         INTVAL i, role_count, count;
 
-        if (!role_list)
-            return 0;
+        if (!role_list) {
+            RETURN(INTVAL 0);
+        }
 
         role_count = VTABLE_elements(INTERP, role_list);
 
         for (i = 0; i < role_count; ++i) {
             PMC    * const test_role = VTABLE_get_pmc_keyed_int(INTERP, role_list, i);
-            if (VTABLE_does_pmc(INTERP, test_role, role))
-                return 1;
+            if (VTABLE_does_pmc(INTERP, test_role, role)) {
+                RETURN(INTVAL 1);
+            }
         }
 
         /* Iterate over all the parents and check if they respond true
@@ -1599,14 +1601,16 @@ Returns whether the class does the given C<*role>.
             PMC * const cur_class = VTABLE_get_pmc_keyed_int(INTERP,
                     _class->parents, i);
 
-            if (VTABLE_does_pmc(INTERP, cur_class, role))
-                return 1;
+            if (VTABLE_does_pmc(INTERP, cur_class, role)) {
+                RETURN(INTVAL 1);
+            }
         }
 
-        return VTABLE_isa_pmc(INTERP, SELF, role);
+        i = VTABLE_isa_pmc(INTERP, SELF, role);
+        RETURN(INTVAL i);
     }
 
-    VTABLE INTVAL is_equal(PMC * p) {
+    VTABLE INTVAL is_equal(PMC * p) :no_wb {
         UNUSED(INTERP)
         return p == SELF;
     }
@@ -1621,9 +1625,9 @@ Returns the integer type of the class.
 
 */
 
-    VTABLE INTVAL type() {
-        UNUSED(INTERP)
+    VTABLE INTVAL type() :no_wb {
         Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
+        UNUSED(INTERP)
         return _class->id;
     }
 

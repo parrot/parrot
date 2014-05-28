@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -172,10 +172,10 @@ Returns the timer info for C<key>.
 
 */
 
-    VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
-        UNUSED(INTERP)
+    VTABLE INTVAL get_integer_keyed_int(INTVAL key) :no_wb {
         const Parrot_Timer_attributes * const core_struct = PARROT_TIMER(SELF);
         const FLOATVAL absolute_time = core_struct->birthtime + core_struct->duration;
+        UNUSED(INTERP)
 
         switch (key) {
           case PARROT_TIMER_SEC:
@@ -203,7 +203,7 @@ Returns the PMC associated with C<key>.
 
 */
 
-    VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
+    VTABLE PMC *get_pmc_keyed_int(INTVAL key) :no_wb {
         UNUSED(INTERP)
 
         if (key == PARROT_TIMER_HANDLER) {
@@ -224,9 +224,9 @@ Returns the number associated with C<key>.
 
 */
 
-    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
-        UNUSED(INTERP)
+    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) :no_wb {
         const Parrot_Timer_attributes * const core_struct = PARROT_TIMER(SELF);
+        UNUSED(INTERP)
 
         switch (key) {
           case PARROT_TIMER_NSEC:

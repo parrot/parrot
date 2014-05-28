@@ -229,12 +229,12 @@ otherwise.
             PARROT_GC_WRITE_BARRIER(INTERP, SELF);
     }
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         UNUSED(INTERP)
         return PARROT_PACKFILEVIEW(SELF)->pf;
     }
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         UNUSED(INTERP)
         return (PARROT_PACKFILEVIEW(SELF)->pf != NULL);
     }
@@ -249,14 +249,14 @@ otherwise.
 
 */
 
-    VTABLE void set_string_native(STRING * path) {
+    VTABLE void set_string_native(STRING * path) :no_wb {
         PARROT_PACKFILEVIEW(SELF)->path = path;
     }
 
-    VTABLE STRING * get_string() {
-        UNUSED(INTERP)
+    VTABLE STRING * get_string() :no_wb {
         Parrot_PackfileView_attributes * const attrs =
                 PARROT_PACKFILEVIEW(SELF);
+        UNUSED(INTERP);
         return attrs->path ? attrs->path : STRINGNULL;
     }
 

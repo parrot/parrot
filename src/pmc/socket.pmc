@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008-2013, Parrot Foundation.
+Copyright (C) 2008-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -129,7 +129,7 @@ Returns whether the Socket is currently open.
 
 */
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         return !Parrot_io_is_closed(INTERP, SELF);
     }
 
@@ -149,8 +149,9 @@ Returns whether the Socket is currently open.
 
 
     METHOD socket(INTVAL fam, INTVAL type, INTVAL proto) {
-        if (Parrot_io_socket(INTERP, SELF, fam, type, proto))
+        if (Parrot_io_socket(INTERP, SELF, fam, type, proto)) {
             RETURN(PMC * SELF);
+        }
         RETURN(PMC * PMCNULL);
     }
 
@@ -259,7 +260,7 @@ Test if the socket is closed.
 
 */
 
-    METHOD is_closed() {
+    METHOD is_closed() :no_wb {
         const INTVAL status = !VTABLE_get_bool(INTERP, SELF);
         RETURN(INTVAL status);
     }
@@ -277,7 +278,7 @@ necessary when opening sockets in raw mode.
 
 */
 
-    METHOD getprotobyname(STRING * name) {
+    METHOD getprotobyname(STRING * name) :no_wb {
         INTVAL proto = Parrot_io_getprotobyname(INTERP, name);
         RETURN(INTVAL proto);
     }
@@ -299,7 +300,7 @@ connected socket object.]
 
 */
 
-    METHOD connect(PMC * address) {
+    METHOD connect(PMC * address) :no_wb {
         Parrot_io_socket_connect(INTERP, SELF, address);
         RETURN(INTVAL 0);
     }
