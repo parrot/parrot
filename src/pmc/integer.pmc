@@ -418,18 +418,15 @@ Adds C<value> to C<SELF> inplace.
 
 
     MULTI void i_add(Complex value) {
-        const INTVAL a = SELF.get_integer();
-
         Parrot_pmc_reuse(INTERP, SELF, enum_class_Complex, 0);
         VTABLE_set_number_native(INTERP, SELF,
-                a + VTABLE_get_number(INTERP, value));
+                SELF.get_integer() + VTABLE_get_number(INTERP, value));
     }
 
 
     MULTI void i_add(DEFAULT value) {
-        const INTVAL a = SELF.get_integer();
         VTABLE_set_number_native(INTERP, SELF,
-                a + VTABLE_get_number(INTERP, value));
+                SELF.get_integer() + VTABLE_get_number(INTERP, value));
     }
 
 
