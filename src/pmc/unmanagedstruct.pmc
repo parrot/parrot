@@ -954,6 +954,7 @@ Sets the size of the C<struct>.
 */
 
     VTABLE void set_integer_native(INTVAL size) :no_wb {
+        UNUSED(INTERP)
         PARROT_UNMANAGEDSTRUCT(SELF)->size = size;
     }
 

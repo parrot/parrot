@@ -1625,6 +1625,7 @@ Decrements the integer.
     }
 
     VTABLE void i_add_float(FLOATVAL value) :no_wb {
+        UNUSED(SELF)
         UNUSED(value)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
@@ -1682,6 +1683,7 @@ Decrements the integer.
     }
 
     VTABLE void i_subtract_float(FLOATVAL value) :no_wb {
+        UNUSED(SELF)
         UNUSED(value)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
@@ -1738,6 +1740,7 @@ Decrements the integer.
     }
 
     VTABLE void i_multiply_float(FLOATVAL value) :no_wb {
+        UNUSED(SELF)
         UNUSED(value)
         Parrot_ex_throw_from_c_args(INTERP, NULL,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,

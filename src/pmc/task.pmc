@@ -153,7 +153,7 @@ code as the first argument.
         Parrot_Task_attributes * const task = PARROT_TASK(SELF);
         Parrot_Scheduler_attributes * const sdata =
                 PARROT_SCHEDULER(interp->scheduler);
-                
+
         PMC * const active_tasks = sdata->all_tasks;
 
         PARROT_ASSERT(! PMC_IS_NULL(task->code));
@@ -238,7 +238,6 @@ Create a copy of the task, resetting status, ID, and birthtime.
     VTABLE PMC *clone() :no_wb {
         /* Create the new task PMC, of the same type of this one (we may
          * have been subclassed). */
-        
         PMC * const copy  = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         Parrot_Task_attributes * const new_struct = PARROT_TASK(copy);
         const Parrot_Task_attributes * const old_struct = PARROT_TASK(SELF);
@@ -263,7 +262,7 @@ Gets the value of an attribute for this task.
     VTABLE PMC *get_attr_str(STRING *name) :no_wb {
         Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
         PMC * value = PMCNULL;
-        
+
         if (Parrot_str_equal(INTERP, name, CONST_STRING(INTERP, "birthtime"))) {
             value = Parrot_pmc_new(INTERP, enum_class_Float);
             VTABLE_set_number_native(INTERP, value, core_struct->birthtime);
@@ -453,7 +452,6 @@ Send a message to this task.
         UNLOCK(tdata->mailbox_lock);
 
         if (tdata->partner) {
-            PARROT_GC_WRITE_BARRIER(interp, SELF);
             PMC *                    const partner = tdata->partner;
             Parrot_Task_attributes * const pdata = PARROT_TASK(partner);
             LOCK(tdata->mailbox_lock);

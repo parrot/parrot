@@ -202,6 +202,7 @@ pmclass LexPad provides hash no_ro auto_attrs {
     ATTR PMC *ctx;
 
     VTABLE void init() :no_wb {
+        UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Cannot create a LexPad PMC without an initializer");
     }

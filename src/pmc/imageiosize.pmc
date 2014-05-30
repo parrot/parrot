@@ -189,6 +189,7 @@ The argument C<v> is currently ignored.
 
     VTABLE void push_integer(INTVAL v) :no_wb {
         const size_t len = PF_size_integer() * sizeof (opcode_t);
+        UNUSED(INTERP)
         UNUSED(v)
         PARROT_IMAGEIOSIZE(SELF)->size += len;
     }
