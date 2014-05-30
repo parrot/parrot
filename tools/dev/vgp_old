@@ -1,0 +1,4 @@
+#! /bin/sh
+# building parrot_old is much faster, because of less dependencies
+# make -j4 -s parrot_old && tools/dev/vgp_old t/op/gc.t
+valgrind --suppressions=tools/dev/parrot.supp --num-callers=50 --leak-check=full --leak-resolution=high --show-reachable=yes ./parrot_old --leak-test $@
