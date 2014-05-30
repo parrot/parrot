@@ -81,6 +81,7 @@ Raises an exception. Use C<init_pmc()>.
 */
 
     VTABLE void init() :no_wb {
+        UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "ArrayIterator init without aggregate");
     }

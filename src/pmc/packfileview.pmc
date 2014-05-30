@@ -218,7 +218,7 @@ otherwise.
 
 */
 
-    VTABLE void set_pointer(void * ptr) {
+    VTABLE void set_pointer(void * ptr) :manual_wb {
         Parrot_PackfileView_attributes * const attrs =
                 PARROT_PACKFILEVIEW(SELF);
         if (attrs->pf != NULL)
@@ -250,6 +250,7 @@ otherwise.
 */
 
     VTABLE void set_string_native(STRING * path) :no_wb {
+        UNUSED(INTERP)
         PARROT_PACKFILEVIEW(SELF)->path = path;
     }
 

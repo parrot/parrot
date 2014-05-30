@@ -428,6 +428,8 @@ Called after the task has been thawed.
 */
 
     VTABLE void thawfinish(PMC *info) :no_wb {
+        UNUSED(INTERP)
+        UNUSED(SELF)
         UNUSED(info)
         /* Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF); */
     }

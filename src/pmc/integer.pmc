@@ -142,8 +142,9 @@ Creates an exact duplicate of this PMC.
 
 */
     VTABLE PMC *clone() {
-        return Parrot_pmc_new_init_int(INTERP, SELF->vtable->base_type,
-            SELF.get_integer());
+        PMC * ret = Parrot_pmc_new_init_int(INTERP, SELF->vtable->base_type,
+                                            SELF.get_integer());
+        return ret;
     }
 /*
 

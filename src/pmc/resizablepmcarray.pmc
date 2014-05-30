@@ -148,7 +148,7 @@ Resizes the array to C<size> elements.
 
 */
 
-    VTABLE void set_integer_native(INTVAL size) :no_wb {
+    VTABLE void set_integer_native(INTVAL size) :manual_wb {
         if (size < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizablePMCArray: Can't resize!");
@@ -199,6 +199,7 @@ Resizes the array to C<size> elements.
 
             PMC_threshold(SELF) = cur;
             PMC_size(SELF)      = size;
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
     }
 
@@ -231,7 +232,6 @@ TODO: Check whether there is already an element that can be shifted
         value = VTABLE_get_number(INTERP, PMC_array(SELF)[0]);
         do_shift(SELF);
         
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return value;
     }
 
@@ -245,7 +245,6 @@ TODO: Check whether there is already an element that can be shifted
         value = VTABLE_get_integer(INTERP, PMC_array(SELF)[0]);
         do_shift(SELF);
         
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return value;
     }
 
@@ -256,9 +255,9 @@ TODO: Check whether there is already an element that can be shifted
         if (0 == size)
             throw_shift_empty(INTERP);
 
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         data = PMC_array(SELF)[0];
         do_shift(SELF);
+
         return data;
     }
 
@@ -272,7 +271,6 @@ TODO: Check whether there is already an element that can be shifted
         value = VTABLE_get_string(INTERP, PMC_array(SELF)[0]);
         do_shift(SELF);
         
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return value;
     }
 
@@ -300,7 +298,6 @@ Returns the PMC value of the element at index C<key>.
         if (key >= PMC_size(SELF))
             return PMCNULL;
 
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         data = PMC_array(SELF);
 
         if (PMC_IS_NULL(data[key]))
@@ -437,7 +434,7 @@ Returns TRUE is the element at C<key> is defined; otherwise returns false.
 
 */
 
-    VTABLE INTVAL defined_keyed_int(INTVAL key) {
+    VTABLE INTVAL defined_keyed_int(INTVAL key) :manual_wb {
         PMC *val;
 
         if (key < 0)
@@ -446,12 +443,14 @@ Returns TRUE is the element at C<key> is defined; otherwise returns false.
         if (key < 0 || key >= PMC_size(SELF))
             return 0;
 
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         val = SELF.get_pmc_keyed_int(key);
 
-        if (PMC_IS_NULL(val))
+        if (PMC_IS_NULL(val)) {
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             return 0;
+        }
 
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return VTABLE_defined(INTERP, val);
     }
 
@@ -477,11 +476,8 @@ the array.
         const INTVAL size = PMC_size(SELF);
         PMC   * const val = Parrot_pmc_new(INTERP, enum_class_Float);
         
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         VTABLE_set_number_native(INTERP, val, value);
         SELF.set_pmc_keyed_int(size, val);
-
-        return;
     }
 
     VTABLE void push_integer(INTVAL value) {
@@ -489,10 +485,7 @@ the array.
         const INTVAL size = PMC_size(SELF);
         PMC   * const val = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, value);
         
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         SELF.set_pmc_keyed_int(size, val);
-
-        return;
     }
 
     VTABLE void push_pmc(PMC *value) {
@@ -505,9 +498,6 @@ the array.
             SELF.set_integer_native(size + 1);
         }
         ((PMC **)PMC_array(SELF))[size] = value;
-
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
-        return;
     }
 
     VTABLE void push_string(STRING *value) {
@@ -515,11 +505,8 @@ the array.
         const INTVAL size = PMC_size(SELF);
         PMC   * const val = Parrot_pmc_new(INTERP, enum_class_String);
 
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         VTABLE_assign_string_native(INTERP, val, value);
         SELF.set_pmc_keyed_int(size, val);
-
-        return;
     }
 
 /*
@@ -546,7 +533,6 @@ Removes and returns the last element in the array.
         if (0 == size)
             throw_pop_empty(INTERP);
 
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         data           = PMC_array(SELF)[--size];
         PMC_size(SELF) = size;
 
@@ -561,14 +547,13 @@ Removes and returns the last element in the array.
         if (0 == size)
             throw_pop_empty(INTERP);
 
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         data           = PMC_array(SELF)[--size];
         PMC_size(SELF) = size;
 
         return VTABLE_get_integer(INTERP, data);
     }
 
-    VTABLE PMC *pop_pmc() {
+    VTABLE PMC *pop_pmc() :manual_wb {
 
         INTVAL size = PMC_size(SELF);
         PMC   *data;
@@ -576,14 +561,14 @@ Removes and returns the last element in the array.
         if (0 == size)
             throw_pop_empty(INTERP);
         
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         data           = PMC_array(SELF)[--size];
         PMC_size(SELF) = size;
 
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return data;
     }
 
-    VTABLE STRING *pop_string() {
+    VTABLE STRING *pop_string() :manual_wb {
 
         INTVAL  size = PMC_size(SELF);
         PMC    *data;
@@ -591,10 +576,10 @@ Removes and returns the last element in the array.
         if (0 == size)
             throw_pop_empty(INTERP);
         
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         data           = PMC_array(SELF)[--size];
         PMC_size(SELF) = size;
 
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return VTABLE_get_string(INTERP, data);
     }
 
@@ -617,14 +602,12 @@ the array.
 
     VTABLE void unshift_float(FLOATVAL value) {
         PMC * const val = Parrot_pmc_new(INTERP, enum_class_Float);        
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         VTABLE_set_number_native(INTERP, val, value);
         do_unshift(INTERP, SELF, val);
     }
 
     VTABLE void unshift_integer(INTVAL value) {
         PMC * const val = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, value);
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         do_unshift(INTERP, SELF, val);
     }
 
@@ -634,7 +617,6 @@ the array.
 
     VTABLE void unshift_string(STRING *value) {
         PMC * const val = Parrot_pmc_new(INTERP, enum_class_String);
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         VTABLE_set_string_native(INTERP, val, value);
         do_unshift(INTERP, SELF, val);
     }
@@ -652,7 +634,6 @@ Creates and returns a copy of the array.
     VTABLE PMC *clone() {
         PMC * const copy = SUPER();
         
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         /* copy trimmed extra space */
         PMC_threshold(copy) = PMC_size(SELF);
 
@@ -674,8 +655,8 @@ Returns the Parrot string representation C<ResizablePMCArray>.
         INTVAL  j;
         const INTVAL n = VTABLE_elements(INTERP, SELF);
         STRING *res = CONST_STRING(INTERP, "[ ");
+        STRING *ret;
 
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         for (j = 0; j < n; ++j) {
             PMC * const val = SELF.get_pmc_keyed_int(j);
             res      = Parrot_str_concat(INTERP, res, VTABLE_get_repr(INTERP, val));
@@ -684,7 +665,8 @@ Returns the Parrot string representation C<ResizablePMCArray>.
                 res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, ", "));
         }
 
-        return Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, " ]"));
+        ret = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, " ]"));
+        return ret;
     }
 
 /*
@@ -763,13 +745,14 @@ Append the other array to this array.
 
 */
 
-    METHOD append(PMC *other) :manual_wb {
+    METHOD append(PMC *other) {
 
         const INTVAL n = VTABLE_elements(INTERP, SELF);
         const INTVAL m = VTABLE_elements(INTERP, other);
 
-        if (!m)
+        if (!m) {
             RETURN(void);
+        }
 
         /* pre-size it */
         VTABLE_set_integer_native(INTERP, SELF, n + m);
@@ -806,12 +789,12 @@ end of the array.
 
 */
 
-    METHOD shift() :manual_wb {
+    METHOD shift() {
         PMC * const value = VTABLE_shift_pmc(INTERP, SELF);
         RETURN(PMC *value);
     }
 
-    METHOD pop() :manual_wb {
+    METHOD pop() {
         PMC * const value = VTABLE_pop_pmc(INTERP, SELF);
         RETURN(PMC *value);
     }
@@ -828,11 +811,11 @@ Method forms to add a PMC to the beginning or end of the array.
 
 */
 
-    METHOD unshift(PMC* value) :manual_wb {
+    METHOD unshift(PMC* value) {
         VTABLE_unshift_pmc(INTERP, SELF, value);
     }
 
-    METHOD push(PMC* value) :manual_wb {
+    METHOD push(PMC* value) {
         VTABLE_push_pmc(INTERP, SELF, value);
     }
 

@@ -133,13 +133,16 @@ Marks the continuation as live.
             return;
 
         GET_ATTR_to_ctx(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
+        if (tmp)
+            Parrot_gc_mark_PMC_alive(INTERP, tmp);
 
         GET_ATTR_to_call_object(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
+        if (tmp)
+            Parrot_gc_mark_PMC_alive(INTERP, tmp);
 
         GET_ATTR_from_ctx(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
+        if (tmp)
+            Parrot_gc_mark_PMC_alive(INTERP, tmp);
     }
 
 /*

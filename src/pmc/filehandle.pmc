@@ -619,7 +619,7 @@ overflows on 32-bit systems.
     METHOD tell() {
         PIOOFF_T pos;
         GET_ATTR_file_pos(INTERP, SELF, pos);
-        RETURN(INTVAL pos, INTVAL pos >> 32);
+        RETURN(INTVAL pos, INTVAL pos>>32);
     }
 
 /*
