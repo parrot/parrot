@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -336,7 +336,7 @@ Returns C<struct_val>.
 
 */
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         return PMC_interp(SELF);
     }
 
@@ -350,7 +350,7 @@ Returns the thread id of the interpreter.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         const Parrot_Interp i = PMC_interp(SELF);
         if (i->thread_data)
             return (INTVAL)i->thread_data->tid;
@@ -367,7 +367,7 @@ Runs the interpreter's byte code.
 
 */
 
-    VTABLE opcode_t *invoke(void *next) {
+    VTABLE opcode_t *invoke(void *next) :no_wb {
         Interp * const new_interp = PMC_interp(SELF);
 
         /* TODO pass arguments from parent (interp) to child (new_interp) by
@@ -390,7 +390,7 @@ Return this Thread's args.
 
 */
 
-    VTABLE PMC *get_pmc() {
+    VTABLE PMC *get_pmc() :no_wb {
         UNUSED(INTERP)
         return PMC_args(SELF);
     }
@@ -420,7 +420,7 @@ Returns the PMC global value for C<key>.
 
 */
 
-    VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
+    VTABLE PMC *get_pmc_keyed_int(INTVAL key) :no_wb {
         Interp * const new_interp = PMC_interp(SELF);
         UNUSED(INTERP)
 
@@ -459,7 +459,7 @@ Introspection interface. C<key> can be:
 
 */
 
-    VTABLE PMC *get_pmc_keyed(PMC *key) {
+    VTABLE PMC *get_pmc_keyed(PMC *key) :no_wb {
         PMC    *nextkey;
         STRING *outer = NULL;
         STRING *item  = Parrot_key_string(INTERP, key);
@@ -578,7 +578,7 @@ Returns the interpreter info for C<key>.
 
 */
 
-    VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
+    VTABLE INTVAL get_integer_keyed_int(INTVAL key) :no_wb {
         Interp * const new_interp = PMC_interp(SELF);
 
         if (key == -1)
@@ -622,7 +622,7 @@ XXX this should of course call C<Parrot_clone()> and use freeze/thaw.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         PMC * const dest = clone_interpreter(PMC_interp(SELF), PARROT_CLONE_DEFAULT);
         UNUSED(INTERP)
 
@@ -684,14 +684,14 @@ Finish thawing.
 
 */
 
-    VTABLE void freeze(PMC *info) {
+    VTABLE void freeze(PMC *info) :no_wb {
         UNUSED(SELF)
         UNUSED(info)
         Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
                 "Attempt to freeze interpreter");
     }
 
-    METHOD run_gc() {
+    METHOD run_gc() :manual_wb {
         UNUSED(INTERP)
         Parrot_gc_mark_and_sweep(PMC_interp(SELF), 0);
     }
@@ -706,7 +706,7 @@ Map core_type to hll_type.
 
 */
 
-    METHOD hll_map(PMC *core_type, PMC *hll_type) {
+    METHOD hll_map(PMC *core_type, PMC *hll_type) :no_wb {
         const INTVAL core_type_id = VTABLE_type(INTERP, core_type);
         const INTVAL hll_type_id  = VTABLE_type(INTERP, hll_type);
         const INTVAL hll_id       = Parrot_pcc_get_HLL(INTERP, CURRENT_CONTEXT(INTERP));
@@ -727,7 +727,7 @@ If no PMC object is provided, the current standard input handle is returned.
 
 */
 
-    METHOD stdin_handle(PMC *newhandle :optional) {
+    METHOD stdin_handle(PMC *newhandle :optional) :no_wb {
         PMC * const handle = Parrot_io_stdhandle(INTERP, PIO_STDIN_FILENO, newhandle);
         UNUSED(SELF)
         RETURN(PMC *handle);
@@ -746,7 +746,7 @@ If no PMC object is provided, the current standard output handle is returned.
 
 */
 
-    METHOD stdout_handle(PMC *newhandle :optional) {
+    METHOD stdout_handle(PMC *newhandle :optional) :no_wb {
         PMC * const handle = Parrot_io_stdhandle(INTERP, PIO_STDOUT_FILENO, newhandle);
         RETURN(PMC *handle);
     }
@@ -764,7 +764,7 @@ If no PMC object is provided, the current standard error handle is returned.
 
 */
 
-    METHOD stderr_handle(PMC *newhandle :optional) {
+    METHOD stderr_handle(PMC *newhandle :optional) :no_wb {
         PMC * const handle = Parrot_io_stdhandle(INTERP, PIO_STDERR_FILENO, newhandle);
         RETURN(PMC *handle);
     }
@@ -780,7 +780,7 @@ support it.
 
 */
 
-    METHOD getpid() {
+    METHOD getpid() :no_wb {
         const INTVAL id = Parrot_getpid();
         RETURN(INTVAL id);
     }
@@ -795,7 +795,7 @@ Returns the task currently executed by this interpreter.
 
 */
 
-    METHOD current_task() {
+    METHOD current_task() :no_wb {
         Interp * const this_interp = PMC_interp(SELF);
         PMC * const current_task = this_interp->cur_task;
         RETURN(PMC *current_task);
@@ -811,7 +811,7 @@ Schedules the given task on this interpreter.
 
 */
 
-    METHOD schedule(PMC *task) {
+    METHOD schedule(PMC *task) :no_wb {
         Interp * const this_interp = PMC_interp(SELF);
         Parrot_cx_schedule_immediate(this_interp, task);
     }
@@ -826,7 +826,7 @@ Schedules the given task on the proxy's interpreter.
 
 */
 
-    METHOD schedule_proxied(PMC *task, PMC *proxy) {
+    METHOD schedule_proxied(PMC *task, PMC *proxy) :no_wb {
         Parrot_Proxy_attributes * const core_struct    = PARROT_PROXY(proxy);
         Interp                  * const proxied_interp = core_struct->interp;
         UNUSED(SELF)

@@ -173,6 +173,7 @@ Resizes the array to C<size> elements.
         else if (size <= PMC_threshold(SELF)) {
 
             PMC_size(SELF) = size;
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             /* we could shrink here if necessary */
             return;
         }
@@ -199,8 +200,8 @@ Resizes the array to C<size> elements.
 
             PMC_threshold(SELF) = cur;
             PMC_size(SELF)      = size;
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
     }
 
 /*
@@ -232,7 +233,7 @@ TODO: Check whether there is already an element that can be shifted
         value = VTABLE_get_number(INTERP, PMC_array(SELF)[0]);
         do_shift(SELF);
         
-        return value;
+        RETURN(FLOATVAL value);
     }
 
     VTABLE INTVAL shift_integer() {
@@ -245,7 +246,7 @@ TODO: Check whether there is already an element that can be shifted
         value = VTABLE_get_integer(INTERP, PMC_array(SELF)[0]);
         do_shift(SELF);
         
-        return value;
+        RETURN(INTVAL value);
     }
 
     VTABLE PMC *shift_pmc() {
@@ -258,7 +259,7 @@ TODO: Check whether there is already an element that can be shifted
         data = PMC_array(SELF)[0];
         do_shift(SELF);
 
-        return data;
+        RETURN(PMC *data);
     }
 
     VTABLE STRING *shift_string() {
@@ -271,7 +272,7 @@ TODO: Check whether there is already an element that can be shifted
         value = VTABLE_get_string(INTERP, PMC_array(SELF)[0]);
         do_shift(SELF);
         
-        return value;
+        RETURN(STRING *value);
     }
 
 
@@ -285,7 +286,7 @@ Returns the PMC value of the element at index C<key>.
 
 */
 
-    VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
+    VTABLE PMC *get_pmc_keyed_int(INTVAL key) :no_wb {
         PMC **data;
 
         if (key < 0)
@@ -333,17 +334,15 @@ Sets the PMC value of the element keyed by C<key> to C<*src>.
         if (key >= PMC_size(SELF))
             SELF.set_integer_native(key+1);
 
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         data      = PMC_array(SELF);
-
         data[key] = src;
     }
 
-    VTABLE void set_pmc_keyed(PMC *key, PMC *src) :no_wb {
+    VTABLE void set_pmc_keyed(PMC *key, PMC *src) :manual_wb {
         SUPER(key, src);
     }
 
-    VTABLE void set_pmc(PMC *value) :no_wb {
+    VTABLE void set_pmc(PMC *value) {
         INTVAL size;
         INTVAL i;
 
@@ -378,7 +377,7 @@ Delete the element at index C<key>.
 
 */
 
-    VTABLE void delete_keyed(PMC *key) :no_wb {
+    VTABLE void delete_keyed(PMC *key) {
         const INTVAL idx  = VTABLE_get_integer(INTERP, key);
         SELF.delete_keyed_int(idx);
     }
@@ -406,7 +405,7 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
 =cut
 
 */
-    VTABLE INTVAL exists_keyed_int(INTVAL key) {
+    VTABLE INTVAL exists_keyed_int(INTVAL key) :no_wb {
         PMC **data;
         PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         if (key < 0)
@@ -434,7 +433,7 @@ Returns TRUE is the element at C<key> is defined; otherwise returns false.
 
 */
 
-    VTABLE INTVAL defined_keyed_int(INTVAL key) :manual_wb {
+    VTABLE INTVAL defined_keyed_int(INTVAL key) :no_wb {
         PMC *val;
 
         if (key < 0)
@@ -446,11 +445,9 @@ Returns TRUE is the element at C<key> is defined; otherwise returns false.
         val = SELF.get_pmc_keyed_int(key);
 
         if (PMC_IS_NULL(val)) {
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             return 0;
         }
 
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return VTABLE_defined(INTERP, val);
     }
 
@@ -525,7 +522,7 @@ Removes and returns the last element in the array.
 
 */
 
-    VTABLE FLOATVAL pop_float() {
+    VTABLE FLOATVAL pop_float() :manual_wb {
 
         INTVAL   size = PMC_size(SELF);
         PMC     *data;
@@ -536,10 +533,11 @@ Removes and returns the last element in the array.
         data           = PMC_array(SELF)[--size];
         PMC_size(SELF) = size;
 
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return VTABLE_get_number(INTERP, data);
     }
 
-    VTABLE INTVAL pop_integer() {
+    VTABLE INTVAL pop_integer() :manual_wb {
 
         INTVAL  size = PMC_size(SELF);
         PMC    *data;
@@ -550,6 +548,7 @@ Removes and returns the last element in the array.
         data           = PMC_array(SELF)[--size];
         PMC_size(SELF) = size;
 
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return VTABLE_get_integer(INTERP, data);
     }
 
@@ -611,7 +610,7 @@ the array.
         do_unshift(INTERP, SELF, val);
     }
 
-    VTABLE void unshift_pmc(PMC *value) :no_wb {
+    VTABLE void unshift_pmc(PMC *value) {
         do_unshift(INTERP, SELF, value);
     }
 
@@ -631,7 +630,7 @@ Creates and returns a copy of the array.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         PMC * const copy = SUPER();
         
         /* copy trimmed extra space */
@@ -650,7 +649,7 @@ Returns the Parrot string representation C<ResizablePMCArray>.
 
 */
 
-    VTABLE STRING *get_repr() {
+    VTABLE STRING *get_repr() :no_wb {
 
         INTVAL  j;
         const INTVAL n = VTABLE_elements(INTERP, SELF);
@@ -690,8 +689,6 @@ Note that the C<from> PMC can be of any of the various array types.
         INTVAL tail;
         INTVAL i;
         
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
-
         /* start from end? */
         if (offset < 0)
             offset += elems0;

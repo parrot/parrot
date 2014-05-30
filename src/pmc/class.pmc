@@ -755,7 +755,7 @@ Returns the name of the class (without the HLL namespace).
 
 */
 
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         return make_class_name(INTERP, SELF);
     }
 
@@ -769,7 +769,7 @@ Marks any referenced strings and PMCs in the structure as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
         Parrot_gc_mark_STRING_alive(INTERP, _class->name);
         Parrot_gc_mark_STRING_alive(INTERP, _class->fullname);
@@ -1119,7 +1119,7 @@ Array of Class PMCs representing the direct parents of this class.
 =cut
 
 */
-    VTABLE PMC *inspect_str(STRING *what) {
+    VTABLE PMC *inspect_str(STRING *what) :no_wb {
         Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
 
         /* What should we return? */
@@ -1194,7 +1194,7 @@ inspect_str.
 =cut
 
 */
-    VTABLE PMC *inspect() {
+    VTABLE PMC *inspect() :no_wb {
         /* Create a hash, then use inspect_str to get all of the data to
          * fill it up with. */
         PMC    * const metadata    = Parrot_pmc_new(INTERP, enum_class_Hash);
@@ -1241,7 +1241,7 @@ namespace). Unsets the instantiated flag, allowing modifications.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         Parrot_Class_attributes * const _class    = PARROT_CLASS(SELF);
 
         /* Create the new class PMC, of the same type of this one (we may
@@ -1285,7 +1285,7 @@ unset to allow further modifications.
 
 */
 
-    VTABLE PMC *clone_pmc(PMC *args) {
+    VTABLE PMC *clone_pmc(PMC *args) :no_wb {
         /* Do the standard clone. */
         PMC * const copy = SELF.clone();
 
@@ -1304,7 +1304,7 @@ Creates a new PMC object of the type of the class and calls init().
 
 */
 
-    VTABLE PMC *instantiate(PMC *init) {
+    VTABLE PMC *instantiate(PMC *init) :no_wb {
         Parrot_Class_attributes  * const _class = PARROT_CLASS(SELF);
         PMC                      *object;
 
@@ -1415,7 +1415,7 @@ Returns whether the class is or inherits from C<*class>.
 
 */
 
-    VTABLE INTVAL isa_pmc(PMC *lookup) {
+    VTABLE INTVAL isa_pmc(PMC *lookup) :no_wb {
         Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
         PMC          *classobj;
         HashBucket   *b;
@@ -1493,7 +1493,7 @@ Returns whether the class is or inherits from C<*classname>.
 
 */
 
-    VTABLE INTVAL isa(STRING *classname) {
+    VTABLE INTVAL isa(STRING *classname) :no_wb {
         PMC *want_class;
 
         /* hard-code this one exception right away */
@@ -1534,7 +1534,7 @@ Returns whether the class does the role with the given C<*role_name>.
 =cut
 
 */
-    VTABLE INTVAL does(STRING *role_name) {
+    VTABLE INTVAL does(STRING *role_name) :no_wb {
         Parrot_Class_attributes * const _class    = PARROT_CLASS(SELF);
         PMC          * const role_list = _class->roles;
         INTVAL i, count;
@@ -1575,7 +1575,7 @@ Returns whether the class does the given C<*role>.
 =cut
 
 */
-    VTABLE INTVAL does_pmc(PMC *role) {
+    VTABLE INTVAL does_pmc(PMC *role) :no_wb {
         Parrot_Class_attributes * const _class    = PARROT_CLASS(SELF);
         PMC * const role_list          = _class->roles;
         INTVAL i, role_count, count;
@@ -1643,7 +1643,7 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
 
 */
 
-    VTABLE void visit(PMC *info) {
+    VTABLE void visit(PMC *info) :no_wb {
         /* 1) visit the attribute description hash */
         VISIT_PMC_ATTR(INTERP, info, SELF, Class, attrib_metadata);
 
@@ -1673,7 +1673,7 @@ Used to archive the class.
 
 */
 
-    VTABLE void freeze(PMC *info) {
+    VTABLE void freeze(PMC *info) :no_wb {
         Parrot_Class_attributes * const class_data = PARROT_CLASS(SELF);
         STRING       *serial_namespace = CONST_STRING(INTERP, "");
 
@@ -1691,6 +1691,7 @@ Used to archive the class.
                 serial_namespace = Parrot_str_join(INTERP, CONST_STRING(INTERP, ";"), names);
         }
         VTABLE_push_string(INTERP, info, serial_namespace);
+        PARROT_GC_WRITE_BARRIER(INTERP, info);
     }
 
 /*
@@ -1755,7 +1756,7 @@ with functions like Parrot_pmc_new and pmc_reuse, which take type ID numbers sti
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         UNUSED(INTERP)
         return PARROT_CLASS(SELF)->id;
     }
@@ -1824,7 +1825,7 @@ Gets the namespace that this class is attached to.
 =cut
 
 */
-    METHOD get_namespace(PMC *_namespace :optional, int has_name :opt_flag) {
+    METHOD get_namespace(PMC *_namespace :optional, int has_name :opt_flag) :no_wb {
         Parrot_Class_attributes * const _class        = PARROT_CLASS(SELF);
         PMC          * const ret_namespace = _class->_namespace;
         UNUSED(_namespace);
@@ -1842,7 +1843,7 @@ methods from roles. When called with no parameter, returns the list.
 =cut
 
 */
-    METHOD resolve_method(PMC *resolve_list :optional, int has_list :opt_flag) {
+    METHOD resolve_method(PMC *resolve_list :optional, int has_list :opt_flag) :no_wb {
         Parrot_Class_attributes * const _class   = PARROT_CLASS(SELF);
         PMC *ret_list;
 
@@ -1916,7 +1917,7 @@ Return a hash where the keys are method names and the values are methods.
 =cut
 
 */
-    METHOD methods() {
+    METHOD methods() :no_wb {
         PMC * const ret_methods = SELF.inspect_str(CONST_STRING(INTERP, "methods"));
 
         RETURN(PMC *ret_methods);
@@ -1973,7 +1974,7 @@ Walks the MRO of the class and finds the method with the given name.
 
 */
 
-    METHOD find_method(STRING *name) {
+    METHOD find_method(STRING *name) :no_wb {
         Parrot_Class_attributes * const  _class    = PARROT_CLASS(SELF);
         int i;
 
@@ -2005,7 +2006,7 @@ Returns the parents array PMC.
 =cut
 
 */
-    METHOD parents() {
+    METHOD parents() :no_wb {
         PMC * const ret_parents = SELF.inspect_str(CONST_STRING(INTERP, "parents"));
 
         RETURN(PMC *ret_parents);
@@ -2033,7 +2034,7 @@ Returns the roles array PMC.
 =cut
 
 */
-    METHOD roles() {
+    METHOD roles() :no_wb {
         PMC * const ret_roles = SELF.inspect_str(CONST_STRING(INTERP, "roles"));
 
         RETURN(PMC *ret_roles);
@@ -2093,7 +2094,7 @@ parameter is supplied, a particular item of introspection data.
 =cut
 
 */
-    METHOD inspect(STRING *what :optional, int has_what :opt_flag) {
+    METHOD inspect(STRING *what :optional, int has_what :opt_flag) :no_wb {
         PMC *found;
 
         /* Just delegate to the appropriate vtable. */
@@ -2115,7 +2116,7 @@ C<class_name>, false otherwise.
 =cut
 
 */
-    METHOD isa(STRING *class_name) {
+    METHOD isa(STRING *class_name) :no_wb {
         const INTVAL isa = SELF.isa(class_name);
 
         RETURN(INTVAL isa);
@@ -2131,7 +2132,7 @@ false otherwise.
 =cut
 
 */
-    METHOD does(STRING *role_name) {
+    METHOD does(STRING *role_name) :no_wb {
         const INTVAL does = VTABLE_does(INTERP, SELF, role_name);
         RETURN(INTVAL does);
     }
@@ -2143,7 +2144,7 @@ false otherwise.
             attrs->meth_cache = PMCNULL;
     }
 
-    METHOD get_method_cache() {
+    METHOD get_method_cache() :no_wb {
         Parrot_Class_attributes * const attrs = PARROT_CLASS(SELF);
         PMC * cache = attrs->meth_cache;
         if (!cache) {

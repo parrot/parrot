@@ -201,7 +201,7 @@ pmclass LexPad provides hash no_ro auto_attrs {
     ATTR PMC *lexinfo;
     ATTR PMC *ctx;
 
-    VTABLE void init() {
+    VTABLE void init() :no_wb {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Cannot create a LexPad PMC without an initializer");
     }
@@ -256,14 +256,14 @@ Return the LexInfo PMC, if any or a Null PMC.
         SET_ATTR_ctx(INTERP, SELF, (PMC *)ctx);
     }
 
-    VTABLE INTVAL elements() {
+    VTABLE INTVAL elements() :no_wb {
         PMC *info;
         GET_ATTR_lexinfo(INTERP, SELF, info);
         return Parrot_hash_size(INTERP,
                 (Hash *)VTABLE_get_pointer(INTERP, info));
     }
 
-    VTABLE INTVAL exists_keyed_str(STRING *name) {
+    VTABLE INTVAL exists_keyed_str(STRING *name) :no_wb {
         PMC  *info;
         const Hash *hash;
         GET_ATTR_lexinfo(INTERP, SELF, info);
@@ -274,12 +274,12 @@ Return the LexInfo PMC, if any or a Null PMC.
             : 0;
     }
 
-    VTABLE INTVAL exists_keyed(PMC *name) {
+    VTABLE INTVAL exists_keyed(PMC *name) :no_wb {
         STRING * const s = VTABLE_get_string(INTERP, name);
         return SELF.exists_keyed_str(s);
     }
 
-    VTABLE PMC *get_pmc_keyed_str(STRING *name) {
+    VTABLE PMC *get_pmc_keyed_str(STRING *name) :no_wb {
         PMC    *info;
         PMC    *ctx;
         INTVAL  reg;
@@ -293,7 +293,7 @@ Return the LexInfo PMC, if any or a Null PMC.
         return CTX_REG_PMC(INTERP, ctx, reg);
     }
 
-    VTABLE INTVAL get_integer_keyed_str(STRING *name) {
+    VTABLE INTVAL get_integer_keyed_str(STRING *name) :no_wb {
         PMC    *info;
         PMC    *ctx;
         INTVAL  reg;
@@ -307,7 +307,7 @@ Return the LexInfo PMC, if any or a Null PMC.
         return CTX_REG_INT(INTERP, ctx, reg);
     }
 
-    VTABLE FLOATVAL get_number_keyed_str(STRING *name) {
+    VTABLE FLOATVAL get_number_keyed_str(STRING *name) :no_wb {
         PMC    *info;
         PMC    *ctx;
         INTVAL  reg;
@@ -321,7 +321,7 @@ Return the LexInfo PMC, if any or a Null PMC.
         return CTX_REG_NUM(INTERP, ctx, reg);
     }
 
-    VTABLE STRING *get_string_keyed_str(STRING *name) {
+    VTABLE STRING *get_string_keyed_str(STRING *name) :no_wb {
         PMC    *info;
         PMC    *ctx;
         INTVAL  reg;
@@ -335,22 +335,22 @@ Return the LexInfo PMC, if any or a Null PMC.
         return CTX_REG_STR(INTERP, ctx, reg);
     }
 
-    VTABLE PMC *get_pmc_keyed(PMC *name) {
+    VTABLE PMC *get_pmc_keyed(PMC *name) :no_wb {
         STRING * const s = VTABLE_get_string(INTERP, name);
         return SELF.get_pmc_keyed_str(s);
     }
 
-    VTABLE INTVAL get_integer_keyed(PMC *name) {
+    VTABLE INTVAL get_integer_keyed(PMC *name) :no_wb {
         STRING * const s = VTABLE_get_string(INTERP, name);
         return SELF.get_integer_keyed_str(s);
     }
 
-    VTABLE FLOATVAL get_number_keyed(PMC *name) {
+    VTABLE FLOATVAL get_number_keyed(PMC *name) :no_wb {
         STRING * const s = VTABLE_get_string(INTERP, name);
         return SELF.get_number_keyed_str(s);
     }
 
-    VTABLE STRING *get_string_keyed(PMC *name) {
+    VTABLE STRING *get_string_keyed(PMC *name) :no_wb {
         STRING * const s = VTABLE_get_string(INTERP, name);
         return SELF.get_string_keyed_str(s);
     }
@@ -365,7 +365,6 @@ Return the LexInfo PMC, if any or a Null PMC.
 
         GET_ATTR_ctx(INTERP, SELF, ctx);
         CTX_REG_PMC(INTERP, ctx, reg) = value;
-        PARROT_GC_WRITE_BARRIER(INTERP, ctx);
     }
 
     VTABLE void set_integer_keyed_str(STRING *name, INTVAL value) {
@@ -402,7 +401,6 @@ Return the LexInfo PMC, if any or a Null PMC.
 
         GET_ATTR_ctx(INTERP, SELF, ctx);
         CTX_REG_STR(INTERP, ctx, reg) = value;
-        PARROT_GC_WRITE_BARRIER(INTERP, ctx);
     }
 
     VTABLE void set_pmc_keyed(PMC *name, PMC *value) {
@@ -425,7 +423,7 @@ Return the LexInfo PMC, if any or a Null PMC.
         SELF.set_string_keyed_str(s, value);
     }
 
-    METHOD get_lexinfo() {
+    METHOD get_lexinfo() :no_wb {
         PMC *lexinfo;
         GET_ATTR_lexinfo(INTERP, SELF, lexinfo);
         RETURN(PMC *lexinfo);
@@ -445,7 +443,8 @@ Get iterator for declared lexicals.
         PMC    *ctx;
         PMC    *info_iter;
         PMC    *value_map = Parrot_pmc_new(INTERP, enum_class_Hash);
-        Hash *  hash;
+        Hash   *hash;
+        PMC    *iter;
 
         GET_ATTR_lexinfo(INTERP, SELF, info);
         GET_ATTR_ctx(INTERP, SELF, ctx);
@@ -486,7 +485,8 @@ Get iterator for declared lexicals.
                     throw_wrong_register_type(INTERP, name);
             }
         }
-        return VTABLE_get_iter(INTERP, value_map);
+        iter = VTABLE_get_iter(INTERP, value_map);
+        RETURN(PMC *iter);
     }
 
 /*
@@ -513,7 +513,7 @@ Returns a number based on the type of the variable named name.
 
 */
 
-    METHOD INTVAL register_type(STRING *name) {
+    METHOD INTVAL register_type(STRING *name) :no_wb {
         PMC *info;
         HashBucket *b;
         INTVAL ret = -1;

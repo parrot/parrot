@@ -124,7 +124,7 @@ Don't mark target and interp since they belong to a different interpreter.
 =cut
 
 */
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         UNUSED(INTERP)
         UNUSED(SELF)
     }

@@ -45,7 +45,7 @@ Initializes the PMC.
 
 */
 
-    VTABLE void init() :no_wb {
+    VTABLE void init() {
         PARROT_IMAGEIOTHAW(SELF)->seen =
             Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
         PARROT_IMAGEIOTHAW(SELF)->todo =
@@ -67,7 +67,7 @@ Destroys the PMC.
 
 */
 
-    VTABLE void destroy() :no_wb {
+    VTABLE void destroy() {
         PackFile_destroy(INTERP, PARROT_IMAGEIOTHAW(SELF)->pf);
         PARROT_IMAGEIOTHAW(SELF)->pf = NULL;
     }
@@ -100,7 +100,7 @@ Thaws the PMC contained in C<image>.
 
 */
 
-    VTABLE void set_string_native(STRING *image) :no_wb {
+    VTABLE void set_string_native(STRING *image) {
         if (!PObj_external_TEST(image))
             Parrot_str_pin(INTERP, image);
 
@@ -138,7 +138,6 @@ Thaws the PMC contained in C<image>.
             PMC * const todo = PARROT_IMAGEIOTHAW(SELF)->todo;
             INTVAL i, n;
             
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             for (i = 0; i < VTABLE_elements(INTERP, todo); i++) {
                 const INTVAL idx = VTABLE_get_integer_keyed_int(INTERP, todo, i);
                 PMC * const current = VTABLE_get_pmc_keyed_int(INTERP, seen, idx);
@@ -216,7 +215,7 @@ Set an exterior constant table to use for cross-referencing constants.
 
 */
 
-    VTABLE void set_pointer(void *value) :no_wb {
+    VTABLE void set_pointer(void *value) {
         UNUSED(INTERP)
         PObj_flag_SET(private1, SELF);
         PARROT_IMAGEIOTHAW(SELF)->pf_ct = (PackFile_ConstTable *)value;
@@ -242,8 +241,7 @@ Retrieve an integer as the next item from the image.
         PARROT_IMAGEIOTHAW(SELF)->curs = (opcode_t *)PARROT_const_cast(unsigned char *,
                                                                     stream + pf->header->wordsize);
         BYTECODE_SHIFT_OK(INTERP, SELF);
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
-        return i;
+        RETURN(INTVAL i);
     }
 
 
@@ -264,8 +262,7 @@ Retrieve a float as the next item from the image.
         DECL_CONST_CAST;
         PARROT_IMAGEIOTHAW(SELF)->curs = PARROT_const_cast(opcode_t *, curs);
         BYTECODE_SHIFT_OK(INTERP, SELF);
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
-        return f;
+        RETURN(FLOATVAL f);
     }
 
 
@@ -279,7 +276,7 @@ Retrieve a string as the next item from the image.
 
 */
 
-    VTABLE STRING *shift_string() {
+    VTABLE STRING *shift_string() :manual_wb {
         if (PObj_flag_TEST(private1, SELF)) {
             const INTVAL i = STATICSELF.shift_integer();
             BYTECODE_SHIFT_OK(INTERP, SELF);
@@ -327,8 +324,6 @@ Retrieve a PMC as the next item from the image.
         PMC           *seen         = PARROT_IMAGEIOTHAW(SELF)->seen;
         PMC           *todo         = PARROT_IMAGEIOTHAW(SELF)->todo;
         
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
-
         switch (packid_flags) {
           case enum_PackID_seen:
             if (id) /* got a non-NULL PMC */
@@ -367,7 +362,7 @@ Retrieve a PMC as the next item from the image.
             break;
         }
 
-        return pmc;
+        RETURN(PMC *pmc);
     }
 
 }

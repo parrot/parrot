@@ -179,7 +179,7 @@ Return true if active, false otherwise.
 
 */
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         #ifdef ENABLED
         unsigned char *buffer;
         GET_ATTR_buffer(INTERP, SELF, buffer);

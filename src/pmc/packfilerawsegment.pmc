@@ -63,7 +63,7 @@ Marks the object as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         Parrot_PackfileRawSegment_attributes * const attrs =
                 PARROT_PACKFILERAWSEGMENT(SELF);
 
@@ -146,7 +146,7 @@ Get the number of elements in the array.
                 PARROT_PACKFILERAWSEGMENT(SELF)->opcodes);
     }
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         return VTABLE_elements(INTERP,
                 PARROT_PACKFILERAWSEGMENT(SELF)->opcodes);
     }

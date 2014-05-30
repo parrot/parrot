@@ -66,7 +66,7 @@ Create a copy of the alarm.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         PMC * const copy = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         Parrot_Alarm_attributes * const new_struct = PARROT_ALARM(copy);
@@ -88,7 +88,7 @@ Returns the PMC associated with C<key>.
 
 */
 
-    VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
+    VTABLE PMC *get_pmc_keyed_int(INTVAL key) :no_wb {
         switch (key) {
             case PARROT_ALARM_TASK:
                 return PARROT_ALARM(SELF)->alarm_task;
@@ -112,7 +112,7 @@ Returns the number associated with C<key>.
 
 */
 
-    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
+    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) :no_wb {
         UNUSED(INTERP)
         if (key == PARROT_ALARM_TIME)
             return PARROT_ALARM(SELF)->alarm_time;
@@ -130,7 +130,7 @@ Having the alarm numify to the time is convienient for sorting.
 
 */
 
-    VTABLE FLOATVAL get_number() {
+    VTABLE FLOATVAL get_number() :no_wb {
         UNUSED(INTERP)
         return PARROT_ALARM(SELF)->alarm_time;
     }
@@ -160,7 +160,7 @@ Schedules the alarm and adds it to the alarm queue.
 
 */
 
-    VTABLE opcode_t *invoke(void *next) {
+    VTABLE opcode_t *invoke(void *next) :no_wb {
         Parrot_cx_schedule_alarm(INTERP, SELF);
         return (opcode_t *)next;
     }
@@ -186,20 +186,20 @@ Required functions for GC and Freeze / Thaw.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         PMC *sub;
         GET_ATTR_alarm_task(INTERP, SELF, sub);
         Parrot_gc_mark_PMC_alive(INTERP, sub);
     }
 
-    VTABLE void visit(PMC *info) {
+    VTABLE void visit(PMC *info) :no_wb {
         PMC *sub;
         GET_ATTR_alarm_task(INTERP, SELF, sub);
         VISIT_PMC(INTERP, info, sub);
         SUPER(info);
     }
 
-    VTABLE void freeze(PMC *info) {
+    VTABLE void freeze(PMC *info) :no_wb {
         SUPER(info);
         VTABLE_push_integer(INTERP, info, VTABLE_elements(INTERP, SELF));
     }

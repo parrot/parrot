@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -196,7 +196,7 @@ information.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         INTVAL   id;
         STRING   *message;
@@ -246,11 +246,11 @@ throwing and handling information.
 
 */
 
-    VTABLE void visit(PMC *visit) {
+    VTABLE void visit(PMC *visit) :no_wb {
         VISIT_PMC_ATTR(INTERP, visit, SELF, Exception, payload);
     }
 
-    VTABLE void freeze(PMC *visit) {
+    VTABLE void freeze(PMC *visit) :no_wb {
         INTVAL type, severity, exit_code;
         STRING *message;
 
@@ -294,7 +294,7 @@ Mark any active exception data as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         Parrot_Exception_attributes * const core_struct = PARROT_EXCEPTION(SELF);
         Parrot_gc_mark_STRING_alive(INTERP, core_struct->message);
         Parrot_gc_mark_PMC_alive(INTERP, core_struct->payload);
@@ -316,7 +316,7 @@ Return true.
 
 */
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         return 1;
     }
 
@@ -330,7 +330,7 @@ Return the exception message.
 
 */
 
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         STRING *message;
         GET_ATTR_message(INTERP, SELF, message);
         if (STRING_IS_NULL(message))
@@ -348,7 +348,7 @@ Returns the id of the exception.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         const Parrot_Exception_attributes * const exception = PARROT_EXCEPTION(SELF);
         UNUSED(INTERP)
         return exception->id;
@@ -365,7 +365,7 @@ C<key> is "message".
 
 */
 
-    VTABLE STRING *get_string_keyed(PMC *key) {
+    VTABLE STRING *get_string_keyed(PMC *key) :no_wb {
         STRING * const name = VTABLE_get_string(INTERP, key);
         STRING *message;
 
@@ -391,7 +391,7 @@ Returns the integer value for C<*key>.
 
 */
 
-    VTABLE INTVAL get_integer_keyed_str(STRING *key) {
+    VTABLE INTVAL get_integer_keyed_str(STRING *key) :no_wb {
         INTVAL result = 0;
         switch (getAttrEnum(INTERP, key)) {
           case attr_type:
@@ -428,7 +428,7 @@ Returns the integer value for C<*key>.
 
 */
 
-    VTABLE INTVAL get_integer_keyed(PMC *key) {
+    VTABLE INTVAL get_integer_keyed(PMC *key) :no_wb {
         STRING * const name = VTABLE_get_string(INTERP, key);
         return SELF.get_integer_keyed_str(name);
     }
@@ -443,7 +443,7 @@ Returns the PMC value for C<*key>.
 
 */
 
-    VTABLE PMC *get_pmc_keyed(PMC *key) {
+    VTABLE PMC *get_pmc_keyed(PMC *key) :no_wb {
         STRING * const s = VTABLE_get_string(INTERP, key);
         return SELF.get_attr_str(s);
     }
@@ -605,7 +605,7 @@ Retrieve a context stored for the handler iterator.
 
 */
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         const Parrot_Exception_attributes * const core_struct = PARROT_EXCEPTION(SELF);
         UNUSED(INTERP)
         return core_struct->handler_ctx;
@@ -622,7 +622,7 @@ exit_code.
 =cut
 
 */
-    VTABLE INTVAL is_equal(PMC *value) {
+    VTABLE INTVAL is_equal(PMC *value) :no_wb {
         STRING * const exception_str = CONST_STRING(INTERP, "Exception");
 
         if (value->vtable->base_type == SELF->vtable->base_type
@@ -654,7 +654,7 @@ Retrieve an attribute value for the exception object.
 =cut
 
 */
-    VTABLE PMC *get_attr_str(STRING *name) {
+    VTABLE PMC *get_attr_str(STRING *name) :no_wb {
         PMC *value = PMCNULL;
 
         switch (getAttrEnum(INTERP, name)) {

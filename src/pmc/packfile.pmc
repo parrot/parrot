@@ -152,7 +152,7 @@ Marks the Packfile as alive.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);
 
         Parrot_gc_mark_STRING_alive(INTERP, attrs->uuid);

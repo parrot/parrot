@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2010-2012, Parrot Foundation.
-$Id$
+Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -39,7 +38,7 @@ Actually run the callback.
 
 */
 
-    VTABLE opcode_t *invoke(void *next) {
+    VTABLE opcode_t *invoke(void *next) :no_wb {
         Parrot_Callback_attributes *cb_data = PARROT_CALLBACK(SELF);
         PMC *user_data = cb_data->user_data;
         PMC *ext_data  = cb_data->external_data;

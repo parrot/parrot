@@ -375,7 +375,7 @@ Marks the namespace as live.
 =cut
 
 */
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
 
         SUPER();
@@ -544,7 +544,7 @@ really a public API.
             "Invalid namespace key in set_pmc_keyed");
     }
 
-    VTABLE PMC *get_pmc_keyed_str(STRING *key) {
+    VTABLE PMC *get_pmc_keyed_str(STRING *key) :no_wb {
         Hash * const hash = (Hash *)SELF.get_pointer();
         PMC *ns = (PMC *)Parrot_hash_get(INTERP, hash, key);
 
@@ -558,7 +558,7 @@ really a public API.
         return ns;
     }
 
-    VTABLE PMC *get_pmc_keyed(PMC *key) {
+    VTABLE PMC *get_pmc_keyed(PMC *key) :no_wb {
         PMC *ns = SUPER(key);
         /* Is this equivalent?
         PMC    *ns = INTERP->vtables[enum_class_Hash]->get_pmc_keyed(INTERP, SELF, key);
@@ -608,7 +608,7 @@ really a public API.
         */
     }
 
-    VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
+    VTABLE PMC *get_pmc_keyed_int(INTVAL key) :no_wb {
         Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
         PMC              * const vtable = nsinfo->vtable;
 
@@ -636,7 +636,7 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
 
 */
 
-    VTABLE void *get_pointer_keyed_str(STRING *key) {
+    VTABLE void *get_pointer_keyed_str(STRING *key) :no_wb {
         PMC  *ns;
         Hash *hash;
         GETATTR_NameSpace_hash(INTERP, SELF, hash);
@@ -652,7 +652,7 @@ TOTAL KLUDGE.  ON THE CHOPPING BLOCK.
         RETURN(PMC *ns);
     }
 
-    VTABLE void *get_pointer_keyed(PMC *key) {
+    VTABLE void *get_pointer_keyed(PMC *key) :no_wb {
         PMC    *ns = SELF;
 
         if (PMC_IS_NULL(key))
@@ -747,7 +747,7 @@ Includes vtable overrides composed in from roles.
 
 */
 
-    VTABLE PMC *inspect_str(STRING *what) {
+    VTABLE PMC *inspect_str(STRING *what) :no_wb {
         const Parrot_NameSpace_attributes * const nsinfo = PARROT_NAMESPACE(SELF);
         PMC *found;
 

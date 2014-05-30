@@ -62,7 +62,7 @@ Marks the PMC as alive.
 =cut
 
 */
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         Parrot_gc_mark_PMC_alive(INTERP, PARROT_IMAGEIOSTRINGS(SELF)->todo);
         Parrot_gc_mark_PMC_alive(INTERP, PARROT_IMAGEIOSTRINGS(SELF)->seen);
         Parrot_gc_mark_PMC_alive(INTERP, PARROT_IMAGEIOSTRINGS(SELF)->list);
@@ -93,7 +93,7 @@ Returns the flags describing the visit action
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         UNUSED(INTERP)
         UNUSED(SELF)
         return VISIT_FREEZE_NORMAL;

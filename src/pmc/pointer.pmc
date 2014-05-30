@@ -51,7 +51,7 @@ Marks the pointer as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         void (*mark_function)(Interp *, void *) =
             (void (*)(Interp *, void *))D2FPTR(PARROT_POINTER(SELF)->mark_function);
         void * const data = PARROT_POINTER(SELF)->pointer;
@@ -115,7 +115,7 @@ Returns the pointer value as an integer.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         UNUSED(INTERP)
         return (INTVAL)(PARROT_POINTER(SELF)->pointer);
     }
@@ -174,7 +174,7 @@ Returns whether the pointer is not C<NULL>.
 
 */
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         UNUSED(INTERP)
         return (INTVAL)(PMC_data(SELF) != NULL);
     }

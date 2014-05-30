@@ -107,7 +107,7 @@ Get or set the custom C<mark> function.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         void               *ptr;
         ptrobj_mark_func_t  mark;
         GET_ATTR_ptr(INTERP, SELF, ptr);

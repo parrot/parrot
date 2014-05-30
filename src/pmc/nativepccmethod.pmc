@@ -63,7 +63,7 @@ Set the pointer to the native function and the PCC signature.
 */
 
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         UNUSED(INTERP)
         return PARROT_NATIVEPCCMETHOD(SELF)->func;
     }
@@ -85,12 +85,12 @@ NULLness check.
 
 */
 
-    VTABLE INTVAL defined() {
+    VTABLE INTVAL defined() :no_wb {
         UNUSED(INTERP)
         return !! PARROT_NATIVEPCCMETHOD(SELF)->func;
     }
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         return STATICSELF.defined();
     }
 
@@ -104,7 +104,7 @@ Call the function pointer.
 
 */
 
-    VTABLE opcode_t *invoke(void *next) {
+    VTABLE opcode_t *invoke(void *next) :no_wb {
         void                *func;
         native_pcc_method_t  fptr;
 
@@ -147,7 +147,7 @@ Mark contained elements for GC.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         const Parrot_NativePCCMethod_attributes * const attrs = PARROT_NATIVEPCCMETHOD(SELF);
 
         Parrot_gc_mark_STRING_alive(INTERP, attrs->signature);
@@ -165,7 +165,7 @@ Create a clone of this PMC.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         PMC * const ret = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         const Parrot_NativePCCMethod_attributes * const self_attrs = PARROT_NATIVEPCCMETHOD(SELF);
         Parrot_NativePCCMethod_attributes * const ret_attrs  = PARROT_NATIVEPCCMETHOD(ret);
@@ -188,7 +188,7 @@ Return the MMD signature PMC, if any or C<PMCNULL>.
 
 */
 
-    METHOD get_multisig() {
+    METHOD get_multisig() :no_wb {
         PMC *sig;
         GET_ATTR_mmd_multi_sig(INTERP, SELF, sig);
         if (PMC_IS_NULL(sig))

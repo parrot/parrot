@@ -60,7 +60,7 @@ Marks the current idx/key and the aggregate as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         STRING *str_val;
 
         GET_ATTR_str_val(INTERP, SELF, str_val);
@@ -103,7 +103,7 @@ Returns true if there is more elements to iterate over.
 
 */
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         return SELF.elements() > 0;
     }
 
@@ -131,7 +131,7 @@ Returns the number of remaining elements in the C<string>.
             return str_val->strlen - iter->charpos;
     }
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         return SELF.elements();
     }
 

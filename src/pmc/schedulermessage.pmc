@@ -112,7 +112,7 @@ Retrieve the message ID.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         UNUSED(INTERP);
 
         return PARROT_SCHEDULERMESSAGE(SELF)->id;
@@ -171,7 +171,7 @@ Mark any referenced strings and PMCs.
 =cut
 
 */
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         if (PARROT_SCHEDULERMESSAGE(SELF)) {
             Parrot_SchedulerMessage_attributes * const core_struct =
                 PARROT_SCHEDULERMESSAGE(SELF);

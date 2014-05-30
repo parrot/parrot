@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -98,7 +98,7 @@ Reverse the contents of the array.
 
 =back
 
-=head2 Methods
+=head2 Vtable Methods
 
 =over 4
 
@@ -143,7 +143,7 @@ Creates and returns a copy of the array.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         PMC * const dest  = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         const INTVAL size = PMC_size(SELF);
 
@@ -167,7 +167,7 @@ fixed sized array).
 =cut
 
 */
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         const INTVAL size = SELF.elements();
         return (INTVAL)(size != 0);
     }
@@ -180,7 +180,7 @@ fixed sized array).
 
 */
 
-    VTABLE INTVAL elements() {
+    VTABLE INTVAL elements() :no_wb {
         UNUSED(INTERP)
         return PMC_size(SELF);
     }
@@ -195,7 +195,7 @@ Returns the number of elements in the array.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         return SELF.elements();
     }
 
@@ -209,7 +209,7 @@ Returns the number of elements in the array.
 
 */
 
-    VTABLE FLOATVAL get_number() {
+    VTABLE FLOATVAL get_number() :no_wb {
         const INTVAL e = SELF.elements();
         return (FLOATVAL)e;
     }
@@ -229,11 +229,11 @@ TT #1229: implement freeze/thaw and use that instead.
 
 */
 
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         return Parrot_str_from_int(INTERP, SELF.elements());
     }
 
-    VTABLE STRING *get_repr() {
+    VTABLE STRING *get_repr() :no_wb {
         STRING *res    = CONST_STRING(INTERP, "(");
         const INTVAL n = VTABLE_elements(INTERP, SELF);
         INTVAL  i;
@@ -261,7 +261,7 @@ Returns the integer value of the element at index C<key>.
 
 */
 
-    VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
+    VTABLE INTVAL get_integer_keyed_int(INTVAL key) :no_wb {
         PMC * const tempPMC = SELF.get_pmc_keyed_int(key);
         if (PMC_IS_NULL(tempPMC))
             return 0;
@@ -278,7 +278,7 @@ Returns the integer value of the element at index C<*key>.
 
 */
 
-    VTABLE INTVAL get_integer_keyed(PMC *key) {
+    VTABLE INTVAL get_integer_keyed(PMC *key) :no_wb {
         PMC * const tempPMC = SELF.get_pmc_keyed(key);
         return VTABLE_get_integer(INTERP, tempPMC);
     }
@@ -293,7 +293,7 @@ Returns the floating-point value of the element at index C<key>.
 
 */
 
-    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
+    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) :no_wb {
         PMC * const tempPMC = SELF.get_pmc_keyed_int(key);
         return VTABLE_get_number(INTERP, tempPMC);
     }
@@ -308,7 +308,7 @@ Returns the floating-point value of the element at index C<*key>.
 
 */
 
-    VTABLE FLOATVAL get_number_keyed(PMC *key) {
+    VTABLE FLOATVAL get_number_keyed(PMC *key) :no_wb {
         PMC * const tempPMC = SELF.get_pmc_keyed(key);
         return VTABLE_get_number(INTERP, tempPMC);
     }
@@ -323,7 +323,7 @@ Returns the Parrot string value of the element at index C<key>.
 
 */
 
-    VTABLE STRING *get_string_keyed_int(INTVAL key) {
+    VTABLE STRING *get_string_keyed_int(INTVAL key) :no_wb {
         PMC * const retval = SELF.get_pmc_keyed_int(key);
 
         if (PMC_IS_NULL(retval))
@@ -342,7 +342,7 @@ Returns the Parrot string value of the element at index C<*key>.
 
 */
 
-    VTABLE STRING *get_string_keyed(PMC *key) {
+    VTABLE STRING *get_string_keyed(PMC *key) :no_wb {
         PMC * const tempPMC = SELF.get_pmc_keyed(key);
         return VTABLE_get_string(INTERP, tempPMC);
     }
@@ -357,7 +357,7 @@ Returns the PMC value of the element at index C<key>.
 
 */
 
-    VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
+    VTABLE PMC *get_pmc_keyed_int(INTVAL key) :no_wb {
         PMC **data;
 
         if (key < 0 || key >= PMC_size(SELF))
@@ -378,7 +378,7 @@ Returns the PMC value of the element at index C<*key>.
 
 */
 
-    VTABLE PMC *get_pmc_keyed(PMC *key) {
+    VTABLE PMC *get_pmc_keyed(PMC *key) :no_wb {
         const INTVAL k        = VTABLE_get_integer(INTERP, key);
         PMC   * const nextkey = Parrot_key_next(INTERP, key);
         PMC   *box;
@@ -612,7 +612,7 @@ The C<==> operation. Compares two array to hold equal elements.
 
 */
 
-    VTABLE INTVAL is_equal(PMC *value) {
+    VTABLE INTVAL is_equal(PMC *value) :no_wb {
         INTVAL j, n;
 
         if (value->vtable->base_type != SELF->vtable->base_type)
@@ -652,7 +652,7 @@ Return a new iterator for SELF.
 
 */
 
-    VTABLE PMC *get_iter() {
+    VTABLE PMC *get_iter() :no_wb {
         return Parrot_pmc_new_init(INTERP, enum_class_ArrayIterator, SELF);
     }
 
@@ -667,7 +667,7 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
 =cut
 
 */
-    VTABLE INTVAL exists_keyed_int(INTVAL key) {
+    VTABLE INTVAL exists_keyed_int(INTVAL key) :no_wb {
         PMC **data;
         if (key < 0 || key >= PMC_size(SELF))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
@@ -677,7 +677,7 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
         return !PMC_IS_NULL(data[key]);
     }
 
-    VTABLE INTVAL exists_keyed(PMC *key) {
+    VTABLE INTVAL exists_keyed(PMC *key) :no_wb {
         const INTVAL ix = VTABLE_get_integer(INTERP, key);
         return SELF.exists_keyed_int(ix);
     }
@@ -729,7 +729,7 @@ Used to unarchive the array.
 
 */
 
-    VTABLE void visit(PMC *info) {
+    VTABLE void visit(PMC *info) :no_wb {
         INTVAL  i;
         const INTVAL n = VTABLE_elements(INTERP, SELF);
         PMC   **pos    = PMC_array(SELF);
@@ -741,7 +741,7 @@ Used to unarchive the array.
         SUPER(info);
     }
 
-    VTABLE void freeze(PMC *info) {
+    VTABLE void freeze(PMC *info) :no_wb {
         VTABLE_push_integer(INTERP, info, VTABLE_elements(INTERP, SELF));
     }
 
@@ -759,7 +759,7 @@ Returns TRUE is the element at C<key> is defined; otherwise returns false.
 
 */
 
-    VTABLE INTVAL defined_keyed_int(INTVAL key) {
+    VTABLE INTVAL defined_keyed_int(INTVAL key) :no_wb {
         PMC * const val = SELF.get_pmc_keyed_int(key);
 
         if (PMC_IS_NULL(val))
@@ -778,7 +778,7 @@ Mark the array.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         PMC ** const data = PMC_array(SELF);
         if (data) {
             INTVAL i;

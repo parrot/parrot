@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2012, Parrot Foundation.
+Copyright (C) 2005-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -71,7 +71,7 @@ Mark any PMCs and STRINGs in this registry.
 */
 
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         Hash *str_registry, *pmc_registry;
 
         GET_ATTR_str_registry(INTERP, SELF, str_registry);
@@ -127,7 +127,7 @@ Returns true if the hash size is not zero.
 
 */
 
-    VTABLE INTVAL get_integer_keyed(PMC *key) {
+    VTABLE INTVAL get_integer_keyed(PMC *key) :no_wb {
         Hash       *hash;
         const void *value;
 
@@ -140,7 +140,7 @@ Returns true if the hash size is not zero.
         return 0;
     }
 
-    VTABLE INTVAL elements() {
+    VTABLE INTVAL elements() :no_wb {
         const Hash *pmc_registry, *str_registry;
 
         GET_ATTR_pmc_registry(INTERP, SELF, pmc_registry);
@@ -150,7 +150,7 @@ Returns true if the hash size is not zero.
                Parrot_hash_size(INTERP, str_registry);
     }
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         const Hash *pmc_registry, *str_registry;
 
         GET_ATTR_pmc_registry(INTERP, SELF, pmc_registry);

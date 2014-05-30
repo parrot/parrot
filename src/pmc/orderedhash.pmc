@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -277,7 +277,7 @@ Marks the OrderedHash as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         const Parrot_OrderedHash_attributes * const attrs =
                 PARROT_ORDEREDHASH(SELF);
 
@@ -297,7 +297,7 @@ Return a new iterator
 
 */
 
-    VTABLE PMC *get_iter() {
+    VTABLE PMC *get_iter() :no_wb {
         return Parrot_pmc_new_init(INTERP, enum_class_OrderedHashIterator, SELF);
     }
 
@@ -315,15 +315,15 @@ Returns the size of the hash.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         return STATICSELF.elements();
     }
 
-    VTABLE FLOATVAL get_number() {
+    VTABLE FLOATVAL get_number() :no_wb {
         return SELF.get_integer();
     }
 
-    VTABLE INTVAL elements() {
+    VTABLE INTVAL elements() :no_wb {
         return VTABLE_elements(INTERP, PARROT_ORDEREDHASH(SELF)->hash);
     }
 
@@ -433,7 +433,7 @@ Sets the PMC value of the element at index C<key> to C<val>.
 
 */
 
-    VTABLE PMC *get_pmc_keyed_int(INTVAL idx) {
+    VTABLE PMC *get_pmc_keyed_int(INTVAL idx) :no_wb {
         PMC * const list_entry = get_list_item(INTERP, SELF, idx);
 
         if (PMC_IS_NULL(list_entry))
@@ -442,7 +442,7 @@ Sets the PMC value of the element at index C<key> to C<val>.
         return VTABLE_get_pmc_keyed_int(INTERP, list_entry, ORDERED_HASH_ITEM_VALUE);
     }
 
-    VTABLE PMC *get_pmc_keyed(PMC *key) {
+    VTABLE PMC *get_pmc_keyed(PMC *key) :no_wb {
         PMC *item;
 
         /* Access by integer index */
@@ -455,7 +455,7 @@ Sets the PMC value of the element at index C<key> to C<val>.
         return VTABLE_get_pmc_keyed_int(INTERP, item, ORDERED_HASH_ITEM_VALUE);
     }
 
-    VTABLE PMC *get_pmc_keyed_str(STRING *key) {
+    VTABLE PMC *get_pmc_keyed_str(STRING *key) :no_wb {
         PMC * const item = VTABLE_get_pmc_keyed_str(INTERP,
             PARROT_ORDEREDHASH(SELF)->hash, key);
 
@@ -476,12 +476,12 @@ Sets the PMC value of the element at index C<key> to C<val>.
 
 */
 
-    VTABLE STRING *get_string_keyed_int(INTVAL idx) {
+    VTABLE STRING *get_string_keyed_int(INTVAL idx) :no_wb {
         PMC * const item = VTABLE_get_pmc_keyed_int(INTERP, SELF, idx);
         return VTABLE_get_string(INTERP, item);
     }
 
-    VTABLE STRING *get_string_keyed(PMC *key) {
+    VTABLE STRING *get_string_keyed(PMC *key) :no_wb {
         PMC * const item = VTABLE_get_pmc_keyed(INTERP, SELF, key);
         return VTABLE_get_string(INTERP, item);
     }
@@ -499,12 +499,12 @@ Returns the integer value associated with C<key>.
 
 */
 
-    VTABLE INTVAL get_integer_keyed_int(INTVAL idx) {
+    VTABLE INTVAL get_integer_keyed_int(INTVAL idx) :no_wb {
         PMC * const item = VTABLE_get_pmc_keyed_int(INTERP, SELF, idx);
         return VTABLE_get_integer(INTERP, item);
     }
 
-    VTABLE INTVAL get_integer_keyed(PMC *key) {
+    VTABLE INTVAL get_integer_keyed(PMC *key) :no_wb {
         PMC * const item = VTABLE_get_pmc_keyed(INTERP, SELF, key);
         return VTABLE_get_integer(INTERP, item);
     }
@@ -523,12 +523,12 @@ Returns the floating-point value for the element at C<key>.
 
 */
 
-    VTABLE FLOATVAL get_number_keyed_int(INTVAL idx) {
+    VTABLE FLOATVAL get_number_keyed_int(INTVAL idx) :no_wb {
         PMC * const item = VTABLE_get_pmc_keyed_int(INTERP, SELF, idx);
         return VTABLE_get_number(INTERP, item);
     }
 
-    VTABLE FLOATVAL get_number_keyed(PMC *key) {
+    VTABLE FLOATVAL get_number_keyed(PMC *key) :no_wb {
         PMC * const item = VTABLE_get_pmc_keyed(INTERP, SELF, key);
         return VTABLE_get_number(INTERP, item);
     }
@@ -637,11 +637,11 @@ The created key = "\1idx".
 
 */
 
-    VTABLE INTVAL exists_keyed_int(INTVAL idx) {
+    VTABLE INTVAL exists_keyed_int(INTVAL idx) :no_wb {
         return (idx >= 0) && (idx < STATICSELF.elements());
     }
 
-    VTABLE INTVAL exists_keyed(PMC *key) {
+    VTABLE INTVAL exists_keyed(PMC *key) :no_wb {
         if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_integer_FLAG) {
             /* Don't fetch item prematurely. It's costy */
             const INTVAL intval = VTABLE_get_integer(INTERP, key);
@@ -656,7 +656,7 @@ The created key = "\1idx".
         return VTABLE_exists_keyed_str(INTERP, SELF, VTABLE_get_string(INTERP, key));
     }
 
-    VTABLE INTVAL exists_keyed_str(STRING *key) {
+    VTABLE INTVAL exists_keyed_str(STRING *key) :no_wb {
         return VTABLE_exists_keyed_str(INTERP, PARROT_ORDEREDHASH(SELF)->hash, key);
     }
 
@@ -670,7 +670,7 @@ The created key = "\1idx".
 
 */
 
-    VTABLE INTVAL defined_keyed(PMC *key) {
+    VTABLE INTVAL defined_keyed(PMC *key) :no_wb {
         /* We store list_item (which is defined). So fetch original PMC and check it */
         PMC * const item = STATICSELF.get_pmc_keyed(key);
         if (PMC_IS_NULL(item))
@@ -678,7 +678,7 @@ The created key = "\1idx".
         return VTABLE_defined(INTERP, item);
     }
 
-    VTABLE INTVAL defined_keyed_int(INTVAL idx) {
+    VTABLE INTVAL defined_keyed_int(INTVAL idx) :no_wb {
         PMC * item;
         /* If item doesn't exists it's undefined */
         if (!STATICSELF.exists_keyed_int(idx))
@@ -704,7 +704,7 @@ Deletes the key C<*key> from the hash.
 
 */
 
-    VTABLE void delete_keyed(PMC *key) {
+    VTABLE void delete_keyed(PMC *key) :manual_wb {
         Parrot_OrderedHash_attributes * const attrs = PARROT_ORDEREDHASH(SELF);
         PMC *list_entry, *prev, *next;
         if ((PObj_get_FLAGS(key) & KEY_type_FLAGS) == KEY_integer_FLAG) {
@@ -716,12 +716,15 @@ Deletes the key C<*key> from the hash.
             else
                 STATICSELF.delete_keyed_int(intval);
 
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             return;
         }
 
         list_entry = VTABLE_get_pmc_keyed(INTERP, attrs->hash, key);
-        if (PMC_IS_NULL(list_entry))
+        if (PMC_IS_NULL(list_entry)) {
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             return;
+        }
 
         /* Unlink entry */
         next = VTABLE_get_pmc_keyed_int(INTERP, list_entry, ORDERED_HASH_ITEM_NEXT);
@@ -741,15 +744,16 @@ Deletes the key C<*key> from the hash.
 
         /* And finally delete it */
         VTABLE_delete_keyed(INTERP, PARROT_ORDEREDHASH(SELF)->hash, key);
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
     }
 
-    VTABLE void delete_keyed_int(INTVAL idx) {
+    VTABLE void delete_keyed_int(INTVAL idx) :manual_wb {
         if (STATICSELF.exists_keyed_int(idx)) {
             PMC * const list_entry = get_list_item(INTERP, SELF, idx);
             STATICSELF.delete_keyed(
                     VTABLE_get_pmc_keyed_int(INTERP, list_entry, ORDERED_HASH_ITEM_KEY));
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
-        return;
     }
 
 /*
@@ -763,7 +767,7 @@ the clone via integers has different indices, if items were deleted.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         PMC  * const dest   = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         Parrot_OrderedHash_attributes *clone_attrs =
                 PARROT_ORDEREDHASH(dest);
@@ -791,7 +795,7 @@ Used to unarchive the hash.
 
 */
 
-    VTABLE void visit(PMC *info) {
+    VTABLE void visit(PMC *info) :no_wb {
         VISIT_PMC_ATTR(INTERP, info, SELF, OrderedHash, hash);
         SUPER(info);
     }
@@ -812,7 +816,7 @@ Get underlying regular Hash. Used in UnManagedStruct.
 
 */
 
-    VTABLE PMC* get_pmc() {
+    VTABLE PMC* get_pmc() :no_wb {
         PMC *hash;
         GET_ATTR_hash(INTERP, SELF, hash);
         return hash;

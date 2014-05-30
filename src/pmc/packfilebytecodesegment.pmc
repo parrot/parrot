@@ -64,7 +64,7 @@ Marks the object as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         PMC *tmp;
 
         GET_ATTR_op_map(INTERP, SELF, tmp);

@@ -148,7 +148,7 @@ Create a copy of the timer, resetting status, id, and birthtime.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         PMC * const copy = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         Parrot_Timer_attributes * const new_struct = PARROT_TIMER(copy);
@@ -289,8 +289,9 @@ Sets the PMC associated with C<key> to C<*value>.
 
 */
 
-    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
+    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) :manual_wb {
         if (key == PARROT_TIMER_HANDLER) {
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             SET_ATTR_code(INTERP, SELF, value);
         }
     }
@@ -308,7 +309,7 @@ Invoke the codeblock and schedule any repeats.
 
 */
 
-    VTABLE opcode_t *invoke(void *next) {
+    VTABLE opcode_t *invoke(void *next) :no_wb {
         Parrot_Timer_attributes *const timer = PARROT_TIMER(SELF);
         FLOATVAL now_time;
         PMC* alarm;
@@ -403,7 +404,7 @@ Mark any referenced strings and PMCs.
 =cut
 
 */
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         if (PARROT_TIMER(SELF)) {
             Parrot_Timer_attributes * const core_struct = PARROT_TIMER(SELF);
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->code);

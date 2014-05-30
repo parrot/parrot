@@ -62,7 +62,7 @@ Marks the object as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         Parrot_PackfileSegment_attributes * const attrs =
                 PARROT_PACKFILESEGMENT(SELF);
 

@@ -130,7 +130,7 @@ Mark active stringhandle data as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         Parrot_StringHandle_attributes * const data_struct = PARROT_STRINGHANDLE(SELF);
         Parrot_gc_mark_STRING_alive(INTERP, data_struct->stringhandle);
         Parrot_gc_mark_STRING_alive(INTERP, data_struct->mode);
@@ -151,7 +151,7 @@ Returns whether the StringHandle has reached the end of the file.
 
 */
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         STRING *stringhandle;
         GET_ATTR_stringhandle(INTERP, SELF, stringhandle);
 

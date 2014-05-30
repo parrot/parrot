@@ -362,7 +362,7 @@ Returns the number of elements in the array.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         return SELF.elements();
     }
 

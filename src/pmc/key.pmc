@@ -55,7 +55,7 @@ Creates and returns a clone of the key.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         PMC *dkey        = dest;
         PMC *key         = SELF;
@@ -80,7 +80,6 @@ Creates and returns a clone of the key.
                 break;
             }
             
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             key = Parrot_key_next(INTERP, key);
 
             if (key) {
@@ -103,7 +102,7 @@ Marks the key as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         Parrot_key_mark(INTERP, SELF);
     }
 
@@ -131,14 +130,12 @@ Returns the Parrot string value of the key.
 
 */
 
-    VTABLE STRING *get_string() :manual_wb {
+    VTABLE STRING *get_string() :no_wb {
         /* Parrot_key_string() is only useful if this PMC has a key type */
         if (KEY_get_FLAGS(SELF)) {
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             return Parrot_key_string(INTERP, SELF);
         }
 
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return CONST_STRING(INTERP, "");
     }
 
@@ -152,8 +149,7 @@ Returns the PMC value of the key.
 
 */
 
-    VTABLE PMC *get_pmc() :manual_wb {
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+    VTABLE PMC *get_pmc() :no_wb {
         return Parrot_key_pmc(INTERP, SELF);
     }
 
@@ -178,7 +174,7 @@ Returns the PMC value of the key.
 
 */
 
-    VTABLE void set_string_native(STRING *value) :no_wb {
+    VTABLE void set_string_native(STRING *value) {
         Parrot_key_set_string(INTERP, SELF, value);
     }
 
@@ -215,7 +211,6 @@ Appends C<*value> to the key.
                 "Can only push another Key onto a Key PMC.");
 
         Parrot_key_append(INTERP, SELF, value);
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
     }
 
 /*
@@ -279,7 +274,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
 
 */
 
-    void freeze(PMC *info) {
+    void freeze(PMC *info) :no_wb {
         int size;
         PMC *k;
 
@@ -392,8 +387,7 @@ Set key to hold particular register.
 =cut
 
 */
-    METHOD set_register(INTVAL reg_no, INTVAL reg_type) :manual_wb {
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+    METHOD set_register(INTVAL reg_no, INTVAL reg_type) {
         Parrot_key_set_register(INTERP, SELF, reg_no, reg_type);
     }
 
@@ -442,7 +436,7 @@ Aggregate interface.
         return Parrot_key_pmc(INTERP, SELF);
     }
 
-    METHOD make_register_key(STRING * set, INTVAL idx) :no_wb 
+    METHOD make_register_key(STRING * set, INTVAL idx)
     {
         INTVAL first_char = Parrot_str_indexed(INTERP, set, 0);
         KEY_flags key_type;

@@ -71,7 +71,7 @@ Marks the object as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         Parrot_PackfileDebug_attributes * const attrs =
                 PARROT_PACKFILEDEBUG(SELF);
 
@@ -153,7 +153,7 @@ Get the number of filename mappings.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         return STATICSELF.elements();
     }
 

@@ -100,7 +100,7 @@ Returns 0.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         UNUSED(SELF)
         UNUSED(INTERP)
         return 0;
@@ -211,7 +211,7 @@ Returns 0.
 
 */
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         UNUSED(SELF)
         UNUSED(INTERP)
         return 0;

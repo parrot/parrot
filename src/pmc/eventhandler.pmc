@@ -125,7 +125,7 @@ Marks this PMC and any of its contents as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
 
         if (e) {
@@ -164,7 +164,7 @@ Retrieves the C<type> attribute of this event handler.
 
 */
 
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
 
         if (e)
@@ -214,7 +214,7 @@ handle the registered events.
 
 */
 
-    VTABLE PMC *get_attr_str(STRING *name) {
+    VTABLE PMC *get_attr_str(STRING *name) :no_wb {
         Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
         PMC *value = PMCNULL;
 
@@ -234,7 +234,7 @@ Runs the contained code, if any; this is what handles the event.
 =cut
 
 */
-    VTABLE opcode_t *invoke(void *next) {
+    VTABLE opcode_t *invoke(void *next) :no_wb {
         Parrot_EventHandler_attributes * const e = PARROT_EVENTHANDLER(SELF);
         Interp * target_interp = NULL;
 
@@ -276,7 +276,7 @@ Report whether the event handler can handle a particular type of event.
 
 */
 
-    METHOD can_handle(PMC *event) {
+    METHOD can_handle(PMC *event) :no_wb {
 
         if (event->vtable->base_type == enum_class_Task) {
             PMC    * const type     = VTABLE_get_attr_str(INTERP, event, CONST_STRING(INTERP, "type"));

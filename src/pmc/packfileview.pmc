@@ -169,7 +169,7 @@ Mark the PMC and the PackFile* contents
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         Parrot_PackfileView_attributes * const attrs =
                 PARROT_PACKFILEVIEW(SELF);
         if (attrs->pf != NULL)

@@ -93,7 +93,7 @@ Mark active socket handle data as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         Parrot_Socket_attributes * const data = PARROT_SOCKET(SELF);
 
         if (data) {

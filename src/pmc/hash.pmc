@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -132,7 +132,7 @@ Marks the hash as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         Hash * const hash = (Hash *)SELF.get_pointer();
         if (hash && hash->entries)
             Parrot_hash_mark(INTERP, hash);
@@ -148,7 +148,7 @@ Creates and returns a clone of the hash.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :manual_wb {
         PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         Parrot_hash_clone(INTERP, (Hash *)SELF.get_pointer(),
@@ -241,7 +241,7 @@ Get a pointer to this PMC's Hash*.
 =cut
 
 */
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         UNUSED(INTERP);
         return PARROT_HASH(SELF)->hash;
     }
@@ -258,11 +258,11 @@ Returns the size of the hash.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         return Parrot_hash_size(INTERP, (Hash *)SELF.get_pointer());
     }
 
-    VTABLE FLOATVAL get_number() {
+    VTABLE FLOATVAL get_number() :no_wb {
         return SELF.get_integer();
     }
 
@@ -281,11 +281,11 @@ Return a representation of the hash contents.
 
 */
 
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         return Parrot_sprintf_c(INTERP, "Hash[0x%x]", SELF);
     }
 
-    VTABLE STRING *get_repr() {
+    VTABLE STRING *get_repr() :no_wb {
         PMC * const iter = VTABLE_get_iter(INTERP, SELF);
         PMC * const sb   = Parrot_pmc_new(INTERP, enum_class_StringBuilder);
         const INTVAL n   = VTABLE_elements(INTERP, SELF);
@@ -330,7 +330,7 @@ Return a representation of the hash contents.
 
 */
 
-    VTABLE INTVAL get_integer_keyed_str(STRING *key) {
+    VTABLE INTVAL get_integer_keyed_str(STRING *key) :no_wb {
         const Hash * const hash = (Hash*)SELF.get_pointer();
         HashBucket * const b = Parrot_hash_get_bucket(INTERP, hash,
                 Parrot_hash_key_from_string(INTERP, hash, key));
@@ -341,7 +341,7 @@ Return a representation of the hash contents.
         return Parrot_hash_value_to_int(INTERP, hash, b->value);
     }
 
-    VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
+    VTABLE INTVAL get_integer_keyed_int(INTVAL key) :no_wb {
         const Hash * const hash = (Hash*)SELF.get_pointer();
         HashBucket * const b = Parrot_hash_get_bucket(INTERP, hash,
                 Parrot_hash_key_from_int(INTERP, hash, key));
@@ -362,7 +362,7 @@ Returns the integer value for the element at C<*key>.
 */
 
     /* Handling Keys */
-    VTABLE INTVAL get_integer_keyed(PMC *key) {
+    VTABLE INTVAL get_integer_keyed(PMC *key) :no_wb {
         const Hash * const hash     = (Hash *)SELF.get_pointer();
         const void * const hash_key = Parrot_hash_key_from_pmc(INTERP, hash, key);
         HashBucket * const b        = Parrot_hash_get_bucket(INTERP, hash, hash_key);
@@ -453,7 +453,7 @@ Returns the integer value for the element at C<*key>.
 
 */
 
-    VTABLE FLOATVAL get_number_keyed_str(STRING *key) {
+    VTABLE FLOATVAL get_number_keyed_str(STRING *key) :no_wb {
         const Hash * const hash = (Hash *)SELF.get_pointer();
         HashBucket * const b = Parrot_hash_get_bucket(INTERP, hash,
                 Parrot_hash_key_from_string(INTERP, hash, key));
@@ -464,7 +464,7 @@ Returns the integer value for the element at C<*key>.
         return Parrot_hash_value_to_number(INTERP, hash, b->value);
     }
 
-    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
+    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) :no_wb {
         const Hash * const hash = (Hash *)SELF.get_pointer();
         HashBucket * const b = Parrot_hash_get_bucket(INTERP, hash,
                 Parrot_hash_key_from_int(INTERP, hash, key));
@@ -485,7 +485,7 @@ Returns the floating-point value for the element at C<*key>.
 */
 
     /* I can't migrate this function right now. Some problem with JITting */
-    VTABLE FLOATVAL get_number_keyed(PMC *key) {
+    VTABLE FLOATVAL get_number_keyed(PMC *key) :no_wb {
         const Hash * const hash     = (Hash *)SELF.get_pointer();
         void       * const hash_key = Parrot_hash_key_from_pmc(INTERP, hash, key);
         HashBucket * const b        = Parrot_hash_get_bucket(INTERP, hash, hash_key);
@@ -515,7 +515,7 @@ Returns the floating-point value for the element at C<*key>.
 
 */
 
-    VTABLE STRING *get_string_keyed_str(STRING *key) {
+    VTABLE STRING *get_string_keyed_str(STRING *key) :no_wb {
         const Hash * const hash = (Hash*)SELF.get_pointer();
         HashBucket * const b =
             Parrot_hash_get_bucket(INTERP, hash, Parrot_hash_key_from_string(INTERP, hash, key));
@@ -527,7 +527,7 @@ Returns the floating-point value for the element at C<*key>.
         return Parrot_hash_value_to_string(INTERP, hash, b->value);
     }
 
-    VTABLE STRING *get_string_keyed_int(INTVAL key) {
+    VTABLE STRING *get_string_keyed_int(INTVAL key) :no_wb {
         const Hash * const hash = (Hash*)SELF.get_pointer();
         HashBucket * const b =
             Parrot_hash_get_bucket(INTERP, hash, Parrot_hash_key_from_int(INTERP, hash, key));
@@ -548,7 +548,7 @@ Returns the string value for the element at C<*key>.
 
 */
 
-    VTABLE STRING *get_string_keyed(PMC *key) {
+    VTABLE STRING *get_string_keyed(PMC *key) :no_wb {
         const Hash * const hash     = (Hash *)SELF.get_pointer();
         const void * const hash_key = Parrot_hash_key_from_pmc(INTERP, hash, key);
         HashBucket * const b        = Parrot_hash_get_bucket(INTERP, hash, hash_key);
@@ -660,7 +660,7 @@ Returns the PMC value for the element at C<*key>.
 
 */
 
-    VTABLE PMC *get_pmc_keyed_str(STRING *key) {
+    VTABLE PMC *get_pmc_keyed_str(STRING *key) :no_wb {
         const Hash *hash;
         HashBucket *b;
 
@@ -681,7 +681,7 @@ Returns the PMC value for the element at C<*key>.
             return Parrot_hash_value_to_pmc(INTERP, hash, b->value);
     }
 
-    VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
+    VTABLE PMC *get_pmc_keyed_int(INTVAL key) :no_wb {
         const Hash * const hash = (Hash *)SELF.get_pointer();
         HashBucket * const b    = Parrot_hash_get_bucket(INTERP, hash,
                 Parrot_hash_key_from_int(INTERP, hash, key));
@@ -693,7 +693,7 @@ Returns the PMC value for the element at C<*key>.
     }
 
     /* Compound Key */
-    VTABLE PMC *get_pmc_keyed(PMC *key) {
+    VTABLE PMC *get_pmc_keyed(PMC *key) :no_wb {
         const Hash * const hash     = (Hash *)SELF.get_pointer();
         const void * const hash_key = Parrot_hash_key_from_pmc(INTERP, hash, key);
         HashBucket * const b        = Parrot_hash_get_bucket(INTERP, hash, hash_key);
@@ -867,7 +867,7 @@ Sets C<*value> as the value for C<*key>.
 
 */
 
-    VTABLE INTVAL exists_keyed_str(STRING *key) {
+    VTABLE INTVAL exists_keyed_str(STRING *key) :no_wb {
         Hash * const hash = (Hash *)SELF.get_pointer();
         HashBucket * const b = Parrot_hash_get_bucket(INTERP, hash,
                 Parrot_hash_key_from_string(INTERP, hash, key));
@@ -884,7 +884,7 @@ Returns whether a key C<*key> exists in the hash.
 
 */
 
-    VTABLE INTVAL exists_keyed(PMC *key) {
+    VTABLE INTVAL exists_keyed(PMC *key) :no_wb {
         Hash       * const h  = (Hash *)SELF.get_pointer();
         void       * const sx = Parrot_hash_key_from_pmc(INTERP, h, key);
         HashBucket * const b  = Parrot_hash_get_bucket(INTERP, h, sx);
@@ -913,7 +913,7 @@ Returns whether a key C<*key> exists in the hash.
 
 */
 
-    VTABLE INTVAL defined_keyed_str(STRING *key) {
+    VTABLE INTVAL defined_keyed_str(STRING *key) :no_wb {
         const Hash * const hash = (Hash *)SELF.get_pointer();
         HashBucket * const b = Parrot_hash_get_bucket(INTERP, hash,
                 Parrot_hash_key_from_string(INTERP, hash, key));
@@ -935,7 +935,7 @@ Returns whether the value for C<*key> is defined.
 
 */
 
-    VTABLE INTVAL defined_keyed(PMC *key) {
+    VTABLE INTVAL defined_keyed(PMC *key) :no_wb {
         Hash       * const h  = (Hash *)SELF.get_pointer();
         void       * const sx = Parrot_hash_key_from_pmc(INTERP, h, key);
         HashBucket * const b  = Parrot_hash_get_bucket(INTERP, h, sx);
@@ -1023,7 +1023,7 @@ Returns true if the hash size is not zero.
 
 */
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         return Parrot_hash_size(INTERP, (Hash *)SELF.get_pointer()) != 0;
     }
 
@@ -1037,7 +1037,7 @@ Returns the number of elements in the hash.
 
 */
 
-    VTABLE INTVAL elements() {
+    VTABLE INTVAL elements() :no_wb {
         return Parrot_hash_size(INTERP, (Hash *)SELF.get_pointer());
     }
 
@@ -1051,7 +1051,7 @@ Return a new iterator.
 
 */
 
-    VTABLE PMC *get_iter() {
+    VTABLE PMC *get_iter() :no_wb {
         return Parrot_pmc_new_init(INTERP, enum_class_HashIterator, SELF);
     }
 
@@ -1065,7 +1065,7 @@ Returns whether the hash is the same as C<*other>.
 
 */
 
-    VTABLE INTVAL is_same(PMC *other) {
+    VTABLE INTVAL is_same(PMC *other) :no_wb {
         return (INTVAL)(other->vtable == SELF->vtable &&
             VTABLE_get_pointer(INTERP, other) == SELF.get_pointer());
     }
@@ -1082,7 +1082,7 @@ Check if two hashes hold the same keys and values.
 
 */
 
-    VTABLE INTVAL is_equal(PMC *value) {
+    VTABLE INTVAL is_equal(PMC *value) :no_wb {
         PMC * const iter = VTABLE_get_iter(INTERP, SELF);
         INTVAL      j, n;
 
@@ -1124,7 +1124,7 @@ Used to archive the hash.
 
 */
 
-    VTABLE void freeze(PMC *info) {
+    VTABLE void freeze(PMC *info) :no_wb {
         Parrot_hash_freeze(INTERP, (Hash *)SELF.get_pointer(), info);
     }
 
@@ -1184,7 +1184,7 @@ entries with the same key.
         SELF.set_integer_native(type);
     }
 
-    METHOD get_key_type() {
+    METHOD get_key_type() :no_wb {
         const INTVAL ret = ((Hash *)SELF.get_pointer())->key_type;
         RETURN(INTVAL ret);
     }
@@ -1220,7 +1220,7 @@ entries with the same key.
             Parrot_hash_destroy(INTERP, old_hash);
     }
 
-    METHOD get_value_type() {
+    METHOD get_value_type() :no_wb {
         const INTVAL ret = ((Hash *)SELF.get_pointer())->entry_type;
         RETURN(INTVAL ret);
     }

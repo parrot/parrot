@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -42,7 +42,7 @@ Defaults iteration mode to iterate from start.
 
 */
 
-    VTABLE void init_pmc(PMC *hash) :no_wb {
+    VTABLE void init_pmc(PMC *hash) {
         Parrot_OrderedHashIterator_attributes * const attrs =
            (Parrot_OrderedHashIterator_attributes *) PMC_data(SELF);
 
@@ -65,9 +65,8 @@ Marks the hash as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         PMC * const hash = PARROT_ORDEREDHASHITERATOR(SELF)->pmc_hash;
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         Parrot_gc_mark_PMC_alive(INTERP, hash);
     }
 
@@ -91,7 +90,7 @@ Marks the hash as live.
 =cut
 
 */
-    VTABLE void set_integer_native(INTVAL value) :no_wb {
+    VTABLE void set_integer_native(INTVAL value) {
         Parrot_OrderedHashIterator_attributes * const attrs =
                 PARROT_ORDEREDHASHITERATOR(SELF);
 
@@ -159,6 +158,7 @@ Returns the number of remaining elements in the Hash.
     }
 
     VTABLE INTVAL get_integer() :no_wb {
+        UNUSED(INTERP)
         return SELF.elements();
     }
 
@@ -173,7 +173,7 @@ the next one.
 
 */
 
-    VTABLE PMC *shift_pmc() {
+    VTABLE PMC *shift_pmc() :manual_wb {
         Parrot_OrderedHashIterator_attributes * const attrs =
                 PARROT_ORDEREDHASHITERATOR(SELF);
 
@@ -184,8 +184,6 @@ the next one.
                 "StopIteration");
 
         /* Get bucket and move to next bucket */
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
-        
         ret               = VTABLE_get_pmc_keyed_int(INTERP, attrs->next_entry,
                 ORDERED_HASH_ITEM_KEY);
         attrs->next_entry = VTABLE_get_pmc_keyed_int(INTERP, attrs->next_entry,
@@ -193,6 +191,7 @@ the next one.
         ++attrs->pos;
         --attrs->elements;
 
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return ret;
     }
 
@@ -207,7 +206,7 @@ the next one for reverse iterator.
 
 */
 
-    VTABLE PMC *pop_pmc() {
+    VTABLE PMC *pop_pmc() :manual_wb {
         Parrot_OrderedHashIterator_attributes * const attrs =
                 PARROT_ORDEREDHASHITERATOR(SELF);
 
@@ -217,7 +216,6 @@ the next one for reverse iterator.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         ret               = VTABLE_get_pmc_keyed_int(INTERP, attrs->next_entry,
                 ORDERED_HASH_ITEM_KEY);
         attrs->next_entry = VTABLE_get_pmc_keyed_int(INTERP, attrs->next_entry,
@@ -225,6 +223,7 @@ the next one for reverse iterator.
         --attrs->pos;
         --attrs->elements;
 
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return ret;
     }
 
@@ -232,7 +231,7 @@ the next one for reverse iterator.
 
 */
 
-    VTABLE STRING* shift_string() {    
+    VTABLE STRING* shift_string() :manual_wb {
         PMC * const key = SELF.shift_pmc();
         PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return VTABLE_get_string(INTERP, key);

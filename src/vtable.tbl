@@ -116,7 +116,7 @@ void unshift_pmc(PMC* value)
 [SPLICE] :write
 void splice(PMC* value, INTVAL offset, INTVAL count)
 
-# XXX marking writing here?
+# They are returning copies, but some methods upgrade their types
 [MATH]
 PMC* add(PMC* value, PMC* dest)
 PMC* add_int(INTVAL value, PMC* dest)

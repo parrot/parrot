@@ -125,7 +125,7 @@ Marks the continuation as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         PMC *tmp;
 
         /* If Continuation wasn't fully constructed yet */
@@ -155,7 +155,7 @@ Get the value of an attribute by name
 
 */
 
-    VTABLE PMC * get_attr_str(STRING *attr) {
+    VTABLE PMC * get_attr_str(STRING *attr) :no_wb {
         PMC * val = PMCNULL;
         INTVAL ival;
         /*if (STRING_equal(INTERP, attr, CONST_STRING(INTERP, "seg")))
@@ -191,7 +191,7 @@ Creates and returns a clone of the continuation.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         /* Start to prepare for subclassable continuations */
         return Parrot_pmc_new_init(INTERP, SELF->vtable->base_type, SELF);
     }
@@ -238,7 +238,7 @@ Returns the pointer to the return instruction.
 
 */
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         opcode_t          *address;
 
         GET_ATTR_address(INTERP, SELF, address);
@@ -258,7 +258,7 @@ Returns whether the subroutine is defined.
 
 */
 
-    VTABLE INTVAL defined() {
+    VTABLE INTVAL defined() :no_wb {
         opcode_t          *address;
 
         GET_ATTR_address(INTERP, SELF, address);
@@ -266,7 +266,7 @@ Returns whether the subroutine is defined.
     }
 
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         opcode_t          *address;
 
         GET_ATTR_address(INTERP, SELF, address);
@@ -285,7 +285,7 @@ destination to continue execution.
 
 */
 
-    VTABLE opcode_t *invoke(void *next) {
+    VTABLE opcode_t *invoke(void *next) :no_wb {
         UNUSED(next)
         PMC * const        from_obj = Parrot_pcc_get_signature(INTERP, CURRENT_CONTEXT(INTERP));
         opcode_t          *pc;
@@ -319,7 +319,7 @@ Experimental: returns caller info as a STRING.
 
 */
 
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         PMC *to_ctx;
 
         GET_ATTR_to_ctx(INTERP, SELF, to_ctx);

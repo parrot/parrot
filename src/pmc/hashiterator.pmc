@@ -137,7 +137,7 @@ Defaults iteration mode to iterate from start.
 
 */
 
-    VTABLE void init_pmc(PMC *hash) :no_wb {
+    VTABLE void init_pmc(PMC *hash) {
         Parrot_HashIterator_attributes * const attrs =
             (Parrot_HashIterator_attributes *) PMC_data(SELF);
 
@@ -161,9 +161,8 @@ Marks the hash as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         PMC * const hash = PARROT_HASHITERATOR(SELF)->pmc_hash;
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         Parrot_gc_mark_PMC_alive(INTERP, hash);
         /* We don't mark underlying parrot_hash. Hash PMC will mark it */
     }
@@ -188,7 +187,7 @@ Marks the hash as live.
 =cut
 
 */
-    VTABLE void set_integer_native(INTVAL value) :no_wb {
+    VTABLE void set_integer_native(INTVAL value) :manual_wb {
         Parrot_HashIterator_attributes * const attrs =
                 PARROT_HASHITERATOR(SELF);
 
@@ -197,6 +196,7 @@ Marks the hash as live.
             attrs->elements         = attrs->parrot_hash->entries;
             attrs->bucket           = NULL;
             attrs->pos              = 0;
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             return;
         }
 
@@ -265,7 +265,7 @@ the next one.
 
 */
 
-    VTABLE PMC *shift_pmc() {
+    VTABLE PMC *shift_pmc() :manual_wb {
         Parrot_HashIterator_attributes * const attrs =
                 PARROT_HASHITERATOR(SELF);
 
@@ -273,13 +273,12 @@ the next one.
 
         /* Move to next bucket */
         advance_to_next(SELF);
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
 
         if (attrs->elements < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
-        
         ret = Parrot_pmc_new(INTERP, enum_class_HashIteratorKey);
         VTABLE_set_pointer_keyed_int(INTERP, ret, 0, attrs->parrot_hash);
         VTABLE_set_pointer_keyed_int(INTERP, ret, 1, attrs->bucket);
@@ -291,33 +290,33 @@ the next one.
 
 */
 
-    VTABLE STRING* shift_string() {
+    VTABLE STRING* shift_string() :manual_wb {
         Parrot_HashIterator_attributes * const attrs = PARROT_HASHITERATOR(SELF);
 
         /* Move to next bucket */
         advance_to_next(SELF);
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
 
         if (attrs->elements < 0)
             return CONST_STRING(INTERP, "");
         
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return Parrot_hash_key_to_string(INTERP, attrs->parrot_hash, attrs->bucket->key);
     }
 /*
 
 */
 
-    VTABLE INTVAL shift_integer() {
+    VTABLE INTVAL shift_integer() :manual_wb {
         Parrot_HashIterator_attributes * const attrs = PARROT_HASHITERATOR(SELF);
 
         /* Move to next bucket */
         advance_to_next(SELF);
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
 
         if (attrs->elements < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return Parrot_hash_key_to_int(INTERP, attrs->parrot_hash, attrs->bucket->key);
     }
 }

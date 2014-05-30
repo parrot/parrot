@@ -888,7 +888,7 @@ Marks the C<struct> as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         PMC * const init = PARROT_UNMANAGEDSTRUCT(SELF)->init;
         Parrot_gc_mark_PMC_alive(INTERP, init);
     }
@@ -920,7 +920,7 @@ Returns whether the C<struct> is defined.
 
 */
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         return SELF.get_pointer() != NULL;
     }
 
@@ -938,7 +938,7 @@ Returns the size of the C<struct>.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         UNUSED(INTERP);
         return PARROT_UNMANAGEDSTRUCT(SELF)->size;
     }

@@ -855,7 +855,7 @@ Get the size (in bytes) required for one instance.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         size_t size;
         GET_ATTR_size(INTERP, SELF, size);
         return size;

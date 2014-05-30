@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -60,7 +60,7 @@ pmclass MultiSub
     provides array
     provides invokable {
 
-    VTABLE STRING * get_string() {
+    VTABLE STRING * get_string() :no_wb {
         PMC * const sub0    = VTABLE_get_pmc_keyed_int(INTERP, SELF, 0);
         /*if (PMC_IS_NULL(sub0))
             return STRINGNULL;*/
@@ -68,17 +68,17 @@ pmclass MultiSub
         return name;
     }
 
-    VTABLE void push_pmc(PMC *value) {
+    VTABLE void push_pmc(PMC *value) :manual_wb {
         check_is_valid_sub(INTERP, value);
         SUPER(value);
     }
 
-    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
+    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) :manual_wb {
         check_is_valid_sub(INTERP, value);
         SUPER(key, value);
     }
 
-    VTABLE opcode_t *invoke(void *next) {
+    VTABLE opcode_t *invoke(void *next) :no_wb {
         PMC * const sig_obj = CONTEXT(INTERP)->current_sig;
         PMC * const func    = Parrot_mmd_sort_manhattan_by_sig_pmc(INTERP,
                 SELF, sig_obj);

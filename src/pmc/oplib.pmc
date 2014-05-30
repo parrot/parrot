@@ -175,7 +175,7 @@ Returns the number of opcodes in the library.
         return oplib->op_count;
     }
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         return STATICSELF.elements();
     }
 

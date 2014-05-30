@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2011, Parrot Foundation.
+Copyright (C) 2004-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -373,7 +373,7 @@ Creates an identical copy of the complex number.
         }
     }
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         PMC * const dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         FLOATVAL re, im;
 
@@ -397,7 +397,7 @@ Serialize/deserialize this object for bytecode.
 
 */
 
-    VTABLE void freeze(PMC *visit) {
+    VTABLE void freeze(PMC *visit) :no_wb {
         FLOATVAL re, im;
 
         SUPER(visit);
@@ -443,26 +443,26 @@ Returns true if the complex number is non-zero.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         const FLOATVAL f = SELF.get_number();
         return (INTVAL)f;
     }
 
-    VTABLE FLOATVAL get_number() {
+    VTABLE FLOATVAL get_number() :no_wb {
         FLOATVAL re, im;
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
         return sqrt(re * re + im * im);
     }
 
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         FLOATVAL re, im;
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
         return Parrot_sprintf_c(INTERP, "%vg%+vgi", re, im);
     }
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         FLOATVAL re, im;
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
@@ -489,22 +489,22 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
 
 */
 
-    VTABLE INTVAL get_integer_keyed(PMC *key) {
+    VTABLE INTVAL get_integer_keyed(PMC *key) :no_wb {
         STRING * const s = VTABLE_get_string(INTERP, key);
         return SELF.get_integer_keyed_str(s);
     }
 
-    VTABLE INTVAL get_integer_keyed_str(STRING *key) {
+    VTABLE INTVAL get_integer_keyed_str(STRING *key) :no_wb {
         const FLOATVAL f = SELF.get_number_keyed_str(key);
         return (INTVAL)f;
     }
 
-    VTABLE FLOATVAL get_number_keyed(PMC *key) {
+    VTABLE FLOATVAL get_number_keyed(PMC *key) :no_wb {
         STRING * const s = VTABLE_get_string(INTERP, key);
         return SELF.get_number_keyed_str(s);
     }
 
-    VTABLE FLOATVAL get_number_keyed_str(STRING *key) {
+    VTABLE FLOATVAL get_number_keyed_str(STRING *key) :no_wb {
         FLOATVAL value;
         if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "real"))) {
             GET_ATTR_re(INTERP, SELF, value);
@@ -518,7 +518,7 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
         return value;
     }
 
-    VTABLE PMC *get_pmc_keyed(PMC *key) {
+    VTABLE PMC *get_pmc_keyed(PMC *key) :no_wb {
         if (VTABLE_isa(INTERP, key, CONST_STRING(INTERP, "Integer"))) {
             const INTVAL i = VTABLE_get_integer(INTERP, key);
             return SELF.get_pmc_keyed_int(i);
@@ -529,7 +529,7 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
         }
     }
 
-    VTABLE PMC *get_pmc_keyed_str(STRING *key) {
+    VTABLE PMC *get_pmc_keyed_str(STRING *key) :no_wb {
         PMC * const    ret = Parrot_pmc_new(INTERP, enum_class_Float);
         const FLOATVAL val = SELF.get_number_keyed_str(key);
         VTABLE_set_number_native(INTERP, ret, val);
@@ -546,7 +546,7 @@ Returns the requested number (real part for C<0> and imaginary for C<1>).
 
 */
 
-    VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
+    VTABLE PMC *get_pmc_keyed_int(INTVAL key) :no_wb {
         PMC * const    ret = Parrot_pmc_new(INTERP, enum_class_Float);
         const FLOATVAL val = SELF.get_number_keyed_int(key);
         VTABLE_set_number_native(INTERP, ret, val);
@@ -570,7 +570,7 @@ Set real or imag depending on key
 
 */
 
-    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
+    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) :no_wb {
         FLOATVAL f;
         switch (key) {
           case 0:
@@ -1208,7 +1208,7 @@ Compares the complex number with C<value> and returns true if they are equal.
 
 */
 
-    MULTI INTVAL is_equal(Complex value) {
+    MULTI INTVAL is_equal(Complex value) :no_wb {
         FLOATVAL self_re, self_im, val_re, val_im;
         GET_ATTR_re(INTERP, SELF, self_re);
         GET_ATTR_im(INTERP, SELF, self_im);
@@ -1217,7 +1217,7 @@ Compares the complex number with C<value> and returns true if they are equal.
         return (INTVAL)(self_re == val_re && self_im == val_im);
     }
 
-    MULTI INTVAL is_equal(DEFAULT value) {
+    MULTI INTVAL is_equal(DEFAULT value) :no_wb {
         FLOATVAL re, im;
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
@@ -1295,7 +1295,7 @@ ln(+-i) = +- (pi i)/2
 
 */
 
-    METHOD ln() {
+    METHOD ln() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         FLOATVAL re, im, result_re, result_im;
         GET_ATTR_re(INTERP, SELF, re);
@@ -1329,7 +1329,7 @@ exp(a + bi) = exp(a) * (cos(b) + i * sin(b))
 
 */
 
-    METHOD exp() {
+    METHOD exp() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         FLOATVAL re, im, f;
         GET_ATTR_re(INTERP, SELF, re);
@@ -1383,7 +1383,7 @@ Returns C<FUNC>(SELF).
 
 */
 
-    METHOD sin() {
+    METHOD sin() :no_wb {
         PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         FLOATVAL re, im, result_re, result_im;
         GET_ATTR_re(INTERP, SELF, re);
@@ -1413,7 +1413,7 @@ Returns C<FUNC>(SELF).
         RETURN(PMC *d);
     }
 
-    METHOD cos() {
+    METHOD cos() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         FLOATVAL re, im, result_re, result_im;
         GET_ATTR_re(INTERP, SELF, re);
@@ -1438,7 +1438,7 @@ Returns C<FUNC>(SELF).
         RETURN(PMC *d);
     }
 
-    METHOD tan() {
+    METHOD tan() :no_wb {
         PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC * const e = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
@@ -1450,7 +1450,7 @@ Returns C<FUNC>(SELF).
         RETURN(PMC *d);
     }
 
-    METHOD cot() {
+    METHOD cot() :no_wb {
         PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC * const e = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         (PMC *d) = PCCINVOKE(INTERP, SELF, "cos");
@@ -1473,7 +1473,7 @@ Returns C<FUNC>(SELF).
         RETURN(PMC *d);
     }
 
-    METHOD csc() {
+    METHOD csc() :no_wb {
         PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC * const e = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
@@ -1520,7 +1520,7 @@ Returns the inverse function of SELF.
 
 */
 
-    METHOD asin() {
+    METHOD asin() :no_wb {
         FLOATVAL d_re, d_im, e_re, e_im, self_re, self_im;
         PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC *       e = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -1548,7 +1548,7 @@ Returns the inverse function of SELF.
         RETURN(PMC *e);
     }
 
-    METHOD acos() {
+    METHOD acos() :no_wb {
         FLOATVAL d_re, d_im, e_re, e_im, self_re, self_im;
         PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC *       e = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -1576,7 +1576,7 @@ Returns the inverse function of SELF.
         RETURN(PMC *d);
     }
 
-    METHOD atan() {
+    METHOD atan() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC * const e  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         FLOATVAL re, im, d_re, d_im;
@@ -1600,7 +1600,7 @@ Returns the inverse function of SELF.
         RETURN(PMC *e);
     }
 
-    METHOD acot() {
+    METHOD acot() :no_wb {
         PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC     *e;
         FLOATVAL re, im;
@@ -1614,7 +1614,7 @@ Returns the inverse function of SELF.
         RETURN(PMC *e);
     }
 
-    METHOD acsc() {
+    METHOD acsc() :no_wb {
         PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC     *e;
         FLOATVAL re, im;
@@ -1628,7 +1628,7 @@ Returns the inverse function of SELF.
         RETURN(PMC *e);
     }
 
-    METHOD asec() {
+    METHOD asec() :no_wb {
         PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC     *e;
         FLOATVAL re, im;
@@ -1662,7 +1662,7 @@ tanh(z) = sinh(z) / cosh(z)
 
 */
 
-    METHOD sinh() {
+    METHOD sinh() :no_wb {
         PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         FLOATVAL re, im;
         GET_ATTR_re(INTERP, SELF, re);
@@ -1674,7 +1674,7 @@ tanh(z) = sinh(z) / cosh(z)
         RETURN(PMC *d);
     }
 
-    METHOD cosh() {
+    METHOD cosh() :no_wb {
         PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         FLOATVAL re, im;
         GET_ATTR_re(INTERP, SELF, re);
@@ -1691,7 +1691,7 @@ tanh(z) = sinh(z) / cosh(z)
         RETURN(PMC *d);
     }
 
-    METHOD tanh() {
+    METHOD tanh() :no_wb {
         PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC * const e = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
@@ -1703,7 +1703,7 @@ tanh(z) = sinh(z) / cosh(z)
         RETURN(PMC *d);
     }
 
-    METHOD coth() {
+    METHOD coth() :no_wb {
         FLOATVAL re, im;
         PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
@@ -1717,7 +1717,7 @@ tanh(z) = sinh(z) / cosh(z)
         RETURN(PMC *d);
     }
 
-    METHOD csch() {
+    METHOD csch() :no_wb {
         FLOATVAL re, im;
         PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
@@ -1731,7 +1731,7 @@ tanh(z) = sinh(z) / cosh(z)
         RETURN(PMC *d);
     }
 
-    METHOD sech() {
+    METHOD sech() :no_wb {
         FLOATVAL re, im;
         PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
@@ -1773,7 +1773,7 @@ atanh = i atan(-ix)
 
 */
 
-    METHOD asinh() {
+    METHOD asinh() :no_wb {
         FLOATVAL re, im;
         PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC * const e = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -1792,7 +1792,7 @@ atanh = i atan(-ix)
         RETURN(PMC *e);
     }
 
-    METHOD acosh() {
+    METHOD acosh() :no_wb {
         FLOATVAL re, im;
         PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC * const e = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -1806,7 +1806,7 @@ atanh = i atan(-ix)
         RETURN(PMC *e);
     }
 
-    METHOD atanh() {
+    METHOD atanh() :no_wb {
         FLOATVAL re, im;
         PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC * const e = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -1825,7 +1825,7 @@ atanh = i atan(-ix)
         RETURN(PMC *e);
     }
 
-    METHOD acoth() {
+    METHOD acoth() :no_wb {
         PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC     *e;
         FLOATVAL re, im;
@@ -1839,7 +1839,7 @@ atanh = i atan(-ix)
         RETURN(PMC *e);
     }
 
-    METHOD acsch() {
+    METHOD acsch() :no_wb {
         PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC     *e;
         FLOATVAL re, im;
@@ -1853,7 +1853,7 @@ atanh = i atan(-ix)
         RETURN(PMC *e);
     }
 
-    METHOD asech() {
+    METHOD asech() :no_wb {
         PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC     *e;
         FLOATVAL re, im;
@@ -1889,7 +1889,7 @@ x ^ y = exp(y * ln x))
 
 */
 
-    METHOD pow(PMC * value) {
+    METHOD pow(PMC * value) :no_wb {
         PMC *l = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC *log;
         PMC * const dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -1904,7 +1904,7 @@ x ^ y = exp(y * ln x))
         RETURN(PMC *dest);
     }
 
-    METHOD sqrt() {
+    METHOD sqrt() :no_wb {
         PMC * const result = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         const FLOATVAL absval = SELF.get_number();
         FLOATVAL sx, sy, rx, ry;

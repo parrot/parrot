@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008-2013, Parrot Foundation.
+Copyright (C) 2008-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -96,7 +96,7 @@ Create a copy of the filehandle.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         Parrot_FileHandle_attributes * const old_attrs
             = PARROT_FILEHANDLE(SELF);
         PMC * const copy = Parrot_pmc_new(interp, enum_class_FileHandle);
@@ -139,7 +139,7 @@ Mark active filehandle data as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         Parrot_FileHandle_attributes * const attrs
             = PARROT_FILEHANDLE(SELF);
 
@@ -179,7 +179,7 @@ For internal usage only, subject to change without notice.
 
 */
 
-    VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
+    VTABLE INTVAL get_integer_keyed_int(INTVAL key) :no_wb {
         INTVAL result;
         switch (key) {
           case 0:
@@ -229,7 +229,7 @@ in the file.
 
 */
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         return !Parrot_io_eof(INTERP, SELF);
     }
 
@@ -306,7 +306,7 @@ Returns a boolean value indicating whether C<SELF> is a console/tty.
 
 */
 
-    METHOD isatty() {
+    METHOD isatty() :no_wb {
         const INTVAL isatty = Parrot_io_is_tty_handle(INTERP, SELF);
         RETURN(INTVAL isatty);
     }
@@ -322,7 +322,7 @@ Test if the filehandle is closed.
 
 */
 
-    METHOD is_closed() {
+    METHOD is_closed() :no_wb {
         const INTVAL status = Parrot_io_is_closed(INTERP, SELF);
         RETURN(INTVAL status);
     }
@@ -461,7 +461,7 @@ Flushes the filehandle.
 
 */
 
-    METHOD flush() {
+    METHOD flush() :no_wb {
         Parrot_io_flush(INTERP, SELF);
     }
 
@@ -476,7 +476,7 @@ Print the passed in integer, number, string, or PMC to the filehandle.
 
 */
 
-    METHOD print(PMC *to_print) {
+    METHOD print(PMC *to_print) :no_wb {
         STRING * const string_to_print = VTABLE_get_string(INTERP, to_print);
 
         const INTVAL status = Parrot_io_write_s(INTERP, SELF, string_to_print);
@@ -511,9 +511,11 @@ Full buffering, bytes are sent when the buffer is full.
 
 */
 
-    METHOD buffer_type(STRING *new_type :optional, INTVAL got_type :opt_flag) {
-        if (got_type)
+    METHOD buffer_type(STRING *new_type :optional, INTVAL got_type :opt_flag) :manual_wb {
+        if (got_type) {
             Parrot_io_set_buffer_mode(INTERP, SELF, new_type);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+        }
         else {
             STRING * type_str = Parrot_io_get_buffer_mode(INTERP, SELF);
             RETURN(STRING *type_str);
@@ -547,7 +549,7 @@ Retrieve the read mode string for the filehandle.
 
 */
 
-    METHOD mode() {
+    METHOD mode() :no_wb {
         STRING *mode;
         GET_ATTR_mode(INTERP, SELF, mode);
         RETURN(STRING *mode);
@@ -566,7 +568,7 @@ in the file.
 
 */
 
-    METHOD eof() {
+    METHOD eof() :no_wb {
         const INTVAL flags = Parrot_io_eof(INTERP, SELF);
         RETURN(INTVAL flags);
     }
@@ -582,7 +584,7 @@ Returns the INTVAL used by the OS to identify this filehandle.
 
 */
 
-    METHOD handle() {
+    METHOD handle() :no_wb {
         INTVAL handle;
         GET_ATTR_os_handle(INTERP, SELF, handle);
         RETURN(INTVAL handle);
@@ -597,7 +599,7 @@ If this is a pipe, return the exit status of the child process.
 =cut
 
 */
-    METHOD exit_status() {
+    METHOD exit_status() :no_wb {
         INTVAL exit_status;
         GET_ATTR_exit_status(INTERP, SELF, exit_status);
         RETURN(INTVAL exit_status);
@@ -616,7 +618,7 @@ overflows on 32-bit systems.
 
 */
 
-    METHOD tell() {
+    METHOD tell() :no_wb {
         PIOOFF_T pos;
         GET_ATTR_file_pos(INTERP, SELF, pos);
         RETURN(INTVAL pos, INTVAL pos>>32);
@@ -663,7 +665,7 @@ Returns the next byte from the stream, but does not remove it.
 
 */
 
-    METHOD peek() {
+    METHOD peek() :no_wb {
         STRING * const s = Parrot_io_peek(INTERP, SELF);
         RETURN(STRING* s);
     }

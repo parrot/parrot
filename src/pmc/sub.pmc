@@ -273,7 +273,7 @@ Sets the name of the subroutine.
 
 */
 
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         STRING *name;
         GET_ATTR_name(INTERP, SELF, name);
         return name;
@@ -314,7 +314,7 @@ Returns the address of the actual subroutine.
 
 */
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         Parrot_Sub_attributes *sub;
         PMC_get_sub(INTERP, SELF, sub);
         return sub->seg->base.data + sub->start_offs;
@@ -333,7 +333,7 @@ now.> -DRS
 
 */
 
-    VTABLE INTVAL get_integer_keyed(PMC *key) {
+    VTABLE INTVAL get_integer_keyed(PMC *key) :no_wb {
         UNUSED(key)
         Parrot_Sub_attributes *sub;
         PMC_get_sub(INTERP, SELF, sub);
@@ -354,11 +354,11 @@ Returns True.
 
 */
 
-    VTABLE INTVAL defined() {
+    VTABLE INTVAL defined() :no_wb {
         return 1;
     }
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         return 1;
     }
 
@@ -373,7 +373,7 @@ Invokes the subroutine.
 
 */
 
-    VTABLE opcode_t *invoke(void *next) {
+    VTABLE opcode_t *invoke(void *next) :no_wb {
         PMC * const caller_ctx = CURRENT_CONTEXT(INTERP);
         PMC *ccont      = INTERP->current_cont;
 
@@ -532,7 +532,7 @@ Creates and returns a clone of the subroutine.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         PMC * const ret = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         Parrot_Sub_attributes *dest_sub;
@@ -598,7 +598,7 @@ Marks the sub as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         Parrot_Sub_attributes * const sub = PARROT_SUB(SELF);
 
         if (!sub)
@@ -636,7 +636,7 @@ Returns whether the two subroutines are equal.
 
 */
 
-    MULTI INTVAL is_equal(PMC *value) {
+    MULTI INTVAL is_equal(PMC *value) :no_wb {
         Parrot_Sub_attributes *my_sub, *value_sub;
 
         PMC_get_sub(INTERP, SELF, my_sub);
@@ -662,7 +662,7 @@ Archives the subroutine.
 
 */
 
-    VTABLE void visit(PMC *info) {
+    VTABLE void visit(PMC *info) :no_wb {
         VISIT_PMC_ATTR(INTERP, info, SELF, Sub, namespace_name);
         VISIT_PMC_ATTR(INTERP, info, SELF, Sub, multi_signature);
         VISIT_PMC_ATTR(INTERP, info, SELF, Sub, outer_sub);
@@ -681,7 +681,7 @@ Archives the subroutine.
     }
 
 
-    VTABLE void freeze(PMC *info) {
+    VTABLE void freeze(PMC *info) :no_wb {
         Parrot_Sub_attributes *sub;
         STRING                *hll_name;
         int i;
@@ -791,8 +791,7 @@ Returns the full set of meta-data about the sub.
 
 */
 
-    VTABLE PMC *inspect()
-    {
+    VTABLE PMC *inspect() :no_wb {
         /* Create a hash, then use inspect_str to get all of its data */
 
         PMC    * const metadata           = Parrot_pmc_new(INTERP, enum_class_Hash);
@@ -864,8 +863,7 @@ The number of optional named arguments
 
 */
 
-    VTABLE PMC *inspect_str(STRING *what)
-    {
+    VTABLE PMC *inspect_str(STRING *what) :no_wb {
         Parrot_Sub_attributes *sub;
         PMC                   *retval;
         INTVAL                 count_found = -1;
@@ -1002,7 +1000,7 @@ slurpy arguments).
 =cut
 
 */
-    METHOD start_offs() {
+    METHOD start_offs() :no_wb {
         Parrot_Sub_attributes  *sub;
         INTVAL                  start_offs;
 
@@ -1012,7 +1010,7 @@ slurpy arguments).
     }
 
 
-    METHOD end_offs() {
+    METHOD end_offs() :no_wb {
         Parrot_Sub_attributes  *sub;
         INTVAL                  end_offs;
         PMC_get_sub(INTERP, SELF, sub);
@@ -1021,7 +1019,7 @@ slurpy arguments).
     }
 
 
-    METHOD get_namespace() {
+    METHOD get_namespace() :no_wb {
         PMC                   *_namespace;
         Parrot_Sub_attributes *sub;
 
@@ -1036,7 +1034,7 @@ slurpy arguments).
     }
 
 
-    METHOD __get_regs_used(STRING *reg) {
+    METHOD __get_regs_used(STRING *reg) :no_wb {
         /* TODO switch to canonical NiSP order
          * see also imcc/reg_alloc.c */
         STRING                * const types = CONST_STRING(INTERP, "INSP");
@@ -1063,7 +1061,7 @@ slurpy arguments).
     }
 
 
-    METHOD get_lexinfo() {
+    METHOD get_lexinfo() :no_wb {
         PMC                   *lexinfo;
         Parrot_Sub_attributes *sub;
         PMC_get_sub(INTERP, SELF, sub);
@@ -1074,7 +1072,7 @@ slurpy arguments).
     }
 
 
-    METHOD get_subid() {
+    METHOD get_subid() :no_wb {
         STRING                *subid;
         Parrot_Sub_attributes *sub;
         PMC_get_sub(INTERP, SELF, sub);
@@ -1085,7 +1083,7 @@ slurpy arguments).
     }
 
 
-    METHOD get_outer() {
+    METHOD get_outer() :no_wb {
         PMC                   *outersub;
         Parrot_Sub_attributes *sub;
         PMC_get_sub(INTERP, SELF, sub);
@@ -1138,7 +1136,7 @@ slurpy arguments).
     }
 
 
-    METHOD get_multisig() {
+    METHOD get_multisig() :no_wb {
         PMC                   *multisig;
         Parrot_Sub_attributes *sub;
         PMC_get_sub(INTERP, SELF, sub);
@@ -1149,7 +1147,7 @@ slurpy arguments).
     }
 
 
-    METHOD arity() {
+    METHOD arity() :no_wb {
         PMC * const pos_required   = VTABLE_inspect_str(INTERP, SELF, CONST_STRING(INTERP, "pos_required"));
         PMC * const named_required = VTABLE_inspect_str(INTERP, SELF, CONST_STRING(INTERP, "named_required"));
 
@@ -1175,7 +1173,7 @@ slurpy arguments).
 =cut
 
 */
-    METHOD comp_flags() {
+    METHOD comp_flags() :no_wb {
         Parrot_Sub_attributes  *sub;
         INTVAL                  flags;
 
@@ -1184,13 +1182,13 @@ slurpy arguments).
         RETURN(INTVAL flags);
     }
 
-    METHOD pf_flags() {
+    METHOD pf_flags() :no_wb {
         /* Only PF specific flags */
         INTVAL  flags = PObj_get_FLAGS(SELF) & SUB_FLAG_PF_MASK;
         RETURN(INTVAL flags);
     }
 
-    METHOD get_packfile() {
+    METHOD get_packfile() :no_wb {
         Parrot_Sub_attributes *sub;
         PMC *view;
         PMC_get_sub(INTERP, SELF, sub);

@@ -133,7 +133,7 @@ Boolean value of the pointer. Non-C<NULL> is true, following in the C tradition.
 
 */
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         return STATICSELF.get_pointer() != NULL;
     }
 
@@ -164,7 +164,7 @@ In this case, always returns C<0>, indicating undetermined length.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         UNUSED(INTERP)
         UNUSED(SELF)
         return 0;

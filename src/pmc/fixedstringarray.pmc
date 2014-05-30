@@ -85,7 +85,7 @@ Creates and returns a copy of the array.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
 
         STRING **my_str_array;
         PMC        *const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
@@ -121,7 +121,7 @@ Marks the array as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
 
         STRING **str_array;
         GET_ATTR_str_array(INTERP, SELF, str_array);
@@ -162,10 +162,8 @@ Gets an iterator for the array.
 =cut
 
 */
-    VTABLE PMC *get_iter() :manual_wb {
-        PMC * const iter = Parrot_pmc_new_init(INTERP, enum_class_ArrayIterator, SELF);
-        PARROT_GC_WRITE_BARRIER(interp, _self);
-        return iter;
+    VTABLE PMC *get_iter() :no_wb {
+        return Parrot_pmc_new_init(INTERP, enum_class_ArrayIterator, SELF);
     }
 
 /*
@@ -223,10 +221,9 @@ Returns the integer value of the element at index C<key>.
 
 */
 
-    VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
+    VTABLE INTVAL get_integer_keyed_int(INTVAL key) :no_wb {
         STRING * const element = SELF.get_string_keyed_int(key);
-        INTVAL i = Parrot_str_to_int(INTERP, element);
-        RETURN(INTVAL i);
+        return Parrot_str_to_int(INTERP, element);
     }
 
 /*
@@ -256,10 +253,9 @@ Returns the floating-point value of the element at index C<key>.
 
 */
 
-    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
+    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) :no_wb {
         STRING * const element = SELF.get_string_keyed_int(key);
-        FLOATVAL n = Parrot_str_to_num(INTERP, element);
-        RETURN(FLOATVAL n);
+        return Parrot_str_to_num(INTERP, element);
     }
 
 /*
@@ -272,10 +268,9 @@ Returns the floating-point value of the element at index C<*key>.
 
 */
 
-    VTABLE FLOATVAL get_number_keyed(PMC *key) {
+    VTABLE FLOATVAL get_number_keyed(PMC *key) :no_wb {
         const INTVAL k = VTABLE_get_integer(INTERP, key);
-        FLOATVAL n = SELF.get_number_keyed_int(k);
-        RETURN(FLOATVAL n);
+        return SELF.get_number_keyed_int(k);
     }
 
 /*
@@ -288,7 +283,7 @@ Returns the Parrot string value of the element at index C<key>.
 
 */
 
-    VTABLE STRING *get_string_keyed_int(INTVAL key) {
+    VTABLE STRING *get_string_keyed_int(INTVAL key) :no_wb {
         STRING **str_array;
         UINTVAL  size;
 
@@ -298,7 +293,7 @@ Returns the Parrot string value of the element at index C<key>.
                 "FixedStringArray: index out of bounds!");
 
         GET_ATTR_str_array(INTERP, SELF, str_array);
-        RETURN(STRING* str_array[key]);
+        return str_array[key];
     }
 
 /*
@@ -311,10 +306,9 @@ Returns the Parrot string value of the element at index C<*key>.
 
 */
 
-    VTABLE STRING *get_string_keyed(PMC *key) {
+    VTABLE STRING *get_string_keyed(PMC *key) :no_wb {
         const INTVAL k = VTABLE_get_integer(INTERP, key);
-        STRING *ret = SELF.get_string_keyed_int(k);
-        RETURN(STRING* ret);
+        return SELF.get_string_keyed_int(k);
     }
 
 
@@ -328,12 +322,12 @@ Returns the PMC value of the element at index C<key>.
 
 */
 
-    VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
+    VTABLE PMC *get_pmc_keyed_int(INTVAL key) :no_wb {
         PMC    * const ret = Parrot_pmc_new(INTERP, enum_class_String);
         STRING * const val = SELF.get_string_keyed_int(key);
 
         VTABLE_set_string_native(INTERP, ret, val);
-        RETURN(PMC* ret);
+        return ret;
     }
 
 /*
@@ -346,10 +340,9 @@ Returns the PMC value of the element at index C<*key>.
 
 */
 
-    VTABLE PMC *get_pmc_keyed(PMC *key) {
+    VTABLE PMC *get_pmc_keyed(PMC *key) :no_wb {
         const INTVAL k = VTABLE_get_integer(INTERP, key);
-        PMC * const ret = SELF.get_pmc_keyed_int(k);
-        return ret;
+        return SELF.get_pmc_keyed_int(k);
     }
 
 /*
@@ -390,7 +383,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 
 */
 
-    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
+    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) :manual_wb {
         STRING *val = Parrot_str_from_int(INTERP, value);
         SELF.set_string_keyed_int(key, val);
     }
@@ -405,7 +398,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 
 */
 
-    VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
+    VTABLE void set_integer_keyed(PMC *key, INTVAL value) :manual_wb {
         const INTVAL k = VTABLE_get_integer(INTERP, key);
         SELF.set_integer_keyed_int(k, value);
     }
@@ -421,7 +414,7 @@ C<value>.
 
 */
 
-    VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
+    VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) :manual_wb {
         STRING * const val = Parrot_str_from_num(INTERP, value);
         SELF.set_string_keyed_int(key, val);
     }
@@ -437,7 +430,7 @@ C<value>.
 
 */
 
-    VTABLE void set_number_keyed(PMC *key, FLOATVAL value) :no_wb {
+    VTABLE void set_number_keyed(PMC *key, FLOATVAL value) :manual_wb {
         const INTVAL k = VTABLE_get_integer(INTERP, key);
         SELF.set_number_keyed_int(k, value);
     }
@@ -452,7 +445,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 
 */
 
-    VTABLE void set_string_keyed_int(INTVAL key, STRING *value) :no_wb {
+    VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
         STRING **str_array;
 
         if (key < 0 || key >= SELF.elements())
@@ -475,7 +468,7 @@ C<value>.
 
 */
 
-    VTABLE void set_string_keyed(PMC *key, STRING *value) :no_wb {
+    VTABLE void set_string_keyed(PMC *key, STRING *value) :manual_wb {
         const INTVAL k = VTABLE_get_integer(INTERP, key);
         SELF.set_string_keyed_int(k, value);
     }
@@ -490,7 +483,7 @@ Sets the PMC value of the element at index C<key> to C<*src>.
 
 */
 
-    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *src) :no_wb {
+    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *src) :manual_wb {
         STRING * const temp = VTABLE_get_string(INTERP, src);
         SELF.set_string_keyed_int(key, temp);
     }
@@ -506,7 +499,7 @@ C<value>.
 
 */
 
-    VTABLE void set_pmc_keyed(PMC *key, PMC *value) :no_wb {
+    VTABLE void set_pmc_keyed(PMC *key, PMC *value) :manual_wb {
         const INTVAL k = VTABLE_get_integer(INTERP, key);
         SELF.set_pmc_keyed_int(k, value);
     }
@@ -526,7 +519,7 @@ Returns the Parrot string representation C<key>.
         return STATICSELF.get_repr();
     }
 
-    VTABLE STRING *get_repr() {
+    VTABLE STRING *get_repr() :no_wb {
 
         STRING       *res = CONST_STRING(INTERP, "[ ");
         const INTVAL  n   = SELF.get_integer();
@@ -542,8 +535,7 @@ Returns the Parrot string representation C<key>.
                 res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, ", "));
         }
 
-        res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, " ]"));
-        RETURN(STRING *res);
+        return Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, " ]"));
     }
 
 
@@ -600,7 +592,7 @@ Used to archive the string.
 =cut
 
 */
-    VTABLE void freeze(PMC *info) {
+    VTABLE void freeze(PMC *info) :no_wb {
         STRING           **str_array;
         UINTVAL            size, i;
 

@@ -1529,7 +1529,7 @@ Returns the integer conversion of the BigNum.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         return bignum_get_si(INTERP, SELF);
     }
 
@@ -1577,7 +1577,7 @@ Returns the boolean value of the BigNum.
 
 */
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         return bignum_get_bool(INTERP, SELF);
     }
 

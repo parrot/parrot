@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2010-2012, Parrot Foundation.
-$Id$
+Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -71,7 +70,7 @@ Initializes the list.
 
 */
 
-    VTABLE void init() :no_wb {
+    VTABLE void init() {
         PObj_custom_mark_SET(SELF);
         PObj_custom_destroy_SET(SELF);
 
@@ -189,7 +188,7 @@ the array.
 
 */
 
-    VTABLE void push_pmc(PMC *value) :no_wb {
+    VTABLE void push_pmc(PMC *value) {
         INTVAL size;
         void *tmp;
         PMC_List_Item *foot;
@@ -243,7 +242,6 @@ Removes and returns the last element in the array.
         GET_ATTR_foot(INTERP, SELF, tmp);
         item = (PMC_List_Item*) tmp;
         
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         data = item->data;
 
         size -= 1;
@@ -281,7 +279,7 @@ the array.
 
 */
 
-    VTABLE void unshift_pmc(PMC *value) :no_wb {
+    VTABLE void unshift_pmc(PMC *value) {
         INTVAL size;
         void *tmp;
         PMC_List_Item *head;
@@ -320,11 +318,10 @@ Creates and returns a copy of the list.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         PMC * const copy = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         void* tmp;
         PMC_List_Item *it;
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
 
         GET_ATTR_head(INTERP, SELF, tmp);
         it = (PMC_List_Item*) tmp;
@@ -409,7 +406,7 @@ Used to unarchive the array.
         VTABLE_push_integer(INTERP, info, VTABLE_get_integer(INTERP, SELF));
     }
 
-    VTABLE void thaw(PMC *info) :no_wb {
+    VTABLE void thaw(PMC *info) {
         int n, i;
         SUPER(info);
         n = VTABLE_shift_integer(INTERP, info);
@@ -459,12 +456,12 @@ end of the array.
 
 */
 
-    METHOD shift() :manual_wb {
+    METHOD shift() {
         PMC * const value = VTABLE_shift_pmc(INTERP, SELF);
         RETURN(PMC *value);
     }
 
-    METHOD pop() :manual_wb {
+    METHOD pop() {
         PMC * const value = VTABLE_pop_pmc(INTERP, SELF);
         RETURN(PMC *value);
     }
@@ -481,11 +478,11 @@ Method forms to add a PMC to the beginning or end of the array.
 
 */
 
-    METHOD unshift(PMC* value) :no_wb {
+    METHOD unshift(PMC* value) {
         VTABLE_unshift_pmc(INTERP, SELF, value);
     }
 
-    METHOD push(PMC* value) :no_wb {
+    METHOD push(PMC* value) {
         VTABLE_push_pmc(INTERP, SELF, value);
     }
 

@@ -52,7 +52,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
     ATTR INTVAL is_pasm; /* 0 = PIR, 1 = PASM */
     ATTR INTVAL current_eval;
 
-    VTABLE void init() {
+    VTABLE void init() :no_wb {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "IMCCompiler: Must initialize with an integer argument 0 (PIR) or 1 (PASM)");
     }
@@ -74,7 +74,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
 
     /* provided to emulate the current NCI compreg */
     /* DEPRECATED. See TT #1967 */
-    VTABLE opcode_t* invoke(void* next) {
+    VTABLE opcode_t* invoke(void* next) :no_wb {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         imc_info_t * const imcc = (imc_info_t*) attrs->imcc_info;
         PMC * const ctx = CURRENT_CONTEXT(INTERP);
@@ -127,7 +127,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         return attrs->is_pasm;
     }
 
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         const Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         if (attrs->is_pasm)
             return CONST_STRING(INTERP, "PASM");
@@ -145,7 +145,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
     METHOD compile(STRING *source,
             STRING *path   :optional, INTVAL has_path   :opt_flag,
             STRING *target :named("target")    :optional, INTVAL has_target :opt_flag,
-            PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx    :opt_flag)
+            PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx    :opt_flag) :no_wb
     {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         PMC * pf;
@@ -176,7 +176,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
     METHOD compile_file(STRING *filename,
             STRING *path   :optional, INTVAL has_path   :opt_flag,
             STRING *target :named("target")    :optional, INTVAL has_target :opt_flag,
-            PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx    :opt_flag)
+            PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx    :opt_flag) :no_wb
     {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         PMC * pf = PMCNULL;
@@ -207,7 +207,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
 
     /*METHOD eval(STRING *source,
             STRING *target :named("target") :optional, INTVAL has_target :opt_flag,
-            PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx :opt_flag)
+            PMC *outer_ctx :named("outer_ctx") :optional, INTVAL has_ctx :opt_flag) :no_wb
     {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         PMC * pf = PMCNULL;
@@ -218,29 +218,29 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         pf = imcc_compile_string(imcc, source, attrs->is_pasm);
     }*/
 
-    METHOD preprocess(STRING *code) {
+    METHOD preprocess(STRING *code) :no_wb {
         const Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         imc_info_t * const imcc = (imc_info_t*)attrs->imcc_info;
         imcc_preprocess(imcc, code);
     }
 
-    /*METHOD parse_name(STRING *name) {
+    /*METHOD parse_name(STRING *name) :no_wb {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                 "IMCCompiler: parse_name is not supported");
     }*/
 
     /* TODO: This */
-    /*METHOD load_module(STRING *name) {
+    /*METHOD load_module(STRING *name) :no_wb {
 
     }*/
 
     /* TODO: This */
-    /*METHOD get_module(STRING *name) {
+    /*METHOD get_module(STRING *name) :no_wb {
 
     }*/
 
     /* TODO: This */
-    /*METHOD get_exports(PMC *module) {
+    /*METHOD get_exports(PMC *module) :no_wb {
 
     }*/
 }

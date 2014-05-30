@@ -310,7 +310,7 @@ Marks the PMC as alive.
 =cut
 
 */
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         PObj * const buffer = (PObj *)(PARROT_IMAGEIOFREEZE(SELF)->buffer);
         if (buffer)
             Parrot_gc_mark_PObj_alive(INTERP, buffer);
@@ -360,7 +360,7 @@ Returns the flags describing the visit action.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         UNUSED(INTERP)
         UNUSED(SELF)
         return VISIT_FREEZE_NORMAL;

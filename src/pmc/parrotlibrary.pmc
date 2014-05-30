@@ -106,7 +106,7 @@ Returns whether a library has been successfully loaded.
 
 */
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         UNUSED(INTERP)
         return (PMC_dlhandle(SELF) != NULL);
     }

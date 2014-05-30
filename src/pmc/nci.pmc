@@ -97,7 +97,7 @@ Return the MMD signature PMC, if any or C<PMCNULL>.
 
 */
 
-    METHOD get_multisig() {
+    METHOD get_multisig() :no_wb {
         PMC *sig;
         GET_ATTR_multi_sig(INTERP, SELF, sig);
         if (PMC_IS_NULL(sig))
@@ -119,7 +119,7 @@ Initializes the NCI with a C<NULL> function pointer.
         PObj_custom_mark_SET(SELF);
     }
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         UNUSED(INTERP)
         return PARROT_NCI(SELF)->orig_func;
     }
@@ -177,7 +177,7 @@ Mark any referenced strings and PMCs.
 =cut
 
 */
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         if (PARROT_NCI(SELF)) {
             Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
 
@@ -201,7 +201,7 @@ Creates and returns a clone of the NCI.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         Parrot_NCI_attributes * const nci_info_self = PARROT_NCI(SELF);
 
         PMC * const ret     = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
@@ -250,7 +250,7 @@ class, the PMC arguments are shifted down.
 
 */
 
-    VTABLE opcode_t *invoke(void *next) {
+    VTABLE opcode_t *invoke(void *next) :no_wb {
         Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         nci_thunk_t                   func;
         PMC                          *fb_info;
@@ -331,7 +331,7 @@ Return the arity of the NCI (the number of arguments).
 =cut
 
 */
-    METHOD arity() {
+    METHOD arity() :no_wb {
         Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
 
         if (nci_info) {

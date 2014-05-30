@@ -207,7 +207,7 @@ Marks the object as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         PMC *tmp;
 
         GET_ATTR_op_maps(INTERP, SELF, tmp);
@@ -231,7 +231,7 @@ Get the number of opcode mappings.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         PMC *ops;
         GET_ATTR_ops(INTERP, SELF, ops);
         return VTABLE_elements(INTERP, ops);

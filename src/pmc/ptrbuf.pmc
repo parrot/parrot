@@ -51,7 +51,7 @@ Get and set the buffer size.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         INTVAL i;
         GET_ATTR_size(INTERP, SELF, i);
         return i;

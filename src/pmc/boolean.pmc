@@ -103,12 +103,12 @@ Obtain the value of the C<Boolean> as a string: "1" = C<TRUE>, "0" = C<FALSE>.
 
 */
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         UNUSED(INTERP);
         return get_boolean_FLAG(SELF);
     }
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         return SELF.get_bool();
     }
 

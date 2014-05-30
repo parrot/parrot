@@ -184,7 +184,7 @@ Retrieves the number of pending tasks in the scheduler's task list.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
         INTVAL elements;
 
@@ -220,7 +220,7 @@ Marks any referenced strings and PMCs as live.
 =cut
 
 */
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         if (PARROT_SCHEDULER(SELF)) {
             Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
 

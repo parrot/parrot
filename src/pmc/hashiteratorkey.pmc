@@ -60,7 +60,7 @@ Get "key".
     }
 
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         UNUSED(INTERP)
         UNUSED(SELF)
         return -1;
