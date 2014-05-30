@@ -166,7 +166,7 @@ sub rewrite_RETURNs {
     my $signature_re   = qr/
       (RETURN       #method name
       \s*              #optional whitespace
-      \( ([^\(]*) \)   #returns ( stuff ... )
+      \( ([^\(]*) \)   #returns ( type... var)
       ;?)              #optional semicolon
     /sx;
 
@@ -227,6 +227,7 @@ END
     return $result;
 }
 
+# This doesn't handle "const PMC *var", but "PMC *const var"
 sub parse_p_args_string {
     my ($parameters) = @_;
     my $linear_args  = [];
@@ -241,12 +242,16 @@ sub parse_p_args_string {
 
         my ( $type, $name, $rest ) = split /\s+/, trim($x), 3;
 
+        # 'PMC *const ret'
+        if ($rest and $rest !~ /^:/) { # handle const volatile or such
+            $type .= " ".$name;
+            ($name, $rest) = split /\s+/, trim($rest), 2;
+        }
+
         die "invalid PCC arg '$x': did you forget to specify a type?\n"
             unless defined $name;
 
-        if ($name =~ /\**([a-zA-Z_]\w*)/) {
-            $name = $1;
-        }
+        $name =~ s/^\*//g;
 
         my $arg = {
             type  => convert_type_string_to_reg_type($type),
