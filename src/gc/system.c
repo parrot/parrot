@@ -455,10 +455,11 @@ trace_mem_block(PARROT_INTERP,
     if (!lo_var_ptr || !hi_var_ptr)
         return;
 
-    if (lo_var_ptr < hi_var_ptr) {
-        const size_t tmp_ptr = hi_var_ptr;
-        hi_var_ptr           = lo_var_ptr;
-        lo_var_ptr           = tmp_ptr;
+    /* We can the scan the pool upwards from lo to hi. */
+    if (hi_var_ptr < lo_var_ptr) {
+        const size_t tmp_ptr = lo_var_ptr;
+        lo_var_ptr           = hi_var_ptr;
+        hi_var_ptr           = tmp_ptr;
     }
 
     /* Get the expected prefix */
@@ -466,11 +467,10 @@ trace_mem_block(PARROT_INTERP,
                 ? mask & buffer_min
                 : 0;
 
-    for (cur_var_ptr = hi_var_ptr;
-        (ptrdiff_t)cur_var_ptr < (ptrdiff_t)lo_var_ptr;
-        cur_var_ptr = (size_t)((ptrdiff_t)cur_var_ptr + sizeof (void *))) {
-        const size_t ptr = *(size_t *)cur_var_ptr;
+    for (cur_var_ptr = lo_var_ptr; cur_var_ptr < (ptrdiff_t)hi_var_ptr; cur_var_ptr++) {
 
+        /* XXX yes, ptr may be uninitialized here. valgrind and asan complains. */
+        const size_t ptr = *(size_t *)cur_var_ptr;
         if (!ptr)
             continue;
 
