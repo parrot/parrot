@@ -35,10 +35,10 @@ out-of-bounds test. Checks INT and PMC keys.
     test_freez_thaw()
     test_get_string()
     test_equality()
-    test_gc()
     test_number()
     test_new_style_init()
     test_invalid_init_tt1509()
+    test_gc()
 .end
 
 .sub 'test_set_size'
@@ -260,27 +260,6 @@ out-of-bounds test. Checks INT and PMC keys.
     ok($P0, "Non-empty array is true")
 .end
 
-.sub 'test_gc'
-    $P0 = new ['FixedStringArray']
-    $P0 = 8192
-
-    $I0 = 0
-  loop:
-    $P0[$I0] = $I0
-    inc $I0
-    sweep 1
-    if $I0 < 8192 goto loop
-
-    $S0 = $P0[1000]
-    is($S0, "1000", "1000th element survived")
-    $S0 = $P0[2000]
-    is($S0, "2000", "2000th element survived")
-    $S0 = $P0[4000]
-    is($S0, "4000", "4000th element survived")
-    $S0 = $P0[8000]
-    is($S0, "8000", "8000th element survived")
-.end
-
 .sub 'test_get_iter'
     $P0 = new ['FixedStringArray']
     $P0 = 3
@@ -365,7 +344,6 @@ out-of-bounds test. Checks INT and PMC keys.
     isnt(a1, a2, "Not equal when second element is null")
 .end
 
-
 .sub 'test_number'
     .local pmc fsa
     fsa = new ['FixedStringArray']
@@ -401,6 +379,27 @@ CODE
         $P0 = new 'FixedStringArray', -10
     .end
 CODE
+.end
+
+.sub 'test_gc'
+    $P0 = new ['FixedStringArray']
+    $P0 = 8192
+
+    $I0 = 0
+  loop:
+    $P0[$I0] = $I0
+    inc $I0
+    sweep 1
+    if $I0 < 8192 goto loop
+
+    $S0 = $P0[1000]
+    is($S0, "1000", "1000th element survived")
+    $S0 = $P0[2000]
+    is($S0, "2000", "2000th element survived")
+    $S0 = $P0[4000]
+    is($S0, "4000", "4000th element survived")
+    $S0 = $P0[8000]
+    is($S0, "8000", "8000th element survived")
 .end
 
 # Local Variables:
