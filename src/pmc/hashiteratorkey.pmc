@@ -35,7 +35,7 @@ Get "key".
 =cut
 
 */
-    VTABLE PMC* get_pmc() {
+    VTABLE PMC* get_pmc() :no_wb {
         Parrot_HashIteratorKey_attributes *attrs =
                 PARROT_HASHITERATORKEY(SELF);
 
@@ -46,12 +46,12 @@ Get "key".
         return Parrot_hash_key_to_pmc(INTERP, attrs->parrot_hash, attrs->bucket->key);
     }
 
-    METHOD key() {
+    METHOD key() :no_wb {
         PMC * const ret = SELF.get_pmc();
         RETURN(PMC* ret);
     }
 
-    METHOD value() {
+    METHOD value() :no_wb {
         const Parrot_HashIteratorKey_attributes * const attrs =
                 PARROT_HASHITERATORKEY(SELF);
         PMC * const ret =
@@ -66,7 +66,7 @@ Get "key".
         return -1;
     }
 
-    VTABLE STRING* get_string() {
+    VTABLE STRING* get_string() :no_wb {
         const Parrot_HashIteratorKey_attributes * const attrs =
                 PARROT_HASHITERATORKEY(SELF);
 

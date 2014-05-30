@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -74,7 +74,7 @@ Marks the current idx/key and the aggregate as live.
 =cut
 
 */
-    VTABLE PMC* clone() {
+    VTABLE PMC* clone() :no_wb {
         String_iter * const iter    = &PARROT_STRINGITERATOR(SELF)->iter;
         PMC         * const str_pmc = Parrot_pmc_new(INTERP, enum_class_String);
         PMC         *clone;
@@ -117,7 +117,7 @@ Returns the number of remaining elements in the C<string>.
 
 */
 
-    VTABLE INTVAL elements() {
+    VTABLE INTVAL elements() :no_wb {
         String_iter * const iter = &PARROT_STRINGITERATOR(SELF)->iter;
         STRING *str_val;
         INTVAL  reverse;
@@ -178,7 +178,7 @@ Returns this Iterator's string.
 
 */
 
-    VTABLE PMC *get_pmc() {
+    VTABLE PMC *get_pmc() :no_wb {
         PMC * const string = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(
             interp, enum_class_String));
         STRING *str_val;
@@ -197,7 +197,7 @@ Shift next character from C<string> as PMC.
 =cut
 
 */
-    VTABLE PMC *shift_pmc() {
+    VTABLE PMC *shift_pmc() :no_wb {
         String_iter * const iter = &PARROT_STRINGITERATOR(SELF)->iter;
         PMC *ret;
         STRING *str_val, *substr;
@@ -224,7 +224,7 @@ Shift next character from C<string>.
 =cut
 
 */
-    VTABLE STRING *shift_string() {
+    VTABLE STRING *shift_string() :no_wb {
         String_iter * const iter = &PARROT_STRINGITERATOR(SELF)->iter;
         STRING *str_val;
         const String_iter old_iter = *iter;
@@ -247,7 +247,7 @@ Shift next character code from C<string>.
 =cut
 
 */
-    VTABLE INTVAL shift_integer() {
+    VTABLE INTVAL shift_integer() :no_wb {
         String_iter * const iter = &PARROT_STRINGITERATOR(SELF)->iter;
         STRING *str_val;
 
@@ -268,7 +268,7 @@ Shift "next" character from C<string> for reverse iterator as PMC.
 =cut
 
 */
-    VTABLE PMC *pop_pmc() {
+    VTABLE PMC *pop_pmc() :no_wb {
         String_iter * const iter = &PARROT_STRINGITERATOR(SELF)->iter;
         STRING *str_val, *substr;
         PMC *ret;
@@ -296,7 +296,7 @@ Shift "next" character from C<string> for reverse iterator.
 =cut
 
 */
-    VTABLE STRING *pop_string() {
+    VTABLE STRING *pop_string() :no_wb {
         String_iter * const iter = &PARROT_STRINGITERATOR(SELF)->iter;
         STRING *str_val;
         const String_iter old_iter = *iter;
@@ -320,7 +320,7 @@ Shift "next" character code from C<string> for reverse iterator.
 =cut
 
 */
-    VTABLE INTVAL pop_integer() {
+    VTABLE INTVAL pop_integer() :no_wb {
         String_iter * const iter = &PARROT_STRINGITERATOR(SELF)->iter;
         STRING *str_val;
 
@@ -344,7 +344,7 @@ Get integer value of current position plus idx.
 
 */
 
-    VTABLE INTVAL get_integer_keyed_int(INTVAL idx) {
+    VTABLE INTVAL get_integer_keyed_int(INTVAL idx) :no_wb {
         String_iter * const iter = &PARROT_STRINGITERATOR(SELF)->iter;
         STRING *str_val;
         const UINTVAL offset = iter->charpos + idx;
@@ -367,7 +367,7 @@ Get string value of current position plus idx.
 
 */
 
-    VTABLE STRING *get_string_keyed_int(INTVAL idx) {
+    VTABLE STRING *get_string_keyed_int(INTVAL idx) :no_wb {
         String_iter iter = PARROT_STRINGITERATOR(SELF)->iter;
         String_iter next_iter;
         STRING *str_val;

@@ -438,7 +438,7 @@ Get iterator for declared lexicals.
 =cut
 
 */
-    VTABLE PMC *get_iter() {
+    VTABLE PMC *get_iter() :no_wb {
         PMC    *info;
         PMC    *ctx;
         PMC    *info_iter;
@@ -485,8 +485,7 @@ Get iterator for declared lexicals.
                     throw_wrong_register_type(INTERP, name);
             }
         }
-        iter = VTABLE_get_iter(INTERP, value_map);
-        RETURN(PMC *iter);
+        return VTABLE_get_iter(INTERP, value_map);
     }
 
 /*

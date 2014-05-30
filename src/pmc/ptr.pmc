@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2012, Parrot Foundation.
+Copyright (C) 2011-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -81,13 +81,13 @@ C<init> with a value from an existing pointer-ish PMC.
         }
     }
 
-    VTABLE void init_int(INTVAL i) {
+    VTABLE void init_int(INTVAL i) :manual_wb {
         void *ptr = (void *)i;
         SELF.init();
         STATICSELF.set_pointer(ptr);
     }
 
-    VTABLE void init_pmc(PMC *p) {
+    VTABLE void init_pmc(PMC *p) :manual_wb {
         void *ptr = VTABLE_get_pointer(INTERP, p);
         SELF.init();
         STATICSELF.set_pointer(ptr);
@@ -105,7 +105,7 @@ Get and set the pointer value.
 
 */
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :manual_wb {
         void *ptr;
         if (PTR_FAT_TEST(INTERP, SELF))
             GET_ATTR_ptr(INTERP, SELF, ptr);
@@ -187,7 +187,7 @@ specified. If the encoding is omitted or null, use platform encoding.
 
 */
 
-    METHOD as_string(STRING *encodingname :optional) {
+    METHOD as_string(STRING *encodingname :optional) :no_wb {
         const char * content = (const char *)SELF.get_pointer();
         STRING *result = Parrot_str_new_from_cstring(INTERP, content, encodingname);
         RETURN(STRING result);

@@ -116,7 +116,7 @@ Returns the full name of the opcode.
 
 */
 
-    VTABLE STRING* get_string() {
+    VTABLE STRING* get_string() :no_wb {
         Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
         const char * const name                = attrs->info->full_name;
         const INTVAL len                       = strlen(name);
@@ -203,7 +203,7 @@ Returns the family, or short, name of the opcode.
 
 */
 
-    METHOD family_name() {
+    METHOD family_name() :no_wb {
         const char * const name = PARROT_OPCODE(SELF)->info->name;
         const INTVAL len = strlen(name);
         STRING * const result = Parrot_str_new(INTERP, name, len);
@@ -220,7 +220,7 @@ Returns the jump value for the opcode.
 
 */
 
-    METHOD jump() {
+    METHOD jump() :no_wb {
         const op_info_t * const info = PARROT_OPCODE(SELF)->info;
         const INTVAL jump = info->jump;
         RETURN(INTVAL jump);
@@ -248,7 +248,7 @@ Returns an array of direction information for the arguments.
 
 */
 
-    METHOD dirs() {
+    METHOD dirs() :no_wb {
         const op_info_t * const info = PARROT_OPCODE(SELF)->info;
         const INTVAL arg_count = info->op_count - 1;
         PMC *result;
@@ -273,7 +273,7 @@ Returns an array describing if each argument is a label.  (0 or 1)
 
 */
 
-    METHOD labels() {
+    METHOD labels() :no_wb {
         const op_info_t * const info = PARROT_OPCODE(SELF)->info;
         PMC * const result = Parrot_pmc_new(INTERP, enum_class_FixedIntegerArray);
         const INTVAL arg_count = info->op_count - 1;

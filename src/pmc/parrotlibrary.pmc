@@ -79,7 +79,7 @@ Creates and returns a clone of the library.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         PMC * const dest     = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         if (PMC_oplib_init(SELF))
@@ -121,7 +121,7 @@ Returns the name of the loaded library.
 
 */
 
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         STRING * const key  = CONST_STRING(INTERP, "_filename");
         PMC    * const prop = Parrot_pmc_getprop(INTERP, SELF, key);
 
@@ -138,7 +138,7 @@ Gets the pointer to the shared library handle.
 
 */
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         UNUSED(INTERP)
         return PMC_dlhandle(SELF);
     }
@@ -153,7 +153,7 @@ Sets the pointer to the shared library handle.
 
 */
 
-    VTABLE void set_pointer(void *handle) {
+    VTABLE void set_pointer(void *handle) :no_wb {
         PMC_dlhandle(SELF) = handle;
         PObj_custom_destroy_SET(SELF);
     }

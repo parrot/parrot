@@ -161,7 +161,7 @@ Returns the PMC value of the key.
 
 */
 
-    VTABLE void set_integer_native(INTVAL value) :no_wb {
+    VTABLE void set_integer_native(INTVAL value) {
         Parrot_key_set_integer(INTERP, SELF, value);
     }
 
@@ -226,7 +226,7 @@ chain.
 
 */
 
-    VTABLE PMC *shift_pmc() {
+    VTABLE PMC *shift_pmc() :no_wb {
         PMC *next_key;
 
         GET_ATTR_next_key(INTERP, SELF, next_key);
@@ -374,7 +374,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
         }
     }
 
-    VTABLE STRING* get_repr() {
+    VTABLE STRING* get_repr() :no_wb {
         return Parrot_key_set_to_string(INTERP, SELF);
     }
 
@@ -422,22 +422,21 @@ Aggregate interface.
         return Parrot_key_integer(INTERP, SELF);
     }
 
-    VTABLE STRING *get_string_keyed_int(INTVAL n) {
+    VTABLE STRING *get_string_keyed_int(INTVAL n) :no_wb {
         for (; SELF && n; SELF = PARROT_KEY(SELF)->next_key, n--);
         if (n)
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0, "Key access out of bounds");
         return Parrot_key_string(INTERP, SELF);
     }
 
-    VTABLE PMC *get_pmc_keyed_int(INTVAL n) {
+    VTABLE PMC *get_pmc_keyed_int(INTVAL n) :no_wb {
         for (; SELF && n; SELF = PARROT_KEY(SELF)->next_key, n--);
         if (n)
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0, "Key access out of bounds");
         return Parrot_key_pmc(INTERP, SELF);
     }
 
-    METHOD make_register_key(STRING * set, INTVAL idx)
-    {
+    METHOD make_register_key(STRING * set, INTVAL idx) {
         INTVAL first_char = Parrot_str_indexed(INTERP, set, 0);
         KEY_flags key_type;
         switch (first_char) {
@@ -457,14 +456,12 @@ Aggregate interface.
         Parrot_key_set_register(INTERP, SELF, idx, (INTVAL)key_type);
     }
 
-    METHOD is_register_reference() 
-    {
+    METHOD is_register_reference() :no_wb {
         INTVAL is_reg_ref = KEY_register_TEST(SELF) ? 1 : 0;
         RETURN(INTVAL is_reg_ref);
     }
 
-    METHOD get_register_idx()
-    {
+    METHOD get_register_idx() :no_wb {
         if (!KEY_register_TEST(SELF))
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
                 "Key: Key is not a register reference");
@@ -474,8 +471,7 @@ Aggregate interface.
         }
     }
 
-    METHOD get_register_contents(PMC *ctx :optional, INTVAL has_ctx :opt_flag)
-    {
+    METHOD get_register_contents(PMC *ctx :optional, INTVAL has_ctx :opt_flag) :no_wb {
         INTVAL int_key;
         if (!KEY_register_TEST(SELF))
             Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
@@ -524,7 +520,7 @@ Aggregate interface.
     }
 
     /* returns integer, values taken from PCC */
-    METHOD get_type() {
+    METHOD get_type() :no_wb {
         INTVAL ret = 0;
         switch (KEY_get_FLAGS(SELF)) {
 #if 0

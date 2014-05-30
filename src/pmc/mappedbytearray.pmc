@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2011, Parrot Foundation.
+Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -200,7 +200,7 @@ Return the size of the mapped area.
 
 */
 
-    VTABLE INTVAL elements() {
+    VTABLE INTVAL elements() :no_wb {
         #ifdef ENABLED
         UINTVAL size;
         GET_ATTR_size(INTERP, SELF, size);
@@ -225,7 +225,7 @@ Set the byte at pos to value.
 
 */
 
-    VTABLE INTVAL get_integer_keyed_int(INTVAL pos) {
+    VTABLE INTVAL get_integer_keyed_int(INTVAL pos) :no_wb {
         INTVAL size;
         unsigned char *buffer;
         GET_ATTR_size(INTERP, SELF, size);
@@ -274,8 +274,7 @@ Return 0 if file mapping is not supported, non zero otherwise.
 
 */
 
-    METHOD supported()
-    {
+    METHOD supported() :no_wb {
         #ifdef ENABLED
         RETURN(INTVAL 1);
         #else
@@ -294,8 +293,7 @@ Map a file by its name. The mode argument can be "r", "w" or "rw",
 
 */
 
-    METHOD open(STRING *filename, STRING *mode :optional)
-    {
+    METHOD open(STRING *filename, STRING *mode :optional) {
         #ifdef ENABLED
         unsigned long length = 0;
         int flag = 0;
@@ -342,8 +340,7 @@ does not fail, non zero otherwise.
 
 */
 
-    METHOD close()
-    {
+    METHOD close() {
         INTVAL result = 1;
         #ifdef ENABLED
         unsigned char *buffer;
@@ -376,8 +373,7 @@ Get a string from the buffer content with the specified encoding.
 
 */
 
-    METHOD get_string(INTVAL pos, INTVAL bytelength, STRING *encodingname)
-    {
+    METHOD get_string(INTVAL pos, INTVAL bytelength, STRING *encodingname) :no_wb {
         #ifdef ENABLED
         STRING *result;
         unsigned char *buffer;
@@ -405,8 +401,7 @@ length in codepoints.
 
 */
 
-    METHOD get_chars(INTVAL pos, INTVAL length, STRING *encodingname)
-    {
+    METHOD get_chars(INTVAL pos, INTVAL length, STRING *encodingname) :no_wb {
         #ifdef ENABLED
         STRING * const result = get_encoded_chars(INTERP, SELF, pos, length,
                     Parrot_find_encoding_by_string(INTERP, encodingname));
@@ -425,8 +420,7 @@ in codepoints.
 
 */
 
-    METHOD get_utf8(INTVAL pos, INTVAL length)
-    {
+    METHOD get_utf8(INTVAL pos, INTVAL length) :no_wb {
         #ifdef ENABLED
         STRING * const result = get_encoded_chars(INTERP, SELF, pos, length,
                     Parrot_utf8_encoding_ptr);

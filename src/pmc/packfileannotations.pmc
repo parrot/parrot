@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -92,7 +92,7 @@ Get the number of elements in the array.
 =cut
 
 */
-    VTABLE INTVAL elements() {
+    VTABLE INTVAL elements() :no_wb {
         return VTABLE_elements(INTERP,
                 PARROT_PACKFILEANNOTATIONS(SELF)->annotations);
     }
@@ -107,7 +107,7 @@ Fetch an annotation PMC from the array.
 =cut
 
 */
-    VTABLE PMC *get_pmc_keyed_int(INTVAL index)  {
+    VTABLE PMC *get_pmc_keyed_int(INTVAL index) :no_wb {
         return VTABLE_get_pmc_keyed_int(INTERP,
                 PARROT_PACKFILEANNOTATIONS(SELF)->annotations, index);
     }
@@ -137,14 +137,14 @@ thrown unless all of the following criteria are met:
 =cut
 
 */
-    VTABLE void set_pmc_keyed_int(INTVAL index, PMC *annotation)  {
+    VTABLE void set_pmc_keyed_int(INTVAL index, PMC *annotation) :manual_wb {
         const Parrot_PackfileAnnotations_attributes * const attrs =
                 PARROT_PACKFILEANNOTATIONS(SELF);
         const Parrot_PackfileAnnotation_attributes  * const entity_attrs =
                 PARROT_PACKFILEANNOTATION(annotation);
         INTVAL dummy;
 
-        /* TODO: add checks desribed above */
+        /* TODO: add checks described above */
         VTABLE_set_pmc_keyed_int(INTERP, attrs->annotations, index, annotation);
 
         /* Add required constants */
@@ -265,7 +265,7 @@ Create PackFile_Annotations* from self.
 =cut
 
 */
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         Parrot_PackfileAnnotations_attributes * const attrs =
                 PARROT_PACKFILEANNOTATIONS(SELF);
         PackFile_Annotations * const res =
@@ -358,7 +358,7 @@ Get segment type.
 
 */
 
-    METHOD type() {
+    METHOD type() :no_wb {
         RETURN(INTVAL PF_ANNOTATIONS_SEG);
     }
 

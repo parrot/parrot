@@ -225,6 +225,7 @@ otherwise.
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Cannot overwrite existing pointer in PackfileView");
         attrs->pf = (PackFile*)ptr;
+        /* Do not free an empty pf? See above */
         if (ptr != NULL)
             PARROT_GC_WRITE_BARRIER(INTERP, SELF);
     }
@@ -279,7 +280,7 @@ Get a FLOATVAL from the constants table, by index
 
 */
 
-    VTABLE PMC * get_pmc_keyed_int(INTVAL idx) {
+    VTABLE PMC * get_pmc_keyed_int(INTVAL idx) :no_wb {
         PackFile_ConstTable * const ct = get_const_table(INTERP, SELF);
         if (!ct)
             return PMCNULL;
@@ -290,7 +291,7 @@ Get a FLOATVAL from the constants table, by index
         return ct->pmc.constants[idx];
     }
 
-    VTABLE STRING * get_string_keyed_int(INTVAL idx) {
+    VTABLE STRING * get_string_keyed_int(INTVAL idx) :no_wb {
         PackFile_ConstTable * const ct = get_const_table(INTERP, SELF);
         if (!ct)
             return STRINGNULL;
@@ -301,7 +302,7 @@ Get a FLOATVAL from the constants table, by index
         return ct->str.constants[idx];
     }
 
-    VTABLE FLOATVAL get_number_keyed_int(INTVAL idx) {
+    VTABLE FLOATVAL get_number_keyed_int(INTVAL idx) :no_wb {
         PackFile_ConstTable * const ct = get_const_table(INTERP, SELF);
         if (!ct)
             return 0.0;
@@ -329,7 +330,7 @@ and PMC constants in the respective constant tables.
 
 */
 
-    METHOD constant_counts() {
+    METHOD constant_counts() :no_wb {
         PackFile_ConstTable * const ct = get_const_table(INTERP, SELF);
         if (!ct)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNEXPECTED_NULL,
@@ -392,7 +393,7 @@ Determine if the given tag has been marked initialized
 
 */
 
-    METHOD main_sub() {
+    METHOD main_sub() :no_wb {
         Parrot_PackfileView_attributes * const attrs =
                 PARROT_PACKFILEVIEW(SELF);
         if (attrs->pf == NULL)
@@ -403,17 +404,17 @@ Determine if the given tag has been marked initialized
         }
     }
 
-    METHOD subs_by_tag(STRING *flag) {
+    METHOD subs_by_tag(STRING *flag) :no_wb {
         PMC * const subs = Parrot_pf_subs_by_tag(INTERP, SELF, flag);
         RETURN(PMC *subs);
     }
 
-    METHOD single_sub_by_tag(STRING *flag) {
+    METHOD single_sub_by_tag(STRING *flag) :no_wb {
         PMC * const sub = Parrot_pf_single_sub_by_tag(INTERP, SELF, flag);
         RETURN(PMC *sub);
     }
 
-    METHOD all_subs() {
+    METHOD all_subs() :no_wb {
         PMC * const array = Parrot_pf_all_subs(INTERP, SELF);
         RETURN(PMC *array);
     }
@@ -423,12 +424,12 @@ Determine if the given tag has been marked initialized
         RETURN(PMC *sub);
     }
 
-    METHOD all_tags() {
+    METHOD all_tags() :no_wb {
         PMC * const array = Parrot_pf_all_tags_list(INTERP, SELF);
         RETURN(PMC *array);
     }
 
-    METHOD all_tagged_pmcs() {
+    METHOD all_tagged_pmcs() :no_wb {
         PMC * const hash = Parrot_pf_all_tagged_pmcs(INTERP, SELF);
         RETURN(PMC *hash);
     }
@@ -437,7 +438,7 @@ Determine if the given tag has been marked initialized
         add_called_tag(INTERP, SELF, tag);
     }
 
-    METHOD is_initialized(STRING *tag) {
+    METHOD is_initialized(STRING *tag) :no_wb {
         const INTVAL has_it = find_called_tag(INTERP, SELF, tag);
         RETURN(INTVAL has_it);
     }
@@ -461,7 +462,7 @@ ptr in this PMC. Subject to the normal set_pointer restrictions.
 
 */
 
-    METHOD serialized_size() {
+    METHOD serialized_size() :no_wb {
         INTVAL size;
         Parrot_PackfileView_attributes * const attrs =
                 PARROT_PACKFILEVIEW(SELF);
@@ -471,7 +472,7 @@ ptr in this PMC. Subject to the normal set_pointer restrictions.
         RETURN(INTVAL size);
     }
 
-    METHOD serialize() {
+    METHOD serialize() :no_wb {
         STRING *str;
         Parrot_PackfileView_attributes * const attrs =
                 PARROT_PACKFILEVIEW(SELF);
@@ -509,7 +510,7 @@ given .pbc bytecode file.
         VTABLE_set_string_native(INTERP, SELF, filename);
     }
 
-    METHOD write_to_file(STRING *filename) {
+    METHOD write_to_file(STRING *filename) :no_wb {
         Parrot_pf_write_pbc_file(INTERP, SELF, filename);
     }
 
@@ -523,7 +524,7 @@ Return a stringified version number of the packfile
 
 */
 
-    METHOD get_version() {
+    METHOD get_version() :no_wb {
         STRING * const version = Parrot_pf_get_version_string(INTERP, SELF);
         RETURN(STRING * version);
     }

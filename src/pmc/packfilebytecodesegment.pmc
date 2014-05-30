@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 
 =head1 NAME
@@ -83,7 +83,7 @@ Return a pointer to a PackFile_ByteCode* built from this PMC's data.
 
 */
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         INTVAL op_count;
         size_t i;
 
@@ -136,7 +136,7 @@ Initialize PackfileBytecodeSegment from PackFile_Bytecode*
 =cut
 
 */
-    VTABLE void set_pointer(void *pointer) {
+    VTABLE void set_pointer(void *pointer) :manual_wb {
         const PackFile_ByteCode * const pfseg =
                 (const PackFile_ByteCode *)pointer;
         opcode_t i, j;

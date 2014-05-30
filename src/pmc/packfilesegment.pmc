@@ -80,7 +80,7 @@ The C<ptr> argument is ignored.
 =cut
 
 */
-    VTABLE void set_pointer(void *ptr) {
+    VTABLE void set_pointer(void *ptr) :no_wb {
         UNUSED(ptr)
     }
 
@@ -93,7 +93,7 @@ Initialize PMC internals.
 =cut
 
 */
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         UNUSED(INTERP)
         UNUSED(SELF)
         return NULL;
@@ -122,7 +122,7 @@ Get owning directory.
 =cut
 
 */
-    METHOD get_directory() {
+    METHOD get_directory() :no_wb {
         PMC * directory = PARROT_PACKFILESEGMENT(SELF)->directory;
         if (!directory)
             directory = PMCNULL;

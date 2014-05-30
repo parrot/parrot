@@ -838,7 +838,7 @@ The offset.
 
 */
 
-    VTABLE void init_pmc(PMC *value) {
+    VTABLE void init_pmc(PMC *value) :manual_wb {
         SELF.set_pmc(value);
     }
 
@@ -852,7 +852,7 @@ Return a clone of this PMC.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         PMC * const clone = Parrot_pmc_new(INTERP, enum_class_UnManagedStruct);
 
         memmove(PMC_data(clone), PMC_data(SELF),
@@ -903,7 +903,7 @@ Returns whether the two C<struct>s are equivalent.
 
 */
 
-    VTABLE INTVAL is_equal(PMC *value) {
+    VTABLE INTVAL is_equal(PMC *value) :no_wb {
         return (SELF->vtable   == value->vtable
         &&      SELF.get_pointer() == VTABLE_get_pointer(INTERP, value));
     }
@@ -924,7 +924,7 @@ Returns whether the C<struct> is defined.
         return SELF.get_pointer() != NULL;
     }
 
-    VTABLE INTVAL defined() {
+    VTABLE INTVAL defined() :no_wb {
         return SELF.get_pointer() != NULL;
     }
 
@@ -953,7 +953,7 @@ Sets the size of the C<struct>.
 
 */
 
-    VTABLE void set_integer_native(INTVAL size) {
+    VTABLE void set_integer_native(INTVAL size) :no_wb {
         PARROT_UNMANAGEDSTRUCT(SELF)->size = size;
     }
 
@@ -967,7 +967,7 @@ Returns the integer value at index C<ix>.
 
 */
 
-    VTABLE INTVAL get_integer_keyed_int(INTVAL ix) {
+    VTABLE INTVAL get_integer_keyed_int(INTVAL ix) :no_wb {
         int   type;
         const char * const p = char_offset_int(INTERP, SELF, ix, &type);
         return ret_int(INTERP, p, type);
@@ -983,7 +983,7 @@ Returns the integer value associated with C<*key>.
 
 */
 
-    VTABLE INTVAL get_integer_keyed(PMC *key) {
+    VTABLE INTVAL get_integer_keyed(PMC *key) :no_wb {
         int   type;
         const char * const p = char_offset_key(INTERP, SELF, key, &type);
         return ret_int(INTERP, p, type);
@@ -999,7 +999,7 @@ Returns the floating-point value at index C<ix>.
 
 */
 
-    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
+    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) :no_wb {
         int   type;
         const char * const p = char_offset_int(INTERP, SELF, key, &type);
         return ret_float(INTERP, p, type);
@@ -1015,7 +1015,7 @@ Returns the floating-point value associated with C<*key>.
 
 */
 
-    VTABLE FLOATVAL get_number_keyed(PMC *key) {
+    VTABLE FLOATVAL get_number_keyed(PMC *key) :no_wb {
         int   type;
         const char * const p = char_offset_key(INTERP, SELF, key, &type);
         return ret_float(INTERP, p, type);
@@ -1031,7 +1031,7 @@ Returns the Parrot string value at index C<ix>.
 
 */
 
-    VTABLE STRING *get_string_keyed_int(INTVAL key) {
+    VTABLE STRING *get_string_keyed_int(INTVAL key) :no_wb {
         int   type;
         char * const p = char_offset_int(INTERP, SELF, key, &type);
         return ret_string(INTERP, p, type);
@@ -1047,7 +1047,7 @@ Returns the Parrot string value associated with C<*key>.
 
 */
 
-    VTABLE STRING *get_string_keyed(PMC *key) {
+    VTABLE STRING *get_string_keyed(PMC *key) :no_wb {
         int   type;
         char * const p = char_offset_key(INTERP, SELF, key, &type);
         return ret_string(INTERP, p, type);
@@ -1063,7 +1063,7 @@ Returns the PMC value at index C<ix>.
 
 */
 
-    VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
+    VTABLE PMC *get_pmc_keyed_int(INTVAL key) :no_wb {
         int   type;
         char * const p = char_offset_int(INTERP, SELF, key, &type);
         return ret_pmc(INTERP, SELF, p, type, key);
@@ -1079,7 +1079,7 @@ Returns the PMC value associated with C<*key>.
 
 */
 
-    VTABLE PMC *get_pmc_keyed(PMC *key) {
+    VTABLE PMC *get_pmc_keyed(PMC *key) :no_wb {
         int   type;
         char * const p = char_offset_key(INTERP, SELF, key, &type);
         return ret_pmc(INTERP, SELF, p, type, key_2_idx(INTERP, SELF, key));
@@ -1095,7 +1095,7 @@ Returns the pointer to the actual C C<struct>.
 
 */
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         UNUSED(INTERP);
         return PARROT_UNMANAGEDSTRUCT(SELF)->ptr;
     }
@@ -1229,7 +1229,7 @@ specified. If the encoding is omitted or null, use platform encoding.
 
 */
 
-    METHOD as_string(STRING *encodingname :optional) {
+    METHOD as_string(STRING *encodingname :optional) :no_wb {
         const char * content = (const char *)SELF.get_pointer();
         STRING * const result = Parrot_str_new_from_cstring(INTERP, content, encodingname);
         RETURN(STRING result);

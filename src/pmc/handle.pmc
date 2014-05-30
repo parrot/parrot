@@ -41,19 +41,18 @@ pmclass Handle provides Handle manual_attrs {
     ATTR STRING *encoding;              /* The encoding for read/write  */
 
 
-    VTABLE void init() {
+    VTABLE void init() :no_wb {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Handle cannot be instantiated directly.");
     }
 
-    VTABLE void init_pmc(PMC * init) {
+    VTABLE void init_pmc(PMC * init) :no_wb {
         UNUSED(init)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Handle cannot be instantiated directly.");
     }
 
-    VTABLE void *get_pointer_keyed_int(INTVAL key)
-    {
+    VTABLE void *get_pointer_keyed_int(INTVAL key) :no_wb {
         void * ptr;
         switch (key) {
             case IO_PTR_IDX_VTABLE:
@@ -72,8 +71,7 @@ pmclass Handle provides Handle manual_attrs {
         return ptr;
     }
 
-    VTABLE void set_pointer_keyed_int(INTVAL key, void *ptr)
-    {
+    VTABLE void set_pointer_keyed_int(INTVAL key, void *ptr) {
         switch (key) {
             case IO_PTR_IDX_VTABLE:
                 SET_ATTR_io_vtable(INTERP, SELF, (IO_VTABLE *)ptr);
@@ -108,7 +106,7 @@ subtypes that are or can be tty.
 
 */
 
-    METHOD isatty() {
+    METHOD isatty() :no_wb {
         RETURN(INTVAL 0);
     }
 
@@ -123,7 +121,7 @@ platforms that use integer file descriptors).
 
 */
 
-    METHOD get_fd() {
+    METHOD get_fd() :no_wb {
         PIOHANDLE os_handle;
         INTVAL    fd;
         GET_ATTR_os_handle(INTERP, SELF, os_handle);
@@ -142,7 +140,7 @@ Read the given number of bytes from the handle and return them in a string.
 
 */
 
-    METHOD read(INTVAL length) {
+    METHOD read(INTVAL length) :no_wb {
         STRING * const string_result = Parrot_io_reads(INTERP, SELF, length);
         RETURN(STRING *string_result);
     }
@@ -158,7 +156,7 @@ Read a line from the handle and return it in a string.
 
 */
 
-    METHOD readline(STRING * record_separator :optional, INTVAL has_rs :opt_flag) {
+    METHOD readline(STRING * record_separator :optional, INTVAL has_rs :opt_flag) :no_wb {
         STRING * string_result;
         if (!has_rs) {
             GET_ATTR_record_separator(interp, SELF, record_separator);
@@ -179,13 +177,13 @@ to read whatever is available, up to the size of the buffer.
 
 */
 
-    METHOD read_bytes(INTVAL length :optional, INTVAL has_length :opt_flag) {
+    METHOD read_bytes(INTVAL length :optional, INTVAL has_length :opt_flag) :no_wb {
         PMC * const bb = Parrot_io_read_byte_buffer_pmc(INTERP, SELF, PMCNULL,
                                        has_length ? length : (signed)PIO_READ_SIZE_ANY);
         RETURN(PMC *bb);
     }
 
-    METHOD write_bytes(PMC *bytebuffer, INTVAL length) {
+    METHOD write_bytes(PMC *bytebuffer, INTVAL length) :no_wb {
         const INTVAL written = Parrot_io_write_byte_buffer_pmc(INTERP, SELF, bytebuffer, length);
         RETURN(INTVAL written);
     }
@@ -228,7 +226,7 @@ Close the handle.
 
 */
 
-    METHOD close() {
+    METHOD close() :no_wb {
         const INTVAL status = Parrot_io_close(INTERP, SELF, 1);
         RETURN(INTVAL status);
     }

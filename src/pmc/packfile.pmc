@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -169,7 +169,7 @@ Return raw serialized PBC file data.
 Implementation note: all hard stuff done by PackfileDirectory.
 
 */
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         STRING *str;
         const Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);
         PackFile                   * const pf =
@@ -272,7 +272,7 @@ Fetch an integer keyed value from the packfile object.  Valid keys are:
 =cut
 
 */
-    VTABLE INTVAL get_integer_keyed_str(STRING *key) {
+    VTABLE INTVAL get_integer_keyed_str(STRING *key) :no_wb {
         const Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);
 
         INTVAL result;
@@ -326,7 +326,7 @@ Fetch a string keyed value from the packfile object.  Valid keys are:
 =cut
 
 */
-    VTABLE STRING *get_string_keyed_str(STRING *key) {
+    VTABLE STRING *get_string_keyed_str(STRING *key) :no_wb {
         if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "uuid")))
             return PARROT_PACKFILE(SELF)->uuid;
 
@@ -345,7 +345,7 @@ get_integer_keyed_str.
 =cut
 
 */
-    VTABLE INTVAL get_integer_keyed(PMC *key) {
+    VTABLE INTVAL get_integer_keyed(PMC *key) :no_wb {
         STRING * const s = VTABLE_get_string(INTERP, key);
         return SELF.get_integer_keyed_str(s);
     }
@@ -361,7 +361,7 @@ get_string_keyed_str.
 =cut
 
 */
-    VTABLE STRING *get_string_keyed(PMC *key) {
+    VTABLE STRING *get_string_keyed(PMC *key) :no_wb {
         STRING * const s = VTABLE_get_string(INTERP, key);
         return SELF.get_string_keyed_str(s);
     }
@@ -419,7 +419,7 @@ set_integer_keyed_str.
 =cut
 
 */
-    VTABLE void set_integer_keyed(PMC *key, INTVAL val) {
+    VTABLE void set_integer_keyed(PMC *key, INTVAL val) :manual_wb {
         STRING * const s = VTABLE_get_string(INTERP, key);
         SELF.set_integer_keyed_str(s, val);
     }
@@ -461,7 +461,7 @@ set_string_keyed_str.
 =cut
 
 */
-    VTABLE void set_string_keyed(PMC *key, STRING *val) {
+    VTABLE void set_string_keyed(PMC *key, STRING *val) :manual_wb {
         STRING * const s = VTABLE_get_string(INTERP, key);
         SELF.set_string_keyed_str(s, val);
     }
@@ -477,7 +477,7 @@ Return raw serialized PBC file data. Synonym for get_string.
 
 */
 
-    METHOD pack() {
+    METHOD pack() :no_wb {
         STRING * const ret = SELF.get_string();
         RETURN(STRING * ret);
     }
@@ -493,7 +493,7 @@ Synonym for set_string.
 
 */
 
-    METHOD unpack(STRING *str) {
+    METHOD unpack(STRING *str) :manual_wb {
         SELF.set_string_native(str);
     }
 
@@ -507,7 +507,7 @@ start of the packfile.
 =cut
 
 */
-    METHOD get_directory() {
+    METHOD get_directory() :no_wb {
         PMC * const dir = PARROT_PACKFILE(SELF)->directory;
         RETURN(PMC *dir);
     }
@@ -524,7 +524,7 @@ of the packfile structure and assigns that copy to the new PackfileView PMC.
 
 */
 
-    METHOD view() {
+    METHOD view() :no_wb {
         const Parrot_Packfile_attributes * const attrs = PARROT_PACKFILE(SELF);
         PackFile * const pf =
                 (PackFile*)VTABLE_get_pointer(INTERP, attrs->directory);

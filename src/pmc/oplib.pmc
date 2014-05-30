@@ -100,7 +100,7 @@ The VTABLEs that return PMCs throw exceptions instead.
 
 */
 
-    VTABLE INTVAL get_integer_keyed_str(STRING *name) {
+    VTABLE INTVAL get_integer_keyed_str(STRING *name) :no_wb {
         const op_lib_t *oplib;
         char * const  cstr = Parrot_str_to_cstring(INTERP, name);
         INTVAL        num;
@@ -112,12 +112,12 @@ The VTABLEs that return PMCs throw exceptions instead.
         return num;
     }
 
-    VTABLE INTVAL get_integer_keyed(PMC *key) {
+    VTABLE INTVAL get_integer_keyed(PMC *key) :no_wb {
         STRING * const str_key = Parrot_key_string(INTERP, key);
         return SELF.get_integer_keyed_str(str_key);
     }
 
-    VTABLE PMC* get_pmc_keyed_str(STRING *name) {
+    VTABLE PMC* get_pmc_keyed_str(STRING *name) :no_wb {
         const INTVAL  num = STATICSELF.get_integer_keyed_str(name);
         if (num == -1)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
@@ -125,7 +125,7 @@ The VTABLEs that return PMCs throw exceptions instead.
         return STATICSELF.get_pmc_keyed_int(num);
     }
 
-    VTABLE PMC* get_pmc_keyed(PMC *key) {
+    VTABLE PMC* get_pmc_keyed(PMC *key) :no_wb {
         STRING * const strkey = VTABLE_get_string(INTERP, key);
         return VTABLE_get_pmc_keyed_str(INTERP, SELF, strkey);
     }
@@ -141,7 +141,7 @@ from a name, see C<get_integer_keyed_str()> above.
 
 */
 
-    VTABLE PMC* get_pmc_keyed_int(INTVAL value) {
+    VTABLE PMC* get_pmc_keyed_int(INTVAL value) :no_wb {
         op_lib_t *oplib;
         GET_ATTR_oplib(INTERP, SELF, oplib);
         if (value >= oplib->op_count ||
@@ -169,7 +169,7 @@ Returns the number of opcodes in the library.
 
 */
 
-    VTABLE INTVAL elements() {
+    VTABLE INTVAL elements() :no_wb {
         const op_lib_t *oplib;
         GET_ATTR_oplib(INTERP, SELF, oplib);
         return oplib->op_count;
@@ -189,7 +189,7 @@ Returns the C<op_lib_t> pointer for the opcode library.
 
 */
 
-    VTABLE void* get_pointer() {
+    VTABLE void* get_pointer() :no_wb {
         op_lib_t *oplib;
         GET_ATTR_oplib(INTERP, SELF, oplib);
         return oplib;
@@ -212,7 +212,7 @@ share the given short name.
 
 */
 
-    METHOD op_family(STRING *shortname) {
+    METHOD op_family(STRING *shortname) :no_wb {
         char * const sname = Parrot_str_to_cstring(INTERP, shortname);
         const op_lib_t *oplib;
         op_info_t *table;
@@ -243,7 +243,7 @@ of the library.
 
 */
 
-    METHOD version() {
+    METHOD version() :no_wb {
         const op_lib_t *oplib;
         PMC * const version_array = Parrot_pmc_new_init_int(INTERP,
                 enum_class_FixedIntegerArray, 2);

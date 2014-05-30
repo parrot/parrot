@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008-2011, Parrot Foundation.
+Copyright (C) 2008-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -107,7 +107,7 @@ Create a copy of the stringhandle.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         const Parrot_StringHandle_attributes * const old_struct  = PARROT_STRINGHANDLE(SELF);
         PMC * const copy = Parrot_pmc_new(INTERP, enum_class_StringHandle);
         Parrot_StringHandle_attributes * const data_struct = PARROT_STRINGHANDLE(copy);
@@ -207,7 +207,7 @@ Check if the StringHandle is open.
 
 */
 
-    METHOD is_closed() {
+    METHOD is_closed() :no_wb {
         const INTVAL closed = Parrot_io_is_closed(INTERP, SELF);
         RETURN(INTVAL closed);
     }
@@ -358,7 +358,7 @@ Retrieve the read mode string for the stringhandle.
 
 */
 
-    METHOD mode() {
+    METHOD mode() :no_wb {
         STRING *mode;
         GET_ATTR_mode(INTERP, SELF, mode);
         RETURN(STRING *mode);
@@ -375,7 +375,7 @@ string data).
 
 */
 
-    METHOD eof() {
+    METHOD eof() :no_wb {
         const INTVAL is_eof = Parrot_io_eof(INTERP, SELF);
         RETURN(INTVAL 0);
     }
@@ -392,7 +392,7 @@ value.
 
 */
 
-    METHOD get_fd() {
+    METHOD get_fd() :no_wb {
         UNUSED(INTERP);
         RETURN(INTVAL -1);
     }

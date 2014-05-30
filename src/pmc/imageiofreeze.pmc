@@ -329,7 +329,7 @@ Returns the content of the image as a string.
 
 */
 
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         return Parrot_str_new_from_buffer(INTERP,
                                           PARROT_IMAGEIOFREEZE(SELF)->buffer,
                                           PARROT_IMAGEIOFREEZE(SELF)->pos);
@@ -345,7 +345,7 @@ Returns the seen hash.
 
 */
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         return VTABLE_get_pointer(INTERP, PARROT_IMAGEIOFREEZE(SELF)->seen);
     }
 
@@ -413,7 +413,7 @@ Pushes the string C<*v> onto the end of the image.
 
 */
 
-    VTABLE void push_string(STRING *v) {
+    VTABLE void push_string(STRING *v) :manual_wb {
         if (PObj_flag_TEST(private1, SELF)) {
             /* store a reference to constant table entry of string */
             PackFile_ConstTable * const table = PARROT_IMAGEIOFREEZE(SELF)->pf_ct;
@@ -441,6 +441,7 @@ Pushes the string C<*v> onto the end of the image.
             SET_VISIT_CURSOR(SELF,
                 (const char *)PF_store_string(GET_VISIT_CURSOR(SELF), v));
         }
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
     }
 
 
@@ -455,7 +456,7 @@ hasn't been seen yet, it is also pushed onto the todo list.
 
 */
 
-    VTABLE void push_pmc(PMC *v) {
+    VTABLE void push_pmc(PMC *v) :manual_wb {
         UINTVAL id;
 
         if (PMC_IS_NULL(v))
@@ -486,6 +487,7 @@ hasn't been seen yet, it is also pushed onto the todo list.
             }
 
             Parrot_hash_put(INTERP, seen, v, (void *)id);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
     }
 

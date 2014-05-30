@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -135,7 +135,7 @@ Creates PackFile for given directory.
 
 */
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         Parrot_PackfileDirectory_attributes * attrs =
                 PARROT_PACKFILEDIRECTORY(SELF);
         PackFile           * const pf    = PackFile_new(INTERP, 0); /* dummy PackFile... */
@@ -166,7 +166,7 @@ Get the number of elements in the array.
 
 */
 
-    VTABLE INTVAL elements() {
+    VTABLE INTVAL elements() :no_wb {
         return VTABLE_elements(INTERP, PARROT_PACKFILEDIRECTORY(SELF)->hash);
     }
 
@@ -181,7 +181,7 @@ Return a new iterator for the directory.
 
 */
 
-    VTABLE PMC *get_iter() {
+    VTABLE PMC *get_iter() :no_wb {
         return VTABLE_get_iter(INTERP, PARROT_PACKFILEDIRECTORY(SELF)->hash);
     }
 
@@ -195,7 +195,7 @@ Search the array for a segment with the given name, and return it if it exists.
 
 */
 
-    VTABLE PMC *get_pmc_keyed_str(STRING *name)  {
+    VTABLE PMC *get_pmc_keyed_str(STRING *name) :no_wb {
         return VTABLE_get_pmc_keyed_str(INTERP,
                 PARROT_PACKFILEDIRECTORY(SELF)->hash, name);
     }
@@ -211,7 +211,7 @@ Fetch a keyed string value from the packfiledirectory object.
 
 */
 
-    VTABLE PMC *get_pmc_keyed(PMC *key) {
+    VTABLE PMC *get_pmc_keyed(PMC *key) :no_wb {
         STRING * const s_key = VTABLE_get_string(INTERP, key);
         return VTABLE_get_pmc_keyed_str(INTERP,
                 PARROT_PACKFILEDIRECTORY(SELF)->hash, s_key);

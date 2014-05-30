@@ -70,7 +70,7 @@ Create a copy of the socket handle.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         PMC * const copy = SUPER();
         const Parrot_Socket_attributes * const old_struct = PARROT_SOCKET(SELF);
         Parrot_Socket_attributes * const data_struct = PARROT_SOCKET(copy);
@@ -185,7 +185,7 @@ family (integer). If no address family is given, it defaults to IPv4.
 
 */
 
-    METHOD sockaddr(STRING * address, INTVAL port, INTVAL family :optional) {
+    METHOD sockaddr(STRING * address, INTVAL port, INTVAL family :optional) :no_wb {
         PMC *array;
         PMC *res;
 
@@ -215,7 +215,7 @@ including family and protocol. It can be passed to C<bind()> or C<connect()>.
 
 */
     METHOD getaddrinfo(STRING * address,
-                       INTVAL port, INTVAL protocol, INTVAL family, INTVAL passive) {
+                       INTVAL port, INTVAL protocol, INTVAL family, INTVAL passive) :no_wb {
         PMC * const res = Parrot_io_internal_getaddrinfo(INTERP, address, port, protocol, family,
                                                          passive);
         RETURN(PMC * res);
@@ -230,7 +230,7 @@ C<remote_address> returns the remote address of this socket PMC.
 =cut
 
 */
-    METHOD remote_address() {
+    METHOD remote_address() :no_wb {
         PMC * const res = PARROT_SOCKET(SELF)->remote;
         RETURN(PMC * res);
     }
@@ -244,7 +244,7 @@ C<local_address> returns the local address of this socket PMC.
 =cut
 
 */
-    METHOD local_address() {
+    METHOD local_address() :no_wb {
         PMC * const res = PARROT_SOCKET(SELF)->local;
         RETURN(PMC * res);
     }
@@ -300,7 +300,7 @@ connected socket object.]
 
 */
 
-    METHOD connect(PMC * address) :no_wb {
+    METHOD connect(PMC * address) {
         Parrot_io_socket_connect(INTERP, SELF, address);
         RETURN(INTVAL 0);
     }
@@ -324,7 +324,7 @@ Exception.
 
 */
 
-    METHOD recv() {
+    METHOD recv() :no_wb {
         STRING * const result = Parrot_io_read_s(INTERP, SELF, PIO_READ_SIZE_ANY);
         RETURN(STRING * result);
     }

@@ -125,8 +125,6 @@ Otherwise, mem_gc_free() is used.
                 attrs->size = value;
             }
         }
-
-        return;
     }
 
 
@@ -144,7 +142,7 @@ of knowing how to make a deep copy of the pointer contents.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         const custom_clone_func_t clone_func = PARROT_MANAGEDSTRUCT(SELF)->custom_clone_func;
         PMC *dest;
         if (clone_func) {

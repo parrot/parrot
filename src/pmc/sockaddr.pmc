@@ -84,7 +84,7 @@ one.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         const Parrot_Sockaddr_attributes * const old_attrs = PARROT_SOCKADDR(SELF);
         Parrot_Sockaddr_attributes * const new_attrs = PARROT_SOCKADDR(dest);
