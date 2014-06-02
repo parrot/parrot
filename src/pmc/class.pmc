@@ -841,7 +841,7 @@ C<name>.
 
 */
 
-    VTABLE void remove_attribute(STRING *name) {
+    VTABLE void remove_attribute(STRING *name) :manual_wb {
         Parrot_Class_attributes * const _class        = PARROT_CLASS(SELF);
 
         /* If we've been instantiated already, not allowed. */
@@ -858,7 +858,7 @@ C<name>.
         /* Remove the attribute from the attrib_metadata table. */
         VTABLE_delete_keyed_str(INTERP, _class->attrib_metadata, name);
 
-        build_attrib_index(INTERP, SELF);
+        build_attrib_index(INTERP, SELF); /* calls WB */
     }
 
 /*
@@ -1415,7 +1415,7 @@ Returns whether the class is or inherits from C<*class>.
 
 */
 
-    VTABLE INTVAL isa_pmc(PMC *lookup) :no_wb {
+    VTABLE INTVAL isa_pmc(PMC *lookup) :manual_wb {
         Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
         PMC          *classobj;
         HashBucket   *b;
@@ -1673,7 +1673,7 @@ Used to archive the class.
 
 */
 
-    VTABLE void freeze(PMC *info) :no_wb {
+    VTABLE void freeze(PMC *info) :manual_wb {
         Parrot_Class_attributes * const class_data = PARROT_CLASS(SELF);
         STRING       *serial_namespace = CONST_STRING(INTERP, "");
 
@@ -1771,16 +1771,16 @@ Called after the class has been thawed.
 
 */
 
-    VTABLE void thawfinish(PMC *info) {
-        UNUSED(info)
+    VTABLE void thawfinish(PMC *info) :manual_wb {
         Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
+        UNUSED(info)
 
         /* Recalculate full MRO from thawed parents */
         _class->all_parents         = Parrot_ComputeMRO_C3(INTERP, SELF);
         _class->parent_overrides    = Parrot_pmc_new(INTERP, enum_class_Hash);
 
         /* Rebuild attribute index from thawed attribute metadata */
-        build_attrib_index(INTERP, SELF);
+        build_attrib_index(INTERP, SELF); /* calls PARROT_GC_WRITE_BARRIER */
     }
 
     /* **********************************************************************
@@ -1798,7 +1798,7 @@ Sets the name of the class, and updates the namespace accordingly.
 =cut
 
 */
-    METHOD name(STRING *name :optional, int has_name :opt_flag) {
+    METHOD name(STRING *name :optional, int has_name :opt_flag) :manual_wb {
         Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
         STRING *ret_name;
 
@@ -1810,6 +1810,7 @@ Sets the name of the class, and updates the namespace accordingly.
 
             VTABLE_set_string_keyed_str(INTERP, naming_hash, name_str, name);
             init_class_from_hash(INTERP, SELF, naming_hash);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
 
         ret_name = _class->name;
