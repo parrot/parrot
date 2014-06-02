@@ -187,10 +187,19 @@ sub rewrite_RETURNs {
         my $e = Parrot::Pmc2c::Emitter->new( $pmc->filename(".c") );
 
         if ($returns eq 'void') {
-            $e->emit( <<"END" );
-    $wb
+            if ($wb) {
+                $e->emit( <<"END" );
+    {
+        $wb
+        return;
+    }
+END
+            }
+            else {
+                $e->emit( <<"END" );
     return;
 END
+            }
             $matched->replace( $match, $e );
             $result = 1;
             next;
@@ -202,25 +211,27 @@ END
 
         if ($returns_signature and !$method->is_vtable) {
             $e->emit( <<"END" );
-    {
-    /*BEGIN RETURN $returns */
+    {  /*BEGIN RETURN $returns */
+        Parrot_pcc_set_call_from_c_args(interp, _call_object,
+            "$returns_signature", $returns_varargs);
+        $wb
+        return;
+    }   /*END RETURN $returns */
 END
+        }
+        elsif ($wb) { # if ($returns_signature)
             $e->emit( <<"END" );
-    Parrot_pcc_set_call_from_c_args(interp, _call_object,
-        "$returns_signature", $returns_varargs);
-    $wb
-    return;
-    /*END RETURN $returns */
+    {
+        $wb
+        return $returns_varargs;
     }
 END
         }
-        else { # if ($returns_signature)
+        else {
             $e->emit( <<"END" );
-    $wb
     return $returns_varargs;
 END
         }
-
         $matched->replace( $match, $e );
         $result = 1;
     }
