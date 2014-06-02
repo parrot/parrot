@@ -5,6 +5,7 @@
 /core*
 /.gdbinit
 /.lldbinit
+/.perldb
 
 # Ignore patch-related stuff
 *.rej

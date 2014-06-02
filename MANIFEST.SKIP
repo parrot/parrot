@@ -102,6 +102,8 @@
 ^/\.parrot_current_rev/
 ^/\.parrot_current_sha1$
 ^/\.parrot_current_sha1/
+^/\.perldb$
+^/\.perldb/
 ^/\B\.svn\b$
 ^/\B\.svn\b/
 ^/\\..*sw?$
