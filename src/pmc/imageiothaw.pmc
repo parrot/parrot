@@ -137,7 +137,7 @@ Thaws the PMC contained in C<image>.
             PMC * const seen = PARROT_IMAGEIOTHAW(SELF)->seen;
             PMC * const todo = PARROT_IMAGEIOTHAW(SELF)->todo;
             INTVAL i, n;
-            
+
             for (i = 0; i < VTABLE_elements(INTERP, todo); i++) {
                 const INTVAL idx = VTABLE_get_integer_keyed_int(INTERP, todo, i);
                 PMC * const current = VTABLE_get_pmc_keyed_int(INTERP, seen, idx);
@@ -319,11 +319,11 @@ Retrieve a PMC as the next item from the image.
         const UINTVAL  n            = SELF.shift_integer();
         const INTVAL   id           = PackID_get_PMCID(n);
         const int      packid_flags = PackID_get_FLAGS(n);
-        
+
         PMC           *pmc          = PMCNULL;
         PMC           *seen         = PARROT_IMAGEIOTHAW(SELF)->seen;
         PMC           *todo         = PARROT_IMAGEIOTHAW(SELF)->todo;
-        
+
         switch (packid_flags) {
           case enum_PackID_seen:
             if (id) /* got a non-NULL PMC */

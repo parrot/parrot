@@ -79,7 +79,7 @@ Creates and returns a clone of the key.
                                             "Key: Unknown Key type %d", KEY_get_FLAGS(SELF));
                 break;
             }
-            
+
             key = Parrot_key_next(INTERP, key);
 
             if (key) {
@@ -230,7 +230,7 @@ chain.
         PMC *next_key;
 
         GET_ATTR_next_key(INTERP, SELF, next_key);
-        
+
         return next_key;
     }
 
@@ -369,7 +369,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
                 SET_ATTR_next_key(INTERP, key, NULL);
                 break;
             }
-            
+
             key = next;
         }
     }

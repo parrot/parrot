@@ -149,8 +149,7 @@ Removes and returns an item from the start of the array.
 
         GET_ATTR_head(INTERP, SELF, tmp);
         item = (PMC_List_Item*) tmp;
-        
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+
         data = item->data;
 
         size -= 1;
@@ -241,7 +240,7 @@ Removes and returns the last element in the array.
 
         GET_ATTR_foot(INTERP, SELF, tmp);
         item = (PMC_List_Item*) tmp;
-        
+
         data = item->data;
 
         size -= 1;
@@ -337,6 +336,8 @@ Creates and returns a copy of the list.
 /*
 
 =item C<STRING *get_repr()>
+
+=item C<STRING *get_string()>
 
 Returns the Parrot string representation C<ResizablePMCArray>.
 

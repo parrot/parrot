@@ -637,7 +637,7 @@ Converts C<key> to a PMC key and calls C<delete_keyed()> with it.
 */
 
     VTABLE void delete_keyed_int(INTVAL key) {
-        PMC *const r_key = INT2KEY(INTERP, key);    
+        PMC *const r_key = INT2KEY(INTERP, key);
         SELF.delete_keyed(r_key);
     }
 
@@ -1572,7 +1572,7 @@ Default fallback. Performs a multiple dispatch call for 'cmp_pmc'.
 
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "cmp_pmc", "PP->P", SELF, value, &retval);
-    
+
         return retval;
     }
 
@@ -1651,7 +1651,7 @@ Default fallback. Performs a multiple dispatch call for 'repeat'.
 */
 
     VTABLE PMC *repeat(PMC *value, PMC *dest) :manual_wb {
-        PMC *result = PMCNULL;    
+        PMC *result = PMCNULL;
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "repeat", "PPP->P", SELF, value, dest, &result);
         return result;

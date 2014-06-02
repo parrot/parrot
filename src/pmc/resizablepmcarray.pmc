@@ -73,7 +73,6 @@ do_shift(ARGIN(PMC *arr))
 {
     ASSERT_ARGS(do_shift)
     INTVAL    size = PMC_size(arr);
-    
     PMC ** const item = PMC_array(arr);
 
     PMC_size(arr) = --size;
@@ -99,7 +98,7 @@ do_unshift(PARROT_INTERP, ARGIN(PMC *arr), ARGIN(PMC *val))
     const INTVAL size = PMC_size(arr);
     PMC        **item;
 
-    VTABLE_set_integer_native(interp, arr, size + 1);    
+    VTABLE_set_integer_native(interp, arr, size + 1);
     item = PMC_array(arr);
     memmove(item + 1, item, size * sizeof (PMC *));
     item[0] = val;
@@ -232,7 +231,7 @@ TODO: Check whether there is already an element that can be shifted
 
         value = VTABLE_get_number(INTERP, PMC_array(SELF)[0]);
         do_shift(SELF);
-        
+
         RETURN(FLOATVAL value);
     }
 
@@ -245,7 +244,7 @@ TODO: Check whether there is already an element that can be shifted
 
         value = VTABLE_get_integer(INTERP, PMC_array(SELF)[0]);
         do_shift(SELF);
-        
+
         RETURN(INTVAL value);
     }
 
@@ -271,7 +270,7 @@ TODO: Check whether there is already an element that can be shifted
 
         value = VTABLE_get_string(INTERP, PMC_array(SELF)[0]);
         do_shift(SELF);
-        
+
         RETURN(STRING *value);
     }
 
@@ -472,7 +471,7 @@ the array.
 
         const INTVAL size = PMC_size(SELF);
         PMC   * const val = Parrot_pmc_new(INTERP, enum_class_Float);
-        
+
         VTABLE_set_number_native(INTERP, val, value);
         SELF.set_pmc_keyed_int(size, val);
     }
@@ -481,7 +480,7 @@ the array.
 
         const INTVAL size = PMC_size(SELF);
         PMC   * const val = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, value);
-        
+
         SELF.set_pmc_keyed_int(size, val);
     }
 
@@ -559,7 +558,7 @@ Removes and returns the last element in the array.
 
         if (0 == size)
             throw_pop_empty(INTERP);
-        
+
         data           = PMC_array(SELF)[--size];
         PMC_size(SELF) = size;
 
@@ -574,7 +573,7 @@ Removes and returns the last element in the array.
 
         if (0 == size)
             throw_pop_empty(INTERP);
-        
+
         data           = PMC_array(SELF)[--size];
         PMC_size(SELF) = size;
 
@@ -600,7 +599,7 @@ the array.
 */
 
     VTABLE void unshift_float(FLOATVAL value) {
-        PMC * const val = Parrot_pmc_new(INTERP, enum_class_Float);        
+        PMC * const val = Parrot_pmc_new(INTERP, enum_class_Float);
         VTABLE_set_number_native(INTERP, val, value);
         do_unshift(INTERP, SELF, val);
     }
@@ -632,7 +631,7 @@ Creates and returns a copy of the array.
 
     VTABLE PMC *clone() :no_wb {
         PMC * const copy = SUPER();
-        
+
         /* copy trimmed extra space */
         PMC_threshold(copy) = PMC_size(SELF);
 
@@ -684,11 +683,11 @@ Note that the C<from> PMC can be of any of the various array types.
     VTABLE void splice(PMC *from, INTVAL offset, INTVAL count) {
         const INTVAL elems0 = VTABLE_elements(INTERP, SELF);
         const INTVAL elems1 = VTABLE_elements(INTERP, from);
-        
+
         PMC **item = 0;
         INTVAL tail;
         INTVAL i;
-        
+
         /* start from end? */
         if (offset < 0)
             offset += elems0;
@@ -769,7 +768,7 @@ Append the other array to this array.
             for (i = 0; i < m; ++i)
                 this_data[n + i] = VTABLE_get_pmc_keyed_int(INTERP, other, i);
         }
-        
+
         RETURN(void);
     }
 
