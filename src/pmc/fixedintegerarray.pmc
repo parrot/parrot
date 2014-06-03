@@ -83,7 +83,7 @@ Destroys the array.
 
 */
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         INTVAL* int_array;
         GET_ATTR_int_array(INTERP, SELF, int_array);
         if (int_array)
@@ -431,7 +431,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 
 */
 
-    VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
+    VTABLE void set_integer_keyed(PMC *key, INTVAL value) :manual_wb {
         const INTVAL k = VTABLE_get_integer(INTERP, key);
         SELF.set_integer_keyed_int(k, value);
     }
@@ -446,7 +446,7 @@ Sets the floating-point value of the element at index C<key> to C<value>.
 
 */
 
-    VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
+    VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) :manual_wb {
         SELF.set_integer_keyed_int(key, (INTVAL)value);
     }
 
@@ -460,7 +460,7 @@ Sets the floating-point value of the element at index C<key> to C<value>.
 
 */
 
-    VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
+    VTABLE void set_number_keyed(PMC *key, FLOATVAL value) :manual_wb {
         const INTVAL k = VTABLE_get_integer(INTERP, key);
         SELF.set_number_keyed_int(k, value);
     }
@@ -475,7 +475,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 
 */
 
-    VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
+    VTABLE void set_string_keyed_int(INTVAL key, STRING *value) :manual_wb {
         const INTVAL tempInt = Parrot_str_to_int(INTERP, value);
         SELF.set_integer_keyed_int(key, tempInt);
     }
@@ -490,7 +490,7 @@ Sets the string value of the element at index C<key> to C<value>.
 
 */
 
-    VTABLE void set_string_keyed(PMC *key, STRING *value) {
+    VTABLE void set_string_keyed(PMC *key, STRING *value) :manual_wb {
         const INTVAL k = VTABLE_get_integer(INTERP, key);
         SELF.set_string_keyed_int(k, value);
     }
@@ -505,7 +505,7 @@ Sets the PMC value of the element at index C<key> to C<*src>.
 
 */
 
-    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *src) {
+    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *src) :manual_wb {
         const INTVAL tempInt = VTABLE_get_integer(INTERP, src);
         SELF.set_integer_keyed_int(key, tempInt);
     }
@@ -520,7 +520,7 @@ Sets the string value of the element at index C<key> to C<value>.
 
 */
 
-    VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
+    VTABLE void set_pmc_keyed(PMC *key, PMC *value) :manual_wb {
         const INTVAL k = VTABLE_get_integer(INTERP, key);
         SELF.set_pmc_keyed_int(k, value);
     }

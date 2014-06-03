@@ -65,7 +65,7 @@ Destroys the array.
 
 */
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
 
         STRING **str_array;
 

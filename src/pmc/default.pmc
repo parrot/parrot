@@ -276,8 +276,7 @@ Role-y.
 
 */
 
-    VTABLE void add_attribute(STRING *name, PMC *type) :no_wb {
-        UNUSED(SELF);
+    VTABLE void add_attribute(STRING *name, PMC *type) {
         UNUSED(name);
         UNUSED(type);
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
@@ -825,7 +824,7 @@ Add class C<parent> to the list of our parents.
 
 */
 
-    VTABLE void add_parent(PMC *parent) :no_wb {
+    VTABLE void add_parent(PMC *parent) {
         UNUSED(parent);
         if (!PObj_is_class_TEST(SELF))
             Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
@@ -892,7 +891,7 @@ Initializes the PMC during unarchiving.
 
 */
 
-    VTABLE void thaw(PMC *info) :manual_wb { /* WB in init */
+    VTABLE void thaw(PMC *info) { /* WB in init */
         UNUSED(info);
         /* default - initialize the PMC */
         SELF.init();
@@ -908,7 +907,7 @@ Does nothing.
 
 */
 
-    VTABLE void thawfinish(PMC *info) :no_wb {
+    VTABLE void thawfinish(PMC *info) {
         UNUSED(INTERP);
         UNUSED(SELF);
         UNUSED(info);
@@ -925,7 +924,7 @@ Default fallback. Performs a multiple dispatch call for 'add'.
 
 */
 
-    VTABLE PMC *add(PMC *value, PMC *dest) :manual_wb {
+    VTABLE PMC *add(PMC *value, PMC *dest) :no_wb {
         PMC *result = PMCNULL;
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "add", "PPP->P", SELF, value, dest, &result);
@@ -942,7 +941,7 @@ Default fallback. Performs a multiple dispatch call for 'add_int'.
 
 */
 
-    VTABLE PMC *add_int(INTVAL value, PMC *dest) :manual_wb {
+    VTABLE PMC *add_int(INTVAL value, PMC *dest) :no_wb {
         PMC *result = PMCNULL;
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "add_int", "PIP->P", SELF, value, dest, &result);
@@ -959,7 +958,7 @@ Default fallback. Performs a multiple dispatch call for 'add_float'.
 
 */
 
-    VTABLE PMC *add_float(FLOATVAL value, PMC *dest) {
+    VTABLE PMC *add_float(FLOATVAL value, PMC *dest) :no_wb {
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         VTABLE_set_number_native(INTERP, dest,
@@ -977,7 +976,7 @@ Default fallback. Performs a multiple dispatch call for 'i_add'.
 
 */
 
-    VTABLE void i_add(PMC *value) :manual_wb {
+    VTABLE void i_add(PMC *value) {
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "i_add", "PP", SELF, value);
     }
@@ -992,7 +991,7 @@ Default fallback. Performs a multiple dispatch call for 'i_add_int'.
 
 */
 
-    VTABLE void i_add_int(INTVAL value) :manual_wb {
+    VTABLE void i_add_int(INTVAL value) {
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "i_add_int", "PI", SELF, value);
     }
@@ -1007,7 +1006,7 @@ Default fallback. Performs a multiple dispatch call for 'i_add_float'.
 
 */
 
-    VTABLE void i_add_float(FLOATVAL value) :manual_wb {
+    VTABLE void i_add_float(FLOATVAL value) {
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "i_add_float", "PN", SELF, value);
     }
@@ -1022,7 +1021,7 @@ Default fallback. Performs a multiple dispatch call for 'subtract'.
 
 */
 
-    VTABLE PMC *subtract(PMC *value, PMC *dest) :manual_wb {
+    VTABLE PMC *subtract(PMC *value, PMC *dest) :no_wb {
         PMC *result = PMCNULL;
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "subtract", "PPP->P", SELF, value, dest, &result);
@@ -1039,7 +1038,7 @@ Default fallback. Performs a multiple dispatch call for 'subtract_int'.
 
 */
 
-    VTABLE PMC *subtract_int(INTVAL value, PMC *dest) :manual_wb {
+    VTABLE PMC *subtract_int(INTVAL value, PMC *dest) :no_wb {
         PMC *result = PMCNULL;
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "subtract_int", "PIP->P", SELF, value, dest, &result);
@@ -1056,7 +1055,7 @@ Default fallback. Performs a multiple dispatch call for 'subtract_float'.
 
 */
 
-    VTABLE PMC *subtract_float(FLOATVAL value, PMC *dest) :manual_wb {
+    VTABLE PMC *subtract_float(FLOATVAL value, PMC *dest) :no_wb {
         PMC *result = PMCNULL;
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "subtract_float", "PNP->P", SELF, value, dest, &result);
@@ -1073,7 +1072,7 @@ Default fallback. Performs a multiple dispatch call for 'i_subtract'.
 
 */
 
-    VTABLE void i_subtract(PMC *value) :manual_wb {
+    VTABLE void i_subtract(PMC *value) {
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "i_subtract", "PP", SELF, value);
     }
@@ -1088,7 +1087,7 @@ Default fallback. Performs a multiple dispatch call for 'i_subtract_int'.
 
 */
 
-    VTABLE void i_subtract_int(INTVAL value) :manual_wb {
+    VTABLE void i_subtract_int(INTVAL value) {
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "i_subtract_int", "PI", SELF, value);
     }
@@ -1103,7 +1102,7 @@ Default fallback. Performs a multiple dispatch call for 'i_subtract_float'.
 
 */
 
-    VTABLE void i_subtract_float(FLOATVAL value) :manual_wb {
+    VTABLE void i_subtract_float(FLOATVAL value) {
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "i_subtract_float", "PN", SELF, value);
     }
@@ -1118,7 +1117,7 @@ Default fallback. Performs a multiple dispatch call for 'multiply'.
 
 */
 
-    VTABLE PMC *multiply(PMC *value, PMC *dest) :manual_wb {
+    VTABLE PMC *multiply(PMC *value, PMC *dest) :no_wb {
         PMC *result = PMCNULL;
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "multiply", "PPP->P", SELF, value, dest, &result);
@@ -1135,7 +1134,7 @@ Default fallback. Performs a multiple dispatch call for 'multiply_int'.
 
 */
 
-    VTABLE PMC *multiply_int(INTVAL value, PMC *dest) :manual_wb {
+    VTABLE PMC *multiply_int(INTVAL value, PMC *dest) :no_wb {
         PMC *result = PMCNULL;
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "multiply_int", "PIP->P", SELF, value, dest, &result);
@@ -1152,7 +1151,7 @@ Default fallback. Performs a multiple dispatch call for 'multiply_float'.
 
 */
 
-    VTABLE PMC *multiply_float(FLOATVAL value, PMC *dest) :manual_wb {
+    VTABLE PMC *multiply_float(FLOATVAL value, PMC *dest) :no_wb {
         PMC *result = PMCNULL;
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "multiply_float", "PNP->P", SELF, value, dest, &result);
@@ -1169,7 +1168,7 @@ Default fallback. Performs a multiple dispatch call for 'i_multiply'.
 
 */
 
-    VTABLE void i_multiply(PMC *value) :manual_wb {
+    VTABLE void i_multiply(PMC *value) {
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "i_multiply", "PP", SELF, value);
     }
@@ -1184,7 +1183,7 @@ Default fallback. Performs a multiple dispatch call for 'i_multiply_int'.
 
 */
 
-    VTABLE void i_multiply_int(INTVAL value) :manual_wb {
+    VTABLE void i_multiply_int(INTVAL value) {
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "i_multiply_int", "PI", SELF, value);
     }
@@ -1199,7 +1198,7 @@ Default fallback. Performs a multiple dispatch call for 'i_multiply_float'.
 
 */
 
-    VTABLE void i_multiply_float(FLOATVAL value) :manual_wb {
+    VTABLE void i_multiply_float(FLOATVAL value) {
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "i_multiply_float", "PN", SELF, value);
     }
@@ -1214,7 +1213,7 @@ Default fallback. Performs a multiple dispatch call for 'divide'.
 
 */
 
-    VTABLE PMC *divide(PMC *value, PMC *dest) :manual_wb {
+    VTABLE PMC *divide(PMC *value, PMC *dest) :no_wb {
         PMC *result = PMCNULL;
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "divide", "PPP->P", SELF, value, dest, &result);
@@ -1231,7 +1230,7 @@ Default fallback. Performs a multiple dispatch call for 'divide_int'.
 
 */
 
-    VTABLE PMC *divide_int(INTVAL value, PMC *dest) :manual_wb {
+    VTABLE PMC *divide_int(INTVAL value, PMC *dest) :no_wb {
         PMC *result = PMCNULL;
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "divide_int", "PIP->P", SELF, value, dest, &result);
@@ -1248,7 +1247,7 @@ Default fallback. Performs a multiple dispatch call for 'divide_float'.
 
 */
 
-    VTABLE PMC *divide_float(FLOATVAL value, PMC *dest) :manual_wb {
+    VTABLE PMC *divide_float(FLOATVAL value, PMC *dest) :no_wb {
         PMC *result = PMCNULL;
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "divide_float", "PNP->P", SELF, value, dest, &result);
@@ -1265,7 +1264,7 @@ Default fallback. Performs a multiple dispatch call for 'i_divide'.
 
 */
 
-    VTABLE void i_divide(PMC *value) :manual_wb {
+    VTABLE void i_divide(PMC *value) {
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "i_divide", "PP", SELF, value);
     }
@@ -1280,7 +1279,7 @@ Default fallback. Performs a multiple dispatch call for 'i_divide_int'.
 
 */
 
-    VTABLE void i_divide_int(INTVAL value) :manual_wb {
+    VTABLE void i_divide_int(INTVAL value) {
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "i_divide_int", "PI", SELF, value);
     }
@@ -1295,7 +1294,7 @@ Default fallback. Performs a multiple dispatch call for 'i_divide_float'.
 
 */
 
-    VTABLE void i_divide_float(FLOATVAL value) :manual_wb {
+    VTABLE void i_divide_float(FLOATVAL value) {
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "i_divide_float", "PN", SELF, value);
     }
@@ -1310,7 +1309,7 @@ Default fallback. Performs a multiple dispatch call for 'floor_divide'.
 
 */
 
-    VTABLE PMC *floor_divide(PMC *value, PMC *dest) :manual_wb {
+    VTABLE PMC *floor_divide(PMC *value, PMC *dest) :no_wb {
         PMC *result = PMCNULL;
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "floor_divide", "PPP->P", SELF, value, dest, &result);
@@ -1327,7 +1326,7 @@ Default fallback. Performs a multiple dispatch call for 'floor_divide_int'.
 
 */
 
-    VTABLE PMC *floor_divide_int(INTVAL value, PMC *dest) :manual_wb {
+    VTABLE PMC *floor_divide_int(INTVAL value, PMC *dest) :no_wb {
         PMC *result = PMCNULL;
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "floor_divide_int", "PIP->P", SELF, value, dest, &result);
@@ -1344,7 +1343,7 @@ Default fallback. Performs a multiple dispatch call for 'floor_divide_float'.
 
 */
 
-    VTABLE PMC *floor_divide_float(FLOATVAL value, PMC *dest) :manual_wb {
+    VTABLE PMC *floor_divide_float(FLOATVAL value, PMC *dest) :no_wb {
         PMC *result = PMCNULL;
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "floor_divide_float", "PNP->P", SELF, value, dest, &result);
@@ -1361,7 +1360,7 @@ Default fallback. Performs a multiple dispatch call for 'i_floor_divide'.
 
 */
 
-    VTABLE void i_floor_divide(PMC *value) :manual_wb {
+    VTABLE void i_floor_divide(PMC *value) {
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "i_floor_divide", "PP", SELF, value);
     }
@@ -1376,7 +1375,7 @@ Default fallback. Performs a multiple dispatch call for 'i_floor_divide_int'.
 
 */
 
-    VTABLE void i_floor_divide_int(INTVAL value) :manual_wb {
+    VTABLE void i_floor_divide_int(INTVAL value) {
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "i_floor_divide_int", "PI", SELF, value);
     }
@@ -1391,7 +1390,7 @@ Default fallback. Performs a multiple dispatch call for 'i_floor_divide_float'.
 
 */
 
-    VTABLE void i_floor_divide_float(FLOATVAL value) :manual_wb {
+    VTABLE void i_floor_divide_float(FLOATVAL value) {
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "i_floor_divide_float", "PN", SELF, value);
     }
@@ -1406,7 +1405,7 @@ Default fallback. Performs a multiple dispatch call for 'modulus'.
 
 */
 
-    VTABLE PMC *modulus(PMC *value, PMC *dest) :manual_wb {
+    VTABLE PMC *modulus(PMC *value, PMC *dest) :no_wb {
         PMC *result = PMCNULL;
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "modulus", "PPP->P", SELF, value, dest, &result);
@@ -1423,7 +1422,7 @@ Default fallback. Performs a multiple dispatch call for 'modulus_int'.
 
 */
 
-    VTABLE PMC *modulus_int(INTVAL value, PMC *dest) :manual_wb {
+    VTABLE PMC *modulus_int(INTVAL value, PMC *dest) :no_wb {
         PMC *result = PMCNULL;
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "modulus_int", "PIP->P", SELF, value, dest, &result);
@@ -1440,7 +1439,7 @@ Default fallback. Performs a multiple dispatch call for 'modulus_float'.
 
 */
 
-    VTABLE PMC *modulus_float(FLOATVAL value, PMC *dest) :manual_wb {
+    VTABLE PMC *modulus_float(FLOATVAL value, PMC *dest) :no_wb {
         PMC *result = PMCNULL;
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "modulus_float", "PNP->P", SELF, value, dest, &result);
@@ -1457,7 +1456,7 @@ Default fallback. Performs a multiple dispatch call for 'i_modulus'.
 
 */
 
-    VTABLE void i_modulus(PMC *value) :manual_wb {
+    VTABLE void i_modulus(PMC *value) {
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "i_modulus", "PP", SELF, value);
     }
@@ -1472,7 +1471,7 @@ Default fallback. Performs a multiple dispatch call for 'i_modulus_int'.
 
 */
 
-    VTABLE void i_modulus_int(INTVAL value) :manual_wb {
+    VTABLE void i_modulus_int(INTVAL value) {
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "i_modulus_int", "PI", SELF, value);
     }
@@ -1487,7 +1486,7 @@ Default fallback. Performs a multiple dispatch call for 'i_modulus_float'.
 
 */
 
-    VTABLE void i_modulus_float(FLOATVAL value) :manual_wb {
+    VTABLE void i_modulus_float(FLOATVAL value) {
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "i_modulus_float", "PN", SELF, value);
     }
@@ -1586,7 +1585,7 @@ Default fallback. Performs a multiple dispatch call for 'concatenate'.
 
 */
 
-    VTABLE PMC *concatenate(PMC *value, PMC *dest) :manual_wb {
+    VTABLE PMC *concatenate(PMC *value, PMC *dest) :no_wb {
         PMC *result = PMCNULL;
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "concatenate", "PPP->P", SELF, value, dest, &result);
@@ -1603,7 +1602,7 @@ Default fallback. Performs a multiple dispatch call for 'concatenate_str'.
 
 */
 
-    VTABLE PMC *concatenate_str(STRING *value, PMC *dest) :manual_wb {
+    VTABLE PMC *concatenate_str(STRING *value, PMC *dest) :no_wb {
         PMC *result = PMCNULL;
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "concatenate_str", "PSP->P", SELF, value, dest, &result);
@@ -1620,7 +1619,7 @@ Default fallback. Performs a multiple dispatch call for 'i_concatenate'.
 
 */
 
-    VTABLE void i_concatenate(PMC *value) :manual_wb {
+    VTABLE void i_concatenate(PMC *value) {
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "i_concatenate", "PP", SELF, value);
     }
@@ -1635,7 +1634,7 @@ Default fallback. Performs a multiple dispatch call for 'i_concatenate_str'.
 
 */
 
-    VTABLE void i_concatenate_str(STRING *value) :manual_wb {
+    VTABLE void i_concatenate_str(STRING *value) {
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "i_concatenate_str", "PS", SELF, value);
     }
@@ -1650,7 +1649,7 @@ Default fallback. Performs a multiple dispatch call for 'repeat'.
 
 */
 
-    VTABLE PMC *repeat(PMC *value, PMC *dest) :manual_wb {
+    VTABLE PMC *repeat(PMC *value, PMC *dest) :no_wb {
         PMC *result = PMCNULL;
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "repeat", "PPP->P", SELF, value, dest, &result);
@@ -1667,7 +1666,7 @@ Default fallback. Performs a multiple dispatch call for 'repeat_int'.
 
 */
 
-    VTABLE PMC *repeat_int(INTVAL value, PMC *dest) :manual_wb {
+    VTABLE PMC *repeat_int(INTVAL value, PMC *dest) :no_wb {
         PMC *result = PMCNULL;
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "repeat_int", "PIP->P", SELF, value, dest, &result);
@@ -1684,7 +1683,7 @@ Default fallback. Performs a multiple dispatch call for 'i_repeat'.
 
 */
 
-    VTABLE void i_repeat(PMC *value) :manual_wb {
+    VTABLE void i_repeat(PMC *value) {
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "i_repeat", "PP", SELF, value);
     }
@@ -1699,7 +1698,7 @@ Default fallback. Performs a multiple dispatch call for 'i_repeat_int'.
 
 */
 
-    VTABLE void i_repeat_int(INTVAL value) :manual_wb {
+    VTABLE void i_repeat_int(INTVAL value) {
         Parrot_mmd_multi_dispatch_from_c_args(INTERP,
                 "i_repeat_int", "PI", SELF, value);
     }

@@ -727,7 +727,7 @@ Adds C<value> to the complex number, placing the result in C<dest>.
 
 */
 
-    MULTI PMC *add(Complex value, PMC *dest) {
+    MULTI PMC *add(Complex value, PMC *dest) :no_wb {
         FLOATVAL self_re, self_im, val_re, val_im;
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
@@ -743,7 +743,7 @@ Adds C<value> to the complex number, placing the result in C<dest>.
         return dest;
     }
 
-    MULTI PMC *add(DEFAULT value, PMC *dest) {
+    MULTI PMC *add(DEFAULT value, PMC *dest) :no_wb {
         FLOATVAL re, im;
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
@@ -816,7 +816,7 @@ Subtracts C<value> from the complex number, placing the result in C<dest>.
 
 */
 
-    MULTI PMC *subtract(Complex value, PMC *dest) {
+    MULTI PMC *subtract(Complex value, PMC *dest) :no_wb {
         FLOATVAL self_re, self_im, val_re, val_im;
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
@@ -832,7 +832,7 @@ Subtracts C<value> from the complex number, placing the result in C<dest>.
         return dest;
     }
 
-    MULTI PMC *subtract(DEFAULT value, PMC *dest) {
+    MULTI PMC *subtract(DEFAULT value, PMC *dest) :no_wb {
         FLOATVAL re, im;
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
@@ -918,7 +918,7 @@ Multiplies the complex number SELF inplace with C<value>.
   (a+bi)(c+di)=(ac-bd)+i(ad+bc)
 
 */
-    MULTI PMC *multiply(Complex value, PMC *dest) {
+    MULTI PMC *multiply(Complex value, PMC *dest) :no_wb {
         FLOATVAL a, b, c, d;
 
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -933,7 +933,7 @@ Multiplies the complex number SELF inplace with C<value>.
         return dest;
     }
 
-    MULTI PMC *multiply(DEFAULT value, PMC *dest) {
+    MULTI PMC *multiply(DEFAULT value, PMC *dest) :no_wb {
         FLOATVAL re, im;
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
@@ -1029,7 +1029,7 @@ http://docs.sun.com/source/806-3568/ncg_goldberg.html
 
 */
 
-    MULTI PMC *divide(Complex value, PMC *dest) {
+    MULTI PMC *divide(Complex value, PMC *dest) :no_wb {
         FLOATVAL mod, re, im;
         FLOATVAL self_re, self_im, val_re, val_im;
 
@@ -1060,7 +1060,7 @@ http://docs.sun.com/source/806-3568/ncg_goldberg.html
         return dest;
     }
 
-    MULTI PMC *divide(DEFAULT value, PMC *dest) {
+    MULTI PMC *divide(DEFAULT value, PMC *dest) :no_wb {
         FLOATVAL re, im;
         const FLOATVAL d = VTABLE_get_number(INTERP, value);
         float_check_divide_zero(INTERP, d);
