@@ -109,7 +109,7 @@ Destroys the array.
 
 */
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         unsigned char *bit_array;
         GET_ATTR_bit_array(INTERP, SELF, bit_array);
         if (bit_array)

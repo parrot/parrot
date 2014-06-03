@@ -93,7 +93,7 @@ Destroy this PMC.
 
 */
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         Hash *str_registry, *pmc_registry;
 
         GET_ATTR_str_registry(INTERP, SELF, str_registry);
