@@ -336,7 +336,7 @@ the next one.
 
 */
 
-    VTABLE PMC *shift_pmc() {
+    VTABLE PMC *shift_pmc() :manual_wb {
         INTVAL pos;
         PMC   *array;
 

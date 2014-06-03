@@ -1395,7 +1395,7 @@ Return GMP version string "x.y.z".
         return res;
     }
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         bigint_clear(INTERP, SELF);
     }
 
@@ -1714,7 +1714,7 @@ Decrements the integer.
             VTABLE_name(INTERP, value));
     }
 
-    VTABLE PMC *multiply_int(INTVAL value, PMC *dest) {
+    VTABLE PMC *multiply_int(INTVAL value, PMC *dest) :no_wb {
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
         bigint_mul_bigint_int(INTERP, SELF, value, dest);

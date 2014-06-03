@@ -740,7 +740,7 @@ arguments. The class is attached to the current HLL namespace.
         init_class_from_hash(INTERP, SELF, arg);
     }
 
-    void destroy() {
+    void destroy() :no_wb {
         Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
         Parrot_hash_destroy(INTERP, _class->isa_cache);
     }

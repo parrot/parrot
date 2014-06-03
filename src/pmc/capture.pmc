@@ -204,56 +204,56 @@ Unshift a value onto the array component of the Capture.
 
 */
 
-    VTABLE void push_float(FLOATVAL value) {
+    VTABLE void push_float(FLOATVAL value) :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_push_float(INTERP, array, value);
     }
 
-    VTABLE void push_integer(INTVAL value) {
+    VTABLE void push_integer(INTVAL value) :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_push_integer(INTERP, array, value);
     }
 
-    VTABLE void push_pmc(PMC *value) {
+    VTABLE void push_pmc(PMC *value) :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_push_pmc(INTERP, array, value);
     }
 
-    VTABLE void push_string(STRING *value) {
+    VTABLE void push_string(STRING *value) :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_push_string(INTERP, array, value);
     }
 
-    VTABLE void unshift_float(FLOATVAL value) {
+    VTABLE void unshift_float(FLOATVAL value) :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_unshift_float(INTERP, array, value);
     }
 
-    VTABLE void unshift_integer(INTVAL value) {
+    VTABLE void unshift_integer(INTVAL value) :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_unshift_integer(INTERP, array, value);
     }
 
-    VTABLE void unshift_pmc(PMC *value) {
+    VTABLE void unshift_pmc(PMC *value) :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
         VTABLE_unshift_pmc(INTERP, array, value);
     }
 
-    VTABLE void unshift_string(STRING *value) {
+    VTABLE void unshift_string(STRING *value) :manual_wb {
         PMC *array;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
@@ -286,7 +286,7 @@ Shift a value from the array component of the Capture.
 
 */
 
-    VTABLE FLOATVAL pop_float() {
+    VTABLE FLOATVAL pop_float() :manual_wb {
         PMC *array;
         FLOATVAL ret;
 
@@ -295,7 +295,7 @@ Shift a value from the array component of the Capture.
         RETURN(FLOATVAL ret);
     }
 
-    VTABLE INTVAL pop_integer() {
+    VTABLE INTVAL pop_integer() :manual_wb {
         PMC *array;
         INTVAL ret;
 
@@ -304,7 +304,7 @@ Shift a value from the array component of the Capture.
         RETURN(INTVAL ret);
     }
 
-    VTABLE PMC *pop_pmc() {
+    VTABLE PMC *pop_pmc() :manual_wb {
         PMC *array, *ret;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
@@ -312,7 +312,7 @@ Shift a value from the array component of the Capture.
         RETURN(PMC *ret);
     }
 
-    VTABLE STRING *pop_string() {
+    VTABLE STRING *pop_string() :manual_wb {
         PMC *array;
         STRING *ret;
 
@@ -321,7 +321,7 @@ Shift a value from the array component of the Capture.
         RETURN(STRING *ret);
     }
 
-    VTABLE FLOATVAL shift_float() {
+    VTABLE FLOATVAL shift_float() :manual_wb {
         PMC *array;
         FLOATVAL ret;
 
@@ -330,7 +330,7 @@ Shift a value from the array component of the Capture.
         RETURN(FLOATVAL ret);
     }
 
-    VTABLE INTVAL shift_integer() {
+    VTABLE INTVAL shift_integer() :manual_wb {
         PMC *array;
         INTVAL ret;
 
@@ -339,7 +339,7 @@ Shift a value from the array component of the Capture.
         RETURN(INTTVAL ret);
     }
 
-    VTABLE PMC *shift_pmc() {
+    VTABLE PMC *shift_pmc() :manual_wb {
         PMC *array, *ret;
 
         CAPTURE_array_CREATE(INTERP, SELF, array);
@@ -347,7 +347,7 @@ Shift a value from the array component of the Capture.
         RETURN(PMC *ret);
     }
 
-    VTABLE STRING *shift_string() {
+    VTABLE STRING *shift_string() :manual_wb {
         PMC *array;
         STRING *ret;
 
@@ -438,28 +438,28 @@ Sets a value in the hash component of the Capture.
 
 */
 
-    VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
+    VTABLE void set_number_keyed(PMC *key, FLOATVAL value) :manual_wb {
         PMC *hash;
 
         CAPTURE_hash_CREATE(INTERP, SELF, hash);
         VTABLE_set_number_keyed(INTERP, hash, key, value);
     }
 
-    VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
+    VTABLE void set_integer_keyed(PMC *key, INTVAL value) :manual_wb {
         PMC *hash;
 
         CAPTURE_hash_CREATE(INTERP, SELF, hash);
         VTABLE_set_integer_keyed(INTERP, hash, key, value);
     }
 
-    VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
+    VTABLE void set_pmc_keyed(PMC *key, PMC *value) :manual_wb {
         PMC *hash;
 
         CAPTURE_hash_CREATE(INTERP, SELF, hash);
         VTABLE_set_pmc_keyed(INTERP, hash, key, value);
     }
 
-    VTABLE void set_string_keyed(PMC *key, STRING *value) {
+    VTABLE void set_string_keyed(PMC *key, STRING *value) :manual_wb {
         PMC *hash;
 
         CAPTURE_hash_CREATE(INTERP, SELF, hash);
@@ -542,28 +542,28 @@ Sets a value in the hash component of the Capture.
 
 */
 
-    VTABLE void set_number_keyed_str(STRING *key, FLOATVAL value) {
+    VTABLE void set_number_keyed_str(STRING *key, FLOATVAL value) :manual_wb {
         PMC *hash;
 
         CAPTURE_hash_CREATE(INTERP, SELF, hash);
         VTABLE_set_number_keyed_str(INTERP, hash, key, value);
     }
 
-    VTABLE void set_integer_keyed_str(STRING *key, INTVAL value) {
+    VTABLE void set_integer_keyed_str(STRING *key, INTVAL value) :manual_wb {
         PMC *hash;
 
         CAPTURE_hash_CREATE(INTERP, SELF, hash);
         VTABLE_set_integer_keyed_str(INTERP, hash, key, value);
     }
 
-    VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
+    VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) :manual_wb {
         PMC *hash;
 
         CAPTURE_hash_CREATE(INTERP, SELF, hash);
         VTABLE_set_pmc_keyed_str(INTERP, hash, key, value);
     }
 
-    VTABLE void set_string_keyed_str(STRING *key, STRING *value) {
+    VTABLE void set_string_keyed_str(STRING *key, STRING *value) :manual_wb {
         PMC *hash;
 
         CAPTURE_hash_CREATE(INTERP, SELF, hash);
@@ -841,7 +841,7 @@ Freeze/thaw Capture
 
 */
 
-    METHOD list() :no_wb {
+    METHOD list() :manual_wb {
         PMC *array;
         PMC *capt;
 
@@ -863,7 +863,7 @@ Freeze/thaw Capture
         RETURN(PMC *array);
     }
 
-    METHOD hash() :no_wb {
+    METHOD hash() :manual_wb {
         PMC *hash;
         PMC *capt;
         /* XXX:  This workaround is for when we get here as

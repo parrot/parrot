@@ -105,7 +105,7 @@ Free the buffer when destroying.
             Parrot_gc_mark_STRING_alive(INTERP, source);
     }
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         INTVAL allocated_size;
         GET_ATTR_allocated_size(INTERP, SELF, allocated_size);
         if (allocated_size) {

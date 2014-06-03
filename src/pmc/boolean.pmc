@@ -151,15 +151,15 @@ C<FALSE>.
         set_boolean_FLAG(SELF, value);
     }
 
-    VTABLE void set_integer_native(INTVAL value) :manual_wb {
+    VTABLE void set_integer_native(INTVAL value) {
         SELF.set_bool(value);
     }
 
-    VTABLE void set_number_native(FLOATVAL value) :manual_wb {
+    VTABLE void set_number_native(FLOATVAL value) {
         SELF.set_bool(!FLOAT_IS_ZERO(value));
     }
 
-    VTABLE void set_string_native(STRING *value) :manual_wb {
+    VTABLE void set_string_native(STRING *value) {
         SELF.set_bool(Parrot_str_boolean(INTERP, value));
     }
 

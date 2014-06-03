@@ -755,11 +755,11 @@ Adds C<value> to the complex number, placing the result in C<dest>.
         return dest;
     }
 
-    VTABLE PMC *add_int(INTVAL value, PMC *dest) {
+    VTABLE PMC *add_int(INTVAL value, PMC *dest) :no_wb {
         return SELF.add_float((FLOATVAL)value, dest);
     }
 
-    VTABLE PMC *add_float(FLOATVAL value, PMC *dest) {
+    VTABLE PMC *add_float(FLOATVAL value, PMC *dest) :no_wb {
         FLOATVAL re, im;
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
@@ -844,11 +844,11 @@ Subtracts C<value> from the complex number, placing the result in C<dest>.
         return dest;
     }
 
-    VTABLE PMC *subtract_int(INTVAL value, PMC *dest) {
+    VTABLE PMC *subtract_int(INTVAL value, PMC *dest) :no_wb {
         return SELF.subtract_float((FLOATVAL)value, dest);
     }
 
-    VTABLE PMC *subtract_float(FLOATVAL value, PMC *dest) {
+    VTABLE PMC *subtract_float(FLOATVAL value, PMC *dest) :no_wb {
         FLOATVAL re, im;
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
@@ -945,11 +945,11 @@ Multiplies the complex number SELF inplace with C<value>.
         return dest;
     }
 
-    VTABLE PMC *multiply_int(INTVAL value, PMC *dest) {
+    VTABLE PMC *multiply_int(INTVAL value, PMC *dest) :no_wb {
         return SELF.multiply_float((FLOATVAL) value, dest);
     }
 
-    VTABLE PMC *multiply_float(FLOATVAL value, PMC *dest) {
+    VTABLE PMC *multiply_float(FLOATVAL value, PMC *dest) :no_wb {
         FLOATVAL re, im;
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
@@ -1075,7 +1075,7 @@ http://docs.sun.com/source/806-3568/ncg_goldberg.html
         return dest;
     }
 
-    VTABLE PMC *divide_int(INTVAL value, PMC *dest) {
+    VTABLE PMC *divide_int(INTVAL value, PMC *dest) :no_wb {
         FLOATVAL re, im;
         int_check_divide_zero(INTERP, value);
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -1089,7 +1089,7 @@ http://docs.sun.com/source/806-3568/ncg_goldberg.html
         return dest;
     }
 
-    VTABLE PMC *divide_float(FLOATVAL value, PMC *dest) {
+    VTABLE PMC *divide_float(FLOATVAL value, PMC *dest) :no_wb {
         FLOATVAL re, im;
         float_check_divide_zero(INTERP, value);
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -1177,7 +1177,7 @@ Set C<dest> to the negated value of C<SELF>.
 
 */
 
-    VTABLE PMC *neg(PMC *dest) {
+    VTABLE PMC *neg(PMC *dest) :no_wb {
         FLOATVAL re, im;
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
 
@@ -1252,7 +1252,7 @@ Sets C<dest> to the absolute value of SELF that is the distance from (0.0).
 
 */
 
-    VTABLE PMC *absolute(PMC *dest) {
+    VTABLE PMC *absolute(PMC *dest) :no_wb {
         FLOATVAL re, im, d;
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
