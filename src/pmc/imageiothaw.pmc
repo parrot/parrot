@@ -67,7 +67,7 @@ Destroys the PMC.
 
 */
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         PackFile_destroy(INTERP, PARROT_IMAGEIOTHAW(SELF)->pf);
         PARROT_IMAGEIOTHAW(SELF)->pf = NULL;
     }
@@ -216,7 +216,6 @@ Set an exterior constant table to use for cross-referencing constants.
 */
 
     VTABLE void set_pointer(void *value) {
-        UNUSED(INTERP)
         PObj_flag_SET(private1, SELF);
         PARROT_IMAGEIOTHAW(SELF)->pf_ct = (PackFile_ConstTable *)value;
     }
@@ -232,7 +231,7 @@ Retrieve an integer as the next item from the image.
 
 */
 
-    VTABLE INTVAL shift_integer() {
+    VTABLE INTVAL shift_integer() :manual_wb {
         /* inlining PF_fetch_integer speeds up PBC thawing measurably */
         PackFile * const pf = PARROT_IMAGEIOTHAW(SELF)->pf;
         const unsigned char *stream    = (const unsigned char *)PARROT_IMAGEIOTHAW(SELF)->curs;
@@ -255,7 +254,7 @@ Retrieve a float as the next item from the image.
 
 */
 
-    VTABLE FLOATVAL shift_float() {
+    VTABLE FLOATVAL shift_float() :manual_wb {
         PackFile * const pf  = PARROT_IMAGEIOTHAW(SELF)->pf;
         const opcode_t *curs = PARROT_IMAGEIOTHAW(SELF)->curs;
         const FLOATVAL f     = PF_fetch_number(pf, &curs);
@@ -283,6 +282,7 @@ Retrieve a string as the next item from the image.
 
             if (i >= 0) {
                 PackFile_ConstTable *table = PARROT_IMAGEIOTHAW(SELF)->pf_ct;
+                PARROT_GC_WRITE_BARRIER(INTERP, SELF);
                 return table->str.constants[i];
             }
 
@@ -315,7 +315,7 @@ Retrieve a PMC as the next item from the image.
 
 */
 
-    VTABLE PMC *shift_pmc() {
+    VTABLE PMC *shift_pmc() :manual_wb {
         const UINTVAL  n            = SELF.shift_integer();
         const INTVAL   id           = PackID_get_PMCID(n);
         const int      packid_flags = PackID_get_FLAGS(n);

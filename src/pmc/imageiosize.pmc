@@ -187,9 +187,8 @@ The argument C<v> is currently ignored.
 
 */
 
-    VTABLE void push_integer(INTVAL v) :no_wb {
+    VTABLE void push_integer(INTVAL v) {
         const size_t len = PF_size_integer() * sizeof (opcode_t);
-        UNUSED(INTERP)
         UNUSED(v)
         PARROT_IMAGEIOSIZE(SELF)->size += len;
     }
@@ -224,7 +223,7 @@ Pushes the string C<*v> onto the end of the image.
 
 */
 
-    VTABLE void push_string(STRING *v) :manual_wb {
+    VTABLE void push_string(STRING *v) {
         if (PObj_flag_TEST(private1, SELF)) {
             /* store a reference to constant table entry of string */
             const PackFile_ConstTable * const table = PARROT_IMAGEIOSIZE(SELF)->pf_ct;
@@ -263,7 +262,7 @@ hasn't been seen yet, it is also pushed onto the todo list.
 
 */
 
-    VTABLE void push_pmc(PMC *v) :manual_wb {
+    VTABLE void push_pmc(PMC *v) {
         if (PMC_IS_NULL(v)
         ||  check_seen(INTERP, SELF, v))
             SELF.push_integer(0);

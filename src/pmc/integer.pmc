@@ -187,7 +187,7 @@ Sets this PMC as shared and read-only.
 
 */
 
-    VTABLE void share() :manual_wb {
+    VTABLE void share() {
         /*
          * assume that the access to a long is atomic.
          * integers are most often (1) equal to C longs,
@@ -642,7 +642,7 @@ Multiplies the integer by C<*value> and returns the result in C<*dest>.
     }
 
 
-    MULTI PMC *multiply(String value, PMC *dest) :manual_wb {
+    MULTI PMC *multiply(String value, PMC *dest) :no_wb {
         return Parrot_Integer_multi_multiply_Integer_PMC(INTERP, SELF, value, dest);
     }
 

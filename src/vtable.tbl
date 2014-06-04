@@ -261,3 +261,4 @@ void thawfinish(PMC* info) :write
 void visit(PMC* info)
 
 void init_int(INTVAL initializer) :write
+void share() :write

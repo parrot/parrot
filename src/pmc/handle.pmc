@@ -41,14 +41,12 @@ pmclass Handle provides Handle manual_attrs {
     ATTR STRING *encoding;              /* The encoding for read/write  */
 
 
-    VTABLE void init() :no_wb {
-        UNUSED(SELF)
+    VTABLE void init() {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Handle cannot be instantiated directly.");
     }
 
-    VTABLE void init_pmc(PMC * init) :no_wb {
-        UNUSED(SELF)
+    VTABLE void init_pmc(PMC * init) {
         UNUSED(init)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Handle cannot be instantiated directly.");

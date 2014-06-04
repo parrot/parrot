@@ -52,8 +52,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
     ATTR INTVAL is_pasm; /* 0 = PIR, 1 = PASM */
     ATTR INTVAL current_eval;
 
-    VTABLE void init() :no_wb {
-        UNUSED(SELF)
+    VTABLE void init() {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "IMCCompiler: Must initialize with an integer argument 0 (PIR) or 1 (PASM)");
     }
@@ -136,7 +135,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
             return CONST_STRING(INTERP, "PIR");
     }
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         Parrot_IMCCompiler_attributes * const attrs = PARROT_IMCCOMPILER(SELF);
         UNUSED(INTERP)
         imcc_destroy((imc_info_t*)(attrs->imcc_info));

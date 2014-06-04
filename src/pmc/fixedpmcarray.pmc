@@ -110,7 +110,7 @@ Initializes the array.
 
 */
 
-    VTABLE void init_int(INTVAL size) {
+    VTABLE void init_int(INTVAL size) :manual_wb {
         if (size < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     _("FixedPMCArray: Cannot set array size to a negative number (%d)"), size);
@@ -440,7 +440,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 
 */
 
-    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
+    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) :manual_wb {
         PMC * const val = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(INTERP,
                     enum_class_Integer));
 
@@ -458,7 +458,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 
 */
 
-    VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
+    VTABLE void set_integer_keyed(PMC *key, INTVAL value) :manual_wb {
         PMC * const val = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(INTERP,
                     enum_class_Integer));
 
@@ -479,7 +479,7 @@ C<value>.
 
 */
 
-    VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
+    VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) :manual_wb {
         PMC * const val = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(INTERP,
                     enum_class_Float));
 
@@ -498,7 +498,7 @@ C<value>.
 
 */
 
-    VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
+    VTABLE void set_number_keyed(PMC *key, FLOATVAL value) :manual_wb {
         const INTVAL k        = VTABLE_get_integer(INTERP, key);
         PMC   * const nextkey = Parrot_key_next(INTERP, key);
 
@@ -525,7 +525,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 
 */
 
-    VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
+    VTABLE void set_string_keyed_int(INTVAL key, STRING *value) :manual_wb {
         PMC * const val = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(INTERP,
                     enum_class_String));
 
@@ -544,7 +544,7 @@ C<value>.
 
 */
 
-    VTABLE void set_string_keyed(PMC *key, STRING *value) {
+    VTABLE void set_string_keyed(PMC *key, STRING *value) :manual_wb {
         PMC * const val = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(INTERP,
                     enum_class_String));
 
@@ -585,7 +585,7 @@ Sets the PMC at index C<key> to C<value>.
 
 */
 
-    VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
+    VTABLE void set_pmc_keyed(PMC *key, PMC *value) :manual_wb {
         const INTVAL k = VTABLE_get_integer(INTERP, key);
         PMC * const nextkey = Parrot_key_next(INTERP, key);
 
@@ -698,7 +698,7 @@ of this array.
 
 */
 
-    VTABLE void splice(PMC *value, INTVAL offset, INTVAL count) {
+    VTABLE void splice(PMC *value, INTVAL offset, INTVAL count) :manual_wb {
         if (count + offset > PMC_size(SELF))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 _("FixedPMCArray: index out of bounds!"));
