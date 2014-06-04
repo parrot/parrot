@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2013, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -63,8 +63,6 @@ PMC2C_FILES = \\
     lib/Parrot/Pmc2c/PCCMETHOD.pm \\
     lib/Parrot/Pmc2c/Library.pm \\
     lib/Parrot/Pmc2c/UtilFunctions.pm \\
-    lib/Parrot/Pmc2c/PMC/default.pm \\
-    lib/Parrot/Pmc2c/PMC/Null.pm \\
     lib/Parrot/Pmc2c/PMC/RO.pm
 
 END
@@ -123,7 +121,14 @@ END
             $o_deps{'include/parrot/runcore_api.h'} = 1;
         }
 
-        my $o_deps = "    " . join(" \\\n    ", keys %o_deps);
+        # optional pmc2c classfiles
+        my $class = uc(substr($pmc,0,1)).substr($pmc,1);
+        $class = "default" if $pmc eq "default";
+        if (-e "lib/Parrot/Pmc2c/PMC/$class.pm" ) {
+            $o_deps{"lib/Parrot/Pmc2c/PMC/$class.pm"} = 1;
+        }
+
+        my $o_deps = "    " . join(" \\\n    ", sort keys %o_deps);
         $TEMP_pmc_build .= <<END
 include/pmc/pmc_$pmc.h src/pmc/$pmc.c : src/pmc/$pmc.dump
 \t\$(PMC2CC) src/pmc/$pmc.pmc
