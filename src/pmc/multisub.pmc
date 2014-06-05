@@ -68,12 +68,12 @@ pmclass MultiSub
         return name;
     }
 
-    VTABLE void push_pmc(PMC *value) :manual_wb {
+    VTABLE void push_pmc(PMC *value) {
         check_is_valid_sub(INTERP, value);
         SUPER(value);
     }
 
-    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) :manual_wb {
+    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
         check_is_valid_sub(INTERP, value);
         SUPER(key, value);
     }

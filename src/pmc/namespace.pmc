@@ -809,7 +809,7 @@ an invalid type exception if C<namespace> is not a NameSpace PMC or subclass.
 
 */
 
-    METHOD add_namespace(STRING *name, PMC *_namespace) {
+    METHOD add_namespace(STRING *name, PMC *_namespace) :manual_wb {
         STRING * const s_ns = CONST_STRING(INTERP, "NameSpace");
 
         if (!VTABLE_isa(INTERP, _namespace, s_ns))
@@ -831,7 +831,7 @@ invalid type exception if C<sub> is not a Sub PMC or subclass.
 
 */
 
-    METHOD add_sub(STRING *name, PMC *sub) {
+    METHOD add_sub(STRING *name, PMC *sub) :manual_wb {
         STRING * const s_sub      = CONST_STRING(INTERP, "Sub");
         STRING * const s_multisub = CONST_STRING(INTERP, "MultiSub");
 
@@ -854,7 +854,7 @@ Stores the given variable under this namespace, with the given name.
 
 */
 
-    METHOD add_var(STRING *name, PMC *var) {
+    METHOD add_var(STRING *name, PMC *var) :manual_wb {
         VTABLE_set_pmc_keyed_str(INTERP, SELF, name, var);
     }
 

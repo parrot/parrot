@@ -136,11 +136,11 @@ Call the equivalent C<set_pointer*> function.
 
 */
 
-    VTABLE void set_pmc_keyed(PMC *key, PMC *p) {
+    VTABLE void set_pmc_keyed(PMC *key, PMC *p) :manual_wb {
         STATICSELF.set_pointer_keyed(key, VTABLE_get_pointer(INTERP, p));
     }
 
-    VTABLE void set_pmc_keyed_str(STRING *key, PMC *p) {
+    VTABLE void set_pmc_keyed_str(STRING *key, PMC *p) :manual_wb {
         STATICSELF.set_pointer_keyed_str(key, VTABLE_get_pointer(INTERP, p));
     }
 
@@ -164,7 +164,7 @@ Sets the specified function pointer and siganture as described in the string C<k
         SET_ATTR_signature(INTERP, SELF, key);
     }
 
-    VTABLE void set_pointer_keyed_str(STRING *key, void *func) {
+    VTABLE void set_pointer_keyed_str(STRING *key, void *func) :manual_wb {
         SELF.set_pointer_keyed(Parrot_nci_parse_signature(INTERP, key), func);
     }
 

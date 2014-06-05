@@ -43,7 +43,7 @@ Overrides the default to do nothing.
 
 */
 
-    VTABLE void init() :no_wb {}
+    VTABLE void init() {}
 
     VTABLE void *get_pointer() :no_wb {
         UNUSED(INTERP)
@@ -52,8 +52,6 @@ Overrides the default to do nothing.
     }
 
     VTABLE void set_pointer(void *p) {
-        UNUSED(INTERP)
-        UNUSED(SELF)
         PMCNULL = (PMC *)p;
     }
 

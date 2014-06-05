@@ -288,8 +288,7 @@ Raises an exception; you can only instantiate objects from a class.
 
 */
 
-    VTABLE void init() :no_wb {
-        UNUSED(SELF)
+    VTABLE void init() {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Object must be created by a class.");
     }
@@ -305,8 +304,7 @@ Raises an exception; you can only instantiate objects from a class.
 
 */
 
-    VTABLE void init_pmc(PMC *from) :no_wb {
-        UNUSED(SELF)
+    VTABLE void init_pmc(PMC *from) {
         UNUSED(from)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Object must be created by a class.");
@@ -802,7 +800,7 @@ Invokes the object (if this vtable function is overridden).
 
 */
 
-    opcode_t * invoke(void *next) {
+    opcode_t * invoke(void *next) :no_wb {
         Parrot_Object_attributes * const obj    = PARROT_OBJECT(SELF);
         Parrot_Class_attributes  * const _class = PARROT_CLASS(obj->_class);
 
@@ -934,7 +932,7 @@ The C<info> arguments are ignored.
         UNUSED(info)
     }
 
-    VTABLE void thaw(PMC *info) :no_wb {
+    VTABLE void thaw(PMC *info) {
         UNUSED(info)
     }
 
@@ -950,7 +948,6 @@ Called after the object has been thawed.
 */
 
     VTABLE void thawfinish(PMC *info) {
-        UNUSED(INTERP)
         UNUSED(info)
         /* Set custom GC mark and destroy on the object. */
         PObj_custom_mark_SET(SELF);

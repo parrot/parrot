@@ -385,17 +385,17 @@ Sets the PMC value of the element at index C<key> to C<val>.
 
 */
 
-    VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
+    VTABLE void set_integer_keyed(PMC *key, INTVAL value) :manual_wb {
         PMC * const v = box_integer(INTERP, value);
         SELF.set_pmc_keyed(key, v);
     }
 
-    VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
+    VTABLE void set_number_keyed(PMC *key, FLOATVAL value) :manual_wb {
         PMC * const v = box_number(INTERP, value);
         SELF.set_pmc_keyed(key, v);
     }
 
-    VTABLE void set_string_keyed(PMC *key, STRING *value) {
+    VTABLE void set_string_keyed(PMC *key, STRING *value) :manual_wb {
         PMC * const v = Parrot_pmc_box_string(INTERP, value);
         SELF.set_pmc_keyed(key, v);
     }
@@ -410,7 +410,7 @@ Sets the PMC value of the element at index C<key> to C<val>.
 
 */
 
-    VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
+    VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) :manual_wb {
         /* Wallpapering problem with HLL Strings as keys */
         /* Apparently HLL registry in Parrot uses OrderedHash */
         /* Now we have chicken and egg problem during freeze/thaw */
@@ -550,7 +550,7 @@ The created key = "\1idx".
 
 */
 
-    VTABLE void set_pmc_keyed_int(INTVAL idx, PMC *val) {
+    VTABLE void set_pmc_keyed_int(INTVAL idx, PMC *val) :manual_wb {
         const INTVAL n = STATICSELF.elements();
 
         if (idx < -n)
@@ -571,21 +571,21 @@ The created key = "\1idx".
         }
     }
 
-    VTABLE void set_integer_keyed_int(INTVAL idx, INTVAL value) {
+    VTABLE void set_integer_keyed_int(INTVAL idx, INTVAL value) :manual_wb {
         PMC * const v = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(INTERP,
                     enum_class_Integer));
         VTABLE_set_integer_native(INTERP, v, value);
         SELF.set_pmc_keyed_int(idx, v);
     }
 
-    VTABLE void set_number_keyed_int(INTVAL idx, FLOATVAL value) {
+    VTABLE void set_number_keyed_int(INTVAL idx, FLOATVAL value) :manual_wb {
         PMC * const v = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(INTERP,
                     enum_class_Float));
         VTABLE_set_number_native(INTERP, v, value);
         SELF.set_pmc_keyed_int(idx, v);
     }
 
-    VTABLE void set_string_keyed_int(INTVAL idx, STRING *value) {
+    VTABLE void set_string_keyed_int(INTVAL idx, STRING *value) :manual_wb {
         PMC * const v = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(INTERP,
                     enum_class_String));
         VTABLE_set_string_native(INTERP, v, value);
@@ -605,22 +605,22 @@ The created key = "\1idx".
 
 */
 
-    VTABLE void push_pmc(PMC *value) {
+    VTABLE void push_pmc(PMC *value) :manual_wb {
         const INTVAL n = SELF.elements();
         SELF.set_pmc_keyed_int(n, value);
     }
 
-    VTABLE void push_float(FLOATVAL value) {
+    VTABLE void push_float(FLOATVAL value) :manual_wb {
         const INTVAL n = SELF.elements();
         SELF.set_number_keyed_int(n, value);
     }
 
-    VTABLE void push_integer(INTVAL value) {
+    VTABLE void push_integer(INTVAL value) :manual_wb {
         const INTVAL n = SELF.elements();
         SELF.set_integer_keyed_int(n, value);
     }
 
-    VTABLE void push_string(STRING *value) {
+    VTABLE void push_string(STRING *value) :manual_wb {
         const INTVAL n = SELF.elements();
         SELF.set_string_keyed_int(n, value);
     }
@@ -752,7 +752,6 @@ Deletes the key C<*key> from the hash.
             PMC * const list_entry = get_list_item(INTERP, SELF, idx);
             STATICSELF.delete_keyed(
                     VTABLE_get_pmc_keyed_int(INTERP, list_entry, ORDERED_HASH_ITEM_KEY));
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
     }
 

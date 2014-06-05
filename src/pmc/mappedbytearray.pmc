@@ -123,7 +123,6 @@ Free all resources used.
 */
 
     VTABLE void init() {
-        UNUSED(INTERP);
         #ifdef ENABLED
         PObj_custom_destroy_SET(SELF);
         #endif
@@ -153,7 +152,7 @@ Free all resources used.
         #endif
     }
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         #ifdef ENABLED
         unsigned char *buffer;
         UINTVAL size;
