@@ -5,6 +5,7 @@
         + Fix opengl on bsd which does not have __APPLE__ defined as 0 [GH #1070]
     - Documentation
     - Tests
+        + Fix t/op/gc.t for --gc=inf
     - Community
 
 2014-05-20    release 6.4.0

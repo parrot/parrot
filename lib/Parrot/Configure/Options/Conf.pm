@@ -77,7 +77,7 @@ Compile Options:
 
    --no-line-directives Disable creation of C #line directives
    --define=inet_aton   Quick hack to use inet_aton instead of inet_pton
-   --gc=(type)          Which implementation of GC to use. One of ms, ms2 or gms.
+   --gc=(type)          Which implementation of GC to use. One of gms, ms, ms2 or inf.
 
 Parrot Options:
 

@@ -14,6 +14,8 @@ t/op/gc.t - Garbage collection
 Tests garbage collection with the C<interpinfo> operation and various
 GC related bugs.
 
+Note that this test will fail for --gc=inf
+
 =cut
 
 .include 'interpinfo.pasm'
@@ -23,8 +25,16 @@ GC related bugs.
     # :main is tailcalled from prt0, but tailcaller frames aren't eliminated
     # until get_params is called.
     .param pmc argv
+    .local pmc config_hash, interp
+    .local string gc_type
 
     .include 'test_more.pir'
+    .include "iglobals.pasm"
+
+    interp = getinterp
+    config_hash = interp[.IGLOBALS_CONFIG_HASH]
+    gc_type = config_hash["gc_type"]
+    if gc_type == "INF" goto start_inf_tests
 
     sweep_1()
     sweep_0()
@@ -34,6 +44,7 @@ GC related bugs.
     collect_toggle()
     collect_toggle_nested()
     "stats"()
+  start_inf_tests:
     vanishing_singleton_PMC()
     vanishing_ret_continuation()
     regsave_marked()
@@ -44,8 +55,8 @@ GC related bugs.
     addr_registry_2_int()
     pmc_proxy_obj_mark()
     coro_context_ret_continuation()
-    # END_OF_TESTS
 
+  end_of_tests:
     "done_testing"()
 .end
 
@@ -159,20 +170,26 @@ GC related bugs.
 .sub vanishing_singleton_PMC
     $P16 = new 'Env'
     $P16['Foo'] = 'bar'
-    $I16 = 100    #Why 100?
+    # sweep max 100 times
+    $I0 = interpinfo .INTERPINFO_ACTIVE_PMCS
+    $I1 = interpinfo .INTERPINFO_TOTAL_PMCS
+    $I16 = $I1 - $I0
     $I17 = 0
+    if $I16 <= 100 goto loop
+    $I16 = 100
 
     loop:
 	sweep 1
-    	_rand()
+	_rand($I17)
     	$I17 += 1
-    	if $I17 <= $I16 goto loop
+	if $I17 < $I16 goto loop
 .end
 
 .sub _rand
+    .param pmc n
     $P16 = new 'Env'
     $P5 = $P16['Foo']
-    is($P5, 'bar', "_rand")
+    is($P5, 'bar', "_rand singleton")
     if $P5 != 'bar' goto err
     .return()
     err:
