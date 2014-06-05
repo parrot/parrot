@@ -407,7 +407,7 @@ Used to unarchive the array.
         VTABLE_push_integer(INTERP, info, VTABLE_get_integer(INTERP, SELF));
     }
 
-    VTABLE void thaw(PMC *info) {
+    VTABLE void thaw(PMC *info) :manual_wb {
         int n, i;
         SUPER(info);
         n = VTABLE_shift_integer(INTERP, info);

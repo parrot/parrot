@@ -80,7 +80,7 @@ The C<ptr> argument is ignored.
 =cut
 
 */
-    VTABLE void set_pointer(void *ptr) :no_wb {
+    VTABLE void set_pointer(void *ptr) {
         UNUSED(ptr)
     }
 

@@ -295,7 +295,7 @@ Destroys the PMC.
 
 */
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         if (PMC_data(SELF)) {
             mem_gc_free(INTERP, PMC_data(SELF));
             PMC_data(SELF) = NULL;
@@ -691,8 +691,7 @@ Finish thawing.
                 "Attempt to freeze interpreter");
     }
 
-    METHOD run_gc() :manual_wb {
-        UNUSED(INTERP)
+    METHOD run_gc() {
         Parrot_gc_mark_and_sweep(PMC_interp(SELF), 0);
     }
 

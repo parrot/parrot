@@ -187,7 +187,7 @@ Mark the PMC and the PackFile* contents
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         Parrot_PackfileView_attributes * const attrs =
                 PARROT_PACKFILEVIEW(SELF);
         if (attrs->pf != NULL)
@@ -250,8 +250,7 @@ otherwise.
 
 */
 
-    VTABLE void set_string_native(STRING * path) :no_wb {
-        UNUSED(INTERP)
+    VTABLE void set_string_native(STRING * path) {
         PARROT_PACKFILEVIEW(SELF)->path = path;
     }
 

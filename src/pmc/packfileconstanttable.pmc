@@ -256,7 +256,7 @@ Set the constant to the given number.
 =cut
 
 */
-    VTABLE void set_number_keyed_int(INTVAL index, FLOATVAL value) :manual_wb {
+    VTABLE void set_number_keyed_int(INTVAL index, FLOATVAL value) {
         Parrot_PackfileConstantTable_attributes * const attrs =
                 PARROT_PACKFILECONSTANTTABLE(SELF);
         VTABLE_set_number_keyed_int(INTERP, attrs->num_constants, index, value);
@@ -273,7 +273,7 @@ Set the constant to the given string.
 
 */
 
-    VTABLE void set_string_keyed_int(INTVAL index, STRING *value) :manual_wb {
+    VTABLE void set_string_keyed_int(INTVAL index, STRING *value) {
         Parrot_PackfileConstantTable_attributes * const attrs =
                 PARROT_PACKFILECONSTANTTABLE(SELF);
         VTABLE_set_string_keyed_int(INTERP, attrs->str_constants, index, value);
@@ -289,7 +289,7 @@ Set the constant to the given PMC (or key).
 =cut
 
 */
-    VTABLE void set_pmc_keyed_int(INTVAL index, PMC *value) :manual_wb {
+    VTABLE void set_pmc_keyed_int(INTVAL index, PMC *value) {
         Parrot_PackfileConstantTable_attributes * const attrs =
                 PARROT_PACKFILECONSTANTTABLE(SELF);
         VTABLE_set_pmc_keyed_int(INTERP, attrs->pmc_constants,  index, value);
@@ -366,7 +366,6 @@ Get or create constant for passed value.
 
         /* Constant not found. Add new one */
         SELF.set_string_keyed_int(i, value);
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return i;
     }
 
@@ -384,7 +383,6 @@ Get or create constant for passed value.
 
         /* Constant not found. Add new one */
         SELF.set_number_keyed_int(i, value);
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return i;
     }
 
@@ -402,7 +400,6 @@ Get or create constant for passed value.
 
         /* Constant not found. Add new one */
         SELF.set_pmc_keyed_int(i, value);
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return i;
     }
 
@@ -428,7 +425,7 @@ Add a string->pmc tag mapping
 
 */
 
-    METHOD add_tag_mapping(INTVAL pmc_idx, INTVAL str_idx) :manual_wb {
+    METHOD add_tag_mapping(INTVAL pmc_idx, INTVAL str_idx) {
         Parrot_PackfileConstantTable_attributes * const attrs =
                 PARROT_PACKFILECONSTANTTABLE(SELF);
         INTVAL idx = VTABLE_elements(INTERP, attrs->tag_map);

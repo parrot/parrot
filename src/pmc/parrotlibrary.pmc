@@ -153,8 +153,7 @@ Sets the pointer to the shared library handle.
 
 */
 
-    VTABLE void set_pointer(void *handle) :no_wb {
-        UNUSED(INTERP)
+    VTABLE void set_pointer(void *handle) {
         PMC_dlhandle(SELF) = handle;
         PObj_custom_destroy_SET(SELF);
     }

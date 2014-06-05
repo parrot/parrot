@@ -250,7 +250,7 @@ set_pmc_keyed_str.
 
 */
 
-    VTABLE void set_pmc_keyed(PMC *key, PMC *segment)  {
+    VTABLE void set_pmc_keyed(PMC *key, PMC *segment)  :manual_wb {
         STRING * const s_key = VTABLE_get_string(INTERP, key);
         VTABLE_set_pmc_keyed_str(INTERP, SELF, s_key, segment);
     }
