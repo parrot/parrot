@@ -223,7 +223,7 @@ Pushes the string C<*v> onto the end of the image.
 
 */
 
-    VTABLE void push_string(STRING *v) {
+    VTABLE void push_string(STRING *v) :manual_wb {
         if (PObj_flag_TEST(private1, SELF)) {
             /* store a reference to constant table entry of string */
             const PackFile_ConstTable * const table = PARROT_IMAGEIOSIZE(SELF)->pf_ct;
@@ -248,6 +248,7 @@ Pushes the string C<*v> onto the end of the image.
         {
             const size_t len = PF_size_string(v) * sizeof (opcode_t);
             PARROT_IMAGEIOSIZE(SELF)->size += len;
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
     }
 
@@ -262,7 +263,7 @@ hasn't been seen yet, it is also pushed onto the todo list.
 
 */
 
-    VTABLE void push_pmc(PMC *v) {
+    VTABLE void push_pmc(PMC *v) :manual_wb {
         if (PMC_IS_NULL(v)
         ||  check_seen(INTERP, SELF, v))
             SELF.push_integer(0);

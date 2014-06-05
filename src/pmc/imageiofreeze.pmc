@@ -295,7 +295,7 @@ Destroys the PMC.
 =cut
 
 */
-    VTABLE void destroy() :no_wb {
+    VTABLE void destroy() {
         PackFile_destroy(INTERP, PARROT_IMAGEIOFREEZE(SELF)->pf);
         PARROT_IMAGEIOFREEZE(SELF)->pf = NULL;
     }
@@ -413,7 +413,7 @@ Pushes the string C<*v> onto the end of the image.
 
 */
 
-    VTABLE void push_string(STRING *v) {
+    VTABLE void push_string(STRING *v) :manual_wb {
         if (PObj_flag_TEST(private1, SELF)) {
             /* store a reference to constant table entry of string */
             PackFile_ConstTable * const table = PARROT_IMAGEIOFREEZE(SELF)->pf_ct;
@@ -440,6 +440,7 @@ Pushes the string C<*v> onto the end of the image.
             ensure_buffer_size(INTERP, SELF, len);
             SET_VISIT_CURSOR(SELF,
                 (const char *)PF_store_string(GET_VISIT_CURSOR(SELF), v));
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
     }
 
@@ -483,10 +484,10 @@ hasn't been seen yet, it is also pushed onto the todo list.
                 SELF.push_integer(PackID_new(id, enum_PackID_normal));
                 SELF.push_integer(base_type);
                 VTABLE_push_pmc(INTERP, PARROT_IMAGEIOFREEZE(SELF)->todo, v);
+                PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             }
 
             Parrot_hash_put(INTERP, seen, v, (void *)id);
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
     }
 

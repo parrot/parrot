@@ -41,13 +41,15 @@ pmclass Handle provides Handle manual_attrs {
     ATTR STRING *encoding;              /* The encoding for read/write  */
 
 
-    VTABLE void init() {
+    VTABLE void init() :no_wb {
+        UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Handle cannot be instantiated directly.");
     }
 
-    VTABLE void init_pmc(PMC * init) {
+    VTABLE void init_pmc(PMC * init) :no_wb {
         UNUSED(init)
+        UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Handle cannot be instantiated directly.");
     }
@@ -71,16 +73,25 @@ pmclass Handle provides Handle manual_attrs {
         return ptr;
     }
 
-    VTABLE void set_pointer_keyed_int(INTVAL key, void *ptr) {
+    VTABLE void set_pointer_keyed_int(INTVAL key, void *ptr) :manual_wb {
         switch (key) {
             case IO_PTR_IDX_VTABLE:
+                {
                 SET_ATTR_io_vtable(INTERP, SELF, (IO_VTABLE *)ptr);
+                PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+                }
                 break;
             case IO_PTR_IDX_READ_BUFFER:
+                {
                 SET_ATTR_read_buffer(INTERP, SELF, (IO_BUFFER *)ptr);
+                PARROT_GC_WRITE_BARRIER(INTERP, SELF);
                 break;
+                }
             case IO_PTR_IDX_WRITE_BUFFER:
+                {
                 SET_ATTR_write_buffer(INTERP, SELF, (IO_BUFFER *)ptr);
+                PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+                }
                 break;
             default:
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,

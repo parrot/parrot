@@ -1304,7 +1304,7 @@ Creates a new PMC object of the type of the class and calls init().
 
 */
 
-    VTABLE PMC *instantiate(PMC *init) :no_wb {
+    VTABLE PMC *instantiate(PMC *init) :manual_wb {
         Parrot_Class_attributes  * const _class = PARROT_CLASS(SELF);
         PMC                      *object;
 
@@ -1934,7 +1934,7 @@ C<add_method> vtable.
 =cut
 
 */
-    METHOD add_method(STRING *name, PMC *sub) {
+    METHOD add_method(STRING *name, PMC *sub) :manual_wb {
         SELF.add_method(name, sub);
     }
 
@@ -1948,7 +1948,7 @@ the C<add_vtable_override> vtable.
 =cut
 
 */
-    METHOD add_vtable_override(STRING *name, PMC *sub) {
+    METHOD add_vtable_override(STRING *name, PMC *sub) :manual_wb {
         VTABLE_add_vtable_override(INTERP, SELF, name, sub);
     }
 
@@ -1961,7 +1961,7 @@ Removes the method with the given name.
 =cut
 
 */
-    METHOD remove_method(STRING *name) {
+    METHOD remove_method(STRING *name) :manual_wb {
         VTABLE_remove_method(INTERP, SELF, name);
     }
 
@@ -2022,7 +2022,7 @@ Adds the supplied PMC to the list of parents for the class.
 =cut
 
 */
-    METHOD add_parent(PMC *parent) {
+    METHOD add_parent(PMC *parent) :manual_wb {
         SELF.add_parent(parent);
     }
 

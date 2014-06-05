@@ -161,7 +161,7 @@ Free structures.
 =cut
 
 */
-    VTABLE void destroy() :no_wb {
+    VTABLE void destroy() {
         Parrot_io_close(INTERP, SELF, 1);
 
         /* TODO: flush and free the buffers */
@@ -204,10 +204,13 @@ For internal usage only, subject to change without notice.
 
 */
 
-    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
+    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) :manual_wb {
         switch (key) {
           case 0:
+            {
             SET_ATTR_process_id(INTERP, SELF, value);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+            }
             break;
           default:
             break;

@@ -317,7 +317,7 @@ Extends the buffer by adding a byte of value C<value> to the end.
 
 */
 
-    VTABLE void push_integer(INTVAL value) {
+    VTABLE void push_integer(INTVAL value) :manual_wb {
         INTVAL size;
 
         GET_ATTR_size(INTERP, SELF, size);

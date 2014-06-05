@@ -187,7 +187,7 @@ Sets this PMC as shared and read-only.
 
 */
 
-    VTABLE void share() {
+    VTABLE void share() :no_wb {
         /*
          * assume that the access to a long is atomic.
          * integers are most often (1) equal to C longs,
@@ -1173,8 +1173,10 @@ Increments the integer.
         c = a + 1;
 
         /* did not overflow */
-        if ((c^a) >= 0 || (c^1) >= 0)
+        if ((c^a) >= 0 || (c^1) >= 0) {
             SET_ATTR_iv(INTERP, SELF, c);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+        }
         else {
             Parrot_pmc_reuse(INTERP, SELF, enum_class_BigInt, 0);
             VTABLE_set_integer_native(INTERP, SELF, a);
@@ -1197,8 +1199,10 @@ Decrements the integer.
         const INTVAL a = SELF.get_integer();
         const INTVAL c = a - 1;
 
-        if ((c^a) >= 0 || (c^~1) >= 0)
+        if ((c^a) >= 0 || (c^~1) >= 0) {
             VTABLE_set_integer_native(INTERP, SELF, c);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+        }
         else {
             Parrot_pmc_reuse(INTERP, SELF, enum_class_BigInt, 0);
             VTABLE_set_integer_native(INTERP, SELF, a);

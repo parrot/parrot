@@ -128,7 +128,7 @@ Destroys the array.
 
 */
 
-    VTABLE void destroy() :no_wb {
+    VTABLE void destroy() {
         if (PMC_array(SELF))
             mem_gc_free(INTERP, PMC_array(SELF));
     }
@@ -512,6 +512,7 @@ C<value>.
                 cannot_autovivify_nested(INTERP);
 
             VTABLE_set_number_keyed(INTERP, box, nextkey, value);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
     }
 
@@ -599,6 +600,7 @@ Sets the PMC at index C<key> to C<value>.
                 cannot_autovivify_nested(INTERP);
 
             VTABLE_set_pmc_keyed(INTERP, box, nextkey, value);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
     }
 
@@ -745,7 +747,7 @@ Used to unarchive the array.
         VTABLE_push_integer(INTERP, info, VTABLE_elements(INTERP, SELF));
     }
 
-    VTABLE void thaw(PMC *info) {
+    VTABLE void thaw(PMC *info) :manual_wb {
         SELF.init_int(VTABLE_shift_integer(INTERP, info));
     }
 

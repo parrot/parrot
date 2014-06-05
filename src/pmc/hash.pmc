@@ -116,7 +116,7 @@ Free hash structure.
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
-    VTABLE void destroy() :no_wb {
+    VTABLE void destroy() {
         Hash * const hash = (Hash *)SELF.get_pointer();
         if (hash)
             Parrot_hash_destroy(INTERP, hash);
@@ -1180,7 +1180,7 @@ entries with the same key.
 
 */
 
-    METHOD set_key_type(INTVAL type) {
+    METHOD set_key_type(INTVAL type) :manual_wb {
         SELF.set_integer_native(type);
     }
 

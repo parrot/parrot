@@ -341,7 +341,7 @@ Creates an identical copy of the complex number.
         SET_ATTR_im(INTERP, SELF, 0.0);
     }
 
-    VTABLE void init_pmc(PMC *initializer) {
+    VTABLE void init_pmc(PMC *initializer) :manual_wb {
         const INTVAL arg_type = VTABLE_type(INTERP, initializer);
         SELF.init();
         switch (arg_type) {
@@ -357,6 +357,7 @@ Creates an identical copy of the complex number.
                 const FLOATVAL im = VTABLE_get_number_keyed_int(INTERP, initializer, 1);
                 SET_ATTR_re(INTERP, SELF, re);
                 SET_ATTR_im(INTERP, SELF, im);
+                PARROT_GC_WRITE_BARRIER(INTERP, SELF);
                 break;
             }
             /* else let it fall to default */
@@ -586,13 +587,15 @@ Set real or imag depending on key
         return f;
     }
 
-    VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL v) {
+    VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL v) :manual_wb {
         switch (key) {
           case 0:
             SET_ATTR_re(INTERP, SELF, v);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             break;
           case 1:
             SET_ATTR_im(INTERP, SELF, v);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             break;
           default:
             Parrot_ex_throw_from_c_args(INTERP, NULL,
@@ -630,19 +633,20 @@ part to C<0.0>
         SET_ATTR_im(INTERP, SELF, im);
     }
 
-    VTABLE void set_pmc(PMC *value) {
+    VTABLE void set_pmc(PMC *value) :manual_wb {
         if (VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "Complex"))) {
             FLOATVAL re, im;
             GET_ATTR_re(INTERP, value, re);
             GET_ATTR_im(INTERP, value, im);
             SET_ATTR_re(INTERP, SELF, re);
             SET_ATTR_im(INTERP, SELF, im);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
         else
             VTABLE_set_string_native(INTERP, SELF, VTABLE_get_string(INTERP, value));
     }
 
-    VTABLE void set_integer_native(INTVAL value) {
+    VTABLE void set_integer_native(INTVAL value) :manual_wb {
         SELF.set_number_native((FLOATVAL)value);
     }
 
@@ -672,15 +676,15 @@ to C<value>.
 
 */
 
-    VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
+    VTABLE void set_integer_keyed(PMC *key, INTVAL value) :manual_wb {
         SELF.set_number_keyed(key, (FLOATVAL)value);
     }
 
-    VTABLE void set_integer_keyed_str(STRING *key, INTVAL value) {
+    VTABLE void set_integer_keyed_str(STRING *key, INTVAL value) :manual_wb {
         SELF.set_number_keyed_str(key, (FLOATVAL)value);
     }
 
-    VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
+    VTABLE void set_number_keyed(PMC *key, FLOATVAL value) :manual_wb {
         if (VTABLE_isa(INTERP, key, CONST_STRING(INTERP, "Integer"))) {
             const INTVAL i = VTABLE_get_integer(INTERP, key);
             SELF.set_number_keyed_int(i, value);
@@ -691,24 +695,26 @@ to C<value>.
         }
     }
 
-    VTABLE void set_number_keyed_str(STRING *key, FLOATVAL value) {
+    VTABLE void set_number_keyed_str(STRING *key, FLOATVAL value) :manual_wb {
         if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "real"))) {
             SET_ATTR_re(INTERP, SELF, value);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
         else if (STRING_equal(INTERP, key, CONST_STRING(INTERP, "imag"))) {
             SET_ATTR_im(INTERP, SELF, value);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
         else
             Parrot_ex_throw_from_c_args(INTERP, NULL,
                 EXCEPTION_INVALID_OPERATION, "Complex: key is neither 'real' or 'imag'");
     }
 
-    VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
+    VTABLE void set_pmc_keyed(PMC *key, PMC *value) :manual_wb {
         const FLOATVAL f = VTABLE_get_number(INTERP, value);
         SELF.set_number_keyed(key, f);
     }
 
-    VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) {
+    VTABLE void set_pmc_keyed_str(STRING *key, PMC *value) :manual_wb {
         const FLOATVAL f = VTABLE_get_number(INTERP, value);
         SELF.set_number_keyed_str(key, f);
     }

@@ -97,7 +97,7 @@ Defaults iteration mode to iterate from start.
 
 */
 
-    VTABLE void init_pmc(PMC *array) {
+    VTABLE void init_pmc(PMC *array) :manual_wb {
 
         SET_ATTR_array(INTERP, SELF, array);
 

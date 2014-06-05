@@ -1395,7 +1395,7 @@ Return GMP version string "x.y.z".
         return res;
     }
 
-    VTABLE void destroy() :no_wb {
+    VTABLE void destroy() {
         bigint_clear(INTERP, SELF);
     }
 

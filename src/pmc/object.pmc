@@ -981,8 +981,10 @@ Changes the PMC to a PMC of a new type
              Parrot_oo_find_vtable_override(INTERP, classobj, meth_name);
 
         if (!PMC_IS_NULL(method))
+        {
             Parrot_ext_call(INTERP, method, "PiP->", SELF, type);
             PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+        }
         else
             SUPER(type);
     }

@@ -204,7 +204,7 @@ Required functions for GC and Freeze / Thaw.
         VTABLE_push_integer(INTERP, info, VTABLE_elements(INTERP, SELF));
     }
 
-    VTABLE void thaw(PMC *info) {
+    VTABLE void thaw(PMC *info) :manual_wb {
         SUPER(info);
         SELF.set_integer_native(VTABLE_shift_integer(INTERP, info));
     }
