@@ -128,7 +128,7 @@ Destroys the array.
 
 */
 
-    VTABLE void destroy() :no_wb {
+    VTABLE void destroy() {
         if (PMC_array(SELF))
             mem_gc_free(INTERP, PMC_array(SELF));
     }

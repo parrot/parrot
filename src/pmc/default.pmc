@@ -910,7 +910,7 @@ Does nothing.
 
 */
 
-    VTABLE void thawfinish(PMC *info) {
+    VTABLE void thawfinish(PMC *info) :no_wb {
         UNUSED(INTERP);
         UNUSED(SELF);
         UNUSED(info);
