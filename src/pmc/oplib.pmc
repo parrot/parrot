@@ -37,7 +37,7 @@ Throws an error.  OpLib requires an argument to init.  See C<init_pmc>.
 
 */
 
-    VTABLE void init() {
+    VTABLE void init() :no_wb {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "OpLib must be initialized with an oplib name");
     }

@@ -201,7 +201,7 @@ pmclass LexPad provides hash no_ro auto_attrs {
     ATTR PMC *lexinfo;
     ATTR PMC *ctx;
 
-    VTABLE void init() {
+    VTABLE void init() :no_wb {
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Cannot create a LexPad PMC without an initializer");
     }
@@ -403,22 +403,22 @@ Return the LexInfo PMC, if any or a Null PMC.
         CTX_REG_STR(INTERP, ctx, reg) = value;
     }
 
-    VTABLE void set_pmc_keyed(PMC *name, PMC *value) {
+    VTABLE void set_pmc_keyed(PMC *name, PMC *value) :manual_wb {
         STRING * const s = VTABLE_get_string(INTERP, name);
         SELF.set_pmc_keyed_str(s, value);
     }
 
-    VTABLE void set_integer_keyed(PMC *name, INTVAL value) {
+    VTABLE void set_integer_keyed(PMC *name, INTVAL value) :manual_wb {
         STRING * const s = VTABLE_get_string(INTERP, name);
         SELF.set_integer_keyed_str(s, value);
     }
 
-    VTABLE void set_number_keyed(PMC *name, FLOATVAL value) {
+    VTABLE void set_number_keyed(PMC *name, FLOATVAL value) :manual_wb {
         STRING * const s = VTABLE_get_string(INTERP, name);
         SELF.set_number_keyed_str(s, value);
     }
 
-    VTABLE void set_string_keyed(PMC *name, STRING *value) {
+    VTABLE void set_string_keyed(PMC *name, STRING *value) :manual_wb {
         STRING * const s = VTABLE_get_string(INTERP, name);
         SELF.set_string_keyed_str(s, value);
     }

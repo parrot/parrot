@@ -43,12 +43,12 @@ The C<sub> argument is currently ignored.
 
 */
 
-    VTABLE void init() {
+    VTABLE void init() :manual_wb {
         /* Set value type to INTVAL */
         SELF.init_int((INTVAL)enum_type_INTVAL);
     }
 
-    VTABLE void init_pmc(PMC *sub) {
+    VTABLE void init_pmc(PMC *sub) :manual_wb {
         UNUSED(sub)
         /* Set value type to INTVAL */
         SELF.init_int((INTVAL)enum_type_INTVAL);

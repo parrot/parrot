@@ -43,7 +43,7 @@ Overrides the default to do nothing.
 
 */
 
-    VTABLE void init() {}
+    VTABLE void init() :no_wb {}
 
     VTABLE void *get_pointer() :no_wb {
         UNUSED(INTERP)

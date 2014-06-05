@@ -711,12 +711,12 @@ Deletes the key C<*key> from the hash.
             const INTVAL intval = VTABLE_get_integer(INTERP, key);
             PMC * const  nexti  = VTABLE_shift_pmc(INTERP, key);
 
-            if (nexti)
+            if (nexti) {
                 VTABLE_delete_keyed(INTERP, STATICSELF.get_pmc_keyed_int(intval), nexti);
+                PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+            }
             else
                 STATICSELF.delete_keyed_int(intval);
-
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             return;
         }
 

@@ -188,7 +188,7 @@ Sets the value of the key to C<*value>.
 
 */
 
-    VTABLE void set_pmc(PMC *value) {
+    VTABLE void set_pmc(PMC *value) :no_wb {
         UNUSED(value)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                 "Key.set_pmc is broken - see GH #499");
@@ -225,7 +225,7 @@ chain.
 
 */
 
-    VTABLE PMC *shift_pmc() {
+    VTABLE PMC *shift_pmc() :no_wb {
         PMC *next_key;
 
         GET_ATTR_next_key(INTERP, SELF, next_key);

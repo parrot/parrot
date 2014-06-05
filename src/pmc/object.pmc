@@ -288,7 +288,8 @@ Raises an exception; you can only instantiate objects from a class.
 
 */
 
-    VTABLE void init() {
+    VTABLE void init() :no_wb {
+        UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Object must be created by a class.");
     }
@@ -304,7 +305,8 @@ Raises an exception; you can only instantiate objects from a class.
 
 */
 
-    VTABLE void init_pmc(PMC *from) {
+    VTABLE void init_pmc(PMC *from) :no_wb {
+        UNUSED(SELF)
         UNUSED(from)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Object must be created by a class.");
@@ -932,7 +934,9 @@ The C<info> arguments are ignored.
         UNUSED(info)
     }
 
-    VTABLE void thaw(PMC *info) {
+    VTABLE void thaw(PMC *info) :no_wb {
+        UNUSED(INTERP)
+        UNUSED(SELF)
         UNUSED(info)
     }
 
@@ -969,7 +973,7 @@ Changes the PMC to a PMC of a new type
 
 */
 
-    VTABLE void morph(PMC* type) {
+    VTABLE void morph(PMC* type) :manual_wb {
         PMC    * const classobj  = VTABLE_get_class(INTERP, SELF);
         STRING * const meth_name = CONST_STRING(INTERP, "morph");
         /* If there's a vtable override for 'morph' run that instead. */
@@ -978,6 +982,7 @@ Changes the PMC to a PMC of a new type
 
         if (!PMC_IS_NULL(method))
             Parrot_ext_call(INTERP, method, "PiP->", SELF, type);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         else
             SUPER(type);
     }

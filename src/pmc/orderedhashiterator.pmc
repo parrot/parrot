@@ -173,7 +173,7 @@ the next one.
 
 */
 
-    VTABLE PMC *shift_pmc() {
+    VTABLE PMC *shift_pmc() :manual_wb {
         Parrot_OrderedHashIterator_attributes * const attrs =
                 PARROT_ORDEREDHASHITERATOR(SELF);
 
@@ -190,7 +190,8 @@ the next one.
                 ORDERED_HASH_ITEM_NEXT);
         ++attrs->pos;
         --attrs->elements;
-
+        
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return ret;
     }
 
@@ -205,7 +206,7 @@ the next one for reverse iterator.
 
 */
 
-    VTABLE PMC *pop_pmc() {
+    VTABLE PMC *pop_pmc() :manual_wb {
         Parrot_OrderedHashIterator_attributes * const attrs =
                 PARROT_ORDEREDHASHITERATOR(SELF);
 
@@ -221,7 +222,8 @@ the next one for reverse iterator.
                 ORDERED_HASH_ITEM_PREV);
         --attrs->pos;
         --attrs->elements;
-
+        
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return ret;
     }
 
@@ -229,8 +231,9 @@ the next one for reverse iterator.
 
 */
 
-    VTABLE STRING* shift_string() {
+    VTABLE STRING* shift_string() :manual_wb {
         PMC * const key = SELF.shift_pmc();
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return VTABLE_get_string(INTERP, key);
     }
 }
