@@ -193,7 +193,7 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
 
 */
 
-    VTABLE void visit(PMC *info) {
+    VTABLE void visit(PMC *info) :no_wb {
         /* visit message data */
         VISIT_PMC(INTERP, info, PARROT_SCHEDULERMESSAGE(SELF)->data);
     }
@@ -208,7 +208,7 @@ Used to archive the scheduler message.
 
 */
 
-    VTABLE void freeze(PMC *info) {
+    VTABLE void freeze(PMC *info) :no_wb {
         Parrot_SchedulerMessage_attributes * const core_struct =
             PARROT_SCHEDULERMESSAGE(SELF);
 

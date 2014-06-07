@@ -38,10 +38,12 @@ Initializes the array.
 
 */
 
-    VTABLE void init_int(INTVAL size) {
+    VTABLE void init_int(INTVAL size) :manual_wb {
         SUPER(size);
-        if (size)
+        if (size) {
             SET_ATTR_resize_threshold(INTERP, SELF, size);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+        }
     }
 
 
@@ -122,7 +124,7 @@ the array.
 
 */
 
-    VTABLE void push_string(STRING *value) {
+    VTABLE void push_string(STRING *value) :manual_wb {
         INTVAL next_idx;
         GET_ATTR_size(INTERP, SELF, next_idx);
         SELF.set_string_keyed_int(next_idx, value);
@@ -162,7 +164,7 @@ Removes and returns the last element in the array.
 
 */
 
-    VTABLE PMC *pop_pmc() :manual_wb {
+    VTABLE PMC *pop_pmc() {
         STRING *strval = SELF.pop_string();
         PMC    *value  = Parrot_pmc_new(INTERP, enum_class_String);
 
@@ -183,6 +185,7 @@ Removes and returns the last element in the array.
 
     VTABLE INTVAL pop_integer() :manual_wb {
         PMC * const pmcval = SELF.pop_pmc();
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return VTABLE_get_integer(INTERP, pmcval);
     }
 
@@ -198,6 +201,7 @@ Removes and returns the last element in the array.
 
     VTABLE FLOATVAL pop_float() :manual_wb {
         PMC * const pmcval = SELF.pop_pmc();
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return VTABLE_get_number(INTERP, pmcval);
     }
 
@@ -330,6 +334,7 @@ Removes and returns the first element in the array.
 
     VTABLE INTVAL shift_integer() :manual_wb {
         PMC * const pmcval = SELF.shift_pmc();
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return VTABLE_get_integer(INTERP, pmcval);
     }
 
@@ -345,6 +350,7 @@ Removes and returns the first element in the array.
 
     VTABLE FLOATVAL shift_float() :manual_wb {
         PMC * const pmcval = SELF.shift_pmc();
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return VTABLE_get_number(INTERP, pmcval);
     }
 
@@ -580,7 +586,7 @@ everything via the VTABLE api.
 
 */
 
-    VTABLE void splice(PMC *value, INTVAL offset, INTVAL count) {
+    VTABLE void splice(PMC *value, INTVAL offset, INTVAL count) :manual_wb {
 
         INTVAL length, elems, shift, i;
 

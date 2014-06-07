@@ -170,7 +170,7 @@ Adds C<value> to the end of the array.
 
 */
 
-    VTABLE void push_float(FLOATVAL value) {
+    VTABLE void push_float(FLOATVAL value) :manual_wb {
         const INTVAL nextix = SELF.elements();
         SELF.set_number_keyed_int(nextix, value);
     }

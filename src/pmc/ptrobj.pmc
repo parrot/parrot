@@ -147,7 +147,7 @@ Get or set the custom C<destroy> function.
 
 */
 
-    VTABLE void destroy() :no_wb {
+    VTABLE void destroy() {
         void                  *ptr;
         ptrobj_destroy_func_t  destroy;
         GET_ATTR_ptr(INTERP, SELF, ptr);

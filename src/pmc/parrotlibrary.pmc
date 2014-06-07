@@ -48,7 +48,9 @@ Initializes the library with a C<NULL> oplib init function.
 
 */
 
-    VTABLE void init() {
+    VTABLE void init() :no_wb {
+        UNUSED(SELF)
+        UNUSED(INTERP)
     }
 
 /*
@@ -61,9 +63,8 @@ Destroys the library, closing the shared library.
 
 */
 
-    VTABLE void destroy() :no_wb {
+    VTABLE void destroy() {
         void *dl_handle = PMC_dlhandle(SELF);
-        UNUSED(INTERP)
         if (dl_handle)
             Parrot_dlclose(dl_handle);
     }

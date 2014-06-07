@@ -192,7 +192,7 @@ Set an integer's worth of data in the segment.
 =cut
 
 */
-    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
+    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) :manual_wb {
         VTABLE_set_integer_keyed_int(INTERP,
             PARROT_PACKFILERAWSEGMENT(SELF)->opcodes, key, value);
     }
@@ -212,12 +212,12 @@ Append opcode to segment
 =cut
 
 */
-    VTABLE void push_integer(INTVAL value) {
+    VTABLE void push_integer(INTVAL value) :manual_wb {
         VTABLE_push_integer(INTERP,
             PARROT_PACKFILERAWSEGMENT(SELF)->opcodes, value);
     }
 
-    VTABLE void push_pmc(PMC *value) {
+    VTABLE void push_pmc(PMC *value) :manual_wb {
         VTABLE_push_integer(INTERP,
             PARROT_PACKFILERAWSEGMENT(SELF)->opcodes,
                 VTABLE_get_integer(INTERP, value));

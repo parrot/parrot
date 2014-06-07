@@ -161,20 +161,19 @@ Adds C<value> to C<SELF> inplace.
                 a + VTABLE_get_number_keyed_int(INTERP, value, 0));
         VTABLE_set_number_keyed_int(INTERP, SELF, 1,
                 VTABLE_get_number_keyed_int(INTERP, value, 1));
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
     }
 
-    MULTI void i_add(DEFAULT value) {
+    MULTI void i_add(DEFAULT value) :manual_wb {
         VTABLE_set_number_native(INTERP, SELF,
             SELF.get_number() + VTABLE_get_number(INTERP, value));
     }
 
-    VTABLE void i_add_int(INTVAL value) {
+    VTABLE void i_add_int(INTVAL value) :manual_wb {
         VTABLE_set_number_native(INTERP, SELF,
             SELF.get_number() + (FLOATVAL)value);
     }
 
-    VTABLE void i_add_float(FLOATVAL value) {
+    VTABLE void i_add_float(FLOATVAL value) :manual_wb {
         VTABLE_set_number_native(INTERP, SELF,
             SELF.get_number() + value);
     }
@@ -244,20 +243,19 @@ Subtracts C<value> from C<SELF> inplace.
                 a - VTABLE_get_number_keyed_int(INTERP, value, 0));
         VTABLE_set_number_keyed_int(INTERP, SELF, 1,
                 -VTABLE_get_number_keyed_int(INTERP, value, 1));
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
     }
 
-    MULTI void i_subtract(DEFAULT value) {
+    MULTI void i_subtract(DEFAULT value) :manual_wb {
         VTABLE_set_number_native(INTERP, SELF,
             SELF.get_number() - VTABLE_get_number(INTERP, value));
     }
 
-    VTABLE void i_subtract_int(INTVAL value) {
+    VTABLE void i_subtract_int(INTVAL value) :manual_wb {
         VTABLE_set_number_native(INTERP, SELF,
             SELF.get_number() - (FLOATVAL)value);
     }
 
-    VTABLE void i_subtract_float(FLOATVAL value) {
+    VTABLE void i_subtract_float(FLOATVAL value) :manual_wb {
         VTABLE_set_number_native(INTERP, SELF,
             SELF.get_number() - value);
     }
@@ -316,17 +314,17 @@ Multiplies the number by C<value> and returns the result in C<*dest>.
             "TODO i_mul<Float, Complex>");
     }
 
-    MULTI void i_multiply(DEFAULT value) {
+    MULTI void i_multiply(DEFAULT value) :manual_wb {
         VTABLE_set_number_native(INTERP, SELF,
             SELF.get_number() * VTABLE_get_number(INTERP, value));
     }
 
-    VTABLE void i_multiply_int(INTVAL value) {
+    VTABLE void i_multiply_int(INTVAL value) :manual_wb {
         VTABLE_set_number_native(INTERP, SELF,
             SELF.get_number() * (FLOATVAL)value);
     }
 
-    VTABLE void i_multiply_float(FLOATVAL value) {
+    VTABLE void i_multiply_float(FLOATVAL value) :manual_wb {
         VTABLE_set_number_native(INTERP, SELF, SELF.get_number() * value);
     }
 
@@ -387,7 +385,7 @@ Divides C<SELF> by C<value> inplace.
         return dest;
     }
 
-    VTABLE void i_divide(PMC *value) {
+    VTABLE void i_divide(PMC *value) :manual_wb {
         const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
@@ -397,7 +395,7 @@ Divides C<SELF> by C<value> inplace.
         VTABLE_set_number_native(INTERP, SELF, SELF.get_number() / d);
     }
 
-    VTABLE void i_divide_int(INTVAL value) {
+    VTABLE void i_divide_int(INTVAL value) :manual_wb {
         if (value == 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                 "float division by zero");
@@ -405,7 +403,7 @@ Divides C<SELF> by C<value> inplace.
         VTABLE_set_number_native(INTERP, SELF, SELF.get_number() / value);
     }
 
-    VTABLE void i_divide_float(FLOATVAL value) {
+    VTABLE void i_divide_float(FLOATVAL value) :manual_wb {
         if (FLOAT_IS_ZERO(value))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                 "float division by zero");
@@ -473,7 +471,7 @@ Divides C<SELF> by C<value> inplace.
         return dest;
     }
 
-    VTABLE void i_floor_divide(PMC *value) {
+    VTABLE void i_floor_divide(PMC *value) :manual_wb {
         const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
@@ -484,7 +482,7 @@ Divides C<SELF> by C<value> inplace.
                 floor(SELF.get_number() / d));
     }
 
-    VTABLE void i_floor_divide_int(INTVAL value) {
+    VTABLE void i_floor_divide_int(INTVAL value) :manual_wb {
         if (value == 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                 "float division by zero");
@@ -493,7 +491,7 @@ Divides C<SELF> by C<value> inplace.
                 floor(SELF.get_number() / value));
     }
 
-    VTABLE void i_floor_divide_float(FLOATVAL value) {
+    VTABLE void i_floor_divide_float(FLOATVAL value) :manual_wb {
         if (FLOAT_IS_ZERO(value))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                 "float division by zero");
@@ -563,7 +561,7 @@ Calculates modulus inplace
         return dest;
     }
 
-    VTABLE void i_modulus(PMC *value) {
+    VTABLE void i_modulus(PMC *value) :manual_wb {
         const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
@@ -574,7 +572,7 @@ Calculates modulus inplace
                 Parrot_util_floatval_mod(SELF.get_number(), d));
     }
 
-    VTABLE void i_modulus_int(INTVAL value) {
+    VTABLE void i_modulus_int(INTVAL value) :manual_wb {
         if (value == 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                 "float modulus by zero");
@@ -583,7 +581,7 @@ Calculates modulus inplace
                 Parrot_util_floatval_mod(SELF.get_number(), (FLOATVAL)value));
     }
 
-    VTABLE void i_modulus_float(FLOATVAL value) {
+    VTABLE void i_modulus_float(FLOATVAL value) :manual_wb {
         if (FLOAT_IS_ZERO(value))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
                 "float modulus by zero");
@@ -613,7 +611,7 @@ Set C<dest> to the negated value of C<SELF>.
         return dest;
     }
 
-    VTABLE void i_neg() {
+    VTABLE void i_neg() :manual_wb {
         VTABLE_set_integer_native(INTERP, SELF, -SELF.get_integer());
     }
 
@@ -661,13 +659,13 @@ Concatenate the string C<value> in place.
         return dest;
     }
 
-    VTABLE void i_concatenate(PMC *value) {
+    VTABLE void i_concatenate(PMC *value) :manual_wb {
         STRING * const s = SELF.get_string();
         STRING * const v = VTABLE_get_string(INTERP, value);
         SELF.set_string_native(Parrot_str_concat(INTERP, s, v));
     }
 
-    VTABLE void i_concatenate_str(STRING *value) {
+    VTABLE void i_concatenate_str(STRING *value) :manual_wb {
         STRING * const s = SELF.get_string();
         SELF.set_string_native(Parrot_str_concat(INTERP, s, value));
     }
@@ -713,13 +711,13 @@ Repeat the string C<SELF> in place C<value> times.
     }
 
 
-    VTABLE void i_repeat(PMC *value) {
+    VTABLE void i_repeat(PMC *value) :manual_wb {
         STRING * const s = SELF.get_string();
         const UINTVAL  n = (UINTVAL)VTABLE_get_integer(INTERP, value);
         SELF.set_string_native(Parrot_str_repeat(INTERP, s, n));
     }
 
-    VTABLE void i_repeat_int(INTVAL value) {
+    VTABLE void i_repeat_int(INTVAL value) :manual_wb {
         STRING * const s = SELF.get_string();
         const UINTVAL  n = value;
         SELF.set_string_native(Parrot_str_repeat(INTERP, s, n));
@@ -778,7 +776,7 @@ Returns whether the PMC is equal to C<*value>.
 */
 
 /*
-    MULTI INTVAL is_equal(PMC *value) {
+    MULTI INTVAL is_equal(PMC *value) :no_wb {
         return (SELF->vtable         == value->vtable
             &&  PMC_data(SELF)       == PMC_data(value));
     }

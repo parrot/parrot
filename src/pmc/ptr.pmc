@@ -74,10 +74,11 @@ C<init> with a value from an existing pointer-ish PMC.
 
 */
 
-    VTABLE void init() {
+    VTABLE void init() :manual_wb {
         if (PTR_FAT_TEST(INTERP, SELF) && !PMC_data(SELF)) {
             PMC_data(SELF) = (void *)mem_gc_allocate_zeroed_typed(INTERP, Parrot_Ptr_attributes);
             PObj_custom_destroy_SET(SELF);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
     }
 
@@ -147,7 +148,7 @@ Manage attribute deallocation for C<fat> representation.
 
 */
 
-    VTABLE void destroy() :no_wb {
+    VTABLE void destroy() {
         if (PTR_FAT_TEST(INTERP, SELF) && PMC_data(SELF))
             mem_gc_free(INTERP, PMC_data(SELF));
     }

@@ -231,7 +231,7 @@ TODO: check type
 
 */
 
-    VTABLE void set_pmc_keyed_str(STRING *name, PMC *segment)  {
+    VTABLE void set_pmc_keyed_str(STRING *name, PMC *segment) :manual_wb {
         Parrot_pcc_invoke_method_from_c_args(INTERP, segment,
             Parrot_str_new_constant(INTERP, "set_directory"),
             "P->", SELF);
@@ -265,7 +265,7 @@ Delete the specified segment from the directory.
 
 */
 
-    VTABLE void delete_keyed(PMC *key) {
+    VTABLE void delete_keyed(PMC *key) :manual_wb {
         VTABLE_delete_keyed(INTERP,
             PARROT_PACKFILEDIRECTORY(SELF)->hash, key);
     }

@@ -297,7 +297,8 @@ Sets the pointer to the actual subroutine.
 
 */
 
-    VTABLE void set_pointer(void *value) {
+    VTABLE void set_pointer(void *value) :no_wb {
+        UNUSED(SELF)
         UNUSED(value)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Don't set the address of a sub\nuse .const 'Sub' instead");
@@ -373,7 +374,7 @@ Invokes the subroutine.
 
 */
 
-    VTABLE opcode_t *invoke(void *next) :no_wb {
+    VTABLE opcode_t *invoke(void *next) :manual_wb {
         PMC * const caller_ctx = CURRENT_CONTEXT(INTERP);
         PMC *ccont      = INTERP->current_cont;
 
@@ -565,11 +566,11 @@ Set SELF to the data in other.
 
 */
 
-    VTABLE void set_pmc(PMC *other) {
+    VTABLE void set_pmc(PMC *other) :manual_wb {
         SELF.assign_pmc(other);
     }
 
-    VTABLE void assign_pmc(PMC *other) {
+    VTABLE void assign_pmc(PMC *other) :manual_wb {
         /* only handle the case where the other PMC is the same type */
         if (other->vtable->base_type == SELF->vtable->base_type) {
             Parrot_Sub_attributes *my_sub;
@@ -580,6 +581,7 @@ Set SELF to the data in other.
 
             /* copy the sub struct */
             memmove(my_sub, other_sub, sizeof (Parrot_Sub_attributes));
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
         else
             Parrot_ex_throw_from_c_args(INTERP, NULL,

@@ -43,7 +43,7 @@ Initialize PackfileBytecodeSegment.
 =cut
 
 */
-    VTABLE void init() {
+    VTABLE void init() :manual_wb {
         Parrot_PackfileBytecodeSegment_attributes * const attrs =
                 PARROT_PACKFILEBYTECODESEGMENT(SELF);
 
@@ -136,7 +136,7 @@ Initialize PackfileBytecodeSegment from PackFile_Bytecode*
 =cut
 
 */
-    VTABLE void set_pointer(void *pointer) {
+    VTABLE void set_pointer(void *pointer) :manual_wb {
         const PackFile_ByteCode * const pfseg =
                 (const PackFile_ByteCode *)pointer;
         opcode_t i, j;

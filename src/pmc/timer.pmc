@@ -101,7 +101,7 @@ Takes an even-length collection of keys and values.
 
 */
 
-    VTABLE void init_pmc(PMC *init) {
+    VTABLE void init_pmc(PMC *init) :manual_wb {
         const INTVAL n = VTABLE_get_integer(INTERP, init);
         INTVAL       i;
 
@@ -289,9 +289,8 @@ Sets the PMC associated with C<key> to C<*value>.
 
 */
 
-    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) :manual_wb {
+    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
         if (key == PARROT_TIMER_HANDLER) {
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             SET_ATTR_code(INTERP, SELF, value);
         }
     }

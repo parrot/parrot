@@ -100,7 +100,7 @@ Initializes the StringBuilder with an array of STRINGs.
 
 */
 
-    VTABLE void init_pmc(PMC *ar) {
+    VTABLE void init_pmc(PMC *ar) :manual_wb {
         const INTVAL count = VTABLE_elements(INTERP, ar);
 
         if (!count)

@@ -80,8 +80,10 @@ The C<ptr> argument is ignored.
 =cut
 
 */
-    VTABLE void set_pointer(void *ptr) {
+    VTABLE void set_pointer(void *ptr) :no_wb {
         UNUSED(ptr)
+        UNUSED(SELF)
+        UNUSED(INTERP)
     }
 
 /*
@@ -109,7 +111,7 @@ Set owning directory.
 =cut
 
 */
-    METHOD set_directory(PMC *directory) {
+    METHOD set_directory(PMC *directory) :manual_wb {
         PARROT_PACKFILESEGMENT(SELF)->directory = directory;
     }
 

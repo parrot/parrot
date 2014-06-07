@@ -589,13 +589,15 @@ Set real or imag depending on key
 
     VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL v) :manual_wb {
         switch (key) {
-          case 0:
+          case 0: {
             SET_ATTR_re(INTERP, SELF, v);
             PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+            }
             break;
-          case 1:
+          case 1: {
             SET_ATTR_im(INTERP, SELF, v);
             PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+            }
             break;
           default:
             Parrot_ex_throw_from_c_args(INTERP, NULL,

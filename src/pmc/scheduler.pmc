@@ -205,7 +205,7 @@ Frees the scheduler's underlying struct.
 =cut
 
 */
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         UNUSED(INTERP)
         UNUSED(SELF)
     }
@@ -246,7 +246,7 @@ C<*info> is the visit info (see F<include/parrot/pmc_freeze.h>).
 
 */
 
-    VTABLE void visit(PMC *info) {
+    VTABLE void visit(PMC *info) :no_wb {
         /* 1) visit task list */
         VISIT_PMC_ATTR(INTERP, info, SELF, Scheduler, task_queue);
 
@@ -271,7 +271,7 @@ Archives the scheduler.
 
 */
 
-    VTABLE void freeze(PMC *info) {
+    VTABLE void freeze(PMC *info) :no_wb {
         Parrot_Scheduler_attributes * const core_struct = PARROT_SCHEDULER(SELF);
 
         /* 1) freeze scheduler id */
@@ -310,8 +310,10 @@ Finishes thawing the scheduler.
 
 */
 
-    VTABLE void thawfinish(PMC *info) {
+    VTABLE void thawfinish(PMC *info) :no_wb {
         UNUSED(info)
+        UNUSED(INTERP)
+        UNUSED(SELF)
         /* Parrot_cx_refresh_task_list(INTERP, SELF); */
     }
 

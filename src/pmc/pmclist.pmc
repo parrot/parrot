@@ -89,7 +89,7 @@ Free all the list cells.
 
 */
 
-    VTABLE void destroy() :no_wb {
+    VTABLE void destroy() {
         void *tmp;
         PMC_List_Item *aa;
 
@@ -457,12 +457,12 @@ end of the array.
 
 */
 
-    METHOD shift() {
+    METHOD shift() :manual_wb {
         PMC * const value = VTABLE_shift_pmc(INTERP, SELF);
         RETURN(PMC *value);
     }
 
-    METHOD pop() {
+    METHOD pop() :manual_wb {
         PMC * const value = VTABLE_pop_pmc(INTERP, SELF);
         RETURN(PMC *value);
     }
@@ -479,11 +479,11 @@ Method forms to add a PMC to the beginning or end of the array.
 
 */
 
-    METHOD unshift(PMC* value) {
+    METHOD unshift(PMC* value) :manual_wb {
         VTABLE_unshift_pmc(INTERP, SELF, value);
     }
 
-    METHOD push(PMC* value) {
+    METHOD push(PMC* value) :manual_wb {
         VTABLE_push_pmc(INTERP, SELF, value);
     }
 

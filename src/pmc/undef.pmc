@@ -257,14 +257,14 @@ Returns 1 if the C<*value> is an Undef PMC, 0 otherwise.
 
 */
 
-    MULTI INTVAL is_equal(Undef value) {
+    MULTI INTVAL is_equal(Undef value) :no_wb {
         UNUSED(SELF)
         UNUSED(INTERP)
         UNUSED(value)
         return 1;
     }
 
-    MULTI INTVAL is_equal(DEFAULT value) {
+    MULTI INTVAL is_equal(DEFAULT value) :no_wb {
         UNUSED(SELF)
         UNUSED(INTERP)
         UNUSED(value)

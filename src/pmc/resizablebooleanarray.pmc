@@ -89,7 +89,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 
 */
 
-    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
+    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) :manual_wb {
         UINTVAL offsetkey, tail_pos, head_pos;
 
         /* Try to make negative index into a real index */
