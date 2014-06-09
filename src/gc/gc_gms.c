@@ -2052,8 +2052,9 @@ gc_gms_pmc_needs_early_collection(PARROT_INTERP, SHIM(PMC *pmc))
 =item C<static void gc_gms_write_barrier(PARROT_INTERP, PMC *pmc)>
 
 WriteBarrier for PMC. Add to root_objects list for mandatory next collecting.
-This is automatically added by pmc2c to all VTABLE function which are marked
-with C<:write> in src/vtable.tbl.
+This is automatically added by B<pmc2c> to all VTABLE methods which are marked
+with C<:write> in src/vtable.tbl and when neither the :no_wb nor :manual_wb
+attributes are specified.
 
 =cut
 

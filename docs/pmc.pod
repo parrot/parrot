@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =pod
 
@@ -54,7 +54,7 @@ the PMC declaration, or manually by using the manual_attrs flag. You must set
 one of those flags, a warning is emitted otherwise. In future releases
 auto_attrs will be the default.
 
-If manual_attrs is specified or assumed the struct must be manually allocated
+If C<manual_attrs> is specified or assumed the struct must be manually allocated
 in the PMC's C<init()> and C<init_pmc()> VTABLE functions (if used)
 and it must be destroyed in the C<destroy()> VTABLE function, the PMC must
 also indicate that they need active destruction by calling
@@ -77,6 +77,43 @@ PMC is found in the root set, B<Parrot_gc_mark_PObj_alive()> is called with
 that PMC. The PMC is responsible to mark all contained or referenced active
 Parrot objects (Buffers, STRINGs or other PMCs) when its C<mark()> VTABLE
 function is called.
+
+C<pmc2c> can generate GC write barriers automatically for all methods
+which change SELF and one of its pointers to other PMCs, but you can
+also specify the method attribute C<:manual_wb> or C<:no_wb> to not add
+write barriers automatically.
+
+=head2 PMCs and Write Barriers
+
+We mark needed or unneeded WBs ("write barriers") in each method for
+SELF.  A PMC write barrier adds the PMC to the root_objects list for
+mandatory next collecting.
+
+=head3 When to WB SELF in PMC VTABLE methods
+
+- If you change a PMC you didn’t create WB it.
+
+- Any time you save a value to a new PMC in an old PMC, WB the old one.
+  See F<src/vtable.tbl> for the :write annotation.
+
+=head3 How to annotate WBs for VTABLE methods
+
+- Mark a method as C<:manual_wb> if you added a WB manually, if in the
+body after all SELF changes were done, or in an inlined macro or in an
+included function.  Or if the last method is a vtable method on SELF,
+which does the WB then. We don't need to WB SELF twice per method
+call.
+
+- Mark a method as C<:no_wb> if no WB is needed. See above. Only
+writers need a WB. Check F<src/vtable.tbl> for the C<:write>
+annotation.
+
+- If you leave out a C<:manual_wb> or C<:no_wb> attribute in a
+C<:write> vtable method, pmc2c will try to add the write barrier line
+automatically before the return line or as last line of the
+method. However this is not possible if the method has more than one
+return. Then yoo need to switch to C<:manual_wb> and use
+C<RETURN(decl variable)> statements instead, as with PCCMETHODs.
 
 =head2 PMCs and System Resources
 
@@ -103,15 +140,17 @@ If your PMC allocates any memory or opens any resources during its lifetime, it
 must set B<PObj_custom_destroy> and implement the B<destroy()> VTABLE function to
 free those resources.
 
-=item PObj_needs_early_gc_FLAG
+=item PObj_needs_early_gc_FLAG (deprecated)
 
 Set this flag if your PMC needs timely destruction, e.g. to close a file handle
-at the end of a block scope if the PMC isn't alive any more.
+at the end of a block scope if the PMC isn't alive any more. This is only implemented
+with the C<MS> garbage collector. Use C<--gc=ms> at Configure.pl to activate this.
+Note that this feature does not work and is deprecated since release 3.1.
 
 =back
 
 =head1 SEE ALSO
 
-F<include/parrot/pobj.h>, F<src/gc/api.c>, F<docs/pdds/pdd02_vtables.pod>
+F<include/parrot/pobj.h>, F<src/gc/api.c>.
 
 =cut
