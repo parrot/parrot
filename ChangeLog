@@ -1,5 +1,6 @@
 2014-06-17    release 6.5.0
     - Core
+        + Re-add -DMEMORY_DEBUG support to the new GMS GC [GH #1073]
     - Build
         + Fixed wrong ICU header probes on multi-arch systems (debian) [GH #1014]
         + Fix opengl on bsd which does not have __APPLE__ defined as 0 [GH #1070]

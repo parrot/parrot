@@ -106,6 +106,7 @@ TBD
 #include "parrot/parrot.h"
 #include "parrot/gc_api.h"
 #include "parrot/pointer_array.h"
+#include "parrot/list.h"        /* only for MEMORY_DEBUG */
 #include "gc_private.h"
 #include "fixed_allocator.h"
 
@@ -2083,6 +2084,10 @@ gc_gms_write_barrier(PARROT_INTERP, ARGMOD(PMC *pmc))
 
         PARROT_GC_ASSERT_INTERP(pmc, interp);
 
+#ifdef MEMORY_DEBUG
+        fprintf(stderr, "GC WB pmc %-21s gen %ld at %p - %p\n",
+                pmc->vtable->whoami->strstart, gen, pmc, item->ptr);
+#endif
         Parrot_pa_remove(interp, self->objects[gen], item->ptr);
         item->ptr = Parrot_pa_insert(self->dirty_list, item);
 
@@ -2171,19 +2176,13 @@ gc_gms_count_used_string_memory(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *list)
     UNUSED(interp)
     UNUSED(list)
 #else
-    List_Item_Header *tmp = list->first;
-    while (tmp) {
-        List_Item_Header *next = tmp->next;
-        PObj             *obj  = LLH2Obj_typed(tmp, PObj);
-        STRING           *str  = (STRING*)obj;
+    POINTER_ARRAY_ITER(list,
+        string_alloc_struct * const item = (string_alloc_struct *)ptr;
+        STRING * const str = &(item->str);
 
         /* Header size */
-        total_amount += sizeof (List_Item_Header)
-                        + sizeof (STRING*);
-        total_amount += str->bufused;
-
-        tmp = next;
-    }
+        total_amount += sizeof (string_alloc_struct);
+        total_amount += str->bufused;);
 #endif
     return total_amount;
 }
@@ -2211,18 +2210,13 @@ gc_gms_count_used_pmc_memory(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *list))
     UNUSED(interp)
     UNUSED(list)
 #else
-    List_Item_Header *tmp = list->first;
-    while (tmp) {
-        List_Item_Header *next = tmp->next;
-        PMC              *obj  = LLH2Obj_typed(tmp, PMC);
+    POINTER_ARRAY_ITER(list,
+        PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
+        PARROT_GC_ASSERT_INTERP(pmc, interp);
 
         /* Header size */
-        total_amount += sizeof (List_Item_Header)
-                        + sizeof (PMC*);
-        total_amount += obj->vtable->attr_size;
-
-        tmp = next;
-    }
+        total_amount += sizeof (pmc_alloc_struct);
+        total_amount += pmc->vtable->attr_size;);
 #endif
     return total_amount;
 }
@@ -2278,8 +2272,15 @@ gc_gms_check_sanity(PARROT_INTERP)
     for (i = 0; i < MAX_GENERATIONS; i++) {
         POINTER_ARRAY_ITER(self->objects[i],
             PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
+            const size_t gen  = POBJ2GEN(pmc);
             PARROT_GC_ASSERT_INTERP(pmc, interp);
-            PARROT_ASSERT((POBJ2GEN(pmc) == i)
+
+#  ifdef DETAIL_MEMORY_DEBUG
+            fprintf(stderr, "GC live pmc %-21s gen %ld at %p\n",
+                    pmc->vtable->whoami->strstart, gen, pmc);
+#  endif
+
+            PARROT_ASSERT((gen == i)
                 || !"Object from wrong generation");
 
             if (i)
@@ -2295,12 +2296,20 @@ gc_gms_check_sanity(PARROT_INTERP)
     POINTER_ARRAY_ITER(self->dirty_list,
         PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
         PARROT_GC_ASSERT_INTERP(pmc, interp);
+#  ifdef DETAIL_MEMORY_DEBUG
+        fprintf(stderr, "GC dirty pmc %-21s at %p\n",
+                pmc->vtable->whoami->strstart, pmc);
+#  endif
         PARROT_ASSERT(PObj_GC_on_dirty_list_TEST(pmc)
             || !"Object in dirty_list without dirty_flag"););
 
     POINTER_ARRAY_ITER(self->work_list,
         PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
         PARROT_GC_ASSERT_INTERP(pmc, interp);
+#  ifdef DETAIL_MEMORY_DEBUG
+        fprintf(stderr, "GC work pmc %-21s at %p\n",
+                pmc->vtable->whoami->strstart, pmc);
+#  endif
         PARROT_ASSERT(!PObj_GC_on_dirty_list_TEST(pmc)
             || !"Dirty object in work_list"););
 #endif
