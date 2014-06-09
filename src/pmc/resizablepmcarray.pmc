@@ -387,7 +387,7 @@ Delete the element at index C<key>.
         PMC ** const data = PMC_array(SELF);
         const INTVAL  n   = PMC_size(SELF);
         INTVAL  i;
-        
+
         for (i = key; i < n - 1; ++i)
             data[i] = data[i + 1];
 

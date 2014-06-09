@@ -256,7 +256,7 @@ Shift next character code from C<string>.
         if (iter->charpos >= str_val->strlen)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
-                
+
         PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return STRING_iter_get_and_advance(INTERP, str_val, iter);
     }

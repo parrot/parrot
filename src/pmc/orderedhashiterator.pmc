@@ -189,7 +189,7 @@ the next one.
                 ORDERED_HASH_ITEM_NEXT);
         ++attrs->pos;
         --attrs->elements;
-        
+
         PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return ret;
     }
@@ -221,7 +221,7 @@ the next one for reverse iterator.
                 ORDERED_HASH_ITEM_PREV);
         --attrs->pos;
         --attrs->elements;
-        
+
         PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return ret;
     }
