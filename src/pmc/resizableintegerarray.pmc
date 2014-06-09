@@ -105,7 +105,7 @@ Resizes the array to C<size> elements.
 
 */
 
-    VTABLE void set_integer_native(INTVAL size) :manual_wb {
+    VTABLE void set_integer_native(INTVAL size) {
         INTVAL *int_array;
         INTVAL  resize_threshold;
 
@@ -130,8 +130,6 @@ Resizes the array to C<size> elements.
         else if (size <= resize_threshold) {
             /* we could shrink here if necessary */
             SET_ATTR_size(INTERP, SELF, size);
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
-            return;
         }
         else {
             INTVAL  cur = resize_threshold;
@@ -150,7 +148,6 @@ Resizes the array to C<size> elements.
             SET_ATTR_int_array(INTERP, SELF, int_array);
             SET_ATTR_size(INTERP, SELF, size);
             SET_ATTR_resize_threshold(INTERP, SELF, cur);
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
     }
 
