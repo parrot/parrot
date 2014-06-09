@@ -59,26 +59,26 @@ according to the type of C<*value>.
         if (VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "Integer"))) {
             const INTVAL v = VTABLE_get_integer(INTERP, value);
             SELF.set_integer_native(v);
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+            /* PARROT_GC_WRITE_BARRIER(INTERP, SELF); */
             return;
         }
 
         if (VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "Float"))) {
             const FLOATVAL v = VTABLE_get_number(INTERP, value);
             SELF.set_number_native(v);
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+            /* PARROT_GC_WRITE_BARRIER(INTERP, SELF); */
             return;
         }
 
         if (VTABLE_isa(INTERP, value, CONST_STRING(INTERP, "String"))) {
             STRING * const v = VTABLE_get_string(INTERP, value);
             SELF.set_string_native(v);
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+            /* PARROT_GC_WRITE_BARRIER(INTERP, SELF); */
             return;
         }
         Parrot_pmc_reuse(INTERP, SELF, val_type, 0);
         SELF.set_pmc(value);
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+        /* PARROT_GC_WRITE_BARRIER(INTERP, SELF); */
     }
 
 /*
