@@ -312,15 +312,26 @@ sub add_write_barrier {
         else {
             # how many return lines? if only 1 add wb before
             my $count;
-            $count++ while $body->{data} =~ /^\s+return /g;
+            $count++ while $body->{data} =~ /^\s+return/mg;
             if (!$count) {
-                $body->{data} .= "    PARROT_GC_WRITE_BARRIER(interp, _self);\n";
+                if ($body->{data} =~ /^\s+return/mi) {
+                  warn "pmc2c error: wrong return detection in " . $pmc->name . "." . $method->name."\n";
+                  $body->{data} =~ s/^(\s+return)/    PARROT_GC_WRITE_BARRIER(interp, _self);\n$1/m;
+                }
+                else {
+                    $body->{data} .= "    PARROT_GC_WRITE_BARRIER(interp, _self);\n";
+                }
             }
             elsif ($count == 1) {
-                $body->{data} =~ s/^(\s+return )/    PARROT_GC_WRITE_BARRIER(interp, _self);\n$1/m;
+                $body->{data} =~ s/^(\s+return)/    PARROT_GC_WRITE_BARRIER(interp, _self);\n$1/m;
             }
             else { # multiple returns. need manual_wb
-                warn "TODO manual_wb GC write barrier to " . $pmc->name . "." . $method->name."\n";
+                if ($body->{data} !~ /^\s+PARROT_GC_WRITE_BARRIER/m) {
+                    warn "Error: Missing manual_wb GC write barrier to " . $pmc->name . "." . $method->name."\n";
+                }
+                else {
+                    warn "TODO: Check manual_wb GC write barrier to " . $pmc->name . "." . $method->name."\n";
+                }
                 $body->{data} .= "    /* need PARROT_GC_WRITE_BARRIER(interp, _self); or uppercase RETURN */\n";
             }
         }

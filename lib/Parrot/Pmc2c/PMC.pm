@@ -737,7 +737,7 @@ sub post_method_gen {
         next if $name eq 'class_init';
         next unless $self->implements_vtable($name);
         # Skip non-updating methods
-        # next unless $self->vtable_method_does_write($name);
+        next unless $self->vtable_method_does_write($name);
 
         # Skip methods with manual WBs.
         next if $method->vtable_method_has_manual_wb;
