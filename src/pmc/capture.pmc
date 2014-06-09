@@ -417,8 +417,8 @@ Delete the element corresponding to C<key> in the array component.
         GET_ATTR_array(INTERP, SELF, array);
 
         if (array) {
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             VTABLE_delete_keyed_int(INTERP, array, key);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
     }
 
@@ -740,11 +740,10 @@ erase the contents of the array and hash components.
 
 */
 
-    VTABLE void set_pmc(PMC *capture) :manual_wb {
+    VTABLE void set_pmc(PMC *capture) {
         if (PMC_IS_NULL(capture)) {
             SET_ATTR_array(INTERP, SELF, NULL);
             SET_ATTR_hash(INTERP, SELF, NULL);
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
         else if (VTABLE_isa(INTERP, capture, CONST_STRING(INTERP, "Capture"))) {
             PMC *array, *hash;
@@ -754,7 +753,6 @@ erase the contents of the array and hash components.
             SET_ATTR_hash(INTERP, SELF, hash);
             if (!PMC_IS_NULL(array) || !PMC_IS_NULL(hash))
                 PObj_custom_mark_SET(SELF);
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
         else
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,

@@ -1581,17 +1581,15 @@ Returns whether the class does the given C<*role>.
         PMC * const role_list          = _class->roles;
         INTVAL i, role_count, count;
 
-        if (!role_list) {
-            RETURN(INTVAL 0);
-        }
+        if (!role_list)
+            return 0;
 
         role_count = VTABLE_elements(INTERP, role_list);
 
         for (i = 0; i < role_count; ++i) {
             PMC    * const test_role = VTABLE_get_pmc_keyed_int(INTERP, role_list, i);
-            if (VTABLE_does_pmc(INTERP, test_role, role)) {
-                RETURN(INTVAL 1);
-            }
+            if (VTABLE_does_pmc(INTERP, test_role, role))
+                return 1;
         }
 
         /* Iterate over all the parents and check if they respond true
@@ -1602,13 +1600,11 @@ Returns whether the class does the given C<*role>.
             PMC * const cur_class = VTABLE_get_pmc_keyed_int(INTERP,
                     _class->parents, i);
 
-            if (VTABLE_does_pmc(INTERP, cur_class, role)) {
-                RETURN(INTVAL 1);
-            }
+            if (VTABLE_does_pmc(INTERP, cur_class, role))
+                return 1;
         }
 
-        i = VTABLE_isa_pmc(INTERP, SELF, role);
-        RETURN(INTVAL i);
+        return VTABLE_isa_pmc(INTERP, SELF, role);
     }
 
     VTABLE INTVAL is_equal(PMC * p) :no_wb {
@@ -1692,7 +1688,7 @@ Used to archive the class.
                 serial_namespace = Parrot_str_join(INTERP, CONST_STRING(INTERP, ";"), names);
         }
         VTABLE_push_string(INTERP, info, serial_namespace);
-        PARROT_GC_WRITE_BARRIER(INTERP, info);
+        /* PARROT_GC_WRITE_BARRIER(INTERP, info); */
     }
 
 /*
@@ -1845,13 +1841,15 @@ methods from roles. When called with no parameter, returns the list.
 =cut
 
 */
-    METHOD resolve_method(PMC *resolve_list :optional, int has_list :opt_flag) :no_wb {
+    METHOD resolve_method(PMC *resolve_list :optional, int has_list :opt_flag) :manual_wb {
         Parrot_Class_attributes * const _class   = PARROT_CLASS(SELF);
         PMC *ret_list;
 
         /* Store list. */
-        if (has_list)
+        if (has_list) {
             _class->resolve_method = resolve_list;
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+        }
 
         ret_list = _class->resolve_method;
         RETURN(PMC *ret_list);

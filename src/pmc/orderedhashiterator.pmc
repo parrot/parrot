@@ -232,7 +232,6 @@ the next one for reverse iterator.
 
     VTABLE STRING* shift_string() :manual_wb {
         PMC * const key = SELF.shift_pmc();
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return VTABLE_get_string(INTERP, key);
     }
 }
