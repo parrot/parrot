@@ -39,6 +39,7 @@ Throws an exception.  Opcode PMCs are not to be created directly.
 */
 
     VTABLE void init() :no_wb {
+        UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Opcode must be created from OpLib.");
     }

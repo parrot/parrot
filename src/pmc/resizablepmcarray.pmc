@@ -149,7 +149,7 @@ Resizes the array to C<size> elements.
 
 */
 
-    VTABLE void set_integer_native(INTVAL size) :manual_wb {
+    VTABLE void set_integer_native(INTVAL size) {
         if (size < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "ResizablePMCArray: Can't resize!");
@@ -224,7 +224,7 @@ TODO: Check whether there is already an element that can be shifted
 
 */
 
-    VTABLE FLOATVAL shift_float() :manual_wb {
+    VTABLE FLOATVAL shift_float() {
         const INTVAL size = PMC_size(SELF);
         FLOATVAL value;
 
@@ -237,7 +237,7 @@ TODO: Check whether there is already an element that can be shifted
         RETURN(FLOATVAL value);
     }
 
-    VTABLE INTVAL shift_integer() :manual_wb {
+    VTABLE INTVAL shift_integer() {
         const INTVAL size = PMC_size(SELF);
         INTVAL value;
 
@@ -250,7 +250,7 @@ TODO: Check whether there is already an element that can be shifted
         RETURN(INTVAL value);
     }
 
-    VTABLE PMC *shift_pmc() :manual_wb {
+    VTABLE PMC *shift_pmc() {
         const INTVAL size = PMC_size(SELF);
         PMC   *data;
 
@@ -263,7 +263,7 @@ TODO: Check whether there is already an element that can be shifted
         RETURN(PMC *data);
     }
 
-    VTABLE STRING *shift_string() :manual_wb {
+    VTABLE STRING *shift_string() {
         const INTVAL size = PMC_size(SELF);
         STRING  *value;
 
@@ -339,7 +339,7 @@ Sets the PMC value of the element keyed by C<key> to C<*src>.
         data[key] = src;
     }
 
-    VTABLE void set_pmc_keyed(PMC *key, PMC *src) :no_wb {
+    VTABLE void set_pmc_keyed(PMC *key, PMC *src) :manual_wb {
         SUPER(key, src);
     }
 

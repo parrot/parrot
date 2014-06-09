@@ -53,6 +53,7 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
     ATTR INTVAL current_eval;
 
     VTABLE void init() :no_wb {
+        UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "IMCCompiler: Must initialize with an integer argument 0 (PIR) or 1 (PASM)");
     }

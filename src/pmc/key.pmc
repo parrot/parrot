@@ -189,6 +189,7 @@ Sets the value of the key to C<*value>.
 */
 
     VTABLE void set_pmc(PMC *value) :no_wb {
+        UNUSED(SELF)
         UNUSED(value)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                 "Key.set_pmc is broken - see GH #499");

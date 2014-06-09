@@ -67,6 +67,7 @@ Destroys the library, closing the shared library.
         void *dl_handle = PMC_dlhandle(SELF);
         if (dl_handle)
             Parrot_dlclose(dl_handle);
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
     }
 
 
