@@ -613,7 +613,7 @@ Calculate and return the square root of the input argument.
         RETURN(PMC *d);
     }
 
-    METHOD sinh() {
+    METHOD sinh() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, sinh(SELF.get_number()));
         RETURN(PMC *d);
