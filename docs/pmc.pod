@@ -15,28 +15,27 @@ This document covers some of the important internals of Parrot's PMCs.
 Ideally, there should be minimal direct access to a PMC's internals.  In order
 to enforce encapsulation, most interaction with a PMC should be performed
 through VTABLE function calls, which allow code to remain robust as PMC
-internals are changed.  
+internals are changed.
 
 When it is not possible or practical to use VTABLE functions (for instance when
 implementing PMC internals), ATTRs should be used.  ATTRs are declared after
 the C<pmclass> line in a .pmc file.  For a given pmc ("Foo"), an ATTR ("bar")
 can be accessed either directly: C<< PARROT_FOO(pmc)->bar >> or via a
 SETATTR/GETATTR accessor macro: C<GETATTR_Foo_bar(INTERP, x)>.  Note that
-inside a PMC's source file, these can be shortened to C<GET_ATTR_bar(INTERP, x)>.
+inside a .pmc file, these can be shortened to C<GET_ATTR_bar(INTERP, x)>.
 
 =head1 PMC STORAGE
 
 PMCs can store data in two places.  8 bits can be stored in the PMC's flags.
 These are accessed via PObj_private0_FLAG, PObj_private1_FLAG, etc, although
 these flags should be #define'd on a per-PMC basis to have more meaningful
-names.  If a PMC needs more than 8 bits of storage, it should declare ATTRs of
-the appropriate type.  Storage for ATTRs hangs off of C<PMC_data()>.  See
-src/pmc/exporter.pmc for example code that does this.
+names.
 
-The PMC UnionVal is an obsolete storage area which was previously used to
-provide a limited amount of storage.  The use of this storage encouraged poor
-encapsulation and hidden dependencies between PMCs.  Any new code should not
-use the UnionVal, which will eventually be removed from Parrot.
+If a PMC needs more than 8 bits of storage, it should declare ATTRs of
+the appropriate type.  Storage for ATTRs hangs off of C<PMC_data()>.  See
+F<src/pmc/exporter.pmc> for example code that does this.
+
+The PMC UnionVal was removed from Parrot with 1.6.0.
 
 =head2 ATTRs and C<PMC_data()>
 
@@ -45,7 +44,7 @@ flags, it should declare ATTRs of the appropriate type.  The pmc2c code will
 generate a struct containing all ATTRs, including those inherited via
 C<extends> declarations.  This struct will be named in the form
 C<Parrot_x_attributes>, where C<x> is the name of your PMC, e.g.
-C<Parrot_FixedIntegerArray_attributes>. 
+C<Parrot_FixedIntegerArray_attributes>.
 
 When creating a PMC that has one or more ATTRs, the C<Parrot_x_attributes>
 struct must be allocated and assigned to C<PMC_data>, and freed on PMC
@@ -86,33 +85,38 @@ write barriers automatically.
 =head2 PMCs and Write Barriers
 
 We mark needed or unneeded WBs ("write barriers") in each method for
-SELF.  A PMC write barrier adds the PMC to the root_objects list for
-mandatory next collecting.
+SELF.  A PMC write barrier adds the PMC to the C<root_objects> list for
+mandatory next collecting, so that dangling pointers to old PMCs are
+recycled.
 
-=head3 When to WB SELF in PMC VTABLE methods
+=head3 When To Write Barrier SELF in PMC VTABLE Methods
 
-- If you change a PMC you didn’t create WB it.
+- If you change a PMC you didn't create, WB it.
 
 - Any time you save a value to a new PMC in an old PMC, WB the old one.
-  See F<src/vtable.tbl> for the :write annotation.
+  See F<src/vtable.tbl> for the C<:write> annotation.
 
-=head3 How to annotate WBs for VTABLE methods
+=head3 How To Annotate Write Barriers for VTABLE Methods
 
-- Mark a method as C<:manual_wb> if you added a WB manually, if in the
+Generally WBs are added automatically for C<:write> methods unless you
+have more than one C<return> statement. But you can optimize that
+manually.
+
+- Mark a method as C<:manual_wb> if you added all WBs manually, if in the
 body after all SELF changes were done, or in an inlined macro or in an
 included function.  Or if the last method is a vtable method on SELF,
 which does the WB then. We don't need to WB SELF twice per method
 call.
 
-- Mark a method as C<:no_wb> if no WB is needed. See above. Only
-writers need a WB. Check F<src/vtable.tbl> for the C<:write>
-annotation.
+- Mark a method as C<:no_wb> if no WB is needed. See above.
+Only writers on SELF need a WB. Check F<src/vtable.tbl> for the
+C<:write> annotation.
 
 - If you leave out a C<:manual_wb> or C<:no_wb> attribute in a
-C<:write> vtable method, pmc2c will try to add the write barrier line
+C<:write> vtable method, C<pmc2c> will try to add the write barrier line
 automatically before the return line or as last line of the
 method. However this is not possible if the method has more than one
-return. Then yoo need to switch to C<:manual_wb> and use
+return. Then you need to add them manually switch to C<:manual_wb> or use
 C<RETURN(decl variable)> statements instead, as with PCCMETHODs.
 
 =head2 PMCs and System Resources
@@ -136,16 +140,17 @@ your PMC contains.
 
 =item PObj_custom_destroy_FLAG
 
-If your PMC allocates any memory or opens any resources during its lifetime, it
-must set B<PObj_custom_destroy> and implement the B<destroy()> VTABLE function to
-free those resources.
+If your PMC allocates any memory or opens any resources during its lifetime,
+it must set B<PObj_custom_destroy> and implement the B<destroy()> VTABLE
+function to free those resources.
 
 =item PObj_needs_early_gc_FLAG (deprecated)
 
-Set this flag if your PMC needs timely destruction, e.g. to close a file handle
-at the end of a block scope if the PMC isn't alive any more. This is only implemented
-with the C<MS> garbage collector. Use C<--gc=ms> at Configure.pl to activate this.
-Note that this feature does not work and is deprecated since release 3.1.
+Set this flag if your PMC needs timely destruction, e.g. to close a file
+handle at the end of a block scope if the PMC isn't alive any more. This is
+only implemented with the C<MS> garbage collector. Use C<--gc=ms> at
+Configure.pl to activate this.  Note that this feature does not work and is
+deprecated since release 3.1.
 
 =back
 
