@@ -1201,7 +1201,6 @@ Decrements the integer.
 
         if ((c^a) >= 0 || (c^~1) >= 0) {
             VTABLE_set_integer_native(INTERP, SELF, c);
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
         else {
             Parrot_pmc_reuse(INTERP, SELF, enum_class_BigInt, 0);
