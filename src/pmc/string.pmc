@@ -475,7 +475,7 @@ Replace every occurrence of C<orig> with C<_new>.
 
 */
 
-    METHOD replace(STRING *orig, STRING *_new) {
+    METHOD replace(STRING *orig, STRING *_new) :manual_wb {
         const INTVAL   old_len = Parrot_str_length(INTERP, orig);
         const INTVAL   new_len = Parrot_str_length(INTERP, _new);
         STRING       * s       = VTABLE_get_string(INTERP, SELF);
@@ -505,7 +505,7 @@ TODO Currently overflow to BigInt is B<not> handled nor detected.
 
 */
 
-    METHOD to_int(INTVAL base) {
+    METHOD to_int(INTVAL base) :no_wb {
         PMC * const result = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(INTERP,
                         enum_class_Integer));
 
@@ -627,7 +627,7 @@ Translate ascii string C<src> with entries from C<trans_table>.
 
 */
 
-    METHOD trans(STRING *src, PMC *table) {
+    METHOD trans(STRING *src, PMC *table) :no_wb {
         unsigned char *p;
         INTVAL        *tr_data;
         INTVAL         i;
