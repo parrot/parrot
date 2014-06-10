@@ -1,13 +1,25 @@
 2014-06-17    release 6.5.0
     - Core
         + Re-add -DMEMORY_DEBUG support to the new GMS GC [GH #1073]
+        + Added 2 new PMC method attributes :manual_wb and :no_wb and
+          worked over all core PMCs for unneeded GC write barriers.
+          Thereby removed the vtable method calling overhead of _orig into a
+          wrapper with the mandatory write barrier. This was the first part
+          of Chirag's GSOC project. [GH #1069]
     - Build
         + Fixed wrong ICU header probes on multi-arch systems (debian) [GH #1014]
         + Fix opengl on bsd which does not have __APPLE__ defined as 0 [GH #1070]
+        + pmc2c was extended to improve write barriers and deal with :manual_wb,
+          :no_wb and RETURN() in VTABLE methods. [GH #1069]
     - Documentation
+        + Improved the docs for pmc and pmc2c [GH #1069]
     - Tests
         + Fix t/op/gc.t for --gc=inf
     - Community
+        + Our GSOC project succeeded in the first deliverable
+        + Non-core dynpmc's with multiple return paths in writer VTABLE methods will
+          need to be changed to use either :manual_wb or RETURN() as in PCCMETHODs,
+          and can now be optimized for unneeded GC write barriers.
 
 2014-05-20    release 6.4.0
     - Examples
