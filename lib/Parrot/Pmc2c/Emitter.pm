@@ -326,8 +326,11 @@ sub add_write_barrier {
                 $body->{data} =~ s/^(\s+return)/    PARROT_GC_WRITE_BARRIER(interp, _self);\n$1/m;
             }
             else { # multiple returns. need manual_wb
-                if ($body->{data} !~ /^\s+PARROT_GC_WRITE_BARRIER/m) {
+                if ($body->{data} !~ /\sPARROT_GC_WRITE_BARRIER\s/) {
                     warn "Error: Missing manual_wb GC write barrier to " . $pmc->name . "." . $method->name."\n";
+                }
+                elsif ($pmc->name eq 'Object' and $method->name =~ /^(pop|shift)_/) {
+                    # all 8 overrides from Object.pm are :manual_wb, need no extra WB
                 }
                 else {
                     warn "TODO: Check manual_wb GC write barrier to " . $pmc->name . "." . $method->name."\n";
