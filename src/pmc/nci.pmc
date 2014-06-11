@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -97,7 +97,7 @@ Return the MMD signature PMC, if any or C<PMCNULL>.
 
 */
 
-    METHOD get_multisig() {
+    METHOD get_multisig() :no_wb {
         PMC *sig;
         GET_ATTR_multi_sig(INTERP, SELF, sig);
         if (PMC_IS_NULL(sig))
@@ -116,11 +116,10 @@ Initializes the NCI with a C<NULL> function pointer.
 */
 
     VTABLE void init() {
-        UNUSED(INTERP)
         PObj_custom_mark_SET(SELF);
     }
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         UNUSED(INTERP)
         return PARROT_NCI(SELF)->orig_func;
     }
@@ -137,11 +136,11 @@ Call the equivalent C<set_pointer*> function.
 
 */
 
-    VTABLE void set_pmc_keyed(PMC *key, PMC *p) {
+    VTABLE void set_pmc_keyed(PMC *key, PMC *p) :manual_wb {
         STATICSELF.set_pointer_keyed(key, VTABLE_get_pointer(INTERP, p));
     }
 
-    VTABLE void set_pmc_keyed_str(STRING *key, PMC *p) {
+    VTABLE void set_pmc_keyed_str(STRING *key, PMC *p) :manual_wb {
         STATICSELF.set_pointer_keyed_str(key, VTABLE_get_pointer(INTERP, p));
     }
 
@@ -165,7 +164,7 @@ Sets the specified function pointer and siganture as described in the string C<k
         SET_ATTR_signature(INTERP, SELF, key);
     }
 
-    VTABLE void set_pointer_keyed_str(STRING *key, void *func) {
+    VTABLE void set_pointer_keyed_str(STRING *key, void *func) :manual_wb {
         SELF.set_pointer_keyed(Parrot_nci_parse_signature(INTERP, key), func);
     }
 
@@ -178,7 +177,7 @@ Mark any referenced strings and PMCs.
 =cut
 
 */
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         if (PARROT_NCI(SELF)) {
             Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
 
@@ -202,7 +201,7 @@ Creates and returns a clone of the NCI.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         Parrot_NCI_attributes * const nci_info_self = PARROT_NCI(SELF);
 
         PMC * const ret     = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
@@ -221,7 +220,7 @@ Creates and returns a clone of the NCI.
         nci_info_ret->arity                 = nci_info_self->arity;
         PObj_get_FLAGS(ret)                 = PObj_get_FLAGS(SELF);
 
-        return ret;
+        RETURN(PMC *ret);
     }
 
 /*
@@ -234,9 +233,9 @@ Returns whether the NCI is defined.
 
 */
 
-    VTABLE INTVAL defined() {
-        UNUSED(INTERP)
+    VTABLE INTVAL defined() :no_wb {
         const Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
+        UNUSED(INTERP)
         return nci_info->orig_func != NULL;
     }
 
@@ -251,7 +250,7 @@ class, the PMC arguments are shifted down.
 
 */
 
-    VTABLE opcode_t *invoke(void *next) {
+    VTABLE opcode_t *invoke(void *next) :no_wb {
         Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         nci_thunk_t                   func;
         PMC                          *fb_info;
@@ -300,7 +299,7 @@ Returns the function pointer as an integer.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         if (!nci_info->func)
             build_func(INTERP, SELF, nci_info);
@@ -317,9 +316,9 @@ Returns the boolean value of the pointer.
 
 */
 
-    VTABLE INTVAL get_bool() {
-        UNUSED(INTERP)
+    VTABLE INTVAL get_bool() :no_wb {
         const Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
+        UNUSED(INTERP)
         return (0 != (INTVAL)nci_info->orig_func);
     }
 
@@ -332,7 +331,7 @@ Return the arity of the NCI (the number of arguments).
 =cut
 
 */
-    METHOD arity() {
+    METHOD arity() :no_wb {
         Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
 
         if (nci_info) {

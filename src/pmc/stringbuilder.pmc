@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2011, Parrot Foundation.
+Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -60,7 +60,7 @@ Initializes the StringBuilder.
 
 */
 
-    VTABLE void init() {
+    VTABLE void init() :manual_wb {
         STATICSELF.init_int(INITIAL_STRING_CAPACITY);
     }
 
@@ -100,7 +100,7 @@ Initializes the StringBuilder with an array of STRINGs.
 
 */
 
-    VTABLE void init_pmc(PMC *ar) {
+    VTABLE void init_pmc(PMC *ar) :manual_wb {
         const INTVAL count = VTABLE_elements(INTERP, ar);
 
         if (!count)
@@ -129,7 +129,7 @@ Mark the buffer.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         if (PMC_data(SELF)) {
             STRING *buffer;
             GET_ATTR_buffer(INTERP, SELF, buffer);
@@ -147,7 +147,7 @@ Returns created string.
 
 */
 
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         STRING *buffer;
         GET_ATTR_buffer(INTERP, SELF, buffer);
         /* We need to build a new string because outside of StringBuilder
@@ -263,15 +263,15 @@ Append string. Synonym for push_string
 
 */
 
-    VTABLE void i_concatenate_str(STRING *s) {
+    VTABLE void i_concatenate_str(STRING *s) :manual_wb {
         STATICSELF.push_string(s);
     }
 
-    VTABLE void i_concatenate(PMC *p) {
+    VTABLE void i_concatenate(PMC *p) :manual_wb {
         STATICSELF.push_string(VTABLE_get_string(INTERP, p));
     }
 
-    VTABLE void push_pmc(PMC *p) {
+    VTABLE void push_pmc(PMC *p) :manual_wb {
         STATICSELF.push_string(VTABLE_get_string(INTERP, p));
     }
 
@@ -310,7 +310,7 @@ Set content of buffer to passed string or PMC
         buffer->encoding = s->encoding;
     }
 
-    VTABLE void set_pmc(PMC *s) {
+    VTABLE void set_pmc(PMC *s) :manual_wb {
         STATICSELF.set_string_native(VTABLE_get_string(INTERP, s));
     }
 
@@ -327,7 +327,7 @@ For testing purpose only?
 
 */
 
-    INTVAL get_integer() {
+    INTVAL get_integer() :no_wb {
         STRING *buffer;
         GET_ATTR_buffer(INTERP, SELF, buffer);
         return Buffer_buflen(buffer);
@@ -341,7 +341,7 @@ For testing purpose only?
 
 */
 
-    VTABLE STRING *substr(INTVAL offset, INTVAL length) {
+    VTABLE STRING *substr(INTVAL offset, INTVAL length) :no_wb {
         STRING *buffer;
         GET_ATTR_buffer(INTERP, SELF, buffer);
         /* We must clone here because we can reallocate buffer behind the scene... */
@@ -453,7 +453,7 @@ Returns length of currently built string.
 
 */
 
-    METHOD get_string_length() {
+    METHOD get_string_length() :no_wb {
         STRING *buffer;
         INTVAL  length;
         GET_ATTR_buffer(INTERP, SELF, buffer);

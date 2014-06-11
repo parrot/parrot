@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -36,7 +36,7 @@ Returns the floating-point value of the element at index C<key>.
 
 */
 
-    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
+    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) :no_wb {
         FLOATVAL *float_array;
         INTVAL    size;
 
@@ -149,7 +149,7 @@ Creates and returns a copy of the array.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         INTVAL size;
         PMC * const copy = SUPER();
 
@@ -170,7 +170,7 @@ Adds C<value> to the end of the array.
 
 */
 
-    VTABLE void push_float(FLOATVAL value) {
+    VTABLE void push_float(FLOATVAL value) :manual_wb {
         const INTVAL nextix = SELF.elements();
         SELF.set_number_keyed_int(nextix, value);
     }
@@ -185,7 +185,7 @@ Removes and returns the last element in the array.
 
 */
 
-    VTABLE FLOATVAL pop_float() {
+    VTABLE FLOATVAL pop_float() :manual_wb {
         FLOATVAL value;
         INTVAL size;
         GET_ATTR_size(INTERP, SELF, size);

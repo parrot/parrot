@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -61,7 +61,7 @@ Marks the object as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         Parrot_PackfileDirectory_attributes * const attrs =
                 PARROT_PACKFILEDIRECTORY(SELF);
 
@@ -135,7 +135,7 @@ Creates PackFile for given directory.
 
 */
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         Parrot_PackfileDirectory_attributes * attrs =
                 PARROT_PACKFILEDIRECTORY(SELF);
         PackFile           * const pf    = PackFile_new(INTERP, 0); /* dummy PackFile... */
@@ -166,7 +166,7 @@ Get the number of elements in the array.
 
 */
 
-    VTABLE INTVAL elements() {
+    VTABLE INTVAL elements() :no_wb {
         return VTABLE_elements(INTERP, PARROT_PACKFILEDIRECTORY(SELF)->hash);
     }
 
@@ -181,7 +181,7 @@ Return a new iterator for the directory.
 
 */
 
-    VTABLE PMC *get_iter() {
+    VTABLE PMC *get_iter() :no_wb {
         return VTABLE_get_iter(INTERP, PARROT_PACKFILEDIRECTORY(SELF)->hash);
     }
 
@@ -195,7 +195,7 @@ Search the array for a segment with the given name, and return it if it exists.
 
 */
 
-    VTABLE PMC *get_pmc_keyed_str(STRING *name)  {
+    VTABLE PMC *get_pmc_keyed_str(STRING *name) :no_wb {
         return VTABLE_get_pmc_keyed_str(INTERP,
                 PARROT_PACKFILEDIRECTORY(SELF)->hash, name);
     }
@@ -211,7 +211,7 @@ Fetch a keyed string value from the packfiledirectory object.
 
 */
 
-    VTABLE PMC *get_pmc_keyed(PMC *key) {
+    VTABLE PMC *get_pmc_keyed(PMC *key) :no_wb {
         STRING * const s_key = VTABLE_get_string(INTERP, key);
         return VTABLE_get_pmc_keyed_str(INTERP,
                 PARROT_PACKFILEDIRECTORY(SELF)->hash, s_key);
@@ -231,7 +231,7 @@ TODO: check type
 
 */
 
-    VTABLE void set_pmc_keyed_str(STRING *name, PMC *segment)  {
+    VTABLE void set_pmc_keyed_str(STRING *name, PMC *segment) :manual_wb {
         Parrot_pcc_invoke_method_from_c_args(INTERP, segment,
             Parrot_str_new_constant(INTERP, "set_directory"),
             "P->", SELF);
@@ -250,7 +250,7 @@ set_pmc_keyed_str.
 
 */
 
-    VTABLE void set_pmc_keyed(PMC *key, PMC *segment)  {
+    VTABLE void set_pmc_keyed(PMC *key, PMC *segment)  :manual_wb {
         STRING * const s_key = VTABLE_get_string(INTERP, key);
         VTABLE_set_pmc_keyed_str(INTERP, SELF, s_key, segment);
     }
@@ -265,7 +265,7 @@ Delete the specified segment from the directory.
 
 */
 
-    VTABLE void delete_keyed(PMC *key) {
+    VTABLE void delete_keyed(PMC *key) :manual_wb {
         VTABLE_delete_keyed(INTERP,
             PARROT_PACKFILEDIRECTORY(SELF)->hash, key);
     }

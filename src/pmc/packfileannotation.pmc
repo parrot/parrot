@@ -42,7 +42,6 @@ Create empty PackfileAnnotation.
 */
 
     VTABLE void init() {
-        UNUSED(INTERP)
         Parrot_PackfileAnnotation_attributes * const attrs =
                 PMC_data_typed(SELF, Parrot_PackfileAnnotation_attributes*);
 
@@ -60,7 +59,7 @@ Marks the object as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         const Parrot_PackfileAnnotation_attributes * const attrs =
                 PARROT_PACKFILEANNOTATION(SELF);
 
@@ -78,7 +77,7 @@ Fetch the offset into the bytecode of the instruction that is being annotated.
 =cut
 
 */
-    METHOD get_offset() {
+    METHOD get_offset() :no_wb {
         const INTVAL offset = PARROT_PACKFILEANNOTATION(SELF)->offset;
         RETURN(INTVAL offset);
     }
@@ -107,7 +106,7 @@ Fetch the name of the annotation.
 =cut
 
 */
-    METHOD get_name() {
+    METHOD get_name() :no_wb {
         STRING * const name = PARROT_PACKFILEANNOTATION(SELF)->name;
         RETURN(STRING * name);
     }
@@ -136,7 +135,7 @@ Fetch the PMC value of the annotation.
 =cut
 
 */
-    METHOD get_pmc_value() {
+    METHOD get_pmc_value() :no_wb {
         const Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
         if (attrs->value_type != PF_ANNOTATION_KEY_TYPE_PMC)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
@@ -180,7 +179,7 @@ Get the type of the annotation.
 =cut
 
 */
-    METHOD get_type() {
+    METHOD get_type() :no_wb {
         /* These values were chosen to match the type values for opcodes */
         Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
         INTVAL ret;
@@ -214,7 +213,7 @@ Fetch the integer value of the annotation.
 =cut
 
 */
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         const Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
         if (attrs->value_type != PF_ANNOTATION_KEY_TYPE_INT)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
@@ -233,7 +232,6 @@ Set the integer value of the annotation.
 
 */
     VTABLE void set_integer_native(INTVAL value) {
-        UNUSED(INTERP)
         Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
         attrs->value_type = PF_ANNOTATION_KEY_TYPE_INT;
         attrs->int_value  = value;
@@ -248,7 +246,7 @@ Fetch the string value of the annotation.
 =cut
 
 */
-    VTABLE STRING * get_string() {
+    VTABLE STRING * get_string() :no_wb {
         Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
         if (attrs->value_type != PF_ANNOTATION_KEY_TYPE_STR)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
@@ -267,7 +265,6 @@ Set the string value of the annotation.
 
 */
     VTABLE void set_string_native(STRING * value) {
-        UNUSED(INTERP)
         Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
         attrs->value_type = PF_ANNOTATION_KEY_TYPE_STR;
         attrs->str_value  = value;

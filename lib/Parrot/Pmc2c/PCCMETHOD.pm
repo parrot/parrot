@@ -115,6 +115,7 @@ sub parse_adverb_attributes {
     if ( defined $adverb_string ) {
         ++$result{$1} while $adverb_string =~ /:(\S+)/g;
     }
+    $result{manual_wb}++ if $result{no_wb};
     return \%result;
 }
 
@@ -160,16 +161,17 @@ sub rewrite_RETURNs {
     my $wb             = $method->attrs->{manual_wb}
                          ? ''
                          : 'PARROT_GC_WRITE_BARRIER(interp, _self);';
+    my $result;
 
     my $signature_re   = qr/
       (RETURN       #method name
       \s*              #optional whitespace
-      \( ([^\(]*) \)   #returns ( stuff ... )
+      \( ([^\(]*) \)   #returns ( type... var)
       ;?)              #optional semicolon
     /sx;
 
     croak "return not allowed in pccmethods, use RETURN instead $body"
-        if $body and $body =~ m/\breturn\b.*?;\z/s;
+        if !$method->is_vtable and $wb and $body and $body =~ m/\breturn\b.*?;\z/s;
 
     while ($body) {
         my $matched;
@@ -185,15 +187,21 @@ sub rewrite_RETURNs {
         my $e = Parrot::Pmc2c::Emitter->new( $pmc->filename(".c") );
 
         if ($returns eq 'void') {
-            $e->emit( <<"END" );
+            if ($wb) {
+                $e->emit( <<"END" );
     {
-    /*BEGIN RETURN $returns */
-    $wb
-    return;
-    /*END RETURN $returns */
+        $wb
+        return;
     }
 END
+            }
+            else {
+                $e->emit( <<"END" );
+    return;
+END
+            }
             $matched->replace( $match, $e );
+            $result = 1;
             next;
         }
 
@@ -201,36 +209,36 @@ END
         my ( $returns_signature, $returns_varargs ) =
             process_pccmethod_args( parse_p_args_string($returns), 'return' );
 
-        if ($returns_signature) {
-        $e->emit( <<"END" );
-    {
-    /*BEGIN RETURN $returns */
-END
-        $e->emit( <<"END" );
-    Parrot_pcc_set_call_from_c_args(interp, _call_object,
-        "$returns_signature", $returns_varargs);
-    $wb
-    return;
-    /*END RETURN $returns */
-    }
+        if ($returns_signature and !$method->is_vtable) {
+            $e->emit( <<"END" );
+    {  /*BEGIN RETURN $returns */
+        Parrot_pcc_set_call_from_c_args(interp, _call_object,
+            "$returns_signature", $returns_varargs);
+        $wb
+        return;
+    }   /*END RETURN $returns */
 END
         }
-        else { # if ($returns_signature)
+        elsif ($wb) { # if ($returns_signature)
             $e->emit( <<"END" );
     {
-    /*BEGIN RETURN $returns */
-    $wb
-    return;
+        $wb
+        return $returns_varargs;
     }
-    /*END RETURN $returns */
 END
         }
-
+        else {
+            $e->emit( <<"END" );
+    return $returns_varargs;
+END
+        }
         $matched->replace( $match, $e );
+        $result = 1;
     }
-
+    return $result;
 }
 
+# This doesn't handle "const PMC *var", but "PMC *const var"
 sub parse_p_args_string {
     my ($parameters) = @_;
     my $linear_args  = [];
@@ -245,12 +253,16 @@ sub parse_p_args_string {
 
         my ( $type, $name, $rest ) = split /\s+/, trim($x), 3;
 
+        # 'PMC *const ret'
+        if ($rest and $rest !~ /^:/) { # handle const volatile or such
+            $type .= " ".$name;
+            ($name, $rest) = split /\s+/, trim($rest), 2;
+        }
+
         die "invalid PCC arg '$x': did you forget to specify a type?\n"
             unless defined $name;
 
-        if ($name =~ /\**([a-zA-Z_]\w*)/) {
-            $name = $1;
-        }
+        $name =~ s/^\*//g;
 
         my $arg = {
             type  => convert_type_string_to_reg_type($type),
@@ -343,7 +355,7 @@ sub rewrite_pccmethod {
             already_declared => 1,
         };
 
- # The invocant is already passed in the C signature, why pass it again?
+    # The invocant is already passed in the C signature, why pass it again?
 
     my ( $params_signature, $params_varargs, $params_declarations ) =
         process_pccmethod_args( $linear_args, 'arg' );

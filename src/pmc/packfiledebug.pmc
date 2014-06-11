@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -71,7 +71,7 @@ Marks the object as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         Parrot_PackfileDebug_attributes * const attrs =
                 PARROT_PACKFILEDEBUG(SELF);
 
@@ -122,7 +122,7 @@ Builds a Packfile_Debug segment for this PMC.
 
 */
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         PackFile_Debug * const p = (PackFile_Debug *) mem_gc_realloc_n_typed(INTERP,
                                                            SUPER(), sizeof (PackFile_Debug), char);
         INTVAL num_mappings;
@@ -153,11 +153,11 @@ Get the number of filename mappings.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         return STATICSELF.elements();
     }
 
-    VTABLE INTVAL elements() {
+    VTABLE INTVAL elements() :no_wb {
         INTVAL num_mappings;
         GET_ATTR_num_mappings(INTERP, SELF, num_mappings);
         return num_mappings;
@@ -177,7 +177,7 @@ version returns -1 and the PMC version returns PMCNULL;
 
 */
 
-    VTABLE PMC *get_pmc_keyed_int(INTVAL n) {
+    VTABLE PMC *get_pmc_keyed_int(INTVAL n) :no_wb {
         INTVAL line = STATICSELF.get_integer_keyed_int(n);
         if (line < 0)
             return PMCNULL;
@@ -185,7 +185,7 @@ version returns -1 and the PMC version returns PMCNULL;
         return Parrot_pmc_new_init_int(INTERP, enum_class_Integer, line);
     }
 
-    VTABLE INTVAL get_integer_keyed_int(INTVAL n) {
+    VTABLE INTVAL get_integer_keyed_int(INTVAL n) :no_wb {
         Parrot_PackfileDebug_attributes * const attrs =
                 PARROT_PACKFILEDEBUG(SELF);
 
@@ -207,7 +207,7 @@ the constant table.
 
 */
 
-    VTABLE STRING *get_string_keyed_int(INTVAL n) {
+    VTABLE STRING *get_string_keyed_int(INTVAL n) :no_wb {
         Parrot_PackfileDebug_attributes * const attrs =
                 PARROT_PACKFILEDEBUG(SELF);
         INTVAL filename;

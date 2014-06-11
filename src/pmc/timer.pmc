@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -101,7 +101,7 @@ Takes an even-length collection of keys and values.
 
 */
 
-    VTABLE void init_pmc(PMC *init) {
+    VTABLE void init_pmc(PMC *init) :manual_wb {
         const INTVAL n = VTABLE_get_integer(INTERP, init);
         INTVAL       i;
 
@@ -148,7 +148,7 @@ Create a copy of the timer, resetting status, id, and birthtime.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         PMC * const copy = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         Parrot_Timer_attributes * const new_struct = PARROT_TIMER(copy);
@@ -172,10 +172,10 @@ Returns the timer info for C<key>.
 
 */
 
-    VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
-        UNUSED(INTERP)
+    VTABLE INTVAL get_integer_keyed_int(INTVAL key) :no_wb {
         const Parrot_Timer_attributes * const core_struct = PARROT_TIMER(SELF);
         const FLOATVAL absolute_time = core_struct->birthtime + core_struct->duration;
+        UNUSED(INTERP)
 
         switch (key) {
           case PARROT_TIMER_SEC:
@@ -203,7 +203,7 @@ Returns the PMC associated with C<key>.
 
 */
 
-    VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
+    VTABLE PMC *get_pmc_keyed_int(INTVAL key) :no_wb {
         UNUSED(INTERP)
 
         if (key == PARROT_TIMER_HANDLER) {
@@ -224,9 +224,9 @@ Returns the number associated with C<key>.
 
 */
 
-    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
-        UNUSED(INTERP)
+    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) :no_wb {
         const Parrot_Timer_attributes * const core_struct = PARROT_TIMER(SELF);
+        UNUSED(INTERP)
 
         switch (key) {
           case PARROT_TIMER_NSEC:
@@ -308,7 +308,7 @@ Invoke the codeblock and schedule any repeats.
 
 */
 
-    VTABLE opcode_t *invoke(void *next) {
+    VTABLE opcode_t *invoke(void *next) :no_wb {
         Parrot_Timer_attributes *const timer = PARROT_TIMER(SELF);
         FLOATVAL now_time;
         PMC* alarm;
@@ -403,7 +403,7 @@ Mark any referenced strings and PMCs.
 =cut
 
 */
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         if (PARROT_TIMER(SELF)) {
             Parrot_Timer_attributes * const core_struct = PARROT_TIMER(SELF);
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->code);

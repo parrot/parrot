@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -72,7 +72,7 @@ Raises an exception. Use C<init_pmc()>.
 
 */
 
-    VTABLE void init() {
+    VTABLE void init() :no_wb {
         UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "Iterator init without aggregate");
@@ -105,7 +105,7 @@ Defaults iteration mode to iterate from start.
 
 */
 
-    VTABLE INTVAL get_integer_keyed(PMC *key) {
+    VTABLE INTVAL get_integer_keyed(PMC *key) :no_wb {
         return VTABLE_get_integer_keyed(INTERP, SELF.get_pmc(), key);
     }
 
@@ -117,7 +117,7 @@ Defaults iteration mode to iterate from start.
 
 */
 
-    VTABLE FLOATVAL get_number_keyed(PMC *key) {
+    VTABLE FLOATVAL get_number_keyed(PMC *key) :no_wb {
         return VTABLE_get_number_keyed(INTERP, SELF.get_pmc(), key);
     }
 
@@ -130,7 +130,7 @@ Defaults iteration mode to iterate from start.
 
 */
 
-    VTABLE STRING *get_string_keyed(PMC *key) {
+    VTABLE STRING *get_string_keyed(PMC *key) :no_wb {
         return VTABLE_get_string_keyed(INTERP, SELF.get_pmc(), key);
     }
 
@@ -144,7 +144,7 @@ Returns the element for C<*key>.
 
 */
 
-    VTABLE PMC *get_pmc_keyed(PMC *key) {
+    VTABLE PMC *get_pmc_keyed(PMC *key) :no_wb {
         return VTABLE_get_pmc_keyed(INTERP, SELF.get_pmc(), key);
     }
 
@@ -158,7 +158,7 @@ Returns whether an element for C<*key> exists in the aggregate.
 
 */
 
-    VTABLE INTVAL exists_keyed(PMC *key) {
+    VTABLE INTVAL exists_keyed(PMC *key) :no_wb {
         return VTABLE_exists_keyed(INTERP, SELF.get_pmc(), key);
     }
 
@@ -172,7 +172,7 @@ Returns whether the iterator contains an aggregate.
 
 */
 
-    VTABLE INTVAL defined() {
+    VTABLE INTVAL defined() :no_wb {
         return (INTVAL)(SELF.get_pmc() != PMCNULL);
     }
 
@@ -184,12 +184,12 @@ Returns whether the iterator contains an aggregate.
 
 */
 
-    VTABLE INTVAL defined_keyed(PMC *key) {
+    VTABLE INTVAL defined_keyed(PMC *key) :no_wb {
         return VTABLE_defined_keyed(INTERP, SELF.get_pmc(), key);
     }
 
 
-    VTABLE PMC *get_iter() {
+    VTABLE PMC *get_iter() :no_wb {
         UNUSED(INTERP);
         return SELF;
     }
@@ -210,10 +210,10 @@ Restart iterator
 =cut
 
 */
-    VTABLE void set_integer_native(INTVAL value) {
-        UNUSED(SELF)
+    VTABLE void set_integer_native(INTVAL value) :no_wb {
         UNUSED(value)
-        PARROT_FAILURE("Iterator: implementation have to override this method");
+        UNUSED(SELF)
+        PARROT_FAILURE("Iterator: implementation has to override this method");
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
                 "Iterator: unimplemented method");
     }

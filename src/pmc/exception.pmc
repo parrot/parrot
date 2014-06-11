@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -196,7 +196,7 @@ information.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         INTVAL   id;
         STRING   *message;
@@ -246,11 +246,11 @@ throwing and handling information.
 
 */
 
-    VTABLE void visit(PMC *visit) {
+    VTABLE void visit(PMC *visit) :no_wb {
         VISIT_PMC_ATTR(INTERP, visit, SELF, Exception, payload);
     }
 
-    VTABLE void freeze(PMC *visit) {
+    VTABLE void freeze(PMC *visit) :no_wb {
         INTVAL type, severity, exit_code;
         STRING *message;
 
@@ -294,7 +294,7 @@ Mark any active exception data as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         Parrot_Exception_attributes * const core_struct = PARROT_EXCEPTION(SELF);
         Parrot_gc_mark_STRING_alive(INTERP, core_struct->message);
         Parrot_gc_mark_PMC_alive(INTERP, core_struct->payload);
@@ -316,7 +316,7 @@ Return true.
 
 */
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         return 1;
     }
 
@@ -330,7 +330,7 @@ Return the exception message.
 
 */
 
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         STRING *message;
         GET_ATTR_message(INTERP, SELF, message);
         if (STRING_IS_NULL(message))
@@ -348,9 +348,9 @@ Returns the id of the exception.
 
 */
 
-    VTABLE INTVAL get_integer() {
-        UNUSED(INTERP)
+    VTABLE INTVAL get_integer() :no_wb {
         const Parrot_Exception_attributes * const exception = PARROT_EXCEPTION(SELF);
+        UNUSED(INTERP)
         return exception->id;
     }
 
@@ -365,7 +365,7 @@ C<key> is "message".
 
 */
 
-    VTABLE STRING *get_string_keyed(PMC *key) {
+    VTABLE STRING *get_string_keyed(PMC *key) :no_wb {
         STRING * const name = VTABLE_get_string(INTERP, key);
         STRING *message;
 
@@ -391,7 +391,7 @@ Returns the integer value for C<*key>.
 
 */
 
-    VTABLE INTVAL get_integer_keyed_str(STRING *key) {
+    VTABLE INTVAL get_integer_keyed_str(STRING *key) :no_wb {
         INTVAL result = 0;
         switch (getAttrEnum(INTERP, key)) {
           case attr_type:
@@ -428,7 +428,7 @@ Returns the integer value for C<*key>.
 
 */
 
-    VTABLE INTVAL get_integer_keyed(PMC *key) {
+    VTABLE INTVAL get_integer_keyed(PMC *key) :no_wb {
         STRING * const name = VTABLE_get_string(INTERP, key);
         return SELF.get_integer_keyed_str(name);
     }
@@ -443,7 +443,7 @@ Returns the PMC value for C<*key>.
 
 */
 
-    VTABLE PMC *get_pmc_keyed(PMC *key) {
+    VTABLE PMC *get_pmc_keyed(PMC *key) :no_wb {
         STRING * const s = VTABLE_get_string(INTERP, key);
         return SELF.get_attr_str(s);
     }
@@ -503,7 +503,7 @@ Sets the Parrot string value for C<*key>.
 
 */
 
-    VTABLE void set_string_keyed(PMC *key, STRING *value) {
+    VTABLE void set_string_keyed(PMC *key, STRING *value) :manual_wb {
         STRING * const name = VTABLE_get_string(INTERP, key);
 
         if (STRING_equal(INTERP, name, CONST_STRING(INTERP, "message"))) {
@@ -526,22 +526,37 @@ Sets the integer value for C<*key>.
 
 */
 
-    VTABLE void set_integer_keyed_str(STRING *key, INTVAL value) {
+    VTABLE void set_integer_keyed_str(STRING *key, INTVAL value) :manual_wb {
         switch (getAttrEnum(INTERP, key)) {
           case attr_type:
+            {
             SET_ATTR_type(INTERP, SELF, value);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+            }
             break;
           case attr_severity:
+            {
             SET_ATTR_severity(INTERP, SELF, value);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+            }
             break;
           case attr_exit_code:
+            {
             SET_ATTR_exit_code(INTERP, SELF, value);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+            }
             break;
           case attr_handled:
+            {
             SET_ATTR_handled(INTERP, SELF, value);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+            }
             break;
           case attr_handlers_left:
+            {
             SET_ATTR_handlers_left(INTERP, SELF, value);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+            }
             break;
           default:
             /* If unknown attribute name, throw an exception. */
@@ -560,7 +575,7 @@ Sets the integer value for C<*key>.
 
 */
 
-    VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
+    VTABLE void set_integer_keyed(PMC *key, INTVAL value) :manual_wb {
         STRING * const name = VTABLE_get_string(INTERP, key);
         SELF.set_integer_keyed_str(name, value);
     }
@@ -575,7 +590,7 @@ Sets the PMC value for C<*key>.
 
 */
 
-    VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
+    VTABLE void set_pmc_keyed(PMC *key, PMC *value) :manual_wb {
         STRING * const s = VTABLE_get_string(INTERP, key);
         SELF.set_attr_str(s, value);
     }
@@ -591,7 +606,6 @@ Store a context for the handler iterator.
 */
 
     VTABLE void set_pointer(void *context) {
-        UNUSED(INTERP)
         Parrot_Exception_attributes * const core_struct = PARROT_EXCEPTION(SELF);
         core_struct->handler_ctx = (PMC*)context;
     }
@@ -606,9 +620,9 @@ Retrieve a context stored for the handler iterator.
 
 */
 
-    VTABLE void *get_pointer() {
-        UNUSED(INTERP)
+    VTABLE void *get_pointer() :no_wb {
         const Parrot_Exception_attributes * const core_struct = PARROT_EXCEPTION(SELF);
+        UNUSED(INTERP)
         return core_struct->handler_ctx;
     }
 
@@ -623,7 +637,7 @@ exit_code.
 =cut
 
 */
-    VTABLE INTVAL is_equal(PMC *value) {
+    VTABLE INTVAL is_equal(PMC *value) :no_wb {
         STRING * const exception_str = CONST_STRING(INTERP, "Exception");
 
         if (value->vtable->base_type == SELF->vtable->base_type
@@ -655,7 +669,7 @@ Retrieve an attribute value for the exception object.
 =cut
 
 */
-    VTABLE PMC *get_attr_str(STRING *name) {
+    VTABLE PMC *get_attr_str(STRING *name) :no_wb {
         PMC *value = PMCNULL;
 
         switch (getAttrEnum(INTERP, name)) {
@@ -741,31 +755,35 @@ Set an attribute value for the exception object.
 =cut
 
 */
-    VTABLE void set_attr_str(STRING *name, PMC *value) {
+    VTABLE void set_attr_str(STRING *name, PMC *value) :manual_wb {
 
         switch (getAttrEnum(INTERP, name)) {
           case attr_type:
             {
             const INTVAL type = VTABLE_get_integer(INTERP, value);
             SET_ATTR_type(INTERP, SELF, type);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             }
             break;
           case attr_severity:
             {
             const INTVAL severity = VTABLE_get_integer(INTERP, value);
             SET_ATTR_severity(INTERP, SELF, severity);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             }
             break;
           case attr_exit_code:
             {
             const INTVAL exit_code = VTABLE_get_integer(INTERP, value);
             SET_ATTR_exit_code(INTERP, SELF, exit_code);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             }
             break;
           case attr_handled:
             {
             const INTVAL handled = VTABLE_get_integer(INTERP, value);
             SET_ATTR_handled(INTERP, SELF, handled);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             }
             break;
           case attr_message:
@@ -775,22 +793,40 @@ Set an attribute value for the exception object.
             }
             break;
           case attr_payload:
+            {
             SET_ATTR_payload(INTERP, SELF, value);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+            }
             break;
           case attr_resume:
+            {
             SET_ATTR_resume(INTERP, SELF, value);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+            }
             break;
           case attr_backtrace:
+            {
             SET_ATTR_backtrace(INTERP, SELF, value);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+            }
             break;
           case attr_handler:
+            {
             SET_ATTR_handler(INTERP, SELF, value);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+            }
             break;
           case attr_thrower:
+            {
             SET_ATTR_thrower(INTERP, SELF, value);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+            }
             break;
           case attr_bt_strings:
+            {
             SET_ATTR_bt_strings(INTERP, SELF, value);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+            }
             break;
           case attr_NONE:
             /* If unknown attribute name, throw an exception. */

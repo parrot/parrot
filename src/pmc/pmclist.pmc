@@ -1,6 +1,5 @@
 /*
-Copyright (C) 2010-2012, Parrot Foundation.
-$Id$
+Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -114,13 +113,13 @@ Returns the size of the list.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         INTVAL size;
         GET_ATTR_size(INTERP, SELF, size);
         return size;
     }
 
-    VTABLE INTVAL elements() {
+    VTABLE INTVAL elements() :no_wb {
         INTVAL size;
         GET_ATTR_size(INTERP, SELF, size);
         return size;
@@ -150,6 +149,7 @@ Removes and returns an item from the start of the array.
 
         GET_ATTR_head(INTERP, SELF, tmp);
         item = (PMC_List_Item*) tmp;
+
         data = item->data;
 
         size -= 1;
@@ -240,6 +240,7 @@ Removes and returns the last element in the array.
 
         GET_ATTR_foot(INTERP, SELF, tmp);
         item = (PMC_List_Item*) tmp;
+
         data = item->data;
 
         size -= 1;
@@ -316,7 +317,7 @@ Creates and returns a copy of the list.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         PMC * const copy = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         void* tmp;
         PMC_List_Item *it;
@@ -336,13 +337,15 @@ Creates and returns a copy of the list.
 
 =item C<STRING *get_repr()>
 
+=item C<STRING *get_string()>
+
 Returns the Parrot string representation C<ResizablePMCArray>.
 
 =cut
 
 */
 
-    VTABLE STRING *get_repr() {
+    VTABLE STRING *get_repr() :no_wb {
         PMC_List_Item *it;
         void* tmp;
         STRING *res = CONST_STRING(INTERP, "[ ");
@@ -360,7 +363,7 @@ Returns the Parrot string representation C<ResizablePMCArray>.
         return Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, "]"));
     }
 
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         return VTABLE_get_repr(INTERP, SELF);
     }
 
@@ -385,7 +388,7 @@ Used to unarchive the array.
 
 */
 
-    VTABLE void visit(PMC *info) {
+    VTABLE void visit(PMC *info) :no_wb {
         void* tmp;
         PMC_List_Item *it;
 
@@ -399,12 +402,12 @@ Used to unarchive the array.
         SUPER(info);
     }
 
-    VTABLE void freeze(PMC *info) {
+    VTABLE void freeze(PMC *info) :no_wb {
         SUPER(info);
         VTABLE_push_integer(INTERP, info, VTABLE_get_integer(INTERP, SELF));
     }
 
-    VTABLE void thaw(PMC *info) {
+    VTABLE void thaw(PMC *info) :manual_wb {
         int n, i;
         SUPER(info);
         n = VTABLE_shift_integer(INTERP, info);
@@ -424,7 +427,7 @@ Mark the stuff.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         void* tmp;
         PMC_List_Item *it;
 
@@ -454,12 +457,12 @@ end of the array.
 
 */
 
-    METHOD shift() {
+    METHOD shift() :manual_wb {
         PMC * const value = VTABLE_shift_pmc(INTERP, SELF);
         RETURN(PMC *value);
     }
 
-    METHOD pop() {
+    METHOD pop() :manual_wb {
         PMC * const value = VTABLE_pop_pmc(INTERP, SELF);
         RETURN(PMC *value);
     }
@@ -476,11 +479,11 @@ Method forms to add a PMC to the beginning or end of the array.
 
 */
 
-    METHOD unshift(PMC* value) {
+    METHOD unshift(PMC* value) :manual_wb {
         VTABLE_unshift_pmc(INTERP, SELF, value);
     }
 
-    METHOD push(PMC* value) {
+    METHOD push(PMC* value) :manual_wb {
         VTABLE_push_pmc(INTERP, SELF, value);
     }
 

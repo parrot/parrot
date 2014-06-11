@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -36,10 +36,12 @@ Initializes the array.
 
 */
 
-    VTABLE void init_int(INTVAL size) {
+    VTABLE void init_int(INTVAL size) :manual_wb {
         SUPER(size);
-        if (size > 0)
+        if (size > 0) {
             SET_ATTR_resize_threshold(INTERP, SELF, size);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+        }
     }
 
 /*
@@ -52,7 +54,7 @@ Returns the integer value of the element at index C<key>.
 
 */
 
-    VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
+    VTABLE INTVAL get_integer_keyed_int(INTVAL key) :no_wb {
         INTVAL *int_array;
         INTVAL  size;
 
@@ -128,7 +130,6 @@ Resizes the array to C<size> elements.
         else if (size <= resize_threshold) {
             /* we could shrink here if necessary */
             SET_ATTR_size(INTERP, SELF, size);
-            return;
         }
         else {
             INTVAL  cur = resize_threshold;
@@ -190,7 +191,7 @@ Removes and returns the last element in the array.
 
 */
 
-    VTABLE INTVAL pop_integer() {
+    VTABLE INTVAL pop_integer() :manual_wb {
         INTVAL value;
         INTVAL size = SELF.get_integer();
 
@@ -212,7 +213,7 @@ Removes and returns an item from the start of the array.
 
 */
 
-    VTABLE INTVAL shift_integer() {
+    VTABLE INTVAL shift_integer() :manual_wb {
         INTVAL value, *int_array;
         INTVAL size = SELF.get_integer();
 
@@ -259,7 +260,7 @@ Removes the element at C<key>.
 
 */
 
-    VTABLE void delete_keyed_int(INTVAL key) {
+    VTABLE void delete_keyed_int(INTVAL key) :manual_wb {
         INTVAL size = SELF.get_integer();
 
         if (size < 1 || key >= size) {
@@ -285,7 +286,7 @@ Creates and returns a copy of the array.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         INTVAL  size;
         PMC * const copy = SUPER();
 

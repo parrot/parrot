@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =pod
 
@@ -8,9 +8,9 @@ docs/pmc2c.pod - The PMC definition to C compiler.
 
 =head1 SYNOPSIS
 
-To see the internal data structures please run:
-
-    % perl tools/build/pmc2c.pl --c --debug --debug sarray.pmc | less
+    % perl tools/build/pmc2c.pl --vtable
+    % perl tools/build/pmc2c.pl --dump src/pmc/scalar.pmc
+    % perl tools/build/pmc2c.pl --c src/pmc/scalar.pmc
 
 =head1 DESCRIPTION
 
@@ -19,12 +19,19 @@ F<tools/build/pmc2c.pl>.
 
 =head2 Compiling PMCs
 
-First, the program determines the names of the .c and .h files from
-the basename of the .pmc file (e.g. F<perlint.pmc> -> F<perlint.c> and
-F<perlint.h>).
+To compile methods the first C<--vtable> phase needs to scan
+F<src/vtable.tbl> once and dump F<vtable.dump>.
 
-Next, the file is searched for C</pmclass \w*/> which attempts to find the
-class being declared.
+In the second C<--dump> phase on the each .pmc file pmc2c will parse
+the class definition, inheritance and all methods and will store this
+information in .dump files along the .pmc file.
+
+The program determines the names of the .c and .h files from the
+basename of the .pmc file (e.g. F<scalar.pmc> -> F<scalar.c> and
+F<scalar.h>).
+
+The .pmc file is searched for C</pmclass \w*/> which attempts to find
+the class being declared.
 
 Once the class is found, all of its superclasses are scanned and their
 methods added to the methods of the current PMC. PMCs default to
@@ -36,8 +43,8 @@ are extracted and saved.
 Next, each method body is processed with various directives (see below)
 getting replaced by their appropriate values.
 
-Finally, the .c and .h files are generated. The appropriate base class
-header files are included.
+Finally, in the third phase <--c> the .c and .h files are
+generated. The appropriate base class header files are included.
 
 If the C<no_init> flag was used, then no init function is generated.
 Otherwise, one is generated which sets up the vtable and enters it into
@@ -203,14 +210,5 @@ Calls the overridden implementation of the current method in the nearest
 superclass, using the type of C<SELF>.
 
 =back
-
-=head1 AUTHOR
-
-Leopold Toetsch.
-
-Cleaned up by Matt Diephouse.
-
-Many thanks to the author of F<pmc2c.pl>, many useful code pieces got
-reused.
 
 =cut

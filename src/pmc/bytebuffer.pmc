@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2012, Parrot Foundation.
+Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -83,7 +83,6 @@ Free the buffer when destroying.
 */
 
     VTABLE void init() {
-        UNUSED(INTERP)
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
@@ -99,14 +98,14 @@ Free the buffer when destroying.
         SET_ATTR_content(INTERP, SELF, content);
     }
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         STRING * source;
         GET_ATTR_source(INTERP, SELF, source);
         if (!STRING_IS_NULL(source))
             Parrot_gc_mark_STRING_alive(INTERP, source);
     }
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         INTVAL allocated_size;
         GET_ATTR_allocated_size(INTERP, SELF, allocated_size);
         if (allocated_size) {
@@ -126,7 +125,7 @@ Get current size.
 
 */
 
-    VTABLE INTVAL elements() {
+    VTABLE INTVAL elements() :no_wb {
         INTVAL size;
         GET_ATTR_size(INTERP, SELF, size);
         return size;
@@ -235,7 +234,7 @@ Get the value of the byte at position or 0 if out of bounds.
 
 */
 
-    VTABLE INTVAL get_integer_keyed_int(INTVAL position) {
+    VTABLE INTVAL get_integer_keyed_int(INTVAL position) :no_wb {
         INTVAL size;
         GET_ATTR_size(INTERP, SELF, size);
         if (position < 0 || position >= size)
@@ -318,7 +317,7 @@ Extends the buffer by adding a byte of value C<value> to the end.
 
 */
 
-    VTABLE void push_integer(INTVAL value) {
+    VTABLE void push_integer(INTVAL value) :manual_wb {
         INTVAL size;
 
         GET_ATTR_size(INTERP, SELF, size);
@@ -335,7 +334,7 @@ Return a pointer to the content. Use with care.
 
 */
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         unsigned char *content;
         GET_ATTR_content(INTERP, SELF, content);
         if (content == NULL) {
@@ -357,7 +356,7 @@ Return a new Iterator for this PMC.
 
 */
 
-    VTABLE PMC *get_iter() {
+    VTABLE PMC *get_iter() :no_wb {
         return Parrot_pmc_new_init(INTERP, enum_class_ArrayIterator, SELF);
     }
 
@@ -377,7 +376,7 @@ Create a string with the buffer content and the encoding specified.
 
 */
 
-    METHOD get_string(STRING *encodingname) {
+    METHOD get_string(STRING *encodingname) :no_wb {
         STRING *result;
         unsigned char *content;
         INTVAL size;
@@ -405,7 +404,7 @@ as the string argument.
 
 */
 
-    METHOD get_string_as(STRING *as :optional) {
+    METHOD get_string_as(STRING *as :optional) :no_wb {
         STRING *result;
         unsigned char *content;
         INTVAL size;
@@ -434,7 +433,7 @@ length in codepoints.
 
 */
 
-    METHOD get_chars(INTVAL pos, INTVAL length, STRING *encodingname)
+    METHOD get_chars(INTVAL pos, INTVAL length, STRING *encodingname) :no_wb
     {
         const STR_VTABLE * const encoding = Parrot_find_encoding_by_string(INTERP, encodingname);
         STRING           *result;

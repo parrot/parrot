@@ -244,6 +244,11 @@ sub find_methods {
         # trim trailing ws from last line
         $methodblock =~ s/\n[\t ]+$/\n/g;
 
+        # detect manual_wb via PARROT_GC_WRITE_BARRIER automatically
+        if ($methodblock =~ m|^\s*(/* no )?PARROT_GC_WRITE_BARRIER|m) {
+            $attrs->{manual_wb} = 1;
+        }
+
         $decorators ||= '';
         $decorators   =~ s/^\s*(.*?)\s*$/$1/s;
         $decorators   = [ split /\s+/ => $decorators ];
@@ -561,6 +566,7 @@ sub parse_method_attrs {
 
     my %result;
     ++$result{$1} while $flags =~ /:(\w+)/g;
+    $result{manual_wb}++ if $result{no_wb};
 
     return \%result;
 }

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -80,7 +80,7 @@ Raises an exception. Use C<init_pmc()>.
 
 */
 
-    VTABLE void init() {
+    VTABLE void init() :no_wb {
         UNUSED(SELF)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "ArrayIterator init without aggregate");
@@ -97,7 +97,7 @@ Defaults iteration mode to iterate from start.
 
 */
 
-    VTABLE void init_pmc(PMC *array) {
+    VTABLE void init_pmc(PMC *array) :manual_wb {
 
         SET_ATTR_array(INTERP, SELF, array);
 
@@ -117,7 +117,7 @@ Marks the current idx/key and the aggregate as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         PMC *array;
 
         GET_ATTR_array(INTERP, SELF, array);
@@ -132,7 +132,7 @@ Marks the current idx/key and the aggregate as live.
 =cut
 
 */
-    VTABLE PMC* clone() {
+    VTABLE PMC* clone() :no_wb {
         INTVAL pos, reverse;
         PMC   *array;
         PMC   *clone;
@@ -142,6 +142,7 @@ Marks the current idx/key and the aggregate as live.
         GET_ATTR_reverse(INTERP, SELF, reverse);
 
         clone = Parrot_pmc_new_init(INTERP, enum_class_ArrayIterator, array);
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
 
         SET_ATTR_pos(INTERP, clone, pos);
         SET_ATTR_reverse(INTERP, clone, reverse);
@@ -159,7 +160,7 @@ Returns true if there is more elements to iterate over.
 
 */
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         return STATICSELF.elements() > 0;
     }
 
@@ -173,7 +174,7 @@ Returns the number of remaining elements in the array.
 
 */
 
-    VTABLE INTVAL elements() {
+    VTABLE INTVAL elements() :no_wb {
         INTVAL reverse;
 
         GET_ATTR_reverse(INTERP, SELF, reverse);
@@ -191,7 +192,7 @@ Returns the number of remaining elements in the array.
         }
     }
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         return STATICSELF.elements();
     }
 
@@ -241,7 +242,7 @@ Returns this Iterator's array.
 
 */
 
-    VTABLE PMC *get_pmc() {
+    VTABLE PMC *get_pmc() :no_wb {
         PMC *array;
         GET_ATTR_array(INTERP, SELF, array);
         return array ? array : PMCNULL;
@@ -258,7 +259,7 @@ the next one.
 
 */
 
-    VTABLE INTVAL shift_integer() {
+    VTABLE INTVAL shift_integer() :manual_wb {
         INTVAL pos, length;
         PMC   *array;
 
@@ -271,6 +272,7 @@ the next one.
         GET_ATTR_array(INTERP, SELF, array);
         SET_ATTR_pos(INTERP, SELF, pos+1);
 
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return VTABLE_get_integer_keyed_int(INTERP, array, pos);
     }
 
@@ -282,7 +284,7 @@ the next one.
 
 */
 
-    VTABLE FLOATVAL shift_float() {
+    VTABLE FLOATVAL shift_float() :manual_wb {
         INTVAL pos;
         PMC   *array;
 
@@ -294,6 +296,7 @@ the next one.
         GET_ATTR_array(INTERP, SELF, array);
         SET_ATTR_pos(INTERP, SELF, pos+1);
 
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return VTABLE_get_number_keyed_int(INTERP, array, pos);
     }
 
@@ -306,7 +309,7 @@ the next one.
 
 */
 
-    VTABLE STRING *shift_string() {
+    VTABLE STRING *shift_string() :manual_wb {
         INTVAL pos;
         PMC   *array;
 
@@ -318,6 +321,7 @@ the next one.
         GET_ATTR_array(INTERP, SELF, array);
         SET_ATTR_pos(INTERP, SELF, pos+1);
 
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return VTABLE_get_string_keyed_int(INTERP, array, pos);
     }
 
@@ -332,12 +336,11 @@ the next one.
 
 */
 
-    VTABLE PMC *shift_pmc() {
+    VTABLE PMC *shift_pmc() :manual_wb {
         INTVAL pos;
         PMC   *array;
 
         GET_ATTR_pos(INTERP, SELF, pos);
-
 
         if (!STATICSELF.get_bool())
             out_of_bounds(INTERP);
@@ -345,6 +348,7 @@ the next one.
         GET_ATTR_array(INTERP, SELF, array);
         SET_ATTR_pos(INTERP, SELF, pos+1);
 
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return VTABLE_get_pmc_keyed_int(INTERP, array, pos);
     }
 
@@ -360,7 +364,7 @@ the next one.
 
 */
 
-    VTABLE INTVAL pop_integer() {
+    VTABLE INTVAL pop_integer() :manual_wb {
         INTVAL pos;
         PMC   *array;
 
@@ -373,6 +377,7 @@ the next one.
         GET_ATTR_array(INTERP, SELF, array);
         SET_ATTR_pos(INTERP, SELF, --pos);
 
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return VTABLE_get_integer_keyed_int(INTERP, array, pos);
     }
 
@@ -384,7 +389,7 @@ the next one.
 
 */
 
-    VTABLE FLOATVAL pop_float() {
+    VTABLE FLOATVAL pop_float() :manual_wb {
         INTVAL pos;
         PMC   *array;
 
@@ -396,6 +401,7 @@ the next one.
         GET_ATTR_array(INTERP, SELF, array);
         SET_ATTR_pos(INTERP, SELF, --pos);
 
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return VTABLE_get_number_keyed_int(INTERP, array, pos);
     }
 
@@ -408,7 +414,7 @@ the next one.
 
 */
 
-    VTABLE STRING *pop_string() {
+    VTABLE STRING *pop_string() :manual_wb {
         INTVAL pos;
         PMC   *array;
 
@@ -420,6 +426,7 @@ the next one.
         GET_ATTR_array(INTERP, SELF, array);
         SET_ATTR_pos(INTERP, SELF, --pos);
 
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return VTABLE_get_string_keyed_int(INTERP, array, pos);
     }
 
@@ -434,7 +441,7 @@ the next one.
 
 */
 
-    VTABLE PMC *pop_pmc() {
+    VTABLE PMC *pop_pmc() :manual_wb {
         INTVAL pos;
         PMC   *array;
 
@@ -446,6 +453,7 @@ the next one.
         GET_ATTR_array(INTERP, SELF, array);
         SET_ATTR_pos(INTERP, SELF, --pos);
 
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return VTABLE_get_pmc_keyed_int(INTERP, array, pos);
     }
 
@@ -459,7 +467,7 @@ Returns the element for C<*key>.
 
 */
 
-    VTABLE PMC *get_pmc_keyed(PMC *key) {
+    VTABLE PMC *get_pmc_keyed(PMC *key) :no_wb {
         return STATICSELF.get_pmc_keyed_int(VTABLE_get_integer(INTERP, key));
     }
 
@@ -473,7 +481,7 @@ Returns the element for C<key>.
 
 */
 
-    VTABLE PMC *get_pmc_keyed_int(INTVAL idx) {
+    VTABLE PMC *get_pmc_keyed_int(INTVAL idx) :no_wb {
         INTVAL pos;
 
         GET_ATTR_pos(INTERP, SELF, pos);
@@ -489,7 +497,7 @@ Returns the element for C<key>.
 
 */
 
-    VTABLE INTVAL get_integer_keyed(PMC *key) {
+    VTABLE INTVAL get_integer_keyed(PMC *key) :no_wb {
         return STATICSELF.get_integer_keyed_int(VTABLE_get_integer(INTERP, key));
     }
 
@@ -503,7 +511,7 @@ Get integer value of current position plus idx.
 
 */
 
-    VTABLE INTVAL get_integer_keyed_int(INTVAL idx) {
+    VTABLE INTVAL get_integer_keyed_int(INTVAL idx) :no_wb {
         INTVAL pos;
 
         GET_ATTR_pos(INTERP, SELF, pos);
@@ -520,7 +528,7 @@ Get integer value of current position plus idx.
 
 */
 
-    VTABLE FLOATVAL get_number_keyed(PMC *key) {
+    VTABLE FLOATVAL get_number_keyed(PMC *key) :no_wb {
         return STATICSELF.get_number_keyed_int(VTABLE_get_integer(INTERP, key));
     }
 
@@ -534,7 +542,7 @@ Get number value of current position plus idx.
 
 */
 
-    VTABLE FLOATVAL get_number_keyed_int(INTVAL idx) {
+    VTABLE FLOATVAL get_number_keyed_int(INTVAL idx) :no_wb {
         INTVAL pos;
 
         GET_ATTR_pos(INTERP, SELF, pos);
@@ -553,7 +561,7 @@ Get number value of current position plus idx.
 
 */
 
-    VTABLE STRING *get_string_keyed(PMC *key) {
+    VTABLE STRING *get_string_keyed(PMC *key) :no_wb {
         return STATICSELF.get_string_keyed_int(VTABLE_get_integer(INTERP, key));
     }
 
@@ -567,7 +575,7 @@ Get string value of current position plus idx.
 
 */
 
-    VTABLE STRING *get_string_keyed_int(INTVAL idx) {
+    VTABLE STRING *get_string_keyed_int(INTVAL idx) :no_wb {
         INTVAL pos;
 
         GET_ATTR_pos(INTERP, SELF, pos);
@@ -586,7 +594,7 @@ Returns whether an element for C<*key> exists in the array.
 
 */
 
-    VTABLE INTVAL exists_keyed(PMC *key) {
+    VTABLE INTVAL exists_keyed(PMC *key) :no_wb {
         return STATICSELF.exists_keyed_int(VTABLE_get_integer(INTERP, key));
     }
 
@@ -600,7 +608,7 @@ Returns whether an element for C<idx> exists in the aggregate.
 
 */
 
-    VTABLE INTVAL exists_keyed_int(INTVAL idx) {
+    VTABLE INTVAL exists_keyed_int(INTVAL idx) :no_wb {
         INTVAL pos, reverse, final_pos;
         PMC   *array;
 
@@ -622,7 +630,7 @@ Returns whether an element for C<idx> exists in the aggregate.
 
 */
 
-    VTABLE INTVAL defined_keyed(PMC *key) {
+    VTABLE INTVAL defined_keyed(PMC *key) :no_wb {
         return STATICSELF.defined_keyed_int(VTABLE_get_integer(INTERP, key));
     }
 
@@ -636,7 +644,7 @@ Returns the result of calling C<defined_keyed(key)> on the aggregate.
 
 */
 
-    VTABLE INTVAL defined_keyed_int(INTVAL idx) {
+    VTABLE INTVAL defined_keyed_int(INTVAL idx) :no_wb {
         INTVAL pos, reverse, final_pos;
         PMC   *array;
 

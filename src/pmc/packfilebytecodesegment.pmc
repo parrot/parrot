@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 
 =head1 NAME
@@ -43,7 +43,7 @@ Initialize PackfileBytecodeSegment.
 =cut
 
 */
-    VTABLE void init() {
+    VTABLE void init() :manual_wb {
         Parrot_PackfileBytecodeSegment_attributes * const attrs =
                 PARROT_PACKFILEBYTECODESEGMENT(SELF);
 
@@ -64,7 +64,7 @@ Marks the object as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         PMC *tmp;
 
         GET_ATTR_op_map(INTERP, SELF, tmp);
@@ -83,7 +83,7 @@ Return a pointer to a PackFile_ByteCode* built from this PMC's data.
 
 */
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         INTVAL op_count;
         size_t i;
 
@@ -136,7 +136,7 @@ Initialize PackfileBytecodeSegment from PackFile_Bytecode*
 =cut
 
 */
-    VTABLE void set_pointer(void *pointer) {
+    VTABLE void set_pointer(void *pointer) :manual_wb {
         const PackFile_ByteCode * const pfseg =
                 (const PackFile_ByteCode *)pointer;
         opcode_t i, j;
@@ -209,7 +209,7 @@ Return :main Sub for this segment.
 */
 
 
-    METHOD main_sub(INTVAL main_sub :optional, INTVAL got_main :opt_flag) {
+    METHOD main_sub(INTVAL main_sub :optional, INTVAL got_main :opt_flag) :no_wb {
         if (got_main) {
             SET_ATTR_main_sub(INTERP, SELF, main_sub);
         }

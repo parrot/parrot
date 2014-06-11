@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2004-2012, Parrot Foundation.
+Copyright (C) 2004-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -83,7 +83,7 @@ appropriate type.
 
 */
 
-    VTABLE void assign_pmc(PMC *other) {
+    VTABLE void assign_pmc(PMC *other) :manual_wb {
         /* don't want to call set_pmc if we're assigning an Undef to an Undef */
         if (other->vtable->base_type != enum_class_Undef)
             VTABLE_set_pmc(INTERP, SELF, other);
@@ -100,7 +100,7 @@ Returns 0.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         UNUSED(SELF)
         UNUSED(INTERP)
         return 0;
@@ -116,7 +116,7 @@ Returns 0.
 
 */
 
-    VTABLE INTVAL defined() {
+    VTABLE INTVAL defined() :no_wb {
         UNUSED(SELF)
         UNUSED(INTERP)
         return 0;
@@ -132,7 +132,7 @@ Morphs the current PMC to an C<Integer> and sets the value from C<value>.
 
 */
 
-    VTABLE void set_integer_native(INTVAL value) {
+    VTABLE void set_integer_native(INTVAL value) :manual_wb {
         Parrot_pmc_reuse(INTERP, SELF, enum_class_Integer, 0);
         VTABLE_set_integer_native(INTERP, SELF, value);
     }
@@ -147,7 +147,7 @@ Returns 0.0.
 
 */
 
-    VTABLE FLOATVAL get_number() {
+    VTABLE FLOATVAL get_number() :no_wb {
         UNUSED(SELF)
         UNUSED(INTERP)
         return 0.0;
@@ -163,7 +163,7 @@ Morphs the current PMC to a C<Float> and sets the value from C<value>.
 
 */
 
-    VTABLE void set_number_native(FLOATVAL value) {
+    VTABLE void set_number_native(FLOATVAL value) :manual_wb {
         Parrot_pmc_reuse(INTERP, SELF, enum_class_Float, 0);
         VTABLE_set_number_native(INTERP, SELF, value);
     }
@@ -178,7 +178,7 @@ Returns an empty string.
 
 */
 
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         UNUSED(SELF)
         Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG,
             "Stringifying an Undef PMC");
@@ -196,7 +196,7 @@ Morphs the current PMC to a C<String> and sets the value from C<value>.
 
 */
 
-    VTABLE void set_string_native(STRING *value) {
+    VTABLE void set_string_native(STRING *value) :manual_wb {
         Parrot_pmc_reuse(INTERP, SELF, enum_class_String, 0);
         VTABLE_set_string_native(INTERP, SELF, value);
     }
@@ -211,7 +211,7 @@ Returns 0.
 
 */
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         UNUSED(SELF)
         UNUSED(INTERP)
         return 0;
@@ -227,7 +227,7 @@ Unknown. (TODO)
 
 */
 
-    VTABLE void share() {
+    VTABLE void share() :no_wb {
         UNUSED(SELF)
         UNUSED(INTERP)
         /* see src/pmc/integer.pmc */
@@ -243,7 +243,7 @@ Clones the current Undef PMC.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         return Parrot_pmc_new(INTERP, SELF->vtable->base_type);
     }
 
@@ -257,14 +257,14 @@ Returns 1 if the C<*value> is an Undef PMC, 0 otherwise.
 
 */
 
-    MULTI INTVAL is_equal(Undef value) {
+    MULTI INTVAL is_equal(Undef value) :no_wb {
         UNUSED(SELF)
         UNUSED(INTERP)
         UNUSED(value)
         return 1;
     }
 
-    MULTI INTVAL is_equal(DEFAULT value) {
+    MULTI INTVAL is_equal(DEFAULT value) :no_wb {
         UNUSED(SELF)
         UNUSED(INTERP)
         UNUSED(value)

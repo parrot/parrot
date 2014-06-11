@@ -82,7 +82,7 @@ already in the map, a new map will be created.
 
 */
 
-    VTABLE INTVAL get_integer_keyed(PMC *key) {
+    VTABLE INTVAL get_integer_keyed(PMC *key) :no_wb {
         STRING *key_str, *oplib_str;
         PMC    *map_cache, *op_maps, *ops;
         INTVAL  op_map_count, i;
@@ -135,7 +135,7 @@ already in the map, a new map will be created.
         return -1;
     }
 
-    VTABLE INTVAL get_integer_keyed_str(STRING *str_key) {
+    VTABLE INTVAL get_integer_keyed_str(STRING *str_key) :no_wb {
         PMC * const pmc_key = Parrot_key_new_string(INTERP, str_key);
         return SELF.get_integer_keyed(pmc_key);
     }
@@ -151,7 +151,7 @@ Get Op PMC by name.
 
 */
 
-    VTABLE PMC* get_pmc_keyed_str(STRING *name) {
+    VTABLE PMC* get_pmc_keyed_str(STRING *name) :no_wb {
         PMC    *op_maps;
         INTVAL  op_map_count, i;
         STRING * const oplib_str = CONST_STRING(INTERP, "oplib");
@@ -172,7 +172,7 @@ Get Op PMC by name.
         return PMCNULL;
     }
 
-    VTABLE PMC* get_pmc_keyed(PMC *key) {
+    VTABLE PMC* get_pmc_keyed(PMC *key) :no_wb {
         return STATICSELF.get_pmc_keyed_str(Parrot_key_string(INTERP, key));
     }
 
@@ -186,13 +186,13 @@ Lookup op name by mapped id.
 =cut
 
 */
-    VTABLE STRING* get_string_keyed_int(INTVAL key) {
+    VTABLE STRING* get_string_keyed_int(INTVAL key) :no_wb {
         PMC *ops;
         GET_ATTR_ops(INTERP, SELF, ops);
         return VTABLE_get_string_keyed_int(INTERP, ops, key);
     }
 
-    VTABLE PMC* get_pmc_keyed_int(INTVAL key) {
+    VTABLE PMC* get_pmc_keyed_int(INTVAL key) :no_wb {
         return Parrot_pmc_box_string(INTERP, STATICSELF.get_string_keyed_int(key));
     }
 
@@ -207,7 +207,7 @@ Marks the object as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         PMC *tmp;
 
         GET_ATTR_op_maps(INTERP, SELF, tmp);
@@ -231,7 +231,7 @@ Get the number of opcode mappings.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         PMC *ops;
         GET_ATTR_ops(INTERP, SELF, ops);
         return VTABLE_elements(INTERP, ops);
@@ -300,7 +300,7 @@ Construct PackFile_ByteCode_OpMapping.
 
 */
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         PMC                         *op_maps;
         PackFile_ByteCode_OpMapping *m;
         INTVAL                       i;
@@ -365,7 +365,7 @@ Returns an hash of name to C<OpLib> PMCs for all oplibs loaded in the map.
 
 */
 
-    METHOD oplibs() {
+    METHOD oplibs() :no_wb {
         STRING *oplib_str  = CONST_STRING(INTERP, "oplib");
         STRING *oplib_name = CONST_STRING(INTERP, "oplib_name");
         PMC *op_maps, *result;

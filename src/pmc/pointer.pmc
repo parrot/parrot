@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -38,7 +38,6 @@ Initializes the pointer.
 */
 
     VTABLE void init() {
-        UNUSED(INTERP)
         PObj_custom_mark_SET(SELF);
     }
 
@@ -52,7 +51,7 @@ Marks the pointer as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         void (*mark_function)(Interp *, void *) =
             (void (*)(Interp *, void *))D2FPTR(PARROT_POINTER(SELF)->mark_function);
         void * const data = PARROT_POINTER(SELF)->pointer;
@@ -70,7 +69,7 @@ Creates and returns a clone of the pointer.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         PMC * const dest = Parrot_pmc_new_noinit(INTERP, SELF->vtable->base_type);
         PObj_custom_mark_SET(dest);
         PMC_data(dest) = PMC_data(SELF);
@@ -88,7 +87,6 @@ Sets the pointer value.
 */
 
     VTABLE void set_pointer(void *ptr) {
-        UNUSED(INTERP)
         PARROT_POINTER(SELF)->pointer = ptr;
     }
 
@@ -102,7 +100,7 @@ Returns the pointer value.
 
 */
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         UNUSED(INTERP)
         return PARROT_POINTER(SELF)->pointer;
     }
@@ -117,7 +115,7 @@ Returns the pointer value as an integer.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         UNUSED(INTERP)
         return (INTVAL)(PARROT_POINTER(SELF)->pointer);
     }
@@ -132,7 +130,7 @@ Returns the pointer value as a floating-point number.
 
 */
 
-    VTABLE FLOATVAL get_number() {
+    VTABLE FLOATVAL get_number() :no_wb {
         UNUSED(INTERP)
         return (FLOATVAL)(INTVAL)(PARROT_POINTER(SELF)->pointer);
     }
@@ -147,7 +145,7 @@ Returns the pointer value as a Parrot string.
 
 */
 
-    VTABLE STRING *get_repr() {
+    VTABLE STRING *get_repr() :no_wb {
         return Parrot_sprintf_c(INTERP, "Pointer = 0x%p", PARROT_POINTER(SELF)->pointer);
     }
 
@@ -162,7 +160,7 @@ Returns the pointer value as a Parrot string.
 
 */
 
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         return Parrot_sprintf_c(INTERP, "%s", PARROT_POINTER(SELF)->pointer);
     }
 
@@ -176,7 +174,7 @@ Returns whether the pointer is not C<NULL>.
 
 */
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         UNUSED(INTERP)
         return (INTVAL)(PMC_data(SELF) != NULL);
     }
@@ -191,7 +189,7 @@ Returns whether the pointer has the same value as C<*pmc2>.
 
 */
 
-    VTABLE INTVAL is_same(PMC *pmc2) {
+    VTABLE INTVAL is_same(PMC *pmc2) :no_wb {
         UNUSED(INTERP)
         return (INTVAL)(SELF->vtable   == pmc2->vtable &&
                         PARROT_POINTER(SELF)->pointer == PARROT_POINTER(pmc2)->pointer);

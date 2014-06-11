@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -42,7 +42,7 @@ Initializes the array.
 
 */
 
-    VTABLE void init_int(INTVAL size) {
+    VTABLE void init_int(INTVAL size) :manual_wb {
         if (size < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 _("FixedStringArray: Cannot set array size to a negative number (%d)"), size);
@@ -51,6 +51,7 @@ Initializes the array.
             SET_ATTR_str_array(INTERP,
                                SELF, mem_gc_allocate_n_zeroed_typed(INTERP, size, STRING *));
             PObj_custom_mark_destroy_SETALL(SELF);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
     }
 
@@ -85,7 +86,7 @@ Creates and returns a copy of the array.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
 
         STRING **my_str_array;
         PMC        *const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
@@ -108,7 +109,7 @@ Creates and returns a copy of the array.
             PObj_custom_mark_destroy_SETALL(dest);
         }
 
-        return dest;
+        RETURN(PMC *const dest);
     }
 
 /*
@@ -121,7 +122,7 @@ Marks the array as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
 
         STRING **str_array;
         GET_ATTR_str_array(INTERP, SELF, str_array);
@@ -148,7 +149,7 @@ size set by C<set_integer_native>.
 =cut
 
 */
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         const INTVAL size = SELF.elements();
         return (INTVAL)(size != 0);
     }
@@ -162,7 +163,7 @@ Gets an iterator for the array.
 =cut
 
 */
-    VTABLE PMC *get_iter() {
+    VTABLE PMC *get_iter() :no_wb {
         return Parrot_pmc_new_init(INTERP, enum_class_ArrayIterator, SELF);
     }
 
@@ -176,7 +177,7 @@ Returns the number of elements in the array.
 
 */
 
-    VTABLE INTVAL elements() {
+    VTABLE INTVAL elements() :no_wb {
         UINTVAL size;
         GET_ATTR_size(INTERP, SELF, size);
         return size;
@@ -192,7 +193,7 @@ Returns the number of elements in the array.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         return SELF.elements();
     }
 
@@ -206,7 +207,7 @@ Returns the number of elements in the array.
 
 */
 
-    VTABLE FLOATVAL get_number() {
+    VTABLE FLOATVAL get_number() :no_wb {
         const INTVAL e = SELF.elements();
         return (FLOATVAL)e;
     }
@@ -221,7 +222,7 @@ Returns the integer value of the element at index C<key>.
 
 */
 
-    VTABLE INTVAL get_integer_keyed_int(INTVAL key) {
+    VTABLE INTVAL get_integer_keyed_int(INTVAL key) :no_wb {
         STRING * const element = SELF.get_string_keyed_int(key);
         return Parrot_str_to_int(INTERP, element);
     }
@@ -236,7 +237,7 @@ Returns the integer value of the element at index C<*key>.
 
 */
 
-    VTABLE INTVAL get_integer_keyed(PMC *key) {
+    VTABLE INTVAL get_integer_keyed(PMC *key) :no_wb {
         /* simple int keys only */
         const INTVAL k = VTABLE_get_integer(INTERP, key);
         return SELF.get_integer_keyed_int(k);
@@ -253,7 +254,7 @@ Returns the floating-point value of the element at index C<key>.
 
 */
 
-    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) {
+    VTABLE FLOATVAL get_number_keyed_int(INTVAL key) :no_wb {
         STRING * const element = SELF.get_string_keyed_int(key);
         return Parrot_str_to_num(INTERP, element);
     }
@@ -268,7 +269,7 @@ Returns the floating-point value of the element at index C<*key>.
 
 */
 
-    VTABLE FLOATVAL get_number_keyed(PMC *key) {
+    VTABLE FLOATVAL get_number_keyed(PMC *key) :no_wb {
         const INTVAL k = VTABLE_get_integer(INTERP, key);
         return SELF.get_number_keyed_int(k);
     }
@@ -283,7 +284,7 @@ Returns the Parrot string value of the element at index C<key>.
 
 */
 
-    VTABLE STRING *get_string_keyed_int(INTVAL key) {
+    VTABLE STRING *get_string_keyed_int(INTVAL key) :no_wb {
         STRING **str_array;
         UINTVAL  size;
 
@@ -306,7 +307,7 @@ Returns the Parrot string value of the element at index C<*key>.
 
 */
 
-    VTABLE STRING *get_string_keyed(PMC *key) {
+    VTABLE STRING *get_string_keyed(PMC *key) :no_wb {
         const INTVAL k = VTABLE_get_integer(INTERP, key);
         return SELF.get_string_keyed_int(k);
     }
@@ -322,7 +323,7 @@ Returns the PMC value of the element at index C<key>.
 
 */
 
-    VTABLE PMC *get_pmc_keyed_int(INTVAL key) {
+    VTABLE PMC *get_pmc_keyed_int(INTVAL key) :no_wb {
         PMC    * const ret = Parrot_pmc_new(INTERP, enum_class_String);
         STRING * const val = SELF.get_string_keyed_int(key);
 
@@ -340,7 +341,7 @@ Returns the PMC value of the element at index C<*key>.
 
 */
 
-    VTABLE PMC *get_pmc_keyed(PMC *key) {
+    VTABLE PMC *get_pmc_keyed(PMC *key) :no_wb {
         const INTVAL k = VTABLE_get_integer(INTERP, key);
         return SELF.get_pmc_keyed_int(k);
     }
@@ -383,7 +384,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 
 */
 
-    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
+    VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) :manual_wb {
         STRING *val = Parrot_str_from_int(INTERP, value);
         SELF.set_string_keyed_int(key, val);
     }
@@ -398,7 +399,7 @@ Sets the integer value of the element at index C<key> to C<value>.
 
 */
 
-    VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
+    VTABLE void set_integer_keyed(PMC *key, INTVAL value) :manual_wb {
         const INTVAL k = VTABLE_get_integer(INTERP, key);
         SELF.set_integer_keyed_int(k, value);
     }
@@ -414,7 +415,7 @@ C<value>.
 
 */
 
-    VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
+    VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) :manual_wb {
         STRING * const val = Parrot_str_from_num(INTERP, value);
         SELF.set_string_keyed_int(key, val);
     }
@@ -430,7 +431,7 @@ C<value>.
 
 */
 
-    VTABLE void set_number_keyed(PMC *key, FLOATVAL value) {
+    VTABLE void set_number_keyed(PMC *key, FLOATVAL value) :manual_wb {
         const INTVAL k = VTABLE_get_integer(INTERP, key);
         SELF.set_number_keyed_int(k, value);
     }
@@ -468,7 +469,7 @@ C<value>.
 
 */
 
-    VTABLE void set_string_keyed(PMC *key, STRING *value) {
+    VTABLE void set_string_keyed(PMC *key, STRING *value) :manual_wb {
         const INTVAL k = VTABLE_get_integer(INTERP, key);
         SELF.set_string_keyed_int(k, value);
     }
@@ -483,7 +484,7 @@ Sets the PMC value of the element at index C<key> to C<*src>.
 
 */
 
-    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *src) {
+    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *src) :manual_wb {
         STRING * const temp = VTABLE_get_string(INTERP, src);
         SELF.set_string_keyed_int(key, temp);
     }
@@ -499,7 +500,7 @@ C<value>.
 
 */
 
-    VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
+    VTABLE void set_pmc_keyed(PMC *key, PMC *value) :manual_wb {
         const INTVAL k = VTABLE_get_integer(INTERP, key);
         SELF.set_pmc_keyed_int(k, value);
     }
@@ -515,11 +516,11 @@ Returns the Parrot string representation C<key>.
 =cut
 
 */
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         return STATICSELF.get_repr();
     }
 
-    VTABLE STRING *get_repr() {
+    VTABLE STRING *get_repr() :no_wb {
 
         STRING       *res = CONST_STRING(INTERP, "[ ");
         const INTVAL  n   = SELF.get_integer();
@@ -535,8 +536,7 @@ Returns the Parrot string representation C<key>.
                 res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, ", "));
         }
 
-        res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, " ]"));
-        return res;
+        return Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, " ]"));
     }
 
 
@@ -550,7 +550,7 @@ The C<==> operation. Compares two array to hold equal elements.
 
 */
 
-    VTABLE INTVAL is_equal(PMC *value) {
+    VTABLE INTVAL is_equal(PMC *value) :no_wb {
         INTVAL j, n;
 
         if (value->vtable->base_type != SELF->vtable->base_type)
@@ -593,7 +593,7 @@ Used to archive the string.
 =cut
 
 */
-    VTABLE void freeze(PMC *info) {
+    VTABLE void freeze(PMC *info) :no_wb {
         STRING           **str_array;
         UINTVAL            size, i;
 

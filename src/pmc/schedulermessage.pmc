@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -112,7 +112,7 @@ Retrieve the message ID.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         UNUSED(INTERP);
 
         return PARROT_SCHEDULERMESSAGE(SELF)->id;
@@ -129,7 +129,6 @@ Set the message ID.
 */
 
     VTABLE void set_integer_native(INTVAL value) {
-        UNUSED(INTERP);
         PARROT_SCHEDULERMESSAGE(SELF)->id = value;
     }
 
@@ -160,7 +159,6 @@ Set the message type.
 */
 
     VTABLE void set_string_native(STRING *value) {
-        UNUSED(INTERP);
         PARROT_SCHEDULERMESSAGE(SELF)->type = value;
     }
 
@@ -173,7 +171,7 @@ Mark any referenced strings and PMCs.
 =cut
 
 */
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         if (PARROT_SCHEDULERMESSAGE(SELF)) {
             Parrot_SchedulerMessage_attributes * const core_struct =
                 PARROT_SCHEDULERMESSAGE(SELF);
@@ -195,7 +193,7 @@ C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
 
 */
 
-    VTABLE void visit(PMC *info) {
+    VTABLE void visit(PMC *info) :no_wb {
         /* visit message data */
         VISIT_PMC(INTERP, info, PARROT_SCHEDULERMESSAGE(SELF)->data);
     }
@@ -210,7 +208,7 @@ Used to archive the scheduler message.
 
 */
 
-    VTABLE void freeze(PMC *info) {
+    VTABLE void freeze(PMC *info) :no_wb {
         Parrot_SchedulerMessage_attributes * const core_struct =
             PARROT_SCHEDULERMESSAGE(SELF);
 

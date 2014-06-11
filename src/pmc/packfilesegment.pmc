@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -44,7 +44,6 @@ Initialize PackfileSegment.
 
 */
     VTABLE void init() {
-        UNUSED(INTERP)
         Parrot_PackfileSegment_attributes * const attrs =
                 PMC_data_typed(SELF, Parrot_PackfileSegment_attributes*);
 
@@ -63,7 +62,7 @@ Marks the object as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         Parrot_PackfileSegment_attributes * const attrs =
                 PARROT_PACKFILESEGMENT(SELF);
 
@@ -81,10 +80,10 @@ The C<ptr> argument is ignored.
 =cut
 
 */
-    VTABLE void set_pointer(void *ptr) {
-        UNUSED(INTERP)
-        UNUSED(SELF)
+    VTABLE void set_pointer(void *ptr) :no_wb {
         UNUSED(ptr)
+        UNUSED(SELF)
+        UNUSED(INTERP)
     }
 
 /*
@@ -96,7 +95,7 @@ Initialize PMC internals.
 =cut
 
 */
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         UNUSED(INTERP)
         UNUSED(SELF)
         return NULL;
@@ -112,7 +111,7 @@ Set owning directory.
 =cut
 
 */
-    METHOD set_directory(PMC *directory) {
+    METHOD set_directory(PMC *directory) :manual_wb {
         PARROT_PACKFILESEGMENT(SELF)->directory = directory;
     }
 
@@ -125,7 +124,7 @@ Get owning directory.
 =cut
 
 */
-    METHOD get_directory() {
+    METHOD get_directory() :no_wb {
         PMC * directory = PARROT_PACKFILESEGMENT(SELF)->directory;
         if (!directory)
             directory = PMCNULL;

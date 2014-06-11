@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -119,7 +119,7 @@ Mark any active exception handler data as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         Parrot_ExceptionHandler_attributes * const attrs =
             PARROT_EXCEPTIONHANDLER(SELF);
         Parrot_gc_mark_PMC_alive(INTERP, attrs->handled_types);
@@ -137,7 +137,7 @@ Get the value of an attribute by name
 
 */
 
-    VTABLE PMC * get_attr_str(STRING *attr) {
+    VTABLE PMC * get_attr_str(STRING *attr) :no_wb {
         PMC * val = PMCNULL;
         INTVAL ival;
         /*if (STRING_equal(INTERP, attr, CONST_STRING(INTERP, "seg")))
@@ -161,7 +161,7 @@ Get the value of an attribute by name
         return val;
     }
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         PMC * const result = SUPER();
         /* This looks wrong, why wouldn't we want to mark the clone? */
         PObj_custom_mark_CLEAR(result);
@@ -179,7 +179,6 @@ Mark whether the handler has been invoked.
 */
 
     VTABLE void set_integer_native(INTVAL value) {
-        UNUSED(INTERP)
         PARROT_CONTINUATION(SELF)->invoked = value;
     }
 
@@ -193,7 +192,7 @@ Check whether the handler has been invoked.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         UNUSED(INTERP)
         return PARROT_CONTINUATION(SELF)->invoked;
     }
@@ -210,7 +209,7 @@ The argument C<next> is currently ignored.
 
 */
 
-    VTABLE opcode_t *invoke(void *next) {
+    VTABLE opcode_t *invoke(void *next) :no_wb {
         UNUSED(next)
         opcode_t    * const pc = PARROT_CONTINUATION(SELF)->address;
 
@@ -247,7 +246,7 @@ Report whether the exception handler can handle a particular type of exception.
 
 */
 
-    METHOD can_handle(PMC *exception) {
+    METHOD can_handle(PMC *exception) :no_wb {
         STRING * const ex_str = CONST_STRING(INTERP, "Exception");
 
         /* We handle Exception and anything that claims to implement that role
@@ -345,12 +344,14 @@ Set or get the minimum severity of the exception handler.
 
 */
 
-    METHOD min_severity(INTVAL severity :optional, INTVAL have_severity :opt_flag) {
+    METHOD min_severity(INTVAL severity :optional, INTVAL have_severity :opt_flag) :manual_wb {
         Parrot_ExceptionHandler_attributes * const attrs =
                     PARROT_EXCEPTIONHANDLER(SELF);
 
-        if (have_severity)
+        if (have_severity) {
             attrs->min_severity = severity;
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+        }
         else
             severity = attrs->min_severity;
 
@@ -367,12 +368,14 @@ Set or get the maximum severity of the exception handler.
 
 */
 
-    METHOD max_severity(INTVAL severity :optional, INTVAL have_severity :opt_flag) {
+    METHOD max_severity(INTVAL severity :optional, INTVAL have_severity :opt_flag) :manual_wb {
         Parrot_ExceptionHandler_attributes * const attrs =
                     PARROT_EXCEPTIONHANDLER(SELF);
 
-        if (have_severity)
+        if (have_severity) {
             attrs->max_severity = severity;
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+        }
         else
             severity = attrs->max_severity;
 

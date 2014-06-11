@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -48,9 +48,9 @@ Initializes the library with a C<NULL> oplib init function.
 
 */
 
-    VTABLE void init() {
-        UNUSED(INTERP)
+    VTABLE void init() :no_wb {
         UNUSED(SELF)
+        UNUSED(INTERP)
     }
 
 /*
@@ -64,10 +64,10 @@ Destroys the library, closing the shared library.
 */
 
     VTABLE void destroy() {
-        UNUSED(INTERP)
         void *dl_handle = PMC_dlhandle(SELF);
         if (dl_handle)
             Parrot_dlclose(dl_handle);
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
     }
 
 
@@ -81,7 +81,7 @@ Creates and returns a clone of the library.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         PMC * const dest     = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
 
         if (PMC_oplib_init(SELF))
@@ -108,7 +108,7 @@ Returns whether a library has been successfully loaded.
 
 */
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         UNUSED(INTERP)
         return (PMC_dlhandle(SELF) != NULL);
     }
@@ -123,7 +123,7 @@ Returns the name of the loaded library.
 
 */
 
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         STRING * const key  = CONST_STRING(INTERP, "_filename");
         PMC    * const prop = Parrot_pmc_getprop(INTERP, SELF, key);
 
@@ -140,7 +140,7 @@ Gets the pointer to the shared library handle.
 
 */
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         UNUSED(INTERP)
         return PMC_dlhandle(SELF);
     }
@@ -156,7 +156,6 @@ Sets the pointer to the shared library handle.
 */
 
     VTABLE void set_pointer(void *handle) {
-        UNUSED(INTERP)
         PMC_dlhandle(SELF) = handle;
         PObj_custom_destroy_SET(SELF);
     }

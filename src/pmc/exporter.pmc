@@ -130,7 +130,7 @@ Mark referenced strings and PMCs in the structure as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         PMC *ns_src;
         PMC *ns_dest;
         PMC *globals;

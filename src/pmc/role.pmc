@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -280,7 +280,7 @@ Mark referenced strings and PMCs in the structure as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         Parrot_Role_attributes * const role = PARROT_ROLE(SELF);
 
         Parrot_gc_mark_STRING_alive(INTERP, role->name);
@@ -408,7 +408,7 @@ composed into this role.
 
 */
 
-    VTABLE PMC *inspect_str(STRING *what) {
+    VTABLE PMC *inspect_str(STRING *what) :no_wb {
         Parrot_Role_attributes * const role  = PARROT_ROLE(SELF);
 
         /* What should we return? */
@@ -465,7 +465,7 @@ inspect_str.
 
 */
 
-    VTABLE PMC *inspect() {
+    VTABLE PMC *inspect() :no_wb {
         /* Create a hash, then use inspect_str to get all of the data to
          * fill it up with. */
         PMC * const metadata = Parrot_pmc_new(INTERP, enum_class_Hash);
@@ -503,7 +503,7 @@ Return the name of the role (without the HLL namespace).
 
 */
 
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         const Parrot_Role_attributes * const role = PARROT_ROLE(SELF);
         PMC               * const _namespace = role->_namespace;
 
@@ -534,8 +534,7 @@ Returns whether the class does the role with the given C<*rolename>.
 =cut
 
 */
-    INTVAL does(STRING *role_name)
-    {
+    VTABLE INTVAL does(STRING *role_name) :no_wb {
         const Parrot_Role_attributes * const role  = PARROT_ROLE(SELF);
         INTVAL      i, count;
 
@@ -561,8 +560,7 @@ Returns whether the class does the given C<*role>.
 =cut
 
 */
-    INTVAL does_pmc(PMC *role)
-    {
+    VTABLE INTVAL does_pmc(PMC *role) :no_wb {
         const Parrot_Role_attributes * const this_role  = PARROT_ROLE(SELF);
         INTVAL      i, count;
 
@@ -631,7 +629,7 @@ Gets the namespace associated with this role, if any.
 
 */
 
-    METHOD get_namespace() {
+    METHOD get_namespace() :no_wb {
         PMC * const ret_namespace = PARROT_ROLE(SELF)->_namespace;
         RETURN(PMC *ret_namespace);
     }
@@ -648,7 +646,7 @@ providing a set of key/value pairs describing the attribute.
 =cut
 
 */
-    METHOD attributes() {
+    METHOD attributes() :no_wb {
         PMC * const ret_attrib_metadata = VTABLE_inspect_str(INTERP, SELF, CONST_STRING(INTERP, "attributes"));
         RETURN(PMC *ret_attrib_metadata);
     }
@@ -681,7 +679,7 @@ Return a hash where the keys are method names and the values are methods.
 =cut
 
 */
-    METHOD methods() {
+    METHOD methods() :no_wb {
         PMC * const ret_methods = VTABLE_inspect_str(INTERP, SELF, CONST_STRING(INTERP, "methods"));
         RETURN(PMC *ret_methods);
     }
@@ -709,8 +707,7 @@ Removes the method with the given name.
 =cut
 
 */
-    METHOD remove_method(STRING *name)
-    {
+    METHOD remove_method(STRING *name) {
         VTABLE_remove_method(INTERP, SELF, name);
     }
 
@@ -724,7 +721,7 @@ Return the roles array PMC.
 =cut
 
 */
-    METHOD roles() {
+    METHOD roles() :no_wb {
         PMC * const ret_roles = VTABLE_inspect_str(INTERP, SELF, CONST_STRING(INTERP, "roles"));
         RETURN(PMC *ret_roles);
     }
@@ -773,7 +770,7 @@ parameter is supplied, a particular item of introspection data.
 =cut
 
 */
-    METHOD inspect(STRING *what :optional, int got_what :opt_flag) {
+    METHOD inspect(STRING *what :optional, int got_what :opt_flag) :no_wb {
         PMC *found;
 
         /* Just delegate to the appropriate vtable. */
@@ -796,7 +793,7 @@ named role.  This will recurse through all roles as far back as it can.
 
 */
 
-    METHOD does(STRING *name) {
+    METHOD does(STRING *name) :no_wb {
         const INTVAL does = VTABLE_does(INTERP, SELF, name);
         RETURN(INTVAL does);
     }

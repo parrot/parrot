@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -65,7 +65,7 @@ Marks the hash as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         PMC * const hash = PARROT_ORDEREDHASHITERATOR(SELF)->pmc_hash;
         Parrot_gc_mark_PMC_alive(INTERP, hash);
     }
@@ -77,7 +77,7 @@ Marks the hash as live.
 =cut
 
 */
-    VTABLE PMC* clone() {
+    VTABLE PMC* clone() :no_wb {
         UNUSED(INTERP)
         UNUSED(SELF)
         return PMCNULL;
@@ -123,7 +123,7 @@ Returns this Iterator's Hash.
 =cut
 
 */
-    VTABLE PMC* get_pmc() {
+    VTABLE PMC* get_pmc() :no_wb {
         UNUSED(INTERP)
         return PARROT_ORDEREDHASHITERATOR(SELF)->pmc_hash;
     }
@@ -138,7 +138,7 @@ Returns true if there is more elements to iterate over.
 
 */
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         return STATICSELF.elements() > 0;
     }
 
@@ -152,12 +152,12 @@ Returns the number of remaining elements in the Hash.
 
 */
 
-    VTABLE INTVAL elements() {
+    VTABLE INTVAL elements() :no_wb {
         UNUSED(INTERP)
         return PARROT_ORDEREDHASHITERATOR(SELF)->elements;
     }
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         return SELF.elements();
     }
 
@@ -172,7 +172,7 @@ the next one.
 
 */
 
-    VTABLE PMC *shift_pmc() {
+    VTABLE PMC *shift_pmc() :manual_wb {
         Parrot_OrderedHashIterator_attributes * const attrs =
                 PARROT_ORDEREDHASHITERATOR(SELF);
 
@@ -190,6 +190,7 @@ the next one.
         ++attrs->pos;
         --attrs->elements;
 
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return ret;
     }
 
@@ -204,7 +205,7 @@ the next one for reverse iterator.
 
 */
 
-    VTABLE PMC *pop_pmc() {
+    VTABLE PMC *pop_pmc() :manual_wb {
         Parrot_OrderedHashIterator_attributes * const attrs =
                 PARROT_ORDEREDHASHITERATOR(SELF);
 
@@ -221,6 +222,7 @@ the next one for reverse iterator.
         --attrs->pos;
         --attrs->elements;
 
+        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         return ret;
     }
 
@@ -228,7 +230,7 @@ the next one for reverse iterator.
 
 */
 
-    VTABLE STRING* shift_string() {
+    VTABLE STRING* shift_string() :manual_wb {
         PMC * const key = SELF.shift_pmc();
         return VTABLE_get_string(INTERP, key);
     }

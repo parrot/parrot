@@ -74,8 +74,10 @@ EOC
         $method_body_text .= "            key = clone_key_arg(interp, key);\n"
             if $vt_method_name =~ /_keyed$/;
 
+        # XXX: Parrot_ext_call is the slowest part. new runloop, recrate sig and callcontext
         $method_body_text .= <<"EOC";
             Parrot_ext_call(interp, meth, "Pi$pcc_sig", _self$pcc_args);
+            /* PARROT_GC_WRITE_BARRIER done in ext method call */
             $pcc_return_stmt
         }
 EOC
@@ -91,6 +93,7 @@ EOC
             PMC    * const del_object = VTABLE_get_attr_str(interp, SELF, proxy);
             if (!PMC_IS_NULL(del_object)) {
                 ${return}VTABLE_$vt_method_name(interp, del_object$args);
+                /* PARROT_GC_WRITE_BARRIER done in method call */
                 $void_return
             }
         }
@@ -100,6 +103,7 @@ EOC
         $method_body_text .= <<"EOC";
     }
     ${return}SUPER($superargs);
+    /* PARROT_GC_WRITE_BARRIER done in super method call */
     $void_return
 EOC
         $new_default_method->body( Parrot::Pmc2c::Emitter->text($method_body_text) );

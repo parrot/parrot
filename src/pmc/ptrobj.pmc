@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011, Parrot Foundation.
+Copyright (C) 2011-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -67,7 +67,7 @@ Get or set the custom C<clone> function.
 */
 
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         void                *ptr;
         ptrobj_clone_func_t  clone;
         GET_ATTR_ptr(INTERP, SELF, ptr);
@@ -79,10 +79,11 @@ Get or set the custom C<clone> function.
                     "clone not implemented for PtrObj %x", ptr);
     }
 
-    METHOD clone_func(PMC *func :optional, INTVAL has_func :opt_flag) {
+    METHOD clone_func(PMC *func :optional, INTVAL has_func :opt_flag) :manual_wb {
         if (has_func) {
             void * const f = VTABLE_get_pointer(INTERP, func);
             PTROBJ_SET_CLONE(INTERP, SELF, (ptrobj_clone_func_t)f);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             RETURN();
         }
         else {
@@ -107,7 +108,7 @@ Get or set the custom C<mark> function.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         void               *ptr;
         ptrobj_mark_func_t  mark;
         GET_ATTR_ptr(INTERP, SELF, ptr);
@@ -117,10 +118,11 @@ Get or set the custom C<mark> function.
         mark(INTERP, SELF, ptr);
     }
 
-    METHOD mark_func(PMC *func :optional, INTVAL has_func :opt_flag) {
+    METHOD mark_func(PMC *func :optional, INTVAL has_func :opt_flag) :manual_wb {
         if (has_func) {
             void * const f = VTABLE_get_pointer(INTERP, func);
             PTROBJ_SET_MARK(INTERP, SELF, (ptrobj_mark_func_t)f);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             RETURN();
         }
         else {
@@ -155,10 +157,11 @@ Get or set the custom C<destroy> function.
         destroy(INTERP, SELF, ptr);
     }
 
-    METHOD destroy_func(PMC *func :optional, INTVAL has_func :opt_flag) {
+    METHOD destroy_func(PMC *func :optional, INTVAL has_func :opt_flag) :manual_wb {
         if (has_func) {
             void * const f = VTABLE_get_pointer(INTERP, func);
             PTROBJ_SET_DESTROY(INTERP, SELF, (ptrobj_destroy_func_t)f);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             RETURN();
         }
         else {

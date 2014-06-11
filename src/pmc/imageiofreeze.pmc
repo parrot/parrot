@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2012, Parrot Foundation.
+Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -310,7 +310,7 @@ Marks the PMC as alive.
 =cut
 
 */
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         PObj * const buffer = (PObj *)(PARROT_IMAGEIOFREEZE(SELF)->buffer);
         if (buffer)
             Parrot_gc_mark_PObj_alive(INTERP, buffer);
@@ -329,7 +329,7 @@ Returns the content of the image as a string.
 
 */
 
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         return Parrot_str_new_from_buffer(INTERP,
                                           PARROT_IMAGEIOFREEZE(SELF)->buffer,
                                           PARROT_IMAGEIOFREEZE(SELF)->pos);
@@ -345,7 +345,7 @@ Returns the seen hash.
 
 */
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         return VTABLE_get_pointer(INTERP, PARROT_IMAGEIOFREEZE(SELF)->seen);
     }
 
@@ -360,7 +360,7 @@ Returns the flags describing the visit action.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         UNUSED(INTERP)
         UNUSED(SELF)
         return VISIT_FREEZE_NORMAL;
@@ -413,7 +413,7 @@ Pushes the string C<*v> onto the end of the image.
 
 */
 
-    VTABLE void push_string(STRING *v) {
+    VTABLE void push_string(STRING *v) :manual_wb {
         if (PObj_flag_TEST(private1, SELF)) {
             /* store a reference to constant table entry of string */
             PackFile_ConstTable * const table = PARROT_IMAGEIOFREEZE(SELF)->pf_ct;
@@ -440,6 +440,7 @@ Pushes the string C<*v> onto the end of the image.
             ensure_buffer_size(INTERP, SELF, len);
             SET_VISIT_CURSOR(SELF,
                 (const char *)PF_store_string(GET_VISIT_CURSOR(SELF), v));
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
     }
 
@@ -455,7 +456,7 @@ hasn't been seen yet, it is also pushed onto the todo list.
 
 */
 
-    VTABLE void push_pmc(PMC *v) {
+    VTABLE void push_pmc(PMC *v) :manual_wb {
         UINTVAL id;
 
         if (PMC_IS_NULL(v))
@@ -483,6 +484,7 @@ hasn't been seen yet, it is also pushed onto the todo list.
                 SELF.push_integer(PackID_new(id, enum_PackID_normal));
                 SELF.push_integer(base_type);
                 VTABLE_push_pmc(INTERP, PARROT_IMAGEIOFREEZE(SELF)->todo, v);
+                PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             }
 
             Parrot_hash_put(INTERP, seen, v, (void *)id);
@@ -501,13 +503,12 @@ Sets the constant table of this ImageIO PMC.
 */
 
     VTABLE void set_pointer(void *value) {
-        UNUSED(INTERP)
         PObj_flag_SET(private1, SELF);
         PARROT_IMAGEIOFREEZE(SELF)->pf_ct = (PackFile_ConstTable *)value;
     }
 
 
-    VTABLE void set_pmc(PMC *p) {
+    VTABLE void set_pmc(PMC *p) :manual_wb {
         create_buffer(INTERP, p, SELF);
 
         if (PObj_flag_TEST(private1, SELF)) {

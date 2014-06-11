@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2012, Parrot Foundation.
+Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -138,7 +138,7 @@ Marks the PMC as alive.
 =cut
 
 */
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         Parrot_gc_mark_PMC_alive(INTERP, PARROT_IMAGEIOSIZE(SELF)->todo);
         Parrot_gc_mark_PMC_alive(INTERP, PARROT_IMAGEIOSIZE(SELF)->seen);
     }
@@ -153,7 +153,7 @@ Gets the result PMC after a thaw.
 
 */
 
-    VTABLE PMC *get_pmc() {
+    VTABLE PMC *get_pmc() :no_wb {
         PMC * const ret = Parrot_pmc_new_init_int(INTERP, enum_class_Integer,
                 PARROT_IMAGEIOSIZE(SELF)->size);
         return ret;
@@ -169,7 +169,7 @@ Returns the flags describing the visit action
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         UNUSED(INTERP)
         UNUSED(SELF)
         return VISIT_FREEZE_NORMAL;
@@ -188,9 +188,8 @@ The argument C<v> is currently ignored.
 */
 
     VTABLE void push_integer(INTVAL v) {
-        UNUSED(INTERP)
-        UNUSED(v)
         const size_t len = PF_size_integer() * sizeof (opcode_t);
+        UNUSED(v)
         PARROT_IMAGEIOSIZE(SELF)->size += len;
     }
 
@@ -207,11 +206,9 @@ The argument C<v> is currently ignored.
 
 */
 
-    VTABLE void push_float(FLOATVAL v)
-    {
-        UNUSED(INTERP)
-        UNUSED(v)
+    VTABLE void push_float(FLOATVAL v) {
         const size_t len = PF_size_number() * sizeof (opcode_t);
+        UNUSED(v)
         PARROT_IMAGEIOSIZE(SELF)->size += len;
     }
 
@@ -226,7 +223,7 @@ Pushes the string C<*v> onto the end of the image.
 
 */
 
-    VTABLE void push_string(STRING *v) {
+    VTABLE void push_string(STRING *v) :manual_wb {
         if (PObj_flag_TEST(private1, SELF)) {
             /* store a reference to constant table entry of string */
             const PackFile_ConstTable * const table = PARROT_IMAGEIOSIZE(SELF)->pf_ct;
@@ -251,6 +248,7 @@ Pushes the string C<*v> onto the end of the image.
         {
             const size_t len = PF_size_string(v) * sizeof (opcode_t);
             PARROT_IMAGEIOSIZE(SELF)->size += len;
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
     }
 
@@ -265,7 +263,7 @@ hasn't been seen yet, it is also pushed onto the todo list.
 
 */
 
-    VTABLE void push_pmc(PMC *v) {
+    VTABLE void push_pmc(PMC *v) :manual_wb {
         if (PMC_IS_NULL(v)
         ||  check_seen(INTERP, SELF, v))
             SELF.push_integer(0);
@@ -285,18 +283,18 @@ hasn't been seen yet, it is also pushed onto the todo list.
                 SELF.push_integer(0);
                 VTABLE_push_integer(INTERP, SELF, v->vtable->base_type);
                 VTABLE_push_pmc(INTERP, PARROT_IMAGEIOSIZE(SELF)->todo, v);
+                PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             }
 
             Parrot_hash_put(INTERP, seen, v, v);
         }
     }
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         return VTABLE_get_pointer(INTERP, PARROT_IMAGEIOSIZE(SELF)->seen);
     }
 
-    VTABLE void set_pmc(PMC *p)
-    {
+    VTABLE void set_pmc(PMC *p) :manual_wb {
         if (!PObj_flag_TEST(private1, SELF)) {
             const UINTVAL header_length = GROW_TO_16_BYTE_BOUNDARY(PACKFILE_HEADER_BYTES);
             PARROT_IMAGEIOSIZE(SELF)->size += header_length;

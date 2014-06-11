@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2012, Parrot Foundation.
+Copyright (C) 2011-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -74,20 +74,21 @@ C<init> with a value from an existing pointer-ish PMC.
 
 */
 
-    VTABLE void init() {
+    VTABLE void init() :manual_wb {
         if (PTR_FAT_TEST(INTERP, SELF) && !PMC_data(SELF)) {
             PMC_data(SELF) = (void *)mem_gc_allocate_zeroed_typed(INTERP, Parrot_Ptr_attributes);
             PObj_custom_destroy_SET(SELF);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
     }
 
-    VTABLE void init_int(INTVAL i) {
+    VTABLE void init_int(INTVAL i) :manual_wb {
         void *ptr = (void *)i;
         SELF.init();
         STATICSELF.set_pointer(ptr);
     }
 
-    VTABLE void init_pmc(PMC *p) {
+    VTABLE void init_pmc(PMC *p) :manual_wb {
         void *ptr = VTABLE_get_pointer(INTERP, p);
         SELF.init();
         STATICSELF.set_pointer(ptr);
@@ -105,7 +106,7 @@ Get and set the pointer value.
 
 */
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :manual_wb {
         void *ptr;
         if (PTR_FAT_TEST(INTERP, SELF))
             GET_ATTR_ptr(INTERP, SELF, ptr);
@@ -133,7 +134,7 @@ Boolean value of the pointer. Non-C<NULL> is true, following in the C tradition.
 
 */
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         return STATICSELF.get_pointer() != NULL;
     }
 
@@ -164,7 +165,7 @@ In this case, always returns C<0>, indicating undetermined length.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         UNUSED(INTERP)
         UNUSED(SELF)
         return 0;
@@ -187,7 +188,7 @@ specified. If the encoding is omitted or null, use platform encoding.
 
 */
 
-    METHOD as_string(STRING *encodingname :optional) {
+    METHOD as_string(STRING *encodingname :optional) :no_wb {
         const char * content = (const char *)SELF.get_pointer();
         STRING *result = Parrot_str_new_from_cstring(INTERP, content, encodingname);
         RETURN(STRING result);

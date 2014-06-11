@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003-2013, Parrot Foundation.
+Copyright (C) 2003-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -49,7 +49,7 @@ Make an exact copy of this PMC.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         FLOATVAL fv;
         PMC * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         GET_ATTR_fv(INTERP, SELF, fv);
@@ -68,7 +68,7 @@ applications and may be disabled in certain security contexts.
 
 */
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         UNUSED(INTERP)
         return &(PARROT_FLOAT(SELF)->fv);
     }
@@ -83,7 +83,7 @@ Returns the value of the number.
 
 */
 
-    VTABLE FLOATVAL get_number() {
+    VTABLE FLOATVAL get_number() :no_wb {
         FLOATVAL fv;
         GET_ATTR_fv(INTERP, SELF, fv);
         return fv;
@@ -100,7 +100,7 @@ Returns an integer representation of the number by truncating
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         /* two steps avoid casting warnings */
         const FLOATVAL n = SELF.get_number();
         return (INTVAL) n;
@@ -116,7 +116,7 @@ Evaluates the number as a boolean, i.e. it's true if it's not zero.
 
 */
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         const FLOATVAL f = SELF.get_number();
         return !FLOAT_IS_ZERO(f);
     }
@@ -133,11 +133,11 @@ Returns a Parrot string representation of the number.
 
 */
 
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         return Parrot_str_from_num(INTERP, SELF.get_number());
     }
 
-    VTABLE STRING *get_repr() {
+    VTABLE STRING *get_repr() :no_wb {
         const FLOATVAL val      = SELF.get_number();
         const double d          = fabs((double)val);
         const char * const sign = val < 0 ? "-" : "";
@@ -154,13 +154,13 @@ Returns a Parrot string representation of the number.
 
 */
 
-    VTABLE void set_integer_native(INTVAL value) {
+    VTABLE void set_integer_native(INTVAL value) :manual_wb {
         Parrot_pmc_reuse(INTERP, SELF,
             Parrot_hll_get_ctx_HLL_type(INTERP, enum_class_Integer), 0);
         SELF.set_integer_native(value);
     }
 
-    VTABLE void set_bool(INTVAL value) {
+    VTABLE void set_bool(INTVAL value) :manual_wb {
         Parrot_pmc_reuse(INTERP, SELF,
             Parrot_hll_get_ctx_HLL_type(INTERP, enum_class_Boolean), 0);
         SELF.set_bool(value);
@@ -192,7 +192,7 @@ Note that this method morphs the number into a C<String>.
 
 */
 
-    VTABLE void set_string_native(STRING *value) {
+    VTABLE void set_string_native(STRING *value) :manual_wb {
         Parrot_pmc_reuse(INTERP, SELF,
             Parrot_hll_get_ctx_HLL_type(INTERP, enum_class_String), 0);
         SELF.set_string_native(value);
@@ -225,7 +225,7 @@ Set C<dest> to the negated value of C<SELF>.
 
 */
 
-    VTABLE PMC *neg(PMC *dest) {
+    VTABLE PMC *neg(PMC *dest) :no_wb {
         const FLOATVAL a = -SELF.get_number();
 
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -234,7 +234,7 @@ Set C<dest> to the negated value of C<SELF>.
         return dest;
     }
 
-    VTABLE void i_neg() {
+    VTABLE void i_neg() :manual_wb {
         const FLOATVAL a = -SELF.get_number();
         VTABLE_set_number_native(INTERP, SELF, a);
     }
@@ -249,19 +249,19 @@ The C<==> operation.
 
 */
 
-    MULTI INTVAL is_equal(Float value) {
+    MULTI INTVAL is_equal(Float value) :no_wb {
         return (INTVAL)(SELF.get_number() == VTABLE_get_number(INTERP, value));
     }
 
-    MULTI INTVAL is_equal(DEFAULT *value) {
+    MULTI INTVAL is_equal(DEFAULT *value) :no_wb {
         return (INTVAL)(SELF.get_number() == VTABLE_get_number(INTERP, value));
     }
 
-    MULTI INTVAL is_equal_num(Float value) {
+    MULTI INTVAL is_equal_num(Float value) :no_wb {
         return (INTVAL)(SELF.get_number() == VTABLE_get_number(INTERP, value));
     }
 
-    MULTI INTVAL is_equal_num(DEFAULT value) {
+    MULTI INTVAL is_equal_num(DEFAULT value) :no_wb {
         return (INTVAL)(SELF.get_number() == VTABLE_get_number(INTERP, value));
     }
 
@@ -275,12 +275,12 @@ The C<cmp> operation.
 
 */
 
-    MULTI INTVAL cmp(Float value) {
+    MULTI INTVAL cmp(Float value) :no_wb {
         const FLOATVAL diff = SELF.get_number() - VTABLE_get_number(INTERP, value);
         return diff > 0 ? 1 : diff < 0 ? -1 : 0;
     }
 
-    MULTI INTVAL cmp(DEFAULT value) {
+    MULTI INTVAL cmp(DEFAULT value) :no_wb {
         const FLOATVAL diff =
                 SELF.get_number() - VTABLE_get_number(INTERP, value);
         return diff > 0 ? 1 : diff < 0 ? -1 : 0;
@@ -296,12 +296,12 @@ Returns the result of comparing the number with C<*value>.
 
 */
 
-    MULTI INTVAL cmp_num(Float value) {
+    MULTI INTVAL cmp_num(Float value) :no_wb {
         const FLOATVAL diff = SELF.get_number() - VTABLE_get_number(INTERP, value);
         return diff > 0 ? 1 : diff < 0 ? -1 : 0;
     }
 
-    MULTI INTVAL cmp_num(DEFAULT value) {
+    MULTI INTVAL cmp_num(DEFAULT value) :no_wb {
         /* fix an apparent gcc 4.4.x and 4.5.x bug that manifests itself when
          * using g++ and an optimized build. See TT #1978.
          */
@@ -356,7 +356,7 @@ Sets C<dest> to the absolute value of SELF.
 
 */
 
-    VTABLE PMC *absolute(PMC *dest) {
+    VTABLE PMC *absolute(PMC *dest) :no_wb {
         const FLOATVAL a = fabs(SELF.get_number());
 
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -365,7 +365,7 @@ Sets C<dest> to the absolute value of SELF.
         return dest;
     }
 
-    VTABLE void i_absolute() {
+    VTABLE void i_absolute() :manual_wb {
         const FLOATVAL a = fabs(SELF.get_number());
         VTABLE_set_number_native(INTERP, SELF, a);
     }
@@ -379,7 +379,7 @@ Used to archive the number.
 =cut
 
 */
-    VTABLE void freeze(PMC *info) {
+    VTABLE void freeze(PMC *info) :no_wb {
         SUPER(info);
         VTABLE_push_float(INTERP, info, SELF.get_number());
     }
@@ -502,136 +502,136 @@ Calculate and return the square root of the input argument.
 
 */
 
-    METHOD acos() {
+    METHOD acos() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, acos(SELF.get_number()));
         RETURN(PMC *d);
     }
 
 
-    METHOD acot() {
+    METHOD acot() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, atan(1.0 / SELF.get_number()));
         RETURN(PMC *d);
     }
 
-    METHOD asec() {
+    METHOD asec() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, acos(1.0 / SELF.get_number()));
         RETURN(PMC *d);
     }
 
-    METHOD asin() {
+    METHOD asin() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, asin(SELF.get_number()));
         RETURN(PMC *d);
     }
 
-    METHOD atan() {
+    METHOD atan() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, atan(SELF.get_number()));
         RETURN(PMC *d);
     }
 
-    METHOD atan2(PMC *val) {
+    METHOD atan2(PMC *val) :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, atan2(SELF.get_number(), VTABLE_get_number(INTERP, val)));
         RETURN(PMC *d);
     }
 
-    METHOD cos() {
+    METHOD cos() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP,
                 Parrot_hll_get_ctx_HLL_type(INTERP, enum_class_Float));
         SET_ATTR_fv(INTERP, d, cos(SELF.get_number()));
         RETURN(PMC *d);
     }
 
-    METHOD cosh() {
+    METHOD cosh() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, cosh(SELF.get_number()));
         RETURN(PMC *d);
     }
 
-    METHOD cot() {
+    METHOD cot() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, 1.0 / tan(SELF.get_number()));
         RETURN(PMC *d);
     }
 
 
-    METHOD coth() {
+    METHOD coth() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, 1.0 / tanh(SELF.get_number()));
         RETURN(PMC *d);
     }
 
-    METHOD csc() {
+    METHOD csc() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, 1.0 / sin(SELF.get_number()));
         RETURN(PMC *d);
     }
 
-    METHOD exp() {
+    METHOD exp() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, exp(SELF.get_number()));
         RETURN(PMC *d);
     }
 
-    METHOD ln() {
+    METHOD ln() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, log(SELF.get_number()));
         RETURN(PMC *d);
     }
 
-    METHOD log10() {
+    METHOD log10() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, log10(SELF.get_number()));
         RETURN(PMC *d);
     }
 
-    METHOD log2() {
+    METHOD log2() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, log(SELF.get_number()) / log(2.0));
         RETURN(PMC *d);
     }
 
-    METHOD sec() {
+    METHOD sec() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, 1.0 / cos(SELF.get_number()));
         RETURN(PMC *d);
     }
 
-    METHOD sech() {
+    METHOD sech() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, 1.0 / cosh(SELF.get_number()));
         RETURN(PMC *d);
     }
 
-    METHOD sin() {
+    METHOD sin() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, sin(SELF.get_number()));
         RETURN(PMC *d);
     }
 
-    METHOD sinh() {
+    METHOD sinh() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, sinh(SELF.get_number()));
         RETURN(PMC *d);
     }
 
-    METHOD tan() {
+    METHOD tan() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, tan(SELF.get_number()));
         RETURN(PMC *d);
     }
 
-    METHOD tanh() {
+    METHOD tanh() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, tanh(SELF.get_number()));
         RETURN(PMC *d);
     }
 
-    METHOD sqrt() {
+    METHOD sqrt() :no_wb {
         PMC * const d  = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_fv(INTERP, d, sqrt(SELF.get_number()));
         RETURN(PMC *d);

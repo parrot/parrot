@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -69,7 +69,6 @@ as a Boolean.
     /* These init functions set the boolean flag directly. */
 
     VTABLE void init() {
-        UNUSED(INTERP)
         set_boolean_FLAG(SELF, 0);
     }
 
@@ -79,7 +78,6 @@ as a Boolean.
     }
 
     VTABLE void init_int(INTVAL value) {
-        UNUSED(INTERP)
         set_boolean_FLAG(SELF, value);
     }
 
@@ -105,21 +103,21 @@ Obtain the value of the C<Boolean> as a string: "1" = C<TRUE>, "0" = C<FALSE>.
 
 */
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         UNUSED(INTERP);
         return get_boolean_FLAG(SELF);
     }
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         return SELF.get_bool();
     }
 
-    VTABLE FLOATVAL get_number() {
+    VTABLE FLOATVAL get_number() :no_wb {
         const INTVAL value = SELF.get_bool();
         return (FLOATVAL)value;
     }
 
-    VTABLE STRING *get_string() {
+    VTABLE STRING *get_string() :no_wb {
         return Parrot_str_from_int(INTERP, SELF.get_integer());
     }
 
@@ -150,19 +148,18 @@ C<FALSE>.
 */
 
     VTABLE void set_bool(INTVAL value) {
-        UNUSED(INTERP)
         set_boolean_FLAG(SELF, value);
     }
 
-    VTABLE void set_integer_native(INTVAL value) {
+    VTABLE void set_integer_native(INTVAL value) :manual_wb {
         SELF.set_bool(value);
     }
 
-    VTABLE void set_number_native(FLOATVAL value) {
+    VTABLE void set_number_native(FLOATVAL value) :manual_wb {
         SELF.set_bool(!FLOAT_IS_ZERO(value));
     }
 
-    VTABLE void set_string_native(STRING *value) {
+    VTABLE void set_string_native(STRING *value) :manual_wb {
         SELF.set_bool(Parrot_str_boolean(INTERP, value));
     }
 
@@ -176,7 +173,7 @@ The C<==> operation.
 
 */
 
-    VTABLE INTVAL is_equal(PMC *value) {
+    VTABLE INTVAL is_equal(PMC *value) :no_wb {
         return (INTVAL)(get_boolean_FLAG(SELF) == VTABLE_get_bool(INTERP, value));
     }
 
@@ -194,12 +191,12 @@ Used to unarchive the C<Boolean>.
 
 */
 
-    VTABLE void freeze(PMC *info) {
+    VTABLE void freeze(PMC *info) :no_wb {
         SUPER(info);
         VTABLE_push_integer(INTERP, info, SELF.get_bool());
     }
 
-    VTABLE void thaw(PMC *info) {
+    VTABLE void thaw(PMC *info) :manual_wb {
         SUPER(info);
         SELF.set_bool(VTABLE_shift_integer(INTERP, info));
     }
