@@ -1,9 +1,9 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/file.pmc - File PMC
+src/dynpmc/file.pmc - File PMC
 
 =head1 DESCRIPTION
 
@@ -40,21 +40,21 @@ information see F<src/pmc.c>.
 =cut
 
 */
-    void class_init() {
+    void class_init() :no_wb {
         UNUSED(INTERP);
         UNUSED(entry);
 
         File_PMC = NULL;
     }
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         UNUSED(INTERP);
         UNUSED(SELF);
 
         return File_PMC;
     }
 
-    VTABLE void set_pointer(void *ptr) {
+    VTABLE void set_pointer(void *ptr) :no_wb {
         UNUSED(INTERP);
         UNUSED(SELF);
 
@@ -71,7 +71,7 @@ Returns a true value (1) if the supplied file or directory exists.
 
 */
 
-    METHOD exists(STRING *path) {
+    METHOD exists(STRING *path) :no_wb {
         const INTVAL res = Parrot_file_lstat_intval(interp, path, STAT_EXISTS);
 
         RETURN(INTVAL res);
@@ -87,7 +87,7 @@ Returns a true value (1) if the supplied path is a directory.
 
 */
 
-    METHOD is_dir(STRING *path) {
+    METHOD is_dir(STRING *path) :no_wb {
         const INTVAL res = Parrot_file_lstat_intval(interp, path, STAT_ISDIR);
 
         RETURN(INTVAL res);
@@ -103,7 +103,7 @@ Returns a true value (1) if the supplied path is a plain file.
 
 */
 
-    METHOD is_file(STRING *path) {
+    METHOD is_file(STRING *path) :no_wb {
         const INTVAL res = Parrot_file_lstat_intval(interp, path, STAT_ISREG);
 
         RETURN(INTVAL res);
@@ -119,7 +119,7 @@ Returns a true value (1) if the supplied path is a link.
 
 */
 
-    METHOD is_link(STRING *path) {
+    METHOD is_link(STRING *path) :no_wb {
         const INTVAL res = Parrot_file_lstat_intval(interp, path, STAT_ISLNK);
 
         RETURN(INTVAL res);
@@ -141,7 +141,7 @@ free to change or give me hints on how to change it. -- ambs
 
 */
 
-    METHOD copy(STRING *from, STRING *to) {
+    METHOD copy(STRING *from, STRING *to) :no_wb {
 #define CHUNK_SIZE 1024
 
         char * const cfrom  = Parrot_str_to_cstring(INTERP, from);
@@ -196,7 +196,7 @@ Rename a file C<from> to the path C<to>.
 
 */
 
-    METHOD rename(STRING *from, STRING *to) {
+    METHOD rename(STRING *from, STRING *to) :no_wb {
         Parrot_file_rename(INTERP, from, to);
     }
 }

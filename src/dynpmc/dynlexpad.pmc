@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2011, Parrot Foundation.
+Copyright (C) 2005-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -66,10 +66,12 @@ Initialize the LexPad PMC and remember the associate context.
 
 */
 
-    VTABLE void set_pointer(void* ctx) {
+    VTABLE void set_pointer(void* ctx) :manual_wb {
         PMC * const std_pad = PARROT_DYNLEXPAD(SELF)->init;
-        if (std_pad)
+        if (std_pad) {
             VTABLE_set_pointer(INTERP, std_pad, ctx);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+        }
     }
 
 /*
@@ -191,7 +193,7 @@ doesn't exist, it is created.
 
 */
 
-    VTABLE void set_pmc_keyed(PMC* name, PMC* value) {
+    VTABLE void set_pmc_keyed(PMC* name, PMC* value) :manual_wb {
         STRING * const s = VTABLE_get_string(INTERP, name);
         SELF.set_pmc_keyed_str(s, value);
     }
@@ -226,7 +228,7 @@ Destroy DynLexPad.
 
 */
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         if (PARROT_DYNLEXPAD(SELF)->hash) {
             Parrot_hash_destroy(INTERP, PARROT_DYNLEXPAD(SELF)->hash);
             PARROT_DYNLEXPAD(SELF)->hash = NULL;
@@ -242,7 +244,7 @@ Marks the lexpad hash as live.
 
 */
 
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         PMC * const std_pad = PARROT_DYNLEXPAD(SELF)->init;
         Parrot_gc_mark_PMC_alive(INTERP, std_pad);
         if (PARROT_DYNLEXPAD(SELF)->hash)
