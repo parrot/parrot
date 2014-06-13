@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007-2012, Parrot Foundation.
+# Copyright (C) 2007-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -53,7 +53,7 @@ my (
 my $copyright_simple =
     qr/Copyright \(C\) \d{4}/i;
 my $copyright_parrot =
-    qr/Copyright \(C\) (?:\d{4}\-)?\d{4}, Parrot Foundation\.\n/;
+    qr/Copyright \(C\) (?:(?:\d{4}\-)?\d{4},)+ Parrot Foundation\.\n/;
 
 foreach my $file (@files) {
 
