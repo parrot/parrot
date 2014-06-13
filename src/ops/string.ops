@@ -577,15 +577,36 @@ op compose(out STR, in STR) {
 Set $1 to the codepoint with the name given in $2, or -1 if there is none.
 Requires ICU lib, otherwise exception is thrown.
 
+See /usr/include/unicode/uchar.h for UCharNameChoice and u_charFromName
+
 =cut
 
 op find_codepoint(out INT, in STR) {
 #if PARROT_HAS_ICU
     UErrorCode   err       = U_ZERO_ERROR;
     char * const cstr      = Parrot_str_to_cstring(interp, $2);
-    UChar32      codepoint = u_charFromName(U_EXTENDED_CHAR_NAME, cstr, &err);
+    /* At first search for proper names. This will not find name aliases for control characters */
+    UCharNameChoice nameChoices[]  = {U_UNICODE_CHAR_NAME, U_EXTENDED_CHAR_NAME,
+                                      U_CHAR_NAME_ALIAS, U_UNICODE_10_CHAR_NAME};
+    unsigned int i = 0;
+    for (; i < (sizeof(nameChoices)/sizeof(nameChoices[0])); i++) {
+        UChar32 codepoint = u_charFromName(nameChoices[i], cstr, &err);
+        if (U_SUCCESS(err)) {
+            $1 = (INTVAL) codepoint;
+            Parrot_str_free_cstring(cstr);
+            goto ADDRESS(dest);
+        }
+    }
+#if 0
+    {   /* TODO [GH #1074]*/
+        UProperty property = u_getPropertyEnum("Name_Alias");
+        INTVAL result = u_getPropertyValueEnum(property, cstr);
+        char *name = u_getPropertyValueName(property, result, 0);
+    }
+#endif
+    $1 = -1;
     Parrot_str_free_cstring(cstr);
-    $1 = U_SUCCESS(err) ? (INTVAL) codepoint : -1;
+    goto ADDRESS(dest);
 #else
     opcode_t * const dest = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
         EXCEPTION_LIBRARY_ERROR, "no ICU lib loaded");

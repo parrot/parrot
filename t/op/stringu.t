@@ -1,11 +1,11 @@
 #!perl
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 48;
+use Parrot::Test tests => 49;
 use Parrot::Config;
 
 =head1 NAME
@@ -331,7 +331,7 @@ CODE
 AAAAAAAAAA\xd9\xa6
 OUTPUT
 
-    pir_output_is( <<'CODE', <<OUTPUT, "downcase changes string behind scenes" );
+pir_output_is( <<'CODE', <<OUTPUT, "downcase changes string behind scenes" );
 .sub main :main
     .local string str
     .local string rest
@@ -353,7 +353,7 @@ xyz
 xyz
 OUTPUT
 
-    pir_output_is( <<'CODE', <<OUTPUT, "downcase asciish" );
+pir_output_is( <<'CODE', <<OUTPUT, "downcase asciish" );
 .sub main :main
     .local string str
     .local string rest
@@ -1159,6 +1159,39 @@ CODE
 0x266d
 0x2673
 OUT
+
+# name aliases needed by perl6, but not defined in icu. https://ssl.icu-project.org/trac/ticket/8963
+pir_output_is( <<'CODE', <<'OUT', 'find_codepoint opcode for name aliases #1075', todo => 'no U_CHAR_NAME_ALIAS with icu');
+.sub 'main' :main
+    'test_name'('LINE FEED (LF)')
+    'test_name'('CARRIAGE RETURN (CR)')
+    'test_name'('NULL')
+    'test_name'('NEXT LINE (NEL)')
+    'test_name'('CHARACTER TABULATION')
+.end
+
+.sub 'test_name'
+    .param string chars
+    $I0 = find_codepoint chars
+    if $I0 == -1 goto fail
+
+    .const string cpf = "0x%04x"
+    $P0 = new 'FixedIntegerArray', 1
+    $P0[0] = $I0
+    $S0 = sprintf cpf, $P0
+    say $S0
+    .return ()
+  fail:
+    say -1
+.end
+CODE
+0x000a
+0x000d
+0x0000
+-1
+-1
+OUT
+
 }
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'ord with Unicode encodings' );
