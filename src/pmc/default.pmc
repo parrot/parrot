@@ -279,6 +279,7 @@ Role-y.
     VTABLE void add_attribute(STRING *name, PMC *type) :no_wb {
         UNUSED(name);
         UNUSED(type);
+        UNUSED(SELF);
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
             "Cannot add attribute to non-class");
     }
@@ -808,12 +809,12 @@ the string name passed in.
 
 */
     VTABLE PMC *get_attr_keyed(PMC *key, STRING *name) :no_wb {
-        UNUSED(key)
+        UNUSED(key);
         return VTABLE_get_attr_str(INTERP, SELF, name);
     }
 
-    VTABLE void set_attr_keyed(PMC *key, STRING *name, PMC *value) {
-        UNUSED(key)
+    VTABLE void set_attr_keyed(PMC *key, STRING *name, PMC *value) :manual_wb {
+        UNUSED(key);
         VTABLE_set_attr_str(INTERP, SELF, name, value);
     }
 
@@ -894,7 +895,7 @@ Initializes the PMC during unarchiving.
 
 */
 
-    VTABLE void thaw(PMC *info) { /* WB in init */
+    VTABLE void thaw(PMC *info) :manual_wb { /* WB in init */
         UNUSED(info);
         /* default - initialize the PMC */
         SELF.init();

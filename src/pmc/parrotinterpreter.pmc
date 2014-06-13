@@ -232,7 +232,7 @@ new.
 
 */
 
-    METHOD recursion_limit(INTVAL l :optional, INTVAL has_l :opt_flag) {
+    METHOD recursion_limit(INTVAL l :optional, INTVAL has_l :opt_flag) :no_wb {
         const INTVAL ret = INTERP->recursion_limit;
         UNUSED(SELF)
         if (has_l)
@@ -337,6 +337,7 @@ Returns C<struct_val>.
 */
 
     VTABLE void *get_pointer() :no_wb {
+        UNUSED(INTERP)
         return PMC_interp(SELF);
     }
 
@@ -351,6 +352,7 @@ Returns the thread id of the interpreter.
 */
 
     VTABLE INTVAL get_integer() :no_wb {
+        UNUSED(INTERP)
         const Parrot_Interp i = PMC_interp(SELF);
         if (i->thread_data)
             return (INTVAL)i->thread_data->tid;
@@ -579,6 +581,7 @@ Returns the interpreter info for C<key>.
 */
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL key) :no_wb {
+        UNUSED(INTERP)
         Interp * const new_interp = PMC_interp(SELF);
 
         if (key == -1)

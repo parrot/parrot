@@ -89,7 +89,7 @@ Defaults iteration mode to iterate from start.
 
 */
 
-    VTABLE void init_pmc(PMC *aggregate) {
+    VTABLE void init_pmc(PMC *aggregate) :no_wb {
         UNUSED(SELF)
         UNUSED(aggregate)
         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,

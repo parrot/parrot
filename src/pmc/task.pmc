@@ -398,7 +398,7 @@ Used to unarchive the task.
 
 */
 
-    VTABLE void thaw(PMC *info) :no_wb {
+    VTABLE void thaw(PMC *info) {
         const FLOATVAL birthtime = VTABLE_shift_float(INTERP, info);
 
         /* Allocate the task's core data struct and set custom flags. */

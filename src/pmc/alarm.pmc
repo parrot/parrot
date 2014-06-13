@@ -145,9 +145,11 @@ Sets the PMC associated with C<key> to C<*value>.
 
 */
 
-    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
-        if (key == PARROT_ALARM_TASK)
+    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) :manual_wb {
+        if (key == PARROT_ALARM_TASK) {
             SET_ATTR_alarm_task(INTERP, SELF, value);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+        }
     }
 
 /*
@@ -175,9 +177,11 @@ Sets the floating-point value associated with C<key> to C<value>.
 
 */
 
-    VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
-        if (key == PARROT_ALARM_TIME)
+    VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) :manual_wb {
+        if (key == PARROT_ALARM_TIME) {
             SET_ATTR_alarm_time(INTERP, SELF, value);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+        }
     }
 
 /*

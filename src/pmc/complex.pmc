@@ -795,7 +795,7 @@ Adds C<value> to the complex number, placing the result in C<dest>.
         SET_ATTR_re(INTERP, SELF, re + VTABLE_get_number(INTERP, value));
     }
 
-    VTABLE void i_add_int(INTVAL value) {
+    VTABLE void i_add_int(INTVAL value) :manual_wb {
         SELF.i_add_float((FLOATVAL)value);
     }
 
@@ -884,7 +884,7 @@ Subtracts C<value> from the complex number, placing the result in C<dest>.
         SET_ATTR_re(INTERP, SELF, re - VTABLE_get_number(INTERP, value));
     }
 
-    VTABLE void i_subtract_int(INTVAL value) {
+    VTABLE void i_subtract_int(INTVAL value) :manual_wb {
         SELF.i_subtract_float((FLOATVAL) value);
     }
 
@@ -1269,7 +1269,7 @@ Sets C<dest> to the absolute value of SELF that is the distance from (0.0).
         return dest;
     }
 
-    VTABLE void i_absolute() {
+    VTABLE void i_absolute() :manual_wb {
         FLOATVAL re, im, d;
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
@@ -1465,7 +1465,7 @@ Returns C<FUNC>(SELF).
         RETURN(PMC *d);
     }
 
-    METHOD sec() {
+    METHOD sec() :no_wb {
         PMC * const d = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         PMC * const e = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
         SET_ATTR_re(INTERP, d, 1.0);
