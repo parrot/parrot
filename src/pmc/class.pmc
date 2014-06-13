@@ -740,7 +740,7 @@ arguments. The class is attached to the current HLL namespace.
         init_class_from_hash(INTERP, SELF, arg);
     }
 
-    void destroy() :no_wb {
+    void destroy() {
         Parrot_Class_attributes * const _class = PARROT_CLASS(SELF);
         Parrot_hash_destroy(INTERP, _class->isa_cache);
     }
@@ -1670,7 +1670,7 @@ Used to archive the class.
 
 */
 
-    VTABLE void freeze(PMC *info) :manual_wb {
+    VTABLE void freeze(PMC *info) :no_wb {
         Parrot_Class_attributes * const class_data = PARROT_CLASS(SELF);
         STRING       *serial_namespace = CONST_STRING(INTERP, "");
 
