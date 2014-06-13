@@ -152,7 +152,7 @@ Free all resources used.
         #endif
     }
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         #ifdef ENABLED
         unsigned char *buffer;
         UINTVAL size;

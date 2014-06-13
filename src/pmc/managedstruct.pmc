@@ -80,7 +80,7 @@ Otherwise, mem_gc_free() is used.
 
 */
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         void * const ptr = PARROT_MANAGEDSTRUCT(SELF)->ptr;
         if (ptr) {
             const custom_free_func_t free_func = PARROT_MANAGEDSTRUCT(SELF)->custom_free_func;

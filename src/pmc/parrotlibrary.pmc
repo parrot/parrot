@@ -63,7 +63,7 @@ Destroys the library, closing the shared library.
 
 */
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         void *dl_handle = PMC_dlhandle(SELF);
         if (dl_handle)
             Parrot_dlclose(dl_handle);

@@ -63,7 +63,7 @@ Destroys the PMC and frees all allocated memory.
 
 */
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         Parrot_Sockaddr_attributes * const data = PARROT_SOCKADDR(SELF);
 
         if (data) {

@@ -148,7 +148,7 @@ Manage attribute deallocation for C<fat> representation.
 
 */
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         if (PTR_FAT_TEST(INTERP, SELF) && PMC_data(SELF))
             mem_gc_free(INTERP, PMC_data(SELF));
     }
