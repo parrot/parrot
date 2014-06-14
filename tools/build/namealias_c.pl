@@ -39,7 +39,11 @@ my $tmp = "tmp_namealias.c";
 my $out = "src/string/namealias.c";
 system("gperf", "--output-file=$tmp", $src);
 
-open my $IN, '<', $tmp or die "Can't read gperf generated '$out': $!";
+my $IN;
+unless (open $IN, '<', $tmp) {
+    warn "gperf not available or failed. Using the prepared $out\n"; # but no problem, we have the file
+    exit;
+}
 open my $OUT, '>', $out or die "Can't write '$out': $!";
 local $/ = "\n\n";
 while (<$IN>) {

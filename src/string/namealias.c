@@ -72,7 +72,9 @@ by some ICU versions.
 =back
 
 =cut
+
 */
+
 #define PARROT_IN_CORE
 #include <string.h>
 #include "parrot/config.h"
