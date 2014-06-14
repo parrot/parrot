@@ -1160,8 +1160,11 @@ CODE
 0x2673
 OUT
 
-# name aliases needed by perl6, but not defined in icu. https://ssl.icu-project.org/trac/ticket/8963
-pir_output_is( <<'CODE', <<'OUT', 'find_codepoint opcode for name aliases #1075');
+}
+
+# control character name aliases needed by perl6, but not defined in icu since 5.2
+# https://ssl.icu-project.org/trac/ticket/8963
+pir_output_is( <<'CODE', <<'OUT', 'find_codepoint for control character names #1075');
 .sub 'main' :main
     'test_name'('LINE FEED (LF)')
     'test_name'('CARRIAGE RETURN (CR)')
@@ -1191,8 +1194,6 @@ CODE
 0x0085
 0x0009
 OUT
-
-}
 
 pir_output_is(<<'CODE', <<'OUTPUT', 'ord with Unicode encodings' );
 .sub 'main' :main
