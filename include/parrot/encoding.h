@@ -1,5 +1,5 @@
 /* encoding.h
- *  Copyright (C) 2004-2007, Parrot Foundation.
+ *  Copyright (C) 2004-2007,2014, Parrot Foundation.
  *  Overview:
  *     This is the header for the generic encoding functions
  *  Data Structure and Algorithms:
@@ -121,6 +121,13 @@ INTVAL Parrot_register_encoding(PARROT_INTERP, ARGIN(STR_VTABLE *encoding))
 void Parrot_deinit_encodings(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+PARROT_PURE_FUNCTION
+PARROT_WARN_UNUSED_RESULT
+INTVAL Parrot_str_internal_find_codepoint(PARROT_INTERP,
+    ARGIN(const STRING *name))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 void Parrot_str_internal_register_encoding_names(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -153,6 +160,10 @@ void Parrot_str_internal_register_encoding_names(PARROT_INTERP)
     , PARROT_ASSERT_ARG(encoding))
 #define ASSERT_ARGS_Parrot_deinit_encodings __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_str_internal_find_codepoint \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS_Parrot_str_internal_register_encoding_names \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))

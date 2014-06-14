@@ -86,6 +86,7 @@ our %second_analysis_subs = (
                         | t/configure/testlib/bdefectivefoobar
                         | compilers/opsc
                         | tools/dev/mk_language_shell\.pl
+                        | src/string/namealias_c\.in
                         | lib/IO/CaptureOutput\.pm
                     }x
                 ) {

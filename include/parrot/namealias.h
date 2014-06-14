@@ -1,11 +1,15 @@
 /* namealias.h
- Copyright (C) 2014, Parrot Foundation.
+Copyright (C) 2014, Parrot Foundation.
 
- gperf generated icu control character namealias lookup
+gperf generated icu control character namealias lookup
+
+=over
 
 =item C<struct Parrot_namealias>
 
-Generated hash table with name and key.
+Generated hash table with name and codepoint.
+
+=back
 
 =cut
 */
@@ -13,13 +17,14 @@ Generated hash table with name and key.
 #ifndef PARROT_NAMEALIAS_H_GUARD
 #define PARROT_NAMEALIAS_H_GUARD
 
-#include "parrot/config.h"
+#include "parrot/parrot.h"
 
 #ifdef PARROT_IN_CORE
 
-struct Parrot_namealias { int name; const int key; };
+/* HEADERIZER STOP */
 
-PARROT_INLINE
+struct Parrot_namealias { int name; const INTVAL codepoint; };
+
 const struct Parrot_namealias *
 Parrot_namealias_lookup(register const char *str, register unsigned int len);
 

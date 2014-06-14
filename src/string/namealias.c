@@ -1,5 +1,5 @@
 /* ANSI-C code produced by gperf version 3.0.4 */
-/* Command-line: gperf --output-file=src/string/namealias.c src/string/namealias_c.in  */
+/* Command-line: gperf --output-file=tmp_namealias.c src/string/namealias_c.in  */
 /* Computed positions: -k'1,14,$' */
 
 #if !((' ' == 32) && ('!' == 33) && ('"' == 34) && ('#' == 35) \
@@ -29,7 +29,6 @@
 #  error "gperf generated tables don't work with this execution character set."
 #endif
 
-#line 1 "src/string/namealias_c.in"
 
 /*
   Copyright (C) 2014, Parrot Foundation.
@@ -42,9 +41,12 @@ src/string/namealias.c - namealias for ICU control characters
 
 Generated namealias hash for icu control characters
 
-  perl -F'/;/' -alne'print "$F[10],\t0x$F[0]" if $F[1] eq "<control>" and $F[10]' \
+- perl -F'/;/' -alne'print "$F[10],\t0x$F[0]" if $F[1] eq "<control>" and $F[10]' \
     UnicodeData.txt >> src/string/namealias_c.in
-  gperf --output-file=src/string/namealias.c src/string/namealias_c.in
+
+- gperf --output-file=src/string/namealias.c src/string/namealias_c.in
+
+- manual cleanup for inline and codingstd_tests. TODO: tools/build/namealias.pl
 
 =over 4
 
@@ -52,13 +54,20 @@ Generated namealias hash for icu control characters
 
 Generated hash table with name and key.
 
+=back
+
+=head2 Functions
+
+=over 4
+
 =item C<static unsigned int Parrot_namealias_hash(register const char *str,
 register unsigned int len)>
 
 =item C<const struct Parrot_namealias * Parrot_namealias_lookup(register const
 char *str, register unsigned int len)>
 
-Generated lookup function used by the find_codepoint op.
+Generated lookup function used by the C<find_codepoint> op for name aliases not found
+by some ICU versions.
 
 =back
 
@@ -67,8 +76,13 @@ Generated lookup function used by the find_codepoint op.
 #define PARROT_IN_CORE
 #include <string.h>
 #include "parrot/config.h"
-#line 33 "src/string/namealias_c.in"
-struct Parrot_namealias { int name; const int key; };
+
+/* HEADERIZER HFILE: include/parrot/namealias.h */
+/* HEADERIZER STOP */
+
+const struct Parrot_namealias *
+Parrot_namealias_lookup(register const char *str, register unsigned int len);
+struct Parrot_namealias { int name; const INTVAL codepoint; };
 
 #define TOTAL_KEYWORDS 61
 #define MIN_WORD_LENGTH 4
@@ -77,7 +91,7 @@ struct Parrot_namealias { int name; const int key; };
 #define MAX_HASH_VALUE 139
 /* maximum key range = 136, duplicates = 0 */
 
-PARROT_INLINE
+
 static unsigned int
 Parrot_namealias_hash(register const char *str, register unsigned int len)
 {
@@ -266,164 +280,102 @@ static const struct stringpool_t stringpool_contents =
   };
 #define stringpool ((const char *) &stringpool_contents)
 
-PARROT_INLINE
 const struct Parrot_namealias *
 Parrot_namealias_lookup(register const char *str, register unsigned int len)
 {
   static const struct Parrot_namealias wordlist[] =
     {
-      {-1}, {-1}, {-1}, {-1},
-#line 42 "src/string/namealias_c.in"
+      {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str4,	0x0007},
-      {-1},
-#line 62 "src/string/namealias_c.in"
+      {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str6,	0x001B},
-#line 40 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str7,	0x0005},
-      {-1},
-#line 43 "src/string/namealias_c.in"
+      {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str9,	0x0008},
-#line 61 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str10,	0x001A},
-#line 67 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str11,	0x007F},
-      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
-#line 84 "src/string/namealias_c.in"
+      {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str18,	0x0093},
-      {-1},
-#line 68 "src/string/namealias_c.in"
+      {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str20,	0x0082},
-#line 57 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str21,	0x0016},
-      {-1},
-#line 52 "src/string/namealias_c.in"
+      {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str23,	0x0011},
-#line 49 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str24,	0x000E},
-#line 54 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str25,	0x0013},
-#line 38 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str26,	0x0003},
-      {-1},
-#line 37 "src/string/namealias_c.in"
+      {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str28,	0x0002},
-#line 55 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str29,	0x0014},
-      {-1}, {-1},
-#line 78 "src/string/namealias_c.in"
+      {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str32,	0x008D},
-#line 80 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str33,	0x008F},
-      {-1}, {-1}, {-1}, {-1},
-#line 53 "src/string/namealias_c.in"
+      {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str38,	0x0012},
-#line 35 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str39,	0x0000},
-      {-1},
-#line 41 "src/string/namealias_c.in"
+      {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str41,	0x0006},
-      {-1},
-#line 50 "src/string/namealias_c.in"
+      {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str43,	0x000F},
-      {-1}, {-1},
-#line 79 "src/string/namealias_c.in"
+      {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str46,	0x008E},
-#line 90 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str47,	0x009A},
-#line 69 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str48,	0x0083},
-#line 75 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str49,	0x008A},
-#line 72 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str50,	0x0087},
-#line 51 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str51,	0x0010},
-#line 92 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str52,	0x009C},
-#line 60 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str53,	0x0019},
-#line 88 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str54,	0x0097},
-      {-1},
-#line 87 "src/string/namealias_c.in"
+      {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str56,	0x0096},
-      {-1}, {-1},
-#line 93 "src/string/namealias_c.in"
+      {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str59,	0x009D},
-#line 66 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str60,	0x001F},
-#line 59 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str61,	0x0018},
-#line 64 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str62,	0x001D},
-      {-1}, {-1},
-#line 46 "src/string/namealias_c.in"
+      {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str65,	0x000B},
-#line 63 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str66,	0x001C},
-#line 95 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str67,	0x009F},
-      {-1}, {-1},
-#line 56 "src/string/namealias_c.in"
+      {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str70,	0x0015},
-#line 81 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str71,	0x0090},
-      {-1}, {-1},
-#line 45 "src/string/namealias_c.in"
+      {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str74,	0x000A},
-#line 65 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str75,	0x001E},
-      {-1}, {-1}, {-1},
-#line 47 "src/string/namealias_c.in"
+      {-1, 0}, {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str79,	0x000C},
-#line 70 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str80,	0x0085},
-#line 77 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str81,	0x008C},
-      {-1}, {-1}, {-1},
-#line 76 "src/string/namealias_c.in"
+      {-1, 0}, {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str85,	0x008B},
-      {-1}, {-1}, {-1},
-#line 39 "src/string/namealias_c.in"
+      {-1, 0}, {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str89,	0x0004},
-#line 83 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str90,	0x0092},
-#line 85 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str91,	0x0094},
-      {-1}, {-1}, {-1},
-#line 89 "src/string/namealias_c.in"
+      {-1, 0}, {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str95,	0x0098},
-#line 36 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str96,	0x0001},
-      {-1}, {-1}, {-1},
-#line 58 "src/string/namealias_c.in"
+      {-1, 0}, {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str100,	0x0017},
-      {-1}, {-1}, {-1},
-#line 73 "src/string/namealias_c.in"
+      {-1, 0}, {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str104,	0x0088},
-#line 82 "src/string/namealias_c.in"
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str105,	0x0091},
-      {-1},
-#line 71 "src/string/namealias_c.in"
+      {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str107,	0x0086},
-      {-1}, {-1},
-#line 48 "src/string/namealias_c.in"
+      {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str110,	0x000D},
-      {-1}, {-1}, {-1}, {-1},
-#line 94 "src/string/namealias_c.in"
+      {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str115,	0x009E},
-      {-1}, {-1}, {-1}, {-1},
-#line 44 "src/string/namealias_c.in"
+      {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str120,	0x0009},
-      {-1},
-#line 91 "src/string/namealias_c.in"
+      {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str122,	0x009B},
-      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
-      {-1}, {-1}, {-1},
-#line 86 "src/string/namealias_c.in"
+      {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0},
+      {-1, 0}, {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str135,	0x0095},
-      {-1}, {-1}, {-1},
-#line 74 "src/string/namealias_c.in"
+      {-1, 0}, {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str139,	0x0089}
     };
 
@@ -445,7 +397,6 @@ Parrot_namealias_lookup(register const char *str, register unsigned int len)
     }
   return 0;
 }
-#line 96 "src/string/namealias_c.in"
 
 
 /*

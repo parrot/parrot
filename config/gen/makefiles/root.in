@@ -2036,20 +2036,21 @@ src/string/namealias$(O) : \
 
 ## SUFFIX OVERRIDE
 src/string/sprintf$(O) : $(PARROT_H_HEADERS) src/string/sprintf.c src/string/spf_private.h
-	$(CC) $(CFLAGS) @optimize::src/string/sprintf.c@ @ccwarn::src/string/sprintf.c@ @cc_shared@ \
+	$(CC) $(CFLAGS) @optimize::src/string/sprintf.c@ @ccwarn::src/string/sprintf.c@ \
 	  -I$(@D)/. @cc_o_out@$@ -c src/string/sprintf.c
 
 ## SUFFIX OVERRIDE
 src/string/spf_render$(O) : $(PARROT_H_HEADERS) src/string/spf_render.str \
   src/string/spf_render.c src/string/spf_private.h
 	$(CC) $(CFLAGS) @optimize::src/string/spf_render.c@ @ccwarn::src/string/spf_render.c@ \
-	  @cc_shared@ -I$(@D)/. @cc_o_out@$@ -c src/string/spf_render.c
+	  -I$(@D)/. @cc_o_out@$@ -c src/string/spf_render.c
 
 src/string/spf_vtable$(O) : $(PARROT_H_HEADERS) src/string/spf_vtable.str \
 	src/string/spf_vtable.c src/string/spf_private.h
 
 src/string/encoding$(O) : \
 	$(PARROT_H_HEADERS) \
+	$(INC_DIR)/namealias.h \
 	src/string/encoding.c \
 	src/string/encoding.str
 
@@ -3232,9 +3233,9 @@ src/extra_nci_thunks$(O) : $(PARROT_H_HEADERS) src/extra_nci_thunks.c \
 	$(INC_PMC_DIR)/pmc_nci.h
 	$(CC) $(CFLAGS) @optimize::src/extra_nci_thunks.c@ @ccwarn::src/extra_nci_thunks.c@ @cc_shared@ -I$(@D)/. @cc_o_out@$@ -c src/extra_nci_thunks.c
 
-# UnicodeData.txt updates must be done manual
-bootstrap-namealias : src/string/namealias_c.in
-	 gperf --output-file=src/string/namealias.c src/string/namealias_c.in
+# UnicodeData.txt updates must be done manually, or with namealias_c.pl --create
+bootstrap-namealias src/string/namealias.c : src/string/namealias_c.in $(BUILD_TOOLS_DIR)/namealias_c.pl
+	$(PERL) $(BUILD_TOOLS_DIR)/namealias_c.pl
 
 # emacs etags
 # this needs exuberant-ctags

@@ -16,6 +16,10 @@ These are parrot's generic encoding handling functions
 */
 
 #include "parrot/encoding.h"
+#include "parrot/namealias.h"
+#if PARROT_HAS_ICU
+#  include <unicode/uchar.h>
+#endif
 #include "encoding.str"
 
 STR_VTABLE *Parrot_default_encoding_ptr  = NULL;
@@ -495,6 +499,53 @@ Parrot_default_encoding(SHIM_INTERP)
 {
     ASSERT_ARGS(Parrot_default_encoding)
     return Parrot_default_encoding_ptr;
+}
+
+/*
+
+=item C<INTVAL Parrot_str_internal_find_codepoint(PARROT_INTERP, const STRING
+*name)>
+
+Helper function for string.ops in the ICU and non-ICU variant.
+
+At first search for ICU names.
+This will not find name aliases for control characters starting with ICU 5.2.
+U_CHAR_NAME_ALIAS started with ICU 4.4,
+U_UNICODE_10_CHAR_NAME (the "old name" like "LINE FEED") was deprecated with ICU 4.9,
+but U_CHAR_NAME_CHOICE_COUNT is stable since 2.0.
+
+=cut
+
+*/
+
+PARROT_PURE_FUNCTION
+PARROT_WARN_UNUSED_RESULT
+INTVAL
+Parrot_str_internal_find_codepoint(PARROT_INTERP, ARGIN(const STRING *name))
+{
+    ASSERT_ARGS(Parrot_str_internal_find_codepoint)
+    INTVAL retval = -1;
+    char * const cstr      = Parrot_str_to_cstring(interp, name);
+#if PARROT_HAS_ICU
+    UErrorCode   err       = U_ZERO_ERROR;
+    unsigned int i = 0;
+    for (; i < U_CHAR_NAME_CHOICE_COUNT; i++) {
+        UChar32 codepoint = u_charFromName((UCharNameChoice)i, cstr, &err);
+        if (U_SUCCESS(err)) {
+            retval = (INTVAL) codepoint;
+            goto found;
+        }
+    }
+#endif
+    {
+        const struct Parrot_namealias *namealias
+            = Parrot_namealias_lookup(cstr, STRING_byte_length(name));
+        if (namealias)
+            retval = (INTVAL) namealias->codepoint;
+    }
+  found:
+    Parrot_str_free_cstring(cstr);
+    return retval;
 }
 
 /*

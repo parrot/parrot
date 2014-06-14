@@ -10,9 +10,12 @@ src/string/namealias.c - namealias for ICU control characters
 
 Generated namealias hash for icu control characters
 
-  perl -F'/;/' -alne'print "$F[10],\t0x$F[0]" if $F[1] eq "<control>" and $F[10]' \
+- perl -F'/;/' -alne'print "$F[10],\t0x$F[0]" if $F[1] eq "<control>" and $F[10]' \
     UnicodeData.txt >> src/string/namealias_c.in
-  gperf --output-file=src/string/namealias.c src/string/namealias_c.in
+
+- gperf --output-file=src/string/namealias.c src/string/namealias_c.in
+
+- manual cleanup for inline and codingstd_tests. TODO: tools/build/namealias.pl
 
 =over 4
 
@@ -32,7 +35,8 @@ register unsigned int len)>
 =item C<const struct Parrot_namealias * Parrot_namealias_lookup(register const
 char *str, register unsigned int len)>
 
-Generated lookup function used by the find_codepoint op.
+Generated lookup function used by the C<find_codepoint> op for name aliases not found
+by some ICU versions.
 
 =back
 
@@ -41,6 +45,12 @@ Generated lookup function used by the find_codepoint op.
 #define PARROT_IN_CORE
 #include <string.h>
 #include "parrot/config.h"
+
+/* HEADERIZER HFILE: include/parrot/namealias.h */
+/* HEADERIZER STOP */
+
+const struct Parrot_namealias *
+Parrot_namealias_lookup(register const char *str, register unsigned int len);
 %}
 %language=ANSI-C
 %struct-type
@@ -50,7 +60,7 @@ Generated lookup function used by the find_codepoint op.
 %null-strings
 %pic
 
-struct Parrot_namealias { int name; const int key; };
+struct Parrot_namealias { int name; const INTVAL codepoint; };
 %%
 NULL,	0x0000
 START OF HEADING,	0x0001
