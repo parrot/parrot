@@ -520,6 +520,7 @@ INTERP_O_FILES = \
 	src/events$(O) \
 	src/string/spf_render$(O) \
 	src/string/spf_vtable$(O) \
+	src/string/namealias$(O) \
 	src/sub$(O) \
 	src/runcore/trace$(O) \
 	src/utils$(O) \
@@ -2026,6 +2027,13 @@ src/utils$(O) : \
 	src/utils.c \
 	$(EXTEND_HEADERS)
 
+src/string/namealias$(O) : \
+	$(INC_DIR)/feature.h \
+	$(INC_DIR)/pbcversion.h \
+	$(INC_DIR)/has_header.h \
+	$(INC_DIR)/config.h \
+	src/string/namealias.c
+
 ## SUFFIX OVERRIDE
 src/string/sprintf$(O) : $(PARROT_H_HEADERS) src/string/sprintf.c src/string/spf_private.h
 	$(CC) $(CFLAGS) @optimize::src/string/sprintf.c@ @ccwarn::src/string/sprintf.c@ @cc_shared@ \
@@ -2140,6 +2148,7 @@ src/ops/core_ops$(O) : src/ops/core_ops.c \
 	$(INC_PMC_DIR)/pmc_task.h \
 	$(INC_DIR)/events.h \
 	$(INC_DIR)/scheduler_private.h \
+	$(INC_DIR)/namealias.h \
 	src/io/io_private.h
 	$(CC) $(CFLAGS) @optimize::src/ops/core_ops.c@ @ccwarn::src/ops/core_ops.c@ @cc_shared@ -I$(@D)/. @cc_o_out@$@ -c src/ops/core_ops.c
 
@@ -3222,6 +3231,10 @@ bootstrap-nci : src/nci/core_thunks.nci src/nci/extra_thunks.nci
 src/extra_nci_thunks$(O) : $(PARROT_H_HEADERS) src/extra_nci_thunks.c \
 	$(INC_PMC_DIR)/pmc_nci.h
 	$(CC) $(CFLAGS) @optimize::src/extra_nci_thunks.c@ @ccwarn::src/extra_nci_thunks.c@ @cc_shared@ -I$(@D)/. @cc_o_out@$@ -c src/extra_nci_thunks.c
+
+# UnicodeData.txt updates must be done manual
+bootstrap-namealias : src/string/namealias_c.in
+	 gperf --output-file=src/string/namealias.c src/string/namealias_c.in
 
 # emacs etags
 # this needs exuberant-ctags

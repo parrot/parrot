@@ -935,6 +935,7 @@ include/parrot/longopt.h                                    [main]include
 include/parrot/memory.h                                     [main]include
 include/parrot/misc.h                                       [main]include
 include/parrot/multidispatch.h                              [main]include
+include/parrot/namealias.h                                  [main]include
 include/parrot/namespace.h                                  [main]include
 include/parrot/nci.h                                        [main]include
 include/parrot/oo.h                                         [main]include
@@ -1483,6 +1484,8 @@ src/string/encoding/ucs4.c                                  []
 src/string/encoding/unicode.h                               []
 src/string/encoding/utf16.c                                 []
 src/string/encoding/utf8.c                                  []
+src/string/namealias.c                                      []
+src/string/namealias_c.in                                   []
 src/string/spf_private.h                                    []
 src/string/spf_render.c                                     []
 src/string/spf_vtable.c                                     []

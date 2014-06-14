@@ -1161,7 +1161,7 @@ CODE
 OUT
 
 # name aliases needed by perl6, but not defined in icu. https://ssl.icu-project.org/trac/ticket/8963
-pir_output_is( <<'CODE', <<'OUT', 'find_codepoint opcode for name aliases #1075', todo => 'no U_CHAR_NAME_ALIAS with icu');
+pir_output_is( <<'CODE', <<'OUT', 'find_codepoint opcode for name aliases #1075');
 .sub 'main' :main
     'test_name'('LINE FEED (LF)')
     'test_name'('CARRIAGE RETURN (CR)')
@@ -1188,8 +1188,8 @@ CODE
 0x000a
 0x000d
 0x0000
--1
--1
+0x0085
+0x0009
 OUT
 
 }
