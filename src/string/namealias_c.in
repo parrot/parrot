@@ -1,0 +1,135 @@
+%{
+/*
+  Copyright (C) 2014, Parrot Foundation.
+
+=head1 NAME
+
+src/string/namealias.c - namealias for ICU control characters
+
+=head1 DESCRIPTION
+
+Generated namealias hash for icu control characters
+
+- perl -F'/;/' -alne'print "$F[10],\t0x$F[0]" if $F[1] eq "<control>" and $F[10]' \
+    UnicodeData.txt >> src/string/namealias_c.in
+
+- gperf --output-file=src/string/namealias.c src/string/namealias_c.in
+
+- manual cleanup for inline and codingstd_tests. TODO: tools/build/namealias.pl
+
+=over 4
+
+=item C<struct Parrot_namealias>
+
+Generated hash table with name and key.
+
+=back
+
+=head2 Functions
+
+=over 4
+
+=item C<static unsigned int Parrot_namealias_hash(register const char *str,
+register unsigned int len)>
+
+=item C<const struct Parrot_namealias * Parrot_namealias_lookup(register const
+char *str, register unsigned int len)>
+
+Generated lookup function used by the C<find_codepoint> op for name aliases not found
+by some ICU versions.
+
+=back
+
+=cut
+
+*/
+
+#define PARROT_IN_CORE
+#include <string.h>
+#include "parrot/config.h"
+
+/* HEADERIZER HFILE: include/parrot/namealias.h */
+/* HEADERIZER STOP */
+
+const struct Parrot_namealias *
+Parrot_namealias_lookup(register const char *str, register unsigned int len);
+%}
+%language=ANSI-C
+%struct-type
+%define hash-function-name Parrot_namealias_hash
+%define lookup-function-name Parrot_namealias_lookup
+%readonly-tables
+%null-strings
+%pic
+
+struct Parrot_namealias { int name; const INTVAL codepoint; };
+%%
+NULL,	0x0000
+START OF HEADING,	0x0001
+START OF TEXT,	0x0002
+END OF TEXT,	0x0003
+END OF TRANSMISSION,	0x0004
+ENQUIRY,	0x0005
+ACKNOWLEDGE,	0x0006
+BELL,	0x0007
+BACKSPACE,	0x0008
+CHARACTER TABULATION,	0x0009
+LINE FEED (LF),	0x000A
+LINE TABULATION,	0x000B
+FORM FEED (FF),	0x000C
+CARRIAGE RETURN (CR),	0x000D
+SHIFT OUT,	0x000E
+SHIFT IN,	0x000F
+DATA LINK ESCAPE,	0x0010
+DEVICE CONTROL ONE,	0x0011
+DEVICE CONTROL TWO,	0x0012
+DEVICE CONTROL THREE,	0x0013
+DEVICE CONTROL FOUR,	0x0014
+NEGATIVE ACKNOWLEDGE,	0x0015
+SYNCHRONOUS IDLE,	0x0016
+END OF TRANSMISSION BLOCK,	0x0017
+CANCEL,	0x0018
+END OF MEDIUM,	0x0019
+SUBSTITUTE,	0x001A
+ESCAPE,	0x001B
+INFORMATION SEPARATOR FOUR,	0x001C
+INFORMATION SEPARATOR THREE,	0x001D
+INFORMATION SEPARATOR TWO,	0x001E
+INFORMATION SEPARATOR ONE,	0x001F
+DELETE,	0x007F
+BREAK PERMITTED HERE,	0x0082
+NO BREAK HERE,	0x0083
+NEXT LINE (NEL),	0x0085
+START OF SELECTED AREA,	0x0086
+END OF SELECTED AREA,	0x0087
+CHARACTER TABULATION SET,	0x0088
+CHARACTER TABULATION WITH JUSTIFICATION,	0x0089
+LINE TABULATION SET,	0x008A
+PARTIAL LINE FORWARD,	0x008B
+PARTIAL LINE BACKWARD,	0x008C
+REVERSE LINE FEED,	0x008D
+SINGLE SHIFT TWO,	0x008E
+SINGLE SHIFT THREE,	0x008F
+DEVICE CONTROL STRING,	0x0090
+PRIVATE USE ONE,	0x0091
+PRIVATE USE TWO,	0x0092
+SET TRANSMIT STATE,	0x0093
+CANCEL CHARACTER,	0x0094
+MESSAGE WAITING,	0x0095
+START OF GUARDED AREA,	0x0096
+END OF GUARDED AREA,	0x0097
+START OF STRING,	0x0098
+SINGLE CHARACTER INTRODUCER,	0x009A
+CONTROL SEQUENCE INTRODUCER,	0x009B
+STRING TERMINATOR,	0x009C
+OPERATING SYSTEM COMMAND,	0x009D
+PRIVACY MESSAGE,	0x009E
+APPLICATION PROGRAM COMMAND,	0x009F
+%%
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

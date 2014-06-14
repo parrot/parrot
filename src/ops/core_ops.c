@@ -65,7 +65,8 @@ extern op_lib_t core_op_lib;
 
 #include "../io/io_private.h"
 
-
+#include "parrot/encoding.h"
+#include "parrot/namealias.h"
 #if PARROT_HAS_ICU
 #  include <unicode/uchar.h>
 #endif
@@ -13795,7 +13796,8 @@ Parrot_local_return_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_jump_i(opcode_t *cur_opcode, PARROT_INTERP) {
-    opcode_t * const loc = INTVAL2PTR(opcode_t *, IREG(1));
+    opcode_t  * const  loc = INTVAL2PTR(opcode_t *, IREG(1));
+
     UNUSED(interp);
     UNUSED(cur_opcode);
     return (opcode_t *)loc;
@@ -13803,7 +13805,8 @@ Parrot_jump_i(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_jump_ic(opcode_t *cur_opcode, PARROT_INTERP) {
-    opcode_t * const loc = INTVAL2PTR(opcode_t *, ICONST(1));
+    opcode_t  * const  loc = INTVAL2PTR(opcode_t *, ICONST(1));
+
     UNUSED(interp);
     UNUSED(cur_opcode);
     return (opcode_t *)loc;
@@ -22113,37 +22116,13 @@ Parrot_compose_s_sc(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_find_codepoint_i_s(opcode_t *cur_opcode, PARROT_INTERP) {
-    #if PARROT_HAS_ICU
-        UErrorCode     err = U_ZERO_ERROR;
-        char  * const  cstr = Parrot_str_to_cstring(interp, SREG(2));
-        UChar32        codepoint = u_charFromName(U_EXTENDED_CHAR_NAME, cstr, (&err));
-        Parrot_str_free_cstring(cstr);
-        IREG(1) = U_SUCCESS(err) ? (INTVAL)codepoint : (-1);
-
-#else
-        opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 3, EXCEPTION_LIBRARY_ERROR, "no ICU lib loaded");
-        return (opcode_t *)dest;
-
-#endif
-;
+    IREG(1) = Parrot_str_internal_find_codepoint(interp, SREG(2));
     return cur_opcode + 3;
 }
 
 opcode_t *
 Parrot_find_codepoint_i_sc(opcode_t *cur_opcode, PARROT_INTERP) {
-    #if PARROT_HAS_ICU
-        UErrorCode     err = U_ZERO_ERROR;
-        char  * const  cstr = Parrot_str_to_cstring(interp, SCONST(2));
-        UChar32        codepoint = u_charFromName(U_EXTENDED_CHAR_NAME, cstr, (&err));
-        Parrot_str_free_cstring(cstr);
-        IREG(1) = U_SUCCESS(err) ? (INTVAL)codepoint : (-1);
-
-#else
-        opcode_t  * const  dest = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 3, EXCEPTION_LIBRARY_ERROR, "no ICU lib loaded");
-        return (opcode_t *)dest;
-
-#endif
-;
+    IREG(1) = Parrot_str_internal_find_codepoint(interp, SCONST(2));
     return cur_opcode + 3;
 }
 
@@ -24621,6 +24600,7 @@ Parrot_terminate(opcode_t *cur_opcode, PARROT_INTERP) {
     UNUSED(interp);
     UNUSED(cur_opcode);
     return (opcode_t *)0;
+    return cur_opcode + 1;
 }
 
 

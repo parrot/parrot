@@ -10,11 +10,11 @@ use Parrot::Config;
 
 =head1 NAME
 
-t/op/cclass.t - character class tests
+t/op/string_cclass.t - character class tests
 
 =head1 SYNOPSIS
 
-        % prove t/op/cclass.t
+        % prove t/op/string_cclass.t
 
 =head1 DESCRIPTION
 

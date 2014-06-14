@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2010, Parrot Foundation.
+# Copyright (C) 2006-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -99,6 +99,9 @@ sub check_parens {
                 push @keyword_paren => "$path: $paren";
             }
             if ( $line =~ m{ ( (?<!\w) (?!(?:$keywords)\W) \w+ \s+ \( ) }xo ) {
+                # Misparse the gperf list as function calls, so skip them.
+                # The generated C is checked
+                next if $path =~ m{src/string/namealias_c\.in};
                 push @non_keyword_paren => "$path: $1";
             }
             if ( $line =~ m{ ( \( [ \t]+ [^\n] | [^\n] [ \t]+ \) ) }x ) {

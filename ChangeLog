@@ -6,6 +6,10 @@
           Thereby removed the vtable method calling overhead of _orig into a
           wrapper with the mandatory write barrier. This was the first part
           of Chirag's GSOC project. [GH #1069]
+        + find_codepoint: Added name aliases for control character names which
+          disappeared with ICU 5.2, and added those names to non-ICU builds also.
+          Improved ICU search for u_charFromName() to check all UCharNameChoices,
+          not only U_EXTENDED_CHAR_NAME. [GH #1075, roast #43]
     - Build
         + Fixed wrong ICU header probes on multi-arch systems (debian) [GH #1014]
         + Fix opengl on bsd which does not have __APPLE__ defined as 0 [GH #1070]
