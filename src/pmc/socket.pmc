@@ -114,7 +114,7 @@ Free structures.
 =cut
 
 */
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         /* TODO: Make sure to free the buffers */
         Parrot_io_close(INTERP, SELF, 1);
     }

@@ -82,7 +82,7 @@ Destroys the array.
 
 */
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         FLOATVAL *float_array;
         GET_ATTR_float_array(INTERP, SELF, float_array);
         if (float_array)

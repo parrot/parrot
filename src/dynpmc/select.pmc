@@ -1,9 +1,9 @@
 /*
-Copyright (C) 2011, Parrot Foundation.
+Copyright (C) 2011,2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/select.pmc - IO Select PMC
+src/dynpmc/select.pmc - IO Select PMC
 
 =head1 DESCRIPTION
 
@@ -104,7 +104,7 @@ Mark fd_map hash as live.
 =cut
 
 */
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         PMC *fd_map;
         GET_ATTR_fd_map(INTERP, SELF, fd_map);
         Parrot_gc_mark_PMC_alive(interp, fd_map);
@@ -127,7 +127,7 @@ the Select PMC
 
 */
 
-    METHOD max_fd() {
+    METHOD max_fd() :no_wb {
         INTVAL v;
         GET_ATTR_max_fd(INTERP, SELF, v);
         RETURN(INTVAL v);
@@ -146,7 +146,7 @@ Used mainly for testing purposes.
 
 */
 
-    METHOD fd_map() {
+    METHOD fd_map() :no_wb {
         PMC *fd_map;
         GET_ATTR_fd_map(INTERP, SELF, fd_map);
         RETURN(PMC *fd_map);
@@ -225,7 +225,7 @@ read before returning.
 
 */
 
-    METHOD can_read(FLOATVAL timeout) {
+    METHOD can_read(FLOATVAL timeout) :no_wb {
         fd_set rdset;
         struct timeval timeouts;
         PMC    *results;
@@ -265,7 +265,7 @@ write to before returning.
 
 */
 
-    METHOD can_write(FLOATVAL timeout) {
+    METHOD can_write(FLOATVAL timeout) :no_wb {
         fd_set         wbset;
         struct timeval timeouts;
         PMC    *results, *fd_map;
@@ -304,7 +304,7 @@ exception state before returning.
 
 */
 
-    METHOD has_exception(FLOATVAL timeout) {
+    METHOD has_exception(FLOATVAL timeout) :no_wb {
         fd_set ebset;
         struct timeval timeouts;
         PMC    *results, *fd_map;
@@ -345,7 +345,7 @@ handled.
 
 */
 
-    METHOD select(FLOATVAL timeout) {
+    METHOD select(FLOATVAL timeout) :no_wb {
         fd_set rdset, wrset, erset;
         struct timeval timeouts;
 

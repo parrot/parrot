@@ -42,7 +42,7 @@ appropriate type.
 
 */
 
-    VTABLE void set_pmc(PMC *other) {
+    VTABLE void set_pmc(PMC *other) :manual_wb {
         if (!PObj_is_object_TEST(other)) {
             Parrot_pmc_reuse(INTERP, SELF, other->vtable->base_type, 0);
             VTABLE_set_pmc(INTERP, SELF, other);
@@ -69,6 +69,7 @@ appropriate type.
             PMC_data(clone) = NULL;
 
             PObj_is_object_SET(SELF);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
     }
 

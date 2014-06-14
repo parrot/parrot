@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 
 =head1 NAME
@@ -213,7 +213,7 @@ Return the MMD signature PMC, if any or a Null PMC.
 
 */
 
-    METHOD get_multisig() {
+    METHOD get_multisig() :no_wb {
         PMC *sig;
         GET_ATTR_multi_sig(INTERP, SELF, sig);
         if (PMC_IS_NULL(sig))
@@ -235,7 +235,7 @@ Initializes the NCI with a C<NULL> function pointer.
         PObj_custom_mark_SET(SELF);
     }
 
-    VTABLE void *get_pointer() {
+    VTABLE void *get_pointer() :no_wb {
         return PARROT_NCI(SELF)->orig_func;
     }
 
@@ -276,7 +276,7 @@ Mark any referenced strings and PMCs.
 =cut
 
 */
-    VTABLE void mark() {
+    VTABLE void mark() :no_wb {
         if (PARROT_NCI(SELF)) {
             Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
 
@@ -300,7 +300,7 @@ Creates and returns a clone of the NCI.
 
 */
 
-    VTABLE PMC *clone() {
+    VTABLE PMC *clone() :no_wb {
         Parrot_NCI_attributes * const nci_info_self = PARROT_NCI(SELF);
         Parrot_NCI_attributes *nci_info_ret;
         void                  *orig_func;
@@ -334,7 +334,7 @@ Returns whether the NCI is defined.
 
 */
 
-    VTABLE INTVAL defined() {
+    VTABLE INTVAL defined() :no_wb {
         Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         return nci_info->orig_func != NULL;
     }
@@ -402,7 +402,7 @@ Returns the function pointer as an integer.
 
 */
 
-    VTABLE INTVAL get_integer() {
+    VTABLE INTVAL get_integer() :no_wb {
         Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         if (!nci_info->func)
             build_func(INTERP, nci_info);
@@ -419,7 +419,7 @@ Returns the boolean value of the pointer.
 
 */
 
-    VTABLE INTVAL get_bool() {
+    VTABLE INTVAL get_bool() :no_wb {
         Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         return (0 != (INTVAL)nci_info->orig_func);
     }
@@ -433,7 +433,7 @@ Return the arity of the NCI (the number of arguments).
 =cut
 
 */
-    METHOD arity() {
+    METHOD arity() :no_wb {
         Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         INTVAL arity = 0;
 

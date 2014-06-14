@@ -503,7 +503,7 @@ really a public API.
         }
     }
 
-    VTABLE void set_pmc_keyed(PMC *key, PMC *value) {
+    VTABLE void set_pmc_keyed(PMC *key, PMC *value) :manual_wb {
         PMC *ns = SELF;
 
         if (key->vtable->base_type == enum_class_String) {
@@ -518,6 +518,7 @@ really a public API.
 
                 if (!key) {
                     Parrot_ns_set_global(INTERP, ns, part, value);
+                    PARROT_GC_WRITE_BARRIER(INTERP, SELF);
                     return;
                 }
 
@@ -533,6 +534,7 @@ really a public API.
 
                 if ((i + 1) >= elements) { /* Last entry in the array */
                     Parrot_ns_set_global(INTERP, ns, part, value);
+                    PARROT_GC_WRITE_BARRIER(INTERP, SELF);
                     return;
                 }
 

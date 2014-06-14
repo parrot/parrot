@@ -187,7 +187,7 @@ Mark the PMC and the PackFile* contents
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         Parrot_PackfileView_attributes * const attrs =
                 PARROT_PACKFILEVIEW(SELF);
         if (attrs->pf != NULL)

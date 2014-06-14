@@ -1418,9 +1418,10 @@ Return GMP version string "x.y.z".
 
 */
 
-    METHOD version() {
+    METHOD version() :no_wb {
         STRING *version;
 #ifdef PARROT_HAS_GMP
+        UNUSED(SELF)
         version = Parrot_str_new(INTERP, gmp_version, 0);
 #else
         version = Parrot_str_new(INTERP, "0.0.0", 5);
@@ -1439,7 +1440,7 @@ Return GMP version string "x.y.z".
         return res;
     }
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         bignum_clear(INTERP, SELF);
     }
 

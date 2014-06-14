@@ -89,7 +89,7 @@ Free all the list cells.
 
 */
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         void *tmp;
         PMC_List_Item *aa;
 

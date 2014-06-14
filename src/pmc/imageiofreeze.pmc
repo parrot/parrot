@@ -295,7 +295,7 @@ Destroys the PMC.
 =cut
 
 */
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         PackFile_destroy(INTERP, PARROT_IMAGEIOFREEZE(SELF)->pf);
         PARROT_IMAGEIOFREEZE(SELF)->pf = NULL;
     }

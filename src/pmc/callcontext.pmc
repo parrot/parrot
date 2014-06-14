@@ -718,7 +718,7 @@ stored.)
         }
     }
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         INTVAL    allocated_positionals;
         Hash     *hash;
 

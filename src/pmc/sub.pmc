@@ -251,7 +251,7 @@ Destroys the subroutine.
 
 */
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         Parrot_Sub_attributes * const sub = PARROT_SUB(SELF);
 
         if (sub && sub->arg_info)
@@ -356,10 +356,14 @@ Returns True.
 */
 
     VTABLE INTVAL defined() :no_wb {
+        UNUSED(INTERP)
+        UNUSED(SELF)
         return 1;
     }
 
     VTABLE INTVAL get_bool() :no_wb {
+        UNUSED(INTERP)
+        UNUSED(SELF)
         return 1;
     }
 

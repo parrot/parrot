@@ -459,7 +459,7 @@ Free internal offsets array.
 
 */
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         elt_desc_t *elts;
         GET_ATTR_elts(INTERP, SELF, elts);
         mem_gc_free(INTERP, elts);

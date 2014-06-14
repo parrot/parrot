@@ -116,7 +116,7 @@ Free hash structure.
         PObj_custom_mark_destroy_SETALL(SELF);
     }
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         Hash * const hash = (Hash *)SELF.get_pointer();
         if (hash)
             Parrot_hash_destroy(INTERP, hash);

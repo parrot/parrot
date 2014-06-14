@@ -67,7 +67,7 @@ Destroys the PMC.
 
 */
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         PackFile_destroy(INTERP, PARROT_IMAGEIOTHAW(SELF)->pf);
         PARROT_IMAGEIOTHAW(SELF)->pf = NULL;
     }

@@ -83,7 +83,7 @@ Destroys the array.
 
 */
 
-    VTABLE void destroy() {
+    VTABLE void destroy() :no_wb {
         INTVAL* int_array;
         GET_ATTR_int_array(INTERP, SELF, int_array);
         if (int_array)

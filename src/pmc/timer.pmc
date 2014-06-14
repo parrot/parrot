@@ -289,9 +289,10 @@ Sets the PMC associated with C<key> to C<*value>.
 
 */
 
-    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) {
+    VTABLE void set_pmc_keyed_int(INTVAL key, PMC *value) :manual_wb {
         if (key == PARROT_TIMER_HANDLER) {
             SET_ATTR_code(INTERP, SELF, value);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
     }
 

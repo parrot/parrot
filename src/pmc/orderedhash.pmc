@@ -568,6 +568,7 @@ The created key = "\1idx".
             PMC * const list_entry = get_list_item(INTERP, SELF, idx);
             PARROT_ASSERT(!PMC_IS_NULL(list_entry));
             VTABLE_set_pmc_keyed_int(INTERP, list_entry, ORDERED_HASH_ITEM_VALUE, val);
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
     }
 
@@ -744,7 +745,6 @@ Deletes the key C<*key> from the hash.
 
         /* And finally delete it */
         VTABLE_delete_keyed(INTERP, PARROT_ORDEREDHASH(SELF)->hash, key);
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
     }
 
     VTABLE void delete_keyed_int(INTVAL idx) :manual_wb {
@@ -799,7 +799,7 @@ Used to unarchive the hash.
         SUPER(info);
     }
 
-    VTABLE void thawfinish(PMC *info) {
+    VTABLE void thawfinish(PMC *info) :manual_wb {
         Parrot_OrderedHash_attributes * const attrs = PARROT_ORDEREDHASH(SELF);
         find_bounds(INTERP, attrs->hash, &attrs->first, &attrs->last);
         SUPER(info);
