@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2010, Parrot Foundation.
+# Copyright (C) 2006-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -11,7 +11,7 @@ and by language implementation F<t/harness> to generate smoke reports.
 
 =head1 SUBROUTINES
 
-The module currently exports three subroutines on demand.
+The module currently exports three subroutines.
 
 =head2 C<collect_test_environment_data()>
 
@@ -56,7 +56,7 @@ On network problem or for offline use you may send tar reports later
 with that command:
 
   perl -Ilib -MParrot::Harness::Smoke \
-    -e'Parrot::Harness::Smoke::send_archive_to_smolder(Parrot::Harness::Smoke::collect_test_environment_data())'
+    -e'send_archive_to_smolder(collect_test_environment_data())'
 
 =head2 C<generate_html_smoke_report()>
 
@@ -84,12 +84,11 @@ use lib qw( . lib ../lib ../../lib );
 use Parrot::Config qw/%PConfig/;
 use Parrot::Git qw/has_git/;
 use Parrot::Git::Describe;
-use base qw( Exporter );
-our @EXPORT_OK = qw(
-    generate_html_smoke_report
+use Exporter 'import';
+our @EXPORT = qw(
     collect_test_environment_data
     send_archive_to_smolder
-);
+    generate_html_smoke_report);
 
 # language implementations have a different project id
 my %SMOLDER_CONFIG = (

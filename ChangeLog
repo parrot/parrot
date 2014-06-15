@@ -6,6 +6,7 @@
     - Documentation
     - Tests
 	+ Run fulltests with the runcore=fast,-O1,-O2 fast, without -D040, --gc-debug [GH #1086]
+	+ Simplify smolder resend usage
     - Community
 
 2014-09-16    release 6.8.0
