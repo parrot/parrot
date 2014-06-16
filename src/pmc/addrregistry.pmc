@@ -3,7 +3,7 @@ Copyright (C) 2005-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/addrregistry.pmc - A GC Registry PMC
+src/pmc/addrregistry.pmc - AddrRegistry PMC
 
 =head1 DESCRIPTION
 

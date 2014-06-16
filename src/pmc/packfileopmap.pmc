@@ -4,7 +4,7 @@ Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/packfileopmap.pmc - Packfile Op Map PMC
+src/pmc/packfileopmap.pmc - PackfileOpMap PMC
 
 =head1 DESCRIPTION
 

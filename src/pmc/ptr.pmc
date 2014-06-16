@@ -3,14 +3,14 @@ Copyright (C) 2011-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/ptr.pmc - Pointer base type
+src/pmc/ptr.pmc - Ptr PMC
 
 =head1 DESCRIPTION
 
-C<Ptr> is a bare bones PMC for representing pointers. It is intended that
-additional functionality be added via subclassing. Any functionality added
-to this PMC not critical to its operation as a pointer representation is
-deprecated in advance and subject to removal without notice.
+C<Ptr> is a bare bones PMC for representing the base type for pointers. It is
+intended that additional functionality be added via subclassing. Any
+functionality added to this PMC not critical to its operation as a pointer
+representation is deprecated in advance and subject to removal without notice.
 
 =head2 Fat versus Thin
 

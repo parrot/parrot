@@ -10,16 +10,18 @@
       {
          "source" : [
             "src/pmc/default.pmc",
-            "src/pmc/scalar.pmc"
+            "src/pmc/scalar.pmc",
+            "src/pmc/packfilesegment.pmc"
          ],
          "title" : "Abstract PMCs"
       },
       {
          "source" : "src/pmc/*.pmc",
-         "title" : "Abstract PMCs",
+         "title" : "Core PMCs",
          "exclude" : [
             "src/pmc/default.pmc",
-            "src/pmc/scalar.pmc"
+            "src/pmc/scalar.pmc",
+            "src/pmc/packfilesegment.pmc"
          ]
       },
       {
@@ -30,7 +32,8 @@
              "src/dynpmc/subproxy.pmc",
              "src/dynpmc/pccmethod_test.pmc",
              "src/dynpmc/foo.pmc",
-             "src/dynpmc/foo2.pmc"
+             "src/dynpmc/foo2.pmc",
+             "src/dynpmc/osdummy.pmc"
          ]
       }
    ],

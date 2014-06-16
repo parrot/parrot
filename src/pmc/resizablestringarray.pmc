@@ -3,7 +3,7 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/resizablestringarray.pmc - resizable array for strings only
+src/pmc/resizablestringarray.pmc - ResizableStringArray PMC
 
 =head1 DESCRIPTION
 

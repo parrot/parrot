@@ -3,12 +3,12 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/orderedhash.pmc - Ordered Hash
+src/pmc/orderedhash.pmc - OrderedHash PMC
 
 =head1 DESCRIPTION
 
 C<OrderedHash> provide the interfaces of C<array> and
-C<hash>.
+C<hash>. Overall design heavily inspired by perl5 C<Tie::StoredOrderHash>.
 
 Some limitations:
 
@@ -65,8 +65,6 @@ Pointer to last inserter value.
 =back
 
 See F<t/pmc/orderedhash.t> for test cases.
-
-Overall design heavily inspired by C<Tie::StoredOrderHash>.
 
 =head2 Methods
 

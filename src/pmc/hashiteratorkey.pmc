@@ -3,12 +3,11 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/hashiteratorkey.pmc - accessor for single value during hash iteration.
+src/pmc/hashiteratorkey.pmc - HashIteratorKey PMC
 
 =head1 DESCRIPTION
 
-Single (key,value) pair.
-
+Accessor for a single value during hash iteration, a single (key,value) pair.
 
 =head1 Methods
 

@@ -3,11 +3,11 @@ Copyright (C) 2011-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/imccompiler.pmc - A compiler object to wrap IMCC
+src/pmc/imccompiler.pmc - IMCCompiler PMC
 
 =head1 DESCRIPTION
 
-A compiler object to wrap IMCC
+A compiler object to wrap IMCC, the internal PIR and PASM compiler.
 
 =head2 Functions
 

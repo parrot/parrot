@@ -11,7 +11,7 @@ This class implements a PackfileSegment class, an abstract class defining a
 couple of methods which all Packfile segments will implement.  The stub methods
 found here explode when called.
 
-See packfile.pmc for the toplevel Packfile interface; see PDD13 for the design
+See Packfile PMC for the toplevel Packfile interface; see PDD13 for the design
 spec.
 
 =head2 Methods

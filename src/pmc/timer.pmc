@@ -3,7 +3,7 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/timer.pmc - Timer
+src/pmc/timer.pmc - Timer PMC
 
 =head1 SYNOPSIS
 

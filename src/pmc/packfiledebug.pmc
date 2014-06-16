@@ -3,7 +3,7 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/packfiledebug.pmc - Packfile Debug Segment PMC
+src/pmc/packfiledebug.pmc - PackfileDebug PMC
 
 =head1 DESCRIPTION
 

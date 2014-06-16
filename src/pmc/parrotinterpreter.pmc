@@ -3,7 +3,7 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/parrotinterpreter.pmc - Parrot Interpreter
+src/pmc/parrotinterpreter.pmc - ParrotInterpreter PMC
 
 =head1 DESCRIPTION
 

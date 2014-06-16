@@ -3,9 +3,11 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/fixedintegerarray.pmc - fixed size array for integers only
+src/pmc/fixedintegerarray.pmc - FixedIntegerArray PMC
 
 =head1 DESCRIPTION
+
+Fixed size array for integers only.
 
 This class, FixedIntegerArray, implements an array of fixed size which stores
 INTVALs.  It uses Integer PMCs for all of the conversions.

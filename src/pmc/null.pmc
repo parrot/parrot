@@ -3,11 +3,11 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/null.pmc - NULL
+src/pmc/null.pmc - Null PMC
 
 =head1 DESCRIPTION
 
-This simply creates a way of catching C<NULL> register accesses without
+This singleton simply creates a way of catching C<NULL> register accesses without
 really slowing down the bytecode execution.
 
 =cut

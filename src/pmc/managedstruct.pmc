@@ -3,12 +3,13 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/managedstruct.pmc - Memory-managed C struct
+src/pmc/managedstruct.pmc - ManagedStruct PMC
 
 =head1 DESCRIPTION
 
 C<ManagedStruct> extends C<UnManagedStruct> to provide a class to hold C
-C<struct> values that Parrot is responsible for disposing of.
+C<struct> values, a memory-managed C struct, that Parrot is responsible
+for disposing of.
 
 =head2 Methods
 

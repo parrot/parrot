@@ -3,11 +3,11 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/hashiterator.pmc - Implementation of Iterator for Hashes.
+src/pmc/hashiterator.pmc - HashIterator PMC
 
 =head1 DESCRIPTION
 
-Generic iterator for traversing Hash.
+Generic iterator for traversing a Hash PMC.
 
 =head1 SYNOPSIS
 

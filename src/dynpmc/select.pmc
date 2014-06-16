@@ -3,11 +3,11 @@ Copyright (C) 2011,2014, Parrot Foundation.
 
 =head1 NAME
 
-src/dynpmc/select.pmc - IO Select PMC
+src/dynpmc/select.pmc - Select PMC
 
 =head1 DESCRIPTION
 
-This is the base-class for non-blocking IO using select
+This is the base-class for non-blocking IO using select().
 
 =head2 Functions
 

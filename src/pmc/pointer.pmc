@@ -3,7 +3,7 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/pointer.pmc - Pointer
+src/pmc/pointer.pmc - Pointer PMC
 
 =head1 DESCRIPTION
 

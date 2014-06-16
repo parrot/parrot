@@ -3,9 +3,11 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/fixedstringarray.pmc - fixed size array for strings only
+src/pmc/fixedstringarray.pmc - FixedStringArray PMC
 
 =head1 DESCRIPTION
+
+Fixed size array for strings only.
 
 This class, FixedStringArray, implements an array of fixed size which
 stores Parrot strings.

@@ -3,9 +3,11 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/multisub.pmc - A container for multi-dispatched subs
+src/pmc/multisub.pmc - MultiSub PMC
 
 =head1 DESCRIPTION
+
+A container for multi-dispatched subs.
 
 This class inherits from ResizablePMCArray and provides an Array of
 Sub PMCs with the same short name, but different long names.

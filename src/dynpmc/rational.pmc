@@ -1,25 +1,21 @@
 /*
-Copyright (C) 2008-2012, Parrot Foundation.
+Copyright (C) 2008-2014, Parrot Foundation.
 
 =pod
 
 =head1 NAME
 
-src/dynpmc/rational.pmc - Rational numbers PMC
+src/dynpmc/rational.pmc - Rational PMC
 
 =head1 DESCRIPTION
 
-Rational is currently going to get implemented. It uses the GNU Multiple Precision (GMP) library,
-like BigInt, because implementation with integers would be too unstable and inaccurate.
+Rational requires the GNU Multiple Precision (GMP) library, like BigInt,
+because implementation with integers would be too unstable and inaccurate.
 
-'LispRational' will subclass this.
-
-You may use Rational with any of parrot's basic data types as well as with String-, Integer- and
-Float-PMCs.
+You may use Rational with any of parrot's basic data types as well as with
+String-, Integer- and Float-PMCs.
 
 =head1 Functions
-
-Currently C<rational.pmc> only has some C<static> functions for code sharing.
 
 =over 4
 

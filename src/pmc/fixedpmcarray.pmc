@@ -3,12 +3,14 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/fixedpmcarray.pmc - fixed size array for PMCs only
+src/pmc/fixedpmcarray.pmc - FixedPMCArray PMC
 
 =head1 DESCRIPTION
 
+Fixed size array for PMCs only.
+
 This class, FixedPMCArray, implements an array of fixed size which stores PMCs.
-It puts things into Integer, Float, or String PMCs as appropriate
+It puts things into Integer, Float, or String PMCs as appropriate.
 
 =head2 Note
 

@@ -3,11 +3,12 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/task.pmc - A concurrent task
+src/pmc/task.pmc - Task
 
 =head1 DESCRIPTION
 
-The Task PMC represents a concurrent running "green thread".
+A Task PMC represents a concurrent native thread,
+initialized at startup in a threadpool.
 
 =head2 Functions
 

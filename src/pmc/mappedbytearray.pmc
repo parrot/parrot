@@ -3,14 +3,14 @@ Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/mappedbytearray.pmc - Mapped byte array
+src/pmc/mappedbytearray.pmc - MappedByteArray PMC
 
 =head1 DESCRIPTION
 
 A memory mapped file or shared memory segment accessible as array of bytes.
 
-Bare minimal functionality available, only for posix platforms
-(tested on linux).
+Bare minimal functionality available, currently only for posix platforms
+with <sys/mman.h> available, or on mingw32.
 
 =cut
 
@@ -29,7 +29,7 @@ Bare minimal functionality available, only for posix platforms
 #  ifdef __MINGW32__
 #    define ENABLED
 #    define MAPW32
-#    include<Windows.h>
+#    include <Windows.h>
 #  endif
 #endif
 

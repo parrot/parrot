@@ -17,6 +17,7 @@
           :no_wb and RETURN() in VTABLE methods. [GH #1069]
     - Documentation
         + Improved the docs for pmc and pmc2c [GH #1069]
+	+ Harmonized pmc names for the PMC html index [GH #1079]
     - Tests
         + Fix t/op/gc.t for --gc=inf
     - Community

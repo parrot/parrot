@@ -3,9 +3,11 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/fixedbooleanarray.pmc - fixed size array for booleans only
+src/pmc/fixedbooleanarray.pmc - FixedBooleanArray PMC
 
 =head1 DESCRIPTION
+
+Fixed size array for booleans only.
 
 The C<FixedBooleanArray> PMC implements an array of fixed size, which
 stores booleans.  It uses the C<Boolean> PMC for all conversions.  The

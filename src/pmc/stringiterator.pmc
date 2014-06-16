@@ -7,7 +7,8 @@ src/pmc/stringiterator.pmc - StringIterator PMC
 
 =head1 DESCRIPTION
 
-Implementation of Iterator for String PMC.
+Implementation of Iterator for String PMC to treat a string as array as in C
+but honoring the encoding.
 
 =head1 SYNOPSIS
 

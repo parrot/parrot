@@ -3,15 +3,16 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/structview.pmc - View pointers as C structs
+src/pmc/structview.pmc - StructView PMC
 
 =head1 DESCRIPTION
 
-PMC class to view pointers as C C<struct>s. This includes read, write, allocate,
-and deallocate operations. Bounds checking is implemented where the pointer
-class reports a non-zero bound. Recursive definition through nesting is not
-supported but can be emulated by interpreting pointer or buffer elements as
-structs once dereferenced.
+PMC class to view pointers as C C<struct>s, required for NCI.
+This includes read, write, allocate, and deallocate operations. Bounds
+checking is implemented where the pointer class reports a non-zero
+bound. Recursive definition through nesting is not supported but can be
+emulated by interpreting pointer or buffer elements as structs once
+dereferenced.
 
 Elements are get/set using keyed access of the form C<[Ptr; Idx]>, which will
 interpret the C<Ptr> PMC and lookup the C<Idx>'th element.
