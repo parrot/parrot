@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2011, Parrot Foundation.
+# Copyright (C) 2004-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -112,7 +112,7 @@ sub footer {
             </div> <!-- "mainbody" -->
             <div id="divider"></div>
             <div id="footer">
-	        Copyright &copy; 2002-2011, Parrot Foundation.
+	        Copyright &copy; 2002-2014, Parrot Foundation.
 FOOTER
 
     $footer .= "\n<br>Parrot version $version" if $version;

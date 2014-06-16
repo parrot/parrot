@@ -73,17 +73,17 @@ A listing of POD files. This may be an array or a string; a string will behave a
 an array of one element.
 
 Each element in the array must be a path relative to the Parrot repo, such as
-"docs/pmc/default.pmc". Globbing is supported, so paths liek "docs/pmc/*.pmc" are
+F<docs/pmc/default.pmc>. Globbing is supported, so paths like F<docs/pmc/*.pmc> are
 also allowed.
 
 =item C<resource>
 
-An optional listing of files that should be copied directly to C<$target_dir>. This
-is useful for things like images that require no transformation, but should be accessible
-to generated output.
+An optional listing of files that should be copied directly to
+C<$target_dir>. This is useful for things like images that require no
+transformation, but should be accessible to generated output.
 
-This element behaves similarly to C<source>: a string or array may be passed, and globbing
-is performed for each element.
+This element behaves similarly to C<source>: a string or array may be passed,
+and globbing is performed for each element.
 
 =back
 
@@ -202,14 +202,16 @@ foreach my $page (keys %pages) {
 
     my $outfile = File::Spec->catfile($target_dir, $outfilename) . '.html';
 
-    # replace make_path with legacy functional mkpath to accommodate older versions of Perl
+    # replace make_path with legacy functional mkpath to accommodate older
+    # versions of Perl
     my $dir = File::Path::mkpath(File::Basename::dirname($outfile));
 
     open my $out_fh, '>', $outfile;
 
     # set up and output header
     my $nav_HTML = qq{<a href="index.html">Home</a>};
-    print $out_fh Parrot::Docs::HTMLPage->header($title, $nav_HTML, $resource_dir, $version);
+    print $out_fh Parrot::Docs::HTMLPage->header($title, $nav_HTML,
+                                                 $resource_dir, $version);
 
     foreach my $section (@{$page->{content}}) {
         # output Section title
