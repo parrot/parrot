@@ -3,7 +3,7 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/role.pmc - Role - defines a role
+src/pmc/role.pmc - Role PMC
 
 =head1 DESCRIPTION
 

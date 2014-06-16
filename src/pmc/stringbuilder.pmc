@@ -3,11 +3,12 @@ Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/stringbuilder.pmc - StringBuilder PMC Class
+src/pmc/stringbuilder.pmc - StringBuilder PMC
 
 =head1 DESCRIPTION
 
-TODO: Add description here.
+Helper class to create and manipulate strings, which are outside of
+StringBuilder immutable.
 
 =head2 Methods
 

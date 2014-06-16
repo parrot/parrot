@@ -3,11 +3,11 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/schedulermessage.pmc - Scheduler messages
+src/pmc/schedulermessage.pmc - SchedulerMessage PMC
 
 =head1 DESCRIPTION
 
-Implements a message passed between concurrency schedulers.
+Implements a message passed between concurrent tasks.
 
 =head2 Vtable Functions
 

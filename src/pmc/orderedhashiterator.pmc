@@ -3,11 +3,11 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/orderedhashiterator.pmc
+src/pmc/orderedhashiterator.pmc - OrderedHashIterator
 
 =head1 DESCRIPTION
 
-Implementation of Iterator for OrderedHash.
+Specialized iterator for an OrderedHash PMC.
 
 =head1 METHODS
 

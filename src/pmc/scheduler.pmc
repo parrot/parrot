@@ -3,11 +3,11 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/scheduler.pmc - The concurrency scheduler
+src/pmc/scheduler.pmc - Scheduler PMC
 
 =head1 DESCRIPTION
 
-Implements the core concurrency scheduler.
+Access to the core concurrency scheduler.
 
 =head2 Vtable Functions
 

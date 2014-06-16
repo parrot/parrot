@@ -3,8 +3,7 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/resizablefloatarray.pmc - resizable array for floating point
-numbers only
+src/pmc/resizablefloatarray.pmc - ResizableFloatArray PMC
 
 =head1 DESCRIPTION
 

@@ -3,11 +3,12 @@ Copyright (C) 2011-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/proxy.pmc - Class for proxy objects used in threading
+src/pmc/proxy.pmc - Proxy PMC
 
 =head1 DESCRIPTION
 
-These are the vtable functions for the Proxy PMC class.
+Proxy objects are generated automatically and are used to protect objects from
+being written to directly by other threads.
 
 All methods which are not defined here get a default implementation
 generated from F<src/vtable.tbl> by F<tools/build/pmc2c.pl>.

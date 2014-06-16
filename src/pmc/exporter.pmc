@@ -3,9 +3,11 @@ Copyright (C) 2007-2009, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/exporter.pmc - Export globals from one namespace to another
+src/pmc/exporter.pmc - Exporter PMC
 
 =head1 SYNOPSIS
+
+Export globals from one namespace to another.
 
 You can use Exporter in PIR to import subs from a library. At its simplest:
 

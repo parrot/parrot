@@ -8,6 +8,7 @@ src/pmc/imageiosize.pmc - ImageIOSize PMC
 =head1 DESCRIPTION
 
 Gets the size of an ImageIO image without the allocation costs.
+Part of the internal serializer.
 
 =head1 STATIC FUNCTIONS
 

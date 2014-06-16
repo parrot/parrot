@@ -3,11 +3,12 @@ Copyright (C) 2011-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/ptrobj.pmc - PtrObj
+src/pmc/ptrobj.pmc - PtrObj PMC
 
 =head1 DESCRIPTION
 
-C<PtrObj> is for object-ish pointers. These augment C<PtrBuf> to afford memory management.
+C<PtrObj> is for object-ish pointers. These augment C<PtrBuf> to afford
+memory management.
 
 =head2 VTABLEs
 

@@ -3,11 +3,11 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/scalar.pmc - Scalar Abstract Superclass
+src/pmc/scalar.pmc - Scalar PMC
 
 =head1 DESCRIPTION
 
-These are the vtable functions for the scalar base PMC class
+These are the vtable functions for the abstract base PMC class for scalars.
 
 =head2 Methods
 

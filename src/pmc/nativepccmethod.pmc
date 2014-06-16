@@ -3,11 +3,12 @@ Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/nativepccmethod.pmc - Native PCC Method PMC
+src/pmc/nativepccmethod.pmc - NativePCCMethod PMC
 
 =head1 DESCRIPTION
 
-Container for native functions that handle PCC on their own.
+Container for native functions that handle PCC, the Parrot Calling Convention,
+on their own.
 
 =head2 Methods
 

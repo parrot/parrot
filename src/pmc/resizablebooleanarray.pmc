@@ -3,7 +3,7 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/resizablebooleanarray.pmc - resizable array for booleans only
+src/pmc/resizablebooleanarray.pmc - ResizableBooleanArray PMC
 
 =head1 DESCRIPTION
 

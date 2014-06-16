@@ -3,7 +3,7 @@ Copyright (C) 2004-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/complex.pmc - Complex Numbers PMC Class
+src/pmc/complex.pmc - Complex PMC
 
 =head1 DESCRIPTION
 
@@ -13,7 +13,7 @@ string parsing/generating and basic mathematical operations.
 =head2 Functions
 
 Equations used are sometimes listed.  At times, multiple equations are given,
-but those starting with => are the ones used
+but those starting with => are the ones used.
 
 =over 4
 

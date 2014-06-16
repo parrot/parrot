@@ -3,11 +3,12 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/default.pmc - Abstract root class
+src/pmc/default.pmc - default PMC
 
 =head1 DESCRIPTION
 
-These are the vtable functions for the default PMC class.
+These are the vtable functions for the default PMC class, the abstract
+root class.
 
 All methods which are not defined here get a default implementation
 generated from F<src/vtable.tbl> by F<tools/build/pmc2c.pl>.

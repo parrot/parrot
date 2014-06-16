@@ -7,7 +7,7 @@ src/pmc/imageiofreeze.pmc - ImageIOFreeze PMC
 
 =head1 DESCRIPTION
 
-Freezes other PMCs.
+Freezes other PMCs. Part of the internal serializer.
 
 =head1 FUNCTIONS
 

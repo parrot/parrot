@@ -3,9 +3,11 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/pmcproxy.pmc - proxy class object for a PMC enabling introspection
+src/pmc/pmcproxy.pmc - PMCProxy PMC
 
 =head1 DESCRIPTION
+
+Proxy class object for a PMC enabling introspection.
 
 This class is used to describe a PMC. It can sit in an inheritance hierarchy
 of a PDD15 class as well as allowing introspection of the PMC.

@@ -7,7 +7,7 @@ src/pmc/socket.pmc - Socket PMC
 
 =head1 DESCRIPTION
 
-The Socket PMC performs network I/O operations.
+The Socket PMC performs abstract network I/O operations.
 
 =head2 Vtable Functions
 

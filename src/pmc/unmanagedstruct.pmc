@@ -3,12 +3,12 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/pmc/unmanagedstruct.pmc - C struct with unmanaged memory
+src/pmc/unmanagedstruct.pmc - UnManagedStruct PMC
 
 =head1 DESCRIPTION
 
 PMC class to hold C C<struct>s that Parrot's not responsible for
-disposing of.
+disposing of, C struct for unmanaged memory in NCI.
 
 Buffer can be accessed using keyed assignments to PMC. Out of
 bounds access will very likely segfault.
