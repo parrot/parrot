@@ -20,6 +20,7 @@
 	+ Harmonized pmc names for the PMC html index [GH #1079]
     - Tests
         + Fix t/op/gc.t for --gc=inf
+        + Fix t/library/pcre.t for --without-pcre or windows
     - Community
         + Our GSOC project succeeded in the first deliverable
         + Non-core dynpmc's with multiple return paths in writer VTABLE methods will

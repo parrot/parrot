@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -24,13 +24,17 @@ the installed PCRE library, and matches patterns successfully.
 
 =cut
 
-# if we keep pcre, we need a config test
-my $cmd = ( $^O =~ /MSWin32/ ) ? "pcregrep --version" : "pcre-config --version";
-my $has_pcre = !Parrot::Test::run_command( $cmd, STDOUT => File::Spec->devnull ,STDERR => File::Spec->devnull, );
-my $pcre_libpath = '';
+# test if compiled with pcre and if the run-time component of pcre still works
+my $had_pcre = $PConfig{HAS_PCRE};
+my ($has_pcre, $pcre_libpath);
+if ($had_pcre) {
+    my $cmd = ( $^O =~ /MSWin32/ ) ? "pcregrep --version" : "pcre-config --version";
+    $has_pcre = !Parrot::Test::run_command( $cmd, STDOUT => File::Spec->devnull ,STDERR => File::Spec->devnull, );
+    $pcre_libpath = '';
+}
 
 # It's possible that libpcre is installed in some non-standard path...
-if ($has_pcre && ($^O !~ /MSWin32/)) {
+if ($had_pcre && $has_pcre && ($^O !~ /MSWin32/)) {
     # Extract the library path for non-windows platforms (in case it isn't in
     # the normal lookup locations)
     my $outfile = 'pcre-config.out';
@@ -42,7 +46,10 @@ if ($has_pcre && ($^O !~ /MSWin32/)) {
 }
 
 SKIP: {
-    skip( 'no pcre-config',
+    skip( 'no pcre',
+        Test::Builder->new()->expected_tests()
+    ) unless $had_pcre;
+    skip( ($^O eq 'MSWin32' ? 'no pcregrep' : 'no pcre-config'),
         Test::Builder->new()->expected_tests()
     ) unless $has_pcre;
     skip( 'Parrot built without libffi or extra NCI thunks',
