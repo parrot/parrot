@@ -26,6 +26,7 @@
         + Non-core dynpmc's with multiple return paths in writer VTABLE methods will
           need to be changed to use either :manual_wb or RETURN() as in PCCMETHODs,
           and can now be optimized for unneeded GC write barriers.
+          E.g. nqp 6model got 2-4% faster.
 
 2014-05-20    release 6.4.0
     - Examples
