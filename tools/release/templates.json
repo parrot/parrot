@@ -19,7 +19,7 @@ The SHA256 message digests for the downloadable tarballs are:
 @message_digests@
 
 Many thanks to all our contributors for making this possible, and our sponsors
-for supporting this project.  Our next scheduled release is @release.nextdate@.
+for supporting this project.  Our next scheduled release is at @release.nextdate@.
 
 Enjoy!
 
@@ -56,7 +56,7 @@ argument to clone:
 </pre>
 
 <p>Thanks to all our contributors for making this possible, and our sponsors
-for supporting this project.  Our next release is @release.nextdate@.</p>
+for supporting this project.  Our next scheduled release is at @release.nextdate@.</p>
 
 <p>Enjoy!</p>
 ",
