@@ -162,6 +162,10 @@ E: austin_hastings@yahoo.com
 D: Close
 D: Kakapo
 
+N: Bart Wiegmans
+E: bartwiegmans@gmail.com
+D: mod_parrot
+
 N: Benjamin Goldberg
 D: Numerous improvements and proposals.
 
@@ -283,6 +287,12 @@ D: SDL library and examples; PIR Test::*; test suite cleanup; Parrot::Embed
 D: freaky bugs; cool features; Pheme
 E: chromatic@wgz.org
 W: http://wgz.org/chromatic/
+
+N: Chirag Agrawal
+U: ZYROz
+D: GSOC2014 method call optimizations
+E: a.chirag14@yahoo.com
+S: Goa, India
 
 N: Clayton O'Neill
 D: Fix for parrot linking issue on Solaris 8
@@ -979,8 +989,9 @@ U: rurban
 E: rurban@cpan.org
 E: rurban@cpanel.net
 D: cygwin, install, native_pbc
-D: Release manager
-S: Houston, TX
+D: various optimizations and maintenance
+D: Release manager and GSOC mentor
+S: Houston, TX (formerly Graz, A)
 
 N: Richard Hainsworth
 U: finanalyst
@@ -1226,7 +1237,3 @@ E: cvs@perl.org
 N: svn
 U: svn
 E: svn@perl.org
-
-N: Bart Wiegmans
-E: bartwiegmans@gmail.com
-D: mod_parrot

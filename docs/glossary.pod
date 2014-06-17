@@ -10,7 +10,7 @@ Short descriptions of words and acronyms found in Parrot development.
 
 =head1 VERSION
 
-LAST UPDATED: 24 MAY 2012
+LAST UPDATED: 2014-06-17
 
 glossary.pod is updated and maintained from Parrot's GitHub repository.
 You may get the most up-to-date version at:
@@ -178,7 +178,7 @@ L<http://oss.software.ibm.com/icu/index.html>
 
 =item IMCC
 
-Intermediate Code Compiler: the component of parrot that compiles PASM
+Intermediate Code Compiler: The component of parrot that compiles PASM
 and PIR into bytecode.
 
 See also L<"PIR">.
@@ -224,7 +224,7 @@ in to bytecode.  Generally PIR is used.
 =item PBC
 
 Parrot bytecode. The name for the "executable" files that can be passed to the
-Parrot interpreter for immediate execution (although PASM and IMC files can be
+Parrot interpreter for immediate execution (although PASM files can be
 executed directly, too).
 
 See also L<"Packfile">.
@@ -293,6 +293,10 @@ aka run loop, aka runcore. The way Parrot executes PBCs.
 See L<docs/running.pod> for a list of available runcores, and how to tell
 parrot which one to use.
 
+=item SELF
+
+The current object, PMC, which the current method is acting on.
+
 =item SMOP
 
 Simple Meta Object Protocol: A prototype object model written in PIR.
@@ -315,6 +319,14 @@ and not even getting an acknowledgement of its existence. This leaves you
 wondering if your problem is unimportant or previously addressed, if everyone is
 waiting on someone else to answer you,  or if maybe your mail never actually
 made it to anyone else in the forum.
+
+=item Write Barrier
+
+A write barrier is a function call to add the current PMC, usually SELF, to
+the "root" (i.e. list) of garbage collected objects on the next GC. This is
+needed in a destructive method call when a pointer to another garbage
+collectable object is changed, and thus the content if the old object needs to
+be recycled.
 
 =back
 
