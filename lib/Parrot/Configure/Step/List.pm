@@ -22,7 +22,6 @@ my @steps = qw(
     auto::attributes
     auto::warnings
     auto::arch
-    auto::cpu
     init::optimize
     inter::shlibs
     inter::libparrot

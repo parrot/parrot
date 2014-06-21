@@ -60,6 +60,7 @@ sub runstep {
 
     # This was added to convert 9000/800 to 9000_800 on HP-UX
     $cpuarch =~ s|/|_|g;
+    my $ptrsize = $conf->data->get('ptrsize_provisional');
 
     # On OS X if you are using the Perl that shipped with the system
     # the above split fails because archname is "darwin-thread-multi-2level".
@@ -67,7 +68,7 @@ sub runstep {
         $osname = 'darwin';
         $cpuarch = ( $self->{unamep} eq 'powerpc' )
             ? 'ppc'
-            : 'i386';
+            : $ptrsize == 8 ? 'amd64' : 'i386';
     }
 
     # cpuarch and osname are reversed in archname on windows
@@ -76,7 +77,7 @@ sub runstep {
         $osname = 'MSWin32';
     }
     elsif ( $osname =~ /cygwin/i || $cpuarch =~ /cygwin/i ) {
-        $cpuarch = 'i386';
+        $cpuarch = $ptrsize == 8 ? 'amd64' : 'i386';
         $osname  = 'cygwin';
     }
     elsif ( $osname =~ /msys/i || $cpuarch =~ /msys/i ) {
