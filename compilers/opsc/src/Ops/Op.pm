@@ -689,6 +689,10 @@ our multi sub indent(%c) {
 
 =item F<tools/build/ops2c.pl>
 
+=item F<tools/build/ops2pm.pl>
+
+=item F<tools/build/pbc2c.pl>
+
 =back
 
 =head1 HISTORY

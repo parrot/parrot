@@ -164,6 +164,8 @@ Returns a list of the tests found in these directories:
 
     t/postconfigure/
     t/tools/pmc2cutils/
+    t/tools/ops2cutils/
+    t/tools/ops2pm/
     t/pharness/
 
 =item * C<get_steps_missing_tests()>
