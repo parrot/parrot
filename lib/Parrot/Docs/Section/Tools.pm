@@ -81,6 +81,7 @@ sub new {
         $self->new_group(
             'Utilities',
             '',
+            $self->new_item( '', 'tools/dev/list_unjitted.pl' ),
             $self->new_item( '', 'tools/dev/gen_class.pl' ),
             $self->new_item( '', 'tools/dev/ncidef2pir.pl' ),
             $self->new_item( '', 'tools/dev/pbc_header.pl' ),
