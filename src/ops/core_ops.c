@@ -65,6 +65,7 @@ extern op_lib_t core_op_lib;
 
 #include "../io/io_private.h"
 
+
 #include "parrot/encoding.h"
 #include "parrot/namealias.h"
 #if PARROT_HAS_ICU

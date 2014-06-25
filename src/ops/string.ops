@@ -584,7 +584,7 @@ for control characters.
 =cut
 
 op find_codepoint(out INT, in STR) {
-    $1 = Parrot_str_internal_find_codepoint(INTERP, $2);
+    $1 = Parrot_str_internal_find_codepoint(interp, $2);
 }
 
 =back
