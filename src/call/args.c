@@ -1586,7 +1586,7 @@ Parrot_pcc_merge_signature_for_tailcall(PARROT_INTERP, ARGMOD(PMC *parent), ARGM
     if (LIKELY(PMC_IS_NULL(parent) || PMC_IS_NULL(tailcall) || (parent == tailcall)))
         return;
     else {
-        /* Broke encapuslation. Direct poking into CallContext is much faster */
+        /* Broke encapsulation. Direct poking into CallContext is much faster */
         PMC * temp;
 
         /* Store raw signature */

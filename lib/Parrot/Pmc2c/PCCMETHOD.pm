@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2012, Parrot Foundation.
+# Copyright (C) 2004-2014, Parrot Foundation.
 
 package Parrot::Pmc2c::PCCMETHOD;
 use strict;
@@ -128,6 +128,14 @@ sub convert_type_string_to_reg_type {
     croak "$_ not recognized as INTVAL, FLOATVAL, STRING, or PMC";
 }
 
+sub convert_pcc_sigtype {
+    my %sigtype = ('P' => 'pmc',
+                   'S' => 'string',
+                   'I' => 'integer',
+                   'N' => 'number');
+    return $sigtype{$_[0]};
+}
+
 sub gen_arg_pcc_sig {
     my ($param) = @_;
 
@@ -209,33 +217,32 @@ END
         my ( $returns_signature, $returns_varargs ) =
             process_pccmethod_args( parse_p_args_string($returns), 'return' );
 
+        my $rettype;
         if ($returns_signature and !$method->is_vtable) {
-            $e->emit( <<"END" );
+            my $type = convert_pcc_sigtype($returns_signature);
+            unless ($type) {
+                # Fallback to slow arg filling. Currently only "II" with FileHandle.tell
+                $e->emit( <<"END" );
     {  /*BEGIN RETURN $returns */
-END
-        my $sigtype = {'P' => 'pmc',
-                       'S' => 'string',
-                       'I' => 'integer',
-                       'N' => 'number'};
-        my $type = $$sigtype{$returns_signature};
-        if ($type) {
-            $e->emit( <<"END");
-        VTABLE_set_${type}_keyed_int(interp, _call_object, 0, $returns_varargs);
-END
-        }
-        else {
-            $e->emit( <<"END");
         Parrot_pcc_set_call_from_c_args(interp, _call_object,
             "$returns_signature", $returns_varargs);
-END
-        }
-        $e->emit( <<"END" );
         $wb
         return;
     }   /*END RETURN $returns */
 END
+                $matched->replace( $match, $e );
+                $result = 1;
+                next;
+            }
+            $e->emit( <<"END" );
+     {
+        VTABLE_set_${type}_keyed_int(interp, _call_object, 0, $returns_varargs);
+        $wb
+        return;
+     }
+END
         }
-        elsif ($wb) { # if ($returns_signature)
+        elsif ($wb) { # if ($returns_signature) block needed
             $e->emit( <<"END" );
     {
         $wb
@@ -243,7 +250,7 @@ END
     }
 END
         }
-        else {
+        else { # no block needed
             $e->emit( <<"END" );
     return $returns_varargs;
 END
@@ -387,31 +394,47 @@ sub rewrite_pccmethod {
     PMC * const _ctx         = CURRENT_CONTEXT(interp);
     PMC * const _call_object = Parrot_pcc_get_signature(interp, _ctx);
 
-    { /* BEGIN PARMS SCOPE */
+    /* BEGIN PARAMS SCOPE */
 END
+    $params_declarations =~ s/\n/\n    /g;
     $e->emit(<<"END");
-$params_declarations
+    $params_declarations
 END
-    if ($params_signature) {
-        my $sigtype = {'P' => 'pmc',
-                       'S' => 'string',
-                       'I' => 'integer',
-                       'N' => 'number'};
+    # SKIP fast code for c,f,l,n,o,p,s arg adverbs
+    if ($params_signature and $params_signature !~ /[cflnops]/) { # new fast branch
         my $arg_index = 0;
         my @sig_vals = split(//,$params_signature);
         my @params_vararg_list = split(/, &/,(substr $params_varargs, 1));
 
+        # TODO: handle o for optional, and c for constant
         foreach my $sig (@sig_vals) {
-            if ($$sigtype{$sig}) {
-                    my $type = $$sigtype{$sig};
-                    $e->emit( <<"END");
-        $params_vararg_list[$arg_index] = VTABLE_get_${type}_keyed_int(interp, _call_object, $arg_index);
+            my $type = convert_pcc_sigtype($sig);
+            if ($type) {
+                $e->emit( <<"END");
+    $params_vararg_list[$arg_index] = VTABLE_get_${type}_keyed_int(interp, _call_object, $arg_index);
 END
                 $arg_index++;
             }
+            elsif ($sig eq 'i' # for invocant
+                   and $params_vararg_list[$arg_index - 1] eq '_self'
+                   and $sig_vals[$arg_index - 1] eq 'P') {
+            }
+            else {
+                warn "Warning: ".$pmc->name.".".$method->name."(\"$params_signature\"): unhandled arg adverb $sig for $params_vararg_list[$arg_index - 1]";
+                $e->emit( <<"END");
+    /* unhandled $sig for $params_vararg_list[$arg_index - 1] */
+END
+            }
         }
     }
+    elsif ($params_signature) { # old slow branch
+        $e->emit( <<"END");
+    Parrot_pcc_fill_params_from_c_args(interp, _call_object, "$params_signature",
+        $params_varargs);
+END
+    }
     $e->emit( <<'END' );
+
     { /* BEGIN PMETHOD BODY */
 END
 
@@ -421,7 +444,7 @@ END
 
     $wb
 
-    } /* END PARAMS SCOPE */
+    /* END PARAMS SCOPE */
     return;
 END
     $method->return_type('void');
