@@ -402,10 +402,19 @@ END
 END
     # SKIP fast code for c,f,l,n,o,p,s arg adverbs
     if ($params_signature and $params_signature !~ /[cflnops]/) { # new fast branch
-        my $arg_index = 0;
         my @sig_vals = split(//,$params_signature);
         my @params_vararg_list = split(/, &/,(substr $params_varargs, 1));
-
+        my ($arg_index, $arity) = (0, 0);
+        $params_signature =~ s/([PSIN])/$arity++; $1/ge;
+        $e->emit( <<"END");
+    const INTVAL arity = $arity; /* \"$params_signature\" */
+    INTVAL param_count = VTABLE_elements(interp, _call_object);
+    if (param_count != arity)
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                                    EXCEPTION_INVALID_OPERATION,
+                                    "wrong number of arguments: %d passed, %d expected",
+                                    param_count, arity);
+END
         # TODO: handle o for optional, and c for constant
         foreach my $sig (@sig_vals) {
             my $type = convert_pcc_sigtype($sig);
@@ -415,9 +424,10 @@ END
 END
                 $arg_index++;
             }
-            elsif ($sig eq 'i' # for invocant
-                   and $params_vararg_list[$arg_index - 1] eq '_self'
-                   and $sig_vals[$arg_index - 1] eq 'P') {
+            elsif ($sig eq 'i' # ignore i for Pi :invocant, already done above
+                   and $arg_index == 1
+                   and $params_vararg_list[0] eq '_self'
+                   and $sig_vals[0] eq 'P') {
             }
             else {
                 warn "Warning: ".$pmc->name.".".$method->name."(\"$params_signature\"): unhandled arg adverb $sig for $params_vararg_list[$arg_index - 1]";
