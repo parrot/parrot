@@ -9,6 +9,9 @@ src/pmc/object.pmc - Object PMC
 
 Implements an instance of a class.
 
+TODO: If a vtable override exists, calls the found method via the slow
+Parrot_ext_call, which creates a new interp, task and calls a new runloop.
+
 =head2 Functions
 
 =over 4

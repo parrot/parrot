@@ -985,7 +985,7 @@ Calculates modulus in place.
                     "int modulus by zero");
 
         VTABLE_set_integer_native(INTERP, SELF,
-                Parrot_util_intval_mod(SELF.get_integer() , value));
+                Parrot_util_intval_mod(SELF.get_integer(), value));
     }
 
 
@@ -995,7 +995,7 @@ Calculates modulus in place.
                     "int modulus by zero");
 
         VTABLE_set_integer_native(INTERP, SELF,
-                Parrot_util_intval_mod(SELF.get_integer() , (INTVAL)value));
+                Parrot_util_intval_mod(SELF.get_integer(), (INTVAL)value));
     }
 
 /*
