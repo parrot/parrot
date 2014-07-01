@@ -1,4 +1,4 @@
-# Copyright (C) 2010-2011, Parrot Foundation.
+# Copyright (C) 2010-2014, Parrot Foundation.
 #
 
 =head1 NAME
@@ -57,7 +57,7 @@ sub runstep {
         print "Program 'pkg-config' needed for libffi\n" if $verbose;
         $conf->data->set( HAS_LIBFFI => 0 );
         $conf->data->set( has_libffi => 0 );
-        $self->set_result('lack pkg-config');
+        $self->set_result('no, missing pkg-config');
         return 1;
     }
 
@@ -82,7 +82,7 @@ sub runstep {
 
     $conf->cc_gen('config/auto/libffi/test_c.in');
     eval { $conf->cc_build( $libffi_options_cflags, $libffi_options_libs ) };
-    my $has_libffi = 0;
+    my $has_libffi;
     if ( !$@ ) {
         my $test = $conf->cc_run();
         $has_libffi = _evaluate_cc_run($test);
@@ -95,7 +95,18 @@ sub runstep {
         $conf->data->add( ' ', ccflags => $libffi_options_cflags );
         $conf->data->add( ' ', libs => $libffi_options_libs );
         $conf->data->add( ' ', linkflags => $libffi_options_linkflags );
-        $self->set_result('yes');
+        my $result = "yes";
+        if ($libffi_options_cflags =~ m{libffi-(.*?)/include}) {
+            my $version = $1;
+            $result = "yes, $version";
+            if ($version eq '3.1') {
+                # libffi-3.1 bug #597919. see https://github.com/atgreen/libffi/issues/125
+                # HAVE_LONG_DOUBLE_VARIANT if you support more than one size of the long double type
+                $conf->data->add( ' ', ccflags => "-DHAVE_LONG_DOUBLE_VARIANT=0");
+            }
+        }
+        $conf->debug(" ($result) ");
+        $self->set_result($result);
         if ($verbose) {
             print 'libffi cflags: ', $libffi_options_cflags, "libffi libs: ", $libffi_options_libs, "\n";
         }
@@ -103,7 +114,7 @@ sub runstep {
     else {
         $conf->data->set( HAS_LIBFFI => 0 );
         $conf->data->set( has_libffi => 0 );
-        $self->set_result('no');
+        $self->set_result('no, failed test');
         print "No libffi found." if ($verbose);
     }
 

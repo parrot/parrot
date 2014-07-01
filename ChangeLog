@@ -5,6 +5,8 @@
           avoiding at least 2 costly C functions per method call.
 	  New arity warning:
             "wrong number of arguments: %d passed, %d expected" [GH #1080]
+    - Build
+        + Workaround libffi-3.1 upstream bug in ffi.h [GH #1081]
     - Community
         + More parrot-bench numbers at https://github.com/parrot/parrot-bench,
           now using gnuplot for all releases from 1.8.0 - 6.6.0, amd64 + -m32
