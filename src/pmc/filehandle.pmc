@@ -426,7 +426,7 @@ filehandle when finished.
 
 */
 
-    METHOD readall(STRING *name :optional, INTVAL got_name :opt_flag) {
+    METHOD readall(STRING *name :optional, INTVAL got_name :opt_flag) :no_wb {
         STRING *result;
 
         if (got_name) {

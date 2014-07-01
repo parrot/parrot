@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2012, Parrot Foundation.
+# Copyright (C) 2004-2014, Parrot Foundation.
 
 package Parrot::Pmc2c::PCCMETHOD;
 use strict;
@@ -128,6 +128,14 @@ sub convert_type_string_to_reg_type {
     croak "$_ not recognized as INTVAL, FLOATVAL, STRING, or PMC";
 }
 
+sub convert_pcc_sigtype {
+    my %sigtype = ('P' => 'pmc',
+                   'S' => 'string',
+                   'I' => 'integer',
+                   'N' => 'number');
+    return $sigtype{$_[0]};
+}
+
 sub gen_arg_pcc_sig {
     my ($param) = @_;
 
@@ -209,8 +217,12 @@ END
         my ( $returns_signature, $returns_varargs ) =
             process_pccmethod_args( parse_p_args_string($returns), 'return' );
 
+        my $rettype;
         if ($returns_signature and !$method->is_vtable) {
-            $e->emit( <<"END" );
+            my $type = convert_pcc_sigtype($returns_signature);
+            unless ($type) {
+                # Fallback to slow arg filling. Currently only "II" with FileHandle.tell
+                $e->emit( <<"END" );
     {  /*BEGIN RETURN $returns */
         Parrot_pcc_set_call_from_c_args(interp, _call_object,
             "$returns_signature", $returns_varargs);
@@ -218,8 +230,19 @@ END
         return;
     }   /*END RETURN $returns */
 END
+                $matched->replace( $match, $e );
+                $result = 1;
+                next;
+            }
+            $e->emit( <<"END" );
+     {
+        VTABLE_set_${type}_keyed_int(interp, _call_object, 0, $returns_varargs);
+        $wb
+        return;
+     }
+END
         }
-        elsif ($wb) { # if ($returns_signature)
+        elsif ($wb) { # if ($returns_signature) block needed
             $e->emit( <<"END" );
     {
         $wb
@@ -227,7 +250,7 @@ END
     }
 END
         }
-        else {
+        else { # no block needed
             $e->emit( <<"END" );
     return $returns_varargs;
 END
@@ -371,18 +394,118 @@ sub rewrite_pccmethod {
     PMC * const _ctx         = CURRENT_CONTEXT(interp);
     PMC * const _call_object = Parrot_pcc_get_signature(interp, _ctx);
 
-    { /* BEGIN PARMS SCOPE */
+    /* BEGIN PARAMS SCOPE */
 END
+    $params_declarations =~ s/\n/\n    /g;
     $e->emit(<<"END");
-$params_declarations
+    $params_declarations
 END
-    if ($params_signature) {
+    # SKIP fast code for c,f,l,n,s arg adverbs
+    if ($params_signature and $params_signature !~ /[cflns]/) { # new fast branch
+        my @params_vararg_list = split(/, &/, substr($params_varargs, 1));
+        my ($arg_index, $list_index, $i) = (0, 0, 0);
+        # run-time arity-check: error if too many or too less args given.
+        # cost of the 2 if's: 4.4% in parrot-bench
+        my ($arity, $arity_opt) = (0, 0);
+        $params_signature =~ s/([PSIN])/$arity++; $1/ge;
+        $arity_opt = $params_signature =~ tr/o/o/;
+        $arity -= $arity_opt;
+        $arity -= $params_signature =~ tr/p/p/;
+        if ($arity_opt) { # slow checks
+            $e->emit( <<"END");
+    const INTVAL arity = $arity; /* \"$params_signature\" */
+    const INTVAL arity_opt  = $arity_opt;
+    INTVAL param_count = VTABLE_elements(interp, _call_object);
+    if (param_count < arity)
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                                    EXCEPTION_INVALID_OPERATION,
+                                    "too few arguments: %d passed, %d expected",
+                                    param_count, arity);
+    if (param_count > arity + arity_opt)
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                                    EXCEPTION_INVALID_OPERATION,
+                                    "too many arguments: %d passed, %d expected",
+                                    param_count, arity + arity_opt);
+END
+        }
+        else { # only one check
+            $e->emit( <<"END");
+    const INTVAL arity = $arity; /* \"$params_signature\" */
+    INTVAL param_count = VTABLE_elements(interp, _call_object);
+    if (param_count != arity)
+        Parrot_ex_throw_from_c_args(interp, NULL,
+                                    EXCEPTION_INVALID_OPERATION,
+                                    "wrong number of arguments: %d passed, %d expected",
+                                    param_count, arity);
+END
+        }
+        # TODO: handle c for constant
+        while ($i < length($params_signature)) {
+            my $sig = substr($params_signature, $i, 1);
+            my $sig2 = substr($params_signature, $i+1, 1);
+            my $type = convert_pcc_sigtype($sig);
+            $i++;
+            if ($type) {
+                if ($sig2 eq "o") { # for :optional
+                    $e->emit( "    if (param_count > $list_index) {\n    " );
+                }
+                $e->emit( <<"END");
+    $params_vararg_list[$arg_index] = VTABLE_get_${type}_keyed_int(interp, _call_object, $list_index);
+END
+                if ($sig2 eq "o") { # for :optional
+                    my $opt_arg = $params_vararg_list[$arg_index];
+                    my $null_def = { 'P' => 'PMCNULL',
+                                     'S' => 'STRINGNULL',
+                                     'I' => '0',
+                                     'N' => '0.0' };
+                    my $def = $null_def->{$sig};
+                    if (substr($params_signature, $i, 3) eq "oIp") { # and set :opt_flag
+                        my $opt_flag = $params_vararg_list[$arg_index + 1];
+                        $arg_index++;
+                        $list_index++;
+                        $i += 2;
+                        $e->emit( <<"END");
+        $opt_flag = 1;
+    }
+    else {
+        $opt_arg = $def;
+        $opt_flag = 0;
+    }
+END
+                    }
+                    else { # no :opt_flag, only :optional
+                        $e->emit( <<"END");
+    }
+    else {
+        $opt_arg = $def;
+    }
+END
+                    }
+                    $i++;
+                }
+                $arg_index++;
+                $list_index++ unless $sig2 eq "o";
+            }
+            elsif ($sig eq 'i' # for invocant
+                   and $params_vararg_list[$arg_index - 1] eq '_self'
+                   and substr($params_signature, $i-2, 1) eq 'P') {
+            }
+            else {
+                warn "Warning: ".$pmc->name.".".$method->name."(\"$params_signature\"): unhandled arg adverb $sig for $params_vararg_list[$arg_index - 1]";
+                $e->emit( <<"END");
+    /* unhandled $sig for $params_vararg_list[$arg_index - 1] */
+END
+            }
+        }
+    }
+    elsif ($params_signature) { # the old slow branch
         $e->emit( <<"END");
-        Parrot_pcc_fill_params_from_c_args(interp, _call_object, "$params_signature",
-            $params_varargs);
+    Parrot_pcc_fill_params_from_c_args(interp, _call_object, "$params_signature",
+        $params_varargs);
 END
     }
     $e->emit( <<'END' );
+
     { /* BEGIN PMETHOD BODY */
 END
 
@@ -392,7 +515,7 @@ END
 
     $wb
 
-    } /* END PARAMS SCOPE */
+    /* END PARAMS SCOPE */
     return;
 END
     $method->return_type('void');
