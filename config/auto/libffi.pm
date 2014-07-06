@@ -7,7 +7,8 @@ config/auto/libffi - Check whether libffi is installed
 
 =head1 DESCRIPTION
 
-Note: The program F<pkg-config> is also required.
+Note: The program F<pkg-config> is also required
+and can be set in the env C<TEST_PKGCONFIG>.
 
 =cut
 
@@ -30,8 +31,18 @@ sub _init {
 
 my @pkgconfig_variations =
     defined( $ENV{TEST_PKGCONFIG} )
-    ? @{ $ENV{TEST_PKGCONFIG} }
-    : qw( pkg-config );
+      ? @{ $ENV{TEST_PKGCONFIG} }
+      : qw( pkg-config );
+
+sub _expand_pkgconfig {
+    my ( $conf, $var ) = @_;
+    chomp $var;
+    if ($var =~ /\$\((\w+)\)/) {
+        my $option = $conf->data->get($1);
+        $var =~ s/\$\(\w+\)/$option/;
+    }
+    return $var;
+}
 
 sub runstep {
     my ( $self, $conf ) = @_;
@@ -61,27 +72,23 @@ sub runstep {
         return 1;
     }
 
-    my $libffi_options_cflags = '';
-    my $libffi_options_libs = '';
-    my $libffi_options_linkflags = '';
-
-    $libffi_options_linkflags =
-        capture_output($pkgconfig_exec, 'libffi --libs-only-L');
-    chomp $libffi_options_linkflags;
-    $libffi_options_libs = capture_output($pkgconfig_exec, 'libffi --libs-only-l');
-    chomp $libffi_options_libs;
-    $libffi_options_cflags = capture_output($pkgconfig_exec, 'libffi --cflags');
-    chomp $libffi_options_cflags;
+    # GH #1082: we need to expand $(libdir) because we use it directly also.
+    my $linkflags = _expand_pkgconfig($conf,
+                      capture_output($pkgconfig_exec, 'libffi --libs-only-L'));
+    my $libs      = _expand_pkgconfig($conf,
+                      capture_output($pkgconfig_exec, 'libffi --libs-only-l'));
+    my $cflags    = _expand_pkgconfig($conf,
+                      capture_output($pkgconfig_exec, 'libffi --cflags'));
 
     my $extra_libs = $self->_select_lib( {
         conf            => $conf,
         osname          => $osname,
         cc              => $conf->data->get('cc'),
-        default         => $libffi_options_libs . ' ' . $libffi_options_cflags,
+        default         => $libs . ' ' . $cflags,
     } );
 
     $conf->cc_gen('config/auto/libffi/test_c.in');
-    eval { $conf->cc_build( $libffi_options_cflags, $libffi_options_libs ) };
+    eval { $conf->cc_build( $cflags, $libs ) };
     my $has_libffi;
     if ( !$@ ) {
         my $test = $conf->cc_run();
@@ -92,11 +99,11 @@ sub runstep {
     if ($has_libffi) {
         $conf->data->set( HAS_LIBFFI => $has_libffi);
         $conf->data->set( has_libffi => $has_libffi);
-        $conf->data->add( ' ', ccflags => $libffi_options_cflags );
-        $conf->data->add( ' ', libs => $libffi_options_libs );
-        $conf->data->add( ' ', linkflags => $libffi_options_linkflags );
+        $conf->data->add( ' ', ccflags => $cflags );
+        $conf->data->add( ' ', libs => $libs );
+        $conf->data->add( ' ', linkflags => $linkflags );
         my $result = "yes";
-        if ($libffi_options_cflags =~ m{libffi-(.*?)/include}) {
+        if ($cflags =~ m{libffi-(.*?)/include}) {
             my $version = $1;
             $result = "yes, $version";
             if ($version eq '3.1') {
@@ -108,7 +115,7 @@ sub runstep {
         $conf->debug(" ($result) ");
         $self->set_result($result);
         if ($verbose) {
-            print 'libffi cflags: ', $libffi_options_cflags, "libffi libs: ", $libffi_options_libs, "\n";
+            print 'libffi cflags: ', $cflags, "libffi libs: ", $libs, "\n";
         }
     }
     else {
