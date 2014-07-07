@@ -48,18 +48,26 @@ as (likely invalid) unicode escape codes.
 =cut
 
 sub create_tempfile {
-        my ($filehandle, $filename) = &tempfile;
+    # platform quirks (GH 1077, cygwin 5.18 - Cwd 3.40 only):
+    # we cannot get Cwd::abs_path on a non-existing file, and we don't
+    # need to unlink it.
+    my ($filehandle, $filename, $winfixup);
+    if ($^O eq 'cygwin' and join(' ',@_) eq 'UNLINK 1 OPEN 0') {
+        ($filehandle, $filename) = tempfile('UNLINK' => 0, 'OPEN' => 0);
+    }
+    else {
+        ($filehandle, $filename) = &tempfile;
+    }
 
-        # expand msys virtual paths
-        if($^O eq 'msys') {
-            my $tmpdir = `cd /tmp && pwd -W`;
-            chomp $tmpdir;
-            $filename =~ s/^\/tmp\//$tmpdir\//;
-        }
+    # expand msys virtual paths
+    if($^O eq 'msys') {
+        my $tmpdir = `cd /tmp && pwd -W`;
+        chomp $tmpdir;
+        $filename =~ s/^\/tmp\//$tmpdir\//;
+    }
 
-        $filename =~ s/\\/\//g;
-
-        return ($filehandle, $filename);
+    $filename =~ s/\\/\//g;
+    return ($filehandle, $filename);
 }
 
 =back

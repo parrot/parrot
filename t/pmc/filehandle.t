@@ -911,7 +911,7 @@ OUTPUT
 
 }
 
-my (undef, $no_such_file) = create_tempfile( UNLINK => 1, OPEN => 0 );
+my (undef, $no_such_file) = create_tempfile( UNLINK => 0, OPEN => 0 );
 
 pir_output_is( sprintf( <<'CODE', $no_such_file, $temp_file ), <<'OUTPUT', "get_bool" );
 .const string no_such_file = '%s'

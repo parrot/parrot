@@ -8,6 +8,8 @@
     - Build
         + Workaround libffi-3.1 upstream bug in ffi.h [GH #1081]
         + Expand pkg-config make macros in auto::libffi [GH #1082]
+    - Tests
+        + Fix t/pmc/filehandle.t on cygwin with newer Cwd >= 3.40 [GH #1077]
     - Community
         + More parrot-bench numbers at https://github.com/parrot/parrot-bench,
           now using gnuplot for all releases from 1.8.0 - 6.6.0, amd64 + -m32
