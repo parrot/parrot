@@ -46,7 +46,7 @@ Generated namealias hash for icu control characters
 
 - gperf --output-file=src/string/namealias.c src/string/namealias_c.in
 
-- manual cleanup for inline and codingstd_tests. TODO: tools/build/namealias.pl
+- manual cleanup for inline and codingstd_tests via F<tools/build/namealias.pl>
 
 =over 4
 
@@ -92,7 +92,6 @@ struct Parrot_namealias { int name; const INTVAL codepoint; };
 #define MIN_HASH_VALUE 4
 #define MAX_HASH_VALUE 139
 /* maximum key range = 136, duplicates = 0 */
-
 
 static unsigned int
 Parrot_namealias_hash(register const char *str, register unsigned int len)

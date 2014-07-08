@@ -59,7 +59,7 @@ while (<$IN>) {
     # c_operator.t: there should be one space or a newline after a comma
     s/{-1},/{-1, 0},/g;
 
-    # skip inline. we use it twice in core_ops.c
+    # skip inline. we use it twice in core_ops.c. Note that on windows this regex fails.
     s/\Q#ifdef __GNUC__
 __inline
 #if defined __GNUC_STDC_INLINE__ || defined __GNUC_GNU_INLINE__

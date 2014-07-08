@@ -15,7 +15,7 @@ Generated namealias hash for icu control characters
 
 - gperf --output-file=src/string/namealias.c src/string/namealias_c.in
 
-- manual cleanup for inline and codingstd_tests. TODO: tools/build/namealias.pl
+- manual cleanup for inline and codingstd_tests via F<tools/build/namealias.pl>
 
 =over 4
 
