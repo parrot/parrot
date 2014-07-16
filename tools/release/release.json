@@ -1,9 +1,9 @@
 {
-    "release.version"  : "6.5.0",
-    "release.name"     : "Black-winged Lovebird",
+    "release.version"  : "6.6.0",
+    "release.name"     : "Parrothead",
     "release.day"      : "Tuesday",
-    "release.nextdate" : "15 Jul 2014",
-    "release.type"     : "devel",
+    "release.nextdate" : "19 Aug 2014",
+    "release.type"     : "supported",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -12,10 +12,10 @@
     "web.org_root"     : "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "12 Jul 2014",
+    "bugday.date"      : "16 Aug 2014",
 
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
-    "wiki.bugday"      : "bug_day_2014_07_12",
+    "wiki.bugday"      : "bug_day_2014_08_16",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/6.5.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/6.6.0/"
 }

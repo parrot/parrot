@@ -1,9 +1,16 @@
+2014-08-19    release 6.7.0
+    - Core
+    - Build
+    - Documentation
+    - Tests
+    - Community
+
 2014-07-15    release 6.6.0
     - Core
         + Optimized method call overhead at compile-time in pmc2c directly
           to avoid run-time overhead. Less temp. PMC's, less branches and
           avoiding at least 2 costly C functions per method call.
-	  New arity warning:
+        + New arity warning:
             "wrong number of arguments: %d passed, %d expected" [GH #1080]
     - Build
         + Workaround libffi-3.1 upstream bug in ffi.h [GH #1081]
@@ -11,6 +18,8 @@
     - Tests
         + Fix t/pmc/filehandle.t on cygwin with newer Cwd >= 3.40 [GH #1077]
     - Community
+        + Our GSoC student passed the project midterm, having made great progress.
+          Congratulations to Chirag Agrawal!
         + More parrot-bench numbers at https://github.com/parrot/parrot-bench,
           now using gnuplot for all releases from 1.8.0 - 6.6.0, amd64 + -m32
 
