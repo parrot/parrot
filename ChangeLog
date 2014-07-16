@@ -2,6 +2,8 @@
     - Core
     - Build
     - Documentation
+        + Updated documentation for StringHandle.readall and FileHandle.readall, which
+          reads just the rest of the buffer if tell > 0. [GH #1084]
     - Tests
     - Community
 

@@ -406,7 +406,7 @@ Read a line from the filehandle and return it in a string.
 
 =item METHOD readall(STRING *name);
 
-Read the entire contents of a file named I<name> into a Parrot string. On a
+Read the contents of a file named I<name> into a Parrot string. On a
 filehandle object that isn't opened yet, the path to a file can be passed to
 C<readall> and it will open a filehandle on that file, read in the contents,
 and close the filehandle.
@@ -416,11 +416,13 @@ and close the filehandle.
   $S0 = pio.'readall'('the_file')
 
 If the filehandle is already open, then no file path should be passed. The
-C<readall> method will read the contents of the file, and will not close the
-filehandle when finished.
+C<readall> method will read the rest of the contents of the file, and will
+not close the filehandle when finished.
 
   pio = open 'the_file', 'r'
   $S0 = pio.'readall'()
+
+To ensure readall semantics C<seek> to position 0 first.
 
 =cut
 

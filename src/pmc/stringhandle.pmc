@@ -217,8 +217,11 @@ Check if the StringHandle is open.
 
 =item METHOD readall(STRING *name);
 
-Read the entire contents of the StringHandle into a Parrot string. On a
-StringHandle object that isn't opened yet, returns an empty string.
+Read the rest of the contents of the StringHandle into a Parrot string.
+On a StringHandle object that isn't opened yet, returns an empty string.
+
+To ensure readall semantics seek to position 0, which needs to be done
+in this case by checking C<is_closed()> and reopening the StringHandle.
 
 =cut
 
