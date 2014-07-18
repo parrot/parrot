@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -24,6 +24,7 @@ value passing to and from subroutines.
 #include "pcc.str"
 #include "pmc/pmc_key.h"
 #include "pmc/pmc_continuation.h"
+#include "pmc/pmc_callcontext.h"
 
 /* HEADERIZER HFILE: include/parrot/call.h */
 
@@ -161,12 +162,9 @@ static void
 Parrot_pcc_add_invocant(PARROT_INTERP, ARGIN(PMC *call_obj), ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_pcc_add_invocant)
-    PMC *arg_flags;
-    GETATTR_CallContext_arg_flags(interp, call_obj, arg_flags);
-
-    VTABLE_unshift_integer(interp, arg_flags,
-          PARROT_ARG_PMC | PARROT_ARG_INVOCANT);
-          VTABLE_unshift_pmc(interp, call_obj, pmc);
+    PMC *arg_flags = PARROT_CALLCONTEXT(call_obj)->arg_flags;
+    VTABLE_unshift_integer(interp, arg_flags, PARROT_ARG_PMC | PARROT_ARG_INVOCANT);
+    VTABLE_unshift_pmc(interp, call_obj, pmc);
 }
 
 /*
@@ -196,6 +194,7 @@ Parrot_pcc_invoke_method_from_c_args(PARROT_INTERP, ARGIN(PMC* pmc),
     PMC        *sub_obj;
     va_list     args;
     const char *arg_sig, *ret_sig;
+    PMC        *arg_flags;
     PMC        * const old_call_obj =
         Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
@@ -203,7 +202,11 @@ Parrot_pcc_invoke_method_from_c_args(PARROT_INTERP, ARGIN(PMC* pmc),
 
     va_start(args, signature);
     call_obj = Parrot_pcc_build_call_from_varargs(interp, PMCNULL, arg_sig, &args);
-    Parrot_pcc_add_invocant(interp, call_obj, pmc);
+
+    /* inlined version of pcc_add_invocant */
+    arg_flags = PARROT_CALLCONTEXT(call_obj)->arg_flags;
+    VTABLE_unshift_integer(interp, arg_flags, PARROT_ARG_PMC | PARROT_ARG_INVOCANT);
+    VTABLE_unshift_pmc(interp, call_obj, pmc);
 
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), call_obj);
 
