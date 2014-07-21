@@ -16,7 +16,7 @@ table, which should be created by your sysadmin.
 
 =cut
 
-.const int N_TESTS = 40
+.const int N_TESTS = 43
 
 ## XXX
 ## .include 'postgres.pasm'
