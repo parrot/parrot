@@ -17,7 +17,7 @@ CODE
 OUT
 
 SKIP: {
-  skip "invalid -O2 test GH #1049", 1 if $ENV{TEST_PROG_ARGS} =~ / -O2/;
+  skip "invalid -O2 test GH #1049", 1 if $ENV{TEST_PROG_ARGS} =~ /-O2/;
   pir_output_is( <<'CODE', <<'OUT', 'cannot constant fold div by 0');
 .sub fold_by_zero :main
   push_eh ok1

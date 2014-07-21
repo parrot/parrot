@@ -1671,7 +1671,7 @@ OUTPUT
 
 TODO: {
   local $TODO = 'bad -O1 test 63' if $ENV{TEST_PROG_ARGS}
-    and $ENV{TEST_PROG_ARGS} =~ / -O[12]/;
+    and $ENV{TEST_PROG_ARGS} =~ /-O[12]/;
   pir_output_is( <<'CODE', <<'OUTPUT', "newclosure followed by tailcall" );
 ## regression test for newclosure followed by tailcall, which used to recycle
 ## the context too soon.  it looks awful because (a) the original version was
