@@ -6,7 +6,6 @@
         + Updated documentation for StringHandle.readall and FileHandle.readall, which
           reads just the rest of the buffer if tell > 0. [GH #1084]
     - Tests
-        + Fix test number in t/library/pg.t
     - Community
 
 2014-07-15    release 6.6.0
