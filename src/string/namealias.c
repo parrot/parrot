@@ -86,44 +86,45 @@ const struct Parrot_namealias *
 Parrot_namealias_lookup(register const char *str, register unsigned int len);
 struct Parrot_namealias { int name; const INTVAL codepoint; };
 
-#define TOTAL_KEYWORDS 61
-#define MIN_WORD_LENGTH 4
+#define TOTAL_KEYWORDS 65
+#define MIN_WORD_LENGTH 2
 #define MAX_WORD_LENGTH 39
-#define MIN_HASH_VALUE 4
-#define MAX_HASH_VALUE 139
-/* maximum key range = 136, duplicates = 0 */
+#define MIN_HASH_VALUE 2
+#define MAX_HASH_VALUE 136
+/* maximum key range = 135, duplicates = 0 */
+
 
 static unsigned int
 Parrot_namealias_hash(register const char *str, register unsigned int len)
 {
   static const unsigned char asso_values[] =
     {
-      140, 140, 140, 140, 140, 140, 140, 140, 140, 140,
-      140, 140, 140, 140, 140, 140, 140, 140, 140, 140,
-      140, 140, 140, 140, 140, 140, 140, 140, 140, 140,
-      140, 140, 140, 140, 140, 140, 140, 140, 140, 140,
-      140,  30, 140, 140, 140, 140, 140, 140, 140, 140,
-      140, 140, 140, 140, 140, 140, 140, 140, 140, 140,
-      140, 140, 140, 140, 140,  30,   0,  55,   5,   0,
-        5,  45, 140,  35, 140,  40,   0,  40,  35,  15,
-       55, 140,   5,   0,  15,  10, 140,   5, 140,   0,
-      140, 140, 140, 140, 140, 140, 140, 140, 140, 140,
-      140, 140, 140, 140, 140, 140, 140, 140, 140, 140,
-      140, 140, 140, 140, 140, 140, 140, 140, 140, 140,
-      140, 140, 140, 140, 140, 140, 140, 140, 140, 140,
-      140, 140, 140, 140, 140, 140, 140, 140, 140, 140,
-      140, 140, 140, 140, 140, 140, 140, 140, 140, 140,
-      140, 140, 140, 140, 140, 140, 140, 140, 140, 140,
-      140, 140, 140, 140, 140, 140, 140, 140, 140, 140,
-      140, 140, 140, 140, 140, 140, 140, 140, 140, 140,
-      140, 140, 140, 140, 140, 140, 140, 140, 140, 140,
-      140, 140, 140, 140, 140, 140, 140, 140, 140, 140,
-      140, 140, 140, 140, 140, 140, 140, 140, 140, 140,
-      140, 140, 140, 140, 140, 140, 140, 140, 140, 140,
-      140, 140, 140, 140, 140, 140, 140, 140, 140, 140,
-      140, 140, 140, 140, 140, 140, 140, 140, 140, 140,
-      140, 140, 140, 140, 140, 140, 140, 140, 140, 140,
-      140, 140, 140, 140, 140, 140
+      137, 137, 137, 137, 137, 137, 137, 137, 137, 137,
+      137, 137, 137, 137, 137, 137, 137, 137, 137, 137,
+      137, 137, 137, 137, 137, 137, 137, 137, 137, 137,
+      137, 137, 137, 137, 137, 137, 137, 137, 137, 137,
+      137,   0, 137, 137, 137, 137, 137, 137, 137, 137,
+      137, 137, 137, 137, 137, 137, 137, 137, 137, 137,
+      137, 137, 137, 137, 137,  20,  75,  25,   5,   0,
+        0,  40, 137,   5, 137,  15,  25,  50,  30,   5,
+       35, 137,  20,   0,  15,  25, 137,  50, 137,   0,
+      137, 137, 137, 137, 137, 137, 137, 137, 137, 137,
+      137, 137, 137, 137, 137, 137, 137, 137, 137, 137,
+      137, 137, 137, 137, 137, 137, 137, 137, 137, 137,
+      137, 137, 137, 137, 137, 137, 137, 137, 137, 137,
+      137, 137, 137, 137, 137, 137, 137, 137, 137, 137,
+      137, 137, 137, 137, 137, 137, 137, 137, 137, 137,
+      137, 137, 137, 137, 137, 137, 137, 137, 137, 137,
+      137, 137, 137, 137, 137, 137, 137, 137, 137, 137,
+      137, 137, 137, 137, 137, 137, 137, 137, 137, 137,
+      137, 137, 137, 137, 137, 137, 137, 137, 137, 137,
+      137, 137, 137, 137, 137, 137, 137, 137, 137, 137,
+      137, 137, 137, 137, 137, 137, 137, 137, 137, 137,
+      137, 137, 137, 137, 137, 137, 137, 137, 137, 137,
+      137, 137, 137, 137, 137, 137, 137, 137, 137, 137,
+      137, 137, 137, 137, 137, 137, 137, 137, 137, 137,
+      137, 137, 137, 137, 137, 137, 137, 137, 137, 137,
+      137, 137, 137, 137, 137, 137
     };
   register int hval = len;
 
@@ -153,131 +154,139 @@ Parrot_namealias_hash(register const char *str, register unsigned int len)
 
 struct stringpool_t
   {
-    char stringpool_str4[sizeof ("BELL")];
+    char stringpool_str2[sizeof ("FF")];
     char stringpool_str6[sizeof ("ESCAPE")];
     char stringpool_str7[sizeof ("ENQUIRY")];
-    char stringpool_str9[sizeof ("BACKSPACE")];
     char stringpool_str10[sizeof ("SUBSTITUTE")];
     char stringpool_str11[sizeof ("DELETE")];
+    char stringpool_str14[sizeof ("FORM FEED (FF)")];
     char stringpool_str18[sizeof ("SET TRANSMIT STATE")];
-    char stringpool_str20[sizeof ("BREAK PERMITTED HERE")];
     char stringpool_str21[sizeof ("SYNCHRONOUS IDLE")];
-    char stringpool_str23[sizeof ("DEVICE CONTROL ONE")];
     char stringpool_str24[sizeof ("SHIFT OUT")];
-    char stringpool_str25[sizeof ("DEVICE CONTROL THREE")];
     char stringpool_str26[sizeof ("END OF TEXT")];
+    char stringpool_str27[sizeof ("LF")];
     char stringpool_str28[sizeof ("START OF TEXT")];
-    char stringpool_str29[sizeof ("DEVICE CONTROL FOUR")];
-    char stringpool_str32[sizeof ("REVERSE LINE FEED")];
+    char stringpool_str30[sizeof ("INFORMATION SEPARATOR ONE")];
+    char stringpool_str31[sizeof ("ACKNOWLEDGE")];
+    char stringpool_str32[sizeof ("INFORMATION SEPARATOR THREE")];
     char stringpool_str33[sizeof ("SINGLE SHIFT THREE")];
-    char stringpool_str38[sizeof ("DEVICE CONTROL TWO")];
-    char stringpool_str39[sizeof ("NULL")];
-    char stringpool_str41[sizeof ("ACKNOWLEDGE")];
-    char stringpool_str43[sizeof ("SHIFT IN")];
-    char stringpool_str46[sizeof ("SINGLE SHIFT TWO")];
-    char stringpool_str47[sizeof ("SINGLE CHARACTER INTRODUCER")];
-    char stringpool_str48[sizeof ("NO BREAK HERE")];
-    char stringpool_str49[sizeof ("LINE TABULATION SET")];
-    char stringpool_str50[sizeof ("END OF SELECTED AREA")];
-    char stringpool_str51[sizeof ("DATA LINK ESCAPE")];
-    char stringpool_str52[sizeof ("STRING TERMINATOR")];
-    char stringpool_str53[sizeof ("END OF MEDIUM")];
-    char stringpool_str54[sizeof ("END OF GUARDED AREA")];
-    char stringpool_str56[sizeof ("START OF GUARDED AREA")];
-    char stringpool_str59[sizeof ("OPERATING SYSTEM COMMAND")];
-    char stringpool_str60[sizeof ("INFORMATION SEPARATOR ONE")];
-    char stringpool_str61[sizeof ("CANCEL")];
-    char stringpool_str62[sizeof ("INFORMATION SEPARATOR THREE")];
-    char stringpool_str65[sizeof ("LINE TABULATION")];
-    char stringpool_str66[sizeof ("INFORMATION SEPARATOR FOUR")];
-    char stringpool_str67[sizeof ("APPLICATION PROGRAM COMMAND")];
-    char stringpool_str70[sizeof ("NEGATIVE ACKNOWLEDGE")];
-    char stringpool_str71[sizeof ("DEVICE CONTROL STRING")];
-    char stringpool_str74[sizeof ("LINE FEED (LF)")];
-    char stringpool_str75[sizeof ("INFORMATION SEPARATOR TWO")];
-    char stringpool_str79[sizeof ("FORM FEED (FF)")];
-    char stringpool_str80[sizeof ("NEXT LINE (NEL)")];
-    char stringpool_str81[sizeof ("PARTIAL LINE BACKWARD")];
-    char stringpool_str85[sizeof ("PARTIAL LINE FORWARD")];
-    char stringpool_str89[sizeof ("END OF TRANSMISSION")];
-    char stringpool_str90[sizeof ("PRIVATE USE TWO")];
-    char stringpool_str91[sizeof ("CANCEL CHARACTER")];
-    char stringpool_str95[sizeof ("START OF STRING")];
-    char stringpool_str96[sizeof ("START OF HEADING")];
-    char stringpool_str100[sizeof ("END OF TRANSMISSION BLOCK")];
-    char stringpool_str104[sizeof ("CHARACTER TABULATION SET")];
-    char stringpool_str105[sizeof ("PRIVATE USE ONE")];
-    char stringpool_str107[sizeof ("START OF SELECTED AREA")];
-    char stringpool_str110[sizeof ("CARRIAGE RETURN (CR)")];
-    char stringpool_str115[sizeof ("PRIVACY MESSAGE")];
-    char stringpool_str120[sizeof ("CHARACTER TABULATION")];
-    char stringpool_str122[sizeof ("CONTROL SEQUENCE INTRODUCER")];
+    char stringpool_str35[sizeof ("INFORMATION SEPARATOR TWO")];
+    char stringpool_str36[sizeof ("SINGLE SHIFT TWO")];
+    char stringpool_str38[sizeof ("SHIFT IN")];
+    char stringpool_str39[sizeof ("LINE FEED (LF)")];
+    char stringpool_str40[sizeof ("END OF SELECTED AREA")];
+    char stringpool_str41[sizeof ("DATA LINK ESCAPE")];
+    char stringpool_str42[sizeof ("REVERSE LINE FEED")];
+    char stringpool_str43[sizeof ("NO BREAK HERE")];
+    char stringpool_str44[sizeof ("END OF GUARDED AREA")];
+    char stringpool_str45[sizeof ("END OF TRANSMISSION BLOCK")];
+    char stringpool_str46[sizeof ("START OF GUARDED AREA")];
+    char stringpool_str47[sizeof ("CR")];
+    char stringpool_str48[sizeof ("DEVICE CONTROL ONE")];
+    char stringpool_str49[sizeof ("OPERATING SYSTEM COMMAND")];
+    char stringpool_str50[sizeof ("DEVICE CONTROL THREE")];
+    char stringpool_str51[sizeof ("INFORMATION SEPARATOR FOUR")];
+    char stringpool_str53[sizeof ("DEVICE CONTROL TWO")];
+    char stringpool_str54[sizeof ("END OF TRANSMISSION")];
+    char stringpool_str55[sizeof ("NEGATIVE ACKNOWLEDGE")];
+    char stringpool_str56[sizeof ("CANCEL")];
+    char stringpool_str57[sizeof ("STRING TERMINATOR")];
+    char stringpool_str58[sizeof ("NEL")];
+    char stringpool_str59[sizeof ("NULL")];
+    char stringpool_str60[sizeof ("PARTIAL LINE FORWARD")];
+    char stringpool_str61[sizeof ("START OF HEADING")];
+    char stringpool_str62[sizeof ("SINGLE CHARACTER INTRODUCER")];
+    char stringpool_str63[sizeof ("END OF MEDIUM")];
+    char stringpool_str64[sizeof ("LINE TABULATION SET")];
+    char stringpool_str65[sizeof ("CARRIAGE RETURN (CR)")];
+    char stringpool_str67[sizeof ("START OF SELECTED AREA")];
+    char stringpool_str69[sizeof ("DEVICE CONTROL FOUR")];
+    char stringpool_str70[sizeof ("NEXT LINE (NEL)")];
+    char stringpool_str72[sizeof ("APPLICATION PROGRAM COMMAND")];
+    char stringpool_str75[sizeof ("LINE TABULATION")];
+    char stringpool_str76[sizeof ("CANCEL CHARACTER")];
+    char stringpool_str80[sizeof ("PRIVATE USE ONE")];
+    char stringpool_str84[sizeof ("BACKSPACE")];
+    char stringpool_str85[sizeof ("START OF STRING")];
+    char stringpool_str89[sizeof ("CHARACTER TABULATION SET")];
+    char stringpool_str90[sizeof ("PRIVACY MESSAGE")];
+    char stringpool_str91[sizeof ("DEVICE CONTROL STRING")];
+    char stringpool_str95[sizeof ("BREAK PERMITTED HERE")];
+    char stringpool_str100[sizeof ("CHARACTER TABULATION")];
+    char stringpool_str102[sizeof ("CONTROL SEQUENCE INTRODUCER")];
+    char stringpool_str104[sizeof ("BELL")];
+    char stringpool_str105[sizeof ("PRIVATE USE TWO")];
+    char stringpool_str119[sizeof ("CHARACTER TABULATION WITH JUSTIFICATION")];
     char stringpool_str135[sizeof ("MESSAGE WAITING")];
-    char stringpool_str139[sizeof ("CHARACTER TABULATION WITH JUSTIFICATION")];
+    char stringpool_str136[sizeof ("PARTIAL LINE BACKWARD")];
   };
 static const struct stringpool_t stringpool_contents =
   {
-    "BELL",
+    "FF",
     "ESCAPE",
     "ENQUIRY",
-    "BACKSPACE",
     "SUBSTITUTE",
     "DELETE",
+    "FORM FEED (FF)",
     "SET TRANSMIT STATE",
-    "BREAK PERMITTED HERE",
     "SYNCHRONOUS IDLE",
-    "DEVICE CONTROL ONE",
     "SHIFT OUT",
-    "DEVICE CONTROL THREE",
     "END OF TEXT",
+    "LF",
     "START OF TEXT",
-    "DEVICE CONTROL FOUR",
-    "REVERSE LINE FEED",
-    "SINGLE SHIFT THREE",
-    "DEVICE CONTROL TWO",
-    "NULL",
+    "INFORMATION SEPARATOR ONE",
     "ACKNOWLEDGE",
-    "SHIFT IN",
+    "INFORMATION SEPARATOR THREE",
+    "SINGLE SHIFT THREE",
+    "INFORMATION SEPARATOR TWO",
     "SINGLE SHIFT TWO",
-    "SINGLE CHARACTER INTRODUCER",
-    "NO BREAK HERE",
-    "LINE TABULATION SET",
+    "SHIFT IN",
+    "LINE FEED (LF)",
     "END OF SELECTED AREA",
     "DATA LINK ESCAPE",
-    "STRING TERMINATOR",
-    "END OF MEDIUM",
+    "REVERSE LINE FEED",
+    "NO BREAK HERE",
     "END OF GUARDED AREA",
-    "START OF GUARDED AREA",
-    "OPERATING SYSTEM COMMAND",
-    "INFORMATION SEPARATOR ONE",
-    "CANCEL",
-    "INFORMATION SEPARATOR THREE",
-    "LINE TABULATION",
-    "INFORMATION SEPARATOR FOUR",
-    "APPLICATION PROGRAM COMMAND",
-    "NEGATIVE ACKNOWLEDGE",
-    "DEVICE CONTROL STRING",
-    "LINE FEED (LF)",
-    "INFORMATION SEPARATOR TWO",
-    "FORM FEED (FF)",
-    "NEXT LINE (NEL)",
-    "PARTIAL LINE BACKWARD",
-    "PARTIAL LINE FORWARD",
-    "END OF TRANSMISSION",
-    "PRIVATE USE TWO",
-    "CANCEL CHARACTER",
-    "START OF STRING",
-    "START OF HEADING",
     "END OF TRANSMISSION BLOCK",
-    "CHARACTER TABULATION SET",
-    "PRIVATE USE ONE",
-    "START OF SELECTED AREA",
+    "START OF GUARDED AREA",
+    "CR",
+    "DEVICE CONTROL ONE",
+    "OPERATING SYSTEM COMMAND",
+    "DEVICE CONTROL THREE",
+    "INFORMATION SEPARATOR FOUR",
+    "DEVICE CONTROL TWO",
+    "END OF TRANSMISSION",
+    "NEGATIVE ACKNOWLEDGE",
+    "CANCEL",
+    "STRING TERMINATOR",
+    "NEL",
+    "NULL",
+    "PARTIAL LINE FORWARD",
+    "START OF HEADING",
+    "SINGLE CHARACTER INTRODUCER",
+    "END OF MEDIUM",
+    "LINE TABULATION SET",
     "CARRIAGE RETURN (CR)",
+    "START OF SELECTED AREA",
+    "DEVICE CONTROL FOUR",
+    "NEXT LINE (NEL)",
+    "APPLICATION PROGRAM COMMAND",
+    "LINE TABULATION",
+    "CANCEL CHARACTER",
+    "PRIVATE USE ONE",
+    "BACKSPACE",
+    "START OF STRING",
+    "CHARACTER TABULATION SET",
     "PRIVACY MESSAGE",
+    "DEVICE CONTROL STRING",
+    "BREAK PERMITTED HERE",
     "CHARACTER TABULATION",
     "CONTROL SEQUENCE INTRODUCER",
+    "BELL",
+    "PRIVATE USE TWO",
+    "CHARACTER TABULATION WITH JUSTIFICATION",
     "MESSAGE WAITING",
-    "CHARACTER TABULATION WITH JUSTIFICATION"
+    "PARTIAL LINE BACKWARD"
   };
 #define stringpool ((const char *) &stringpool_contents)
 
@@ -286,98 +295,98 @@ Parrot_namealias_lookup(register const char *str, register unsigned int len)
 {
   static const struct Parrot_namealias wordlist[] =
     {
-      {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str4,	0x0007},
-      {-1, 0},
+      {-1, 0}, {-1, 0},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str2,	0x000C},
+      {-1, 0}, {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str6,	0x001B},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str7,	0x0005},
-      {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str9,	0x0008},
+      {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str10,	0x001A},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str11,	0x007F},
-      {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0},
+      {-1, 0}, {-1, 0},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str14,	0x000C},
+      {-1, 0}, {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str18,	0x0093},
-      {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str20,	0x0082},
+      {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str21,	0x0016},
-      {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str23,	0x0011},
+      {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str24,	0x000E},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str25,	0x0013},
+      {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str26,	0x0003},
-      {-1, 0},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str27,	0x000A},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str28,	0x0002},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str29,	0x0014},
-      {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str32,	0x008D},
+      {-1, 0},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str30,	0x001F},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str31,	0x0006},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str32,	0x001D},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str33,	0x008F},
+      {-1, 0},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str35,	0x001E},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str36,	0x008E},
+      {-1, 0},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str38,	0x000F},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str39,	0x000A},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str40,	0x0087},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str41,	0x0010},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str42,	0x008D},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str43,	0x0083},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str44,	0x0097},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str45,	0x0017},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str46,	0x0096},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str47,	0x000D},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str48,	0x0011},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str49,	0x009D},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str50,	0x0013},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str51,	0x001C},
+      {-1, 0},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str53,	0x0012},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str54,	0x0004},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str55,	0x0015},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str56,	0x0018},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str57,	0x009C},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str58,	0x0085},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str59,	0x0000},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str60,	0x008B},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str61,	0x0001},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str62,	0x009A},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str63,	0x0019},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str64,	0x008A},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str65,	0x000D},
+      {-1, 0},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str67,	0x0086},
+      {-1, 0},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str69,	0x0014},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str70,	0x0085},
+      {-1, 0},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str72,	0x009F},
+      {-1, 0}, {-1, 0},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str75,	0x000B},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str76,	0x0094},
+      {-1, 0}, {-1, 0}, {-1, 0},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str80,	0x0091},
+      {-1, 0}, {-1, 0}, {-1, 0},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str84,	0x0008},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str85,	0x0098},
+      {-1, 0}, {-1, 0}, {-1, 0},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str89,	0x0088},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str90,	0x009E},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str91,	0x0090},
+      {-1, 0}, {-1, 0}, {-1, 0},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str95,	0x0082},
       {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str38,	0x0012},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str39,	0x0000},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str100,	0x0009},
       {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str41,	0x0006},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str102,	0x009B},
       {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str43,	0x000F},
-      {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str46,	0x008E},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str47,	0x009A},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str48,	0x0083},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str49,	0x008A},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str50,	0x0087},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str51,	0x0010},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str52,	0x009C},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str53,	0x0019},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str54,	0x0097},
-      {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str56,	0x0096},
-      {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str59,	0x009D},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str60,	0x001F},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str61,	0x0018},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str62,	0x001D},
-      {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str65,	0x000B},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str66,	0x001C},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str67,	0x009F},
-      {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str70,	0x0015},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str71,	0x0090},
-      {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str74,	0x000A},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str75,	0x001E},
-      {-1, 0}, {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str79,	0x000C},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str80,	0x0085},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str81,	0x008C},
-      {-1, 0}, {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str85,	0x008B},
-      {-1, 0}, {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str89,	0x0004},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str90,	0x0092},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str91,	0x0094},
-      {-1, 0}, {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str95,	0x0098},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str96,	0x0001},
-      {-1, 0}, {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str100,	0x0017},
-      {-1, 0}, {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str104,	0x0088},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str105,	0x0091},
-      {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str107,	0x0086},
-      {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str110,	0x000D},
-      {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str115,	0x009E},
-      {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str120,	0x0009},
-      {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str122,	0x009B},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str104,	0x0007},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str105,	0x0092},
       {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0},
-      {-1, 0}, {-1, 0}, {-1, 0},
+      {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0},
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str119,	0x0089},
+      {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0},
+      {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0},
       {(int)(long)&((struct stringpool_t *)0)->stringpool_str135,	0x0095},
-      {-1, 0}, {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str139,	0x0089}
+      {(int)(long)&((struct stringpool_t *)0)->stringpool_str136,	0x008C}
     };
 
   if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
