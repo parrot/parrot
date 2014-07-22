@@ -393,6 +393,9 @@ u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
     if ((flags & enum_cclass_alphanumeric) && u_isalnum(codepoint))  return 1;
     if ((flags & enum_cclass_word)         &&
         (u_isalnum(codepoint) || codepoint == '_'))                  return 1;
+    if ((flags & enum_cclass_newline)      &&
+        (codepoint == 0x2028 || codepoint == 0x2029 ||
+         u_hasBinaryProperty(codepoint, UCHAR_LINE_BREAK)))          return 1;
 
     return 0;
 #else
@@ -447,6 +450,12 @@ u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
         if (codepoint >= 0x19d0 && codepoint <= 0x19d9) return 1;
         if (codepoint >= 0x1b50 && codepoint <= 0x1b59) return 1;
         if (codepoint >= 0xff10 && codepoint <= 0xff19) return 1;
+    }
+
+    if (flags & enum_cclass_newline) {
+        /* from http://www.unicode.org/Public/UNIDATA/extracted/DerivedLineBreak.txt
+         * Line_Break=Mandatory_Break*/
+        if (codepoint == 0x2028 || codepoint == 0x2029) return 1;
     }
 
     if (flags & ~(enum_cclass_whitespace | enum_cclass_numeric | enum_cclass_newline))
