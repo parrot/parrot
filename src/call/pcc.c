@@ -164,7 +164,7 @@ Parrot_pcc_add_invocant(PARROT_INTERP, ARGIN(PMC *call_obj), ARGIN(PMC *pmc))
     ASSERT_ARGS(Parrot_pcc_add_invocant)
     PMC *arg_flags = PARROT_CALLCONTEXT(call_obj)->arg_flags;
     VTABLE_unshift_integer(interp, arg_flags, PARROT_ARG_PMC | PARROT_ARG_INVOCANT);
-    VTABLE_unshift_pmc(interp, call_obj, pmc);
+    Parrot_CallContext_unshift_pmc(interp, call_obj, pmc);
 }
 
 /*
@@ -206,7 +206,7 @@ Parrot_pcc_invoke_method_from_c_args(PARROT_INTERP, ARGIN(PMC* pmc),
     /* inlined version of pcc_add_invocant */
     arg_flags = PARROT_CALLCONTEXT(call_obj)->arg_flags;
     VTABLE_unshift_integer(interp, arg_flags, PARROT_ARG_PMC | PARROT_ARG_INVOCANT);
-    VTABLE_unshift_pmc(interp, call_obj, pmc);
+    Parrot_CallContext_unshift_pmc(interp, call_obj, pmc);
 
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), call_obj);
 

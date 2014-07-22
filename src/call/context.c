@@ -887,7 +887,12 @@ Parrot_pcc_reuse_continuation(PARROT_INTERP, ARGIN(PMC *call_context), ARGIN_NUL
         c->continuation = Parrot_pmc_new(interp, enum_class_Continuation);
     }
 
-    VTABLE_set_pointer(interp, c->continuation, next);
+    /*Parrot_Continuation_set_pointer(interp, c->continuation, next);*/
+    SETATTR_Continuation_address(interp, c->continuation, next);
+    /* needed */
+    SETATTR_Continuation_runloop_id(interp, c->continuation, interp->current_runloop_id);
+    PARROT_GC_WRITE_BARRIER(interp, c->continuation);
+
     interp->current_cont = c->continuation;
 }
 
