@@ -337,9 +337,10 @@ sub decl {
     }
     my $interp = $self->interp_unused ? 'SHIM_INTERP' : 'PARROT_INTERP';
     my $pmcarg = $self->pmc_unused ? 'SHIM(PMC *_self)' : 'ARGMOD(PMC *_self)';
+    my $static = $pmcname eq 'CallContext' ? "" : "static";
 
     return <<"EOC";
-static $decs $ret${newl}Parrot_${pmcname}_$meth($interp, $pmcarg$args)$semi
+$static $decs $ret${newl}Parrot_${pmcname}_$meth($interp, $pmcarg$args)$semi
 EOC
 }
 
