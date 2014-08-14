@@ -1,6 +1,8 @@
 2014-08-19    release 6.7.0
     - Core
         + find_codepoint: added more name aliases for perl6 (LF,FF,CR and NEL)
+        + Optimize internal pcc CallContext calls from VTABLE to direct calls
+          and inline CallContext ATTR accessors to omit the obj check. [GH #1083]
     - Build
     - Documentation
         + Updated documentation for StringHandle.readall and FileHandle.readall, which
@@ -8,6 +10,8 @@
     - Tests
         + Improve test plan for t/library/pg.t
     - Community
+        + Our GSoC student Chirag Agrawal successfully passed the final evaluation.
+          All three project parts have been merged already.
 
 2014-07-15    release 6.6.0
     - Core
