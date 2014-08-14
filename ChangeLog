@@ -10,6 +10,8 @@
     - Tests
         + Improve test plan for t/library/pg.t
     - Community
+        + Our GSoC student Chirag Agrawal successfully passed the final evaluation.
+          All three project parts have been merged already.
 
 2014-07-15    release 6.6.0
     - Core
