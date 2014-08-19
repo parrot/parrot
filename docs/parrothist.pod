@@ -175,5 +175,6 @@ Starred release numbers indicate supported releases.
  Util        6.4.0          2014-May-20     "Double-eyed Fig Parrot"
  rurban      6.5.0          2014-Jun-17     "Black-winged Lovebird"
  Util        6.6.0 *        2014-Jul-15     "Parrothead"
+ rurban      6.7.0          2014-Aug-19     "Grey-headed Lovebird"
 
 =cut
