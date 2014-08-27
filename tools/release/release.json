@@ -1,9 +1,9 @@
 {
-    "release.version"  : "6.6.0",
-    "release.name"     : "Parrothead",
+    "release.version"  : "6.7.0",
+    "release.name"     : "Grey-headed Lovebird",
     "release.day"      : "Tuesday",
-    "release.nextdate" : "19 Aug 2014",
-    "release.type"     : "supported",
+    "release.nextdate" : "16 Sep 2014",
+    "release.type"     : "devel",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -12,10 +12,10 @@
     "web.org_root"     : "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "16 Aug 2014",
+    "bugday.date"      : "13 Sep 2014",
 
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
-    "wiki.bugday"      : "bug_day_2014_08_16",
+    "wiki.bugday"      : "bug_day_2014_09_13",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/6.6.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/6.7.0/"
 }
