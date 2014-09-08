@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -53,8 +53,16 @@ Parrot::Test::Util::Runloop->testloop(
 # https://trac.parrot.org will be inaccurately reported as a C++-style
 # comment.
 # Quick fix added
+# Note: Crashes with perl < 5.10 with DEBUGGING
 sub check_cppcomments {
     my $buf = shift;
+    if ($] < 5.010) {
+        require Config;
+        if ($Config::Config{ccflags} =~ /DDEBUGGING/) {
+            diag "skip check_cppcomments with $] and DEBUGGING";
+            return 1;
+        }
+    }
     $buf =~ s{ (?:
                    (?: ' (?: \\\\ | \\' | [^'] )* ' )  # remove ' string
                  | (?: " (?: \\\\ | \\" | [^"] )* " )  # remove " string

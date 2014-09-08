@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2008-2010, Parrot Foundation.
+# Copyright (C) 2008-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -42,6 +42,13 @@ sub check_macro_args {
     foreach my $file (@files) {
         my $path = @ARGV ? $file : $file->path();
         my $buf = $DIST->slurp($path);
+        if ($] < 5.010) {
+            require Config;
+            if ($Config::Config{ccflags} =~ /DDEBUGGING/) {
+                ok(1, "skip check_macro_args with $] and DEBUGGING");
+                return 1;
+            }
+        }
         $buf =~ s{ (?:
                        (?: ' (?: \\\\ | \\' | [^'] )* ' )  # remove ' string
                      | (?: " (?: \\\\ | \\" | [^"] )* " )  # remove " string

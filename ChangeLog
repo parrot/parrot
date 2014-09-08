@@ -8,6 +8,7 @@
     - Tests
         + Update embedded Pod::Simple to 3.28 to fix the missing whiteline_handler method
           from non-embedded podchecker [GH #1089]
+        + Skip 3 crashing codingstd tests with 5.8 DEBUGGING [GH #1090]
     - Community
 
 2014-08-19    release 6.7.0

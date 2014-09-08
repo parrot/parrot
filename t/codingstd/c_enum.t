@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -41,6 +41,13 @@ sub check_enums {
         my $path = @ARGV ? $file : $file->path();
         my $buf  = $DIST->slurp($path);
 
+        if ($] < 5.010) {
+            require Config;
+            if ($Config::Config{ccflags} =~ /DDEBUGGING/) {
+                ok(1, "skip check_enums with $] and DEBUGGING");
+                return 1;
+            }
+        }
         # strip ', ", and C comments
         $buf =~ s{ (?:
                        (?: (') (?: \\\\ | \\' | [^'] )* (') ) # remove ' string
