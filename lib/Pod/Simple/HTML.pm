@@ -10,7 +10,7 @@ use vars qw(
   $Doctype_decl  $Content_decl
 );
 @ISA = ('Pod::Simple::PullParser');
-$VERSION = '3.19';
+$VERSION = '3.28';
 
 BEGIN {
   if(defined &DEBUG) { } # no-op
@@ -134,7 +134,7 @@ my @_to_accept;
     qw[
       sample=samp
       definition=dfn
-      kbd=keyboard
+      keyboard=kbd
       variable=var
       citation=cite
       abbreviation=abbr
@@ -145,6 +145,8 @@ my @_to_accept;
       small=small
       underline=u
       strikethrough=s
+      preformat=pre
+      teletype=tt
     ]  # no point in providing a way to get <q>...</q>, I think
   ),
   
@@ -491,8 +493,11 @@ sub _do_middle_main_loop {
         $name = $self->do_section($name, $token) if defined $name;
 
         print $fh "<a ";
-        print $fh "class='u' href='#___top' title='click to go to top of document'\n"
-         if $tagname =~ m/^head\d$/s;
+        if ($tagname =~ m/^head\d$/s) {
+            print $fh "class='u'", $self->index
+                ? " href='#___top' title='click to go to top of document'\n"
+                : "\n";
+        }
         
         if(defined $name) {
           my $esc = esc(  $self->section_name_tidy( $name ) );
@@ -1086,7 +1091,7 @@ pod-people@perl.org mail list. Send an empty email to
 pod-people-subscribe@perl.org to subscribe.
 
 This module is managed in an open GitHub repository,
-L<http://github.com/theory/pod-simple/>. Feel free to fork and contribute, or
+L<https://github.com/theory/pod-simple/>. Feel free to fork and contribute, or
 to clone L<git://github.com/theory/pod-simple.git> and send patches!
 
 Patches against Pod::Simple are welcome. Please send bug reports to

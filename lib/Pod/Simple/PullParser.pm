@@ -1,7 +1,7 @@
 
 require 5;
 package Pod::Simple::PullParser;
-$VERSION = '3.19';
+$VERSION = '3.28';
 use Pod::Simple ();
 BEGIN {@ISA = ('Pod::Simple')}
 
@@ -231,6 +231,8 @@ sub unget_token {
 sub set_source {
   my $self = shift @_;
   return $self->{'source_fh'} unless @_;
+  Carp::croak("Cannot assign new source to pull parser; create a new instance, instead")
+      if $self->{'source_fh'} || $self->{'source_scalar_ref'} || $self->{'source_arrayref'};
   my $handle;
   if(!defined $_[0]) {
     Carp::croak("Can't use empty-string as a source for set_source");
@@ -345,6 +347,7 @@ sub _get_titled_section {
 
   my $head1_text_content;
   my $para_text_content;
+  my $skipX;
 
   while(
     ++$token_count <= ($max_token || 1_000_000)
@@ -362,8 +365,14 @@ sub _get_titled_section {
 
     elsif($state == 1) { # accumulating text until end of head1
       if( $token->is_text ) {
-        DEBUG and print "   Adding \"", $token->text, "\" to head1-content.\n";
-        $head1_text_content .= $token->text;
+          unless ($skipX) {
+            DEBUG and print "   Adding \"", $token->text, "\" to head1-content.\n";
+            $head1_text_content .= $token->text;
+          }
+      } elsif( $token->is_tagname('X') ) {
+          # We're going to want to ignore X<> stuff.
+          $skipX = $token->is_start;
+          DEBUG and print +($skipX ? 'Start' : 'End'), 'ing ignoring of X<> tag';
       } elsif( $token->is_end and $token->tagname eq 'head1' ) {
         DEBUG and print "  Found end of head1.  Considering content...\n";
         $head1_text_content = uc $head1_text_content if $nocase;
@@ -390,9 +399,9 @@ sub _get_titled_section {
             ? (length($head1_text_content) <= $max_content_length) # sanity
             : 1)
         ) {
-          DEBUG and print "  It looks titular: \"$head1_text_content\".\n",
-            "\n  Using that.\n";
-          $title = $head1_text_content;
+          # Looks good; trim it
+          ($title = $head1_text_content) =~ s/\s+$//;
+          DEBUG and print "  It looks titular: \"$title\".\n\n  Using that.\n";
           last;
         } else {
           --$state;
@@ -734,7 +743,7 @@ pod-people@perl.org mail list. Send an empty email to
 pod-people-subscribe@perl.org to subscribe.
 
 This module is managed in an open GitHub repository,
-L<http://github.com/theory/pod-simple/>. Feel free to fork and contribute, or
+L<https://github.com/theory/pod-simple/>. Feel free to fork and contribute, or
 to clone L<git://github.com/theory/pod-simple.git> and send patches!
 
 Patches against Pod::Simple are welcome. Please send bug reports to

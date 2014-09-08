@@ -5,6 +5,8 @@
           and not only argv[0] which needs to be looked up in the path. [GH #1088]
     - Documentation
     - Tests
+        + Update embedded Pod::Simple to 3.28 to fix the missing whiteline_handler method
+          from non-embedded podchecker [GH #1089]
     - Community
 
 2014-08-19    release 6.7.0
