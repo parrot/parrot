@@ -1,6 +1,6 @@
 #! winxed
 
-# Copyright (C) 2009-2012 Parrot Foundation.
+# Copyright (C) 2009-2014 Parrot Foundation.
 
 /*
 
@@ -37,7 +37,9 @@ const string C_HEADER = <<:HEADER
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h> /* for readlink() */
 #include "parrot/api.h"
+
 int Parrot_set_config_hash(Parrot_PMC interp_pmc);
 static void show_last_error_and_exit(Parrot_PMC interp);
 static void print_parrot_string(Parrot_PMC interp, FILE *vector, Parrot_String str, int newline);
@@ -45,8 +47,8 @@ static void setup_pir_compregs(Parrot_PMC interp);
 static PMC * get_class_pmc(Parrot_PMC interp, const char *name);
 static void get_imcc_compiler_pmc(Parrot_PMC interp, Parrot_PMC class_pmc, Parrot_Int is_pasm);
 
+#define TRACE 0
 
-    #define TRACE 0
 HEADER:>>
     ;
 
