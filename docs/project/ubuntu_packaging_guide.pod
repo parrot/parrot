@@ -1,6 +1,5 @@
-# Copyright (C) 2007-2012, Parrot Foundation.
-
-=pod
+# Copyright (C) 2007-2014, Parrot Foundation.
+=encoding utf8
 
 =head1 NAME
 
@@ -25,17 +24,17 @@ To package Parrot for Ubuntu:
 
 =over 4
 
-=item 0.
+=item C<0.>
 
 Download the latest tarball.
 
-=item 1.
+=item C<1.>
 
 Compile it and run the tests, just to be sure the tarball is sound (especially
 useful if you're running in a chroot environment different than your usual dev
 environment).
 
-=item 2.
+=item C<2.>
 
 Create a new directory. (The name is irrelevant, but we'll use F<~/udeb/parrot> for
 the sake of illustration.)
@@ -46,7 +45,7 @@ directory should be named F<parrot-[version]> (it will be by default).
 Copy the original tarball into F<~/udeb/parrot>, naming it
 F<parrot_[version].orig.tar.gz> (note the "_" in place of dash).
 
-=item 3.
+=item C<3.>
 
 Integrate any new change entries from F<ports/debian/changelog> into
 F<ports/ubuntu/changelog>, preserving chronological order.
@@ -62,7 +61,7 @@ F<ports/ubuntu/> into the new F<debian/> directory.
 
   cp <path/to/parrot/git>/ports/ubuntu/* ~/udeb/parrot/parrot-[version]/debian/.
 
-=item 4.
+=item C<4.>
 
 Add a new entry to the F<changelog> file in
 F<~/udeb/parrot/parrot-[version]/debian/> for the Ubuntu package. Copy
@@ -84,26 +83,26 @@ required between the email and the date.)
 
    -- Your Name <you@example.org>  Sun, 30 Dec 2007 17:21:45 +0000
 
-=item 5.
+=item C<5.>
 
 Install all dependencies:
 
   $ sudo /usr/lib/pbuilder/pbuilder-satisfydepends
 
-=item 6.
+=item C<6.>
 
 Build the source packages. From F<~/udeb/parrot/parrot_[version]/>, run:
 
   $ debuild -S -sa
 
-=item 7.
+=item C<7.>
 
 Update Parrot's PPA with the new release (configured in ChrootSetup).
 From F<~/udeb/parrot/> run:
 
   $ dput parrot-ppa parrot_[version]_source.changes
 
-=item 8.
+=item C<8.>
 
 Commit the Ubuntu F<changelog> file to the F<ports/ubuntu/> directory in the
 repository. (At the moment, we're keeping the Debian packages as the primary.)

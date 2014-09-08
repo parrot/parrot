@@ -121,29 +121,17 @@ Currently these segment types are defined:
 
 =over 4
 
-=item 0
+=item Directory segment
 
-Directory segment
+=item Unknown segment (conforms to a default segment)
 
-=item 1
+=item Fixup segment
 
-Unknown segment (conforms to a default segment)
+=item Constant table segment
 
-=item 2
+=item Bytecode segment
 
-Fixup segment
-
-=item 3
-
-Constant table segment
-
-=item 4
-
-Bytecode segment
-
-=item 5
-
-Debug segment
+=item Debug segment
 
 =back
 

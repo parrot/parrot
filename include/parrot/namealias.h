@@ -3,15 +3,6 @@ Copyright (C) 2014, Parrot Foundation.
 
 gperf generated icu control character namealias lookup
 
-=over
-
-=item C<struct Parrot_namealias>
-
-Generated hash table with name and codepoint.
-
-=back
-
-=cut
 */
 
 #ifndef PARROT_NAMEALIAS_H_GUARD

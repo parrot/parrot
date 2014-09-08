@@ -1265,6 +1265,10 @@ FOOTER
 
 1;
 
+=end ignored
+
+=cut
+
 # Local Variables:
 #   mode: cperl
 #   cperl-indent-level: 4

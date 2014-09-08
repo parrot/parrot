@@ -426,7 +426,7 @@ set_integer_keyed_str.
 
 /*
 
-=item * C<get_string_keyed_str> (v-table)
+=item C<get_string_keyed_str> (v-table)
 
 Used to get data about fields in the header that have a string value. Valid
 keys are:

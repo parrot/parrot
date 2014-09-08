@@ -39,8 +39,6 @@ used to generate native pbc's.
   8_le: x86_64 double float 64 bit opcode_t   (linux-gcc-x86_64, solaris-cc-64int)
   8_be: big-endian 64 bit opcode_t, 8 byte double (Sparc64, mips64, ppc64)
 
-=cut
-
 =begin comment
 
 See t/native_pbc/number.t for additional comments.
@@ -61,6 +59,8 @@ On test failures please add the output of
   $ ./pbc_dump -h t/native_pbc/integer_${id}.pbc
 
 into your report. We need your wordsize/floattype/endianess.
+
+=end comment
 
 =cut
 

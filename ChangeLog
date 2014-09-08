@@ -4,6 +4,7 @@
         + pbc_to_exe created executables use now the absolute execname on most platforms
           and not only argv[0] which needs to be looked up in the path. [GH #1088]
     - Documentation
+        + Fix various new podchecker syntax errors with the new Pod::Simple 3.28
     - Tests
         + Update embedded Pod::Simple to 3.28 to fix the missing whiteline_handler method
           from non-embedded podchecker [GH #1089]

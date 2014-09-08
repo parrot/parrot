@@ -1,6 +1,5 @@
 #! perl
-# Copyright (C) 2008-2013, Parrot Foundation.
-# auto/pcre-01.t
+# Copyright (C) 2008-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -138,10 +137,11 @@ $test = q{pcre 4.0};
 pass("Completed all tests in $0");
 
 ################### DOCUMENTATION ###################
+=encoding utf8
 
 =head1 NAME
 
-  auto/pcre-01.t - test auto::pcre
+auto/pcre-01.t - test auto::pcre
 
 =head1 SYNOPSIS
 
@@ -155,7 +155,7 @@ The tests in this file test configuration step class auto::pcre.
 
 =head1 AUTHOR
 
-Alberto Sim√es.
+Alberto Sim√µes
 
 =head1 SEE ALSO
 

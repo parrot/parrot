@@ -1,6 +1,5 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
-
-=pod
+# Copyright (C) 2001-2014, Parrot Foundation.
+=encoding utf8
 
 =head1 NAME
 
@@ -83,14 +82,14 @@ Make sure that there is actually a patch attached to the ticket. If you've
 applied a patch, be sure to include the revision in your response when closing
 the ticket.
 
-=item * Is it a [CAGE] bug?
+=item Is it a [CAGE] bug?
 
 Is the subject line in the format C<"[CAGE] subsystem - issue>?
 
 C<[CAGE]> bugs should have their status changed to C<open> to prevent them from
 appearing in a listing of C<new> bugs.
 
-=item * Assign the bug to someone if at all possible.
+=item Assign the bug to someone if at all possible.
 
 =back
 

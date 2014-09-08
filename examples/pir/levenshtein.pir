@@ -3,7 +3,7 @@
 # Levenshtein distance
 #
 # implementation based on http://www.merriampark.com/ld.htm
-# First implementation by Alberto Simoes (ambs <at> cpan.org)
+# First implementation by Alberto Simões (ambs <at> cpan.org)
 #
 
 # .sub main :main

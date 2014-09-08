@@ -1,6 +1,5 @@
-# Copyright (C) 2001-2012, Parrot Foundation.
-
-=pod
+# Copyright (C) 2001-2014, Parrot Foundation.
+=encoding utf8
 
 =head1 NAME
 
@@ -449,7 +448,7 @@ Alberto Simões
 
 =over 4
 
-=item * Jonathan Scott Duff
+=item Jonathan Scott Duff
 
 =back
 

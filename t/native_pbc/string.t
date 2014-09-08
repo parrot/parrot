@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -70,13 +70,13 @@ used to generate native pbc's.
   8_le: x86_64 double float 64 bit opcode_t   (linux-gcc-x86_64, solaris-cc-64int)
   8_be: big-endian 64 bit opcode_t, 8 byte double (Sparc64, mips64, ppc64)
 
-=cut
-
 =begin comment
 
 The PBC is generated from t/native_pbc/testdata/string.pasm for different architectures.
 
 For adding tests, see the comments in t/native_pbc/number.t
+
+=end comment
 
 =cut
 

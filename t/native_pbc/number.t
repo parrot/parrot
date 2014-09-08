@@ -242,9 +242,6 @@ little/big-endian.
   4_4_be: big-endian 32 bit opcode_t, 4 byte intval, 4 byte single float
        (darwin or debian/ppc with --floatval="float")
 
-=cut
-
-
 =begin comment
 
 # These are PBC files generated from F<t/native_pbc/testdata/number.pasm> with
@@ -269,6 +266,8 @@ On test failures please add the output of
   $ ./pbc_dump -h t/native_pbc/number_${id}.pbc
 
 into your report. We need your wordsize/floattype/endianess.
+
+=end comment
 
 =cut
 

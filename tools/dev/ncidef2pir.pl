@@ -1,6 +1,5 @@
 #! perl
-
-# Copyright (C) 2003-2011, Parrot Foundation.
+# Copyright (C) 2003-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -126,19 +125,19 @@ Interpreter pointer. The current interpreter pointer is passed in
 
 PMC.
 
-=item 2
+=item C<2>
 
 Pointer to short.
 
 Taken from an I register.
 
-=item 3
+=item C<3>
 
 Pointer to int.
 
 Taken from an I register
 
-=item 4
+=item C<4>
 
 Pointer to long
 

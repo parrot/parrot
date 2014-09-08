@@ -1,6 +1,5 @@
 # Copyright (C) 2006-2014, Parrot Foundation.
-
-=pod
+=encoding utf8
 
 =head1 NAME
 
@@ -176,5 +175,6 @@ Starred release numbers indicate supported releases.
  rurban      6.5.0          2014-Jun-17     "Black-winged Lovebird"
  Util        6.6.0 *        2014-Jul-15     "Parrothead"
  rurban      6.7.0          2014-Aug-19     "Grey-headed Lovebird"
+ Util        6.8.0          2014-Sep-16     (upcoming)
 
 =cut

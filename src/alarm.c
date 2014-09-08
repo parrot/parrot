@@ -149,7 +149,6 @@ set the alarm.
 */
 
 PARROT_EXPORT
-PARROT_INLINE
 int
 Parrot_alarm_check(ARGMOD(UINTVAL* last_serial))
 {

@@ -59,7 +59,7 @@ static void throw_shift_empty(PARROT_INTERP)
 
 /*
 
-=item C<inline static void do_shift(ARGIN(PMC *arr))>
+=item C<static void do_shift(PMC *arr)>
 
 Removes and returns an item from the start of the array.
 Moves the whole rest of the array around.
@@ -82,7 +82,7 @@ do_shift(ARGIN(PMC *arr))
 
 /*
 
-=item C<inline static void do_unshift(ARGIN(PMC *arr))>
+=item C<static void do_unshift(PARROT_INTERP, PMC *arr, PMC *val)>
 
 Adds an item at the start of the array.
 Moves the whole rest of the array around.
