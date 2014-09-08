@@ -36,6 +36,7 @@ $load "config.pbc";
 const string C_HEADER = <<:HEADER
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "parrot/api.h"
 int Parrot_set_config_hash(Parrot_PMC interp_pmc);
 static void show_last_error_and_exit(Parrot_PMC interp);
@@ -58,8 +59,43 @@ const string C_MAIN = <<:MAIN
             PMC                 *pbc;
             PMC                 *argsarray;
             const unsigned char *program_code_addr;
-
             Parrot_Init_Args    *initargs;
+
+            char execname[1024];
+            size_t execname_size = sizeof(execname);
+            memset(execname, 0, execname_size);
+#if defined(__APPLE__)
+            if (_NSGetExecutablePath(execname, &execname_size) != 0)
+                memcpy(execname, argv[0], strlen(argv[0]));
+#elif defined(sun) || defined(__sun)
+            const char *_execname = getexecname();
+            if (_execname)
+                memcpy(execname, _execname, strlen(_execname));
+            else
+                memcpy(execname, argv[0], strlen(argv[0]));
+#elif defined(__FreeBSD__)
+            int mib[4];
+            mib[0] = CTL_KERN;
+            mib[1] = KERN_PROC;
+            mib[2] = KERN_PROC_PATHNAME;
+            mib[3] = -1;
+            sysctl(mib, 4, execname, &execname_size, NULL, 0);
+#elif defined(__NetBSD__)
+            if (readlink("/proc/curproc/exe", execname, execname_size-1) <= 0)
+                memcpy(execname, argv[0], strlen(argv[0]));
+#elif defined(__DragonFly__)
+            if (readlink("/proc/curproc/file", execname, execname_size-1) <= 0)
+                memcpy(execname, argv[0], strlen(argv[0]));
+#elif defined(_WIN32)
+            if (GetModuleFileName(NULL, execname, (DWORD)execname_size) == 0)
+                memcpy(execname, argv[0], strlen(argv[0]));
+#elif defined(__unix__) || defined(__linux__)
+            if (readlink("/proc/self/exe", execname, execname_size-1) <= 0)
+                memcpy(execname, argv[0], strlen(argv[0]));
+#else
+            memcpy(execname, argv[0], strlen(argv[0]));
+#endif
+
             GET_INIT_STRUCT(initargs);
 
             initargs->gc_system = GCCORE;
@@ -71,7 +107,7 @@ const string C_MAIN = <<:MAIN
 
             if (!(Parrot_api_make_interpreter(NULL, 0, initargs, &interp) &&
                   Parrot_set_config_hash(interp) &&
-                  Parrot_api_set_executable_name(interp, argv[0]) &&
+                  Parrot_api_set_executable_name(interp, execname) &&
                   Parrot_api_set_runcore(interp, RUNCORE, TRACE))) {
                 fprintf(stderr, "PARROT VM: Could not initialize new interpreter\n");
                 show_last_error_and_exit(interp);
