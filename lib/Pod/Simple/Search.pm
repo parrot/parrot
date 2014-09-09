@@ -961,8 +961,6 @@ strips Perl-like extensions (.pm, .pl, .pod) and extensions like
 F<.bat>, F<.cmd> on Win32 and OS/2, or F<.com> on VMS, respectively.
 
 
-=head2 C<< $search->find( $pod ) >>
-
 =head2 C<< $search->find( $pod, @search_dirs ) >>
 
 Returns the location of a Pod file, given a Pod/module/script name
@@ -1004,6 +1002,7 @@ with default attribute values is used.
 
 Returns true if the supplied filename (not POD module) contains some Pod
 documentation.
+
 =head1 SUPPORT
 
 Questions or discussion about POD and Pod::Simple should be sent to the
