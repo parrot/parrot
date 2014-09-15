@@ -38,6 +38,9 @@ const string C_HEADER = <<:HEADER
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h> /* for readlink() */
+#ifdef __APPLE__
+#  include <mach-o/dyld.h> /* for _NSGetExecutablePath() */
+#endif
 #include "parrot/api.h"
 
 int Parrot_set_config_hash(Parrot_PMC interp_pmc);
@@ -67,7 +70,7 @@ const string C_MAIN = <<:MAIN
             size_t execname_size = sizeof(execname);
             memset(execname, 0, execname_size);
 #if defined(__APPLE__)
-            if (_NSGetExecutablePath(execname, &execname_size) != 0)
+            if (_NSGetExecutablePath(execname, (unsigned int*)&execname_size) != 0)
                 memcpy(execname, argv[0], strlen(argv[0]));
 #elif defined(sun) || defined(__sun)
             const char *_execname = getexecname();
