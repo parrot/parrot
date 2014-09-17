@@ -1,8 +1,8 @@
 {
-    "release.version"  : "6.7.0",
-    "release.name"     : "Grey-headed Lovebird",
+    "release.version"  : "6.8.0",
+    "release.name"     : "Little Lorikeet",
     "release.day"      : "Tuesday",
-    "release.nextdate" : "16 Sep 2014",
+    "release.nextdate" : "21 Oct 2014",
     "release.type"     : "devel",
 
     "web.root"         : "http://parrot.org/",
@@ -12,10 +12,10 @@
     "web.org_root"     : "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "13 Sep 2014",
+    "bugday.date"      : "18 Oct 2014",
 
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
-    "wiki.bugday"      : "bug_day_2014_09_13",
+    "wiki.bugday"      : "bug_day_2014_10_18",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/6.7.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/6.8.0/"
 }
