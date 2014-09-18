@@ -41,6 +41,9 @@ const string C_HEADER = <<:HEADER
 #ifdef __APPLE__
 #  include <mach-o/dyld.h> /* for _NSGetExecutablePath() */
 #endif
+#ifdef __FreeBSD__
+#  include <sys/sysctl.h>
+#endif
 #include "parrot/api.h"
 
 int Parrot_set_config_hash(Parrot_PMC interp_pmc);
