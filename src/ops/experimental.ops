@@ -40,7 +40,7 @@ all generated ops files.
 
 Break into debugger. Implementation notes:
 
- - x86/gcc ... works with gdb
+ - x86/gcc ... works with gdb/lldb
  - ppc/gcc ... works with gdb, to proceed: gdb> p $pc = $pc + 4
  - TODO
 
@@ -50,7 +50,7 @@ For other architectures, this is a C<noop>.
 
 op trap() :deprecated {
     UNUSED(interp);
-#if defined(__GNUC__) && defined(i386) && !defined(sun)
+#if defined(__GNUC__) && (defined(i386) || defined(__x86_64__)) && !defined(sun)
     __asm__("int3");       /* opcode 0xcc */
 #endif
 #if defined(__GNUC__) && defined(PPC)
