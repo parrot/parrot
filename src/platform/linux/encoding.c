@@ -1,12 +1,12 @@
 /*
- * Copyright (C) 2011-2012, Parrot Foundation.
+ * Copyright (C) 2011-2014, Parrot Foundation.
  */
 
 /*
 
 =head1 NAME
 
-config/gen/platform/generic/encoding.c
+config/gen/platform/linux/encoding.c
 
 =head1 DESCRIPTION
 

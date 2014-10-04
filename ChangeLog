@@ -1,5 +1,7 @@
 2014-10-21    release 6.9.0
     - Core
+	+ Add platform encoding functions for FreeBSD, OpenBSD and NetBSD, fixing
+	  rakudo problems with UTF-8 locales. [GH #1092]
     - Build
     - Documentation
     - Tests
