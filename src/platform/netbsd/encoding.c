@@ -1,12 +1,12 @@
 /*
- * Copyright (C) 2011-2014, Parrot Foundation.
+ * Copyright (C) 2014, Parrot Foundation.
  */
 
 /*
 
 =head1 NAME
 
-config/gen/platform/linux/encoding.c
+config/gen/platform/netbsd/encoding.c
 
 =head1 DESCRIPTION
 
@@ -47,9 +47,9 @@ Parrot_init_platform_encoding(SHIM_INTERP)
         const char *codeset = nl_langinfo(CODESET);
         if (STREQ(codeset, "UTF-8"))
             Parrot_platform_encoding_ptr = Parrot_utf8_encoding_ptr;
-        else if (STREQ(codeset, "ISO-8859-1"))
+        else if (STREQ(codeset, "ISO8859-1"))
             Parrot_platform_encoding_ptr = Parrot_latin1_encoding_ptr;
-        else if (STREQ(codeset, "ANSI_X3.4-1968"))
+        else if (STREQ(codeset, "646"))
             Parrot_platform_encoding_ptr = Parrot_ascii_encoding_ptr;
         else {
             /* Can't use Parrot_warn here, the interpreter is not ready */

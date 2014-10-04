@@ -1842,6 +1842,8 @@ src/platform/darwin/hires_timer$(O) : src/platform/darwin/hires_timer.c $(PARROT
 
 src/platform/darwin/sysmem$(O) : src/platform/darwin/sysmem.c $(PARROT_H_HEADERS)
 
+src/platform/freebsd/encoding$(O) : src/platform/freebsd/encoding.c $(PARROT_H_HEADERS)
+
 src/platform/generic/cpu_type$(O) : src/platform/generic/cpu_type.c $(PARROT_H_HEADERS)
 
 src/platform/generic/dl$(O) : src/platform/generic/dl.c $(PARROT_H_HEADERS)
@@ -1884,7 +1886,11 @@ src/platform/win32/entropy$(O) : src/platform/win32/entropy.c $(PARROT_H_HEADERS
 
 src/platform/linux/encoding$(O) : src/platform/linux/encoding.c $(PARROT_H_HEADERS)
 
+src/platform/netbsd/encoding$(O) : src/platform/netbsd/encoding.c $(PARROT_H_HEADERS)
+
 src/platform/netbsd/misc$(O) : src/platform/netbsd/misc.c $(PARROT_H_HEADERS)
+
+src/platform/openbsd/encoding$(O) : src/platform/openbsd/encoding.c $(PARROT_H_HEADERS)
 
 src/platform/openbsd/math$(O) : src/platform/openbsd/math.c $(PARROT_H_HEADERS)
 
