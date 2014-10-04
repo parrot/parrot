@@ -93,7 +93,9 @@ static PIOOFF_T io_socket_seek(PARROT_INTERP,
 
 static void io_socket_set_eof(PARROT_INTERP,
     ARGIN_NULLOK(PMC *handle),
-    INTVAL is_eof);
+    INTVAL is_eof)
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*handle);
 
 static void io_socket_set_flags(PARROT_INTERP,
     ARGIN_NULLOK(PMC *handle),
@@ -150,9 +152,15 @@ static INTVAL io_socket_write_b(PARROT_INTERP,
 #define ASSERT_ARGS_io_socket_seek __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
-#define ASSERT_ARGS_io_socket_set_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_io_socket_set_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
-#define ASSERT_ARGS_io_socket_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_io_socket_set_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_socket_set_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
+#define ASSERT_ARGS_io_socket_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_socket_tell __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
@@ -191,7 +199,6 @@ io_socket_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), INTVAL i
     vtable->write_b = io_socket_write_b;
     vtable->flush = io_socket_flush;
     vtable->is_eof = io_socket_is_eof;
-    vtable->set_eof = io_socket_set_eof;
     vtable->tell = io_socket_tell;
     vtable->seek = io_socket_seek;
     vtable->adv_position = io_socket_adv_position;
@@ -285,7 +292,7 @@ static INTVAL
 io_socket_is_eof(SHIM_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(io_socket_is_eof)
-    UNUSED(handle)
+    UNUSED(handle);
     return 0;
 }
 
@@ -294,6 +301,8 @@ io_socket_set_eof(SHIM_INTERP, ARGIN_NULLOK(PMC *handle), SHIM(INTVAL is_eof))
 {
     ASSERT_ARGS(io_socket_set_eof)
     UNUSED(handle);
+    UNUSED(is_eof);
+    return !!(buffer->flags & PIO_BF_UNDERFLOW);
 }
 
 /*

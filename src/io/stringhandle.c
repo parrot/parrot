@@ -103,8 +103,11 @@ static PIOOFF_T io_stringhandle_seek(PARROT_INTERP,
         FUNC_MODIFIES(*handle);
 
 static void io_stringhandle_set_eof(PARROT_INTERP,
-    PMC *handle,
-    INTVAL is_set);
+    ARGMOD(PMC *handle),
+    INTVAL is_set)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*handle);
 
 static void io_stringhandle_set_flags(PARROT_INTERP,
     ARGIN(PMC *handle),
@@ -169,7 +172,9 @@ static INTVAL io_stringhandle_write_b(PARROT_INTERP,
 #define ASSERT_ARGS_io_stringhandle_seek __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
-#define ASSERT_ARGS_io_stringhandle_set_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_io_stringhandle_set_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_stringhandle_set_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_stringhandle_set_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
@@ -219,7 +224,6 @@ io_stringhandle_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), IN
     vtable->write_b = io_stringhandle_write_b;
     vtable->flush = io_stringhandle_flush;
     vtable->is_eof = io_stringhandle_is_eof;
-    vtable->set_eof = io_stringhandle_set_eof;
     vtable->tell = io_stringhandle_tell;
     vtable->seek = io_stringhandle_seek;
     vtable->adv_position = io_stringhandle_adv_position;
@@ -319,11 +323,6 @@ io_stringhandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
 
 The StringHandle is at eof if the current read cursor is passed the end of the
 string contents.
-
-=item C<static void io_stringhandle_set_eof(PARROT_INTERP, PMC *handle, INTVAL
-is_set)>
-
-Do nothing.
 
 =cut
 

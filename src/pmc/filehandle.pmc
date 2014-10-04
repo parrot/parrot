@@ -217,7 +217,6 @@ For internal usage only, subject to change without notice.
         }
     }
 
-
 /*
 
 =item C<INTVAL get_bool()>
@@ -314,7 +313,6 @@ Returns a boolean value indicating whether C<SELF> is a console/tty.
         RETURN(INTVAL isatty);
     }
 
-
 /*
 
 =item C<METHOD is_closed()>
@@ -329,7 +327,6 @@ Test if the filehandle is closed.
         const INTVAL status = Parrot_io_is_closed(INTERP, SELF);
         RETURN(INTVAL status);
     }
-
 
 /*
 
@@ -704,7 +701,7 @@ Returns the next byte from the stream, but does not remove it.
 */
 
 
-} /* end pmclass */
+} /* end pmcclass */
 
 /*
  * Local variables:

@@ -32,10 +32,11 @@
 #endif
 
 /* Buffer flags */
-#define PIO_BF_MALLOC   0x0001        /* Buffer malloced              */
-#define PIO_BF_MMAP     0x0002        /* Buffer mmap()ed              */
-#define PIO_BF_LINEBUF  0x0004        /* Flushes on newline           */
-#define PIO_BF_BLKBUF   0x0008        /* Raw block-based buffering    */
+#define PIO_BF_MALLOC       0x0001      /* Buffer malloced              */
+#define PIO_BF_MMAP         0x0002      /* Buffer mmap()ed              */
+#define PIO_BF_LINEBUF      0x0004      /* Flushes on newline           */
+#define PIO_BF_BLKBUF       0x0008      /* Raw block-based buffering    */
+#define PIO_BF_UNDERFLOW    0x0010      /* Buffer failed to fill        */
 
 /* TODO: What is this? Figure it out and properly document it's use. */
 #define PIO_NR_OPEN 256                 /* Size of an "IO handle table" */
@@ -113,7 +114,6 @@ typedef struct _ParrotIOData ParrotIOData;
 /* BUFFERING */
 typedef struct _io_buffer {
     INTVAL flags;                   /* Flags on this buffer            */
-    size_t raw_reads;               /* Number of raw reads             */
     size_t buffer_size;             /* Current allocated size          */
     const STR_VTABLE *encoding;     /* Encoding used by this buffer    */
     char *buffer_ptr;               /* ptr to the buffer mem block     */
@@ -137,7 +137,6 @@ typedef INTVAL      (*io_vtable_write_b)      (PARROT_INTERP, PMC *handle,
                                                 ARGIN(char * buffer), size_t byte_length);
 typedef INTVAL      (*io_vtable_flush)        (PARROT_INTERP, PMC *handle);
 typedef INTVAL      (*io_vtable_is_eof)       (PARROT_INTERP, PMC *handle);
-typedef void        (*io_vtable_set_eof)      (PARROT_INTERP, PMC *handle, INTVAL is_set);
 typedef PIOOFF_T    (*io_vtable_tell)         (PARROT_INTERP, PMC *handle);
 typedef PIOOFF_T    (*io_vtable_seek)         (PARROT_INTERP, PMC *handle,
                                                 PIOOFF_T offset, INTVAL whence);
@@ -163,7 +162,6 @@ typedef struct _io_vtable {
     io_vtable_write_b       write_b;        /* Write bytes to the handle */
     io_vtable_flush         flush;          /* Flush the handle */
     io_vtable_is_eof        is_eof;         /* Determine if at end-of-file */
-    io_vtable_set_eof       set_eof;        /* Set or clear the passed-EOF flag */
     io_vtable_open          open;           /* Open the handle */
     io_vtable_is_open       is_open;        /* Determine if the handle is open */
     io_vtable_close         close;          /* Close the handle */

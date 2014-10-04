@@ -145,7 +145,7 @@ Mark active stringhandle data as live.
 
 =item C<INTVAL get_bool()>
 
-Returns whether the StringHandle has reached the end of the file.
+Returns whether the StringHandle has reached the end of the buffer.
 
 =cut
 
@@ -196,7 +196,6 @@ stored for mocking.
         RETURN(PMC *handle);
     }
 
-
 /*
 
 =item C<METHOD is_closed()>
@@ -211,7 +210,6 @@ Check if the StringHandle is open.
         const INTVAL closed = Parrot_io_is_closed(INTERP, SELF);
         RETURN(INTVAL closed);
     }
-
 
 /*
 
@@ -371,7 +369,7 @@ Retrieve the read mode string for the stringhandle.
 
 =item C<METHOD eof()>
 
-Check if the StringHandle is at end-of-file (if it has read to the end of the
+Check if the StringHandle is at end of the buffer (if it has read to the end of the
 string data).
 
 =cut
@@ -382,7 +380,6 @@ string data).
         const INTVAL is_eof = Parrot_io_eof(INTERP, SELF);
         RETURN(INTVAL 0);
     }
-
 
 /*
 

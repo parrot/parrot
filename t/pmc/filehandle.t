@@ -941,7 +941,7 @@ ok1:
 ok2:    say "ok 2"
     $S0 = $P0.'read'(1024)
     $S0 = $P0.'read'(1024)
-    unless $P0, ok3
+    if $P0, ok3             # file at EOF is still true
     print "not "
 ok3:    say "ok 3"
     defined $I0, $P0
