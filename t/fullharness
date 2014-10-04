@@ -131,9 +131,14 @@ sub set_alternate_runcore_env_args {
 
 sub _handle_opts {
     my $optsref = shift;
+    my $gc_debug = 1 if %$optsref;
     $optsref->{D} =
         sprintf( '%x', hex(40) | (exists $optsref->{D} ? hex($optsref->{D}) : 0));
-    my $args = get_test_prog_args( $optsref, 1, 0 );
+    my $run_exec = 0;
+    $gc_debug = 0 if $optsref->{f} or $optsref->{O1} or $optsref->{O2};
+    delete $optsref->{D} unless $gc_debug or $optsref->{f};
+    delete $optsref->{D} if $optsref->{O1} or $optsref->{O2};
+    my $args = get_test_prog_args( $optsref, $gc_debug, $run_exec );
     $ENV{TEST_PROG_ARGS} = $args;
 }
 

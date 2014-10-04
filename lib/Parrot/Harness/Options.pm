@@ -60,7 +60,7 @@ sub get_test_prog_args {
     my $args = join(' ', map { "-$_" } sort keys %opts );
 
     $args =~ s/-O/-O$opts{O}/ if exists $opts{O};
-    $args =~ s/-D/-D$opts{D}/;
+    $args =~ s/-D/-D$opts{D}/ if exists $opts{D};
     $args .= ' --gc-debug'    if $gc_debug;
     ## no critic qw(Bangs::ProhibitFlagComments)
     # XXX find better way
