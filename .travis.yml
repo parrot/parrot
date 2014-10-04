@@ -23,9 +23,9 @@ before_script:
 script: "perl Configure.pl $PARROT_CONFIG_ARGS $PARROT_OPTIMIZE --cc=\"$CC\" --link=\"$CC\" --ld=\"$CC\"; make $PARROT_TEST"
 
 branches:
-   only:
-     - master
-     - /smoke-me/
+  only:
+    - master
+    - /smoke-me/
 
 notifications:
   recipients:
