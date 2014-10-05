@@ -225,10 +225,8 @@ Parrot_io_mark(PARROT_INTERP, ARGIN(ParrotIOData *piodata))
     INTVAL i;
     PMC ** const table = piodata->table;
 
-    /* this was i < PIO_NR_OPEN, but only standard handles 0..2 need
-     * to be kept alive AFAIK -leo
-     */
-    for (i = 0; i < 3; ++i) {
+    /* PIO_NR_OPEN is now 3 */
+    for (i = 0; i < PIO_NR_OPEN; ++i) {
         Parrot_gc_mark_PMC_alive(interp, table[i]);
     }
 }

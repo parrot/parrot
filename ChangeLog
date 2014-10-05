@@ -4,6 +4,7 @@
 	  fixing rakudo problems with UTF-8 locales. [GH #1092]
 	+ Enable trap op (int3) on x86_64 also
 	+ Add const to env api STRING args
+	+ Do no pre-allocate 256 IO tables for the standard handles, only 3. [GH #1093]
     - Build
 	+ Fix all -Wshadow instances
     - Documentation

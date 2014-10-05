@@ -37,8 +37,8 @@
 #define PIO_BF_LINEBUF  0x0004        /* Flushes on newline           */
 #define PIO_BF_BLKBUF   0x0008        /* Raw block-based buffering    */
 
-/* TODO: What is this? Figure it out and properly document it's use. */
-#define PIO_NR_OPEN 256                 /* Size of an "IO handle table" */
+/* Number of pre-allocated standard IO streams, only 3 are needed */
+#define PIO_NR_OPEN 3                   /* Nr of internal IO handles    */
 
 /* Handle flags */
 #define PIO_F_READ      00000001        /* File is opened for reading   */
