@@ -1838,6 +1838,8 @@ src/platform/ansi/time$(O) : src/platform/ansi/time.c $(PARROT_H_HEADERS)
 
 src/platform/cygwin/math$(O) : src/platform/cygwin/math.c $(PARROT_H_HEADERS)
 
+src/platform/darwin/encoding$(O) : src/platform/darwin/encoding.c $(PARROT_H_HEADERS)
+
 src/platform/darwin/hires_timer$(O) : src/platform/darwin/hires_timer.c $(PARROT_H_HEADERS)
 
 src/platform/darwin/sysmem$(O) : src/platform/darwin/sysmem.c $(PARROT_H_HEADERS)
