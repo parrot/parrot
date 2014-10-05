@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2012, Parrot Foundation.
+Copyright (C) 2005-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -24,6 +24,8 @@ table.
 
 The name of the PBC file to produce, containing the merged
 segments from the input PBC files.
+
+=item C<-?> or C<--help>
 
 =back
 
@@ -202,7 +204,7 @@ static void pbc_merge_write(PARROT_INTERP,
 
 =item C<static void help(void)>
 
-Print out the user help info.
+Prints usage info.
 
 =cut
 
@@ -380,7 +382,7 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 
     /* Loop over input files. */
     for (i = 0; i < num_inputs; ++i) {
-        opcode_t pmc_cursor_start = pmc_cursor;
+        /* opcode_t pmc_cursor_start = pmc_cursor; */
         int j;
 
         /* Get the constant table segment from the input file. */
@@ -527,7 +529,7 @@ pbc_merge_annotations(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                         new_value = inputs[i]->pmc.const_map[old_value];
                         break;
                     default:
-                        Parrot_io_eprintf(interp, "Cannot find annotation type %d",
+                        Parrot_io_eprintf(interp, "Wrong annotation type %d",
                             in_ann->keys[j].type);
                         exit(1);
                 }
@@ -860,12 +862,12 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
         for (j = 0; j < pf_dir->num_segments; ++j) {
             const PackFile_Segment * const seg = pf_dir->segments[j];
             if (seg->type == PF_CONST_SEG) {
-                const PackFile_ConstTable * const ct = (const PackFile_ConstTable *)seg;
-                inputs[i]->num.const_map = mem_gc_allocate_n_typed(interp, ct->num.const_count,
+                const PackFile_ConstTable * const cct = (const PackFile_ConstTable *)seg;
+                inputs[i]->num.const_map = mem_gc_allocate_n_typed(interp, cct->num.const_count,
                                                                     opcode_t);
-                inputs[i]->str.const_map = mem_gc_allocate_n_typed(interp, ct->str.const_count,
+                inputs[i]->str.const_map = mem_gc_allocate_n_typed(interp, cct->str.const_count,
                                                                     opcode_t);
-                inputs[i]->pmc.const_map = mem_gc_allocate_n_typed(interp, ct->pmc.const_count,
+                inputs[i]->pmc.const_map = mem_gc_allocate_n_typed(interp, cct->pmc.const_count,
                                                                     opcode_t);
             }
         }
@@ -939,9 +941,8 @@ pbc_merge_write(PARROT_INTERP, ARGMOD(PackFile *pf), ARGIN(const char *filename)
 
 =item C<int main(int argc, const char **argv)>
 
-The main function that grabs console input, reads in the packfiles
-provided they exist, hands them to another function that runs the
-merge process and finally writes out the produced packfile.
+The main function checks arguments, reads in the packfiles provided they exist,
+call the merge functions and writes out the produced packfile.
 
 =cut
 
@@ -949,6 +950,7 @@ merge process and finally writes out the produced packfile.
 
 static struct longopt_opt_decl options[] = {
     { 'o', 'o', OPTION_required_FLAG, { "--output" } },
+    { '?', '?', OPTION_optional_FLAG, { "--help"   } },
     {  0 ,  0 , OPTION_optional_FLAG, { NULL       } }
 };
 

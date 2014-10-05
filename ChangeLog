@@ -5,6 +5,7 @@
 	+ Enable trap op (int3) on x86_64 also
 	+ Add const to env api STRING args
     - Build
+	+ Fix all -Wshadow instances
     - Documentation
     - Tests
 	+ Run fulltests with the runcore=fast,-O1,-O2 fast, without -D040, --gc-debug [GH #1086]
