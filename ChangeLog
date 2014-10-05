@@ -7,6 +7,7 @@
     - Build
 	+ Fix all -Wshadow instances
     - Documentation
+	+ Add missing manpages for pbc_disassemble, pbc_dump, pbc_merge
     - Tests
 	+ Run fulltests with the runcore=fast,-O1,-O2 fast, without -D040, --gc-debug [GH #1086]
 	+ Simplify smolder resend usage
