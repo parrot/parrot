@@ -45,7 +45,9 @@ Parrot_init_platform_encoding(SHIM_INTERP)
     setlocale(LC_CTYPE, "");                       /* set locale to environment specification */
     {
         const char *codeset = nl_langinfo(CODESET);
-        if (STREQ(codeset, "UTF-8"))
+        /* Needs eventually to be seperated into old and new darwin.
+           On ppc 10.4 utf-8 is returned, on newer darwins UTF-8 */
+        if (STREQ(codeset, "UTF-8") || STREQ(codeset, "utf-8"))
             Parrot_platform_encoding_ptr = Parrot_utf8_encoding_ptr;
         else if (STREQ(codeset, "ISO8859-1"))
             Parrot_platform_encoding_ptr = Parrot_latin1_encoding_ptr;
