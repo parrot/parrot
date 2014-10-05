@@ -864,6 +864,8 @@ help :
 	@echo "  bootstrap-ops:     Generate C code from .ops files. Requires already built parrot."
 	@echo "  bootstrap-nci:     Generate C code for NCI. Requires already built parrot."
 	@echo "  bootstrap-prt0:    Generate prt0.pir. Requires already built parrot."
+	@echo "  bootstrap-tables:  Generate src/string/encoding/tables.[ch]."
+	@echo "  bootstrap-namealias: Generate src/string/namealias.c via gperf."
 	@echo ""
 	@echo "Release:"
 	@echo "  release:           Create a tarball."
@@ -902,6 +904,12 @@ $(RUN_INC_DIR)/config.fpmc : myconfig config_lib.pir \
 	$(PERL) tools/build/gen_version.pl >$(RUN_INC_DIR)/parrot_version.pir
 	$(MINIPARROT) -I$(RUN_INC_DIR) config_lib.pir > $@
 	@$(ADDGENERATED) "$@" "[]"
+
+# Check the generated tables before submitting updates.
+bootstrap-tables \
+  src/string/encoding/tables.h \
+  src/string/encoding/tables.c: tools/dev/gen_charset_tables.pl
+	$(PERL) tools/dev/gen_charset_tables.pl
 
 bootstrap-prt0: $(WINXED) $(FRPTWO_DIR)/prt0.winxed
 	$(WINXED) --noan -c $(FRPTWO_DIR)/prt0.winxed

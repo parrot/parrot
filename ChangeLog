@@ -14,10 +14,16 @@
 	+ Fix sprintf width count for unicode strings [GH #956]
 	+ Fix sprintf width for NaN/Inf/-Inf [GH #1099/perl6 RT#116280]
 	+ Optimize utf8_substr. Do not use the slow utf8 iterator.
+        + Regenerated and fixed the iso_8859_1_typetable. Add \x2028, \x2029 and \v
+          to be of cclass newline. [GH #1086, perl6 RT #122341].
+          Several chars 160..191 are not in the [[:punct:]] class anymore.
+          Removed defunct Parrot_ascii_typetable, unused since 2010.
     - Build
-	+ Fix all -Wshadow instances
+        + Fix all -Wshadow instances
+        + Added bootstrap-tables make target
     - Documentation
 	+ Add missing manpages for pbc_disassemble, pbc_dump, pbc_merge
+        + Improved src/string/encoding/tables.c pod.
     - Tests
 	+ Run fulltests with the runcore=fast,-O1,-O2 fast, without -D040, --gc-debug
 	  [GH #1086]
