@@ -133,7 +133,7 @@ Resizes the array to C<size> elements.
         }
         else {
             INTVAL  cur = resize_threshold;
-            INTVAL *int_array;
+            INTVAL *i_array;
 
             if (cur < 8192)
                 cur = size < 2 * cur ? 2 * cur : size;
@@ -143,9 +143,9 @@ Resizes the array to C<size> elements.
                 cur          &= ~0xfff;
             }
 
-            GET_ATTR_int_array(INTERP, SELF, int_array);
-            int_array = mem_gc_realloc_n_typed(INTERP, int_array, cur, INTVAL);
-            SET_ATTR_int_array(INTERP, SELF, int_array);
+            GET_ATTR_int_array(INTERP, SELF, i_array);
+            i_array = mem_gc_realloc_n_typed(INTERP, i_array, cur, INTVAL);
+            SET_ATTR_int_array(INTERP, SELF, i_array);
             SET_ATTR_size(INTERP, SELF, size);
             SET_ATTR_resize_threshold(INTERP, SELF, cur);
         }

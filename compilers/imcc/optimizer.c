@@ -1456,8 +1456,8 @@ branch_cond_loop(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
 
                 if (found) {
                     const char * const lbl = get_branch_reg(cond)->name;
-                    const SymReg * const r = get_sym(imcc, lbl);
-                    if (r && (r->type & VTADDRESS) && r->first_ins == end) {
+                    const SymReg * const r1 = get_sym(imcc, lbl);
+                    if (r1 && (r1->type & VTADDRESS) && r1->first_ins == end) {
                         /* the current ins is replaced - remember prev
                          * and set ins again after the changes
                          */

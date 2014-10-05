@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -156,8 +156,8 @@ Parrot_sub_context_get_info(PARROT_INTERP, ARGIN(PMC *ctx),
     if (pc) {
         const size_t offs = info->pc;
         size_t i, n;
-        opcode_t *pc = sub->seg->base.data;
         PackFile_Debug * const debug = sub->seg->debugs;
+        pc = sub->seg->base.data;
 
         if (!debug)
             return 0;

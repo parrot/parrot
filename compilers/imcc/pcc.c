@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2010, Parrot Foundation.
+ * Copyright (C) 2003-2014, Parrot Foundation.
  */
 
 /*
@@ -561,8 +561,8 @@ expand_pcc_sub_call(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
     PARROT_ASSERT(sub->pcc_sub);
 
     if (ins->type & ITRESULT) {
-        const int n = sub->pcc_sub->nret;
-        ins         = pcc_get_args(imcc, unit, ins, "get_results", n,
+        const int nret = sub->pcc_sub->nret;
+        ins         = pcc_get_args(imcc, unit, ins, "get_results", nret,
                         sub->pcc_sub->ret, sub->pcc_sub->ret_flags);
         return;
     }

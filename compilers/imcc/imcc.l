@@ -173,7 +173,7 @@ SP              [ ]
         /* Are we at the end of the heredoc? */
         if (STREQ(imcc->heredoc_end, yytext)) {
             /* End of the heredoc. */
-            yyguts_t * const yyg = (yyguts_t *)yyscanner;
+            /*yyguts_t * const yyg = (yyguts_t *)yyscanner;*/
             const int len        = strlen(imcc->heredoc_content);
 
             /* delim */

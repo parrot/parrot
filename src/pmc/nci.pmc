@@ -339,8 +339,8 @@ Return the arity of the NCI (the number of arguments).
             if (!nci_info->func)
                 build_func(INTERP, SELF, nci_info);
             if (nci_info->func) {
-                const INTVAL arity = nci_info->arity;
-                RETURN(INTVAL arity);
+                const INTVAL i = nci_info->arity;
+                RETURN(INTVAL i);
             }
         }
 

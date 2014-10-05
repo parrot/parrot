@@ -1461,11 +1461,11 @@ and phase of the Moon.
 
 #define gc_gms_maybe_mark_and_sweep(i) \
     do { \
-        MarkSweep_GC * const self = (MarkSweep_GC *)(i)->gc_sys->gc_private; \
+        MarkSweep_GC * const _self = (MarkSweep_GC *)(i)->gc_sys->gc_private; \
     \
         /* Collect every gc_threshold. */ \
-        if (!self->gc_mark_block_level \
-        &&  (i)->gc_sys->stats.mem_used_last_collect > self->gc_threshold) \
+        if (!_self->gc_mark_block_level \
+        &&  (i)->gc_sys->stats.mem_used_last_collect > _self->gc_threshold) \
             gc_gms_mark_and_sweep(interp, 0); \
     } while (0)
 

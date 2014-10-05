@@ -1157,10 +1157,10 @@ slurpy arguments).
         PMC * const pos_required   = VTABLE_inspect_str(INTERP, SELF, CONST_STRING(INTERP, "pos_required"));
         PMC * const named_required = VTABLE_inspect_str(INTERP, SELF, CONST_STRING(INTERP, "named_required"));
 
-        const INTVAL arity = VTABLE_get_integer(INTERP, pos_required)
-                           + VTABLE_get_integer(INTERP, named_required);
+        const INTVAL i = VTABLE_get_integer(INTERP, pos_required)
+                       + VTABLE_get_integer(INTERP, named_required);
 
-        RETURN(INTVAL arity);
+        RETURN(INTVAL i);
     }
 
 /*

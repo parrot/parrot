@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2009, Parrot Foundation.
+Copyright (C) 2001-2009,2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -390,10 +390,10 @@ canonicalize_exponent(ARGMOD(char *tc), ARGIN(const SpfInfo *info))
                 }
             }
             else {
-                size_t i;
+                size_t j;
                 memmove(&tc[info->width - len], &tc[0], len+1);
-                for (i = 0; i < info->width - len; ++i)
-                    tc[i] = (info->flags & FLAG_ZERO) ? '0' : ' ';
+                for (j = 0; j < info->width - len; ++j)
+                    tc[j] = (info->flags & FLAG_ZERO) ? '0' : ' ';
             }
         }
     }

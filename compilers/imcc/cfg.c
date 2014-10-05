@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2011, Parrot Foundation.
+ * Copyright (C) 2002-2014, Parrot Foundation.
  */
 
 /*
@@ -774,27 +774,27 @@ compute_dominators(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
     change = 1;
 
     while (change) {
-        unsigned int i;
+        unsigned int j;
         change = 0;
 
         /* TODO: This 'for' should be a breadth-first search for speed */
-        for (i = 1; i < n; i++) {
-            Set  * const s = set_copy(imcc, dominators[i]);
+        for (j = 1; j < n; j++) {
+            Set  * const s = set_copy(imcc, dominators[j]);
             Edge *edge;
 
-            for (edge = unit->bb_list[i]->pred_list;
+            for (edge = unit->bb_list[j]->pred_list;
                 edge;
                 edge = edge->pred_next) {
                 pred_index = edge->from->index;
                 set_intersec_inplace(s, dominators[pred_index]);
             }
 
-            set_add(s, i);
+            set_add(s, j);
 
-            if (! set_equal(dominators[i], s)) {
+            if (! set_equal(dominators[j], s)) {
                 change = 1;
-                set_free(dominators[i]);
-                dominators[i] = s;
+                set_free(dominators[j]);
+                dominators[j] = s;
             }
             else
                 set_free(s);
