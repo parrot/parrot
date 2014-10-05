@@ -91,12 +91,6 @@ static PIOOFF_T io_socket_seek(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
-static void io_socket_set_eof(PARROT_INTERP,
-    ARGIN_NULLOK(PMC *handle),
-    INTVAL is_eof)
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*handle);
-
 static void io_socket_set_flags(PARROT_INTERP,
     ARGIN_NULLOK(PMC *handle),
     INTVAL flags);
@@ -150,9 +144,6 @@ static INTVAL io_socket_write_b(PARROT_INTERP,
     , PARROT_ASSERT_ARG(handle) \
     , PARROT_ASSERT_ARG(buffer))
 #define ASSERT_ARGS_io_socket_seek __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle))
-#define ASSERT_ARGS_io_socket_set_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_socket_set_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -268,7 +259,7 @@ static INTVAL
 io_socket_flush(SHIM_INTERP, ARGIN_NULLOK(PMC *handle))
 {
     ASSERT_ARGS(io_socket_flush)
-    UNUSED(handle);
+    UNUSED(handle)
     /* TODO: Do we need to fsync the socket? */
     return 0;
 }
@@ -277,31 +268,21 @@ io_socket_flush(SHIM_INTERP, ARGIN_NULLOK(PMC *handle))
 
 =item C<static INTVAL io_socket_is_eof(PARROT_INTERP, PMC *handle)>
 
-Sockets are not "passed-the-end" so long as the connection is open. Return 0.
-
-=item C<static void io_socket_set_eof(PARROT_INTERP, PMC *handle, INTVAL
-is_eof)>
-
-Do nothing.
+Sockets are considered at EOF if the last buffered read failed to fill the
+buffer. Always return 0 for unbuffered sockets.
 
 =cut
 
 */
 
 static INTVAL
-io_socket_is_eof(SHIM_INTERP, ARGIN(PMC *handle))
+io_socket_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(io_socket_is_eof)
-    UNUSED(handle);
-    return 0;
-}
+    IO_BUFFER * const buffer = IO_GET_READ_BUFFER(interp, handle);
+    if (!buffer)
+        return 0;
 
-static void
-io_socket_set_eof(SHIM_INTERP, ARGIN_NULLOK(PMC *handle), SHIM(INTVAL is_eof))
-{
-    ASSERT_ARGS(io_socket_set_eof)
-    UNUSED(handle);
-    UNUSED(is_eof);
     return !!(buffer->flags & PIO_BF_UNDERFLOW);
 }
 
@@ -369,7 +350,7 @@ static void
 io_socket_adv_position(SHIM_INTERP, ARGMOD_NULLOK(PMC *handle), SHIM(size_t offset))
 {
     ASSERT_ARGS(io_socket_adv_position)
-    UNUSED(handle);
+    UNUSED(handle)
     /* Socket doesn't keep track of position internally. Ignore this. */
 }
 
@@ -377,7 +358,7 @@ static void
 io_socket_set_position(SHIM_INTERP, ARGMOD_NULLOK(PMC *handle), SHIM(PIOOFF_T pos))
 {
     ASSERT_ARGS(io_socket_set_position)
-    UNUSED(handle);
+    UNUSED(handle)
     /* Socket doesn't keep track of position internally. Ignore. */
 }
 
@@ -385,7 +366,7 @@ static PIOOFF_T
 io_socket_get_position(SHIM_INTERP, ARGIN_NULLOK(PMC *handle))
 {
     ASSERT_ARGS(io_socket_get_position)
-    UNUSED(handle);
+    UNUSED(handle)
     /* Socket doesn't keep track of position internally. Return 0 */
     return (PIOOFF_T)0;
 }
@@ -473,7 +454,7 @@ static void
 io_socket_set_flags(SHIM_INTERP, ARGIN_NULLOK(PMC *handle), SHIM(INTVAL flags))
 {
     ASSERT_ARGS(io_socket_set_flags)
-    UNUSED(handle);
+    UNUSED(handle)
     /* Ignore, for now */
 }
 
@@ -481,7 +462,7 @@ static INTVAL
 io_socket_get_flags(SHIM_INTERP, ARGIN_NULLOK(PMC *handle))
 {
     ASSERT_ARGS(io_socket_get_flags)
-    UNUSED(handle);
+    UNUSED(handle)
     /* For now, just say that all sockets are read/write handles */
     return PIO_F_WRITE | PIO_F_READ;
 }

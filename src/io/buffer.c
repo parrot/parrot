@@ -75,7 +75,8 @@ static size_t io_buffer_transfer_to_mem(PARROT_INTERP,
 =item C<IO_BUFFER * Parrot_io_buffer_allocate(PARROT_INTERP, PMC *owner, INTVAL
 flags, const STR_VTABLE *encoding, size_t init_size)>
 
-Allocate a new buffer for PMC C<owner> with the given flags and settings.
+Allocate a new buffer with the given flags and settings.
+The owner argument is now ignored.
 
 =item C<void Parrot_io_buffer_free(PARROT_INTERP, IO_BUFFER *buffer)>
 
@@ -89,13 +90,12 @@ Free the C<buffer> memory.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 IO_BUFFER *
-Parrot_io_buffer_allocate(PARROT_INTERP, ARGMOD(PMC *owner), INTVAL flags,
+Parrot_io_buffer_allocate(PARROT_INTERP, SHIM(PMC *owner), INTVAL flags,
         ARGIN_NULLOK(const STR_VTABLE *encoding), size_t init_size)
 {
     ASSERT_ARGS(Parrot_io_buffer_allocate)
     IO_BUFFER * const buffer =
             (IO_BUFFER *)Parrot_gc_allocate_fixed_size_storage(interp, sizeof (IO_BUFFER));
-    UNUSED(owner);
     buffer->encoding = encoding;
     if (init_size == BUFFER_SIZE_ANY) {
         if (flags & PIO_BF_LINEBUF)

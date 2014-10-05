@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -415,10 +415,8 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
 {
     ASSERT_ARGS(io_readline_encoded_string)
     STRING * const s = Parrot_gc_new_string_header(interp, 0);
-    size_t total_bytes_read = 0;
-    const size_t raw_reads = buffer->raw_reads;
-    size_t available_bytes = BUFFER_USED_SIZE(buffer);
-    size_t prev_available_bytes = 0;
+
+    /* XXX: What do we do if encoding and rs->encoding don't agree? */
     const size_t delim_size = STRING_byte_length(rs);
 
     s->bufused  = 0;
@@ -427,55 +425,34 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
     if (encoding == NULL)
         encoding = io_get_encoding(interp, handle, vtable, PIO_F_READ);
 
-    if (available_bytes < delim_size || available_bytes < encoding->max_bytes_per_codepoint)
-        available_bytes = Parrot_io_buffer_fill(interp, buffer, handle, vtable);
-
     s->encoding = encoding;
 
     while (1) {
         Parrot_String_Bounds bounds;
-        size_t bytes_to_read;
+        INTVAL have_delim = 0;
 
-        /* We used to check against encoding->max_bytes_per_codepoint
-           instead of encoding->bytes_per_unit.
+        /* Look for terminator and get amount of complete character data */
+        const size_t bytes_to_read = io_buffer_find_string_marker(
+            interp, buffer, handle, vtable, encoding, &bounds, rs, &have_delim);
 
-           In case of variable-length codings like UTF-8, this meant waiting
-           for more characters even if we already got all expected data and
-           possibly hanging indefinitely if there's no more input available.
+        if (bytes_to_read != 0) {
+            /* Append buffer to result */
+            io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read);
 
-           FIXME: available_bytes < delim_size only makes sense if the
-                  encodings agree
-        */
-        if (available_bytes < delim_size || available_bytes < encoding->bytes_per_unit) {
-            prev_available_bytes = available_bytes;
-            available_bytes = Parrot_io_buffer_fill(interp, buffer, handle, vtable);
+            if (have_delim)
+                break;
         }
 
-        bytes_to_read = io_buffer_find_string_marker(interp, buffer, handle,
-            vtable, encoding, &bounds, rs, &have_delim);
+        /* XXX: Should we discard any partial characters so vtable->is_eof()
+                and Parrot_io_eof() (and thus the PMC method) will agree?
 
-        /* Check if the buffer contains no (full) characters.
-           If the last read returned nothing, assume we're at EOF and
-           break out of the loop.
-
-           This used to check bytes_to_read == 0 only. In case of
-           variable-length codings, the buffer may now contain a single
-           partial character after a successful read, whereas it used to
-           contain at least one full character.
+                Imo keeping the partial characters is the right thing to do.
         */
-        if (bytes_to_read == 0 && prev_available_bytes == available_bytes)
+        if (vtable->is_eof(interp, handle))
             break;
 
-        /* Append buffer to result */
-        io_read_chars_append_string(interp, s, handle, vtable, buffer, bytes_to_read);
-        total_bytes_read += bytes_to_read;
-        available_bytes -= bytes_to_read;
-
-        /* Some types, like Socket, don't want to be read more than once in a
-           single request because recv can hang waiting for data. In those
-           cases, break out of the loop early. */
-        if ((vtable->flags & PIO_VF_MULTI_READABLE) == 0 && buffer->raw_reads > raw_reads)
-            break;
+        /* We haven't found the terminator yet, so get new input and try again */
+        Parrot_io_buffer_fill(interp, buffer, handle, vtable);
     }
 
     return s;

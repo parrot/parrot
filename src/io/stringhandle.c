@@ -102,13 +102,6 @@ static PIOOFF_T io_stringhandle_seek(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
-static void io_stringhandle_set_eof(PARROT_INTERP,
-    ARGMOD(PMC *handle),
-    INTVAL is_set)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*handle);
-
 static void io_stringhandle_set_flags(PARROT_INTERP,
     ARGIN(PMC *handle),
     INTVAL flags)
@@ -170,9 +163,6 @@ static INTVAL io_stringhandle_write_b(PARROT_INTERP,
     , PARROT_ASSERT_ARG(handle) \
     , PARROT_ASSERT_ARG(buffer))
 #define ASSERT_ARGS_io_stringhandle_seek __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(handle))
-#define ASSERT_ARGS_io_stringhandle_set_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_io_stringhandle_set_flags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -337,12 +327,6 @@ io_stringhandle_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
     GETATTR_StringHandle_read_offset(interp, handle, read_offs);
     GETATTR_StringHandle_stringhandle(interp, handle, stringhandle);
     return (UINTVAL)read_offs >= stringhandle->bufused;
-}
-
-static void
-io_stringhandle_set_eof(SHIM_INTERP, SHIM(PMC *handle), SHIM(INTVAL is_set))
-{
-    ASSERT_ARGS(io_stringhandle_set_eof)
 }
 
 /*
