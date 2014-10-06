@@ -181,7 +181,7 @@ Parrot_api_set_runcore(Parrot_PMC interp_pmc, ARGIN(const char * corename),
     ASSERT_ARGS(Parrot_api_set_runcore)
     EMBED_API_CALLIN(interp_pmc, interp)
     if (trace) {
-        Interp_trace_SET(interp, PARROT_TRACE_OPS_FLAG);
+        Interp_trace_SET(interp, trace);
         Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "slow"));
     }
     else {

@@ -1897,7 +1897,7 @@ Parrot_switch_to_cs(PARROT_INTERP, ARGIN(PackFile_ByteCode *new_cs), int really)
             Interp * const tracer = interp->pdb && interp->pdb->debugger
                                   ? interp->pdb->debugger
                                   : interp;
-            Parrot_io_eprintf(tracer, "*** switching to %s\n",
+            Parrot_io_eprintf(tracer, "*** switching to %Ss\n",
                              new_cs->base.name);
         }
 
