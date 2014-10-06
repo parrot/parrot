@@ -1,11 +1,11 @@
 #! perl
-# Copyright (C) 2001-2005, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 12;
+use Parrot::Test tests => 15;
 
 =head1 NAME
 
@@ -306,6 +306,7 @@ ex:
 .end
 CODE
 
+# TODO: Fails with Null PMC access in get_string()
 pir_output_like(
     <<'CODE', <<'OUTPUT', "Call an exited coroutine", todo => 'goes one iteration too far TT #1003' );
 .sub main :main
@@ -415,6 +416,104 @@ CODE
 3
 6
 OUTPUT
+
+pir_output_is(
+    <<'CODE', <<'OUTPUT', "Resume dead coroutine one-off", todo => 'goes one iteration too far TT #1003' );
+.sub 'MyCoro'
+    .yield(1)
+    .yield(2)
+    .return(4)
+.end
+
+.sub 'main' :main
+    $I0 = MyCoro()
+    say $I0
+    $I0 = MyCoro()
+    say $I0
+    $I0 = MyCoro()
+    say $I0
+.end
+CODE
+1
+2
+4
+OUTPUT
+
+# Note: TT #1702/GH #564 argues that dead coros should be resumable. Manually via a reset()?
+# docs/book/pir/ch06_subroutines.pod argues also that they should restart. They aren't and shouldn't.
+# Check with -td t/pmc/coroutine_14.pir
+pir_error_output_like(
+    <<'CODE', <<'OUTPUT', "Resume dead coroutine");
+.sub 'MyCoro'
+    .yield(1)      # 2. ff y=1=>0
+    .yield(2)      # 4. ff y=1=>0
+    .return(4)     # 6. returncc !ff
+.end
+
+.sub 'main' :main
+    $I0 = MyCoro() # 1. setup first ctx
+    print $I0
+    $I0 = MyCoro() # 3. !ff y=>1
+    print $I0
+    $I0 = MyCoro() # 5. !ff y=>1
+    print $I0
+
+    push_eh ehandler
+    $I0 = MyCoro() # 7. ff (y=0) => Cannot resume dead coroutine
+    print $I0
+
+    ehandler:
+    pop_eh
+.end
+CODE
+/\A124Cannot resume dead coroutine./
+OUTPUT
+
+# Note: TT #1710/GH #585 argues that if one clone is dead the other are also dead.
+# Wrong. Each coro is dead/exhausted independently here.
+pir_error_output_like(
+    <<'CODE', <<'OUTPUT', "No dead clones" );
+.sub 'main' :main
+    .const 'Sub' $P99 = 'coro'
+
+    .local pmc three, four, five
+    three = clone $P99
+    four  = clone $P99
+    five  = clone $P99
+
+    three(3)
+    four(4)
+    five(5)
+
+    three(1)
+    push_eh ehandler
+    three(2)
+
+    restart:
+    four(1)
+
+    ehandler:
+    pop_eh
+    goto restart
+.end
+
+.sub '' :anon :subid('coro')
+    .param int x
+    print x
+    print '.0-'
+    .yield (x)
+
+    print x
+    print '.1-'
+    .yield (x)
+
+    print x
+    print '.done-'
+.end
+CODE
+/\A3.0-4.0-5.0-3.1-3.done-4.1-5.1-4.done-5.done-Cannot resume dead coroutine./
+OUTPUT
+
 
 # Local Variables:
 #   mode: cperl

@@ -1,4 +1,4 @@
-# Copyright (C) 2003-2012, Parrot Foundation.
+# Copyright (C) 2003-2014, Parrot Foundation.
 
 =pod
 
@@ -53,9 +53,35 @@ a C<Closure>, the subsequent scopes working outwards).
 
 A C<Coroutine> acts like a normal sub when called initially, and can also
 return normally, but acts like a continuation when exited via the C<yield>
-instruction and re-entered by re-invoking.
+instruction and re-entered by re-invoking. But when all C<yield> states are
+exhausted the coroutine dies.
 
-[need a reference to a C<coroutine> example.  -- rgr, 6-Apr-08.]
+=begin PIR
+
+    .sub 'mycoro'
+        .yield(1)
+        .yield(2)
+        .return(4)
+    .end
+
+    .sub 'main' :main
+        $I0 = mycoro()
+        say $I0
+        $I0 = mycoro()
+        say $I0
+        $I0 = mycoro()
+        say $I0
+        $I0 = mycoro()
+        say $I0
+    .end
+
+    # =>
+    # 1
+    # 2
+    # 4
+    # Cannot resume dead coroutine.
+
+=end PIR
 
 =back
 
@@ -83,15 +109,15 @@ Here's an example of fetching a sub from another namespace:
 =begin PIR
 
     .sub main :main
-	get_hll_global $P0, ['Other'; 'Namespace'], "the_sub"
-	$P0()
-	print "back\n"
+        get_hll_global $P0, ['Other'; 'Namespace'], "the_sub"
+        $P0()
+        print "back\n"
     .end
 
     .namespace ['Other'; 'Namespace']
 
     .sub the_sub
-	print "in sub\n"
+        print "in sub\n"
     .end
 
 =end PIR
@@ -106,9 +132,9 @@ the "main" subroutine, where execution starts.
 
 =begin PIR
 
-  .sub the_main_event :main
-     # ...
-  .end
+    .sub the_main_event :main
+       # ...
+    .end
 
 =end PIR
 
@@ -129,17 +155,17 @@ e.g.
 
 =begin PIR
 
-  .sub main :main
-     print "in main\n"
-     load_bytecode "library_code.pir"
-     print "back to main\n"
-  .end
+    .sub main :main
+       print "in main\n"
+       load_bytecode "library_code.pir"
+       print "back to main\n"
+    .end
 
-  # library_code.pir
+    # library_code.pir
 
-  .sub _my_lib_init :load
-     print "initializing library\n"
-  .end
+    .sub _my_lib_init :load
+       print "initializing library\n"
+    .end
 
 =end PIR
 
@@ -152,15 +178,15 @@ These markers are called "pragmas", and are defined fully in
 L<docs/pdds/pdd19_pir.pod>.  The following table summarizes the behavior
 of the five pragmas that cause Parrot to run a sub implicitly:
 
-                ------ Executed when --------
-                compiling to    -- loading --
-  Sub Pragma    disk  memory    first   after
-  ==========    ====  ======    =====   =====
-   :immediate   yes   yes       no      no        
-   :postcomp    yes   no        no      no        
-   :load        no    no        no      yes       
-   :init        no    yes       yes     no        
-   :main        no    no        yes     no        
+                  ------ Executed when --------
+                  compiling to    -- loading --
+    Sub Pragma    disk  memory    first   after
+    ==========    ====  ======    =====   =====
+     :immediate   yes   yes       no      no
+     :postcomp    yes   no        no      no
+     :load        no    no        no      yes
+     :init        no    yes       yes     no
+     :main        no    no        yes     no
 
 The same load-time behavior applies regardless of whether the loaded file is
 PIR source or bytecode.  Note that it is possible to mark a sub with both

@@ -1044,16 +1044,16 @@ This example prints the correct value C<7>.
 
 =head2 Coroutines
 
-X<coroutines>
-X<subroutines; coroutines>
-Coroutines are similar to subroutines except that they have an internal
-notion of I<state>.  In addition to performing a normal C<.return> to
-return control flow back to the caller and destroy the execution
-environment of the subroutine, coroutines may also perform a C<.yield>
-operation.  C<.yield> returns a value to the caller like C<.return> can,
-but it does not destroy the execution state of the coroutine. The next
-call to the coroutine continues execution from the point of the last
-C<.yield>, not at the beginning of the coroutine.
+X<coroutines> X<subroutines; coroutines>
+Coroutines are similar to subroutines except that they have an
+internal list of I<states> for each C<.yield> call. In addition to
+performing a normal C<.return> to return control flow back to the
+caller and destroy the execution environment of the subroutine,
+coroutines may also perform a C<.yield> operation.  C<.yield> returns
+a value to the caller like C<.return> can, but it does not destroy the
+execution state of the coroutine. The next call to the coroutine
+continues execution from the point of the last C<.yield>, not at the
+beginning of the coroutine.
 
 Inside a coroutine continuing from a C<.yield>, the entire execution
 environment is the same as it was when the coroutine C<.yield>ed. This
