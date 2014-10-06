@@ -1,12 +1,12 @@
-# Copyright (C) 2011, Parrot Foundation.
+# Copyright (C) 2011-2014, Parrot Foundation.
 
 =head1 NAME
 
-ops2c - Convert Parrot opcodes to C
+parrot-ops2c - Convert Parrot opcodes to C
 
 =head1 SYNOPSIS
 
-ops2c [option]
+parrot-ops2c [option]
 
 =head1 DESCRIPTION
 
@@ -44,6 +44,10 @@ To perform all processing without writing to any files, use :
 
     -g
     --debug
+
+=head1 SEE ALSO
+
+Before Parrot 6.9.0 this program was called F<ops2c>.
 
 =head1 HELP
 

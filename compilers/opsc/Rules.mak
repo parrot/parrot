@@ -35,12 +35,12 @@ $(OPSC_DIR)/gen/Ops/Trans/C.pir: $(OPSC_DIR)/src/Ops/Trans/C.pm $(NQP_RX)
 $(OPSC_DIR)/ops2c.nqp: $(LIBRARY_DIR)/opsc.pbc
 
 $(OPS2C): $(OPSC_DIR)/ops2c.nqp $(LIBRARY_DIR)/opsc.pbc $(NQP_RX) $(PBC_TO_EXE)
-	$(NQP_RX) --target=pir $(OPSC_DIR)/ops2c.nqp >ops2c.pir
-	$(PARROT) -o ops2c.pbc ops2c.pir
-	$(PBC_TO_EXE) ops2c.pbc
+	$(NQP_RX) --target=pir $(OPSC_DIR)/ops2c.nqp >parrot-ops2c.pir
+	$(PARROT) -o parrot-ops2c.pbc parrot-ops2c.pir
+	$(PBC_TO_EXE) parrot-ops2c.pbc
 
 $(INSTALLABLEOPS2C): $(OPS2C) src/install_config$(O)
-	$(PBC_TO_EXE) ops2c.pbc --install
+	$(PBC_TO_EXE) parrot-ops2c.pbc --install
 	@$(ADDGENERATED) "$@" "[main]" bin
 
 opsc: $(LIBRARY_DIR)/opsc.pbc

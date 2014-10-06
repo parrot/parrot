@@ -19,11 +19,11 @@ OPS_SUMMARY = ../tools/docs/ops_summary.pl
 POD = @TEMP_pod@
 
 MAN_1 = binaries/parrot.1 \
-	binaries/ops2c.1 \
 	binaries/parrotbug.1 \
 	binaries/parrot_config.1 \
 	binaries/parrot_nci_thunk_gen.1 \
 	binaries/parrot-nqp.1 \
+	binaries/parrot-ops2c.1 \
 	binaries/parrot-prove.1 \
 	binaries/pbc_disassemble.1 \
 	binaries/pbc_dump.1 \

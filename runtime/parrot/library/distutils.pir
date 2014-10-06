@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2012, Parrot Foundation.
+# Copyright (C) 2009-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -1177,7 +1177,7 @@ the value is the OPS pathname
     .local pmc config
     config = get_config()
     .local string cmd
-    cmd = get_executable('ops2c')
+    cmd = get_executable('parrot-ops2c')
     cmd .= " --dynamic "
     cmd .= src
     system(cmd, 1 :named('verbose'))

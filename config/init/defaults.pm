@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -203,6 +203,9 @@ sub runstep {
         rm_rf     => '$(PERL) -MExtUtils::Command -e rm_rf',
         touch     => '$(PERL) -MExtUtils::Command -e touch',
 
+        # added with 6.9.0 to hint at the rename ops2c => parrot-ops2c
+        ops2c     => 'parrot-ops2c',
+
         # tar is currently used only in 'make release'.
         tar       => which('tar') || '',
 
@@ -251,7 +254,7 @@ sub runstep {
         # Extra flags needed for libnci_test.so
         ncilib_link_extra => '',
 
-        # Flag determines if pmc2c.pl and ops2c.pl also
+        # Flag determines if pmc2c and ops2c also
         # generate #line directives. These can confuse
         # debugging internals.
         no_lines_flag => $conf->options->get('no-line-directives') ? '--no-lines' : '',
@@ -305,8 +308,6 @@ sub _64_bit_adjustments {
             $archname =~ s/x86_64/i386/;
 
             # adjust gcc?
-            ## add parentheses around qw(...)
-            ## to remove deprecation warning in perl 5.14.0
             for my $cc (qw(cc cxx link ld)) {
                 $conf->data->add( ' ', $cc, '-m32' );
             }

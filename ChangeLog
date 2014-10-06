@@ -5,6 +5,8 @@
 	+ Enable trap op (int3) on x86_64 also
 	+ Add const to env api STRING args
 	+ Do no pre-allocate 256 IO tables for the standard handles, only 3. [GH #1093]
+	+ Renamed ops2c to parrot-ops2c. Get the new name if exists in config key ops2c
+	  [GH #900]
     - Build
 	+ Fix all -Wshadow instances
     - Documentation

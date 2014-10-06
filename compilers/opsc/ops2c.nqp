@@ -102,7 +102,7 @@ sub get_options() {
 }
 
 sub usage() {
-    say("This is ops2c, part of the Parrot VM's build infrastructure.
+    say("This is parrot-ops2c, part of the Parrot VM's build infrastructure.
     normal options:
     -c --core                generate the C code for core ops (must be run from within Parrot's build directory)
     -d --dynamic <file.ops>  generate the C code for the dynamic ops in a single .ops file

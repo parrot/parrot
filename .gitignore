@@ -28,7 +28,7 @@ compilers-*.html
 src-*.html
 frontend-parrot2-prt0-pbc-c.html
 include-parrot-pointer_array-h.html
-ops2c-c.html
+parrot-ops2c-c.html
 parrot-nqp-c.html
 pbc_to_exe-c.html
 winxed-c.html
@@ -83,10 +83,10 @@ winxed-c.html
 /cygparrot*.dll
 /miniparrot
 /myconfig
-/ops2c
-/ops2c.c
-/ops2c.pbc
-/ops2c.pir
+/parrot-ops2c
+/parrot-ops2c.c
+/parrot-ops2c.pbc
+/parrot-ops2c.pir
 /parrot
 /parrot-nqp
 /parrot-nqp.c

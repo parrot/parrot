@@ -2,7 +2,7 @@
 PortSystem              1.0
 
 name                    parrot
-version                 3.0.0
+version                 6.9.0
 revision                4
 categories              lang devel
 maintainers             bfulgham coleda.com:will
@@ -44,7 +44,7 @@ post-destroot {
     set docdir ${destroot}${prefix}/share/doc/${name}
 
     set executables {
-        ops2c parrot-nqp parrot_config parrot_nci_thunk_gen
+        parrot-ops2c parrot-nqp parrot_config parrot_nci_thunk_gen
         pbc_dump pbc_to_exe parrot parrot-prove parrot_debugger
         pbc_disassemble pbc_merge
     }

@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -9,10 +9,10 @@ use lib "$Bin/../lib";    # install location
 use Parrot::Config;
 use File::Spec;
 
-warn 'ops2c.pl is deprecated. Use ops2c$(EXE) instead';
+warn 'ops2c.pl is deprecated. Use parrot-ops2c$(EXE) instead';
 # Ignore "core"
 shift @ARGV;
-my $ops2c = File::Spec->catfile($PConfig{bindir}, 'ops2c');
+my $ops2c = File::Spec->catfile($PConfig{bindir}, 'parrot-ops2c');
 exec $ops2c, @ARGV;
 
 # Local Variables:

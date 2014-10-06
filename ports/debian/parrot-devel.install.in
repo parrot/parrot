@@ -1,4 +1,3 @@
-usr/bin/ops2c
 usr/bin/parrot_debugger
 usr/bin/pbc_disassemble
 usr/bin/pbc_dump
@@ -6,6 +5,7 @@ usr/bin/pbc_merge
 usr/bin/pbc_to_exe
 usr/bin/parrot_config
 usr/bin/parrot-nqp
+usr/bin/parrot-ops2c
 usr/lib/parrot/@VERSION@/tools/*
 usr/lib/parrot/@VERSION@/languages/pct/*
 usr/lib/parrot/@VERSION@/library/distutils.pbc
