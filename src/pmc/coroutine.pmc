@@ -147,9 +147,30 @@ Signals the start of a yield.
 
 /*
 
+=item C<void reset()>
+
+Resets the state of the coroutine, so that the next call will start at the
+first yield again.
+
+=cut
+
+*/
+
+    METHOD void reset() {
+#ifndef NDEBUG
+        if (Interp_trace_TEST(INTERP, 8))
+            fprintf(stderr, "# coro: reset ff\n");
+#endif
+        SET_ATTR_ctx(INTERP, SELF, PMCNULL);
+        INTERP->current_cont   = PMCNULL;
+    }
+
+/*
+
 =item C<opcode_t *invoke(void *next)>
 
-Swaps the "context".
+Swaps the "context" between the call to the coro and the yield back, until all
+yields are exhausted and the coro is dead.
 
 =cut
 

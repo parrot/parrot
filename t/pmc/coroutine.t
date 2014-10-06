@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 15;
+use Parrot::Test tests => 16;
 
 =head1 NAME
 
@@ -469,7 +469,7 @@ CODE
 /\A124Cannot resume dead coroutine./
 OUTPUT
 
-# Note: TT #1710/GH #585 argues that if one clone is dead the other are also dead.
+# Note: TT #1710/GH #585 argued that if one clone is dead the other are also dead.
 # Wrong. Each coro is dead/exhausted independently here.
 pir_error_output_like(
     <<'CODE', <<'OUTPUT', "No dead clones" );
@@ -512,6 +512,33 @@ pir_error_output_like(
 .end
 CODE
 /\A3.0-4.0-5.0-3.1-3.done-4.1-5.1-4.done-5.done-Cannot resume dead coroutine./
+OUTPUT
+
+pir_output_is(
+    <<'CODE', <<'OUTPUT', "Reset" );
+.sub 'main' :main
+    .const 'Coroutine' $P99 = 'MyCoro'
+    $I0 = MyCoro()
+    say $I0
+    $I0 = MyCoro()
+    say $I0
+
+    $P99.'reset'()
+    $I0 = MyCoro()
+    say $I0
+    $I0 = MyCoro()
+    say $I0
+.end
+.sub 'MyCoro'
+    .yield(1)
+    .yield(2)
+    .return(3)
+.end
+CODE
+1
+2
+1
+2
 OUTPUT
 
 

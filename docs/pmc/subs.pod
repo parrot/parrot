@@ -54,7 +54,7 @@ a C<Closure>, the subsequent scopes working outwards).
 A C<Coroutine> acts like a normal sub when called initially, and can also
 return normally, but acts like a continuation when exited via the C<yield>
 instruction and re-entered by re-invoking. But when all C<yield> states are
-exhausted the coroutine dies.
+exhausted the coroutine dies. How can however C<reset> a Coroutine.
 
 =begin PIR
 
@@ -65,8 +65,6 @@ exhausted the coroutine dies.
     .end
 
     .sub 'main' :main
-        $I0 = mycoro()
-        say $I0
         $I0 = mycoro()
         say $I0
         $I0 = mycoro()
