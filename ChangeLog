@@ -7,6 +7,8 @@
 	+ Do no pre-allocate 256 IO tables for the standard handles, only 3. [GH #1093]
 	+ Renamed ops2c to parrot-ops2c. Get the new name if exists in config key ops2c
 	  [GH #900]
+	+ Reenable parrot -t [flags] traceflags to enable the flags 2 find_method and
+	  4 invoke/retcc/yield again.
     - Build
 	+ Fix all -Wshadow instances
     - Documentation
