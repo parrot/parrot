@@ -2707,9 +2707,6 @@ reconfig : realclean
 manitest :
 	$(PERL) $(DEV_TOOLS_DIR)/manicheck.pl
 
-opsrenumber :
-	$(PERL) $(DEV_TOOLS_DIR)/opsrenumber.pl $(OPS_FILES)
-
 pmcrenumber :
 	$(PERL) $(DEV_TOOLS_DIR)/pmcrenumber.pl src/pmc/pmc.num
 
