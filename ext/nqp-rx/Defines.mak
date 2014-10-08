@@ -12,3 +12,8 @@ NQPRX_LIB_SETTING = $(LIBRARY_DIR)/nqp-setting.pbc
 NQPRX_CLEANUPS = \
     ext/nqp-rx/src/stage0/nqp-setting.pir
 
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:
+

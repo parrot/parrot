@@ -12,3 +12,8 @@ PCT_CLEANUPS = $(PCT_LIB_PBCS) \
 	compilers/pct/src/POST/Node.pbc \
 	compilers/pct/src/POST/Compiler.pbc
 
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:
+

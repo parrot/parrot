@@ -98,3 +98,8 @@ DYNPMC_CLEANUPS =                        \
 #IF(win32):    src/dynpmc/*.def"         \
 #IF(win32):    src/dynpmc/*.manifest"    \
 #IF(load_ext):    src/dynpmc/*@load_ext@
+
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

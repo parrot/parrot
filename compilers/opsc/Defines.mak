@@ -21,3 +21,7 @@ OPSC_CLEANUPS = \
 	$(LIBRARY_DIR)/opsc.pbc \
 	$(OPSC_SOURCES_GENERATED)
 
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

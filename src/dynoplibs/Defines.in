@@ -20,3 +20,7 @@ DYNOPLIBS_CLEANUPS = \
 #IF(win32):    src/dynoplibs/*.manifest \
 #IF(o):    src/dynoplibs/*$(O)
 
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:

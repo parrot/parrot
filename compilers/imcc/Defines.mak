@@ -15,3 +15,8 @@ IMCC_O_FILES = \
     compilers/imcc/parser_util$(O) \
     compilers/imcc/pcc$(O) \
     compilers/imcc/api$(O)
+
+# Local variables:
+#   mode: makefile
+# End:
+# vim: ft=make:
