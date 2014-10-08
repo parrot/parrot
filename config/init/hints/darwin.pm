@@ -50,7 +50,7 @@ sub runstep {
         $flags->{ccflags} .= '-Wno-long-double ';
     }
 
-    $flags->{linkflags} .= " -undefined dynamic_lookup";
+    $flags->{linkflags} .= ""; # -undefined dynamic_lookup";
 
     _probe_for_libraries($conf, $flags, 'fink');
     _probe_for_libraries($conf, $flags, 'macports');
@@ -68,14 +68,14 @@ sub runstep {
         osvers              => $osvers,
         ccflags             => $flags->{ccflags},
         ldflags             => $flags->{ldflags},
-        ccwarn              => "-Wno-shadow",
+        #ccwarn              => "-Wno-shadow",
         libs                => $libs,
         share_ext           => '.dylib',
         load_ext            => '.bundle',
-        link                => 'c++',
+        link                => $flags->{link} || 'c++',
         linkflags           => $flags->{linkflags},
-        ld                  => 'c++',
-        ld_share_flags      => '-dynamiclib -undefined dynamic_lookup',
+        ld                  => $flags->{ld} || 'c++',
+        ld_share_flags      => '-dynamiclib',
         ld_load_flags       => '-undefined dynamic_lookup -bundle',
         memalign            => 'some_memalign',
         has_dynamic_linking => 1,
@@ -302,6 +302,9 @@ Should you not want to search for either of these packages, you may specify
 the command-line options C<darwin_no_fink> and/or C<darwin_no_macports>.
 
 The functionality is tested in F<t/steps/init/hints/darwin-01.t>.
+
+Note that debugging with F<gdb> requires static linking (F<parrot_old>) and
+no C<-undefined dynamic_lookup>
 
 =cut
 
