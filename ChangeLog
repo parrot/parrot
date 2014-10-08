@@ -34,6 +34,7 @@
     - Tests
 	+ Run fulltests with the runcore=fast,-O1,-O2 fast, without -D040, --gc-debug
 	  [GH #1086]
+	+ Added tests for LexInfo.declare_lex_preg and .lex quoting roundtrips [GH #1095]
 	+ Simplify smolder resend usage
 	+ Fix mingw issues with \r\n
     - Community

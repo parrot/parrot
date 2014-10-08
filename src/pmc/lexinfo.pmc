@@ -58,8 +58,9 @@ The C<sub> argument is currently ignored.
 
 =item C<void declare_lex_preg(STRING *name, INTVAL preg)>
 
-Declare a lexical variable that is an alias for a PMC register.  The PIR
-compiler calls this method in response to a ".lex STRING, PREG" directive.
+Declare a lexical variable that is an alias for a PMC register.  This is
+the dynamic version of a ".lex STRING, PREG" directive.
+Note that the second argument is just an integer, i.e. C<0> for C<$P0>.
 
 =cut
 

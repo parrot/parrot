@@ -1930,6 +1930,7 @@ labeled_inst:
    | LEXICAL STRINGC COMMA target
          {
            SymReg *n;
+           /* This strips the " and ' quotes and treats both as ' */
            char   *name = mem_sys_strdup($2 + 1);
            name[strlen(name) - 1] = 0;
            n = mk_const(imcc, name, 'S');
