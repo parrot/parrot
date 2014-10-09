@@ -2657,6 +2657,9 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                 case 'f': next = '\f'; break;
                 case 'r': next = '\r'; break;
                 case 'e': next = '\x1B'; break;
+                /* and previously handled in the default case: */
+                case '\\': next = '\\'; break;
+                case '"': next = '"'; break;
                 /* Escape character */
                 case 'c':
                     if (itersrc.bytepos >= srclen) break;
@@ -2747,7 +2750,16 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                         pending = 1;
                     break;
                 default:
-                    next = c;
+                    /* die with Illegal escape sequences but allow quoting of special chars */
+                    if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
+                        /* next = c; for a deprecation cycle? */
+                        /* catch inproper use of \O, \o */
+                        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
+                          "Illegal escape sequence \\%c in '%Ss'", c, src);
+                    }
+                    else {
+                        next = c; /* ignore the \, like \[, \}, \' */
+                    }
                 }
             }
             STRING_iter_set_and_advance(interp, result, &iterdest, next);
@@ -2772,6 +2784,10 @@ Unescapes the specified C string. These sequences are covered:
   \uhhhh      4 hex digits
   \Uhhhhhhhh  8 hex digits
   \a, \b, \t, \n, \v, \f, \r, \e
+
+These sequences are not escaped: C<\\ \" \' \?>
+
+All other escape sequences within C<[a-zA-Z]> are illegal.
 
 =cut
 
