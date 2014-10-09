@@ -290,6 +290,9 @@ Return the LexInfo PMC, if any or a Null PMC.
         if (reg < 0)
             return PMCNULL;
 
+        if (Interp_trace_TEST(INTERP, 8))
+            fprintf(stderr, "#    lexpad.get '%s'\n", name->strstart);
+
         GET_ATTR_ctx(INTERP, SELF, ctx);
         return CTX_REG_PMC(INTERP, ctx, reg);
     }

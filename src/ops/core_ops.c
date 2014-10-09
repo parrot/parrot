@@ -22306,6 +22306,9 @@ Parrot_store_lex_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING   * const  lex_name = SCONST(1);
     PMC      * const  lex_pad = Parrot_sub_find_pad(interp, lex_name, ctx);
 
+    if (Interp_trace_TEST(interp, 8))
+        fprintf(stderr, "#    store_lex_sc_p '%s'\n", lex_name->strstart);
+
     if (PMC_IS_NULL(lex_pad)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, NULL, EXCEPTION_LEX_NOT_FOUND, "Lexical '%Ss' not found", lex_name);
 
@@ -22558,6 +22561,9 @@ Parrot_find_lex_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING   * const  lex_name = SCONST(2);
     PMC      * const  lex_pad = Parrot_sub_find_pad(interp, lex_name, ctx);
     PMC  * const  result = PMC_IS_NULL(lex_pad) ? PMCNULL : VTABLE_get_pmc_keyed_str(interp, lex_pad, lex_name);
+
+    if (Interp_trace_TEST(interp, 8))
+        fprintf(stderr, "#    find_lex_p_sc '%s'\n", lex_name->strstart);
 
     PREG(1) = result;
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));

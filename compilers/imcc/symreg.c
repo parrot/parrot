@@ -766,7 +766,7 @@ _mk_const(ARGMOD(imc_info_t * imcc), ARGMOD(SymHash *hsh),
     r->type          = VTCONST;
 
     if (t == 'U') {
-        /* charset:"string" */
+        /* encoding:"string" */
         r->set   = 'S';
         r->type |= VT_ENCODED;
     }
@@ -846,6 +846,9 @@ mk_const(ARGMOD(imc_info_t * imcc), ARGIN(const char *name), int t)
 {
     ASSERT_ARGS(mk_const)
     SymHash * const h = &imcc->ghash;
+    int encoded = 0;
+    SymReg  * result;
+    char *const_name;
 
     if (!h->data)
         create_symhash(imcc, h);

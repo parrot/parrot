@@ -469,11 +469,11 @@ mk_pmc_const_named(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
     ASSERT_ARGS(mk_pmc_const_named)
     SymReg *rhs;
     SymReg *r[3];
-    char   *const_name;
-    const int ascii       = (*constant == '\'' || *constant == '"');
+    //const int ascii       = (*constant == '\'' || *constant == '"');
     char   *unquoted_name = mem_sys_strdup(name + 1);
-    size_t  name_length   = strlen(unquoted_name) - 1;
+    size_t  name_length;
 
+    name_length = strlen(unquoted_name) - 1;
     unquoted_name[name_length] = 0;
 
     if (left->type == VTADDRESS) {      /* IDENTIFIER */
@@ -486,42 +486,32 @@ mk_pmc_const_named(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
         left->set = 'P';
     }
     r[0] = left;
-    if (ascii) {
-        /* strip delimiters */
-        const_name = mem_sys_strdup(constant + 1);
-        const_name[strlen(const_name) - 1] = 0;
-    }
-    else {
-        const_name = mem_sys_strdup(constant);
-    }
 
     /* That that an empty name here, like .const '' $Pxx = "constant"
        can only be a Sub. name_length = 0 matches all */
     if ((strncmp(unquoted_name, "Sub",       name_length) == 0)
     ||  (strncmp(unquoted_name, "Coroutine", name_length) == 0)) {
-        rhs = mk_const(imcc, const_name, 'p');
-
-        if (!ascii)
-            rhs->type |= VT_ENCODED;
-
+        rhs = mk_const(imcc, constant, 'p');
+        //if (!ascii)
+        //    rhs->type |= VT_ENCODED;
         rhs->usage    |= U_FIXUP | U_SUBID_LOOKUP;
     }
     else if (strncmp(unquoted_name, "LexInfo", name_length) == 0) {
-        rhs = mk_const(imcc, const_name, 'l');
-        if (!ascii)
-            rhs->type |= VT_ENCODED;
+        rhs = mk_const(imcc, constant, 'l');
+        //if (!ascii)
+        //    rhs->type |= VT_ENCODED;
         rhs->usage    |= U_FIXUP | U_LEXINFO_LOOKUP;
     }
     else {
-        rhs = mk_const(imcc, const_name, 'P');
+        rhs = mk_const(imcc, constant, 'P');
     }
 
     r[1]          = rhs;
     rhs->pmc_type = Parrot_pmc_get_type_str(imcc->interp,
-        Parrot_str_new(imcc->interp, unquoted_name, name_length));
+                      Parrot_str_new(imcc->interp, unquoted_name, name_length));
 
     mem_sys_free(unquoted_name);
-    mem_sys_free(const_name);
+    //mem_sys_free(const_name);
 
     return INS(imcc, unit, "set_p_pc", "", r, 2, 0, 1);
 }
@@ -1264,10 +1254,16 @@ pasm_inst:                     { clear_state(imcc); }
          }
    | LEXICAL STRINGC COMMA REG
          {
-           char   *name = mem_sys_strdup($2 + 1);
+           char   *name;
            SymReg *r    = mk_pasm_reg(imcc, $4);
            SymReg *n;
-           name[strlen(name) - 1] = 0;
+           if (*$2 == '"') { /* interpolate name with double-quote */
+               STRING *unescaped = Parrot_str_unescape(imcc->interp, name, '"', NULL);
+               name              = Parrot_str_to_cstring(imcc->interp, unescaped);
+           } else { /* only if we insist on keeping ' or " around (there's no need) */
+               name = mem_sys_strdup($2 + 1);
+               name[strlen(name) - 1] = 0;
+           }
            n = mk_const(imcc, name, 'S');
            set_lexical(imcc, r, n);
            $$ = 0;
@@ -1933,13 +1929,9 @@ labeled_inst:
    | LEXICAL STRINGC COMMA target
          {
            SymReg *n;
-           /* This strips the " and ' quotes and treats both as ' */
-           char   *name = mem_sys_strdup($2 + 1);
-           name[strlen(name) - 1] = 0;
-           n = mk_const(imcc, name, 'S');
+           n = mk_const(imcc, $2, 'S');
            set_lexical(imcc, $4, n); $$ = 0;
            mem_sys_free($2);
-           mem_sys_free(name);
          }
    | LEXICAL USTRINGC COMMA target
          {
