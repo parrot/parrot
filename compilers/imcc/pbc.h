@@ -64,9 +64,7 @@ STRING * IMCC_string_from__STRINGC(
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-STRING * IMCC_string_from_reg(
-    ARGMOD(imc_info_t * imcc),
-    ARGIN(const SymReg *r))
+STRING * IMCC_string_from_reg(ARGMOD(imc_info_t * imcc), ARGIN(SymReg *r))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(* imcc);

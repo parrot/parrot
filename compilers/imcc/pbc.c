@@ -1029,7 +1029,7 @@ fixup_globals(ARGMOD(imc_info_t * imcc))
 
 /*
 
-=item C<STRING * IMCC_string_from_reg(imc_info_t * imcc, const SymReg *r)>
+=item C<STRING * IMCC_string_from_reg(imc_info_t * imcc, SymReg *r)>
 
 Creates and returns a constant STRING, given a stringish SymReg.
 
@@ -1040,7 +1040,7 @@ Creates and returns a constant STRING, given a stringish SymReg.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-IMCC_string_from_reg(ARGMOD(imc_info_t * imcc), ARGIN(const SymReg *r))
+IMCC_string_from_reg(ARGMOD(imc_info_t * imcc), ARGIN(SymReg *r))
 {
     ASSERT_ARGS(IMCC_string_from_reg)
     char *buf = r->name;
@@ -1056,6 +1056,10 @@ IMCC_string_from_reg(ARGMOD(imc_info_t * imcc), ARGIN(const SymReg *r))
         size_t len;
 
         IMCC_debug(imcc, DEBUG_MKCONST, "#    string_from_reg '%s' U\n", buf);
+        if (!p) {
+            r->type -= VT_ENCODED; /* FIXME! */
+            goto bare;
+        }
         PARROT_ASSERT(p && p[-1] == ':');
 
         len = p - buf - 1;
@@ -1076,12 +1080,12 @@ IMCC_string_from_reg(ARGMOD(imc_info_t * imcc), ARGIN(const SymReg *r))
     }
     else if (*buf == '\'') {
         buf++;
-        return Parrot_str_new_init(imcc->interp, buf, strlen(buf) - 1,
+        return Parrot_str_new_init(imcc->interp, buf, *buf ? strlen(buf) - 1 : 0,
                 Parrot_ascii_encoding_ptr, PObj_constant_FLAG);
     }
-
+  bare:
     /* unquoted bare name - ASCII only don't unescape it */
-    return Parrot_str_new_init(imcc->interp, buf, strlen(buf),
+    return Parrot_str_new_init(imcc->interp, buf, *buf ? strlen(buf) : 0,
             Parrot_ascii_encoding_ptr, PObj_constant_FLAG);
 }
 
@@ -1130,7 +1134,7 @@ IMCC_string_from__STRINGC(ARGMOD(imc_info_t * imcc), ARGIN(char *buf))
     }
     else if (*buf == '\'') {
         buf++;
-        return Parrot_str_new_init(imcc->interp, buf, strlen(buf) - 1,
+        return Parrot_str_new_init(imcc->interp, buf, *buf ? strlen(buf) - 1 : 0,
                 Parrot_ascii_encoding_ptr, PObj_constant_FLAG);
     }
     else {

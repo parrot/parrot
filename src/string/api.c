@@ -2633,7 +2633,6 @@ EXPERIMENTAL, see TT #1628
 
 Unescapes the src string returning a new string with the encoding specified.
 
-
 =cut
 
 */
@@ -2831,9 +2830,8 @@ Parrot_str_unescape(PARROT_INTERP,
 {
     ASSERT_ARGS(Parrot_str_unescape)
 
-    STRING           *src;
     const STR_VTABLE *encoding, *src_encoding;
-    size_t            clength = strlen(cstring);
+    size_t            clength = *cstring ? strlen(cstring) : 0;
 
     if (delimiter && clength)
         --clength;
@@ -2854,11 +2852,15 @@ Parrot_str_unescape(PARROT_INTERP,
     else
         src_encoding = Parrot_utf8_encoding_ptr;
 
-    src = Parrot_str_new_init(interp, cstring, clength, src_encoding,
-            PObj_external_FLAG);
-
-    return Parrot_str_unescape_string(interp, src, encoding,
-            PObj_constant_FLAG);
+    if (clength) {
+        STRING *src = Parrot_str_new_init(interp, cstring, clength, src_encoding,
+                                          PObj_external_FLAG);
+        return Parrot_str_unescape_string(interp, src, Parrot_ascii_encoding_ptr,
+                                          PObj_constant_FLAG);
+    } else {
+        return Parrot_str_new_init(interp, "", 0, encoding,
+                                   PObj_constant_FLAG);
+    }
 }
 
 

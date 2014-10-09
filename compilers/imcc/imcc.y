@@ -759,12 +759,15 @@ mk_sub_address_fromc(ARGMOD(imc_info_t *imcc), ARGIN(const char *name))
         STRING *unescaped = Parrot_str_unescape(imcc->interp, name+1, '"', NULL);
         name_copy         = Parrot_str_to_cstring(imcc->interp, unescaped);
     }
-    else {
-        name_copy = mem_sys_strdup(name);
+    else if (*name == '\'') {
+        name_copy = mem_sys_strdup(name+1);
         name_copy[strlen(name) - 1] = 0;
     }
+    else {
+        name_copy = mem_sys_strdup(name);
+    }
 
-    r = mk_sub_address(imcc, name_copy + 1);
+    r = mk_sub_address(imcc, name_copy);
     mem_sys_free(name_copy);
 
     return r;
