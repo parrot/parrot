@@ -2855,7 +2855,7 @@ Parrot_str_unescape(PARROT_INTERP,
     if (clength) {
         STRING *src = Parrot_str_new_init(interp, cstring, clength, src_encoding,
                                           PObj_external_FLAG);
-        return Parrot_str_unescape_string(interp, src, Parrot_ascii_encoding_ptr,
+        return Parrot_str_unescape_string(interp, src, src_encoding,
                                           PObj_constant_FLAG);
     } else {
         return Parrot_str_new_init(interp, "", 0, encoding,

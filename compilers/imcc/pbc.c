@@ -1057,7 +1057,7 @@ IMCC_string_from_reg(ARGMOD(imc_info_t * imcc), ARGIN(SymReg *r))
 
         IMCC_debug(imcc, DEBUG_MKCONST, "#    string_from_reg '%s' U\n", buf);
         if (!p) {
-            r->type -= VT_ENCODED; /* FIXME! */
+            r->type -= VT_ENCODED; /* FIXME! Whose fault is this? */
             goto bare;
         }
         PARROT_ASSERT(p && p[-1] == ':');
@@ -1068,7 +1068,7 @@ IMCC_string_from_reg(ARGMOD(imc_info_t * imcc), ARGIN(SymReg *r))
         memcpy(encoding_name, buf, len);
         encoding_name[len] = '\0';
 
-        return Parrot_str_unescape(imcc->interp, p + 1, '"', encoding_name);
+        return Parrot_str_unescape(imcc->interp, p+1, '"', encoding_name);
     }
     else if (*buf == '"') {
         buf++;
