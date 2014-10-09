@@ -756,7 +756,7 @@ mk_sub_address_fromc(ARGMOD(imc_info_t *imcc), ARGIN(const char *name))
 
     /* interpolate only if the first character is a double-quote */
     if (*name == '"') {
-        STRING *unescaped = Parrot_str_unescape(imcc->interp, name, '"', NULL);
+        STRING *unescaped = Parrot_str_unescape(imcc->interp, name+1, '"', NULL);
         name_copy         = Parrot_str_to_cstring(imcc->interp, unescaped);
     }
     else {
@@ -1258,7 +1258,7 @@ pasm_inst:                     { clear_state(imcc); }
            SymReg *r    = mk_pasm_reg(imcc, $4);
            SymReg *n;
            if (*$2 == '"') { /* interpolate name with double-quote */
-               STRING *unescaped = Parrot_str_unescape(imcc->interp, name, '"', NULL);
+               STRING *unescaped = Parrot_str_unescape(imcc->interp, name+1, '"', NULL);
                name              = Parrot_str_to_cstring(imcc->interp, unescaped);
            } else { /* only if we insist on keeping ' or " around (there's no need) */
                name = mem_sys_strdup($2 + 1);
