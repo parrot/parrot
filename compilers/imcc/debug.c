@@ -271,7 +271,7 @@ IMCC_debug_ins(ARGMOD(imc_info_t *imcc), int level, ARGIN(const Instruction *ins
 
 =item C<void dump_instructions(imc_info_t * imcc, const IMC_Unit *unit)>
 
-Dumps the current instruction status of IMCC
+Dumps the current instruction status of IMCC, with -d8.
 
 =cut
 
@@ -299,7 +299,7 @@ dump_instructions(ARGMOD(imc_info_t * imcc), ARGIN(const IMC_Unit *unit))
             Parrot_io_eprintf(imcc->interp,
                     "%4i %4d %4d %4d\t%x\t%8x %4d %4d %4d  ",
                      ins->index, ins->line, bb->index, bb->loop_depth,
-                     ins->flags, ins->type, OP_INFO_OPNUM(ins->op),
+                     ins->flags, ins->type, ins->op ? OP_INFO_OPNUM(ins->op) : 0,
                      ins->opsize, pc);
         }
         else {
@@ -318,7 +318,7 @@ dump_instructions(ARGMOD(imc_info_t * imcc), ARGIN(const IMC_Unit *unit))
 
 =item C<void dump_cfg(const IMC_Unit *unit)>
 
-Dumps the current IMCC config data.
+Dumps the current IMCC config data, with -d10.
 
 =cut
 

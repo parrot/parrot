@@ -8,8 +8,7 @@
 
 #define DEBUG_PARROT 0x0001
 /* unused:
-#define DEBUG_LEXER  0x0002
-*/
+#define DEBUG_LEXER  0x0002 */
 #define DEBUG_PARSER 0x0004
 #define DEBUG_IMC    0x0008
 #define DEBUG_CFG    0x0010
@@ -20,8 +19,7 @@
 #define DEBUG_AST    0x0100
 /* unused:
 #define DEBUG_REG    0x0200
-#define DEBUG_REG2   0x0400
-*/
+#define DEBUG_REG2   0x0400 */
 
 #define DEBUG_PBC          0x1000
 #define DEBUG_PBC_CONST    0x2000
