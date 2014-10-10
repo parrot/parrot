@@ -1056,7 +1056,7 @@ IMCC_string_from_reg(ARGMOD(imc_info_t * imcc), ARGIN(SymReg *r))
         char * p = strchr(buf, '"');
         size_t len;
 
-        IMCC_debug(imcc, DEBUG_MKCONST, "#    string_from_reg '%s' U\n", buf);
+        IMCC_debug(imcc, DEBUG_MKCONST, "#    string_from_reg '%s'\n", buf);
         if (!p) {
             r->type -= VT_ENCODED; /* FIXME! Whose fault is this? fixup_globals */
             goto bare;

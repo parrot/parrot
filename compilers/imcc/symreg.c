@@ -870,7 +870,8 @@ mk_const(ARGMOD(imc_info_t * imcc), ARGIN(const char *name), int t)
             const_name[strlen(const_name) - 1] = 0;
         }
     }
-    /* TODO: resolve encoding aliases here with U */
+    /* TODO: resolve encoding aliases here with U, not in string_from_reg.
+     registers should store encoded strings more efficiently: GH #1097 */
 
     IMCC_debug(imcc, DEBUG_MKCONST, "#    mk_const '%s' %c\n",
                const_name, t);
