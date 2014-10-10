@@ -490,31 +490,31 @@ CODE
 OUT
 
 pir_output_is(
-    <<'CODE', <<'OUT', "PIR heredoc: escaped characters, escaped quotes, starting quotes" );
+    <<'CODE', <<"OUT", "PIR heredoc: escaped characters, escaped quotes, starting quotes" );
 .sub test :main
 	.local string test
 
 	test = <<"TEST"
 { \{ \\{
-w \w \\w
+w \a \\w
 " \" \\"
 { \{ \\{
-w \w \\w
+w \a \\w
 " \" \\"
 { \{ \\{
-w \w \\w
+w \a \\w
 TEST
 	print test
 .end
 CODE
-{ { \{
-w w \w
-" " \"
-{ { \{
-w w \w
-" " \"
-{ { \{
-w w \w
+{ { \\{
+w \a \\w
+" " \\"
+{ { \\{
+w \a \\w
+" " \\"
+{ { \\{
+w \a \\w
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', "heredoc not eol 1" );
