@@ -860,10 +860,17 @@ mk_const(ARGMOD(imc_info_t * imcc), ARGIN(const char *name), int t)
         create_symhash(imcc, h);
 
     if (t != 'U') {
-        if (*name == '"') { /* but we need to keep escaped \0 */
+        if (*name == '"') {
             STRING *unescaped = Parrot_str_unescape(imcc->interp, name+1, '"', NULL);
-            if (!memchr(unescaped->strstart, 0, unescaped->bufused))
-                const_name    = Parrot_str_to_cstring(imcc->interp, unescaped);
+            /* but we need to keep escaped \0. represent it encoded */
+            if (memchr(unescaped->strstart, 0, unescaped->bufused)) {
+                int len = strlen(name);
+                const_name = (char*)mem_internal_allocate(len + 8 + 1); /* 8 = strlen("fixed_8:") */
+                strcpy(const_name, "fixed_8:");
+                strcat(const_name, name);
+                const_name[len + 7 + 1] = 0;
+                if (t == 'S') t = 'U';
+            }
         }
         else if (*name == '\'') {
             const_name = mem_sys_strdup(name + 1);
