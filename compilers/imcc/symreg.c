@@ -833,7 +833,7 @@ int_overflows(ARGIN(const SymReg *r))
 
 =item C<SymReg * mk_const(imc_info_t * imcc, const char *name, int t)>
 
-Makes a new constant (and populates the cache of global symbols).
+Makes a new constant and populates the cache of global symbols.
 
 =cut
 
@@ -912,6 +912,7 @@ add_ns(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
     strcat(ns_name, "@@@");
     strcat(ns_name, name);
 
+    /* Note that only double-quotes are detected here */
     p = strstr(ns_name, "\";\"");   /* Foo";"Bar  -> Foo@@@Bar */
 
     while (p) {

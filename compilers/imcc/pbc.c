@@ -1057,7 +1057,7 @@ IMCC_string_from_reg(ARGMOD(imc_info_t * imcc), ARGIN(SymReg *r))
 
         IMCC_debug(imcc, DEBUG_MKCONST, "#    string_from_reg '%s' U\n", buf);
         if (!p) {
-            r->type -= VT_ENCODED; /* FIXME! Whose fault is this? */
+            r->type -= VT_ENCODED; /* FIXME! Whose fault is this? fixup_globals */
             goto bare;
         }
         PARROT_ASSERT(p && p[-1] == ':');
@@ -1070,6 +1070,9 @@ IMCC_string_from_reg(ARGMOD(imc_info_t * imcc), ARGIN(SymReg *r))
 
         return Parrot_str_unescape(imcc->interp, p+1, '"', encoding_name);
     }
+#if 0
+    /* mk_const already stripped the quotes.
+       don't strip valid quotes from the string again. t/op/basic_6.pasm */
     else if (*buf == '"') {
         buf++;
         if (r->usage & U_LEXICAL) /* GH 1095 quirks, treat as single-quote */
@@ -1080,13 +1083,16 @@ IMCC_string_from_reg(ARGMOD(imc_info_t * imcc), ARGIN(SymReg *r))
     }
     else if (*buf == '\'') {
         buf++;
-        return Parrot_str_new_init(imcc->interp, buf, *buf ? strlen(buf) - 1 : 0,
-                Parrot_ascii_encoding_ptr, PObj_constant_FLAG);
+        return *buf ? Parrot_str_new_init(imcc->interp, buf, strlen(buf) - 1,
+                        Parrot_ascii_encoding_ptr, PObj_constant_FLAG)
+                    : STRINGNULL;
     }
+#endif
   bare:
     /* unquoted bare name - ASCII only don't unescape it */
-    return Parrot_str_new_init(imcc->interp, buf, *buf ? strlen(buf) : 0,
-            Parrot_ascii_encoding_ptr, PObj_constant_FLAG);
+    return *buf ? Parrot_str_new_init(imcc->interp, buf, strlen(buf),
+                     Parrot_ascii_encoding_ptr, PObj_constant_FLAG)
+                 : STRINGNULL;
 }
 
 /*
@@ -1134,8 +1140,9 @@ IMCC_string_from__STRINGC(ARGMOD(imc_info_t * imcc), ARGIN(char *buf))
     }
     else if (*buf == '\'') {
         buf++;
-        return Parrot_str_new_init(imcc->interp, buf, *buf ? strlen(buf) - 1 : 0,
-                Parrot_ascii_encoding_ptr, PObj_constant_FLAG);
+        return *buf ? Parrot_str_new_init(imcc->interp, buf, strlen(buf) - 1,
+                        Parrot_ascii_encoding_ptr, PObj_constant_FLAG)
+                    : STRINGNULL;
     }
     else {
         IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,

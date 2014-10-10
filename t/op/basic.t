@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2014, Parrot Foundation.
+# Copyright (C) 2001-2007,2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -78,7 +78,7 @@ CODE
 /Illegal escape sequence \\i in 'Parrot fl\\ies'/
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "print string with embedded newline" );
+pasm_output_is( <<'CODE', <<OUTPUT, "print string with embedded newline, known escape" );
 .pcc_sub :main main:
        print "Parrot flies\n"
        end
