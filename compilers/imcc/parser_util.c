@@ -263,7 +263,7 @@ var_arg_ins(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit), ARGIN(const char 
                     "The opcode '%s' needs arguments", name);
 
     if (r[0]->set == 'S') {
-        r[0]           = mk_const(imcc, r[0]->name, 'P');
+        r[0]           = _mk_const(imcc, 0, r[0]->name, 'P');
         r[0]->pmc_type = enum_class_FixedIntegerArray;
     }
 
@@ -520,7 +520,7 @@ change_op_arg_to_num(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
         if (c->type & VT_CONSTP)
             c = c->reg;
 
-        r[num]  = mk_const(imcc, c->name, 'N');
+        r[num]  = _mk_const(imcc, 0, c->name, 'N');
         changed = 1;
     }
     else if (emit) {

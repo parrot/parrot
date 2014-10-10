@@ -749,7 +749,11 @@ mk_const_ident(ARGMOD(imc_info_t * imcc), ARGIN(const char *name), int t,
 =item C<SymReg * _mk_const(imc_info_t * imcc, SymHash *hsh, const char *name,
 int t)>
 
-Makes a new constant (internal use only).
+Makes a new constant without stripping surrounding string quotes.
+Must be used internally.
+If hsh is 0, the global symbol table is used.
+
+mk_const which strips the quotes is only to be used from the parser.
 
 =cut
 
@@ -758,11 +762,11 @@ Makes a new constant (internal use only).
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
-_mk_const(ARGMOD(imc_info_t * imcc), ARGMOD(SymHash *hsh),
-        ARGIN(const char *name), int t)
+_mk_const(ARGMOD(imc_info_t * imcc), ARGMOD_NULLOK(SymHash *hsh),
+          ARGIN(const char *name), int t)
 {
     ASSERT_ARGS(_mk_const)
-    SymReg * const r = _mk_symreg(imcc, hsh, name, t);
+    SymReg * const r = _mk_symreg(imcc, hsh ? hsh : &imcc->ghash, name, t);
     r->type          = VTCONST;
 
     if (t == 'U') {
@@ -834,6 +838,8 @@ int_overflows(ARGIN(const SymReg *r))
 =item C<SymReg * mk_const(imc_info_t * imcc, const char *name, int t)>
 
 Makes a new constant and populates the cache of global symbols.
+Strips surrounding string quotes and unescapes double-quoted strings.
+Must be used in the parser.
 
 =cut
 
@@ -854,15 +860,17 @@ mk_const(ARGMOD(imc_info_t * imcc), ARGIN(const char *name), int t)
         create_symhash(imcc, h);
 
     if (t != 'U') {
-        if (*name == '"') {
+        if (*name == '"') { /* but we need to keep escaped \0 */
             STRING *unescaped = Parrot_str_unescape(imcc->interp, name+1, '"', NULL);
-            const_name        = Parrot_str_to_cstring(imcc->interp, unescaped);
+            if (!memchr(unescaped->strstart, 0, unescaped->bufused))
+                const_name    = Parrot_str_to_cstring(imcc->interp, unescaped);
         }
         else if (*name == '\'') {
             const_name = mem_sys_strdup(name + 1);
             const_name[strlen(const_name) - 1] = 0;
         }
     }
+    /* TODO: resolve encoding aliases here with U */
 
     IMCC_debug(imcc, DEBUG_MKCONST, "#    mk_const '%s' %c\n",
                const_name, t);

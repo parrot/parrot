@@ -985,7 +985,7 @@ fixup_globals(ARGMOD(imc_info_t * imcc))
                     }
                 }
                 if (!s1) {
-                    SymReg * const nam = mk_const(imcc, fixup->name,
+                    SymReg * const nam = _mk_const(imcc, 0, fixup->name,
                             fixup->type & VT_ENCODED ? 'U' : 'S');
 
                     /* TODO: Don't hard-code this op name in here. Ask libparrot
@@ -1071,24 +1071,6 @@ IMCC_string_from_reg(ARGMOD(imc_info_t * imcc), ARGIN(SymReg *r))
 
         return Parrot_str_unescape(imcc->interp, p+1, '"', encoding_name);
     }
-#if 0
-    /* mk_const already stripped the quotes.
-       don't strip valid quotes from the string again. t/op/basic_6.pasm */
-    else if (*buf == '"') {
-        buf++;
-        if (r->usage & U_LEXICAL) /* GH 1095 quirks, treat as single-quote */
-            return Parrot_str_new_init(imcc->interp, buf, strlen(buf) - 1,
-                       Parrot_ascii_encoding_ptr, PObj_constant_FLAG);
-        else
-            return Parrot_str_unescape(imcc->interp, buf, '"', NULL);
-    }
-    else if (*buf == '\'') {
-        buf++;
-        return *buf ? Parrot_str_new_init(imcc->interp, buf, strlen(buf) - 1,
-                        Parrot_ascii_encoding_ptr, PObj_constant_FLAG)
-                    : STRINGNULL;
-    }
-#endif
   bare:
     /* unquoted bare name - ASCII only don't unescape it */
     return *buf ? Parrot_str_new_init(imcc->interp, buf, strlen(buf),

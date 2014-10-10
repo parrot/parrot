@@ -649,7 +649,7 @@ strength_reduce(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
                 IMCC_debug_ins(imcc, DEBUG_OPT1, ins);
                 IMCC_debug(imcc, DEBUG_OPT1, "  => ");
             }
-            r = mk_const(imcc, "0", ins->symregs[0]->set);
+            r = _mk_const(imcc, 0, "0", ins->symregs[0]->set);
             --ins->symregs[1]->use_count;
             if (ins->opsize == 4)
                 --ins->symregs[2]->use_count;
@@ -727,7 +727,7 @@ constant_propagation(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
         }
         else if (STREQ(ins->opname, "null") && ins->symregs[0]->set == 'I') {
             found = 1;
-            c = mk_const(imcc, "0", 'I');
+            c = _mk_const(imcc, 0, "0", 'I');
             o = ins->symregs[0];
         } /* this would be good because 'set I0, 0' is reduced to 'null I0'
                before it gets to us */
@@ -860,7 +860,7 @@ IMCC_subst_constants_umix(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
                 STREQ(name, ops[i])) {
             IMCC_debug(imcc, DEBUG_OPT1, "opt1 %s_nc_ic => ", name);
             strcpy(b, r[1]->name);
-            r[1] = mk_const(imcc, b, 'N');
+            r[1] = _mk_const(imcc, 0, b, 'N');
             tmp = INS(imcc, unit, name, "", r, 2, 0, 0);
             IMCC_debug_ins(imcc, DEBUG_OPT1, tmp);
         }
@@ -1116,22 +1116,22 @@ IMCC_subst_constants(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
         switch (r[0]->set) {
           case 'I':
             snprintf(b, sizeof (b), INTVAL_FMT, REG_INT(imcc->interp, 0));
-            r[1] = mk_const(imcc, b, r[0]->set);
+            r[1] = _mk_const(imcc, 0, b, r[0]->set);
             break;
           case 'N':
             snprintf(b, sizeof (b), fmt, REG_NUM(imcc->interp, 0));
-            r[1] = mk_const(imcc, b, r[0]->set);
+            r[1] = _mk_const(imcc, 0, b, r[0]->set);
             break;
           case 'S':
           {
             char * const cstr = Parrot_str_to_cstring(imcc->interp, REG_STR(imcc->interp, 0));
             const STR_VTABLE* encoding = REG_STR(imcc->interp, 0)->encoding;
             if (encoding == Parrot_ascii_encoding_ptr) {
-                r[1] = mk_const(imcc, cstr, r[0]->set);
+                r[1] = _mk_const(imcc, 0, cstr, r[0]->set);
             }
             else {
                 snprintf(b, sizeof (b), "%s:\"%s\"", encoding->name, cstr);
-                r[1] = mk_const(imcc, b, 'U');
+                r[1] = _mk_const(imcc, 0, b, 'U');
             }
             Parrot_str_free_cstring(cstr);
           }

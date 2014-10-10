@@ -185,7 +185,7 @@ get_const(ARGMOD(imc_info_t * imcc), ARGIN(const char *name), int type)
     if (r && r->set == type)
         return r;
 
-    return mk_const(imcc, name, type);
+    return _mk_const(imcc, 0, name, type);
 }
 
 /*
@@ -317,7 +317,7 @@ pcc_get_args(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
         bufpos--;
     memcpy(buf + bufpos, subf, lensubf);
 
-    regs[0] = mk_const(imcc, buf, 'P');
+    regs[0] = _mk_const(imcc, 0, buf, 'P');
     regs[0]->pmc_type = enum_class_FixedIntegerArray;
     ins     = insINS(imcc, unit, ins, op_name, regs, n + 1);
 
@@ -638,10 +638,10 @@ expand_pcc_sub_call(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
             ||    arg->type == VTPASM
             ||    arg->type == VTREG)) {
                 if (arg->type & VT_ENCODED) {
-                    meth = mk_const(imcc, arg->name, 'U');
+                    meth = _mk_const(imcc, 0, arg->name, 'U');
                 }
                 else {
-                    meth = mk_const(imcc, arg->name, 'S');
+                    meth = _mk_const(imcc, 0, arg->name, 'S');
                 }
             }
         }
