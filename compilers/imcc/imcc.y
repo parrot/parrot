@@ -469,7 +469,7 @@ mk_pmc_const_named(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
     ASSERT_ARGS(mk_pmc_const_named)
     SymReg *rhs;
     SymReg *r[3];
-    //const int ascii       = (*constant == '\'' || *constant == '"');
+    const int ascii       = (*constant == '\'' || *constant == '"');
     char   *unquoted_name = mem_sys_strdup(name + 1);
     size_t  name_length;
 
@@ -492,14 +492,14 @@ mk_pmc_const_named(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
     if ((strncmp(unquoted_name, "Sub",       name_length) == 0)
     ||  (strncmp(unquoted_name, "Coroutine", name_length) == 0)) {
         rhs = mk_const(imcc, constant, 'p');
-        //if (!ascii)
-        //    rhs->type |= VT_ENCODED;
+        if (!ascii)
+            rhs->type |= VT_ENCODED;
         rhs->usage    |= U_FIXUP | U_SUBID_LOOKUP;
     }
     else if (strncmp(unquoted_name, "LexInfo", name_length) == 0) {
         rhs = mk_const(imcc, constant, 'l');
-        //if (!ascii)
-        //    rhs->type |= VT_ENCODED;
+        if (!ascii)
+            rhs->type |= VT_ENCODED;
         rhs->usage    |= U_FIXUP | U_LEXINFO_LOOKUP;
     }
     else {
@@ -511,7 +511,6 @@ mk_pmc_const_named(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
                       Parrot_str_new(imcc->interp, unquoted_name, name_length));
 
     mem_sys_free(unquoted_name);
-    //mem_sys_free(const_name);
 
     return INS(imcc, unit, "set_p_pc", "", r, 2, 0, 1);
 }

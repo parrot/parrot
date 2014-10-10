@@ -848,32 +848,25 @@ mk_const(ARGMOD(imc_info_t * imcc), ARGIN(const char *name), int t)
     SymHash * const h = &imcc->ghash;
     int encoded = 0;
     SymReg  * result;
-    char *const_name;
+    char *const_name = (char *)name;
 
     if (!h->data)
         create_symhash(imcc, h);
 
-    if (t == 'U') {
-        const_name = (char *)name;
-    }
-    else if (*name == '"') {
-        STRING *unescaped = Parrot_str_unescape(imcc->interp, name+1, '"', NULL);
-        const_name        = Parrot_str_to_cstring(imcc->interp, unescaped);
-    }
-    else if (*name == '\'') {
-        const_name = mem_sys_strdup(name + 1);
-        const_name[strlen(const_name) - 1] = 0;
-    }
-    else { /* else encoded. TODO: Unify encodings per aliases.*/
-        const_name = (char *)name;
-        if (t =='S') t = 'U';
-        else encoded++;
+    if (t != 'U') {
+        if (*name == '"') {
+            STRING *unescaped = Parrot_str_unescape(imcc->interp, name+1, '"', NULL);
+            const_name        = Parrot_str_to_cstring(imcc->interp, unescaped);
+        }
+        else if (*name == '\'') {
+            const_name = mem_sys_strdup(name + 1);
+            const_name[strlen(const_name) - 1] = 0;
+        }
     }
 
-    IMCC_debug(imcc, DEBUG_MKCONST, "#    mk_const '%s' %c\n", name, t);
+    IMCC_debug(imcc, DEBUG_MKCONST, "#    mk_const '%s' %c\n",
+               const_name, t);
     result = _mk_const(imcc, h, const_name, t);
-    if (encoded)
-        result->type |= VT_ENCODED;
     return result;
 }
 

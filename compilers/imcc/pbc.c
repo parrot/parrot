@@ -699,8 +699,9 @@ get_code_size(ARGMOD(imc_info_t * imcc), ARGIN(const IMC_Unit *unit),
         else {
             if (ins->op == &core_ops->op_info_table[PARROT_OP_set_p_pc]) {
                 /* set_p_pc opcode */
-                IMCC_debug(imcc, DEBUG_PBC_FIXUP, "PMC constant %s\n",
-                           ins->symregs[1]->name);
+                IMCC_debug(imcc, DEBUG_PBC_FIXUP, "PMC constant %s type=%d usage=%d set=%d\n",
+                           ins->symregs[1]->name, ins->symregs[1]->type,
+                           ins->symregs[1]->usage, ins->symregs[1]->set);
 
                 if (ins->symregs[1]->usage & U_FIXUP)
                     store_fixup(imcc, ins->symregs[1], code_size, 2);
@@ -1809,6 +1810,8 @@ build_key(ARGMOD(imc_info_t * imcc), ARGIN(SymReg *key_reg),
             /* Fall through. */
           case VTCONST:
           case VTCONST|VT_ENCODED:
+            IMCC_debug(imcc, DEBUG_PBC_CONST, " const key reg %s set=%c color=%d type=%x\n",
+                       r->name, r->set, (int)r->color, r->type);
             switch (r->set) {
               case 'S':                       /* P["key"] */
                 /* str constant */
@@ -2140,8 +2143,8 @@ add_1_const(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r),
     if (!r)
         return;
 
-    IMCC_debug(imcc, DEBUG_PBC_CONST, "const %s\tcolor %d use_count %d\n",
-            r->name, r->color, r->use_count);
+    IMCC_debug(imcc, DEBUG_PBC_CONST, "const %s\tset=%c color=%d use_count=%d type=%x\n",
+               r->name, r->set, r->color, r->use_count, r->type);
 }
 
 
