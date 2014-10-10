@@ -868,7 +868,7 @@ mk_const(ARGMOD(imc_info_t * imcc), ARGIN(const char *name), int t)
                 const_name = (char*)mem_internal_allocate(len + 8 + 1); /* 8 = strlen("fixed_8:") */
                 strcpy(const_name, "fixed_8:");
                 strcat(const_name, name);
-                const_name[len + 7 + 1] = 0;
+                const_name[len + 8 + 1] = 0;
                 if (t == 'S') t = 'U';
             }
         }
