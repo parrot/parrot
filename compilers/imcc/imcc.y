@@ -761,7 +761,7 @@ mk_sub_address_fromc(ARGMOD(imc_info_t *imcc), ARGIN(const char *name))
     }
     else if (*name == '\'') {
         name_copy = mem_sys_strdup(name+1);
-        name_copy[strlen(name) - 1] = 0;
+        name_copy[strlen(name_copy) - 1] = 0;
     }
     else {
         name_copy = mem_sys_strdup(name);
