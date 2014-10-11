@@ -725,12 +725,12 @@ mk_const_ident(ARGMOD(imc_info_t * imcc), ARGIN(const char *name), int t,
             IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
                     "global PMC constant not allowed");
 
-        r = _mk_symreg(imcc, &imcc->ghash, name, t);
+        r = _mk_symreg(imcc, &imcc->ghash, mk_string(imcc, name, &t), t);
 
         r->type = VT_CONSTP;
     }
     else {
-        r = mk_ident(imcc, name, t, VT_CONSTP);
+        r = mk_ident(imcc, mk_string(imcc, name, &t), t, VT_CONSTP);
 
         if (t == 'P')
             return mk_pmc_const_2(imcc, imcc->cur_unit, r, val);
@@ -833,6 +833,58 @@ int_overflows(ARGIN(const SymReg *r))
 
 /*
 
+=item C<char * mk_string(imc_info_t * imcc, const char *name, int *t)>
+
+Creates a fresh char *.
+Strips surrounding string quotes and unescapes double-quoted strings.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+char *
+mk_string(ARGMOD(imc_info_t * imcc), ARGIN(const char *name), ARGMOD(int *t))
+{
+    ASSERT_ARGS(mk_string)
+    char *new_name;
+
+    if (*t != 'U') {
+        if (*name == '"') {
+            STRING *unescaped = Parrot_str_unescape(imcc->interp, name+1, '"', NULL);
+            new_name = unescaped->strstart;
+            /* but we need to keep escaped \0. represent it encoded */
+            if (memchr(new_name, 0, unescaped->bufused)) {
+                int len = strlen(name);
+                new_name = (char*)mem_internal_allocate(len + 8 + 1);
+                strcpy(new_name, "fixed_8:");
+                strcat(new_name, name);
+                new_name[len + 8 + 1] = 0;
+                if (*t == 'S') *t = 'U';
+            }
+        }
+        else if (*name == '\'') {
+            new_name = mem_sys_strdup(name + 1);
+            new_name[strlen(new_name) - 1] = 0;
+        }
+        else {
+            new_name = mem_sys_strdup(name);
+        }
+    }
+    else {
+        new_name = mem_sys_strdup(name);
+    }
+    /* TODO: resolve encoding aliases here with U, not in string_from_reg.
+     registers should store encoded strings more efficiently: GH #1097 */
+
+    IMCC_debug(imcc, DEBUG_MKCONST, "#    mk_string '%s' %c\n",
+               new_name, *t);
+    return new_name;
+}
+
+/*
+
 =item C<SymReg * mk_const(imc_info_t * imcc, const char *name, int t)>
 
 Makes a new constant and populates the cache of global symbols.
@@ -852,38 +904,15 @@ mk_const(ARGMOD(imc_info_t * imcc), ARGIN(const char *name), int t)
     SymHash * const h = &imcc->ghash;
     int encoded = 0;
     SymReg  * result;
-    char *const_name = (char *)name;
+    const char *const_name = mk_string(imcc, name, &t);
 
     if (!h->data)
         create_symhash(imcc, h);
-
-    if (t != 'U') {
-        if (*name == '"') {
-            STRING *unescaped = Parrot_str_unescape(imcc->interp, name+1, '"', NULL);
-            /* but we need to keep escaped \0. represent it encoded */
-            if (memchr(unescaped->strstart, 0, unescaped->bufused)) {
-                int len = strlen(name);
-                const_name = (char*)mem_internal_allocate(len + 8 + 1); /* 8 = strlen("fixed_8:") */
-                strcpy(const_name, "fixed_8:");
-                strcat(const_name, name);
-                const_name[len + 8 + 1] = 0;
-                if (t == 'S') t = 'U';
-            }
-        }
-        else if (*name == '\'') {
-            const_name = mem_sys_strdup(name + 1);
-            const_name[strlen(const_name) - 1] = 0;
-        }
-    }
-    /* TODO: resolve encoding aliases here with U, not in string_from_reg.
-     registers should store encoded strings more efficiently: GH #1097 */
-
     IMCC_debug(imcc, DEBUG_MKCONST, "#    mk_const '%s' %c\n",
                const_name, t);
     result = _mk_const(imcc, h, const_name, t);
     return result;
 }
-
 
 /*
 
@@ -952,17 +981,19 @@ _mk_address(ARGMOD(imc_info_t * imcc), ARGMOD(SymHash *hsh),
 {
     ASSERT_ARGS(_mk_address)
     SymReg *r;
+    int t = 'S';
+    char *unquoted_name = mk_string(imcc, name, &t);
 
     if (uniq == U_add_all) {
         int is_lexical = 0;
-        r = get_sym_by_name(&imcc->ghash, name);
+        r = get_sym_by_name(&imcc->ghash, unquoted_name);
 
         if (r && r->usage & U_LEXICAL)
             is_lexical = 1;
 
         r       = mem_gc_allocate_zeroed_typed(imcc->interp, SymReg);
         r->type = VTADDRESS;
-        r->name = mem_sys_strdup(name);
+        r->name = unquoted_name;
         _store_symreg(imcc, hsh, r);
 
         if (is_lexical)
@@ -973,8 +1004,8 @@ _mk_address(ARGMOD(imc_info_t * imcc), ARGMOD(SymHash *hsh),
         char *aux_name = NULL;
         const char * const sub_name = (uniq == U_add_uniq_sub)
                        /* remember to free this name; add_ns malloc()s it */
-                       ? (aux_name = add_ns(imcc, name))
-                       : name;
+                       ? (aux_name = add_ns(imcc, unquoted_name))
+                       : unquoted_name;
 
         r = _get_sym(hsh, sub_name);
 
@@ -984,6 +1015,7 @@ _mk_address(ARGMOD(imc_info_t * imcc), ARGMOD(SymHash *hsh),
                 IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
                     "Label '%s' already defined\n", sub_name);
             else if (uniq == U_add_uniq_sub) {
+                mem_sys_free(unquoted_name);
                 mem_sys_free(aux_name);
                 IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
                         "Subroutine '%s' already defined\n", name);
@@ -997,7 +1029,11 @@ _mk_address(ARGMOD(imc_info_t * imcc), ARGMOD(SymHash *hsh),
             r->lhs_use_count++;
             if (uniq == U_add_uniq_sub)
                 mem_sys_free(aux_name);
+            else
+                mem_sys_free(unquoted_name);
         }
+        else
+            mem_sys_free(unquoted_name);
     }
 
     return r;

@@ -469,12 +469,14 @@ mk_pmc_const_named(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
     ASSERT_ARGS(mk_pmc_const_named)
     SymReg *rhs;
     SymReg *r[3];
-    const int ascii       = (*constant == '\'' || *constant == '"');
-    char   *unquoted_name = mem_sys_strdup(name + 1);
-    size_t  name_length;
+    //const int ascii       = (*constant == '\'' || *constant == '"');
+    //char   *unquoted_name = mem_sys_strdup(name + 1);
+    //size_t  name_length;
+    int t = 'S';
+    char *unquoted_name = mk_string(imcc, name, &t);
 
-    name_length = strlen(unquoted_name) - 1;
-    unquoted_name[name_length] = 0;
+    //name_length = strlen(unquoted_name) - 1;
+    //unquoted_name[name_length] = 0;
 
     if (left->type == VTADDRESS) {      /* IDENTIFIER */
         if (imcc->state->pasm_file) {
@@ -492,13 +494,13 @@ mk_pmc_const_named(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
     if ((strncmp(unquoted_name, "Sub",       name_length) == 0)
     ||  (strncmp(unquoted_name, "Coroutine", name_length) == 0)) {
         rhs = mk_const(imcc, constant, 'p');
-        if (!ascii)
+        if (t == 'U')
             rhs->type |= VT_ENCODED;
         rhs->usage    |= U_FIXUP | U_SUBID_LOOKUP;
     }
     else if (strncmp(unquoted_name, "LexInfo", name_length) == 0) {
         rhs = mk_const(imcc, constant, 'l');
-        if (!ascii)
+        if (t == 'U')
             rhs->type |= VT_ENCODED;
         rhs->usage    |= U_FIXUP | U_LEXINFO_LOOKUP;
     }
@@ -751,23 +753,11 @@ mk_sub_address_fromc(ARGMOD(imc_info_t *imcc), ARGIN(const char *name))
     ASSERT_ARGS(mk_sub_address_fromc)
     /* name is a quoted sub name */
     SymReg *r;
-    char   *name_copy;
+    int t = 'S';
+    char *unquoted_name = mk_string(imcc, name, &t);
 
-    /* interpolate only if the first character is a double-quote */
-    if (*name == '"') {
-        STRING *unescaped = Parrot_str_unescape(imcc->interp, name+1, '"', NULL);
-        name_copy         = Parrot_str_to_cstring(imcc->interp, unescaped);
-    }
-    else if (*name == '\'') {
-        name_copy = mem_sys_strdup(name+1);
-        name_copy[strlen(name_copy) - 1] = 0;
-    }
-    else {
-        name_copy = mem_sys_strdup(name);
-    }
-
-    r = mk_sub_address(imcc, name_copy);
-    mem_sys_free(name_copy);
+    r = mk_sub_address(imcc, unquoted_name);
+    mem_sys_free(unquoted_name);
 
     return r;
 }
@@ -1019,7 +1009,8 @@ static void
 do_loadlib(ARGMOD(imc_info_t *imcc), ARGIN(const char *lib))
 {
     ASSERT_ARGS(do_loadlib)
-    STRING * const s = Parrot_str_unescape(imcc->interp, lib + 1, '"', NULL);
+    STRING * const s = Parrot_str_new_init(imcc->interp, lib, 0,
+                         Parrot_platform_encoding_ptr, 0);
     PMC    * const lib_pmc = Parrot_dyn_load_lib(imcc->interp, s, NULL);
     if (PMC_IS_NULL(lib_pmc) || !VTABLE_get_bool(imcc->interp, lib_pmc)) {
         IMCC_fataly(imcc, EXCEPTION_LIBRARY_ERROR,
@@ -1163,8 +1154,9 @@ pragma:
      hll_def         '\n'      { $$ = 0; }
    | LOADLIB STRINGC '\n'
          {
+           int t = 'S';
            $$ = 0;
-           do_loadlib(imcc, $2);
+           do_loadlib(imcc, mk_string(imcc, $2, &t));
            mem_sys_free($2);
          }
    ;
@@ -1183,7 +1175,7 @@ annotate_directive:
 hll_def:
 
      HLL STRINGC
-         {
+         {  /* XXX no '' or bare. first mk_const it, and then get the name from that */
             STRING * const hll_name = Parrot_str_unescape(imcc->interp, $2 + 1, '"', NULL);
             Parrot_pcc_set_HLL(imcc->interp, CURRENT_CONTEXT(imcc->interp),
                 Parrot_hll_register_HLL(imcc->interp, hll_name));
@@ -1256,20 +1248,10 @@ pasm_inst:                     { clear_state(imcc); }
          }
    | LEXICAL STRINGC COMMA REG
          {
-           char   *name;
-           SymReg *r    = mk_pasm_reg(imcc, $4);
-           SymReg *n;
-           if (*$2 == '"') { /* interpolate name with double-quote */
-               STRING *unescaped = Parrot_str_unescape(imcc->interp, name+1, '"', NULL);
-               name              = Parrot_str_to_cstring(imcc->interp, unescaped);
-           } else { /* only if we insist on keeping ' or " around (there's no need) */
-               name = mem_sys_strdup($2 + 1);
-               name[strlen(name) - 1] = 0;
-           }
-           n = mk_const(imcc, name, 'S');
+           SymReg *r = mk_pasm_reg(imcc, $4);
+           SymReg *n = mk_const(imcc, $2, 'S');
            set_lexical(imcc, r, n);
            $$ = 0;
-           mem_sys_free(name);
            mem_sys_free($2);
            mem_sys_free($4);
          }

@@ -368,6 +368,18 @@ SymReg * mk_pcc_sub(
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+char * mk_string(
+    ARGMOD(imc_info_t * imcc),
+    ARGIN(const char *name),
+    ARGMOD(int *t))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(* imcc)
+        FUNC_MODIFIES(*t);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 SymReg * mk_sub_address(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -498,6 +510,10 @@ char * symreg_to_str(ARGIN(const SymReg *s))
 #define ASSERT_ARGS_mk_pcc_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(name))
+#define ASSERT_ARGS_mk_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(name) \
+    , PARROT_ASSERT_ARG(t))
 #define ASSERT_ARGS_mk_sub_address __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(name))
