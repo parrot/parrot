@@ -152,7 +152,7 @@ _get_sym_typed(ARGIN(const SymHash *hsh), ARGIN_NULLOK(const char *name), int t)
 {
     ASSERT_ARGS(_get_sym_typed)
     SymReg     *p;
-    const char *nameh = name ? name : mem_sys_strdup("\0"); /* sentinel */
+    const char *nameh = name ? name : mem_sys_strdup("\0"); /* a sentinel */
     unsigned int i = hash_str(nameh) % hsh->size;
 
     for (p = hsh->data[i]; p; p = p->next) {
@@ -213,7 +213,6 @@ _mk_symreg(ARGMOD(imc_info_t * imcc), ARGMOD(SymHash *hsh),
         ARGIN_NULLOK(const char *name), int t)
 {
     ASSERT_ARGS(_mk_symreg)
-    /* TODO special-case empty names (string constants) */ 
     SymReg * r = _get_sym_typed(hsh, name, t);
 
     if (!r) {

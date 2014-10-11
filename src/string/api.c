@@ -2857,7 +2857,8 @@ Parrot_str_unescape(PARROT_INTERP,
                                           PObj_external_FLAG);
         return Parrot_str_unescape_string(interp, src, src_encoding,
                                           PObj_constant_FLAG);
-    } else {
+    }
+    else {
         return Parrot_str_new_init(interp, "", 0, encoding,
                                    PObj_constant_FLAG);
     }
