@@ -39,10 +39,9 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static SymReg * _get_sym_typed(
     ARGIN(const SymHash *hsh),
-    ARGIN(const char *name),
+    ARGIN_NULLOK(const char *name),
     int t)
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(1);
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
@@ -109,8 +108,7 @@ static void resize_symhash(ARGMOD(imc_info_t * imcc), ARGMOD(SymHash *hsh))
         FUNC_MODIFIES(*hsh);
 
 #define ASSERT_ARGS__get_sym_typed __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(hsh) \
-    , PARROT_ASSERT_ARG(name))
+       PARROT_ASSERT_ARG(hsh))
 #define ASSERT_ARGS__mk_fullname __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(name))
@@ -150,14 +148,15 @@ Gets a symbol from the hash, with the given C<name> of the specific type C<t>.
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 static SymReg *
-_get_sym_typed(ARGIN(const SymHash *hsh), ARGIN(const char *name), int t)
+_get_sym_typed(ARGIN(const SymHash *hsh), ARGIN_NULLOK(const char *name), int t)
 {
     ASSERT_ARGS(_get_sym_typed)
-    SymReg            *p;
-    const unsigned int i = hash_str(name) % hsh->size;
+    SymReg     *p;
+    const char *nameh = name ? name : mem_sys_strdup("\0"); /* sentinel */
+    unsigned int i = hash_str(nameh) % hsh->size;
 
     for (p = hsh->data[i]; p; p = p->next) {
-        if ((t == p->set) && STREQ(name, p->name))
+        if ((t == p->set) && STREQ(nameh, p->name))
             return p;
     }
 
@@ -215,13 +214,13 @@ _mk_symreg(ARGMOD(imc_info_t * imcc), ARGMOD(SymHash *hsh),
 {
     ASSERT_ARGS(_mk_symreg)
     /* TODO special-case empty names (string constants) */ 
-    SymReg * r = *name ? _get_sym_typed(hsh, name, t) : NULL;
+    SymReg * r = _get_sym_typed(hsh, name, t);
 
     if (!r) {
         r             = mem_gc_allocate_zeroed_typed(imcc->interp, SymReg);
         r->set        = t;
         r->type       = VTREG;
-        r->name       = *name ? mem_sys_strdup(name) : "";
+        r->name       = mem_sys_strdup(name ? name : "\0");
         r->color      = -1;
         r->want_regno = -1;
 
