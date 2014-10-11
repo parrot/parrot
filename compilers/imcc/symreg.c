@@ -662,13 +662,11 @@ mk_pmc_const_2(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
     r[0] = left;
 
     /* strip delimiters */
-    name          = mem_sys_strdup(rhs->name + 1);
-    len           = strlen(name);
-    name[len - 1] = '\0';
-
-    mem_sys_free(rhs->name);
-
-    rhs->name     = name;
+    //name          = mem_sys_strdup(rhs->name + 1);
+    //len           = strlen(name);
+    //name[len - 1] = '\0';
+    //mem_sys_free(rhs->name);
+    //rhs->name     = name;
     rhs->set      = 'P';
     rhs->pmc_type = left->pmc_type;
 

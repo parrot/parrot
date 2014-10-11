@@ -1536,12 +1536,6 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
     if (!unit->subid)
         unit->subid = r;
     else {
-        /* trim the quotes  */
-        char *oldname     = unit->subid->name;
-        unit->subid->name = mem_sys_strdup(unit->subid->name + 1);
-        unit->subid->name[strlen(unit->subid->name) - 1] = 0;
-        mem_sys_free(oldname);
-
         /* create string constant for it. */
         unit->subid->color = add_const_str(imcc,
             IMCC_string_from_reg(imcc, unit->subid), interp_code);
@@ -1593,6 +1587,7 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
 
         /* Work out the name of the vtable function. */
         if (unit->vtable_name) {
+            /* XXX CHECKME */
             vtable_name = Parrot_str_new(imcc->interp, unit->vtable_name + 1,
                     strlen(unit->vtable_name) - 2);
             UNIT_FREE_CHAR(unit->vtable_name);
@@ -1708,6 +1703,7 @@ store_sub_tags(ARGMOD(imc_info_t * imcc), ARGIN(pcc_sub_t * sub), const int sub_
     for (i = 0; i < sub->nflags; i++) {
         SymReg * const flag = sub->flags[i];
 
+        /* XXX CHECKME */
         STRING * const tag = Parrot_str_new(imcc->interp, flag->name + 1,
                     strlen(flag->name) - 2);
         const int tag_idx = add_const_str(imcc, tag, ct->code);
@@ -1912,7 +1908,8 @@ init_fixedintegerarray_from_string(ARGMOD(imc_info_t * imcc), ARGIN(PMC *p),
 
     if (STRING_max_bytes_per_codepoint(s) != 1)
         Parrot_ex_throw_from_c_args(imcc->interp, NULL, EXCEPTION_INVALID_ENCODING,
-            "unhandled string encoding in FixedIntegerArray initialization");
+          "unhandled string encoding %Ss in FixedIntegerArray initialization",
+          s->encoding->name_str);
 
     l = Parrot_str_byte_length(imcc->interp, s);
 
@@ -2035,6 +2032,7 @@ make_pmc_const(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r))
     if (PMC_IS_NULL(_class))
         IMCC_fatal(imcc, 1, "make_pmc_const: no such pmc");
 
+    /* FIXME highly unperformant and possibly double unescaping */
     if (*r->name == '"')
         s = Parrot_str_unescape(imcc->interp, r->name + 1, '"', NULL);
 
@@ -2043,7 +2041,7 @@ make_pmc_const(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r))
 
     else
         s = Parrot_str_unescape(imcc->interp, r->name, 0, NULL);
-
+    //s = r->name; /* XXX CHECKME */
     p  = Parrot_pmc_new(imcc->interp, r->pmc_type);
 
     switch (r->pmc_type) {
