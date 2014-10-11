@@ -761,7 +761,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 SymReg *
 _mk_const(ARGMOD(imc_info_t * imcc), ARGMOD_NULLOK(SymHash *hsh),
-          ARGIN(const char *name), int t)
+          ARGIN_NULLOK(const char *name), int t)
 {
     ASSERT_ARGS(_mk_const)
     SymReg * const r = _mk_symreg(imcc, hsh ? hsh : &imcc->ghash, name, t);

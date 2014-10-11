@@ -166,10 +166,9 @@ PARROT_CANNOT_RETURN_NULL
 SymReg * _mk_const(
     ARGMOD(imc_info_t * imcc),
     ARGMOD_NULLOK(SymHash *hsh),
-    ARGIN(const char *name),
+    ARGIN_NULLOK(const char *name),
     int t)
         __attribute__nonnull__(1)
-        __attribute__nonnull__(3)
         FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*hsh);
 
@@ -432,8 +431,7 @@ char * symreg_to_str(ARGIN(const SymReg *s))
     , PARROT_ASSERT_ARG(hsh) \
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS__mk_const __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(imcc) \
-    , PARROT_ASSERT_ARG(name))
+       PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS__store_symreg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(hsh) \
