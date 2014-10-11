@@ -60,11 +60,10 @@ PARROT_CANNOT_RETURN_NULL
 static SymReg * _mk_symreg(
     ARGMOD(imc_info_t * imcc),
     ARGMOD(SymHash *hsh),
-    ARGIN(const char *name),
+    ARGIN_NULLOK(const char *name),
     int t)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
         FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*hsh);
 
@@ -117,8 +116,7 @@ static void resize_symhash(ARGMOD(imc_info_t * imcc), ARGMOD(SymHash *hsh))
     , PARROT_ASSERT_ARG(name))
 #define ASSERT_ARGS__mk_symreg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
-    , PARROT_ASSERT_ARG(hsh) \
-    , PARROT_ASSERT_ARG(name))
+    , PARROT_ASSERT_ARG(hsh))
 #define ASSERT_ARGS_add_ns __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(name))
@@ -213,16 +211,17 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 static SymReg *
 _mk_symreg(ARGMOD(imc_info_t * imcc), ARGMOD(SymHash *hsh),
-        ARGIN(const char *name), int t)
+        ARGIN_NULLOK(const char *name), int t)
 {
     ASSERT_ARGS(_mk_symreg)
-    SymReg * r = _get_sym_typed(hsh, name, t);
+    /* TODO special-case empty names (string constants) */ 
+    SymReg * r = *name ? _get_sym_typed(hsh, name, t) : NULL;
 
     if (!r) {
         r             = mem_gc_allocate_zeroed_typed(imcc->interp, SymReg);
         r->set        = t;
         r->type       = VTREG;
-        r->name       = mem_sys_strdup(name);
+        r->name       = *name ? mem_sys_strdup(name) : "";
         r->color      = -1;
         r->want_regno = -1;
 
