@@ -86,8 +86,6 @@ typedef Parrot_Int4   utf32_t;
 #define UTF8_IS_OVERLONG(c1, c2)   (((c1) == 0xE0 && (c2) < 0xA0) || \
                                     ((c1) == 0xF0 && (c2) < 0x90))
 
-extern const char Parrot_utf8skip[256];
-
 #define UTF8SKIP(c) Parrot_utf8skip[c]
 
 #define UTF8_MAXLEN 4

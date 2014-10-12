@@ -501,6 +501,8 @@ C<count>.
 
 =cut
 
+Note: The utf8 part is high-cost in perl6. utf8_iter_skip consumes about 10x more
+time than all other functions. GH #1097
 */
 
 PARROT_CANNOT_RETURN_NULL

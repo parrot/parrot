@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -70,6 +70,10 @@ static void utf8_iter_skip(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*i);
 
+PARROT_INLINE
+static UINTVAL utf8_offset(ARGIN(const utf8_t *ptr), UINTVAL n)
+        __attribute__nonnull__(1);
+
 static UINTVAL utf8_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -98,6 +102,14 @@ PARROT_CANNOT_RETURN_NULL
 static const utf8_t * utf8_skip_forward(ARGIN(const utf8_t *ptr), UINTVAL n)
         __attribute__nonnull__(1);
 
+PARROT_CANNOT_RETURN_NULL
+static STRING * utf8_substr(PARROT_INTERP,
+    ARGIN(const STRING *src),
+    INTVAL offset,
+    INTVAL length)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 PARROT_CAN_RETURN_NULL
 static STRING * utf8_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
@@ -123,6 +135,8 @@ static STRING * utf8_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
 #define ASSERT_ARGS_utf8_iter_skip __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(str) \
     , PARROT_ASSERT_ARG(i))
+#define ASSERT_ARGS_utf8_offset __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(ptr))
 #define ASSERT_ARGS_utf8_ord __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
@@ -137,6 +151,9 @@ static STRING * utf8_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
        PARROT_ASSERT_ARG(ptr))
 #define ASSERT_ARGS_utf8_skip_forward __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(ptr))
+#define ASSERT_ARGS_utf8_substr __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(src))
 #define ASSERT_ARGS_utf8_to_encoding __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(src))
@@ -146,7 +163,7 @@ static STRING * utf8_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
 #define UNIMPL Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED, \
     "unimpl utf8")
 
-const char Parrot_utf8skip[256] = {
+static const char Parrot_utf8skip[256] = {
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* ascii */
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* ascii */
     1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,     /* ascii */
@@ -260,7 +277,7 @@ utf8_partial_scan(PARROT_INTERP, ARGIN(const char *buf),
         c = p[i];
 
         if (UTF8_IS_START(c)) {
-            UINTVAL len2 = Parrot_utf8skip[c];
+            UINTVAL len2 = UTF8SKIP(c);
             UINTVAL count;
 
             /* partial utf8-character bytes at end of buffer (e.g. split by chunksize) */
@@ -358,7 +375,7 @@ utf8_decode(SHIM_INTERP, ARGIN(const utf8_t *ptr))
     UINTVAL c = *u8ptr;
 
     if (UTF8_IS_START(c)) {
-        const UINTVAL len = Parrot_utf8skip[c];
+        const UINTVAL len = UTF8SKIP(c);
         UINTVAL count;
 
         c &= UTF8_START_MASK(len);
@@ -432,12 +449,37 @@ utf8_skip_forward(ARGIN(const utf8_t *ptr), UINTVAL n)
     ASSERT_ARGS(utf8_skip_forward)
 
     while (n-- > 0) {
-        ptr += Parrot_utf8skip[*ptr];
+        ptr += UTF8SKIP(*ptr);
     }
-
     return ptr;
 }
 
+/*
+
+=item C<static UINTVAL utf8_offset(const utf8_t *ptr, UINTVAL n)>
+
+Returns byte offset for C<n> utf8 chars in ptr.
+Similar to C<utf8_skip_forward()> but this version just returns the byte index.
+
+See also L<http://www.daemonology.net/blog/2008-06-05-faster-utf8-strlen.html>
+for even better versions if we can guarantee buffer alignment.
+
+=cut
+
+*/
+
+PARROT_INLINE
+static UINTVAL
+utf8_offset(ARGIN(const utf8_t *ptr), UINTVAL n)
+{
+    ASSERT_ARGS(utf8_offset)
+
+    UINTVAL i = 0;
+    while (n-- > 0) {
+        i += UTF8SKIP(*(ptr+i));
+    }
+    return i;
+}
 
 /*
 
@@ -549,7 +591,7 @@ utf8_iter_get_and_advance(PARROT_INTERP,
     UINTVAL       c   = utf8_decode(interp, ptr);
 
     i->charpos += 1;
-    i->bytepos += Parrot_utf8skip[*ptr];
+    i->bytepos += UTF8SKIP(*ptr);
 
     PARROT_ASSERT(i->bytepos <= str->bufused);
 
@@ -585,6 +627,68 @@ utf8_iter_set_and_advance(PARROT_INTERP,
     /* PARROT_ASSERT(i->bytepos <= str->bufused); */
 }
 
+/*
+
+=item C<static STRING * utf8_substr(PARROT_INTERP, const STRING *src, INTVAL
+offset, INTVAL length)>
+
+Returns the codepoints in string C<src> at position C<offset> and length
+C<count>.
+
+=cut
+
+Note: The generic method with iter was high-cost in perl6.
+utf8_iter_skip consumed about 10x more time than all other functions.
+See GH #1097
+*/
+
+PARROT_CANNOT_RETURN_NULL
+static STRING *
+utf8_substr(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset, INTVAL length)
+{
+    ASSERT_ARGS(utf8_substr)
+    const UINTVAL  strlen = STRING_length(src);
+    STRING        *return_string;
+    String_iter    iter;
+    UINTVAL        start = 0;
+
+    if (offset < 0)
+        offset += strlen;
+
+    if ((UINTVAL)offset >= strlen || length <= 0) {
+        /* Allow regexes to return $' easily for "aaa" =~ /aaa/ */
+        if ((UINTVAL)offset == strlen || length <= 0)
+            return Parrot_str_new_constant(interp, "");
+
+        Parrot_ex_throw_from_c_args(interp, NULL,
+            EXCEPTION_SUBSTR_OUT_OF_STRING,
+            "Cannot take substr outside string");
+    }
+
+    return_string = Parrot_str_copy(interp, src);
+
+    if (offset == 0 && (UINTVAL)length >= strlen)
+        return return_string;
+
+    if (offset) {
+        start = utf8_offset((const utf8_t *)return_string->strstart, offset);
+        return_string->strstart += start;
+    }
+
+    if ((UINTVAL)length >= strlen - (UINTVAL)offset) {
+        return_string->bufused -= start;
+        return_string->strlen  -= offset;
+    }
+    else {
+        UINTVAL end = utf8_offset((const utf8_t *)return_string->strstart, length);
+        return_string->bufused = end;
+        return_string->strlen  = length;
+    }
+
+    return_string->hashval = 0;
+
+    return return_string;
+}
 
 static STR_VTABLE Parrot_utf8_encoding = {
     -1,
@@ -605,7 +709,7 @@ static STR_VTABLE Parrot_utf8_encoding = {
     utf8_scan,
     utf8_partial_scan,
     utf8_ord,
-    encoding_substr,
+    utf8_substr,
 
     encoding_is_cclass,
     encoding_find_cclass,
