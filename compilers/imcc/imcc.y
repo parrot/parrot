@@ -470,12 +470,10 @@ mk_pmc_const_named(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
     SymReg *rhs;
     SymReg *r[3];
     //const int ascii       = (*constant == '\'' || *constant == '"');
-    //char   *unquoted_name = mem_sys_strdup(name + 1);
-    //size_t  name_length;
     int t = 'S';
     char *unquoted_name = mk_string(imcc, name, &t);
+    size_t name_length = strlen(unquoted_name) - 1;
 
-    //name_length = strlen(unquoted_name) - 1;
     //unquoted_name[name_length] = 0;
 
     if (left->type == VTADDRESS) {      /* IDENTIFIER */
