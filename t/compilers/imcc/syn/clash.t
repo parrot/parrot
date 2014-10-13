@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -169,19 +169,19 @@ CODE
 ok
 OUT
 
-pir_error_output_like( <<'CODE', <<'OUTPUT', 'new with a native type, no string constant', todo => 'GH #335 not done yet' );
+pir_error_output_like( <<'CODE', <<'OUTPUT', 'new with unknown sub_label_op, no string constant');
 .sub test :main
-        $P1 = new INTVAL
+    $P1 = new INTVAL
     print "never\n"
     end
 .end
 CODE
-/error:imcc:syntax error, unexpected IDENTIFIER \('INTVAL'\)/
+/error:imcc:The opcode 'new_p_ic' \(new<2>\) was not found/
 OUTPUT
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "new with an unknown class" );
 .sub test :main
-        $P1 = new 'INTVAL'
+    $P1 = new 'INTVAL'
     print "never\n"
     end
 .end
