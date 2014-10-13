@@ -187,7 +187,7 @@ Swaps the "context".
                 ctx = Parrot_pmc_new(INTERP, enum_class_CallContext);
 #ifndef NDEBUG
             if (Interp_trace_TEST(INTERP, 8))
-                fprintf(stderr, "# coro: first ctx\n");
+                fprintf(stderr, "# - coro: first ctx\n");
 #endif
             Parrot_pcc_set_context(INTERP, ctx);
 
@@ -234,7 +234,7 @@ Swaps the "context".
 
 #ifndef NDEBUG
             if (Interp_trace_TEST(INTERP, 8))
-                fprintf(stderr, "# coro: !ff\n");
+                fprintf(stderr, "# - coro: !ff\n");
 #endif
             PObj_get_FLAGS(SELF) |= SUB_FLAG_CORO_FF;
 
@@ -251,7 +251,7 @@ Swaps the "context".
             /* set context to coroutine context */
             Parrot_pcc_set_context(INTERP, ctx);
         }
-        else { /* FF: yield from the Coro back */
+        else { /* FF: yield or returncc from the Coro back */
             INTVAL             yield;
             PMC               *ccont, *to_ctx;
             PackFile_ByteCode *caller_seg;
@@ -259,19 +259,17 @@ Swaps the "context".
             GET_ATTR_yield(INTERP, SELF, yield);
 #ifndef NDEBUG
             if (Interp_trace_TEST(INTERP, 8))
-                fprintf(stderr, "# coro: ff (yield=%ld)\n", yield);
+                fprintf(stderr, "# - coro: ff (yield=%ld)\n", yield);
 #endif
-            if (!yield)
+            if (!yield) {
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                                "Cannot resume dead coroutine.");
-
+            }
             SET_ATTR_yield(INTERP, SELF, 0);
-
             GET_ATTR_ctx(INTERP, SELF, ctx);
             ccont = Parrot_pcc_get_continuation(INTERP, ctx);
 
             GETATTR_Continuation_to_ctx(INTERP, ccont, to_ctx);
-
             PObj_get_FLAGS(SELF) &= ~SUB_FLAG_CORO_FF;
             GET_ATTR_caller_seg(INTERP, SELF, caller_seg);
 

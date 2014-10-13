@@ -22,6 +22,7 @@ Subroutines, continuations, co-routines and other fun stuff...
 #include "sub.str"
 #include "pmc/pmc_sub.h"
 #include "pmc/pmc_continuation.h"
+#include "pmc/pmc_coroutine.h"
 #include "parrot/oplib/core_ops.h"
 
 /* HEADERIZER HFILE: include/parrot/sub.h */
@@ -491,13 +492,21 @@ Parrot_sub_continuation_rewind_environment(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_sub_continuation_rewind_environment)
 
+    PMC * const ctx = CURRENT_CONTEXT(interp);
     PMC * const to_ctx = PARROT_CONTINUATION(pmc)->to_ctx;
-    PMC * const sig    = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
+    PMC * const sig    = Parrot_pcc_get_signature(interp, ctx);
+    PMC * const from_sub = Parrot_pcc_get_sub(interp, ctx);
+
+    /* reset if coro */
+    if (from_sub->vtable->base_type == enum_class_Coroutine) {
+        if (Interp_trace_TEST(interp, 8))
+            fprintf(stderr, "# - coro: reset\n");
+        SETATTR_Coroutine_ctx(interp, from_sub, PMCNULL);
+    }
 
     /* debug print before context is switched */
     if (Interp_trace_TEST(interp, PARROT_TRACE_SUB_CALL_FLAG)) {
         PMC * const sub = Parrot_pcc_get_sub(interp, to_ctx);
-
         Parrot_io_eprintf(interp, "# Back in sub '%Ss\n",
                     Parrot_sub_full_sub_name(interp, sub));
     }

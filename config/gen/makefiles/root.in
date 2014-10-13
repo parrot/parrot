@@ -1647,7 +1647,8 @@ src/sub$(O) : \
 	src/sub.str \
 	src/sub.c \
 	$(INC_PMC_DIR)/pmc_sub.h \
-	$(INC_PMC_DIR)/pmc_continuation.h
+	$(INC_PMC_DIR)/pmc_continuation.h \
+	$(INC_PMC_DIR)/pmc_coroutine.h
 
 src/string/api$(O) : $(PARROT_H_HEADERS) src/string/api.str \
 	src/string/private_cstring.h src/string/api.c \
