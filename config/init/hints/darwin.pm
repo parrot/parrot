@@ -76,7 +76,7 @@ sub runstep {
         linkflags           => $flags->{linkflags},
         ld                  => $flags->{ld} || 'c++',
         ld_share_flags      => '-dynamiclib',
-        ld_load_flags       => '-undefined dynamic_lookup -bundle',
+        ld_load_flags       => '-bundle -undefined dynamic_lookup',
         memalign            => 'some_memalign',
         has_dynamic_linking => 1,
 

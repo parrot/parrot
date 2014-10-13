@@ -73,16 +73,16 @@ sub _get_programs {
     # triggers to help pick the correct defaults for later answers.
     my ( $cc, $cxx, $link, $ld, $ccflags, $linkflags, $ldflags, $arflags);
     my ( $libs, $lex, $yacc, $ar );
-    $cc = integrate( $conf->data->get('cc'), $conf->options->get('cc') );
+    $cc = integrate( $conf->data->get('cc'), $conf->options->get('cc'), $conf->options->get('ccld') );
     $cc = prompt( "What C compiler do you want to use?", $cc )
         if $ask;
     $conf->data->set( cc => $cc );
 
-    $link = integrate( $conf->data->get('link'), $conf->options->get('link') );
+    $link = integrate( $conf->data->get('link'), $conf->options->get('link'), $conf->options->get('ccld') );
     $link = prompt( "How about your linker?", $link ) if $ask;
     $conf->data->set( link => $link );
 
-    $ld = integrate( $conf->data->get('ld'), $conf->options->get('ld') );
+    $ld = integrate( $conf->data->get('ld'), $conf->options->get('ld'), $conf->options->get('ccld') );
     $ld = prompt( "What program do you want to use to build shared libraries?", $ld ) if $ask;
     $conf->data->set( ld => $ld );
 

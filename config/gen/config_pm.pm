@@ -175,7 +175,7 @@ END
                 }
                 else {
                     # Null
-                    print {$OUT} qq(    set \$P0["$k"], \$S2\n);
+                    print {$OUT} qq(    set \$P0["$k"], nullstr\n);
                 }
             }
         }

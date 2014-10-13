@@ -78,6 +78,8 @@ sub runstep {
     $conf->data->set( OSNAME_provisional => $^O );
 
     my $ccdlflags = $Config{ccdlflags};
+    # You rarely want the perl5 rpath in parrot also.
+    # TODO: check -R on solaris and @executable_name on darwin also
     $ccdlflags =~ s/\s*-Wl,-rpath,\S*//g if $conf->options->get('disable-rpath');
     $ccdlflags =~ s/-Xlink.*perl\.exp// if $Config{osname} eq 'aix';
 
@@ -86,7 +88,7 @@ sub runstep {
 
     my $build_dir =  abs_path($FindBin::Bin);
 
-    my $cc_option = $conf->options->get('cc');
+    my $cc_option = $conf->options->get('cc') || $conf->options->get('ccld');
     my $debugging = $conf->options->get('debugging');
     my $disable_static = $conf->options->get('disable-static');
     my $disable_shared = $conf->options->get('disable-shared');

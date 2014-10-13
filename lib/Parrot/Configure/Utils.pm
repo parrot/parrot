@@ -140,24 +140,28 @@ sub _build_compile_command {
     return "$cc $ccflags $cc_args test_$$.c";
 }
 
-=item C<integrate($orig, $new)>
+=item C<integrate($orig, $new [,$other])>
 
-Integrates C<$new> into C<$orig>.  Returns C<$orig> if C<$new> is undefined.
+Integrates C<$new> or C<$other> into C<$orig>. Check also C<$other> if C<$new> is undefined.
+Returns C<$orig> if C<$new> or C<$other> are undefined.
 
 =cut
 
 sub integrate {
-    my ( $orig, $new ) = @_;
+    my ( $orig, $new, $other ) = @_;
 
     # Rather than sprinkling "if defined(...)", everywhere,
     # various inter::* steps (coded in config/inter/*.pm) permit simply
     # passing in potentially undefined strings.
     # In these instances, we simply pass back the original string without
     # generating a warning.
-    return $orig unless defined $new;
+    return $orig if (!defined $new and !defined $orig);
 
-    if ( $new =~ /\S/ ) {
+    if ( defined $new and $new =~ /\S/ ) {
         $orig = $new;
+    }
+    elsif ( defined $other and $other =~ /\S/ ) {
+        $orig = $other;
     }
 
     return $orig;

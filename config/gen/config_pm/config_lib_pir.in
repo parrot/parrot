@@ -4,6 +4,7 @@
 .include 'parrot_version.pir'
 
 .sub 'main' :main
+    .local string nullstr
     get_params "(0)", $P5
     set $I10, $P5     # argv
     set $I11, 0      # flag
@@ -14,7 +15,7 @@
 no_arg:
     new $P0, 'Hash'
     $P0.'set_value_type'(.DATATYPE_STRING)
-    $S2 = null
+    nullstr = null
 
     @PCONFIG@
 

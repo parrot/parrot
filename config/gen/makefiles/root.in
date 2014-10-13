@@ -134,7 +134,7 @@ LOAD_EXT         = @load_ext@
 A                = @a@
 LD_SHARE_FLAGS   = @ld_share_flags@
 LD_LOAD_FLAGS    = @ld_load_flags@
-LINKARGS         = $(LDFLAGS) $(LD_LOAD_FLAGS) @libparrot_ldflags@ @icu_shared@ @libs@
+LINKARGS         = $(LDFLAGS) @ld_load_flags@ @libparrot_ldflags@ $(ALL_PARROT_LIBS)
 
 # The headerizer
 HEADERIZER       = $(PERL) $(DEV_TOOLS_DIR)/headerizer.pl
@@ -663,7 +663,7 @@ corevm : \
 	$(GEN_PM_INCLUDES) \
 	PARROT_LIBS \
 	$(PARROT) \
-        $(PARROTOLD) \
+	$(PARROTOLD) \
 	$(RUN_INC_DIR)/parrotlib.pbc \
 	$(RUN_INC_DIR)/config.fpmc \
 #IF(has_dynamic_linking):	$(DYNPMC_TARGETS) \
@@ -1271,7 +1271,8 @@ $(FR_DIR)/pbc_dump/packdump$(O) : $(PARROT_H_HEADERS) $(INC_PMC_DIR)/pmc_sub.h \
 $(PDUMP) : $(FR_DIR)/pbc_dump/main$(O) $(FR_DIR)/pbc_dump/packdump$(O) $(LIBPARROT) $(INC_DIR)/api.h
 	$(LINK) @ld_out@$@ \
 	  $(FR_DIR)/pbc_dump/main$(O) \
-	  $(FR_DIR)/pbc_dump/packdump$(O) $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
+	  $(FR_DIR)/pbc_dump/packdump$(O) \
+	  $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 $(FR_DIR)/pbc_dump/main$(O) : \
@@ -3129,8 +3130,8 @@ cover-clean:
 	$(PERL) -MCwd -e 'for my $$dir ( qw ( ./ $(COVER_DIRS) t/src t/src/embed ) ) {my $$cwd = cwd(); chdir $$dir; unlink glob( "*.gcda *.gcno *.gcov" ); chdir $$cwd;}'
 	@echo "Deleting cover-generated html files"
 	$(RM_F) cover.13 cover.css coverage.html compilers-*.html src-*.html\
-	    frontend-parrot2-prt0-pbc-c.html include-parrot-pointer_array-h.html\
-	    parrot-ops2c-c.html parrot-nqp-c.html pbc_to_exe-c.html winxed-c.html
+	  frontend-parrot2-prt0-pbc-c.html include-parrot-pointer_array-h.html\
+	  parrot-ops2c-c.html parrot-nqp-c.html pbc_to_exe-c.html winxed-c.html
 	$(RM_RF) structure/
 
 
@@ -3145,45 +3146,45 @@ install-dev: install
 
 install-bin: installable docs
 	$(PERL) $(DEV_TOOLS_DIR)/install_files.pl \
-	--buildprefix=$(BUILDPREFIX) \
-	--prefix=$(PREFIX) \
-	--exec-prefix=$(EXEC_PREFIX) \
-	--bindir=$(BIN_DIR) \
-	--libdir=$(LIB_DIR) \
-	--includedir=$(INCLUDE_DIR) \
-	--destdir=$(DESTDIR) \
-	--datadir=$(DATA_DIR) \
-	--docdir=$(DOC_DIR) \
-	--mandir=$(MAN_DIR) \
-	--versiondir=$(VERSION_DIR) \
-	MANIFEST MANIFEST.generated
+	  --buildprefix=$(BUILDPREFIX) \
+	  --prefix=$(PREFIX) \
+	  --exec-prefix=$(EXEC_PREFIX) \
+	  --bindir=$(BIN_DIR) \
+	  --libdir=$(LIB_DIR) \
+	  --includedir=$(INCLUDE_DIR) \
+	  --destdir=$(DESTDIR) \
+	  --datadir=$(DATA_DIR) \
+	  --docdir=$(DOC_DIR) \
+	  --mandir=$(MAN_DIR) \
+	  --versiondir=$(VERSION_DIR) \
+	  MANIFEST MANIFEST.generated
 
 install-dev-only: installable
 	$(MAKE_C) docs man
 	$(PERL) $(DEV_TOOLS_DIR)/install_dev_files.pl \
-	--buildprefix=$(BUILDPREFIX) \
-	--prefix=$(PREFIX) \
-	--exec-prefix=$(EXEC_PREFIX) \
-	--bindir=$(BIN_DIR) \
-	--libdir=$(LIB_DIR) \
-	--includedir=$(INCLUDE_DIR) \
-	--destdir=$(DESTDIR) \
-	--docdir=$(DOC_DIR) \
-	--datadir=$(DATA_DIR) \
-	--srcdir=$(SRC_DIR) \
-	--versiondir=$(VERSION_DIR) \
-	MANIFEST MANIFEST.generated
+	  --buildprefix=$(BUILDPREFIX) \
+	  --prefix=$(PREFIX) \
+	  --exec-prefix=$(EXEC_PREFIX) \
+	  --bindir=$(BIN_DIR) \
+	  --libdir=$(LIB_DIR) \
+	  --includedir=$(INCLUDE_DIR) \
+	  --destdir=$(DESTDIR) \
+	  --docdir=$(DOC_DIR) \
+	  --datadir=$(DATA_DIR) \
+	  --srcdir=$(SRC_DIR) \
+	  --versiondir=$(VERSION_DIR) \
+	  MANIFEST MANIFEST.generated
 
 install-doc: docs
 	$(PERL) $(DEV_TOOLS_DIR)/install_doc_files.pl \
-	--buildprefix=$(BUILDPREFIX) \
-	--prefix=$(PREFIX) \
-	--docdir=$(DOC_DIR) \
-	--mandir=$(MAN_DIR) \
-	--destdir=$(DESTDIR) \
-	--datadir=$(DATA_DIR) \
-	--versiondir=$(VERSION_DIR) \
-	MANIFEST MANIFEST.generated
+	  --buildprefix=$(BUILDPREFIX) \
+	  --prefix=$(PREFIX) \
+	  --docdir=$(DOC_DIR) \
+	  --mandir=$(MAN_DIR) \
+	  --destdir=$(DESTDIR) \
+	  --datadir=$(DATA_DIR) \
+	  --versiondir=$(VERSION_DIR) \
+	  MANIFEST MANIFEST.generated
 
 ###############################################################################
 #
@@ -3215,7 +3216,8 @@ win32-inno-installer : world installable
 ###############################################################################
 
 exec : src/parrot_config$(O) $(LIBPARROT)
-	$(LINK) @ld_out@$(EXEC)$(EXE) $(EXEC)$(O) src/parrot_config$(O) $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
+	$(LINK) @ld_out@$(EXEC)$(EXE) $(EXEC)$(O) src/parrot_config$(O) \
+	  $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 
 ###### OS depend targets ##########
 
@@ -3224,7 +3226,7 @@ src/nci_test$(O): $(PARROT_H_HEADERS) src/nci_test.c
 
 $(LIBNCI_TEST_SO): src/nci_test$(O)
 	$(LD) $(LD_LOAD_FLAGS) @ncilib_link_extra@ $(LDFLAGS) \
-	@ld_out@$@ src/nci_test$(O) $(C_LIBS)
+	  @ld_out@$@ src/nci_test$(O) $(C_LIBS)
 
 # for use by $(LIBRARY_DIR)/OpenGL.pir
 src/glut_callbacks$(O): \
@@ -3269,7 +3271,8 @@ bootstrap-nci : src/nci/core_thunks.nci src/nci/extra_thunks.nci
 ## SUFFIX OVERRIDE - no -Wstrict-prototypes
 src/extra_nci_thunks$(O) : $(PARROT_H_HEADERS) src/extra_nci_thunks.c \
 	$(INC_PMC_DIR)/pmc_nci.h
-	$(CC) $(CFLAGS) @optimize::src/extra_nci_thunks.c@ @ccwarn::src/extra_nci_thunks.c@ -I$(@D)/. @cc_o_out@$@ -c src/extra_nci_thunks.c
+	$(CC) $(CFLAGS) @optimize::src/extra_nci_thunks.c@ @ccwarn::src/extra_nci_thunks.c@ \
+	  -I$(@D)/. @cc_o_out@$@ -c src/extra_nci_thunks.c
 
 # UnicodeData.txt updates must be done manually, or with namealias_c.pl --create
 bootstrap-namealias src/string/namealias.c : src/string/namealias_c.in $(BUILD_TOOLS_DIR)/namealias_c.pl
@@ -3285,13 +3288,13 @@ tags-emacs: tags.emacs.dummy
 	  -R --exclude=blib --exclude=.git  \
 	  --languages=c,perl --langmap=c:+.h,c:+.pmc,c:+.ops \
 	  -I NOTNULL,NULLOK,ARGIN,ARGMOD,ARGOUT,ARGINOUT,ARGIN_NULLOK,ARGOUT_NULLOK,ARGMOD_NULLOK,ARGFREE,ARGFREE_NOTNULL \
-	.
 
 # this works with an old etags (XEmacs 21.5*)
 tags-xemacs: tags.emacs.dummy
 	$(RM_F) TAGS
 	find . \
-	  -name \*.c -o -name \*.h -o -name \*.pmc -o -name \*.ops | etags -l c - -o TAGS
+	    -name \*.c -o -name \*.h -o -name \*.pmc -o -name \*.ops | \
+	  etags -l c - -o TAGS
 
 tags.emacs.dummy:
 

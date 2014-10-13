@@ -15,6 +15,7 @@ our @shared_valid_options = qw{
     cage
     cc
     ccflags
+    ccld
     ccwarn
     configure_trace
     coveragedir
