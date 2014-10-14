@@ -658,17 +658,15 @@ CODE
 /wrong .const value/
 OUT
 
-TODO: {
-  local $TODO = "SEGV with non-existent constant #1024";
-  pir_error_output_like( <<'CODE', <<'OUT', "missing const Sub [GH #1024]" );
+pir_exit_code_is( <<'CODE', 1, "missing const Sub should not SEGV [GH #1024]", todo => "dubious");
 .sub baz :immediate :anon
   .const "Sub" foo = "foo"
   $P1 = foo."new"()
 .end
 CODE
-/wrong .const value/
-OUT
-}
+#was:
+#/Method 'new' not found for non-object/
+#OUT
 
 # Local Variables:
 #   mode: cperl

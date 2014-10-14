@@ -18327,8 +18327,15 @@ Parrot_callmethodcc_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC       * const  object = PREG(1);
     STRING    * const  meth = SREG(2);
     opcode_t  * const  next =  cur_opcode + 3;
-    PMC       * const  method_pmc = VTABLE_find_method(interp, object, meth);
-    opcode_t  * dest = NULL;
+    opcode_t  *  dest = NULL;
+    PMC       *  method_pmc = PMCNULL;
+
+    if ((!PObj_is_PMC_TEST(object))) {
+        dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND, "Method '%Ss' not found for non-object", meth);
+    }
+    else {
+        method_pmc = VTABLE_find_method(interp, object, meth);
+    }
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
     if ((!PMC_IS_NULL(method_pmc))) {
@@ -18338,13 +18345,16 @@ Parrot_callmethodcc_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
         dest = VTABLE_invoke(interp, method_pmc, next);
     }
     else {
-        PMC  * const  _class = VTABLE_get_class(interp, object);
+        if ((!dest)) {
+            PMC  * const  _class = VTABLE_get_class(interp, object);
 
-        if (PMC_IS_NULL(_class)) {
-            dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND, "Method '%Ss' not found for non-object", meth);
-        }
-        else {
-            dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND, "Method '%Ss' not found for invocant of class '%Ss'", meth, VTABLE_get_string(interp, _class));
+            if (PMC_IS_NULL(_class)) {
+                dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND, "Method '%Ss' not found for non-object", meth);
+            }
+            else {
+                dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND, "Method '%Ss' not found for invocant of class '%Ss'", meth, VTABLE_get_string(interp, _class));
+            }
+
         }
 
     }
@@ -18357,8 +18367,15 @@ Parrot_callmethodcc_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC       * const  object = PREG(1);
     STRING    * const  meth = SCONST(2);
     opcode_t  * const  next =  cur_opcode + 3;
-    PMC       * const  method_pmc = VTABLE_find_method(interp, object, meth);
-    opcode_t  * dest = NULL;
+    opcode_t  *  dest = NULL;
+    PMC       *  method_pmc = PMCNULL;
+
+    if ((!PObj_is_PMC_TEST(object))) {
+        dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND, "Method '%Ss' not found for non-object", meth);
+    }
+    else {
+        method_pmc = VTABLE_find_method(interp, object, meth);
+    }
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
     if ((!PMC_IS_NULL(method_pmc))) {
@@ -18368,13 +18385,16 @@ Parrot_callmethodcc_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
         dest = VTABLE_invoke(interp, method_pmc, next);
     }
     else {
-        PMC  * const  _class = VTABLE_get_class(interp, object);
+        if ((!dest)) {
+            PMC  * const  _class = VTABLE_get_class(interp, object);
 
-        if (PMC_IS_NULL(_class)) {
-            dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND, "Method '%Ss' not found for non-object", meth);
-        }
-        else {
-            dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND, "Method '%Ss' not found for invocant of class '%Ss'", meth, VTABLE_get_string(interp, _class));
+            if (PMC_IS_NULL(_class)) {
+                dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND, "Method '%Ss' not found for non-object", meth);
+            }
+            else {
+                dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND, "Method '%Ss' not found for invocant of class '%Ss'", meth, VTABLE_get_string(interp, _class));
+            }
+
         }
 
     }
