@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 49;
+use Parrot::Test tests => 50;
 use Parrot::Config;
 
 =head1 NAME
@@ -1226,6 +1226,45 @@ ok
 ok
 48879
 ok
+OUTPUT
+
+pir_output_is(<<'CODE',<<'OUTPUT', 'sprintf counts bytes instead of characters', todo => 'GH#956');
+.sub main :main
+    $S0 = unicode:"mäöüØ€p"
+    $P0 = new 'ResizablePMCArray'
+    push $P0, $S0
+    $S1 = sprintf unicode:"[%20s]", $P0
+    $I0 = length $S1
+    say $I0
+
+    $S0 = unicode:"ä"
+    $P0 = new 'ResizablePMCArray'
+    push $P0, $S0
+    $S1 = sprintf unicode:"[%4s]", $P0
+    $I0 = length $S1
+    say $I0
+
+    # this works correctly
+    $S0 = unicode:"ä"
+    $P0 = new 'ResizablePMCArray'
+    push $P0, $S0
+    $S1 = sprintf unicode:"[%1s]", $P0
+    $I0 = length $S1
+    say $I0
+
+    # this works correctly
+    $S0 = unicode:"a"
+    $P0 = new 'ResizablePMCArray'
+    push $P0, $S0
+    $S1 = sprintf unicode:"[%4s]", $P0
+    $I0 = length $S1
+    say $I0
+.end
+CODE
+22
+6
+3
+6
 OUTPUT
 
 # Local Variables:
