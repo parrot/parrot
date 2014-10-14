@@ -10,6 +10,9 @@
 	+ Reenable parrot -t [flags] traceflags to enable the flags 2 find_method and
 	  4 invoke/retcc/yield again.
 	+ Enable >2GB RAM on darwin also [GH #268]
+	+ Fix crash with parrot -d8 DEBUG_IMC dump_instructions
+	+ Fix sprintf width count for unicode strings [GH #956]
+	+ Optimize utf8_substr. Do not use the slow utf8 iterator.
     - Build
 	+ Fix all -Wshadow instances
     - Documentation
