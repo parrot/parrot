@@ -571,6 +571,7 @@ INSTALLABLENCITHUNKGEN  = .@slash@installable_parrot_nci_thunk_gen$(EXE)
 INSTALLABLEPARROT_PROVE = .@slash@installable_parrot-prove$(EXE)
 INSTALLABLEOPS2C    = .@slash@installable_parrot-ops2c$(EXE)
 INSTALLABLEWINXED   = .@slash@installable_winxed$(EXE)
+INSTALLABLELIBPARROT= @blib_dir@/inst_@libparrot_shared@
 
 # Libraries
 #IF(libparrot_static):LIBPARROT_STATIC    = @blib_dir@/@libparrot_static@
@@ -639,16 +640,10 @@ MAKE_C = @make_c@
 #
 ###############################################################################
 
-all : \
+core : \
 	corevm \
 #IF(has_glut):    $(LIBGLUTCB_SO) \
-	$(DIS) \
-	$(PARROT_CONFIG) \
-	$(PBC_TO_EXE) \
-	$(PBC_MERGE) \
-	$(PDB) \
-	$(PDUMP) \
-	$(NQP_RX) \
+	some_utils \
 	$(TGE_LIB_PBCS) \
 	$(PGE_LIB_PBCS) \
 	$(PCT_LIB_PBCS) \
@@ -656,7 +651,6 @@ all : \
 	$(JSON_LANG) \
 	$(NQP_LIB_PBCS) \
 	$(WINXED_LANG) \
-	$(WINXED) \
 #IF(has_dynamic_linking):    $(DYNOPLIBS_TARGETS) \
 #IF(has_dynamic_linking):    $(LIBNCI_TEST_SO) \
 	gen_library \
@@ -774,19 +768,20 @@ help :
 	@echo "Following targets are available for the user:"
 	@echo ""
 	@echo "Executables:"
-	@echo "  all:               'parrot' and the documentation."
+	@echo "  core:              'parrot', most 'parrot_utils', compilers and libraries."
 	@echo "                     This is the default."
 	@echo ""
-	@echo "  parrot_utils:      ./pbc_dump, ./pbc_disassemble,"
-	@echo "                       ./parrot_debugger, ./pbc_merge,"
-	@echo "                       ./pbc_to_exe ./parrot_config"
-	@echo " ./pbc_dump:           Parrot Dumper"
-	@echo " ./pbc_disassemble:    Parrot Disassembler"
-	@echo " ./parrot_debugger:    Parrot Debugger"
-	@echo " ./pbc_merge:          Parrot configuration information"
+	@echo "  parrot_utils:      pbc_dump, pbc_disassemble, parrot_debugger,"
+	@echo "                     pbc_merge, pbc_to_exe, parrot_config,"
+	@echo "                     parrot-prove, parrot-ops2c"
+	@echo "  pbc_dump:          Parrot Dumper"
+	@echo "  pbc_disassemble:   Parrot Disassembler"
+	@echo "  parrot_debugger:   Parrot Debugger"
+	@echo "  pbc_merge:         Parrot configuration information"
 	@echo ""
-	@echo "  world:             'all' and 'parrot_utils'."
-	@echo "  installable:       same as 'world', but targets for installation"
+	@echo "  world:             'core' and 'parrot_utils'."
+	@echo "  installable:       'world' and 'docs', but targets for installation"
+	@echo "  all:               'world' and 'installable'"
 	@echo ""
 	@echo "Installation:"
 	@echo "  install:           Install under '$(PREFIX)'."
@@ -877,12 +872,16 @@ help :
 	@echo "  hello:             'Hello World' as an executable."
 	@echo ""
 
-world : parrot_utils
+all : world installable
 
-parrot_utils : all $(PDUMP) $(DIS) $(PDB) $(PBC_MERGE) $(PBC_TO_EXE) $(PARROT_CONFIG) \
-  src/install_config$(O) $(PARROT_PROVE) $(OPS2C)
+world : core parrot_utils
 
-installable: all docs $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPDB) \
+some_utils : $(PDUMP) $(DIS) $(PDB) $(PBC_MERGE) $(PBC_TO_EXE) $(PARROT_CONFIG) \
+  $(WINXED) $(NQP-RX)
+
+parrot_utils : core some_utils src/install_config$(O) $(PARROT_PROVE) $(OPS2C)
+
+installable: core docs $(INSTALLABLELIBPARROT) $(INSTALLABLEPARROT) $(INSTALLABLEPDUMP) $(INSTALLABLEDIS) $(INSTALLABLEPDB) \
   $(INSTALLABLEPBC_MERGE) $(INSTALLABLEPBCTOEXE) $(INSTALLABLECONFIG) $(INSTALLABLENQP) \
   $(INSTALLABLENCITHUNKGEN) $(INSTALLABLEPARROT_PROVE) $(INSTALLABLEOPS2C) $(INSTALLABLEWINXED)
 
@@ -987,6 +986,9 @@ $(MINIPARROT) : $(FRP_DIR)/main$(O) $(INC_DIR)/api.h $(INC_DIR)/longopt.h $(LIBP
 $(INSTALLABLEPARROT) : $(FRPTWO_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
   src/install_config$(O) \
   $(FRPTWO_DIR)/prt0.pbc$(O) $(PARROT)
+#IF(darwin):	$(RM) $(LIBPARROT_SHARED)
+#IF(darwin):	$(MAKE) $(INSTALLABLELIBPARROT)
+#IF(darwin):	$(MV) $(INSTALLABLELIBPARROT) $(LIBPARROT_SHARED)
 	$(LINK) @ld_out@$@ \
 	  $(FRPTWO_DIR)/main$(O) src/install_config$(O) \
 	  $(FRPTWO_DIR)/prt0.pbc$(O) @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
@@ -1176,6 +1178,17 @@ $(LIBPARROT_SHARED) : $(O_FILES)
 	$(CP) tools/dev/gdb-pp-load.py @blib_dir@/@libparrot_shared@-gdb.py
 	$(CP) tools/dev/gdb-pp.py @blib_dir@/GDBPrettyPrint.py
 	@echo '' > @blib_dir@/__init__.py
+
+# so far only used with darwin
+$(INSTALLABLELIBPARROT) : $(O_FILES)
+	$(MKPATH) @blib_dir@
+	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) @ld_out@$@ @inst_libparrot_soname@ \
+#IF(cygwin and optimize):	  -s \
+#IF(cygwin or (win32 and cc==gcc)):	  -Wl,--out-implib=$(IMPORTLIB) \
+	  $(O_FILES) $(C_LIBS) $(ICU_SHARED)
+#IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
+#IF(win32 or cygwin):	$(ADDGENERATED) "$@" "[main]" bin
+#ELSE:	$(ADDGENERATED) "$@" "[main]" lib
 
 $(INSTALLABLECONFIG) : src/install_config$(O) $(PARROT_CONFIG) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc $(DEV_TOOLS_DIR)/parrot-config.pir
@@ -2545,6 +2558,24 @@ clean : \
 
 prog-clean : archclean
 	$(RM_F) \
+	  $(O_FILES) \
+	  $(PARROT) \
+	  $(PARROTOLD) \
+	  $(MINIPARROT) \
+	  $(LIBPARROT) \
+	  $(INSTALLABLEOPS2C) \
+	  $(INSTALLABLELIBPARROT) \
+	  $(INSTALLABLEPARROT) \
+	  $(INSTALLABLEDIS) \
+	  $(INSTALLABLEPDUMP) \
+	  $(INSTALLABLEPBC_MERGE) \
+	  $(INSTALLABLEPBCTOEXE) \
+	  $(INSTALLABLEPDB) \
+	  $(INSTALLABLECONFIG) \
+	  $(INSTALLABLENQP) \
+	  $(INSTALLABLENCITHUNKGEN) \
+	  $(INSTALLABLEPARROT_PROVE) \
+	  $(INSTALLABLEWINXED) \
 	  $(DEV_TOOLS_DIR)/pbc_to_exe.pir \
 	  pbc_to_exe.pbc pbc_to_exe.c \
 	  parrot_nci_thunk_gen.c parrot_nci_thunk_gen.pbc \
@@ -2566,6 +2597,7 @@ archclean: dynext-clean
 	  $(PARROT) \
           $(PARROTOLD) \
 	  $(MINIPARROT) \
+	  $(INSTALLABLELIBPARROT) \
 	  $(INSTALLABLEPARROT) \
 	  $(INSTALLABLEOPS2C) \
 	  $(INSTALLABLEDIS) \

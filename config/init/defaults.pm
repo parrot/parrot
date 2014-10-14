@@ -197,6 +197,7 @@ sub runstep {
 
         #avoid a warning during Configure.pl
         libparrot_soname => '',
+        inst_libparrot_soname => '',
 
         perl      => $^X,
         test_prog => 'parrot',

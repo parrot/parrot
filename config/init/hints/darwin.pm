@@ -88,12 +88,13 @@ sub runstep {
         libparrot_shared       => "libparrot.$version$share_ext",
         libparrot_shared_alias => "libparrot$share_ext",
         rpath                  => "-L",
-        libparrot_soname       => "-install_name "
+        inst_libparrot_soname       => "-install_name "
             . '"'
             . $conf->data->get('libdir')
             . '/libparrot'
             . $conf->data->get('share_ext')
-            . '"'
+            . '"',
+        libparrot_soname       => "-install_name \"$lib_dir/libparrot.$version$share_ext\""
     );
     $darwin_selections{dynext_dirs} = $flags->{dynext_dirs} if $flags->{dynext_dirs};
     my $darwin_hints = "Darwin hints settings:\n";

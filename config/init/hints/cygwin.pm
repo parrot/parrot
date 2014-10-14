@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2014, Parrot Foundation.
+# Copyright (C) 2005-2015, Parrot Foundation.
 
 package init::hints::cygwin;
 
@@ -81,7 +81,7 @@ sub runstep {
     unless ( $libparrot_shared ) {
         $conf->data->set(
              libparrot_ldflags   => '-L' . $build_dir . '/blib/lib -lparrot',
-             libparrot_linkflags   => '-L' . $build_dir . '/blib/lib -lparrot'
+             libparrot_linkflags => '-L' . $build_dir . '/blib/lib -lparrot'
         );
     }
 
@@ -95,6 +95,12 @@ sub runstep {
     }
     $conf->options->set( define => $define );
 
+    # -shared-libgcc should be used also, but this will be the new default soon.
+    my $cygwin = `/bin/uname -r`;
+    if ($cygwin =~ /^1\.7\./) {
+        $conf->data->set(cc => 'gcc') unless $conf->options->get('cc');
+        $conf->data->set(ld => 'g++') unless $conf->options->get('ld');
+    }
     $conf->data->set( clock_best => '-DCLOCK_BEST=CLOCK_REALTIME' );
 }
 
