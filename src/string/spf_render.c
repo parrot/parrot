@@ -146,7 +146,7 @@ handle_flags(PARROT_INTERP, ARGIN(const SpfInfo *info), ARGIN(STRING *str),
         INTVAL is_int_type, ARGIN_NULLOK(STRING* prefix))
 {
     ASSERT_ARGS(handle_flags)
-    UINTVAL len = Parrot_str_byte_length(interp, str);
+    UINTVAL len = Parrot_str_length(interp, str);
 
     if (is_int_type) {
         if (info->flags & FLAG_PREC && info->prec == 0 &&

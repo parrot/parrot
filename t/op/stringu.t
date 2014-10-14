@@ -1228,7 +1228,8 @@ ok
 ok
 OUTPUT
 
-pir_output_is(<<'CODE',<<'OUTPUT', 'sprintf counts bytes instead of characters', todo => 'GH#956');
+# GH 956
+pir_output_is(<<'CODE',<<'OUTPUT', 'sprintf width counts bytes instead of chars');
 .sub main :main
     $S0 = unicode:"mäöüØ€p"
     $P0 = new 'ResizablePMCArray'
