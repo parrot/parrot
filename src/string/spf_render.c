@@ -826,23 +826,27 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                   case 'g':
                   case 'G':
                     {
-                        STRING *ts;
+                        STRING *ts = NULL;
                         const HUGEFLOATVAL thefloat =
                             obj->getfloat(interp, info.type, obj);
+                        int is_special = 0;
 
-                        /* check for Inf and NaN values */
+                        gen_sprintf_call(tc, &info, ch);
+                        /* check for Inf and NaN values and honor width, but not prec */
                         if (PARROT_FLOATVAL_IS_POSINF(thefloat)) {
                             ts = cstr2pstr(PARROT_CSTRING_INF_POSITIVE);
+                            is_special++;
                         }
                         else if (PARROT_FLOATVAL_IS_NEGINF(thefloat)) {
                             ts = cstr2pstr(PARROT_CSTRING_INF_NEGATIVE);
+                            is_special++;
                         }
                         else if (PARROT_FLOATVAL_IS_NAN(thefloat)) {
                             ts = cstr2pstr(PARROT_CSTRING_NAN_QUIET);
+                            is_special++;
                         }
                         else {
                             /* turn -0.0 into 0.0 */
-                            gen_sprintf_call(tc, &info, ch);
                             ts = cstr2pstr(tc);
                         }
 
@@ -851,13 +855,28 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                             char * const tempstr =
                                 Parrot_str_to_cstring(interp, ts);
 
+                            /* Apply width to NaN/Inf/-Inf [GH #1100/perl6 RT#116280]
+                               Don't rely on how systems print nan. */
+                            if (is_special && info.width != 0) {
+                                char tc1[16];
 #ifdef PARROT_HAS_SNPRINTF
-                            snprintf(tc, PARROT_SPRINTF_BUFFER_SIZE,
-                                     tempstr, (double)thefloat);
+                                snprintf(tc1, 16, "%%%ds", info.width);
+                                snprintf(tc, PARROT_SPRINTF_BUFFER_SIZE,
+                                         tc1, tempstr);
 #else
-                            /* the buffer is 4096, so no problem here */
-                            sprintf(tc, tempstr, (double)thefloat);
+                                sprintf(tc1, "%%%ds", info.width);
+                                sprintf(tc, tc1, tempstr);
 #endif
+                            }
+                            else {
+#ifdef PARROT_HAS_SNPRINTF
+                                snprintf(tc, PARROT_SPRINTF_BUFFER_SIZE,
+                                         tempstr, (double)thefloat);
+#else
+                                /* the buffer is 4096, so no problem here */
+                                sprintf(tc, tempstr, (double)thefloat);
+#endif
+                            }
                             Parrot_str_free_cstring(tempstr);
                         }
 

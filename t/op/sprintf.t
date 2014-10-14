@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2010, Parrot Foundation.
+# Copyright (C) 2006-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -11,7 +11,8 @@ t/op/sprintf.t  -- sprintf tests
 
 =head1 DESCRIPTION
 
-These tests are based on C<sprintf> tests from perl 5.9.4.
+These tests are based on C<sprintf> tests from perl 5.9.4
+with additional tests from perl6 F<S32-str/sprintf.t>
 
 Tests C<sprintf>, excluding handling of 64-bit integers or long
 doubles (if supported), of machine-specific short and long
@@ -56,7 +57,7 @@ tag C<all> is allowed for todo tests that should fail on any system.
 =cut
 
 
-.const int TESTS = 308
+.const int TESTS = 311
 
 #.loadlib 'sys_ops'
 #.loadlib 'io_ops'

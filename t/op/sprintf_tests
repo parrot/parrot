@@ -307,5 +307,8 @@
 %#x	0	0
 %2147483647$v2d	''	
 %*2147483647$v2d	''	 UNINIT
+"%12.5f"	NaN	"         NaN"	perl6 RT 116280
+"%12.5f"	Inf	"         Inf"	perl6 RT 116280
+"%12.5f"	-Inf	"        -Inf"	perl6 RT 116280
 
 # vim: sw=4 et

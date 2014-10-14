@@ -12,6 +12,7 @@
 	+ Enable >2GB RAM on darwin also [GH #268]
 	+ Fix crash with parrot -d8 DEBUG_IMC dump_instructions
 	+ Fix sprintf width count for unicode strings [GH #956]
+	+ Fix sprintf width for NaN/Inf/-Inf [GH #1099/perl6 RT#116280]
 	+ Optimize utf8_substr. Do not use the slow utf8 iterator.
     - Build
 	+ Fix all -Wshadow instances
