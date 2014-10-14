@@ -84,7 +84,7 @@ sub runstep {
         # installable_parrot records the path to the blib version
         # of the library.
 
-        parrot_is_shared       => 1,
+        parrot_is_shared       => $flags->{debugging} ? 0 : 1,
         libparrot_shared       => "libparrot.$version$share_ext",
         libparrot_shared_alias => "libparrot$share_ext",
         rpath                  => "-L",

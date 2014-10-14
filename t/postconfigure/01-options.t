@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007,2014, Parrot Foundation.
 # 01-options.t
 
 use strict;
@@ -11,7 +11,7 @@ BEGIN {
     our $topdir = realpath($Bin) . "/../..";
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 29;
+use Test::More tests => 31;
 use Carp;
 use_ok(
     'Parrot::Configure::Options', qw|
@@ -46,7 +46,7 @@ $args = process_options(
     }
 );
 ok( defined $args, "process_options() returned successfully" );
-ok( $args->{debugging}, "debugging turned on by default" );
+ok( !$args->{debugging}, "debugging turned off by default" );
 
 eval { $args = process_options( { argv => [] } ); };
 like(
@@ -158,6 +158,15 @@ $args = process_options(
 );
 ok( defined $args, "process_options() returned successfully" );
 ok( !$args->{debugging}, "debugging explicitly turned off" );
+
+$args = process_options(
+    {
+        argv => [q{--debugging=-g3}],
+        mode => q{reconfigure},
+    }
+);
+ok( defined $args, "process_options() returned successfully" );
+ok( $args->{debugging}, "debugging turned on via arg" );
 
 pass("Completed all tests in $0");
 

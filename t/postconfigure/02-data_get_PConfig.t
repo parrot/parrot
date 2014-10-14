@@ -1,11 +1,11 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007,2014 Parrot Foundation.
 # 02-data_get_PConfig.t
 
 use strict;
 use warnings;
 
-use Test::More tests => 30;
+use Test::More tests => 29;
 use Carp;
 use lib qw( lib );
 use Parrot::Configure;
@@ -73,8 +73,6 @@ is( $nontaskcount, 0, "Each step is a Parrot::Configure::Task object" );
 $conf->options->set( %{$args} );
 is( $conf->options->{c}->{step},
     'inter::make', "command-line option '--step=inter::make' has been stored in object" );
-is( $conf->options->{c}->{debugging},
-    1, "command-line option '--debugging' has been stored in object" );
 
 my $res = eval "no strict; use Parrot::Config; \\%PConfig";
 SKIP: {

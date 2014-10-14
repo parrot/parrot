@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2010, Parrot Foundation.
+# Copyright (C) 2007-2014, Parrot Foundation.
 
 package Parrot::Configure::Options::Reconf;
 
@@ -36,8 +36,8 @@ our %options_components = (
 
 sub conditional_assignments {
     my $argsref = shift;
-    $argsref->{debugging} = 1
-        unless ( ( exists $argsref->{debugging} ) && !$argsref->{debugging} );
+    $argsref->{debugging} = 0
+        unless exists $argsref->{debugging};
     $argsref->{maintainer} = 1
         if defined $argsref->{lex}
             or defined $argsref->{yacc};

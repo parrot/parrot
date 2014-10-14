@@ -45,7 +45,8 @@ our %options_components = (
 
 sub conditional_assignments {
     my $data = shift;
-    $data->{debugging} = 1;
+    $data->{debugging} = 0
+        unless exists $data->{debugging};
     $data->{maintainer} = undef;
     my %valid_step_options = map {$_ => 1} @shared_valid_options;
     my $file_str = Parrot::BuildUtil::slurp_file($data->{file});

@@ -1,11 +1,11 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007,2014, Parrot Foundation.
 # 06-data_get_PConfig_Temp.t
 
 use strict;
 use warnings;
 
-use Test::More tests => 32;
+use Test::More tests => 31;
 use Carp;
 use lib qw( lib );
 use Parrot::Configure;
@@ -75,8 +75,6 @@ is( $conf->options->{c}->{step},
     'gen::makefiles', "command-line option '--step=gen::makefiles' has been stored in object" );
 is( $conf->options->{c}->{target},
     'Makefile', "command-line option '--target=Makefiles' has been stored in object" );
-is( $conf->options->{c}->{debugging},
-    1, "command-line option '--debugging' has been stored in object" );
 
 my $res = eval "no strict; use Parrot::Config::Generated; \\%PConfig";
 SKIP: {

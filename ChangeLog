@@ -22,6 +22,8 @@
           Several chars 160..191 are not in the [[:punct:]] class anymore.
           Removed defunct Parrot_ascii_typetable, unused since 2010.
         + Protect callmethod from an empty object, missed by fixup_subs immediate [GH #1024]
+        + Change default of the config key debugging from 1 to 0, i.e. you need to provide
+          now --debugging[=flags] for debugging. [GH #1099]
     - Build
         + Fix all -Wshadow instances
         + Added bootstrap-tables make target

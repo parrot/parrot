@@ -51,7 +51,7 @@ General Options:
 
 Compile Options:
 
-   --debugging=0        Disable debugging, default = 1
+   --debugging=-g3      Enable and set cc debugging flag, default -g
    --inline             Compiler supports inline
    --optimize           Optimized compile
    --optimize=flags     Add given optimizer flags

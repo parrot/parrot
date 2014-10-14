@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007-2011, Parrot Foundation.
+# Copyright (C) 2007-2014, Parrot Foundation.
 # 008-file_based_configuration.t
 
 use strict;
@@ -29,8 +29,8 @@ use Parrot::Configure::Options qw| process_options |;
         "Configuring from $configfile: will omit check of MANIFEST");
     is($args->{file}, $configfile,
         "Configuring from $configfile: config file correctly stored");
-    ok($args->{debugging},
-        "Configuring from $configfile: debugging turned on");
+    ok(!$args->{debugging},
+        "Configuring from $configfile: debugging turned off");
     my %steps_seen = map {$_ => 1} @{ $steps_list_ref };
     ok(exists $steps_seen{'init::manifest'},
         "Configuring from $configfile: init::manifest is in list even though it will be skipped");
@@ -53,8 +53,8 @@ use Parrot::Configure::Options qw| process_options |;
         "Configuring from $configfile: will omit check of MANIFEST");
     is($args->{file}, $configfile,
         "Configuring from $configfile: config file correctly stored");
-    ok($args->{debugging},
-        "Configuring from $configfile: debugging turned on");
+    ok(!$args->{debugging},
+        "Configuring from $configfile: debugging turned off");
     is($args->{cc}, $c_compiler,
         "Configuring from $configfile: C compiler is $c_compiler");
     is($args->{link}, $cplusplus_compiler,
@@ -82,8 +82,8 @@ use Parrot::Configure::Options qw| process_options |;
         "Configuring from $configfile: will omit check of MANIFEST");
     is($args->{file}, $configfile,
         "Configuring from $configfile: config file correctly stored");
-    ok($args->{debugging},
-        "Configuring from $configfile: debugging turned on");
+    ok(!$args->{debugging},
+        "Configuring from $configfile: debugging turned off");
     is($args->{verbose}, 1,
         "Configuring from $configfile: verbose output is on");
 

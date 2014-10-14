@@ -83,9 +83,10 @@ sub runstep {
     my $build_dir =  abs_path($FindBin::Bin);
 
     my $cc_option = $conf->options->get('cc');
+    my $debugging = $conf->options->get('debugging');
     # We need a Glossary somewhere!
     $conf->data->set(
-        debugging => $conf->options->get('debugging') ? 1 : 0,
+        debugging => $debugging ? 1 : 0,
         optimize  => '',
         verbose   => $conf->options->get('verbose'),
         build_dir => $build_dir,
@@ -138,13 +139,13 @@ sub runstep {
         ld_share_flags => $Config{lddlflags},
 
         # Flags to tell ld to build a dynamically loadable module, e.g.
-        # -shared for GNU ld.
+        # -shared for GNU ld, -bundle -undefined dynamic_lookup on darwin.
         ld_load_flags => $Config{lddlflags},
 
         libs => $Config{libs},
 
         cc_inc     => "-I./include -I./include/pmc",
-        cc_debug   => '-g',
+        cc_debug   => $debugging =~ /^[-\/]\w+/ ? $debugging : '-g',
         link_debug => '',
 
         o         => $Config{_o},       # object files extension

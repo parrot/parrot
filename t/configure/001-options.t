@@ -85,7 +85,7 @@ my ($args, $step_list_ref);
     }
 );
 ok( defined $args, "process_options() returned successfully" );
-ok( $args->{debugging}, "debugging turned on by default" );
+ok( !$args->{debugging}, "debugging turned off by default" );
 
 eval { ($args, $step_list_ref) = process_options( { argv => [] } ); };
 like(
