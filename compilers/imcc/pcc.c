@@ -210,15 +210,15 @@ pcc_get_args(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
 {
     ASSERT_ARGS(pcc_get_args)
     /* Notes:
-     * The created string is in the format "\"(0x0010,0x0220,0x0010)\"".
+     * The created string is in the format "(0x0010,0x0220,0x0010)".
      * flags always has exactly 4 hex digits.
      * The hex number at the end of the list has no "," but we can safely
      * ignore this.
      */
-    static const char pref[] = {'"', '('};
+    static const char pref[] = {'('};
     static const char item[] = {'0', 'x', 'f', 'f', 'f', 'f', ','};
     /* The list suffix includes the '\0' terminator */
-    static const char subf[] = {')', '"', '\0'};
+    static const char subf[] = {')', '\0'};
     static const unsigned int lenpref = sizeof pref;
     static const unsigned int lenitem = sizeof item;
     static const unsigned int lensubf = sizeof subf;

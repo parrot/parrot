@@ -132,7 +132,7 @@ LOAD_EXT         = @load_ext@
 A                = @a@
 LD_SHARE_FLAGS   = @ld_share_flags@
 LD_LOAD_FLAGS    = @ld_load_flags@
-LINKARGS         = $(LDFLAGS) $(LD_LOAD_FLAGS) @libparrot_ldflags@ @icu_shared@ @libs@
+LINKARGS         = $(LDFLAGS) @ld_load_flags@ @libparrot_ldflags@ $(ALL_PARROT_LIBS)
 
 # The headerizer
 HEADERIZER       = $(PERL) $(DEV_TOOLS_DIR)/headerizer.pl
@@ -931,11 +931,11 @@ $(FRPTWO_DIR)/prt0.pbc$(O) : $(FRPTWO_DIR)/prt0.pbc.c \
 	$(INC_DIR)/config.h \
 	$(INC_DIR)/pbcversion.h
 
-$(PARROTOLD) : $(FRP_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
+$(PARROTOLD) : $(FRP_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT_STATIC) \
   src/parrot_config$(O) src/longopt$(O) $(MINIPARROT)
 	$(LINK) @ld_out@$@ \
 	$(FRP_DIR)/main$(O) src/parrot_config$(O) src/longopt$(O) \
-	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
+	$(LIBPARROT_STATIC) $(ICU_SHARED) $(C_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 $(PARROT) : $(FRPTWO_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
@@ -2584,9 +2584,8 @@ prog-clean :
 archclean: dynext-clean
 	$(RM_F) \
 	$(O_FILES) \
-	$(GEN_CONFIGS) \
-	$(GEN_MAKEFILES) \
 	$(PARROT) \
+        $(PARROTOLD) \
 	$(MINIPARROT) \
 	$(INSTALLABLEPARROT) \
 	$(INSTALLABLEDIS) \
@@ -2688,6 +2687,8 @@ test-clean :
 # a failing step of cleaning, usually doesn't concern the following steps
 realclean : clean
 	$(RM_RF) \
+	$(GEN_CONFIGS) \
+	$(GEN_MAKEFILES) \
 	$(CONFIGURE_GENERATED_FILES) \
 	cover_db
 
@@ -3187,7 +3188,7 @@ src/nci_test$(O): $(PARROT_H_HEADERS) src/nci_test.c
 
 $(LIBNCI_TEST_SO): src/nci_test$(O)
 	$(LD) $(LD_LOAD_FLAGS) @ncilib_link_extra@ $(LDFLAGS) \
-	@ld_out@$@ src/nci_test$(O) $(C_LIBS)
+	  @ld_out@$@ src/nci_test$(O) $(C_LIBS)
 
 # for use by $(LIBRARY_DIR)/OpenGL.pir
 src/glut_callbacks$(O): \

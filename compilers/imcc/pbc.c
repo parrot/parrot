@@ -1033,6 +1033,7 @@ fixup_globals(ARGMOD(imc_info_t * imcc))
 =item C<STRING * IMCC_string_from_reg(imc_info_t * imcc, SymReg *r)>
 
 Creates and returns a constant STRING, given a stringish SymReg.
+Handles also encoded strings in the form encoding:\string"
 
 =cut
 
@@ -2030,18 +2031,12 @@ make_pmc_const(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r))
     PMC    *p;
 
     if (PMC_IS_NULL(_class))
-        IMCC_fatal(imcc, 1, "make_pmc_const: no such pmc");
+        IMCC_fatal(imcc, 1, "make_pmc_const: no such pmc '%s'", r->name);
 
-    /* FIXME highly unperformant and possibly double unescaping */
-    if (*r->name == '"')
-        s = Parrot_str_unescape(imcc->interp, r->name + 1, '"', NULL);
-
-    else if (*r->name == '\'')
-        s = Parrot_str_unescape(imcc->interp, r->name + 1, '\'', NULL);
-
-    else
-        s = Parrot_str_unescape(imcc->interp, r->name, 0, NULL);
-    //s = r->name; /* XXX CHECKME */
+    /* assuming utf8 pmc names for now... XXX encoding prefix? */
+    s = Parrot_str_new_init(imcc->interp, r->name, strlen(r->name),
+                            (r->type == 'U') ? Parrot_utf8_encoding_ptr
+                                             : Parrot_ascii_encoding_ptr, 0);
     p  = Parrot_pmc_new(imcc->interp, r->pmc_type);
 
     switch (r->pmc_type) {

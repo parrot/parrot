@@ -469,12 +469,8 @@ mk_pmc_const_named(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
     ASSERT_ARGS(mk_pmc_const_named)
     SymReg *rhs;
     SymReg *r[3];
-    //const int ascii       = (*constant == '\'' || *constant == '"');
     int t = 'S';
     char *unquoted_name = mk_string(imcc, name, &t);
-    size_t name_length = strlen(unquoted_name) - 1;
-
-    //unquoted_name[name_length] = 0;
 
     if (left->type == VTADDRESS) {      /* IDENTIFIER */
         if (imcc->state->pasm_file) {
@@ -496,7 +492,7 @@ mk_pmc_const_named(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
             rhs->type |= VT_ENCODED;
         rhs->usage    |= U_FIXUP | U_SUBID_LOOKUP;
     }
-    else if (strncmp(unquoted_name, "LexInfo", name_length) == 0) {
+    else if (STREQ(unquoted_name, "LexInfo")) {
         rhs = mk_const(imcc, constant, 'l');
         if (t == 'U')
             rhs->type |= VT_ENCODED;
@@ -508,8 +504,7 @@ mk_pmc_const_named(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
 
     r[1]          = rhs;
     rhs->pmc_type = Parrot_pmc_get_type_str(imcc->interp,
-                      Parrot_str_new(imcc->interp, unquoted_name, name_length));
-
+                      Parrot_str_new(imcc->interp, unquoted_name, 0));
     mem_sys_free(unquoted_name);
 
     return INS(imcc, unit, "set_p_pc", "", r, 2, 0, 1);
@@ -1007,7 +1002,7 @@ static void
 do_loadlib(ARGMOD(imc_info_t *imcc), ARGIN(const char *lib))
 {
     ASSERT_ARGS(do_loadlib)
-    STRING * const s = Parrot_str_new_init(imcc->interp, lib, 0,
+        STRING * const s = Parrot_str_new_init(imcc->interp, lib, strlen(lib),
                          Parrot_platform_encoding_ptr, 0);
     PMC    * const lib_pmc = Parrot_dyn_load_lib(imcc->interp, s, NULL);
     if (PMC_IS_NULL(lib_pmc) || !VTABLE_get_bool(imcc->interp, lib_pmc)) {
@@ -1421,7 +1416,7 @@ multi_type:
    | IDENTIFIER
          {
            SymReg *r;
-           if (strcmp($1, "_") != 0)
+           if (STRNEQ($1, "_"))
                r = mk_const(imcc, $1, 'S');
            else {
                r = mk_const(imcc, "PMC", 'S');
@@ -1432,7 +1427,7 @@ multi_type:
    | STRINGC
          {
            SymReg *r;
-           if (strcmp($1, "\"_\"") == 0 || strcmp($1, "'_'") == 0)
+           if (STREQ($1, "\"_\"") || STREQ($1, "'_'"))
                r = mk_const(imcc, "PMC", 'S');
            else {
                r = mk_const(imcc, $1, 'S');
