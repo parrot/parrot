@@ -845,20 +845,22 @@ char *
 mk_string(ARGMOD(imc_info_t * imcc), ARGIN(const char *name), ARGMOD(int *t))
 {
     ASSERT_ARGS(mk_string)
-    char *new_name;
+    char *new_name = NULL;
 
     if (*t != 'U') {
         if (*name == '"') {
             STRING *unescaped = Parrot_str_unescape(imcc->interp, name+1, '"', NULL);
-            new_name = unescaped->strstart;
             /* but we need to keep escaped \0. represent it encoded */
-            if (memchr(new_name, 0, unescaped->bufused)) {
+            if (memchr(unescaped->strstart, 0, unescaped->bufused)) {
                 int len = strlen(name);
-                new_name = (char*)mem_internal_allocate(len + 8 + 1);
+                new_name = (char*)mem_sys_allocate(len + 8 + 1);
                 strcpy(new_name, "fixed_8:");
                 strcat(new_name, name);
                 new_name[len + 8 + 1] = 0;
                 if (*t == 'S') *t = 'U';
+            }
+            else {
+                new_name =  mem_sys_strdup(unescaped->bufused ? unescaped->strstart : "\0");
             }
         }
         else if (*name == '\'') {
@@ -866,11 +868,11 @@ mk_string(ARGMOD(imc_info_t * imcc), ARGIN(const char *name), ARGMOD(int *t))
             new_name[strlen(new_name) - 1] = 0;
         }
         else {
-            new_name = mem_sys_strdup(name);
+            new_name = mem_sys_strdup(name ? name : "\0");
         }
     }
     else {
-        new_name = mem_sys_strdup(name);
+        new_name = mem_sys_strdup(name ? name : "\0");
     }
     /* TODO: resolve encoding aliases here with U, not in string_from_reg.
      registers should store encoded strings more efficiently: GH #1097 */

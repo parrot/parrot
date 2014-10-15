@@ -116,6 +116,10 @@ PackFile_pack(PARROT_INTERP, ARGMOD(PackFile *self), ARGOUT(opcode_t *cursor))
     char *byte_cursor = (char*)cursor;
 
     self->src = cursor;
+#ifndef NDEBUG
+    if (Interp_trace_TEST(interp, 8))
+        Parrot_io_eprintf(interp, "*** pack init %lu\n", cursor);
+#endif
 
     /* Pack the fixed part of the header */
     memcpy(cursor, self->header, PACKFILE_HEADER_BYTES);
@@ -128,7 +132,7 @@ PackFile_pack(PARROT_INTERP, ARGMOD(PackFile *self), ARGOUT(opcode_t *cursor))
 
     /* Padding. */
     padding_size = 16 - (PACKFILE_HEADER_BYTES + self->header->uuid_size) % 16;
-    if (padding_size < 16) {
+    if (padding_size < 16) { /* TODO memset */
         int i;
         for (i = 0; i < padding_size; ++i)
             *byte_cursor++ = 0;

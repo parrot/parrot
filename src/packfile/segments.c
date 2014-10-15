@@ -1062,19 +1062,35 @@ PackFile_Segment_pack(PARROT_INTERP, ARGIN(PackFile_Segment *self),
         self->pf->PackFuncs[self->type].pack;
     opcode_t * old_cursor;          /* Used for filling padding with 0 */
 
+#ifndef NDEBUG
+    if (Interp_trace_TEST(interp, 8))
+        Parrot_io_eprintf(interp, "*** seg pack %lu %d\n", cursor, cursor - self->pf->src);
+#endif
     cursor = default_pack(self, cursor);
+#ifndef NDEBUG
+    if (Interp_trace_TEST(interp, 8))
+        Parrot_io_eprintf(interp, "*** def pack %lu %d\n", cursor, cursor - self->pf->src);
+#endif
 
     if (f)
         cursor = (f)(interp, self, cursor);
+#ifndef NDEBUG
+    if (Interp_trace_TEST(interp, 8))
+        Parrot_io_eprintf(interp, "*** seg cb %lu %d\n", cursor, cursor - self->pf->src);
+#endif
 
     old_cursor = cursor;
     ALIGN_16(self->pf, cursor);
     /* fill padding with zeros */
     while (old_cursor != cursor)
-        *old_cursor++ = 0;
+        *old_cursor++ = 0; /* TODO faster memset */
 
     /*if (align && (cursor - self->pf->src) % align)
       cursor += align - (cursor - self->pf->src) % align;*/
+#ifndef NDEBUG
+    if (Interp_trace_TEST(interp, 8))
+        Parrot_io_eprintf(interp, "*** seg padded %lu %d\n", cursor, cursor - self->pf->src);
+#endif
 
     return cursor;
 }
@@ -1508,6 +1524,10 @@ directory_pack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGOUT(opcode_t *c
     PackFile           * const pf       = self->pf;
     opcode_t                 * old_cursor;  /* Used for filling padding with 0 */
 
+#ifndef NDEBUG
+    if (Interp_trace_TEST(interp, 8))
+        Parrot_io_eprintf(interp, "*** directory_pack %lu %d\n", cursor, num_segs);
+#endif
     *cursor++ = num_segs;
 
     for (i = 0; i < num_segs; i++) {
@@ -1517,6 +1537,10 @@ directory_pack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGOUT(opcode_t *c
         cursor = PF_store_string(cursor, seg->name);
         *cursor++ = seg->file_offset;
         *cursor++ = seg->op_count;
+#ifndef NDEBUG
+    if (Interp_trace_TEST(interp, 8))
+        Parrot_io_eprintf(interp, "*** seg header %lu %s\n", cursor, seg->name->strstart);
+#endif
     }
 
     old_cursor = cursor;
@@ -1532,6 +1556,10 @@ directory_pack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGOUT(opcode_t *c
     for (i = 0; i < dir->num_segments; ++i) {
         PackFile_Segment * const seg = dir->segments[i];
         cursor = PackFile_Segment_pack(interp, seg, cursor);
+#ifndef NDEBUG
+        if (Interp_trace_TEST(interp, 8))
+            Parrot_io_eprintf(interp, "*** cursor %lu %s\n", cursor, seg->name->strstart);
+#endif
     }
 
     return cursor;
