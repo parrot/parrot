@@ -233,7 +233,8 @@ CODE
 /Multiple declarations of lexical 'foo'/
 OUT
 
-# perl6 has a similar issue but there testcase 2 failed. RT #116643
+# perl6 has a similar issue but there the next testcase failed. RT #116643
+# use single-quotes with .lex!
 pir_output_is( <<'CODE', <<'OUT', 'legal quoted .lex names', todo => 'GH #1095');
 .sub 'main' :main
     .lex 'bar\o', $P0        # ok, parsed as "bar\\o"
@@ -262,7 +263,7 @@ pir_error_output_like( <<'CODE', <<'OUT', 'illegal quoted .lex names');
     say $P2
 .end
 CODE
-/Lexical 'fooo' not found/
+/Illegal escape sequence \\o in 'foo\\o'/
 OUT
 
 pir_output_is( <<'CODE', <<'OUT', 'legal quote with global names');
@@ -284,7 +285,7 @@ ok 1
 ok 2
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'illegal quoted global names');
+pir_error_output_like( <<'CODE', <<'OUT', 'illegal quoted global names');
 .sub 'main' :main
     $S0 = 'bar\o'
     $P1 = box 'ok 1'
@@ -311,10 +312,7 @@ pir_output_is( <<'CODE', <<'OUT', 'illegal quoted global names');
     say $P3
 .end
 CODE
-ok 1
-ok 2
-ok 4
-ok 4
+/Illegal escape sequence \\o in 'foo\\o'/
 OUT
 
 # Local Variables:

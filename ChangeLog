@@ -1,5 +1,8 @@
 2014-10-21    release 6.9.0
     - Core
+        + Changed behavior with illegal escape sequences, GH #1103. Do not silently
+          skip the \ anymore, throw an EXCEPTION_INVALID_CHARACTER error with
+          "Illegal escape sequence \o in 'string\o'".
         + Add platform encoding functions for darwin, FreeBSD, OpenBSD and NetBSD,
           fixing rakudo problems with UTF-8 locales. [GH #1092]
         + Enable trap op (int3) on x86_64 also
