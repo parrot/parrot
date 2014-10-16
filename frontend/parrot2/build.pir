@@ -1,5 +1,6 @@
-# Copyright (C) 2011-2012, Parrot Foundation.
+# Copyright (C) 2011-2014, Parrot Foundation.
 
+# a 3rd argument means --verbose
 .sub 'main' :main
     .param pmc args
     .local pmc outfh, ifh
@@ -8,7 +9,9 @@
     program_name = shift args
     infile = shift args
     outfile = infile . ".c"
+    unless args goto silent_1
     say outfile
+  silent_1:
     ifh = new ['FileHandle']
     ifh.'open'(infile, 'rb')
     outfh = new ['FileHandle']
@@ -44,10 +47,11 @@
     goto read_loop
 
   read_done:
+    unless args goto silent_2
     say "Done reading input"
-    ifh.'close'()
-
     say "writing coda"
+  silent_2:
+    ifh.'close'()
     print outfh, "\n};\n\nstatic const size_t bytecode_size = "
     $S0 = size
     print outfh, $S0

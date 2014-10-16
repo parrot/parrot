@@ -235,7 +235,7 @@ MAIN:>>
 function main [main] (var argv)
 {
     :(string infile, string cfile, string objfile, string exefile,
-            string runcore, string gccore, int install) =
+      string runcore, string gccore, var opts) =
         handle_args(argv)
     if (infile == "")
         throw "cannot read infile";
@@ -272,8 +272,8 @@ function main [main] (var argv)
             '' :
             replace_pbc_extension(infile, '.RES');
 
-    compile_file(cfile, objfile, install);
-    link_file(objfile, exefile, extra_obj, install);
+    compile_file(cfile, objfile, opts);
+    link_file(objfile, exefile, extra_obj, opts);
 }
 
 function print_define(var outfh, var args[slurpy])
@@ -298,6 +298,7 @@ function handle_args(var argv)
     push(getopt, 'install|i');
     push(getopt, 'runcore|R:s');
     push(getopt, 'output|o:s');
+    push(getopt, 'verbose|v');
     push(getopt, 'help|h');
     push(getopt, 'gc:s');
 
@@ -305,6 +306,7 @@ function handle_args(var argv)
     var opts = getopt.get_options(argv);
 
     int help    = opts['help'];
+    int verbose = opts['verbose'];
     int install = opts['install'];
     string runcore = opts['runcore'];
     string outfile = opts['output'];
@@ -318,6 +320,7 @@ pbc_to_exe [options] <file>
   Options:
     -h --help
     -i --install
+    -v --verbose
     -R --runcore=slow|fast
     -o --output=FILE
        --gc=ms2|gms
@@ -371,7 +374,7 @@ HELP:>>
         throw "Unsupported runcore: '" + runcore + "'";
     }
 
-    return infile, cfile, objfile, exefile, runcore_code, gccore, install;
+    return infile, cfile, objfile, exefile, runcore_code, gccore, opts;
 }
 
 function determine_code_type()
@@ -597,8 +600,10 @@ END_OF_FUNCTION:>>
 }
 
 # util functions
-function compile_file(string cfile, string objfile, int install)
+function compile_file(string cfile, string objfile, var opts)
 {
+    int verbose = opts['verbose'];
+    int install = opts['install'];
     var $P0 = '_config'();
     string cc        = $P0['cc'];
     string ccflags   = $P0['ccflags'];
@@ -622,17 +627,21 @@ function compile_file(string cfile, string objfile, int install)
         ccflags + ' ' +
         optimize +
         ' -c ' + cfile;
-    say(compile);
+    if (verbose)
+        say(compile);
     int status = spawnw_cmd(compile);
     if (status != 0)
         throw "compilation failed";
 
-    say("Compiled: ", objfile);
+    if (verbose)
+        say("Compiled: ", objfile);
     return;
 }
 
-function link_file(string objfile, string exefile, string extra_obj, int install)
+function link_file(string objfile, string exefile, string extra_obj, var opts)
 {
+    int verbose = opts['verbose'];
+    int install = opts['install'];
     var $P0 = _config();
     string cc           = $P0['cc'];
     string link         = $P0['link'];
@@ -679,7 +688,8 @@ function link_file(string objfile, string exefile, string extra_obj, int install
     link += ' ' + config + ' ' + rpath + ' ' + libparrot + ' ' +
             link_dynamic + ' ' + linkflags + ' ' + libs + ' ' + icushared;
 
-    say(link);
+    if (verbose)
+        say(link);
     int status = spawnw_cmd(link);
     if (status != 0)
         throw "linking failed";
@@ -693,12 +703,14 @@ function link_file(string objfile, string exefile, string extra_obj, int install
         string embed_manifest_str = 'mt.exe -nologo -manifest ' +
                 manifest_file_name +
                 ' -outputresource:' + exefile + ';1';
-        say(embed_manifest_str);
+        if (verbose)
+            say(embed_manifest_str);
         int embed_manifest_status = spawnw_cmd(embed_manifest_str);
         if (embed_manifest_status != 0)
             throw 'manifest embedding failed';
     }
-    say("Linked: ", exefile);
+    if (verbose)
+        say("Linked: ", exefile);
     return;
 }
 
