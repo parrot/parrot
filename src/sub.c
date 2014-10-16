@@ -497,11 +497,15 @@ Parrot_sub_continuation_rewind_environment(PARROT_INTERP, ARGIN(PMC *pmc))
     PMC * const sig    = Parrot_pcc_get_signature(interp, ctx);
     PMC * const from_sub = Parrot_pcc_get_sub(interp, ctx);
 
-    /* reset if coro */
-    if (from_sub->vtable->base_type == enum_class_Coroutine) {
-        if (Interp_trace_TEST(interp, 8))
-            fprintf(stderr, "# - coro: reset\n");
-        SETATTR_Coroutine_ctx(interp, from_sub, PMCNULL);
+    /* A yield could not bring us here */
+    if (from_sub && from_sub->vtable->base_type == enum_class_Coroutine) {
+        INTVAL autoreset;
+        GETATTR_Coroutine_autoreset(interp, from_sub, autoreset);
+        if (autoreset) {
+            if (Interp_trace_TEST(interp, 8))
+                fprintf(stderr, "# - coro: autoreset\n");
+            SETATTR_Coroutine_ctx(interp, from_sub, PMCNULL);
+        }
     }
 
     /* debug print before context is switched */

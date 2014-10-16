@@ -83,6 +83,7 @@ print_sub_name(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 
 pmclass Coroutine extends Sub provides invokable auto_attrs {
     ATTR INTVAL             yield;      /* yield in process */
+    ATTR INTVAL             autoreset;  /* die or autoreset? */
     ATTR opcode_t          *address;    /* next address to run - toggled each time */
     ATTR PackFile_ByteCode *caller_seg; /* bytecode segment */
 
@@ -163,6 +164,34 @@ first yield again.
 #endif
         SET_ATTR_ctx(INTERP, SELF, PMCNULL);
         INTERP->current_cont   = PMCNULL;
+    }
+
+/*
+
+=item C<void autoreset()>
+
+Sets a coroutine to auto-resetting, so it will never die when all yield
+states are exhausted. You can use autoreset(0) to turn it off again.
+
+Use this with care, as it might not do what you want!
+
+=cut
+
+*/
+
+    METHOD void autoreset(INTVAL set :optional, INTVAL have_set :opt_flag) {
+        INTVAL value = 1;
+        if (have_set)
+            value = set;
+#ifndef NDEBUG
+        if (Interp_trace_TEST(INTERP, 8)) {
+            if (have_set)
+                fprintf(stderr, "# coro: autoreset %d\n", value);
+            else
+                fprintf(stderr, "# coro: autoreset\n");
+        }
+#endif
+        SET_ATTR_autoreset(INTERP, SELF, value);
     }
 
 /*
