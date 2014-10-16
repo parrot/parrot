@@ -502,9 +502,15 @@ Parrot_sub_continuation_rewind_environment(PARROT_INTERP, ARGIN(PMC *pmc))
         INTVAL autoreset;
         GETATTR_Coroutine_autoreset(interp, from_sub, autoreset);
         if (autoreset) {
-            if (Interp_trace_TEST(interp, 8))
-                fprintf(stderr, "# - coro: autoreset\n");
+            if (Interp_trace_TEST(interp, PARROT_TRACE_SUB_CALL_FLAG))
+                Parrot_io_eprintf(interp, "# Coroutine autoreset '%Ss'\n",
+                                  Parrot_sub_full_sub_name(interp, from_sub));
             SETATTR_Coroutine_ctx(interp, from_sub, PMCNULL);
+        }
+        else {
+            if (Interp_trace_TEST(interp, PARROT_TRACE_SUB_CALL_FLAG))
+                Parrot_io_eprintf(interp, "# Coroutine no autoreset '%Ss'\n",
+                                  Parrot_sub_full_sub_name(interp, from_sub));
         }
     }
 

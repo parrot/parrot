@@ -5,7 +5,7 @@ use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 16;
+use Parrot::Test tests => 17;
 
 =head1 NAME
 
@@ -418,7 +418,7 @@ CODE
 OUTPUT
 
 pir_output_is(
-    <<'CODE', <<'OUTPUT', "Resume dead coroutine one-off", todo => 'goes one iteration too far TT #1003' );
+    <<'CODE', <<'OUTPUT', "Final return from coroutine", todo => 'one invoke too many TT #1003' );
 .sub 'MyCoro'
     .yield(1)
     .yield(2)
@@ -439,11 +439,8 @@ CODE
 4
 OUTPUT
 
-# Note: TT #1702/GH #564 argues that dead coros should be resumable. Manually via a reset()?
-# docs/book/pir/ch06_subroutines.pod argues also that they should restart. They aren't and shouldn't.
-# Check with -td t/pmc/coroutine_14.pir
-pir_error_output_like(
-    <<'CODE', <<'OUTPUT', "Resume dead coroutine");
+# Note: TT #1702/GH #564 argued that dead coros should be resumable.
+pir_error_output_like(<<'CODE', <<'OUTPUT', "Resume dead coroutine w/o autoreset");
 .sub 'MyCoro'
     .yield(1)      # 2. ff y=1=>0
     .yield(2)      # 4. ff y=1=>0
@@ -514,8 +511,7 @@ CODE
 /\A3.0-4.0-5.0-3.1-3.done-4.1-5.1-4.done-5.done-Cannot resume dead coroutine./
 OUTPUT
 
-pir_output_is(
-    <<'CODE', <<'OUTPUT', "Reset" );
+pir_output_is(<<'CODE', <<'OUTPUT', "Manual reset" );
 .sub 'main' :main
     .const 'Coroutine' $P99 = 'MyCoro'
     $I0 = MyCoro()
@@ -539,6 +535,31 @@ CODE
 2
 1
 2
+OUTPUT
+
+pir_output_is(<<'CODE', <<'OUTPUT', "autoreset", todo => 'one invoke too many TT #1003' );
+.sub 'main' :main
+    .const 'Coroutine' $P99 = 'MyCoro'
+    $P99.'autoreset'()
+    $I0 = MyCoro()
+    say $I0
+    $I0 = MyCoro()
+    say $I0
+    $I0 = MyCoro()
+    say $I0
+    $I0 = MyCoro()
+    say $I0
+.end
+.sub 'MyCoro'
+    .yield(1)
+    .yield(2)
+    .return(3)
+.end
+CODE
+1
+2
+3
+1
 OUTPUT
 
 
