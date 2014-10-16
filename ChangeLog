@@ -25,6 +25,9 @@
     - Build
         + Fix all -Wshadow instances
         + Added bootstrap-tables make target
+        + Configure options consistency: --{en,dis}able-<feature> for shared, rpath,
+          threads, --with{,out}-<library> for: llvm pcre ... + threads. [GH #1101]
+        + Deprecated --parrot_is_shared in favor of --enable-shared. [GH #1101]
     - Documentation
 	+ Add missing manpages for pbc_disassemble, pbc_dump, pbc_merge
         + Improved src/string/encoding/tables.c pod.

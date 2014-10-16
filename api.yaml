@@ -666,3 +666,9 @@
     - 'completed'
   ticket:  'https://github.com/parrot/parrot/issues/937'
 -
+  name:  '--parrot_is_shared replaced by --enable-shared'
+  note:  'Harmonized the Configure.pl options'
+  tags:
+    - deprecated
+  ticket:  'https://github.com/parrot/parrot/issues/1101'
+-

@@ -34,7 +34,7 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     my $verbose = $conf->options->get( 'verbose' );
-    unless ( $conf->options->get( 'with-llvm' ) ) {
+    if ( !$conf->options->get('with-llvm') ) {
         $self->_handle_result( $conf, 0 );
         $self->set_result('skipped');
         print "--with-llvm not requested.\n" if $verbose;
@@ -125,7 +125,7 @@ sub runstep {
             $verbose,
         );
         if (! $rv) {
-            uconf->cc_clean();
+            $conf->cc_clean();
             return 1;
         }
     }

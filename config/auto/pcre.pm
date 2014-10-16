@@ -32,12 +32,11 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $without = $conf->options->get( qw| without-pcre | );
-
-    $self->set_result('skipped');
-    $conf->data->set( HAS_PCRE => 0 );
-
-    return 1 if ($without);
+    unless ( $conf->options->get('without-pcre') ) {
+        $self->set_result('skipped');
+        $conf->data->set( HAS_PCRE => 0 );
+        return 1;
+    }
 
     my $osname = $conf->data->get('osname');
 

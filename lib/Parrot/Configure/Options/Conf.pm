@@ -55,8 +55,8 @@ Compile Options:
    --inline             Compiler supports inline
    --optimize           Optimized compile
    --optimize=flags     Add given optimizer flags
-   --parrot_is_shared   Link parrot dynamically
-   --disable-rpath      Link without rpath (user must set LD_LIBRARY_PATH)
+   --{en,dis}able-shared  How to link libparrot
+   --{en,dis}able-rpath   If without rpath (user must set LD_LIBRARY_PATH)
    --m=32               Build 32bit executable on 64-bit architecture.
    --profile            Turn on profiled compile (gcc only for now)
    --cage               [CAGE] compile includes many additional warnings
@@ -95,7 +95,7 @@ Parrot Options:
                         Build parrot without unnecessary
                         statically compiled NCI call frames
 
-External Library Options:
+External Library Options (use --with- or --without-):
 
    --with-llvm          Link to LLVM if it is available
    --without-gettext    Build parrot without gettext support

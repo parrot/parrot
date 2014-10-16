@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 package Parrot::Configure::Options;
 
@@ -87,12 +87,35 @@ sub _initial_pass {
         if ($el =~ m/--([-\w]+)(?:=(.*))?/) {
             ( $key, $value ) = ($1, $2);
         }
-        $key   = 'help' unless defined $key;
+        # threads is a feature, not a library. but we check for without-threads
+        if ( $key =~ /^(en|dis)able-threads/ ) {
+            $data->{'without-threads'} = $1 eq 'dis' ? 1 : 0;
+        }
+        # binary logic for with/without and enable/disable
+        # we should only check positive keys in Data
+        if ($key =~ /^(disable|without)-(.*)/) {
+            # but traditionally we check against --without in most libs
+            $data->{$key} = defined $value ? $value : 1;
+            $key =~ s/^dis/en/;
+            $key =~ s/^without/with/;
+            $value = defined $value ? !$value : 0;
+        }
+        elsif ($key =~ /^(enable|with)-(.*)/) {
+            $data->{$key} = defined $value ? $value : 1;
+            $key =~ s/^en/dis/;
+            $key =~ s/^with/without/;
+            $value = defined $value ? !$value : 0;
+        }
         $value = 1      unless defined $value;
+        $key   = 'help' unless defined $key;
         $value =~ s/^(["'])(.*)\1$/$2/;
 
         unless ( $valid_opts{$key} ) {
             die qq/Invalid option "$key". See "perl $script --help" for valid options\n/;
+        }
+        if ( $key eq 'parrot_is_shared' ) {
+            warn qq/--parrot_is_shared is deprecated. please use --enable-shared instead/;
+            $key = 'enable-shared';
         }
         if ( $key eq 'prefix' and
             ! File::Spec->file_name_is_absolute( $value) ) {

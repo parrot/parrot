@@ -248,9 +248,11 @@ On Darwin, do not probe for Macports libraries.
 
 Debugging is turned on by default. Use this to disable it.
 
-=item C<--parrot_is_shared>
+=item C<--enable-shared>
+=item C<--disable-shared>
+=item C<--parrot_is_shared> C<DEPRECATED>
 
-Link parrot dynamically.
+Link libparrot static or dynamically.
 
 =item C<--m=32>
 
@@ -324,13 +326,14 @@ Specify which loader to use for shared libraries.
 
 Use the given loader flags for shared libraries
 
+=item C<--enable-rpath>
 =item C<--disable-rpath>
 
-Specify that rpath should not be included in linking flags. With this
+If rpath should be included in the linking flags. With this
 configuration option, you must append the library build directory
 (usually blib/lib) to the LD_LIBRARY_PATH environment variable (or your
-platform equivalent). This option is primarily used for building Linux
-packages.
+platform equivalent). C<--disable-rpath> is primarily used for building Linux
+packages, to be prefix independent.
 
 =item C<--lex=(lexer)>
 

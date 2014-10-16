@@ -32,15 +32,18 @@ sub _init {
 
 sub runstep {
     my ( $self, $conf ) = @_;
-    my $parrot_is_shared = $conf->options->get('parrot_is_shared');
-    my $disable_rpath    = $conf->options->get('disable-rpath');
+    my $enable_shared = !$conf->options->get('disable-shared');
+    my $disable_rpath = $conf->options->get('disable-rpath');
 
-    $parrot_is_shared = integrate(
-        $conf->data->get('parrot_is_shared'),
-        $parrot_is_shared
+    $enable_shared = integrate(
+        $conf->data->get('enable-shared'),
+        $enable_shared
     );
 
-    $parrot_is_shared = 0 unless $conf->data->get('has_dynamic_linking');
+    # let the command-line override the failed has_dynamic_linking probe
+    unless ($conf->data->get('has_dynamic_linking')) {
+      $enable_shared = 0 unless $conf->options->get('enable-shared');
+    }
 
     # Parrot can't necessarily handle a pre-existing installed shared
     # libparrot.so without rpath.
@@ -65,18 +68,17 @@ sub runstep {
         &&
         $conf->data->get('has_dynamic_linking')
     ) {
-        $parrot_is_shared = prompt(
+        $enable_shared = prompt(
             "\nShould parrot be built using a shared library?",
-            $parrot_is_shared ? 'y' : 'n'
+            $enable_shared ? 'y' : 'n'
         );
 
-        $parrot_is_shared = lc($parrot_is_shared) eq 'y';
+        $enable_shared = lc($enable_shared) eq 'y';
     }
 
     $conf->data->set(
-        parrot_is_shared => $parrot_is_shared,
-
-        libparrot_for_makefile_only => $parrot_is_shared
+        parrot_is_shared => $enable_shared,
+        libparrot_for_makefile_only => $enable_shared
             ? '$(LIBPARROT_SHARED)'
             : '$(LIBPARROT_STATIC)',
     );
@@ -84,7 +86,7 @@ sub runstep {
     # Set -rpath (or equivalent) for executables to find the
     # shared libparrot in the build directory.
     $conf->data->set( rpath_blib => ( ! $disable_rpath
-                                     && $parrot_is_shared
+                                     && $enable_shared
                                      && $conf->data->get('rpath') )
         ? '"' . $conf->data->get('rpath')
             . $conf->data->get('build_dir')
@@ -96,7 +98,7 @@ sub runstep {
     # Set -rpath (or equivalent) for the installed executables to find the
     # installed shared libparrot.
     $conf->data->set( rpath_lib => ( ! $disable_rpath
-                                    && $parrot_is_shared
+                                    && $enable_shared
                                     && $conf->data->get('rpath') )
         ? $conf->data->get('rpath')
             . '"' . $conf->data->get('libdir') . '"'
@@ -142,7 +144,7 @@ sub runstep {
         );
     }
 
-    $self->set_result( $parrot_is_shared ? 'yes' : 'no' );
+    $self->set_result( $enable_shared ? 'yes' : 'no' );
 
     return 1;
 }

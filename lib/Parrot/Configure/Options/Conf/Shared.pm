@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2012, Parrot Foundation.
+# Copyright (C) 2007-2014, Parrot Foundation.
 package Parrot::Configure::Options::Conf::Shared;
 
 use strict;
@@ -25,6 +25,8 @@ our @shared_valid_options = qw{
     debugging
     define
     disable-rpath
+    disable-shared
+    disable-threads
     exec-prefix
     fatal
     fatal-step
@@ -86,6 +88,24 @@ our @shared_valid_options = qw{
     without-zlib
     yacc
 };
+
+our @reverse_valid_options;
+for (@shared_valid_options) {
+    if (/^with-(.*)/) {
+        push @reverse_valid_options, "without-$1";
+    }
+    elsif (/^without-(.*)/) {
+        push @reverse_valid_options, "with-$1";
+    }
+    elsif (/^enable-(.*)/) {
+        push @reverse_valid_options, "disable-$1";
+    }
+    elsif (/^disable-(.*)/) {
+        push @reverse_valid_options, "enable-$1";
+    }
+}
+
+push @shared_valid_options, @reverse_valid_options;
 
 ################### DOCUMENTATION ###################
 
