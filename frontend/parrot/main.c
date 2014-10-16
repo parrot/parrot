@@ -456,8 +456,8 @@ usage(ARGMOD(FILE *fp))
 {
     ASSERT_ARGS(usage)
     fprintf(fp,
-            "parrot -[acEGhrtvVwy.] [-d [FLAGS]] [-D [FLAGS]]"
-            "[-O [level]] [-L path] [-R runcore] [-o FILE] <file>\n");
+            "parrot -[acEGhrtvVwy.] [-Ddt[HEXFLAGS]] [-O[level]]"
+            "[-[LIX] path] [-R runcore] [-o FILE] <file> <args>\n");
 }
 
 /*
@@ -490,6 +490,10 @@ help_debug(void)
     "    0001    opcodes\n"
     "    0002    find_method\n"
     "    0004    function calls\n");
+#ifndef NDEBUG
+    printf(
+    "    0008    coro states\n");
+#endif
     printf(
     "\n"
     "--imcc-debug -d [Flags] ...\n"
@@ -552,7 +556,6 @@ help(void)
     "    -. --wait    Read a keystroke before starting\n"
     "       --runtime-prefix\n"
     "   <Compiler options>\n"
-    "    -d --imcc-debug[=HEXFLAGS] (see --help-debug)\n"
     "    -v --verbose\n"
     "    -E --pre-process-only\n"
     "    -o --output=FILE\n"
@@ -562,6 +565,7 @@ help(void)
     "    -c --pbc\n"
     "    -r --run-pbc\n"
     "    -y --yydebug\n"
+    "    -d --imcc-debug[=HEXFLAGS] (see --help-debug)\n"
     "   <Language options>\n"
     "see docs/running.pod for more\n");
 }

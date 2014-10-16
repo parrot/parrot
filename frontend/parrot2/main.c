@@ -368,9 +368,8 @@ static void
 usage(ARGMOD(FILE *fp))
 {
     ASSERT_ARGS(usage)
-    fprintf(fp,
-            "parrot -[acEGhrtVwy.] [-D [FLAGS]]"
-            "[-R runcore] [-o FILE] <file>\n");
+    fprintf(fp, "parrot -[acEGhrtVwy.] -[Ddt][HEXFLAGS] [-O[level] "
+                "[-[LIX] path] [-R runcore] [-o FILE] <file> <args>\n");
 }
 
 /*
@@ -403,6 +402,10 @@ help_debug(void)
     "    0001    opcodes\n"
     "    0002    find_method\n"
     "    0004    function calls\n");
+#ifndef NDEBUG
+    printf(
+    "    0008    coro states\n");
+#endif
     printf(
     "\n"
     "--imcc-debug -d [Flags] ...\n"

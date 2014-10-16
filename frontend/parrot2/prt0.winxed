@@ -211,13 +211,14 @@ parrot [Options] <file> [<program options...>]
     -. --wait    Read a keystroke before starting
        --runtime-prefix
    <Compiler options>
+    -v --verbose
     -E --pre-process-only
     -o --output=FILE
        --output-pbc
+    -O --optimize[=LEVEL]
     -a --pasm
     -c --pbc
     -r --run-pbc
-    -v --verbose
     -y --yydebug
     -d --imcc-debug[=HEXFLAGS] (see --help-debug)
    <Language options>
@@ -234,12 +235,13 @@ function __get_temporary_output_file[anon](string infile)
     return infile + ".pbc";
 }
 
+# TODO yet unused
 function __usage_and_exit[anon](string msg [optional], int has_msg [opt_flag])
 {
     var stderr = getstderr();
     if (has_msg)
         stderr.print(msg + "\n");
-    stderr.print("parrot -[acEGhrtVvwy.] [-D [FLAGS]] ");
+    stderr.print("parrot -[acEGhrtvVwy.] -[Ddt][HEXFLAGS] [-O[level] ");
     stderr.print("[-[LIX] path] [-R runcore] [-o FILE] <file> <args>\n");
     exit(1);
 }

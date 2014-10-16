@@ -4,25 +4,28 @@
           skip the \ anymore, throw an EXCEPTION_INVALID_CHARACTER error with
           "Illegal escape sequence \o in 'string\o'".
         + Add platform encoding functions for darwin, FreeBSD, OpenBSD and NetBSD,
-          fixing rakudo problems with UTF-8 locales. [GH #1092]
+          fixing rakudo problems with UTF-8 locales. #1092
         + Enable trap op (int3) on x86_64 also
         + Add const to env api STRING args
-        + Do no pre-allocate 256 IO tables for the standard handles, only 3. [GH #1093]
-        + Renamed ops2c to parrot-ops2c. Get the new name if exists in config key ops2c
-          [GH #900]
+        + Do no pre-allocate 256 IO tables for the standard handles, only 3. #1093
+        + Renamed ops2c to parrot-ops2c. Get the new name if exists in config
+          key ops2c. #900
         + Reenable parrot -t [flags] traceflags to enable the flags 2 find_method and
           4 invoke/retcc/yield again.
-        + Enable >2GB RAM on darwin also [GH #268]
+        + Enable >2GB RAM on darwin also. #268
         + Fix crash with parrot -d8 DEBUG_IMC dump_instructions
-        + Fix sprintf width count for unicode strings [GH #956]
+        + Fix sprintf width count for unicode strings. #956
         + Fix sprintf width for NaN/Inf/-Inf [GH #1099/perl6 RT#116280]
         + Optimize utf8_substr. Do not use the slow utf8 iterator.
-        + Regenerated and fixed the iso_8859_1_typetable. Add \x2028, \x2029 and \v
-          to be of cclass newline. [GH #1086, perl6 RT #122341].
+        + Regenerated and fixed the iso_8859_1_typetable. Add \x2028, \x2029
+          and \v to be of cclass newline. [GH #1086, perl6 RT #122341].
           Several chars 160..191 are not in the [[:punct:]] class anymore.
           Removed defunct Parrot_ascii_typetable, unused since 2010.
-        + Protect callmethod from an empty object, missed by fixup_subs immediate [GH #1024]
-        + Add Couroutine reset and autoreset methods [GH #564]
+        + Protect callmethod from an empty object, missed by fixup_subs
+          immediate. #1024
+        + Add Couroutine reset and autoreset methods. #564
+        + Add -t8 trace flag for Coroutine states
+        + Harmonize parrot usage messages
     - Build
         + Fix all -Wshadow instances
         + Added bootstrap-tables make target
