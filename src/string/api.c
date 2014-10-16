@@ -61,8 +61,17 @@ static const STR_VTABLE * string_rep_compatible(
 
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
-static void throw_illegal_escape(PARROT_INTERP)
-        __attribute__nonnull__(1);
+static void throw_illegal_escape(PARROT_INTERP, ARGIN(const STRING *s))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_DOES_NOT_RETURN
+PARROT_COLD
+static void throw_illegal_escape_char(PARROT_INTERP,
+    const char c,
+    ARGIN(const STRING *s))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_string_max_bytes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(s))
@@ -70,7 +79,11 @@ static void throw_illegal_escape(PARROT_INTERP)
        PARROT_ASSERT_ARG(a) \
     , PARROT_ASSERT_ARG(b))
 #define ASSERT_ARGS_throw_illegal_escape __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_throw_illegal_escape_char __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(s))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -2580,9 +2593,12 @@ Parrot_str_escape_truncate(PARROT_INTERP,
 
 /*
 
-=item C<static void throw_illegal_escape(PARROT_INTERP)>
+=item C<static void throw_illegal_escape(PARROT_INTERP, const STRING *s)>
 
-Helper function to avoid repeated throw calls.
+=item C<static void throw_illegal_escape_char(PARROT_INTERP, const char c, const
+STRING *s)>
+
+Helper functions to avoid repeated throw calls.
 
 =cut
 
@@ -2591,11 +2607,21 @@ Helper function to avoid repeated throw calls.
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
 static void
-throw_illegal_escape(PARROT_INTERP)
+throw_illegal_escape(PARROT_INTERP, ARGIN(const STRING *s))
 {
     ASSERT_ARGS(throw_illegal_escape)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-            "Illegal escape sequence");
+            "Illegal escape sequence in '%Ss'", s);
+}
+
+PARROT_DOES_NOT_RETURN
+PARROT_COLD
+static void
+throw_illegal_escape_char(PARROT_INTERP, const char c, ARGIN(const STRING *s))
+{
+    ASSERT_ARGS(throw_illegal_escape_char)
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
+            "Illegal escape sequence \\%c in '%Ss'", c, s);
 }
 
 /*
@@ -2648,22 +2674,27 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                 if (itersrc.bytepos >= srclen) break;
                 c = STRING_iter_get_and_advance(interp, src, &itersrc);
                 switch (c) {
-                /* Common one char sequences */
-                case 'a': next = '\a'; break;
-                case 'b': next = '\b'; break;
-                case 't': next = '\t'; break;
-                case 'n': next = '\n'; break;
-                case 'v': next = '\v'; break;
-                case 'f': next = '\f'; break;
-                case 'r': next = '\r'; break;
-                case 'e': next = '\x1B'; break;
-                /* Escape character */
-                case 'c':
+                  /* Allowed escape sequences */
+                  case 'a': next = '\a'; break; /* \x07 Alarm, beep */
+                  case 'b': next = '\b'; break; /* \x08 Backspace */
+                  case 't': next = '\t'; break; /* \x09 horizontal tab */
+                  case 'n': next = '\n'; break; /* \x0a newline */
+                  case 'v': next = '\v'; break; /* \x0b vertical tab */
+                  case 'f': next = '\f'; break; /* \x0c formfeed */
+                  case 'r': next = '\r'; break; /* \x0d carriage return */
+                  case 'e': next = '\x1B'; break; /* \x1b prefix ansi escape */
+                  /* and previously handled in the default case: */
+                  case '\\': next = c; break;   /* \x5c */
+                  case '"':  next = c; break;   /* \x22 */
+                  case '\'': next = c; break;   /* \x27 */
+                  case '?':  next = c; break;   /* \x3f */
+                  /* Escape character */
+                  case 'c':
                     if (itersrc.bytepos >= srclen) break;
                     c = STRING_iter_get_and_advance(interp, src, &itersrc);
                     /* This assumes ascii-alike encoding */
                     if (c < 'A' || c > 'Z')
-                        throw_illegal_escape(interp);
+                        throw_illegal_escape(interp, src);
                     next = c - 'A' + 1;
                     break;
                 case 'x':
@@ -2678,13 +2709,13 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                             if (c == '}')
                                 break;
                             if (!isxdigit(c))
-                                throw_illegal_escape(interp);
+                                throw_illegal_escape(interp, src);
                             if (digcount == 8)
                                 break;
                             digbuf[digcount++] = c;
                         }
                         if (c != '}')
-                            throw_illegal_escape(interp);
+                            throw_illegal_escape(interp, src);
                     }
                     else {
                         /* \xhh 1..2 hex digits */
@@ -2702,7 +2733,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                         }
                     }
                     if (digcount == 0)
-                        throw_illegal_escape(interp);
+                        throw_illegal_escape(interp, src);
                     digbuf[digcount] = '\0';
                     next = strtol(digbuf, NULL, 16);
                     break;
@@ -2712,7 +2743,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                         if (itersrc.bytepos >= srclen) break;
                         c = STRING_iter_get_and_advance(interp, src, &itersrc);
                         if (!isxdigit(c))
-                            throw_illegal_escape(interp);
+                            throw_illegal_escape(interp, src);
                         digbuf[digcount] = c;
                     }
                     digbuf[digcount] = '\0';
@@ -2724,7 +2755,7 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                         if (itersrc.bytepos >= srclen) break;
                         c = STRING_iter_get_and_advance(interp, src, &itersrc);
                         if (!isxdigit(c))
-                            throw_illegal_escape(interp);
+                            throw_illegal_escape(interp, src);
                         digbuf[digcount] = c;
                     }
                     digbuf[digcount] = '\0';
@@ -2747,7 +2778,18 @@ Parrot_str_unescape_string(PARROT_INTERP, ARGIN(const STRING *src),
                         pending = 1;
                     break;
                 default:
-                    next = c;
+                    /* Die with Illegal escape sequence since 6.9.0 but allow quoting of
+                       special chars. */
+                    /* The C standard requires such "invalid" escape sequences to be diagnosed
+                       (i.e., the compiler must print an error message). GH #1103 */
+                    if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z')) {
+                        /* next = c; for a deprecation cycle? */
+                        /* catch inproper use of \i, \O, \o */
+                        throw_illegal_escape_char(interp, c, src);
+                    }
+                    else {
+                        next = c; /* ignore the \ in special chars like \[, \}, ... */
+                    }
                 }
             }
             STRING_iter_set_and_advance(interp, result, &iterdest, next);
@@ -2772,6 +2814,10 @@ Unescapes the specified C string. These sequences are covered:
   \uhhhh      4 hex digits
   \Uhhhhhhhh  8 hex digits
   \a, \b, \t, \n, \v, \f, \r, \e
+
+These sequences are not escaped: C<\\ \" \' \?>
+
+All other escape sequences within C<[a-zA-Z]> are illegal.
 
 =cut
 

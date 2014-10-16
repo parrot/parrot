@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2007, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -70,7 +70,7 @@ pasm_output_is( <<'CODE', q(Parrot flies), "print string with embedded hex escap
        end
 CODE
 
-pasm_output_is( <<'CODE', q(Parrot flies), "escaped non-special" );
+pasm_error_output_is( <<'CODE', qq(Illegal escape sequence \\i in 'Parrot fl\\ies'\n), "unknown escaped" );
 .pcc_sub :main main:
        print "Parrot fl\ies"
        end
