@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007,2014 Parrot Foundation.
+# Copyright (C) 2007,2014, Parrot Foundation.
 # 02-data_get_PConfig.t
 
 use strict;
