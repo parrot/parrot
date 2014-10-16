@@ -249,8 +249,10 @@ On Darwin, do not probe for Macports libraries.
 Debugging is turned on by default. Use this to disable it.
 
 =item C<--enable-shared>
+
 =item C<--disable-shared>
-=item C<--parrot_is_shared> C<DEPRECATED>
+
+=item C<--parrot_is_shared> I<DEPRECATED>
 
 Link libparrot static or dynamically.
 
@@ -327,6 +329,7 @@ Specify which loader to use for shared libraries.
 Use the given loader flags for shared libraries
 
 =item C<--enable-rpath>
+
 =item C<--disable-rpath>
 
 If rpath should be included in the linking flags. With this
