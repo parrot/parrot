@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2014, Parrot Foundation.
+Copyright (C) 2001-2017, Parrot Foundation.
 
 =head1 NAME
 
@@ -1097,6 +1097,7 @@ Preallocates at least C<size> buckets.
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
+PARROT_INLINE
 Hash *
 Parrot_hash_create_sized(PARROT_INTERP, PARROT_DATA_TYPE val_type, Hash_key_type hkey_type,
         UINTVAL size)
@@ -1204,7 +1205,6 @@ INTVAL
 Parrot_hash_size(SHIM_INTERP, ARGIN(const Hash *hash))
 {
     ASSERT_ARGS(Parrot_hash_size)
-
     return hash->entries;
 }
 
@@ -1310,8 +1310,7 @@ INTVAL
 Parrot_hash_exists(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(const void *key))
 {
     ASSERT_ARGS(Parrot_hash_exists)
-    const HashBucket * const bucket = Parrot_hash_get_bucket(interp, hash, key);
-    return bucket ? 1 : 0;
+    return Parrot_hash_get_bucket(interp, hash, key) ? 1 : 0;
 }
 
 
@@ -1381,6 +1380,8 @@ parrot_hash_store_value_in_bucket(PARROT_INTERP, ARGMOD(Hash *hash),
 {
     ASSERT_ARGS(parrot_hash_store_value_in_bucket)
 
+    /* if (value == STRINGNULL)
+       value = string_from_literal(interp, "\0"); */
     /* If we have a bucket already, put the value in it. Otherwise, we need
        to get a new bucket */
     if (bucket)
@@ -1677,25 +1678,20 @@ void*
 Parrot_hash_key_from_int(PARROT_INTERP, ARGIN(const Hash *hash), INTVAL key)
 {
     ASSERT_ARGS(Parrot_hash_key_from_int)
-    void *ret;
     switch (hash->key_type) {
       case Hash_key_type_int:
-        ret = (void *)key;
-        break;
-        /* Currently PMCs are stringified */
+        return INTVAL2PTR(void *, key);
+      /* Currently PMCs are stringified */
       case Hash_key_type_PMC:
       case Hash_key_type_PMC_ptr:
-        ret = (void *)Parrot_pmc_box_integer(interp, key);
-        break;
+        return (void *)Parrot_pmc_box_integer(interp, key);
       case Hash_key_type_STRING:
       case Hash_key_type_STRING_enc:
-        ret = (void *)Parrot_str_from_int(interp, key);
-        break;
+        return (void *)Parrot_str_from_int(interp, key);
       default:
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported key_type");
     }
-    return ret;
 }
 
 /*
@@ -1717,28 +1713,17 @@ Parrot_hash_key_from_string(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(STRING
     void *ret;
     switch (hash->key_type) {
       case Hash_key_type_int:
-      {
-        /* Pacify compiler about casting INVTAL to void */
-        const INTVAL int_key = Parrot_str_to_int(interp, key);
-        ret                  = INTVAL2PTR(void *, int_key);
-        break;
-      }
-
+        return INTVAL2PTR(void *, Parrot_str_to_int(interp, key));
       case Hash_key_type_PMC:
       case Hash_key_type_PMC_ptr:
-        ret = Parrot_pmc_box_string(interp, key);
-        break;
-
+        return Parrot_pmc_box_string(interp, key);
       case Hash_key_type_STRING:
       case Hash_key_type_STRING_enc:
-        ret = key;
-        break;
-
+        return key;
       default:
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported key_type");
     }
-    return ret;
 }
 
 /*
@@ -1757,14 +1742,9 @@ void*
 Parrot_hash_key_from_pmc(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(PMC *key))
 {
     ASSERT_ARGS(Parrot_hash_key_from_pmc)
-    void *ret;
     switch (hash->key_type) {
       case Hash_key_type_int:
-        {
-            const INTVAL int_key = VTABLE_get_integer(interp, key);
-            ret                  = INTVAL2PTR(void *, int_key);
-            break;
-        }
+        return INTVAL2PTR(void *, VTABLE_get_integer(interp, key));
       case Hash_key_type_PMC:
       case Hash_key_type_PMC_ptr:
         {
@@ -1772,25 +1752,21 @@ Parrot_hash_key_from_pmc(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(PMC *key)
             if (key->vtable->base_type == enum_class_Key)
                 switch (Parrot_key_type(interp, key)) {
                   case KEY_integer_FLAG:
-                    key = Parrot_pmc_box_integer(interp, Parrot_key_integer(interp, key));
-                    break;
+                    return Parrot_pmc_box_integer(interp, Parrot_key_integer(interp, key));
                   case KEY_string_FLAG:
-                    key = Parrot_pmc_box_string(interp, Parrot_key_string(interp, key));
-                    break;
+                    return Parrot_pmc_box_string(interp, Parrot_key_string(interp, key));
                   case KEY_pmc_FLAG:
-                    key = Parrot_key_pmc(interp, key);
-                    break;
+                    return Parrot_key_pmc(interp, key);
                   default:
                     /* It's impossible if Keys are same (and they are not) */
                     /* So throw exception */
                     Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
                                 "hash: unexpected type of Key");
-                    break;
                 }
-
-            ret = key;
-            break;
         }
+      default:
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+                    "Hash: unsupported key_type");
       case Hash_key_type_STRING:
       case Hash_key_type_STRING_enc:
         {
@@ -1798,14 +1774,9 @@ Parrot_hash_key_from_pmc(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(PMC *key)
             if (STRING_IS_NULL(tmp))
                 Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNEXPECTED_NULL,
                             "hash: can't use null as key");
-            ret = (void *)tmp;
+            return (void *)tmp;
         }
-        break;
-      default:
-        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
-                    "Hash: unsupported key_type");
     }
-    return ret;
 }
 
 /*
@@ -1823,24 +1794,20 @@ INTVAL
 Parrot_hash_key_to_int(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(void *key))
 {
     ASSERT_ARGS(Parrot_hash_key_to_int)
-    INTVAL ret;
     switch (hash->key_type) {
       case Hash_key_type_int:
-        ret = (INTVAL)key;
+        return (INTVAL)key;
         break;
       case Hash_key_type_PMC:
       case Hash_key_type_PMC_ptr:
-        ret = VTABLE_get_integer(interp, (PMC *)key);
-        break;
+        return VTABLE_get_integer(interp, (PMC *)key);
       case Hash_key_type_STRING:
       case Hash_key_type_STRING_enc:
-        ret = Parrot_str_to_int(interp, (STRING *)key);
-        break;
+        return Parrot_str_to_int(interp, (STRING *)key);
       default:
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported key_type");
     }
-    return ret;
 }
 
 /*
@@ -1859,27 +1826,19 @@ STRING*
 Parrot_hash_key_to_string(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(void *key))
 {
     ASSERT_ARGS(Parrot_hash_key_to_string)
-    STRING *ret;
     switch (hash->key_type) {
       case Hash_key_type_int:
-        ret = Parrot_str_from_int(interp, (INTVAL)key);
-        break;
-
+        return Parrot_str_from_int(interp, (INTVAL)key);
       case Hash_key_type_PMC:
       case Hash_key_type_PMC_ptr:
-        ret = VTABLE_get_string(interp, (PMC *)key);
-        break;
-
+        return VTABLE_get_string(interp, (PMC *)key);
       case Hash_key_type_STRING:
       case Hash_key_type_STRING_enc:
-        ret = (STRING *)key;
-        break;
-
+        return (STRING *)key;
       default:
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported key_type");
     }
-    return ret;
 }
 
 /*
@@ -1898,24 +1857,19 @@ PMC*
 Parrot_hash_key_to_pmc(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN(void *key))
 {
     ASSERT_ARGS(Parrot_hash_key_to_pmc)
-    PMC *ret;
     switch (hash->key_type) {
       case Hash_key_type_int:
-        ret = Parrot_pmc_box_integer(interp, (INTVAL)key);
-        break;
+        return Parrot_pmc_box_integer(interp, (INTVAL)key);
       case Hash_key_type_PMC:
       case Hash_key_type_PMC_ptr:
-        ret = (PMC*)key;
-        break;
+        return (PMC*)key;
       case Hash_key_type_STRING:
       case Hash_key_type_STRING_enc:
-        ret = Parrot_pmc_box_string(interp, (STRING*)key);
-        break;
+        return Parrot_pmc_box_string(interp, (STRING*)key);
       default:
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported key_type");
     }
-    return ret;
 }
 
 /* Second part - convert from stored void* to real type */
@@ -1937,25 +1891,17 @@ void*
 Parrot_hash_value_from_int(PARROT_INTERP, ARGIN(const Hash *hash), INTVAL value)
 {
     ASSERT_ARGS(Parrot_hash_value_from_int)
-    void *ret;
     switch (hash->entry_type) {
       case enum_type_INTVAL:
-        ret = INTVAL2PTR(void *, value);
-        break;
+        return INTVAL2PTR(void *, value);
       case enum_type_PMC:
-        {
-            PMC * const tmp = Parrot_pmc_box_integer(interp, value);
-            ret = (void *)tmp;
-        }
-        break;
+        return (void *)Parrot_pmc_box_integer(interp, value);
       case enum_type_STRING:
-        ret = (void *)Parrot_str_from_int(interp, value);
-        break;
+        return (void *)Parrot_str_from_int(interp, value);
       default:
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported entry_type");
     }
-    return ret;
 }
 
 /*
@@ -1975,31 +1921,26 @@ Parrot_hash_value_from_string(PARROT_INTERP, ARGIN(const Hash *hash),
         ARGIN_NULLOK(STRING *value))
 {
     ASSERT_ARGS(Parrot_hash_value_from_string)
-    void *ret;
     switch (hash->entry_type) {
       case enum_type_INTVAL:
         {
             const INTVAL int_val = STRING_IS_NULL(value) ?
                     (INTVAL) 0 : Parrot_str_to_int(interp, value);
-            ret = INTVAL2PTR(void *, int_val);
+            return INTVAL2PTR(void *, int_val);
         }
-        break;
       case enum_type_STRING:
-        ret = (void *)value;
-        break;
+        return (void *)value;
       case enum_type_PMC:
         {
             PMC * const s = STRING_IS_NULL(value)
                             ? PMCNULL
                             : Parrot_pmc_box_string(interp, value);
-            ret = (void *)s;
+            return (void *)s;
         }
-        break;
       default:
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported entry_type");
     }
-    return ret;
 }
 
 /*
@@ -2019,27 +1960,22 @@ Parrot_hash_value_from_pmc(PARROT_INTERP, ARGIN(const Hash *hash),
     ARGIN_NULLOK(PMC *value))
 {
     ASSERT_ARGS(Parrot_hash_value_from_pmc)
-    void *ret;
     switch (hash->entry_type) {
       case enum_type_INTVAL:
         {
             const INTVAL int_val = PMC_IS_NULL(value) ?
                     (INTVAL) 0 : VTABLE_get_integer(interp, value);
-            ret                  = INTVAL2PTR(void *, int_val);
+            return INTVAL2PTR(void *, int_val);
         }
-        break;
       case enum_type_STRING:
-        ret = PMC_IS_NULL(value) ?
+        return PMC_IS_NULL(value) ?
                 PMCNULL : (void *)VTABLE_get_string(interp, value);
-        break;
       case enum_type_PMC:
-        ret = (void *)value;
-        break;
+        return (void *)value;
       default:
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported entry_type");
     }
-    return ret;
 }
 
 /*
@@ -2047,7 +1983,7 @@ Parrot_hash_value_from_pmc(PARROT_INTERP, ARGIN(const Hash *hash),
 =item C<void* Parrot_hash_value_from_number(PARROT_INTERP, const Hash *hash,
 FLOATVAL value)>
 
-Cast FLOATVAL to hash value.
+Cast FLOATVAL to hash value, stringifying it or casting it to an integer.
 
 =cut
 
@@ -2058,28 +1994,17 @@ void*
 Parrot_hash_value_from_number(PARROT_INTERP, ARGIN(const Hash *hash), FLOATVAL value)
 {
     ASSERT_ARGS(Parrot_hash_value_from_number)
-    void *ret;
     switch (hash->entry_type) {
       case enum_type_INTVAL:
-        {
-            const INTVAL tmp = value;
-            ret = (void*)tmp;
-        }
-        break;
+        return INTVAL2PTR(void *, (INTVAL)value);
       case enum_type_STRING:
-        ret = (void *)Parrot_str_from_num(interp, value);
-        break;
+        return (void *)Parrot_str_from_num(interp, value);
       case enum_type_PMC:
-        {
-            PMC * const tmp = Parrot_pmc_box_number(interp, value);
-            ret = (void *)tmp;
-        }
-        break;
+        return (void *)Parrot_pmc_box_number(interp, value);
       default:
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported entry_type");
     }
-    return ret;
 }
 
 /*
@@ -2097,23 +2022,18 @@ INTVAL
 Parrot_hash_value_to_int(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(void *value))
 {
     ASSERT_ARGS(Parrot_hash_value_to_int)
-    INTVAL ret;
     switch (hash->entry_type) {
       case enum_type_ptr:
       case enum_type_INTVAL:
-        ret = (INTVAL)value;
-        break;
+        return (INTVAL)value;
       case enum_type_STRING:
-        ret = Parrot_str_to_int(interp, (STRING*)value);
-        break;
+        return Parrot_str_to_int(interp, (STRING*)value);
       case enum_type_PMC:
-        ret = VTABLE_get_integer(interp, (PMC*)value);
-        break;
+        return VTABLE_get_integer(interp, (PMC*)value);
       default:
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported entry_type");
     }
-    return ret;
 }
 
 /*
@@ -2132,22 +2052,17 @@ STRING*
 Parrot_hash_value_to_string(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(void *value))
 {
     ASSERT_ARGS(Parrot_hash_value_to_string)
-    STRING *ret;
     switch (hash->entry_type) {
       case enum_type_INTVAL:
-        ret = Parrot_str_from_int(interp, (INTVAL)value);
-        break;
+        return Parrot_str_from_int(interp, (INTVAL)value);
       case enum_type_STRING:
-        ret = (STRING *)value;
-        break;
+        return (STRING *)value;
       case enum_type_PMC:
-        ret = VTABLE_get_string(interp, (PMC *)value);
-        break;
+        return VTABLE_get_string(interp, (PMC *)value);
       default:
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported entry_type");
     }
-    return ret;
 }
 
 /*
@@ -2166,22 +2081,17 @@ PMC*
 Parrot_hash_value_to_pmc(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(void *value))
 {
     ASSERT_ARGS(Parrot_hash_value_to_pmc)
-    PMC *ret;
     switch (hash->entry_type) {
       case enum_type_INTVAL:
-        ret = Parrot_pmc_box_integer(interp, (INTVAL)value);
-        break;
+        return Parrot_pmc_box_integer(interp, (INTVAL)value);
       case enum_type_STRING:
-        ret = Parrot_pmc_box_string(interp, (STRING*)value);
-        break;
+        return Parrot_pmc_box_string(interp, (STRING*)value);
       case enum_type_PMC:
-        ret = (PMC *)value;
-        break;
+        return (PMC *)value;
       default:
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported entry_type");
     }
-    return ret;
 }
 
 /*
@@ -2199,26 +2109,17 @@ FLOATVAL
 Parrot_hash_value_to_number(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(void *value))
 {
     ASSERT_ARGS(Parrot_hash_value_to_number)
-    FLOATVAL ret;
     switch (hash->entry_type) {
       case enum_type_INTVAL:
-        {
-            /* Pacify compiler about casting */
-            const INTVAL tmp = (INTVAL)value;
-            ret = tmp;
-        }
-        break;
+        return (INTVAL)value;
       case enum_type_STRING:
-        ret = Parrot_str_to_num(interp, (STRING*)value);
-        break;
+        return Parrot_str_to_num(interp, (STRING*)value);
       case enum_type_PMC:
-        ret = VTABLE_get_number(interp, (PMC*)value);
-        break;
+        return VTABLE_get_number(interp, (PMC*)value);
       default:
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported entry_type");
     }
-    return ret;
 }
 
 /*

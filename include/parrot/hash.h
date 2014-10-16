@@ -270,6 +270,7 @@ void Parrot_hash_clone_prunable(PARROT_INTERP,
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
+PARROT_INLINE
 Hash * Parrot_hash_create_sized(PARROT_INTERP,
     PARROT_DATA_TYPE val_type,
     Hash_key_type hkey_type,
