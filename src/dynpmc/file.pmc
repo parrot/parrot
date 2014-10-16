@@ -41,22 +41,22 @@ information see F<src/pmc.c>.
 
 */
     void class_init() :no_wb {
-        UNUSED(INTERP);
-        UNUSED(entry);
+        UNUSED(INTERP)
+        UNUSED(entry)
 
         File_PMC = NULL;
     }
 
     VTABLE void *get_pointer() :no_wb {
-        UNUSED(INTERP);
-        UNUSED(SELF);
+        UNUSED(INTERP)
+        UNUSED(SELF)
 
         return File_PMC;
     }
 
     VTABLE void set_pointer(void *ptr) :no_wb {
-        UNUSED(INTERP);
-        UNUSED(SELF);
+        UNUSED(INTERP)
+        UNUSED(SELF)
 
         File_PMC = (PMC *)ptr;
     }
@@ -73,6 +73,7 @@ Returns a true value (1) if the supplied file or directory exists.
 
     METHOD exists(STRING *path) :no_wb {
         const INTVAL res = Parrot_file_lstat_intval(interp, path, STAT_EXISTS);
+        UNUSED(SELF)
 
         RETURN(INTVAL res);
     }
@@ -89,6 +90,7 @@ Returns a true value (1) if the supplied path is a directory.
 
     METHOD is_dir(STRING *path) :no_wb {
         const INTVAL res = Parrot_file_lstat_intval(interp, path, STAT_ISDIR);
+        UNUSED(SELF)
 
         RETURN(INTVAL res);
     }
@@ -105,6 +107,7 @@ Returns a true value (1) if the supplied path is a plain file.
 
     METHOD is_file(STRING *path) :no_wb {
         const INTVAL res = Parrot_file_lstat_intval(interp, path, STAT_ISREG);
+        UNUSED(SELF)
 
         RETURN(INTVAL res);
     }
@@ -121,6 +124,7 @@ Returns a true value (1) if the supplied path is a link.
 
     METHOD is_link(STRING *path) :no_wb {
         const INTVAL res = Parrot_file_lstat_intval(interp, path, STAT_ISLNK);
+        UNUSED(SELF)
 
         RETURN(INTVAL res);
     }
@@ -146,6 +150,7 @@ free to change or give me hints on how to change it. -- ambs
 
         char * const cfrom  = Parrot_str_to_cstring(INTERP, from);
         FILE * const source = fopen(cfrom, "rb");
+        UNUSED(SELF)
 
         Parrot_str_free_cstring(cfrom);
 
@@ -197,6 +202,7 @@ Rename a file C<from> to the path C<to>.
 */
 
     METHOD rename(STRING *from, STRING *to) :no_wb {
+        UNUSED(SELF)
         Parrot_file_rename(INTERP, from, to);
     }
 }
