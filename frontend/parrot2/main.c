@@ -400,11 +400,14 @@ help_debug(void)
     "\n"
     "--trace -t [Flags] ...\n"
     "    0001    opcodes\n"
-    "    0002    find_method\n"
-    "    0004    function calls\n");
+    "    0002    find_method\n");
 #ifndef NDEBUG
     printf(
+    "    0004    function calls\n"
     "    0008    coro states\n");
+#else
+    printf(
+    "    (more without --optimize)\n");
 #endif
     printf(
     "\n"

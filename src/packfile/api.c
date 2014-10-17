@@ -1893,6 +1893,7 @@ Parrot_switch_to_cs(PARROT_INTERP, ARGIN(PackFile_ByteCode *new_cs), int really)
     if (really) {
         /* compiling source code uses this function too,
          * which gives misleading trace messages */
+#ifndef NDEBUG
         if (Interp_trace_TEST(interp, PARROT_TRACE_SUB_CALL_FLAG)) {
             Interp * const tracer = interp->pdb && interp->pdb->debugger
                                   ? interp->pdb->debugger
@@ -1900,7 +1901,7 @@ Parrot_switch_to_cs(PARROT_INTERP, ARGIN(PackFile_ByteCode *new_cs), int really)
             Parrot_io_eprintf(tracer, "*** switching to %Ss\n",
                              new_cs->base.name);
         }
-
+#endif
         prepare_for_run(interp);
         return cur_cs;
     }

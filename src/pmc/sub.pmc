@@ -390,9 +390,10 @@ Invokes the subroutine.
         opcode_t              *pc;
 
         PMC_get_sub(INTERP, SELF, sub);
+#ifndef NDEBUG
         if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG))
             print_sub_name(INTERP, SELF);
-
+#endif
         /*
          * A remark WRT tail calls
          *

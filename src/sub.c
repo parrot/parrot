@@ -502,24 +502,30 @@ Parrot_sub_continuation_rewind_environment(PARROT_INTERP, ARGIN(PMC *pmc))
         INTVAL autoreset;
         GETATTR_Coroutine_autoreset(interp, from_sub, autoreset);
         if (autoreset) {
+#ifndef NDEBUG
             if (Interp_trace_TEST(interp, PARROT_TRACE_SUB_CALL_FLAG))
                 Parrot_io_eprintf(interp, "# Coroutine autoreset '%Ss'\n",
                                   Parrot_sub_full_sub_name(interp, from_sub));
+#endif
             SETATTR_Coroutine_ctx(interp, from_sub, PMCNULL);
         }
+#ifndef NDEBUG
         else {
             if (Interp_trace_TEST(interp, PARROT_TRACE_SUB_CALL_FLAG))
                 Parrot_io_eprintf(interp, "# Coroutine no autoreset '%Ss'\n",
                                   Parrot_sub_full_sub_name(interp, from_sub));
         }
+#endif
     }
 
+#ifndef NDEBUG
     /* debug print before context is switched */
     if (Interp_trace_TEST(interp, PARROT_TRACE_SUB_CALL_FLAG)) {
         PMC * const sub = Parrot_pcc_get_sub(interp, to_ctx);
         Parrot_io_eprintf(interp, "# Back in sub '%Ss\n",
                     Parrot_sub_full_sub_name(interp, sub));
     }
+#endif
 
     /* set context */
     Parrot_pcc_set_context(interp, to_ctx);
