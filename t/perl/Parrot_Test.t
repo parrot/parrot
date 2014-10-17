@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -534,17 +534,19 @@ is($chdir, '', "Got expected value for working directory");
     }
 }
 
-my $command_orig;
-$command_orig = 'ls';
-is_deeply( Parrot::Test::_handle_command($command_orig), [ qw( ls ) ],
-    "Scalar command transformed into array ref as expected");
-$command_orig = [ qw( ls -l ) ];
-is( Parrot::Test::_handle_command($command_orig), $command_orig,
-    "Array ref holding multiple commands unchanged as expected");
+{
+    my $cmd = 'ls';
+    my @expected = $ENV{VALGRIND} ? ($ENV{VALGRIND}." $cmd") : ($cmd);
+    is_deeply( Parrot::Test::_handle_command($cmd), [ @expected ],
+               "Scalar command transformed into array ref as expected");
+    $cmd = [ qw( ls -l ) ];
+    is( Parrot::Test::_handle_command($cmd), $cmd,
+        "Array ref holding multiple commands unchanged as expected");
+}
 
 {
     my $oldvalgrind      = defined $ENV{VALGRIND} ? $ENV{VALGRIND} : '';
-    $command_orig        = 'ls';
+    my $command_orig     = 'ls';
     my $foo              = 'foobar';
     local $ENV{VALGRIND} = $foo;
     my $ret              = Parrot::Test::_handle_command($command_orig);

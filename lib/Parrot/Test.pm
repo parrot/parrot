@@ -610,7 +610,7 @@ sub _pir_stdin_output_slurp {
             or die "Unable to pipe output to us: $!";
         <$in>;
     };
-    $result =~ s/(^==\d+==.*\n)//mg if defined $ENV{VALGRIND};
+    $result =~ s/(^(?:==|--)\d+(?:==|--).*\n)//mg if defined $ENV{VALGRIND};
     return $result;
 }
 
@@ -812,7 +812,7 @@ sub _generate_test_functions {
             my $meth        = $parrot_test_map{$func};
             my $real_output = slurp_file($out_f);
             my $ori_output = $real_output;
-            $real_output =~ s/(^==\d+==.*\n)//mg if defined $ENV{VALGRIND};
+            $real_output =~ s/(^(?:==|--)\d+(?:==|--).*\n)//mg if defined $ENV{VALGRIND};
 
             _unlink_or_retain( $out_f );
 
@@ -1065,7 +1065,7 @@ sub _generate_test_functions {
                 );
                 my $output = slurp_file($out_f);
                 my $ori_output = $output;
-                $output =~ s/(^==\d+==.*\n)//mg if defined $ENV{VALGRIND};
+                $output =~ s/(^(?:==|--)\d+(?:==|--).*\n)//mg if defined $ENV{VALGRIND};
 
                 if ($exit_code) {
                     $pass = $builder->ok( 0, $desc );
