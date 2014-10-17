@@ -308,7 +308,7 @@ CODE
 
 # TODO: Fails with Null PMC access in get_string()
 pir_output_like(
-    <<'CODE', <<'OUTPUT', "Call an exited coroutine", todo => 'goes one iteration too far TT #1003' );
+    <<'CODE', <<'OUTPUT', "Call an exited coroutine", todo => 'goes one iteration too far GH #1106' );
 .sub main :main
     .local pmc c
     c = get_global "coro"
@@ -418,7 +418,7 @@ CODE
 OUTPUT
 
 pir_output_is(
-    <<'CODE', <<'OUTPUT', "Final return from coroutine", todo => 'one invoke too many TT #1003' );
+    <<'CODE', <<'OUTPUT', "Final return from coroutine", todo => 'one invoke too many GH #1106' );
 .sub 'MyCoro'
     .yield(1)
     .yield(2)
@@ -537,7 +537,7 @@ CODE
 2
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "autoreset", todo => 'one invoke too many TT #1003' );
+pir_output_is(<<'CODE', <<'OUTPUT', "autoreset", todo => 'one invoke too many GH #1106' );
 .sub 'main' :main
     .const 'Coroutine' $P99 = 'MyCoro'
     $P99.'autoreset'()
