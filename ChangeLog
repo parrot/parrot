@@ -25,6 +25,7 @@
           immediate. #1024
         + Add Couroutine reset and autoreset methods. #564
         + Add -t8 trace flag for Coroutine states
+        + Disabled trace flags -t4 and -t8 with --optimize. #1105
         + Harmonize parrot usage messages
     - Build
         + Fix all -Wshadow instances
