@@ -48,6 +48,7 @@ static void print_sub_name(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 #ifdef NDEBUG
 #  define TRACE_CORO(s)
 #  define TRACE_CORO_1(s, arg)
+#  define TRACE_CORO_d(s, arg)
 #else
 #  define TRACE_CORO(s) \
             if (Interp_trace_TEST(interp, PARROT_TRACE_CORO_STATE_FLAG)) \
@@ -55,6 +56,7 @@ static void print_sub_name(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 #  define TRACE_CORO_1(s, arg) \
             if (Interp_trace_TEST(interp, PARROT_TRACE_CORO_STATE_FLAG)) \
                 fprintf(stderr, (s), (arg))
+#  define TRACE_CORO_d(s, arg) TRACE_CORO_1(s, arg)
 #endif
 
 
@@ -81,7 +83,7 @@ print_sub_name(PARROT_INTERP, ARGIN(PMC *sub_pmc))
     GETATTR_Coroutine_ctx(interp, sub_pmc, ctx);
     GETATTR_Coroutine_yield(interp, sub_pmc, yield);
 
-    if (!yield && (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_CORO_FF))
+    if (yield != 1 && (PObj_get_FLAGS(sub_pmc) & SUB_FLAG_CORO_FF))
         Parrot_io_eprintf(tracer, "# %s coroutine '%Ss'",
                           "returning from",
                           Parrot_sub_full_sub_name(interp, sub_pmc));
@@ -226,8 +228,9 @@ yields are exhausted and the coro is dead.
         PMC               *ctx;
         opcode_t          *dest;
         PackFile_ByteCode *wanted_seg;
-        PMC      * const signature = Parrot_pcc_get_signature(INTERP,
-                                            CURRENT_CONTEXT(INTERP));
+        PMC        * const caller_ctx = CURRENT_CONTEXT(INTERP);
+        PMC        * const signature = Parrot_pcc_get_signature(INTERP,
+                                            caller_ctx);
 
 #ifndef NDEBUG
         if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG))
@@ -240,7 +243,6 @@ yields are exhausted and the coro is dead.
             size_t             start_offs;
             const UINTVAL     *n_regs_used;
             PMC               *lex_info;
-            PMC * const        caller_ctx = CURRENT_CONTEXT(INTERP);
             PMC               *ccont      = INTERP->current_cont;
 
             PARROT_ASSERT(!PMC_IS_NULL(ccont));
@@ -255,6 +257,8 @@ yields are exhausted and the coro is dead.
                 ctx = Parrot_pmc_new(INTERP, enum_class_CallContext);
             TRACE_CORO("# - coro: first ctx\n");
             Parrot_pcc_set_context(INTERP, ctx);
+            TRACE_CORO_d("# - coro: first ctx %p\n", caller_ctx);
+            TRACE_CORO_d("# - coro:    to_ctx %p\n", ctx);
 
             GET_ATTR_n_regs_used(INTERP, SELF, n_regs_used);
             Parrot_pcc_allocate_registers(INTERP, ctx, n_regs_used);
@@ -267,6 +271,7 @@ yields are exhausted and the coro is dead.
 
             Parrot_pcc_set_sub(INTERP, ctx, SELF);
             Parrot_pcc_set_continuation(INTERP, ctx, ccont);
+            TRACE_CORO_d("# - coro:   cont %p\n", ccont);
 
             INTERP->current_cont   = PMCNULL;
 
@@ -297,6 +302,9 @@ yields are exhausted and the coro is dead.
             GET_ATTR_ctx(INTERP, SELF, ctx);
             ccont = Parrot_pcc_get_continuation(INTERP, ctx);
             TRACE_CORO("# - coro: !ff\n");
+            TRACE_CORO_d("# - coro:     cont %p\n", ccont);
+            TRACE_CORO_d("# - coro:      ctx %p\n", caller_ctx);
+            TRACE_CORO_d("# - coro:   to_ctx %p\n", ctx);
             PObj_get_FLAGS(SELF) |= SUB_FLAG_CORO_FF;
 
             GET_ATTR_seg(INTERP, SELF, seg);
@@ -306,13 +314,13 @@ yields are exhausted and the coro is dead.
             SET_ATTR_caller_seg(INTERP, SELF, INTERP->code);
 
             /* and the recent call context */
-            SETATTR_Continuation_to_ctx(INTERP, ccont, CURRENT_CONTEXT(INTERP));
-            Parrot_pcc_set_caller_ctx(INTERP, ctx, CURRENT_CONTEXT(INTERP));
+            SETATTR_Continuation_to_ctx(INTERP, ccont, caller_ctx);
+            Parrot_pcc_set_caller_ctx(INTERP, ctx, caller_ctx);
 
             /* set context to coroutine context */
             Parrot_pcc_set_context(INTERP, ctx);
         }
-        else { /* FF: yield or returncc from the Coro back */
+        else { /* FF: yield 1 or returncc 2 back from the Coro */
             INTVAL             yield;
             PMC               *ccont, *to_ctx;
             PackFile_ByteCode *caller_seg;
@@ -329,23 +337,14 @@ yields are exhausted and the coro is dead.
             ccont = Parrot_pcc_get_continuation(INTERP, ctx);
 
             GETATTR_Continuation_to_ctx(INTERP, ccont, to_ctx);
+            TRACE_CORO_d("# - coro:     cont %p\n", ccont);
+            TRACE_CORO_d("# - coro:      ctx %p\n", ctx);
+            TRACE_CORO_d("# - coro:   to_ctx %p\n", to_ctx);
             PObj_get_FLAGS(SELF) &= ~SUB_FLAG_CORO_FF;
-            GET_ATTR_caller_seg(INTERP, SELF, caller_seg);
 
+            GET_ATTR_caller_seg(INTERP, SELF, caller_seg);
             /* switch back to last remembered code seg and context */
             wanted_seg = caller_seg;
-
-            if (PMC_IS_NULL(to_ctx)) {
-                /* This still isn't quite right, but it beats segfaulting.  See
-                   the "Call an exited coroutine" case in t/pmc/coroutine.t; the
-                   problem is that the defunct coroutine yields up one more
-                   result before we get here.  -- rgr, 7-Oct-06.
-                 * This may be unneeded after the yield fix, see TT #1003
-                 */
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                               "Cannot resume dead coroutine. Invalid context");
-            }
-
             Parrot_pcc_set_context(INTERP, to_ctx);
         }
 

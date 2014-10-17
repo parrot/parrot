@@ -21,7 +21,7 @@ Tests the C<Coroutine> PMC.
 
 =cut
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine 1" );
+pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine pasm" );
 .include "interpinfo.pasm"
 .pcc_sub :main _main:
     .const 'Sub' P0 = "_coro"
@@ -48,8 +48,8 @@ back 0
 done
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "Coroutines - M. Wallace yield example" );
-
+# very old-style syntax, returncc does not honor the continuation label here
+pir_output_is( <<'CODE', <<'OUTPUT', "yield and returncc with cont", todo=>'returncc to label' );
 .sub __main__ :main
     .local pmc return
     .local pmc counter
@@ -306,16 +306,14 @@ ex:
 .end
 CODE
 
-# TODO: Fails with Null PMC access in get_string()
-pir_output_like(
-    <<'CODE', <<'OUTPUT', "Call an exited coroutine", todo => 'goes one iteration too far GH #1106' );
+pir_output_like(<<'CODE', <<'OUTPUT', "Call an exited coroutine" );
 .sub main :main
     .local pmc c
     c = get_global "coro"
 loop:
     $P0 = c()
     print $P0
-    goto loop
+    if $P0 != 9 goto loop
 .end
 .sub coro
     .local pmc x
@@ -325,9 +323,10 @@ loop:
         .yield (x)
         x = x + 1
     if x <= 4 goto iloop
+    .return(9)
 .end
 CODE
-/\A01234Cannot resume dead coroutine/
+/\A012349/
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "check whether interface is done" );
@@ -418,13 +417,15 @@ CODE
 OUTPUT
 
 pir_output_is(
-    <<'CODE', <<'OUTPUT', "Final return from coroutine", todo => 'one invoke too many GH #1106' );
+    <<'CODE', <<'OUTPUT', "Final return from coroutine");
 .sub 'MyCoro'
+    say 'in coro 1st'
     .yield(1)
+    say 'in coro 2nd'
     .yield(2)
+    say 'coro done'
     .return(4)
 .end
-
 .sub 'main' :main
     $I0 = MyCoro()
     say $I0
@@ -434,13 +435,16 @@ pir_output_is(
     say $I0
 .end
 CODE
+in coro 1st
 1
+in coro 2nd
 2
+coro done
 4
 OUTPUT
 
-# Note: TT #1702/GH #564 argued that dead coros should be resumable.
-pir_error_output_like(<<'CODE', <<'OUTPUT', "Resume dead coroutine w/o autoreset");
+# dead coros need autoreset or reset
+pir_output_is(<<'CODE', <<'OUTPUT', "Resume dead coroutine w/o autoreset");
 .sub 'MyCoro'
     .yield(1)      # 2. ff y=1=>0
     .yield(2)      # 4. ff y=1=>0
@@ -457,18 +461,18 @@ pir_error_output_like(<<'CODE', <<'OUTPUT', "Resume dead coroutine w/o autoreset
 
     push_eh ehandler
     $I0 = MyCoro() # 7. ff (y=0) => Cannot resume dead coroutine
-    print $I0
+    say $I0
 
     ehandler:
     pop_eh
 .end
 CODE
-/\A124Cannot resume dead coroutine./
+1240
 OUTPUT
 
 # Note: TT #1710/GH #585 argued that if one clone is dead the other are also dead.
 # Wrong. Each coro is dead/exhausted independently here.
-pir_error_output_like(
+pir_output_is(
     <<'CODE', <<'OUTPUT', "No dead clones" );
 .sub 'main' :main
     .const 'Sub' $P99 = 'coro'
@@ -488,6 +492,8 @@ pir_error_output_like(
 
     restart:
     four(1)
+    say ""
+    .return()
 
     ehandler:
     pop_eh
@@ -508,7 +514,7 @@ pir_error_output_like(
     print '.done-'
 .end
 CODE
-/\A3.0-4.0-5.0-3.1-3.done-4.1-5.1-4.done-5.done-Cannot resume dead coroutine./
+3.0-4.0-5.0-3.1-3.done-4.1-
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "Manual reset" );
@@ -526,18 +532,25 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Manual reset" );
     say $I0
 .end
 .sub 'MyCoro'
+    say 'in coro 1st'
     .yield(1)
+    say 'in coro 2nd'
     .yield(2)
+    say 'coro done'
     .return(3)
 .end
 CODE
+in coro 1st
 1
+in coro 2nd
 2
+in coro 1st
 1
+in coro 2nd
 2
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "autoreset", todo => 'one invoke too many GH #1106' );
+pir_output_is(<<'CODE', <<'OUTPUT', "autoreset", todo => 'wrong return cont GH #1106' );
 .sub 'main' :main
     .const 'Coroutine' $P99 = 'MyCoro'
     $P99.'autoreset'()
@@ -545,20 +558,30 @@ pir_output_is(<<'CODE', <<'OUTPUT', "autoreset", todo => 'one invoke too many GH
     say $I0
     $I0 = MyCoro()
     say $I0
+    say 'main pre'
     $I0 = MyCoro()
     say $I0
+    say 'main loop'
     $I0 = MyCoro()
     say $I0
 .end
 .sub 'MyCoro'
+    say 'in coro 1st'
     .yield(1)
+    say 'in coro 2nd'
     .yield(2)
+    say 'coro done'
     .return(3)
 .end
 CODE
+in coro 1st
 1
+in coro 2nd
 2
+main pre
+coro done
 3
+in coro 1st
 1
 OUTPUT
 

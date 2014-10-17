@@ -32,7 +32,9 @@
           Removed defunct Parrot_ascii_typetable, unused since 2010.
         + Protect callmethod from an empty object, missed by fixup_subs
           immediate. #1024
-        + Add Couroutine reset and autoreset methods. #564
+        + Add Coroutine reset and autoreset methods. #564
+        + Fixed Coroutine return and tests, with one returncc regression
+          and one n_regs_used for autoreset bug left. #1106
         + Add -t8 trace flag for Coroutine states
         + Disabled trace flags -t4 and -t8 with --optimize. #1105
         + Harmonize parrot usage messages

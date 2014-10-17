@@ -22,6 +22,7 @@ more information.
 
 #include "parrot/oplib/ops.h"
 #include "pmc/pmc_sub.h"
+#include "pmc/pmc_coroutine.h"
 
 /*
 
@@ -286,17 +287,42 @@ destination to continue execution.
 */
 
     VTABLE opcode_t *invoke(void *next) :no_wb {
-        UNUSED(next)
-        PMC * const        from_obj = Parrot_pcc_get_signature(INTERP, CURRENT_CONTEXT(INTERP));
         opcode_t          *pc;
         PackFile_ByteCode *seg;
+        PMC               *from_sub;
+        PMC * const        from_obj = Parrot_pcc_get_signature(INTERP, CURRENT_CONTEXT(INTERP));
+        UNUSED(next)
 
         GET_ATTR_seg(INTERP, SELF, seg);
         GET_ATTR_address(INTERP, SELF, pc);
         SET_ATTR_invoked(INTERP, SELF, 1);
 
         Parrot_sub_continuation_check(INTERP, SELF);
-        Parrot_sub_continuation_rewind_environment(INTERP, SELF);
+        from_sub = Parrot_sub_continuation_rewind_environment(INTERP, SELF);
+
+        /* if return from a coro */
+        if (from_sub && from_sub->vtable->base_type == enum_class_Coroutine) {
+            INTVAL     autoreset;
+            GETATTR_Coroutine_autoreset(INTERP, from_sub, autoreset);
+            if (autoreset) {
+#ifndef NDEBUG
+                if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG))
+                    Parrot_io_eprintf(INTERP, "# Coroutine autoreset '%Ss'\n",
+                                      Parrot_sub_full_sub_name(INTERP, from_sub));
+#endif
+                SETATTR_Coroutine_ctx(INTERP, from_sub, PMCNULL);
+            }
+            else {
+#ifndef NDEBUG
+                if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG))
+                    Parrot_io_eprintf(INTERP, "# Coroutine no autoreset '%Ss'\n",
+                                      Parrot_sub_full_sub_name(INTERP, from_sub));
+#endif
+            }
+            GETATTR_Coroutine_address(INTERP, from_sub, pc);
+            SETATTR_Coroutine_yield(INTERP, from_sub, 2);
+            pc = VTABLE_invoke(INTERP, from_sub, pc);
+        }
 
         if (!PMC_IS_NULL(from_obj))
             Parrot_pcc_set_signature(INTERP, CURRENT_CONTEXT(INTERP), from_obj);

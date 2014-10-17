@@ -478,7 +478,7 @@ Parrot_sub_continuation_check(PARROT_INTERP, ARGIN(const PMC *pmc))
 
 /*
 
-=item C<void Parrot_sub_continuation_rewind_environment(PARROT_INTERP, PMC
+=item C<PMC * Parrot_sub_continuation_rewind_environment(PARROT_INTERP, PMC
 *pmc)>
 
 Restores the appropriate context for the continuation.
@@ -487,36 +487,16 @@ Restores the appropriate context for the continuation.
 
 */
 
-void
+PARROT_CAN_RETURN_NULL
+PMC *
 Parrot_sub_continuation_rewind_environment(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_sub_continuation_rewind_environment)
 
-    PMC * const ctx = CURRENT_CONTEXT(interp);
-    PMC * const to_ctx = PARROT_CONTINUATION(pmc)->to_ctx;
+    PMC * const ctx    = CURRENT_CONTEXT(interp);
+    PMC *       to_ctx = PARROT_CONTINUATION(pmc)->to_ctx;
     PMC * const sig    = Parrot_pcc_get_signature(interp, ctx);
     PMC * const from_sub = Parrot_pcc_get_sub(interp, ctx);
-
-    /* A yield could not bring us here */
-    if (from_sub && from_sub->vtable->base_type == enum_class_Coroutine) {
-        INTVAL autoreset;
-        GETATTR_Coroutine_autoreset(interp, from_sub, autoreset);
-        if (autoreset) {
-#ifndef NDEBUG
-            if (Interp_trace_TEST(interp, PARROT_TRACE_SUB_CALL_FLAG))
-                Parrot_io_eprintf(interp, "# Coroutine autoreset '%Ss'\n",
-                                  Parrot_sub_full_sub_name(interp, from_sub));
-#endif
-            SETATTR_Coroutine_ctx(interp, from_sub, PMCNULL);
-        }
-#ifndef NDEBUG
-        else {
-            if (Interp_trace_TEST(interp, PARROT_TRACE_SUB_CALL_FLAG))
-                Parrot_io_eprintf(interp, "# Coroutine no autoreset '%Ss'\n",
-                                  Parrot_sub_full_sub_name(interp, from_sub));
-        }
-#endif
-    }
 
 #ifndef NDEBUG
     /* debug print before context is switched */
@@ -530,7 +510,9 @@ Parrot_sub_continuation_rewind_environment(PARROT_INTERP, ARGIN(PMC *pmc))
     /* set context */
     Parrot_pcc_set_context(interp, to_ctx);
     Parrot_pcc_set_signature(interp, to_ctx, sig);
+    return from_sub;
 }
+
 
 
 /*

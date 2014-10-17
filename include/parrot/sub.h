@@ -201,7 +201,8 @@ void Parrot_sub_continuation_check(PARROT_INTERP, ARGIN(const PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void Parrot_sub_continuation_rewind_environment(PARROT_INTERP,
+PARROT_CAN_RETURN_NULL
+PMC * Parrot_sub_continuation_rewind_environment(PARROT_INTERP,
     ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
