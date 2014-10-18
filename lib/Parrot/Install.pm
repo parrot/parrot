@@ -132,7 +132,7 @@ sub lines_to_files {
                 $filehash = &{ $thash->{transform} }($filehash);
                 ref($filehash) eq 'HASH' or die "Error: transform didn't return a hash for key '$tkey'\n";
                 $filehash->{Dest} = File::Spec->catdir(
-                    $options_ref->{$thash->{optiondir} . 'dir'},
+                    $options_ref->{$thash->{optiondir} . 'dir'} || '',
                     @{ $filehash->{DestDirs} },
                     $filehash->{Dest}
                 );

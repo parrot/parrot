@@ -1,4 +1,4 @@
-# Copyright (C) 2008, Parrot Foundation.
+# Copyright (C) 2008-2014, Parrot Foundation.
 
 =head1 NAME
 
