@@ -173,7 +173,8 @@ trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
         STRING * const s = VTABLE_get_string(interp, pmc);
         Parrot_io_eprintf(debugger, "Complex=PMC(%#p: %Ss)", pmc, s);
     }
-    else if (pmc->vtable->base_type == enum_class_Sub) {
+    else if (pmc->vtable->base_type == enum_class_Sub
+          || pmc->vtable->base_type == enum_class_Coroutine) {
         PMC_get_sub(interp, pmc, sub);
         Parrot_io_eprintf(debugger, "%S=PMC(%#p pc:%d)",
                 VTABLE_name(interp, pmc), pmc, sub->start_offs);
