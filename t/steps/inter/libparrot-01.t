@@ -44,11 +44,11 @@ my $step = test_step_constructor_and_description($conf);
 
 $conf->replenish($serialized);
 
-########## no ask; parrot_is_shared ##########
+########## no ask; enable-shared ##########
 
 ($args, $step_list_ref) = process_options(
     {
-        argv => [ q{--parrot_is_shared} ],
+        argv => [ q{--enable-shared} ],
         mode => q{configure},
     }
 );
@@ -63,11 +63,11 @@ $step = test_step_constructor_and_description($conf);
 
 $conf->replenish($serialized);
 
-########## no ask; parrot_is_shared; has_dynamic_linking ##########
+########## no ask; enable-shared; has_dynamic_linking ##########
 
 ($args, $step_list_ref) = process_options(
     {
-        argv => [ q{--parrot_is_shared} ],
+        argv => [ q{--enable-shared} ],
         mode => q{configure},
     }
 );
@@ -89,11 +89,11 @@ $conf->data->set('has_dynamic_linking' => $has_dynamic_linking_orig);
 
 $conf->replenish($serialized);
 
-########## no ask; parrot_is_shared; has_dynamic_linking; rpath ##########
+########## no ask; enable-shared; has_dynamic_linking; rpath ##########
 
 ($args, $step_list_ref) = process_options(
     {
-        argv => [ q{--parrot_is_shared} ],
+        argv => [ q{--enable-shared} ],
         mode => q{configure},
     }
 );
@@ -116,11 +116,11 @@ $conf->data->set('rpath' => $rpath_orig);
 
 $conf->replenish($serialized);
 
-########## no ask; parrot_is_shared; has_dynamic_linking; rpath ##########
+########## no ask; enable-shared; has_dynamic_linking; rpath ##########
 
 ($args, $step_list_ref) = process_options(
     {
-        argv => [ q{--parrot_is_shared} ],
+        argv => [ q{--enable-shared} ],
         mode => q{configure},
     }
 );
@@ -189,11 +189,11 @@ $conf->data->set('has_dynamic_linking' => $has_dynamic_linking_orig);
 
 $conf->replenish($serialized);
 
-########## ask; parrot_is_shared; has_dynamic_linking ##########
+########## ask; enable-shared; has_dynamic_linking ##########
 
 ($args, $step_list_ref) = process_options(
     {
-        argv => [ q{--ask}, q{--parrot_is_shared} ],
+        argv => [ q{--ask}, q{--enable-shared} ],
         mode => q{configure},
     }
 );
