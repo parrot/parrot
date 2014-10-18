@@ -32,7 +32,7 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    unless ( $conf->options->get('without-pcre') ) {
+    if ( $conf->options->get('without-pcre') ) {
         $self->set_result('skipped');
         $conf->data->set( HAS_PCRE => 0 );
         return 1;
@@ -56,6 +56,8 @@ sub runstep {
             $conf->data->set( HAS_PCRE => $has_pcre);
         }
     }
+
+    $conf->cc_clean();
 
     return 1;
 }
