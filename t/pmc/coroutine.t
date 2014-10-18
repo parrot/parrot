@@ -457,17 +457,17 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Resume dead coroutine w/o autoreset");
     $I0 = MyCoro() # 3. !ff y=>1
     print $I0
     $I0 = MyCoro() # 5. !ff y=>1
-    print $I0
+    say $I0
 
     push_eh ehandler
     $I0 = MyCoro() # 7. ff (y=0) => Cannot resume dead coroutine
-    say $I0
+    print $I0
 
     ehandler:
     pop_eh
 .end
 CODE
-1240
+124
 OUTPUT
 
 # Note: TT #1710/GH #585 argued that if one clone is dead the other are also dead.
