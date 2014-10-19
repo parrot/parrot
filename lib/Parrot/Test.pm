@@ -847,6 +847,7 @@ sub _generate_test_functions {
                         . $ori_output ne $real_output ? "$ori_output\n" : "");
                 return 0;
             }
+            $cmd = join"\n",@$cmd if ref $cmd eq 'ARRAY';
             my $pass = $builder->$meth( $real_output, $expected, $desc );
             $builder->diag("'$cmd' failed with exit code $exit_code")
                 if not $pass and $exit_code;

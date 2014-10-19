@@ -70,11 +70,13 @@ pasm_output_is( <<'CODE', q(Parrot flies), "print string with embedded hex escap
        end
 CODE
 
-pir_error_output_is( <<'CODE', qq(Illegal escape sequence \\i in 'Parrot fl\\ies'\n), "unknown escaped" );
+pir_error_output_like( <<'CODE', <<'OUTPUT', "Illegal escape" );
 .sub main
        print "Parrot fl\ies"
 .end
 CODE
+/Illegal escape sequence \\i in 'Parrot fl\\ies'/
+OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "print string with embedded newline" );
 .pcc_sub :main main:
