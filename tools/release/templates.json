@@ -66,8 +66,8 @@ for supporting this project.  Our next scheduled release is at @release.nextdate
 Bug Day
 
 On @bugday.day@, @bugday.date@, please join us on IRC in #parrot
-(irc.parrot.org) to work on closing out as many Trac tickets
-(https://trac.parrot.org) tickets as possible in the parrot queue. This will
+(irc://irc.parrot.org/#parrot) to work on closing out as many tickets
+(https://github.com/parrot/parrot/issues) as possible in the parrot queue. This will
 help us get ready for the next release of parrot: @release.version@, scheduled
 for @release.day@, @release.date@. You'll find C, parrot assembly, perl,
 documentation, and plenty of tasks to go around. Core developers will be
@@ -79,12 +79,12 @@ No experience with parrot necessary.
 
 Check the list at:
 
-https://trac.parrot.org/parrot/report/3
+https://github.com/parrot/parrot/milestones/@release.version@
 
 Which contains all the tickets I'd like to see resolved in @release.version@. To
 see all the open tickets, use:
 
-https://trac.parrot.org/parrot/report
+https://github.com/parrot/parrot/issues
 
 If you've got something you're working on that you think you'll be
 getting done before the release, please
