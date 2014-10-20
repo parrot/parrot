@@ -38,7 +38,8 @@ my $page_title;
 
 Extend C<Pod::Simple::HTML> method to accept PIR and PASM sections that
 contain example code, which will be put into a <pre> HTML element.
-Also table sections.
+
+Also table extensions from the book.
 
 =cut
 
@@ -50,9 +51,23 @@ sub new {
         PIR_INVALID PIR_TODO
         PASM_INVALID PASM_TODO
         PIR_FRAGMENT_INVALID
-        table headrow row cell bodyrows
+        table headrow row cell bodyrows A Z
     ));
     delete(@{$new->{'Tagmap'}}{'Data','/Data'});
+    $new->{'Tagmap'}->{'table'} = '<table>';
+    $new->{'Tagmap'}->{'/table'} = "</table>\n";
+    $new->{'Tagmap'}->{'headrow'} = '<th>';
+    $new->{'Tagmap'}->{'/headrow'} = "</th>\n";
+    $new->{'Tagmap'}->{'row'} = '<tr>';
+    $new->{'Tagmap'}->{'/row'} = "</tr>\n";
+    $new->{'Tagmap'}->{'cell'} = '<td>';
+    $new->{'Tagmap'}->{'/cell'} = '</td>';
+    $new->{'Tagmap'}->{'bodyrows'} = '';
+    $new->{'Tagmap'}->{'/bodyrows'} = '';
+    $new->{'Tagmap'}->{'A'} = '';
+    $new->{'Tagmap'}->{'/A'} = '';
+    $new->{'Tagmap'}->{'Z'} = '';
+    $new->{'Tagmap'}->{'/Z'} = '';
 
     return $new;
 }
@@ -542,7 +557,8 @@ s/([^\._abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789])/sprintf
 
 =item C<resolve_pod_page_link($to, $section)>
 
-Resolves the POD link. Perl modules are converted to paths.
+Resolves links in F\<\> and L\<\> to libraries and
+docs, converted to html.
 
 =cut
 
@@ -551,21 +567,20 @@ sub resolve_pod_page_link {
     my $to      = shift;
     my $section = shift;
 
-    ## XXX re-enable this
     if ( $to =~ /^Parrot::/o ) {
         my $href = $self->href_for_perl_module($to);
-        # This gets corrupted somewhere down the line, with
+        # XXX This gets corrupted somewhere down the line, with
         # Parrot/PackFile/ConstTable.pm.html being turned into
         # Parrot/PackFile%2FConstTable.pm.html and thus breaking
         # the CSS and images somehow.
         return $href if defined $href;
     }
-    elsif ( $to =~ m{^(docs|tools|lib|compilers|examples|src|runtime)/}o ) {
+    elsif ( $to =~ m{^(docs|tools|runtime|src)/}o ) {
         my $href = $self->href_for_pod($to);
         return $href if defined $href;
     }
 
-    return 'TODO';
+    return;
 }
 
 =item C<href_for_perl_module($module)>
