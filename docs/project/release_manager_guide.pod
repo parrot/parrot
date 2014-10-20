@@ -52,13 +52,13 @@ and report (and hopefully fix!) any problems they discover. Check-in with
 language project leaders (I<e.g.,> Rakudo) for any potential release blockers.
 This will, hopefully, afford them sufficient time apply any fixes. Also,
 please ask people to review any issues targeted for the upcoming release at
-L<https://github.com/parrot/parrot/issues>.
+L<https://github.com/parrot/parrot/milestones/@version@>.
 
 =item 4
 
 During the course of the release process, you will need to be able to log in
 and operate on two different servers. To oversimplify a bit, you will need to
-be able to execute these two commands and their C<scp> equivalents.
+be able to execute these two commands and their C<scp> or C<rsync> equivalents.
 
 =over 4
 
@@ -209,8 +209,8 @@ The URL of the FTP directory where the Parrot tarball can be found.
 
 =item C<release.type>
 
-Either "devel" for a regular development release, or "supported" for a
-long-term-support release.
+Either B<devel> for a regular development release, or B<supported> for a
+long-term-support release, every 3rd release a year (i.e. 0, 3, 6, 9).
 
 =back
 
@@ -570,11 +570,10 @@ The calendar of releases is available at the C<comp.lang.parrot> Google
 calendar, visible at
 L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.calendar.google.com>.
 
-Make sure that at least the next two releases are covered
+Make sure that at least the next two releases are covered.
 
-    - Oct 21, 2014 - *6.9.0   - rurban
     - Nov 18, 2014 -  6.10.0  - Util
-    - Dec 16, 2014 -  6.11.0  - 
+    - Dec 16, 2014 -  6.11.0  - rurban
     - Jan 20, 2015 - *7.0.0   - 
 
 =cut

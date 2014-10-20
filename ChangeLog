@@ -33,20 +33,21 @@
         + Configure options consistency: --{en,dis}able-<feature> for shared, rpath,
           threads, --with{,out}-<library> for: llvm pcre ... + threads. [GH #1101]
         + Deprecated --parrot_is_shared in favor of --enable-shared. [GH #1101]
-        + Change default of the config key debugging from 1 to 0, i.e. you need to provide
-          now --debugging[=flags] for debugging. [GH #1099]
+        + Change default of the config key debugging from 1 to 0, i.e. you need to
+          provide now --debugging[=flags] for debugging. [GH #1099]
         + Enable --disable-shared (or --parrot_is_shared=0) to link against static
           libparrot [GH #1101]
     - Documentation
-	+ Add missing manpages for pbc_disassemble, pbc_dump, pbc_merge
+        + Add missing manpages for pbc_disassemble, pbc_dump, pbc_merge
         + Improved src/string/encoding/tables.c pod.
     - Tests
-	+ Run fulltests with the runcore=fast,-O1,-O2 fast, without -D040, --gc-debug
-	  [GH #1086]
-	+ Added tests for LexInfo.declare_lex_preg and .lex quoting roundtrips [GH #1095]
-	+ Simplify smolder resend usage
-	+ Fix mingw issues with \r\n
-    - Community
+        + Run fulltests with the runcore=fast,-O1,-O2 fast, without -D040, --gc-debug
+          [GH #1086]
+        + Added tests for LexInfo.declare_lex_preg and .lex quoting roundtrips
+          [GH #1095]
+        + Simplify smolder resend usage
+        + Fix mingw issues with \r\n
+        + Updated the missing native_pbc 64-bit big-endian files on mips64 qemu.
 
 2014-09-16    release 6.8.0
     - Build
