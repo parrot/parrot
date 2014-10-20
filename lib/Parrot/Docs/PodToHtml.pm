@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2011, Parrot Foundation.
+# Copyright (C) 2004-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -27,9 +27,10 @@ use warnings;
 use base qw( Pod::Simple::HTML );
 
 # This is just here to keep Pod::Simple::HTML's version_tag_comment() happy.
-our $VERSION = '1.0';
+our $VERSION = '1.1';
 
 use Parrot::Docs::HTMLPage;
+use Parrot::Distribution;
 
 my $page_title;
 
@@ -37,6 +38,7 @@ my $page_title;
 
 Extend C<Pod::Simple::HTML> method to accept PIR and PASM sections that
 contain example code, which will be put into a <pre> HTML element.
+Also table sections.
 
 =cut
 
@@ -48,6 +50,7 @@ sub new {
         PIR_INVALID PIR_TODO
         PASM_INVALID PASM_TODO
         PIR_FRAGMENT_INVALID
+        table headrow row cell bodyrows
     ));
     delete(@{$new->{'Tagmap'}}{'Data','/Data'});
 
@@ -238,38 +241,25 @@ sub process_code_start_token {
     # We make the code tags in items bold because they are almost
     # always part of function and arguments, or constants listings
     # and should stand out.
-
     print { $self->{'output_fh'} } '<b>' if $self->{IN_ITEM_TEXT};
-
     print { $self->{'output_fh'} } $self->{'Tagmap'}{$tagname};
-
     my $next = $self->get_token;
-
     unless ( $next->type eq 'text' ) {
         $self->unget_token($next);
         return;
     }
-
     my $text = $next->text;
-
-
     ## XXX re-enable this
-
-    #if ( $text =~ /^Parrot::/o ) {
-
-        #my $href = $self->href_for_perl_module($text);
-
-        #esc($text);
-
-        #if ($href) {
-            #$text = "<a href='$href'>$text</a>";
-        #}
-    #}
-    #else {
-
+    if ( $text =~ /^Parrot::/o ) {
+        my $href = $self->href_for_perl_module($text);
         esc($text);
-    #}
-
+        if ($href) {
+            $text = "<a href='$href'>$text</a>";
+        }
+    }
+    else {
+        esc($text);
+    }
     print { $self->{'output_fh'} } $text;
 }
 
@@ -562,17 +552,18 @@ sub resolve_pod_page_link {
     my $section = shift;
 
     ## XXX re-enable this
-
-    #if ( $to =~ /^Parrot::/o ) {
-        #my $href = $self->href_for_perl_module($to);
-
+    if ( $to =~ /^Parrot::/o ) {
+        my $href = $self->href_for_perl_module($to);
         # This gets corrupted somewhere down the line, with
         # Parrot/PackFile/ConstTable.pm.html being turned into
         # Parrot/PackFile%2FConstTable.pm.html and thus breaking
         # the CSS and images somehow.
-
-        #return $href if defined $href;
-    #}
+        return $href if defined $href;
+    }
+    elsif ( $to =~ m{^(docs|tools|lib|compilers|examples|src|runtime)/}o ) {
+        my $href = $self->href_for_pod($to);
+        return $href if defined $href;
+    }
 
     return 'TODO';
 }
@@ -599,20 +590,33 @@ sub href_for_perl_module {
 
     my $dist = Parrot::Distribution->new;
     my $file = $dist->file_for_perl_module($module);
-
     return if not $file or not $file->contains_pod;
 
     my $path = $self->append_html_suffix( $dist->relative_path($file) );
 
     ## XXX re-enable this
-
     # This is the docs file for the module.
-    ## $file = $self->{TARGET}->file_with_relative_path($path);
-
+    # $file = $self->{TARGET}->file_with_relative_path($path);
     # There's no point in linking to the file you are already in.
-    ##return if $file == $self->{DOCS_FILE};
+    return if $file eq $self->{source_filename};
+    return $self->href_path( $path ); #$self->{DOCS_FILE}->parent->relative_path($file) );
+}
 
-    ##return $self->href_path( $self->{DOCS_FILE}->parent->relative_path($file) );
+=item C<href_for_pod($pod)>
+
+Returns the path to the POD's HTML file relative to the current
+documentation page.
+
+=cut
+
+sub href_for_pod {
+    my $self   = shift;
+    my $pod = shift;
+    return if not $pod or not -e $pod;
+
+    my $dist = Parrot::Distribution->new;
+    my $path = $self->append_html_suffix( $dist->relative_path($pod) );
+    return $self->href_path( $path );
 }
 
 =item C<do_end()>
