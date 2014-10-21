@@ -819,13 +819,14 @@ sub linearize_tokens {  # self, tokens
       $out .= $t; # a string, or some insane thing
     } elsif($t->is_text) {
       $out .= $t->text;
-    } elsif($t->is_start and $t->tag eq 'X') {
+    } elsif($t->is_start and $t->tag =~ /^[XAZ]$/) {
       # Ignore until the end of this X<...> sequence:
       my $x_open = 1;
+      my $tag = $t->tag;
       while($x_open) {
         next if( ($t = shift @_)->is_text );
-        if(   $t->is_start and $t->tag eq 'X') { ++$x_open }
-        elsif($t->is_end   and $t->tag eq 'X') { --$x_open }
+        if(   $t->is_start and $t->tag eq $tag) { ++$x_open }
+        elsif($t->is_end   and $t->tag eq $tag) { --$x_open }
       }
     }
   }

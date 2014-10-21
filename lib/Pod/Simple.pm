@@ -3,7 +3,7 @@ require 5;
 package Pod::Simple;
 use strict;
 use Carp ();
-BEGIN           { *DEBUG = sub () {0} unless defined &DEBUG }
+BEGIN           { *DEBUG = sub () {3} unless defined &DEBUG }
 use integer;
 use Pod::Escapes 1.04 ();
 use Pod::Simple::LinkSection ();
@@ -20,7 +20,7 @@ use vars qw(
 @ISA = ('Pod::Simple::BlackBox');
 $VERSION = '3.28';
 
-@Known_formatting_codes = qw(I B C L E F S X Z); 
+@Known_formatting_codes = qw(A I B C L E F S X Z);
 %Known_formatting_codes = map(($_=>1), @Known_formatting_codes);
 @Known_directives       = qw(head1 head2 head3 head4 item over back); 
 %Known_directives       = map(($_=>'Plain'), @Known_directives);

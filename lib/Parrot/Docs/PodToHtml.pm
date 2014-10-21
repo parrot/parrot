@@ -51,7 +51,10 @@ sub new {
         PIR_INVALID PIR_TODO
         PASM_INVALID PASM_TODO
         PIR_FRAGMENT_INVALID
-        table headrow row cell bodyrows A Z
+        table headrow row cell bodyrows
+    ));
+    $new->accept_codes(qw(
+        A Z
     ));
     delete(@{$new->{'Tagmap'}}{'Data','/Data'});
     $new->{'Tagmap'}->{'table'} = '<table>';
