@@ -49,7 +49,7 @@ done
 OUTPUT
 
 # very old-style syntax, returncc does not honor the continuation label here
-pir_output_is( <<'CODE', <<'OUTPUT', "yield and returncc with cont", todo=>'returncc to label' );
+pir_output_is( <<'CODE', <<'OUTPUT', "yield and returncc with cont"); #, todo=>'returncc to label' );
 .sub __main__ :main
     .local pmc return
     .local pmc counter
@@ -88,7 +88,7 @@ return_here:
         .set_yield x
         .end_yield
         x = x + 1
-    if x <= 10 goto iloop
+    if x <= 3 goto iloop
     returncc
 .end
 CODE
@@ -96,13 +96,6 @@ CODE
 1 0
 2 0
 3 0
-4 0
-5 0
-6 0
-7 0
-8 0
-9 0
-10 0
 OUTPUT
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "Coroutine - exception in main" );
@@ -550,7 +543,7 @@ in coro 2nd
 2
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "autoreset", todo => 'wrong return cont GH #1106' );
+pir_output_is(<<'CODE', <<'OUTPUT', "autoreset"); #, todo => 'wrong return cont GH #1106' );
 .sub 'main' :main
     .const 'Coroutine' $P99 = 'MyCoro'
     $P99.'autoreset'()

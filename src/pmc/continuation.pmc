@@ -319,7 +319,6 @@ destination to continue execution.
                                       Parrot_sub_full_sub_name(INTERP, from_sub));
 #endif
             }
-            GETATTR_Coroutine_address(INTERP, from_sub, pc);
             SETATTR_Coroutine_yield(INTERP, from_sub, 2);
             pc = VTABLE_invoke(INTERP, from_sub, pc);
         }

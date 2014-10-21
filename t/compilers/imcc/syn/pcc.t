@@ -165,9 +165,9 @@ pir_output_is( <<'CODE', <<'OUT', "coroutine iterator" );
   .local int i
   i=5
   new $P1, 'Continuation'
+  set_label $P1, after_loop
 loop:
-    $I2 = _addtwo(i)
-    if $I2 == -1 goto after_loop
+    $I2 = _addtwo($P1, i)
     print $I2
     print "\n"
     goto loop
@@ -177,18 +177,19 @@ loop:
 .end
 
 .sub _addtwo
+  .param pmc when_done
   .param int a
   .local int i
   i = 0
  loop:
-    if i >= 10 goto done
+    if i >= 7 goto done
     $I5 = a+i
     .yield($I5)
     i = i + 1
     goto loop
  done:
   print "done in coroutine\n"
-  .return(-1)
+  when_done()
 .end
 CODE
 5
