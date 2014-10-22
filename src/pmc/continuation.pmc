@@ -40,6 +40,16 @@ more information.
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
 
+#ifdef NDEBUG
+#  define TRACE_CONT_1(s, arg)
+#  define TRACE_CONT_d(s, arg)
+#else
+#  define TRACE_CONT_1(s, arg) \
+            if (Interp_trace_TEST(interp, PARROT_TRACE_CORO_STATE_FLAG)) \
+                fprintf(stderr, (s), (arg))
+#  define TRACE_CONT_d(s, arg)  TRACE_CONT_1(s, arg)
+#endif
+
 
 /*
  * A Continuation (and an ExceptionHandler) has in its context a pointer
@@ -225,7 +235,9 @@ for any returned values.
 
     VTABLE void set_pointer(void *value) {
         SET_ATTR_address(INTERP, SELF, (opcode_t *)value);
+        TRACE_CONT_d("# - cont:  address %p - ", value);
         SET_ATTR_runloop_id(INTERP, SELF, INTERP->current_runloop_id);
+        TRACE_CONT_d("%d\n", INTERP->current_runloop_id);
     }
 
 
@@ -327,8 +339,11 @@ destination to continue execution.
             Parrot_pcc_set_signature(INTERP, CURRENT_CONTEXT(INTERP), from_obj);
 
         /* switch segment */
-        if (INTERP->code != seg)
+        if (INTERP->code != seg) {
+            TRACE_CONT_d("# - cont:  switch from seg %p - ", INTERP->code);
+            TRACE_CONT_d("%p\n", seg);
             Parrot_switch_to_cs(INTERP, seg, 1);
+        }
 
         return pc;
     }

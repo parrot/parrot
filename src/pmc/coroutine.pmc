@@ -257,9 +257,10 @@ yields are exhausted and the coro is dead.
                 ctx = Parrot_pmc_new(INTERP, enum_class_CallContext);
             TRACE_CORO("# - coro: first ctx\n");
             Parrot_pcc_set_context(INTERP, ctx);
-            TRACE_CORO_d("# - coro: first ctx %p\n", caller_ctx);
-            TRACE_CORO_d("# - coro:    to_ctx %p\n", ctx);
-            TRACE_CORO_d("# - coro:      cont %p\n", ccont);
+            TRACE_CORO_d("# - coro: first ctx %p -> ", caller_ctx);
+            TRACE_CORO_d("%p\n", ctx);
+            TRACE_CORO_d("# - coro:      cont %p pc ", ccont);
+            TRACE_CORO_d("%p\n", PARROT_CONTINUATION(ccont)->address);
 
             GET_ATTR_n_regs_used(INTERP, SELF, n_regs_used);
             Parrot_pcc_allocate_registers(INTERP, ctx, n_regs_used);
@@ -272,7 +273,6 @@ yields are exhausted and the coro is dead.
 
             Parrot_pcc_set_sub(INTERP, ctx, SELF);
             Parrot_pcc_set_continuation(INTERP, ctx, ccont);
-            TRACE_CORO_d("# - coro:   cont %p\n", ccont);
 
             INTERP->current_cont   = PMCNULL;
 
@@ -305,9 +305,10 @@ yields are exhausted and the coro is dead.
             ccont = Parrot_pcc_get_continuation(INTERP, ctx);
             GET_ATTR_yield(INTERP, SELF, yield);
             TRACE_CORO_1("# - coro: !ff (yield=%ld)\n", yield);
-            TRACE_CORO_d("# - coro:     cont %p\n", ccont);
-            TRACE_CORO_d("# - coro:      ctx %p\n", caller_ctx);
-            TRACE_CORO_d("# - coro:   to_ctx %p\n", ctx);
+            TRACE_CORO_d("# - coro:      ctx %p -> ", caller_ctx);
+            TRACE_CORO_d("%p\n", ctx);
+            TRACE_CORO_d("# - coro:     cont %p pc ", ccont);
+            TRACE_CORO_d("%p\n", PARROT_CONTINUATION(ccont)->address);
 
             if (yield == 2) {
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
@@ -342,9 +343,10 @@ yields are exhausted and the coro is dead.
             ccont = Parrot_pcc_get_continuation(INTERP, ctx);
 
             GETATTR_Continuation_to_ctx(INTERP, ccont, to_ctx);
-            TRACE_CORO_d("# - coro:     cont %p\n", ccont);
-            TRACE_CORO_d("# - coro:      ctx %p\n", ctx);
-            TRACE_CORO_d("# - coro:   to_ctx %p\n", to_ctx);
+            TRACE_CORO_d("# - coro:      ctx %p -> ", ctx);
+            TRACE_CORO_d("%p\n", to_ctx);
+            TRACE_CORO_d("# - coro:     cont %p pc ", ccont);
+            TRACE_CORO_d("%p\n", PARROT_CONTINUATION(ccont)->address);
             PObj_get_FLAGS(SELF) &= ~SUB_FLAG_CORO_FF;
 
             GET_ATTR_caller_seg(INTERP, SELF, caller_seg);
@@ -357,10 +359,15 @@ yields are exhausted and the coro is dead.
 
         /* toggle address */
         GET_ATTR_address(INTERP, SELF, dest);
+        TRACE_CORO_d("# - coro:  address %p -> ", dest);
         SET_ATTR_address(INTERP, SELF, (opcode_t *)next);
+        TRACE_CORO_d("%p\n", next);
 
-        if (INTERP->code != wanted_seg)
+        if (INTERP->code != wanted_seg) {
+            TRACE_CORO_d("# - coro:  switch from seg %p -> ", INTERP->code);
+            TRACE_CORO_d("%p\n", wanted_seg);
             Parrot_switch_to_cs(INTERP, wanted_seg, 1);
+        }
 
         return dest;
     }
