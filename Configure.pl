@@ -1,6 +1,6 @@
 #! perl
 
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use 5.008;
 use strict;
@@ -246,15 +246,22 @@ On Darwin, do not probe for Macports libraries.
 
 =item C<--debugging=0>
 
-Debugging is turned on by default. Use this to disable it.
-
-=item C<--enable-shared>
+Debugging is turned on by default. Use this to disable it, or to set a
+different debugging flag than C<-g>, such as C<--debugging=-g3>.
 
 =item C<--disable-shared>
 
 =item C<--parrot_is_shared> I<DEPRECATED>
 
 Link libparrot static or dynamically.
+
+=item C<--enable-static>
+
+Link libparrot static.
+
+=item C<--disable-static>
+
+Do not compile a static libparrot.
 
 =item C<--m=32>
 

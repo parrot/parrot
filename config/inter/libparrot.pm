@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2011, Parrot Foundation.
+# Copyright (C) 2005-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -44,6 +44,7 @@ sub runstep {
     unless ($conf->data->get('has_dynamic_linking')) {
       $enable_shared = 0 unless $conf->options->get('enable-shared');
     }
+    $enable_shared = 0 if $conf->options->get('enable-static');
 
     # Parrot can't necessarily handle a pre-existing installed shared
     # libparrot.so without rpath.

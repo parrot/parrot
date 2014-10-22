@@ -26,6 +26,7 @@ our @shared_valid_options = qw{
     define
     disable-rpath
     disable-shared
+    disable-static
     disable-threads
     exec-prefix
     fatal

@@ -84,6 +84,8 @@ sub runstep {
 
     my $cc_option = $conf->options->get('cc');
     my $debugging = $conf->options->get('debugging');
+    my $disable_static = $conf->options->get('disable-static');
+    my $disable_shared = !$conf->options->get('parrot_is_shared');
     # We need a Glossary somewhere!
     $conf->data->set(
         debugging => $debugging ? 1 : 0,
@@ -178,11 +180,11 @@ sub runstep {
         blib_dir => 'blib/lib',
 
         # libparrot library names
-        libparrot_static => 'libparrot' . $Config{_a},
-        libparrot_shared => 'libparrot.' . $Config{so},
+        libparrot_static => $disable_static ? '' : 'libparrot' . $Config{_a},
+        libparrot_shared => $disable_shared ? '' : 'libparrot.' . $Config{so},
 
         # does the system know about static/dynamic linking?
-        has_static_linking  => 1,
+        has_static_linking  => $disable_static ? 0 : 1,
         has_dynamic_linking => 0,
 
         # default behaviour for linking parrot to a static or shared libparrot

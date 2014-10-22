@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2012, Parrot Foundation.
+# Copyright (C) 2007-2014, Parrot Foundation.
 package Parrot::Configure::Options::Conf;
 
 use strict;
@@ -56,6 +56,7 @@ Compile Options:
    --optimize           Optimized compile
    --optimize=flags     Add given optimizer flags
    --{en,dis}able-shared  How to link libparrot
+   --{en,dis}able-static  How to link libparrot
    --{en,dis}able-rpath   If without rpath (user must set LD_LIBRARY_PATH)
    --m=32               Build 32bit executable on 64-bit architecture.
    --profile            Turn on profiled compile (gcc only for now)

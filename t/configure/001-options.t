@@ -11,7 +11,7 @@ BEGIN {
     our $topdir = realpath($Bin) . "/../..";
     unshift @INC, qq{$topdir/lib};
 }
-use Test::More tests => 92;
+use Test::More tests => 94;
 use Carp;
 use Parrot::Configure::Options qw| process_options |;
 use Parrot::Configure::Options::Conf::CLI ();
@@ -34,7 +34,7 @@ ok( defined $valid{verbose},     "verbose option found" );
 ok( !defined $valid{$badoption}, "invalid option not found" );
 ok( !defined $valid{step},       "invalid 'step' option not found" );
 ok( !defined $valid{target},     "invalid 'target' option not found" );
-for my $feat (qw(shared rpath threads)) {
+for my $feat (qw(shared static rpath threads)) {
     my $key = "enable-".$feat;
     ok( defined $valid{$key}, "$key valid" );
     $key = "disable-$feat";
