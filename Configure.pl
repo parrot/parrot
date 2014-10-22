@@ -258,11 +258,16 @@ Link libparrot static or dynamically.
 
 =item C<--m=32>
 
-Create a 32-bit executable on 64-architectures like x86_64. This
+Create 32-bit executables on 64-architectures like x86_64. This
 option appends C<-m32> to compiler and linker programs and does
 C<s/lib64/lib/g> on link flags.
 
 This option is experimental. See F<config/init/defaults.pm> for more.
+
+=item C<--m=64>
+
+Create 64-bit executables on architectures which default to 32-bit but can do 64-bit,
+like gcc on mips64 and ppc64. This option appends C<-mabi=64> to gcc.
 
 =item C<--profile>
 

@@ -85,6 +85,39 @@ sub _evaluate_gcc {
     $gccversion .= ".$minor" if defined $minor;
     $self->set_result("yes, $gccversion");
 
+    # necessary platform adjustments
+    my $m = $conf->options->get('m');
+    if ($m) {
+        my $archname = $conf->data->get('archname');
+        # other multilib platforms usually default to 32bit. untested: sparc64, arm64
+        if ( $archname =~ /^(mips|ppc)64/ && $m eq '32' ) {
+            $archname =~ s/64//;
+            for my $cc (qw(cc cxx link ld)) {
+                $conf->data->add( ' ', $cc, '-mabi=32' );
+            }
+            # and lib flags
+            for my $lib (qw(ld_load_flags ld_share_flags ldflags linkflags)) {
+                my $item = $conf->data->get($lib);
+                ( my $ni = $item ) =~ s/lib64/lib/g;
+                $conf->data->set( $lib, $ni );
+            }
+        }
+        elsif ( $archname =~ /^(mips|ppc)/ && $m eq '64' ) {
+            $archname =~ s/(s|c)$/$164/;
+            for my $cc (qw(cc cxx link ld)) {
+                $conf->data->add( ' ', $cc, '-mabi=64' );
+            }
+            # and lib flags
+            for my $lib (qw(ld_load_flags ld_share_flags ldflags linkflags)) {
+                my $item = $conf->data->get($lib);
+                ( my $ni = $item ) =~ s{lib\W}{lib64}g;
+                $conf->data->set( $lib, $ni );
+            }
+        }
+        $conf->data->set( 'archname', $archname );
+        $gnucref = _probe_for_gcc($conf);
+    }
+
     $conf->data->set( sym_export => '__attribute__ ((visibility("default")))' )
         if $gccversion >= 4.0 && !$conf->data->get('sym_export');
     $conf->data->set( noinline => '__attribute__ ((noinline))' );

@@ -291,7 +291,7 @@ sub runstep {
         $conf->data->set( HAS_EXTRA_NCI_THUNKS => 0 );
     }
 
-    # adjust archname, cc and libs for e.g. --m=32
+    # adjust archname, cc and libs for e.g. --m=32 or --m=64
     # remember corrected archname - jit.pm was using $Config('archname')
     _64_bit_adjustments($conf);
 
