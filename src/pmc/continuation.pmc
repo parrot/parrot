@@ -47,7 +47,7 @@ more information.
 #  define TRACE_CONT_1(s, arg) \
             if (Interp_trace_TEST(interp, PARROT_TRACE_CORO_STATE_FLAG)) \
                 fprintf(stderr, (s), (arg))
-#  define TRACE_CONT_d(s, arg)  TRACE_CONT_1(s, arg)
+#  define TRACE_CONT_d(s, arg) /* TRACE_CONT_1(s, arg) */
 #endif
 
 

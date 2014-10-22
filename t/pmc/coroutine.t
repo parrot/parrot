@@ -48,8 +48,7 @@ back 0
 done
 OUTPUT
 
-# very old-style syntax, returncc does not honor the continuation label here
-pir_output_is( <<'CODE', <<'OUTPUT', "yield and returncc with cont"); #, todo=>'returncc to label' );
+pir_output_is( <<'CODE', <<'OUTPUT', "yield and returncc with cont");
 .sub __main__ :main
     .local pmc return
     .local pmc counter
@@ -409,31 +408,24 @@ CODE
 6
 OUTPUT
 
-pir_output_is(
-    <<'CODE', <<'OUTPUT', "Final return from coroutine");
+pir_error_output_like(
+    <<'CODE', <<'OUTPUT', "dead coroutine w/o cont. label");
 .sub 'MyCoro'
-    say 'in coro 1st'
+    print 'in coro 1st '
     .yield(1)
-    say 'in coro 2nd'
+    print ' in coro 2nd '
     .yield(2)
-    say 'coro done'
-    .return(4)
+    print ' coro dead '
 .end
 .sub 'main' :main
     $I0 = MyCoro()
-    say $I0
+    print $I0
     $I0 = MyCoro()
-    say $I0
-    $I0 = MyCoro()
-    say $I0
+    print $I0
+    MyCoro()
 .end
 CODE
-in coro 1st
-1
-in coro 2nd
-2
-coro done
-4
+/\Ain coro 1st 1 in coro 2nd 2 coro dead 0Cannot resume dead coroutine/
 OUTPUT
 
 # dead coros need autoreset or reset
@@ -446,27 +438,27 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Resume dead coroutine w/o autoreset");
 
 .sub 'main' :main
     $I0 = MyCoro() # 1. setup first ctx
-    print $I0
+    say $I0
     $I0 = MyCoro() # 3. !ff y=>1
-    print $I0
-    $I0 = MyCoro() # 5. !ff y=>1
     say $I0
 
     push_eh ehandler
-    $I0 = MyCoro() # 7. ff (y=0) => Cannot resume dead coroutine
-    print $I0
+    $I0 = MyCoro() # 5. ff (y=0) => Cannot resume dead coroutine
+    say $I0
 
     ehandler:
     pop_eh
 .end
 CODE
-124
+1
+2
+4
 OUTPUT
 
 # Note: TT #1710/GH #585 argued that if one clone is dead the other are also dead.
 # Wrong. Each coro is dead/exhausted independently here.
 pir_output_is(
-    <<'CODE', <<'OUTPUT', "No dead clones" );
+    <<'CODE', <<'OUTPUT', "No dead clones", todo=>"GH #1106" );
 .sub 'main' :main
     .const 'Sub' $P99 = 'coro'
 
@@ -481,16 +473,14 @@ pir_output_is(
 
     three(1)
     push_eh ehandler
-    three(2)
+    three(2) # 3 is now done
+    ehandler:
+    pop_eh
 
-    restart:
-    four(1)
+    four(1)  # but 4 not
     say ""
     .return()
 
-    ehandler:
-    pop_eh
-    goto restart
 .end
 
 .sub '' :anon :subid('coro')
@@ -530,7 +520,7 @@ pir_output_is(<<'CODE', <<'OUTPUT', "Manual reset" );
     say 'in coro 2nd'
     .yield(2)
     say 'coro done'
-    .return(3)
+    returncc
 .end
 CODE
 in coro 1st
@@ -543,7 +533,7 @@ in coro 2nd
 2
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "autoreset"); #, todo => 'wrong return cont GH #1106' );
+pir_output_is(<<'CODE', <<'OUTPUT', "autoreset", todo=>"GH #1106");
 .sub 'main' :main
     .const 'Coroutine' $P99 = 'MyCoro'
     $P99.'autoreset'()
@@ -564,7 +554,6 @@ pir_output_is(<<'CODE', <<'OUTPUT', "autoreset"); #, todo => 'wrong return cont 
     say 'in coro 2nd'
     .yield(2)
     say 'coro done'
-    .return(3)
 .end
 CODE
 in coro 1st
@@ -573,7 +562,7 @@ in coro 2nd
 2
 main pre
 coro done
-3
+main loop
 in coro 1st
 1
 OUTPUT

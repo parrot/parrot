@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -154,7 +154,7 @@ OUT
 #
 #       addtwo (int a) {
 #         int i;
-#         for (i=0; i<10; i++) {
+#         for (i=0; i<7; i++) {
 #           yield a+i;
 #         }
 #         print "done in coroutine\n";
@@ -199,9 +199,6 @@ CODE
 9
 10
 11
-12
-13
-14
 done in coroutine
 done in main
 OUT

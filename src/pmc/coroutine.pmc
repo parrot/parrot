@@ -231,6 +231,7 @@ yields are exhausted and the coro is dead.
         PMC        * const caller_ctx = CURRENT_CONTEXT(INTERP);
         PMC        * const signature = Parrot_pcc_get_signature(INTERP,
                                             caller_ctx);
+        INTVAL             yield = 0;
 
 #ifndef NDEBUG
         if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG))
@@ -257,10 +258,6 @@ yields are exhausted and the coro is dead.
                 ctx = Parrot_pmc_new(INTERP, enum_class_CallContext);
             TRACE_CORO("# - coro: first ctx\n");
             Parrot_pcc_set_context(INTERP, ctx);
-            TRACE_CORO_d("# - coro: first ctx %p -> ", caller_ctx);
-            TRACE_CORO_d("%p\n", ctx);
-            TRACE_CORO_d("# - coro:      cont %p pc ", ccont);
-            TRACE_CORO_d("%p\n", PARROT_CONTINUATION(ccont)->address);
 
             GET_ATTR_n_regs_used(INTERP, SELF, n_regs_used);
             Parrot_pcc_allocate_registers(INTERP, ctx, n_regs_used);
@@ -280,7 +277,8 @@ yields are exhausted and the coro is dead.
 
             /* create pad if needed */
             if (!PMC_IS_NULL(lex_info)) {
-                const INTVAL hlltype = Parrot_hll_get_ctx_HLL_type(INTERP, enum_class_LexPad);
+                const INTVAL hlltype = Parrot_hll_get_ctx_HLL_type(INTERP,
+                                                                   enum_class_LexPad);
                 PMC * const lexpad = Parrot_pmc_new_init(INTERP, hlltype, lex_info);
                 Parrot_pcc_set_lex_pad(INTERP, ctx, lexpad);
                 VTABLE_set_pointer(INTERP, lexpad, ctx);
@@ -291,6 +289,8 @@ yields are exhausted and the coro is dead.
             wanted_seg            = seg;
 
             GET_ATTR_start_offs(INTERP, SELF, start_offs);
+            TRACE_CORO_d("# - coro:      cont %p pc ", ccont);
+            TRACE_CORO_d("%ld\n", PARROT_CONTINUATION(ccont)->address - seg->base.data);
             SET_ATTR_caller_seg(INTERP, SELF, INTERP->code);
             SET_ATTR_address(INTERP, SELF, seg->base.data + start_offs);
         }
@@ -299,16 +299,12 @@ yields are exhausted and the coro is dead.
         else if (!(PObj_get_FLAGS(SELF) & SUB_FLAG_CORO_FF)) {
             PackFile_ByteCode *seg;
             PMC               *ccont;
-            INTVAL             yield;
 
             GET_ATTR_ctx(INTERP, SELF, ctx);
             ccont = Parrot_pcc_get_continuation(INTERP, ctx);
             GET_ATTR_yield(INTERP, SELF, yield);
             TRACE_CORO_1("# - coro: !ff (yield=%ld)\n", yield);
-            TRACE_CORO_d("# - coro:      ctx %p -> ", caller_ctx);
-            TRACE_CORO_d("%p\n", ctx);
             TRACE_CORO_d("# - coro:     cont %p pc ", ccont);
-            TRACE_CORO_d("%p\n", PARROT_CONTINUATION(ccont)->address);
 
             if (yield == 2) {
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
@@ -318,6 +314,7 @@ yields are exhausted and the coro is dead.
 
             GET_ATTR_seg(INTERP, SELF, seg);
             wanted_seg            = seg;
+            TRACE_CORO_d("%ld\n", PARROT_CONTINUATION(ccont)->address - seg->base.data);
 
             /* remember segment of caller */
             SET_ATTR_caller_seg(INTERP, SELF, INTERP->code);
@@ -330,26 +327,28 @@ yields are exhausted and the coro is dead.
             Parrot_pcc_set_context(INTERP, ctx);
         }
         else { /* FF: yield 1 or returncc 2 back from the Coro */
-            INTVAL             yield;
             PMC               *ccont, *to_ctx;
             PackFile_ByteCode *caller_seg;
 
             GET_ATTR_yield(INTERP, SELF, yield);
             TRACE_CORO_1("# - coro: ff (yield=%ld)\n", yield);
 
-            if (yield != 2)
-                SET_ATTR_yield(INTERP, SELF, 0);
             GET_ATTR_ctx(INTERP, SELF, ctx);
             ccont = Parrot_pcc_get_continuation(INTERP, ctx);
 
             GETATTR_Continuation_to_ctx(INTERP, ccont, to_ctx);
-            TRACE_CORO_d("# - coro:      ctx %p -> ", ctx);
-            TRACE_CORO_d("%p\n", to_ctx);
             TRACE_CORO_d("# - coro:     cont %p pc ", ccont);
-            TRACE_CORO_d("%p\n", PARROT_CONTINUATION(ccont)->address);
             PObj_get_FLAGS(SELF) &= ~SUB_FLAG_CORO_FF;
-
             GET_ATTR_caller_seg(INTERP, SELF, caller_seg);
+
+            if (yield != 2) {
+                SET_ATTR_yield(INTERP, SELF, 0);
+            }
+            else {
+                SET_ATTR_address(INTERP, SELF, (opcode_t *)next);
+            }
+
+            TRACE_CORO_d("%ld\n", PARROT_CONTINUATION(ccont)->address - caller_seg->base.data);
             /* switch back to last remembered code seg and context */
             wanted_seg = caller_seg;
             Parrot_pcc_set_context(INTERP, to_ctx);
@@ -359,9 +358,9 @@ yields are exhausted and the coro is dead.
 
         /* toggle address */
         GET_ATTR_address(INTERP, SELF, dest);
-        TRACE_CORO_d("# - coro:  address %p -> ", dest);
+        TRACE_CORO_d("# - coro:  address [%ld]", dest - wanted_seg->base.data);
         SET_ATTR_address(INTERP, SELF, (opcode_t *)next);
-        TRACE_CORO_d("%p\n", next);
+        TRACE_CORO_d(", next: %ld\n", (opcode_t *)next - wanted_seg->base.data);
 
         if (INTERP->code != wanted_seg) {
             TRACE_CORO_d("# - coro:  switch from seg %p -> ", INTERP->code);
