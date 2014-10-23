@@ -49,6 +49,7 @@ static void print_sub_name(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 #  define TRACE_CORO(s)
 #  define TRACE_CORO_1(s, arg)
 #  define TRACE_CORO_d(s, arg)
+#  define TRACE_ADDR(addr, seg)
 #else
 #  define TRACE_CORO(s) \
             if (Interp_trace_TEST(interp, PARROT_TRACE_CORO_STATE_FLAG)) \
@@ -57,6 +58,7 @@ static void print_sub_name(PARROT_INTERP, ARGIN(PMC *sub_pmc))
             if (Interp_trace_TEST(interp, PARROT_TRACE_CORO_STATE_FLAG)) \
                 fprintf(stderr, (s), (arg))
 #  define TRACE_CORO_d(s, arg)  TRACE_CORO_1((s), (arg))
+#  define TRACE_ADDR(addr, seg) (unsigned int)(((opcode_t *)(addr)) - (seg)->base.data)
 #endif
 
 
@@ -290,7 +292,7 @@ yields are exhausted and the coro is dead.
 
             GET_ATTR_start_offs(INTERP, SELF, start_offs);
             TRACE_CORO_d("# - coro:      cont %p pc ", ccont);
-            TRACE_CORO_d("%ld\n", PARROT_CONTINUATION(ccont)->address - seg->base.data);
+            TRACE_CORO_d("%2x\n", TRACE_ADDR(PARROT_CONTINUATION(ccont)->address, seg));
             SET_ATTR_caller_seg(INTERP, SELF, INTERP->code);
             SET_ATTR_address(INTERP, SELF, seg->base.data + start_offs);
         }
@@ -314,7 +316,7 @@ yields are exhausted and the coro is dead.
 
             GET_ATTR_seg(INTERP, SELF, seg);
             wanted_seg            = seg;
-            TRACE_CORO_d("%ld\n", PARROT_CONTINUATION(ccont)->address - seg->base.data);
+            TRACE_CORO_d("%2x\n", TRACE_ADDR(PARROT_CONTINUATION(ccont)->address, seg));
 
             /* remember segment of caller */
             SET_ATTR_caller_seg(INTERP, SELF, INTERP->code);
@@ -348,7 +350,7 @@ yields are exhausted and the coro is dead.
                 SET_ATTR_address(INTERP, SELF, (opcode_t *)next);
             }
 
-            TRACE_CORO_d("%ld\n", PARROT_CONTINUATION(ccont)->address - caller_seg->base.data);
+            TRACE_CORO_d("%2x\n", TRACE_ADDR(PARROT_CONTINUATION(ccont)->address, caller_seg));
             /* switch back to last remembered code seg and context */
             wanted_seg = caller_seg;
             Parrot_pcc_set_context(INTERP, to_ctx);
@@ -358,9 +360,9 @@ yields are exhausted and the coro is dead.
 
         /* toggle address */
         GET_ATTR_address(INTERP, SELF, dest);
-        TRACE_CORO_d("# - coro:  address [%ld]", dest - wanted_seg->base.data);
+        TRACE_CORO_d("# - coro:  address [%2x]", TRACE_ADDR(dest, wanted_seg));
         SET_ATTR_address(INTERP, SELF, (opcode_t *)next);
-        TRACE_CORO_d(", next: %ld\n", (opcode_t *)next - wanted_seg->base.data);
+        TRACE_CORO_d(", next: %2x\n", TRACE_ADDR(next, wanted_seg));
 
         if (INTERP->code != wanted_seg) {
             TRACE_CORO_d("# - coro:  switch from seg %p -> ", INTERP->code);

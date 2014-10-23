@@ -40,6 +40,7 @@ more information.
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
 
+/* only used temp. for debugging */
 #ifdef NDEBUG
 #  define TRACE_CONT_1(s, arg)
 #  define TRACE_CONT_d(s, arg)
