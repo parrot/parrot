@@ -13889,10 +13889,11 @@ opcode_t *
 Parrot_invokecc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC       * const  p = PREG(1);
     opcode_t  * dest =  cur_opcode + 2;
-    PMC       * const  signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
+    PMC       * const  ctx = CURRENT_CONTEXT(interp);
+    PMC       * const  signature = Parrot_pcc_get_signature(interp, ctx);
 
-    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
-    Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), dest);
+    Parrot_pcc_set_pc(interp, ctx, dest);
+    Parrot_pcc_reuse_continuation(interp, ctx, dest);
     dest = VTABLE_invoke(interp, p, dest);
     return (opcode_t *)dest;
 }
@@ -13901,9 +13902,10 @@ opcode_t *
 Parrot_invoke_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t    * dest =  cur_opcode + 3;
     PMC  * const  p = PREG(1);
-    PMC  * const  signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
+    PMC  * const  ctx = CURRENT_CONTEXT(interp);
+    PMC  * const  signature = Parrot_pcc_get_signature(interp, ctx);
 
-    Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
+    Parrot_pcc_set_pc(interp, ctx, dest);
     interp->current_cont = PREG(2);
     dest = VTABLE_invoke(interp, p, dest);
     return (opcode_t *)dest;
@@ -13991,13 +13993,12 @@ Parrot_get_params_pc(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_set_returns_pc(opcode_t *cur_opcode, PARROT_INTERP) {
-    opcode_t * const  raw_args  = CUR_OPCODE;
-    PMC      * const  signature = PCONST(1);
-    PMC      * ctx              = CURRENT_CONTEXT(interp);
-    PMC      * const caller_ctx = Parrot_pcc_get_caller_ctx(interp, ctx);
-    PMC      * const call_sig   = Parrot_pcc_build_sig_object_from_op(interp,
-                Parrot_pcc_get_signature(interp, caller_ctx), signature, raw_args);
-    INTVAL argc;
+    opcode_t  * const  raw_args = CUR_OPCODE;
+    PMC       * const  signature = PCONST(1);
+    PMC       *  ctx = CURRENT_CONTEXT(interp);
+    PMC       * const  caller_ctx = Parrot_pcc_get_caller_ctx(interp, ctx);
+    PMC       * const  call_sig = Parrot_pcc_build_sig_object_from_op(interp, Parrot_pcc_get_signature(interp, caller_ctx), signature, raw_args);
+    INTVAL   argc;
 
     Parrot_pcc_set_signature(interp, ctx, call_sig);
     GETATTR_FixedIntegerArray_size(interp, signature, argc);
@@ -14006,10 +14007,10 @@ Parrot_set_returns_pc(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_get_results_pc(opcode_t *cur_opcode, PARROT_INTERP) {
-    opcode_t  * const raw_params = CUR_OPCODE;
-    PMC       * const signature = PCONST(1);
-    PMC       *       ctx = CURRENT_CONTEXT(interp);
-    PMC       * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    opcode_t  * const  raw_params = CUR_OPCODE;
+    PMC       * const  signature = PCONST(1);
+    PMC       * const  ctx = CURRENT_CONTEXT(interp);
+    PMC       * const  call_object = Parrot_pcc_get_signature(interp, ctx);
     INTVAL   argc;
 
     Parrot_pcc_fill_params_from_op(interp, call_object, signature, raw_params, PARROT_ERRORS_RESULT_COUNT_FLAG);
@@ -17241,7 +17242,14 @@ Parrot_getstderr_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_abs_i(opcode_t *cur_opcode, PARROT_INTERP) {
-    IREG(1) = abs(IREG(1));
+    #if defined(PARROT_HAS_LABS)
+        IREG(1) = labs(IREG(1));
+
+#else
+        IREG(1) = abs(IREG(1));
+
+#endif
+;
     return cur_opcode + 2;
 }
 
@@ -17253,7 +17261,14 @@ Parrot_abs_n(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_abs_i_i(opcode_t *cur_opcode, PARROT_INTERP) {
-    IREG(1) = abs(IREG(2));
+    #if defined(PARROT_HAS_LABS)
+        IREG(1) = labs(IREG(2));
+
+#else
+        IREG(1) = abs(IREG(2));
+
+#endif
+;
     return cur_opcode + 3;
 }
 

@@ -1,13 +1,13 @@
 #! perl
 # Copyright (C) 2007,2014, Parrot Foundation.
-# auto/snprintf-01.t
+# auto/labs-01.t
 
 use strict;
 use warnings;
-use Test::More tests => 18;
+use Test::More tests => 17;
 use Carp;
 use lib qw( lib t/configure/testlib );
-use_ok('config::auto::snprintf');
+use_ok('config::auto::labs');
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(
@@ -25,7 +25,7 @@ my ($args, $step_list_ref) = process_options( {
 my $conf = Parrot::Configure::Step::Test->new;
 $conf->include_config_results( $args );
 
-my $pkg = q{auto::snprintf};
+my $pkg = q{auto::labs};
 
 $conf->add_steps($pkg);
 
@@ -44,23 +44,25 @@ $conf->replenish($serialized);
 } );
 $conf->options->set(%{$args});
 $step = test_step_constructor_and_description($conf);
+$conf->data->set('HAS_LABS', 0);
 
 my $res;
-$res = q{old snprintf};
+$res = q{labs};
 ok($step->_check($conf, $res),
     "_check returned true value");
-ok($conf->data->get('HAS_OLD_SNPRINTF'),
-    "Got expected value");
+ok($conf->data->get('HAS_LABS'),
+    "Got HAS_LABS");
 
-$res = q{C99 snprintf};
-ok($step->_check($conf, $res),
-    "_check returned true value");
-ok($conf->data->get('HAS_C99_SNPRINTF'),
-    "Got expected value");
-ok($conf->data->get('HAS_SNPRINTF'),
-    "Got expected value");
+$conf->data->set('HAS_LABS', 0);
+
+$res = q{broken};
+ok(!$step->_check($conf, $res),
+    "_check returned false value");
+ok(!$conf->data->get('HAS_LABS'),
+    "Got !HAS_LABS");
 
 $conf->replenish($serialized);
+$conf->data->set('HAS_LABS', 0);
 
 ########## --verbose; _check() ##########
 
@@ -73,14 +75,14 @@ $step = test_step_constructor_and_description($conf);
 
 {
     my $stdout;
-    my $res = q{snprintf};
+    my $res = q{labs};
     my $ret = capture(
         sub { $step->_check($conf, $res) },
         \$stdout
     );
     ok($ret, "_check returned true value");
-    ok($conf->data->get('HAS_SNPRINTF'),
-        "Got expected value");
+    ok($conf->data->get('HAS_LABS'),
+        "Got --verbose HAS_LABS");
 }
 
 $conf->cc_clean();
@@ -91,17 +93,17 @@ pass("Completed all tests in $0");
 
 =head1 NAME
 
-auto/snprintf-01.t - test auto::snprintf
+auto/labs-01.t - test auto::labs
 
 =head1 SYNOPSIS
 
-    % prove t/steps/auto/snprintf-01.t
+    % prove t/steps/auto/labs-01.t
 
 =head1 DESCRIPTION
 
 The files in this directory test functionality used by F<Configure.pl>.
 
-The tests in this file test auto::snprintf.
+The tests in this file test auto::labs.
 
 =head1 AUTHOR
 
@@ -109,7 +111,7 @@ James E Keenan
 
 =head1 SEE ALSO
 
-config::auto::snprintf, F<Configure.pl>.
+config::auto::labs, F<Configure.pl>.
 
 =cut
 
