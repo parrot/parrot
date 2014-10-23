@@ -1,4 +1,4 @@
-# Copyright (C) 2008, Parrot Foundation.
+# Copyright (C) 2008,2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -81,7 +81,7 @@ sub testloop {
             my $cb = $args{per_file};
             my $buf = join('', @lines);
             # do the per-file test
-            unless($cb->($buf)) {
+            unless($cb->($buf, $path)) {
                 push(@failures, $error_line);
             }
         }
@@ -92,7 +92,7 @@ sub testloop {
             # do the test, once for each line
             foreach my $n (0..@lines-1) {
                 my $line = $lines[$n];
-                unless($cb->($line)) {
+                unless($cb->($line, $path)) {
                     $error_line .= "," if $have_errors;
                     $error_line .= " " . ($n+1);
                     $have_errors = 1;

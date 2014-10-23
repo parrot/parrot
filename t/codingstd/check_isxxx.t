@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2009, Parrot Foundation.
+# Copyright (C) 2006-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -56,12 +56,16 @@ my $isxxx_functions = join '|', @isxxx_functions_list;
 
 sub check_isxxx {
     my $line = shift;
+    my $path = shift;
 
     # does the line contain an isxxx call?
     return 1 unless $line =~ /[^_]($isxxx_functions)\([^)]+/;
     # is the line missing a cast?
     return 1 unless $line !~ /[^_]($isxxx_functions)\(\(unsigned char\)/;
-    # yes!  fail.
+    # skip src/platform/vms/exec.c 2426, 2427, 2457, 2461, 2471
+    return 1 if $path =~ m{src/platform/vms/exec.c$}
+            and $line =~ /[^_]($isxxx_functions)\(b\[/;
+    # else fail
     return 0;
 }
 

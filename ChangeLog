@@ -64,6 +64,7 @@
         + Fix self heuristic with vtable overridden method calls.
           $P0($P0) instead of $P0() is now invalid, it is always a method.
           https://trac.parrot.org/parrot/ticket/103 #1013
+        + Add vms support by mvorl. GH #866
     - Build
         + Set -mabi=64 for gcc --m=64 on mips, -m64 on powerpc #1110
         + Add --{en,dis}able-static #1104

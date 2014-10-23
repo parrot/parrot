@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2010, Parrot Foundation.
+ * Copyright (C) 2004-2014, Parrot Foundation.
  * Copyright (C) 1993, 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001,
  *    2002, 2003, 2004, 2005, 2006, 2007 by Charles Bailey and others
  */
@@ -2342,9 +2342,10 @@ setup_cmddsc(const char *incmd, int check_img, int *suggest_quote,
 #else
         char *cp2;
         for (cp2 = resspec;
-             *rest && !isspace((unsigned char)*rest) && cp2 - resspec < (VMS_MAXRSS - 1);
-             rest++, cp2++)
+            *rest && !isspace((unsigned char)*rest)
+                  && cp2 - resspec < (VMS_MAXRSS - 1); rest++, cp2++) {
             *cp2 = *rest;
+        }
         *cp2 = '\0';
         if (int_tovmsspec(resspec, cp, 0, NULL)) {
             s = vmsspec;
@@ -2363,9 +2364,9 @@ setup_cmddsc(const char *incmd, int check_img, int *suggest_quote,
 
             if (*rest) {
                 for (cp2 = vmsspec + strlen(vmsspec);
-                     *rest && cp2 - vmsspec < MAX_DCL_LINE_LENGTH;
-                     rest++, cp2++)
+                    *rest && cp2 - vmsspec < MAX_DCL_LINE_LENGTH; rest++, cp2++) {
                     *cp2 = *rest;
+                }
                 *cp2 = '\0';
             }
         }
@@ -2472,7 +2473,7 @@ setup_cmddsc(const char *incmd, int check_img, int *suggest_quote,
                             if (j >= NAM$C_MAXRSS)
                                 break;
                         }
-                        while ((j > 0) && !isprint(image_argv[j-1]))
+                        while ((j > 0) && !isprint((unsigned char)image_argv[j-1]))
                             j--;
                         image_argv[j] = 0;
 
@@ -2552,7 +2553,7 @@ setup_cmddsc(const char *incmd, int check_img, int *suggest_quote,
                     strncat(vmscmd->dsc$a_pointer, resspec, MAX_DCL_LINE_LENGTH);
                 else {
                     rest = cmd;
-                    while (*rest && isspace(*rest)) rest++;
+                    while (*rest && isspace((unsigned char)*rest)) rest++;
                 }
 
                 if (image_argv[0] != 0) {
