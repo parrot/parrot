@@ -1,8 +1,9 @@
 2014-11-18    release 6.10.0
     - Core
+        + Fixed Coroutine return and tests. #1106
     - Build
-      + Set -mabi=64 for gcc --m=64 on mips or ppc #1110
-      + Add --{en,dis}able-static #1104
+        + Set -mabi=64 for gcc --m=64 on mips or ppc. #1110
+        + Add --{en,dis}able-static. #1104
     - Documentation
     - Tests
     - Community
@@ -33,8 +34,6 @@
         + Protect callmethod from an empty object, missed by fixup_subs
           immediate. #1024
         + Add Coroutine reset and autoreset methods. #564
-        + Fixed Coroutine return and tests. Warning: temp. broke returncc from
-          coro to label, use a return value instead. #1106
         + Add -t8 trace flag for Coroutine states
         + Disabled trace flags -t4 and -t8 with --optimize. #1105
         + Harmonize parrot usage messages
