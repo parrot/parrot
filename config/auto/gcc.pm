@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -90,10 +90,11 @@ sub _evaluate_gcc {
     if ($m) {
         my $archname = $conf->data->get('archname');
         # other multilib platforms usually default to 32bit. untested: sparc64, arm64
-        if ( $archname =~ /^(mips|ppc)64/ && $m eq '32' ) {
+        if ( $archname =~ /^(mips|powerpc)64/ && $m eq '32' ) {
+            my $abi = $1 eq 'mips' ? '-mabi=32' : '-m32';
             $archname =~ s/64//;
             for my $cc (qw(cc cxx link ld)) {
-                $conf->data->add( ' ', $cc, '-mabi=32' );
+                $conf->data->add( ' ', $cc, $abi );
             }
             # and lib flags
             for my $lib (qw(ld_load_flags ld_share_flags ldflags linkflags)) {
@@ -102,10 +103,11 @@ sub _evaluate_gcc {
                 $conf->data->set( $lib, $ni );
             }
         }
-        elsif ( $archname =~ /^(mips|ppc)/ && $m eq '64' ) {
+        elsif ( $archname =~ /^(mips|powerpc)/ && $m eq '64' ) {
+            my $abi = $1 eq 'mips' ? '-mabi=64' : '-m64';
             $archname =~ s/(s|c)$/$164/;
             for my $cc (qw(cc cxx link ld)) {
-                $conf->data->add( ' ', $cc, '-mabi=64' );
+                $conf->data->add( ' ', $cc, $abi );
             }
             # and lib flags
             for my $lib (qw(ld_load_flags ld_share_flags ldflags linkflags)) {
