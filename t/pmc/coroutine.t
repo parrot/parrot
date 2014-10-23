@@ -541,10 +541,10 @@ pir_output_is(<<'CODE', <<'OUTPUT', "autoreset", todo=>"GH #1106");
     say $I0
     $I0 = MyCoro()
     say $I0
-    say 'main pre'
+    say 'main return'
     $I0 = MyCoro()
     say $I0
-    say 'main loop'
+    say 'main autoreset'
     $I0 = MyCoro()
     say $I0
 .end
@@ -560,9 +560,9 @@ in coro 1st
 1
 in coro 2nd
 2
-main pre
+main return
 coro done
-main loop
+main autoreset
 in coro 1st
 1
 OUTPUT

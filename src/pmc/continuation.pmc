@@ -313,7 +313,7 @@ destination to continue execution.
         Parrot_sub_continuation_check(INTERP, SELF);
         from_sub = Parrot_sub_continuation_rewind_environment(INTERP, SELF);
 
-        /* if return from a coro */
+        /* if return from a coro check for autoreset */
         if (from_sub && from_sub->vtable->base_type == enum_class_Coroutine) {
             INTVAL     autoreset;
             GETATTR_Coroutine_autoreset(INTERP, from_sub, autoreset);
@@ -323,7 +323,10 @@ destination to continue execution.
                     Parrot_io_eprintf(INTERP, "# Coroutine autoreset '%Ss'\n",
                                       Parrot_sub_full_sub_name(INTERP, from_sub));
 #endif
-                SETATTR_Coroutine_ctx(INTERP, from_sub, PMCNULL);
+                SETATTR_Coroutine_yield(INTERP, from_sub, 0);
+                //pc = VTABLE_invoke(INTERP, from_sub, pc);
+                //GET_ATTR_address(INTERP, SELF, dest);
+                SETATTR_Coroutine_address(INTERP, from_sub, pc);
             }
             else {
 #ifndef NDEBUG
@@ -331,9 +334,8 @@ destination to continue execution.
                     Parrot_io_eprintf(INTERP, "# Coroutine no autoreset '%Ss'\n",
                                       Parrot_sub_full_sub_name(INTERP, from_sub));
 #endif
+                SETATTR_Coroutine_yield(INTERP, from_sub, 2);
             }
-            SETATTR_Coroutine_yield(INTERP, from_sub, 2);
-            pc = VTABLE_invoke(INTERP, from_sub, pc);
         }
 
         if (!PMC_IS_NULL(from_obj))
