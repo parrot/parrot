@@ -56,7 +56,7 @@ static void print_sub_name(PARROT_INTERP, ARGIN(PMC *sub_pmc))
 #  define TRACE_CORO_1(s, arg) \
             if (Interp_trace_TEST(interp, PARROT_TRACE_CORO_STATE_FLAG)) \
                 fprintf(stderr, (s), (arg))
-#  define TRACE_CORO_d(s, arg)  TRACE_CORO_1(s, arg)
+#  define TRACE_CORO_d(s, arg)  TRACE_CORO_1((s), (arg))
 #endif
 
 
