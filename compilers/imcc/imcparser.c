@@ -1079,8 +1079,8 @@ static void
 do_loadlib(ARGMOD(imc_info_t *imcc), ARGIN(const char *lib))
 {
     ASSERT_ARGS(do_loadlib)
-        STRING * const s = Parrot_str_new_init(imcc->interp, lib, strlen(lib),
-                         Parrot_platform_encoding_ptr, 0);
+    STRING * const s = Parrot_str_new_init(imcc->interp, lib, strlen(lib),
+                           Parrot_platform_encoding_ptr, PObj_external_FLAG);
     PMC    * const lib_pmc = Parrot_dyn_load_lib(imcc->interp, s, NULL);
     if (PMC_IS_NULL(lib_pmc) || !VTABLE_get_bool(imcc->interp, lib_pmc)) {
         IMCC_fataly(imcc, EXCEPTION_LIBRARY_ERROR,
