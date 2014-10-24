@@ -1074,9 +1074,8 @@ IMCC_string_from_reg(ARGMOD(imc_info_t * imcc), ARGIN(SymReg *r))
     }
   bare:
     /* unquoted bare name - ASCII only don't unescape it */
-    return *buf ? Parrot_str_new_init(imcc->interp, buf, strlen(buf),
-                     Parrot_ascii_encoding_ptr, PObj_constant_FLAG)
-                 : STRINGNULL;
+    return Parrot_str_new_init(imcc->interp, buf, strlen(buf),
+               Parrot_ascii_encoding_ptr, PObj_constant_FLAG);
 }
 
 /*
@@ -1124,9 +1123,8 @@ IMCC_string_from__STRINGC(ARGMOD(imc_info_t * imcc), ARGIN(char *buf))
     }
     else if (*buf == '\'') {
         buf++;
-        return *buf ? Parrot_str_new_init(imcc->interp, buf, strlen(buf) - 1,
-                        Parrot_ascii_encoding_ptr, PObj_constant_FLAG)
-                    : STRINGNULL;
+        return Parrot_str_new_init(imcc->interp, buf, strlen(buf) - 1,
+                        Parrot_ascii_encoding_ptr, PObj_constant_FLAG);
     }
     else {
         IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
