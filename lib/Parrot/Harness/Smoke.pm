@@ -123,7 +123,7 @@ sub send_archive_to_smolder {
     # create our tags based off the test environment information
     my $tags = join(',',
         (map { $test_env_data{$_} } qw(Architecture Compiler Platform Version)),
-        'Perl ' . $test_env_data{'Perl Version'});
+        'Perl ' . $test_env_data{'Perl_Version'});
     my $response = $ua->post(
         $url,
         Content_Type => 'form-data',
@@ -192,7 +192,7 @@ sub collect_test_environment_data {
         'Compiler'     => _get_compiler_version(),
         'DEVEL'        => $devel,
         'Optimize'     => ($PConfig{optimize} || 'none'),
-        'Perl Version' => (sprintf('%vd', $^V) . " $PConfig{archname}"),
+        'Perl_Version' => (sprintf('%vd', $^V) . " $PConfig{archname}"),
         'Platform'     => $PConfig{osname},
         'Version'      => $PConfig{VERSION},
         'Submitter'    => $ENV{"SMOLDER_SUBMITTER"} || "$me\@$domain"
