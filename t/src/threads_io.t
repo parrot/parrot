@@ -1,13 +1,20 @@
 #! perl
 # Copyright (C) 2010, Parrot Foundation.
-# $Id$
 
 use strict;
 use warnings;
 use lib qw(lib);
 
 use File::Temp;
-use Time::HiRes qw(sleep);
+BEGIN {
+    unless ( eval qq(require Time::HiRes;) ) {
+        print "1..0 # SKIP Time::HiRes not installed\n";
+        exit 0;
+    }
+    else {
+        Time::HiRes->import('sleep');
+    }
+}
 use Parrot::Config;
 
 unless ( $PConfig{HAS_THREADS} ) {
