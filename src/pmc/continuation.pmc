@@ -323,10 +323,9 @@ destination to continue execution.
                     Parrot_io_eprintf(INTERP, "# Coroutine autoreset '%Ss'\n",
                                       Parrot_sub_full_sub_name(INTERP, from_sub));
 #endif
-                SETATTR_Coroutine_yield(INTERP, from_sub, 0);
-                //pc = VTABLE_invoke(INTERP, from_sub, pc);
                 //GET_ATTR_address(INTERP, SELF, dest);
-                SETATTR_Coroutine_address(INTERP, from_sub, pc);
+                SETATTR_Coroutine_ctx(INTERP, from_sub, PMCNULL);
+                //SETATTR_Coroutine_address(INTERP, from_sub, pc);
             }
             else {
 #ifndef NDEBUG
@@ -334,8 +333,9 @@ destination to continue execution.
                     Parrot_io_eprintf(INTERP, "# Coroutine no autoreset '%Ss'\n",
                                       Parrot_sub_full_sub_name(INTERP, from_sub));
 #endif
-                SETATTR_Coroutine_yield(INTERP, from_sub, 2);
             }
+            SETATTR_Coroutine_yield(INTERP, from_sub, 2);
+            pc = VTABLE_invoke(INTERP, from_sub, pc);
         }
 
         if (!PMC_IS_NULL(from_obj))
