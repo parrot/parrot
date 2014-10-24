@@ -458,7 +458,7 @@ OUTPUT
 # Note: TT #1710/GH #585 argued that if one clone is dead the other are also dead.
 # Wrong. Each coro is dead/exhausted independently here.
 pir_output_is(
-    <<'CODE', <<'OUTPUT', "No dead clones", todo=>"GH #1106" );
+    <<'CODE', <<'OUTPUT', "No dead clones"); #, todo=>"GH #1106" );
 .sub 'main' :main
     .const 'Sub' $P99 = 'coro'
 
@@ -533,7 +533,7 @@ in coro 2nd
 2
 OUTPUT
 
-pir_output_is(<<'CODE', <<'OUTPUT', "autoreset", todo=>"GH #1106");
+pir_output_is(<<'CODE', <<'OUTPUT', "autoreset"); #, todo=>"GH #1106");
 .sub 'main' :main
     .const 'Coroutine' $P99 = 'MyCoro'
     $P99.'autoreset'()

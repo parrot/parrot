@@ -48,7 +48,7 @@ more information.
 #  define TRACE_CONT_1(s, arg) \
             if (Interp_trace_TEST(interp, PARROT_TRACE_CORO_STATE_FLAG)) \
                 fprintf(stderr, (s), (arg))
-#  define TRACE_CONT_d(s, arg) /* TRACE_CONT_1(s, arg) */
+#  define TRACE_CONT_d(s, arg) TRACE_CONT_1(s, arg)
 #endif
 
 
@@ -318,14 +318,22 @@ destination to continue execution.
             INTVAL     autoreset;
             GETATTR_Coroutine_autoreset(INTERP, from_sub, autoreset);
             if (autoreset) {
+                opcode_t *dest;
+                PackFile_ByteCode *seg;
+                size_t start_offs;
 #ifndef NDEBUG
                 if (Interp_trace_TEST(INTERP, PARROT_TRACE_SUB_CALL_FLAG))
                     Parrot_io_eprintf(INTERP, "# Coroutine autoreset '%Ss'\n",
                                       Parrot_sub_full_sub_name(INTERP, from_sub));
 #endif
-                //GET_ATTR_address(INTERP, SELF, dest);
-                SETATTR_Coroutine_ctx(INTERP, from_sub, PMCNULL);
-                //SETATTR_Coroutine_address(INTERP, from_sub, pc);
+                GETATTR_Coroutine_address(INTERP, from_sub, dest);
+                pc = dest;
+                /* inlined Coro.reset() method */
+                GETATTR_Coroutine_seg(INTERP, from_sub, seg);
+                GETATTR_Coroutine_start_offs(INTERP, from_sub, start_offs);
+                SETATTR_Coroutine_address(INTERP, from_sub, seg->base.data + start_offs);
+                TRACE_CONT_d("# - coro: reset to pc %2x\n", (unsigned int)start_offs);
+                SETATTR_Coroutine_yield(INTERP, from_sub, 3);
             }
             else {
 #ifndef NDEBUG
@@ -333,8 +341,8 @@ destination to continue execution.
                     Parrot_io_eprintf(INTERP, "# Coroutine no autoreset '%Ss'\n",
                                       Parrot_sub_full_sub_name(INTERP, from_sub));
 #endif
+                SETATTR_Coroutine_yield(INTERP, from_sub, 2);
             }
-            SETATTR_Coroutine_yield(INTERP, from_sub, 2);
             pc = VTABLE_invoke(INTERP, from_sub, pc);
         }
 
