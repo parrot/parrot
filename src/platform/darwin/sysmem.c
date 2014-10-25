@@ -40,21 +40,19 @@ Get information about available physical memory.
 size_t
 Parrot_sysmem_amount(PARROT_INTERP)
 {
-    int           err = 0 ;
-    size_t        memsize = 0 ;
+    int           err = 0;
+    size_t        memsize = 0;
     char         *err_msg;
-    unsigned long length = sizeof (memsize) ;
+    unsigned long length = sizeof (memsize);
 
-#if defined(HW_MEMSIZE)
+#if defined(HW_MEMSIZE) && (PTR_SIZE > 4)
     int memchk = HW_MEMSIZE; /* uint64_t: >2G RAM */
 #elif defined(HW_PHYSMEM)
     int memchk = HW_PHYSMEM; /* sint32_t: max 2G RAM only */
 #endif
-
     int selection[2] = { CTL_HW, memchk };
 
     err = sysctl(selection, 2, &memsize, &length, NULL, 0) ;
-
     if (err) {
         err_msg = strerror(err);
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,

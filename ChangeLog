@@ -4,6 +4,7 @@
     - Build
         + Set -mabi=64 for gcc --m=64 on mips, -m64 on powerpc #1110
         + Add --{en,dis}able-static #1104
+        + Fix darwin --m=32 Parrot_sysmem_amount() #1113
     - Documentation
       + Document .lex "" limitations
     - Tests
