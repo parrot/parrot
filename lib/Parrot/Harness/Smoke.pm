@@ -123,7 +123,8 @@ sub send_archive_to_smolder {
     # create our tags based off the test environment information
     my $tags = join(',',
         (map { $test_env_data{$_} } qw(Architecture Compiler Platform Version)),
-        'Perl ' . $test_env_data{'Perl_Version'});
+                    'Perl ' . $test_env_data{'Perl_Version'});
+    $tags =~ s/ /_/g;
     my $response = $ua->post(
         $url,
         Content_Type => 'form-data',
@@ -198,10 +199,10 @@ sub collect_test_environment_data {
         'Submitter'    => $ENV{"SMOLDER_SUBMITTER"} || "$me\@$domain"
     );
     push @data, ( 'Branch' => $branch ) if $branch;
-    push @data, ( 'Configure args' => $PConfig{configure_args} )
+    push @data, ( 'Configure_args' => $PConfig{configure_args} )
       if $PConfig{configure_args};
     push @data, ( 'Modifications' => join(" ", @mods) ) if @mods;
-    push @data, ( 'Git sha1' => $PConfig{sha1} )
+    push @data, ( 'Git_sha1' => $PConfig{sha1} )
       if $PConfig{sha1};
     return @data;
 }
