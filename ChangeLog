@@ -1,10 +1,12 @@
 2014-11-18    release 6.10.0
     - Core
     - Build
-      + Set -mabi=64 for gcc --m=64 on mips, -m64 on powerpc #1110
-      + Add --{en,dis}able-static #1104
+        + Set -mabi=64 for gcc --m=64 on mips, -m64 on powerpc #1110
+        + Add --{en,dis}able-static #1104
     - Documentation
     - Tests
+        + Stabilized make smoke, uploading to smolder with changed YAML::Tiny
+          quoting. #1078
     - Community
 
 2014-10-21    release 6.9.0 - supported
