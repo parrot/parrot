@@ -3,7 +3,7 @@ Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/gc/gc_gms.c - Generational M&S
+src/gc/gc_gms.c - Generational mark & sweep garbage collector
 
 =head1 DESCRIPTION
 

@@ -3,11 +3,12 @@ Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
-src/gc/gc_ms.c - Implementation of the basic mark & sweep collector
+src/gc/gc_ms.c - Basic mark & sweep garbage collector
 
 =head1 DESCRIPTION
 
-This code implements the default mark and sweep garbage collector.
+This code implements a basic mark and sweep garbage collector
+without generations.
 
 =cut
 
