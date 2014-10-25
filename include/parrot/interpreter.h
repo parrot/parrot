@@ -56,6 +56,7 @@ typedef enum {
 typedef enum { /* sync with compilers/imcc/debug.h */
     PARROT_IMCC_DEBUG_NONE          = 0x0000,
     PARROT_IMCC_VERBOSE             = 0x0001,
+    PARROT_IMCC_DEBUG_MK_CONST      = 0x0002,
     PARROT_IMCC_DEBUG_PARSER        = 0x0004,   /* sets yydebug */
     PARROT_IMCC_DEBUG_IMC           = 0x0008,   /* dump symreg, insns */
     PARROT_IMCC_DEBUG_CFG           = 0x0010,

@@ -9,22 +9,22 @@
  */
 /* HEADERIZER HFILE: none */
 /* HEADERIZER STOP */
-/* A Bison parser, made by GNU Bison 3.0.2.  */
+/* A Bison parser, made by GNU Bison 2.7.12-4996.  */
 
 /* Bison interface for Yacc-like parsers in C
-
-   Copyright (C) 1984, 1989-1990, 2000-2013 Free Software Foundation, Inc.
-
+   
+      Copyright (C) 1984, 1989-1990, 2000-2013 Free Software Foundation, Inc.
+   
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
-
+   
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-
+   
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
@@ -37,13 +37,13 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-
+   
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
 #ifndef YY_YY_COMPILERS_IMCC_IMCPARSER_H_INCLUDED
 # define YY_YY_COMPILERS_IMCC_IMCPARSER_H_INCLUDED
-/* Debug traces.  */
+/* Enabling traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
 #endif
@@ -51,125 +51,126 @@
 extern int yydebug;
 #endif
 
-/* Token type.  */
+/* Tokens.  */
 #ifndef YYTOKENTYPE
 # define YYTOKENTYPE
-  enum yytokentype
-  {
-    LOW_PREC = 258,
-    PARAM = 259,
-    SOL = 260,
-    HLL = 261,
-    GOTO = 262,
-    ARG = 263,
-    IF = 264,
-    UNLESS = 265,
-    PNULL = 266,
-    SET_RETURN = 267,
-    SET_YIELD = 268,
-    ADV_FLAT = 269,
-    ADV_SLURPY = 270,
-    ADV_OPTIONAL = 271,
-    ADV_OPT_FLAG = 272,
-    ADV_NAMED = 273,
-    ADV_ARROW = 274,
-    ADV_INVOCANT = 275,
-    ADV_CALL_SIG = 276,
-    NAMESPACE = 277,
-    DOT_METHOD = 278,
-    SUB = 279,
-    SYM = 280,
-    LOCAL = 281,
-    LEXICAL = 282,
-    CONST = 283,
-    ANNOTATE = 284,
-    GLOBAL_CONST = 285,
-    PLUS_ASSIGN = 286,
-    MINUS_ASSIGN = 287,
-    MUL_ASSIGN = 288,
-    DIV_ASSIGN = 289,
-    CONCAT_ASSIGN = 290,
-    BAND_ASSIGN = 291,
-    BOR_ASSIGN = 292,
-    BXOR_ASSIGN = 293,
-    FDIV = 294,
-    FDIV_ASSIGN = 295,
-    MOD_ASSIGN = 296,
-    SHR_ASSIGN = 297,
-    SHL_ASSIGN = 298,
-    SHR_U_ASSIGN = 299,
-    SHIFT_LEFT = 300,
-    SHIFT_RIGHT = 301,
-    INTV = 302,
-    FLOATV = 303,
-    STRINGV = 304,
-    PMCV = 305,
-    LOG_XOR = 306,
-    RELOP_EQ = 307,
-    RELOP_NE = 308,
-    RELOP_GT = 309,
-    RELOP_GTE = 310,
-    RELOP_LT = 311,
-    RELOP_LTE = 312,
-    RESULT = 313,
-    RETURN = 314,
-    TAILCALL = 315,
-    YIELDT = 316,
-    GET_RESULTS = 317,
-    POW = 318,
-    SHIFT_RIGHT_U = 319,
-    LOG_AND = 320,
-    LOG_OR = 321,
-    COMMA = 322,
-    ESUB = 323,
-    DOTDOT = 324,
-    PCC_BEGIN = 325,
-    PCC_END = 326,
-    PCC_CALL = 327,
-    PCC_SUB = 328,
-    PCC_BEGIN_RETURN = 329,
-    PCC_END_RETURN = 330,
-    PCC_BEGIN_YIELD = 331,
-    PCC_END_YIELD = 332,
-    INVOCANT = 333,
-    MAIN = 334,
-    LOAD = 335,
-    INIT = 336,
-    IMMEDIATE = 337,
-    POSTCOMP = 338,
-    METHOD = 339,
-    ANON = 340,
-    OUTER = 341,
-    NEED_LEX = 342,
-    MULTI = 343,
-    SUBTAG = 344,
-    VTABLE_METHOD = 345,
-    LOADLIB = 346,
-    SUB_INSTANCE_OF = 347,
-    SUBID = 348,
-    NS_ENTRY = 349,
-    LABEL = 350,
-    EMIT = 351,
-    EOM = 352,
-    IREG = 353,
-    NREG = 354,
-    SREG = 355,
-    PREG = 356,
-    IDENTIFIER = 357,
-    REG = 358,
-    MACRO = 359,
-    ENDM = 360,
-    STRINGC = 361,
-    INTC = 362,
-    FLOATC = 363,
-    USTRINGC = 364,
-    PARROT_OP = 365,
-    VAR = 366,
-    LINECOMMENT = 367,
-    FILECOMMENT = 368,
-    CONCAT = 369,
-    DOT = 370
-  };
+   /* Put the tokens into the symbol table, so that GDB and other debuggers
+      know about them.  */
+   enum yytokentype {
+     LOW_PREC = 258,
+     PARAM = 259,
+     SOL = 260,
+     HLL = 261,
+     GOTO = 262,
+     ARG = 263,
+     IF = 264,
+     UNLESS = 265,
+     PNULL = 266,
+     SET_RETURN = 267,
+     SET_YIELD = 268,
+     ADV_FLAT = 269,
+     ADV_SLURPY = 270,
+     ADV_OPTIONAL = 271,
+     ADV_OPT_FLAG = 272,
+     ADV_NAMED = 273,
+     ADV_ARROW = 274,
+     ADV_INVOCANT = 275,
+     ADV_CALL_SIG = 276,
+     NAMESPACE = 277,
+     DOT_METHOD = 278,
+     SUB = 279,
+     SYM = 280,
+     LOCAL = 281,
+     LEXICAL = 282,
+     CONST = 283,
+     ANNOTATE = 284,
+     GLOBAL_CONST = 285,
+     PLUS_ASSIGN = 286,
+     MINUS_ASSIGN = 287,
+     MUL_ASSIGN = 288,
+     DIV_ASSIGN = 289,
+     CONCAT_ASSIGN = 290,
+     BAND_ASSIGN = 291,
+     BOR_ASSIGN = 292,
+     BXOR_ASSIGN = 293,
+     FDIV = 294,
+     FDIV_ASSIGN = 295,
+     MOD_ASSIGN = 296,
+     SHR_ASSIGN = 297,
+     SHL_ASSIGN = 298,
+     SHR_U_ASSIGN = 299,
+     SHIFT_LEFT = 300,
+     SHIFT_RIGHT = 301,
+     INTV = 302,
+     FLOATV = 303,
+     STRINGV = 304,
+     PMCV = 305,
+     LOG_XOR = 306,
+     RELOP_EQ = 307,
+     RELOP_NE = 308,
+     RELOP_GT = 309,
+     RELOP_GTE = 310,
+     RELOP_LT = 311,
+     RELOP_LTE = 312,
+     RESULT = 313,
+     RETURN = 314,
+     TAILCALL = 315,
+     YIELDT = 316,
+     GET_RESULTS = 317,
+     POW = 318,
+     SHIFT_RIGHT_U = 319,
+     LOG_AND = 320,
+     LOG_OR = 321,
+     COMMA = 322,
+     ESUB = 323,
+     DOTDOT = 324,
+     PCC_BEGIN = 325,
+     PCC_END = 326,
+     PCC_CALL = 327,
+     PCC_SUB = 328,
+     PCC_BEGIN_RETURN = 329,
+     PCC_END_RETURN = 330,
+     PCC_BEGIN_YIELD = 331,
+     PCC_END_YIELD = 332,
+     INVOCANT = 333,
+     MAIN = 334,
+     LOAD = 335,
+     INIT = 336,
+     IMMEDIATE = 337,
+     POSTCOMP = 338,
+     METHOD = 339,
+     ANON = 340,
+     OUTER = 341,
+     NEED_LEX = 342,
+     MULTI = 343,
+     SUBTAG = 344,
+     VTABLE_METHOD = 345,
+     LOADLIB = 346,
+     SUB_INSTANCE_OF = 347,
+     SUBID = 348,
+     NS_ENTRY = 349,
+     LABEL = 350,
+     EMIT = 351,
+     EOM = 352,
+     IREG = 353,
+     NREG = 354,
+     SREG = 355,
+     PREG = 356,
+     IDENTIFIER = 357,
+     REG = 358,
+     MACRO = 359,
+     ENDM = 360,
+     STRINGC = 361,
+     INTC = 362,
+     FLOATC = 363,
+     USTRINGC = 364,
+     PARROT_OP = 365,
+     VAR = 366,
+     LINECOMMENT = 367,
+     FILECOMMENT = 368,
+     DOT = 369,
+     CONCAT = 370
+   };
 #endif
 /* Tokens.  */
 #define LOW_PREC 258
@@ -283,15 +284,16 @@ extern int yydebug;
 #define VAR 366
 #define LINECOMMENT 367
 #define FILECOMMENT 368
-#define CONCAT 369
-#define DOT 370
+#define DOT 369
+#define CONCAT 370
 
-/* Value type.  */
+
+
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef union YYSTYPE YYSTYPE;
-union YYSTYPE
+typedef union YYSTYPE
 {
-#line 1048 "compilers/imcc/imcc.y" /* yacc.c:1909  */
+/* Line 2053 of yacc.c  */
+#line 1051 "compilers/imcc/imcc.y"
 
     IdList * idlist;
     int t;
@@ -299,14 +301,28 @@ union YYSTYPE
     SymReg * sr;
     Instruction *i;
 
-#line 292 "compilers/imcc/imcparser.h" /* yacc.c:1909  */
-};
+
+/* Line 2053 of yacc.c  */
+#line 296 "compilers/imcc/imcparser.h"
+} YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
+# define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
 #endif
 
 
-
+#ifdef YYPARSE_PARAM
+#if defined __STDC__ || defined __cplusplus
+int yyparse (void *YYPARSE_PARAM);
+#else
+int yyparse ();
+#endif
+#else /* ! YYPARSE_PARAM */
+#if defined __STDC__ || defined __cplusplus
 int yyparse (void *yyscanner, imc_info_t *imcc);
+#else
+int yyparse ();
+#endif
+#endif /* ! YYPARSE_PARAM */
 
 #endif /* !YY_YY_COMPILERS_IMCC_IMCPARSER_H_INCLUDED  */

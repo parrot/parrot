@@ -1055,6 +1055,7 @@ IMCC_string_from_reg(ARGMOD(imc_info_t * imcc), ARGIN(const SymReg *r))
         char * p = strchr(buf, '"');
         size_t len;
 
+        IMCC_debug(imcc, DEBUG_MKCONST, "#    string_from_reg '%s' U\n", buf);
         PARROT_ASSERT(p && p[-1] == ':');
 
         len = p - buf - 1;
@@ -1067,7 +1068,11 @@ IMCC_string_from_reg(ARGMOD(imc_info_t * imcc), ARGIN(const SymReg *r))
     }
     else if (*buf == '"') {
         buf++;
-        return Parrot_str_unescape(imcc->interp, buf, '"', NULL);
+        if (r->usage & U_LEXICAL) /* GH 1095 quirks, treat as single-quote */
+            return Parrot_str_new_init(imcc->interp, buf, strlen(buf) - 1,
+                       Parrot_ascii_encoding_ptr, PObj_constant_FLAG);
+        else
+            return Parrot_str_unescape(imcc->interp, buf, '"', NULL);
     }
     else if (*buf == '\'') {
         buf++;

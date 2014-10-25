@@ -235,7 +235,7 @@ OUT
 
 # perl6 has a similar issue but there the next testcase failed. RT #116643
 # use single-quotes with .lex!
-pir_output_is( <<'CODE', <<'OUT', 'legal quoted .lex names', todo => 'GH #1095');
+pir_output_is( <<'CODE', <<'OUT', 'legal quoted .lex names');#, todo => 'GH #1095');
 .sub 'main' :main
     .lex 'bar\o', $P0        # ok, parsed as "bar\\o"
     $P1 = box 'ok 1'
@@ -243,9 +243,9 @@ pir_output_is( <<'CODE', <<'OUT', 'legal quoted .lex names', todo => 'GH #1095')
     $P2 = find_lex 'bar\o'
     say $P2
 
-    .lex "foo\\o", $P3       # wrong, parsed as "foo\\\\o"
+    .lex "foo\\o", $P3       # wrong, parsed as 'foo\\o'
     $P1 = box 'ok 2'
-    store_lex "foo\\o", $P1  # wrong, parsed as "foo\\\\o"
+    store_lex "foo\\o", $P1  # Error: Lexical 'foo\o' not found
     $P2 = find_lex "foo\\o"
     say $P2
 .end
@@ -258,7 +258,7 @@ pir_error_output_like( <<'CODE', <<'OUT', 'illegal quoted .lex names');
 .sub 'main' :main
     .lex "foo\o", $P4        # ok, parsed as "foo\o" (set_lexical)
     $P1 = box 'ok 3'
-    store_lex "foo\o", $P1   # imcc compressed that to "fooo"
+    store_lex "foo\o", $P1   # old imcc compressed that to "fooo", now error
     $P2 = find_lex "foo\o"   # ditto
     say $P2
 .end
@@ -276,7 +276,7 @@ pir_output_is( <<'CODE', <<'OUT', 'legal quote with global names');
 
     $S1 = "foo\\o"
     $P1 = box 'ok 2'
-    set_global "foo\\o", $P1   # ok, parsed as "foo\\o"
+    set_global "foo\\o", $P1   # ok, parsed as 'foo\o'
     $P2 = get_global "foo\\o"
     say $P2
 .end
@@ -303,7 +303,7 @@ pir_error_output_like( <<'CODE', <<'OUT', 'illegal quoted global names');
     $P1 = box 'ok 3'
     $S3 = "fooo"
     $P2 = box 'ok 4'
-    set_global "foo\o", $P1    # wrong, parsed as "fooo"
+    set_global "foo\o", $P1    # now illegal, before "fooo"
     set_global "fooo",  $P2
     $P3 = get_global "foo\o"
     say $P3

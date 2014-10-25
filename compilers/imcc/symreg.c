@@ -850,6 +850,7 @@ mk_const(ARGMOD(imc_info_t * imcc), ARGIN(const char *name), int t)
     if (!h->data)
         create_symhash(imcc, h);
 
+    IMCC_debug(imcc, DEBUG_MKCONST, "#    mk_const '%s' %c\n", name, t);
     return _mk_const(imcc, h, name, t);
 }
 

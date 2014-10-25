@@ -631,9 +631,9 @@ in the current pad.  The C<find_lex> opcode retrieves a variable from the curren
 
   $P0 = new "Integer"       # create a variable
   $P0 = 10                  # assign value to it
-  store_lex "foo", $P0      # store with lexical name "foo"
+  store_lex 'foo', $P0      # store with lexical name "foo"
   # ...
-  $P1 = find_lex "foo"      # get the lexical "foo" into $P1
+  $P1 = find_lex 'foo'      # get the lexical "foo" into $P1
   say $P1                   # prints 10
 
 =end PIR_FRAGMENT
@@ -645,6 +645,21 @@ follows these scoping rules:
 
       .local pmc foo
       .lex 'foo', foo
+
+=end PIR_FRAGMENT
+
+B<Limitation>: For now use only single-quotes for lexical variable
+names!  Double-quoted lexical names in C<.lex> are treated as already
+escaped, i.e. only as single-quoted and are not unescaped.
+
+So never use this:
+
+=begin PIR_FRAGMENT
+
+    .lex "foo\\o", $P3       # wrong, parsed as 'foo\\o'
+    $P1 = box 'ok 2'
+    store_lex "foo\\o", $P1  # Lexical 'foo\o' not found
+    $P2 = find_lex "foo\\o"
 
 =end PIR_FRAGMENT
 

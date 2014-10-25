@@ -7,8 +7,7 @@
 
 
 #define DEBUG_PARROT 0x0001
-/* unused:
-#define DEBUG_LEXER  0x0002 */
+#define DEBUG_MKCONST 0x0002 /* was DEBUG_LEXER */
 #define DEBUG_PARSER 0x0004
 #define DEBUG_IMC    0x0008
 #define DEBUG_CFG    0x0010

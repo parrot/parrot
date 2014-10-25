@@ -501,6 +501,7 @@ help_debug(void)
     "\n"
     "--imcc-debug -d [Flags] ...\n"
     "    0001    verbose\n"
+    "    0002    mkconst\n"
     "    0004    parser\n"
     "    0008    imc\n"
     "    0010    CFG\n"

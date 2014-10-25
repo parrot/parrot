@@ -1,9 +1,11 @@
 2014-11-18    release 6.10.0
     - Core
+      + Add imcc -d2 flag for MKCONST tracing.
     - Build
         + Set -mabi=64 for gcc --m=64 on mips, -m64 on powerpc #1110
         + Add --{en,dis}able-static #1104
     - Documentation
+      + Document .lex "" limitations
     - Tests
         + Stabilized make smoke, uploading to smolder with changed YAML::Tiny
           quoting. #1078

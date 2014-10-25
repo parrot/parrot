@@ -495,6 +495,8 @@ mk_pmc_const_named(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
         const_name = mem_sys_strdup(constant);
     }
 
+    /* That that an empty name here, like .const '' $Pxx = "constant"
+       can only be a Sub. name_length = 0 matches all */
     if ((strncmp(unquoted_name, "Sub",       name_length) == 0)
     ||  (strncmp(unquoted_name, "Coroutine", name_length) == 0)) {
         rhs = mk_const(imcc, const_name, 'p');
@@ -865,6 +867,7 @@ set_lexical(ARGMOD(imc_info_t *imcc), ARGMOD(SymReg *r), ARGMOD(SymReg *name))
 
     r->usage |= U_LEXICAL;
 
+    IMCC_debug(imcc, DEBUG_MKCONST, "#    .lex '%s'\n", name->name);
     if (name == r->reg)
         IMCC_fataly(imcc, EXCEPTION_SYNTAX_ERROR,
             "register %s already declared as lexical %s", r->name, name->name);
