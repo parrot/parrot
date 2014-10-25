@@ -31,6 +31,9 @@ Get system memory information.
 #if defined(PARROT_HAS_HEADER_SYSSYSCTL)
 #  include <sys/sysctl.h>
 #endif
+#if defined(PARROT_HAS_HEADER_SYSRESOURCE)
+#  include <sys/resource.h>
+#endif
 
 /* HEADERIZER HFILE: none */
 
@@ -40,7 +43,7 @@ Get system memory information.
 
 Get information about available physical memory.
 
-Returns available physical memory in bytes.
+Returns available physical memory in bytes, with respect to resource limits.
 
 =cut
 
@@ -59,6 +62,9 @@ size_t
 Parrot_sysmem_amount(PARROT_INTERP)
 {
     size_t        memsize = 0;
+#if defined(PARROT_HAS_HEADER_SYSRESOURCE)
+    struct rlimit rlim;
+#endif
 
 #if defined(_SC_PAGESIZE) && defined(_SC_AVPHYS_PAGES)
     UNUSED(interp);
@@ -78,7 +84,7 @@ Parrot_sysmem_amount(PARROT_INTERP)
      * the header sys/sysctl.h and the appropriate constants.
      */
 
-#  if defined(HW_MEMSIZE)
+#  if defined(HW_MEMSIZE) && (PTR_SIZE > 4)
     int memchk = HW_MEMSIZE; /* uint64_t: >2G RAM */
 #  elif defined(HW_PHYSMEM)
     int memchk = HW_PHYSMEM; /* sint32_t: max 2G RAM only */
@@ -111,6 +117,21 @@ Parrot_sysmem_amount(PARROT_INTERP)
      * here and instruct the user to fix it manually.
      */
     memsize = 512 * 1024 * 1024;
+#endif
+
+#if defined(PARROT_HAS_HEADER_SYSRESOURCE)
+    if (getrlimit(RLIMIT_DATA, &rlim) == 0) {
+        if ((rlim.rlim_max != RLIM_INFINITY) && (rlim.rlim_max <  memsize))
+            memsize = rlim.rlim_max;
+        else if ((rlim.rlim_cur != RLIM_INFINITY) && (rlim.rlim_cur <  memsize))
+            memsize = rlim.rlim_cur;
+    }
+    if (getrlimit(RLIMIT_AS, &rlim) == 0) {
+        if ((rlim.rlim_max != RLIM_INFINITY) && (rlim.rlim_max <  memsize))
+            memsize = rlim.rlim_max;
+        else if ((rlim.rlim_cur != RLIM_INFINITY) && (rlim.rlim_cur <  memsize))
+            memsize = rlim.rlim_cur;
+    }
 #endif
 
     return memsize;
