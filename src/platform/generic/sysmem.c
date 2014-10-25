@@ -121,14 +121,16 @@ Parrot_sysmem_amount(PARROT_INTERP)
 
 #if defined(PARROT_HAS_HEADER_SYSRESOURCE)
     if (getrlimit(RLIMIT_DATA, &rlim) == 0) {
-        if ((rlim.rlim_max != RLIM_INFINITY) && (rlim.rlim_max <  memsize)) memsize = rlim.rlim_max;
-        else
-        if ((rlim.rlim_cur != RLIM_INFINITY) && (rlim.rlim_cur <  memsize)) memsize = rlim.rlim_cur;
+        if ((rlim.rlim_max != RLIM_INFINITY) && (rlim.rlim_max <  memsize))
+            memsize = rlim.rlim_max;
+        else if ((rlim.rlim_cur != RLIM_INFINITY) && (rlim.rlim_cur <  memsize))
+            memsize = rlim.rlim_cur;
     }
     if (getrlimit(RLIMIT_AS, &rlim) == 0) {
-        if ((rlim.rlim_max != RLIM_INFINITY) && (rlim.rlim_max <  memsize)) memsize = rlim.rlim_max;
-        else
-        if ((rlim.rlim_cur != RLIM_INFINITY) && (rlim.rlim_cur <  memsize)) memsize = rlim.rlim_cur;
+        if ((rlim.rlim_max != RLIM_INFINITY) && (rlim.rlim_max <  memsize))
+            memsize = rlim.rlim_max;
+        else if ((rlim.rlim_cur != RLIM_INFINITY) && (rlim.rlim_cur <  memsize))
+            memsize = rlim.rlim_cur;
     }
 #endif
 

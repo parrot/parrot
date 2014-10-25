@@ -24,6 +24,9 @@ Get system memory information.
 
 #include <sys/sysctl.h>
 #include <stdio.h>
+#if defined(PARROT_HAS_HEADER_SYSRESOURCE)
+#  include <sys/resource.h>
+#endif
 
 /* HEADERIZER HFILE: none */
 
@@ -44,6 +47,9 @@ Parrot_sysmem_amount(PARROT_INTERP)
     size_t        memsize = 0;
     char         *err_msg;
     unsigned long length = sizeof (memsize);
+#if defined(PARROT_HAS_HEADER_SYSRESOURCE)
+    struct rlimit rlim;
+#endif
 
 #if defined(HW_MEMSIZE) && (PTR_SIZE > 4)
     int memchk = HW_MEMSIZE; /* uint64_t: >2G RAM */
@@ -65,6 +71,21 @@ Parrot_sysmem_amount(PARROT_INTERP)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
                 "sysctl failed: %s\n", err_msg);
     }
+
+#if defined(PARROT_HAS_HEADER_SYSRESOURCE)
+    if (getrlimit(RLIMIT_DATA, &rlim) == 0) {
+        if ((rlim.rlim_max != RLIM_INFINITY) && (rlim.rlim_max <  memsize))
+            memsize = rlim.rlim_max;
+        else if ((rlim.rlim_cur != RLIM_INFINITY) && (rlim.rlim_cur <  memsize))
+            memsize = rlim.rlim_cur;
+    }
+    if (getrlimit(RLIMIT_RSS, &rlim) == 0) {
+        if ((rlim.rlim_max != RLIM_INFINITY) && (rlim.rlim_max <  memsize))
+            memsize = rlim.rlim_max;
+        else if ((rlim.rlim_cur != RLIM_INFINITY) && (rlim.rlim_cur <  memsize))
+            memsize = rlim.rlim_cur;
+    }
+#endif
 
     return memsize;
 }
