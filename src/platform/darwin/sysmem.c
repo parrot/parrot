@@ -55,8 +55,15 @@ Parrot_sysmem_amount(PARROT_INTERP)
     err = sysctl(selection, 2, &memsize, &length, NULL, 0) ;
     if (err) {
         err_msg = strerror(err);
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
-                "sysctl failed: %s", err_msg);
+        /* sysmem_amount() is usually called too early, exceptions cannot be called yet */
+        if (!Parrot_default_encoding_ptr) {
+            fprintf(stderr, "sysctl failed: %s\n", err_msg);
+            fprintf(stderr, "C file %s, line %u\n", __FILE__, __LINE__);
+            exit(err);
+        }
+        else
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
+                "sysctl failed: %s\n", err_msg);
     }
 
     return memsize;
