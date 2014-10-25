@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -85,8 +85,7 @@ if ($longopts->{archive}) {
         }
     );
     my $results = $harness->runtests(@tests);
-    # smolder is currently (2014) too unstable to accept most reports: GH #1040
-    # osuosl blames their 32bit VM
+    # smolder was too unstable to accept most reports, Fixed with GH #1078
     eval { send_archive_to_smolder(%env_data); } if $longopts->{send_to_smolder};
     warn $@ if $@;
     exit ( $results->all_passed() ? 0 : 1 );
