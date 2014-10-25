@@ -233,9 +233,9 @@ CODE
 /Multiple declarations of lexical 'foo'/
 OUT
 
-# perl6 has a similar issue but there the next testcase failed. RT #116643
-# use single-quotes with .lex!
-pir_output_is( <<'CODE', <<'OUT', 'legal quoted .lex names');#, todo => 'GH #1095');
+# use only single-quotes with .lex!
+# needs to be fixed in perl6 also. RT #116643
+pir_output_is( <<'CODE', <<'OUT', 'legal quoted .lex names', todo => 'GH #1095');
 .sub 'main' :main
     .lex 'bar\o', $P0        # ok, parsed as "bar\\o"
     $P1 = box 'ok 1'
