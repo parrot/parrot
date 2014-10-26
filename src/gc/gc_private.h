@@ -48,8 +48,7 @@ extern int CONSERVATIVE_POINTER_CHASING;
 
 /*
 
-=item C<static void panic_failed_allocation(unsigned int line, unsigned long
-size)>
+=item C<static void panic_failed_allocation(unsigned int line, size_t size)>
 
 Print an error message and die.
 

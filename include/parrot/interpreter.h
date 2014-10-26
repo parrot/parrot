@@ -141,11 +141,11 @@ typedef Parrot_Run_core_t Run_Cores;
 
 #define Interp_flags_SET(interp, flag)   ((interp)->flags |= (flag))
 #define Interp_flags_CLEAR(interp, flag) ((interp)->flags &= ~(flag))
-#define Interp_flags_TEST(interp, flag)  ((interp)->flags & (flag))
+#define Interp_flags_TEST(interp, flag)  (((interp)->flags & (flag)) == (flag))
 
 #define Interp_debug_SET(interp, flag)   ((interp)->debug_flags |= (flag))
 #define Interp_debug_CLEAR(interp, flag) ((interp)->debug_flags &= ~(flag))
-#define Interp_debug_TEST(interp, flag)  ((interp)->debug_flags & (flag))
+#define Interp_debug_TEST(interp, flag)  (((interp)->debug_flags & (flag)) == (flag))
 
 #define Interp_trace_SET(interp, flag)   Parrot_pcc_trace_flags_on(interp, interp->ctx, (flag))
 #define Interp_trace_CLEAR(interp, flag) Parrot_pcc_trace_flags_off(interp, interp->ctx, (flag))
