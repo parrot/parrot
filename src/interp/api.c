@@ -251,6 +251,7 @@ Parrot_interp_initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *a
     int numthr;
 
     /* Set up the memory allocation system */
+    interp->debug_flags = args->debug_flags;
     Parrot_gc_initialize(interp, args);
     Parrot_block_GC_mark(interp);
     Parrot_block_GC_sweep(interp);

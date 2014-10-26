@@ -766,9 +766,16 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
         /*
          * Collect every nursery_size/100 of system memory.
          *
-         * Configured by runtime parameter (default 2%).
+         * Configured by runtime parameter, default 2%.
+         * or --gc-nursery-size=2 [default]
          */
         self->gc_threshold = Parrot_sysmem_amount(interp) * nursery_size / 100;
+#ifndef NDEBUG
+        if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG)) {
+            fprintf(stderr, "GC nursery size: %f\n", nursery_size);
+            fprintf(stderr, "GMS GC threshold: %ld\n", self->gc_threshold);
+        }
+#endif
 
         Parrot_gc_str_initialize(interp, &self->string_gc);
     }
@@ -1438,7 +1445,7 @@ gc_gms_finalize(PARROT_INTERP)
 {
     ASSERT_ARGS(gc_gms_finalize)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    size_t        i;
+    size_t i;
 
     Parrot_gc_str_finalize(interp, &self->string_gc);
 
@@ -1456,8 +1463,7 @@ gc_gms_finalize(PARROT_INTERP)
 
 =item C<gc_gms_maybe_mark_and_sweep(PARROT_INTERP)>
 
-Maybe M&S. Depends on total allocated memory, memory allocated since last alloc
-and phase of the Moon.
+Maybe M&S. Depends on total allocated memory, memory allocated since last alloc.
 
 =cut
 
@@ -1800,7 +1806,7 @@ gc_gms_iterate_live_strings(PARROT_INTERP,
     ASSERT_ARGS(gc_gms_iterate_live_strings)
 
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    size_t             i;
+    size_t i;
     for (i = 0; i < MAX_GENERATIONS; i++) {
         POINTER_ARRAY_ITER(self->strings[i],
             STRING *s = &((string_alloc_struct *)ptr)->str;
@@ -2251,15 +2257,19 @@ gc_gms_check_sanity(PARROT_INTERP)
     UNUSED(interp)
 #else
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
-    size_t            i;
+    size_t i;
 
     for (i = 0; i < MAX_GENERATIONS; i++) {
         POINTER_ARRAY_ITER(self->objects[i],
             PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
             const size_t gen  = POBJ2GEN(pmc);
             PARROT_GC_ASSERT_INTERP(pmc, interp);
-            MEMORY_DEBUG_DETAIL_3("GC live pmc %-21s gen %ld at %p\n",
+            if (i < 3) /* too many objects in gen3 */
+                GC_DEBUG_DETAIL_3("GC live pmc %-21s gen %ld at %p\n",
                                   pmc->vtable->whoami->strstart, gen, pmc);
+            if (gen != i)
+                fprintf(stderr, "GC live pmc %-21s gen %ld != %ld at %p\n",
+                        pmc->vtable->whoami->strstart, gen, i, pmc);
             PARROT_ASSERT((gen == i)
                 || !"Object from wrong generation");
 
@@ -2276,7 +2286,7 @@ gc_gms_check_sanity(PARROT_INTERP)
     POINTER_ARRAY_ITER(self->dirty_list,
         PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
         PARROT_GC_ASSERT_INTERP(pmc, interp);
-        MEMORY_DEBUG_DETAIL_2("GC dirty pmc %-21s at %p\n",
+        GC_DEBUG_DETAIL_2("GC dirty pmc %-21s at %p\n",
                 pmc->vtable->whoami->strstart, pmc);
         PARROT_ASSERT(PObj_GC_on_dirty_list_TEST(pmc)
             || !"Object in dirty_list without dirty_flag"););
@@ -2284,7 +2294,7 @@ gc_gms_check_sanity(PARROT_INTERP)
     POINTER_ARRAY_ITER(self->work_list,
         PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
         PARROT_GC_ASSERT_INTERP(pmc, interp);
-        MEMORY_DEBUG_DETAIL_2("GC work pmc %-21s at %p\n",
+        GC_DEBUG_DETAIL_2("GC work pmc %-21s at %p\n",
                 pmc->vtable->whoami->strstart, pmc);
         PARROT_ASSERT(!PObj_GC_on_dirty_list_TEST(pmc)
             || !"Dirty object in work_list"););

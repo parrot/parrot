@@ -205,6 +205,10 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
             fprintf(stderr, "Unknown GC type '%s'\n", args->system);
             PANIC(interp, "Cannot activate GC");
         }
+#ifndef NDEBUG
+        if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG))
+            fprintf(stderr, "GC type '%s'\n", args->system);
+#endif
     }
 
     switch (interp->gc_sys->sys_type) {

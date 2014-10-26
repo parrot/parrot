@@ -1448,7 +1448,7 @@ gc_ms2_free_memory_chunk(PARROT_INTERP, ARGFREE(void *data))
 
 =item C<static void gc_ms2_pmc_needs_early_collection(PARROT_INTERP, PMC *pmc)>
 
-Marks a PMC as needing timely destruction.
+Helper function to count how many PMCs need timely destruction.
 
 =cut
 

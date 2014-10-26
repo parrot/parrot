@@ -160,10 +160,27 @@ This turns off GC. This may be useful to find GC related bugs. Don't use this
 option for longer running programs: as memory is no longer recycled, it may
 quickly become exhausted.
 
+=item --gc-nursery-size=percent
+
+Default: 2
+
+=item --gc-dynamic-threshold=percent
+
+Default: 75
+
+=item --gc-min-threshold=MB
+
+Default: 4
+
 =item --leak-test, --destroy-at-end
 
 Free all memory of the last interpreter.  This is useful when running leak
 checkers.
+
+=item --numthreads=number
+
+Overrides the automatically detected number of CPU cores to set the
+number of OS threads. Minimum number: 2
 
 =back
 

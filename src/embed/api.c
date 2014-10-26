@@ -143,6 +143,7 @@ Parrot_api_make_interpreter(Parrot_PMC parent, Parrot_Int flags,
             gc_args.nursery_size      = args->gc_nursery_size;
             gc_args.dynamic_threshold = args->gc_dynamic_threshold;
             gc_args.min_threshold     = args->gc_min_threshold;
+            gc_args.debug_flags       = args->debug_flags;
             gc_args.numthreads        = args->numthreads;
 
             if (args->hash_seed)

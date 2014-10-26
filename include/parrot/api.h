@@ -78,6 +78,7 @@ typedef struct _Parrot_Init_Args {
     Parrot_Int gc_min_threshold;
     Parrot_UInt hash_seed;
     Parrot_UInt numthreads;
+    Parrot_UInt debug_flags;
 } Parrot_Init_Args;
 
 #define GET_INIT_STRUCT(i) do {\

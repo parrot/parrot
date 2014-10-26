@@ -30,7 +30,7 @@ typedef enum {
 /* &gen_from_enum(interpdebug.pasm) */
 typedef enum {
     PARROT_NO_DEBUG                 = 0x00,
-    PARROT_MEM_STAT_DEBUG_FLAG      = 0x01,  /* memory usage summary */
+    PARROT_MEM_STAT_DEBUG_FLAG      = 0x01,  /* memory/gc usage summary */
     PARROT_BACKTRACE_DEBUG_FLAG     = 0x02,  /* print bt in exception */
     PARROT_JIT_DEBUG_FLAG           = 0x04,  /* create jit stabs file (unused) */
     PARROT_START_DEBUG_FLAG         = 0x08,
@@ -38,7 +38,8 @@ typedef enum {
     PARROT_EVAL_DEBUG_FLAG          = 0x20,  /* create EVAL_n file */
     PARROT_REG_DEBUG_FLAG           = 0x40,  /* fill I,N with garbage */
     PARROT_CTX_DESTROY_DEBUG_FLAG   = 0x80,  /* ctx of a sub is gone */
-    PARROT_GC_DETAIL_DEBUG_FLAG     = 0x100,
+    PARROT_GC_DETAIL_DEBUG_FLAG     = 0x100, /* formerly DETAIL_MEMORY_DEBUG */
+    PARROT_MEM_DETAIL_DEBUG_FLAG    = 0x200, /* every single malloc/free */
     PARROT_ALL_DEBUG_FLAGS          = 0xffff
 } Parrot_debug_flags;
 /* &end_gen */
