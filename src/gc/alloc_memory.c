@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -26,6 +26,13 @@ setup function to initialize the memory pools.
 
 #define PANIC_OUT_OF_MEM(size) panic_failed_allocation(__LINE__, (size))
 #define PANIC_ZERO_ALLOCATION(func) panic_zero_byte_allocation(__LINE__, (func))
+
+#ifndef DETAIL_MEMORY_DEBUG
+#  define MEMORY_DEBUG_DETAIL_2(s, a1, a2)
+#else
+#  define MEMORY_DEBUG_DETAIL_2(s, a1, a2) \
+        fprintf(stderr, (s), (a1), (a2))
+#endif
 
 /* HEADERIZER HFILE: include/parrot/memory.h */
 /* HEADERIZER BEGIN: static */
@@ -68,9 +75,7 @@ mem_sys_allocate(size_t size)
     void * const ptr = malloc(size);
     if (size==0)
         PANIC_ZERO_ALLOCATION("mem_sys_allocate");
-#ifdef DETAIL_MEMORY_DEBUG
-    fprintf(stderr, "Allocated %i at %p\n", size, ptr);
-#endif
+    MEMORY_DEBUG_DETAIL_2("Allocated %i at %p\n", size, ptr);
     if (!ptr)
         PANIC_OUT_OF_MEM(size);
     return ptr;
@@ -98,9 +103,7 @@ mem_sys_allocate_zeroed(size_t size)
 
     if (size==0)
         PANIC_ZERO_ALLOCATION("mem_sys_allocate_zeroed");
-#ifdef DETAIL_MEMORY_DEBUG
-    fprintf(stderr, "Allocated %i at %p\n", size, ptr);
-#endif
+    MEMORY_DEBUG_DETAIL_2("Allocated %i at %p\n", size, ptr);
     if (!ptr)
         PANIC_OUT_OF_MEM(size);
     return ptr;
@@ -128,16 +131,12 @@ mem_sys_realloc(ARGFREE(void *from), size_t size)
     void *ptr;
     if (size==0)
         PANIC_ZERO_ALLOCATION("mem_sys_realloc");
-#ifdef DETAIL_MEMORY_DEBUG
-    fprintf(stderr, "Freed %p (realloc -- %i bytes)\n", from, size);
-#endif
+    MEMORY_DEBUG_DETAIL_2("Freed %p (realloc -- %i bytes)\n", from, size);
     if (from)
         ptr = realloc(from, size);
     else
         ptr = calloc(1, size);
-#ifdef DETAIL_MEMORY_DEBUG
-    fprintf(stderr, "Allocated %i at %p\n", size, ptr);
-#endif
+    MEMORY_DEBUG_DETAIL_2("Allocated %i at %p\n", size, ptr);
     if (!ptr)
         PANIC_OUT_OF_MEM(size);
     return ptr;
@@ -166,13 +165,9 @@ mem_sys_realloc_zeroed(ARGFREE(void *from), size_t size, size_t old_size)
     void *ptr;
     if (size==0)
         PANIC_ZERO_ALLOCATION("mem_sys_realloc_zeroed");
-#ifdef DETAIL_MEMORY_DEBUG
-    fprintf(stderr, "Freed %p (realloc -- %i bytes)\n", from, size);
-#endif
+    MEMORY_DEBUG_DETAIL_2("Freed %p (realloc -- %i bytes)\n", from, size);
     ptr = from ? realloc(from, size) : malloc(size);
-#ifdef DETAIL_MEMORY_DEBUG
-    fprintf(stderr, "Allocated %i at %p\n", size, ptr);
-#endif
+    MEMORY_DEBUG_DETAIL_2("Allocated %i at %p\n", size, ptr);
     if (!ptr)
         PANIC_OUT_OF_MEM(size);
 
@@ -197,9 +192,7 @@ void
 mem_sys_free(ARGFREE(void *from))
 {
     ASSERT_ARGS(mem_sys_free)
-#ifdef DETAIL_MEMORY_DEBUG
-    fprintf(stderr, "Freed %p\n", from);
-#endif
+    MEMORY_DEBUG_DETAIL_2("Freed %p%s\n", from, "");
     if (from)
         free(from);
 }

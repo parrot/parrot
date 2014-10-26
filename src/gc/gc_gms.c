@@ -110,8 +110,6 @@ TBD
 #include "gc_private.h"
 #include "fixed_allocator.h"
 
-#define PANIC_OUT_OF_MEM(size) failed_allocation(__LINE__, (size))
-
 #ifdef THREAD_DEBUG
 #  define PARROT_GC_ASSERT_INTERP(pmc, interp) \
     PARROT_ASSERT((pmc) == NULL || (pmc)->orig_interp == (interp))
@@ -217,9 +215,6 @@ typedef void (*sweep_cb)(PARROT_INTERP, PObj *obj);
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_DOES_NOT_RETURN
-static void failed_allocation(unsigned int line, size_t size);
-
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
 static Parrot_Buffer* gc_gms_allocate_buffer_header(PARROT_INTERP,
@@ -238,12 +233,14 @@ static void* gc_gms_allocate_fixed_size_storage(PARROT_INTERP, size_t size)
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static void * gc_gms_allocate_memory_chunk(PARROT_INTERP, size_t size);
+static void * gc_gms_allocate_memory_chunk(PARROT_INTERP, size_t size)
+        __attribute__nonnull__(1);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
 static void * gc_gms_allocate_memory_chunk_zeroed(PARROT_INTERP,
-    size_t size);
+    size_t size)
+        __attribute__nonnull__(1);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
@@ -315,7 +312,9 @@ static void gc_gms_free_fixed_size_storage(PARROT_INTERP,
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*data);
 
-static void gc_gms_free_memory_chunk(PARROT_INTERP, ARGFREE(void *data));
+static void gc_gms_free_memory_chunk(PARROT_INTERP, ARGFREE(void *data))
+        __attribute__nonnull__(1);
+
 static void gc_gms_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -389,6 +388,7 @@ static void gc_gms_pmc_get_youngest_generation(PARROT_INTERP,
 static void gc_gms_pmc_needs_early_collection(PARROT_INTERP, PMC *pmc)
         __attribute__nonnull__(1);
 
+PARROT_INLINE
 static void gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -416,7 +416,8 @@ PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
 static void * gc_gms_reallocate_memory_chunk(PARROT_INTERP,
     ARGFREE(void *from),
-    size_t size);
+    size_t size)
+        __attribute__nonnull__(1);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
@@ -475,7 +476,6 @@ static void gc_gms_write_barrier(PARROT_INTERP, ARGMOD(PMC *pmc))
         FUNC_MODIFIES(*pmc);
 
 static int gen2flags(int gen);
-#define ASSERT_ARGS_failed_allocation __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_gms_allocate_buffer_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_allocate_buffer_storage \
@@ -485,9 +485,11 @@ static int gen2flags(int gen);
 #define ASSERT_ARGS_gc_gms_allocate_fixed_size_storage \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_gc_gms_allocate_memory_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_gc_gms_allocate_memory_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_allocate_memory_chunk_zeroed \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_allocate_pmc_attributes \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -529,7 +531,8 @@ static int gen2flags(int gen);
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(data))
-#define ASSERT_ARGS_gc_gms_free_memory_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_gc_gms_free_memory_chunk __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_free_pmc_attributes __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
@@ -590,7 +593,8 @@ static int gen2flags(int gen);
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_gc_gms_reallocate_memory_chunk \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_reallocate_memory_chunk_zeroed \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_gms_reallocate_string_storage \
@@ -1935,8 +1939,6 @@ size)>
 
 =item C<static void gc_gms_free_memory_chunk(PARROT_INTERP, void *data)>
 
-=item C<static void failed_allocation(unsigned int line, size_t size)>
-
 TODO Write docu.
 
 */
@@ -1944,13 +1946,11 @@ TODO Write docu.
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
 static void *
-gc_gms_allocate_memory_chunk(SHIM_INTERP, size_t size)
+gc_gms_allocate_memory_chunk(PARROT_INTERP, size_t size)
 {
     ASSERT_ARGS(gc_gms_allocate_memory_chunk)
     void * const ptr = malloc(size);
-#if defined(DETAIL_MEMORY_DEBUG)
-    fprintf(stderr, "Allocated %i at %p\n", size, ptr);
-#endif
+    MEMORY_DEBUG_DETAIL_2("Allocated %ld at %p\n", size, ptr);
     if (!ptr && size)
         PANIC_OUT_OF_MEM(size);
     return ptr;
@@ -1959,20 +1959,16 @@ gc_gms_allocate_memory_chunk(SHIM_INTERP, size_t size)
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
 static void *
-gc_gms_reallocate_memory_chunk(SHIM_INTERP, ARGFREE(void *from), size_t size)
+gc_gms_reallocate_memory_chunk(PARROT_INTERP, ARGFREE(void *from), size_t size)
 {
     ASSERT_ARGS(gc_gms_reallocate_memory_chunk)
     void *ptr;
-#if defined(DETAIL_MEMORY_DEBUG)
-    fprintf(stderr, "Freed %p (realloc -- %i bytes)\n", from, size);
-#endif
+    MEMORY_DEBUG_DETAIL_2("Freed %p (realloc -- %ld bytes)\n", from, size);
     if (from)
         ptr = realloc(from, size);
     else
         ptr = calloc(1, size);
-#if defined(DETAIL_MEMORY_DEBUG)
-    fprintf(stderr, "Allocated %i at %p\n", size, ptr);
-#endif
+    MEMORY_DEBUG_DETAIL_2("Allocated %ld at %p\n", size, ptr);
     if (!ptr && size)
         PANIC_OUT_OF_MEM(size);
     return ptr;
@@ -1981,13 +1977,11 @@ gc_gms_reallocate_memory_chunk(SHIM_INTERP, ARGFREE(void *from), size_t size)
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
 static void *
-gc_gms_allocate_memory_chunk_zeroed(SHIM_INTERP, size_t size)
+gc_gms_allocate_memory_chunk_zeroed(PARROT_INTERP, size_t size)
 {
     ASSERT_ARGS(gc_gms_allocate_memory_chunk_zeroed)
     void * const ptr = calloc(1, size);
-#if defined(DETAIL_MEMORY_DEBUG)
-    fprintf(stderr, "Allocated %i at %p\n", size, ptr);
-#endif
+    MEMORY_DEBUG_DETAIL_2("Allocated %ld at %p\n", size, ptr);
     if (!ptr && size)
         PANIC_OUT_OF_MEM(size);
     return ptr;
@@ -2007,25 +2001,13 @@ gc_gms_reallocate_memory_chunk_zeroed(SHIM_INTERP, ARGFREE(void *data),
 }
 
 static void
-gc_gms_free_memory_chunk(SHIM_INTERP, ARGFREE(void *data))
+gc_gms_free_memory_chunk(PARROT_INTERP, ARGFREE(void *data))
 {
     ASSERT_ARGS(gc_gms_free_memory_chunk)
-#if defined(DETAIL_MEMORY_DEBUG)
-    fprintf(stderr, "Freed %p\n", data);
-#endif
+    MEMORY_DEBUG_DETAIL_2("Freed %p%s\n", data, "");
     if (data)
         free(data);
 }
-
-PARROT_DOES_NOT_RETURN
-static void
-failed_allocation(unsigned int line, size_t size)
-{
-    ASSERT_ARGS(failed_allocation)
-    fprintf(stderr, "Failed allocation of %lu bytes\n", (unsigned long)size);
-    Parrot_x_panic_and_exit(NULL, "Out of mem", __FILE__, line);
-}
-
 
 /*
 
@@ -2086,8 +2068,9 @@ gc_gms_write_barrier(PARROT_INTERP, ARGMOD(PMC *pmc))
         PARROT_GC_ASSERT_INTERP(pmc, interp);
 
 #ifdef MEMORY_DEBUG
-        fprintf(stderr, "GC WB pmc %-21s gen %ld at %p - %p\n",
-                pmc->vtable->whoami->strstart, gen, pmc, item->ptr);
+        if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG))
+            fprintf(stderr, "GC WB pmc %-21s gen %ld at %p - %p\n",
+                    pmc->vtable->whoami->strstart, gen, pmc, item->ptr);
 #endif
         Parrot_pa_remove(interp, self->objects[gen], item->ptr);
         item->ptr = Parrot_pa_insert(self->dirty_list, item);
@@ -2275,12 +2258,8 @@ gc_gms_check_sanity(PARROT_INTERP)
             PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
             const size_t gen  = POBJ2GEN(pmc);
             PARROT_GC_ASSERT_INTERP(pmc, interp);
-
-#  ifdef DETAIL_MEMORY_DEBUG
-            fprintf(stderr, "GC live pmc %-21s gen %ld at %p\n",
-                    pmc->vtable->whoami->strstart, gen, pmc);
-#  endif
-
+            MEMORY_DEBUG_DETAIL_3("GC live pmc %-21s gen %ld at %p\n",
+                                  pmc->vtable->whoami->strstart, gen, pmc);
             PARROT_ASSERT((gen == i)
                 || !"Object from wrong generation");
 
@@ -2297,20 +2276,16 @@ gc_gms_check_sanity(PARROT_INTERP)
     POINTER_ARRAY_ITER(self->dirty_list,
         PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
         PARROT_GC_ASSERT_INTERP(pmc, interp);
-#  ifdef DETAIL_MEMORY_DEBUG
-        fprintf(stderr, "GC dirty pmc %-21s at %p\n",
+        MEMORY_DEBUG_DETAIL_2("GC dirty pmc %-21s at %p\n",
                 pmc->vtable->whoami->strstart, pmc);
-#  endif
         PARROT_ASSERT(PObj_GC_on_dirty_list_TEST(pmc)
             || !"Object in dirty_list without dirty_flag"););
 
     POINTER_ARRAY_ITER(self->work_list,
         PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
         PARROT_GC_ASSERT_INTERP(pmc, interp);
-#  ifdef DETAIL_MEMORY_DEBUG
-        fprintf(stderr, "GC work pmc %-21s at %p\n",
+        MEMORY_DEBUG_DETAIL_2("GC work pmc %-21s at %p\n",
                 pmc->vtable->whoami->strstart, pmc);
-#  endif
         PARROT_ASSERT(!PObj_GC_on_dirty_list_TEST(pmc)
             || !"Dirty object in work_list"););
 #endif
@@ -2374,13 +2349,15 @@ gc_gms_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
 
 }
 
+PARROT_INLINE
 static void
 gc_gms_print_stats(PARROT_INTERP, ARGIN(const char* header))
 {
     ASSERT_ARGS(gc_gms_print_stats)
 
 #ifdef MEMORY_DEBUG
-    gc_gms_print_stats_always(interp, header);
+    if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG))
+        gc_gms_print_stats_always(interp, header);
 #else
     UNUSED(interp);
     UNUSED(header);

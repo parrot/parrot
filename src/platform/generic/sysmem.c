@@ -62,6 +62,9 @@ size_t
 Parrot_sysmem_amount(PARROT_INTERP)
 {
     size_t        memsize = 0;
+#ifndef NDEBUG
+    size_t        ori_memsize = 0;
+#endif
 #if defined(PARROT_HAS_HEADER_SYSRESOURCE)
     struct rlimit rlim;
 #endif
@@ -109,14 +112,25 @@ Parrot_sysmem_amount(PARROT_INTERP)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
                 "sysctl failed: %s\n", err_msg);
     }
-
+#  ifndef NDEBUG
+    if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG)) {
+        ori_memsize = memsize;
+        fprintf(stderr, "Free Memory: %ld\n", memsize);
+    }
+#  endif
 #else
     UNUSED(interp);
-    /* Method 3:  Random guess.  Simply guess 512 MB.  This way, parrot
+    /* Method 3:  Faith.  Simply guess 512 MB.  This way, parrot
      * will at least build.  Arguably, one could also just put an error
      * here and instruct the user to fix it manually.
      */
     memsize = 512 * 1024 * 1024;
+#  ifndef NDEBUG
+    if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG)) {
+        ori_memsize = memsize;
+        fprintf(stderr, "Default Memory: %ld\n", memsize);
+    }
+#  endif
 #endif
 
 #if defined(PARROT_HAS_HEADER_SYSRESOURCE)
@@ -132,6 +146,11 @@ Parrot_sysmem_amount(PARROT_INTERP)
         else if ((rlim.rlim_cur != RLIM_INFINITY) && (rlim.rlim_cur <  memsize))
             memsize = rlim.rlim_cur;
     }
+#  ifndef NDEBUG
+    if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG)
+        && ori_memsize != memsize)
+        fprintf(stderr, "Memory via rlimit restricted to: %ld\n", memsize);
+#  endif
 #endif
 
     return memsize;

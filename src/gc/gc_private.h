@@ -10,6 +10,13 @@ src/gc/gc_private.h - private header file for the GC subsystem
 This is a private header file for the GC subsystem. It contains definitions
 that are only for use in the GC and don't need to be included in the rest of
 Parrot.
+
+=head2 Private Functions
+
+=over 4
+
+=cut
+
 */
 
 #ifndef PARROT_GC_PRIVATE_H_GUARD
@@ -22,6 +29,42 @@ Parrot.
 /* Set when walking the system stack. Defined in src/gc/system.c */
 extern int CONSERVATIVE_POINTER_CHASING;
 #endif
+
+#ifndef MEMORY_DEBUG
+#  define MEMORY_DEBUG_DETAIL_2(s, a1, a2)
+#  define MEMORY_DEBUG_DETAIL_3(s, a1, a2, a3)
+#else
+#  define MEMORY_DEBUG_DETAIL_2(s, a1, a2) \
+    if (Interp_debug_TEST(interp, \
+                PARROT_MEM_STAT_DEBUG_FLAG | PARROT_GC_DETAIL_DEBUG_FLAG)) \
+        fprintf(stderr, (s), (a1), (a2))
+#  define MEMORY_DEBUG_DETAIL_3(s, a1, a2, a3)     \
+    if (Interp_debug_TEST(interp, \
+                PARROT_MEM_STAT_DEBUG_FLAG | PARROT_GC_DETAIL_DEBUG_FLAG)) \
+        fprintf(stderr, (s), (a1), (a2), (a3))
+#endif
+
+#define PANIC_OUT_OF_MEM(size) panic_failed_allocation(__LINE__, (size))
+
+/*
+
+=item C<static void panic_failed_allocation(unsigned int line, unsigned long
+size)>
+
+Print an error message and die.
+
+=cut
+
+*/
+
+PARROT_DOES_NOT_RETURN
+static void
+panic_failed_allocation(unsigned int line, size_t size)
+{
+    fprintf(stderr, "Failed allocation of %lu bytes\n", (unsigned long)size);
+    Parrot_x_panic_and_exit(NULL, "Out of mem", __FILE__, line);
+}
+
 
 #ifdef __ia64__
 
@@ -784,6 +827,14 @@ void Parrot_gc_str_reallocate_string_storage(PARROT_INTERP,
 /* HEADERIZER END: src/gc/string_gc.c */
 
 #endif /* PARROT_GC_PRIVATE_H_GUARD */
+
+/*
+
+=back
+
+=cut
+
+*/
 
 /*
  * Local variables:
