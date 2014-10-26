@@ -108,8 +108,8 @@ io_setup_vtables(PARROT_INTERP)
 {
     ASSERT_ARGS(io_setup_vtables)
     const int number_of_vtables = 5;
-    interp->piodata->vtables = (const IO_VTABLE*)mem_gc_allocate_n_zeroed_typed(interp,
-                                                                number_of_vtables, const IO_VTABLE);
+    interp->piodata->vtables = (IO_VTABLE*)mem_gc_allocate_n_zeroed_typed(interp,
+                                   number_of_vtables, IO_VTABLE);
     interp->piodata->num_vtables = number_of_vtables;
     io_filehandle_setup_vtable(interp, NULL, IO_VTABLE_FILEHANDLE);
     io_socket_setup_vtable(interp, NULL, IO_VTABLE_SOCKET);
@@ -145,13 +145,13 @@ Parrot_io_allocate_new_vtable(PARROT_INTERP, ARGIN(const char *name))
     const int number_of_vtables = interp->piodata->num_vtables;
     IO_VTABLE *vtable;
     interp->piodata->vtables = mem_gc_realloc_n_typed(interp,
-                                (void *)interp->piodata->vtables,
-                                number_of_vtables + 1, const IO_VTABLE);
+                                interp->piodata->vtables,
+                                number_of_vtables + 1, IO_VTABLE);
     vtable = IO_EDITABLE_IO_VTABLE(interp, number_of_vtables);
     vtable->name = name;
     vtable->number = number_of_vtables;
     interp->piodata->num_vtables++;
-    return (const IO_VTABLE *)vtable;
+    return vtable;
 }
 
 PARROT_WARN_UNUSED_RESULT

@@ -124,7 +124,7 @@ DIAGRAM
 struct _ParrotIOData {
     PMC ** table;               /* Standard IO Streams (STDIN, STDOUT, STDERR) */
     INTVAL num_vtables;         /* Number of vtables */
-    const IO_VTABLE * vtables;  /* Array of VTABLES */
+    IO_VTABLE * vtables;        /* Array of VTABLES */
 };
 
 /* redefine PIO_STD* for internal use */
@@ -168,8 +168,8 @@ struct _ParrotIOData {
     } while (0);
 
 /* Get an editable version of the IO_VTABLE structure, typically used during
-   vtable initialization. cast the const away. */
-#define IO_EDITABLE_IO_VTABLE(i, idx) (IO_VTABLE *)(&((i)->piodata->vtables[(idx)]))
+   vtable initialization. */
+#define IO_EDITABLE_IO_VTABLE(i, idx) &((i)->piodata->vtables[(idx)])
 
 
 /* HEADERIZER BEGIN: src/io/utilities.c */
