@@ -7,7 +7,7 @@
         + Set -mabi=64 for gcc --m=64 on mips, -m64 on powerpc #1110
         + Add --{en,dis}able-static #1104
     - Documentation
-        + Document .lex "" limitations
+        + Document .lex "name" limitations. Use .lex 'name' w/ single-quotes #1095
     - Tests
         + Stabilized make smoke, uploading to smolder with changed YAML::Tiny
           quoting. #1078
