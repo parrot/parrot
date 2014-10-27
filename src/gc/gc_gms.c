@@ -2267,9 +2267,14 @@ gc_gms_check_sanity(PARROT_INTERP)
             PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
             const size_t gen  = POBJ2GEN(pmc);
             PARROT_GC_ASSERT_INTERP(pmc, interp);
-            if (i < 3) /* too many objects in gen3 */
-                GC_DEBUG_DETAIL_3("GC live pmc %-21s gen %ld at %p\n",
-                                  pmc->vtable->whoami->strstart, gen, pmc);
+            if (i < 3) { /* too many objects in gen3 */
+                if (Interp_debug_TEST(interp,
+                      PARROT_MEM_STAT_DEBUG_FLAG | PARROT_GC_DETAIL_DEBUG_FLAG)) {
+                    fprintf(stderr, "GC live gen %ld ", gen);
+                    trace_pmc_dump(interp, pmc);
+                    fprintf(stderr, "\n");
+                }
+            }
             if (gen != i) {
                 fprintf(stderr, "GC live pmc %-21s gen %ld != %ld\n",
                         pmc->vtable->whoami->strstart, gen, i);

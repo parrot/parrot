@@ -158,12 +158,22 @@ trace_pmc_flags_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
     if (!pmc || PMC_IS_NULL(pmc)) {
         return;
     }
-    Parrot_io_eprintf(debugger, " (");
+    if (debugger == interp)
+        fprintf(stderr, " (");
+    else
+        Parrot_io_eprintf(debugger, " (");
     for (i=0; i < sizeof (flags_names) / sizeof (flags_names[0]); i++) {
-        if (flags & flags_names[i].flag)
-            Parrot_io_eprintf(debugger, "%s,", flags_names[i].name);
+        if (flags & flags_names[i].flag) {
+            if (debugger == interp)
+                fprintf(stderr, "%s,", flags_names[i].name);
+            else
+                Parrot_io_eprintf(debugger, "%s,", flags_names[i].name);
+        }
     }
-    Parrot_io_eprintf(debugger, ")");
+    if (debugger == interp)
+        fprintf(stderr, ")");
+    else
+        Parrot_io_eprintf(debugger, ")");
 }
 
 /*
