@@ -9,7 +9,7 @@
     - Documentation
         + Document .lex "name" limitations. Use .lex 'name' w/ single-quotes #1095
     - Tests
-        + Stabilized make smoke, uploading to smolder with changed YAML::Tiny
+        + Fixed make smoke, uploading to smolder with changed YAML::Tiny
           quoting. #1078
     - Community
 
