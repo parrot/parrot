@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -103,6 +103,71 @@ trace_class_name(PARROT_INTERP, ARGIN(const PMC* pmc))
 
 /*
 
+=item C<void trace_pmc_flags_dump(PARROT_INTERP, PMC *pmc)>
+
+Pretty prints PMC flags to C<stderr>.
+
+=cut
+
+*/
+
+void
+trace_pmc_flags_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
+{
+    ASSERT_ARGS(trace_pmc_flags_dump)
+    Interp * const debugger = debugger_or_interp(interp);
+    UINTVAL i;
+    UINTVAL flags = pmc->flags;
+    struct flag_names_decl {
+        UINTVAL flag;
+        const char *name;
+    } flags_names[] = {
+      { 1<<0, "private0" },
+      { 1<<1, "private1" },
+      { 1<<2, "private2" },
+      { 1<<3, "private3" },
+      { 1<<4, "private4" },
+      { 1<<5, "private5" },
+      { 1<<6, "private6" },
+      { 1<<7, "private7" },
+      { 1<<8, "is_string" },
+      { 1<<9, "is_PMC" },
+      { 1<<10, "is_string_copy" },
+      { 1<<11, "is_shared" },
+      { 1<<12, "constant" },
+      { 1<<13, "external" },
+      { 1<<14, "sysmem" },
+      { 1<<15, "is_COWable" },
+      { 1<<16, "live" },
+      { 1<<17, "free" },
+      { 1<<18, "custom_mark" },
+      { 1<<19, "custom_destroy" },
+      { 1<<20, "report" },
+      { 1<<21, "is_new" },
+      { 1<<22, "gen0" },
+      { 1<<23, "gen1" },
+      { 1<<24, "gen2" },
+      { 1<<25, "dirty" },
+      { 1<<26, "need_wb" },
+      { 1<<27, "soil_root" },
+      { 1<<28, "needs_early_gc" }, /* timely destruction */
+      { 1<<29, "is_class" },
+      { 1<<30, "is_object" },
+    };
+
+    if (!pmc || PMC_IS_NULL(pmc)) {
+        return;
+    }
+    Parrot_io_eprintf(debugger, " (");
+    for (i=0; i < sizeof (flags_names) / sizeof (flags_names[0]); i++) {
+        if (flags & flags_names[i].flag)
+            Parrot_io_eprintf(debugger, "%s,", flags_names[i].name);
+    }
+    Parrot_io_eprintf(debugger, ")");
+}
+
+/*
+
 =item C<void trace_pmc_dump(PARROT_INTERP, PMC *pmc)>
 
 Prints a PMC to C<stderr>.
@@ -186,8 +251,8 @@ trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
         Parrot_io_eprintf(debugger, "%S=PMC(%#p)",
                 VTABLE_name(interp, pmc), pmc);
     }
+    trace_pmc_flags_dump(interp, pmc);
 }
-
 
 /*
 

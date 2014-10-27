@@ -109,6 +109,9 @@ TBD
 #include "parrot/list.h"        /* only for MEMORY_DEBUG */
 #include "gc_private.h"
 #include "fixed_allocator.h"
+#ifdef MEMORY_DEBUG
+#  include "parrot/runcore_trace.h"
+#endif
 
 #ifdef THREAD_DEBUG
 #  define PARROT_GC_ASSERT_INTERP(pmc, interp) \
@@ -2267,9 +2270,12 @@ gc_gms_check_sanity(PARROT_INTERP)
             if (i < 3) /* too many objects in gen3 */
                 GC_DEBUG_DETAIL_3("GC live pmc %-21s gen %ld at %p\n",
                                   pmc->vtable->whoami->strstart, gen, pmc);
-            if (gen != i)
-                fprintf(stderr, "GC live pmc %-21s gen %ld != %ld at %p\n",
-                        pmc->vtable->whoami->strstart, gen, i, pmc);
+            if (gen != i) {
+                fprintf(stderr, "GC live pmc %-21s gen %ld != %ld\n",
+                        pmc->vtable->whoami->strstart, gen, i);
+                trace_pmc_dump(interp, pmc);
+                fprintf(stderr, "\n");
+            }
             PARROT_ASSERT((gen == i)
                 || !"Object from wrong generation");
 
