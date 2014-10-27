@@ -772,7 +772,7 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
         self->gc_threshold = Parrot_sysmem_amount(interp) * nursery_size / 100;
 #ifndef NDEBUG
         if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG)) {
-            fprintf(stderr, "GC nursery size: %f\n", nursery_size);
+            fprintf(stderr, "GC nursery size: %.1f%%\n", nursery_size);
             fprintf(stderr, "GMS GC threshold: %ld\n", self->gc_threshold);
         }
 #endif
