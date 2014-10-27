@@ -1580,6 +1580,7 @@ src/gc/gc_gms$(O) : \
 	src/gc/gc_gms.c \
 	$(INC_DIR)/pointer_array.h \
 	$(INC_DIR)/list.h \
+	$(INC_DIR)/runcore_trace.h \
 	src/gc/gc_private.h \
 	src/gc/fixed_allocator.h \
 	src/gc/variable_size_pool.h

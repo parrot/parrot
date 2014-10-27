@@ -63,7 +63,7 @@ CODE
 
   S0 = foo
 
-  P0 = String=PMC[(]0x[a-f0-9]+ Str:"bar"[)]
+  P0 = String=PMC[(]0x[a-f0-9]+ Str:"bar"[)] \(is_PMC,custom_mark,\)
 /
 OUTPUT
 
