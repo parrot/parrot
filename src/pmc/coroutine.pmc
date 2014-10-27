@@ -154,6 +154,28 @@ Clones the coroutine.
 
 /*
 
+=item C<void mark()>
+
+Marks all GC-able pmc elements as live.
+
+=cut
+
+*/
+
+    VTABLE void mark() :no_wb {
+        Parrot_Coroutine_attributes * const coro = PARROT_COROUTINE(SELF);
+
+        if (!coro)
+            return;
+        if (coro->caller_seg && ! Interp_flags_TEST(interp, PARROT_IS_THREAD)) {
+            Parrot_gc_mark_PMC_alive(INTERP, coro->caller_seg->base.pf->view);
+        }
+
+        SUPER();
+    }
+
+/*
+
 =item C<void increment()>
 
 Signals the start of a yield.

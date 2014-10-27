@@ -599,7 +599,7 @@ Set SELF to the data in other.
 
 =item C<void mark()>
 
-Marks the sub as live.
+Marks all GC-able pmc elements as live.
 
 =cut
 
