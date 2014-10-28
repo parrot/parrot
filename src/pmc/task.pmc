@@ -341,9 +341,8 @@ Mark any referenced strings and PMCs.
 
 */
     VTABLE void mark() :no_wb {
-        if (PARROT_TASK(SELF)) {
-            Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
-
+        Parrot_Task_attributes * const core_struct = PARROT_TASK(SELF);
+        if (core_struct) {
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->code);
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->data);
             Parrot_gc_mark_PMC_alive(INTERP, core_struct->mailbox);

@@ -572,7 +572,7 @@ pmclass CallContext provides array provides hash auto_attrs {
     ATTR PMC    *return_flags;         /* Integer array of return flags */
     ATTR Hash   *hash;                 /* Hash of named arguments */
 
-    ATTR PMC    *continuation;          /* Reusable continuation */
+    ATTR PMC    *continuation;         /* Reusable continuation */
 
 /*
 
@@ -607,58 +607,35 @@ Mark any referenced strings and PMCs.
         PMC      *tmp;
         STRING   *short_sig;
         UINTVAL  *n_regs_used;
+        Parrot_CallContext_attributes * const data =
+            PMC_data_typed(SELF, Parrot_CallContext_attributes *);
 
-        if (!PMC_data(SELF))
+        if (!data)
             return;
 
-        GET_ATTR_short_sig(INTERP, SELF, short_sig);
-        Parrot_gc_mark_STRING_alive(INTERP, short_sig);
-
+        Parrot_gc_mark_STRING_alive(INTERP, data->short_sig);
         mark_positionals(INTERP, SELF);
 
-        GET_ATTR_hash(INTERP, SELF, hash);
-        if (hash)
-            mark_hash(INTERP, hash);
+        if (data->hash)
+            mark_hash(INTERP, data->hash);
 
-        GET_ATTR_arg_flags(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        GET_ATTR_return_flags(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        GET_ATTR_type_tuple(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        GET_ATTR_caller_ctx(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        GET_ATTR_lex_pad(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        GET_ATTR_outer_ctx(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        GET_ATTR_current_sub(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        GET_ATTR_handlers(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        GET_ATTR_current_cont(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        GET_ATTR_current_namespace(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        GET_ATTR_current_sig(INTERP, SELF, tmp);
-        Parrot_gc_mark_PMC_alive(INTERP, tmp);
+        Parrot_gc_mark_PMC_alive(INTERP, data->arg_flags);
+        Parrot_gc_mark_PMC_alive(INTERP, data->return_flags);
+        Parrot_gc_mark_PMC_alive(INTERP, data->type_tuple);
+        Parrot_gc_mark_PMC_alive(INTERP, data->caller_ctx);
+        Parrot_gc_mark_PMC_alive(INTERP, data->lex_pad);
+        Parrot_gc_mark_PMC_alive(INTERP, data->outer_ctx);
+        Parrot_gc_mark_PMC_alive(INTERP, data->current_sub);
+        Parrot_gc_mark_PMC_alive(INTERP, data->handlers);
+        Parrot_gc_mark_PMC_alive(INTERP, data->current_cont);
+        Parrot_gc_mark_PMC_alive(INTERP, data->current_namespace);
+        Parrot_gc_mark_PMC_alive(INTERP, data->current_sig);
 
         /* We don't keep reusable continuation alive. It will keep too many
            other things alive as well. Just NULL it */
         SET_ATTR_continuation(INTERP, SELF, PMCNULL);
 
         GET_ATTR_n_regs_used(INTERP, SELF, n_regs_used);
-
         if (n_regs_used) {
             Regs_ps         bp_ps;
             const UINTVAL   regs_p = n_regs_used[REGNO_PMC];

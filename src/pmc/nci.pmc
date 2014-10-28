@@ -179,9 +179,8 @@ Mark any referenced strings and PMCs.
 
 */
     VTABLE void mark() :no_wb {
-        if (PARROT_NCI(SELF)) {
-            Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
-
+        Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
+        if (nci_info) {
             Parrot_gc_mark_PMC_alive(interp, nci_info->signature);
             Parrot_gc_mark_PMC_alive(interp, nci_info->fb_info);
             Parrot_gc_mark_PMC_alive(interp, nci_info->multi_sig);
@@ -209,8 +208,7 @@ Creates and returns a clone of the NCI.
         Parrot_NCI_attributes * const nci_info_ret = PARROT_NCI(ret);
 
         /* FIXME if data is malloced (JIT/i386!) then we need
-         * the length of data here, to memcpy it
-         * ManagedStruct or Buffer?
+         * the length of data here, to memcpy it. ManagedStruct or Buffer?
          */
         nci_info_ret->func                  = nci_info_self->func;
         nci_info_ret->fb_info               = nci_info_self->fb_info;
