@@ -815,9 +815,11 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 
     interp->gc_sys->stats.gc_mark_runs++;
 
+#ifdef MEMORY_DEBUG
     gc_gms_print_stats(interp, "Before");
-
     gc_gms_check_sanity(interp);
+#endif
+
     /*
     2. Choose K - how many collections we want to collect. Collections [0..K]
     will be collected. Remember K in C<self->gen_to_collect>.
@@ -831,7 +833,9 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     "dirty_list".
     */
     gc_gms_cleanup_dirty_list(interp, self, self->dirty_list);
+#ifdef MEMORY_DEBUG
     gc_gms_print_stats(interp, "After cleanup");
+#endif
 
     /*
     4. Trace root objects. According to "0. Pre-requirements" we will ignore all
@@ -844,23 +848,29 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     if (interp->pdb && interp->pdb->debugger)
         Parrot_gc_trace_root(interp->pdb->debugger, NULL, GC_TRACE_FULL);
 
+#ifdef MEMORY_DEBUG
     gc_gms_print_stats(interp, "After trace_roots");
     gc_gms_check_sanity(interp);
+#endif
 
     /*
     5. Iterate over "dirty_set" calling VTABLE_mark on it. It will move all
     children into "work_list".
     */
     gc_gms_process_dirty_list(interp, self, self->dirty_list);
+#ifdef MEMORY_DEBUG
     gc_gms_print_stats(interp, "After dirty_list");
     gc_gms_check_sanity(interp);
+#endif
 
     /*
     6. Iterate over "work_list" calling VTABLE_mark on it.
     */
     gc_gms_process_work_list(interp, self, self->work_list);
+#ifdef MEMORY_DEBUG
     gc_gms_print_stats(interp, "After work_list");
     gc_gms_check_sanity(interp);
+#endif
 
     /*
     7. Sweep generations starting from K:
@@ -869,7 +879,9 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         - Paint them white.
     */
     gc_gms_sweep_pools(interp, self);
+#ifdef MEMORY_DEBUG
     gc_gms_check_sanity(interp);
+#endif
 
     /* Update some stats */
     interp->gc_sys->stats.header_allocs_since_last_collect  = 0;
@@ -884,11 +896,13 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     if (gen)
         gc_gms_compact_memory_pool(interp);
 
+#ifdef MEMORY_DEBUG
     gc_gms_check_sanity(interp);
-
     gc_gms_print_stats(interp, "After");
+#endif
 
-    Parrot_pa_destroy(interp, self->work_list);
+    if (self->work_list)
+        Parrot_pa_destroy(interp, self->work_list);
     self->work_list = NULL;
 
     gc_gms_validate_objects(interp);
@@ -2302,6 +2316,7 @@ gc_gms_check_sanity(PARROT_INTERP)
         PARROT_ASSERT(PObj_GC_on_dirty_list_TEST(pmc)
             || !"Object in dirty_list without dirty_flag"););
 
+    if (!self->work_list) return; /* empty work_list */
     POINTER_ARRAY_ITER(self->work_list,
         PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
         PARROT_GC_ASSERT_INTERP(pmc, interp);
