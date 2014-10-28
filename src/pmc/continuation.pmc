@@ -126,23 +126,17 @@ Marks the continuation as live.
 */
 
     VTABLE void mark() :no_wb {
-        PMC *tmp;
+        Parrot_Continuation_attributes * const cont = PARROT_CONTINUATION(SELF);
 
         /* If Continuation wasn't fully constructed yet */
-        if (!PMC_data(SELF))
-            return;
+        if (!cont) return;
 
-        GET_ATTR_to_ctx(INTERP, SELF, tmp);
-        if (tmp)
-            Parrot_gc_mark_PMC_alive(INTERP, tmp);
+        if (cont->to_ctx)         Parrot_gc_mark_PMC_alive(INTERP, cont->to_ctx);
+        if (cont->to_call_object) Parrot_gc_mark_PMC_alive(INTERP, cont->to_call_object);
+        if (cont->from_ctx)       Parrot_gc_mark_PMC_alive(INTERP, cont->from_ctx);
 
-        GET_ATTR_to_call_object(INTERP, SELF, tmp);
-        if (tmp)
-            Parrot_gc_mark_PMC_alive(INTERP, tmp);
-
-        GET_ATTR_from_ctx(INTERP, SELF, tmp);
-        if (tmp)
-            Parrot_gc_mark_PMC_alive(INTERP, tmp);
+        if (cont->seg && ! Interp_flags_TEST(interp, PARROT_IS_THREAD))
+            Parrot_gc_mark_PMC_alive(INTERP, cont->seg->base.pf->view);
     }
 
 /*
