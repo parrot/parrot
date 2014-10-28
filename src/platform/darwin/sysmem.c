@@ -78,27 +78,27 @@ Parrot_sysmem_amount(PARROT_INTERP)
 #ifndef NDEBUG
     if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG)) {
         ori_memsize = memsize;
-        fprintf(stderr, "Free Memory: %ld\n", memsize);
+        fprintf(stderr, "Free Memory: "UINTVAL_FMT"\n", memsize);
     }
 #endif
 
 #if defined(PARROT_HAS_HEADER_SYSRESOURCE)
     if (getrlimit(RLIMIT_DATA, &rlim) == 0) {
-        if ((rlim.rlim_max != RLIM_INFINITY) && (rlim.rlim_max <  memsize))
+        if ((rlim.rlim_max != RLIM_INFINITY) && (rlim.rlim_max < memsize))
             memsize = rlim.rlim_max;
-        else if ((rlim.rlim_cur != RLIM_INFINITY) && (rlim.rlim_cur <  memsize))
+        else if ((rlim.rlim_cur != RLIM_INFINITY) && (rlim.rlim_cur < memsize))
             memsize = rlim.rlim_cur;
     }
     if (getrlimit(RLIMIT_RSS, &rlim) == 0) {
-        if ((rlim.rlim_max != RLIM_INFINITY) && (rlim.rlim_max <  memsize))
+        if ((rlim.rlim_max != RLIM_INFINITY) && (rlim.rlim_max < memsize))
             memsize = rlim.rlim_max;
-        else if ((rlim.rlim_cur != RLIM_INFINITY) && (rlim.rlim_cur <  memsize))
+        else if ((rlim.rlim_cur != RLIM_INFINITY) && (rlim.rlim_cur < memsize))
             memsize = rlim.rlim_cur;
     }
 #  ifndef NDEBUG
     if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG)
         && ori_memsize != memsize)
-        fprintf(stderr, "Memory via rlimit restricted to: %ld\n", memsize);
+        fprintf(stderr, "Memory via rlimit restricted to: "UINTVAL_FMT"\n", memsize);
 #  endif
 #endif
 

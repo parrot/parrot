@@ -149,7 +149,8 @@ typedef void DPOINTER;
 #define PARROT_HAS_ICU @has_icu@
 
 /* Int and float formats. */
-#define INTVAL_FMT "@intvalfmt@"
+#define UINTVAL_FMT  "@uintvalfmt@"
+#define INTVAL_FMT   "@intvalfmt@"
 #define FLOATVAL_FMT "@floatvalfmt@"
 
 #include "parrot/has_header.h"
