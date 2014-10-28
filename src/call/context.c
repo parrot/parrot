@@ -874,18 +874,17 @@ Parrot_pcc_reuse_continuation(PARROT_INTERP, ARGIN(PMC *call_context), ARGIN_NUL
     ASSERT_ARGS(Parrot_pcc_reuse_continuation)
     Parrot_CallContext_attributes * const c = CONTEXT_STRUCT(call_context);
     INTVAL reuse = 0;
+    PMC * cont = c->continuation;
 
-    if (!PMC_IS_NULL(c->continuation)) {
-        PMC * const cont = c->continuation;
-        INTVAL   invoked;
+    if (!PMC_IS_NULL(cont)) {
+        INTVAL  invoked;
         GETATTR_Continuation_invoked(interp, cont, invoked);
         /* Reuse if invoked. And not tailcalled? */
         reuse = invoked && !(PObj_get_FLAGS(cont) |= SUB_FLAG_TAILCALL);
     }
 
-    if (!reuse) {
-        c->continuation = Parrot_pmc_new(interp, enum_class_Continuation);
-        PARROT_ASSERT(PMC_data(c->continuation));
+    if (!reuse || !PMC_data(cont)) {
+        cont = Parrot_pmc_new(interp, enum_class_Continuation);
 #ifndef NDEBUG
         if (Interp_trace_TEST(interp, PARROT_TRACE_CORO_STATE_FLAG))
             Parrot_io_eprintf(interp, "# continuation not reused\n");
@@ -897,12 +896,12 @@ Parrot_pcc_reuse_continuation(PARROT_INTERP, ARGIN(PMC *call_context), ARGIN_NUL
     }
 
     /* inlined VTABLE_set_pointer(interp, c->continuation, next) */
-    SETATTR_Continuation_address(interp, c->continuation, next);
+    SETATTR_Continuation_address(interp, cont, next);
     /* needed */
-    SETATTR_Continuation_runloop_id(interp, c->continuation, interp->current_runloop_id);
-    PARROT_GC_WRITE_BARRIER(interp, c->continuation);
+    SETATTR_Continuation_runloop_id(interp, cont, interp->current_runloop_id);
+    PARROT_GC_WRITE_BARRIER(interp, cont);
 
-    interp->current_cont = c->continuation;
+    interp->current_cont = cont;
 }
 
 /*
