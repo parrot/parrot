@@ -775,7 +775,7 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
         self->gc_threshold = Parrot_sysmem_amount(interp) * nursery_size / 100;
 #ifndef NDEBUG
         if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG)) {
-            fprintf(stderr, "GC nursery size: %.1f%%\n", nursery_size);
+            fprintf(stderr, "GC nursery size: %.3f%%\n", nursery_size);
             fprintf(stderr, "GMS GC threshold: %ld\n", self->gc_threshold);
         }
 #endif
@@ -1133,15 +1133,18 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
                         item->ptr = Parrot_pa_insert(self->dirty_list, item);
                         PObj_GC_soil_root_CLEAR(pmc);
                         PObj_GC_on_dirty_list_SET(pmc);
+                        GC_DEBUG_DETAIL_FLAGS("GC ->dirty ", pmc);
                     }
                     else {
                         item->ptr = Parrot_pa_insert(self->objects[i + 1], item);
-                        gc_gms_seal_object(interp, pmc);
+                        /* gc_gms_seal_object(interp, pmc); */
+                        PObj_GC_need_write_barrier_SET(pmc);
                     }
                 }
             }
             else {
                 Parrot_pa_remove(interp, self->objects[i], item->ptr);
+                GC_DEBUG_DETAIL_FLAGS("GC free ", pmc);
 
                 interp->gc_sys->stats.memory_used -= sizeof (PMC);
 
@@ -2098,10 +2101,10 @@ gc_gms_write_barrier(PARROT_INTERP, ARGMOD(PMC *pmc))
         Parrot_pa_remove(interp, self->objects[gen], item->ptr);
         item->ptr = Parrot_pa_insert(self->dirty_list, item);
 
-        pmc->flags |= PObj_GC_on_dirty_list_FLAG;
-
+        PObj_GC_on_dirty_list_SET(pmc);
         /* We don't need it anymore */
-        gc_gms_unseal_object(interp, pmc);
+        /* gc_gms_unseal_object(interp, pmc); */
+        PObj_GC_need_write_barrier_CLEAR(pmc);
     }
 
 DONE:
@@ -2282,21 +2285,17 @@ gc_gms_check_sanity(PARROT_INTERP)
             const size_t gen  = POBJ2GEN(pmc);
             PARROT_GC_ASSERT_INTERP(pmc, interp);
             if (i < 3) { /* too many objects in gen3 */
-                if (Interp_debug_TEST(interp,
-                      PARROT_MEM_STAT_DEBUG_FLAG | PARROT_GC_DETAIL_DEBUG_FLAG)) {
-                    fprintf(stderr, "GC live gen %ld ", gen);
-                    trace_pmc_dump(interp, pmc);
-                    fprintf(stderr, "\n");
-                }
+                GC_DEBUG_DETAIL_1_FLAGS("GC live gen %ld ", gen, pmc);
             }
             if (gen != i) {
-                fprintf(stderr, "GC live pmc %-21s gen %ld != %ld\n",
-                        pmc->vtable->whoami->strstart, gen, i);
+                fprintf(stderr, "GC live gen %ld != %ld ", gen, i);
                 trace_pmc_dump(interp, pmc);
                 fprintf(stderr, "\n");
             }
-            PARROT_ASSERT((gen == i)
-                || !"Object from wrong generation");
+            /*PARROT_ASSERT((gen == i) || !PObj_GC_on_dirty_list_TEST(pmc)
+                             || !"Dirty live object from wrong generation");*/
+            PARROT_ASSERT((gen == i) || (pmc->vtable->base_type == enum_class_Coroutine)
+              || !"Object from wrong generation");
 
             if (i)
                 PARROT_ASSERT(PObj_GC_need_write_barrier_TEST(pmc)
@@ -2311,8 +2310,7 @@ gc_gms_check_sanity(PARROT_INTERP)
     POINTER_ARRAY_ITER(self->dirty_list,
         PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
         PARROT_GC_ASSERT_INTERP(pmc, interp);
-        GC_DEBUG_DETAIL_2("GC dirty pmc %-21s at %p\n",
-                pmc->vtable->whoami->strstart, pmc);
+        GC_DEBUG_DETAIL_FLAGS("GC dirty pmc ", pmc);
         PARROT_ASSERT(PObj_GC_on_dirty_list_TEST(pmc)
             || !"Object in dirty_list without dirty_flag"););
 
@@ -2320,8 +2318,7 @@ gc_gms_check_sanity(PARROT_INTERP)
     POINTER_ARRAY_ITER(self->work_list,
         PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
         PARROT_GC_ASSERT_INTERP(pmc, interp);
-        GC_DEBUG_DETAIL_2("GC work pmc %-21s at %p\n",
-                pmc->vtable->whoami->strstart, pmc);
+        GC_DEBUG_DETAIL_FLAGS("GC work pmc ", pmc);
         PARROT_ASSERT(!PObj_GC_on_dirty_list_TEST(pmc)
             || !"Dirty object in work_list"););
 #endif

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -32,6 +32,9 @@ extern int CONSERVATIVE_POINTER_CHASING;
 
 #ifndef MEMORY_DEBUG
 #  define MEMORY_DEBUG_DETAIL_2(s, a1, a2)
+#  define GC_DEBUG_DETAIL(s)
+#  define GC_DEBUG_DETAIL_FLAGS(s, pmc)
+#  define GC_DEBUG_DETAIL_1_FLAGS(s, a1, pmc)
 #  define GC_DEBUG_DETAIL_2(s, a1, a2)
 #  define GC_DEBUG_DETAIL_3(s, a1, a2, a3)
 #else
@@ -39,6 +42,18 @@ extern int CONSERVATIVE_POINTER_CHASING;
     if (Interp_debug_TEST(interp, \
                 PARROT_MEM_STAT_DEBUG_FLAG | PARROT_MEM_DETAIL_DEBUG_FLAG)) \
         fprintf(stderr, (s), (a1), (a2))
+#  define GC_DEBUG_DETAIL(s) \
+    if (Interp_debug_TEST(interp, \
+                PARROT_MEM_STAT_DEBUG_FLAG | PARROT_GC_DETAIL_DEBUG_FLAG)) \
+        fprintf(stderr, (s))
+#  define GC_DEBUG_DETAIL_FLAGS(s, pmc) \
+    if (Interp_debug_TEST(interp, \
+                PARROT_MEM_STAT_DEBUG_FLAG | PARROT_GC_DETAIL_DEBUG_FLAG)) { \
+        fprintf(stderr, (s)); trace_pmc_dump(interp, (pmc)); fprintf(stderr, "\n"); }
+#  define GC_DEBUG_DETAIL_1_FLAGS(s, a1, pmc) \
+    if (Interp_debug_TEST(interp, \
+                PARROT_MEM_STAT_DEBUG_FLAG | PARROT_GC_DETAIL_DEBUG_FLAG)) { \
+        fprintf(stderr, (s), (a1)); trace_pmc_dump(interp, (pmc)); fprintf(stderr, "\n"); }
 #  define GC_DEBUG_DETAIL_2(s, a1, a2) \
     if (Interp_debug_TEST(interp, \
                 PARROT_MEM_STAT_DEBUG_FLAG | PARROT_GC_DETAIL_DEBUG_FLAG)) \
