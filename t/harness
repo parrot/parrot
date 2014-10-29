@@ -45,7 +45,7 @@ $opts{D} = sprintf( '%x', hex(40) | (exists $opts{D} ? hex($opts{D}) : 0));
 my $args = get_test_prog_args(
     \%opts, $longopts->{gc_debug}, $longopts->{run_exec}
 );
-$ENV{TEST_PROG_ARGS} = $args;
+$ENV{TEST_PROG_ARGS} .= $args;
 
 my @tests;
 if ($longopts->{code}) {
@@ -206,17 +206,14 @@ your standard output.
     HARNESS_VERBOSE
     TEST_JOBS
     HARNESS_TIMER
+    TEST_PROG_ARGS
 
-=head1 HISTORY
+If C<TEST_PROG_ARGS> is set, it needs an ending space, as the other parrot
+args are added to this. E.g.
 
-Mike Lambert stole F<t/harness> for F<languages/perl6/t/harness>.
-
-Leo Toetsch stole F<languages/perl6/t/harness> for F<imcc/t/harness>.
-
-Bernhard Schmalhofer merged F<imcc/t/harness> back into F<t/harness>.
+C<TEST_PROG_ARGS='--gc-nursery-size=0.01 ' perl t/harness --gc-debug t/pmc/coroutine.t>
 
 =cut
-
 
 # Local Variables:
 #   mode: cperl

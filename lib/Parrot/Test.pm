@@ -826,12 +826,18 @@ sub _generate_test_functions {
 
             if ( $func =~ /_exit_code_is$/ ) {
                 $expected = int($expected);
+                if ($exit_code and $exit_code =~ /\[SIGNAL (\d+)\]/) {
+                    $exit_code = $1;
+                }
                 if ($exit_code == $expected) {
                     my $pass = $builder->$meth( $exit_code, $expected, $desc );
                     return $pass;
                 }
                 else {
-                    $builder->ok(0);
+                    $builder->ok(0, $desc);
+                    $builder->diag( "Exited with error code: $exit_code, expected: $expected\n"
+                                    . "STDOUT:\n$real_output\n"
+                                    );
                     return 0;
                 }
             }

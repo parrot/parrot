@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2013, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -11,7 +11,7 @@ t/stress/gc.t - Garbage Collection
 
 =head1 DESCRIPTION
 
-Tests garbage collection.
+Stress tests the garbage collectors.
 
 =cut
 
@@ -19,21 +19,26 @@ use strict;
 use warnings;
 
 use lib qw(lib . ../lib ../../lib);
-use Parrot::Test tests => 3;
+my @gc;
+BEGIN { @gc = qw(gms ms2 ms inf); }
+use Parrot::Test tests => 4 * (1+@gc);
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "arraystress" );
+for my $gc (@gc, '--no-gc') {
+
+    # override the args
+    my $gc_arg = $gc eq '--no-gc' ? $gc : "--gc $gc";
+    local $ENV{TEST_PROG_ARGS} = "-t $gc_arg --gc-debug --gc-nursery-size=0.0001 ";
+
+    pasm_exit_code_is( <<'CODE', 0, "arraystress $gc_arg" );
     print "starting\n"
     new P0, 'Integer'
     print "ending\n"
     end
 CODE
-starting
-ending
-OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "GC stress" );
+    pir_exit_code_is( <<'CODE', 0, "ResizablePMCArray stress $gc_arg" );
 .sub 'main' :main
     .param pmc args
 
@@ -51,9 +56,8 @@ pir_output_is( <<'CODE', <<'OUTPUT', "GC stress" );
   done:
 .end
 CODE
-OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "GC subs" );
+    pir_exit_code_is( <<'CODE', 0, "GC subs $gc_arg" );
 .sub 'main' :main
     .param pmc args
 
@@ -75,8 +79,36 @@ pir_output_is( <<'CODE', <<'OUTPUT', "GC subs" );
     noop
 .end
 CODE
-OUTPUT
 
+    pir_exit_code_is( <<'CODE', 0, "GC coros $gc_arg" );
+.sub 'main' :main
+    .const 'Sub' $P99 = 'coro'
+    .local pmc three, four, five
+    three = clone $P99
+    four  = clone $P99
+    five  = clone $P99
+    three(3)
+    four(4)
+    five(5)
+    three(1)
+    push_eh ehandler
+    three(2)
+    four(1)
+    goto end
+
+    ehandler:
+      pop_eh
+    end:
+.end
+
+.sub '' :anon :subid('coro')
+    .param int x
+    .yield (x)
+    .yield (x)
+.end
+CODE
+
+}
 1;
 
 # Local Variables:
