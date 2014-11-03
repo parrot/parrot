@@ -85,7 +85,7 @@ sub runstep {
     my $cc_option = $conf->options->get('cc');
     my $debugging = $conf->options->get('debugging');
     my $disable_static = $conf->options->get('disable-static');
-    my $disable_shared = !$conf->options->get('parrot_is_shared');
+    my $disable_shared = $conf->options->get('disable-shared');
     # We need a Glossary somewhere!
     $conf->data->set(
         debugging => $debugging ? 1 : 0,
