@@ -37,9 +37,6 @@ const string C_HEADER = <<:HEADER
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifdef PARROT_HAS_HEADER_UNISTD
-#  include <unistd.h> /* for readlink() */
-#endif
 #ifdef __APPLE__
 #  include <mach-o/dyld.h> /* for _NSGetExecutablePath() */
 #endif
@@ -47,6 +44,9 @@ const string C_HEADER = <<:HEADER
 #  include <sys/sysctl.h>
 #endif
 #include "parrot/api.h"
+#ifdef PARROT_HAS_HEADER_UNISTD
+#  include <unistd.h> /* for readlink() */
+#endif
 
 int Parrot_set_config_hash(Parrot_PMC interp_pmc);
 static void show_last_error_and_exit(Parrot_PMC interp);
