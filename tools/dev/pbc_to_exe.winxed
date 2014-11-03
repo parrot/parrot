@@ -37,7 +37,9 @@ const string C_HEADER = <<:HEADER
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h> /* for readlink() */
+#ifdef PARROT_HAS_HEADER_UNISTD
+#  include <unistd.h> /* for readlink() */
+#endif
 #ifdef __APPLE__
 #  include <mach-o/dyld.h> /* for _NSGetExecutablePath() */
 #endif

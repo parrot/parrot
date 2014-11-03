@@ -6,6 +6,7 @@
     - Build
         + Set -mabi=64 for gcc --m=64 on mips, -m64 on powerpc #1110
         + Add --{en,dis}able-static #1104
+        + Fix Windows build for pbc_to_exe #1114
     - Documentation
         + Document .lex "name" limitations. Use .lex 'name' w/ single-quotes #1095
     - Tests
