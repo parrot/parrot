@@ -8,6 +8,7 @@
         + Add --{en,dis}able-static #1104
         + Fix Windows build for pbc_to_exe #1114
         + Fix default cygwin builds #1116
+        + Silence failing auto::inline probe #1118
     - Documentation
         + Document .lex "name" limitations. Use .lex 'name' w/ single-quotes #1095
     - Tests
