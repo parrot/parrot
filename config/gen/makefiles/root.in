@@ -906,9 +906,7 @@ $(RUN_INC_DIR)/config.fpmc : myconfig config_lib.pir \
 	@$(ADDGENERATED) "$@" "[]"
 
 # Check the generated tables before submitting updates.
-bootstrap-tables \
-  src/string/encoding/tables.h \
-  src/string/encoding/tables.c: tools/dev/gen_charset_tables.pl
+bootstrap-tables: tools/dev/gen_charset_tables.pl
 	$(PERL) tools/dev/gen_charset_tables.pl
 
 bootstrap-prt0: $(WINXED) $(FRPTWO_DIR)/prt0.winxed

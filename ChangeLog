@@ -9,6 +9,7 @@
         + Fix Windows build for pbc_to_exe #1114
         + Fix default cygwin builds #1116
         + Silence failing auto::inline probe #1118
+        + Revert automatic regeneration of encoding tables, added with 6.9.0. #1119
     - Documentation
         + Document .lex "name" limitations. Use .lex 'name' w/ single-quotes #1095
     - Tests
