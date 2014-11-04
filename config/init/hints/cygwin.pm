@@ -1,4 +1,4 @@
-# Copyright (C) 2005, Parrot Foundation.
+# Copyright (C) 2005-2014, Parrot Foundation.
 
 package init::hints::cygwin;
 
@@ -22,12 +22,12 @@ sub runstep {
     $libdir =~ s/ /\\ /g;
     my $libparrot_shared = $conf->data->get('libparrot_shared');
     if ($libparrot_shared) {
-	# force cyg prefix
-	$libparrot_shared =~ s/^lib/cyg/g;
-	# force the dll versioning
-	my @parrot_version = Parrot::BuildUtil::parrot_version();
-	my $dllsuffix = join('.', @parrot_version);
-	$libparrot_shared =~ s/parrot\.dll/parrot-$dllsuffix\.dll/;
+        # force cyg prefix
+        $libparrot_shared =~ s/^lib/cyg/g;
+        # force the dll versioning
+        my @parrot_version = Parrot::BuildUtil::parrot_version();
+        my $dllsuffix = join('.', @parrot_version);
+        $libparrot_shared =~ s/parrot\.dll/parrot-$dllsuffix\.dll/;
     }
 
     # An old note about building shared libraries: Perl5 used the 'ld2' tool until
@@ -37,28 +37,28 @@ sub runstep {
     # this later causes problems, it might be worth revisiting.  A. Dougherty
     # 9/9/2002
     if ($conf->data->get('ld') eq 'ld2') {
-	$conf->data->set('ld' => 'gcc');
+        $conf->data->set('ld' => 'gcc');
     }
     # cygwin gcc removed the old gcc-4 symlink, but perl still uses gcc-4/g++-4
     if ($conf->data->get('ld') eq 'g++-4' and !-e '/usr/bin/g++-4') {
-	$conf->data->set('ld' => 'g++');
-	if ($conf->data->get('cc') eq 'gcc-4' and !-e '/usr/bin/gcc-4') {
-	    $conf->data->set('cc' => 'gcc');
-	}
-	if ($conf->data->get('link') eq 'gcc-4' and !-e '/usr/bin/gcc-4') {
-	    $conf->data->set('link' => 'gcc');
-	}
+        $conf->data->set('ld' => 'g++');
+        if ($conf->data->get('cc') eq 'gcc-4' and !-e '/usr/bin/gcc-4') {
+            $conf->data->set('cc' => 'gcc');
+        }
+        if ($conf->data->get('link') eq 'gcc-4' and !-e '/usr/bin/gcc-4') {
+            $conf->data->set('link' => 'gcc');
+        }
     }
     else {
-	# default to gcc-4 on cygwin-1.7 with the old gcc package.
-	# -shared-libgcc should be used also, but this will be the new default soon.
-	my $cygwin = `/bin/uname -r`;
-	if ($cygwin =~ /^1\.7\./) {
-	    $conf->data->set(cc => 'gcc-4') if -e '/usr/bin/gcc-4'
-	        and !$conf->options->get('cc');
-	    $conf->data->set(ld => 'g++-4') if -e '/usr/bin/g++-4'
-	        and !$conf->options->get('ld');
-	}
+        # default to gcc-4 on cygwin-1.7 with the old gcc package.
+        # -shared-libgcc should be used also, but this will be the new default soon.
+        my $cygwin = `/bin/uname -r`;
+        if ($cygwin =~ /^1\.7\./) {
+            $conf->data->set(cc => 'gcc-4') if -e '/usr/bin/gcc-4'
+                and !$conf->options->get('cc');
+            $conf->data->set(ld => 'g++-4') if -e '/usr/bin/g++-4'
+                and !$conf->options->get('ld');
+        }
     }
 
     $conf->data->set(
@@ -79,10 +79,10 @@ sub runstep {
         inst_libparrot_linkflags => '-L' . $libdir . ' -lparrot',
     );
     unless ( $libparrot_shared ) {
-	$conf->data->set(
-	     libparrot_ldflags   => '-L' . $build_dir . '/blib/lib -lparrot',
-	     libparrot_linkflags   => '-L' . $build_dir . '/blib/lib -lparrot'
-	);
+        $conf->data->set(
+             libparrot_ldflags   => '-L' . $build_dir . '/blib/lib -lparrot',
+             libparrot_linkflags   => '-L' . $build_dir . '/blib/lib -lparrot'
+        );
     }
 
     # inet_aton needs to be defined on Cygwin.
