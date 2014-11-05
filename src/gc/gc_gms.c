@@ -1477,7 +1477,7 @@ gc_gms_allocate_pmc_header(PARROT_INTERP, SHIM(UINTVAL flags))
     ASSERT_ARGS(gc_gms_allocate_pmc_header)
     MarkSweep_GC     * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     Pool_Allocator   * const pool = self->pmc_allocator;
-    pmc_alloc_struct *item;
+    pmc_alloc_struct * item = NULL;
 
     gc_gms_maybe_mark_and_sweep(interp);
 

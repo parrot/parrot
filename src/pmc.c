@@ -506,7 +506,7 @@ static PMC *
 get_new_pmc_header(PARROT_INTERP, INTVAL base_type, UINTVAL flags)
 {
     ASSERT_ARGS(get_new_pmc_header)
-    PMC    *newpmc;
+    PMC    *newpmc = NULL;
     VTABLE *vtable = interp->vtables[base_type];
     UINTVAL vtable_flags;
 

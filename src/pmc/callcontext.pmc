@@ -465,10 +465,12 @@ mark_positionals(PARROT_INTERP, ARGIN(PMC *self))
     if (size) {
         Pcc_cell *cells;
         INTVAL i;
-        GETATTR_CallContext_positionals(interp, self, cells);
 
-        for (i = 0; i < size; ++i)
-            mark_cell(interp, &cells[i]);
+        GETATTR_CallContext_positionals(interp, self, cells);
+        if (cells) {
+            for (i = 0; i < size; ++i)
+                mark_cell(interp, &cells[i]);
+        }
     }
 }
 

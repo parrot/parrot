@@ -138,7 +138,6 @@ struct Fixed_Allocator*
 Parrot_gc_fixed_allocator_new(SHIM_INTERP)
 {
     ASSERT_ARGS(Parrot_gc_fixed_allocator_new)
-
     return mem_internal_allocate_zeroed_typed(Fixed_Allocator);
 }
 
@@ -311,7 +310,7 @@ Parrot_gc_pool_new(SHIM_INTERP, size_t object_size)
     newpool->newfree           = NULL;
     newpool->newlast           = NULL;
     newpool->num_arenas        = 0;
-    newpool->arena_bounds      = (void **)mem_sys_allocate(NEXT_ARENA_BOUNDS_SIZE(0));
+    newpool->arena_bounds      = (void **)mem_sys_allocate_zeroed(NEXT_ARENA_BOUNDS_SIZE(0));
 
     return newpool;
 }
@@ -323,16 +322,13 @@ Parrot_gc_pool_destroy(SHIM_INTERP, ARGMOD(Pool_Allocator *pool))
     ASSERT_ARGS(Parrot_gc_pool_destroy)
 
     Pool_Allocator_Arena *arena = pool->top_arena;
-
     while (arena) {
         Pool_Allocator_Arena * const next = arena->next;
-        mem_internal_free(arena);
+        mem_sys_free(arena);
         arena = next;
     }
-
     mem_sys_free(pool->arena_bounds);
-
-    mem_internal_free(pool);
+    mem_sys_free(pool);
 }
 
 PARROT_CANNOT_RETURN_NULL
@@ -544,7 +540,7 @@ allocate_new_pool_arena(PARROT_INTERP, ARGMOD(Pool_Allocator *pool))
     /* Run a GC if needed */
     Parrot_gc_maybe_mark_and_sweep(interp, GC_trace_stack_FLAG);
 
-    new_arena = (Pool_Allocator_Arena *)mem_internal_allocate_zeroed(total_size);
+    new_arena = (Pool_Allocator_Arena *)mem_sys_allocate_zeroed(total_size);
 
     interp->gc_sys->stats.memory_allocated += total_size;
 
