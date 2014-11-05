@@ -776,7 +776,7 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 #ifndef NDEBUG
         if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG)) {
             fprintf(stderr, "GC nursery size: %.3f%%\n", nursery_size);
-            fprintf(stderr, "GMS GC threshold: %ld\n", self->gc_threshold);
+            fprintf(stderr, "GMS GC threshold: "SIZE_FMT"\n", self->gc_threshold);
         }
 #endif
 
@@ -1976,7 +1976,7 @@ gc_gms_allocate_memory_chunk(PARROT_INTERP, size_t size)
 {
     ASSERT_ARGS(gc_gms_allocate_memory_chunk)
     void * const ptr = malloc(size);
-    MEMORY_DEBUG_DETAIL_2("Allocated %ld at %p\n", size, ptr);
+    MEMORY_DEBUG_DETAIL_2("Allocated "SIZE_FMT" at %p\n", size, ptr);
     if (!ptr && size)
         PANIC_OUT_OF_MEM(size);
     return ptr;
@@ -1989,12 +1989,12 @@ gc_gms_reallocate_memory_chunk(PARROT_INTERP, ARGFREE(void *from), size_t size)
 {
     ASSERT_ARGS(gc_gms_reallocate_memory_chunk)
     void *ptr;
-    MEMORY_DEBUG_DETAIL_2("Freed %p (realloc -- %ld bytes)\n", from, size);
+    MEMORY_DEBUG_DETAIL_2("Freed %p (realloc -- "SIZE_FMT" bytes)\n", from, size);
     if (from)
         ptr = realloc(from, size);
     else
         ptr = calloc(1, size);
-    MEMORY_DEBUG_DETAIL_2("Allocated %ld at %p\n", size, ptr);
+    MEMORY_DEBUG_DETAIL_2("Allocated "SIZE_FMT" at %p\n", size, ptr);
     if (!ptr && size)
         PANIC_OUT_OF_MEM(size);
     return ptr;
@@ -2007,7 +2007,7 @@ gc_gms_allocate_memory_chunk_zeroed(PARROT_INTERP, size_t size)
 {
     ASSERT_ARGS(gc_gms_allocate_memory_chunk_zeroed)
     void * const ptr = calloc(1, size);
-    MEMORY_DEBUG_DETAIL_2("Allocated %ld at %p\n", size, ptr);
+    MEMORY_DEBUG_DETAIL_2("Allocated "SIZE_FMT" at %p\n", size, ptr);
     if (!ptr && size)
         PANIC_OUT_OF_MEM(size);
     return ptr;
@@ -2095,7 +2095,7 @@ gc_gms_write_barrier(PARROT_INTERP, ARGMOD(PMC *pmc))
 
 #ifdef MEMORY_DEBUG
         if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG))
-            fprintf(stderr, "GC WB pmc %-21s gen %ld at %p - %p\n",
+            fprintf(stderr, "GC WB pmc %-21s gen "SIZE_FMT" at %p - %p\n",
                     pmc->vtable->whoami->strstart, gen, pmc, item->ptr);
 #endif
         Parrot_pa_remove(interp, self->objects[gen], item->ptr);

@@ -169,7 +169,7 @@ initialized. Used in next cycle:
 
     allocate_interpreter
     parseflags
-   Parrot_interp_initialize_interpreter
+    Parrot_interp_initialize_interpreter
 
 for overriding subsystems (e.g. GC) which require early initialization.
 

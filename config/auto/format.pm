@@ -57,7 +57,7 @@ sub _set_intvalfmt {
     my $uvformat = $ivformat;
     $uvformat =~ s/d$/u/;
     $conf->data->set( intvalfmt   => $ivformat );
-    $conf->data->set( uintvalfmt   => $uvformat );
+    $conf->data->set( uintvalfmt  => $uvformat );
 }
 
 sub _set_floatvalfmt_nvsize {
