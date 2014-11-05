@@ -5,6 +5,8 @@
         + Honor rlimit settings on all non-windows platforms. #935
         + Slightly improved mark methods for Coroutine, Continuation,
           CallContext, NCI, Task
+        + Unify code for platform encodings, now supports all. #1120
+          e.g. unicode filenames or UTF-8 term output on cygwin, solaris, dragonfly
     - Build
         + Set -mabi=64 for gcc --m=64 on mips, -m64 on powerpc #1110
         + Add --{en,dis}able-static #1104
