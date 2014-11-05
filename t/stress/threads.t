@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2012-2013, Parrot Foundation.
+# Copyright (C) 2012-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -13,7 +13,7 @@ t/stress/threads.t - Threads with Garbage Collection
 
 Tests threads stability under garbage collection.
 
-Also IO stress: Large -t trace pir output segfaults in GC
+Also IO stress: Large -t trace pir output segfaults in GC. see gc.t
 
 =cut
 
@@ -47,7 +47,7 @@ use Parrot::Config;
 # IO stress: trace pir output segfaults
 # ASSERT src/gc/gc_gms.c:1189: failed assertion '(pmc) == NULL || (pmc)->orig_interp == (interp)'
 {
-    local $ENV{TEST_PROG_ARGS} .= '-t1';
+    local $ENV{TEST_PROG_ARGS} .= '-t1 --gc-nursery-size=0.001 --gc-debug ';
 
     pir_exit_code_is( << 'CODE', 0, "IO Stress with -t", todo => 'GH875 threads and -t1: gc_gms_mark_pmc_header: self->work_list might be empty' );
 .sub test :main
