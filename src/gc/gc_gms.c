@@ -1137,7 +1137,7 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
                     }
                     else {
                         item->ptr = Parrot_pa_insert(self->objects[i + 1], item);
-                        /* gc_gms_seal_object(interp, pmc); */
+                        /* inlined gc_gms_seal_object(interp, pmc); */
                         PObj_GC_need_write_barrier_SET(pmc);
                     }
                 }
@@ -1233,7 +1233,9 @@ gc_gms_mark_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
     /* mark it live. */
     PObj_live_SET(pmc);
 
-    PARROT_ASSERT(self->work_list);
+    /* empty work_list. not from last gc_gms_validate_objects in m&s */
+    if (!self->work_list)
+        self->work_list = Parrot_pa_new(interp);
     Parrot_pa_remove(interp, self->objects[gen], item->ptr);
     item->ptr = Parrot_pa_insert(self->work_list, item);
 }
@@ -2103,7 +2105,7 @@ gc_gms_write_barrier(PARROT_INTERP, ARGMOD(PMC *pmc))
 
         PObj_GC_on_dirty_list_SET(pmc);
         /* We don't need it anymore */
-        /* gc_gms_unseal_object(interp, pmc); */
+        /* inlined gc_gms_unseal_object(interp, pmc); */
         PObj_GC_need_write_barrier_CLEAR(pmc);
     }
 
