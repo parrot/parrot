@@ -31,11 +31,12 @@ for my $gc (@gc, '--no-gc') {
     my $gc_arg = $gc eq '--no-gc' ? $gc : "--gc $gc";
     local $ENV{TEST_PROG_ARGS} = "-t $gc_arg --gc-debug --gc-nursery-size=0.0001 ";
 
-    pasm_exit_code_is( <<'CODE', 0, "arraystress $gc_arg" );
+    pir_exit_code_is( <<'CODE', 0, "arraystress $gc_arg" );
+.sub 'main' :main
     print "starting\n"
-    new P0, 'Integer'
+    $P0 = new ['Integer']
     print "ending\n"
-    end
+.end
 CODE
 
     pir_exit_code_is( <<'CODE', 0, "ResizablePMCArray stress $gc_arg" );

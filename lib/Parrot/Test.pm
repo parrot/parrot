@@ -835,7 +835,7 @@ sub _generate_test_functions {
                 }
                 else {
                     $builder->ok(0, $desc);
-                    $builder->diag( "Exited with error code: $exit_code, expected: $expected\n"
+                    $builder->diag( "$cmd\nExited with error code: $exit_code, expected: $expected\n"
                                     . "STDOUT:\n$real_output\n"
                                     );
                     return 0;
@@ -848,7 +848,7 @@ sub _generate_test_functions {
             }
             elsif ($exit_code) {
                 $builder->ok( 0, $desc );
-                $builder->diag( "Exited with error code: $exit_code\n"
+                $builder->diag( "$cmd\nExited with error code: $exit_code\n"
                         . "Received:\n$real_output\nExpected:\n$expected\n"
                         . $ori_output ne $real_output ? "$ori_output\n" : "");
                 return 0;
