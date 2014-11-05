@@ -146,8 +146,8 @@ Parrot_ext_call(PARROT_INTERP, ARGIN(Parrot_PMC sub_pmc),
 {
     ASSERT_ARGS(Parrot_ext_call)
     va_list args;
-    PMC  *call_obj;
-    const char *arg_sig, *ret_sig;
+    PMC  *call_obj = NULL;
+    const char *arg_sig = NULL, *ret_sig = NULL;
     PMC * old_call_obj = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
     Parrot_pcc_split_signature_string(signature, &arg_sig, &ret_sig);
 
