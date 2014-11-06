@@ -1226,9 +1226,14 @@ is the minimum integer, a BigInt is created.
     VTABLE PMC *absolute(PMC *dest) :no_wb {
         const INTVAL a = SELF.get_integer();
 
-        if (a != PARROT_INTVAL_MIN)
-            return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
-                                                   abs(a));
+        if (a != PARROT_INTVAL_MIN) {
+#if defined(PARROT_HAS_LABS) && (INTVAL_SIZE == 8)
+            UINTVAL ua = labs(a);
+#else
+            UINTVAL ua = abs(a);
+#endif
+            return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF), ua);
+        }
         else {
             PMC *promoted;
             maybe_throw_overflow_error(INTERP);
@@ -1241,8 +1246,14 @@ is the minimum integer, a BigInt is created.
     VTABLE void i_absolute() :manual_wb {
         const INTVAL a = SELF.get_integer();
 
-        if (a != PARROT_INTVAL_MIN)
-            VTABLE_set_integer_native(INTERP, SELF, abs(a));
+        if (a != PARROT_INTVAL_MIN) {
+#if defined(PARROT_HAS_LABS) && (INTVAL_SIZE == 8)
+            UINTVAL ua = labs(a);
+#else
+            UINTVAL ua = abs(a);
+#endif
+            VTABLE_set_integer_native(INTERP, SELF, ua);
+        }
         else {
             maybe_throw_overflow_error(INTERP);
             SELF = upgrade_self_to_bignum(INTERP, SELF);

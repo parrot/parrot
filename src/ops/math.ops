@@ -46,7 +46,7 @@ Set $1 to absolute value of $2.
 =cut
 
 inline op abs(inout INT)  {
-#ifdef PARROT_HAS_LABS
+#if defined(PARROT_HAS_LABS) && (INTVAL_SIZE == 8)
     $1 = labs($1);
 #else
     $1 = abs($1);
@@ -58,7 +58,7 @@ inline op abs(inout NUM)  {
 }
 
 inline op abs(out INT, in INT)  {
-#ifdef PARROT_HAS_LABS
+#if defined(PARROT_HAS_LABS) && (INTVAL_SIZE == 8)
     $1 = labs($2);
 #else
     $1 = abs($2);

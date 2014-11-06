@@ -17242,7 +17242,7 @@ Parrot_getstderr_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_abs_i(opcode_t *cur_opcode, PARROT_INTERP) {
-    #if defined(PARROT_HAS_LABS)
+    #if defined(PARROT_HAS_LABS) && (INTVAL_SIZE == 8)
         IREG(1) = labs(IREG(1));
 
 #else
@@ -17261,7 +17261,7 @@ Parrot_abs_n(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_abs_i_i(opcode_t *cur_opcode, PARROT_INTERP) {
-    #if defined(PARROT_HAS_LABS)
+    #if defined(PARROT_HAS_LABS) && (INTVAL_SIZE == 8)
         IREG(1) = labs(IREG(2));
 
 #else
