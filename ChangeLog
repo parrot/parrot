@@ -3,6 +3,8 @@
         + Add imcc -d2 flag for MKCONST tracing.
         + Fix darwin --m=32 Parrot_sysmem_amount() #1113
         + Honor rlimit settings on all non-windows platforms. #935
+        + Slightly improved mark methods for Coroutine, Continuation,
+          CallContext, NCI, Task
     - Build
         + Set -mabi=64 for gcc --m=64 on mips, -m64 on powerpc #1110
         + Add --{en,dis}able-static #1104
@@ -16,6 +18,7 @@
     - Tests
         + Fixed make smoke, uploading to smolder with changed YAML::Tiny
           quoting. #1078
+        + Add better GC stress tests with reproducible GC bugs #1108
     - Community
 
 2014-10-21    release 6.9.0 - supported
