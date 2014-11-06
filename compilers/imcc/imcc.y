@@ -483,10 +483,10 @@ mk_pmc_const_named(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
     }
     r[0] = left;
 
-    /* That that an empty name here, like .const '' $Pxx = "constant"
-       can only be a Sub. name_length = 0 matches all */
-    if ((strncmp(unquoted_name, "Sub",       name_length) == 0)
-    ||  (strncmp(unquoted_name, "Coroutine", name_length) == 0)) {
+    if (STREQ(unquoted_name, "Sub")
+    ||  STREQ(unquoted_name, "Coroutine")
+    /* see e.g. the end of ext/nqp-rx/src/stage0/nqp-setting.pir */
+    ||  !*unquoted_name) { /* empty named constants can only be subs */
         rhs = mk_const(imcc, constant, 'p');
         if (t == 'U')
             rhs->type |= VT_ENCODED;
