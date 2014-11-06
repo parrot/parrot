@@ -42,7 +42,7 @@ if ($had_pcre && $has_pcre && ($^O !~ /MSWin32/)) {
     my $out = Parrot::Test::slurp_file($outfile);
     unlink $outfile;
     chomp $out;
-    $pcre_libpath = "$out/lib";
+    $pcre_libpath = $^O eq 'cygwin' ? "$out/bin" : "$out/lib";
 }
 
 SKIP: {

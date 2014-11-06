@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2009, Parrot Foundation.
+# Copyright (C) 2004-2014, Parrot Foundation.
 
 =head1 TITLE
 
@@ -101,6 +101,9 @@ LIB_WIN32:
     branch LIB_FAILED
 
 LIB_CYGWIN:
+    loadlib libpcre, 'cygpcre-1'
+    loaded = defined libpcre
+    if loaded goto LIB_LOADED
     loadlib libpcre, 'cygpcre-0'
     loaded = defined libpcre
     if loaded goto LIB_LOADED
