@@ -20,22 +20,19 @@ use base qw(Parrot::Configure::Step);
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Test snprintf};
+    $data{description} = q{Test for snprintf};
     $data{result}      = q{};
     return \%data;
 }
 
 sub runstep {
     my ( $self, $conf ) = @_;
-
-    my $res = _probe_for_snprintf($conf);
-
-    $self->_evaluate_snprintf($conf, $res);
-
+    my $res = _probe($conf);
+    $self->_check($conf, $res);
     return 1;
 }
 
-sub _probe_for_snprintf {
+sub _probe {
     my $conf = shift;
     $conf->cc_gen('config/auto/snprintf/test_c.in');
     $conf->cc_build();
@@ -44,16 +41,19 @@ sub _probe_for_snprintf {
     return $res;
 }
 
-sub _evaluate_snprintf {
+sub _check {
     my ($self, $conf, $res) = @_;
     if ( $res =~ /snprintf/ ) {
         $conf->data->set( HAS_SNPRINTF => 1 );
+        $self->set_result('yes');
     }
     if ( $res =~ /^C99 snprintf/ ) {
         $conf->data->set( HAS_C99_SNPRINTF => 1 );
+        $self->set_result('yes, C99');
     }
     elsif ( $res =~ /^old snprintf/ ) {
         $conf->data->set( HAS_OLD_SNPRINTF => 1 );
+        $self->set_result('yes, old');
     }
     $conf->debug(" ($res) ");
     return 1;

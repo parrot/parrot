@@ -10,6 +10,7 @@
         + Fix default cygwin builds #1116
         + Silence failing auto::inline probe #1118
         + Revert automatic regeneration of encoding tables, added with 6.9.0. #1119
+        + Use labs() instead of abs() with 64-bit #1111
     - Documentation
         + Document .lex "name" limitations. Use .lex 'name' w/ single-quotes #1095
     - Tests

@@ -54,6 +54,7 @@ my @steps = qw(
     auto::zlib
     auto::gettext
     auto::snprintf
+    auto::labs
     auto::perldoc
     auto::coverage
     auto::pod2man
