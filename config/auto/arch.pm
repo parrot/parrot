@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2013, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -67,7 +67,7 @@ sub runstep {
         $osname = 'darwin';
         $cpuarch = ( $self->{unamep} eq 'powerpc' )
             ? 'ppc'
-            : 'i386';
+            : 'x86';
     }
 
     # cpuarch and osname are reversed in archname on windows
@@ -76,7 +76,7 @@ sub runstep {
         $osname = 'MSWin32';
     }
     elsif ( $osname =~ /cygwin/i || $cpuarch =~ /cygwin/i ) {
-        $cpuarch = 'i386';
+        $cpuarch = 'x86'; # 64 how?
         $osname  = 'cygwin';
     }
     elsif ( $osname =~ /msys/i || $cpuarch =~ /msys/i ) {
@@ -108,6 +108,14 @@ sub runstep {
     $cpuarch =~ s/i[456]86/i386/i;
     $cpuarch =~ s/x86_64/amd64/i;
     $cpuarch =~ s/x86/i386/i;
+    if ($conf->options->get('m')) {
+        if ($conf->options->get('m') eq '64' and $cpuarch eq 'i386') {
+            $cpuarch = 'amd64';
+        }
+        elsif ($conf->options->get('m') eq '32' and $cpuarch eq 'amd64') {
+            $cpuarch = 'i386';
+        }
+    }
 
     my $cpu_type = "unknown";
     eval {
@@ -115,11 +123,12 @@ sub runstep {
             $cpu_type = _parse_cpuinfo('cat /proc/cpuinfo',
                                        qr/model name\s+:/);
         } elsif ($^O eq 'solaris' and -x '/usr/bin/kstat') {
-            $cpu_type = _cpu_type('/usr/bin/kstat -m cpu_info',
-                                  qr/brand/);
+            $cpu_type = _parse_cpuinfo('/usr/bin/kstat -m cpu_info',
+				       qr/brand/);
         } elsif ($^O eq 'darwin' and -x '/usr/sbin/system_profiler') {
-            $cpu_type = _cpu_type('/usr/sbin/system_profiler SPHardwareDataType',
-                                  qr/Processor Name:/i);
+            $cpu_type = _parse_cpuinfo('/usr/sbin/system_profiler SPHardwareDataType',
+				       qr/Processor Name:/i);
+            $cpuarch = 'amd64' if $cpu_type =~ /^Intel Core/;
         } elsif ($^O eq 'MSWin32' and defined $ENV{PROCESSOR_IDENTIFIER}) {
             $cpu_type = $ENV{PROCESSOR_IDENTIFIER};
         }
