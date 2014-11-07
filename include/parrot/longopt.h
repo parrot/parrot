@@ -1,5 +1,5 @@
 /* longopt.h
- *  Copyright (C) 2001-2012, Parrot Foundation.
+ *  Copyright (C) 2001-2014, Parrot Foundation.
  *  Overview:
  *     Command line option parsing (for pre-initialized code)
  */
@@ -54,6 +54,7 @@ struct longopt_opt_info {
 /* HEADERIZER BEGIN: src/longopt.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_EXPORT
 int longopt_get(
     int argc,
     ARGIN(const char* argv[]),

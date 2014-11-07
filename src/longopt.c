@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -7,7 +7,7 @@ longopt.c - Command-line option parsing
 
 =head1 DESCRIPTION
 
-This is used by C<parrot>.
+This is used by all frontends.
 
 =head2 Functions
 
@@ -80,6 +80,7 @@ Any other value is a valid option identifier.
 
 */
 
+PARROT_EXPORT
 int
 longopt_get(int argc, ARGIN(const char* argv[]),
             ARGIN(const struct longopt_opt_decl options[]),
