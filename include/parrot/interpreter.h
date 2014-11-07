@@ -51,6 +51,7 @@ typedef enum {
     PARROT_TRACE_FIND_METH_FLAG     = 0x02,  /* find_method */
     PARROT_TRACE_SUB_CALL_FLAG      = 0x04,  /* invoke/retcc, not with --optimizing */
     PARROT_TRACE_CORO_STATE_FLAG    = 0x08,  /* not with --optimizing */
+    PARROT_TRACE_OPS_PMC_FLAG       = 0x10,  /* verbose op: pmc flags */
     PARROT_ALL_TRACE_FLAGS          = 0xffff
 } Parrot_trace_flags;
 /* &end_gen */

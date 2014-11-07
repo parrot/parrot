@@ -29,9 +29,9 @@ for my $gc (@gc, '--no-gc') {
 
     # override the args
     my $gc_arg = $gc eq '--no-gc' ? $gc : "--gc $gc";
-    local $ENV{TEST_PROG_ARGS} = "-t $gc_arg --gc-debug --gc-nursery-size=0.0001 ";
+    local $ENV{TEST_PROG_ARGS} = "-t11 $gc_arg --gc-debug --gc-nursery-size=0.0001 ";
 
-    pir_exit_code_is( <<'CODE', 0, "arraystress $gc_arg" );
+    pir_exit_code_is( <<'CODE', 0, "box Integer $gc_arg" );
 .sub 'main' :main
     print "starting\n"
     $P0 = new ['Integer']

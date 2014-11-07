@@ -496,9 +496,11 @@ help_debug(void)
 #ifndef NDEBUG
     printf(
     "    0004    function calls\n"
-    "    0008    coro states\n");
+    "    0008    coro states\n"
+    "    0010    pmc flags\n");
 #else
     printf(
+    "    0010    pmc flags\n"
     "    (more without --optimize)\n");
 #endif
     printf(

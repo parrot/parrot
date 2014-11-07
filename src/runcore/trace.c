@@ -29,27 +29,34 @@ src/test_main.c
 #include "pmc/pmc_callcontext.h"
 #include "parrot/oplib/core_ops.h"
 
-#define EPRINTF(fmt)				\
-    if (debugger == interp) {			\
-        fprintf(stderr, fmt);			\
-    } else {					\
-        Parrot_io_eprintf(debugger, fmt);	\
+#define EPRINTF(fmt)                            \
+    if (debugger == interp) {                   \
+        fprintf(stderr, (fmt));                 \
+    }                                           \
+    else {                                      \
+        Parrot_io_eprintf(debugger, (fmt));     \
     }
 #define EPRINTF_1(fmt, a)			\
     if (debugger == interp) {			\
-        fprintf(stderr, fmt, a);		\
-    } else {					\
-        Parrot_io_eprintf(debugger, fmt, a); }
+        fprintf(stderr, (fmt), (a));		\
+    }                                           \
+    else {                                      \
+        Parrot_io_eprintf(debugger, (fmt), (a));\
+    }
 #define EPRINTF_2(fmt, a1, a2)			\
     if (debugger == interp) {			\
-        fprintf(stderr, fmt, a1, a2);		\
-    } else {					\
-        Parrot_io_eprintf(debugger, fmt, a1, a2); }
-#define EPRINTF_3(fmt, a1, a2, a3)			\
+        fprintf(stderr, (fmt), (a1), (a2));     \
+    }                                           \
+    else {                                      \
+        Parrot_io_eprintf(debugger, (fmt), (a1), (a2));\
+    }
+#define EPRINTF_3(fmt, a1, a2, a3)              \
     if (debugger == interp) {			\
-        fprintf(stderr, fmt, a1, a2, a3);		\
-    } else {					\
-        Parrot_io_eprintf(debugger, fmt, a1, a2, a3); }
+        fprintf(stderr, (fmt), (a1), (a2), (a3));\
+    }                                           \
+    else {                                      \
+        Parrot_io_eprintf(debugger, (fmt), (a1), (a2), (a3));\
+    }
 
 
 /* HEADERIZER HFILE: include/parrot/runcore_trace.h */
@@ -240,34 +247,38 @@ trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
         const STRING * const s = VTABLE_get_string(interp, pmc);
         if (!s) {
             EPRINTF_1("String=PMC(%p Str:(NULL))", pmc);
-        } else {
+        }
+        else {
             STRING * const escaped = Parrot_str_escape_truncate(interp, s, 20);
             if (escaped) {
                 EPRINTF_2("String=PMC(%p Str:\"%s\")", pmc, escaped->strstart);
-            } else {
+            }
+            else {
                 EPRINTF_1("String=PMC(%p Str:\"(null)\")", pmc);
-	    }
+            }
         }
     }
     else if (pmc->vtable->base_type == enum_class_StringBuilder) {
         const STRING * const s = VTABLE_get_string(interp, pmc);
         if (!s) {
             EPRINTF_1("StringBuilder=PMC(%p Str:(NULL))", pmc);
-        } else {
+        }
+        else {
             STRING * const escaped = Parrot_str_escape_truncate(interp, s, 20);
             if (escaped) {
                 EPRINTF_2("StringBuilder=PMC(%p Str:\"%s\")", pmc, escaped->strstart);
-	    } else {
+            }
+            else {
                 EPRINTF_1("StringBuilder=PMC(%p Str:\"(null)\")", pmc);
-	    }
+            }
         }
     }
     else if (pmc->vtable->base_type == enum_class_Boolean) {
-        EPRINTF_2("Boolean=PMC(%p: %ld)",
+        EPRINTF_2("Boolean=PMC(%p: "INTVAL_FMT")",
                 pmc, VTABLE_get_integer(interp, pmc));
     }
     else if (pmc->vtable->base_type == enum_class_Integer) {
-        EPRINTF_2("Integer=PMC(%p: %ld)",
+        EPRINTF_2("Integer=PMC(%p: "INTVAL_FMT")",
                 pmc, VTABLE_get_integer(interp, pmc));
     }
     else if (pmc->vtable->base_type == enum_class_BigInt) {
@@ -279,24 +290,27 @@ trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
         EPRINTF_2("Complex=PMC(%p: %s)", pmc, s->strstart);
     }
     else if (pmc->vtable->base_type == enum_class_Sub) {
-	Parrot_Sub_attributes *sub;
+        Parrot_Sub_attributes *sub;
         PMC_get_sub(interp, pmc, sub);
-        EPRINTF_3("Sub(%s pc:%d)=PMC(%p)", sub->name->strstart, sub->start_offs, pmc);
+        EPRINTF_3("Sub(%s pc:"SIZE_FMT")=PMC(%p)",
+                  sub->name->strstart ? sub->name->strstart : "", sub->start_offs, pmc);
     }
     else if (pmc->vtable->base_type == enum_class_Coroutine) {
-	Parrot_Sub_attributes *sub;
+        Parrot_Sub_attributes *sub;
         PMC_get_sub(interp, pmc, sub);
-        EPRINTF_3("Coroutine(%s pc:%d)=PMC(%p)", sub->name->strstart, sub->start_offs, pmc);
+        EPRINTF_3("Coroutine(%s pc:"SIZE_FMT")=PMC(%p)",
+                  sub->name->strstart ? sub->name->strstart : "", sub->start_offs, pmc);
     }
     else if (PObj_is_object_TEST(pmc)) {
-	STRING * const s = VTABLE_get_string(interp, VTABLE_get_class(interp, pmc));
-	EPRINTF_2("Object(%s)=PMC(%p)", s->strstart, pmc);
+        STRING * const s = VTABLE_get_string(interp, VTABLE_get_class(interp, pmc));
+        EPRINTF_2("Object(%s)=PMC(%p)", s->strstart, pmc);
     }
     else {
         STRING * const name = VTABLE_name(interp, pmc);
         EPRINTF_2("%s=PMC(%p)", name->strstart, pmc);
     }
-    trace_pmc_flags_dump(interp, pmc);
+    if (Interp_trace_TEST(interp, PARROT_TRACE_OPS_PMC_FLAG))
+        trace_pmc_flags_dump(interp, pmc);
 }
 
 /*
