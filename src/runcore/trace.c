@@ -265,7 +265,7 @@ trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
         }
         else {
             STRING * const escaped = Parrot_str_escape_truncate(interp, s, 20);
-            if (escaped) {
+            if (escaped && escaped->strstart) {
                 EPRINTF_2("StringBuilder=PMC(%p Str:\"%s\")", pmc, escaped->strstart);
             }
             else {
