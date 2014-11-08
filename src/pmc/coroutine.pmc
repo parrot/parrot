@@ -113,19 +113,13 @@ pmclass Coroutine extends Sub provides invokable auto_attrs {
 
 Initializes the coroutine.
 
-=item C<PMC *clone()>
-
-Clone the coroutine.
-
 =cut
 
 */
 
     VTABLE void init() {
-        SET_ATTR_seg(INTERP, SELF, INTERP->code);
         SET_ATTR_ctx(INTERP, SELF, PMCNULL);
-
-        PObj_custom_mark_destroy_SETALL(SELF);
+        SUPER();
     }
 
 
