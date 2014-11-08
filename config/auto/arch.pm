@@ -124,10 +124,10 @@ sub runstep {
                                        qr/model name\s+:/);
         } elsif ($^O eq 'solaris' and -x '/usr/bin/kstat') {
             $cpu_type = _parse_cpuinfo('/usr/bin/kstat -m cpu_info',
-				       qr/brand/);
+                                       qr/brand/);
         } elsif ($^O eq 'darwin' and -x '/usr/sbin/system_profiler') {
             $cpu_type = _parse_cpuinfo('/usr/sbin/system_profiler SPHardwareDataType',
-				       qr/Processor Name:/i);
+                                       qr/Processor Name:/i);
             $cpuarch = 'amd64' if $cpu_type =~ /^Intel Core/;
         } elsif ($^O eq 'MSWin32' and defined $ENV{PROCESSOR_IDENTIFIER}) {
             $cpu_type = $ENV{PROCESSOR_IDENTIFIER};
