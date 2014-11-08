@@ -2348,7 +2348,7 @@ gc_gms_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t            i;
 
-    fprintf(stderr, "%s\ntotal: %lu, gen: %lu, ", header,
+    fprintf(stderr, "GC %-25s | total: %lu, gen: %lu, ", header,
             (unsigned long)interp->gc_sys->stats.gc_mark_runs,
             (unsigned long)self->gen_to_collect);
 
@@ -2359,26 +2359,26 @@ gc_gms_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
               : 0);
 
     for (i = 0; i < MAX_GENERATIONS; i++)
-        fprintf(stderr, "GEN %lu: %lu objects, %lu strings\n",
+        fprintf(stderr, "GEN %lu: %6lu objects, %6lu strings\n",
                 (unsigned long)i,
                 (unsigned long)Parrot_pa_count_used(interp, self->objects[i]),
                 (unsigned long)Parrot_pa_count_used(interp, self->strings[i]));
 
 #if 1
-    fprintf(stderr, "parent: 0x%lx, tid: %d\n", (unsigned long)interp->parent_interpreter,
-            interp->thread_data ? (signed)interp->thread_data->tid : -1);
-
-    fprintf(stderr, "PMC: %lu\n",
+    fprintf(stderr, "GC PMC: %6lu",
             (unsigned long)Parrot_gc_pool_allocated_size(interp, self->pmc_allocator));
-    fprintf(stderr, "STRING: %lu\n",
+    fprintf(stderr, ", STRING: %6lu",
             (unsigned long)Parrot_gc_pool_allocated_size(interp, self->string_allocator));
-    fprintf(stderr, "buffers: %lu\n",
+    fprintf(stderr, ", buf: %6lu",
             (unsigned long)self->string_gc.memory_pool->total_allocated);
-    fprintf(stderr, "const buffers: %lu\n",
+    fprintf(stderr, ", const buf: %6lu",
             (unsigned long)self->string_gc.constant_string_pool->total_allocated);
-    fprintf(stderr, "attrs: %lu\n",
+    fprintf(stderr, ", attrs: %6lu",
             (unsigned long)Parrot_gc_fixed_allocator_allocated_memory(interp,
               self->fixed_size_allocator));
+    fprintf(stderr, ", parent: 0x%lx, tid: %3d",
+            (unsigned long)interp->parent_interpreter,
+            interp->thread_data ? (signed)interp->thread_data->tid : -1);
 #endif
     fprintf(stderr, "\n");
 
