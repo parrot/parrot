@@ -393,7 +393,7 @@ main(int argc, const char **argv)
     /* init and set top of stack */
     Parrot_interp_init_stacktop(interp, &status);
 
-    while ((status = longopt_get(argc, argv, opt_options, &opt)) > 0) {
+    while ((status = Parrot_longopt_get(argc, argv, opt_options, &opt)) > 0) {
         switch (opt.opt_id) {
           case 'h':
             options += PFOPT_HEADERONLY;

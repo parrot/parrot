@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -123,7 +123,7 @@ parseflags(PARROT_INTERP, int *argc, char **argv[])
     setopt(PARROT_CGOTO_FLAG);
 #endif
 
-    while (longopt_get(*argc, *argv, options, &opt)) {
+    while (Parrot_longopt_get(*argc, *argv, options, &opt)) {
         if (opt.opt_id == -1) {
             fprintf(stderr, "parrot: %s\n", opt.opt_error);
             Parrot_x_exit(interp, 1);

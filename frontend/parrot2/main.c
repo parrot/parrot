@@ -502,7 +502,7 @@ parseflags_minimal(ARGMOD(Parrot_Init_Args * initargs), int argc, ARGIN(const ch
     struct longopt_opt_info opt = LONGOPT_OPT_INFO_INIT;
     int status;
 
-    while ((status = longopt_get(argc, argv, Parrot_cmd_options(), &opt)) > 0) {
+    while ((status = Parrot_longopt_get(argc, argv, Parrot_cmd_options(), &opt)) > 0) {
         switch (opt.opt_id) {
           case 'g':
             initargs->gc_system = opt.opt_arg;
@@ -624,7 +624,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     args->imcc_opts = 0;
     pargs[nargs++] = argv[0];
 
-    while ((status = longopt_get(argc, argv, Parrot_cmd_options(), &opt)) > 0) {
+    while ((status = Parrot_longopt_get(argc, argv, Parrot_cmd_options(), &opt)) > 0) {
         switch (opt.opt_id) {
           case 'R':
             args->run_core_name = opt.opt_arg;

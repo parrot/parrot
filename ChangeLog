@@ -16,7 +16,7 @@
         + Silence failing auto::inline probe #1118
         + Revert automatic regeneration of encoding tables, added with 6.9.0. #1119
         + Use labs() instead of abs() with 64-bit #1111
-        + Avoid duplicate src/longopt.o, export longopt_get. #1121
+        + Avoid duplicate src/longopt.o, export Parrot_longopt_get. #1121
         + Detect icu version, new icu_version config key. #867
         + Skip -Werror=strict-prototypes only on broken icu 4.2 - 4.9. #867
     - Documentation

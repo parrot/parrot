@@ -55,7 +55,7 @@ struct longopt_opt_info {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-int longopt_get(
+int Parrot_longopt_get(
     int argc,
     ARGIN(const char* argv[]),
     ARGIN(const struct longopt_opt_decl options[]),
@@ -65,7 +65,7 @@ int longopt_get(
         __attribute__nonnull__(4)
         FUNC_MODIFIES(* info_buf);
 
-#define ASSERT_ARGS_longopt_get __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+#define ASSERT_ARGS_Parrot_longopt_get __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(argv) \
     , PARROT_ASSERT_ARG(options) \
     , PARROT_ASSERT_ARG(info_buf))

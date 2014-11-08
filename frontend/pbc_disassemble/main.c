@@ -109,7 +109,7 @@ main(int argc, const char *argv[])
     Parrot_Init_Args       *initargs = NULL;
 
     /* Parse command-line arguments */
-    while ((status = longopt_get(argc, argv, options, &opt)) > 0) {
+    while ((status = Parrot_longopt_get(argc, argv, options, &opt)) > 0) {
         switch (opt.opt_id) {
           case 'h':
             option += enum_DIS_HEADER;

@@ -62,7 +62,7 @@ static char longopt_error_buffer[512];
 
 /*
 
-=item C<int longopt_get(int argc, const char* argv[], const struct
+=item C<int Parrot_longopt_get(int argc, const char* argv[], const struct
 longopt_opt_decl options[], struct longopt_opt_info* info_buf)>
 
 Gets long or short options, specified in C<options[]> (see
@@ -82,11 +82,11 @@ Any other value is a valid option identifier.
 
 PARROT_EXPORT
 int
-longopt_get(int argc, ARGIN(const char* argv[]),
+Parrot_longopt_get(int argc, ARGIN(const char* argv[]),
             ARGIN(const struct longopt_opt_decl options[]),
             ARGMOD(struct longopt_opt_info* info_buf))
 {
-    ASSERT_ARGS(longopt_get)
+    ASSERT_ARGS(Parrot_longopt_get)
     const int dex = info_buf->opt_index;
 
     info_buf->opt_id = 0;
