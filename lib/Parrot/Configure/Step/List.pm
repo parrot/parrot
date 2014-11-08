@@ -20,7 +20,6 @@ my @steps = qw(
     auto::backtrace
     auto::msvc
     auto::attributes
-    auto::warnings
     auto::arch
     auto::cpu
     init::optimize
@@ -65,6 +64,7 @@ my @steps = qw(
     auto::platform
     auto::alignof
     auto::expect
+    auto::warnings
     gen::config_h
     gen::core_pmcs
     gen::opengl

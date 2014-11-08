@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2012, Parrot Foundation.
+# Copyright (C) 2007-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -333,9 +333,12 @@ sub runstep {
             '-fvisibility=hidden';
     };
 
-    # icu4.4 has a uset_openEmpty() declaration without (void)
-    $self->{'warnings'}{$compiler}{'never'}{'-Werror=strict-prototypes'} =
-        [ 'src/string/encoding/shared.c' ];
+    # icu4.2 -4.9 uset.h had a wrong uset_openEmpty() declaration missing (void) GH #867
+    my $icu_version = $conf->data->get('icu_version');
+    if ($icu_version and $icu_version >= 42.0 and $icu_version < 50.1) {
+        $self->{'warnings'}{$compiler}{'never'}{'-Werror=strict-prototypes'} =
+          [ 'src/string/encoding/shared.c' ];
+    }
 
     if ($conf->data->get('clang') and $compiler eq 'g++') { # clang++
         $self->{'warnings'}{'g++'}{'override'} =
