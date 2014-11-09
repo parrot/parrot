@@ -90,7 +90,7 @@ Free the buffer when destroying.
         unsigned char *content;
         if (initial_size < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                _("ByteBuffer: Cannot set buffer size to a negative number (%d)"), initial_size);
+                                        "illegal argument");
         STATICSELF.init();
         SET_ATTR_size(INTERP, SELF, initial_size);
         SET_ATTR_allocated_size(INTERP, SELF, initial_size);
@@ -146,7 +146,7 @@ Resize the buffer to the given value.
         unsigned char *content;
         if (set_size < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "Negative size in ByteBuffer");
+                                        "illegal argument");
 
         GET_ATTR_allocated_size(INTERP, SELF, allocated_size);
         if (set_size == 0) {
@@ -444,9 +444,8 @@ length in codepoints.
         GET_ATTR_size(interp, SELF, size);
 
         if (pos < 0 || pos > size)
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
-                    EXCEPTION_OUT_OF_BOUNDS,
-                    "get_chars: index out of bounds");
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                "index out of bounds");
 
         if (content == NULL) {
             STRING *source;

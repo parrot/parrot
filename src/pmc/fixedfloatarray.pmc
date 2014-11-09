@@ -104,7 +104,8 @@ Initializes the array.
     VTABLE void init_int(INTVAL size) {
         if (size < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                _("FixedFloatArray: Cannot set array size to a negative number (%d)"), size);
+                    "illegal argument");
+
         SET_ATTR_size(INTERP, SELF, size);
         SET_ATTR_float_array(INTERP, SELF, mem_gc_allocate_n_typed(INTERP, size, FLOATVAL));
         PObj_custom_destroy_SET(SELF);
@@ -247,7 +248,7 @@ Returns the floating-point value of the element at index C<key>.
         GET_ATTR_size(INTERP, SELF, size);
         if (key < 0 || key >= size)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "FixedFloatArray: index out of bounds!");
+                "index out of bounds");
 
         GET_ATTR_float_array(INTERP, SELF, float_array);
         return float_array[key];
@@ -365,7 +366,7 @@ Resizes the array to C<size> elements.
         GET_ATTR_size(INTERP, SELF, old_size);
         if (old_size || new_size < 1)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                    "FixedFloatArray: Can't resize!");
+                    "Can't resize");
 
         SET_ATTR_size(INTERP, SELF, new_size);
         SET_ATTR_float_array(INTERP, SELF,
@@ -416,11 +417,10 @@ C<value>.
     VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
         FLOATVAL *float_array;
         INTVAL size;
-
         GET_ATTR_size(INTERP, SELF, size);
         if (key < 0 || key >= size)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "FixedFloatArray: index out of bounds!");
+                "index out of bounds");
 
         GET_ATTR_float_array(INTERP, SELF, float_array);
         float_array[key] = value;

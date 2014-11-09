@@ -843,8 +843,8 @@ Parrot_str_extract_chars(PARROT_INTERP, ARGIN(const char *buffer),
 
     if (bounds.chars < chars)
         Parrot_ex_throw_from_c_args(interp, NULL,
-                EXCEPTION_OUT_OF_BOUNDS,
-                "extract_chars: index out of bounds");
+                                    EXCEPTION_OUT_OF_BOUNDS,
+                                   "index out of bounds");
 
     result = Parrot_str_new_noinit(interp, bounds.bytes);
 

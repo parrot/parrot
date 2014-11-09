@@ -57,12 +57,11 @@ Returns the integer value of the element at index C<key>.
     VTABLE INTVAL get_integer_keyed_int(INTVAL key) :no_wb {
         INTVAL *int_array;
         INTVAL  size;
+        GET_ATTR_size(INTERP, SELF, size);
 
         if (key < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "ResizableIntegerArray: index out of bounds!");
-
-        GET_ATTR_size(INTERP, SELF, size);
+                "index out of bounds");
 
         if (key >= size)
             return 0;
@@ -83,10 +82,12 @@ Sets the integer value of the element at index C<key> to C<value>.
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
         INTVAL *int_array;
+        INTVAL    size;
+        GET_ATTR_size(INTERP, SELF, size);
 
         if (key < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "ResizableIntegerArray: index out of bounds!");
+                "index out of bounds");
 
         if (key >= SELF.get_integer())
             SELF.set_integer_native(key + 1);
@@ -111,7 +112,7 @@ Resizes the array to C<size> elements.
 
         if (size < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                    "ResizableIntegerArray: Can't resize!");
+                "illegal argument");
 
         GET_ATTR_int_array(INTERP, SELF, int_array);
         GET_ATTR_resize_threshold(INTERP, SELF, resize_threshold);
@@ -193,11 +194,11 @@ Removes and returns the last element in the array.
 
     VTABLE INTVAL pop_integer() :manual_wb {
         INTVAL value;
-        INTVAL size = SELF.get_integer();
+        GET_ATTR_size(INTERP, SELF, size);
 
         if (size == 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                    "ResizableIntegerArray: Can't pop from an empty array!");
+                    "Can't pop from an empty array");
 
         value = SELF.get_integer_keyed_int(size-1);
         SELF.set_integer_native(size - 1);
@@ -215,11 +216,12 @@ Removes and returns an item from the start of the array.
 
     VTABLE INTVAL shift_integer() :manual_wb {
         INTVAL value, *int_array;
-        INTVAL size = SELF.get_integer();
+        INTVAL    size;
+        GET_ATTR_size(INTERP, SELF, size);
 
         if (size == 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                    "ResizableIntegerArray: Can't shift from an empty array!");
+                    "Can't shift from an empty array");
 
         GET_ATTR_int_array(INTERP, SELF, int_array);
         value = int_array[0];
@@ -242,7 +244,8 @@ Add an integer to the start of the array.
 
     VTABLE void unshift_integer(INTVAL value) {
         INTVAL *int_array;
-        const INTVAL size = SELF.get_integer();
+        INTVAL size;
+        GET_ATTR_size(INTERP, SELF, size);
 
         SELF.set_integer_native(size + 1);
         GET_ATTR_int_array(INTERP, SELF, int_array);
@@ -261,19 +264,18 @@ Removes the element at C<key>.
 */
 
     VTABLE void delete_keyed_int(INTVAL key) :manual_wb {
-        INTVAL size = SELF.get_integer();
+        INTVAL *int_array;
+        INTVAL size;
+        GET_ATTR_size(INTERP, SELF, size);
 
-        if (size < 1 || key >= size) {
+        if (size < 1 || key >= size)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "ResizableIntegerArray: index out of bounds!");
-        }
-        else {
-            INTVAL *int_array;
-            GET_ATTR_int_array(INTERP, SELF, int_array);
-            --size;
-            memmove(int_array + key, int_array + key + 1, (size - key) * sizeof (INTVAL));
-            SELF.set_integer_native(size);
-        }
+                    "index out of bounds");
+
+        GET_ATTR_int_array(INTERP, SELF, int_array);
+        --size;
+        memmove(int_array + key, int_array + key + 1, (size - key) * sizeof (INTVAL));
+        SELF.set_integer_native(size);
     }
 
 /*

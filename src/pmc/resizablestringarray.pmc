@@ -63,14 +63,11 @@ Returns the Parrot string value of the element at index C<key>.
         INTVAL size;
         GET_ATTR_size(INTERP, SELF, size);
 
-        if (key < 0) {
-            if (key < -size)
+        if (key < 0)
+            key += size;
+        if (key < 0)
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                    "ResizableStringArray: index out of bounds!");
-            else
-                key += size;
-        }
-
+                    "index out of bounds");
         if (key >= size)
             return CONST_STRING(INTERP, "");
 
@@ -98,13 +95,11 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
         INTVAL   size;
         GET_ATTR_size(INTERP, SELF, size);
 
-        if (key < 0) {
-            if (key < -size)
+        if (key < 0)
+            key += size;
+        if (key < 0)
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                    "ResizableStringArray: index out of bounds!");
-            else
-                key += size;
-        }
+                    "index out of bounds");
 
         if (key >= size)
             SELF.set_integer_native(key+1);
@@ -147,7 +142,7 @@ Removes and returns the last element in the array.
 
         if (size == 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                    "ResizableStringArray: Can't pop from an empty array!");
+                    "Can't pop from an empty array");
 
         value = SELF.get_string_keyed_int(size - 1);
         SELF.set_integer_native(size - 1);
@@ -222,7 +217,7 @@ Resizes the array to C<size> elements.
 
         if (new_size < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                    "ResizableStringArray: Can't resize!");
+                    "illegal argument");
 
         GET_ATTR_str_array(INTERP, SELF, str_array);
         GET_ATTR_resize_threshold(INTERP, SELF, resize_threshold);
@@ -315,7 +310,7 @@ Removes and returns an item from the start of the array.
 
         if (size == 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                    "ResizableStringArray: Can't shift from an empty array!");
+                    "Can't shift from an empty array");
 
         value = SELF.get_string_keyed_int(0);
         SELF.delete_keyed_int(0);
@@ -425,12 +420,11 @@ Removes and returns a String PMC from the start of the array.
         UINTVAL  size;
         PMC     *ret;
         STRING  *value;
-
         GET_ATTR_size(INTERP, SELF, size);
 
         if (size == 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                    "ResizableStringArray: Can't shift from an empty array!");
+                    "Can't shift from an empty array");
 
         value = SELF.get_string_keyed_int(0);
         ret   = Parrot_pmc_new(INTERP, enum_class_String);
@@ -572,12 +566,12 @@ Removes the element at C<*key>.
 
 /*
 
-=item C<void splice(PMC *value, INTVAL offset, INTVAL count)>
+=item C<void splice(PMC *from, INTVAL offset, INTVAL count)>
 
 Replaces C<count> elements starting at C<offset> with the elements in
-C<value>.
+C<from>.
 
-Note that the C<value> PMC can be of any of the various array types.
+Note that the C<from> PMC can be of any of the various array types.
 
 Note that this implementation can be *VERY *inefficient as it manipulates
 everything via the VTABLE api.
@@ -586,29 +580,29 @@ everything via the VTABLE api.
 
 */
 
-    VTABLE void splice(PMC *value, INTVAL offset, INTVAL count) :manual_wb {
+    VTABLE void splice(PMC *from, INTVAL offset, INTVAL count) :manual_wb {
 
         INTVAL length, elems, shift, i;
 
-        if (value->vtable->base_type != SELF->vtable->base_type &&
-                value->vtable->base_type != enum_class_FixedStringArray)
+        if (from->vtable->base_type != SELF->vtable->base_type
+         && from->vtable->base_type != enum_class_FixedStringArray)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "ResizableStringArray: illegal type for splice!");
 
         length = VTABLE_elements(INTERP, SELF);
-        elems  = VTABLE_elements(INTERP, value);
+        elems  = VTABLE_elements(INTERP, from);
         shift  = elems - count;
 
         /* start from end? */
-        if (offset < 0)
+        if (offset < 0) {
             offset += length;
-
-        if (offset < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                _("illegal splice offset"));
+            if (offset < 0)
+                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                        "index out of bounds");
+        }
         if (count < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                                        _("illegal argument"));
+                    "illegal argument");
 
         /* shrink the array */
         if (shift < 0) {
@@ -633,7 +627,7 @@ everything via the VTABLE api.
         /* copy the new values */
         for (i = 0; i < elems; ++i)
             VTABLE_set_pmc_keyed_int(INTERP, SELF, i + offset,
-                VTABLE_get_pmc_keyed_int(INTERP, value, i));
+                VTABLE_get_pmc_keyed_int(INTERP, from, i));
     }
 
 /*

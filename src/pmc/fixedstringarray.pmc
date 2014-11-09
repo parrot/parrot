@@ -47,7 +47,7 @@ Initializes the array.
     VTABLE void init_int(INTVAL size) :manual_wb {
         if (size < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                _("FixedStringArray: Cannot set array size to a negative number (%d)"), size);
+                    "illegal argument");
         if (size) {
             SET_ATTR_size(INTERP, SELF, size);
             SET_ATTR_str_array(INTERP,
@@ -69,11 +69,9 @@ Destroys the array.
 */
 
     VTABLE void destroy() :no_wb {
-
         STRING **str_array;
 
         GET_ATTR_str_array(INTERP, SELF, str_array);
-
         if (str_array)
             mem_gc_free(INTERP, str_array);
     }
@@ -293,7 +291,7 @@ Returns the Parrot string value of the element at index C<key>.
         GET_ATTR_size(INTERP, SELF, size);
         if (key < 0 || (UINTVAL)key >= size)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "FixedStringArray: index out of bounds!");
+                    "index out of bounds");
 
         GET_ATTR_str_array(INTERP, SELF, str_array);
         return str_array[key];
@@ -367,7 +365,7 @@ cause an exception to be thrown.
 
         if (old_size || new_size < 1)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "FixedStringArray: Can't resize!");
+                    "Can't resize");
 
         SET_ATTR_size(INTERP, SELF, new_size);
         SET_ATTR_str_array(INTERP, SELF,
@@ -453,10 +451,9 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 
         if (key < 0 || key >= SELF.elements())
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "FixedStringArray: index out of bounds!");
+                "index out of bounds");
 
         GET_ATTR_str_array(INTERP, SELF, str_array);
-
         str_array[key] = value;
     }
 

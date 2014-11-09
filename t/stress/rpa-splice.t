@@ -11,7 +11,8 @@ t/stress/rpa-slice.t - ResizablePMCArray.splice variants
 
 =head1 DESCRIPTION
 
-Test ResizablePMCArray.splice heap-buffer overflows under AddressSanitizer or valgrind.
+Test ResizablePMCArray.splice heap-buffer overflows with negative count arguments
+under AddressSanitizer or valgrind.
 
 =cut
 

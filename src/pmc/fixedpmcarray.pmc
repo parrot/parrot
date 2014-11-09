@@ -115,7 +115,7 @@ Initializes the array.
     VTABLE void init_int(INTVAL size) :manual_wb {
         if (size < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                    _("FixedPMCArray: Cannot set array size to a negative number (%d)"), size);
+                    "illegal argument");
 
         SELF.set_integer_native(size);
     }
@@ -364,7 +364,7 @@ Returns the PMC value of the element at index C<key>.
 
         if (key < 0 || key >= PMC_size(SELF))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                _("FixedPMCArray: index out of bounds!"));
+                    "index out of bounds");
 
         data = PMC_array(SELF);
         return data[key];
@@ -414,13 +414,12 @@ array.
 
         if (PMC_size(SELF) && size)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                    _("FixedPMCArray: Can't resize!"));
+                    "Can't resize");
         if (!size)
             return;
-
         if (size < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                    _("FixedPMCArray: Cannot set array size to a negative number"));
+                                        "illegal argument");
 
         PMC_size(SELF) = size;
         data           = mem_gc_allocate_n_typed(INTERP, size, PMC *);
@@ -572,7 +571,7 @@ Sets the PMC value of the element at index C<key> to C<*src>.
 
         if (key < 0 || key >= PMC_size(SELF))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                _("FixedPMCArray: index out of bounds!"));
+                "index out of bounds");
 
         data      = PMC_array(SELF);
         data[key] = src;
@@ -675,7 +674,7 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
         PMC **data;
         if (key < 0 || key >= PMC_size(SELF))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                _("FixedPMCArray: index out of bounds!"));
+                "index out of bounds");
 
         data = PMC_array(SELF);
         return !PMC_IS_NULL(data[key]);
@@ -707,16 +706,13 @@ of this array.
         /* start from end? */
         if (offset < 0)
             offset += elems0;
-        if (offset < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                                        _("illegal splice offset"));
         if (count < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                                        _("illegal argument"));
-        if (count + offset > PMC_size(SELF))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                _("index out of bounds"));
-
+                    "illegal argument");
+        if (offset < 0 || count + offset > PMC_size(SELF))
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                    "index out of bounds");
+        /* TODO: use faster memmove as in ResizablePMCArray */
         for (count--; count >= 0; --count) {
             VTABLE_set_pmc_keyed_int(INTERP, SELF, offset + count, value);
         }

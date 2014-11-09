@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 
 =head1 NAME
@@ -372,7 +372,7 @@ Resizes the array to C<size> elements.
 
         if (old_size || size < 1)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "FixedBooleanArray: Can't resize!");
+                "Can't resize");
 
         SET_ATTR_size(INTERP, SELF, size);
         SET_ATTR_resize_threshold(INTERP, SELF, size_in_bytes * BITS_PER_CHAR);
