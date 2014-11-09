@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -18,7 +18,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(50)
+    plan(51)
 
     test_set_size()
     test_reset_size()
@@ -115,12 +115,19 @@ out-of-bounds test. Checks INT and PMC keys.
     pop_eh
 
     $I0 = 1
-    push_eh handle_set_negative
-    $P0[-42] = 7
+    push_eh handle_get1
+    $I1 = $P0[-42]
     $I0 = 0
-  handle_set_negative:
-    ok($I0, "Can't set element on negative index")
+  handle_get1:
+    ok($I0, "Can't get negative out-of-bounds element")
     pop_eh
+
+    $I0 = $P0[-1]
+    ok(1, "Can get element on negative index")
+
+    $P0[-1] = ""
+    $S0 = $P0[-1]
+    is($S0, "", "Can set element on negative index")
 
     $I0 = 1
     push_eh handle_get
@@ -128,14 +135,6 @@ out-of-bounds test. Checks INT and PMC keys.
     $I0 = 0
   handle_get:
     ok($I0, "Can't get out-of-bounds element")
-    pop_eh
-
-    $I0 = 1
-    push_eh handle_get_negative
-    $I1 = $P0[-1]
-    $I0 = 0
-  handle_get_negative:
-    ok($I0, "Can't get element with negative index")
     pop_eh
 
 .end
@@ -368,13 +367,13 @@ out-of-bounds test. Checks INT and PMC keys.
 .end
 
 .sub test_invalid_init_tt1509
-    throws_substring(<<'CODE', 'FixedStringArray: Cannot set array size to a negative number (-10)', 'New style init does not dump core for negative array lengths')
+    throws_substring(<<'CODE', 'illegal argument', 'New style init does not dump core for negative array lengths')
     .sub main :main
         $P0 = new ['FixedStringArray'], -10
     .end
 CODE
 
-    throws_substring(<<'CODE', 'FixedStringArray: Cannot set array size to a negative number (-10)', 'New style init (key constant) does not dump core for negative array lengths')
+    throws_substring(<<'CODE', 'illegal argument', 'New style init (key constant) does not dump core for negative array lengths')
     .sub main :main
         $P0 = new 'FixedStringArray', -10
     .end

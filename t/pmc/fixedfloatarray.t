@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2013, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -278,13 +278,13 @@ loop:
 .end
 
 .sub test_invalid_init_tt1509
-    throws_substring(<<'CODE', 'FixedFloatArray: Cannot set array size to a negative number (-10)', 'New style init does not dump core for negative array lengths')
+    throws_substring(<<'CODE', 'illegal argument', 'New style init does not dump core for negative array lengths')
     .sub main :main
         $P0 = new ['FixedFloatArray'], -10
     .end
 CODE
 
-    throws_substring(<<'CODE', 'FixedFloatArray: Cannot set array size to a negative number (-10)', 'New style init (key constant) does not dump core for negative array lengths')
+    throws_substring(<<'CODE', 'illegal argument', 'New style init (key constant) does not dump core for negative array lengths')
     .sub main :main
         $P0 = new 'FixedFloatArray', -10
     .end

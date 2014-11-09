@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -958,17 +958,6 @@ too_low:
     finalize $P9
 too_low_end:
     ok($I0, "splice with negative offset too low")
-<<<<<<< HEAD
-=======
-
-    # GH 766 heap-buffer-overflow with asan. See t/stress/rpa-slice.t
-    $P1 = new ['ResizablePMCArray']
-    $P2 = new ['ResizablePMCArray']
-    $P1 = 0
-    $P2 = 0
-    # splice $P1, $P2, 0, -1
-
->>>>>>> c9a7c2e... [pmc] harmonize out of bounds exception strings
 .end
 
 

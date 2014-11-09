@@ -721,7 +721,7 @@ pir_output_is( <<'CODE', <<'OUT', 'illegal utf8 chars' );
     .local pmc ex
     .get_results (ex)
     $S0 = ex['message']
-    print $S0
+    say $S0
   end:
     pop_eh
 .end
@@ -845,7 +845,7 @@ $code
     .local pmc ex
     .get_results (ex)
     \$S0 = ex['message']
-    print \$S0
+    say \$S0
   end:
     pop_eh
 .end
@@ -949,7 +949,7 @@ $code
     .local pmc ex
     .get_results (ex)
     \$S0 = ex['message']
-    print \$S0
+    say \$S0
   end:
     pop_eh
 .end
@@ -1059,7 +1059,7 @@ $code
     .local pmc ex
     .get_results (ex)
     \$S0 = ex['message']
-    print \$S0
+    say \$S0
     pop_eh
   end:
 .end

@@ -150,7 +150,7 @@ out-of-bounds test. Checks INT and PMC keys.
     $P0 = 1
 
     push_eh setting_oob_handler
-    $P0[-2] = -7
+    $P0[-3] = -7
     pop_eh
     nok(1, 'setting out of bounds elements')
     .return ()
