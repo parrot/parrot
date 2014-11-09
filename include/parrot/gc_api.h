@@ -41,6 +41,7 @@ typedef struct _Parrot_GC_Init_Args {
     Parrot_Int dynamic_threshold;
     Parrot_Int min_threshold;
     Parrot_UInt numthreads;
+    Parrot_UInt debug_flags;
 } Parrot_GC_Init_Args;
 
 typedef enum _gc_sys_type_enum {

@@ -211,7 +211,7 @@ SP              [ ]
         yy_pop_state(yyscanner);
         yy_push_state(cmt3, yyscanner);
 
-        str = Parrot_str_new(imcc->interp, yytext,0);
+        str = Parrot_str_new(imcc->interp, yytext, 0);
         imcc->frames->s.file = str;
         imcc->cur_unit->file = str;
 

@@ -667,7 +667,7 @@ Parrot_pcc_trace_flags_off_func(SHIM_INTERP, ARGIN(PMC *ctx), UINTVAL flags)
 =item C<UINTVAL Parrot_pcc_trace_flags_test_func(PARROT_INTERP, PMC *ctx,
 UINTVAL flags)>
 
-Test trace flags.
+Test for one trace flag, one only.
 
 =cut
 

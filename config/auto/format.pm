@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2003, Parrot Foundation.
+# Copyright (C) 2001-2003,2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -32,7 +32,6 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     _set_intvalfmt($conf);
-
     _set_floatvalfmt_nvsize($conf);
 
     return 1;
@@ -55,7 +54,10 @@ sub _set_intvalfmt {
     else {
         die qq{Configure.pl:  Can't find a printf-style format specifier for type '$iv'\n};
     }
+    my $uvformat = $ivformat;
+    $uvformat =~ s/d$/u/;
     $conf->data->set( intvalfmt   => $ivformat );
+    $conf->data->set( uintvalfmt  => $uvformat );
 }
 
 sub _set_floatvalfmt_nvsize {

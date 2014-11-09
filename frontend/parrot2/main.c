@@ -397,6 +397,10 @@ help_debug(void)
     "    0020    eval/compile\n"
     "    0040    fill I, N registers with garbage\n"
     "    0080    show when a context is destroyed\n"
+#ifdef MEMORY_DEBUG
+    "    0100    GC traces\n"
+    "    0200    every single alloc/free\n"
+#endif
     "\n"
     "--trace -t [Flags] ...\n"
     "    0001    opcodes\n"
@@ -404,9 +408,11 @@ help_debug(void)
 #ifndef NDEBUG
     printf(
     "    0004    function calls\n"
-    "    0008    coro states\n");
+    "    0008    coro states\n"
+    "    0010    pmc flags\n");
 #else
     printf(
+    "    0010    pmc flags\n"
     "    (more without --optimize)\n");
 #endif
     printf(
@@ -506,6 +512,12 @@ parseflags_minimal(ARGMOD(Parrot_Init_Args * initargs), int argc, ARGIN(const ch
         switch (opt.opt_id) {
           case 'g':
             initargs->gc_system = opt.opt_arg;
+            break;
+          case 'D':
+            if (opt.opt_arg && is_all_hex_digits(opt.opt_arg))
+                initargs->debug_flags = strtoul(opt.opt_arg, NULL, 16);
+            else
+                initargs->debug_flags = PARROT_MEM_STAT_DEBUG_FLAG;
             break;
           case OPT_GC_DYNAMIC_THRESHOLD:
             if (opt.opt_arg && is_all_digits(opt.opt_arg)) {

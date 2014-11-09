@@ -1,4 +1,4 @@
-/* Copyright (C) 2001-2012, Parrot Foundation.
+/* Copyright (C) 2001-2014, Parrot Foundation.
  */
 
 /* config.h
@@ -149,7 +149,13 @@ typedef void DPOINTER;
 #define PARROT_HAS_ICU @has_icu@
 
 /* Int and float formats. */
-#define INTVAL_FMT "@intvalfmt@"
+#define UINTVAL_FMT  "@uintvalfmt@"
+#define INTVAL_FMT   "@intvalfmt@"
+#if PTR_SIZE == 4
+#  define SIZE_FMT     "%d"
+#else
+#  define SIZE_FMT     "%ld"
+#endif
 #define FLOATVAL_FMT "@floatvalfmt@"
 
 #include "parrot/has_header.h"

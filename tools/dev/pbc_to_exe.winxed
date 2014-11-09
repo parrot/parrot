@@ -71,7 +71,7 @@ const string C_MAIN = <<:MAIN
             const unsigned char *program_code_addr;
             Parrot_Init_Args    *initargs;
 
-            char execname[1024];
+            static char         execname[1024];
             size_t execname_size = sizeof(execname);
             memset(execname, 0, execname_size);
 #if defined(__APPLE__)

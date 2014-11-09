@@ -495,7 +495,7 @@ mk_pmc_const_named(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
         const_name = mem_sys_strdup(constant);
     }
 
-    /* That that an empty name here, like .const '' $Pxx = "constant"
+    /* With an empty name here, like .const '' $Pxx = "constant"
        can only be a Sub. name_length = 0 matches all */
     if ((strncmp(unquoted_name, "Sub",       name_length) == 0)
     ||  (strncmp(unquoted_name, "Coroutine", name_length) == 0)) {

@@ -197,7 +197,7 @@ removal of unused labels and dead code.
 
 -Op applies -O2 to pasm files also.
 
-The old options -Oc and -Oj are currently ineffective.
+The old options -Oc (tailcall) and -Oj are currently ineffective.
 
 -O defaults to -O1.
 

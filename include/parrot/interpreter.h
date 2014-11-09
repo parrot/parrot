@@ -30,7 +30,7 @@ typedef enum {
 /* &gen_from_enum(interpdebug.pasm) */
 typedef enum {
     PARROT_NO_DEBUG                 = 0x00,
-    PARROT_MEM_STAT_DEBUG_FLAG      = 0x01,  /* memory usage summary */
+    PARROT_MEM_STAT_DEBUG_FLAG      = 0x01,  /* memory/gc usage summary */
     PARROT_BACKTRACE_DEBUG_FLAG     = 0x02,  /* print bt in exception */
     PARROT_JIT_DEBUG_FLAG           = 0x04,  /* create jit stabs file (unused) */
     PARROT_START_DEBUG_FLAG         = 0x08,
@@ -38,6 +38,8 @@ typedef enum {
     PARROT_EVAL_DEBUG_FLAG          = 0x20,  /* create EVAL_n file */
     PARROT_REG_DEBUG_FLAG           = 0x40,  /* fill I,N with garbage */
     PARROT_CTX_DESTROY_DEBUG_FLAG   = 0x80,  /* ctx of a sub is gone */
+    PARROT_GC_DETAIL_DEBUG_FLAG     = 0x100, /* formerly DETAIL_MEMORY_DEBUG */
+    PARROT_MEM_DETAIL_DEBUG_FLAG    = 0x200, /* every single malloc/free */
     PARROT_ALL_DEBUG_FLAGS          = 0xffff
 } Parrot_debug_flags;
 /* &end_gen */
@@ -49,6 +51,7 @@ typedef enum {
     PARROT_TRACE_FIND_METH_FLAG     = 0x02,  /* find_method */
     PARROT_TRACE_SUB_CALL_FLAG      = 0x04,  /* invoke/retcc, not with --optimizing */
     PARROT_TRACE_CORO_STATE_FLAG    = 0x08,  /* not with --optimizing */
+    PARROT_TRACE_OPS_PMC_FLAG       = 0x10,  /* verbose op: pmc flags */
     PARROT_ALL_TRACE_FLAGS          = 0xffff
 } Parrot_trace_flags;
 /* &end_gen */
@@ -140,11 +143,11 @@ typedef Parrot_Run_core_t Run_Cores;
 
 #define Interp_flags_SET(interp, flag)   ((interp)->flags |= (flag))
 #define Interp_flags_CLEAR(interp, flag) ((interp)->flags &= ~(flag))
-#define Interp_flags_TEST(interp, flag)  ((interp)->flags & (flag))
+#define Interp_flags_TEST(interp, flag)  (((interp)->flags & (flag)) == (flag))
 
 #define Interp_debug_SET(interp, flag)   ((interp)->debug_flags |= (flag))
 #define Interp_debug_CLEAR(interp, flag) ((interp)->debug_flags &= ~(flag))
-#define Interp_debug_TEST(interp, flag)  ((interp)->debug_flags & (flag))
+#define Interp_debug_TEST(interp, flag)  (((interp)->debug_flags & (flag)) == (flag))
 
 #define Interp_trace_SET(interp, flag)   Parrot_pcc_trace_flags_on(interp, interp->ctx, (flag))
 #define Interp_trace_CLEAR(interp, flag) Parrot_pcc_trace_flags_off(interp, interp->ctx, (flag))

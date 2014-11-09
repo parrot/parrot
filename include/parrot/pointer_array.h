@@ -138,7 +138,7 @@ PARROT_INLINE
 void
 Parrot_pa_remove(SHIM_INTERP, ARGIN(Parrot_Pointer_Array *self), ARGIN(void *ptr))
 {
-    /* Mark sell to avoid iterating over */
+    /* Mark cell to avoid iterating over */
     *(void**)ptr = (void*)((ptrcast_t)self->next_free | 1);
     self->next_free = (void**)ptr;
 }

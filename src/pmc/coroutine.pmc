@@ -113,19 +113,13 @@ pmclass Coroutine extends Sub provides invokable auto_attrs {
 
 Initializes the coroutine.
 
-=item C<PMC *clone()>
-
-Clone the coroutine.
-
 =cut
 
 */
 
     VTABLE void init() {
-        SET_ATTR_seg(INTERP, SELF, INTERP->code);
         SET_ATTR_ctx(INTERP, SELF, PMCNULL);
-
-        PObj_custom_mark_destroy_SETALL(SELF);
+        SUPER();
     }
 
 
@@ -144,10 +138,13 @@ Clones the coroutine.
 
         PObj_custom_mark_destroy_SETALL(ret);
 
+        /* first copy the struct, Parrot_str_copy may cause GC */
         memcpy((Parrot_Coroutine_attributes *)PMC_data(ret),
-                (Parrot_Coroutine_attributes *)PMC_data(SELF),
-                sizeof (Parrot_Coroutine_attributes));
-        PObj_flags_SETTO(ret, PObj_get_FLAGS(SELF));
+               (Parrot_Coroutine_attributes *)PMC_data(SELF),
+               sizeof (Parrot_Coroutine_attributes));
+        /* but unlike with Sub we do share the arg_info struct */
+
+        PObj_flags_SETTO(ret, PObj_get_FLAGS(SELF) & ~PObj_GC_all_FLAGS);
 
         return ret;
     }
