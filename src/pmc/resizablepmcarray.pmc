@@ -693,10 +693,15 @@ Note that the C<from> PMC can be of any of the various array types.
         /* start from end? */
         if (offset < 0)
             offset += elems0;
-
         if (offset < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "illegal splice offset\n");
+                _("illegal splice offset"));
+        if (count < 0)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                _("illegal argument"));
+        if (count + offset > elems0)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                _("index out of bounds"));
 
         /* number of elements to the right of the splice (the "tail") */
         tail = elems0 - offset - count;

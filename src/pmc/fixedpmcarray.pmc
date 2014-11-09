@@ -703,9 +703,19 @@ of this array.
 */
 
     VTABLE void splice(PMC *value, INTVAL offset, INTVAL count) :manual_wb {
+        const INTVAL elems0 = VTABLE_elements(INTERP, SELF);
+        /* start from end? */
+        if (offset < 0)
+            offset += elems0;
+        if (offset < 0)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                                        _("illegal splice offset"));
+        if (count < 0)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                                        _("illegal argument"));
         if (count + offset > PMC_size(SELF))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                _("FixedPMCArray: index out of bounds!"));
+                _("index out of bounds"));
 
         for (count--; count >= 0; --count) {
             VTABLE_set_pmc_keyed_int(INTERP, SELF, offset + count, value);
