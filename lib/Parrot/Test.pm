@@ -835,9 +835,8 @@ sub _generate_test_functions {
                 }
                 else {
                     $builder->ok(0, $desc);
-                    $builder->diag( "$cmd\nExited with error code: $exit_code, expected: $expected\n"
-                                    . "STDOUT:\n$real_output\n"
-                                    );
+                    $builder->diag( "$cmd\nExited with error code: $exit_code, expected: $expected\n" );
+                    $builder->diag( "STDOUT:\n$real_output\n" ) if $ENV{TEST_VERBOSE};
                     return 0;
                 }
             }
