@@ -306,6 +306,8 @@ sub _try_icuconfig {
         chomp ($icuversion);
         $icuversion =~ s/\n//g;
         $conf->debug("$arg->{icuconfig} --version:  captured $icuversion\n");
+        # convert it into icu-compat floats. i.e. 4.8.1 on cygwin => 48.1
+        $icuversion =~ s/^(\d)\.(\d)/$1$2/;
     }
 
     return ($arg->{without}, $icushared, $icuheaders, $icuversion);
