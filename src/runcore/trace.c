@@ -301,6 +301,21 @@ trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
         EPRINTF_3("Coroutine(%s pc:"SIZE_FMT")=PMC(%p)",
                   sub->name->strstart ? sub->name->strstart : "", sub->start_offs, pmc);
     }
+    else if (pmc->vtable->base_type == enum_class_FixedBooleanArray
+          || pmc->vtable->base_type == enum_class_FixedFloatArray
+          || pmc->vtable->base_type == enum_class_FixedIntegerArray
+          || pmc->vtable->base_type == enum_class_FixedPMCArray
+          || pmc->vtable->base_type == enum_class_FixedStringArray
+          || pmc->vtable->base_type == enum_class_ResizableBooleanArray
+          || pmc->vtable->base_type == enum_class_ResizableFloatArray
+          || pmc->vtable->base_type == enum_class_ResizableIntegerArray
+          || pmc->vtable->base_type == enum_class_ResizablePMCArray
+          || pmc->vtable->base_type == enum_class_ResizableStringArray
+          || pmc->vtable->base_type == enum_class_MappedByteArray) {
+        STRING * const name = VTABLE_name(interp, pmc);
+        EPRINTF_3("%s("INTVAL_FMT")=PMC(%p)",
+                  name->strstart, VTABLE_elements(interp, pmc), pmc);
+    }
     else if (PObj_is_object_TEST(pmc)) {
         STRING * const s = VTABLE_get_string(interp, VTABLE_get_class(interp, pmc));
         EPRINTF_2("Object(%s)=PMC(%p)", s->strstart, pmc);
