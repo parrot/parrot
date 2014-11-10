@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -599,7 +599,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "resuming after exception handled - return 
     $P0 = new 'FirstClass'
     $P1 = $P0.'compile'(classname)
     print "returned from handler\nException message: "
-    print $P1
+    say $P1
 .end
 
 .namespace [ "FirstClass" ]
@@ -635,7 +635,7 @@ in compile method
 in make method
 in handler
 returned from handler
-Exception message: Class Foo already registered!
+Exception message: Class Foo already registered
 after compile
 OUTPUT
 

@@ -131,7 +131,7 @@ Initializes the array.
     VTABLE void init_int(INTVAL size) :manual_wb {
         if (size < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                    _("ResizeblePMCArray: Cannot set array size to a negative number (%d)"), size);
+                    "illegal argument");
         SUPER(size);
         if (size > 0) {
             PMC_threshold(SELF) = size;
@@ -152,7 +152,7 @@ Resizes the array to C<size> elements.
     VTABLE void set_integer_native(INTVAL size) :manual_wb {
         if (size < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                    "ResizablePMCArray: Can't resize!");
+                    "illegal argument");
 
         if (!PMC_array(SELF)) {
             /* empty - used fixed routine */
@@ -289,19 +289,18 @@ Returns the PMC value of the element at index C<key>.
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) :no_wb {
         PMC **data;
+        INTVAL    size;
+        GET_ATTR_size(INTERP, SELF, size);
 
         if (key < 0)
-            key += PMC_size(SELF);
-
+            key += size;
         if (key < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "ResizablePMCArray: index out of bounds!");
-
-        if (key >= PMC_size(SELF))
+                "index out of bounds");
+        if (key >= size)
             return PMCNULL;
 
         data = PMC_array(SELF);
-
         if (PMC_IS_NULL(data[key]))
             return PMCNULL;
 
@@ -330,7 +329,7 @@ Sets the PMC value of the element keyed by C<key> to C<*src>.
 
         if (key < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "ResizablePMCArray: index out of bounds!");
+                "index out of bounds");
 
         if (key >= PMC_size(SELF))
             SELF.set_integer_native(key+1);
@@ -352,7 +351,7 @@ Sets the PMC value of the element keyed by C<key> to C<*src>.
 
         if (!VTABLE_does(INTERP, value, CONST_STRING(INTERP, "array")))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                    _("Can't set self from this type"));
+                    "Can't set self from this type");
 
         if (PMC_array(SELF))
             mem_gc_free(INTERP, PMC_array(SELF));
@@ -499,7 +498,6 @@ the array.
     }
 
     VTABLE void push_string(STRING *value) :manual_wb {
-
         const INTVAL size = PMC_size(SELF);
         PMC   * const val = Parrot_pmc_new(INTERP, enum_class_String);
 
@@ -524,7 +522,6 @@ Removes and returns the last element in the array.
 */
 
     VTABLE FLOATVAL pop_float() :manual_wb {
-
         INTVAL   size = PMC_size(SELF);
         PMC     *data;
 
@@ -539,7 +536,6 @@ Removes and returns the last element in the array.
     }
 
     VTABLE INTVAL pop_integer() :manual_wb {
-
         INTVAL  size = PMC_size(SELF);
         PMC    *data;
 
@@ -554,7 +550,6 @@ Removes and returns the last element in the array.
     }
 
     VTABLE PMC *pop_pmc() :manual_wb {
-
         INTVAL size = PMC_size(SELF);
         PMC   *data;
 
@@ -569,7 +564,6 @@ Removes and returns the last element in the array.
     }
 
     VTABLE STRING *pop_string() :manual_wb {
-
         INTVAL  size = PMC_size(SELF);
         PMC    *data;
 
@@ -651,7 +645,6 @@ Returns the Parrot string representation C<ResizablePMCArray>.
 */
 
     VTABLE STRING *get_repr() :no_wb {
-
         INTVAL  j;
         const INTVAL n = VTABLE_elements(INTERP, SELF);
         STRING *res = CONST_STRING(INTERP, "[ ");
@@ -693,10 +686,12 @@ Note that the C<from> PMC can be of any of the various array types.
         /* start from end? */
         if (offset < 0)
             offset += elems0;
-
+        if (count < 0)
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                    "illegal argument");
         if (offset < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "illegal splice offset\n");
+                    "index out of bounds");
 
         /* number of elements to the right of the splice (the "tail") */
         tail = elems0 - offset - count;
@@ -845,21 +840,23 @@ Throws with the appropriate message.
 */
 
 PARROT_DOES_NOT_RETURN
+PARROT_INLINE
 static void
 throw_shift_empty(PARROT_INTERP)
 {
     ASSERT_ARGS(throw_shift_empty)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
-            "ResizablePMCArray: Can't shift from an empty array!");
+            "Can't shift from an empty array");
 }
 
 PARROT_DOES_NOT_RETURN
+PARROT_INLINE
 static void
 throw_pop_empty(PARROT_INTERP)
 {
     ASSERT_ARGS(throw_pop_empty)
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
-            "ResizablePMCArray: Can't pop from an empty array!");
+            "Can't pop from an empty array");
 }
 
 /*

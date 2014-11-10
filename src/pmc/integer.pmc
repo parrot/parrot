@@ -1279,7 +1279,7 @@ and 36, inclusive.
 
         if ((base < 2) || (base > 36))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "get_as_base: base out of bounds");
+                    "base out of bounds");
 
         result = Parrot_str_from_int_base(INTERP, buf,
                 (HUGEINTVAL)VTABLE_get_integer(INTERP, SELF),
@@ -1348,7 +1348,7 @@ Set to a random value.
             }
             if (a == b || a > b) {
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                    "set_random: range start must be less than range end (%d, %d)", a, b);
+                    "range start must be less than range end (%d, %d)", a, b);
             }
             {
                 const double spread = (double)(b - a + 1);

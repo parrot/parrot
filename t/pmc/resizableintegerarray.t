@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -50,8 +50,8 @@ Coverage plan:
     test_resize()
     test_distinct_storage()
 
-    test_cant_set_negative()
-    test_cant_get_negative()
+    test_set_negative()
+    test_get_negative()
     test_set_beyond_end()
     test_get_beyond_end()
     test_delete()
@@ -180,28 +180,19 @@ X1:
     is( $I0, $I4, 'All array elements stored separately' )
 .end
 
-.sub test_cant_set_negative
+.sub test_set_negative
     $P0 = new ['ResizableIntegerArray']
     $P0 = 1
-    $I0 = 1
-    push_eh eh
     $P0[-1] = -7
-    $I0 = 0
-eh:
-    pop_eh
-    ok( $I0, 'Setting with negative index should throw an exception' )
+    $I0 = $P0[-1]
+    is($I0, -7, 'Set negative index' )
 .end
 
-.sub test_cant_get_negative
+.sub test_get_negative
     $P0 = new ['ResizableIntegerArray']
     $P0 = 1
-    $I0 = 1
-    push_eh eh
     $I0 = $P0[-1]
-    $I0 = 0
-eh:
-    pop_eh
-    ok( $I0, 'Getting with negative index should throw an exception' )
+    ok( 1, 'Get negative index' )
 .end
 
 .sub test_set_beyond_end

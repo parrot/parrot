@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2009-2010, Parrot Foundation.
+# Copyright (C) 2009-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -63,7 +63,7 @@ disassemble_raw_output_like( "--thisisnotarealoption", $helpregex, "pbc_disassem
 disassemble_raw_output_like( "-h -b -o - -?", $helpregex, "pbc_disassemble every option");
 
 my $errorregex = <<OUTPUT;
-/Error during disassembly\nPackFile_Header_validate: This is not a valid Parrot bytecode file./m
+/Error during disassembly\nPackFile_Header_validate: Invalid Parrot bytecode file/m
 OUTPUT
 
 disassemble_raw_output_like( "-o del.pasm pbc_disassemble$PConfig{exe}", $errorregex, "pbc_disassemble bad bytecode file");

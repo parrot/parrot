@@ -73,7 +73,7 @@ Parrot_sysmem_amount(PARROT_INTERP)
         }
         else
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_EXTERNAL_ERROR,
-                "sysctl failed: %s\n", err_msg);
+                "sysctl failed: %s", err_msg);
     }
 #ifndef NDEBUG
     if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG)) {

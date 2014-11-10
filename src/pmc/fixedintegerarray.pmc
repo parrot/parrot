@@ -67,7 +67,7 @@ Initializes the array.
     VTABLE void init_int(INTVAL size) {
         if (size < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                _("FixedIntegerArray: Cannot set array size to a negative number (%d)"), size);
+                    "illegal argument");
         if (size > 0) {
             SET_ATTR_size(INTERP, SELF, size);
             SET_ATTR_int_array(INTERP, SELF, mem_gc_allocate_n_typed(INTERP, size, INTVAL));
@@ -112,7 +112,6 @@ Creates and returns a copy of the array.
 
         INTVAL * int_array;
         PMC    * const dest = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
-
         GET_ATTR_int_array(INTERP, SELF, int_array);
 
         if (int_array) {
@@ -194,12 +193,13 @@ Returns the integer value of the element at index C<key>.
     VTABLE INTVAL get_integer_keyed_int(INTVAL key) :no_wb {
         INTVAL *int_array;
         INTVAL  size;
-
         GET_ATTR_size(INTERP, SELF, size);
 
+        if (key < 0)
+            key += size;
         if (key < 0 || key >= size)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "FixedIntegerArray: index out of bounds!");
+                    "index out of bounds");
 
         GET_ATTR_int_array(INTERP, SELF, int_array);
         return int_array[key];
@@ -288,7 +288,6 @@ Returns the Parrot string representation C<key>.
         STRING *res    = CONST_STRING(INTERP, "[ ");
         INTVAL  n;
         INTVAL  j;
-
         GET_ATTR_size(INTERP, SELF, n);
 
         for (j = 0; j < n; ++j) {
@@ -385,12 +384,11 @@ Resizes the array to C<size> elements.
     VTABLE void set_integer_native(INTVAL size) {
         INTVAL *int_array;
         INTVAL  cur_size;
-
         GET_ATTR_size(INTERP, SELF, cur_size);
 
         if (cur_size || size < 1)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "FixedIntegerArray: Can't resize!");
+                    "Can't resize");
 
         SET_ATTR_size(INTERP, SELF, size);
         GET_ATTR_int_array(INTERP, SELF, int_array);
@@ -412,12 +410,13 @@ Sets the integer value of the element at index C<key> to C<value>.
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) {
         INTVAL *int_array;
         INTVAL  size;
-
         GET_ATTR_size(INTERP, SELF, size);
 
+        if (key < 0)
+            key += size;
         if (key < 0 || key >= size)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "FixedIntegerArray: index out of bounds!");
+                    "index out of bounds");
 
         GET_ATTR_int_array(INTERP, SELF, int_array);
         int_array[key] = value;
@@ -544,7 +543,6 @@ The C<==> operation. Compares two array to hold equal elements.
             return 0;
 
         n = SELF.elements();
-
         if (VTABLE_elements(INTERP, value) != n)
             return 0;
 

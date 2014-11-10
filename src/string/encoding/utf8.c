@@ -239,7 +239,7 @@ utf8_scan(PARROT_INTERP, ARGMOD(STRING *src))
 
     if ((res == 0 || src->bufused < PIO_BUFFER_MIN_SIZE) && bounds.bytes != src->bufused)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
-            "Unaligned end in UTF-8 string\n");
+            "Unaligned end in UTF-8 string");
 
     src->strlen = bounds.chars;
 }
@@ -289,7 +289,7 @@ utf8_partial_scan(PARROT_INTERP, ARGIN(const char *buf),
             /* Check for overlong forms */
             if (UTF8_IS_OVERLONG(c, p[i+1]))
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
-                    "Overlong form in UTF-8 string\n");
+                    "Overlong form in UTF-8 string");
 
             c &= UTF8_START_MASK(len2);
 
@@ -298,18 +298,18 @@ utf8_partial_scan(PARROT_INTERP, ARGIN(const char *buf),
 
                 if (!UTF8_IS_CONTINUATION(p[i]))
                     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
-                        "Malformed UTF-8 string\n");
+                        "Malformed UTF-8 string");
 
                 c = UTF8_ACCUMULATE(c, p[i]);
             }
 
             if (UNICODE_IS_INVALID(c))
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
-                    "Invalid character in UTF-8 string\n");
+                    "Invalid character in UTF-8 string");
         }
         else if (!UNICODE_IS_INVARIANT(c)) {
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF8,
-                "Malformed UTF-8 string\n");
+                "Malformed UTF-8 string");
         }
 
         ++chars;
@@ -416,7 +416,7 @@ utf8_encode(PARROT_INTERP, ARGMOD(utf8_t *ptr), UINTVAL c)
 
     if (UNICODE_IS_INVALID(c))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
-                "Invalid character for UTF-8 encoding\n");
+                "Invalid character for UTF-8 encoding");
 
     len = UNISKIP(c);
     end = ptr + len - 1;

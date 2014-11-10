@@ -68,7 +68,7 @@ Parrot_Run_OS_Command(PARROT_INTERP, STRING *command)
 
     if (!GetExitCodeProcess(pi.hProcess, &status)) {
         Parrot_warn(interp, PARROT_WARNINGS_PLATFORM_FLAG,
-            "Process completed: Failed to get exit code.");
+            "Process completed: Failed to get exit code");
     }
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
@@ -138,7 +138,7 @@ Parrot_Run_OS_Command_Argv(PARROT_INTERP, PMC *cmdargs)
     /* Get exit code. */
     if (!GetExitCodeProcess(pi.hProcess, &status)) {
         Parrot_warn(interp, PARROT_WARNINGS_PLATFORM_FLAG,
-            "Process completed: Failed to get exit code.");
+            "Process completed: Failed to get exit code");
     }
 
     /* Clean up. */

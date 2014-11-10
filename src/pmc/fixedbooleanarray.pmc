@@ -91,7 +91,7 @@ Initializes the array.
 
         if (size < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                _("FixedBooleanArray: Cannot set array size to a negative number (%d)"), size);
+                    "illegal argument");
 
         SET_ATTR_size(INTERP, SELF, size);
         SET_ATTR_resize_threshold(INTERP, SELF, size_in_bytes * BITS_PER_CHAR);
@@ -212,9 +212,11 @@ Returns the integer value of the element at index C<key>.
         GET_ATTR_bit_array(INTERP, SELF, bit_array);
         GET_ATTR_size(INTERP, SELF, size);
 
+        if (key < 0)
+            key += size;
         if (key < 0 || (UINTVAL)key >= size)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "FixedBooleanArray: index out of bounds!");
+                    "index out of bounds");
 
         return (bit_array[key / BITS_PER_CHAR] & (1 << (key % BITS_PER_CHAR))) ? 1 : 0;
     }
@@ -370,10 +372,9 @@ Resizes the array to C<size> elements.
         unsigned char *bit_array;
 
         GET_ATTR_size(INTERP, SELF, old_size);
-
         if (old_size || size < 1)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "FixedBooleanArray: Can't resize!");
+                    "Can't resize");
 
         SET_ATTR_size(INTERP, SELF, size);
         SET_ATTR_resize_threshold(INTERP, SELF, size_in_bytes * BITS_PER_CHAR);
@@ -398,9 +399,11 @@ Sets the integer value of the element at index C<key> to C<value>.
         GET_ATTR_bit_array(INTERP, SELF, bit_array);
         GET_ATTR_size(INTERP, SELF, size);
 
+        if (key < 0)
+            key += size;
         if (key < 0 || (UINTVAL)key >= size)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "FixedBooleanArray: index out of bounds!");
+                "index out of bounds");
 
         if (value)
             bit_array[key/BITS_PER_CHAR] |=  (1 << (key % BITS_PER_CHAR));

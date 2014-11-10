@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2011, Parrot Foundation.
+Copyright (C) 2005-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -357,7 +357,7 @@ Parrot_hll_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
 
         if (core_type >= PARROT_MAX_CLASSES || core_type < 0) {
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                    "FixedIntegerArray: index out of bounds!");
+                "index out of bounds");
         }
 
         type_array_attrs = PARROT_FIXEDINTEGERARRAY(type_array);

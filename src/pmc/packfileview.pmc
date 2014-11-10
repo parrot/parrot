@@ -285,7 +285,7 @@ Get a FLOATVAL from the constants table, by index
             return PMCNULL;
         if (idx < 0 || idx >= ct->pmc.const_count) {
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "PMC constant index out of bounds");
+                                        "index out of bounds");
         }
         return ct->pmc.constants[idx];
     }
@@ -296,7 +296,7 @@ Get a FLOATVAL from the constants table, by index
             return STRINGNULL;
         if (idx < 0 || idx >= ct->str.const_count) {
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "STRING constant index out of bounds");
+                                        "index out of bounds");
         }
         return ct->str.constants[idx];
     }
@@ -307,7 +307,7 @@ Get a FLOATVAL from the constants table, by index
             return 0.0;
         if (idx < 0 || idx >= ct->num.const_count) {
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "PMC constant index out of bounds");
+                                        "index out of bounds");
         }
         return ct->num.constants[idx];
     }

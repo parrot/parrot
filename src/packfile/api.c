@@ -332,7 +332,7 @@ Parrot_pf_deserialize(PARROT_INTERP, ARGIN(STRING *str))
     if (!PackFile_unpack(interp, pf, ptr, length)) {
         PackFile_destroy(interp, pf);
         Parrot_ex_throw_from_c_args(interp, NULL,
-            EXCEPTION_MALFORMED_PACKFILE, "Can't unpack packfile.");
+            EXCEPTION_MALFORMED_PACKFILE, "Can't unpack packfile");
     }
     return pf;
 }
@@ -1043,7 +1043,7 @@ PackFile_Header_validate(PARROT_INTERP, ARGIN(const PackFile_Header *self),
     /* Ensure the magic is correct. */
     if (memcmp(self->magic, "\376PBC\r\n\032\n", 8) != 0) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-        "PackFile_Header_validate: This is not a valid Parrot bytecode file.");
+        "PackFile_Header_validate: Invalid Parrot bytecode file");
     }
 
     /* Ensure the bytecode version is one we can read. Currently, we only
@@ -1884,7 +1884,7 @@ Parrot_switch_to_cs(PARROT_INTERP, ARGIN(PackFile_ByteCode *new_cs), int really)
 
     if (!new_cs)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NO_PREV_CS,
-            "No code segment to switch to\n");
+            "No code segment to switch to");
 
     interp->code = new_cs;
     Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp),
@@ -2017,7 +2017,7 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
         if (self->keys[key_id].type != (pf_ann_key_type_t)type)
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_INVALID_OPERATION,
-                "Annotations with different types of value used for key '%S'\n",
+                "Annotations with different types of value used for key '%S'",
                 self->code->const_table->str.constants[self->keys[key_id].name]);
     }
 
@@ -2599,12 +2599,12 @@ Parrot_pf_read_pbc_file(PARROT_INTERP, ARGIN_NULLOK(STRING * const fullname))
         /* can't read a file that doesn't exist */
         if (!Parrot_file_stat_intval(interp, fullname, STAT_EXISTS))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                    "Can't stat %Ss, code %i.\n", fullname, errno);
+                    "Can't stat %Ss, code %i", fullname, errno);
 
         /* we may need to relax this if we want to read bytecode from pipes */
         if (!Parrot_file_stat_intval(interp, fullname, STAT_ISREG))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                    "'%Ss', is not a regular file %i.\n", fullname, errno);
+                    "'%Ss' is not a regular file %i", fullname, errno);
 
         /* check that fullname isn't NULL, just in case */
         if (!fullname)
@@ -2642,7 +2642,7 @@ read_pbc_file_packfile_handle(PARROT_INTERP, ARGIN(STRING * const fullname),
 
     if (!PackFile_unpack(interp, pf, (opcode_t *)program_code, (size_t)program_size))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                "Can't unpack packfile %Ss.\n", fullname);
+                "Can't unpack packfile %Ss", fullname);
     return pf;
 }
 
@@ -2683,7 +2683,7 @@ read_pbc_file_bytes_handle(PARROT_INTERP, PIOHANDLE io, INTVAL program_size)
         if (!program_code) {
             Parrot_io_internal_close(interp, io);
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                    "Could not reallocate buffer while reading packfile from PIO.\n");
+                    "Could not reallocate buffer while reading packfile from PIO");
         }
 
         cursor = program_code + program_size;
@@ -2717,7 +2717,7 @@ read_pbc_file_packfile(PARROT_INTERP, ARGIN(STRING * const fullname),
 
     if (io == PIO_INVALID_HANDLE)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                "Can't open %Ss, code %i.\n", fullname, errno);
+                "Can't open %Ss, code %i", fullname, errno);
 
     /* TODO: Who frees program_code? We don't do it here (And don't need to
              if we've mmapped it. Figure out where this is handled and
@@ -2751,7 +2751,7 @@ read_pbc_file_packfile(PARROT_INTERP, ARGIN(STRING * const fullname),
 
     if (!PackFile_unpack(interp, pf, (opcode_t *)program_code, (size_t)program_size))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                "Can't unpack packfile %Ss.\n", fullname);
+                "Can't unpack packfile %Ss", fullname);
 
     Parrot_io_internal_close(interp, io);
     return pf;
@@ -2846,7 +2846,7 @@ Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc),
 
     if (!pf || !pf->cur_cs)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
-            "Could not get packfile.");
+            "Could not get packfile");
 
     Parrot_pf_set_current_packfile(interp, pbc);
     Parrot_pf_prepare_packfile_init(interp, pbc);

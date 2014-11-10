@@ -94,13 +94,13 @@ Parrot_io_init(PARROT_INTERP)
     interp->piodata = mem_gc_allocate_zeroed_typed(interp, ParrotIOData);
     if (interp->piodata == NULL)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-            "PIO alloc piodata failure.");
+            "PIO alloc piodata failure");
     interp->piodata->table         =
             mem_gc_allocate_n_zeroed_typed(interp, PIO_NR_OPEN, PMC *);
 
     if (!interp->piodata->table)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-            "PIO alloc table failure.");
+            "PIO alloc table failure");
 }
 
 void

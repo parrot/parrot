@@ -465,25 +465,25 @@ check_pmc_reuse_flags(PARROT_INTERP, UINTVAL srcflags, UINTVAL destflags)
         if (destflags & VTABLE_PMC_IS_SINGLETON)
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_ALLOCATION_ERROR,
-                "Parrot VM: Can't turn to a singleton type!\n");
+                "Parrot VM: Can't turn to a singleton type");
 
         /* Is the destination a constant? No joy for us there */
         if (destflags & VTABLE_IS_CONST_FLAG)
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_ALLOCATION_ERROR,
-                "Parrot VM: Can't turn to a constant type!\n");
+                "Parrot VM: Can't turn to a constant type");
 
         /* Is the source a singleton? */
         if (srcflags & VTABLE_PMC_IS_SINGLETON)
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_ALLOCATION_ERROR,
-                "Parrot VM: Can't modify a singleton\n");
+                "Parrot VM: Can't modify a singleton");
 
         /* Is the source constant? */
         if (srcflags & VTABLE_IS_CONST_FLAG)
             Parrot_ex_throw_from_c_args(interp, NULL,
                 EXCEPTION_ALLOCATION_ERROR,
-                "Parrot VM: Can't modify a constant\n");
+                "Parrot VM: Can't modify a constant");
     }
 }
 

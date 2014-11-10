@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -20,7 +20,7 @@ out-of-bounds test. Checks INT and PMC keys.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(86)
+    plan(87)
     test_setting_array_size()
     test_resize_exception()
     test_truthiness()
@@ -397,7 +397,7 @@ done:
 .end
 
 .sub test_splice_oob
-    throws_substring(<<'CODE','FixedPMCArray: index out of bounds','splice oob, offset 0')
+    throws_substring(<<'CODE','index out of bounds','splice oob, offset 0')
     .sub main :main
         .local pmc fpa
         fpa = new ['FixedPMCArray']
@@ -409,7 +409,7 @@ done:
         splice fpa, nil, 0, 6
     .end
 CODE
-    throws_substring(<<'CODE','FixedPMCArray: index out of bounds','splice oob, big offset')
+    throws_substring(<<'CODE','index out of bounds','splice oob, big offset')
     .sub main :main
         .local pmc fpa
         fpa = new ['FixedPMCArray']
@@ -533,39 +533,38 @@ CODE
 .end
 
 .sub test_oob_elem
-    throws_substring(<<'CODE','FixedPMCArray: index out of bounds!','set out-of-bounds index')
+    throws_substring(<<'CODE','index out of bounds','set out-of-bounds index')
         .sub main :main
             new $P0, ['FixedPMCArray']
-            set $P0, 1
-            set $P0[1], -7
+            $P0 = 1
+            $P0[1] = -7
         .end
 CODE
-    throws_substring(<<'CODE','FixedPMCArray: index out of bounds!','set out-of-bounds index')
+    throws_substring(<<'CODE','index out of bounds','set out-of-bounds index')
         .sub main :main
             new $P0, ['FixedPMCArray']
-            set $P0, 1
-            set $I0, $P0[1]
+            $P0 = 1
+            $I0 = $P0[1]
         .end
 CODE
-
+    throws_substring(<<'CODE','index out of bounds','set out-of-bounds index')
+        .sub main :main
+            new $P0, ['FixedPMCArray']
+            $P0 = 1
+            $I0 = $P0[-2]
+        .end
+CODE
 .end
 
 .sub test_negative_index
-    throws_substring(<<'CODE','FixedPMCArray: index out of bounds!','set negative index')
-.sub main :main
     new $P0, ['FixedPMCArray']
-    set $P0, 1
-    set $P0[-1], -7
-.end
-CODE
-    throws_substring(<<'CODE','FixedPMCArray: index out of bounds!','get negative index')
-.sub main :main
-    new $P0, ['FixedPMCArray']
-    set $P0, 1
-    set $I0, $P0[-1]
-.end
-CODE
+    $P0 = 1
+    $I0 = $P0[-1]
+    ok(1, 'get negative index')
 
+    set $P0[-1], -7
+    set $I0, $P0[-1]
+    is($I0, -7, 'set negative index')
 .end
 
 .sub test_setting_second_elem
@@ -611,7 +610,7 @@ CODE
 .end
 
 .sub test_tt991
-    throws_substring(<<'CODE','FixedPMCArray: Cannot set array size to a negative number','cannot create a negative length array')
+    throws_substring(<<'CODE','illegal argument','cannot create a negative length array')
         .sub main :main
             new $P0, ['FixedPMCArray']
             set $P0, -1
@@ -662,7 +661,7 @@ CODE
 .end
 
 .sub test_resize_exception
-    throws_substring(<<'CODE',"FixedPMCArray: Can't resize",'cannot resize FixedPMCArray')
+    throws_substring(<<'CODE',"Can't resize",'cannot resize FixedPMCArray')
         .sub main :main
             new $P0, ['FixedPMCArray']
             set $I0,$P0
@@ -716,13 +715,13 @@ CODE
 .end
 
 .sub test_invalid_init_tt1509
-    throws_substring(<<'CODE', 'Cannot set array size to a negative number (-10)', 'New style init does not dump core for negative array lengths')
+    throws_substring(<<'CODE', 'illegal argument', 'New style init does not dump core for negative array lengths')
     .sub main :main
         $P0 = new ['FixedPMCArray'], -10
     .end
 CODE
 
-    throws_substring(<<'CODE', 'Cannot set array size to a negative number (-10)', 'New style init (key constant) does not dump core for negative array lengths')
+    throws_substring(<<'CODE', 'illegal argument', 'New style init (key constant) does not dump core for negative array lengths')
     .sub main :main
         $P0 = new 'FixedPMCArray', -10
     .end

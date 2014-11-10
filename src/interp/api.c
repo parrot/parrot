@@ -1293,7 +1293,7 @@ Parrot_interp_set_run_core(PARROT_INTERP, Parrot_Run_core_t core)
         break;
       default:
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-                "Invalid runcore requested\n");
+            "Invalid runcore %d requested", (int)core);
     }
 }
 

@@ -5059,7 +5059,7 @@ determine_input_file_type(ARGMOD(imc_info_t * imcc), ARGIN(STRING *sourcefile))
     else {
         if (Parrot_file_stat_intval(imcc->interp, sourcefile, STAT_ISDIR))
             Parrot_ex_throw_from_c_args(imcc->interp, NULL, EXCEPTION_EXTERNAL_ERROR,
-                "imcc_compile_file: '%Ss' is a directory\n", sourcefile);
+                "imcc_compile_file: '%Ss' is a directory", sourcefile);
 
         handle = Parrot_io_internal_open(imcc->interp, sourcefile, PIO_F_READ);
         if (handle == PIO_INVALID_HANDLE)

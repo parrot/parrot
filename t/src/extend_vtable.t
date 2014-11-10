@@ -629,7 +629,7 @@ OUTPUT
 
 # TODO: Improve this test
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_splice");
-    Parrot_PMC_splice( interp, rpa, rpa2, 0, 1 );
+    Parrot_PMC_splice( interp, rpa, rpa2, 0, 0 );
     Parrot_printf(interp,"42\n");
 CODE
 42

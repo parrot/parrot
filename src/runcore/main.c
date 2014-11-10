@@ -140,7 +140,7 @@ Parrot_runcore_switch(PARROT_INTERP, ARGIN(STRING *name))
 
     /* XXX This might end in an endless exception cycle. Better panic here? */
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
-        "Invalid runcore %Ss requested\n", name);
+        "Invalid runcore %Ss requested", name);
 }
 
 
