@@ -361,7 +361,11 @@ Returns the PMC value of the element at index C<key>.
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) :no_wb {
         PMC **data;
+        INTVAL    size;
+        GET_ATTR_size(INTERP, SELF, size);
 
+        if (key < 0)
+            key += size;
         if (key < 0 || key >= PMC_size(SELF))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "index out of bounds");
@@ -568,8 +572,12 @@ Sets the PMC value of the element at index C<key> to C<*src>.
 
     VTABLE void set_pmc_keyed_int(INTVAL key, PMC *src) {
         PMC **data;
+        INTVAL    size;
+        GET_ATTR_size(INTERP, SELF, size);
 
-        if (key < 0 || key >= PMC_size(SELF))
+        if (key < 0)
+            key += size;
+        if (key < 0 || key >= size)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "index out of bounds");
 

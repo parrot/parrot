@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -132,43 +132,44 @@ out-of-bounds test. Checks INT and PMC keys.
     $P0 = new ['ResizableFloatArray']
     $P0 = 1
 
-    push_eh setting_negative_index_handler
     $P0[-1] = -7
-    pop_eh
-    nok(1, 'setting negatively indexed elements')
-    .return ()
-
-  setting_negative_index_handler:
-    ok(1, 'setting negatively indexed elements')
+    $I0 = $P0[-1]
+    ok($I0, -7, 'setting negatively indexed elements')
 .end
 
 .sub 'getting_negative_index'
     $P0 = new ['ResizableFloatArray']
     $P0 = 1
 
-    push_eh getting_negative_index_handler
     $I0 = $P0[-1]
-    pop_eh
-    nok(1, 'getting negatively indexed elements')
-    .return ()
-
-  getting_negative_index_handler:
-    ok(1, 'getting negatively indexed elements')
+    is($I0, 0, 'getting negatively indexed elements')
 .end
 
 .sub 'setting_out_of_bounds'
     $P0 = new ['ResizableFloatArray']
     $P0 = 1
 
-    $P0[1] = -7
-    ok(1, 'setting out-of-bounds elements')
+    push_eh setting_oob_handler
+    $P0[-2] = -7
+    pop_eh
+    nok(1, 'setting out of bounds elements')
+    .return ()
+
+  setting_oob_handler:
+    ok(1, 'setting out of bounds elements')
 .end
 
 .sub 'getting_out_of_bounds'
     $P0 = new ['ResizableFloatArray']
     $P0 = 1
 
-    $I0 = $P0[1]
+    push_eh getting_oob_handler
+    $I0 = $P0[-2]
+    pop_eh
+    nok(1, 'getting out of bounds elements')
+    .return ()
+
+  getting_oob_handler:
     ok(1, 'getting out-of-bounds elements')
 .end
 

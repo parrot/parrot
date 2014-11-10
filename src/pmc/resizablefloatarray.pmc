@@ -66,14 +66,16 @@ C<value>.
     VTABLE void set_number_keyed_int(INTVAL key, FLOATVAL value) {
         FLOATVAL *float_array;
         INTVAL    size;
+        GET_ATTR_size(INTERP, SELF, size);
 
+        if (key < 0)
+            key += size;
         if (key < 0)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "index out of bounds");
 
-        GET_ATTR_size(INTERP, SELF, size);
         if (key >= size)
-            SELF.set_integer_native(key+1);
+            SELF.set_integer_native(key + 1);
 
         GET_ATTR_float_array(INTERP, SELF, float_array);
         float_array[key] = value;

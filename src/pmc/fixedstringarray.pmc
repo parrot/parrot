@@ -289,6 +289,8 @@ Returns the Parrot string value of the element at index C<key>.
         UINTVAL  size;
 
         GET_ATTR_size(INTERP, SELF, size);
+        if (key < 0)
+            key += size;
         if (key < 0 || (UINTVAL)key >= size)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                     "index out of bounds");
@@ -448,8 +450,12 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
 
     VTABLE void set_string_keyed_int(INTVAL key, STRING *value) {
         STRING **str_array;
+        INTVAL    size;
+        GET_ATTR_size(INTERP, SELF, size);
 
-        if (key < 0 || key >= SELF.elements())
+        if (key < 0)
+            key += size;
+        if (key < 0 || key >= size)
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
                 "index out of bounds");
 

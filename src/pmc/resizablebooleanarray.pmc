@@ -57,11 +57,11 @@ Returns the integer value of the element at index C<key>.
 
     VTABLE INTVAL get_integer_keyed_int(INTVAL key) :no_wb {
         UINTVAL offsetkey, tail_pos, head_pos;
+        GET_ATTR_size(INTERP, SELF, tail_pos);
 
         /* Try to make negative index into a real index */
         if (key < 0) {
-            key = SELF.elements() + key;
-
+            key += tail_pos;
             /* If it's still negative, we have a problem */
             if (key < 0)
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
@@ -69,7 +69,6 @@ Returns the integer value of the element at index C<key>.
         }
 
         /* Check if key is greater than allocated size */
-        GET_ATTR_size(INTERP, SELF, tail_pos);
         GET_ATTR_resize_threshold(INTERP, SELF, head_pos);
         offsetkey = key + head_pos;
 
@@ -91,11 +90,11 @@ Sets the integer value of the element at index C<key> to C<value>.
 
     VTABLE void set_integer_keyed_int(INTVAL key, INTVAL value) :manual_wb {
         UINTVAL offsetkey, tail_pos, head_pos;
+        GET_ATTR_size(INTERP, SELF, tail_pos);
 
         /* Try to make negative index into a real index */
         if (key < 0) {
-            key = SELF.elements() + key;
-
+            key += tail_pos;
             /* If it's still negative, we have a problem */
             if (key < 0)
                 Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
@@ -103,7 +102,6 @@ Sets the integer value of the element at index C<key> to C<value>.
         }
 
         /* Check if key is greater than allocated size */
-        GET_ATTR_size(INTERP, SELF, tail_pos);
         GET_ATTR_resize_threshold(INTERP, SELF, head_pos);
         offsetkey = key + head_pos;
 
