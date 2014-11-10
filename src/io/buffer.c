@@ -844,7 +844,9 @@ Parrot_io_buffer_seek(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
     PIOOFF_T cur_pos = vtable->get_position(interp, handle);
     PIOOFF_T pos_diff;
 
-    PARROT_ASSERT(w == SEEK_SET);
+    if (w != SEEK_SET)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            "Illegal seek origin argument, only SEEK_SET is supported");
 
     if (cur_pos == offset)
         return offset;
@@ -856,7 +858,9 @@ Parrot_io_buffer_seek(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
         return vtable->seek(interp, handle, offset, w);
     }
     pos_diff = offset - cur_pos;
-    PARROT_ASSERT(pos_diff > 0);
+    if (pos_diff < 0)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            "Illegal seek offset argument");
 
     if ((size_t)pos_diff > BUFFER_USED_SIZE(buffer)) {
         Parrot_io_buffer_clear(interp, buffer);

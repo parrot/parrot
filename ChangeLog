@@ -14,6 +14,7 @@
         + Fixed GC bug in Coroutine.clone #1108, #1109
         + Export Parrot_io_get_vtable. #1131
         + Added lstat io op for nqp, fixed os.lstat method. #1129
+        + Throw errors on illegal seek arguments, no assertions. #1130
     - Build
         + Set -mabi=64 for gcc --m=64 on mips, -m64 on powerpc #1110
         + Add --{en,dis}able-static #1104
