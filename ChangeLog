@@ -25,6 +25,7 @@
         + Skip -Werror=strict-prototypes only on broken icu 4.2 - 4.9. #867
     - Documentation
         + Document .lex "name" limitations. Use .lex 'name' w/ single-quotes #1095
+        + Fixed 6.9 manpage regressions on BSD make #1125
     - Tests
         + Fixed make smoke, uploading to smolder with changed YAML::Tiny
           quoting. #1078

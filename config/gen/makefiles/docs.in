@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 # Setup of some commands
 #IF(win32):SHELL   = CMD
@@ -79,13 +79,13 @@ ops/index.pod : $(POD) $(OPS_SUMMARY)
 	$(ADDGENERATED) "docs/$@" "[doc]"
 
 binaries/pbc_disassemble.1 : ../frontend/pbc_disassemble/main.c
-	$(POD2MAN) $< > $@
+	$(POD2MAN) ../frontend/pbc_disassemble/main.c > $@
 	$(ADDGENERATED) "docs/$@" "[main]" man
 binaries/pbc_dump.1 : ../frontend/pbc_dump/main.c
-	$(POD2MAN) $< > $@
+	$(POD2MAN) ../frontend/pbc_dump/main.c > $@
 	$(ADDGENERATED) "docs/$@" "[main]" man
 binaries/pbc_merge.1 : ../frontend/pbc_merge/main.c
-	$(POD2MAN) $< > $@
+	$(POD2MAN) ../frontend/pbc_merge/main.c > $@
 	$(ADDGENERATED) "docs/$@" "[main]" man
 
 #IF(has_pod2man):man: man.good
