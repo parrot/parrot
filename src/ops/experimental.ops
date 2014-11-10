@@ -416,7 +416,7 @@ op wait(in PMC) {
 
     if (!VTABLE_isa(interp, task, Parrot_str_new_constant(interp, "Task")))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-            "Argument to wait op must be a Task.\n");
+            "Argument to wait op must be a Task");
 
     tdata = PARROT_TASK(task);
     LOCK(tdata->waiters_lock);

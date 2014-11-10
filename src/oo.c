@@ -714,7 +714,7 @@ Parrot_oo_register_type(PARROT_INTERP, ARGIN(PMC *name), ARGIN(PMC *_namespace))
     if (!PMC_IS_NULL(classobj)) {
         STRING * const classname = VTABLE_get_string(interp, _namespace);
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                "Class %Ss already registered!\n",
+                "Class %Ss already registered",
                 Parrot_str_escape(interp, classname));
     }
 
@@ -1185,7 +1185,7 @@ Parrot_ComputeMRO_C3(PARROT_INTERP, ARGIN(PMC *_class))
     /* Now get immediate parents list. */
     if (PMC_IS_NULL(immediate_parents))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_METHOD_NOT_FOUND,
-            "Failed to get parents list from class!");
+            "Failed to get parents list from class");
 
     parent_count = VTABLE_elements(interp, immediate_parents);
 
@@ -1318,7 +1318,7 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
                     Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_ROLE_COMPOSITION_METHOD_CONFLICT,
                         "A conflict occurred during role composition "
-                        "due to method '%S'.", method_name);
+                        "due to method '%S'", method_name);
             }
 
             /* What about a conflict with ourslef? */
@@ -1329,7 +1329,7 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
                     EXCEPTION_ROLE_COMPOSITION_METHOD_CONFLICT,
                     "A conflict occurred during role composition;"
                     " the method '%S' from the role managed to conflict "
-                    "with itself somehow.", method_name);
+                    "with itself somehow", method_name);
 
             /* If we got here, no conflicts! Add method to the "to compose"
              * list. */
@@ -1352,7 +1352,7 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
                     Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_ROLE_COMPOSITION_METHOD_CONFLICT,
                         "A conflict occurred during role composition"
-                        " due to the aliasing of '%S' to '%S'.",
+                        " due to the aliasing of '%S' to '%S'",
                         method_name, alias_name);
             }
 
@@ -1363,7 +1363,7 @@ Parrot_ComposeRole(PARROT_INTERP, ARGIN(PMC *role),
                     EXCEPTION_ROLE_COMPOSITION_METHOD_CONFLICT,
                     "A conflict occurred during role composition"
                     " due to the aliasing of '%S' to '%S' (role already has"
-                    " a method '%S').", method_name, alias_name, alias_name);
+                    " a method '%S')", method_name, alias_name, alias_name);
 
             /* If we get here, no conflicts! Add method to the "to compose"
              * list with its alias. */

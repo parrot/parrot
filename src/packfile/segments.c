@@ -440,7 +440,7 @@ PackFile_ConstTable_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
 
   err:
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
-        "PackFile_ConstTable_unpack: Could not allocate memory for array!\n");
+        "PackFile_ConstTable_unpack: Could not allocate memory for array");
 }
 
 
@@ -668,7 +668,7 @@ PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
 
     if (!code || code->base.type != PF_BYTEC_SEG) {
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
-            "Code '%s' not found for annotations segment '%s'\n",
+            "Code '%s' not found for annotations segment '%s'",
             code_name, self->base.name);
     }
 
@@ -791,7 +791,7 @@ default_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opcode
 
     if (!self->data) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
-            "PackFile_unpack: Unable to allocate data memory!\n");
+            "PackFile_unpack: Unable to allocate data memory");
     }
 
     if (!self->pf->need_endianize && !self->pf->need_wordsize) {
@@ -1279,7 +1279,7 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
         if (seg->op_count != opcode) {
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
                 "%Ss: Size in directory %d doesn't match size %d "
-                "at offset 0x%x\n", seg->name, (int)seg->op_count,
+                "at offset 0x%x", seg->name, (int)seg->op_count,
                 (int)opcode, (int)seg->file_offset);
         }
 
@@ -1315,7 +1315,7 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
 
         if (!pos) {
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-                "PackFile_unpack segment '%Ss' failed\n", dir->segments[i]->name);
+                "PackFile_unpack segment '%Ss' failed", dir->segments[i]->name);
         }
 
         /* FIXME bug on 64bit reading 32bit lurking here! TT #254 */
@@ -1952,7 +1952,7 @@ byte_code_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opco
 
                 if (0 > op || op >= entry->lib->op_count)
                     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-                        "opcode index out of bounds on library `%s'. Found %d, expected 0 to %d.",
+                        "opcode index out of bounds on library `%s'. Found %d, expected 0 to %d",
                         entry->lib->name, op, entry->lib->op_count - 1);
 
                 if (0 > idx || (size_t)idx >= byte_code->op_count)
@@ -2144,7 +2144,7 @@ pf_debug_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opcod
 
     if (!code || code->base.type != PF_BYTEC_SEG) {
         Parrot_ex_throw_from_c_args(interp, NULL, 1,
-            "Code '%Ss' not found for debug segment '%Ss'\n",
+            "Code '%Ss' not found for debug segment '%Ss'",
             code_name, self->name);
     }
 

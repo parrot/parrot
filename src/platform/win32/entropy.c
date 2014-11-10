@@ -42,7 +42,7 @@ Parrot_get_entropy(PARROT_INTERP) {
     HCRYPTPROV hCryptProv;
     INTVAL     entropy;
     if (!CryptAcquireContext(&hCryptProv, NULL, NULL, PROV_RSA_FULL, CRYPT_VERIFYCONTEXT)){
-        const char *msg = "Couldn't crypt context.";
+        const char *msg = "Couldn't crypt context";
         /* This function is called during interp init, so use the GC registry
          * as a way to figure out interp's initializedness.
          */
@@ -52,7 +52,7 @@ Parrot_get_entropy(PARROT_INTERP) {
             PANIC(interp, msg);
     }
     if (!CryptGenRandom(hCryptProv, sizeof (INTVAL), &entropy)) {
-        const char *msg = "Couldn't get entropy from crypt context.";
+        const char *msg = "Couldn't get entropy from crypt context";
         if (interp->gc_registry)
             Parrot_ex_throw_from_c_args(interp, NULL, 1, msg);
         else

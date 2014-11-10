@@ -240,7 +240,7 @@ build_ffi_thunk(PARROT_INTERP, SHIM(PMC *user_data), ARGIN(PMC *sig))
         if (ffi_prep_cif(&thunk_data->pcc_arg_cif, FFI_DEFAULT_ABI, argc, &ffi_type_void, arg_t) !=
             FFI_OK)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
-                                        "invalid ffi signature");
+                "invalid ffi signature");
     }
 
     /* generate target function dynamic call infrastructure */
@@ -258,7 +258,7 @@ build_ffi_thunk(PARROT_INTERP, SHIM(PMC *user_data), ARGIN(PMC *sig))
 
         if (ffi_prep_cif(&thunk_data->cif, FFI_DEFAULT_ABI, argc, ret_t, arg_t) != FFI_OK)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
-                                        "invalid ffi signature");
+                "invalid ffi signature");
     }
 
     /* generate Parrot_pcc_build_call_from_c_args dynamic call infrastructure */
@@ -286,14 +286,14 @@ build_ffi_thunk(PARROT_INTERP, SHIM(PMC *user_data), ARGIN(PMC *sig))
                 break;
               default:
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
-                                            "invalid pcc signature");
+                    "invalid pcc signature");
             }
         }
 
         if (FFI_OK != ffi_prep_cif(&thunk_data->pcc_ret_cif, FFI_DEFAULT_ABI,
                                     retc, &ffi_type_pointer, ret_t))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
-                                        "invalid ffi signature");
+                "invalid ffi signature");
     }
 
     return thunk;

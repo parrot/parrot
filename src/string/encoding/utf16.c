@@ -236,7 +236,7 @@ utf16_scan(PARROT_INTERP, ARGMOD(STRING *src))
 
     if (bounds.bytes != src->bufused)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF16,
-            "Unaligned end in UTF-16 string\n");
+            "Unaligned end in UTF-16 string");
 
     src->strlen = bounds.chars;
 }
@@ -284,19 +284,19 @@ utf16_partial_scan(PARROT_INTERP, ARGIN(const char *buf),
 
             if (!UNICODE_IS_LOW_SURROGATE(p[i]))
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF16,
-                    "Malformed UTF-16 string\n");
+                    "Malformed UTF-16 string");
 
             c = UNICODE_DECODE_SURROGATE(c, p[i]);
         }
         else {
             if (UNICODE_IS_LOW_SURROGATE(c))
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_UTF16,
-                    "Malformed UTF-16 string\n");
+                    "Malformed UTF-16 string");
         }
 
         if (UNICODE_IS_NON_CHARACTER(c))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
-                "Non-character in UTF-16 string\n");
+                "Non-character in UTF-16 string");
 
         ++chars;
 
@@ -416,7 +416,7 @@ utf16_encode(PARROT_INTERP, ARGMOD(utf16_t *ptr), UINTVAL c)
         if (UNICODE_IS_SURROGATE(c)
         || (c >= 0xFDD0 && c <= 0xFDEF))
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
-                    "Invalid character for UTF-16 encoding\n");
+                    "Invalid character for UTF-16 encoding");
 
         *ptr++ = c;
     }
@@ -424,7 +424,7 @@ utf16_encode(PARROT_INTERP, ARGMOD(utf16_t *ptr), UINTVAL c)
         if ((c & 0xFFFE) == 0xFFFE
         ||   c > 0x10FFFF)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_CHARACTER,
-                    "Invalid character for UTF-16 encoding\n");
+                    "Invalid character for UTF-16 encoding");
 
         *ptr++ = UNICODE_HIGH_SURROGATE(c);
         *ptr++ = UNICODE_LOW_SURROGATE(c);
