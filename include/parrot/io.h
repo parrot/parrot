@@ -657,6 +657,7 @@ PARROT_WARN_UNUSED_RESULT
 PIOHANDLE Parrot_io_get_standard_piohandle(PARROT_INTERP, INTVAL idx)
         __attribute__nonnull__(1);
 
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const IO_VTABLE * Parrot_io_get_vtable(PARROT_INTERP,

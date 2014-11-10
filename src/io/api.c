@@ -154,6 +154,7 @@ Parrot_io_allocate_new_vtable(PARROT_INTERP, ARGIN(const char *name))
     return vtable;
 }
 
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 const IO_VTABLE *
