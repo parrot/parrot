@@ -353,6 +353,10 @@ be one of:
 
 =item * C<STAT_ISDEV>
 
+=item * C<STAT_ISLNK>
+
+if S_ISLNK is supported by the platform.
+
 =item * C<STAT_ACCESSTIME>
 
 =item * C<STAT_MODIFYTIME>
@@ -381,7 +385,11 @@ be one of:
 
 =item * C<STAT_PLATFORM_BLOCKSIZE>
 
+if supported by the platform.
+
 =item * C<STAT_PLATFORM_BLOCKS>
+
+if supported by the platform.
 
 =back
 

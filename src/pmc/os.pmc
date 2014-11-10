@@ -221,7 +221,7 @@ https://trac.parrot.org/parrot/ticket/849
 
 =item C<fixedpmcarray *lstat(STRING *path)>
 
-Lstats a file, and returns a 13 position array as in Perl. See C<stat>.
+Lstats a symlink, and returns a 13 position array as in Perl. See C<lstat>.
 
 =cut
 
@@ -231,7 +231,7 @@ Lstats a file, and returns a 13 position array as in Perl. See C<stat>.
         Parrot_Stat_Buf  buf;
         PMC             *array;
 
-        Parrot_file_stat(interp, path, &buf);
+        Parrot_file_lstat(interp, path, &buf);
         array = stat_buf_to_array(interp, &buf);
 
         RETURN(PMC *array);
