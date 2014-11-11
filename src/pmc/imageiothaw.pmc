@@ -126,7 +126,7 @@ Thaws the PMC contained in C<image>.
             if (unpacked_length)
                 PARROT_IMAGEIOTHAW(SELF)->curs += header_length / sizeof (opcode_t*);
             else
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                Parrot_ex_throw_from_c_noargs(INTERP,
                         EXCEPTION_INVALID_STRING_REPRESENTATION,
                         "PackFile header failed during unpack");
         }
@@ -347,7 +347,7 @@ Retrieve a PMC as the next item from the image.
                 PARROT_ASSERT(id - 1 == VTABLE_elements(INTERP, seen));
 
                 if (type <= 0 || type > INTERP->n_vtable_max)
-                    Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                             "Unknown PMC type to thaw %d", type);
 
                 pmc = Parrot_pmc_new_noinit(INTERP, type);
@@ -357,7 +357,7 @@ Retrieve a PMC as the next item from the image.
             }
             break;
           default:
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                     "Unknown PMC id args thaw %d", packid_flags);
             break;
         }

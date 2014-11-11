@@ -52,7 +52,7 @@ check_is_valid_sub(PARROT_INTERP, ARGIN(PMC * sub))
     ASSERT_ARGS(check_is_valid_sub)
     STRING * const invokable_str = CONST_STRING(interp, "invokable");
     if (!VTABLE_does(interp, sub, invokable_str))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
             "attempt to add non-invokable PMC");
 }
 

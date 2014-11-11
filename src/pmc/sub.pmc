@@ -300,7 +300,7 @@ Sets the pointer to the actual subroutine.
     VTABLE void set_pointer(void *value) :no_wb {
         UNUSED(SELF)
         UNUSED(value)
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
             "Don't set the address of a sub\nuse .const 'Sub' instead");
     }
 
@@ -589,7 +589,7 @@ Set SELF to the data in other.
             PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
         else
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
+            Parrot_ex_throw_from_c_noargs(INTERP,
                 EXCEPTION_INVALID_OPERATION,
                 "Can't assign a non-Sub type to a Sub");
     }

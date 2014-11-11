@@ -93,7 +93,7 @@ imcc_get_pir_compreg_api(Parrot_PMC interp_pmc, int add_compreg, ARGOUT(Parrot_P
     IMCC_API_CALLIN(interp_pmc, interp)
     *compiler = get_compreg_pmc(interp, 0, add_compreg);
     if (PMC_IS_NULL(*compiler))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNEXPECTED_NULL,
             "Could not create PIR compiler PMC");
     IMCC_API_CALLOUT(interp_pmc, interp)
 }
@@ -118,7 +118,7 @@ imcc_get_pasm_compreg_api(Parrot_PMC interp_pmc, int add_compreg, ARGOUT(Parrot_
     IMCC_API_CALLIN(interp_pmc, interp)
     *compiler = get_compreg_pmc(interp, 1, add_compreg);
     if (PMC_IS_NULL(*compiler))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNEXPECTED_NULL,
             "Could not create PASM compiler PMC");
     IMCC_API_CALLOUT(interp_pmc, interp)
 }

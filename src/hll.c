@@ -286,7 +286,7 @@ Parrot_hll_register_HLL_type(PARROT_INTERP, INTVAL hll_id,
     ASSERT_ARGS(Parrot_hll_register_HLL_type)
 
     if (hll_id == Parrot_hll_get_HLL_id(interp, CONST_STRING(interp, "parrot")))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
             "Cannot map without an HLL");
     else {
         PMC * const hll_info = interp->HLL_info;
@@ -356,7 +356,7 @@ Parrot_hll_get_HLL_type(PARROT_INTERP, INTVAL hll_id, INTVAL core_type)
             return core_type;
 
         if (core_type >= PARROT_MAX_CLASSES || core_type < 0) {
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_OUT_OF_BOUNDS,
                 "index out of bounds");
         }
 

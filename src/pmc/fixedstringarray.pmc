@@ -46,7 +46,7 @@ Initializes the array.
 
     VTABLE void init_int(INTVAL size) :manual_wb {
         if (size < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "illegal argument");
         if (size) {
             SET_ATTR_size(INTERP, SELF, size);
@@ -292,7 +292,7 @@ Returns the Parrot string value of the element at index C<key>.
         if (key < 0)
             key += size;
         if (key < 0 || (UINTVAL)key >= size)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "index out of bounds");
 
         GET_ATTR_str_array(INTERP, SELF, str_array);
@@ -366,7 +366,7 @@ cause an exception to be thrown.
         GET_ATTR_size(INTERP, SELF, old_size);
 
         if (old_size || new_size < 1)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "Can't resize");
 
         SET_ATTR_size(INTERP, SELF, new_size);
@@ -456,7 +456,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
         if (key < 0)
             key += size;
         if (key < 0 || key >= size)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "index out of bounds");
 
         GET_ATTR_str_array(INTERP, SELF, str_array);

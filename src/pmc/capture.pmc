@@ -755,8 +755,8 @@ erase the contents of the array and hash components.
                 PObj_custom_mark_SET(SELF);
         }
         else
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                "Can only set a capture to another capture.");
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
+                "Can only set a capture to another capture");
     }
 
 /*
@@ -847,12 +847,12 @@ Freeze/thaw Capture
                  part of a subclass of Capture */
         if (PObj_is_object_TEST(SELF)) {
             PMC    *classobj;
-            PMC    *ns        = INTERP->root_namespace;
+            PMC    *ns = INTERP->root_namespace;
 
-            ns                = Parrot_ns_get_namespace_keyed_str(INTERP, ns, CONST_STRING(INTERP, "parrot"));
-            ns                = Parrot_ns_get_namespace_keyed_str(INTERP, ns, CONST_STRING(INTERP, "Capture"));
-            classobj          = Parrot_oo_get_class(INTERP, ns);
-            capt              = VTABLE_get_attr_keyed(INTERP, SELF, classobj, CONST_STRING(INTERP, "proxy"));
+            ns         = Parrot_ns_get_namespace_keyed_str(INTERP, ns, CONST_STRING(INTERP, "parrot"));
+            ns         = Parrot_ns_get_namespace_keyed_str(INTERP, ns, CONST_STRING(INTERP, "Capture"));
+            classobj   = Parrot_oo_get_class(INTERP, ns);
+            capt       = VTABLE_get_attr_keyed(INTERP, SELF, classobj, CONST_STRING(INTERP, "proxy"));
         }
         else
             capt = SELF;

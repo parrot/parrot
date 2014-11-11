@@ -221,7 +221,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_ext_try coverage");
     klass        = Parrot_pmc_new(interp, type);
 CODE
 Failed!
-Exception is: type 20 severity 2 message 'Object must be created by a class.'
+Exception is: type 20 severity 2 message 'Object must be created by a class'
 OUTPUT
 
 

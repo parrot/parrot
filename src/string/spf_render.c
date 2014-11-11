@@ -947,7 +947,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                  * loop, so we absolutely shouldn't be here. Throw an
                  * exception and hope this doesn't happen often.
                  */
-                Parrot_ex_throw_from_c_args(interp, NULL,
+                Parrot_ex_throw_from_c_noargs(interp,
                     EXCEPTION_INVALID_CHARACTER,
                     "Catastrophic sprintf error. Your input is very bad. "
                     "Please file a bug report.");

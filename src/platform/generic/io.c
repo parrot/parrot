@@ -230,7 +230,7 @@ Parrot_io_internal_async(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL async)
     }
 #else
     UNUSED(async)
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_NOT_IMPLEMENTED,
+    Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_PIO_NOT_IMPLEMENTED,
         "Async support not available");
 #endif
     return -1;

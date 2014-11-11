@@ -285,7 +285,7 @@ EXCEPTION_INVALID_OPERATION with:
         PMC    *filehandle;
 
         if (!Parrot_io_is_closed(INTERP, SELF))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_PIO_ERROR,
                                 "Cannot reopen already open FileHandle");
 
         if (!got_mode || STRING_IS_NULL(mode))
@@ -439,7 +439,7 @@ To ensure readall semantics C<seek> to position 0 first.
             GET_ATTR_encoding(INTERP, SELF, encoding);
 
             if (!Parrot_io_is_closed(INTERP, SELF))
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_PIO_ERROR,
+                Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_PIO_ERROR,
                     "Cannot readall on a new file from an already open filehandle");
 
             filehandle = Parrot_io_open(INTERP, PMCNULL, name, STRINGNULL);

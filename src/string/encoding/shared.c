@@ -459,7 +459,7 @@ u_iscclass(PARROT_INTERP, UINTVAL codepoint, INTVAL flags)
     }
 
     if (flags & ~(enum_cclass_whitespace | enum_cclass_numeric | enum_cclass_newline))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_LIBRARY_ERROR,
             "no ICU lib loaded");
 
     return 0;
@@ -495,7 +495,7 @@ encoding_ord_error(PARROT_INTERP, ARGIN(const STRING *s), INTVAL offset)
     else
         err_msg = "Unknown encoding_ord_error";
 
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ORD_OUT_OF_STRING,
+    Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_ORD_OUT_OF_STRING,
         err_msg);
 }
 
@@ -532,7 +532,7 @@ encoding_substr(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset, INTVAL l
         if ((UINTVAL)offset == strlen || length <= 0)
             return Parrot_str_new_constant(interp, "");
 
-        Parrot_ex_throw_from_c_args(interp, NULL,
+        Parrot_ex_throw_from_c_noargs(interp,
             EXCEPTION_SUBSTR_OUT_OF_STRING,
             "Cannot take substr outside string");
     }
@@ -771,7 +771,7 @@ encoding_decompose(PARROT_INTERP, SHIM(const STRING *src))
 {
     ASSERT_ARGS(encoding_decompose)
     /* TODO: https://trac.parrot.org/parrot/wiki/StringsTasklist Implement this. */
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+    Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
         "Decompose not implemented");
 }
 
@@ -803,7 +803,7 @@ fixed8_to_encoding(PARROT_INTERP, ARGIN(const STRING *src),
 
             for (i = 0; i < src->strlen; ++i) {
                 if (ptr[i] >= limit)
-                    Parrot_ex_throw_from_c_args(interp, NULL,
+                    Parrot_ex_throw_from_c_noargs(interp,
                         EXCEPTION_LOSSY_CONVERSION,
                         "Lossy conversion to single byte encoding");
             }
@@ -826,7 +826,7 @@ fixed8_to_encoding(PARROT_INTERP, ARGIN(const STRING *src),
             const UINTVAL c = STRING_iter_get_and_advance(interp, src, &iter);
 
             if (c >= limit)
-                Parrot_ex_throw_from_c_args(interp, NULL,
+                Parrot_ex_throw_from_c_noargs(interp,
                     EXCEPTION_LOSSY_CONVERSION,
                     "Lossy conversion to single byte encoding");
 
@@ -1087,7 +1087,7 @@ fixed_substr(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset, INTVAL leng
         if ((UINTVAL)offset == strlen || length <= 0)
             return Parrot_str_new_constant(interp, "");
 
-        Parrot_ex_throw_from_c_args(interp, NULL,
+        Parrot_ex_throw_from_c_noargs(interp,
             EXCEPTION_SUBSTR_OUT_OF_STRING,
             "Cannot take substr outside string");
     }
@@ -1323,7 +1323,7 @@ fixed8_iter_set_and_advance(PARROT_INTERP,
     UINTVAL limit = str->encoding == Parrot_ascii_encoding_ptr ? 0x80 : 0x100;
 
     if (c >= limit)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LOSSY_CONVERSION,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_LOSSY_CONVERSION,
             "Lossy conversion to single byte encoding");
 
     ptr[iter->charpos++] = c;
@@ -1421,7 +1421,7 @@ unicode_compose(PARROT_INTERP, ARGIN(const STRING *src))
     return dest;
 #else
     UNUSED(src);
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+    Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_LIBRARY_ERROR,
         "no ICU lib loaded");
 #endif
 }
@@ -1479,7 +1479,7 @@ convert_case_buf(PARROT_INTERP, ARGMOD_NULLOK(char *dest_buf), size_t dest_len,
     return res * 2;
 #else
     if (mode == ENCODING_TITLECASE)
-        Parrot_ex_throw_from_c_args(interp, NULL,
+        Parrot_ex_throw_from_c_noargs(interp,
             EXCEPTION_LIBRARY_ERROR, "no ICU lib loaded");
     else if (dest_buf) {
         const Parrot_UInt2 *s = (const Parrot_UInt2 *)src_buf;
@@ -1490,7 +1490,7 @@ convert_case_buf(PARROT_INTERP, ARGMOD_NULLOK(char *dest_buf), size_t dest_len,
         for (i = 0; i < len; ++i) {
             unsigned int c = s[i];
             if (c > 255) {
-                Parrot_ex_throw_from_c_args(interp, NULL,
+                Parrot_ex_throw_from_c_noargs(interp,
                      EXCEPTION_LIBRARY_ERROR, "no ICU lib loaded");
             }
             switch (mode) {
@@ -1649,7 +1649,7 @@ unicode_upcase_first(PARROT_INTERP, SHIM(const STRING *src))
 {
     ASSERT_ARGS(unicode_upcase_first)
     /* TODO: https://trac.parrot.org/parrot/wiki/StringsTasklist Implement this. */
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+    Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
         "Unicode upcase_first not implemented");
 }
 
@@ -1671,7 +1671,7 @@ unicode_downcase_first(PARROT_INTERP, SHIM(const STRING *src))
 {
     ASSERT_ARGS(unicode_downcase_first)
     /* TODO: https://trac.parrot.org/parrot/wiki/StringsTasklist Implement this. */
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+    Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
         "Unicode downcase_first not implemented");
 }
 
@@ -1693,7 +1693,7 @@ unicode_titlecase_first(PARROT_INTERP, SHIM(const STRING *src))
 {
     ASSERT_ARGS(unicode_titlecase_first)
     /* TODO: https://trac.parrot.org/parrot/wiki/StringsTasklist Implement this. */
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+    Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
         "Unicode titlecase_first not implemented");
 }
 

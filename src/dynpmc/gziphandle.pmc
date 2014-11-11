@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2012, Parrot Foundation.
+Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -91,7 +91,7 @@ invocant is modified and becomes an open filehandle.
         Parrot_str_free_cstring(path);
 
         if (!file)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_LIBRARY_ERROR,
                 "gzopen fails");
 
         SET_ATTR_file(INTERP, SELF, file);
@@ -247,7 +247,7 @@ Returns a string with the zlib version.
         char * const src = Parrot_str_to_cstring(INTERP, str);
 
         if (!src)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_ALLOCATION_ERROR,
                 "failed to allocate");
 
         srcLen = Parrot_str_byte_length(INTERP, str);
@@ -256,7 +256,7 @@ Returns a string with the zlib version.
 
         if (!buf) {
             Parrot_str_free_cstring(src);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_ALLOCATION_ERROR,
                 "failed to allocate");
         }
 
@@ -272,13 +272,13 @@ Returns a string with the zlib version.
 
           case Z_MEM_ERROR:
             mem_sys_free(buf);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_ALLOCATION_ERROR,
                 "not enough memory");
             break;
 
           case Z_BUF_ERROR:
             mem_sys_free(buf);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_LIBRARY_ERROR,
                 "output buffer error");
             break;
 
@@ -298,7 +298,7 @@ Returns a string with the zlib version.
         char * const src = Parrot_str_to_cstring(INTERP, str);
 
         if (!src)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_ALLOCATION_ERROR,
                 "failed to allocate");
 
         srcLen = Parrot_str_byte_length(INTERP, str);
@@ -308,7 +308,7 @@ Returns a string with the zlib version.
 
         if (!buf) {
             Parrot_str_free_cstring(src);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_ALLOCATION_ERROR,
                 "failed to allocate");
         }
 
@@ -325,7 +325,7 @@ Returns a string with the zlib version.
           case Z_MEM_ERROR:
             Parrot_str_free_cstring(src);
             mem_sys_free(buf);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_ALLOCATION_ERROR,
                 "not enough memory");
             break;
 
@@ -337,7 +337,7 @@ Returns a string with the zlib version.
           case Z_DATA_ERROR:
             Parrot_str_free_cstring(src);
             mem_sys_free(buf);
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_LIBRARY_ERROR,
                 "input data corrupted");
             break;
 
@@ -354,7 +354,7 @@ Returns a string with the zlib version.
         char * const src = Parrot_str_to_cstring(INTERP, str);
 
         if (!src)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_ILL_INHERIT,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_ALLOCATION_ERROR,
                 "failed to allocate");
 
         srcLen  = Parrot_str_byte_length(INTERP, str);

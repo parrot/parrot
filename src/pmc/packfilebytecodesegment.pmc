@@ -181,7 +181,7 @@ an op and the remaining PMCs being Integers.
         INTVAL  i, op_num, arr_size;
 
         if (!VTABLE_does(INTERP, p, CONST_STRING(INTERP, "array"))) {
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                     "PMC passed to push_pmc is not array-like");
         }
 

@@ -710,10 +710,10 @@ Parrot_api_pmc_setup_signature(Parrot_PMC interp_pmc, Parrot_PMC callcontext,
     EMBED_API_CALLIN(interp_pmc, interp);
 
     if (PMC_IS_NULL(callcontext))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
             "You must provide a CallContext to Parrot_api_pmc_setup_signature");
     if (!signature)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
             "You must provide a signature to Parrot_api_pmc_setup_signature");
 
     va_start(args, signature);

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -1692,7 +1692,7 @@ Parrot_hash_key_from_int(PARROT_INTERP, ARGIN(const Hash *hash), INTVAL key)
         ret = (void *)Parrot_str_from_int(interp, key);
         break;
       default:
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported key_type");
     }
     return ret;
@@ -1735,7 +1735,7 @@ Parrot_hash_key_from_string(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(STRING
         break;
 
       default:
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported key_type");
     }
     return ret;
@@ -1783,7 +1783,7 @@ Parrot_hash_key_from_pmc(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(PMC *key)
                   default:
                     /* It's impossible if Keys are same (and they are not) */
                     /* So throw exception */
-                    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                    Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
                                 "hash: unexpected type of Key");
                     break;
                 }
@@ -1796,13 +1796,13 @@ Parrot_hash_key_from_pmc(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN(PMC *key)
         {
             STRING * const tmp = VTABLE_get_string(interp, key);
             if (STRING_IS_NULL(tmp))
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+                Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNEXPECTED_NULL,
                             "hash: can't use null as key");
             ret = (void *)tmp;
         }
         break;
       default:
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported key_type");
     }
     return ret;
@@ -1837,7 +1837,7 @@ Parrot_hash_key_to_int(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(void
         ret = Parrot_str_to_int(interp, (STRING *)key);
         break;
       default:
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported key_type");
     }
     return ret;
@@ -1876,7 +1876,7 @@ Parrot_hash_key_to_string(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(v
         break;
 
       default:
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported key_type");
     }
     return ret;
@@ -1912,7 +1912,7 @@ Parrot_hash_key_to_pmc(PARROT_INTERP, ARGIN(const Hash * const hash), ARGIN(void
         ret = Parrot_pmc_box_string(interp, (STRING*)key);
         break;
       default:
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported key_type");
     }
     return ret;
@@ -1952,7 +1952,7 @@ Parrot_hash_value_from_int(PARROT_INTERP, ARGIN(const Hash *hash), INTVAL value)
         ret = (void *)Parrot_str_from_int(interp, value);
         break;
       default:
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported entry_type");
     }
     return ret;
@@ -1996,7 +1996,7 @@ Parrot_hash_value_from_string(PARROT_INTERP, ARGIN(const Hash *hash),
         }
         break;
       default:
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported entry_type");
     }
     return ret;
@@ -2036,7 +2036,7 @@ Parrot_hash_value_from_pmc(PARROT_INTERP, ARGIN(const Hash *hash),
         ret = (void *)value;
         break;
       default:
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported entry_type");
     }
     return ret;
@@ -2076,7 +2076,7 @@ Parrot_hash_value_from_number(PARROT_INTERP, ARGIN(const Hash *hash), FLOATVAL v
         }
         break;
       default:
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported entry_type");
     }
     return ret;
@@ -2110,7 +2110,7 @@ Parrot_hash_value_to_int(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(vo
         ret = VTABLE_get_integer(interp, (PMC*)value);
         break;
       default:
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported entry_type");
     }
     return ret;
@@ -2144,7 +2144,7 @@ Parrot_hash_value_to_string(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK
         ret = VTABLE_get_string(interp, (PMC *)value);
         break;
       default:
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported entry_type");
     }
     return ret;
@@ -2178,7 +2178,7 @@ Parrot_hash_value_to_pmc(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK(vo
         ret = (PMC *)value;
         break;
       default:
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported entry_type");
     }
     return ret;
@@ -2215,7 +2215,7 @@ Parrot_hash_value_to_number(PARROT_INTERP, ARGIN(const Hash *hash), ARGIN_NULLOK
         ret = VTABLE_get_number(interp, (PMC*)value);
         break;
       default:
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                     "Hash: unsupported entry_type");
     }
     return ret;

@@ -37,10 +37,12 @@ static void do_unshift(PARROT_INTERP, ARGIN(PMC *arr), ARGIN(PMC *val))
         __attribute__nonnull__(3);
 
 PARROT_DOES_NOT_RETURN
+PARROT_INLINE
 static void throw_pop_empty(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_DOES_NOT_RETURN
+PARROT_INLINE
 static void throw_shift_empty(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -130,7 +132,7 @@ Initializes the array.
 
     VTABLE void init_int(INTVAL size) :manual_wb {
         if (size < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "illegal argument");
         SUPER(size);
         if (size > 0) {
@@ -151,7 +153,7 @@ Resizes the array to C<size> elements.
 
     VTABLE void set_integer_native(INTVAL size) :manual_wb {
         if (size < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "illegal argument");
 
         if (!PMC_array(SELF)) {
@@ -295,7 +297,7 @@ Returns the PMC value of the element at index C<key>.
         if (key < 0)
             key += size;
         if (key < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "index out of bounds");
         if (key >= size)
             return PMCNULL;
@@ -328,7 +330,7 @@ Sets the PMC value of the element keyed by C<key> to C<*src>.
             key += PMC_size(SELF);
 
         if (key < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "index out of bounds");
 
         if (key >= PMC_size(SELF))
@@ -350,7 +352,7 @@ Sets the PMC value of the element keyed by C<key> to C<*src>.
             return;
 
         if (!VTABLE_does(INTERP, value, CONST_STRING(INTERP, "array")))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "Can't set self from this type");
 
         if (PMC_array(SELF))
@@ -687,10 +689,10 @@ Note that the C<from> PMC can be of any of the various array types.
         if (offset < 0)
             offset += elems0;
         if (count < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "illegal argument");
         if (offset < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "index out of bounds");
 
         /* number of elements to the right of the splice (the "tail") */
@@ -845,7 +847,7 @@ static void
 throw_shift_empty(PARROT_INTERP)
 {
     ASSERT_ARGS(throw_shift_empty)
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+    Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_OUT_OF_BOUNDS,
             "Can't shift from an empty array");
 }
 
@@ -855,7 +857,7 @@ static void
 throw_pop_empty(PARROT_INTERP)
 {
     ASSERT_ARGS(throw_pop_empty)
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+    Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_OUT_OF_BOUNDS,
             "Can't pop from an empty array");
 }
 

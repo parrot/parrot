@@ -39,7 +39,7 @@ Throws an error.  OpLib requires an argument to init.  See C<init_pmc>.
 
     VTABLE void init() :no_wb {
         UNUSED(SELF)
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                 "OpLib must be initialized with an oplib name");
     }
 

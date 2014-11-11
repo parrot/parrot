@@ -639,7 +639,7 @@ Translate ascii string C<src> with entries from C<trans_table>.
             RETURN(STRING src);
 
         if (src->encoding != Parrot_ascii_encoding_ptr)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_ENCODING,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_ENCODING,
                 "Can't translate non-ascii");
 
         dest = Parrot_str_clone(INTERP, src);

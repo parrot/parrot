@@ -278,7 +278,7 @@ Multiplies the number by C<value> and returns the result in C<*dest>.
         UNUSED(SELF)
         UNUSED(value)
         UNUSED(dest)
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
+        Parrot_ex_throw_from_c_noargs(INTERP,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED, "TODO mul<Float, Complex>");
     }
 
@@ -309,7 +309,7 @@ Multiplies the number by C<value> and returns the result in C<*dest>.
     MULTI void i_multiply(Complex value) :no_wb {
         UNUSED(SELF)
         UNUSED(value)
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
+        Parrot_ex_throw_from_c_noargs(INTERP,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "TODO i_mul<Float, Complex>");
     }
@@ -354,7 +354,7 @@ Divides C<SELF> by C<value> inplace.
         const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                 "float division by zero");
 
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -365,7 +365,7 @@ Divides C<SELF> by C<value> inplace.
 
     VTABLE PMC *divide_int(INTVAL value, PMC *dest) :no_wb {
         if (value == 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                 "float division by zero");
 
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -376,7 +376,7 @@ Divides C<SELF> by C<value> inplace.
 
     VTABLE PMC *divide_float(FLOATVAL value, PMC *dest) :no_wb {
         if (FLOAT_IS_ZERO(value))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                 "float division by zero");
 
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -389,7 +389,7 @@ Divides C<SELF> by C<value> inplace.
         const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                 "float division by zero");
 
         VTABLE_set_number_native(INTERP, SELF, SELF.get_number() / d);
@@ -397,7 +397,7 @@ Divides C<SELF> by C<value> inplace.
 
     VTABLE void i_divide_int(INTVAL value) :manual_wb {
         if (value == 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                 "float division by zero");
 
         VTABLE_set_number_native(INTERP, SELF, SELF.get_number() / value);
@@ -405,7 +405,7 @@ Divides C<SELF> by C<value> inplace.
 
     VTABLE void i_divide_float(FLOATVAL value) :manual_wb {
         if (FLOAT_IS_ZERO(value))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                 "float division by zero");
 
         VTABLE_set_number_native(INTERP, SELF, SELF.get_number() / value);
@@ -437,7 +437,7 @@ Divides C<SELF> by C<value> inplace.
         FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                 "float division by zero");
 
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -449,7 +449,7 @@ Divides C<SELF> by C<value> inplace.
 
     VTABLE PMC *floor_divide_int(INTVAL value, PMC *dest) :no_wb {
         if (value == 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                 "float division by zero");
 
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -461,7 +461,7 @@ Divides C<SELF> by C<value> inplace.
 
     VTABLE PMC *floor_divide_float(FLOATVAL value, PMC *dest) :no_wb {
         if (FLOAT_IS_ZERO(value))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                 "float division by zero");
 
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -475,7 +475,7 @@ Divides C<SELF> by C<value> inplace.
         const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                 "float division by zero");
 
         VTABLE_set_number_native(INTERP, SELF,
@@ -484,7 +484,7 @@ Divides C<SELF> by C<value> inplace.
 
     VTABLE void i_floor_divide_int(INTVAL value) :manual_wb {
         if (value == 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                 "float division by zero");
 
         VTABLE_set_number_native(INTERP, SELF,
@@ -493,7 +493,7 @@ Divides C<SELF> by C<value> inplace.
 
     VTABLE void i_floor_divide_float(FLOATVAL value) :manual_wb {
         if (FLOAT_IS_ZERO(value))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                 "float division by zero");
 
         VTABLE_set_number_native(INTERP, SELF,
@@ -527,7 +527,7 @@ Calculates modulus inplace
         const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                 "float modulus by zero");
 
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -539,7 +539,7 @@ Calculates modulus inplace
 
     VTABLE PMC *modulus_int(INTVAL value, PMC *dest) :no_wb {
         if (value == 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                 "float modulus by zero");
 
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -551,7 +551,7 @@ Calculates modulus inplace
 
     VTABLE PMC *modulus_float(FLOATVAL value, PMC *dest) :no_wb {
         if (FLOAT_IS_ZERO(value))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                 "float modulus by zero");
 
         dest = Parrot_pmc_new(INTERP, VTABLE_type(INTERP, SELF));
@@ -565,7 +565,7 @@ Calculates modulus inplace
         const FLOATVAL d = VTABLE_get_number(INTERP, value);
 
         if (FLOAT_IS_ZERO(d))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                 "float modulus by zero");
 
         VTABLE_set_number_native(INTERP, SELF,
@@ -574,7 +574,7 @@ Calculates modulus inplace
 
     VTABLE void i_modulus_int(INTVAL value) :manual_wb {
         if (value == 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                 "float modulus by zero");
 
         VTABLE_set_number_native(INTERP, SELF,
@@ -583,7 +583,7 @@ Calculates modulus inplace
 
     VTABLE void i_modulus_float(FLOATVAL value) :manual_wb {
         if (FLOAT_IS_ZERO(value))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_DIV_BY_ZERO,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                 "float modulus by zero");
 
         VTABLE_set_number_native(INTERP, SELF,

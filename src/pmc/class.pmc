@@ -321,16 +321,16 @@ init_class_from_hash(PARROT_INTERP, ARGMOD(PMC *self), ARGIN_NULLOK(PMC *info))
         }
 
         if (PMC_IS_NULL(new_namespace))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                "Failed to set namespace for class.");
+            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
+                "Failed to set namespace for class");
 
         /* Set the name of the class to the name of the innermost namespace
          * associated with the class.  */
         new_name = VTABLE_get_string(interp, new_namespace);
 
         if (STRING_IS_NULL(new_name) || STRING_IS_EMPTY(new_name))
-              Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                "Failed to set name for class.");
+              Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
+                "Failed to set name for class");
 
         _class->_namespace = new_namespace;
         _class->name       = new_name;
@@ -730,7 +730,7 @@ arguments. The class is attached to the current HLL namespace.
             if (VTABLE_isa(INTERP, init_data, CONST_STRING(INTERP, "Hash")))
                 arg = init_data;
             else
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                Parrot_ex_throw_from_c_noargs(INTERP,
                         EXCEPTION_INVALID_OPERATION,
                             "Invalid class name key in init_pmc for Class");
             break;
@@ -809,13 +809,13 @@ Returns an error if an attribute of C<name> already exists.
 
         /* If we've been instantiated already, not allowed. */
         if (_class->instantiated)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                "Modifications to classes are not allowed after instantiation.");
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
+                "Modifications to classes are not allowed after instantiation");
 
         /* If we already have an attribute of this name, it's an error. */
         if (VTABLE_exists_keyed_str(INTERP, _class->attrib_metadata, name))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                "Attribute '%Ss' already exists in '%Ss'.", name,
+                "Attribute '%Ss' already exists in '%Ss'", name,
                 VTABLE_get_string(INTERP, SELF));
 
         /* Set name and type. */
@@ -846,13 +846,13 @@ C<name>.
 
         /* If we've been instantiated already, not allowed. */
         if (_class->instantiated)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                "Modifications to classes are not allowed after instantiation.");
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
+                "Modifications to classes are not allowed after instantiation");
 
         /* If we don't have an attribute of this name, it's an error. */
         if (!VTABLE_exists_keyed_str(INTERP, _class->attrib_metadata, name))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                "Attribute '%Ss' cannot be removed, does not exist in '%Ss'.", name,
+                "Attribute '%Ss' cannot be removed, does not exist in '%Ss'", name,
                 VTABLE_get_string(INTERP, SELF));
 
         /* Remove the attribute from the attrib_metadata table. */
@@ -882,7 +882,7 @@ Adds the given sub PMC as a method with the given name.
 
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
                 "A method named '%S' already exists in class '%S'. "
-                "It may have been supplied by a role.",
+                "It may have been supplied by a role",
                 name, VTABLE_get_string(INTERP, SELF));
         }
 
@@ -905,7 +905,7 @@ Removes the method with the given name.
             VTABLE_delete_keyed_str(INTERP, _class->methods, name);
         else
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                "No method named '%S' to remove in class '%S'.",
+                "No method named '%S' to remove in class '%S'",
                 name, VTABLE_get_string(INTERP, SELF));
     }
 
@@ -925,7 +925,7 @@ Adds the given sub PMC as a vtable override with the given name.
         if (Parrot_get_vtable_index(INTERP, name) == -1)
             Parrot_ex_throw_from_c_args(INTERP, NULL,
                 EXCEPTION_METHOD_NOT_FOUND,
-                "'%S' is not a valid vtable function name.", name);
+                "'%S' is not a valid vtable function name", name);
 
         /* Add it to vtable list. */
         VTABLE_set_pmc_keyed_str(INTERP, _class->vtable_overrides, name, sub);
@@ -946,9 +946,9 @@ Adds the supplied PMC to the list of parents for the class.
 
         /* If we've been instantiated already, not allowed. */
         if (_class->instantiated)
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
+            Parrot_ex_throw_from_c_noargs(INTERP,
                 EXCEPTION_INVALID_OPERATION,
-                "Modifications to classes are not allowed after instantiation.");
+                "Modifications to classes are not allowed after instantiation");
 
         if (PMC_IS_NULL(parent)) {
             STRING * const me_str = make_class_name(INTERP, SELF);
@@ -962,12 +962,12 @@ Adds the supplied PMC to the list of parents for the class.
             STRING * me_str = make_class_name(INTERP, SELF);
             Parrot_ex_throw_from_c_args(INTERP, NULL,
                 EXCEPTION_INVALID_OPERATION,
-                "Parent '%Ss' of '%Ss' isn't a Class.", pstr, me_str);
+                "Parent '%Ss' of '%Ss' isn't a Class", pstr, me_str);
         }
 
         /* Check is not self */
         if (parent == SELF)
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
+            Parrot_ex_throw_from_c_noargs(INTERP,
                     EXCEPTION_INVALID_OPERATION, "Can't be own parent");
 
         /* get number of direct parents */
@@ -985,7 +985,7 @@ Adds the supplied PMC to the list of parents for the class.
                 Parrot_ex_throw_from_c_args(INTERP, NULL,
                     EXCEPTION_INVALID_OPERATION,
                     "The class '%S' already has a parent class '%S'. "
-                    "It may have been supplied by a role.",
+                    "It may have been supplied by a role",
                     VTABLE_get_string(INTERP, SELF),
                     VTABLE_get_string(INTERP, parent));
         }
@@ -1001,7 +1001,7 @@ Adds the supplied PMC to the list of parents for the class.
             if (current_parent == SELF)
                 Parrot_ex_throw_from_c_args(INTERP, NULL,
                     EXCEPTION_INVALID_OPERATION,
-                    "Loop in class hierarchy: '%S' is an ancestor of '%S'.",
+                    "Loop in class hierarchy: '%S' is an ancestor of '%S'",
                     VTABLE_get_string(INTERP, SELF),
                     VTABLE_get_string(INTERP, parent));
         }
@@ -1029,14 +1029,14 @@ if the class has been instantiated.
 
         /* If we've been instantiated already, not allowed. */
         if (_class->instantiated)
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
+            Parrot_ex_throw_from_c_noargs(INTERP,
                 EXCEPTION_INVALID_OPERATION,
-                "Modifications to classes are not allowed after instantiation.");
+                "Modifications to classes are not allowed after instantiation");
 
         /* Ensure it really is a class. */
         if (!PObj_is_class_TEST(parent))
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
-                EXCEPTION_INVALID_OPERATION, "Parent isn't a Class.");
+            Parrot_ex_throw_from_c_noargs(INTERP,
+                EXCEPTION_INVALID_OPERATION, "Parent isn't a Class");
 
         /* get number of direct parents */
         parent_count = VTABLE_elements(INTERP, _class->parents);
@@ -1051,9 +1051,9 @@ if the class has been instantiated.
         }
 
         if (index >= parent_count)
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
+            Parrot_ex_throw_from_c_noargs(INTERP,
                 EXCEPTION_INVALID_OPERATION,
-                "Can't remove_parent: is not a parent.");
+                "Can't remove_parent: is not a parent");
 
         VTABLE_delete_keyed_int(INTERP, _class->parents, index);
         Parrot_hash_put(INTERP, _class->isa_cache, (void *)parent, (void *)0);

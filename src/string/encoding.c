@@ -236,7 +236,7 @@ const STR_VTABLE *
 Parrot_load_encoding(PARROT_INTERP, SHIM(const char *encodingname))
 {
     ASSERT_ARGS(Parrot_load_encoding)
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+    Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
         "Can't load encodings yet");
 }
 

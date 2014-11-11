@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2005-2011,2014, Parrot Foundation.
+Copyright (C) 2005-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -24,7 +24,7 @@ pmclass DynLexPad dynpmc provides lexpad auto_attrs {
 
     VTABLE void init() {
         UNUSED(SELF);
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
             "don't create me like this");
     }
 
@@ -203,11 +203,11 @@ doesn't exist, it is created.
 
         if (PObj_constant_TEST(SELF)) {
             if (!PObj_constant_TEST((PObj *)name))
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                Parrot_ex_throw_from_c_noargs(INTERP,
                     EXCEPTION_INVALID_OPERATION,
                     "Used non-constant STRING key in constant hash.");
             if (!PObj_constant_TEST((PObj *)value))
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                Parrot_ex_throw_from_c_noargs(INTERP,
                     EXCEPTION_INVALID_OPERATION,
                     "Used non-constant PMC value in constant hash.");
         }

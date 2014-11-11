@@ -490,7 +490,7 @@ Parrot_file_stat_intval(PARROT_INTERP, STRING *file, INTVAL thing)
         }
         break;
       case STAT_ISLNK:
-        Parrot_ex_throw_from_c_args(interp, NULL,
+        Parrot_ex_throw_from_c_noargs(interp,
                 EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
                 "STAT_ISLNK not supported");
         break;
@@ -498,22 +498,22 @@ Parrot_file_stat_intval(PARROT_INTERP, STRING *file, INTVAL thing)
         result = -1;
         break;
       case STAT_UID:
-        Parrot_ex_throw_from_c_args(interp, NULL,
+        Parrot_ex_throw_from_c_noargs(interp,
                 EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
                 "STAT_UID not supported");
         break;
       case STAT_GID:
-        Parrot_ex_throw_from_c_args(interp, NULL,
+        Parrot_ex_throw_from_c_noargs(interp,
                 EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
                 "STAT_GID not supported");
         break;
       case STAT_PLATFORM_DEV:
-        Parrot_ex_throw_from_c_args(interp, NULL,
+        Parrot_ex_throw_from_c_noargs(interp,
                 EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
                 "STAT_PLATFORM_DEV not supported");
         break;
       case STAT_PLATFORM_INODE:
-        Parrot_ex_throw_from_c_args(interp, NULL,
+        Parrot_ex_throw_from_c_noargs(interp,
                 EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
                 "STAT_PLATFORM_INODE not supported");
         break;
@@ -521,22 +521,22 @@ Parrot_file_stat_intval(PARROT_INTERP, STRING *file, INTVAL thing)
         result = 0777;
         break;
       case STAT_PLATFORM_NLINKS:
-        Parrot_ex_throw_from_c_args(interp, NULL,
+        Parrot_ex_throw_from_c_noargs(interp,
                 EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
                 "STAT_PLATFORM_NLINKS not supported");
         break;
       case STAT_PLATFORM_DEVTYPE:
-        Parrot_ex_throw_from_c_args(interp, NULL,
+        Parrot_ex_throw_from_c_noargs(interp,
                 EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
                 "STAT_PLATFORM_DEVTYPE not supported");
         break;
       case STAT_PLATFORM_BLOCKSIZE:
-        Parrot_ex_throw_from_c_args(interp, NULL,
+        Parrot_ex_throw_from_c_noargs(interp,
                 EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
                 "STAT_PLATFORM_BLOCKSIZE not supported");
         break;
       case STAT_PLATFORM_BLOCKS:
-        Parrot_ex_throw_from_c_args(interp, NULL,
+        Parrot_ex_throw_from_c_noargs(interp,
                 EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
                 "STAT_PLATFORM_BLOCKS not supported");
         break;
@@ -668,7 +668,7 @@ Parrot_file_fstat_intval(PARROT_INTERP, PIOHANDLE os_handle, INTVAL thing)
         }
         break;
       case STAT_ISLNK:
-        Parrot_ex_throw_from_c_args(interp, NULL,
+        Parrot_ex_throw_from_c_noargs(interp,
                 EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
                 "STAT_ISLNK not supported");
         break;
@@ -676,12 +676,12 @@ Parrot_file_fstat_intval(PARROT_INTERP, PIOHANDLE os_handle, INTVAL thing)
         result = -1;
         break;
       case STAT_UID:
-        Parrot_ex_throw_from_c_args(interp, NULL,
+        Parrot_ex_throw_from_c_noargs(interp,
                 EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
                 "STAT_UID not supported");
         break;
       case STAT_GID:
-        Parrot_ex_throw_from_c_args(interp, NULL,
+        Parrot_ex_throw_from_c_noargs(interp,
                 EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
                 "STAT_GID not supported");
         break;
@@ -689,17 +689,17 @@ Parrot_file_fstat_intval(PARROT_INTERP, PIOHANDLE os_handle, INTVAL thing)
         result = 0777;
         break;
       case STAT_PLATFORM_DEVTYPE:
-        Parrot_ex_throw_from_c_args(interp, NULL,
+        Parrot_ex_throw_from_c_noargs(interp,
                 EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
                 "STAT_PLATFORM_DEVTYPE not supported");
         break;
       case STAT_PLATFORM_BLOCKSIZE:
-        Parrot_ex_throw_from_c_args(interp, NULL,
+        Parrot_ex_throw_from_c_noargs(interp,
                 EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
                 "STAT_PLATFORM_BLOCKSIZE not supported");
         break;
       case STAT_PLATFORM_BLOCKS:
-        Parrot_ex_throw_from_c_args(interp, NULL,
+        Parrot_ex_throw_from_c_noargs(interp,
                 EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
                 "STAT_PLATFORM_BLOCKS not supported");
         break;
@@ -740,7 +740,7 @@ Parrot_file_symlink(PARROT_INTERP, ARGIN(STRING *from), ARGIN(STRING *to))
     }
 
     if (csl == NULL)
-        Parrot_ex_throw_from_c_args(interp, NULL,
+        Parrot_ex_throw_from_c_noargs(interp,
                 EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
                 "CreateSymbolicLink not supported");
 
@@ -794,7 +794,7 @@ PARROT_CANNOT_RETURN_NULL
 STRING *
 Parrot_file_readlink(PARROT_INTERP, ARGIN(STRING *path))
 {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                 "readlink error: Not yet implemented on Win32");
 }
 
@@ -838,7 +838,7 @@ Changes umask and return previous one
 INTVAL
 Parrot_file_umask(PARROT_INTERP, INTVAL mask)
 {
-    Parrot_ex_throw_from_c_args(interp, NULL,
+    Parrot_ex_throw_from_c_noargs(interp,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "umask not implemented on Win32");
 }
@@ -856,7 +856,7 @@ Change root directory
 void
 Parrot_file_chroot(PARROT_INTERP, ARGIN(STRING *path))
 {
-    Parrot_ex_throw_from_c_args(interp, NULL,
+    Parrot_ex_throw_from_c_noargs(interp,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "chroot not implemented on Win32");
 }
@@ -953,7 +953,7 @@ Changes permissions of file C<path>
 void
 Parrot_file_chmod(PARROT_INTERP, ARGIN(STRING *path), INTVAL mode)
 {
-    Parrot_ex_throw_from_c_args(interp, NULL,
+    Parrot_ex_throw_from_c_noargs(interp,
             EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
             "chmod not implemented on Win32");
 }

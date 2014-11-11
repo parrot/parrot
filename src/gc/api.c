@@ -316,7 +316,7 @@ Parrot_gc_new_pmc_header(PARROT_INTERP, UINTVAL flags)
     PMC * const pmc = interp->gc_sys->allocate_pmc_header(interp, flags);
 
     if (!pmc)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_ALLOCATION_ERROR,
             "Parrot VM: PMC allocation failed!\n");
 
     PObj_get_FLAGS(pmc) = PObj_is_PMC_FLAG|flags;
@@ -371,7 +371,7 @@ Parrot_gc_new_string_header(PARROT_INTERP, UINTVAL flags)
 
     STRING * const string = interp->gc_sys->allocate_string_header(interp, flags);
     if (!string)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_ALLOCATION_ERROR,
             "Parrot VM: STRING allocation failed!\n");
 
     string->strstart        = NULL;

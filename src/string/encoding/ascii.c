@@ -174,7 +174,7 @@ ascii_scan(PARROT_INTERP, ARGMOD(STRING *src))
 
     for (i = 0; i < src->bufused; ++i) {
         if (p[i] >= 0x80)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_STRING_REPRESENTATION,
+            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_STRING_REPRESENTATION,
                 "Invalid character in ASCII string");
     }
 
@@ -212,7 +212,7 @@ ascii_partial_scan(PARROT_INTERP, ARGIN(const char *buf),
         c = (unsigned char)buf[i];
 
         if (c >= 0x80)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_STRING_REPRESENTATION,
+            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_STRING_REPRESENTATION,
                 "Invalid character in ASCII string");
 
         if (c == delim) {

@@ -337,7 +337,7 @@ If something goes wrong, blame NotFound.
     METHOD set_main(INTVAL index) {
         PMC * const mainsub = SELF.get_pmc_keyed_int(index);
         if (mainsub->vtable->base_type != enum_class_Sub)
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
+            Parrot_ex_throw_from_c_noargs(INTERP,
                 EXCEPTION_INVALID_OPERATION,
                 "Attempt to set main flag in a non Sub");
         SUB_FLAG_flag_SET(PF_MAIN, mainsub);

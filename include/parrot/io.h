@@ -289,6 +289,14 @@ Parrot_io_fprintf(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+const IO_VTABLE * Parrot_io_get_vtable(PARROT_INTERP,
+    INTVAL idx,
+    ARGIN_NULLOK(const char * name))
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 PIOHANDLE Parrot_io_getfd(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -657,14 +665,6 @@ PARROT_WARN_UNUSED_RESULT
 PIOHANDLE Parrot_io_get_standard_piohandle(PARROT_INTERP, INTVAL idx)
         __attribute__nonnull__(1);
 
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-const IO_VTABLE * Parrot_io_get_vtable(PARROT_INTERP,
-    INTVAL idx,
-    ARGIN_NULLOK(const char * name))
-        __attribute__nonnull__(1);
-
 PARROT_WARN_UNUSED_RESULT
 PIOOFF_T Parrot_io_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
@@ -735,6 +735,8 @@ INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc) \
     , PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_Parrot_io_get_vtable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_getfd __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
@@ -876,8 +878,6 @@ INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP,
     , PARROT_ASSERT_ARG(handle))
 #define ASSERT_ARGS_Parrot_io_get_standard_piohandle \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_io_get_vtable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_make_offset_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

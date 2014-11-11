@@ -569,7 +569,7 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
     while (pc) {
         size_t runs;
         if (pc < code_start || pc >= code_end)
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            Parrot_ex_throw_from_c_noargs(interp, 1,
                 "attempt to access code outside of current code segment");
 
         Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), pc);
@@ -620,7 +620,7 @@ runops_slow_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcode_t 
 
     while (pc) {
         if (pc < code_start || pc >= code_end)
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            Parrot_ex_throw_from_c_noargs(interp, 1,
                 "attempt to access code outside of current code segment");
 
         Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), pc);
@@ -653,7 +653,7 @@ runops_gc_debug_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcod
     ASSERT_ARGS(runops_gc_debug_core)
     while (pc) {
         if (pc < code_start || pc >= code_end)
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            Parrot_ex_throw_from_c_noargs(interp, 1,
                 "attempt to access code outside of current code segment");
 
         Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
@@ -694,7 +694,7 @@ runops_debugger_core(PARROT_INTERP, SHIM(Parrot_runcore_t *runcore), ARGIN(opcod
 
     while (pc) {
         if (pc < interp->code->base.data || pc >= interp->code->base.data + interp->code->base.size)
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            Parrot_ex_throw_from_c_noargs(interp, 1,
                     "attempt to access code outside of current code segment");
 
         if (interp->pdb->state & PDB_GCDEBUG)

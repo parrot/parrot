@@ -239,7 +239,7 @@ build_ffi_thunk(PARROT_INTERP, SHIM(PMC *user_data), ARGIN(PMC *sig))
 
         if (ffi_prep_cif(&thunk_data->pcc_arg_cif, FFI_DEFAULT_ABI, argc, &ffi_type_void, arg_t) !=
             FFI_OK)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
+            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_JIT_ERROR,
                 "invalid ffi signature");
     }
 
@@ -257,7 +257,7 @@ build_ffi_thunk(PARROT_INTERP, SHIM(PMC *user_data), ARGIN(PMC *sig))
                             (PARROT_DATA_TYPE)VTABLE_get_integer_keyed_int(interp, sig, i + 1));
 
         if (ffi_prep_cif(&thunk_data->cif, FFI_DEFAULT_ABI, argc, ret_t, arg_t) != FFI_OK)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
+            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_JIT_ERROR,
                 "invalid ffi signature");
     }
 
@@ -285,14 +285,14 @@ build_ffi_thunk(PARROT_INTERP, SHIM(PMC *user_data), ARGIN(PMC *sig))
                 ret_t[i] = &ffi_type_pointer;
                 break;
               default:
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
+                Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_JIT_ERROR,
                     "invalid pcc signature");
             }
         }
 
         if (FFI_OK != ffi_prep_cif(&thunk_data->pcc_ret_cif, FFI_DEFAULT_ABI,
                                     retc, &ffi_type_pointer, ret_t))
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
+            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_JIT_ERROR,
                 "invalid ffi signature");
     }
 
@@ -448,7 +448,8 @@ prep_pcc_ret_arg(PARROT_INTERP, PARROT_DATA_TYPE t, parrot_var_t *pv, void **rv,
         break;
 
       default:
-        Parrot_ex_throw_from_c_args(interp, NULL, 0, "Impossible NCI signature code");
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_KEY_NOT_FOUND,
+                "Impossible NCI signature code");
     }
 }
 

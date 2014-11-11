@@ -463,7 +463,7 @@ pir_error_output_like(<<'CODE', <<'OUTPUT', "Resume dead coroutine w/o autoreset
     pop_eh
 .end
 CODE
-/\A124Cannot resume dead coroutine./
+/\A124Cannot resume dead coroutine/
 OUTPUT
 
 # Note: TT #1710/GH #585 argued that if one clone is dead the other are also dead.
@@ -508,7 +508,7 @@ pir_error_output_like(
     print '.done-'
 .end
 CODE
-/\A3.0-4.0-5.0-3.1-3.done-4.1-5.1-4.done-5.done-Cannot resume dead coroutine./
+/\A3.0-4.0-5.0-3.1-3.done-4.1-5.1-4.done-5.done-Cannot resume dead coroutine/
 OUTPUT
 
 pir_output_is(<<'CODE', <<'OUTPUT', "Manual reset" );

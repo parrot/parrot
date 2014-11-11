@@ -132,7 +132,7 @@ Some data that will be passed to C<code> when invoked.
                 core_struct->data = elem;
         }
         else {
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                 "Task initializer must be a Hash or Sub");
         }
     }

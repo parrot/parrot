@@ -414,7 +414,7 @@ find_common_mask(PARROT_INTERP, size_t val1, size_t val2)
         return 0;
     }
 
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INTERP_ERROR,
+    Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INTERP_ERROR,
             "Unexpected condition in find_common_mask()");
 }
 

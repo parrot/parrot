@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -463,27 +463,27 @@ check_pmc_reuse_flags(PARROT_INTERP, UINTVAL srcflags, UINTVAL destflags)
     {
         /* First, is the destination a singleton? No joy for us there */
         if (destflags & VTABLE_PMC_IS_SINGLETON)
-            Parrot_ex_throw_from_c_args(interp, NULL,
+            Parrot_ex_throw_from_c_noargs(interp,
                 EXCEPTION_ALLOCATION_ERROR,
-                "Parrot VM: Can't turn to a singleton type");
+                "Can't turn to a singleton type");
 
         /* Is the destination a constant? No joy for us there */
         if (destflags & VTABLE_IS_CONST_FLAG)
-            Parrot_ex_throw_from_c_args(interp, NULL,
+            Parrot_ex_throw_from_c_noargs(interp,
                 EXCEPTION_ALLOCATION_ERROR,
-                "Parrot VM: Can't turn to a constant type");
+                "Can't turn to a constant type");
 
         /* Is the source a singleton? */
         if (srcflags & VTABLE_PMC_IS_SINGLETON)
-            Parrot_ex_throw_from_c_args(interp, NULL,
+            Parrot_ex_throw_from_c_noargs(interp,
                 EXCEPTION_ALLOCATION_ERROR,
-                "Parrot VM: Can't modify a singleton");
+                "Can't modify a singleton");
 
         /* Is the source constant? */
         if (srcflags & VTABLE_IS_CONST_FLAG)
-            Parrot_ex_throw_from_c_args(interp, NULL,
+            Parrot_ex_throw_from_c_noargs(interp,
                 EXCEPTION_ALLOCATION_ERROR,
-                "Parrot VM: Can't modify a constant");
+                "Can't modify a constant");
     }
 }
 
@@ -776,7 +776,7 @@ Parrot_pmc_register_new_type(PARROT_INTERP, ARGIN(STRING *name))
         return type;
 
     if (type < enum_type_undef)
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+        Parrot_ex_throw_from_c_noargs(interp, 1,
             "undefined type already exists - can't register PMC");
 
     type = Parrot_pmc_get_new_vtable_index(interp);

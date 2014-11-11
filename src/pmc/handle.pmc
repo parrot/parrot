@@ -43,15 +43,15 @@ pmclass Handle provides Handle manual_attrs {
 
     VTABLE void init() :no_wb {
         UNUSED(SELF)
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-            "Handle cannot be instantiated directly.");
+        Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
+            "Handle cannot be instantiated directly");
     }
 
     VTABLE void init_pmc(PMC * init) :no_wb {
         UNUSED(init)
         UNUSED(SELF)
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-            "Handle cannot be instantiated directly.");
+        Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
+            "Handle cannot be instantiated directly");
     }
 
     VTABLE void *get_pointer_keyed_int(INTVAL key) :no_wb {
@@ -213,7 +213,7 @@ Set the record separator for readline.
     METHOD record_separator(STRING *str :optional, int has_str :opt_flag) {
         if (has_str) {
             if (STRING_IS_NULL(str))
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                     "Record separator may not be null");
 
             str = Parrot_io_reencode_string_for_handle(INTERP, SELF, str);

@@ -211,7 +211,7 @@ calls init().
         /* Ensure no looping, as Parrot_pmc_new calls the instantiate vtable entry for
          * classes. */
         if (PObj_is_class_TEST(SELF))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                     "All high-level classes should override instantiate");
 
         if (!PMC_IS_NULL(init))
@@ -281,7 +281,7 @@ Role-y.
         UNUSED(name);
         UNUSED(type);
         UNUSED(SELF);
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
             "Cannot add attribute to non-class");
     }
 
@@ -832,10 +832,10 @@ Add class C<parent> to the list of our parents.
     VTABLE void add_parent(PMC *parent) {
         UNUSED(parent);
         if (!PObj_is_class_TEST(SELF))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                 "Only classes can be subclassed");
 
-        Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+        Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                 "All classes should override add_parent");
     }
 

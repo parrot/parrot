@@ -191,7 +191,7 @@ Sets the value of the key to C<*value>.
     VTABLE void set_pmc(PMC *value) :no_wb {
         UNUSED(SELF)
         UNUSED(value)
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+        Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_UNIMPLEMENTED,
                 "Key.set_pmc is broken - see GH #499");
     }
 
@@ -207,7 +207,7 @@ Appends C<*value> to the key.
 
     void push_pmc(PMC *value) {
         if (value->vtable->base_type != enum_class_Key)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                 "Can only push another Key onto a Key PMC.");
 
         Parrot_key_append(INTERP, SELF, value);
@@ -308,7 +308,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
                 break;
 
               default:
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
+                Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_KEY_NOT_FOUND,
                         "Unsupported key type in Key.freeze");
                 break;
             }
@@ -342,7 +342,7 @@ Called after the Key has been thawed: convert last PMC_NULL key to NULL.
                 break;
 
               default:
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
+                Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_KEY_NOT_FOUND,
                         "Unsupported key type in Key.thaw");
                 break;
             }
@@ -418,21 +418,24 @@ Aggregate interface.
     VTABLE INTVAL get_integer_keyed_int(INTVAL n) :no_wb {
         for (; SELF && n; SELF = PARROT_KEY(SELF)->next_key, n--);
         if (n)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 0, "Key access out of bounds");
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
+                    "Key access out of bounds");
         return Parrot_key_integer(INTERP, SELF);
     }
 
     VTABLE STRING *get_string_keyed_int(INTVAL n) :no_wb {
         for (; SELF && n; SELF = PARROT_KEY(SELF)->next_key, n--);
         if (n)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 0, "Key access out of bounds");
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
+                    "Key access out of bounds");
         return Parrot_key_string(INTERP, SELF);
     }
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL n) :no_wb {
         for (; SELF && n; SELF = PARROT_KEY(SELF)->next_key, n--);
         if (n)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 0, "Key access out of bounds");
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
+                    "Key access out of bounds");
         return Parrot_key_pmc(INTERP, SELF);
     }
 
@@ -450,7 +453,7 @@ Aggregate interface.
                 key_type = KEY_pmc_FLAG;
                 break;
             default:
-                Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+              Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_NULL_REG_ACCESS,
                     "Key: Unknown register set %Ss", set);
         }
         Parrot_key_set_register(INTERP, SELF, idx, (INTVAL)key_type);
@@ -463,7 +466,7 @@ Aggregate interface.
 
     METHOD get_register_idx() :no_wb {
         if (!KEY_register_TEST(SELF))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_KEY_NOT_FOUND,
                 "Key: Key is not a register reference");
         else {
             const INTVAL idx = Parrot_key_integer(INTERP, SELF);
@@ -474,7 +477,7 @@ Aggregate interface.
     METHOD get_register_contents(PMC *ctx :optional, INTVAL has_ctx :opt_flag) :no_wb {
         INTVAL int_key;
         if (!KEY_register_TEST(SELF))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_KEY_NOT_FOUND,
                 "Key: Key is not a register reference");
 
         GETATTR_Key_int_key(interp, SELF, int_key);
@@ -493,7 +496,7 @@ Aggregate interface.
                     RETURN(INTVAL int_val);
                 }
                 default:
-                    Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
                         "Key: Unknown Key type %d", KEY_get_FLAGS(SELF));
             }
         }
@@ -512,7 +515,7 @@ Aggregate interface.
                     RETURN(INTVAL int_val);
                 }
                 default:
-                    Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+                    Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_KEY_NOT_FOUND,
                         "Key: Unknown Key type %d", KEY_get_FLAGS(SELF));
             }
         }

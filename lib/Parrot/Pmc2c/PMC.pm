@@ -1770,7 +1770,7 @@ EOA
 
         if ($isfuncptr == 1) {
             $decl .= <<"EOA";
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, \\
+            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION, \\
                 "Attributes of type '$origtype' cannot be " \\
                 "subclassed from a high-level PMC."); \\
 EOA
@@ -1806,7 +1806,7 @@ EOA
         else {
             $inherit = 0;
             $decl .= <<"EOA";
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, \\
+            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION, \\
                 "Attributes of type '$attrtype' cannot be " \\
                 "subclassed from a high-level PMC."); \\
 EOA
@@ -1825,7 +1825,7 @@ EOA
 
         if ($isfuncptr == 1) {
             $decl .= <<"EOA";
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, \\
+            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION, \\
                 "Attributes of type '$origtype' cannot be " \\
                 "subclassed from a high-level PMC."); \\
 EOA
@@ -1862,7 +1862,7 @@ EOA
 
         else {
             $decl .= <<"EOA";
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, \\
+            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION, \\
                 "Attributes of type '$attrtype' cannot be " \\
                 "subclassed from a high-level PMC."); \\
 EOA

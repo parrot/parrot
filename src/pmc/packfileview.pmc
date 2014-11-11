@@ -222,7 +222,7 @@ otherwise.
         Parrot_PackfileView_attributes * const attrs =
                 PARROT_PACKFILEVIEW(SELF);
         if (attrs->pf != NULL)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                 "Cannot overwrite existing pointer in PackfileView");
         attrs->pf = (PackFile*)ptr;
         /* Do not free an empty pf? See above */
@@ -284,8 +284,8 @@ Get a FLOATVAL from the constants table, by index
         if (!ct)
             return PMCNULL;
         if (idx < 0 || idx >= ct->pmc.const_count) {
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                                        "index out of bounds");
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
+                    "index out of bounds");
         }
         return ct->pmc.constants[idx];
     }
@@ -295,8 +295,8 @@ Get a FLOATVAL from the constants table, by index
         if (!ct)
             return STRINGNULL;
         if (idx < 0 || idx >= ct->str.const_count) {
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                                        "index out of bounds");
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
+                    "index out of bounds");
         }
         return ct->str.constants[idx];
     }
@@ -306,8 +306,8 @@ Get a FLOATVAL from the constants table, by index
         if (!ct)
             return 0.0;
         if (idx < 0 || idx >= ct->num.const_count) {
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                                        "index out of bounds");
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
+                    "index out of bounds");
         }
         return ct->num.constants[idx];
     }
@@ -332,7 +332,7 @@ and PMC constants in the respective constant tables.
     METHOD constant_counts() :no_wb {
         PackFile_ConstTable * const ct = get_const_table(INTERP, SELF);
         if (!ct)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNEXPECTED_NULL,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_UNEXPECTED_NULL,
                 "NULL or Malformed Packfile");
         else {
             PMC * const counts = Parrot_pmc_new(INTERP, enum_class_FixedIntegerArray);
@@ -546,7 +546,7 @@ get_first_sub(PARROT_INTERP, ARGIN(PMC *pfpmc))
     ASSERT_ARGS(get_first_sub)
     PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
     if (!pf || !pf->cur_cs || !pf->cur_cs->const_table)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNEXPECTED_NULL,
             "NULL or invalid packfile");
 
     {

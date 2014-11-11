@@ -1503,7 +1503,7 @@ end:
     ok(0, "'Parent isn\'t a Class' exception not thrown")
     goto end
 handler:
-    .exception_is( "Parent 'Not a class' of 'Astronomical Object 2' isn't a Class." )
+    .exception_is( "Parent 'Not a class' of 'Astronomical Object 2' isn't a Class" )
 end:
 .end
 
@@ -1552,7 +1552,7 @@ end:
     ok(0, "attribute already exists exception not thrown")
     goto end
 handler:
-    .exception_is( "Attribute 'i' already exists in 'Foo53'." )
+    .exception_is( "Attribute 'i' already exists in 'Foo53'" )
 end:
 .end
 
@@ -1563,7 +1563,7 @@ end:
     ok(0, "object instantiation exception not thrown")
     goto end
 handler:
-    .exception_is( "Object must be created by a class." )
+    .exception_is( "Object must be created by a class" )
 end:
 .end
 

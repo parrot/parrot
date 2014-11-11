@@ -258,13 +258,13 @@ pcc_get_args(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
                  IMCC_fatal exceptions? */
         if (arg_flags[i] & VT_CALL_SIG) {
             if ((n > 1 || i != 0) && !(n == 2 && strcmp(args[0]->name, "self") == 0))
-                Parrot_ex_throw_from_c_args(imcc->interp, NULL, EXCEPTION_INTERNAL_PANIC,
+                Parrot_ex_throw_from_c_noargs(imcc->interp, EXCEPTION_INTERNAL_PANIC,
                     ":call_sig must be the first and only parameter besides self");
             if (arg_flags[i] & (VT_FLAT | VT_OPTIONAL | VT_OPT_FLAG | VT_NAMED))
-                Parrot_ex_throw_from_c_args(imcc->interp, NULL, EXCEPTION_INTERNAL_PANIC,
+                Parrot_ex_throw_from_c_noargs(imcc->interp, EXCEPTION_INTERNAL_PANIC,
                     ":call_sig cannot be combined with any other flags");
             if (arg->set != 'P')
-                Parrot_ex_throw_from_c_args(imcc->interp, NULL, EXCEPTION_INTERNAL_PANIC,
+                Parrot_ex_throw_from_c_noargs(imcc->interp, EXCEPTION_INTERNAL_PANIC,
                     ":call_sig must be a PMC");
             flags |= PARROT_ARG_CALL_SIG;
             flags |= PARROT_ARG_PMC;
@@ -306,7 +306,7 @@ pcc_get_args(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
 
         snprintf(s, sizeof (s), "0x%.4x,", flags);
         if (bufpos + lenitem >= bufsize)
-            Parrot_ex_throw_from_c_args(imcc->interp, NULL, EXCEPTION_INTERNAL_PANIC,
+            Parrot_ex_throw_from_c_noargs(imcc->interp, EXCEPTION_INTERNAL_PANIC,
                     "arg string is longer than allocated buffer");
         memcpy(buf + bufpos, s, lenitem);
         bufpos += lenitem;
@@ -428,10 +428,11 @@ expand_pcc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit), ARGIN(Instruct
 
         /* check to make sure the sub is ok before we try to use it */
         if (!sub)
-            Parrot_ex_throw_from_c_args(imcc->interp, NULL, 1, "NULL sub detected");
+            Parrot_ex_throw_from_c_noargs(imcc->interp, EXCEPTION_UNEXPECTED_NULL,
+                    "NULL sub detected");
 
         if (!sub->pcc_sub)
-            Parrot_ex_throw_from_c_args(imcc->interp, NULL, 1,
+            Parrot_ex_throw_from_c_noargs(imcc->interp, EXCEPTION_UNEXPECTED_NULL,
                 "NULL sub->pcc_sub detected");
 
         {
@@ -627,7 +628,7 @@ expand_pcc_sub_call(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
 
     arg = sub->pcc_sub->sub;
     if (arg == NULL)
-        Parrot_ex_throw_from_c_args(imcc->interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+        Parrot_ex_throw_from_c_noargs(imcc->interp, EXCEPTION_UNEXPECTED_NULL,
             "Subroutine is not defined");
 
     if (meth_call) {

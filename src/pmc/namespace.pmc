@@ -543,7 +543,7 @@ really a public API.
             }
         }
 
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
+        Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_GLOBAL_NOT_FOUND,
             "Invalid namespace key in set_pmc_keyed");
     }
 
@@ -606,7 +606,7 @@ really a public API.
             return ns;
         }
         /* If we get the wrong type, should we throw an exception?
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_GLOBAL_NOT_FOUND,
+        Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_GLOBAL_NOT_FOUND,
             "Invalid namespace key in get_pmc_keyed_str");
         */
     }
@@ -1084,11 +1084,11 @@ NOTE: exporting 'default' set of items is not yet implemented.
         STRING * const s_array = CONST_STRING(INTERP, "array");
 
         if (PMC_IS_NULL(dest))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                 "destination namespace not specified");
 
         if (PMC_IS_NULL(what) || !VTABLE_elements(INTERP, what))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_UNIMPLEMENTED,
                 "exporting default object set not yet implemented");
 
         /* if "what" does "hash", we extract string key/value pairs,
@@ -1105,7 +1105,7 @@ NOTE: exporting 'default' set of items is not yet implemented.
                 STRING * const src_name = VTABLE_shift_string(INTERP, iter);
 
                 if (STRING_IS_NULL(src_name) || STRING_IS_EMPTY(src_name))
-                    Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                    Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                         "source object name not specified");
 
                 if (PMC_IS_NULL(VTABLE_get_pmc_keyed_str(INTERP, what, src_name))) {
@@ -1135,7 +1135,7 @@ NOTE: exporting 'default' set of items is not yet implemented.
                 STRING * const name = VTABLE_get_string_keyed_int(INTERP, what, i);
 
                 if (STRING_IS_NULL(name) || STRING_IS_EMPTY(name))
-                    Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                    Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                         "object name not specified");
 
                 object = VTABLE_get_pmc_keyed_str(INTERP, SELF, name);

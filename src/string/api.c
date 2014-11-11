@@ -733,7 +733,7 @@ Parrot_str_new_from_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *buffer),
                 Parrot_platform_encoding_ptr :
                 Parrot_find_encoding_by_string(interp, encodingname);
         if (encoding == NULL)
-            Parrot_ex_throw_from_c_args(interp, NULL,
+            Parrot_ex_throw_from_c_noargs(interp,
                     EXCEPTION_INVALID_ENCODING, "Invalid encoding");
         else {
             int size = strlen(buffer);
@@ -865,9 +865,9 @@ Parrot_str_extract_chars(PARROT_INTERP, ARGIN(const char *buffer),
     encoding->partial_scan(interp, buffer, &bounds);
 
     if (bounds.chars < chars)
-        Parrot_ex_throw_from_c_args(interp, NULL,
-                                    EXCEPTION_OUT_OF_BOUNDS,
-                                   "index out of bounds");
+        Parrot_ex_throw_from_c_noargs(interp,
+                EXCEPTION_OUT_OF_BOUNDS,
+                "index out of bounds");
 
     result = Parrot_str_new_noinit(interp, bounds.bytes);
 
@@ -1282,7 +1282,7 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
     INTVAL          buf_size;
 
     if (STRING_IS_NULL(src)) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNEXPECTED_NULL,
             "Can't replace in NULL string");
     }
 
@@ -1295,7 +1295,7 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
      * Only give exception if caller trys to replace end of string + 2
      */
     if (true_offset > src->strlen)
-        Parrot_ex_throw_from_c_args(interp, NULL,
+        Parrot_ex_throw_from_c_noargs(interp,
             EXCEPTION_SUBSTR_OUT_OF_STRING,
             "Can only replace inside string or index after end of string");
 
@@ -1332,7 +1332,7 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
 
     /* not possible.... */
     if (end_byte < start_byte)
-        Parrot_ex_throw_from_c_args(interp, NULL,
+        Parrot_ex_throw_from_c_noargs(interp,
             EXCEPTION_SUBSTR_OUT_OF_STRING,
             "replace: subend somehow is less than substart");
 
@@ -2268,7 +2268,7 @@ Parrot_str_to_encoded_cstring(PARROT_INTERP, ARGIN(const STRING *s),
     char   *p;
 
     if (STRING_IS_NULL(s))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNEXPECTED_NULL,
             "Can't convert NULL string");
 
     if (s->encoding != enc) {
@@ -2904,7 +2904,7 @@ Parrot_str_upcase(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_upcase)
     if (STRING_IS_NULL(s))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNEXPECTED_NULL,
             "Can't upcase NULL string");
     else {
         STRING * const res = STRING_upcase(interp, s);
@@ -2934,7 +2934,7 @@ Parrot_str_downcase(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
     ASSERT_ARGS(Parrot_str_downcase)
 
     if (STRING_IS_NULL(s))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNEXPECTED_NULL,
             "Can't downcase NULL string");
     else {
         STRING * const res = STRING_downcase(interp, s);
@@ -2964,7 +2964,7 @@ Parrot_str_titlecase(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
     ASSERT_ARGS(Parrot_str_titlecase)
 
     if (STRING_IS_NULL(s))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNEXPECTED_NULL,
             "Can't titlecase NULL string");
     else {
         STRING * const res = STRING_titlecase(interp, s);

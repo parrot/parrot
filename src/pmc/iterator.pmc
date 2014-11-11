@@ -74,7 +74,7 @@ Raises an exception. Use C<init_pmc()>.
 
     VTABLE void init() :no_wb {
         UNUSED(SELF)
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                 "Iterator init without aggregate");
     }
 
@@ -92,7 +92,7 @@ Defaults iteration mode to iterate from start.
     VTABLE void init_pmc(PMC *aggregate) :no_wb {
         UNUSED(SELF)
         UNUSED(aggregate)
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                 "Direct creation of Iterator");
     }
 
@@ -214,7 +214,7 @@ Restart iterator
         UNUSED(value)
         UNUSED(SELF)
         PARROT_FAILURE("Iterator: implementation has to override this method");
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+        Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_UNIMPLEMENTED,
                 "Iterator: unimplemented method");
     }
 }

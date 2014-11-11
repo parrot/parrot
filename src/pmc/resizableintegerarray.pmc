@@ -62,8 +62,8 @@ Returns the integer value of the element at index C<key>.
         if (key < 0)
             key += size;
         if (key < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "index out of bounds");
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
+                    "index out of bounds");
 
         if (key >= size)
             return 0;
@@ -90,8 +90,8 @@ Sets the integer value of the element at index C<key> to C<value>.
         if (key < 0)
             key += size;
         if (key < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "index out of bounds");
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
+                    "index out of bounds");
 
         if (key >= SELF.get_integer())
             SELF.set_integer_native(key + 1);
@@ -115,8 +115,8 @@ Resizes the array to C<size> elements.
         INTVAL  resize_threshold;
 
         if (size < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "illegal argument");
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
+                    "illegal argument");
 
         GET_ATTR_int_array(INTERP, SELF, int_array);
         GET_ATTR_resize_threshold(INTERP, SELF, resize_threshold);
@@ -202,7 +202,7 @@ Removes and returns the last element in the array.
         GET_ATTR_size(INTERP, SELF, size);
 
         if (size == 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "Can't pop from an empty array");
 
         value = SELF.get_integer_keyed_int(size-1);
@@ -225,7 +225,7 @@ Removes and returns an item from the start of the array.
         GET_ATTR_size(INTERP, SELF, size);
 
         if (size == 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "Can't shift from an empty array");
 
         GET_ATTR_int_array(INTERP, SELF, int_array);
@@ -274,7 +274,7 @@ Removes the element at C<key>.
         GET_ATTR_size(INTERP, SELF, size);
 
         if (size < 1 || key >= size)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "index out of bounds");
 
         GET_ATTR_int_array(INTERP, SELF, int_array);

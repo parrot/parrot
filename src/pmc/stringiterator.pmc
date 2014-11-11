@@ -164,7 +164,7 @@ Reset the Iterator. C<value> must be one of
             iter->charpos = str_val->strlen;
         }
         else {
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                     "Wrong direction for StringIterator");
         }
     }
@@ -206,7 +206,7 @@ Shift next character from C<string> as PMC.
 
         GET_ATTR_str_val(INTERP, SELF, str_val);
         if (iter->charpos >= str_val->strlen)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
         ret = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(interp, enum_class_String));
@@ -232,7 +232,7 @@ Shift next character from C<string>.
 
         GET_ATTR_str_val(INTERP, SELF, str_val);
         if (iter->charpos >= str_val->strlen)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
         STRING_iter_skip(INTERP, str_val, iter, 1);
@@ -255,7 +255,7 @@ Shift next character code from C<string>.
 
         GET_ATTR_str_val(INTERP, SELF, str_val);
         if (iter->charpos >= str_val->strlen)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
         PARROT_GC_WRITE_BARRIER(INTERP, SELF);
@@ -280,7 +280,7 @@ Shift "next" character from C<string> for reverse iterator as PMC.
         GET_ATTR_str_val(INTERP, SELF, str_val);
         /* Shouldn't this test be (iter->charpos <= 0) ? */
         if (SELF.elements() <= 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
         ret = Parrot_pmc_new(INTERP, Parrot_hll_get_ctx_HLL_type(interp, enum_class_String));
@@ -307,7 +307,7 @@ Shift "next" character from C<string> for reverse iterator.
         GET_ATTR_str_val(INTERP, SELF, str_val);
         /* Shouldn't this test be (iter->charpos <= 0) ? */
         if (SELF.elements() <= 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
         STRING_iter_skip(INTERP, str_val, iter, -1);
@@ -331,7 +331,7 @@ Shift "next" character code from C<string> for reverse iterator.
         GET_ATTR_str_val(INTERP, SELF, str_val);
         /* Shouldn't this test be (iter->charpos <= 0) ? */
         if (SELF.elements() <= 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
         STRING_iter_skip(INTERP, str_val, iter, -1);
@@ -356,7 +356,7 @@ Get integer value of current position plus idx.
 
         GET_ATTR_str_val(INTERP, SELF, str_val);
         if (offset >= str_val->strlen)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
         return STRING_iter_get(INTERP, str_val, iter, idx);
@@ -380,7 +380,7 @@ Get string value of current position plus idx.
 
         GET_ATTR_str_val(INTERP, SELF, str_val);
         if (offset >= str_val->strlen)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
         if (idx != 0)

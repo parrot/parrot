@@ -259,7 +259,7 @@ Parrot_io_internal_async(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL async)
 
     file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
 #else
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_NOT_IMPLEMENTED,
+    Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_PIO_NOT_IMPLEMENTED,
         "Async support not available");
 #endif
     return -1;
@@ -604,7 +604,7 @@ fail:
         CloseHandle(procinfo.hThread);
     if (procinfo.hProcess != INVALID_HANDLE_VALUE)
         CloseHandle(procinfo.hProcess);
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+    Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
         "pipe open error");
 }
 

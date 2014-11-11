@@ -494,7 +494,7 @@ Introspection interface. C<key> can be:
             level = 1;
 
         if (level < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                 "No such caller depth");
 
         ctx = CURRENT_CONTEXT(INTERP);
@@ -503,7 +503,7 @@ Introspection interface. C<key> can be:
             for (; level; --level) {
                 ctx = Parrot_pcc_get_outer_ctx(INTERP, ctx);
                 if (PMC_IS_NULL(ctx))
-                    Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    Parrot_ex_throw_from_c_noargs(INTERP,
                         EXCEPTION_INVALID_OPERATION, "No such outer depth");
             }
         }
@@ -512,13 +512,13 @@ Introspection interface. C<key> can be:
                 PMC * const cont = Parrot_pcc_get_continuation(INTERP, ctx);
 
                 if (PMC_IS_NULL(cont) || !PARROT_CONTINUATION(cont)->seg)
-                    Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    Parrot_ex_throw_from_c_noargs(INTERP,
                         EXCEPTION_INVALID_OPERATION, "No such caller depth");
 
                 ctx = PARROT_CONTINUATION(cont)->to_ctx;
 
                 if (PMC_IS_NULL(Parrot_pcc_get_sub(INTERP, ctx)))
-                    Parrot_ex_throw_from_c_args(INTERP, NULL,
+                    Parrot_ex_throw_from_c_noargs(INTERP,
                         EXCEPTION_INVALID_OPERATION, "No such caller depth");
             }
         }
@@ -546,7 +546,7 @@ Introspection interface. C<key> can be:
             if (ctx == CURRENT_CONTEXT(INTERP)) {
                 /* We can't know the current program counter for the currently
                  * executing sub, so can't return annotations for that. */
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                         "Cannot get annotations at depth 0; use annotations op instead.");
             }
             if (!PMC_IS_NULL(sub_pmc)
@@ -690,7 +690,7 @@ Finish thawing.
     VTABLE void freeze(PMC *info) :no_wb {
         UNUSED(SELF)
         UNUSED(info)
-        Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+        Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                 "Attempt to freeze interpreter");
     }
 

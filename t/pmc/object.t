@@ -28,12 +28,12 @@ Tests the Object PMC.
 .end
 
 .sub test_new
-    throws_substring(<<'CODE', 'Object must be created by a class.', 'new Object fails')
+    throws_substring(<<'CODE', 'Object must be created by a class', 'new Object fails')
     .sub main
         new $P0, ['Object']
     .end
 CODE
-    throws_substring(<<'CODE', 'Object must be created by a class.', 'new(pmc) Object fails')
+    throws_substring(<<'CODE', 'Object must be created by a class', 'new(pmc) Object fails')
     .sub main
         new $P0, ['String']
         new $P1, ['Object'], $P0

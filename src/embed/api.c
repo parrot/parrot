@@ -635,7 +635,7 @@ Parrot_api_reset_call_signature(Parrot_PMC interp_pmc, ARGMOD(Parrot_PMC ctx))
     EMBED_API_CALLIN(interp_pmc, interp)
     STRING * const callcontext = Parrot_str_new(interp, "CallContext", 0);
     if (!VTABLE_isa(interp, ctx, callcontext))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
             "Not a valid CallContext");
     VTABLE_morph(interp, ctx, PMCNULL);
     EMBED_API_CALLOUT(interp_pmc, interp)

@@ -40,8 +40,8 @@ Throws an exception.  Opcode PMCs are not to be created directly.
 
     VTABLE void init() :no_wb {
         UNUSED(SELF)
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-            "Opcode must be created from OpLib.");
+        Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
+            "Opcode must be created from OpLib");
     }
 
 /*
@@ -58,7 +58,7 @@ the pointer has already been set.  See also C<set_integer_native()>, below.
     VTABLE void set_pointer(void *i) {
         Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
         if (attrs->info)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                 "Opcode has already been initialized");
         attrs->info = (op_info_t *)i;
     }
@@ -102,7 +102,7 @@ Throws an exception if set_pointer has already been called.
     VTABLE void set_integer_native(INTVAL value) {
         Parrot_Opcode_attributes * const attrs = PARROT_OPCODE(SELF);
         if (attrs->info)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                 "Opcode has already been initialized");
         attrs->op_number = value;
     }

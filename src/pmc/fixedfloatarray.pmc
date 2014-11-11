@@ -103,7 +103,7 @@ Initializes the array.
 
     VTABLE void init_int(INTVAL size) {
         if (size < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "illegal argument");
 
         SET_ATTR_size(INTERP, SELF, size);
@@ -249,7 +249,7 @@ Returns the floating-point value of the element at index C<key>.
         if (key < 0)
             key += size;
         if (key < 0 || key >= size)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "index out of bounds");
 
         GET_ATTR_float_array(INTERP, SELF, float_array);
@@ -367,7 +367,7 @@ Resizes the array to C<size> elements.
         INTVAL old_size;
         GET_ATTR_size(INTERP, SELF, old_size);
         if (old_size || new_size < 1)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "Can't resize");
 
         SET_ATTR_size(INTERP, SELF, new_size);
@@ -424,7 +424,7 @@ C<value>.
         if (key < 0)
             key += size;
         if (key < 0 || key >= size)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "index out of bounds");
 
         GET_ATTR_float_array(INTERP, SELF, float_array);

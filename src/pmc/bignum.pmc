@@ -173,6 +173,12 @@ typedef struct BIGNUM {
 } BIGNUM;
 #endif
 
+#define NO_MULTIPLE_DISPATCH(name)                \
+    Parrot_ex_throw_from_c_args(interp, NULL,     \
+            EXCEPTION_INTERNAL_NOT_IMPLEMENTED,   \
+            "BigNum: no multiple dispatch variant '%s' for %Ss", \
+            (name), VTABLE_name(interp, value))
+
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -681,7 +687,7 @@ bignum_get_si(PARROT_INTERP, ARGIN(PMC *self)) {
     if (mpf_fits_slong_p(bn->b))
         return mpf_get_si(bn->b);
 
-    Parrot_ex_throw_from_c_args(interp, NULL, 1, "bignum_get_si: number too big");
+    Parrot_ex_throw_from_c_noargs(interp, 1, "bignum_get_si: number too big");
 }
 
 PARROT_WARN_UNUSED_RESULT
@@ -694,7 +700,7 @@ bignum_get_ui(PARROT_INTERP, ARGIN(PMC *self)) {
     if (mpf_fits_slong_p(bn->b))
         return mpf_get_ui(bn->b);
 
-    Parrot_ex_throw_from_c_args(interp, NULL, 1, "bignum_get_ui: number too big");
+    Parrot_ex_throw_from_c_noargs(interp, 1, "bignum_get_ui: number too big");
 }
 
 PARROT_WARN_UNUSED_RESULT
@@ -894,7 +900,7 @@ bignum_pow_bignum_int(PARROT_INTERP, ARGIN(PMC *self), INTVAL value, ARGMOD(PMC 
 static void
 int_check_divide_zero(PARROT_INTERP, INTVAL value) {
     if (value == 0)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_DIV_BY_ZERO,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
 }
 
@@ -904,7 +910,7 @@ bignum_check_divide_zero(PARROT_INTERP, ARGIN(PMC *value)) {
     const BIGNUM *bn;
     GETATTR_BigNum_bn(interp, value, bn);
     if (mpf_cmp_si(bn->b, 0) == 0)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_DIV_BY_ZERO,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
 }
 
@@ -1107,7 +1113,7 @@ bignum_get_bigint(PARROT_INTERP, ARGIN(PMC *self)) {
         bi_dest->b = mpf_get_ui(bn->b);
     }
     else {
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+        Parrot_ex_throw_from_c_noargs(interp, 1,
             "bignum_get_bigint: Precision loss");
     }
     return bi_dest;
@@ -1127,7 +1133,7 @@ typedef struct BIGNUM {
     FLOATVAL b; /* bogus definition for users without libgmp*/
 } BIGNUM;
 
-#  define THROW_NOGMP Parrot_ex_throw_from_c_args(interp, NULL, \
+#  define THROW_NOGMP Parrot_ex_throw_from_c_noargs(interp, \
                         EXCEPTION_LIBRARY_ERROR, "no bignum lib loaded")
 
 static void
@@ -1563,7 +1569,7 @@ Trunc the BigNum to an BigInt.
         return bignum_get_bigint(INTERP, SELF);
 #else
         UNUSED(SELF)
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_LIBRARY_ERROR,
+        Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_LIBRARY_ERROR,
             "no bigint support in bignum");
 #endif
     }
@@ -1684,10 +1690,7 @@ Decrement the BigNum by 1.0.
     MULTI PMC *add(DEFAULT value, PMC *dest) :no_wb {
         UNUSED(SELF)
         UNUSED(dest)
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
-            EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-            "BigNum: no multiple dispatch variant 'add' for %Ss",
-            VTABLE_name(INTERP, value));
+        NO_MULTIPLE_DISPATCH("add");
     }
 
     VTABLE PMC *add_int(INTVAL value, PMC *dest) :no_wb {
@@ -1711,10 +1714,7 @@ Decrement the BigNum by 1.0.
 
     MULTI void i_add(DEFAULT value) :no_wb {
         UNUSED(SELF)
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
-            EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-            "BigNum: no multiple dispatch variant 'i_add' for %Ss",
-            VTABLE_name(INTERP, value));
+        NO_MULTIPLE_DISPATCH("i_add");
     }
 
     VTABLE void i_add_int(INTVAL value) {
@@ -1750,10 +1750,7 @@ Decrement the BigNum by 1.0.
     MULTI PMC *subtract(DEFAULT value, PMC *dest) :no_wb {
         UNUSED(SELF)
         UNUSED(dest)
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
-            EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-            "BigNum: no multiple dispatch variant 'subtract' for %Ss",
-            VTABLE_name(INTERP, value));
+        NO_MULTIPLE_DISPATCH("substract");
     }
 
     VTABLE PMC *subtract_int(INTVAL value, PMC *dest) :no_wb {
@@ -1777,10 +1774,7 @@ Decrement the BigNum by 1.0.
 
     MULTI void i_subtract(DEFAULT value) :no_wb {
         UNUSED(SELF)
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
-            EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-            "BigNum: no multiple dispatch variant 'i_subtract' for %Ss",
-            VTABLE_name(INTERP, value));
+        NO_MULTIPLE_DISPATCH("i_subtract");
     }
 
     VTABLE void i_subtract_int(INTVAL value) {
@@ -1816,10 +1810,7 @@ Decrement the BigNum by 1.0.
     MULTI PMC *multiply(DEFAULT value, PMC *dest) :no_wb {
         UNUSED(SELF)
         UNUSED(dest)
-         Parrot_ex_throw_from_c_args(INTERP, NULL,
-            EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-            "BigNum: no multiple dispatch variant 'multiply' for %Ss",
-            VTABLE_name(INTERP, value));
+        NO_MULTIPLE_DISPATCH("multiply");
     }
 
     VTABLE PMC *multiply_int(INTVAL value, PMC *dest) :no_wb {
@@ -1843,10 +1834,7 @@ Decrement the BigNum by 1.0.
 
     MULTI void i_multiply(DEFAULT value) :no_wb {
         UNUSED(SELF)
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
-            EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-            "BigNum: no multiple dispatch variant 'i_multiply' for %Ss",
-            VTABLE_name(INTERP, value));
+        NO_MULTIPLE_DISPATCH("i_multiply");
     }
 
     VTABLE void i_multiply_int(INTVAL value) {
@@ -1905,10 +1893,7 @@ TODO: Only supports Integer values for now.
     MULTI PMC *divide(DEFAULT value, PMC *dest) :no_wb {
         UNUSED(SELF)
         UNUSED(dest)
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
-            EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-            "BigNum: no multiple dispatch variant 'divide' for %Ss",
-            VTABLE_name(INTERP, value));
+        NO_MULTIPLE_DISPATCH("divide");
     }
 
     VTABLE PMC *divide_int(INTVAL value, PMC *dest) :no_wb {
@@ -1936,10 +1921,7 @@ TODO: Only supports Integer values for now.
     }
     MULTI void i_divide(DEFAULT value) :no_wb {
         UNUSED(SELF)
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
-            EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-            "BigNum: no multiple dispatch variant 'i_divide' for %Ss",
-            VTABLE_name(INTERP, value));
+        NO_MULTIPLE_DISPATCH("i_divide");
     }
 
     VTABLE void i_divide_int(INTVAL value) {
@@ -1971,10 +1953,7 @@ TODO: Only supports Integer values for now.
     MULTI PMC *floor_divide(DEFAULT value, PMC *dest) :no_wb {
         UNUSED(SELF)
         UNUSED(dest)
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
-            EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-            "BigNum: no multiple dispatch variant 'floor_divide' for %Ss",
-            VTABLE_name(INTERP, value));
+        NO_MULTIPLE_DISPATCH("floor_divide");
     }
 
     VTABLE PMC *floor_divide_int(INTVAL value, PMC *dest) :no_wb {
@@ -1994,10 +1973,7 @@ TODO: Only supports Integer values for now.
 
     MULTI void i_floor_divide(DEFAULT value) :no_wb {
         UNUSED(SELF)
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
-            EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-            "BigNum: no multiple dispatch variant 'i_floor_divide' for %Ss",
-            VTABLE_name(INTERP, value));
+        NO_MULTIPLE_DISPATCH("i_floor_divide");
     }
 
     VTABLE void i_floor_divide_int(INTVAL value) {
@@ -2022,10 +1998,7 @@ TODO: Only supports Integer values for now.
 
     MULTI INTVAL cmp(DEFAULT value) :no_wb {
         UNUSED(SELF)
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
-            EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-            "BigNum: no multiple dispatch variant 'cmp' for %Ss",
-            VTABLE_name(INTERP, value));
+        NO_MULTIPLE_DISPATCH("cmp");
     }
 
 /*
@@ -2046,10 +2019,7 @@ TODO: Only supports Integer values for now.
 
     MULTI INTVAL is_equal(DEFAULT value) :no_wb {
         UNUSED(SELF)
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
-            EXCEPTION_INTERNAL_NOT_IMPLEMENTED,
-            "BigNum: no multiple dispatch variant 'is_equal' for %Ss",
-            VTABLE_name(INTERP, value));
+        NO_MULTIPLE_DISPATCH("is_equal");
     }
 
 /*

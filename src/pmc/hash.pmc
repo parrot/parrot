@@ -221,7 +221,7 @@ NB: this method will destroy all old data!
           default:
             /* We probably will not implement other types of keys. They are way
              * too dangerous to use from PIR */
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_UNIMPLEMENTED,
                 "Hash: Unknown key type");
         }
 
@@ -397,9 +397,9 @@ Returns the integer value for the element at C<*key>.
 
         if (PObj_constant_TEST(SELF)
         && !PObj_constant_TEST((const PObj *)key))
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
+            Parrot_ex_throw_from_c_noargs(INTERP,
                 EXCEPTION_INVALID_OPERATION,
-                "Used non-constant PMC key in constant hash.");
+                "Used non-constant PMC key in constant hash");
 
         key = Parrot_key_next(INTERP, key);
 
@@ -434,9 +434,9 @@ Returns the integer value for the element at C<*key>.
 
         if (PObj_constant_TEST(SELF)
         && !PObj_constant_TEST((PObj *)key))
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
+            Parrot_ex_throw_from_c_noargs(INTERP,
                 EXCEPTION_INVALID_OPERATION,
-                "Used non-constant key in constant hash.");
+                "Used non-constant key in constant hash");
 
         Parrot_hash_put(INTERP, hash, Parrot_hash_key_from_string(INTERP, hash, key),
                 Parrot_hash_value_from_int(INTERP, hash, value));
@@ -583,13 +583,13 @@ Returns the string value for the element at C<*key>.
 
         if (PObj_constant_TEST(SELF)){
             if (!PObj_constant_TEST((PObj *)key))
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                Parrot_ex_throw_from_c_noargs(INTERP,
                     EXCEPTION_INVALID_OPERATION,
-                    "Used non-constant PMC key in constant hash.");
+                    "Used non-constant PMC key in constant hash");
             if (!PObj_constant_TEST((PObj *)value))
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                Parrot_ex_throw_from_c_noargs(INTERP,
                     EXCEPTION_INVALID_OPERATION,
-                    "Used non-constant STRING value in constant hash.");
+                    "Used non-constant STRING value in constant hash");
         }
 
         key = Parrot_key_next(INTERP, key);
@@ -619,13 +619,13 @@ Returns the string value for the element at C<*key>.
 
         if (PObj_constant_TEST(SELF)){
             if (!PObj_constant_TEST((PObj *)key))
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                Parrot_ex_throw_from_c_noargs(INTERP,
                     EXCEPTION_INVALID_OPERATION,
-                    "Used non-constant STRING key in constant hash.");
+                    "Used non-constant STRING key in constant hash");
             if (!PObj_constant_TEST((PObj *)value))
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                Parrot_ex_throw_from_c_noargs(INTERP,
                     EXCEPTION_INVALID_OPERATION,
-                    "Used non-constant STRING value in constant hash.");
+                    "Used non-constant STRING value in constant hash");
         }
 
         Parrot_hash_put(INTERP, hash, Parrot_hash_key_from_string(INTERP, hash, key),
@@ -637,9 +637,9 @@ Returns the string value for the element at C<*key>.
 
         if ((PObj_constant_TEST(SELF))
         && (!PObj_constant_TEST((PObj *)value)))
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
+            Parrot_ex_throw_from_c_noargs(INTERP,
                 EXCEPTION_INVALID_OPERATION,
-                "Used non-constant STRING value in constant hash.");
+                "Used non-constant STRING value in constant hash");
 
         Parrot_hash_put(INTERP, hash,
                 Parrot_hash_key_from_int(INTERP, hash, key),
@@ -728,9 +728,9 @@ Returns the PMC value for the element at C<*key>.
 
         if (PObj_constant_TEST(SELF)
         && !PObj_constant_TEST((PObj *)key))
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
+            Parrot_ex_throw_from_c_noargs(INTERP,
                 EXCEPTION_INVALID_OPERATION,
-                "Used non-constant PMC key in constant hash.");
+                "Used non-constant PMC key in constant hash");
 
         key = Parrot_key_next(INTERP, key);
 
@@ -761,9 +761,9 @@ Sets C<value> as the value for C<*key>.
 
         if (PObj_constant_TEST(SELF)
         && !PObj_constant_TEST((PObj *)key))
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
+            Parrot_ex_throw_from_c_noargs(INTERP,
                 EXCEPTION_INVALID_OPERATION,
-                "Used non-constant STRING key in constant hash.");
+                "Used non-constant STRING key in constant hash");
 
         Parrot_hash_put(INTERP, hash, Parrot_hash_key_from_string(INTERP, hash, key),
                 Parrot_hash_value_from_number(INTERP, hash, value));
@@ -783,14 +783,14 @@ Sets C<value> as the value for C<*key>.
 
         if (PObj_constant_TEST(SELF)) {
             if (!PObj_constant_TEST((PObj *)key))
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                Parrot_ex_throw_from_c_noargs(INTERP,
                     EXCEPTION_INVALID_OPERATION,
-                    "Used non-constant PMC key in constant hash.");
+                    "Used non-constant PMC key in constant hash");
 
             if (!PObj_constant_TEST((PObj *)value))
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                Parrot_ex_throw_from_c_noargs(INTERP,
                     EXCEPTION_INVALID_OPERATION,
-                    "Used non-constant PMC value in constant hash.");
+                    "Used non-constant PMC value in constant hash");
         }
 
         key = Parrot_key_next(INTERP, key);
@@ -821,14 +821,14 @@ Sets C<*value> as the value for C<*key>.
 
         if (PObj_constant_TEST(SELF)) {
             if (!PObj_constant_TEST((PObj *)key))
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                Parrot_ex_throw_from_c_noargs(INTERP,
                     EXCEPTION_INVALID_OPERATION,
-                    "Used non-constant STRING key in constant hash.");
+                    "Used non-constant STRING key in constant hash");
 
             if (!PObj_constant_TEST((PObj *)value))
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                Parrot_ex_throw_from_c_noargs(INTERP,
                     EXCEPTION_INVALID_OPERATION,
-                    "Used non-constant STRING value in constant hash.");
+                    "Used non-constant STRING value in constant hash");
         }
 
         Parrot_hash_put(INTERP, hash, Parrot_hash_key_from_string(INTERP, hash, key),
@@ -850,9 +850,9 @@ Sets C<*value> as the value for C<*key>.
 
         if (PObj_constant_TEST(SELF)
         && (!PObj_constant_TEST((PObj *)value)))
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                Parrot_ex_throw_from_c_noargs(INTERP,
                     EXCEPTION_INVALID_OPERATION,
-                    "Used non-constant PMC value in constant hash.");
+                    "Used non-constant PMC value in constant hash");
 
         Parrot_hash_put(INTERP, hash,
                 Parrot_hash_key_from_int(INTERP, hash, key),
@@ -1232,7 +1232,7 @@ entries with the same key.
                     (Hash *)VTABLE_get_pointer(INTERP, other));
         }
         else {
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_UNIMPLEMENTED,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_UNIMPLEMENTED,
                         "Hash: don't know how to update from a non-Hash type");
         }
     }
@@ -1291,9 +1291,9 @@ static void
 entry_type_must_be_pmc(PARROT_INTERP)
 {
     ASSERT_ARGS(entry_type_must_be_pmc)
-    Parrot_ex_throw_from_c_args(interp, NULL,
+    Parrot_ex_throw_from_c_noargs(interp,
             EXCEPTION_INVALID_OPERATION,
-            "Hash entry type must be PMC for multipart keys.");
+            "Hash entry type must be PMC for multipart keys");
 }
 
 PARROT_DOES_NOT_RETURN
@@ -1301,7 +1301,7 @@ static void
 cannot_autovivify_nested(PARROT_INTERP)
 {
     ASSERT_ARGS(cannot_autovivify_nested)
-    Parrot_ex_throw_from_c_args(interp, NULL,
+    Parrot_ex_throw_from_c_noargs(interp,
             EXCEPTION_INVALID_OPERATION,
             "Cannot autovivify nested hashes");
 }

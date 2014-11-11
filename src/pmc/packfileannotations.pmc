@@ -214,7 +214,7 @@ Initialize PackfileAnnotations from PackFile_Annotations*.
         opcode_t i;
 
         if (!attrs->const_table)
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
+            Parrot_ex_throw_from_c_noargs(INTERP,
                     EXCEPTION_MALFORMED_PACKFILE, "No constant table");
 
 
@@ -248,7 +248,7 @@ Initialize PackfileAnnotations from PackFile_Annotations*.
                         break;
                     default:
                         Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_MALFORMED_PACKFILE,
-                                "Unknown value type %d in Packfile Annotation", key->type);
+                                "Unknown value type %d in PackfileAnnotations", key->type);
                 }
 
                 VTABLE_push_pmc(INTERP, attrs->annotations, annotation);
@@ -335,7 +335,7 @@ Create PackFile_Annotations* from self.
                             &value_id);
                     break;
                 default:
-                    Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_MALFORMED_PACKFILE,
+                    Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_MALFORMED_PACKFILE,
                             "Unknown value type in PackfileAnnotation");
             }
 

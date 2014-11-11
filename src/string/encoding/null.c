@@ -67,7 +67,7 @@ null_error(PARROT_INTERP)
 {
     ASSERT_ARGS(null_error)
 
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+    Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNEXPECTED_NULL,
         "Invalid operation on null string");
 }
 

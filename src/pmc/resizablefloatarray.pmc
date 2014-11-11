@@ -43,7 +43,7 @@ Returns the floating-point value of the element at index C<key>.
         if (key < 0)
             key += size;
         if (key < 0)
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                         "index out of bounds");
         if (key >= size)
             return 0.0;
@@ -71,7 +71,7 @@ C<value>.
         if (key < 0)
             key += size;
         if (key < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "index out of bounds");
 
         if (key >= size)
@@ -103,8 +103,8 @@ equal to three quarters of the old size).
         INTVAL    resize_threshold;
 
         if (size < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                "illegal argument");
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
+                    "illegal argument");
 
         GET_ATTR_float_array(INTERP, SELF, float_array);
         GET_ATTR_resize_threshold(INTERP, SELF, resize_threshold);
@@ -193,7 +193,7 @@ Removes and returns the last element in the array.
         GET_ATTR_size(INTERP, SELF, size);
 
         if (size == 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "Can't pop from an empty array");
 
         value = SELF.get_number_keyed_int(size-1);
@@ -217,8 +217,8 @@ Removes and returns an item from the start of the array.
         GET_ATTR_size(INTERP, SELF, size);
 
         if (size == 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                                        _("Can't shift from an empty array"));
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
+                    "Can't shift from an empty array");
 
         GET_ATTR_float_array(INTERP, SELF, float_array);
         value             = float_array[0];

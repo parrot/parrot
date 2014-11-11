@@ -858,7 +858,7 @@ Parrot_interp_info(PARROT_INTERP, INTVAL what)
         break;
       default:        /* or a warning only? */
         ret = -1;
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                 "illegal argument in Parrot_interp_info");
     }
     return ret;
@@ -901,7 +901,7 @@ Parrot_interp_info_p(PARROT_INTERP, INTVAL what)
         result = Parrot_cx_current_task(interp);
         break;
       default:        /* or a warning only? */
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                 "illegal argument in Parrot_interp_info_p");
     }
 
@@ -1006,7 +1006,7 @@ Parrot_interp_info_s(PARROT_INTERP, INTVAL what)
             break;
 #endif
       default:
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNIMPLEMENTED,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNIMPLEMENTED,
                 "illegal argument in Parrot_interp_info_s");
     }
     return CONST_STRING(interp, ""); /* in case of errors */

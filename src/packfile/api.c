@@ -331,7 +331,7 @@ Parrot_pf_deserialize(PARROT_INTERP, ARGIN(STRING *str))
 
     if (!PackFile_unpack(interp, pf, ptr, length)) {
         PackFile_destroy(interp, pf);
-        Parrot_ex_throw_from_c_args(interp, NULL,
+        Parrot_ex_throw_from_c_noargs(interp,
             EXCEPTION_MALFORMED_PACKFILE, "Can't unpack packfile");
     }
     return pf;
@@ -386,7 +386,7 @@ Parrot_pf_tag_constant(PARROT_INTERP, ARGIN(PackFile_ConstTable *ct),
             hi = cur;
             break;
           default:
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
                                         "Non POSIX strcmp");
         }
     }
@@ -417,7 +417,7 @@ Parrot_pf_subs_by_tag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
     int mode = 0;
     PMC * const subs = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
     if (!pf || !pf->cur_cs || !pf->cur_cs->const_table)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNEXPECTED_NULL,
             "NULL or invalid packfile");
 
     if (STRING_equal(interp, flag, CONST_STRING(interp, "load")))
@@ -456,7 +456,7 @@ Parrot_pf_subs_by_tag(PARROT_INTERP, ARGIN(PMC * pfpmc), ARGIN(STRING * flag))
                 top_hi = cur;
                 break;
               default:
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+                Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
                                             "Non POSIX strcmp");
             }
         }
@@ -557,7 +557,7 @@ Parrot_pf_all_tags_list(PARROT_INTERP, ARGIN(PMC * pfpmc))
     PMC * const tags = Parrot_pmc_new(interp, enum_class_ResizableStringArray);
 
     if (!pf || !pf->cur_cs || !pf->cur_cs->const_table)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNEXPECTED_NULL,
             "NULL or invalid packfile");
     {
         PackFile_ConstTable * const ct = pf->cur_cs->const_table;
@@ -596,7 +596,7 @@ Parrot_pf_all_tagged_pmcs(PARROT_INTERP, ARGIN(PMC * pfpmc))
     PMC * const taghash = Parrot_pmc_new(interp, enum_class_Hash);
 
     if (!pf || !pf->cur_cs || !pf->cur_cs->const_table)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNEXPECTED_NULL,
             "NULL or invalid packfile");
     {
         PackFile_ConstTable * const ct = pf->cur_cs->const_table;
@@ -637,7 +637,7 @@ Parrot_pf_all_subs(PARROT_INTERP, ARGIN(PMC *pfpmc))
     ASSERT_ARGS(Parrot_pf_all_subs)
     PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
     if (!pf || !pf->cur_cs || !pf->cur_cs->const_table)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNEXPECTED_NULL,
             "NULL or invalid packfile");
 
     {
@@ -928,7 +928,7 @@ Parrot_pf_get_packfile_main_sub(PARROT_INTERP, ARGIN(PMC * pbc))
     ASSERT_ARGS(Parrot_pf_get_packfile_main_sub)
     PackFile * const pf = (PackFile*)VTABLE_get_pointer(interp, pbc);
     if (pf == NULL || pf->cur_cs == NULL || pf->cur_cs->const_table == NULL)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNEXPECTED_NULL,
             "Null or invalid PackFile");
     return packfile_main(pf->cur_cs);
 }
@@ -1007,7 +1007,7 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PMC *pfpmc),
     if (interp->resume_flag & RESUME_INITIAL) {
         if (action == PBC_MAIN) {
             if (self->main_sub < 0)
-                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+                Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_LIBRARY_ERROR,
                     "No main sub found");
             {
                 PMC *      const mainsub = packfile_main(self);
@@ -1042,7 +1042,7 @@ PackFile_Header_validate(PARROT_INTERP, ARGIN(const PackFile_Header *self),
 
     /* Ensure the magic is correct. */
     if (memcmp(self->magic, "\376PBC\r\n\032\n", 8) != 0) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_MALFORMED_PACKFILE,
         "PackFile_Header_validate: Invalid Parrot bytecode file");
     }
 
@@ -1622,7 +1622,7 @@ Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PMC *pbc))
 {
     ASSERT_ARGS(Parrot_pf_set_current_packfile)
     if (PMC_IS_NULL(pbc))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNEXPECTED_NULL,
             "Cannot set null packfile");
     else {
         PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
@@ -1883,7 +1883,7 @@ Parrot_switch_to_cs(PARROT_INTERP, ARGIN(PackFile_ByteCode *new_cs), int really)
     PackFile_ByteCode * const cur_cs = interp->code;
 
     if (!new_cs)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_NO_PREV_CS,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_NO_PREV_CS,
             "No code segment to switch to");
 
     interp->code = new_cs;
@@ -2282,7 +2282,7 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
     PMC *is_loaded_hash;
 
     if (STRING_IS_NULL(lang_name))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_LIBRARY_ERROR,
             "\"load_language\" no language name");
 
     /* Full path to language library is "abc/abc.pbc". */
@@ -2369,7 +2369,7 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
     enum_runtime_ft file_type;
 
     if (STRING_IS_NULL(file_str))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_LIBRARY_ERROR,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_LIBRARY_ERROR,
             "\"load_bytecode\" no file name");
 
     parrot_split_path_ext(interp, file_str, &wo_ext, &ext);
@@ -2495,12 +2495,12 @@ Parrot_pf_prepare_packfile_init(PARROT_INTERP, ARGIN(PMC * const pfpmc))
 {
     ASSERT_ARGS(Parrot_pf_prepare_packfile_init)
     if (PMC_IS_NULL(pfpmc))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_MALFORMED_PACKFILE,
             "Could not load packfile: Invalid PMC");
     else {
         PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pfpmc);
         if (!pf)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_MALFORMED_PACKFILE,
                 "Could not load packfile: Invalid Pointer");
         if (!(pf->options & PFOPT_HEADERONLY))
             do_sub_pragmas(interp, pfpmc, PBC_MAIN, pfpmc);
@@ -2524,12 +2524,12 @@ Parrot_pf_prepare_packfile_load(PARROT_INTERP, ARGIN(PMC * const pfpmc))
 {
     ASSERT_ARGS(Parrot_pf_prepare_packfile_load)
     if (PMC_IS_NULL(pfpmc))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_MALFORMED_PACKFILE,
             "Could not load packfile: Invalid PMC");
     else {
         PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pfpmc);
         if (!pf)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_MALFORMED_PACKFILE,
                 "Could not load packfile: Invalid Pointer");
         if (!(pf->options & PFOPT_HEADERONLY))
             do_sub_pragmas(interp, pfpmc, PBC_LOADED, NULL);
@@ -2559,7 +2559,7 @@ Parrot_pf_write_pbc_file(PARROT_INTERP, ARGIN(PMC *pf_pmc), ARGIN(STRING *filena
     ASSERT_ARGS(Parrot_pf_write_pbc_file)
     PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pf_pmc);
     if (!pf)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNEXPECTED_NULL,
             "Could not get packfile.");
     else {
         PIOHANDLE fp;
@@ -2608,7 +2608,7 @@ Parrot_pf_read_pbc_file(PARROT_INTERP, ARGIN_NULLOK(STRING * const fullname))
 
         /* check that fullname isn't NULL, just in case */
         if (!fullname)
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
                 "Trying to open a NULL filename");
 
         program_size = Parrot_file_stat_intval(interp, fullname, STAT_FILESIZE);
@@ -2682,7 +2682,7 @@ read_pbc_file_bytes_handle(PARROT_INTERP, PIOHANDLE io, INTVAL program_size)
 
         if (!program_code) {
             Parrot_io_internal_close(interp, io);
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
                     "Could not reallocate buffer while reading packfile from PIO");
         }
 
@@ -2845,7 +2845,7 @@ Parrot_pf_execute_bytecode_program(PARROT_INTERP, ARGMOD(PMC *pbc),
     PackFile *pf = (PackFile*)VTABLE_get_pointer(interp, pbc);
 
     if (!pf || !pf->cur_cs)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_UNEXPECTED_NULL,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNEXPECTED_NULL,
             "Could not get packfile");
 
     Parrot_pf_set_current_packfile(interp, pbc);

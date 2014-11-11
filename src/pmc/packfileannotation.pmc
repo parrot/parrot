@@ -138,7 +138,7 @@ Fetch the PMC value of the annotation.
     METHOD get_pmc_value() :no_wb {
         const Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
         if (attrs->value_type != PF_ANNOTATION_KEY_TYPE_PMC)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                 "Wrong type of value from annotation");
         RETURN(PMC * attrs->pmc_value);
     }
@@ -195,7 +195,7 @@ Get the type of the annotation.
             ret = 2;
             break;
           default:
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                 "Wrong type of value from annotation");
             break;
         }
@@ -216,7 +216,7 @@ Fetch the integer value of the annotation.
     VTABLE INTVAL get_integer() :no_wb {
         const Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
         if (attrs->value_type != PF_ANNOTATION_KEY_TYPE_INT)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                 "Wrong type of value from annotation");
         return attrs->int_value;
     }
@@ -249,7 +249,7 @@ Fetch the string value of the annotation.
     VTABLE STRING * get_string() :no_wb {
         Parrot_PackfileAnnotation_attributes * const attrs = PARROT_PACKFILEANNOTATION(SELF);
         if (attrs->value_type != PF_ANNOTATION_KEY_TYPE_STR)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                 "Wrong type of value from annotation");
         return attrs->str_value;
     }

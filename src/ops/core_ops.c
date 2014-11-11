@@ -13677,7 +13677,7 @@ Parrot_check_events(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_check_events__(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t  * const  _this = CUR_OPCODE;
-    opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, _this, EXCEPTION_INVALID_OPERATION, "check_events__ opcode doesn't do anything useful.");
+    opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp, _this, EXCEPTION_INVALID_OPERATION, "check_events__ opcode doesn't do anything useful");
 
     return (opcode_t *)handler;
     Parrot_runcore_disable_event_checking(interp);
@@ -14358,7 +14358,7 @@ Parrot_finalize_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
         }
         else {
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "missing runloop");
+            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION, "missing runloop");
         }
 
     }
@@ -14394,7 +14394,7 @@ Parrot_finalize_pc(opcode_t *cur_opcode, PARROT_INTERP) {
 
         }
         else {
-            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "missing runloop");
+            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION, "missing runloop");
         }
 
     }
@@ -24561,7 +24561,7 @@ Parrot_wait_p(opcode_t *cur_opcode, PARROT_INTERP) {
     Parrot_Task_attributes  * tdata;
 
     if ((!VTABLE_isa(interp, task, Parrot_str_new_constant(interp, "Task")))) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Argument to wait op must be a Task.\n");
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION, "Argument to wait op must be a Task");
     }
 
     tdata = PARROT_TASK(task);
@@ -24591,7 +24591,7 @@ Parrot_wait_pc(opcode_t *cur_opcode, PARROT_INTERP) {
     Parrot_Task_attributes  * tdata;
 
     if ((!VTABLE_isa(interp, task, Parrot_str_new_constant(interp, "Task")))) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION, "Argument to wait op must be a Task.\n");
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION, "Argument to wait op must be a Task");
     }
 
     tdata = PARROT_TASK(task);

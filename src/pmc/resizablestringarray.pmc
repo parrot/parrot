@@ -66,7 +66,7 @@ Returns the Parrot string value of the element at index C<key>.
         if (key < 0)
             key += size;
         if (key < 0)
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "index out of bounds");
         if (key >= size)
             return CONST_STRING(INTERP, "");
@@ -98,7 +98,7 @@ Sets the Parrot string value of the element at index C<key> to C<value>.
         if (key < 0)
             key += size;
         if (key < 0)
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "index out of bounds");
 
         if (key >= size)
@@ -141,7 +141,7 @@ Removes and returns the last element in the array.
         GET_ATTR_size(INTERP, SELF, size);
 
         if (size == 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "Can't pop from an empty array");
 
         value = SELF.get_string_keyed_int(size - 1);
@@ -216,7 +216,7 @@ Resizes the array to C<size> elements.
         INTVAL   resize_threshold;
 
         if (new_size < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "illegal argument");
 
         GET_ATTR_str_array(INTERP, SELF, str_array);
@@ -309,7 +309,7 @@ Removes and returns an item from the start of the array.
         GET_ATTR_size(INTERP, SELF, size);
 
         if (size == 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "Can't shift from an empty array");
 
         value = SELF.get_string_keyed_int(0);
@@ -423,7 +423,7 @@ Removes and returns a String PMC from the start of the array.
         GET_ATTR_size(INTERP, SELF, size);
 
         if (size == 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "Can't shift from an empty array");
 
         value = SELF.get_string_keyed_int(0);
@@ -586,7 +586,7 @@ everything via the VTABLE api.
 
         if (from->vtable->base_type != SELF->vtable->base_type
          && from->vtable->base_type != enum_class_FixedStringArray)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                     "ResizableStringArray: illegal type for splice!");
 
         length = VTABLE_elements(INTERP, SELF);
@@ -597,11 +597,11 @@ everything via the VTABLE api.
         if (offset < 0) {
             offset += length;
             if (offset < 0)
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+                Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                         "index out of bounds");
         }
         if (count < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "illegal argument");
 
         /* shrink the array */

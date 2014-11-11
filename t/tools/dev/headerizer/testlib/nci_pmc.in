@@ -368,7 +368,7 @@ class, the PMC arguments are shifted down.
             func = build_func(interp, nci_info);
 
             if (!func)
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                Parrot_ex_throw_from_c_noargs(INTERP,
                     EXCEPTION_INVALID_OPERATION,
                     "attempt to call NULL function");
         }
@@ -446,7 +446,7 @@ Return the arity of the NCI (the number of arguments).
             }
         }
 
-        Parrot_ex_throw_from_c_args(INTERP, NULL,
+        Parrot_ex_throw_from_c_noargs(INTERP,
             EXCEPTION_INVALID_OPERATION,
             "You cannot get the arity of an undefined NCI.");
     }

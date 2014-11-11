@@ -682,7 +682,7 @@ fail_if_type_exists(PARROT_INTERP, ARGIN(PMC *name))
         }
         break;
       default:
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INTERP_ERROR,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INTERP_ERROR,
                     "Unrecognized class name PMC type");
         break;
     }
@@ -1125,7 +1125,7 @@ C3_merge(PARROT_INTERP, ARGIN(PMC *merge_list))
 
     /* If we didn't find anything to accept, error. */
     if (PMC_IS_NULL(accepted))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ILL_INHERIT,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_ILL_INHERIT,
             "Could not build C3 linearization: ambiguous hierarchy");
 
     /* Otherwise, remove what was accepted from the merge lists. */
@@ -1184,7 +1184,7 @@ Parrot_ComputeMRO_C3(PARROT_INTERP, ARGIN(PMC *_class))
 
     /* Now get immediate parents list. */
     if (PMC_IS_NULL(immediate_parents))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_METHOD_NOT_FOUND,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_METHOD_NOT_FOUND,
             "Failed to get parents list from class");
 
     parent_count = VTABLE_elements(interp, immediate_parents);

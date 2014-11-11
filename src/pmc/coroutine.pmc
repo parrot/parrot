@@ -266,7 +266,7 @@ yields are exhausted and the coro is dead.
 
             ctx        = Parrot_pcc_get_signature(INTERP, caller_ctx);
             if (PObj_get_FLAGS(ccont) & SUB_FLAG_TAILCALL)
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                         "tail call to coroutine not allowed");
 
             /* first time set current sub, cont, object */
@@ -340,8 +340,8 @@ yields are exhausted and the coro is dead.
             TRACE_CORO_1("# - coro: ff (yield=%ld)\n", yield);
 
             if (!yield) {
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                               "Cannot resume dead coroutine.");
+                Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
+                               "Cannot resume dead coroutine");
             }
             SET_ATTR_yield(INTERP, SELF, 0);
             GET_ATTR_ctx(INTERP, SELF, ctx);
@@ -361,7 +361,7 @@ yields are exhausted and the coro is dead.
                    result before we get here.  -- rgr, 7-Oct-06.
                  * This may be unneeded after the yield fix, see TT #1003
                  */
-                Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+                Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                                "Cannot resume dead coroutine. Invalid context");
             }
 

@@ -70,12 +70,12 @@ Parrot_cx_delete_handler_local(PARROT_INTERP)
     PMC *handlers  = Parrot_pcc_get_handlers(interp, interp->ctx);
 
     if (PMC_IS_NULL(handlers))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
             "No handler to delete.");
 
     /* test elements so that we get a nice error message */
     if (!VTABLE_elements(interp, handlers))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
             "No handler to delete.");
 
     VTABLE_shift_pmc(interp, handlers);
@@ -108,7 +108,7 @@ Parrot_cx_delete_upto_handler_local(PARROT_INTERP, ARGIN(PMC *handler))
             VTABLE_shift_pmc(interp, handlers);
         }
     }
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+    Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
         "Specified handler is not in the handler list.");
 }
 
@@ -154,7 +154,7 @@ Parrot_cx_add_handler(PARROT_INTERP, ARGIN(PMC *handler))
     ASSERT_ARGS(Parrot_cx_add_handler)
     STRING * const add_handler = CONST_STRING(interp, "add_handler");
     if (!interp->scheduler)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
             "Scheduler was not initialized for this interpreter");
 
     Parrot_pcc_invoke_method_from_c_args(interp, interp->scheduler, add_handler, "P->", handler);
@@ -178,7 +178,7 @@ Parrot_cx_delete_handler_typed(PARROT_INTERP, ARGIN(STRING *handler_type))
 {
     ASSERT_ARGS(Parrot_cx_delete_handler_typed)
     if (!interp->scheduler)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
             "Scheduler was not initialized for this interpreter");
 
     Parrot_pcc_invoke_method_from_c_args(interp, interp->scheduler, CONST_STRING(interp, "delete_handler"), "S->", handler_type);
@@ -204,7 +204,7 @@ Parrot_cx_count_handlers_typed(PARROT_INTERP, ARGIN(STRING *handler_type))
     INTVAL count = 0;
 
     if (!interp->scheduler)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
             "Scheduler was not initialized for this interpreter");
 
     Parrot_pcc_invoke_method_from_c_args(interp, interp->scheduler, CONST_STRING(interp, "count_handlers"), "S->I", handler_type, &count);
@@ -244,7 +244,7 @@ Parrot_cx_find_handler_for_task(PARROT_INTERP, ARGIN(PMC *task))
 #endif
 
     if (!interp->scheduler)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
             "Scheduler was not initialized for this interpreter");
 
     Parrot_pcc_invoke_method_from_c_args(interp, interp->scheduler, CONST_STRING(interp, "find_handler"), "P->P", task, &handler);

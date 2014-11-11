@@ -82,7 +82,7 @@ Raises an exception. Use C<init_pmc()>.
 
     VTABLE void init() :no_wb {
         UNUSED(SELF)
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                 "ArrayIterator init without aggregate");
     }
 
@@ -226,7 +226,7 @@ Reset the Iterator. C<value> must be one of
             SET_ATTR_pos(INTERP, SELF, element);
             break;
           default:
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                     "Wrong direction for ArrayIterator");
         }
     }
@@ -680,7 +680,7 @@ static void
 out_of_bounds(PARROT_INTERP)
 {
     ASSERT_ARGS(out_of_bounds)
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_OUT_OF_BOUNDS,
+    Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_OUT_OF_BOUNDS,
             "StopIteration");
 }
 

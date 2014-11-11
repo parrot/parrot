@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011-2012, Parrot Foundation.
+Copyright (C) 2011-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -439,7 +439,7 @@ PackFile_ConstTable_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
     return cursor;
 
   err:
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
+    Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_ALLOCATION_ERROR,
         "PackFile_ConstTable_unpack: Could not allocate memory for array");
 }
 
@@ -667,7 +667,7 @@ PackFile_Annotations_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *seg),
                                 self->base.dir, code_name, 0);
 
     if (!code || code->base.type != PF_BYTEC_SEG) {
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
             "Code '%s' not found for annotations segment '%s'",
             code_name, self->base.name);
     }
@@ -790,7 +790,7 @@ default_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opcode
     self->data = mem_gc_allocate_n_typed(interp, self->size, opcode_t);
 
     if (!self->data) {
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ALLOCATION_ERROR,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_ALLOCATION_ERROR,
             "PackFile_unpack: Unable to allocate data memory");
     }
 
@@ -1962,7 +1962,7 @@ byte_code_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opco
                         entry->lib->name, idx, byte_code->op_count - 1);
 
                 if (byte_code->op_func_table[idx])
-                    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
+                    Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_MALFORMED_PACKFILE,
                         "duplicate entries in optable");
 
                 entry->table_ops[j]           = idx;
@@ -2143,7 +2143,7 @@ pf_debug_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *self), ARGIN(const opcod
     code        = (PackFile_ByteCode *)PackFile_find_segment(interp, self->dir, code_name, 0);
 
     if (!code || code->base.type != PF_BYTEC_SEG) {
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
             "Code '%Ss' not found for debug segment '%Ss'",
             code_name, self->name);
     }

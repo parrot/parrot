@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2006-2008, Parrot Foundation.
+# Copyright (C) 2006-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -28,7 +28,7 @@ pir_error_output_like( <<'CODE', <<'OUT', 'new' );
     print "ok 1\n"
 .end
 CODE
-/Object must be created by a class./
+/Object must be created by a class/
 OUT
 
 # '

@@ -1915,7 +1915,7 @@ init_fixedintegerarray_from_string(ARGMOD(imc_info_t * imcc), ARGIN(PMC *p),
     int     base;
 
     if (STRING_max_bytes_per_codepoint(s) != 1)
-        Parrot_ex_throw_from_c_args(imcc->interp, NULL, EXCEPTION_INVALID_ENCODING,
+        Parrot_ex_throw_from_c_noargs(imcc->interp, EXCEPTION_INVALID_ENCODING,
             "unhandled string encoding in FixedIntegerArray initialization");
 
     l = Parrot_str_byte_length(imcc->interp, s);
@@ -1958,7 +1958,7 @@ init_fixedintegerarray_from_string(ARGMOD(imc_info_t * imcc), ARGIN(PMC *p),
                 ++chr;
             }
             else {
-                Parrot_ex_throw_from_c_args(imcc->interp, NULL,
+                Parrot_ex_throw_from_c_noargs(imcc->interp,
                         EXCEPTION_INVALID_STRING_REPRESENTATION,
                         "expected ',' in FixedIntegerArray initialization");
             }
@@ -2004,7 +2004,7 @@ init_fixedintegerarray_from_string(ARGMOD(imc_info_t * imcc), ARGIN(PMC *p),
             /* Hold onto the , for the test at the start of the loop */
             break;
           default:
-            Parrot_ex_throw_from_c_args(imcc->interp, NULL,
+            Parrot_ex_throw_from_c_noargs(imcc->interp,
                     EXCEPTION_INVALID_STRING_REPRESENTATION,
                     "invalid number in FixedIntegerArray initialization");
         }
@@ -2064,7 +2064,7 @@ make_pmc_const(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r))
         init_fixedintegerarray_from_string(imcc, p, s);
         break;
       default:
-        Parrot_ex_throw_from_c_args(imcc->interp, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_noargs(imcc->interp, EXCEPTION_INVALID_OPERATION,
             "Can't generate PMC constant for this type.");
     }
 

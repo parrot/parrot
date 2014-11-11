@@ -225,7 +225,7 @@ runops_int(PARROT_INTERP, size_t offset)
          * is ok. */
         if (interp->resume_flag & RESUME_RESTART) {
             if ((int)interp->resume_offset < 0)
-                Parrot_ex_throw_from_c_args(interp, NULL, 1,
+                Parrot_ex_throw_from_c_noargs(interp, 1,
                     "branch_cs: illegal resume offset");
         }
     }

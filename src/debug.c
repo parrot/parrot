@@ -1172,7 +1172,8 @@ Parrot_debugger_load(PARROT_INTERP, ARGIN_NULLOK(const STRING *filename))
     TRACEDEB_MSG("Parrot_debugger_load");
 
     if (!interp->pdb)
-        Parrot_ex_throw_from_c_args(interp, NULL, 0, "No debugger");
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_PARROT_USAGE_ERROR,
+                "No debugger");
 
     file = Parrot_str_to_cstring(interp, filename);
     PDB_load_source(interp, file);
@@ -1197,7 +1198,8 @@ Parrot_debugger_start(PARROT_INTERP, ARGIN_NULLOK(opcode_t * cur_opcode))
     TRACEDEB_MSG("Parrot_debugger_start");
 
     if (!interp->pdb)
-        Parrot_ex_throw_from_c_args(interp, NULL, 0, "No debugger");
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_PARROT_USAGE_ERROR,
+                "No debugger");
 
     interp->pdb->cur_opcode = interp->code->base.data;
 
@@ -1243,10 +1245,12 @@ Parrot_debugger_break(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
     TRACEDEB_MSG("Parrot_debugger_break");
 
     if (!interp->pdb)
-        Parrot_ex_throw_from_c_args(interp, NULL, 0, "No debugger");
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_PARROT_USAGE_ERROR,
+                "No debugger");
 
     if (!interp->pdb->file)
-        Parrot_ex_throw_from_c_args(interp, NULL, 0, "No file loaded to debug");
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_PARROT_USAGE_ERROR,
+                "No file loaded to debug");
 
     if (!(interp->pdb->state & PDB_BREAK)) {
         TRACEDEB_MSG("Parrot_debugger_break - in BREAK state");
@@ -1869,7 +1873,7 @@ PDB_set_break(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     newbreak = mem_gc_allocate_zeroed_typed(interp, PDB_breakpoint_t);
 
     if (! command) {
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNEXPECTED_NULL,
             "NULL command passed to PDB_set_break");
     }
 
@@ -2777,7 +2781,8 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
             dest[size++] = ']';
             break;
           default:
-            Parrot_ex_throw_from_c_args(interp, NULL, 1, "Unknown opcode type");
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_ARG_OP_NOT_HANDLED,
+                                        "Unknown opcode type %c", info->types[j - 1]);
         }
 
         if (j != info->op_count - 1)

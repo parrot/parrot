@@ -200,7 +200,7 @@ Marks the hash as live.
             return;
         }
 
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                 "HashIterator: unknown iterator type");
     };
 
@@ -276,8 +276,8 @@ the next one.
         PARROT_GC_WRITE_BARRIER(INTERP, SELF);
 
         if (attrs->elements < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                                        "StopIteration");
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
+                    "StopIteration");
 
         ret = Parrot_pmc_new(INTERP, enum_class_HashIteratorKey);
         VTABLE_set_pointer_keyed_int(INTERP, ret, 0, attrs->parrot_hash);
@@ -314,8 +314,8 @@ the next one.
         PARROT_GC_WRITE_BARRIER(INTERP, SELF);
 
         if (attrs->elements < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                                        "StopIteration");
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
+                    "StopIteration");
 
         return Parrot_hash_key_to_int(INTERP, attrs->parrot_hash, attrs->bucket->key);
     }

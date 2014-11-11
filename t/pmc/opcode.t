@@ -28,7 +28,7 @@ This PIR file implements various tests of PMC opcodes.
 .end
 
 .sub cannot_create_directly
-    throws_substring(<<'CODE', 'Opcode must be created from OpLib.', 'creation of opcode fails')
+    throws_substring(<<'CODE', 'Opcode must be created from OpLib', 'creation of opcode fails')
     .sub main
         $P0 = new ['Opcode']
     .end

@@ -114,7 +114,7 @@ Initializes the array.
 
     VTABLE void init_int(INTVAL size) :manual_wb {
         if (size < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "illegal argument");
 
         SELF.set_integer_native(size);
@@ -367,7 +367,7 @@ Returns the PMC value of the element at index C<key>.
         if (key < 0)
             key += size;
         if (key < 0 || key >= PMC_size(SELF))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "index out of bounds");
 
         data = PMC_array(SELF);
@@ -417,12 +417,12 @@ array.
         PMC **data;
 
         if (PMC_size(SELF) && size)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "Can't resize");
         if (!size)
             return;
         if (size < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                                         "illegal argument");
 
         PMC_size(SELF) = size;
@@ -578,7 +578,7 @@ Sets the PMC value of the element at index C<key> to C<*src>.
         if (key < 0)
             key += size;
         if (key < 0 || key >= size)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "index out of bounds");
 
         data      = PMC_array(SELF);
@@ -681,7 +681,7 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
     VTABLE INTVAL exists_keyed_int(INTVAL key) :no_wb {
         PMC **data;
         if (key < 0 || key >= PMC_size(SELF))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "index out of bounds");
 
         data = PMC_array(SELF);
@@ -715,10 +715,10 @@ of this array.
         if (offset < 0)
             offset += elems0;
         if (count < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "illegal argument");
         if (offset < 0 || count + offset > PMC_size(SELF))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "index out of bounds");
         /* TODO: use faster memmove as in ResizablePMCArray */
         for (count--; count >= 0; --count) {

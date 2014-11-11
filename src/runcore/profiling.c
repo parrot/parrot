@@ -376,7 +376,7 @@ ARGIN(opcode_t *pc))
         PMC            *preop_ctx_pmc;
 
         if (pc < code_start || pc >= code_end)
-            Parrot_ex_throw_from_c_args(interp, NULL, 1,
+            Parrot_ex_throw_from_c_noargs(interp, 1,
                     "attempt to access code outside of current code segment");
 
         preop_ctx_pmc         = CURRENT_CONTEXT(interp);

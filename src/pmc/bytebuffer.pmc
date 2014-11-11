@@ -89,7 +89,7 @@ Free the buffer when destroying.
     VTABLE void init_int(INTVAL initial_size) {
         unsigned char *content;
         if (initial_size < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                                         "illegal argument");
         STATICSELF.init();
         SET_ATTR_size(INTERP, SELF, initial_size);
@@ -145,7 +145,7 @@ Resize the buffer to the given value.
         INTVAL size,  allocated_size;
         unsigned char *content;
         if (set_size < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                                         "illegal argument");
 
         GET_ATTR_allocated_size(INTERP, SELF, allocated_size);
@@ -268,7 +268,7 @@ is out of current size.
         unsigned char *content;
         INTVAL size, allocated_size;
         if (position < 0)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                 "Negative position not allowed");
 
         GET_ATTR_allocated_size(INTERP, SELF, allocated_size);
@@ -444,7 +444,7 @@ length in codepoints.
         GET_ATTR_size(interp, SELF, size);
 
         if (pos < 0 || pos > size)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "index out of bounds");
 
         if (content == NULL) {
@@ -509,7 +509,7 @@ build_string(PARROT_INTERP, ARGIN_NULLOK(const unsigned char *content),
 {
     ASSERT_ARGS(build_string)
     if (encoding == NULL)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_ENCODING,
                 "Invalid encoding");
     else {
         STRING * const result = Parrot_str_new_init(interp,

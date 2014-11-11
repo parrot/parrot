@@ -186,7 +186,7 @@ complex_parse_string(PARROT_INTERP,
             /* verify that the string ends properly */
             if ((*t != 'i' && *t != 'j') || (*(t+1) != 0)) {
                 /* imaginary part does not end in 'i' or 'j' */
-                Parrot_ex_throw_from_c_args(interp, NULL,
+                Parrot_ex_throw_from_c_noargs(interp,
                     EXCEPTION_INVALID_STRING_REPRESENTATION,
                     "Complex: malformed string");
             }
@@ -201,7 +201,7 @@ complex_parse_string(PARROT_INTERP,
             /* "+" or "-" not found: error */
             Parrot_str_free_cstring(str);
 
-            Parrot_ex_throw_from_c_args(interp, NULL,
+            Parrot_ex_throw_from_c_noargs(interp,
                 EXCEPTION_INVALID_STRING_REPRESENTATION,
                 "Complex: malformed string");
         }
@@ -257,7 +257,7 @@ int_check_divide_zero(PARROT_INTERP, INTVAL value)
     ASSERT_ARGS(int_check_divide_zero)
 
     if (value == 0)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_DIV_BY_ZERO,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
 }
 
@@ -277,7 +277,7 @@ float_check_divide_zero(PARROT_INTERP, FLOATVAL value)
     ASSERT_ARGS(float_check_divide_zero)
 
     if (FLOAT_IS_ZERO(value))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_DIV_BY_ZERO,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
 }
 
@@ -300,8 +300,8 @@ complex_check_divide_zero(PARROT_INTERP, ARGIN(PMC *value))
      * and the imaginary part.*/
 
     if (FLOAT_IS_ZERO(VTABLE_get_number_keyed_int(interp, value, 0))
-            && FLOAT_IS_ZERO(VTABLE_get_number_keyed_int(interp, value, 1)))
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_DIV_BY_ZERO,
+     && FLOAT_IS_ZERO(VTABLE_get_number_keyed_int(interp, value, 1)))
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_DIV_BY_ZERO,
             "Divide by zero");
 }
 
@@ -367,7 +367,7 @@ Creates an identical copy of the complex number.
                 SELF.set_string_native(s);
             }
             else {
-                Parrot_ex_throw_from_c_args(INTERP, NULL,
+                Parrot_ex_throw_from_c_noargs(INTERP,
                         EXCEPTION_INVALID_OPERATION,
                         "Invalid Complex initializer");
             }
@@ -514,7 +514,7 @@ Returns the requested number (real part for C<real> and imaginary for C<imag>).
             GET_ATTR_im(INTERP, SELF, value);
         }
         else
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
+            Parrot_ex_throw_from_c_noargs(INTERP,
                 EXCEPTION_INVALID_OPERATION, "Complex: key is neither 'real' or 'imag'");
         return value;
     }
@@ -581,7 +581,7 @@ Set real or imag depending on key
             GET_ATTR_im(INTERP, SELF, f);
             break;
           default:
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
+            Parrot_ex_throw_from_c_noargs(INTERP,
                     EXCEPTION_INVALID_OPERATION, "Complex: key must be 0 or 1");
         }
         return f;
@@ -596,7 +596,7 @@ Set real or imag depending on key
             SET_ATTR_im(INTERP, SELF, v);
             break;
           default:
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
+            Parrot_ex_throw_from_c_noargs(INTERP,
                     EXCEPTION_INVALID_OPERATION, "Complex: key must be 0 or 1");
         }
     }
@@ -703,7 +703,7 @@ to C<value>.
             PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
         else
-            Parrot_ex_throw_from_c_args(INTERP, NULL,
+            Parrot_ex_throw_from_c_noargs(INTERP,
                 EXCEPTION_INVALID_OPERATION, "Complex: key is neither 'real' or 'imag'");
     }
 

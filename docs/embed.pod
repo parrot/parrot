@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -683,6 +683,8 @@ The list may also be augmented if additional functionality is required.
 =item C<Parrot_ex_throw_from_c>
 
 =item C<Parrot_ex_throw_from_c_args>
+
+=item C<Parrot_ex_throw_from_c_noargs>
 
 =item C<Parrot_ex_throw_from_op>
 

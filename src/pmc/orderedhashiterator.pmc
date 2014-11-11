@@ -109,7 +109,7 @@ Marks the hash as live.
             attrs->next_entry   = PARROT_ORDEREDHASH(attrs->pmc_hash)->last;
             break;
           default:
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
                     "HashIterator: unknown iterator type");
         }
     };
@@ -179,7 +179,7 @@ the next one.
         PMC        *ret;
 
         if (!attrs->elements)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
         /* Get bucket and move to next bucket */
@@ -212,7 +212,7 @@ the next one for reverse iterator.
         PMC        *ret;
 
         if (!attrs->elements)
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "StopIteration");
 
         ret               = VTABLE_get_pmc_keyed_int(INTERP, attrs->next_entry,

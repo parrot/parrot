@@ -450,7 +450,7 @@ io_filehandle_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTV
     }
 
     if ((flags & (PIO_F_WRITE | PIO_F_READ)) == 0)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
                 "Invalid mode for file open");
 
     if (flags & PIO_F_BINARY)

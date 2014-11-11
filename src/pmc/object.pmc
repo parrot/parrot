@@ -177,7 +177,7 @@ get_attrib_index_keyed(PARROT_INTERP, ARGIN(PMC *self), ARGIN(PMC *key), ARGIN(S
     /* Build a string representing the fully qualified attribute name. */
     PMC    * const parent_class = Parrot_oo_get_class(interp, key);
     STRING * const fq_name      = Parrot_str_concat(interp,
-                                VTABLE_get_string(interp, parent_class), name);
+                                    VTABLE_get_string(interp, parent_class), name);
 
     /* Look up. */
     if (VTABLE_exists_keyed_str(interp, _class->attrib_index, fq_name))
@@ -293,8 +293,8 @@ Raises an exception; you can only instantiate objects from a class.
 
     VTABLE void init() :no_wb {
         UNUSED(SELF)
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-            "Object must be created by a class.");
+        Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
+            "Object must be created by a class");
     }
 
 /*
@@ -311,8 +311,8 @@ Raises an exception; you can only instantiate objects from a class.
     VTABLE void init_pmc(PMC *from) :no_wb {
         UNUSED(SELF)
         UNUSED(from)
-        Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_INVALID_OPERATION,
-                "Object must be created by a class.");
+        Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_INVALID_OPERATION,
+                "Object must be created by a class");
     }
 
 
@@ -568,7 +568,7 @@ Queries this object's class to find the method with the given name.
                 }
                 else
                     Parrot_ex_throw_from_c_args(INTERP, NULL, -1,
-                        "Class %Ss inherits from alien parents.",
+                        "Class %Ss inherits from alien parents",
                         class_info->name);
             }
 
