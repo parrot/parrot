@@ -738,7 +738,9 @@ Parrot_str_new_from_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *buffer),
         else {
             int size = strlen(buffer);
             result = Parrot_str_new_init(interp, buffer, size, encoding, 0);
-            /* if string is ascii and platform multi-byte we can downgrade */
+#if 0
+            /* if string is ascii and platform multi-byte we could downgrade.
+               but is is overall slower to scan here, than the faster ops later */
             if (STRING_IS_NULL(encodingname)
                 && Parrot_platform_encoding_ptr->max_bytes_per_codepoint > 1
                 && result->strlen == result->bufused)
@@ -753,6 +755,7 @@ Parrot_str_new_from_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *buffer),
                 if (!multi)
                     result->encoding = Parrot_ascii_encoding_ptr;
             }
+#endif
         }
     }
     return result;
