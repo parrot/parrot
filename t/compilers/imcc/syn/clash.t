@@ -233,9 +233,8 @@ CODE
 /Multiple declarations of lexical 'foo'/
 OUT
 
-# use only single-quotes with .lex!
-# needs to be fixed in perl6 also. RT #116643
-pir_output_is( <<'CODE', <<'OUT', 'legal quoted .lex names', todo => 'GH #1095');
+# GH #1095
+pir_output_is( <<'CODE', <<'OUT', 'legal quoted .lex names');
 .sub 'main' :main
     .lex 'bar\o', $P0        # ok, parsed as "bar\\o"
     $P1 = box 'ok 1'
@@ -243,9 +242,9 @@ pir_output_is( <<'CODE', <<'OUT', 'legal quoted .lex names', todo => 'GH #1095')
     $P2 = find_lex 'bar\o'
     say $P2
 
-    .lex "foo\\o", $P3       # wrong, parsed as 'foo\\o'
+    .lex "foo\\o", $P3       # did parse as 'foo\\o'
     $P1 = box 'ok 2'
-    store_lex "foo\\o", $P1  # Error: Lexical 'foo\o' not found
+    store_lex "foo\\o", $P1  # was Error: Lexical 'foo\o' not found
     $P2 = find_lex "foo\\o"
     say $P2
 .end
