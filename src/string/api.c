@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -734,11 +734,25 @@ Parrot_str_new_from_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *buffer),
                 Parrot_find_encoding_by_string(interp, encodingname);
         if (encoding == NULL)
             Parrot_ex_throw_from_c_args(interp, NULL,
-                    EXCEPTION_INVALID_ENCODING,
-                    "Invalid encoding");
+                    EXCEPTION_INVALID_ENCODING, "Invalid encoding");
         else {
             int size = strlen(buffer);
             result = Parrot_str_new_init(interp, buffer, size, encoding, 0);
+            /* if string is ascii and platform multi-byte we can downgrade */
+            if (STRING_IS_NULL(encodingname)
+                && Parrot_platform_encoding_ptr->max_bytes_per_codepoint > 1
+                && result->strlen == result->bufused)
+            {
+                const unsigned char * const ptr = (unsigned char *)result->strstart;
+                int multi = 0;
+                UINTVAL i;
+                for (i = 0; i < result->strlen; ++i) {
+                    if (ptr[i] >= 0x80)
+                        multi++;
+                }
+                if (!multi)
+                    result->encoding = Parrot_ascii_encoding_ptr;
+            }
         }
     }
     return result;
@@ -779,6 +793,12 @@ Parrot_str_from_platform_cstring(PARROT_INTERP, ARGIN_NULLOK(const char *c))
             Parrot_ex_add_c_handler(interp, &jmp);
             retv = Parrot_str_new_init(interp, c, Parrot_str_platform_strlen(interp, c),
                                         Parrot_platform_encoding_ptr, 0);
+            /* if string is ascii-only and platform multi-byte use ascii */
+            if (retv
+                && Parrot_platform_encoding_ptr->max_bytes_per_codepoint > 1
+                && retv->strlen == retv->bufused) {
+                retv = Parrot_ascii_encoding_ptr->to_encoding(interp, retv);
+            }
             Parrot_cx_delete_handler_local(interp);
         }
 
