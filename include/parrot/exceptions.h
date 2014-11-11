@@ -195,6 +195,15 @@ void Parrot_ex_throw_from_c_args(PARROT_INTERP,
         __attribute__nonnull__(4);
 
 PARROT_EXPORT
+PARROT_DOES_NOT_RETURN
+PARROT_COLD
+void Parrot_ex_throw_from_c_noargs(PARROT_INTERP,
+    int exitcode,
+    ARGIN(const char *msg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 opcode_t * Parrot_ex_throw_from_op(PARROT_INTERP,
     ARGIN(PMC *exception),
@@ -253,6 +262,9 @@ void Parrot_print_backtrace(void);
 #define ASSERT_ARGS_Parrot_ex_throw_from_c_args __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(format))
+#define ASSERT_ARGS_Parrot_ex_throw_from_c_noargs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(msg))
 #define ASSERT_ARGS_Parrot_ex_throw_from_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(exception))

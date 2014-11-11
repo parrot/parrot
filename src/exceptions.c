@@ -31,6 +31,14 @@ Define the core subsystem for exceptions.
 
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+static PMC * build_exception(PARROT_INTERP,
+    int ex_type,
+    ARGIN(const char *msg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3);
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
 static PMC * build_exception_from_args(PARROT_INTERP,
     int ex_type,
     ARGIN(const char *format),
@@ -48,6 +56,9 @@ static void setup_exception_args(PARROT_INTERP, ARGIN(const char *sig), ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+#define ASSERT_ARGS_build_exception __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(msg))
 #define ASSERT_ARGS_build_exception_from_args __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(format))
@@ -302,6 +313,32 @@ build_exception_from_args(PARROT_INTERP, int ex_type,
 
 /*
 
+=item C<static PMC * build_exception(PARROT_INTERP, int ex_type, const
+char *msg)>
+
+Builds an exception PMC with the given integer C<ex_type>, and the constant
+string message.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+static PMC *
+build_exception(PARROT_INTERP, int ex_type,
+        ARGIN(const char *msg))
+{
+    ASSERT_ARGS(build_exception)
+    STRING * const msg =
+            Parrot_str_new_init(interp, format, strlen(format),
+                    Parrot_default_encoding_ptr, 0);
+
+    return Parrot_ex_build_exception(interp, EXCEPT_error, ex_type, msg);
+}
+
+/*
+
 =item C<void Parrot_ex_throw_from_c(PARROT_INTERP, PMC *exception)>
 
 Throws an exception object from any location in C code. A suitable handler
@@ -403,6 +440,32 @@ Parrot_ex_throw_from_op_args(PARROT_INTERP, ARGIN_NULLOK(void *dest),
     va_end(arglist);
 
     return Parrot_ex_throw_from_op(interp, exception, dest);
+}
+
+/*
+
+=item C<void Parrot_ex_throw_from_c_noargs(PARROT_INTERP, int exitcode, const
+char *msg)>
+
+Throws an exception, with a constant error message.
+C<exitcode> is a C<exception_type_enum> value. Constructs an Exception PMC
+and passes it to C<Parrot_ex_throw_from_c>.
+
+See also C<Parrot_ex_throw_from_c_args>.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_DOES_NOT_RETURN
+PARROT_COLD
+void
+Parrot_ex_throw_from_c_noargs(PARROT_INTERP, int exitcode, ARGIN(const char *msg))
+{
+    ASSERT_ARGS(Parrot_ex_throw_from_c_noargs)
+    PMC *exception = build_exception(interp, exitcode, msg);
+    Parrot_ex_throw_from_c(interp, exception);
 }
 
 /*
