@@ -214,7 +214,8 @@ Parrot_api_set_runcore(Parrot_PMC interp_pmc, ARGIN(const char * corename),
               || STREQ(corename, "switch-jit"))
             Parrot_runcore_switch(interp, Parrot_str_new_constant(interp, "fast"));
         else
-            Parrot_ex_throw_from_c_args(interp, NULL, 1, "Invalid runcore type %s", corename);
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_KEY_NOT_FOUND,
+                    "Invalid runcore type %s", corename);
     }
     EMBED_API_CALLOUT(interp_pmc, interp)
 }

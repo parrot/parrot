@@ -76,7 +76,7 @@ Get or set the custom C<clone> function.
         if (clone)
             return clone(INTERP, SELF, ptr);
         else
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 0,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_METHOD_NOT_FOUND,
                     "clone not implemented for PtrObj %x", ptr);
     }
 

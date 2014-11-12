@@ -86,7 +86,7 @@ pmclass MultiSub
                 SELF, sig_obj);
 
         if (PMC_IS_NULL(func))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, 1,
+            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_METHOD_NOT_FOUND,
                     "No applicable candidates found to dispatch to for '%Ss'",
                     VTABLE_get_string(INTERP, SELF));
         return VTABLE_invoke(INTERP, func, next);

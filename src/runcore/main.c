@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -225,7 +225,7 @@ runops_int(PARROT_INTERP, size_t offset)
          * is ok. */
         if (interp->resume_flag & RESUME_RESTART) {
             if ((int)interp->resume_offset < 0)
-                Parrot_ex_throw_from_c_noargs(interp, 1,
+                Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INTERNAL_PANIC,
                     "branch_cs: illegal resume offset");
         }
     }

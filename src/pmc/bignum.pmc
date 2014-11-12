@@ -687,7 +687,8 @@ bignum_get_si(PARROT_INTERP, ARGIN(PMC *self)) {
     if (mpf_fits_slong_p(bn->b))
         return mpf_get_si(bn->b);
 
-    Parrot_ex_throw_from_c_noargs(interp, 1, "bignum_get_si: number too big");
+    Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_ERR_OVERFLOW,
+            "BigNum: number too big");
 }
 
 PARROT_WARN_UNUSED_RESULT
@@ -700,7 +701,8 @@ bignum_get_ui(PARROT_INTERP, ARGIN(PMC *self)) {
     if (mpf_fits_slong_p(bn->b))
         return mpf_get_ui(bn->b);
 
-    Parrot_ex_throw_from_c_noargs(interp, 1, "bignum_get_ui: number too big");
+    Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_ERR_OVERFLOW,
+            "BigNum: number too big");
 }
 
 PARROT_WARN_UNUSED_RESULT
@@ -1113,8 +1115,8 @@ bignum_get_bigint(PARROT_INTERP, ARGIN(PMC *self)) {
         bi_dest->b = mpf_get_ui(bn->b);
     }
     else {
-        Parrot_ex_throw_from_c_noargs(interp, 1,
-            "bignum_get_bigint: Precision loss");
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_LOSSY_CONVERSION,
+            "BigNum: Precision loss");
     }
     return bi_dest;
 }

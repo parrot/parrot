@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -1185,10 +1185,11 @@ get_subprofiledata(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), int type)
     }
 
     if (spdata->profile_type != type)
-        Parrot_ex_throw_from_c_noargs(interp, 1, "illegal profile type change while profiling");
-
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
+                "illegal profile type change while profiling");
     if (spdata->interp != interp)
-        Parrot_ex_throw_from_c_noargs(interp, 1, "illegal interpreter change while profiling");
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
+                "illegal interpreter change while profiling");
 
     return core->spdata;
 }
@@ -1253,7 +1254,7 @@ runops_subprof_sub_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(o
 
     while (pc) {
         if (pc < code_start || pc >= code_end)
-            Parrot_ex_throw_from_c_noargs(interp, 1,
+            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_OUT_OF_BOUNDS,
                 "attempt to access code outside of current code segment");
 
         ctx    = CURRENT_CONTEXT(interp);
@@ -1351,7 +1352,7 @@ runops_subprof_hll_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(o
         PMC *ctx;
         PMC *subpmc;
         if (pc < code_start || pc >= code_end)
-            Parrot_ex_throw_from_c_noargs(interp, 1,
+            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_OUT_OF_BOUNDS,
                 "attempt to access code outside of current code segment");
 
         ctx = CURRENT_CONTEXT(interp);
@@ -1487,7 +1488,7 @@ runops_subprof_ops_core(PARROT_INTERP, ARGIN(Parrot_runcore_t *runcore), ARGIN(o
         PMC *ctx;
         PMC *subpmc;
         if (pc < code_start || pc >= code_end)
-            Parrot_ex_throw_from_c_noargs(interp, 1,
+            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_OUT_OF_BOUNDS,
                 "attempt to access code outside of current code segment");
 
         ctx = CURRENT_CONTEXT(interp);

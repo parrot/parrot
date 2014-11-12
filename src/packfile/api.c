@@ -2240,7 +2240,7 @@ load_file(PARROT_INTERP, ARGIN(STRING *path))
     PMC * const pf_pmc = Parrot_pf_get_packfile_pmc(interp, pf, path);
 
     if (!pf_pmc)
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
                 "Unable to load PBC file %Ss", path);
     else {
         PMC * const pbc_cache = VTABLE_get_pmc_keyed_int(interp,

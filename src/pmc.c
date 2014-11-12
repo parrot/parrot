@@ -776,7 +776,7 @@ Parrot_pmc_register_new_type(PARROT_INTERP, ARGIN(STRING *name))
         return type;
 
     if (type < enum_type_undef)
-        Parrot_ex_throw_from_c_noargs(interp, 1,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
             "undefined type already exists - can't register PMC");
 
     type = Parrot_pmc_get_new_vtable_index(interp);

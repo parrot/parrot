@@ -20,7 +20,7 @@
         + Shorten and harmonize array exception messages: no context, just:
           index out of bounds, illegal argument, can't resize, ... #1126
         + Add simplier Parrot_ex_throw_from_c_noargs. #1132
-        + Fix most wrong exception codes, 0 or 1. #1133
+        + Fix all wrong exception codes left-overs, 0, 1 or -1. #1133
         + Unescape double-quoted .lex string constants. #1095, perl6 RT#116643
         + Downgrade external ascii strings on multi-byte platform encodings
           to ascii. #1098

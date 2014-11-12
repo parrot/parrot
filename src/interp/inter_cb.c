@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -111,7 +111,7 @@ Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
         }
     }
     if (type != 'C' && type != 'D')
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
             "unhandled signature '%Ss' in make_cb", cb_signature);
 
     cb_sig = Parrot_pmc_new(interp, enum_class_String);
@@ -344,7 +344,7 @@ case_I:
         param = Parrot_str_new(interp, (const char*)external_data, 0);
         break;
       default:
-        Parrot_ex_throw_from_c_args(interp, NULL, 1,
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "unhandled signature char '%c' in run_cb", ch);
     }
     pasm_sig[2] = '-';

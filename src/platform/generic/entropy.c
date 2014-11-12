@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011, Parrot Foundation.
+ * Copyright (C) 2011-2014, Parrot Foundation.
  */
 
 /*
@@ -46,7 +46,7 @@ Parrot_get_entropy(PARROT_INTERP) {
          * as a way to figure out interp's initializedness.
          */
         if (interp->gc_registry)
-            Parrot_ex_throw_from_c_noargs(interp, 1, msg);
+            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_EXTERNAL_ERROR, msg);
         else
             PANIC(interp, msg);
     }
@@ -55,7 +55,7 @@ Parrot_get_entropy(PARROT_INTERP) {
         const char* msg = "Couldn't read from /dev/urandom.";
         fclose(urand_fh);
         if (interp->gc_registry)
-            Parrot_ex_throw_from_c_noargs(interp, 1, msg);
+            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_EXTERNAL_ERROR, msg);
         else
             PANIC(interp, msg);
     }

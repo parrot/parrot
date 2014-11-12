@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2011, Parrot Foundation.
+Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -163,7 +163,8 @@ ncidt_to_pcc(PARROT_INTERP, PARROT_DATA_TYPE t)
         return 'v';
 
       default:
-        Parrot_ex_throw_from_c_args(interp, NULL, 0, "Unhandled NCI type: `%Ss'",
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_KEY_NOT_FOUND,
+                "Unhandled NCI type: `%Ss'",
                 Parrot_dt_get_datatype_name(interp, t));
     }
 }

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2009-2011, Parrot Foundation.
+Copyright (C) 2009-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -376,7 +376,7 @@ ARGIN(opcode_t *pc))
         PMC            *preop_ctx_pmc;
 
         if (pc < code_start || pc >= code_end)
-            Parrot_ex_throw_from_c_noargs(interp, 1,
+            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_OUT_OF_BOUNDS,
                     "attempt to access code outside of current code segment");
 
         preop_ctx_pmc         = CURRENT_CONTEXT(interp);

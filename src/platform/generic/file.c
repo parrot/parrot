@@ -1,13 +1,13 @@
 /*
-Copyright (C) 2011-2012, Parrot Foundation.
+Copyright (C) 2011-2014, Parrot Foundation.
 
 =head1 NAME
 
-src/platform/generic/file.c - Generic UNIX file functions
+src/platform/generic/file.c - Generic POSIX file functions
 
 =head1 DESCRIPTION
 
-This file implements OS-specific file functions for generic UNIX platforms.
+This file implements OS-specific file functions for generic POSIX platforms.
 
 =head2 Functions
 
@@ -471,7 +471,7 @@ stat_intval(PARROT_INTERP, ARGIN(struct stat *statbuf), INTVAL thing, int status
 #ifdef PARROT_HAS_BSD_STAT_EXTN
         result = statbuf->st_blksize;
 #else
-        Parrot_ex_throw_from_c_noargs(interp, 1,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_ARG_OP_NOT_HANDLED,
                     "STAT_PLATFORM_BLOCKSIZE not supported");
 #endif
         break;
@@ -479,7 +479,7 @@ stat_intval(PARROT_INTERP, ARGIN(struct stat *statbuf), INTVAL thing, int status
 #ifdef PARROT_HAS_BSD_STAT_EXTN
         result = statbuf->st_blocks;
 #else
-        Parrot_ex_throw_from_c_noargs(interp, 1,
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_ARG_OP_NOT_HANDLED,
                     "STAT_PLATFORM_BLOCKS not supported");
 #endif
         break;
