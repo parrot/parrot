@@ -30,8 +30,9 @@ for my $gc (@gc, '--no-gc') {
     # override the args
     my $gc_arg = $gc eq '--no-gc' ? $gc : "--gc $gc";
     local $ENV{TEST_PROG_ARGS} = "-t11 $gc_arg --gc-debug --gc-nursery-size=0.0001 ";
+    my @TODO = $gc eq 'inf' ? ('todo' => 'inf instability GH #1136') : ();
 
-    pir_exit_code_is( <<'CODE', 0, "box Integer $gc_arg" );
+    pir_exit_code_is( <<'CODE', 0, "box Integer $gc_arg", @TODO );
 .sub 'main' :main
     print "starting\n"
     $P0 = new ['Integer']
@@ -39,7 +40,7 @@ for my $gc (@gc, '--no-gc') {
 .end
 CODE
 
-    pir_exit_code_is( <<'CODE', 0, "ResizablePMCArray stress $gc_arg" );
+    pir_exit_code_is( <<'CODE', 0, "ResizablePMCArray stress $gc_arg", @TODO );
 .sub 'main' :main
     .param pmc args
 
@@ -58,7 +59,7 @@ CODE
 .end
 CODE
 
-    pir_exit_code_is( <<'CODE', 0, "GC subs $gc_arg" );
+    pir_exit_code_is( <<'CODE', 0, "GC subs $gc_arg", @TODO );
 .sub 'main' :main
     .param pmc args
 
@@ -81,7 +82,7 @@ CODE
 .end
 CODE
 
-    pir_exit_code_is( <<'CODE', 0, "GC coros $gc_arg" );
+    pir_exit_code_is( <<'CODE', 0, "GC coros $gc_arg", @TODO );
 .sub 'main' :main
     .const 'Sub' $P99 = 'coro'
     .local pmc three, four, five
