@@ -250,7 +250,7 @@ trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
         }
         else {
             STRING * const escaped = Parrot_str_escape_truncate(interp, s, 20);
-            if (escaped) {
+            if (escaped && escaped->strstart) {
                 EPRINTF_2("String=PMC(%p Str:\"%s\")", pmc, escaped->strstart);
             }
             else {
@@ -322,7 +322,7 @@ trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
     }
     else {
         STRING * const name = VTABLE_name(interp, pmc);
-        EPRINTF_2("%s=PMC(%p)", name->strstart, pmc);
+        EPRINTF_2("%s=PMC(%p)", name->strstart ? name->strstart : "", pmc);
     }
     if (Interp_trace_TEST(interp, PARROT_TRACE_OPS_PMC_FLAG))
         trace_pmc_flags_dump(interp, pmc);
