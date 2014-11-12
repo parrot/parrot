@@ -132,17 +132,18 @@ out-of-bounds test. Checks INT and PMC keys.
     $P0 = new ['ResizableFloatArray']
     $P0 = 1
 
-    $P0[-1] = -7
-    $I0 = $P0[-1]
-    ok($I0, -7, 'setting negatively indexed elements')
+    $P0[-1] = 3.7
+    $N0 = $P0[-1]
+    is($N0, 3.7, 'setting negatively indexed elements', PRECISION)
 .end
 
 .sub 'getting_negative_index'
     $P0 = new ['ResizableFloatArray']
     $P0 = 1
+    $P0[0] = 3.7
 
-    $I0 = $P0[-1]
-    is($I0, 0, 'getting negatively indexed elements')
+    $N0 = $P0[-1]
+    is($N0, 3.7, 'getting negatively indexed elements', PRECISION)
 .end
 
 .sub 'setting_out_of_bounds'
