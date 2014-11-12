@@ -934,16 +934,16 @@ $(FRPTWO_DIR)/prt0.pbc$(O) : $(FRPTWO_DIR)/prt0.pbc.c \
 $(PARROTOLD) : $(FRP_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
   src/parrot_config$(O) $(MINIPARROT)
 	$(LINK) @ld_out@$@ \
-	$(FRP_DIR)/main$(O) src/parrot_config$(O) \
-	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
+	  $(FRP_DIR)/main$(O) src/parrot_config$(O) \
+	  $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 $(PARROT) : $(FRPTWO_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
   src/parrot_config$(O) \
   $(MINIPARROT) $(FRPTWO_DIR)/prt0.pbc$(O) $(GEN_PASM_INCLUDES)
 	$(LINK) @ld_out@$@ \
-	$(FRPTWO_DIR)/main$(O) $(FRPTWO_DIR)/prt0.pbc$(O) src/parrot_config$(O) \
-	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
+	  $(FRPTWO_DIR)/main$(O) $(FRPTWO_DIR)/prt0.pbc$(O) src/parrot_config$(O) \
+	  $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 $(DEV_TOOLS_DIR)/pbc_to_exe.pir: $(DEV_TOOLS_DIR)/pbc_to_exe.winxed $(PARROT) $(WINXED_LANG) winxed.pbc
@@ -978,7 +978,7 @@ $(PARROT_CONFIG) : $(DEV_TOOLS_DIR)/parrot-config.pir $(PARROT) $(PBC_TO_EXE)
 $(MINIPARROT) : $(FRP_DIR)/main$(O) $(INC_DIR)/api.h $(INC_DIR)/longopt.h $(LIBPARROT) \
   src/null_config$(O)
 	$(LINK) @ld_out@$@ $(FRP_DIR)/main$(O) src/null_config$(O) \
-	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
+	  $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 #IF(cygwin and optimize):$(INSTALLABLEPARROT) : LINK += -s
@@ -986,8 +986,8 @@ $(INSTALLABLEPARROT) : $(FRPTWO_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
   src/install_config$(O) \
   $(FRPTWO_DIR)/prt0.pbc$(O) $(PARROT)
 	$(LINK) @ld_out@$@ \
-	$(FRPTWO_DIR)/main$(O) src/install_config$(O) \
-	$(FRPTWO_DIR)/prt0.pbc$(O) @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
+	  $(FRPTWO_DIR)/main$(O) src/install_config$(O) \
+	  $(FRPTWO_DIR)/prt0.pbc$(O) @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 	$(ADDGENERATED) "$@" "[main]" bin
 
@@ -1163,9 +1163,9 @@ $(LIBPARROT_STATIC) : $(O_FILES)
 $(LIBPARROT_SHARED) : $(O_FILES)
 	$(MKPATH) @blib_dir@
 	$(LD) $(LD_SHARE_FLAGS) $(LDFLAGS) @ld_out@$@ @libparrot_soname@ \
-#IF(cygwin and optimize):		-s \
-#IF(cygwin or (win32 and cc==gcc)):		-Wl,--out-implib=$(IMPORTLIB) \
-		$(O_FILES) $(C_LIBS) $(ICU_SHARED)
+#IF(cygwin and optimize):	  -s \
+#IF(cygwin or (win32 and cc==gcc)):	  -Wl,--out-implib=$(IMPORTLIB) \
+	  $(O_FILES) $(C_LIBS) $(ICU_SHARED)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
 #IF(libparrot_shared_alias):	( cd @blib_dir@ ; ln -sf @libparrot_shared@ @libparrot_shared_alias@ )
 #IF(libparrot_shared_alias):	$(ADDGENERATED) "@blib_dir@/@libparrot_shared_alias@" "[main]" lib
@@ -1205,7 +1205,7 @@ $(PDB) : $(FR_DIR)/parrot_debugger/main$(O) src/parrot_config$(O) $(LIBPARROT)
 	$(LINK) @ld_out@$@ \
 	  $(FR_DIR)/parrot_debugger/main$(O) \
 	  src/parrot_config$(O) \
-	$(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
+	  $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 # broken. do not install
@@ -1251,8 +1251,8 @@ $(FR_DIR)/pbc_dump/packdump$(O) : $(PARROT_H_HEADERS) $(INC_PMC_DIR)/pmc_sub.h \
 
 $(PDUMP) : $(FR_DIR)/pbc_dump/main$(O) $(FR_DIR)/pbc_dump/packdump$(O) $(LIBPARROT) $(INC_DIR)/api.h
 	$(LINK) @ld_out@$@ \
-	$(FR_DIR)/pbc_dump/main$(O) \
-	$(FR_DIR)/pbc_dump/packdump$(O) $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
+	  $(FR_DIR)/pbc_dump/main$(O) \
+	  $(FR_DIR)/pbc_dump/packdump$(O) $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 $(FR_DIR)/pbc_dump/main$(O) : \
@@ -1672,7 +1672,7 @@ src/extend$(O) : \
 	$(INC_DIR)/events.h \
 	src/extend.c
 	$(CC) $(CFLAGS) @optimize::src/extend.c@ @ccwarn::src/extend.c@ \
-          -I$(@D)/. @cc_o_out@$@ -c src/extend.c
+	  -I$(@D)/. @cc_o_out@$@ -c src/extend.c
 
 src/runcore/main$(O) : \
 	src/runcore/main.c \
@@ -2060,7 +2060,9 @@ src/string/encoding/shared$(O) : \
   src/string/encoding/shared.h \
   src/string/encoding/shared.c \
   src/string/encoding/tables.h
-	$(CC) $(CFLAGS) @optimize::src/string/encoding/shared.c@ @ccwarn::src/string/encoding/shared.c@ -I$(@D)/. @cc_o_out@$@ -c src/string/encoding/shared.c
+	$(CC) $(CFLAGS) @optimize::src/string/encoding/shared.c@ \
+	  @ccwarn::src/string/encoding/shared.c@ \
+	  -I$(@D)/. @cc_o_out@$@ -c src/string/encoding/shared.c
 
 src/string/encoding/null$(O) : \
 	$(PARROT_H_HEADERS) \
@@ -2146,7 +2148,9 @@ src/ops/core_ops$(O) : src/ops/core_ops.c \
 	$(INC_DIR)/scheduler_private.h \
 	$(INC_DIR)/namealias.h \
 	src/io/io_private.h
-	$(CC) $(CFLAGS) @optimize::src/ops/core_ops.c@ @ccwarn::src/ops/core_ops.c@ -I$(@D)/. @cc_o_out@$@ -c src/ops/core_ops.c
+	$(CC) $(CFLAGS) @optimize::src/ops/core_ops.c@ \
+	  @ccwarn::src/ops/core_ops.c@ \
+	  -I$(@D)/. @cc_o_out@$@ -c src/ops/core_ops.c
 
 
 @TEMP_pmc_build@
@@ -2515,7 +2519,6 @@ clean : \
 	$(RM_F) $(FLUID_FILES_1)
 	$(RM_F) $(FLUID_FILES_2)
 	$(RM_F) MANIFEST.generated
-	$(RM_RF) lib/Parrot/OpLib
 	$(RM_RF) runtime/parrot/languages/data_json
 	$(RM_F) runtime/parrot/languages/JSON/JSON.pir
 	$(RM_F) $(NQP_CLEANUPS) $(PGE_CLEANUPS) $(TGE_CLEANUPS)
@@ -2526,86 +2529,66 @@ clean : \
 	$(RM_F) $(WINXED_CLEANUPS) $(EXAMPLES_CLEANUPS)
 	$(RM_RF) blib
 
-prog-clean :
+prog-clean : archclean
 	$(RM_F) \
-	$(O_FILES) \
-	$(PARROT) \
-	$(MINIPARROT) \
-	$(LIBPARROT) \
-	$(INSTALLABLEOPS2C) \
-	$(INSTALLABLEPARROT) \
-	$(INSTALLABLEDIS) \
-	$(INSTALLABLEPDUMP) \
-	$(INSTALLABLEPBC_MERGE) \
-	$(INSTALLABLEPBCTOEXE) \
-	$(INSTALLABLEPDB) \
-	$(INSTALLABLECONFIG) \
-	$(INSTALLABLENQP) \
-	$(INSTALLABLENCITHUNKGEN) \
-	$(INSTALLABLEPARROT_PROVE) \
-	$(INSTALLABLEWINXED) \
-	$(DEV_TOOLS_DIR)/pbc_to_exe.pir \
-	pbc_to_exe.pbc pbc_to_exe.c pbc_to_exe$(O) pbc_to_exe$(EXE) \
-	$(NCI_THUNK_GEN) parrot_nci_thunk_gen.c parrot_nci_thunk_gen$(O) parrot_nci_thunk_gen.pbc \
-	parrot-ops2c.pbc parrot-ops2c.c parrot-ops2c$(O) parrot-ops2c$(EXE) parrot-ops2c.pir \
-	parrot-prove.pbc parrot-prove.c parrot-prove$(O) parrot-prove$(EXE) \
-	parrot_config$(EXE) parrot_config.c parrot_config$(O) parrot_config.pbc \
-	winxed.pbc winxed.c winxed$(O) $(WINXED) \
-	compilers/imcc/main$(O) \
-	$(PDUMP) $(FR_DIR)/pbc_dump/main$(O) $(FR_DIR)/pbc_dump/packdump$(O) \
-	$(PDB) $(FR_DIR)/parrot_debugger/main$(O) \
-	$(PBC_MERGE) $(FR_DIR)/pbc_merge/main$(O) \
-	$(DIS) $(FR_DIR)/pbc_disassemble/main$(O)
+	  $(DEV_TOOLS_DIR)/pbc_to_exe.pir \
+	  pbc_to_exe.pbc pbc_to_exe.c \
+	  parrot_nci_thunk_gen.c parrot_nci_thunk_gen.pbc \
+	  parrot-ops2c.pbc parrot-ops2c.c parrot-ops2c.pir \
+	  parrot-prove.pbc parrot-prove.c \
+	  parrot_config.c parrot_config.pbc \
+	  winxed.pbc winxed.c
 	$(RM_F) \
-	$(FRP_DIR)/main$(O) \
-	$(FRPTWO_DIR)/main$(O) \
-	parrot_old \
-	src/null_config$(O) \
-	src/parrot_config$(O) \
-	src/install_config$(O) \
-	src/nci_test$(O) \
-	$(LIBNCI_TEST_SO) \
-	src/glut_callbacks$(O) \
-	src/glut_nci_thunks$(O) \
-	$(LIBGLUTCB_SO) \
-	src/extra_nci_thunks$(O) \
-	install_config.fpmc
+	  install_config.fpmc
 	$(PERL) $(BUILD_TOOLS_DIR)/c2str.pl --init
 	$(RM_F) \
-	$(STR_FILES) \
-	src/string/private_cstring.h "src/pmc/*.c" "$(INC_PMC_DIR)/pmc_*.h" \
-	"src/pmc/*.dump" vtable.dump "*.def" "*.lib" "*.exp"
+	  $(STR_FILES) \
+	  src/string/private_cstring.h "src/pmc/*.c" "$(INC_PMC_DIR)/pmc_*.h" \
+	  "src/pmc/*.dump" vtable.dump "*.def" "*.lib" "*.exp"
 
 archclean: dynext-clean
 	$(RM_F) \
-	$(O_FILES) \
-	$(PARROT) \
-	$(MINIPARROT) \
-	$(INSTALLABLEPARROT) \
-	$(INSTALLABLEDIS) \
-	$(INSTALLABLEPDUMP) \
-	$(INSTALLABLEPBC_MERGE) \
-	$(INSTALLABLEPDB) \
-	$(INSTALLABLECONFIG) \
-	$(INSTALLABLENQP) \
-	compilers/imcc/main$(O) \
-	$(PDUMP) $(FR_DIR)/pbc_dump/main$(O) $(FR_DIR)/pbc_dump/packdump$(O) \
-	$(PDB) $(FR_DIR)/parrot_debugger/main$(O) \
-	$(PBC_MERGE) $(FR_DIR)/pbc_merge/main$(O) \
-	$(DIS) $(FR_DIR)/pbc_disassemble/main$(O) \
-	$(PARROT_CONFIG) parrot_config$(O) \
-	src/parrot_config$(O) \
-	pbc_to_exe$(EXE) pbc_to_exe$(O) \
-	src/null_config$(O) \
-	src/parrot_config$(O) \
-	src/install_config$(O) \
-	src/nci_test$(O) \
-	$(LIBNCI_TEST_SO) \
-	src/glut_callbacks$(O) \
-	$(LIBGLUTCB_SO) \
-	src/extra_nci_thunks$(O) \
-	$(LIBPARROT_STATIC) \
-	$(LIBPARROT_SHARED)
+	  $(O_FILES) \
+	  $(PARROT) \
+          $(PARROTOLD) \
+	  $(MINIPARROT) \
+	  $(INSTALLABLEPARROT) \
+	  $(INSTALLABLEOPS2C) \
+	  $(INSTALLABLEDIS) \
+	  $(INSTALLABLEPDUMP) \
+	  $(INSTALLABLEPBC_MERGE) \
+	  $(INSTALLABLEPDB) \
+	  $(INSTALLABLECONFIG) \
+	  $(INSTALLABLENQP) \
+	  $(INSTALLABLEPBCTOEXE) \
+	  $(INSTALLABLENCITHUNKGEN) \
+	  $(INSTALLABLEPARROT_PROVE) \
+	  $(INSTALLABLEWINXED) \
+	  compilers/imcc/main$(O) \
+	  $(FRP_DIR)/main$(O) \
+	  $(FRPTWO_DIR)/main$(O) \
+	  $(PDUMP) $(FR_DIR)/pbc_dump/main$(O) $(FR_DIR)/pbc_dump/packdump$(O) \
+	  $(PDB) $(FR_DIR)/parrot_debugger/main$(O) \
+	  $(PBC_MERGE) $(FR_DIR)/pbc_merge/main$(O) \
+	  $(DIS) $(FR_DIR)/pbc_disassemble/main$(O) \
+	  $(NCI_THUNK_GEN) parrot_nci_thunk_gen$(O) \
+	  $(PARROT_CONFIG) parrot_config$(O) \
+	  src/parrot_config$(O) \
+	  pbc_to_exe$(EXE) pbc_to_exe$(O) \
+	  parrot-ops2c$(EXE) parrot-ops2c$(O) \
+	  parrot-prove$(EXE) parrot-prove$(O) \
+	  $(WINXED) winxed$(O) \
+	  src/null_config$(O) \
+	  src/parrot_config$(O) \
+	  src/install_config$(O) \
+	  src/nci_test$(O) \
+	  $(LIBNCI_TEST_SO) \
+	  src/glut_callbacks$(O) \
+	  $(LIBGLUTCB_SO) \
+	  src/glut_nci_thunks$(O) \
+	  src/extra_nci_thunks$(O) \
+	  $(LIBPARROT_STATIC) \
+	  $(LIBPARROT_SHARED)
 
 dynext-clean :
 # shared libs (LOAD_EXT, SHARE_EXT)
@@ -2615,14 +2598,14 @@ dynext-clean :
 # win32 exported functions and data items (.exp)
 # win32 export definition files (.def)
 	$(RM_F) \
-	"$(DYNEXT_DIR)/*$(LOAD_EXT)" \
-	"$(DYNEXT_DIR)/*$(SHARE_EXT)" \
-	"$(DYNEXT_DIR)/*.lib" \
-	"*.pdb" "$(DYNEXT_DIR)/*.pdb" \
-	"*.ilk" "$(DYNEXT_DIR)/*.ilk" \
-	"*.exp" "$(DYNEXT_DIR)/*.exp" \
-	"*.def" "$(DYNEXT_DIR)/*.def" \
-	"*.manifest" "$(DYNEXT_DIR)/*.manifest"
+	  "$(DYNEXT_DIR)/*$(LOAD_EXT)" \
+	  "$(DYNEXT_DIR)/*$(SHARE_EXT)" \
+	  "$(DYNEXT_DIR)/*.lib" \
+	  "*.pdb" "$(DYNEXT_DIR)/*.pdb" \
+	  "*.ilk" "$(DYNEXT_DIR)/*.ilk" \
+	  "*.exp" "$(DYNEXT_DIR)/*.exp" \
+	  "*.def" "$(DYNEXT_DIR)/*.def" \
+	  "*.manifest" "$(DYNEXT_DIR)/*.manifest"
 
 # Remove files generated by the test suite
 # XXX Is there a danger of too long command lines in the $(RM_F) commands,
@@ -2636,52 +2619,54 @@ test-clean :
 	$(RM_F) t/compilers/pge/*.pir
 	$(RM_F) t/compilers/tge/*.pir
 	$(RM_F) \
-	$(PBC_TEST_FILES) \
-	"t/*/*$(O)" \
-	"t/*/*.out" \
-	"t/*/*.pasm" \
-	"t/*/*_pbcexe*" \
-	"t/*/*.pir" \
-	"t/*/*.stabs.s" \
-	"t/src/embed/*$(O)" \
-	"t/src/embed/*.out"
+	  $(PBC_TEST_FILES) \
+	  "t/*/*$(O)" \
+	  "t/*/*.out" \
+	  "t/*/*.pasm" \
+	  "t/*/*_pbcexe*" \
+	  "t/*/*.pir" \
+	  "t/*/*.stabs.s" \
+	  "t/src/embed/*$(O)" \
+	  "t/src/embed/*.out"
 	$(RM_F) \
-	"t/library/*.pbc" \
-	"t/dynoplibs/*.pbc" \
-	"t/op/*.pbc" \
-	"t/oo/*.pbc" \
-	"t/pir/*.pbc" \
-	"t/pmc/*.pbc" \
-	"t/dynpmc/*.pbc" \
-	"t/stress/*.pbc" \
-	"t/tools/*.pbc"
+	  "t/library/*.pbc" \
+	  "t/dynoplibs/*.pbc" \
+	  "t/op/*.pbc" \
+	  "t/oo/*.pbc" \
+	  "t/pir/*.pbc" \
+	  "t/pmc/*.pbc" \
+	  "t/dynpmc/*.pbc" \
+	  "t/stress/*.pbc" \
+	  "t/tools/*.pbc"
 	$(RM_F) \
-	 "t/src/*.c" \
-	 "t/src/*.pdb" \
-	 "t/src/*.manifest" \
-	 "t/src/*.exp" \
-	 "t/src/*.lib" \
-	 "t/src/*.exe"
+	  "t/src/*.c" \
+	  "t/src/*.pdb" \
+	  "t/src/*.manifest" \
+	  "t/src/*.exp" \
+	  "t/src/*.lib" \
+	  "t/src/*.exe"
 	$(RM_F) \
-	 "t/src/embed/*.c" \
-	 "t/src/embed/*.pdb" \
-	 "t/src/embed/*.manifest"
+	  "t/src/embed/*.c" \
+	  "t/src/embed/*.pdb" \
+	  "t/src/embed/*.manifest"
 	$(RM_F) \
-	 "t/tools/pmc2c.t_*" \
-	 "t/tools/pmc2c.pmc_t_*" \
-	 "t/tools/parrot_debugger.t.*"
+	  "t/tools/pmc2c.t_*" \
+	  "t/tools/pmc2c.pmc_t_*" \
+	  "t/tools/parrot_debugger.t.*"
 	$(RM_F) \
-	 "test$(EXE)" \
-	 "test.*"
+	  "test$(EXE)" \
+	  "test.*"
 	$(RM_F) \
-	 "t/archive/parrot_test_run.tar.gz" \
-	 ".pod_examinable*.sto"
+	  "t/archive/parrot_test_run.tar.gz" \
+	  ".pod_examinable*.sto"
 
 # a failing step of cleaning, usually doesn't concern the following steps
 realclean : clean
 	$(RM_RF) \
-	$(CONFIGURE_GENERATED_FILES) \
-	cover_db
+	  $(GEN_CONFIGS) \
+	  $(GEN_MAKEFILES) \
+	  $(CONFIGURE_GENERATED_FILES) \
+	  cover_db
 
 distclean : realclean
 
@@ -2773,7 +2758,7 @@ BSD_LINT_FLAGS = -a -aa -b -c -e -h -n -p -r -u -x -z -F -H -V
 BSD_LINT_EXCLUSIONS = -X132,135,236,241,247,249,259,265,277,278
 
 bsdlint : $(PARROT)
-	rm -f *.ln
+	$(RM_F) *.ln
 	$(LINT) $(CC_INC) "-Iinclude/pmc" $(BSD_LINT_FLAGS) $(BSD_LINT_EXCLUSIONS) $(LINTABLE_CFILES)
 
 # For checking with splint see also
@@ -3232,17 +3217,17 @@ bootstrap-namealias src/string/namealias.c : src/string/namealias_c.in $(BUILD_T
 tags-emacs: tags.emacs.dummy
 	$(RM_F) TAGS
 	@ctags@ -e \
-	--links=no --totals \
-	-R --exclude=blib --exclude=.git  \
-	--languages=c,perl --langmap=c:+.h,c:+.pmc,c:+.ops \
-	-I NOTNULL,NULLOK,ARGIN,ARGMOD,ARGOUT,ARGINOUT,ARGIN_NULLOK,ARGOUT_NULLOK,ARGMOD_NULLOK,ARGFREE,ARGFREE_NOTNULL \
+	  --links=no --totals \
+	  -R --exclude=blib --exclude=.git  \
+	  --languages=c,perl --langmap=c:+.h,c:+.pmc,c:+.ops \
+	  -I NOTNULL,NULLOK,ARGIN,ARGMOD,ARGOUT,ARGINOUT,ARGIN_NULLOK,ARGOUT_NULLOK,ARGMOD_NULLOK,ARGFREE,ARGFREE_NOTNULL \
 	.
 
 # this works with an old etags (XEmacs 21.5*)
 tags-xemacs: tags.emacs.dummy
 	$(RM_F) TAGS
 	find . \
-	-name \*.c -o -name \*.h -o -name \*.pmc -o -name \*.ops | etags -l c - -o TAGS
+	  -name \*.c -o -name \*.h -o -name \*.pmc -o -name \*.ops | etags -l c - -o TAGS
 
 tags.emacs.dummy:
 
@@ -3252,11 +3237,11 @@ tags.emacs.dummy:
 tags-vi: tags.vi.dummy
 	$(RM_F) tags
 	@ctags@ \
-	--links=no --totals \
-	-R --exclude=blib --exclude=.git  \
-	--languages=c,perl --langmap=c:+.h,c:+.pmc,c:+.ops \
-	-I NOTNULL,NULLOK,ARGIN,ARGMOD,ARGOUT,ARGINOUT,ARGIN_NULLOK,ARGOUT_NULLOK,ARGMOD_NULLOK,ARGFREE,ARGFREE_NOTNULL \
-	.
+	  --links=no --totals \
+	  -R --exclude=blib --exclude=.git  \
+	  --languages=c,perl --langmap=c:+.h,c:+.pmc,c:+.ops \
+	  -I NOTNULL,NULLOK,ARGIN,ARGMOD,ARGOUT,ARGINOUT,ARGIN_NULLOK,ARGOUT_NULLOK,ARGMOD_NULLOK,ARGFREE,ARGFREE_NOTNULL \
+	  .
 	$(PERL) $(DEV_TOOLS_DIR)/addopstags.pl $(OPS_FILES)
 
 tags.vi.dummy:
