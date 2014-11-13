@@ -860,11 +860,11 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                             if (is_special && info.width != 0) {
                                 char tc1[16];
 #ifdef PARROT_HAS_SNPRINTF
-                                snprintf(tc1, 16, "%%%ds", info.width);
+                                snprintf(tc1, 16, "%%"UINTVAL_FMT"s", info.width);
                                 snprintf(tc, PARROT_SPRINTF_BUFFER_SIZE,
                                          tc1, tempstr);
 #else
-                                sprintf(tc1, "%%%ds", info.width);
+                                sprintf(tc1, "%%"UINTVAL_FMT"s", info.width);
                                 sprintf(tc, tc1, tempstr);
 #endif
                             }
