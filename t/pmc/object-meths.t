@@ -1,11 +1,11 @@
 #! perl
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 38;
+use Parrot::Test tests => 39;
 
 =head1 NAME
 
@@ -1137,6 +1137,45 @@ pir_output_is( <<'CODE', <<'OUTPUT', "overloading isa_pmc vtable" );
 CODE
 1
 OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "vtable invoke self" );
+.sub "" :anon :init :load
+    $P0 = newclass "MyFunc"
+    $P1 = newclass "MyMeth"
+.end
+.namespace ["MyFunc"]
+.sub invoke :vtable
+    .param pmc a
+    say "ok"
+    .return ()
+.end
+.namespace ["MyMeth"]
+.sub invoke :method :vtable
+    .param pmc a
+    say "ok"
+    .return ()
+.end
+.namespace []
+.sub main :main
+    $P0 = new "MyFunc"
+    $P1 = new "MyFunc"
+    $P2 = new "MyMeth"
+    $P0("a")
+    $P0($P1)
+    $P0($P0)
+    $P2("x")
+    $P2($P0)
+    $P2($P2)
+.end
+CODE
+ok
+ok
+ok
+ok
+ok
+ok
+OUTPUT
+
 
 # Local Variables:
 #   mode: cperl

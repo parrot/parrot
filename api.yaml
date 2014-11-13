@@ -198,12 +198,14 @@
   ticket:  'https://trac.parrot.org/parrot/ticket/852'
 -
   name:  'Overriding vtable invoke in PIR objects'
-  note:  'The VTABLE invoke in object.pmc puts SELF at the start of the signature call arguments when there is no current object and is not already here. This allows the usage of $P0() instead of $P0($P0).'
+  note:  'The VTABLE invoke in object.pmc always pushes SELF at the start of the method. It is always a method. Never use $P0($P0) instead of $P0(). This changed with 6.10.0'
   tags:
     - 'PMC'
     - 'experimental'
     - 'completed'
-  ticket:  'https://trac.parrot.org/parrot/ticket/103'
+  ticket:
+    - 'https://trac.parrot.org/parrot/ticket/103'
+    - 'https://github.com/parrot/parrot/issues/1013'
 -
   name:  'PARROT_LIBRARY and PARROT_INCLUDE environment variables'
   note:  'A way to provide an equivalent of -L and -I parrot command line options to language that doesn''t support it.'

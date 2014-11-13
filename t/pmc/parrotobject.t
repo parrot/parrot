@@ -193,15 +193,15 @@ pir_output_is( <<'CODE', <<'OUT', 'Execution ends after returning from invoke' )
 .namespace ['Foo']
 
 .sub invoke :vtable
-say "you invoked me!"
-.return()
+  say "you invoked me!"
+  .return()
 .end
 
 .sub main :main
-$P0 = newclass "Foo"
-$P1 = new ['Foo']
-$P1($P1)   # pass the object it"self"
-say "got here"
+  $P0 = newclass "Foo"
+  $P1 = new ['Foo']
+  $P1()   # no explicit self
+  say "got here"
 .end
 CODE
 you invoked me!
@@ -211,7 +211,7 @@ OUT
 pir_output_is( <<'CODE', <<'OUT', 'params/returns from overridden invoke' );
 .namespace ['Foo']
 
-.sub invoke :vtable
+.sub invoke :method :vtable
   .param int a
   print a
   print "\n"
@@ -222,7 +222,7 @@ pir_output_is( <<'CODE', <<'OUT', 'params/returns from overridden invoke' );
 .sub main :main
   $P0 = newclass "Foo"
   $P1 = new ['Foo']
-  $I0 = $P1($P1, 2) # pass the object it"self"
+  $I0 = $P1(2) # pass the object it"self"
   print $I0
   print "\n"
 .end
