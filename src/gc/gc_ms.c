@@ -1363,6 +1363,7 @@ gc_ms_allocate_memory_chunk(PARROT_INTERP, size_t size)
 {
     ASSERT_ARGS(gc_ms_allocate_memory_chunk)
     void * const ptr = malloc(size);
+    MEMORY_DEBUG_UNUSED(interp)
     MEMORY_DEBUG_DETAIL_2("Allocated %ld at %p\n", size, ptr);
     if (!ptr && size)
         PANIC_OUT_OF_MEM(size);
@@ -1376,6 +1377,7 @@ gc_ms_reallocate_memory_chunk(PARROT_INTERP, ARGFREE(void *from), size_t size)
 {
     ASSERT_ARGS(gc_ms_reallocate_memory_chunk)
     void *ptr;
+    MEMORY_DEBUG_UNUSED(interp)
     MEMORY_DEBUG_DETAIL_2("Freed %p (realloc -- %ld bytes)\n", from, size);
     if (from)
         ptr = realloc(from, size);
@@ -1394,6 +1396,7 @@ gc_ms_allocate_memory_chunk_zeroed(PARROT_INTERP, size_t size)
 {
     ASSERT_ARGS(gc_ms_allocate_memory_chunk_zeroed)
     void * const ptr = calloc(1, size);
+    MEMORY_DEBUG_UNUSED(interp)
     MEMORY_DEBUG_DETAIL_2("Allocated %ld at %p\n", size, ptr);
     if (!ptr && size)
         PANIC_OUT_OF_MEM(size);
@@ -1417,6 +1420,7 @@ static void
 gc_ms_free_memory_chunk(PARROT_INTERP, ARGFREE(void *data))
 {
     ASSERT_ARGS(gc_ms_free_memory_chunk)
+    MEMORY_DEBUG_UNUSED(interp)
     MEMORY_DEBUG_DETAIL_2("Freed %p%s\n", data, "");
     if (data)
         free(data);

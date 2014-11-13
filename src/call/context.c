@@ -648,6 +648,9 @@ INTVAL *
 Parrot_pcc_get_INTVAL_reg(PARROT_INTERP, ARGIN(const PMC *ctx), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_INTVAL_reg)
+#ifdef NDEBUG
+    UNUSED(interp)
+#endif
     PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_INT) > idx);
     return &(CONTEXT_STRUCT(ctx)->bp.regs_i[idx]);
 }
@@ -676,6 +679,9 @@ FLOATVAL *
 Parrot_pcc_get_FLOATVAL_reg(PARROT_INTERP, ARGIN(const PMC *ctx), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_FLOATVAL_reg)
+#ifdef NDEBUG
+    UNUSED(interp)
+#endif
     PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_NUM) > idx);
     return &(CONTEXT_STRUCT(ctx)->bp.regs_n[-1L - idx]);
 }

@@ -37,7 +37,9 @@ extern int CONSERVATIVE_POINTER_CHASING;
 #  define GC_DEBUG_DETAIL_1_FLAGS(s, a1, pmc)
 #  define GC_DEBUG_DETAIL_2(s, a1, a2)
 #  define GC_DEBUG_DETAIL_3(s, a1, a2, a3)
+#  define MEMORY_DEBUG_UNUSED(interp) UNUSED(interp)
 #else
+#  define MEMORY_DEBUG_UNUSED(interp)
 #  define MEMORY_DEBUG_DETAIL_2(s, a1, a2) \
     if (Interp_debug_TEST(interp, \
                 PARROT_MEM_STAT_DEBUG_FLAG | PARROT_MEM_DETAIL_DEBUG_FLAG)) \
