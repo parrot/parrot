@@ -1660,11 +1660,11 @@ used_once(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
     int opt = 0;
 
     for (ins = unit->instructions; ins; ins = ins->next) {
-        if (ins->symregs) {
-            SymReg * const r = ins->symregs[0];
+        SymReg * const r = ins->symregs[0];
+        if (r) {
             /* GH 1036: keep side-effects: P0 = pop P1 vs pop P1 */
-            if (r && ins->type & ITPUREFUNC
-                  && (r->use_count == 1 && r->lhs_use_count == 1)) {
+            if (ins->type & ITPUREFUNC
+            && (r->use_count == 1 && r->lhs_use_count == 1)) {
                 IMCC_debug(imcc, DEBUG_OPT2, "used once deleted ");
                 IMCC_debug_ins(imcc, DEBUG_OPT2, ins);
 

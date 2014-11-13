@@ -94,29 +94,21 @@ method print_c_header_files() {
 method emit_c_op_func_header($fh) {
 
     self._emit_guard_prefix($fh, self<func_header>);
-
     self._emit_preamble($fh);
-
     self._emit_includes($fh);
 
     # Emit runcore specific part.
     self.trans.emit_c_op_funcs_header_part($fh);
-
     self._emit_guard_suffix($fh, self<func_header>);
-
     self._emit_coda($fh);
 }
 
 method emit_c_op_enum_header($fh) {
 
     self._emit_guard_prefix($fh, self<enum_header>);
-
     self._emit_preamble($fh);
-
     self._emit_c_op_enum_header_part($fh);
-
     self._emit_guard_suffix($fh, self<enum_header>);
-
     self._emit_coda($fh);
 }
 
@@ -133,13 +125,9 @@ method print_ops_num_files() {
 method emit_c_opsenum_header($fh, $file) {
 
     self._emit_guard_prefix($fh, $file);
-
     self._emit_preamble($fh);
-
     self.emit_opsenum_h_body($fh);
-
     self._emit_guard_suffix($fh, $file);
-
     self._emit_coda($fh);
 }
 
@@ -177,12 +165,10 @@ method print_c_source_file() {
 }
 
 method emit_c_source_file($fh) {
+
     self._emit_source_preamble($fh);
-
     self.trans.emit_source_part(self, $fh);
-
     self._emit_op_lib_descriptor($fh);
-
     self.trans.emit_op_lookup(self, $fh);
 
     self._emit_init_func($fh);
