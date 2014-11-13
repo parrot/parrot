@@ -82,19 +82,14 @@ sub get_options() {
 
     # build core ops
     $getopts.add_option('core', 'c');
-
     # build the dynops in one .ops file
     $getopts.add_option('dynamic', 'd', 'String');
-
     # don't write to any files
     $getopts.add_option('debug', 'g');
-
     # don't add line numbers to generated files (not implemented)
     $getopts.add_option('no-lines', 'n');
-
     # print anemic usage information and exit
     $getopts.add_option('help', 'h');
-
     # suppress timing and debug output on stdout
     $getopts.add_option('quiet', 'q');
 

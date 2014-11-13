@@ -24,14 +24,14 @@ Ops are either I<auto> or I<manual>. Manual ops are responsible for
 having explicit next-op C<RETURN()> statements, while auto ops can count
 on an automatically generated next-op to be appended to the op body.
 
-Note that F<tools/build/ops2c.pl> supplies either 'inline' or 'function'
+Note that C<ops2c> supplies either 'inline' or 'function'
 as the op's type, depending on whether the C<inline> keyword is present
 in the op definition. This has the effect of causing all ops to be
 considered manual.
 
 =head2 Op Arguments
 
-Note that argument 0 is considered to be the op itself, with arguments
+Note that the first argument is considered to be the op itself, with arguments
 1..9 being the arguments passed to the op.
 
 Op argument direction and type are represented by short one or two letter
@@ -424,21 +424,18 @@ our method to_c:pasttype<if> (PAST::Op $chunk, %c) {
 
     if ($chunk<ternary>) {
         @res.push(self.to_c($chunk[0], %c));
-        @res.push(" ? ");
-        # 'then'
+        @res.push(" ? "); # then
         @res.push(self.to_c($chunk[1], %c));
-        # 'else'
-        @res.push(" : ");
+        @res.push(" : "); # else
         @res.push(self.to_c($chunk[2], %c));
     }
     else {
-        @res.push('if (');
-        @res.push(self.to_c($chunk[0], %c));
-        @res.push(") ");
+        @res.push('if ');
+        @res.push(brace(self.to_c($chunk[0], %c)));
+        @res.push(" ");
 
         # 'then'
         # single statement. Make it pretty.
-
         @res.push(self.to_c($chunk[1], %c));
 
         # 'else'
@@ -455,9 +452,9 @@ our method to_c:pasttype<if> (PAST::Op $chunk, %c) {
 
 our method to_c:pasttype<while> (PAST::Op $chunk, %c) {
     join('',
-        'while (',
-        self.to_c($chunk[0], %c),
-        ') ',
+        'while ',
+        brace(self.to_c($chunk[0], %c)),
+        ' ',
         self.to_c($chunk[1], %c),
     );
 }
@@ -466,9 +463,9 @@ our method to_c:pasttype<do-while> (PAST::Op $chunk, %c) {
     join('',
         'do ',
         self.to_c($chunk[0], %c),
-        ' while (',
-        self.to_c($chunk[1], %c),
-        ');',
+        ' while ',
+        brace(self.to_c($chunk[1], %c)),
+        ';',
     );
 }
 
@@ -672,6 +669,11 @@ our multi sub indent($chunk, %c) {
 
 our multi sub indent(%c) {
     pir::repeat(' ', %c<level> * 4);
+}
+
+our sub brace(String $str) {
+    $str ~~ /^\(/ ?? $str
+                  !! "(" ~ $str ~ ")";
 }
 
 
