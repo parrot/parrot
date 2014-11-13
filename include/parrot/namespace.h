@@ -27,7 +27,7 @@ PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_ns_find_global_from_op(PARROT_INTERP,
     ARGIN(PMC *ns),
     ARGIN_NULLOK(STRING *globalname),
-    ARGIN_NULLOK(void *next))
+    void *next)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 

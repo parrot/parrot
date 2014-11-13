@@ -85,6 +85,8 @@
           libparrot [GH #1101]
         + Change darwin build flags to improve gdb debugging,
           no -undefined dynamic_lookup. #1096
+        + Fix parrot-ops2c not generating extraneous parentheses #1008
+        + Adjust all warnings and suffix overrides
     - Documentation
         + Add missing manpages for pbc_disassemble, pbc_dump, pbc_merge
         + Improved src/string/encoding/tables.c pod.

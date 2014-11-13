@@ -1743,18 +1743,21 @@ src/call/ops$(O) : $(INC_DIR)/oplib/ops.h \
 	$(PARROT_H_HEADERS) $(INC_PMC_DIR)/pmc_continuation.h \
 	$(INC_DIR)/runcore_api.h src/call/ops.c
 
+## SUFFIX OVERRIDE - no -Wformat-nonliteral
 src/io/api$(O) : \
-	$(PARROT_H_HEADERS) \
-	src/io/io_private.h \
-	src/io/api.c \
-	src/io/api.str \
-	$(INC_PMC_DIR)/pmc_handle.h \
-	$(INC_PMC_DIR)/pmc_filehandle.h \
-	$(INC_PMC_DIR)/pmc_stringhandle.h \
-	$(INC_PMC_DIR)/pmc_socket.h \
-	$(INC_PMC_DIR)/pmc_sockaddr.h \
-	$(INC_PMC_DIR)/pmc_bytebuffer.h \
-	$(EXTEND_HEADERS)
+  $(PARROT_H_HEADERS) \
+  src/io/io_private.h \
+  src/io/api.c \
+  src/io/api.str \
+  $(INC_PMC_DIR)/pmc_handle.h \
+  $(INC_PMC_DIR)/pmc_filehandle.h \
+  $(INC_PMC_DIR)/pmc_stringhandle.h \
+  $(INC_PMC_DIR)/pmc_socket.h \
+  $(INC_PMC_DIR)/pmc_sockaddr.h \
+  $(INC_PMC_DIR)/pmc_bytebuffer.h \
+  $(EXTEND_HEADERS)
+	$(CC) $(CFLAGS) @optimize::src/io/api.c@ @ccwarn::src/io/api.c@ \
+	  -I$(@D)/. @cc_o_out@$@ -c src/io/api.c
 
 src/io/buffer$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/buffer.c \
 	$(INC_PMC_DIR)/pmc_handle.h
@@ -1959,7 +1962,10 @@ src/embed/pmc$(O) : \
 
 src/dataypes$(O) : $(GEN_HEADERS) src/dataypes.c
 
+## SUFFIX OVERRIDE - no -Wformat-nonliteral
 src/exit$(O) : $(PARROT_H_HEADERS) src/exit.c
+	$(CC) $(CFLAGS) @optimize::src/exit.c@ @ccwarn::src/exit.c@ \
+	  -I$(@D)/. @cc_o_out@$@ -c src/exit.c
 
 src/nci/api$(O) : src/nci/api.str \
 	src/nci/api.c \

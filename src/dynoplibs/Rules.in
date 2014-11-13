@@ -38,8 +38,12 @@ $(DYNEXT_DIR)/math_ops$(LOAD_EXT): src/dynoplibs/math_ops$(O) $(LIBPARROT)
 src/dynoplibs/math_ops.c: src/dynoplibs/math.ops $(OPS2C)
 	$(OPS2C) --dynamic src/dynoplibs/math.ops --quiet
 
+## SUFFIX OVERRIDE - -Wunused-parameter interp for srand_ic
 src/dynoplibs/math_ops$(O): $(DYNOP_O_DEPS) \
     src/dynoplibs/math_ops.c src/dynoplibs/math_ops.h
+	$(CC) $(CFLAGS) @optimize::src/dynoplibs/math_ops.c@ \
+	  @ccwarn::src/dynoplibs/math_ops.c@ \
+	  -I$(@D)/. @cc_o_out@$@ -c src/dynoplibs/math_ops.c
 
 src/dynoplibs/math_ops.h: src/dynoplibs/math_ops.c
 

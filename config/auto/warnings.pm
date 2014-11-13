@@ -214,7 +214,9 @@ sub _init {
     # strip from the list
     $gcc->{'todo'} = $gpp->{'todo'} = {
         '-Wformat-nonliteral' => [ qw(
-            src/spf_render.c
+            src/string/spf_render.c
+            src/io/api.c
+            src/exit.c
             compilers/imcc/optimizer.c
         ) ],
         '-Wstrict-prototypes' => [ qw(
@@ -232,6 +234,10 @@ sub _init {
             compilers/imcc/imcparser.c
         ) ],
         '-Wcast-qual' => [ qw(
+            compilers/imcc/imcparser.c
+        ) ],
+        '-Wsign-compare' => [ qw(
+            compilers/imcc/imclexer.c
             compilers/imcc/imcparser.c
         ) ],
     };
@@ -295,6 +301,11 @@ sub _init {
         ) ],
         '-Wno-unused-parameter' => [ qw(
             compilers/imcc/imclexer.c
+            src/dynoplibs/math_ops.c
+        ) ],
+        '-Wno-sign-compare' => [ qw(
+            compilers/imcc/imclexer.c
+            compilers/imcc/imcparser.c
         ) ],
     };
 
