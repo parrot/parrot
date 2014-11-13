@@ -30,7 +30,6 @@ sub runstep {
     my ( $self, $conf ) = @_;
 
     $conf->debug("\n");
-
     $conf->debug("(optimization options: init::optimize)\n");
 
     # A plain --optimize means use perl5's $Config{optimize}.  If an argument

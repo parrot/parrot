@@ -1664,15 +1664,12 @@ src/exceptions$(O) : $(PARROT_H_HEADERS) \
 
 src/threads$(O) : $(PARROT_H_HEADERS) $(INC_DIR)/atomic.h src/threads.c
 
-## SUFFIX OVERRIDE - dynloaded files need cc_shared
 src/extend$(O) : \
 	$(PARROT_H_HEADERS) \
 	$(EXTEND_HEADERS) \
 	$(INC_PMC_DIR)/pmc_sub.h \
 	$(INC_DIR)/events.h \
 	src/extend.c
-	$(CC) $(CFLAGS) @optimize::src/extend.c@ @ccwarn::src/extend.c@ \
-	  -I$(@D)/. @cc_o_out@$@ -c src/extend.c
 
 src/runcore/main$(O) : \
 	src/runcore/main.c \
@@ -1979,7 +1976,7 @@ src/nci/libffi$(O) : src/nci/libffi.c \
 	$(INC_PMC_DIR)/pmc_unmanagedstruct.h \
 	$(INC_PMC_DIR)/pmc_managedstruct.h \
 
-## SUFFIX OVERRIDE
+## SUFFIX OVERRIDE - no -Wstrict-prototypes
 src/nci/extra_thunks$(O) : \
 	$(PARROT_H_HEADERS) \
 	$(INC_PMC_DIR)/pmc_nci.h \
@@ -2029,12 +2026,12 @@ src/string/namealias$(O) : \
 	$(INC_DIR)/config.h \
 	src/string/namealias.c
 
-## SUFFIX OVERRIDE
+## SUFFIX OVERRIDE - -Wno-format-nonliteral
 src/string/sprintf$(O) : $(PARROT_H_HEADERS) src/string/sprintf.c src/string/spf_private.h
 	$(CC) $(CFLAGS) @optimize::src/string/sprintf.c@ @ccwarn::src/string/sprintf.c@ \
 	  -I$(@D)/. @cc_o_out@$@ -c src/string/sprintf.c
 
-## SUFFIX OVERRIDE
+## SUFFIX OVERRIDE - no -Wformat-nonliteral
 src/string/spf_render$(O) : $(PARROT_H_HEADERS) src/string/spf_render.str \
   src/string/spf_render.c src/string/spf_private.h
 	$(CC) $(CFLAGS) @optimize::src/string/spf_render.c@ @ccwarn::src/string/spf_render.c@ \
@@ -2054,7 +2051,7 @@ src/string/encoding/tables$(O) : \
 	src/string/encoding/tables.h \
 	src/string/encoding/tables.c
 
-## SUFFIX OVERRIDE
+## SUFFIX OVERRIDE - no -Werror=strict-prototypes for icu4.2 - 4.9
 src/string/encoding/shared$(O) : \
   $(PARROT_H_HEADERS) \
   src/string/encoding/shared.h \
@@ -3158,9 +3155,7 @@ exec : src/parrot_config$(O) $(LIBPARROT)
 ###### OS depend targets ##########
 
 # for use by t/pmc/nci.t
-## SUFFIX OVERRIDE - dynloaded files need cc_shared
 src/nci_test$(O): $(PARROT_H_HEADERS) src/nci_test.c
-	$(CC) $(CFLAGS) @optimize::src/nci_test.c@ @ccwarn::src/nci_test.c@ -I$(@D)/. @cc_o_out@$@ -c src/nci_test.c
 
 $(LIBNCI_TEST_SO): src/nci_test$(O)
 	$(LD) $(LD_LOAD_FLAGS) @ncilib_link_extra@ $(LDFLAGS) \
@@ -3202,7 +3197,7 @@ $(LIBGLUTCB_SO): $(LIBPARROT) src/glut_callbacks$(O) src/glut_nci_thunks$(O)
 bootstrap-nci : src/nci/core_thunks.nci src/nci/extra_thunks.nci
 	$(PERL) $(DEV_TOOLS_DIR)/mk_nci_thunks.pl
 
-## SUFFIX OVERRIDE
+## SUFFIX OVERRIDE - no -Wstrict-prototypes
 src/extra_nci_thunks$(O) : $(PARROT_H_HEADERS) src/extra_nci_thunks.c \
 	$(INC_PMC_DIR)/pmc_nci.h
 	$(CC) $(CFLAGS) @optimize::src/extra_nci_thunks.c@ @ccwarn::src/extra_nci_thunks.c@ -I$(@D)/. @cc_o_out@$@ -c src/extra_nci_thunks.c

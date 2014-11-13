@@ -17,13 +17,8 @@ $(DYNEXT_DIR)/obscure_ops$(LOAD_EXT): src/dynoplibs/obscure_ops$(O) $(LIBPARROT)
 #IF(cygwin or hpux):	$(CHMOD) 0775 $@
 	$(ADDGENERATED) "$@" "[library]"
 
-## SUFFIX OVERRIDE - add -Wno-parentheses-equality for clang, with same rule as src/ops/core_ops.c
 src/dynoplibs/obscure_ops$(O): $(DYNOP_O_DEPS) \
     src/dynoplibs/obscure_ops.c src/dynoplibs/obscure_ops.h
-	$(CC) $(CFLAGS) @optimize::src/dynoplibs/obscure_ops.c@ \
-	  @ccwarn::src/ops/core_ops.c@ @cc_shared@ \
-	  -I$(@D)/. @cc_o_out@$@ -c src/dynoplibs/obscure_ops.c
-
 
 src/dynoplibs/obscure_ops.h: src/dynoplibs/obscure_ops.c
 
@@ -43,12 +38,8 @@ $(DYNEXT_DIR)/math_ops$(LOAD_EXT): src/dynoplibs/math_ops$(O) $(LIBPARROT)
 src/dynoplibs/math_ops.c: src/dynoplibs/math.ops $(OPS2C)
 	$(OPS2C) --dynamic src/dynoplibs/math.ops --quiet
 
-## SUFFIX OVERRIDE - add -Wno-parentheses-equality for clang, with same rule as src/ops/core_ops.c
 src/dynoplibs/math_ops$(O): $(DYNOP_O_DEPS) \
     src/dynoplibs/math_ops.c src/dynoplibs/math_ops.h
-	$(CC) $(CFLAGS) @optimize::src/dynoplibs/math_ops.c@ \
-	  @ccwarn::src/ops/core_ops.c@ @cc_shared@ \
-	  -I$(@D)/. @cc_o_out@$@ -c src/dynoplibs/math_ops.c
 
 src/dynoplibs/math_ops.h: src/dynoplibs/math_ops.c
 
@@ -62,12 +53,8 @@ $(DYNEXT_DIR)/trans_ops$(LOAD_EXT): src/dynoplibs/trans_ops$(O) $(LIBPARROT)
 #IF(cygwin or hpux):	$(CHMOD) 0775 $@
 	$(ADDGENERATED) "$@" "[library]"
 
-## SUFFIX OVERRIDE - add -Wno-parentheses-equality for clang, with same rule as src/ops/core_ops.c
 src/dynoplibs/trans_ops$(O): $(DYNOP_O_DEPS) \
     src/dynoplibs/trans_ops.c src/dynoplibs/trans_ops.h
-	$(CC) $(CFLAGS) @optimize::src/dynoplibs/trans_ops.c@ \
-	  @ccwarn::src/ops/core_ops.c@ @cc_shared@ \
-	  -I$(@D)/. @cc_o_out@$@ -c src/dynoplibs/trans_ops.c
 
 src/dynoplibs/trans_ops.h: src/dynoplibs/trans_ops.c
 
@@ -84,12 +71,8 @@ $(DYNEXT_DIR)/bit_ops$(LOAD_EXT): src/dynoplibs/bit_ops$(O) $(LIBPARROT)
 #IF(cygwin or hpux):	$(CHMOD) 0775 $@
 	$(ADDGENERATED) "$@" "[library]"
 
-## SUFFIX OVERRIDE - add -Wno-parentheses-equality for clang, with same rule as src/ops/core_ops.c
 src/dynoplibs/bit_ops$(O): $(DYNOP_O_DEPS) \
     src/dynoplibs/bit_ops.c src/dynoplibs/bit_ops.h
-	$(CC) $(CFLAGS) @optimize::src/dynoplibs/bit_ops.c@ \
-	  @ccwarn::src/ops/core_ops.c@ @cc_shared@ \
-	  -I$(@D)/. @cc_o_out@$@ -c src/dynoplibs/bit_ops.c
 
 src/dynoplibs/bit_ops.h: src/dynoplibs/bit_ops.c
 
@@ -106,12 +89,8 @@ $(DYNEXT_DIR)/debug_ops$(LOAD_EXT): src/dynoplibs/debug_ops$(O) $(LIBPARROT)
 #IF(cygwin or hpux):	$(CHMOD) 0775 $@
 	$(ADDGENERATED) "$@" "[library]"
 
-## SUFFIX OVERRIDE - add -Wno-parentheses-equality for clang, with same rule as src/ops/core_ops.c
 src/dynoplibs/debug_ops$(O): $(DYNOP_O_DEPS) \
     src/dynoplibs/debug_ops.c src/dynoplibs/debug_ops.h
-	$(CC) $(CFLAGS) @optimize::src/dynoplibs/debug_ops.c@ \
-	  @ccwarn::src/ops/core_ops.c@ @cc_shared@ \
-	  -I$(@D)/. @cc_o_out@$@ -c src/dynoplibs/debug_ops.c
 
 src/dynoplibs/debug_ops.h: src/dynoplibs/debug_ops.c
 
@@ -128,12 +107,8 @@ $(DYNEXT_DIR)/sys_ops$(LOAD_EXT): src/dynoplibs/sys_ops$(O) $(LIBPARROT)
 #IF(cygwin or hpux):	$(CHMOD) 0775 $@
 	$(ADDGENERATED) "$@" "[library]"
 
-## SUFFIX OVERRIDE - add -Wno-parentheses-equality for clang, with same rule as src/ops/core_ops.c
 src/dynoplibs/sys_ops$(O): $(DYNOP_O_DEPS) \
     src/dynoplibs/sys_ops.c src/dynoplibs/sys_ops.h
-	$(CC) $(CFLAGS) @optimize::src/dynoplibs/sys_ops.c@ \
-	  @ccwarn::src/ops/core_ops.c@ @cc_shared@ \
-	  -I$(@D)/. @cc_o_out@$@ -c src/dynoplibs/sys_ops.c
 
 src/dynoplibs/sys_ops.h: src/dynoplibs/sys_ops.c
 
@@ -150,12 +125,8 @@ $(DYNEXT_DIR)/io_ops$(LOAD_EXT): src/dynoplibs/io_ops$(O) $(LIBPARROT)
 #IF(cygwin or hpux):	$(CHMOD) 0775 $@
 	$(ADDGENERATED) "$@" "[library]"
 
-## SUFFIX OVERRIDE - add -Wno-parentheses-equality for clang, with same rule as src/ops/core_ops.c
 src/dynoplibs/io_ops$(O): $(DYNOP_O_DEPS) \
     src/dynoplibs/io_ops.c src/dynoplibs/io_ops.h src/io/io_private.h
-	$(CC) $(CFLAGS) @optimize::src/dynoplibs/io_ops.c@ \
-	  @ccwarn::src/ops/core_ops.c@ @cc_shared@ \
-	  -I$(@D)/. @cc_o_out@$@ -c src/dynoplibs/io_ops.c
 
 src/dynoplibs/io_ops.h: src/dynoplibs/io_ops.c
 

@@ -229,6 +229,7 @@ sub _init {
         ) ],
         '-Wswitch-default' => [ qw(
             compilers/imcc/imclexer.c
+            compilers/imcc/imcparser.c
         ) ],
         '-Wcast-qual' => [ qw(
             compilers/imcc/imcparser.c
@@ -288,9 +289,6 @@ sub _init {
     $data->{'warnings'}{'clang'}->{'cage'} = [ @gcc_or_gpp_cage, '-Wcast-align' ];
 
     $data->{'warnings'}{'clang'}->{'override'} = {
-        '-Wno-parentheses-equality' => [ qw(
-            src/ops/core_ops.c
-        ) ],
         '-Wno-format-nonliteral' => [ qw(
             src/string/sprintf.c
             src/string/spf_render.c

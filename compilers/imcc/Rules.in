@@ -155,7 +155,7 @@ compilers/imcc/imclexer$(O) : \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS)
 	$(CC) $(CFLAGS) @optimize::compilers/imcc/imclexer.c@ \
-	  @ccwarn::compilers/imcc/imclexer.c@ @cc_shared@ \
+	  @ccwarn::compilers/imcc/imclexer.c@ \
 	  -I$(@D)/. @cc_o_out@$@ -c compilers/imcc/imclexer.c
 
 ## SUFFIX OVERRIDE - Warnings (This is generated code)
@@ -178,7 +178,7 @@ compilers/imcc/imcparser$(O) : \
     $(INC_DIR)/oplib/ops.h \
     $(PARROT_H_HEADERS)
 	$(CC) $(CFLAGS) @optimize::compilers/imcc/imcparser.c@ \
-	  @ccwarn::compilers/imcc/imcparser.c@ @cc_shared@ \
+	  @ccwarn::compilers/imcc/imcparser.c@ \
 	  -I$(@D)/. @cc_o_out@$@ -c compilers/imcc/imcparser.c
 
 compilers/imcc/main$(O) : \
@@ -203,7 +203,7 @@ compilers/imcc/main$(O) : \
     include/pmc/pmc_sub.h \
     $(PARROT_H_HEADERS)
 
-## SUFFIX OVERRIDE - Warnings (This is generated code)
+## SUFFIX OVERRIDE - no -Wformat-nonliteral
 compilers/imcc/optimizer$(O) : \
     compilers/imcc/optimizer.c \
     compilers/imcc/cfg.h \
@@ -222,7 +222,7 @@ compilers/imcc/optimizer$(O) : \
     $(INC_DIR)/runcore_api.h \
     $(PARROT_H_HEADERS)
 	$(CC) $(CFLAGS) @optimize::compilers/imcc/optimizer.c@ \
-	  @ccwarn::compilers/imcc/optimizer.c@ @cc_shared@ \
+	  @ccwarn::compilers/imcc/optimizer.c@ \
 	  -I$(@D)/. @cc_o_out@$@ -c compilers/imcc/optimizer.c
 
 compilers/imcc/reg_alloc$(O) : \
