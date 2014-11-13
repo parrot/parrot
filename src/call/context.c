@@ -215,6 +215,8 @@ create_initial_context(PARROT_INTERP)
     /* For now create context with 32 regs each. Some src tests (and maybe
      * other extenders) assume the presence of these registers */
     PMC * const ctx = Parrot_set_new_context(interp, num_regs);
+    if (!ctx)
+        Parrot_x_panic_and_exit(interp, "Out of mem", __FILE__, __LINE__);
 }
 
 /*
