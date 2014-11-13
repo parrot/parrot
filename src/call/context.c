@@ -210,13 +210,12 @@ create_initial_context(PARROT_INTERP)
     static const UINTVAL num_regs[] = {32, 32, 32, 32};
 
     /* Create some initial free_list slots. */
-
 #define INITIAL_FREE_SLOTS 8
+
     /* For now create context with 32 regs each. Some src tests (and maybe
      * other extenders) assume the presence of these registers */
-    (void)Parrot_set_new_context(interp, num_regs);
+    PMC * const ctx = Parrot_set_new_context(interp, num_regs);
 }
-
 
 /*
 
