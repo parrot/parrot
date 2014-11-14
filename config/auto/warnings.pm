@@ -117,10 +117,10 @@ sub _init {
     #   -Wsign-compare -Wtype-limits -Wuninitialized -Wunused-parameter (only with -Wunused or
     #   -Wall) -Wunused-but-set-parameter (only with -Wunused or -Wall)
     my @gcc_or_gpp_basic = qw(
+        -fpermissive
         -falign-functions=16
         -funit-at-a-time
         -fexcess-precision=standard
-        -fpermissive
         -maccumulate-outgoing-args
         -Wall
         -Wextra
@@ -340,6 +340,13 @@ sub runstep {
     ) {
         push @{$self->{'warnings'}{$compiler}{'basic'}},
             '-fvisibility=hidden';
+    };
+
+    # cygwin gcc is more particular about -fpermissive in c mode.
+    # this is the 1st element
+    if ( $^O eq 'cygwin' and $compiler eq 'gcc' and
+         $conf->data->get('gccversion') >= 4.0 ) {
+        shift @{$self->{'warnings'}{'gcc'}{'basic'}};
     };
 
     # icu4.2 -4.9 uset.h had a wrong uset_openEmpty() declaration missing (void) GH #867
