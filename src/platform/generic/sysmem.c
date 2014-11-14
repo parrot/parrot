@@ -80,7 +80,7 @@ Parrot_sysmem_amount(PARROT_INTERP)
 #  ifndef NDEBUG
     if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG)) {
         ori_memsize = memsize;
-        fprintf(stderr, "Free Memory: "UINTVAL_FMT"\n", memsize);
+        fprintf(stderr, "Free Memory: "SIZE_FMT"\n", memsize);
     }
 #  endif
 
@@ -121,7 +121,7 @@ Parrot_sysmem_amount(PARROT_INTERP)
 #  ifndef NDEBUG
     if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG)) {
         ori_memsize = memsize;
-        fprintf(stderr, "Free Memory: "UINTVAL_FMT"\n", memsize);
+        fprintf(stderr, "Free Memory: "SIZE_FMT"\n", memsize);
     }
 #  endif
 #else
@@ -134,7 +134,7 @@ Parrot_sysmem_amount(PARROT_INTERP)
 #  ifndef NDEBUG
     if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG)) {
         ori_memsize = memsize;
-        fprintf(stderr, "Default Memory: "UINTVAL_FMT"\n", memsize);
+        fprintf(stderr, "Default Memory: "SIZE_FMT"\n", memsize);
     }
 #  endif
 #endif
@@ -155,7 +155,7 @@ Parrot_sysmem_amount(PARROT_INTERP)
 #  ifndef NDEBUG
     if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG)
         && ori_memsize != memsize)
-        fprintf(stderr, "Memory via rlimit restricted to: "UINTVAL_FMT"\n", memsize);
+        fprintf(stderr, "Memory via rlimit restricted to: "SIZE_FMT"\n", memsize);
 #  endif
 #endif
 
