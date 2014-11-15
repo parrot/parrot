@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -21,10 +21,11 @@ Tests the Object PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(3)
+    plan(4)
 
     test_new()
     test_isa()
+    test_subclass_object()
 .end
 
 .sub test_new
@@ -46,6 +47,19 @@ CODE
     null $P1
     $I0 = isa $P0, $P1
     is($I0, 0, 'isa null pmc')
+.end
+
+.sub test_subclass_object
+    $P0 = subclass "Object", "Foo"
+    push_eh error
+    $P1 = new $P0
+    ok(1, 'subclass from Object')
+    .return()
+
+  error:
+    # Object must be created by a class
+    todo(0, 'subclass from Object', 'GH #1010 allow normal Object instantiaton')
+    pop_eh
 .end
 
 # Local Variables:
