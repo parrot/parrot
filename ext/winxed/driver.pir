@@ -186,7 +186,7 @@
 .end
 .namespace [ ]
 
-.sub 'path_option' :subid('WSubId_2')
+.sub 'path_option' :subid('path_option')
         .param pmc __ARG_1
         .param string __ARG_2
         .param int __ARG_3
@@ -205,7 +205,7 @@
 .end # path_option
 
 
-.sub 'extname' :subid('WSubId_3') :anon
+.sub 'extname' :subid('extname') :anon
         .param string __ARG_1
         .param string __ARG_2
     null $S1
@@ -227,7 +227,7 @@
 .end # extname
 
 
-.sub 'getcompiler' :subid('WSubId_1') :anon
+.sub 'getcompiler' :subid('getcompiler') :anon
     null $P1
     new $P2, 'ExceptionHandler'
     set_label $P2, __label_1
@@ -249,18 +249,18 @@
 .end # getcompiler
 
 
-.sub 'process_args' :subid('WSubId_4') :anon
+.sub 'process_args' :subid('process_args') :anon
         .param pmc __ARG_1
-.const 'Sub' WSubId_1 = "WSubId_1"
-.const 'Sub' WSubId_2 = "WSubId_2"
-.const 'Sub' WSubId_3 = "WSubId_3"
+.const 'Sub' getcompiler = "getcompiler"
+.const 'Sub' path_option = "path_option"
+.const 'Sub' extname = "extname"
     new $P13, [ 'WinxedDriverOptions' ]
     $P13.'WinxedDriverOptions'(__ARG_1)
     set $P1, $P13
     $P13 = $P1.'getbool'('version')
     if_null $P13, __label_1
     unless $P13 goto __label_1
-    $P2 = WSubId_1()
+    $P2 = getcompiler()
     $P13 = $P2.'version_string'()
     say $P13
     exit 0
@@ -294,9 +294,9 @@
     $P1.'showhelp'()
     exit 0
   __label_5: # endif
-    WSubId_2($P1, 'L', 1)
-    WSubId_2($P1, 'I', 0)
-    WSubId_2($P1, 'X', 2)
+    path_option($P1, 'L', 1)
+    path_option($P1, 'I', 0)
+    path_option($P1, 'X', 2)
     root_new $P3, ['parrot';'Hash']
     $P3["debug"] = $I3
     $P3["noan"] = $I5
@@ -334,7 +334,7 @@
     if $I2 goto __label_16
     die '-o without -c or --target is not supported yet'
   __label_16: # endif
-    $P4 = WSubId_1()
+    $P4 = getcompiler()
     null $P5
     null $S4
     new $P13, 'ExceptionHandler'
@@ -351,7 +351,7 @@
     $S5 = __ARG_1[0]
     unless $I2 goto __label_22
     unless_null $S3, __label_22
-    $P13 = WSubId_3($S5, '.pir')
+    $P13 = extname($S5, '.pir')
     set $S4, $P13
   __label_22: # endif
     $P5 = $P4.'compile_from_file'($S5, $P3 :flat :named)
@@ -473,9 +473,9 @@
 
 .sub '__PARROT_ENTRY_WINXED_main' :main
         .param pmc __ARG_1
-.const 'Sub' WSubId_4 = "WSubId_4"
-.const 'Sub' WSubId_5 = "WSubId_5"
-    $P1 = WSubId_4(__ARG_1)
+.const 'Sub' process_args = "process_args"
+.const 'Sub' fail = "fail"
+    $P1 = process_args(__ARG_1)
     null $I1
     new $P4, 'ExceptionHandler'
     set_label $P4, __label_1
@@ -491,14 +491,14 @@
     .get_results($P3)
     finalize $P3
     pop_eh
-    WSubId_5($P3)
+    fail($P3)
   __label_2:
     exit $I1
 
 .end # __PARROT_ENTRY_WINXED_main
 
 
-.sub 'fail' :subid('WSubId_5') :anon
+.sub 'fail' :subid('fail') :anon
         .param pmc __ARG_1
     getstderr $P1
     getattribute $P3, __ARG_1, 'message'
