@@ -193,7 +193,7 @@ trace_pmc_flags_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
     EPRINTF("( ");
     for (i=0; i < sizeof (flags_names) / sizeof (flags_names[0]); i++) {
         if (flags & flags_names[i].flag) {
-	    EPRINTF_1("%s ", flags_names[i].name);
+            EPRINTF_1("%s ", flags_names[i].name);
         }
     }
     EPRINTF(")");
