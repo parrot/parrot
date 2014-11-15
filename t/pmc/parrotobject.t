@@ -213,20 +213,24 @@ pir_output_is( <<'CODE', <<'OUT', 'params/returns from overridden invoke' );
 
 .sub invoke :method :vtable
   .param int a
-  print a
-  print "\n"
+  say self
+  say a
   inc a
   .return(a)
+.end
+
+.sub get_string :vtable
+    .return ("me")
 .end
 
 .sub main :main
   $P0 = newclass "Foo"
   $P1 = new ['Foo']
   $I0 = $P1(2) # pass the object it"self"
-  print $I0
-  print "\n"
+  say $I0
 .end
 CODE
+me
 2
 3
 OUT

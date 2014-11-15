@@ -1146,14 +1146,22 @@ pir_output_is( <<'CODE', <<'OUTPUT', "vtable invoke self" );
 .namespace ["MyFunc"]
 .sub invoke :vtable
     .param pmc a
-    say "ok"
+    print self
+    say " ok"
     .return ()
+.end
+.sub get_string :vtable
+    .return ("me")
 .end
 .namespace ["MyMeth"]
 .sub invoke :method :vtable
     .param pmc a
-    say "ok"
+    print self
+    say " ok"
     .return ()
+.end
+.sub get_string :vtable
+    .return ("me")
 .end
 .namespace []
 .sub main :main
@@ -1168,12 +1176,12 @@ pir_output_is( <<'CODE', <<'OUTPUT', "vtable invoke self" );
     $P2($P2)
 .end
 CODE
-ok
-ok
-ok
-ok
-ok
-ok
+me ok
+me ok
+me ok
+me ok
+me ok
+me ok
 OUTPUT
 
 

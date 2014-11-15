@@ -25,7 +25,7 @@
         + Downgrade external ascii strings on multi-byte platform encodings
           to ascii. #1098
         + Fix self heuristic with vtable overridden method calls.
-          $P0() instead of $P0($P0) is now stable, push if $P0 is a :method, otherwise set.
+          $P0($P0) instead of $P0() is now invalid, it is always a method.
           https://trac.parrot.org/parrot/ticket/103 #1013
     - Build
         + Set -mabi=64 for gcc --m=64 on mips, -m64 on powerpc #1110
