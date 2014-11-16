@@ -2591,8 +2591,8 @@ archclean: dynext-clean
 	  $(LIBGLUTCB_SO) \
 	  src/glut_nci_thunks$(O) \
 	  src/extra_nci_thunks$(O) \
-	  $(LIBPARROT_STATIC) \
-	  $(LIBPARROT_SHARED)
+#IF(libparrot_static):	  $(LIBPARROT_STATIC) \
+#IF(parrot_is_shared):	  $(LIBPARROT_SHARED)
 
 dynext-clean :
 # shared libs (LOAD_EXT, SHARE_EXT)
