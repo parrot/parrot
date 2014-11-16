@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2012, Parrot Foundation.
+# Copyright (C) 2005-2014, Parrot Foundation.
 
 package init::hints::mswin32;
 

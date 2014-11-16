@@ -574,6 +574,7 @@ INSTALLABLEWINXED   = .@slash@installable_winxed$(EXE)
 
 # Libraries
 #IF(libparrot_static):LIBPARROT_STATIC    = @blib_dir@/@libparrot_static@
+#ELSE:LIBPARROT_STATIC    = @blib_dir@/dummy.lib
 #IF(darwin):export DYLD_LIBRARY_PATH := @build_dir@/@blib_dir@:$(DYLD_LIBRARY_PATH)
 #IF(win32 or msys or cygwin):LIBPARROT_SHARED  = @libparrot_shared@
 #ELSE:LIBPARROT_SHARED  = @blib_dir@/@libparrot_shared@
