@@ -935,7 +935,8 @@ $(PARROTOLD) : $(FRP_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
   src/parrot_config$(O) $(MINIPARROT)
 	$(LINK) @ld_out@$@ \
 	  $(FRP_DIR)/main$(O) src/parrot_config$(O) \
-	  $(O_FILES) $(ICU_SHARED) $(C_LIBS) $(LINKFLAGS)
+#IF(darwin and debugging):	  $(O_FILES) $(ICU_SHARED) $(C_LIBS) $(LINKFLAGS)
+#ELSE:	  $(RPATH_BLIB) $(ALL_PARROT_LIBS) $(LINKFLAGS) $(LINK_DYNAMIC)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
 
 $(PARROT) : $(FRPTWO_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
