@@ -1154,12 +1154,12 @@ PARROT_LIBS : \
 #IF(cygwin):IMPORTLIB = libparrot.dll.a
 #IF(win32 and cc==gcc):IMPORTLIB = libparrot.lib
 
-$(LIBPARROT_STATIC) : $(O_FILES)
-	$(MKPATH) @blib_dir@
-	$(AR_CR) @ar_out@$@ @ar_extra@ $(O_FILES)
-#IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
-	$(RANLIB) $@
-	$(ADDGENERATED) "$@" "[main]" lib
+#IF(libparrot_static):$(LIBPARROT_STATIC) : $(O_FILES)
+#IF(libparrot_static):	$(MKPATH) @blib_dir@
+#IF(libparrot_static):	$(AR_CR) @ar_out@$@ @ar_extra@ $(O_FILES)
+#IF(libparrot_static and win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
+#IF(libparrot_static):	$(RANLIB) $@
+#IF(libparrot_static):	$(ADDGENERATED) "$@" "[main]" lib
 
 $(LIBPARROT_SHARED) : $(O_FILES)
 	$(MKPATH) @blib_dir@
@@ -2591,7 +2591,7 @@ archclean: dynext-clean
 	  $(LIBGLUTCB_SO) \
 	  src/glut_nci_thunks$(O) \
 	  src/extra_nci_thunks$(O) \
-	  $(LIBPARROT_STATIC) \
+#IF(libparrot_static):	  $(LIBPARROT_STATIC) \
 	  $(LIBPARROT_SHARED)
 
 dynext-clean :
