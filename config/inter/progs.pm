@@ -161,10 +161,14 @@ sub _set_debug_and_warn {
     my ($conf, $debug) = @_;
     if ( $debug =~ /n/i ) {
         $conf->data->set(
-            cc_debug   => '',
             link_debug => '',
             ld_debug   => ''
         );
+        # We want to keep -g even if --debugging was not requested.
+        # We can strip it easily. -DNDEBUG does the most optimizations.
+        if ($conf->data->get('cc_debug') ne '-g') {
+            $conf->data->set(cc_debug => '');
+        }
     }
 
     # This one isn't prompted for above.  I don't know why.
