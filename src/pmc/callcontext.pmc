@@ -645,6 +645,8 @@ Mark any referenced strings and PMCs.
             UINTVAL         i;
 
             GET_ATTR_bp_ps(INTERP, SELF, bp_ps);
+            if (!bp_ps.regs_p) /* in allocate_registers */
+                return;
 
             for (i = 0; i < regs_p; ++i) {
                 PMC * const p = bp_ps.regs_p[-1L-(i)];
