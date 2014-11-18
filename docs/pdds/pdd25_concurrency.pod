@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 PDD 25: Concurrency
 
@@ -11,11 +11,13 @@ Parrot's concurrency models.
 
 =over 4
 
-=item - Parrot supports multiple concurrency models, including
-green threads, Windows threads, POSIX threads, event-based programming,
-and asynchronous I/O.
+=item - Parrot supports multiple concurrency models, including green
+threads, native Windows and POSIX threads, event-based programming, and
+asynchronous I/O.
 
-=item - A concurrency scheduler manages all concurrent tasks.
+=item - A concurrency scheduler manages all concurrent tasks. A certain
+number of tasks are initialized at startup, a "thread-pool", so that
+task switching scales linearly up to the number of physical CPU's.
 
 =item - Each interpreter has its own concurrency scheduler.
 
@@ -38,10 +40,11 @@ implementation.
 =head2 Definitions
 
 Concurrency is a parallel execution of units of code (on multiprocessor
-machines), or a flexible ordering of serial units of code (on single processor
-machines). For certain problem spaces, concurrency offers significant speed
-gains by parceling out processor-intensive activity or by ensuring that a wait
-for input or system resources doesn't hold up the entire application.
+machines), or a flexible ordering of serial units of code (on single
+processor machines). For certain problem spaces, concurrency offers
+significant speed gains by parceling out processor-intensive activity or by
+ensuring that a wait for input or system resources doesn't hold up the
+entire application.
 
 A task is a unit of code that can be executed concurrently.
 
@@ -86,26 +89,26 @@ shared-interpreter concurrency.
 
 The following are a few of the concurrency models Parrot intends to
 support. The biggest differences between them are in how they handle
-variables shared across concurrent tasks.  But the design is such that
-each of the different models can run simultaneously, coordinated through the
+variables shared across concurrent tasks.  But the design is such that each
+of the different models can run simultaneously, coordinated through the
 central concurrency scheduler.
 
 =head4 Mutex/Lock Concurrency
 
-In this model, before performing an operation on a shared variable, you
-must first acquire a lock on it. Once a lock is acquired, any other
-concurrent tasks that attempt to acquire a lock on that variable will
-block until the existing lock is released.
+In this model, before performing an operation on a shared variable, you must
+first acquire a lock on it. Once a lock is acquired, any other concurrent
+tasks that attempt to acquire a lock on that variable will block until the
+existing lock is released.
 
 A mutex is a thing that can be locked. They are not directly exposed to
 users. They're non-recursive, non-read/write, exclusive things.  When a
-concurrent task gets a mutex, any other attempt to get that mutex will
-block until the owning task releases the mutex. Mutexes are implemented
-using the platform-native lock construct.
+concurrent task gets a mutex, any other attempt to get that mutex will block
+until the owning task releases the mutex. Mutexes are implemented using the
+platform-native lock construct.
 
 The first thing that any vtable function of a shared PMC must do is to
-acquire the mutex of the PMCs in its parameter list (in ascending
-address order). In this model only PMCs can be shared.
+acquire the mutex of the PMCs in its parameter list (in ascending address
+order). In this model only PMCs can be shared.
 
 =head4 STM Concurrency
 
@@ -174,10 +177,10 @@ where reading shared variables is allowed but only the one owner thread
 may write to it.
 
 With our current hybrid threads model all data sharing is implemented
-through Proxy PMCs. Reading foreign data is transparent, writing must
-be done via writer subs scheduled in the owners Task. To reduce latency,
-the task is flagged to run immediately. The data-owning interpreter will
-preempt the currently running task and process the new write task.
+through Proxy PMCs. Reading foreign data is transparent, writing must be
+done via prioritized writer subs scheduled in the owners Task. To reduce
+latency, the task is flagged to run immediately. The data-owning interpreter
+will preempt the currently running task and process the new write task.
 Thus proxies allow a nearly lock-free multithreading implementation.
 
 Each task is assigned a fixed amount of execution time. After this time is
@@ -242,10 +245,10 @@ implemented as a hash. Each task in the list has an integer ID assigned when
 it is first inserted into the list. A task retains the same ID throughout its
 lifetime, and the ID is not reused once a task is finalized. The data
 structure is currently implemented as pre-allocated array, the number of CPU's
-plus one, overridable by --numthreads <N>.
+plus one, overridable by C<--numthreads N>.
 
 Currently a task is implemented as OS thread so ranking is done by the OS.
-Prioritization is done with the interpreter method 'schedule_proxied'.
+Prioritization is done with the interpreter method C<schedule_proxied>.
 Previous versions used a task rank index, calculated based on the type,
 priority rating, age of the tasks in the task list. The index is a simple
 array, and in general the top (zeroth) element in the array is the next one
@@ -482,6 +485,6 @@ Java memory and concurrency - L<http://www.cs.umd.edu/~pugh/java/memoryModel/>
 
 __END__
 Local Variables:
-  fill-column:100
+  fill-column:76
 End:
 vim: expandtab shiftwidth=4:
