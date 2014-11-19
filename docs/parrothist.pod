@@ -177,5 +177,6 @@ Starred release numbers indicate supported releases.
  rurban      6.7.0          2014-Aug-19     "Grey-headed Lovebird"
  Util        6.8.0          2014-Sep-16     "Little Lorikeet"
  rurban      6.9.0 *        2014-Oct-21     "Rosy-faced Lovebird"
+ Util        6.10.0         2014-Nov-18     "New Caledonian lorikeet"
 
 =cut

@@ -572,9 +572,8 @@ L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.cal
 
 Make sure that at least the next two releases are covered.
 
-    - Nov 18, 2014 -  6.10.0  - Util
     - Dec 16, 2014 -  6.11.0  - rurban
-    - Jan 20, 2015 - *7.0.0   - 
+    - Jan 20, 2015 - *7.0.0   - Util
 
 =cut
 
