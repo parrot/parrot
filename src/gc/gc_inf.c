@@ -444,6 +444,7 @@ Parrot_gc_inf_init(PARROT_INTERP, SHIM(Parrot_GC_Init_Args *args))
     interp->gc_sys->do_gc_mark         = gc_inf_mark_and_sweep;
     interp->gc_sys->finalize_gc_system = NULL;
 
+    interp->gc_sys->maybe_gc_mark           = gc_inf_mark_and_sweep; /* dummy */
     interp->gc_sys->do_gc_mark              = gc_inf_mark_and_sweep;
     interp->gc_sys->compact_string_pool     = gc_inf_compact_memory_pool;
 

@@ -199,6 +199,7 @@ typedef struct GC_Subsystem {
     void (*finalize_gc_system) (PARROT_INTERP);
     void (*destroy_child_interp)(ARGMOD(Interp *dest_interp), ARGIN(Interp *child_interp));
 
+    void (*maybe_gc_mark)(PARROT_INTERP, UINTVAL flags);
     void (*do_gc_mark)(PARROT_INTERP, UINTVAL flags);
     void (*compact_string_pool)(PARROT_INTERP);
 

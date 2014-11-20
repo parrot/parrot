@@ -106,10 +106,10 @@ TBD
 #include "parrot/parrot.h"
 #include "parrot/gc_api.h"
 #include "parrot/pointer_array.h"
-#include "parrot/list.h"        /* only for MEMORY_DEBUG */
 #include "gc_private.h"
 #include "fixed_allocator.h"
 #ifdef MEMORY_DEBUG
+#  include "parrot/list.h"
 #  include "parrot/runcore_trace.h"
 #endif
 
@@ -369,6 +369,9 @@ static int gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 static void gc_gms_iterate_live_strings(PARROT_INTERP,
     string_iterator_callback callback,
     ARGIN_NULLOK(void *data))
+        __attribute__nonnull__(1);
+
+static void gc_gms_maybe_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
 static void gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
@@ -681,6 +684,7 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     /* We have to transfer ownership of memory to parent interp in threaded parrot */
     interp->gc_sys->finalize_gc_system = NULL; /* gc_gms_finalize; */
 
+    interp->gc_sys->maybe_gc_mark               = gc_gms_maybe_mark_and_sweep;
     interp->gc_sys->do_gc_mark                  = gc_gms_mark_and_sweep;
     interp->gc_sys->compact_string_pool         = gc_gms_compact_memory_pool;
 
@@ -1483,7 +1487,7 @@ gc_gms_finalize(PARROT_INTERP)
 
 /*
 
-=item C<gc_gms_maybe_mark_and_sweep(PARROT_INTERP)>
+=item C<gc_gms_maybe_mark_and_sweep(PARROT_INTERP, UINTVAL flags)>
 
 Maybe M&S. Depends on total allocated memory, memory allocated since last alloc.
 
@@ -1491,15 +1495,15 @@ Maybe M&S. Depends on total allocated memory, memory allocated since last alloc.
 
 */
 
-#define gc_gms_maybe_mark_and_sweep(i) \
-    do { \
-        MarkSweep_GC * const _self = (MarkSweep_GC *)(i)->gc_sys->gc_private; \
-    \
-        /* Collect every gc_threshold. */ \
-        if (!_self->gc_mark_block_level \
-        &&  (i)->gc_sys->stats.mem_used_last_collect > _self->gc_threshold) \
-            gc_gms_mark_and_sweep(interp, 0); \
-    } while (0)
+static void
+gc_gms_maybe_mark_and_sweep(PARROT_INTERP, UINTVAL flags) {
+    MarkSweep_GC * const self = (MarkSweep_GC *)(interp)->gc_sys->gc_private;
+
+    /* Collect every gc_threshold. */
+    if (!self->gc_mark_block_level
+    && interp->gc_sys->stats.mem_used_last_collect > self->gc_threshold)
+        gc_gms_mark_and_sweep(interp, flags);
+}
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
@@ -1511,7 +1515,7 @@ gc_gms_allocate_pmc_header(PARROT_INTERP, SHIM(UINTVAL flags))
     Pool_Allocator   * const pool = self->pmc_allocator;
     pmc_alloc_struct * item = NULL;
 
-    gc_gms_maybe_mark_and_sweep(interp);
+    gc_gms_maybe_mark_and_sweep(interp, 0);
 
     if (interp->thread_data)
         LOCK(interp->thread_data->interp_lock);
@@ -1647,7 +1651,7 @@ gc_gms_allocate_string_header(PARROT_INTERP, SHIM(UINTVAL flags))
     string_alloc_struct *item;
     STRING              *ret;
 
-    gc_gms_maybe_mark_and_sweep(interp);
+    gc_gms_maybe_mark_and_sweep(interp, 0);
 
     if (interp->thread_data)
         LOCK(interp->thread_data->interp_lock);
@@ -2380,9 +2384,11 @@ gc_gms_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
     fprintf(stderr, ", attrs: %6lu",
             (unsigned long)Parrot_gc_fixed_allocator_allocated_memory(interp,
               self->fixed_size_allocator));
-    fprintf(stderr, ", parent: 0x%lx, tid: %3d",
-            (unsigned long)interp->parent_interpreter,
-            interp->thread_data ? (signed)interp->thread_data->tid : -1);
+    if (interp->parent_interpreter) {
+        fprintf(stderr, ", parent: 0x%lx, tid: %3d",
+                (unsigned long)interp->parent_interpreter,
+                interp->thread_data ? (signed)interp->thread_data->tid : -1);
+    }
 #endif
     fprintf(stderr, "\n");
 

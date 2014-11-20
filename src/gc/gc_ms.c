@@ -176,6 +176,9 @@ static void gc_ms_mark_special(PARROT_INTERP, ARGIN(PMC *pmc))
 static void gc_ms_mark_str_header(PARROT_INTERP, ARGMOD_NULLOK(STRING *obj))
         FUNC_MODIFIES(*obj);
 
+static void gc_ms_maybe_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
+        __attribute__nonnull__(1);
+
 static void gc_ms_more_traceable_objects(PARROT_INTERP,
     Memory_Pools *mem_pools,
     ARGMOD(Fixed_Size_Pool *pool))
@@ -226,6 +229,7 @@ static void gc_ms_unblock_GC_mark(PARROT_INTERP)
 static void gc_ms_unblock_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+PARROT_INLINE
 static void Parrot_gc_allocate_new_attributes_arena(
     ARGMOD(PMC_Attribute_Pool *pool))
         __attribute__nonnull__(1)
@@ -332,6 +336,8 @@ static void Parrot_gc_initialize_fixed_size_pools(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_ms_mark_str_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_gc_ms_maybe_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms_more_traceable_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pool))
@@ -402,6 +408,7 @@ Parrot_gc_ms_init(PARROT_INTERP, SHIM(Parrot_GC_Init_Args *args))
     interp->gc_sys->destroy_child_interp    = gc_ms_destroy_child_interp;
     interp->gc_sys->init_pool               = gc_ms_pool_init;
 
+    interp->gc_sys->maybe_gc_mark           = gc_ms_maybe_mark_and_sweep;
     interp->gc_sys->do_gc_mark              = gc_ms_mark_and_sweep;
     interp->gc_sys->compact_string_pool     = gc_ms_compact_memory_pool;
 
@@ -553,6 +560,28 @@ Parrot_gc_ms_needed(PARROT_INTERP)
                                  0.25);
 
     return new_mem > dynamic_threshold;
+}
+
+/*
+
+=item C<static void gc_ms_maybe_mark_and_sweep(PARROT_INTERP, UINTVAL flags)>
+
+Run a GC if memory used is above threshold.
+
+=cut
+
+*/
+
+static void
+gc_ms_maybe_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
+{
+    ASSERT_ARGS(gc_ms_maybe_mark_and_sweep)
+    struct GC_Subsystem * const gc_sys = interp->gc_sys;
+    Memory_Pools * const self = (Memory_Pools *)gc_sys->gc_private;
+
+    if (!self->gc_mark_block_level
+    &&  Parrot_gc_ms_needed(interp))
+        gc_sys->do_gc_mark(interp, flags);
 }
 
 /*
@@ -1071,11 +1100,11 @@ Parrot_gc_get_attributes_from_pool(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool * po
         return Parrot_gc_get_attributes_from_pool(interp, pool);
     }
 
-    --pool->num_free_objects;
+    --pool->num_free_objects; /* the hottest op in --gc ms: 11.64% */
     return (void *)item;
 }
 
-
+PARROT_INLINE
 static void
 Parrot_gc_allocate_new_attributes_arena(ARGMOD(PMC_Attribute_Pool *pool))
 {

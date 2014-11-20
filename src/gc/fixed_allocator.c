@@ -538,7 +538,7 @@ allocate_new_pool_arena(PARROT_INTERP, ARGMOD(Pool_Allocator *pool))
     const size_t total_size = arena_size(pool);
 
     /* Run a GC if needed */
-    Parrot_gc_maybe_mark_and_sweep(interp, GC_trace_stack_FLAG);
+    interp->gc_sys->maybe_gc_mark(interp, GC_trace_stack_FLAG);
 
     new_arena = (Pool_Allocator_Arena *)mem_sys_allocate_zeroed(total_size);
 

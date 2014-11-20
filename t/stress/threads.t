@@ -49,7 +49,7 @@ use Parrot::Config;
 {
     local $ENV{TEST_PROG_ARGS} .= '-t11 --gc-nursery-size=0.001 --gc-debug ';
 
-    pir_exit_code_is( << 'CODE', 0, "IO Stress with -t", todo => 'GH875 threads and -t1: gc_gms_mark_pmc_header: self->work_list might be empty' );
+    pir_exit_code_is( << 'CODE', 0, "IO Stress with -t" );
 .sub test :main
     load_bytecode "dumper.pbc"
     load_bytecode 'Test/More.pbc'

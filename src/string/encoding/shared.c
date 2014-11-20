@@ -1098,6 +1098,7 @@ fixed_substr(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset, INTVAL leng
         return return_string;
 
     bytes_per_codepoint = src->encoding->max_bytes_per_codepoint;
+    PARROT_ASSERT(bytes_per_codepoint <= 4);
     maxlen              = strlen - offset;
 
     if ((UINTVAL)length > maxlen)

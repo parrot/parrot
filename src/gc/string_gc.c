@@ -630,7 +630,7 @@ mem_allocate(PARROT_INTERP,
     /* If not enough room, try to find some */
     if (pool->top_block->free < size) {
         /* Run a GC if needed */
-        Parrot_gc_maybe_mark_and_sweep(interp, GC_trace_stack_FLAG);
+        interp->gc_sys->maybe_gc_mark(interp, GC_trace_stack_FLAG);
 
         if (pool->top_block->free < size) {
             if (pool->minimum_block_size < 65536 * 16)
