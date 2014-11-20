@@ -18,11 +18,8 @@ get flushed/closed automatically), etc. This is by design and should not be
 considered a "bug" or an "error". It is just a fact of life for such a
 minimalist core.
 
-To enable this core, change the settings in include/parrot/settings.h. Set
-
- PARROT_GC_SUBSYSEM == 3
-
-to activate this core.
+To enable this core, configure it with C<perl Configure.pl --gc inf>
+or use the command line option C<--gc inf> to activate this core.
 
 =cut
 
