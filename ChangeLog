@@ -1,5 +1,8 @@
-2014-12-16    release 6.11.0
+ 2014-12-16    release 6.11.0
     - Core
+        + Fixed wrong maybe_mark_and_sweep call in --gc ms #1142
+        + Added --ccflags=-DMEMORY_DEBUG tracing and validation to --gc ms2
+        + Added GC maybe_gc_mark vtable function
     - Build
     - Documentation
     - Tests
