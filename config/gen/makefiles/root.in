@@ -1547,6 +1547,7 @@ src/gc/gc_inf$(O) : \
 	$(PARROT_H_HEADERS) \
 	src/gc/gc_private.h \
 	src/gc/gc_inf.c \
+	$(INC_DIR)/runcore_trace.h \
 	src/gc/variable_size_pool.h
 
 src/gc/gc_ms2$(O) : \

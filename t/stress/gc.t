@@ -31,6 +31,7 @@ for my $gc (@gc, '--no-gc') {
     my $gc_arg = $gc eq '--no-gc' ? $gc : "--gc $gc";
     local $ENV{TEST_PROG_ARGS} = "-t11 $gc_arg --gc-debug --gc-nursery-size=0.0001 ";
     my @TODO = $gc =~ /^ms/ ? ('todo' => 'ms instability GH #1143') : ();
+    @TODO = $gc eq 'inf' ? ('todo' => 'inf instability GH #1136') : @TODO;
 
     pir_exit_code_is( <<'CODE', 0, "array stress $gc_arg", @TODO );
 .sub 'main' :main

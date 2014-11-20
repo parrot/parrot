@@ -55,8 +55,7 @@ gc_ms2.c implements a generational mark & sweep allocator,
 gc_gms.c implements a generational, non-compacting, mark and sweep allocator,
 gc_inf.c implements an "infinite" allocator which never frees any memory.
 The infinite allocator is not recommended except for debugging.
-The default is currently gc_ms2.c but is expected to move to gc_gms.c
-after RELEASE_3_3_0.
+The default is currently gc_gms.c, it was gc_ms2.c until RELEASE_3_3_0.
 
 =item F<src/gc/mark_sweep.c>
 
@@ -225,15 +224,14 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
         Parrot_gc_gms_init(interp, args);
         break;
       default:
-        /* add a default to supress compiler warnings
-         * should never get here as the above if statemewnt
-         * would catch any invalid GC types and exit
-         */
+        fprintf(stderr, "Unknown GC sys_type %d\n", interp->gc_sys->sys_type);
+        PANIC(interp, "Cannot activate GC");
         break;
     }
 
     /* Assertions that GC subsystem has complete API */
     PARROT_ASSERT(interp->gc_sys->do_gc_mark);
+    PARROT_ASSERT(interp->gc_sys->maybe_gc_mark);
     PARROT_ASSERT(interp->gc_sys->compact_string_pool);
 
     /* It should be mandatory. But there is abstraction leak in */

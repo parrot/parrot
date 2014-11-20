@@ -48,7 +48,7 @@ typedef enum _gc_sys_type_enum {
     MS,  /* mark and sweep */
     INF, /* infinite memory core */
     MS2,
-    GMS
+    GMS  /* generational mark & sweep */
 } gc_sys_type_enum;
 
 /* pool iteration */

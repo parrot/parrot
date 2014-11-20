@@ -213,6 +213,8 @@ typedef struct MarkSweep_GC {
 /* Callback to destroy PMC or free string storage */
 typedef void (*sweep_cb)(PARROT_INTERP, PObj *obj);
 
+static void gc_gms_maybe_mark_and_sweep(PARROT_INTERP, UINTVAL flags);
+
 /* HEADERIZER HFILE: src/gc/gc_private.h */
 
 /* HEADERIZER BEGIN: static */
@@ -369,9 +371,6 @@ static int gc_gms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 static void gc_gms_iterate_live_strings(PARROT_INTERP,
     string_iterator_callback callback,
     ARGIN_NULLOK(void *data))
-        __attribute__nonnull__(1);
-
-static void gc_gms_maybe_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         __attribute__nonnull__(1);
 
 static void gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
