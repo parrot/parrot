@@ -1555,6 +1555,8 @@ src/gc/gc_ms2$(O) : \
 	src/gc/fixed_allocator.h \
 	src/gc/gc_ms2.c \
 	$(INC_DIR)/pointer_array.h \
+	$(INC_DIR)/list.h \
+	$(INC_DIR)/runcore_trace.h \
 	src/gc/variable_size_pool.h
 
 src/gc/api$(O) : \

@@ -712,16 +712,17 @@ void Parrot_gc_inf_init(PARROT_INTERP, Parrot_GC_Init_Args *args)
 /* HEADERIZER BEGIN: src/gc/gc_ms2.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-void Parrot_gc_maybe_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
-        __attribute__nonnull__(1);
+void gc_ms2_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 void Parrot_gc_ms2_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_Parrot_gc_maybe_mark_and_sweep \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_ms2_print_stats_always __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_Parrot_gc_ms2_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(args))
