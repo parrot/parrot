@@ -806,9 +806,10 @@ gc_ms2_mark_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
 
     if (!PObj_constant_TEST(pmc)) {
         Parrot_pa_remove(interp, self->objects, item->ptr);
+        if (!self->new_objects)
+            self->new_objects = Parrot_pa_new(interp);
         item->ptr = Parrot_pa_insert(self->new_objects, item);
     }
-
 }
 
 
