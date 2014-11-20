@@ -11,7 +11,7 @@ t/stress/gc.t - Garbage Collection
 
 =head1 DESCRIPTION
 
-Stress tests the garbage collectors.
+Stress tests all garbage collectors.
 
 =cut
 
@@ -30,26 +30,82 @@ for my $gc (@gc, '--no-gc') {
     # override the args
     my $gc_arg = $gc eq '--no-gc' ? $gc : "--gc $gc";
     local $ENV{TEST_PROG_ARGS} = "-t11 $gc_arg --gc-debug --gc-nursery-size=0.0001 ";
-    my @TODO = $gc eq 'inf' ? ('todo' => 'inf instability GH #1136') : ();
+    my @TODO = $gc =~ /^ms/ ? ('todo' => 'ms instability GH #1143') : ();
 
-    pir_exit_code_is( <<'CODE', 0, "box Integer $gc_arg", @TODO );
+    pir_exit_code_is( <<'CODE', 0, "array stress $gc_arg", @TODO );
 .sub 'main' :main
     print "starting\n"
-    $P0 = new ['Integer']
+    .local int arr_size
+    arr_size = 28
+    _bench( 'FixedFloatArray', arr_size )
+    _bench( 'FixedIntegerArray', arr_size )
+    _bench( 'FixedPMCArray', arr_size )
+    _bench( 'FixedStringArray', arr_size )
+    _bench( 'ResizableFloatArray', arr_size )
+    _bench( 'ResizableIntegerArray', arr_size )
+    _bench( 'ResizablePMCArray', arr_size )
+    _bench( 'ResizableStringArray', arr_size )
     print "ending\n"
+.end
+.sub _bench
+    .param string arr_class
+    .param int arr_size
+    .local pmc arr_1, arr_2
+    arr_1 = new arr_class
+    arr_1 = arr_size
+    arr_2 = new arr_class
+    arr_2 = arr_size
+    .local num start_time
+    start_time = time
+    .local int x_index, value
+    x_index = 0
+    value = 1
+X_LOOP:
+    if x_index >= arr_size goto X_DONE
+    arr_1[x_index] = value
+    arr_2[x_index] = 0
+    inc x_index
+    inc value
+    goto X_LOOP
+X_DONE:
+    .local int max_index, z_index, y_index
+    max_index = arr_size - 1
+    y_index = 0
+Y_LOOP:
+    if y_index >= 100 goto Y_DONE
+    z_index = max_index
+Z_LOOP:
+    if z_index < 0 goto Z_DONE
+    set $I3, arr_2[z_index]
+    set $I4, arr_1[z_index]
+    add $I3, $I4
+    arr_2[z_index] = $I3
+    dec z_index
+    branch Z_LOOP
+Z_DONE:
+    inc y_index
+    branch Y_LOOP
+Y_DONE:
+    .local num start_time, end_time, span_time
+    end_time = time
+    span_time = end_time - start_time
+    .local string arr_type
+    arr_type = typeof arr_1
+    print arr_type
+    print ": "
+    print span_time
+    print "s\n"
 .end
 CODE
 
-    pir_exit_code_is( <<'CODE', 0, "ResizablePMCArray stress $gc_arg", @TODO );
+    pir_exit_code_is( <<'CODE', 0, "ResizablePMCArray stress $gc_arg" );
 .sub 'main' :main
     .param pmc args
-
     $I0 = 0
     .local int N
     N = args[1]
     if N <= 0 goto loop
       N = 10000
-
   loop:
     unless $I0 < N goto done
     $P0 = new ['ResizablePMCArray']
@@ -59,7 +115,7 @@ CODE
 .end
 CODE
 
-    pir_exit_code_is( <<'CODE', 0, "GC subs $gc_arg", @TODO );
+    pir_exit_code_is( <<'CODE', 0, "GC subs $gc_arg" );
 .sub 'main' :main
     .param pmc args
 
@@ -82,7 +138,7 @@ CODE
 .end
 CODE
 
-    pir_exit_code_is( <<'CODE', 0, "GC coros $gc_arg", @TODO );
+    pir_exit_code_is( <<'CODE', 0, "GC coros $gc_arg" );
 .sub 'main' :main
     .const 'Sub' $P99 = 'coro'
     .local pmc three, four, five
