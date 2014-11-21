@@ -690,8 +690,8 @@ sub perl_module_file_directories {
     return
         map $self->directory_with_name($_) =>
         map( "config/$_" => qw<auto auto/cpu/i386 auto/cpu/ppc
-            auto/cpu/sun4 auto/cpu/x86_64
-            gen gen/cpu/i386 gen/cpu/x86_64 init init/hints inter> ),
+            auto/cpu/sun4 auto/cpu/amd64
+            gen gen/cpu/i386 gen/cpu/amd64 init init/hints inter> ),
         'ext/Parrot-Embed/lib/Parrot',
         map( "lib/$_" => qw<
             Class Digest/Perl File Parrot Parse Pod Pod/Simple Test Text
