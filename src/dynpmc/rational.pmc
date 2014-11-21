@@ -138,7 +138,8 @@ static void rat_multiply_integer(PARROT_INTERP, PMC *self, int value) {
 
 /*
 
-=item C<static void rat_multiply_float(PARROT_INTERP, PMC *self, FLOATVAL value)>
+=item C<static void rat_multiply_float(PARROT_INTERP, PMC *self, FLOATVAL
+value)>
 
 Multiplies a Rational-PMC with a float "value" in-place.
 
