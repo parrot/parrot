@@ -1,5 +1,4 @@
-# Copyright (C) 2010, Parrot Foundation.
-# $Id$
+# Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -30,21 +29,20 @@ sub _init {
 
 sub runstep {
     my ( $self, $conf ) = @_;
-
     my $infnan = 0;
 
-    $conf->cc_gen('config/auto/infnan/test_c.in');
-    eval { $conf->cc_build(); };
+    my $floatval = $conf->data->get('nv');
+    my $test = 'config/auto/infnan/test_c.in';
+    $conf->cc_gen($test);
+    eval { $conf->cc_build("-DFLOATVAL='$floatval'"); };
     if (!$@) {
         my $output = eval { $conf->cc_run() };
-        if (!$@ && $output =~ /OK/) {
+        if (!$@ && $output =~ /OK: 1 1/) {
             $infnan = 1;
         }
     }
-    $conf->cc_clean();
-
+    #$conf->cc_clean();
     $self->_handle_infnan($conf, $infnan);
-
     return 1;
 }
 

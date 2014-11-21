@@ -8,6 +8,7 @@
         + Fix bignum.i_substract and i_multiply #1144
         + Optimize printing of single numbers #828
     - Build
+        + Extend auto::infnan probe to other --floatval #1146
     - Documentation
     - Tests
         + Fix t/steps/auto/arch-01.t darwin regression #1142

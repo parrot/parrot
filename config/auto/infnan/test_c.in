@@ -1,8 +1,7 @@
 /*
-Copyright (C) 2010, Parrot Foundation.
-$Id$
+Copyright (C) 2010-2014, Parrot Foundation.
 
-seeing if INFINITY and NAN are defined
+Check if INFINITY and NAN are defined and correct for our FLOATVAL
 
 */
 
@@ -12,8 +11,8 @@ seeing if INFINITY and NAN are defined
 
 int
 main(int argc, char **argv) {
-    double inf = INFINITY;
-    double nan = NAN;
+    FLOATVAL inf = INFINITY;
+    FLOATVAL nan = NAN;
     printf("OK: %d %d\n", isinf(inf), isnan(nan));
     return EXIT_SUCCESS;
 }
