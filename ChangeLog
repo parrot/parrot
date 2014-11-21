@@ -3,6 +3,7 @@
     - Build
     - Documentation
     - Tests
+        + Fix t/steps/auto/arch-01.t darwin regression #1142
     - Community
 
 2014-11-18    release 6.10.0
