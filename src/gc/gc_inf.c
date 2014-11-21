@@ -327,6 +327,7 @@ gc_inf_allocate_bufferlike_header(PARROT_INTERP, SHIM(size_t size))
 {
     ASSERT_ARGS(gc_inf_allocate_bufferlike_header)
     Parrot_Buffer * mem = (Parrot_Buffer*)calloc(sizeof (Parrot_Buffer), 1);
+    MEMORY_DEBUG_UNUSED(interp)
     GC_DEBUG_DETAIL_2("allocate_bufferlike_header %p "SIZE_FMT" bytes)\n",
                       mem, sizeof (Parrot_Buffer));
     return mem;
@@ -615,7 +616,6 @@ gc_inf_reallocate_memory_chunk_zeroed(SHIM_INTERP, ARGFREE(void *data),
 {
     ASSERT_ARGS(gc_inf_reallocate_memory_chunk_zeroed)
     void * const ptr = realloc(data, newsize);
-    MEMORY_DEBUG_UNUSED(interp)
     if (newsize > oldsize)
         memset((char*)ptr + oldsize, 0, newsize - oldsize);
     return ptr;
