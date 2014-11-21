@@ -841,13 +841,13 @@ bignum_sub_bignum_float(PARROT_INTERP, ARGIN(PMC *self), FLOATVAL value, ARGMOD(
     ASSERT_ARGS(bignum_sub_bignum_float)
 
     const BIGNUM *bn_self;
-    BIGNUM *bn_tmp;
     BIGNUM *bn_dest;
-    GETATTR_BigNum_bn(interp, self, bn_tmp);
+    mpf_t t;
+    mpf_init(t);
     GETATTR_BigNum_bn(interp, self, bn_self);
     GETATTR_BigNum_bn(interp, dest, bn_dest);
-    mpf_set_d(bn_tmp->b, value);
-    mpf_sub(bn_dest->b, bn_self->b, bn_tmp->b);
+    mpf_set_d(t, (double)value);
+    mpf_sub(bn_dest->b, bn_self->b, t);
 }
 
 static void
@@ -879,13 +879,13 @@ bignum_mul_bignum_float(PARROT_INTERP, ARGIN(PMC *self), FLOATVAL value, ARGMOD(
     ASSERT_ARGS(bignum_mul_bignum_float)
 
     const BIGNUM *bn_self;
-    BIGNUM *bn_tmp;
     BIGNUM *bn_dest;
-    GETATTR_BigNum_bn(interp, self, bn_tmp);
+    mpf_t t;
+    mpf_init(t);
     GETATTR_BigNum_bn(interp, self, bn_self);
     GETATTR_BigNum_bn(interp, dest, bn_dest);
-    mpf_set_d(bn_tmp->b, value);
-    mpf_mul(bn_dest->b, bn_self->b, bn_tmp->b);
+    mpf_set_d(t, value);
+    mpf_mul(bn_dest->b, bn_self->b, t);
 }
 
 static void

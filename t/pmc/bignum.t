@@ -437,7 +437,7 @@ ok 4
 ok 5
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "i_subtract", todo => 'undiagnosed bug in i_subtract routine with immediate values' );
+pasm_output_is( <<'CODE', <<'OUTPUT', "i_subtract" );
 .pcc_sub :main main:
     .include 'fp_equality.pasm'
     new P0, ['BigNum']
