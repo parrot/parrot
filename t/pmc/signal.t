@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -25,6 +25,7 @@ Tests signal handling.
 # a second problem is to get the test doing the right thing: mainly figuring
 # out what PID to kill. The "ps" command isn't one of the portable ones.
 
+
 my %platforms = map { $_ => 1 } qw/
     darwin
     hpux
@@ -33,12 +34,12 @@ my %platforms = map { $_ => 1 } qw/
     /;
 
 if ( $platforms{$^O} ) {
-
-    #plan tests => 3;
-    plan skip_all => 'Signals currently disabled';
+    plan tests => 4;
+    $ENV{DYLD_LIBRARY_PATH} = "" if $^O eq 'darwin';
+    #plan skip_all => 'Signals currently disabled';
 }
 else {
-    plan skip_all => 'No events yet';
+    plan skip_all => 'Missing portable getpid hack';
 }
 
 #
@@ -48,7 +49,7 @@ else {
 my $pid;
 
 sub parrot_pids {
-    grep { !/harness/ && !/sh -c/ } `ps axw | grep '[p]arrot'`;
+    grep { !/harness/ && !/ Z / && !/sh -c/ } `ps axw | grep '[p]arrot'`;
 }
 
 sub send_SIGHUP {
@@ -79,7 +80,7 @@ sub check_running {
     select undef, undef, undef, 0.1;
     my @ps     = parrot_pids;
     my $thread = pop @ps;
-    if ( $thread =~ /^\s*(\d+)/ && $1 == $pid ) {
+    if ( $thread and $thread =~ /^\s*(\d+)/ and $1 == $pid ) {
         ok( 0, "parrot $pid still running" );
     }
     else {
@@ -99,12 +100,12 @@ CODE
 start
 OUTPUT
 
-# check_running;
+check_running;
 
 send_SIGHUP;
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "SIGHUP event - loop" );
-    bounds 1 # no JIT
+    # bounds 1 # no JIT
     print "start\n"
     # no exception handler - parrot should die silently
 
