@@ -6,6 +6,7 @@
         + Added MEMORY_DEBUG tracing to --gc inf and ms2, added
           GC validation to ms2.
         + Fix bignum.i_substract and i_multiply #1144
+        + Fix cmod_p_p_n* math dynops for NaN and Inf #1147
         + Optimize printing of single numbers #828
     - Build
         + Extend auto::infnan probe to other --floatval #1146

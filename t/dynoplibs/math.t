@@ -569,8 +569,7 @@ CODE
     $P2 = 1
     $N0 = 'NaN'
     cmod $P1, $P2, $N0
-    #is($P1, 'NaN', 'cmod with Float and Integer PMCs and NaN')
-    todo(0, 'cmod with Float and Integer PMCs and NaN', 'cmod does not play nicely with PMCs and NaN')
+    is($P1, 'NaN', 'cmod with Float and Integer PMCs and NaN')
 .end
 
 # Local Variables:
