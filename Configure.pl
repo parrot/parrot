@@ -17,6 +17,7 @@ use Parrot::Configure::Options::Test::Prepare qw(
 use Parrot::Configure::Messages qw(
     print_introduction
     print_conclusion
+    warn_experimental
 );
 
 $| = 1;    # $OUTPUT_AUTOFLUSH = 1;
@@ -72,6 +73,8 @@ $conf->options->set( %{$args} );
 $conf->data->set(configure_args => @ARGV
     ? '"'.join("\" \"", map {qq($_)} @ARGV).'"'
     : '');
+warn_experimental($conf, $args)
+    if !$args->{silent} and ($args->{intval} or $args->{floatval} or $args->{gc});
 
 # Log files created by Configure.pl in MANIFEST.generated
 $conf->{active_configuration} = 1;
@@ -379,18 +382,22 @@ ops. Useful when debugging internals.
 =item C<--intval=(type)>
 
 Use the given type for C<INTVAL>.
+This option is experimental. See https://github.com/parrot/parrot/issues/1145 for more.
 
 =item C<--floatval=(type)>
 
 Use the given type for C<FLOATVAL>.
+This option is experimental. See https://github.com/parrot/parrot/issues/828 for more.
 
 =item C<--opcode=(type)>
 
 Use the given type for opcodes.
+This option is experimental.
 
 =item C<--ops=(files)>
 
 Use the given ops files.
+This option is experimental.
 
 =back
 

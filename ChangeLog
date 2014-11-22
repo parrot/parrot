@@ -11,6 +11,7 @@
         + Optimize printing of single numbers #828
     - Build
         + Extend auto::infnan probe to other --floatval #1146
+        + Warn in Configure on experimental flags intval, floatval and gc #1148
     - Documentation
     - Tests
         + Fix t/steps/auto/arch-01.t darwin regression #1142

@@ -8,6 +8,7 @@ use base qw( Exporter );
 our @EXPORT_OK = qw(
     print_introduction
     print_conclusion
+    warn_experimental
 );
 
 ################### SUBROUTINES ###################
@@ -27,6 +28,25 @@ Since you're running this program, you obviously have Perl 5--I'll be pulling
 some defaults from its configuration.
 END
     return 1;
+}
+
+sub warn_experimental {
+    my ($conf, $args) = @_;
+    print <<"END" if $args->{intval} and $args->{intval} ne 'long';
+
+WARNING: --intval=$args->{intval} is experimental and will not work.
+See https://github.com/parrot/parrot/issues/1145
+END
+    print <<"END" if $args->{floatval} and $args->{floatval} ne 'double';
+
+WARNING: --floatval=$args->{floatval} is experimental and will not work.
+See https://github.com/parrot/parrot/issues/828
+END
+    print <<"END" if $args->{gc} and $args->{gc} ne 'gms';
+
+WARNING: --gc=$args->{gc} is experimental.
+See https://github.com/parrot/parrot/labels/Component-GC
+END
 }
 
 sub print_conclusion {
