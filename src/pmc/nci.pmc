@@ -302,7 +302,7 @@ Returns the function pointer as an integer.
         Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         if (!nci_info->func)
             build_func(INTERP, SELF, nci_info);
-        return (INTVAL)nci_info->func;
+        return PTR2INTVAL(nci_info->func);
     }
 
 /*
@@ -318,7 +318,7 @@ Returns the boolean value of the pointer.
     VTABLE INTVAL get_bool() :no_wb {
         const Parrot_NCI_attributes * const nci_info = PARROT_NCI(SELF);
         UNUSED(INTERP)
-        return (0 != (INTVAL)nci_info->orig_func);
+        return !!nci_info->orig_func;
     }
 
 /*

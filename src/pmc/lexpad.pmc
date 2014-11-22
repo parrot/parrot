@@ -163,10 +163,10 @@ register_number_for_get(PARROT_INTERP, ARGMOD(PMC *info), ARGIN(STRING *name),
     const HashBucket * const b = register_bucket(interp, info, name);
     if (!b)
         return -1;
-    if (((INTVAL)b->value & 3) != reg_type)
+    if ((PTR2INTVAL(b->value) & 3) != reg_type)
         throw_wrong_register_type(interp, name);
 
-    return ((INTVAL)b->value) >> 2;
+    return PTR2INTVAL(b->value) >> 2;
 }
 
 /*
@@ -190,10 +190,10 @@ register_number_for_set(PARROT_INTERP, ARGMOD(PMC *info), ARGMOD(STRING *name),
     const HashBucket * const b = register_bucket(interp, info, name);
     if (!b)
         throw_lexical_not_found(interp, name);
-    if (((INTVAL)b->value & 3) != reg_type)
+    if ((PTR2INTVAL(b->value) & 3) != reg_type)
         throw_wrong_register_type(interp, name);
 
-    return ((INTVAL)b->value) >> 2;
+    return PTR2INTVAL(b->value) >> 2;
 }
 
 
@@ -456,8 +456,8 @@ Get iterator for declared lexicals.
         while (VTABLE_get_bool(INTERP, info_iter)) {
             STRING * const name = VTABLE_shift_string(INTERP, info_iter);
             HashBucket * const b = Parrot_hash_get_bucket(INTERP, hash, name);
-            INTVAL reg_type = (INTVAL)b->value & 3;
-            INTVAL reg_idx = ((INTVAL)b->value) >> 2;
+            INTVAL reg_type = PTR2UINTVAL(b->value) & 3;
+            INTVAL reg_idx  = PTR2UINTVAL(b->value) >> 2;
             PMC * value;
             switch (reg_type) {
                 case REGNO_PMC:
@@ -521,7 +521,7 @@ Returns a number based on the type of the variable named name.
         GET_ATTR_lexinfo(INTERP, SELF, info);
         b = register_bucket(INTERP, info, name);
         if (b)
-            ret = (INTVAL) b->value & 3;
+            ret = PTR2INTVAL(b->value) & 3;
         RETURN(INTVAL ret);
     }
 

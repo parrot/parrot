@@ -135,7 +135,7 @@ Returns true if the hash size is not zero.
         value = Parrot_hash_get(INTERP, hash, key);
 
         if (value)
-            return (INTVAL)value;
+            return PTR2INTVAL(value);
 
         return 0;
     }
@@ -217,7 +217,7 @@ reaches 0, delete the entry.
     VTABLE void set_integer_keyed(PMC *key, INTVAL value) {
         Hash *hash;
         GET_ATTR_pmc_registry(INTERP, SELF, hash);
-        Parrot_hash_put(INTERP, hash, key, (void *)value);
+        Parrot_hash_put(INTERP, hash, key, INTVAL2PTR(void *, value));
     }
 
     VTABLE void delete_keyed(PMC *key) {

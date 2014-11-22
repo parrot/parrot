@@ -1445,7 +1445,7 @@ Returns whether the class is or inherits from C<*class>.
             b = Parrot_hash_get_bucket(INTERP, _class->isa_cache,
                  (void *)classobj);
             if (b)
-                return (INTVAL)b->value;
+                return PTR2INTVAL(b->value);
         }
 
         /* this is effectively what the default PMC's isa_pmc does
@@ -1475,7 +1475,7 @@ Returns whether the class is or inherits from C<*class>.
         if (_class->instantiated) {
             PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             Parrot_hash_put(INTERP, _class->isa_cache, (void *)classobj,
-                 (void *)retval);
+                            INTVAL2PTR(void *, retval));
         }
         return retval;
 

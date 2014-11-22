@@ -135,8 +135,8 @@ typedef struct parrot_interp_t Interp;
 #  endif /* PTR_SIZE == LONG_SIZE */
 #endif /* PTR_SIZE == INTVAL_SIZE */
 #define PTR2INTVAL(p)    INTVAL2PTR(INTVAL, (p))
-#define PTR2UINTVAL(p)    UINTVAL2PTR(UINTVAL, (p))
-#define PTR2ULONG(p)       UINTVAL2PTR(unsigned long, (p))
+#define PTR2UINTVAL(p)   UINTVAL2PTR(UINTVAL, (p))
+#define PTR2ULONG(p)     UINTVAL2PTR(unsigned long, (p))
 
 /*
  * some compilers don't like lvalue casts, so macroize them
@@ -194,7 +194,7 @@ typedef void (*funcptr_t)(void);
 
 /* define macros for converting between data and function pointers.  As it
  * turns out, ANSI C does appear to permit you to do this conversion if you
- * convert the value to an integer (well, a value type large enough to hold
+ * convert the value to a long (well, a value type large enough to hold
  * a pointer) in between.  Believe it or not, this even works on TenDRA (tcc).
  */
 #define D2FPTR(x) UINTVAL2PTR(funcptr_t, PTR2ULONG(x))

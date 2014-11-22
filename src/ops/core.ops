@@ -609,7 +609,7 @@ inline op set_addr(invar PMC, invar LABEL) {
 
 inline op get_addr(out INT, invar PMC) {
     void * const ptr = VTABLE_get_pointer(interp, $2);
-    $1 = (INTVAL)ptr;
+    $1 = PTR2INTVAL(ptr);
 }
 
 =back

@@ -117,7 +117,7 @@ Returns the pointer value as an integer.
 
     VTABLE INTVAL get_integer() :no_wb {
         UNUSED(INTERP)
-        return (INTVAL)(PARROT_POINTER(SELF)->pointer);
+        return PTR2INTVAL(PARROT_POINTER(SELF)->pointer);
     }
 
 /*
@@ -132,7 +132,7 @@ Returns the pointer value as a floating-point number.
 
     VTABLE FLOATVAL get_number() :no_wb {
         UNUSED(INTERP)
-        return (FLOATVAL)(INTVAL)(PARROT_POINTER(SELF)->pointer);
+        return (FLOATVAL)PTR2ULONG(PARROT_POINTER(SELF)->pointer);
     }
 
 /*

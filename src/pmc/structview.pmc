@@ -1009,7 +1009,7 @@ Return a C<Ptr> to the C<n>th element of a struct.
         }
 
         p   = ((char *)p) + elts[n].byte_offset;
-        ret = Parrot_pmc_new_init_int(INTERP, enum_class_Ptr, (INTVAL)p);
+        ret = Parrot_pmc_new_init_int(INTERP, enum_class_Ptr, PTR2ULONG(p));
 
         RETURN(PMC ret);
     }
