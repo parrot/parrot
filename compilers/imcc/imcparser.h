@@ -293,7 +293,7 @@ extern int yydebug;
 typedef union YYSTYPE
 {
 /* Line 2053 of yacc.c  */
-#line 1051 "compilers/imcc/imcc.y"
+#line 1049 "compilers/imcc/imcc.y"
 
     IdList * idlist;
     int t;

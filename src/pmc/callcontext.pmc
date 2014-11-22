@@ -1067,6 +1067,8 @@ return current Namespace
         Pcc_cell *cells;
         INTVAL    num_pos, allocated_positionals;
 
+        PARROT_ASSERT(value
+                || !"Push empty object into CallContext");
         PARROT_ASSERT(!PObj_on_free_list_TEST(value)
                 || !"Push dead object into CallContext");
 

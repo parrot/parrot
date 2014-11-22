@@ -602,7 +602,7 @@ expand_pcc_sub_call(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
 
             /*
              * set_p_pc gets replaced in imcc/pbc.c, if the
-             * function can't located in the current namespace
+             * function can't be located in the current namespace
              */
             get_name   = INS(imcc, unit, "set_p_pc", "", regs, 2, 0, 0);
             ins->type &= ~ITCALL;

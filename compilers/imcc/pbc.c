@@ -704,6 +704,13 @@ get_code_size(ARGMOD(imc_info_t * imcc), ARGIN(const IMC_Unit *unit),
 
                 if (ins->symregs[1]->usage & U_FIXUP)
                     store_fixup(imcc, ins->symregs[1], code_size, 2);
+                if (ins->symregs[1]->color < 0)
+                    IMCC_debug(imcc, DEBUG_PBC_FIXUP, "Warning: PMC %s color %d\n",
+                               ins->symregs[1]->name, ins->symregs[1]->color);
+                /*
+                    Parrot_ex_throw_from_c_noargs(imcc->interp, EXCEPTION_UNEXPECTED_NULL,
+                        "PMC is not defined");
+                */
             }
         }
         code_size += opsize;
@@ -933,8 +940,12 @@ fixup_globals(ARGMOD(imc_info_t * imcc))
                     s1 = NULL;
                 else if (fixup->usage & U_SUBID_LOOKUP) {
                     subid_lookup = 1;
-                    /* s1 = find_sub_by_subid(interp, fixup->name, &pc); */
                     s1 = find_sub_by_subid(imcc, fixup->name, s, &pc);
+                    /* this is changed to find_sub_not_null at run-time
+                    if (!s1 || s1->pmc_const == -1)
+                        IMCC_fataly(imcc, EXCEPTION_INVALID_OPERATION,
+                                "Sub '%s' not found\n", fixup->name);
+                    */
                 }
                 else if (fixup->usage & U_LEXINFO_LOOKUP) {
                     s1 = find_sub_by_subid(imcc, fixup->name, s, &pc);
@@ -2237,9 +2248,10 @@ e_pbc_end_sub(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(IMC_Unit *unit
         return;
 
     /*
-     * if the sub was marked IMMEDIATE, we run it now
+     * if the sub was marked IMMEDIATE, we run it now.
      * This is *dangerous*: all possible global state can be messed
-     * up, e.g. when that sub starts loading bytecode
+     * up, e.g. when that sub starts loading bytecode.
+     * Any pmc color -1 will be invalid as those fixups will not be run. #1024
      */
 
     /* we run only PCC subs */

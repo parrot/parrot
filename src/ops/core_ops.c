@@ -20472,6 +20472,7 @@ Parrot_set_s_nc(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_set_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
+    PARROT_ASSERT((PCONST(2) || (!"Empty PMC in set_p_pc")));
     PREG(1) = PCONST(2);
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return cur_opcode + 3;
@@ -20479,6 +20480,7 @@ Parrot_set_p_pc(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_set_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
+    PARROT_ASSERT((PREG(2) || (!"Empty PMC in set_p_p")));
     PREG(1) = PREG(2);
     PARROT_GC_WRITE_BARRIER(interp, CURRENT_CONTEXT(interp));
     return cur_opcode + 3;

@@ -8,10 +8,9 @@ use vars qw($TODO);
 
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 41;
+use Parrot::Test tests => 40;
 
 pir_output_is( <<'CODE', <<'OUT', "globalconst 1" );
-
 .sub 'main' :main
     .globalconst int N = 5
     _main()
@@ -658,12 +657,13 @@ CODE
 /wrong .const value/
 OUT
 
-pir_exit_code_is( <<'CODE', 1, "missing const Sub should not SEGV [GH #1024]", todo => "dubious");
-.sub baz :immediate :anon
-  .const "Sub" foo = "foo"
-  $P1 = foo."new"()
-.end
-CODE
+#skip WONTFIX :immediate has empty globals by definition
+#pir_exit_code_is( <<'CODE', 1, "missing const Sub in immediate will SEGV", todo => "[TT #1324, GH #1024]");
+#.sub baz :immediate :anon
+#  .const "Sub" foo = "foo"
+#  $P1 = foo."new"()
+#.end
+#CODE
 #was:
 #/Method 'new' not found for non-object/
 #OUT

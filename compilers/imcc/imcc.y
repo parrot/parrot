@@ -500,10 +500,8 @@ mk_pmc_const_named(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit),
     if ((strncmp(unquoted_name, "Sub",       name_length) == 0)
     ||  (strncmp(unquoted_name, "Coroutine", name_length) == 0)) {
         rhs = mk_const(imcc, const_name, 'p');
-
         if (!ascii)
             rhs->type |= VT_ENCODED;
-
         rhs->usage    |= U_FIXUP | U_SUBID_LOOKUP;
     }
     else if (strncmp(unquoted_name, "LexInfo", name_length) == 0) {

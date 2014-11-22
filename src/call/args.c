@@ -403,6 +403,8 @@ Parrot_pcc_build_sig_object_from_op(PARROT_INTERP, ARGIN_NULLOK(PMC *signature),
                         ? Parrot_pcc_get_pmc_constant(interp, ctx, raw_index)
                         : CTX_REG_PMC(interp, ctx, raw_index);
 
+                PARROT_ASSERT(pmc_value
+                    || !"CallContext: Empty PMC argument");
                 if (arg_flags & PARROT_ARG_FLATTEN) {
                     dissect_aggregate_arg(interp, call_object, pmc_value);
                 }
