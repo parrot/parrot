@@ -131,12 +131,12 @@ inline op set(out STR, in NUM)  {
 }
 
 inline op set(out PMC, inconst PMC)  {
-    PARROT_ASSERT($2 || !"Empty PMC in set_p_pc");
+    PARROT_ASSERT(cur_opcode[2] >=0 || !"Empty PMC in set_p_pc");
     $1 = $2;
 }
 
 inline op set(out PMC, invar PMC)  {
-    PARROT_ASSERT($2 || !"Empty PMC in set_p_p");
+    PARROT_ASSERT(cur_opcode[2] >=0 || !"Empty PMC in set_p_p");
     $1 = $2;
 }
 
