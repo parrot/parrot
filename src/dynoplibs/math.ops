@@ -166,8 +166,7 @@ inline op cmod(invar PMC, invar PMC, in NUM)  {
 
     if (FLOAT_IS_ZERO(value)) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
-            EXCEPTION_DIV_BY_ZERO,
-            "Divide by zero");
+            EXCEPTION_DIV_BY_ZERO, "Divide by zero");
         goto ADDRESS(handler);
     }
     result = fmod(VTABLE_get_integer(interp, $2), value);

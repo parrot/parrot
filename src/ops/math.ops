@@ -392,7 +392,14 @@ inline op ceil(inout NUM)  {
 
 inline op ceil(out INT, in NUM)  {
     const FLOATVAL f = ceil($2);
-    $1 = (INTVAL)f;
+    if (PARROT_FLOATVAL_IS_INF_OR_NAN(f)) {
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+	    EXCEPTION_LOSSY_CONVERSION, "Invalid number");
+        goto ADDRESS(handler);
+    }
+    else {
+      $1 = (INTVAL)f;
+    }
 }
 
 inline op ceil(out NUM, in NUM)  {
@@ -411,6 +418,9 @@ Set $1 to the largest integral value less than or equal to $1.
 
 Set $1 to the largest integral value less than or equal to $2.
 
+On Inf or NaN an integer cannot represent the result, so throw a
+LOSSY_CONVERSION exception.
+
 =cut
 
 inline op floor(inout NUM)  {
@@ -419,7 +429,14 @@ inline op floor(inout NUM)  {
 
 inline op floor(out INT, in NUM)  {
     const FLOATVAL f = floor($2);
-    $1 = (INTVAL)f;
+    if (PARROT_FLOATVAL_IS_INF_OR_NAN(f)) {
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
+	    EXCEPTION_LOSSY_CONVERSION, "Invalid number");
+        goto ADDRESS(handler);
+    }
+    else {
+        $1 = (INTVAL)f;
+    }
 }
 
 inline op floor(out NUM, in NUM)  {

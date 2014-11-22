@@ -605,7 +605,6 @@ PIOOFF_T Parrot_io_tell_handle(PARROT_INTERP, ARGMOD(PMC *handle))
         FUNC_MODIFIES(*handle);
 
 PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
 size_t Parrot_io_write_b(PARROT_INTERP,
     ARGMOD(PMC *handle),
     ARGIN(const void *buffer),

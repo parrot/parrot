@@ -999,7 +999,6 @@ Legacy wrapper for Parrot_io_write_b. Deprecated. Do not use.
 */
 
 PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
 size_t
 Parrot_io_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(const void *buffer),
         size_t byte_length)

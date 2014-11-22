@@ -460,7 +460,18 @@ Returns true if the complex number is non-zero.
         FLOATVAL re, im;
         GET_ATTR_re(INTERP, SELF, re);
         GET_ATTR_im(INTERP, SELF, im);
-        return Parrot_sprintf_c(INTERP, "%vg%+vgi", re, im);
+        if (PARROT_FLOATVAL_IS_INF_OR_NAN(re)) {
+            PMC * result = Parrot_pmc_new(interp, enum_class_String);
+            VTABLE_set_number_native(interp, result, re);
+            return VTABLE_get_string(interp, result);
+        }
+        else if (PARROT_FLOATVAL_IS_INF_OR_NAN(im)) {
+            PMC * result = Parrot_pmc_new(interp, enum_class_String);
+            VTABLE_set_number_native(interp, result, im);
+            return VTABLE_get_string(interp, result);
+        }
+        else
+            return Parrot_sprintf_c(INTERP, "%vg%+vgi", re, im);
     }
 
     VTABLE INTVAL get_bool() :no_wb {

@@ -819,34 +819,46 @@ Divides C<SELF> by C<value> inplace.
 
         f = floor(SELF.get_number() / d);
         return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
-            (INTVAL)f);
+                (INTVAL)f);
     }
 
 
     VTABLE PMC *floor_divide_int(INTVAL value, PMC *dest) :no_wb {
-        UNUSED(dest)
         FLOATVAL f;
+        UNUSED(dest)
 
         if (value == 0)
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                     "float division by zero");
 
         f = floor(SELF.get_number() / value);
-        return Parrot_pmc_new_init_int(INTERP,
-               VTABLE_type(INTERP, SELF), (INTVAL)f);
+        if (PARROT_FLOATVAL_IS_INF_OR_NAN(f)) {
+            PMC *result = Parrot_pmc_new(INTERP, enum_class_Float);
+            VTABLE_set_number_native(INTERP, result, f);
+            return result;
+        }
+        else
+            return Parrot_pmc_new_init_int(INTERP,
+                     VTABLE_type(INTERP, SELF), (INTVAL)f);
     }
 
     VTABLE PMC *floor_divide_float(FLOATVAL value, PMC *dest) :no_wb {
-        UNUSED(dest)
         FLOATVAL f;
+        UNUSED(dest)
 
         if (FLOAT_IS_ZERO(value))
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                     "float division by zero");
 
         f = floor(SELF.get_number() / value);
-        return Parrot_pmc_new_init_int(INTERP,
-                VTABLE_type(INTERP, SELF), (INTVAL)f);
+        if (PARROT_FLOATVAL_IS_INF_OR_NAN(f)) {
+            PMC *result = Parrot_pmc_new(INTERP, enum_class_Float);
+            VTABLE_set_number_native(INTERP, result, f);
+            return result;
+        }
+        else
+            return Parrot_pmc_new_init_int(INTERP,
+                       VTABLE_type(INTERP, SELF), (INTVAL)f);
     }
 
     MULTI void i_floor_divide(BigInt value) :manual_wb {
@@ -864,7 +876,10 @@ Divides C<SELF> by C<value> inplace.
                     "float division by zero");
 
         f = floor(SELF.get_number() / d);
-        VTABLE_set_integer_native(INTERP, SELF, (INTVAL)f);
+        if (PARROT_FLOATVAL_IS_INF_OR_NAN(f))
+            VTABLE_set_number_native(INTERP, SELF, f);
+        else
+            VTABLE_set_integer_native(INTERP, SELF, (INTVAL)f);
     }
 
 
@@ -888,7 +903,10 @@ Divides C<SELF> by C<value> inplace.
                     "float division by zero");
 
         f = floor(SELF.get_number() / value);
-        VTABLE_set_integer_native(INTERP, SELF, (INTVAL)f);
+        if (PARROT_FLOATVAL_IS_INF_OR_NAN(f))
+            VTABLE_set_number_native(INTERP, SELF, f);
+        else
+            VTABLE_set_integer_native(INTERP, SELF, (INTVAL)f);
     }
 
 
@@ -955,8 +973,14 @@ Calculates modulus in place.
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                     "int modulus by zero");
 
-        return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
-                Parrot_util_intval_mod(SELF.get_integer(), (INTVAL)value));
+        if (PARROT_FLOATVAL_IS_INF_OR_NAN(value)) {
+            PMC *result = Parrot_pmc_new(INTERP, enum_class_Float);
+            VTABLE_set_number_native(INTERP, result, value);
+            return result;
+        }
+        else
+            return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
+                     Parrot_util_intval_mod(SELF.get_integer(), (INTVAL)value));
     }
 
 
@@ -994,7 +1018,10 @@ Calculates modulus in place.
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                     "int modulus by zero");
 
-        VTABLE_set_integer_native(INTERP, SELF,
+        if (PARROT_FLOATVAL_IS_INF_OR_NAN(value))
+            VTABLE_set_number_native(INTERP, SELF, value);
+        else
+            VTABLE_set_integer_native(INTERP, SELF,
                 Parrot_util_intval_mod(SELF.get_integer(), (INTVAL)value));
     }
 

@@ -16955,7 +16955,7 @@ Parrot_print_n(opcode_t *cur_opcode, PARROT_INTERP) {
         Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
 
 #else
-        if ((!Parrot_is_nzero(NREG(1)))) {
+        if (!Parrot_is_nzero(NREG(1))) {
             Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
         }
         else {
@@ -16983,7 +16983,7 @@ Parrot_print_nc(opcode_t *cur_opcode, PARROT_INTERP) {
         Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
 
 #else
-        if ((!Parrot_is_nzero(NREG(1)))) {
+        if (!Parrot_is_nzero(NREG(1))) {
             Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
         }
         else {
@@ -17078,7 +17078,7 @@ Parrot_say_n(opcode_t *cur_opcode, PARROT_INTERP) {
         Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
 
 #else
-        if ((!Parrot_is_nzero(NREG(1)))) {
+        if (!Parrot_is_nzero(NREG(1))) {
             Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
         }
         else {
@@ -17107,7 +17107,7 @@ Parrot_say_nc(opcode_t *cur_opcode, PARROT_INTERP) {
         Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
 
 #else
-        if ((!Parrot_is_nzero(NREG(1)))) {
+        if (!Parrot_is_nzero(NREG(1))) {
             Parrot_io_write_b(interp, _PIO_STDOUT(interp), buf, strlen(buf));
         }
         else {
@@ -17959,7 +17959,15 @@ opcode_t *
 Parrot_ceil_i_n(opcode_t *cur_opcode, PARROT_INTERP) {
     const FLOATVAL   f = ceil(NREG(2));
 
-    IREG(1) = (INTVAL)f;
+    if (PARROT_FLOATVAL_IS_INF_OR_NAN(f)) {
+        opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 3, EXCEPTION_LOSSY_CONVERSION, "Invalid number");
+
+        return (opcode_t *)handler;
+    }
+    else {
+        IREG(1) = (INTVAL)f;
+    }
+
     return cur_opcode + 3;
 }
 
@@ -17979,7 +17987,15 @@ opcode_t *
 Parrot_floor_i_n(opcode_t *cur_opcode, PARROT_INTERP) {
     const FLOATVAL   f = floor(NREG(2));
 
-    IREG(1) = (INTVAL)f;
+    if (PARROT_FLOATVAL_IS_INF_OR_NAN(f)) {
+        opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 3, EXCEPTION_LOSSY_CONVERSION, "Invalid number");
+
+        return (opcode_t *)handler;
+    }
+    else {
+        IREG(1) = (INTVAL)f;
+    }
+
     return cur_opcode + 3;
 }
 
