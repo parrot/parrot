@@ -394,7 +394,7 @@ inline op ceil(out INT, in NUM)  {
     const FLOATVAL f = ceil($2);
     if (PARROT_FLOATVAL_IS_INF_OR_NAN(f)) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
-	    EXCEPTION_LOSSY_CONVERSION, "Invalid number");
+            EXCEPTION_LOSSY_CONVERSION, "Invalid number");
         goto ADDRESS(handler);
     }
     else {
@@ -431,7 +431,7 @@ inline op floor(out INT, in NUM)  {
     const FLOATVAL f = floor($2);
     if (PARROT_FLOATVAL_IS_INF_OR_NAN(f)) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
-	    EXCEPTION_LOSSY_CONVERSION, "Invalid number");
+            EXCEPTION_LOSSY_CONVERSION, "Invalid number");
         goto ADDRESS(handler);
     }
     else {
