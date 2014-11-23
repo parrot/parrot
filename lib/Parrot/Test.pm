@@ -610,7 +610,12 @@ sub _pir_stdin_output_slurp {
             or die "Unable to pipe output to us: $!";
         <$in>;
     };
-    $result =~ s/(^(?:==|--)\d+(?:==|--).*\n)//mg if defined $ENV{VALGRIND};
+    if (defined $ENV{VALGRIND}) {
+        $result =~ s/(^(?:==|--)\d+(?:==|--).*\n)//mg;
+        # --pid:0:syswrap- WARNING: Ignoring sigreturn( ..., UC_RESET_ALT_STACK );
+        # on longjmp, darwin only.
+        $result =~ s/(^--(?:\d)+:0:syswrap-.*\n)//mg if $^O eq 'darwin' and !$ENV{TEST_VERBOSE};
+    }
     return $result;
 }
 
