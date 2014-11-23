@@ -157,7 +157,11 @@ inline op cmod(out NUM, in NUM, in NUM)  {
             "Divide by zero");
         goto ADDRESS(handler);
     }
-    $1 = fmod($2, den);
+#if defined(PARROT_HAS_FMODL) && NUMVAL_SIZE > 8
+    $1 = (FLOATVAL)fmodl($2, den);
+#else
+    $1 = (FLOATVAL)fmod($2, den);
+#endif
 }
 
 inline op cmod(invar PMC, invar PMC, in NUM)  {
@@ -169,7 +173,11 @@ inline op cmod(invar PMC, invar PMC, in NUM)  {
             EXCEPTION_DIV_BY_ZERO, "Divide by zero");
         goto ADDRESS(handler);
     }
-    result = fmod(VTABLE_get_integer(interp, $2), value);
+#if defined(PARROT_HAS_FMODL) && NUMVAL_SIZE > 8
+    result = (FLOATVAL)fmodl(VTABLE_get_number(interp, $2), value);
+#else
+    result = (FLOATVAL)fmod(VTABLE_get_number(interp, $2), value);
+#endif
 
     if (PARROT_FLOATVAL_IS_INF_OR_NAN(result)) {
         $1 = Parrot_pmc_new(interp, enum_class_String);

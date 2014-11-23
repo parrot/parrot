@@ -2145,12 +2145,11 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
             return PARROT_FLOATVAL_INF_NEGATIVE;
     }
 
-/* powl() could be used here, but it is an optional POSIX extension that
-   needs to be checked for at Configure-time.
-
-   See https://github.com/parrot/parrot/issues/451 for more details. */
-
-#  define POW pow
+#ifdef PARROT_HAS_POWL
+#  define POW (FLOATVAL)powl
+#else
+#  define POW (FLOATVAL)pow
+#endif
 
      if (d && d_is_safe) {
         f = mantissa + (1.0 * d / POW(10.0, d_length));

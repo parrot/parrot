@@ -1,0 +1,87 @@
+/*
+Copyright (C) 2014, Parrot Foundation.
+
+*/
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+
+int
+main(int argc, char* argv[])
+{
+    long i = -10L;
+    long double ld = 10.0;
+    unsigned long n;
+
+#ifdef LABS
+    n = labs(i);
+    if (n == 10UL)
+        puts("labs");
+    else
+        printf("broken l a b s: n = %lu\n", n);
+#endif
+
+#ifdef POWL
+    ld = 10.0;
+    ld = powl(ld, 1.0);
+    if (ld == 10.0)
+        puts("powl");
+    else
+        printf("broken p o w l: ld = %Lg\n", ld);
+#endif
+
+#ifdef FLOORL
+    ld = 10.0;
+    ld = floorl(ld);
+    if (ld == 10.0)
+        puts("floorl");
+    else
+        printf("broken f l o o r l: ld = %Lg\n", ld);
+#endif
+
+#ifdef CEILL
+    ld = 10.0;
+    ld = ceill(ld);
+    if (ld == 10.0)
+        puts("ceill");
+    else
+        printf("broken c e i l l: ld = %Lg\n", ld);
+#endif
+
+#ifdef FMODL
+    ld = 10.0;
+    ld = fmodl(ld, 1);
+    if (ld == 0.0)
+        puts("fmodl");
+    else
+        printf("broken f m o d l: ld = %Lg\n", ld);
+#endif
+
+#ifdef EXPL
+    ld = 0.0;
+    ld = expl(ld);
+    if (ld == 1.0)
+        puts("expl");
+    else
+        printf("broken e x p l: ld = %Lg\n", ld);
+#endif
+
+#ifdef LOGL
+    ld = 1.0;
+    ld = logl(ld);
+    if (ld == 0.0)
+        puts("logl");
+    else
+        printf("broken l o g l: ld = %Lg\n", ld);
+#endif
+
+    return 0;
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

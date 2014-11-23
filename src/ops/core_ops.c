@@ -14073,7 +14073,7 @@ opcode_t *
 Parrot_get_addr_i_p(opcode_t *cur_opcode, PARROT_INTERP) {
     void  * const  ptr = VTABLE_get_pointer(interp, PREG(2));
 
-    IREG(1) = (INTVAL)ptr;
+    IREG(1) = PTR2INTVAL(ptr);
     return cur_opcode + 3;
 }
 
@@ -17324,8 +17324,8 @@ Parrot_getstderr_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_abs_i(opcode_t *cur_opcode, PARROT_INTERP) {
-    #if defined(PARROT_HAS_LABS) && (INTVAL_SIZE == 8)
-        IREG(1) = labs(IREG(1));
+    #if defined(PARROT_HAS_LABS)
+        IREG(1) = labs((long)IREG(1));
 
 #else
         IREG(1) = abs(IREG(1));
@@ -17343,8 +17343,8 @@ Parrot_abs_n(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_abs_i_i(opcode_t *cur_opcode, PARROT_INTERP) {
-    #if defined(PARROT_HAS_LABS) && (INTVAL_SIZE == 8)
-        IREG(1) = labs(IREG(2));
+    #if defined(PARROT_HAS_LABS)
+        IREG(1) = labs((long)IREG(2));
 
 #else
         IREG(1) = abs(IREG(2));
@@ -17750,7 +17750,14 @@ Parrot_fdiv_i_i(opcode_t *cur_opcode, PARROT_INTERP) {
         return (opcode_t *)handler;
     }
 
-    f = floor((((FLOATVAL)IREG(1)) / den));
+    #if defined(PARROT_HAS_FLOORL)
+        f = (FLOATVAL)floorl((IREG(1) / den));
+
+#else
+        f = (FLOATVAL)floor((IREG(1) / den));
+
+#endif
+;
     IREG(1) = (INTVAL)f;
     return cur_opcode + 3;
 }
@@ -17766,7 +17773,14 @@ Parrot_fdiv_i_ic(opcode_t *cur_opcode, PARROT_INTERP) {
         return (opcode_t *)handler;
     }
 
-    f = floor((((FLOATVAL)IREG(1)) / den));
+    #if defined(PARROT_HAS_FLOORL)
+        f = (FLOATVAL)floorl((IREG(1) / den));
+
+#else
+        f = (FLOATVAL)floor((IREG(1) / den));
+
+#endif
+;
     IREG(1) = (INTVAL)f;
     return cur_opcode + 3;
 }
@@ -17781,7 +17795,14 @@ Parrot_fdiv_n_n(opcode_t *cur_opcode, PARROT_INTERP) {
         return (opcode_t *)handler;
     }
 
-    NREG(1) = floor((NREG(1) / den));
+    #if defined(PARROT_HAS_FLOORL)
+        NREG(1) = (FLOATVAL)floorl((NREG(1) / den));
+
+#else
+        NREG(1) = (FLOATVAL)floor((NREG(1) / den));
+
+#endif
+;
     return cur_opcode + 3;
 }
 
@@ -17795,7 +17816,14 @@ Parrot_fdiv_n_nc(opcode_t *cur_opcode, PARROT_INTERP) {
         return (opcode_t *)handler;
     }
 
-    NREG(1) = floor((NREG(1) / den));
+    #if defined(PARROT_HAS_FLOORL)
+        NREG(1) = (FLOATVAL)floorl((NREG(1) / den));
+
+#else
+        NREG(1) = (FLOATVAL)floor((NREG(1) / den));
+
+#endif
+;
     return cur_opcode + 3;
 }
 
@@ -17840,7 +17868,14 @@ Parrot_fdiv_i_i_i(opcode_t *cur_opcode, PARROT_INTERP) {
         return (opcode_t *)handler;
     }
 
-    f = floor(((FLOATVAL)IREG(2) / den));
+    #if defined(PARROT_HAS_FLOORL)
+        f = (FLOATVAL)floorl((IREG(2) / den));
+
+#else
+        f = (FLOATVAL)floor((IREG(2) / den));
+
+#endif
+;
     IREG(1) = (INTVAL)f;
     return cur_opcode + 4;
 }
@@ -17856,7 +17891,14 @@ Parrot_fdiv_i_ic_i(opcode_t *cur_opcode, PARROT_INTERP) {
         return (opcode_t *)handler;
     }
 
-    f = floor(((FLOATVAL)ICONST(2) / den));
+    #if defined(PARROT_HAS_FLOORL)
+        f = (FLOATVAL)floorl((ICONST(2) / den));
+
+#else
+        f = (FLOATVAL)floor((ICONST(2) / den));
+
+#endif
+;
     IREG(1) = (INTVAL)f;
     return cur_opcode + 4;
 }
@@ -17872,7 +17914,14 @@ Parrot_fdiv_i_i_ic(opcode_t *cur_opcode, PARROT_INTERP) {
         return (opcode_t *)handler;
     }
 
-    f = floor(((FLOATVAL)IREG(2) / den));
+    #if defined(PARROT_HAS_FLOORL)
+        f = (FLOATVAL)floorl((IREG(2) / den));
+
+#else
+        f = (FLOATVAL)floor((IREG(2) / den));
+
+#endif
+;
     IREG(1) = (INTVAL)f;
     return cur_opcode + 4;
 }
@@ -17887,7 +17936,14 @@ Parrot_fdiv_n_n_n(opcode_t *cur_opcode, PARROT_INTERP) {
         return (opcode_t *)handler;
     }
 
-    NREG(1) = floor((NREG(2) / den));
+    #if defined(PARROT_HAS_FLOORL)
+        NREG(1) = (FLOATVAL)floorl((NREG(2) / den));
+
+#else
+        NREG(1) = (FLOATVAL)floor((NREG(2) / den));
+
+#endif
+;
     return cur_opcode + 4;
 }
 
@@ -17901,7 +17957,14 @@ Parrot_fdiv_n_nc_n(opcode_t *cur_opcode, PARROT_INTERP) {
         return (opcode_t *)handler;
     }
 
-    NREG(1) = floor((NCONST(2) / den));
+    #if defined(PARROT_HAS_FLOORL)
+        NREG(1) = (FLOATVAL)floorl((NCONST(2) / den));
+
+#else
+        NREG(1) = (FLOATVAL)floor((NCONST(2) / den));
+
+#endif
+;
     return cur_opcode + 4;
 }
 
@@ -17915,7 +17978,14 @@ Parrot_fdiv_n_n_nc(opcode_t *cur_opcode, PARROT_INTERP) {
         return (opcode_t *)handler;
     }
 
-    NREG(1) = floor((NREG(2) / den));
+    #if defined(PARROT_HAS_FLOORL)
+        NREG(1) = (FLOATVAL)floorl((NREG(2) / den));
+
+#else
+        NREG(1) = (FLOATVAL)floor((NREG(2) / den));
+
+#endif
+;
     return cur_opcode + 4;
 }
 
@@ -17951,14 +18021,32 @@ Parrot_fdiv_p_p_nc(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_ceil_n(opcode_t *cur_opcode, PARROT_INTERP) {
-    NREG(1) = ceil(NREG(1));
+    #if defined(PARROT_HAS_CEILL) && (NUMVAL_SIZE > 8)
+        NREG(1) = (FLOATVAL)ceill(NREG(1));
+
+#else
+        NREG(1) = (FLOATVAL)ceil(NREG(1));
+
+#endif
+;
     return cur_opcode + 2;
 }
 
 opcode_t *
 Parrot_ceil_i_n(opcode_t *cur_opcode, PARROT_INTERP) {
-    const FLOATVAL   f = ceil(NREG(2));
+    #if defined(PARROT_HAS_CEILL) && (NUMVAL_SIZE > 8)
+        long;
+        double;
+        d = NREG(2);
+        const;
+        FLOATVAL;
+        f = (FLOATVAL)ceill(d);
 
+#else
+        const FLOATVAL   f = (FLOATVAL)ceil(NREG(2));
+
+#endif
+;
     if (PARROT_FLOATVAL_IS_INF_OR_NAN(f)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 3, EXCEPTION_LOSSY_CONVERSION, "Invalid number");
 
@@ -17973,20 +18061,50 @@ Parrot_ceil_i_n(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_ceil_n_n(opcode_t *cur_opcode, PARROT_INTERP) {
-    NREG(1) = ceil(NREG(2));
+    #if defined(PARROT_HAS_CEILL) && (NUMVAL_SIZE > 8)
+        long;
+        double;
+        d = NREG(2);
+        NREG(1) = (FLOATVAL)ceill(d);
+
+#else
+        NREG(1) = (FLOATVAL)ceil(NREG(2));
+
+#endif
+;
     return cur_opcode + 3;
 }
 
 opcode_t *
 Parrot_floor_n(opcode_t *cur_opcode, PARROT_INTERP) {
-    NREG(1) = floor(NREG(1));
+    #if defined(PARROT_HAS_FLOORL) && (NUMVAL_SIZE > 8)
+        long;
+        double;
+        d = NREG(1);
+        NREG(1) = (FLOATVAL)floorl(d);
+
+#else
+        NREG(1) = (FLOATVAL)floor(NREG(1));
+
+#endif
+;
     return cur_opcode + 2;
 }
 
 opcode_t *
 Parrot_floor_i_n(opcode_t *cur_opcode, PARROT_INTERP) {
-    const FLOATVAL   f = floor(NREG(2));
+    #if defined(PARROT_HAS_FLOORL) && (NUMVAL_SIZE > 8)
+        long;
+        double;
+        d = NREG(2);
+        FLOATVAL;
+        f = (FLOATVAL)floorl(d);
 
+#else
+        FLOATVAL   f = (FLOATVAL)floor(NREG(2));
+
+#endif
+;
     if (PARROT_FLOATVAL_IS_INF_OR_NAN(f)) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 3, EXCEPTION_LOSSY_CONVERSION, "Invalid number");
 
@@ -18001,7 +18119,17 @@ Parrot_floor_i_n(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_floor_n_n(opcode_t *cur_opcode, PARROT_INTERP) {
-    NREG(1) = floor(NREG(2));
+    #if defined(PARROT_HAS_FLOORL) && (NUMVAL_SIZE > 8)
+        long;
+        double;
+        d = NREG(2);
+        NREG(1) = (FLOATVAL)floorl(d);
+
+#else
+        NREG(1) = (FLOATVAL)floor(NREG(2));
+
+#endif
+;
     return cur_opcode + 3;
 }
 
