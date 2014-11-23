@@ -20,6 +20,9 @@ statement in parrot source files
     # test all files
     % prove t/codingstd/copyright.t
 
+    # test years (very slow!)
+    % TEST_SLOW=1 perl t/codingstd/copyright.t
+
     # test specific files
     % perl t/codingstd/copyright.t src/foo.c include/parrot/bar.h
 
