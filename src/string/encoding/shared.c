@@ -1503,12 +1503,12 @@ convert_case_buf(PARROT_INTERP, ARGMOD_NULLOK(char *dest_buf), size_t dest_len,
               case ENCODING_UPCASE:
                 d[i] = (c >= 0xe0 && c != 0xf7)
                          ? c & ~0x20
-                         : toupper((unsigned char)c);
+                         : (Parrot_UInt2)toupper((unsigned char)c);
                 break;
               case ENCODING_DOWNCASE:
                 d[i] = (c >= 0xc0 && c != 0xd7 && c <= 0xde)
                          ? c | 0x20
-                         : tolower((unsigned char)c);
+                         : (Parrot_UInt2)tolower((unsigned char)c);
                 break;
               default:
                 d[i] = s[i];

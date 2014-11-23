@@ -242,7 +242,7 @@ Parrot_io_internal_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
     ||  fam >= PIO_PF_MAX
     || (fam = pio_pf[fam]) < 0)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "unsupported protocol family: %ld", fam);
+                "unsupported protocol family: "INTVAL_FMT, fam);
 
     memset(&hints, 0, sizeof (struct addrinfo));
     if (passive)
@@ -251,7 +251,7 @@ Parrot_io_internal_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
     hints.ai_family   = fam;
     hints.ai_protocol = protocol;
 
-    snprintf(portstr, sizeof (portstr), "%ld", port);
+    snprintf(portstr, sizeof (portstr), INTVAL_FMT, port);
 
     {
         /* Limited scope for the C string to prevent mistakes */
@@ -490,14 +490,14 @@ Parrot_io_internal_socket(PARROT_INTERP, int fam, int type, int proto)
     ||  fam >= PIO_PF_MAX
     || (fam = pio_pf[fam]) < 0)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "unsupported protocol family: %ld", fam);
+                "unsupported protocol family: "INTVAL_FMT, fam);
 
     /* convert Parrot's socket type to system type */
     if (type < 0
     ||  type >= PIO_SOCK_MAX
     || (type = pio_sock[type]) < 0)
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "unsupported socket type: %ld", type);
+                "unsupported socket type: %d", type);
 
     sock = socket(fam, type, proto);
 
