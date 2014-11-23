@@ -271,12 +271,8 @@ sub _handle_ptrcast {
 
     return if $intvalsize >= $ptrsize;
     if ( $conf->options->get('intval') or $conf->options->get('ask') ) {
-        print <<END;
-
-Hmm, I see your chosen INTVAL is of smaller size than your pointers. Parrot
-should still compile and run, but you may see a ton of warnings.
-
-END
+        # See #1145, #642
+        die "Configure.pl: Your chosen INTVAL is of smaller size than your pointers.";
     }
     else {
         $typesref->{intval} = $intptr;

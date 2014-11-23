@@ -14,6 +14,7 @@
     - Build
         + Extend auto::infnan probe to other --floatval #1146
         + Warn in Configure on experimental flags intval, floatval and gc #1148
+        + Die in Configure on unsupported intval sizes #1148, #642, ...
     - Documentation
     - Tests
         + Fix t/steps/auto/arch-01.t darwin regression #1142

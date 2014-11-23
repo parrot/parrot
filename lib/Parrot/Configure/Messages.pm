@@ -32,9 +32,12 @@ END
 
 sub warn_experimental {
     my ($conf, $args) = @_;
-    print <<"END" if $args->{intval} and $args->{intval} ne 'long';
+    # intval long and 'long long' is fine. just shorter than PTR_SIZE will not work.
+    # Note that we die in auto::sizes, so this warning might not be needed.
+    my $intval =  $args->{intval};
+    print <<"END" if $args->{intval} and $intval !~ /^long( long)?( int)?$/;
 
-WARNING: --intval=$args->{intval} is experimental and will not work.
+WARNING: --intval=$args->{intval} is experimental and might not work.
 See https://github.com/parrot/parrot/issues/1145
 END
     print <<"END" if $args->{floatval} and $args->{floatval} ne 'double';
