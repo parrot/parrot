@@ -6,8 +6,12 @@ config/auto/mathl.pm - Test for C90 and C99 long math extensions
 
 =head1 DESCRIPTION
 
-Test for the presence of labs(), powl(), ...
-labs is needed on 64bit intval, powl on long double floatval.
+Test for the presence of various long math variants.
+
+powl and labs are used if available.
+
+fabsl floorl ceill fmodl expl logl are used for NUMVAL_SIZE > 8 only.
+no quad variants yet.
 
 =cut
 
@@ -18,7 +22,7 @@ use warnings;
 
 use base qw(Parrot::Configure::Step);
 
-our @probes = qw(labs powl floorl ceill fmodl expl logl);
+our @probes = qw(labs powl fabsl floorl ceill fmodl expl logl);
 
 sub _init {
     my $self = shift;

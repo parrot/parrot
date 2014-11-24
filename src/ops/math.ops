@@ -54,7 +54,11 @@ inline op abs(inout INT)  {
 }
 
 inline op abs(inout NUM)  {
+#if defined(PARROT_HAS_FABSL) && NUMVAL_SIZE > 8
+    $1 = fabsl((HUGEFLOATVAL)$1);
+#else
     $1 = fabs($1);
+#endif
 }
 
 inline op abs(out INT, in INT)  {
@@ -66,7 +70,11 @@ inline op abs(out INT, in INT)  {
 }
 
 inline op abs(out NUM, in NUM)  {
+#if defined(PARROT_HAS_FABSL) && NUMVAL_SIZE > 8
+    $1 = fabsl((HUGEFLOATVAL)$2);
+#else
     $1 = fabs($2);
+#endif
 }
 
 inline op abs(invar PMC)  {
@@ -306,10 +314,10 @@ inline op fdiv(inout INT, in INT)  {
         goto ADDRESS(handler);
     }
 
-#ifdef PARROT_HAS_FLOORL
-    f = (FLOATVAL)floorl($1 / den);
+#if defined(PARROT_HAS_FLOORL) && NUMVAL_SIZE > 8
+    f = (FLOATVAL)floorl((HUGEFLOATVAL)$1 / den);
 #else
-    f = (FLOATVAL)floor($1 / den);
+    f = (FLOATVAL)floor((FLOATVAL)$1 / den);
 #endif
     $1 = (INTVAL)f;
 }
@@ -323,7 +331,7 @@ inline op fdiv(inout NUM, in NUM)  {
             "Divide by zero");
         goto ADDRESS(handler);
     }
-#ifdef PARROT_HAS_FLOORL
+#if defined(PARROT_HAS_FLOORL) && NUMVAL_SIZE > 8
     $1 = (FLOATVAL)floorl($1 / den);
 #else
     $1 = (FLOATVAL)floor($1 / den);
@@ -344,7 +352,7 @@ inline op fdiv(invar PMC, in NUM)  {
 
 inline op fdiv(out INT, in INT, in INT)  {
     const INTVAL den = $3;
-    FLOATVAL f;
+    FLOATVAL f = (FLOATVAL)$2;
 
     if (den == 0) {
         opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, expr NEXT(),
@@ -353,10 +361,10 @@ inline op fdiv(out INT, in INT, in INT)  {
         goto ADDRESS(handler);
     }
 
-#ifdef PARROT_HAS_FLOORL
-    f = (FLOATVAL)floorl($2 / den);
+#if defined(PARROT_HAS_FLOORL) && NUMVAL_SIZE > 8
+    f = (FLOATVAL)floorl(f / den);
 #else
-    f = (FLOATVAL)floor($2 / den);
+    f = (FLOATVAL)floor(f / den);
 #endif
     $1 = (INTVAL)f;
 }
@@ -369,7 +377,7 @@ inline op fdiv(out NUM, in NUM, in NUM)  {
             "Divide by zero");
         goto ADDRESS(handler);
     }
-#ifdef PARROT_HAS_FLOORL
+#if defined(PARROT_HAS_FLOORL) && NUMVAL_SIZE > 8
     $1 = (FLOATVAL)floorl($2 / den);
 #else
     $1 = (FLOATVAL)floor($2 / den);
@@ -412,8 +420,7 @@ inline op ceil(inout NUM)  {
 
 inline op ceil(out INT, in NUM)  {
 #if defined(PARROT_HAS_CEILL) && (NUMVAL_SIZE > 8)
-    long double d = $2;
-    const FLOATVAL f = (FLOATVAL)ceill(d);
+    const FLOATVAL f = (FLOATVAL)ceill($2);
 #else
     const FLOATVAL f = (FLOATVAL)ceil($2);
 #endif
@@ -429,8 +436,7 @@ inline op ceil(out INT, in NUM)  {
 
 inline op ceil(out NUM, in NUM)  {
 #if defined(PARROT_HAS_CEILL) && (NUMVAL_SIZE > 8)
-    long double d = $2;
-    $1 = (FLOATVAL)ceill(d);
+    $1 = (FLOATVAL)ceill($2);
 #else
     $1 = (FLOATVAL)ceil($2);
 #endif
@@ -455,8 +461,7 @@ LOSSY_CONVERSION exception.
 
 inline op floor(inout NUM)  {
 #if defined(PARROT_HAS_FLOORL) && (NUMVAL_SIZE > 8)
-    long double d = $1;
-    $1 = (FLOATVAL)floorl(d);
+    $1 = (FLOATVAL)floorl($1);
 #else
     $1 = (FLOATVAL)floor($1);
 #endif
@@ -464,8 +469,7 @@ inline op floor(inout NUM)  {
 
 inline op floor(out INT, in NUM)  {
 #if defined(PARROT_HAS_FLOORL) && (NUMVAL_SIZE > 8)
-    long double d = $2;
-    FLOATVAL f = (FLOATVAL)floorl(d);
+    FLOATVAL f = (FLOATVAL)floorl($2);
 #else
     FLOATVAL f = (FLOATVAL)floor($2);
 #endif
@@ -481,8 +485,7 @@ inline op floor(out INT, in NUM)  {
 
 inline op floor(out NUM, in NUM)  {
 #if defined(PARROT_HAS_FLOORL) && (NUMVAL_SIZE > 8)
-    long double d = $2;
-    $1 = (FLOATVAL)floorl(d);
+    $1 = (FLOATVAL)floorl($2);
 #else
     $1 = (FLOATVAL)floor($2);
 #endif

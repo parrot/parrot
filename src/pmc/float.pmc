@@ -139,7 +139,11 @@ Returns a Parrot string representation of the number.
 
     VTABLE STRING *get_repr() :no_wb {
         const FLOATVAL val      = SELF.get_number();
-        const double d          = fabs((double)val);
+#if defined(PARROT_HAS_FABSL) && NUMVAL_SIZE > 8
+        const FLOATVAL d        = fabsl((long double)val);
+#else
+        const FLOATVAL d        = fabs((double)val);
+#endif
         const char * const sign = val < 0 ? "-" : "";
         return Parrot_sprintf_c(INTERP, "%s" FLOATVAL_FMT, sign, d);
     }

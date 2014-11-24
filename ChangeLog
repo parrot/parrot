@@ -16,12 +16,13 @@
         + Warn in Configure on experimental flags intval, floatval and gc #1148
         + Die in Configure on unsupported intval sizes #1148, #642, ...
         + Renamed auto::labs to auto::mathl, probe and use more long math
-          functions: ceill floorl powl fmodl expl logl #1111
+          functions: fabsl powl ceill floorl fmodl expl logl #1111
     - Documentation
     - Tests
         + Fix t/steps/auto/arch-01.t darwin regression #1142
         + Added bigger t/stress/gc.t test to catch most GC issues.
         + Add optional copyright year test on TEST_SLOW #719
+        + Fix most --floatval='long double' tests, just embed API broken #1111
     - Community
 
 2014-11-18    release 6.10.0

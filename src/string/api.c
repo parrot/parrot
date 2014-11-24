@@ -2146,9 +2146,9 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
     }
 
 #ifdef PARROT_HAS_POWL
-#  define POW (FLOATVAL)powl
+#  define POW powl
 #else
-#  define POW (FLOATVAL)pow
+#  define POW pow
 #endif
 
      if (d && d_is_safe) {

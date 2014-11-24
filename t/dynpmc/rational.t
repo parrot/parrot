@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2008-2010, Parrot Foundation.
+# Copyright (C) 2008-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -81,6 +81,8 @@ Tests the Rational PMC.
     skip_all('GMP not found, skipping Rational tests')
     .return()
 .end
+
+.include 'fp_equality.pasm'
 
 .sub test_neg
     new $P2, 'Rational'
@@ -643,7 +645,7 @@ CODE
     $N0 = 11.1
     $P0 = $N0
     $N1 = $P0
-    is($N1,11.1,'set and get a native float')
+    is($N1,11.1,'set and get a native float', 0.000001)
 .end
 
 .sub test_set_get_native_string

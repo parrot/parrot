@@ -17337,7 +17337,14 @@ Parrot_abs_i(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_abs_n(opcode_t *cur_opcode, PARROT_INTERP) {
-    NREG(1) = fabs(NREG(1));
+    #if defined(PARROT_HAS_FABSL) && NUMVAL_SIZE > 8
+        NREG(1) = fabsl((HUGEFLOATVAL)NREG(1));
+
+#else
+        NREG(1) = fabs(NREG(1));
+
+#endif
+;
     return cur_opcode + 2;
 }
 
@@ -17356,7 +17363,14 @@ Parrot_abs_i_i(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_abs_n_n(opcode_t *cur_opcode, PARROT_INTERP) {
-    NREG(1) = fabs(NREG(2));
+    #if defined(PARROT_HAS_FABSL) && NUMVAL_SIZE > 8
+        NREG(1) = fabsl((HUGEFLOATVAL)NREG(2));
+
+#else
+        NREG(1) = fabs(NREG(2));
+
+#endif
+;
     return cur_opcode + 3;
 }
 
@@ -17750,11 +17764,11 @@ Parrot_fdiv_i_i(opcode_t *cur_opcode, PARROT_INTERP) {
         return (opcode_t *)handler;
     }
 
-    #if defined(PARROT_HAS_FLOORL)
-        f = (FLOATVAL)floorl((IREG(1) / den));
+    #if defined(PARROT_HAS_FLOORL) && NUMVAL_SIZE > 8
+        f = (FLOATVAL)floorl(((HUGEFLOATVAL)IREG(1) / den));
 
 #else
-        f = (FLOATVAL)floor((IREG(1) / den));
+        f = (FLOATVAL)floor(((FLOATVAL)IREG(1) / den));
 
 #endif
 ;
@@ -17773,11 +17787,11 @@ Parrot_fdiv_i_ic(opcode_t *cur_opcode, PARROT_INTERP) {
         return (opcode_t *)handler;
     }
 
-    #if defined(PARROT_HAS_FLOORL)
-        f = (FLOATVAL)floorl((IREG(1) / den));
+    #if defined(PARROT_HAS_FLOORL) && NUMVAL_SIZE > 8
+        f = (FLOATVAL)floorl(((HUGEFLOATVAL)IREG(1) / den));
 
 #else
-        f = (FLOATVAL)floor((IREG(1) / den));
+        f = (FLOATVAL)floor(((FLOATVAL)IREG(1) / den));
 
 #endif
 ;
@@ -17795,7 +17809,7 @@ Parrot_fdiv_n_n(opcode_t *cur_opcode, PARROT_INTERP) {
         return (opcode_t *)handler;
     }
 
-    #if defined(PARROT_HAS_FLOORL)
+    #if defined(PARROT_HAS_FLOORL) && NUMVAL_SIZE > 8
         NREG(1) = (FLOATVAL)floorl((NREG(1) / den));
 
 #else
@@ -17816,7 +17830,7 @@ Parrot_fdiv_n_nc(opcode_t *cur_opcode, PARROT_INTERP) {
         return (opcode_t *)handler;
     }
 
-    #if defined(PARROT_HAS_FLOORL)
+    #if defined(PARROT_HAS_FLOORL) && NUMVAL_SIZE > 8
         NREG(1) = (FLOATVAL)floorl((NREG(1) / den));
 
 #else
@@ -17860,7 +17874,7 @@ Parrot_fdiv_p_nc(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_fdiv_i_i_i(opcode_t *cur_opcode, PARROT_INTERP) {
     const INTVAL   den = IREG(3);
-    FLOATVAL   f;
+    FLOATVAL   f = (FLOATVAL)IREG(2);
 
     if (den == 0) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_DIV_BY_ZERO, "Divide by zero");
@@ -17868,11 +17882,11 @@ Parrot_fdiv_i_i_i(opcode_t *cur_opcode, PARROT_INTERP) {
         return (opcode_t *)handler;
     }
 
-    #if defined(PARROT_HAS_FLOORL)
-        f = (FLOATVAL)floorl((IREG(2) / den));
+    #if defined(PARROT_HAS_FLOORL) && NUMVAL_SIZE > 8
+        f = (FLOATVAL)floorl((f / den));
 
 #else
-        f = (FLOATVAL)floor((IREG(2) / den));
+        f = (FLOATVAL)floor((f / den));
 
 #endif
 ;
@@ -17883,7 +17897,7 @@ Parrot_fdiv_i_i_i(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_fdiv_i_ic_i(opcode_t *cur_opcode, PARROT_INTERP) {
     const INTVAL   den = IREG(3);
-    FLOATVAL   f;
+    FLOATVAL   f = (FLOATVAL)ICONST(2);
 
     if (den == 0) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_DIV_BY_ZERO, "Divide by zero");
@@ -17891,11 +17905,11 @@ Parrot_fdiv_i_ic_i(opcode_t *cur_opcode, PARROT_INTERP) {
         return (opcode_t *)handler;
     }
 
-    #if defined(PARROT_HAS_FLOORL)
-        f = (FLOATVAL)floorl((ICONST(2) / den));
+    #if defined(PARROT_HAS_FLOORL) && NUMVAL_SIZE > 8
+        f = (FLOATVAL)floorl((f / den));
 
 #else
-        f = (FLOATVAL)floor((ICONST(2) / den));
+        f = (FLOATVAL)floor((f / den));
 
 #endif
 ;
@@ -17906,7 +17920,7 @@ Parrot_fdiv_i_ic_i(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_fdiv_i_i_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     const INTVAL   den = ICONST(3);
-    FLOATVAL   f;
+    FLOATVAL   f = (FLOATVAL)IREG(2);
 
     if (den == 0) {
         opcode_t  * const  handler = Parrot_ex_throw_from_op_args(interp,  cur_opcode + 4, EXCEPTION_DIV_BY_ZERO, "Divide by zero");
@@ -17914,11 +17928,11 @@ Parrot_fdiv_i_i_ic(opcode_t *cur_opcode, PARROT_INTERP) {
         return (opcode_t *)handler;
     }
 
-    #if defined(PARROT_HAS_FLOORL)
-        f = (FLOATVAL)floorl((IREG(2) / den));
+    #if defined(PARROT_HAS_FLOORL) && NUMVAL_SIZE > 8
+        f = (FLOATVAL)floorl((f / den));
 
 #else
-        f = (FLOATVAL)floor((IREG(2) / den));
+        f = (FLOATVAL)floor((f / den));
 
 #endif
 ;
@@ -17936,7 +17950,7 @@ Parrot_fdiv_n_n_n(opcode_t *cur_opcode, PARROT_INTERP) {
         return (opcode_t *)handler;
     }
 
-    #if defined(PARROT_HAS_FLOORL)
+    #if defined(PARROT_HAS_FLOORL) && NUMVAL_SIZE > 8
         NREG(1) = (FLOATVAL)floorl((NREG(2) / den));
 
 #else
@@ -17957,7 +17971,7 @@ Parrot_fdiv_n_nc_n(opcode_t *cur_opcode, PARROT_INTERP) {
         return (opcode_t *)handler;
     }
 
-    #if defined(PARROT_HAS_FLOORL)
+    #if defined(PARROT_HAS_FLOORL) && NUMVAL_SIZE > 8
         NREG(1) = (FLOATVAL)floorl((NCONST(2) / den));
 
 #else
@@ -17978,7 +17992,7 @@ Parrot_fdiv_n_n_nc(opcode_t *cur_opcode, PARROT_INTERP) {
         return (opcode_t *)handler;
     }
 
-    #if defined(PARROT_HAS_FLOORL)
+    #if defined(PARROT_HAS_FLOORL) && NUMVAL_SIZE > 8
         NREG(1) = (FLOATVAL)floorl((NREG(2) / den));
 
 #else
@@ -18035,12 +18049,7 @@ Parrot_ceil_n(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_ceil_i_n(opcode_t *cur_opcode, PARROT_INTERP) {
     #if defined(PARROT_HAS_CEILL) && (NUMVAL_SIZE > 8)
-        long;
-        double;
-        d = NREG(2);
-        const;
-        FLOATVAL;
-        f = (FLOATVAL)ceill(d);
+        const FLOATVAL   f = (FLOATVAL)ceill(NREG(2));
 
 #else
         const FLOATVAL   f = (FLOATVAL)ceil(NREG(2));
@@ -18062,10 +18071,7 @@ Parrot_ceil_i_n(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_ceil_n_n(opcode_t *cur_opcode, PARROT_INTERP) {
     #if defined(PARROT_HAS_CEILL) && (NUMVAL_SIZE > 8)
-        long;
-        double;
-        d = NREG(2);
-        NREG(1) = (FLOATVAL)ceill(d);
+        NREG(1) = (FLOATVAL)ceill(NREG(2));
 
 #else
         NREG(1) = (FLOATVAL)ceil(NREG(2));
@@ -18078,10 +18084,7 @@ Parrot_ceil_n_n(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_floor_n(opcode_t *cur_opcode, PARROT_INTERP) {
     #if defined(PARROT_HAS_FLOORL) && (NUMVAL_SIZE > 8)
-        long;
-        double;
-        d = NREG(1);
-        NREG(1) = (FLOATVAL)floorl(d);
+        NREG(1) = (FLOATVAL)floorl(NREG(1));
 
 #else
         NREG(1) = (FLOATVAL)floor(NREG(1));
@@ -18094,11 +18097,7 @@ Parrot_floor_n(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_floor_i_n(opcode_t *cur_opcode, PARROT_INTERP) {
     #if defined(PARROT_HAS_FLOORL) && (NUMVAL_SIZE > 8)
-        long;
-        double;
-        d = NREG(2);
-        FLOATVAL;
-        f = (FLOATVAL)floorl(d);
+        FLOATVAL   f = (FLOATVAL)floorl(NREG(2));
 
 #else
         FLOATVAL   f = (FLOATVAL)floor(NREG(2));
@@ -18120,10 +18119,7 @@ Parrot_floor_i_n(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_floor_n_n(opcode_t *cur_opcode, PARROT_INTERP) {
     #if defined(PARROT_HAS_FLOORL) && (NUMVAL_SIZE > 8)
-        long;
-        double;
-        d = NREG(2);
-        NREG(1) = (FLOATVAL)floorl(d);
+        NREG(1) = (FLOATVAL)floorl(NREG(2));
 
 #else
         NREG(1) = (FLOATVAL)floor(NREG(2));

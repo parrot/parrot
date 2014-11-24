@@ -31,6 +31,15 @@ main(int argc, char* argv[])
         printf("broken p o w l: ld = %Lg\n", ld);
 #endif
 
+#ifdef FABSL
+    ld = -10.0;
+    ld = fabsl(ld);
+    if (ld == 10.0)
+        puts("fabsl");
+    else
+        printf("broken f a b s l: ld = %Lg\n", ld);
+#endif
+
 #ifdef FLOORL
     ld = 10.0;
     ld = floorl(ld);

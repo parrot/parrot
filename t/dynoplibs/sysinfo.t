@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2008-2010, Parrot Foundation.
+# Copyright (C) 2008-2014, Parrot Foundation.
 
 # initial work by Brad Gilbert b2gills <at> gmail <dot> com
 
@@ -68,7 +68,7 @@ my @setup = (
       desc        => 'integer size',
       reg_type    => 'I',
     },
-    { pconfig_key => 'doublesize',
+    { pconfig_key => 'numvalsize',
       pasm_key    => 17,
       pir_key     => 'SYSINFO_PARROT_FLOATSIZE',
       desc        => 'float size',

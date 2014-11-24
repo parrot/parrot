@@ -334,8 +334,7 @@ CODE
 123
 OUT
 
-$output = $PConfig{numvalsize} < 16 ? "zero\n" : "not zero\n";
-pasm_output_is( <<'CODE', $output, "rounding due to mapped" );
+pasm_output_is( <<'CODE', "zero\n", "rounding due to mapped" );
 .pcc_sub :main main:
     set N0, 15
     mul N0, N0, 0.1
