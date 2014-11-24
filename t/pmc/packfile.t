@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2010, Parrot Foundation.
+# Copyright (C) 2006-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -19,6 +19,7 @@ Tests the Packfile PMC.
 
 .include 't/pmc/testlib/packfile_common.pir'
 .include 'except_types.pasm'
+.include 'iglobals.pasm'
 
 .sub main :main
 .include 'test_more.pir'
@@ -415,7 +416,9 @@ load_error:
 .end
 
 # Packfile.pack.
-# Check that unpack-pack produce correct result.
+# Check that unpack-pack produce the same binary, but only
+# checks against a pbc with numbers
+# This fails with non-default floatval
 .sub 'test_pack'
     .local string filename, orig
     push_eh load_error
@@ -440,7 +443,14 @@ load_error:
     packfilesecond = first
     second = packfilesecond
 
+    $P0 = getinterp
+    $P1 = $P0[.IGLOBALS_CONFIG_HASH]
+    $I0 = $P1['numvalsize']
+    if $I0 != 8 goto todo
     is(first, second, 'pack produced same result twice: TT #1614')
+    .return()
+todo:
+    todo(first, second, 'testing pack with non-default floatval not possible: TT #1614')
     .return()
 load_error:
     .get_results($P0)
