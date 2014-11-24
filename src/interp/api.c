@@ -152,7 +152,7 @@ Parrot_interp_make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     ASSERT_ARGS(Parrot_interp_make_interpreter)
     int stacktop;
     Parrot_GC_Init_Args args;
-    Interp * const interp = Parrot_interp_allocate_interpreter(parent, flags);
+    Parrot_Interp const interp = Parrot_interp_allocate_interpreter(parent, flags);
     memset(&args, 0, sizeof (args));
     args.stacktop = &stacktop;
     Parrot_interp_initialize_interpreter(interp, &args);

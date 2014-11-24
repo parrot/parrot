@@ -251,16 +251,17 @@ Parrot_compile_string(PARROT_INTERP, Parrot_String type, ARGIN(const char *code)
 {
     ASSERT_ARGS(Parrot_compile_string)
     Parrot_PMC result = PMCNULL;
-    int is_pasm = Parrot_str_compare(interp, Parrot_str_new_constant(interp, "PASM"), type);
+    int is_pasm = (0 == Parrot_str_compare(interp, Parrot_str_new_constant(interp, "PASM"), type));
     PMC * const compiler = Parrot_pmc_new_init_int(interp, enum_class_IMCCompiler, is_pasm);
+    STRING * const code_str =  Parrot_str_new(interp, code, 0);
     if (PMC_IS_NULL(compiler)) {
         *error = Parrot_str_new(interp, "Invalid interpreter or compiler", 0);
         return NULL;
     }
     Parrot_interp_set_compiler(interp, VTABLE_get_string(interp, compiler), compiler);
     Parrot_pcc_invoke_method_from_c_args(interp, compiler,
-        Parrot_str_new_constant(interp, "compile"),
-        "SC->P", code, &result);
+        Parrot_str_new(interp, "compile", 0),
+        "S->P", code_str, &result);
     return result;
 }
 

@@ -604,10 +604,7 @@ close $TEMP;
 # compile to pbc
 system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pir);
 
-SKIP: {
-    #skip "Outdated test with the old embed API [GH #829]", 2;
-
-c_output_is( <<"CODE", <<'OUTPUT', 'eval code through a parrot sub - #39669', todo => "Must explicitly set a PIR compreg");
+c_output_is( <<"CODE", <<'OUTPUT', 'eval code through a parrot sub', todo => "#829");
 
 #include <parrot/parrot.h>
 #include <parrot/extend.h>
@@ -636,7 +633,7 @@ CODE
 Hello from foo!
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', 'compile string in a fresh interp - #39986', todo => "Must explicitly set a PIR compreg" );
+c_output_is( <<'CODE', <<'OUTPUT', 'compile string in a fresh interp', todo => "#829" );
 
 #include <parrot/parrot.h>
 #include <parrot/extend.h>
@@ -666,9 +663,9 @@ CODE
 Hello from foo!
 OUTPUT
 
-}
+#}
 
-c_output_is( <<"CODE", <<'OUTPUT', 'call multi sub from C - #41511' );
+c_output_is( <<"CODE", <<'OUTPUT', 'call multi sub from C' );
 #include <parrot/parrot.h>
 #include <parrot/extend.h>
 
@@ -686,7 +683,8 @@ main(int argc, const char *argv[])
         pbc  = Parrot_pf_get_packfile_pmc(interp, pf, STRINGNULL);
         Parrot_pf_set_current_packfile(interp, pbc);
 
-        sub      = Parrot_ns_find_current_namespace_global( interp, Parrot_str_new_constant( interp, "add" ) );
+        sub = Parrot_ns_find_current_namespace_global( interp,
+                  Parrot_str_new_constant( interp, "add" ) );
         Parrot_ext_call(interp, sub, "II->I", 100, 200, &result);
         printf( "Result is %d.\\n", result );
         Parrot_interp_destroy(interp);
