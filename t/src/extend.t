@@ -605,44 +605,32 @@ close $TEMP;
 system(".$PConfig{slash}parrot$PConfig{exe}", '-o', $temp_pbc, $temp_pir);
 
 SKIP: {
-    skip "Outdated test with the old embed API [GH #829]", 2;
+    #skip "Outdated test with the old embed API [GH #829]", 2;
 
 c_output_is( <<"CODE", <<'OUTPUT', 'eval code through a parrot sub - #39669', todo => "Must explicitly set a PIR compreg");
 
 #include <parrot/parrot.h>
+#include <parrot/extend.h>
 
 int
 main(int argc, const char *argv[])
 {
-    Parrot_Interp interp = NULL;
-    Parrot_PMC pf = NULL;
-    Parrot_PMC args = NULL;
-    const char * code[] = { ".sub foo\\nsay \\"Hello from foo!\\"\\n.end\\n" };
-
-    if (!(Parrot_api_make_interpreter(NULL, NULL, 0, &interp)
-      && Parrot_api_load_bytecode_file(interp, "$temp_pbc", &pf)
-      && Parrot_api_pmc_wrap_string_array(interp, argc, argv, &args)
-      /* FIXME */
-      && Parrot_api_load_bytecode_bytes(interp, code, sizeof(code), &pf)))
-        exit(EXIT_FAILURE);
-
-    Parrot_api_destroy_interpreter(interp);
-    exit(EXIT_SUCCESS);
-
-#if 0
+    const char * code = ".sub main :main\\nsay \\"Hello from foo!\\"\\n.end\\n";
+    Parrot_String main, code_type, error;
+    Parrot_PMC    retval, sub;
     Parrot_Interp interp = Parrot_interp_new(NULL);
     if (interp) {
-        pf   = Parrot_pf_read_pbc_file(interp, Parrot_str_new(interp, "$temp_pbc", 0));
-        if (packfile) {
-            pbc  = Parrot_pf_get_packfile_pmc(interp, pf, STRINGNULL);
-            Parrot_pf_set_current_packfile(interp, pbc);
-            Parrot_runcode( interp, 1, code );
-        }
+        code_type = Parrot_str_new_constant( interp, "PIR" );
+        retval    = Parrot_compile_string( interp, code_type, code, &error );
 
+        if (retval) {
+            main = Parrot_str_new_constant( interp, "main" );
+            sub  = Parrot_ns_find_current_namespace_global( interp, main );
+            Parrot_ext_call(interp, sub, "->");
+        }
         Parrot_interp_destroy( interp );
     }
     return 0;
-#endif
 }
 CODE
 Hello from foo!
@@ -657,9 +645,8 @@ int
 main(int argc, const char *argv[])
 {
     Parrot_Interp   interp    = Parrot_interp_new(NULL);
-    const char      *code      = ".sub foo :main\nprint\"Hello from foo!\\n\"\n.end\n";
-    Parrot_PMC      retval;
-    Parrot_PMC      sub;
+    const char      *code     = ".sub foo :main\nprint\"Hello from foo!\\n\"\n.end\n";
+    Parrot_PMC      retval, sub;
     Parrot_String   code_type, error, foo_name;
 
     if (interp) {
@@ -669,7 +656,6 @@ main(int argc, const char *argv[])
         if (retval) {
             foo_name = Parrot_str_new_constant( interp, "foo" );
             sub      = Parrot_ns_find_current_namespace_global( interp, foo_name );
-
             Parrot_ext_call(interp, sub, "->");
         }
         Parrot_interp_destroy(interp);

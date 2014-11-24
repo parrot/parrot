@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -231,6 +231,37 @@ Parrot_ext_try(PARROT_INTERP,
             }
         }
     }
+}
+
+/*
+
+=item C<Parrot_PMC Parrot_compile_string(PARROT_INTERP, Parrot_String type,
+const char *code, Parrot_String *error)>
+
+Compiles a code string.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+Parrot_PMC
+Parrot_compile_string(PARROT_INTERP, Parrot_String type, ARGIN(const char *code),
+        ARGOUT(Parrot_String *error))
+{
+    ASSERT_ARGS(Parrot_compile_string)
+    Parrot_PMC result = PMCNULL;
+    int is_pasm = Parrot_str_compare(interp, Parrot_str_new_constant(interp, "PASM"), type);
+    PMC * const compiler = Parrot_pmc_new_init_int(interp, enum_class_IMCCompiler, is_pasm);
+    if (PMC_IS_NULL(compiler)) {
+        *error = Parrot_str_new(interp, "Invalid interpreter or compiler", 0);
+        return NULL;
+    }
+    Parrot_interp_set_compiler(interp, VTABLE_get_string(interp, compiler), compiler);
+    Parrot_pcc_invoke_method_from_c_args(interp, compiler,
+        Parrot_str_new_constant(interp, "compile"),
+        "SC->P", code, &result);
+    return result;
 }
 
 /*
