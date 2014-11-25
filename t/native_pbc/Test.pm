@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 package t::native_pbc::Test;
 use strict;
@@ -108,13 +108,25 @@ sub test_native_pbc {
         else {
             $todo_msg = "$cvt yet untested. Please report success.";
         }
-        Parrot::Test::pbc_output_is( $file, $expected, "$cvt $desc",
-                       todo => "$todo_msg" );
+        # integer uses print, not say. so skip the following ==$pid==
+        if ($ENV{VALGRIND} and $expected == '270544960') {
+            Parrot::Test::pbc_output_like( $file, qr/^$expected/, "$cvt $desc",
+                                           todo => "$todo_msg" );
+        }
+        else {
+            Parrot::Test::pbc_output_is( $file, $expected, "$cvt $desc",
+                                         todo => "$todo_msg" );
+        }
     }
     else {
         skip $skip_msg, 1 if $bc ne $pbc_bc_version;
         local $TODO = $skip_msgv if $version ne $pbc_version;
-        Parrot::Test::pbc_output_is( $file, $expected, "$cvt $desc" );
+        if ($ENV{VALGRIND} and $expected == '270544960') {
+            Parrot::Test::pbc_output_like( $file, qr/^$expected/, "$cvt $desc");
+        }
+        else {
+            Parrot::Test::pbc_output_is( $file, $expected, "$cvt $desc" );
+        }
     }
   }
 }

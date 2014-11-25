@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -168,27 +168,27 @@ CODE
 42
 OUTPUT
 
-pir_output_is( <<'CODE', '32', 'constant defined and used' );
+pir_output_is( <<'CODE', "32\n", 'constant defined and used' );
 .sub test :main
 .const int FOO = 32
-  print FOO
+  say FOO
   end
 .end
 CODE
 
-pir_output_is( <<'CODE', 'foo', 'constant defined and used' );
+pir_output_is( <<'CODE', "foo\n", 'constant defined and used' );
 .sub test :main
 .const string FOO = "foo"
-  print FOO
+  say FOO
   end
 .end
 CODE
 
-pasm_output_is( <<'CODE', 'foo', 'constant defined, used in a macro call' );
+pasm_output_is( <<'CODE', "foo\n", 'constant defined, used in a macro call' );
 .pcc_sub :main main:
 .macro_const FOO S0
 .macro answer (bar)
-  print .bar
+  say .bar
 .endm
   set .FOO,"foo"
   .answer(.FOO)
@@ -196,25 +196,25 @@ pasm_output_is( <<'CODE', 'foo', 'constant defined, used in a macro call' );
 CODE
 
 
-pir_output_is( <<'CODE', '42', 'macro_const int in PIR' );
+pir_output_is( <<'CODE', "42\n", 'macro_const int in PIR' );
 .macro_const theanswer 42
 .sub main :main
-    print .theanswer
+    say .theanswer
 .end
 CODE
 
-pir_output_is( <<'CODE', 'Hello', 'macro_const string in PIR' );
+pir_output_is( <<'CODE', "Hello\n", 'macro_const string in PIR' );
 .macro_const sayhello "Hello"
 .sub main :main
-    print .sayhello
+    say .sayhello
 .end
 CODE
 
-pir_output_is( <<'CODE', 'Hello', 'macro_const register in PIR' );
+pir_output_is( <<'CODE', "Hello\n", 'macro_const register in PIR' );
 .macro_const firstreg $S0
 .sub main :main
     .firstreg = "Hello"
-    print .firstreg
+    say .firstreg
 .end
 CODE
 

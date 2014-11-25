@@ -28,51 +28,51 @@ pasm_output_is( <<'CODE', '', "noop, end" );
         end
 CODE
 
-pasm_output_is( <<'CODE', '1', "print 1" );
+pasm_output_is( <<'CODE', "1\n", "print 1" );
 .pcc_sub :main main:
-        print   1
+        say   1
         end
 CODE
 
-pasm_output_is( <<'CODE', 'Parrot flies', "print string" );
+pasm_output_is( <<'CODE', "Parrot flies\n", "print string" );
 .pcc_sub :main main:
-        print 'Parrot flies'
+        say 'Parrot flies'
         end
 CODE
 
-pasm_output_is( <<'CODE', 'Parrot flies', "print double-quoted string" );
+pasm_output_is( <<'CODE', "Parrot flies\n", "print double-quoted string" );
 .pcc_sub :main main:
-       print "Parrot flies"
+       say "Parrot flies"
        end
 CODE
 
-pasm_output_is( <<'CODE', "Parrot\tflies", "print double-quoted string, tabs" );
+pasm_output_is( <<'CODE', "Parrot\tflies\n", "print double-quoted string, tabs" );
 .pcc_sub :main main:
-       print "Parrot\tflies"
+       say   "Parrot\tflies"
        end
 CODE
 
-pasm_output_is( <<'CODE', q('Parrot' flies), "print double-quoted string, nested single" );
+pasm_output_is( <<'CODE', qq('Parrot' flies\n), "print double-quoted string, nested single" );
 .pcc_sub :main main:
-       print "'Parrot' flies"
+       say   "'Parrot' flies"
        end
 CODE
 
-pasm_output_is( <<'CODE', q("Parrot" flies), "print single-quoted string, nested double" );
+pasm_output_is( <<'CODE', qq("Parrot" flies\n), "print single-quoted string, nested double" );
 .pcc_sub :main main:
-       print '"Parrot" flies'
+       say   '"Parrot" flies'
        end
 CODE
 
-pasm_output_is( <<'CODE', q(Parrot flies), "print string with embedded hex escape" );
+pasm_output_is( <<'CODE', qq(Parrot flies\n), "print string with embedded hex escape" );
 .pcc_sub :main main:
-       print "Parrot\x20flies"
+       say   "Parrot\x20flies"
        end
 CODE
 
 pir_error_output_like( <<'CODE', <<'OUTPUT', "Illegal escape" );
 .sub main
-       print "Parrot fl\ies"
+       say   "Parrot fl\ies"
 .end
 CODE
 /Illegal escape sequence \\i in 'Parrot fl\\ies'/
@@ -80,23 +80,23 @@ OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "print string with embedded newline" );
 .pcc_sub :main main:
-       print "Parrot flies\n"
+       print   "Parrot flies\n"
        end
 CODE
 Parrot flies
 OUTPUT
 
-pasm_output_is( <<'CODE', '42', "branch_ic" );
+pasm_output_is( <<'CODE', "42\n", "branch_ic" );
 .pcc_sub :main main:
         set     I4, 42
         branch  HERE
         set     I4, 1234
 HERE:
-        print   I4
+        say     I4
         end
 CODE
 
-pasm_output_is( <<'CODE', '42', "branch_ic (backward)" );
+pasm_output_is( <<'CODE', "42\n", "branch_ic (backward)" );
 .pcc_sub :main main:
         set     I4, 42
         branch  one
@@ -106,22 +106,22 @@ two:    branch  three
 one:
         branch  two
 three:
-        print   I4
+        say     I4
         end
 CODE
 
 pasm_output_is( <<'CODE', <<'OUTPUT', "local_branch_c_i" );
 .pcc_sub :main main:
-        print    "start\n"
+        print      "start\n"
 
         new P0, 'ResizableIntegerArray'
 
         local_branch P0, LAB1
 
-        print    "done\n"
+        print      "done\n"
         end
 
-LAB1:   print    "lab 1\n"
+LAB1:   print      "lab 1\n"
         local_return P0
 CODE
 start
@@ -155,10 +155,10 @@ CODE
 ok 1
 OUTPUT
 
-pasm_output_is( <<'CODE', 32, "Predeclared opcodes" );
+pasm_output_is( <<'CODE', "32\n", "Predeclared opcodes" );
 .pcc_sub :main main:
      set_i_ic I0,32
-     print I0
+     say I0
      end
 CODE
 

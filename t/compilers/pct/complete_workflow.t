@@ -367,8 +367,10 @@ EOT
     # For easier debugging, the generated pir is appended to the PIR
     # that is passed to pir_output_is().
     ( my $gen_parser_fn = $pg_fn ) =~s/pg$/pir/;
+    my ($out_f, undef) = create_tempfile(UNLINK => 1);
     my $rv = Parrot::Test::run_command(
        qq{"$PARROT" "$PERL6GRAMMAR" --output="$gen_parser_fn" "$pg_fn"},
+       STDERR => $out_f
     );
     is( $rv, 0, "$test_name: generated PIR successfully" );
     ok( -e $gen_parser_fn, "$test_name: generated parser file exists" );
@@ -404,6 +406,7 @@ EOT
     ( my $gen_actions_fn = $pm_fn ) =~s/pm$/pir/;
     $rv = Parrot::Test::run_command(
         qq{"$PARROT" "$NQP" --target=pir --output="$gen_actions_fn" "$pm_fn"},
+        STDERR => $out_f
     );
     is( $rv, 0, "$test_name: generated PIR successfully" );
     ok( -e $gen_actions_fn, "$test_name: generated actions file exists" );

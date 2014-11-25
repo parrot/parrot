@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -84,11 +84,11 @@ CODE
 ok\s2\n$/x
 OUTPUT
 
-pasm_output_is( <<'CODE', 'nada:', 'interp - warnings' );
+pasm_output_is( <<'CODE', "nada:\n", 'interp - warnings' );
 .pcc_sub :main main:
     new P0, 'Undef'
     set I0, P0
-    print "nada:"
+    say "nada:"
     warningson 1
     new P1, 'Undef'
     set I0, P1

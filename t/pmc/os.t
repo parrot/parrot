@@ -688,13 +688,12 @@ OUT
 }
 
 # test get_user_id
-pir_output_is( <<'CODE', $UID, 'Test get_user_id' );
+pir_output_is( <<'CODE', "$UID\n", 'Test get_user_id' );
 .sub main :main
     $P1 = new ['OS']
 
     $I0 = $P1."get_user_id"()
-    print $I0
-
+    say $I0
     end
 .end
 CODE

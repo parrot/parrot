@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2005-2007, Parrot Foundation.
+# Copyright (C) 2005-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -37,7 +37,7 @@ CODE
 Hash
 OUT
 
-pir_output_is( <<'CODE', ($^O eq 'MSWin32' ? lc(cwd) : cwd), "prefix" );
+pir_output_is( <<'CODE', ($^O eq 'MSWin32' ? lc(cwd) : cwd)."\n", "prefix" );
 .sub main :main
     load_bytecode "config.pbc"
     .include "iglobals.pasm"
@@ -50,7 +50,7 @@ pir_output_is( <<'CODE', ($^O eq 'MSWin32' ? lc(cwd) : cwd), "prefix" );
     if $S1 != 'MSWin32' goto sayit
     $S0 = downcase $S0
   sayit:
-    print $S0
+    say $S0
 .end
 CODE
 

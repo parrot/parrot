@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2007, Parrot Foundation.
+# Copyright (C) 2004-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -66,7 +66,7 @@ will be matched against. The 'outer rule' if you will.
 sub p6rule_is {
     my ( $target, $pattern ) = ( shift, shift );
 
-    unshift @_ => 'matched';
+    unshift @_ => "matched\n";
     unshift @_ => (
         ref $pattern
         ? Parrot::Test::PGE::_generate_subrule_pir( $target, $pattern )
@@ -86,7 +86,7 @@ they do not match. The same pattern argument syntax above applies here.
 sub p6rule_isnt {
     my ( $target, $pattern ) = ( shift, shift );
 
-    unshift @_ => 'failed';
+    unshift @_ => "failed\n";
     unshift @_ => (
         ref $pattern
         ? Parrot::Test::PGE::_generate_subrule_pir( $target, $pattern )
@@ -157,7 +157,7 @@ what this does.)
 sub pgeglob_is {
     my ( $target, $pattern ) = ( shift, shift );
 
-    unshift @_ => 'matched';
+    unshift @_ => "matched\n";
     unshift @_ => Parrot::Test::PGE::_generate_glob_for( $target, $pattern );
 
     goto &Parrot::Test::pir_output_is;
@@ -173,7 +173,7 @@ they do not match. The same pattern argument syntax above applies here.
 sub pgeglob_isnt {
     my ( $target, $pattern ) = ( shift, shift );
 
-    unshift @_ => 'failed';
+    unshift @_ => "failed\n";
     unshift @_ => Parrot::Test::PGE::_generate_glob_for( $target, $pattern );
 
     goto &Parrot::Test::pir_output_is;
@@ -239,14 +239,14 @@ sub _generate_pir_for {
             match = rulesub(target)
             unless match goto match_fail
           match_success:
-            print "matched"
+            say "matched"
             $captures
             goto end
           match_fail:
-            print "failed"
+            say "failed"
             goto end
           rule_fail:
-            print "rule error"
+            say "rule error"
           end:
         .end\n);
 }
@@ -270,16 +270,16 @@ sub _generate_pir_catch_for {
             rulesub = p6rule_compile(pattern)
             if_null rulesub, compile_fail
           compile_success:
-            print "OK"
+            say "OK"
             goto end
           compile_fail:
-            print "unknown compile error"
+            say "unknown compile error"
             goto end
           handler:
             .local pmc exception
             .local string message
             .get_results (exception, message)
-            print message
+            say message
           end:
         .end\n);
 }
@@ -325,10 +325,10 @@ sub _generate_subrule_pir {
 
             unless match goto match_fail
           match_success:
-            print "matched"
+            say "matched"
             goto match_end
           match_fail:
-            print "failed"
+            say "failed"
           match_end:
         .end\n);
 
@@ -359,10 +359,10 @@ sub _generate_glob_for {
             match = rulesub(target)
             unless match goto match_fail
           match_success:
-            print "matched"
+            say "matched"
             goto match_end
           match_fail:
-            print "failed"
+            say "failed"
           match_end:
         .end\n);
 }

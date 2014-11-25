@@ -1,4 +1,6 @@
-# Copyright (C) 2012, Parrot Foundation.
+# Copyright (C) 2014, Parrot Foundation.
+# TODO: For valgrind mangling we'd need "say".
+#       => 270544960==16547==
 
 print 0x10203040
 end

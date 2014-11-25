@@ -23,6 +23,7 @@
         + Added bigger t/stress/gc.t test to catch most GC issues.
         + Add optional copyright year test on TEST_SLOW #719
         + Fix most --floatval='long double' tests, just embed API broken #1111
+        + Adjust tests for VALGRIND=valgrind #1150
     - Community
 
 2014-11-18    release 6.10.0

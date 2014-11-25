@@ -102,17 +102,17 @@ my @setup = (
 
 foreach ( @setup ) {
     if ( $_->{reg_type} eq 'I' ) {
-        pasm_output_is( <<"CODE", "$PConfig{$_->{pconfig_key}}$PConfig{$_->{pconfig_key}}", "PASM sysinfo  $_->{desc}" );
+        pasm_output_is( <<"CODE", "$PConfig{$_->{pconfig_key}}$PConfig{$_->{pconfig_key}}\n", "PASM sysinfo  $_->{desc}" );
     .pcc_sub :main main:
     .loadlib 'sys_ops'
     sysinfo_i_ic I1, $_->{pasm_key}
     print I1
     set I3, $_->{pasm_key}
     sysinfo_i_i I2, I3
-    print I2
+    say I2
 end
 CODE
-        pir_output_is( <<"CODE", "$PConfig{$_->{pconfig_key}}$PConfig{$_->{pconfig_key}}", "PIR sysinfo  $_->{desc}" );
+        pir_output_is( <<"CODE", "$PConfig{$_->{pconfig_key}}$PConfig{$_->{pconfig_key}}\n", "PIR sysinfo  $_->{desc}" );
 .loadlib 'sys_ops'
 .include 'sysinfo.pasm'
 .sub main :main
@@ -120,22 +120,22 @@ CODE
     print \$I0
     \$I3 = .$_->{pir_key}
     \$I2 = sysinfo \$I3
-    print \$I2
+    say \$I2
 .end
 CODE
     }
     else {
-        pasm_output_is( <<"CODE", "$PConfig{$_->{pconfig_key}}$PConfig{$_->{pconfig_key}}", "PASM sysinfo  $_->{desc}" );
+        pasm_output_is( <<"CODE", "$PConfig{$_->{pconfig_key}}$PConfig{$_->{pconfig_key}}\n", "PASM sysinfo  $_->{desc}" );
     .pcc_sub :main main:
     .loadlib 'sys_ops'
     sysinfo_s_ic S1, $_->{pasm_key}
     print S1
     set I1, $_->{pasm_key}
     sysinfo_s_i S2, I1
-    print S2
+    say S2
 end
 CODE
-        pir_output_is( <<"CODE", "$PConfig{$_->{pconfig_key}}$PConfig{$_->{pconfig_key}}", "PIR sysinfo  $_->{desc}" );
+        pir_output_is( <<"CODE", "$PConfig{$_->{pconfig_key}}$PConfig{$_->{pconfig_key}}\n", "PIR sysinfo  $_->{desc}" );
 .loadlib 'sys_ops'
 .include 'sysinfo.pasm'
 .sub main :main
@@ -143,7 +143,7 @@ CODE
     print \$S0
     \$I1 = .$_->{pir_key}
     \$S1 = sysinfo \$I1
-    print \$S1
+    say \$S1
 .end
 CODE
     }
@@ -162,27 +162,27 @@ SKIP:
         $osname = 'WinXP' if $osname =~ m/^WinXP/;
         TODO: {
             local $TODO = "Not Currently Implemented";
-            pasm_output_is( <<'CODE', "$osname$osname", "sysinfo OS version string" );
+            pasm_output_is( <<'CODE', "$osname$osname\n", "sysinfo OS version string" );
     .pcc_sub :main main:
     .loadlib 'sys_ops'
     sysinfo_s_ic S1, 5
     print S1
     set I0, 5
     sysinfo_s_i S2, 5
-    print S2
+    say S2
 end
 CODE
 
             my ( $osvername, $major, $minor, $id ) = Win32::GetOSVersion();
 
-            pasm_output_is( <<'CODE', "$major.$minor$major.$minor", "sysinfo OS version number string" );
+            pasm_output_is( <<'CODE', "$major.$minor$major.$minor\n", "sysinfo OS version number string" );
     .pcc_sub :main main:
     .loadlib 'sys_ops'
     sysinfo_s_ic S1, 6
     print S1
     set I0, 6
     sysinfo_s_i S2, 6
-    print S2
+    say S2
 end
 CODE
         } # END todo block

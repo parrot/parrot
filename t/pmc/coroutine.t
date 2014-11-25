@@ -260,13 +260,13 @@ catch coro
 catch main
 OUTPUT
 
-pir_output_is( <<'CODE', 'Coroutine', "Coro new - type" );
+pir_output_is( <<'CODE', "Coroutine\n", "Coro new - type" );
 
 .sub main :main
     .local pmc c
     c = get_global "coro"
     typeof $S0, c
-    print $S0
+    say $S0
 .end
 .sub coro
     .local pmc x
@@ -279,7 +279,7 @@ pir_output_is( <<'CODE', 'Coroutine', "Coro new - type" );
 .end
 CODE
 
-pir_output_is( <<'CODE', '01234', "Coro new - yield" );
+pir_output_is( <<'CODE', "01234\n", "Coro new - yield" );
 
 .sub main :main
     .local pmc c
@@ -294,6 +294,7 @@ loop:
     print $P0
     goto loop
 ex:
+    print "\n"
 .end
 .sub coro
     .local pmc x
@@ -439,6 +440,9 @@ CODE
 4
 OUTPUT
 
+SKIP: {
+    skip "with darwin valgrind", 2 if $ENV{VALGRIND} and $^O eq 'darwin';
+
 # Note: TT #1702/GH #564 argued that dead coros should be resumable.
 pir_error_output_like(<<'CODE', <<'OUTPUT', "Resume dead coroutine w/o autoreset");
 .sub 'MyCoro'
@@ -510,6 +514,8 @@ pir_error_output_like(
 CODE
 /\A3.0-4.0-5.0-3.1-3.done-4.1-5.1-4.done-5.done-Cannot resume dead coroutine/
 OUTPUT
+
+}
 
 pir_output_is(<<'CODE', <<'OUTPUT', "Manual reset" );
 .sub 'main' :main

@@ -816,9 +816,14 @@ sub _generate_test_functions {
 
             my $meth        = $parrot_test_map{$func};
             my $real_output = slurp_file($out_f);
-            my $ori_output = $real_output;
-            $real_output =~ s/(^(?:==|--)\d+(?:==|--).*\n)//mg if defined $ENV{VALGRIND};
-
+            my $ori_output  = $real_output;
+            if (defined $ENV{VALGRIND}) {
+                $real_output =~ s/(^(?:==|--)\d+(?:==|--).*\n)//mg;
+                # --pid:0:syswrap- WARNING: Ignoring sigreturn( ..., UC_RESET_ALT_STACK );
+                # on longjmp, darwin only.
+                $real_output =~ s/(^--(?:\d)+:0:syswrap-.*\n)//mg
+                    if $^O eq 'darwin' and !$ENV{TEST_VERBOSE};
+            }
             _unlink_or_retain( $out_f );
 
             # set a todo-item for Test::Builder to find

@@ -835,7 +835,11 @@ CODE
 utf8
 OUTPUT
 
-pir_output_is( <<'CODE', <<"OUTPUT", "exit status" );
+SKIP: {
+    skip "with darwin valgrind", 1 if $ENV{VALGRIND} and $^O eq 'darwin';
+    # UNKNOWN task message [id 3403, to mach_task_self(), reply 0x813]
+
+    pir_output_is( <<'CODE', <<"OUTPUT", "exit status" );
 .include 'iglobals.pasm'
 .sub 'main' :main
     .local pmc pipe, conf, interp
@@ -880,6 +884,8 @@ CODE
 expect 0 exit status: 0
 expect 1 exit status: 1
 OUTPUT
+
+}
 
 SKIP: {
     skip 'Timely destruction is deprecated. GH #278' => 1;
@@ -1129,7 +1135,7 @@ CODE
 1
 OUT
 
-pir_output_is( <<'CODE', "This is a", ".write_bytes" );
+pir_output_is( <<'CODE', "This is a\n", ".write_bytes" );
 .const string temp_file = '%s'
 .sub main :main
     $P0 = getinterp
@@ -1138,6 +1144,7 @@ pir_output_is( <<'CODE', "This is a", ".write_bytes" );
     $P2 = new ['ByteBuffer']
     $P2 = "This is a test"
     $P1.'write_bytes'($P2, 9)
+    print "\n"
 .end
 
 CODE
@@ -1182,9 +1189,14 @@ my $code = <<'CODE';
 CODE
 $code =~ s|echo \$AAAA|cmd /c echo %AAAA%| if $^O eq 'MSWin32';
 
-pir_output_is( $code, <<'OUTPUT', 'openpipe uses Env GH #1065' );
+SKIP: {
+    skip "with darwin valgrind", 1 if $ENV{VALGRIND} and $^O eq 'darwin';
+    # UNKNOWN task message [id 3403, to mach_task_self(), reply 0x813]
+
+    pir_output_is( $code, <<'OUTPUT', 'openpipe uses Env GH #1065' );
 ZZZZZZ
 OUTPUT
+    }
 }
 
 # GH #465

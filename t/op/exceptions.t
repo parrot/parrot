@@ -696,7 +696,9 @@ ok 4
 OUTPUT
 
 # Test massaged from TT #2188
-{
+SKIP: {
+    skip "with valgrind", 1 if $ENV{VALGRIND};
+
     sub compile_wx {
         my $code = shift;
         my ($fh, $wx_filename) = create_tempfile( SUFFIX => '.winxed', UNLINK => 1 );
