@@ -41,8 +41,6 @@ typedef const void * Parrot_Const_CharType;
 /* Backcompat versions for old embed API functions, not yet deprecated */
 #define Parrot_new_string(interp, buf, len, encoding, flags) \
     Parrot_str_new_init((interp), (buf), (len), (encoding), (flags))
-/* #define Parrot_get_root_namespace(interp)     \
-    Parrot_ns_get_root_namespace((interp)) */
 
 /* HEADERIZER BEGIN: src/extend.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
