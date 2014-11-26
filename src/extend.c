@@ -150,7 +150,7 @@ Parrot_ext_call(PARROT_INTERP, ARGIN(Parrot_PMC sub_pmc),
     const char *arg_sig = NULL, *ret_sig = NULL;
     PMC * old_call_obj = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
-    if (0 == strcmp(signature, "->")) {
+    if (signature[0] == '-' && signature[1] == '>' && !signature[2]) {
         call_obj = Parrot_pmc_new(interp, enum_class_CallContext);
         Parrot_pcc_invoke_from_sig_object(interp, sub_pmc, call_obj);
     }
