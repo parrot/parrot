@@ -7,15 +7,15 @@ src/pmc/resizablepmcarray.pmc - ResizablePMCArray PMC
 
 =head1 DESCRIPTION
 
-This class, ResizablePMCArray, implements an resizable array which stores PMCs.
-It puts things into Integer, Float, or String PMCs as appropriate.
+This class, ResizablePMCArray, implements an resizable array which stores
+PMCs.  It changes values into Integer, Float, or String PMCs as appropriate.
 
-It has naive shift/unshift ops, with O(n) and resize thresholds of 8 and
-4096.  Between a 8b - 4K resize it overallocates by 2, over 4K it aligns up
-to the next 4K block.
+Without USE_OFFSET it uses naive shift/unshift ops, with O(n) and resize
+thresholds of 8 and 4096.  Between a 8b - 4K resize it overallocates by 2,
+over 4K it aligns up to the next 4K block.
 
-See also the faster nqp/qrpa pmc with O(1) shift/unshift ops,
-by moving an extra offset attr, with 8 slots reserve. TODO #1152
+With USE_OFFSET we use the faster nqp/qrpa model with O(1) shift/unshift
+ops, by moving an extra offset attr, with 8 slots reserve. See #1152
 
 =head2 Internal Functions
 
@@ -43,7 +43,7 @@ by moving an extra offset attr, with 8 slots reserve. TODO #1152
 #  define TRACE_RPAs(s) \
             if (Interp_trace_TEST(interp, 0x20)) \
                 fprintf(stderr, "# rpa %-12s: (%ld,%ld,%ld) -> size=%ld\n", \
-                        (s), offset, size, threshold, size);
+                        (s), offset, size, threshold, n);
 #endif
 
 
@@ -52,8 +52,9 @@ by moving an extra offset attr, with 8 slots reserve. TODO #1152
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_INLINE
-static void do_shift(ARGIN(PMC *arr))
-        __attribute__nonnull__(1);
+static void do_shift(PARROT_INTERP, ARGIN(PMC *arr))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 PARROT_INLINE
 static void do_unshift(PARROT_INTERP, ARGIN(PMC *arr), ARGIN(PMC *val))
@@ -72,7 +73,8 @@ static void throw_shift_empty(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_do_shift __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(arr))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(arr))
 #define ASSERT_ARGS_do_unshift __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(arr) \
@@ -86,7 +88,7 @@ static void throw_shift_empty(PARROT_INTERP)
 
 /*
 
-=item C<static void do_shift(PMC *arr)>
+=item C<static void do_shift(PARROT_INTERP, PMC *arr)>
 
 Removes and returns an item from the start of the array.
 
@@ -95,19 +97,27 @@ Removes and returns an item from the start of the array.
 */
 PARROT_INLINE
 static void
-do_shift(ARGIN(PMC *arr))
+do_shift(PARROT_INTERP, ARGIN(PMC *arr))
 {
     ASSERT_ARGS(do_shift)
     INTVAL       size  = PMC_size(arr);
     PMC ** const array = PMC_array(arr);
+#ifndef NDEBUG /* only for TRACE */
+    const INTVAL threshold = PMC_threshold(arr);
+    INTVAL offset = PMC_offset(arr);
+#else
+    UNUSED(INTERP)
+#endif
 
     PMC_size(arr) = --size;
 #if USE_OFFSET
+    TRACE_RPA("shift fast");
     PMC_offset(arr)++;
 #else
+    TRACE_RPA("shift slow");
     memmove(array, array + 1, size * sizeof (PMC *));
-#endif
     array[size] = PMCNULL;
+#endif
 }
 
 /*
@@ -140,6 +150,8 @@ do_unshift(PARROT_INTERP, ARGIN(PMC *arr), ARGIN(PMC *val))
     else {
         PMC  **array;
         TRACE_RPA("unshift slow");
+        /* TODO: check which size and offset is convenient here. depends on alignment.
+           we want to add at least offset = 3, anticipating more unshift ops */
         VTABLE_set_integer_native(interp, arr, size + 1);
         array = PMC_array(arr);
         memmove(array + 1, array, size * sizeof (PMC *));
@@ -236,7 +248,7 @@ Resizes the array to C<size> elements.
                 TRACE_RPAs("resize off move");
                 memmove(array, array + offset, size * sizeof (PMC *));
                 for (i=0; i < offset; ++i) { /* fill the slack */
-                    array[i+size] = PMCNULL;
+                    array[i+size] = PMCNULL; /* TODO: memset NULL will be more efficient */
                 }
             }
 #ifndef NDEBUG
@@ -261,8 +273,8 @@ Resizes the array to C<size> elements.
             }
             array = mem_gc_realloc_n_typed(INTERP,
                         array, threshold, PMC *);
-            for (; old < threshold; ++old) { /* fill the slack */
-                array[old] = PMCNULL;
+            for (; old < threshold; ++old) { /* fill the slack (or not) */
+                array[old] = PMCNULL; /* TODO: memset NULL is more efficient (calloc) */
             }
             PMC_threshold(SELF) = threshold;
             PMC_size(SELF)      = n;
@@ -302,7 +314,7 @@ Removes and returns an item from the start of the array.
         if (0 == size)
             throw_shift_empty(INTERP);
         value = VTABLE_get_number(INTERP, PMC_array(SELF)[PMC_offset(SELF)]);
-        do_shift(SELF);
+        do_shift(INTERP, SELF);
         return value;
     }
 
@@ -313,7 +325,7 @@ Removes and returns an item from the start of the array.
         if (0 == size)
             throw_shift_empty(INTERP);
         value = VTABLE_get_integer(INTERP, PMC_array(SELF)[PMC_offset(SELF)]);
-        do_shift(SELF);
+        do_shift(INTERP, SELF);
         return value;
     }
 
@@ -324,7 +336,7 @@ Removes and returns an item from the start of the array.
         if (0 == size)
             throw_shift_empty(INTERP);
         data = PMC_array(SELF)[PMC_offset(SELF)];
-        do_shift(SELF);
+        do_shift(INTERP, SELF);
         return data;
     }
 
@@ -335,7 +347,7 @@ Removes and returns an item from the start of the array.
         if (0 == size)
             throw_shift_empty(INTERP);
         value = VTABLE_get_string(INTERP, PMC_array(SELF)[PMC_offset(SELF)]);
-        do_shift(SELF);
+        do_shift(INTERP, SELF);
         return value;
     }
 
@@ -367,7 +379,7 @@ Returns the PMC value of the element at index C<key>.
         data = PMC_array(SELF);
         val = data[key + offset];
         if (PMC_IS_NULL(val))
-            return PMCNULL; /* handle NULL also */
+            return PMCNULL; /* handles NULL also */
         return val;
     }
 
@@ -882,7 +894,7 @@ Method forms to add a PMC to the beginning or end of the array.
 
 =over 4
 
-=item C<static void do_shift(PMC *arr)>
+=item C<static void do_shift(PARROT_INTERP, PMC *arr)>
 
 Common part for all shift operations.
 
