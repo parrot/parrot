@@ -387,7 +387,7 @@ imcc_globals_destroy(SHIM_INTERP, SHIM(int ex), ARGMOD(void *param))
     ASSERT_ARGS(imcc_globals_destroy)
     imc_info_t * const imcc = (imc_info_t*)param;
 
-    /* This is an allowed condition? See TT #629 */
+    /* In an exit within :immediate there will no globals. See TT #629 */
     if (imcc->globals) {
         code_segment_t *cs = imcc->globals->cs;
 
@@ -408,7 +408,6 @@ imcc_globals_destroy(SHIM_INTERP, SHIM(int ex), ARGMOD(void *param))
         }
         imcc->globals->cs = NULL;
     }
-
 }
 
 
