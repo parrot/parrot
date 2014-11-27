@@ -10,6 +10,13 @@ src/pmc/resizablepmcarray.pmc - ResizablePMCArray PMC
 This class, ResizablePMCArray, implements an resizable array which stores PMCs.
 It puts things into Integer, Float, or String PMCs as appropriate.
 
+It has naive shift/unshift ops, with O(n) and resize thresholds of 8 and
+4096.  Between a 8b - 4K resize it overallocates by 2, over 4K it aligns up
+to the next 4K block.
+
+See also the faster nqp/qrpa pmc with O(1) shift/unshift ops,
+by moving an extra offset attr, with 8 slots reserve. TODO #1152
+
 =head2 Internal Functions
 
 =over 4
@@ -20,7 +27,25 @@ It puts things into Integer, Float, or String PMCs as appropriate.
 
 #define PMC_size(x)      ((Parrot_ResizablePMCArray_attributes *)PMC_data(x))->size
 #define PMC_array(x)     ((Parrot_ResizablePMCArray_attributes *)PMC_data(x))->pmc_array
-#define PMC_threshold(x) ((Parrot_ResizablePMCArray_attributes *)PMC_data(x))->resize_threshold
+#define PMC_offset(x)    ((Parrot_ResizablePMCArray_attributes *)PMC_data(x))->offset
+#define PMC_threshold(x) ((Parrot_ResizablePMCArray_attributes *)PMC_data(x))->threshold
+
+#define USE_OFFSET 0
+
+#ifdef NDEBUG
+#  define TRACE_RPA(s)
+#  define TRACE_RPAs(s)
+#else
+#  define TRACE_RPA(s) \
+            if (Interp_trace_TEST(interp, 0x20)) \
+                fprintf(stderr, "# rpa %-12s: (%ld,%ld,%ld)\n", \
+                        (s), offset, size, threshold);
+#  define TRACE_RPAs(s) \
+            if (Interp_trace_TEST(interp, 0x20)) \
+                fprintf(stderr, "# rpa %-12s: (%ld,%ld,%ld) -> size=%ld\n", \
+                        (s), offset, size, threshold, size);
+#endif
+
 
 /* HEADERIZER HFILE: none */
 /* HEADERIZER BEGIN: static */
@@ -64,7 +89,6 @@ static void throw_shift_empty(PARROT_INTERP)
 =item C<static void do_shift(PMC *arr)>
 
 Removes and returns an item from the start of the array.
-Moves the whole rest of the array around.
 
 =cut
 
@@ -74,12 +98,16 @@ static void
 do_shift(ARGIN(PMC *arr))
 {
     ASSERT_ARGS(do_shift)
-    INTVAL    size = PMC_size(arr);
-    PMC ** const item = PMC_array(arr);
+    INTVAL       size  = PMC_size(arr);
+    PMC ** const array = PMC_array(arr);
 
     PMC_size(arr) = --size;
-    memmove(item, item + 1, size * sizeof (PMC *));
-    item[size] = PMCNULL;
+#if USE_OFFSET
+    PMC_offset(arr)++;
+#else
+    memmove(array, array + 1, size * sizeof (PMC *));
+#endif
+    array[size] = PMCNULL;
 }
 
 /*
@@ -87,7 +115,7 @@ do_shift(ARGIN(PMC *arr))
 =item C<static void do_unshift(PARROT_INTERP, PMC *arr, PMC *val)>
 
 Adds an item at the start of the array.
-Moves the whole rest of the array around.
+If offset == 0 moves the whole rest of the array around.
 
 =cut
 
@@ -97,13 +125,27 @@ static void
 do_unshift(PARROT_INTERP, ARGIN(PMC *arr), ARGIN(PMC *val))
 {
     ASSERT_ARGS(do_unshift)
+#ifndef NDEBUG
+    const INTVAL threshold = PMC_threshold(arr);
+#endif
     const INTVAL size = PMC_size(arr);
-    PMC        **item;
+    INTVAL     offset = PMC_offset(arr);
 
-    VTABLE_set_integer_native(interp, arr, size + 1);
-    item = PMC_array(arr);
-    memmove(item + 1, item, size * sizeof (PMC *));
-    item[0] = val;
+    if (offset > 0) {
+        TRACE_RPA("unshift fast");
+        offset--;
+        PMC_offset(arr) = offset;
+        PMC_array(arr)[offset] = val;
+    }
+    else {
+        PMC  **array;
+        TRACE_RPA("unshift slow");
+        VTABLE_set_integer_native(interp, arr, size + 1);
+        array = PMC_array(arr);
+        memmove(array + 1, array, size * sizeof (PMC *));
+        array[0] = val;
+        PARROT_GC_WRITE_BARRIER(interp, arr);
+    }
 }
 /*
 
@@ -118,7 +160,9 @@ do_unshift(PARROT_INTERP, ARGIN(PMC *arr), ARGIN(PMC *val))
 */
 
 pmclass ResizablePMCArray extends FixedPMCArray auto_attrs provides array {
-    ATTR INTVAL resize_threshold; /* max size before array needs resizing */
+    /* inheriting: size, array */
+    ATTR INTVAL offset;    /* of first index, to leave max 8 slots in front for unshift */
+    ATTR INTVAL threshold; /* allocated number of elements, max size before array needs resizing */
 
 /*
 
@@ -130,13 +174,14 @@ Initializes the array.
 
 */
 
-    VTABLE void init_int(INTVAL size) :manual_wb {
-        if (size < 0)
+    VTABLE void init_int(INTVAL n) :manual_wb {
+        if (n < 0)
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "illegal argument");
-        SUPER(size);
-        if (size > 0) {
-            PMC_threshold(SELF) = size;
+        SUPER(n);
+        PMC_offset(SELF) = 0;
+        if (n > 0) {
+            PMC_threshold(SELF) = n;
             PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
     }
@@ -151,60 +196,87 @@ Resizes the array to C<size> elements.
 
 */
 
-    VTABLE void set_integer_native(INTVAL size) :manual_wb {
-        if (size < 0)
+    VTABLE void set_integer_native(INTVAL n) :manual_wb {
+        INTVAL   size      = PMC_size(SELF);
+        INTVAL   offset    = PMC_offset(SELF);
+        INTVAL   threshold = PMC_threshold(SELF); /* i.e. allocated size */
+        PMC    **array     = PMC_array(SELF);
+
+        if (n < 0)
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "illegal argument");
-
-        if (!PMC_array(SELF)) {
+        if (!array) {
             /* empty - used fixed routine */
-            if (size < 8) {
-
+            PMC_offset(SELF) = 0;
+            if (n < 8) {
                 SUPER(8);
-                PMC_size(SELF)      = size;
+                PMC_size(SELF)      = n;
                 PMC_threshold(SELF) = 8;
-
             }
             else {
-                SUPER(size);
-                PMC_threshold(SELF) = size;
+                SUPER(n);
+                PMC_threshold(SELF) = n;
             }
+            TRACE_RPAs("resize init");
         }
-        else if (size == PMC_size(SELF)) {
+        else if (n == size) {
             return;
         }
-        else if (size <= PMC_threshold(SELF)) {
-
-            PMC_size(SELF) = size;
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
-            /* we could shrink here if necessary */
+        else if (n <= threshold) {
+            TRACE_RPAs("resize skip");
+            PMC_size(SELF) = n;
+            /* we could shrink here, but this would need a GC mark */
             return;
+        }
+        else if (offset > 0 && n + offset > size) {
+            /* if there aren't enough slots at the end, shift off empty
+             * slots from the beginning first */
+            if (size > 0) {
+                size_t i;
+                TRACE_RPAs("resize off move");
+                memmove(array, array + offset, size * sizeof (PMC *));
+                for (i=0; i < offset; ++i) { /* fill the slack */
+                    array[i+size] = PMCNULL;
+                }
+            }
+#ifndef NDEBUG
+            else {
+                TRACE_RPAs("resize off skip");
+            }
+#endif
+            PMC_offset(SELF) = 0;
+            PObj_custom_mark_destroy_SETALL(SELF);
         }
         else {
-            INTVAL i, cur;
-            i = cur = PMC_threshold(SELF);
-            if (cur < 8192)
-                cur = (size < 2 * cur) ? (2 * cur) : size;
+            INTVAL old;
+            old = threshold;
+            if (threshold < 8192) {
+                threshold = (n < 2 * threshold) ? (2 * threshold) : n;
+                if (threshold < 8) threshold = 8;
+            }
             else {
-                const INTVAL needed = size - cur;
-                cur   += needed + 4096;
-                cur   &= ~0xfff;
+                const INTVAL needed = n - threshold;
+                threshold   += needed + 4096;
+                threshold   &= ~0xfff;
             }
-
-            if (cur < 8)
-                cur = 8;
-
-            PMC_array(SELF) = mem_gc_realloc_n_typed_zeroed(INTERP,
-                    PMC_array(SELF), cur, i, PMC *);
-
-            for (; i < cur; ++i) {
-                (PMC_array(SELF))[i] = PMCNULL;
+            array = mem_gc_realloc_n_typed(INTERP,
+                        array, threshold, PMC *);
+            for (; old < threshold; ++old) { /* fill the slack */
+                array[old] = PMCNULL;
             }
-
-            PMC_threshold(SELF) = cur;
-            PMC_size(SELF)      = size;
+            PMC_threshold(SELF) = threshold;
+            PMC_size(SELF)      = n;
+            if (PMC_array(SELF) != array) { /* data moved? */
+                PObj_custom_mark_destroy_SETALL(SELF);
+                PMC_array(SELF) = array;
+                TRACE_RPAs("resize move");
+            }
+#ifndef NDEBUG
+            else {
+                TRACE_RPAs("resize fast realloc");
+            }
+#endif
         }
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
     }
 
 /*
@@ -221,9 +293,6 @@ Removes and returns an item from the start of the array.
 
 =cut
 
-TODO: This always moves the array memory, which is not very performant
-TODO: Check whether there is already an element that can be shifted
-
 */
 
     VTABLE FLOATVAL shift_float() {
@@ -232,10 +301,8 @@ TODO: Check whether there is already an element that can be shifted
 
         if (0 == size)
             throw_shift_empty(INTERP);
-
-        value = VTABLE_get_number(INTERP, PMC_array(SELF)[0]);
+        value = VTABLE_get_number(INTERP, PMC_array(SELF)[PMC_offset(SELF)]);
         do_shift(SELF);
-
         return value;
     }
 
@@ -245,10 +312,8 @@ TODO: Check whether there is already an element that can be shifted
 
         if (0 == size)
             throw_shift_empty(INTERP);
-
-        value = VTABLE_get_integer(INTERP, PMC_array(SELF)[0]);
+        value = VTABLE_get_integer(INTERP, PMC_array(SELF)[PMC_offset(SELF)]);
         do_shift(SELF);
-
         return value;
     }
 
@@ -258,10 +323,8 @@ TODO: Check whether there is already an element that can be shifted
 
         if (0 == size)
             throw_shift_empty(INTERP);
-
-        data = PMC_array(SELF)[0];
+        data = PMC_array(SELF)[PMC_offset(SELF)];
         do_shift(SELF);
-
         return data;
     }
 
@@ -271,10 +334,8 @@ TODO: Check whether there is already an element that can be shifted
 
         if (0 == size)
             throw_shift_empty(INTERP);
-
-        value = VTABLE_get_string(INTERP, PMC_array(SELF)[0]);
+        value = VTABLE_get_string(INTERP, PMC_array(SELF)[PMC_offset(SELF)]);
         do_shift(SELF);
-
         return value;
     }
 
@@ -291,8 +352,9 @@ Returns the PMC value of the element at index C<key>.
 
     VTABLE PMC *get_pmc_keyed_int(INTVAL key) :no_wb {
         PMC **data;
-        INTVAL    size;
-        GET_ATTR_size(INTERP, SELF, size);
+        const INTVAL   size = PMC_size(SELF);
+        const INTVAL offset = PMC_offset(SELF);
+        PMC  *val;
 
         if (key < 0)
             key += size;
@@ -303,10 +365,10 @@ Returns the PMC value of the element at index C<key>.
             return PMCNULL;
 
         data = PMC_array(SELF);
-        if (PMC_IS_NULL(data[key]))
-            return PMCNULL;
-
-        return data[key];
+        val = data[key + offset];
+        if (PMC_IS_NULL(val))
+            return PMCNULL; /* handle NULL also */
+        return val;
     }
 
 /*
@@ -325,19 +387,18 @@ Sets the PMC value of the element keyed by C<key> to C<*src>.
 
     VTABLE void set_pmc_keyed_int(INTVAL key, PMC *src) {
         PMC **data;
+        const INTVAL offset = PMC_offset(SELF);
 
         if (key < 0)
             key += PMC_size(SELF);
-
         if (key < 0)
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "index out of bounds");
-
         if (key >= PMC_size(SELF))
             SELF.set_integer_native(key+1);
 
         data      = PMC_array(SELF);
-        data[key] = src;
+        data[key + offset] = src;
     }
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *src) :manual_wb {
@@ -347,22 +408,22 @@ Sets the PMC value of the element keyed by C<key> to C<*src>.
     VTABLE void set_pmc(PMC *value) :manual_wb {
         INTVAL size;
         INTVAL i;
+        const INTVAL offset = PMC_offset(SELF);
+        PMC **         data = PMC_array(SELF);
 
         if (SELF == value)
             return;
-
         if (!VTABLE_does(INTERP, value, CONST_STRING(INTERP, "array")))
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "Can't set self from this type");
+        if (data)
+            mem_gc_free(INTERP, data);
 
-        if (PMC_array(SELF))
-            mem_gc_free(INTERP, PMC_array(SELF));
-
-        size            = PMC_size(SELF) = VTABLE_elements(INTERP, value);
-        PMC_array(SELF) = mem_gc_allocate_n_typed(INTERP, size, PMC *);
+        size = PMC_size(SELF)  = VTABLE_elements(INTERP, value);
+        data = PMC_array(SELF) = mem_gc_allocate_n_typed(INTERP, size, PMC *);
 
         for (i = 0; i < size; ++i)
-            (PMC_array(SELF))[i] = VTABLE_get_pmc_keyed_int(INTERP, value, i);
+            data[i] = VTABLE_get_pmc_keyed_int(INTERP, value, i);
 
         PObj_custom_mark_destroy_SETALL(SELF);
         PARROT_GC_WRITE_BARRIER(INTERP, SELF);
@@ -386,13 +447,14 @@ Delete the element at index C<key>.
     }
 
     VTABLE void delete_keyed_int(INTVAL key) {
+        const INTVAL offset = PMC_offset(SELF);
+        const INTVAL size = PMC_size(SELF);
         PMC ** const data = PMC_array(SELF);
-        const INTVAL  n   = PMC_size(SELF);
-        INTVAL  i;
+        INTVAL i;
 
-        for (i = key; i < n - 1; ++i)
+        /* TODO: use memmove */
+        for (i = key + offset; i < size - 1; ++i)
             data[i] = data[i + 1];
-
         --PMC_size(SELF);
     }
 
@@ -409,10 +471,10 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
 */
     VTABLE INTVAL exists_keyed_int(INTVAL key) :no_wb {
         PMC **data;
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+        UNUSED(INTERP)
+
         if (key < 0)
             key += PMC_size(SELF);
-
         if (key < 0 || key >= PMC_size(SELF))
             return 0;
 
@@ -440,16 +502,13 @@ Returns TRUE is the element at C<key> is defined; otherwise returns false.
 
         if (key < 0)
             key += PMC_size(SELF);
-
         if (key < 0 || key >= PMC_size(SELF))
             return 0;
 
         val = SELF.get_pmc_keyed_int(key);
-
         if (PMC_IS_NULL(val)) {
             return 0;
         }
-
         return VTABLE_defined(INTERP, val);
     }
 
@@ -471,7 +530,6 @@ the array.
 */
 
     VTABLE void push_float(FLOATVAL value) :manual_wb {
-
         const INTVAL size = PMC_size(SELF);
         PMC   * const val = Parrot_pmc_new(INTERP, enum_class_Float);
 
@@ -480,7 +538,6 @@ the array.
     }
 
     VTABLE void push_integer(INTVAL value) :manual_wb {
-
         const INTVAL size = PMC_size(SELF);
         PMC   * const val = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, value);
 
@@ -490,13 +547,14 @@ the array.
     VTABLE void push_pmc(PMC *value) {
         const INTVAL size   = PMC_size(SELF);
         const INTVAL thresh = PMC_threshold(SELF);
+        const INTVAL offset = PMC_offset(SELF);
 
         if (PMC_array(SELF) && size < thresh)
             PMC_size(SELF) = size + 1;
         else {
             SELF.set_integer_native(size + 1);
         }
-        ((PMC **)PMC_array(SELF))[size] = value;
+        ((PMC **)PMC_array(SELF))[offset + size] = value;
     }
 
     VTABLE void push_string(STRING *value) :manual_wb {
@@ -524,59 +582,33 @@ Removes and returns the last element in the array.
 */
 
     VTABLE FLOATVAL pop_float() :manual_wb {
-        INTVAL   size = PMC_size(SELF);
-        PMC     *data;
-
-        if (0 == size)
-            throw_pop_empty(INTERP);
-
-        data           = PMC_array(SELF)[--size];
-        PMC_size(SELF) = size;
-
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
-        return VTABLE_get_number(INTERP, data);
+        PMC * const val = SELF.pop_pmc();
+        return VTABLE_get_number(INTERP, val);
     }
 
     VTABLE INTVAL pop_integer() :manual_wb {
-        INTVAL  size = PMC_size(SELF);
-        PMC    *data;
-
-        if (0 == size)
-            throw_pop_empty(INTERP);
-
-        data           = PMC_array(SELF)[--size];
-        PMC_size(SELF) = size;
-
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
-        return VTABLE_get_integer(INTERP, data);
+        PMC * const val = SELF.pop_pmc();
+        return VTABLE_get_integer(INTERP, val);
     }
 
     VTABLE PMC *pop_pmc() :manual_wb {
         INTVAL size = PMC_size(SELF);
-        PMC   *data;
+        const INTVAL offset = PMC_offset(SELF);
+        PMC   *val;
 
         if (0 == size)
             throw_pop_empty(INTERP);
-
-        data           = PMC_array(SELF)[--size];
+        --size;
         PMC_size(SELF) = size;
+        val = PMC_array(SELF)[offset + size];
 
         PARROT_GC_WRITE_BARRIER(INTERP, SELF);
-        return data;
+        return val;
     }
 
     VTABLE STRING *pop_string() :manual_wb {
-        INTVAL  size = PMC_size(SELF);
-        PMC    *data;
-
-        if (0 == size)
-            throw_pop_empty(INTERP);
-
-        data           = PMC_array(SELF)[--size];
-        PMC_size(SELF) = size;
-
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
-        return VTABLE_get_string(INTERP, data);
+        PMC * const val = SELF.pop_pmc();
+        return VTABLE_get_string(INTERP, val);
     }
 
 /*
@@ -596,25 +628,46 @@ the array.
 
 */
 
-    VTABLE void unshift_float(FLOATVAL value) {
+    VTABLE void unshift_float(FLOATVAL value) :manual_wb {
         PMC * const val = Parrot_pmc_new(INTERP, enum_class_Float);
         VTABLE_set_number_native(INTERP, val, value);
         do_unshift(INTERP, SELF, val);
     }
 
-    VTABLE void unshift_integer(INTVAL value) {
+    VTABLE void unshift_integer(INTVAL value) :manual_wb {
         PMC * const val = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, value);
         do_unshift(INTERP, SELF, val);
     }
 
-    VTABLE void unshift_pmc(PMC *value) {
+    VTABLE void unshift_pmc(PMC *value) :manual_wb {
         do_unshift(INTERP, SELF, value);
     }
 
-    VTABLE void unshift_string(STRING *value) {
+    VTABLE void unshift_string(STRING *value) :manual_wb {
         PMC * const val = Parrot_pmc_new(INTERP, enum_class_String);
         VTABLE_set_string_native(INTERP, val, value);
         do_unshift(INTERP, SELF, val);
+    }
+
+/*
+
+=item C<void mark(void)>
+
+Mark the array.
+
+=cut
+
+*/
+
+    VTABLE void mark() :no_wb {
+        PMC ** data = PMC_array(SELF);
+        if (data) {
+            INTVAL i = PMC_size(SELF);
+
+            data += PMC_offset(SELF);
+            for (i--; i >= 0; --i)
+                Parrot_gc_mark_PMC_alive(INTERP, data[i]);
+        }
     }
 
 /*
@@ -628,11 +681,23 @@ Creates and returns a copy of the array.
 */
 
     VTABLE PMC *clone() :no_wb {
+#if 0   /* keep the slack and offset */
+        PMC * const copy   = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
+        const INTVAL size  = PMC_size(SELF);
+        const INTVAL tresh = PMC_threshold(SELF);
+        if (size) {
+            PMC_size(copy)  = size;
+            PMC_array(copy) = mem_gc_allocate_n_typed(INTERP, tresh, PMC *);
+            mem_copy_n_typed(PMC_array(copy), PMC_array(SELF), tresh, PMC *);
+            PObj_custom_mark_destroy_SETALL(copy);
+        }
+        PMC_threshold(copy) = tresh;
+        PMC_offset(copy)    = PMC_offset(SELF);
+#else   /* or compact the copy */
         PMC * const copy = SUPER();
-
-        /* copy trimmed extra space */
         PMC_threshold(copy) = PMC_size(SELF);
-
+        PMC_offset(copy)    = 0;
+#endif
         return copy;
     }
 
@@ -654,12 +719,10 @@ Returns the Parrot string representation C<ResizablePMCArray>.
 
         for (j = 0; j < n; ++j) {
             PMC * const val = SELF.get_pmc_keyed_int(j);
-            res      = Parrot_str_concat(INTERP, res, VTABLE_get_repr(INTERP, val));
-
+            res = Parrot_str_concat(INTERP, res, VTABLE_get_repr(INTERP, val));
             if (j < n - 1)
                 res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, ", "));
         }
-
         ret = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, " ]"));
         return ret;
     }
@@ -741,10 +804,8 @@ Append the other array to this array.
 */
 
     METHOD append(PMC *other) {
-
         const INTVAL n = VTABLE_elements(INTERP, SELF);
         const INTVAL m = VTABLE_elements(INTERP, other);
-
         if (!m)
             return;
 
@@ -762,11 +823,9 @@ Append the other array to this array.
         else {
             PMC ** const this_data = PMC_array(SELF);
             INTVAL i;
-
             for (i = 0; i < m; ++i)
                 this_data[n + i] = VTABLE_get_pmc_keyed_int(INTERP, other, i);
         }
-
         RETURN(void);
     }
 
@@ -825,11 +884,11 @@ Method forms to add a PMC to the beginning or end of the array.
 
 =item C<static void do_shift(PMC *arr)>
 
-Common part for shift operations.
+Common part for all shift operations.
 
 =item C<static void do_unshift(PARROT_INTERP, PMC *arr, PMC *val)>
 
-Common part for unshift operations.
+Common part for all unshift operations.
 
 =item C<static void throw_shift_empty(PARROT_INTERP)>
 

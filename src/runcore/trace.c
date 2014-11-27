@@ -284,13 +284,15 @@ trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
         Parrot_Sub_attributes *sub;
         PMC_get_sub(interp, pmc, sub);
         EPRINTF_3("Sub(%s pc:"SIZE_FMT")=PMC(%p)",
-                  sub->name->strstart ? sub->name->strstart : "", sub->start_offs, pmc);
+                  (sub->name && sub->name->strstart) ? sub->name->strstart : "",
+                  sub->start_offs, pmc);
     }
     else if (pmc->vtable->base_type == enum_class_Coroutine) {
         Parrot_Sub_attributes *sub;
         PMC_get_sub(interp, pmc, sub);
         EPRINTF_3("Coroutine(%s pc:"SIZE_FMT")=PMC(%p)",
-                  sub->name->strstart ? sub->name->strstart : "", sub->start_offs, pmc);
+                  (sub->name && sub->name->strstart) ? sub->name->strstart : "",
+                  sub->start_offs, pmc);
     }
     else if (pmc->vtable->base_type == enum_class_FixedBooleanArray
           || pmc->vtable->base_type == enum_class_FixedFloatArray
