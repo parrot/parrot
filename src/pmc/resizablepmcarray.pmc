@@ -39,6 +39,7 @@ ops, by moving an extra offset attr, with 8 slots reserve. See #1152
 #  define TRACE_RPA(s)
 #  define TRACE_RPAn(s)
 #  define TRACE_RPAs(s)
+#  define TRACE_RPAd(s)
 #  define TRACE_PMC(i, pmc)
 #else
 #  define TRACE_RPA(s)                                  \
@@ -53,6 +54,10 @@ ops, by moving an extra offset attr, with 8 slots reserve. See #1152
     if (Interp_trace_TEST(interp, 0x20))                \
         fprintf(stderr, "# rpa %-12s: (%ld,%ld,%ld) -> size=%ld\n", \
                     (s), offset, size, threshold, n);
+#  define TRACE_RPAd(s, self)                           \
+    if (Interp_trace_TEST(interp, 0x20))                \
+        fprintf(stderr, "# rpa %-12s: (%ld,%ld,%ld) ",  \
+        (s), PMC_offset(self), PMC_size(self), PMC_threshold(self));
 #  define TRACE_PMC(i, pmc)                 \
     if (Interp_trace_TEST(interp, 0x20)) {  \
         fprintf(stderr, " rpa[%ld]=", (i)); \
@@ -426,20 +431,20 @@ Sets the PMC value of the element keyed by C<key> to C<*src>.
 */
 
     VTABLE void set_pmc_keyed_int(INTVAL key, PMC *src) {
-        PMC **data;
-        const INTVAL   size = PMC_size(SELF);
-        const INTVAL offset = PMC_offset(SELF);
+        const INTVAL size = PMC_size(SELF);
+        INTVAL offset = PMC_offset(SELF);
 
         if (key < 0)
             key += size;
         if (key < 0)
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "index out of bounds");
-        if (key >= size)
-            SELF.set_integer_native(key+1);
-
-        data = PMC_array(SELF);
-        data[key + offset] = src;
+        if (key >= size) {
+            SELF.set_integer_native(key + 1);
+            offset = PMC_offset(SELF);
+        }
+        TRACE_RPAd("set keyed", SELF);
+        PMC_array(SELF)[key + offset] = src;
     }
 
     VTABLE void set_pmc_keyed(PMC *key, PMC *src) :manual_wb {
@@ -492,7 +497,9 @@ Delete the element at index C<key>.
         PMC ** const data = PMC_array(SELF);
         INTVAL i;
 
-        /* TODO: use memmove */
+        /* TODO: use memmove. if 0 just bump offset */
+        TRACE_RPAd("delete keyed", SELF);
+        TRACE_PMC(key+offset, data[key+offset]);
         for (i = key + offset; i < size - 1; ++i)
             data[i] = data[i + 1];
         --PMC_size(SELF);
@@ -510,16 +517,17 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
 
 */
     VTABLE INTVAL exists_keyed_int(INTVAL key) :no_wb {
-        PMC **data;
+        PMC ** const   data = PMC_array(SELF);
+        const INTVAL   size = PMC_size(SELF);
+        const INTVAL offset = PMC_offset(SELF);
         UNUSED(INTERP)
 
         if (key < 0)
-            key += PMC_size(SELF);
-        if (key < 0 || key >= PMC_size(SELF))
+            key += size;
+        if (key < 0 || key >= size)
             return 0;
 
-        data = PMC_array(SELF);
-        return !PMC_IS_NULL(data[key]);
+        return !PMC_IS_NULL(data[key + offset]);
     }
 
     VTABLE INTVAL exists_keyed(PMC *key) :no_wb {
@@ -538,14 +546,7 @@ Returns TRUE is the element at C<key> is defined; otherwise returns false.
 */
 
     VTABLE INTVAL defined_keyed_int(INTVAL key) :no_wb {
-        PMC *val;
-
-        if (key < 0)
-            key += PMC_size(SELF);
-        if (key < 0 || key >= PMC_size(SELF))
-            return 0;
-
-        val = SELF.get_pmc_keyed_int(key);
+        PMC *val = SELF.get_pmc_keyed_int(key);
         if (PMC_IS_NULL(val)) {
             return 0;
         }
@@ -585,21 +586,20 @@ the array.
     }
 
     VTABLE void push_pmc(PMC *value) {
-        const INTVAL size      = PMC_size(SELF);
         const INTVAL threshold = PMC_threshold(SELF);
-#ifndef NDEBUG
-        const INTVAL offset    = PMC_offset(SELF);
-#endif
+        const INTVAL size      = PMC_size(SELF);
+        INTVAL       offset    = PMC_offset(SELF);
 
-        if (PMC_array(SELF) && (offset + size < threshold)) {
-            TRACE_RPA("push fast");
-            PMC_size(SELF) = size + 1;
+        if (PMC_array(SELF) && (size < threshold)) {
+            PMC_size(SELF)++;
+            TRACE_RPAd("push fast", SELF);
         }
         else {
             SELF.set_integer_native(size + 1);
-            TRACE_RPA("push slow");
+            offset = PMC_offset(SELF);
+            TRACE_RPAd("push slow", SELF);
         }
-        ((PMC **)PMC_array(SELF))[PMC_offset(SELF) + size] = value;
+        ((PMC **)PMC_array(SELF))[offset + size] = value;
         TRACE_PMC(offset+size, value);
     }
 
@@ -788,8 +788,7 @@ Note that the C<from> PMC can be of any of the various array types.
     VTABLE void splice(PMC *from, INTVAL offset, INTVAL count) {
         const INTVAL size = PMC_size(SELF);
         const INTVAL elems1 = VTABLE_elements(INTERP, from);
-        const INTVAL start  = PMC_offset(SELF);
-        const INTVAL threshold  = PMC_threshold(SELF);
+        INTVAL start  = PMC_offset(SELF);
 
         PMC **item = 0;
         INTVAL tail;
@@ -812,7 +811,7 @@ Note that the C<from> PMC can be of any of the various array types.
         item = PMC_array(SELF);
         item += start;
         if (tail > 0 && count > elems1) {
-            TRACE_RPA("splice move tail left");
+            TRACE_RPAd("splice move tail left", SELF);
             TRACE_PMC(offset+elems1, item[offset+elems1]);
             /* we're shrinking the array, so first move the tail left */
             memmove(item + offset + elems1, item + offset + count,
@@ -820,11 +819,12 @@ Note that the C<from> PMC can be of any of the various array types.
         }
         /* now resize the array */
         SELF.set_integer_native(offset + elems1 + tail);
+        start = PMC_offset(SELF);
 
         item = PMC_array(SELF);
         item += start;
         if (tail > 0 && count < elems1) {
-            TRACE_RPA("splice move tail right");
+            TRACE_RPAd("splice move tail right", SELF);
             TRACE_PMC(offset+elems1, item[offset+elems1]);
             /* the array grew, so move the tail to the right */
             memmove(item + offset + elems1, item + offset + count,
@@ -833,7 +833,7 @@ Note that the C<from> PMC can be of any of the various array types.
 
         /* now copy C<from>'s elements into SELF */
         if (elems1 > 0) {
-            TRACE_RPA("splice copy from");
+            TRACE_RPAd("splice copy from", SELF);
             TRACE_PMC(offset, item[offset]);
             PMC *iter = VTABLE_get_iter(INTERP, from);
             for (i = 0; i < elems1; i++)
