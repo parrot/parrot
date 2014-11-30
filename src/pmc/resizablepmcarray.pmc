@@ -14,11 +14,8 @@ Resize thresholds steps are 8 and 4096.
 Between a 8b - 4K resize it overallocates by 2, over 4K it aligns up to
 the next 4K block.
 
-Without USE_OFFSET it uses naive O(n) shift/unshift ops, moving the whole
-array around.
-
-With USE_OFFSET we use the faster nqp/qrpa model with O(1) shift/unshift
-ops, by moving an extra offset attr, with 8 slots reserve. See #1152
+We use now the faster nqp/qrpa model with O(1) shift/unshift
+ops, by moving an extra offset index, with 8 slots reserve. See #1152
 
 =head2 Internal Functions
 
@@ -32,8 +29,6 @@ ops, by moving an extra offset attr, with 8 slots reserve. See #1152
 #define PMC_array(x)     ((Parrot_ResizablePMCArray_attributes *)PMC_data(x))->pmc_array
 #define PMC_offset(x)    ((Parrot_ResizablePMCArray_attributes *)PMC_data(x))->offset
 #define PMC_threshold(x) ((Parrot_ResizablePMCArray_attributes *)PMC_data(x))->threshold
-
-#define USE_OFFSET 1
 
 #ifdef NDEBUG
 #  define TRACE_RPA(s)
@@ -121,29 +116,17 @@ static void
 do_shift(PARROT_INTERP, ARGIN(PMC *arr))
 {
     ASSERT_ARGS(do_shift)
-    PMC ** const array = PMC_array(arr);
-    INTVAL offset = PMC_offset(arr);
+    PMC ** const     array = PMC_array(arr);
 #ifndef NDEBUG /* only for TRACE */
     const INTVAL threshold = PMC_threshold(arr);
-    INTVAL  size  = PMC_size(arr) - 1;
-#else
-    INTVAL  size;
-    UNUSED(INTERP)
 #endif
+    const INTVAL     size  = PMC_size(arr) - 1;
+    const INTVAL    offset = PMC_offset(arr);
 
     PMC_size(arr)--;
-#if USE_OFFSET
     PMC_offset(arr)++;
     TRACE_RPAn("shift fast");
     array[offset] = PMCNULL;
-#else
-    size = PMC_size(arr);
-    array += offset;
-    TRACE_RPAn("shift slow");
-    memmove(array, array + 1, size * sizeof (PMC *));
-    array[size] = PMCNULL;
-    PARROT_GC_WRITE_BARRIER(interp, arr);
-#endif
 }
 
 /*
