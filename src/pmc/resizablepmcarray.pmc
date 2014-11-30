@@ -801,59 +801,69 @@ Note that the C<from> PMC can be of any of the various array types.
 
 */
 
-    VTABLE void splice(PMC *from, INTVAL offset, INTVAL count) {
-        const INTVAL size = PMC_size(SELF);
+    VTABLE void splice(PMC *from, INTVAL off, INTVAL count) {
+        const INTVAL size   = PMC_size(SELF);
+        INTVAL       offset = PMC_offset(SELF);
         const INTVAL elems1 = VTABLE_elements(INTERP, from);
-        INTVAL start  = PMC_offset(SELF);
-
-        PMC **item = 0;
-        INTVAL tail;
-        INTVAL i;
+        PMC **item;
+        INTVAL tail, sizediff;
 
         /* start from end? */
-        if (UNLIKELY(offset < 0))
-            offset += size;
+        if (UNLIKELY(off < 0))
+            off += size;
         if (UNLIKELY(count < 0))
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "illegal argument");
-        if (UNLIKELY(offset < 0))
+        if (UNLIKELY(off < 0))
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "index out of bounds");
 
         /* number of elements to the right of the splice (the "tail") */
-        tail = size - offset - count;
+        tail = size - off - count;
         if (tail < 0) tail = 0;
 
+        /* [0    ^      ...  ... ] */
+        /*  self offset size threshold */
         item = PMC_array(SELF);
-        item += start;
-        if (tail > 0 && count > elems1) {
-            TRACE_RPAd("splice move tail left", SELF);
-            TRACE_PMC(offset+elems1, item[offset+elems1]);
+        sizediff = count - elems1;
+        if (tail > 0 && sizediff > 0) {
             /* we're shrinking the array, so first move the tail left */
-            memmove(item + offset + elems1, item + offset + count,
-                 tail * sizeof (PMC *));
+            if (offset >= sizediff) { /* enough room at the left to fill in from */
+                PMC_offset(SELF) = offset - sizediff;
+                item += offset - sizediff;
+                TRACE_RPAd("splice shrink fast", SELF);
+                goto splice_copy;
+            }
+            else {
+                item += offset;
+                TRACE_RPAd("splice shrink", SELF);
+                //TRACE_PMC(off+elems1, item[off+elems1]);
+                memmove(item + off + elems1, item + off + count,
+                        tail * sizeof (PMC *));
+            }
         }
         /* now resize the array */
-        SELF.set_integer_native(offset + elems1 + tail);
-        start = PMC_offset(SELF);
-
+        SELF.set_integer_native(off + elems1 + tail);
+        offset = PMC_offset(SELF);
         item = PMC_array(SELF);
-        item += start;
-        if (tail > 0 && count < elems1) {
-            TRACE_RPAd("splice move tail right", SELF);
-            TRACE_PMC(offset+elems1, item[offset+elems1]);
+        item += offset;
+        if (tail > 0 && sizediff < 0) {
+            TRACE_RPAd("splice grow", SELF);
+            //TRACE_PMC(off+elems1, item[off+elems1]);
             /* the array grew, so move the tail to the right */
-            memmove(item + offset + elems1, item + offset + count,
-                 tail * sizeof (PMC *));
+            memmove(item + off + elems1, item + off + count,
+                    tail * sizeof (PMC *));
         }
 
+      splice_copy:
         /* now copy C<from>'s elements into SELF */
         if (elems1 > 0) {
-            TRACE_RPAd("splice copy from", SELF);
-            TRACE_PMC(offset, item[offset]);
+            INTVAL i;
+            TRACE_RPAd("splice copy", SELF);
+            //TRACE_PMC(off, item[off]);
             PMC *iter = VTABLE_get_iter(INTERP, from);
             for (i = 0; i < elems1; i++)
-                item[offset + i] = VTABLE_shift_pmc(INTERP, iter);
+                item[off + i] = VTABLE_shift_pmc(INTERP, iter);
         }
     }
 
