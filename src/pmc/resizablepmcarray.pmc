@@ -34,7 +34,7 @@ ops, by moving an extra offset index, with 8 slots reserve. See #1152
 #  define TRACE_RPA(s)
 #  define TRACE_RPAn(s)
 #  define TRACE_RPAs(s)
-#  define TRACE_RPAd(s)
+#  define TRACE_RPAd(s, self)
 #  define TRACE_PMC(i, pmc)
 #else
 #  define TRACE_RPA(s)                                  \
@@ -117,16 +117,27 @@ do_shift(PARROT_INTERP, ARGIN(PMC *arr))
 {
     ASSERT_ARGS(do_shift)
     PMC ** const     array = PMC_array(arr);
-#ifndef NDEBUG /* only for TRACE */
     const INTVAL threshold = PMC_threshold(arr);
-#endif
     const INTVAL     size  = PMC_size(arr) - 1;
     const INTVAL    offset = PMC_offset(arr);
 
     PMC_size(arr)--;
-    PMC_offset(arr)++;
-    TRACE_RPAn("shift fast");
-    array[offset] = PMCNULL;
+    if (UNLIKELY(offset > threshold)) {
+        /* offset overflow: move all to the left, and reset offset */
+        size_t i;
+        PMC_offset(arr) = 0;
+        TRACE_RPAn("shift slow");
+        memmove(array, array + offset, size * sizeof (PMC *));
+        for (i=0; i < (size_t)offset; ++i) { /* fill the slack */
+            array[i+size] = PMCNULL; /* TODO: memset NULL */
+        }
+        PARROT_GC_WRITE_BARRIER(interp, arr);
+    }
+    else {
+        PMC_offset(arr)++;
+        TRACE_RPAn("shift fast");
+        array[offset] = PMCNULL;
+    }
 }
 
 /*
@@ -199,12 +210,12 @@ Initializes the array.
 */
 
     VTABLE void init_int(INTVAL n) :manual_wb {
-        if (n < 0)
+        if (UNLIKELY(n < 0))
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "illegal argument");
         SUPER(n);
         PMC_offset(SELF) = 0;
-        if (n > 0) {
+        if (LIKELY(n > 0)) {
             PMC_threshold(SELF) = n;
             PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
@@ -226,10 +237,10 @@ Resizes the array to C<size> elements.
         INTVAL   threshold = PMC_threshold(SELF); /* i.e. allocated size */
         PMC    **array     = PMC_array(SELF);
 
-        if (n < 0)
+        if (UNLIKELY(n < 0))
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "illegal argument");
-        if (!array) {
+        if (UNLIKELY(!array)) {
             /* empty - used fixed routine */
             PMC_offset(SELF) = 0;
             if (n < 8) {
@@ -324,7 +335,7 @@ Removes and returns an item from the start of the array.
         const INTVAL offset = PMC_offset(SELF);
         FLOATVAL value;
 
-        if (0 == size)
+        if (UNLIKELY(0 == size))
             throw_shift_empty(INTERP);
         value = VTABLE_get_number(INTERP, PMC_array(SELF)[offset]);
         do_shift(INTERP, SELF);
@@ -336,7 +347,7 @@ Removes and returns an item from the start of the array.
         const INTVAL offset = PMC_offset(SELF);
         INTVAL value;
 
-        if (0 == size)
+        if (UNLIKELY(0 == size))
             throw_shift_empty(INTERP);
         value = VTABLE_get_integer(INTERP, PMC_array(SELF)[offset]);
         do_shift(INTERP, SELF);
@@ -348,7 +359,7 @@ Removes and returns an item from the start of the array.
         const INTVAL offset = PMC_offset(SELF);
         PMC   *data;
 
-        if (0 == size)
+        if (UNLIKELY(0 == size))
             throw_shift_empty(INTERP);
         data = PMC_array(SELF)[offset];
         do_shift(INTERP, SELF);
@@ -360,7 +371,7 @@ Removes and returns an item from the start of the array.
         const INTVAL offset = PMC_offset(SELF);
         STRING  *value;
 
-        if (0 == size)
+        if (UNLIKELY(0 == size))
             throw_shift_empty(INTERP);
         value = VTABLE_get_string(INTERP, PMC_array(SELF)[offset]);
         do_shift(INTERP, SELF);
@@ -384,12 +395,12 @@ Returns the PMC value of the element at index C<key>.
         const INTVAL offset = PMC_offset(SELF);
         PMC  *val;
 
-        if (key < 0)
+        if (UNLIKELY(key < 0))
             key += size;
-        if (key < 0)
+        if (UNLIKELY(key < 0))
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "index out of bounds");
-        if (key >= size)
+        if (UNLIKELY(key >= size))
             return PMCNULL;
 
         data = PMC_array(SELF);
@@ -417,12 +428,12 @@ Sets the PMC value of the element keyed by C<key> to C<*src>.
         const INTVAL size = PMC_size(SELF);
         INTVAL offset = PMC_offset(SELF);
 
-        if (key < 0)
+        if (UNLIKELY(key < 0))
             key += size;
-        if (key < 0)
+        if (UNLIKELY(key < 0))
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "index out of bounds");
-        if (key >= size) {
+        if (UNLIKELY(key >= size)) {
             SELF.set_integer_native(key + 1);
             offset = PMC_offset(SELF);
         }
@@ -441,7 +452,7 @@ Sets the PMC value of the element keyed by C<key> to C<*src>.
 
         if (SELF == value)
             return;
-        if (!VTABLE_does(INTERP, value, CONST_STRING(INTERP, "array")))
+        if (UNLIKELY(!VTABLE_does(INTERP, value, CONST_STRING(INTERP, "array"))))
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "Can't set self from this type");
 
@@ -505,9 +516,9 @@ Returns TRUE is the element at C<key> exists; otherwise returns false.
         const INTVAL offset = PMC_offset(SELF);
         UNUSED(INTERP)
 
-        if (key < 0)
+        if (UNLIKELY(key < 0))
             key += size;
-        if (key < 0 || key >= size)
+        if (UNLIKELY(key < 0 || key >= size))
             return 0;
 
         return !PMC_IS_NULL(data[key + offset]);
@@ -530,7 +541,7 @@ Returns TRUE is the element at C<key> is defined; otherwise returns false.
 
     VTABLE INTVAL defined_keyed_int(INTVAL key) :no_wb {
         PMC *val = SELF.get_pmc_keyed_int(key);
-        if (PMC_IS_NULL(val)) {
+        if (UNLIKELY(PMC_IS_NULL(val))) {
             return 0;
         }
         return VTABLE_defined(INTERP, val);
@@ -573,7 +584,7 @@ the array.
         const INTVAL size      = PMC_size(SELF);
         INTVAL       offset    = PMC_offset(SELF);
 
-        if (PMC_array(SELF) && (size < threshold)) {
+        if (PMC_array(SELF) && (offset + size < threshold)) {
             PMC_size(SELF)++;
             TRACE_RPAd("push fast", SELF);
         }
@@ -625,7 +636,7 @@ Removes and returns the last element in the array.
         const INTVAL offset = PMC_offset(SELF);
         PMC   *val;
 
-        if (0 == size)
+        if (UNLIKELY(0 == size))
             throw_pop_empty(INTERP);
         --size;
         PMC_size(SELF) = size;
@@ -690,7 +701,7 @@ Mark the array.
 
     VTABLE void mark() :no_wb {
         PMC ** data = PMC_array(SELF);
-        if (data) {
+        if (LIKELY(data)) {
             INTVAL i = PMC_size(SELF);
             data += PMC_offset(SELF);
             for (i--; i >= 0; --i)
@@ -778,12 +789,12 @@ Note that the C<from> PMC can be of any of the various array types.
         INTVAL i;
 
         /* start from end? */
-        if (offset < 0)
+        if (UNLIKELY(offset < 0))
             offset += size;
-        if (count < 0)
+        if (UNLIKELY(count < 0))
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "illegal argument");
-        if (offset < 0)
+        if (UNLIKELY(offset < 0))
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "index out of bounds");
 
