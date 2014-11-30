@@ -51,7 +51,7 @@ ops, by moving an extra offset index, with 8 slots reserve. See #1152
                     (s), offset, size, threshold, n);
 #  define TRACE_RPAd(s, self)                           \
     if (Interp_trace_TEST(interp, 0x20))                \
-        fprintf(stderr, "# rpa %-12s: (%ld,%ld,%ld) ",  \
+        fprintf(stderr, "# rpa %-12s: (%ld,%ld,%ld)\n",  \
         (s), PMC_offset(self), PMC_size(self), PMC_threshold(self));
 #  define TRACE_PMC(i, pmc)                 \
     if (Interp_trace_TEST(interp, 0x20)) {  \
@@ -402,6 +402,14 @@ Returns the PMC value of the element at index C<key>.
                 "index out of bounds");
         if (UNLIKELY(key >= size))
             return PMCNULL;
+#ifndef NDEBUG
+        if (Interp_trace_TEST(interp, 0x20) && Interp_trace_TEST(interp, 1)) {
+            fprintf(stderr, "# rpa get keyed: (%ld,%ld,%ld): [%ld]=",
+                    offset, size, PMC_threshold(SELF), key);
+            trace_pmc_dump(INTERP, PMC_array(SELF)[key + offset]);
+            fprintf(stderr, "\n");
+        }
+#endif
 
         data = PMC_array(SELF);
         val = data[key + offset];
@@ -433,11 +441,18 @@ Sets the PMC value of the element keyed by C<key> to C<*src>.
         if (UNLIKELY(key < 0))
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "index out of bounds");
+#ifndef NDEBUG
+        if (Interp_trace_TEST(interp, 0x20) && Interp_trace_TEST(interp, 1)) {
+            fprintf(stderr, "# rpa set keyed: (%ld,%ld,%ld): [%ld]=",
+                    offset, size, PMC_threshold(SELF), key);
+            trace_pmc_dump(INTERP, src);
+            fprintf(stderr, "\n");
+        }
+#endif
         if (UNLIKELY(key >= size)) {
             SELF.set_integer_native(key + 1);
             offset = PMC_offset(SELF);
         }
-        TRACE_RPAd("set keyed", SELF);
         PMC_array(SELF)[key + offset] = src;
     }
 
@@ -540,7 +555,14 @@ Returns TRUE is the element at C<key> is defined; otherwise returns false.
 */
 
     VTABLE INTVAL defined_keyed_int(INTVAL key) :no_wb {
-        PMC *val = SELF.get_pmc_keyed_int(key);
+        PMC *val;
+        const INTVAL size = PMC_size(SELF);
+
+        if (UNLIKELY(key < 0))
+            key += size;
+        if (UNLIKELY(key < 0 || key >= size))
+            return 0;
+        val = SELF.get_pmc_keyed_int(key);
         if (UNLIKELY(PMC_IS_NULL(val))) {
             return 0;
         }
