@@ -876,6 +876,7 @@ Append the other array to this array.
     METHOD append(PMC *other) {
         const INTVAL n = VTABLE_elements(INTERP, SELF);
         const INTVAL m = VTABLE_elements(INTERP, other);
+        const INTVAL offset = PMC_offset(SELF);
         if (!m)
             return;
 
@@ -885,7 +886,7 @@ Append the other array to this array.
         if (other->vtable->base_type == SELF->vtable->base_type
         ||  other->vtable->base_type == enum_class_FixedPMCArray) {
             PMC ** const other_data = PMC_array(other);
-            PMC ** const this_data  = PMC_array(SELF);
+            PMC ** const this_data  = PMC_array(SELF) + offset;
 
             /* libc is faster at copying data than a manual loop here */
             memmove(this_data + n, other_data, m  * sizeof (PMC *));
@@ -893,7 +894,7 @@ Append the other array to this array.
         else {
             PMC ** const this_data = PMC_array(SELF);
             INTVAL i;
-            for (i = 0; i < m; ++i)
+            for (i = offset; i < m; ++i)
                 this_data[n + i] = VTABLE_get_pmc_keyed_int(INTERP, other, i);
         }
         RETURN(void);
@@ -940,6 +941,62 @@ Method forms to add a PMC to the beginning or end of the array.
 
     METHOD push(PMC* value) :manual_wb {
         VTABLE_push_pmc(INTERP, SELF, value);
+    }
+
+/*
+
+=item C<METHOD sort(PMC *cmp_func)>
+
+Sort this array, optionally using the provided cmp_func
+
+=cut
+
+*/
+
+    METHOD sort(PMC *cmp_func :optional) {
+        const INTVAL n      = SELF.elements();
+        const INTVAL offset = PMC_offset(SELF);
+        PMC ** array        = PMC_array(SELF);
+
+        if (n > 1) {
+            /* XXX Workaround for TT #218 */
+            if (PObj_is_object_TEST(SELF)) {
+                PMC * const parent = SELF.get_attr_str(CONST_STRING(INTERP, "proxy"));
+                Parrot_pcc_invoke_method_from_c_args(INTERP, parent, CONST_STRING(INTERP, "sort"), "P->", cmp_func);
+            }
+            else {
+                array += offset;
+                Parrot_util_quicksort(INTERP, (void **)array, n, cmp_func, "PP->I");
+            }
+        }
+        RETURN(PMC *SELF);
+    }
+
+
+/*
+
+=item C<METHOD reverse()>
+
+Reverse the contents of the array.
+
+=cut
+
+*/
+    METHOD reverse() {
+        const INTVAL offset = PMC_offset(SELF);
+        INTVAL       n      = SELF.elements();
+
+        if (n > 1) {
+            PMC *val;
+            PMC **data = PMC_array(SELF) + offset;
+            INTVAL i;
+
+            for (i = 0; i <= --n; i++) {
+                val = data[i];
+                data[i] = data[n];
+                data[n] = val;
+            }
+        }
     }
 
 }
