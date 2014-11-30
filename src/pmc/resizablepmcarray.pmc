@@ -36,7 +36,9 @@ ops, by moving an extra offset index, with 8 slots reserve. See #1152
 #  define TRACE_RPAs(s)
 #  define TRACE_RPAd(s, self)
 #  define TRACE_PMC(i, pmc)
+#  define TRACE_SPLC
 #else
+#  include "parrot/runcore_trace.h"
 #  define TRACE_RPA(s)                                  \
     if (Interp_trace_TEST(interp, 0x20))                \
         fprintf(stderr, "# rpa %-12s: (%ld,%ld,%ld) ",  \
@@ -59,7 +61,10 @@ ops, by moving an extra offset index, with 8 slots reserve. See #1152
         trace_pmc_dump(interp, (pmc));      \
         fprintf(stderr, "\n");              \
     }
-
+#  define TRACE_SPLC                        \
+    if (Interp_trace_TEST(interp, 0x20))    \
+        fprintf(stderr, "      off=%ld, count=%ld, elems1=%ld, tail=%ld, sizediff=%ld\n", \
+                off, count, elems1, tail, sizediff)
 #endif
 
 
@@ -802,11 +807,12 @@ Note that the C<from> PMC can be of any of the various array types.
 */
 
     VTABLE void splice(PMC *from, INTVAL off, INTVAL count) {
-        const INTVAL size   = PMC_size(SELF);
-        INTVAL       offset = PMC_offset(SELF);
-        const INTVAL elems1 = VTABLE_elements(INTERP, from);
+        const INTVAL size      = PMC_size(SELF);
+        const INTVAL threshold = PMC_threshold(SELF);
+        INTVAL       offset    = PMC_offset(SELF);
+        const INTVAL elems1    = VTABLE_elements(INTERP, from);
         PMC **item;
-        INTVAL tail, sizediff;
+        INTVAL tail, sizediff, newsize;
 
         /* start from end? */
         if (UNLIKELY(off < 0))
@@ -837,19 +843,26 @@ Note that the C<from> PMC can be of any of the various array types.
             else {
                 item += offset;
                 TRACE_RPAd("splice shrink", SELF);
-                //TRACE_PMC(off+elems1, item[off+elems1]);
+                TRACE_SPLC;
                 memmove(item + off + elems1, item + off + count,
                         tail * sizeof (PMC *));
             }
         }
         /* now resize the array */
-        SELF.set_integer_native(off + elems1 + tail);
-        offset = PMC_offset(SELF);
-        item = PMC_array(SELF);
+        newsize = off + elems1 + tail;
+        if (newsize > threshold - offset) {
+            SELF.set_integer_native(newsize);
+            offset = PMC_offset(SELF);
+            item = PMC_array(SELF);
+        }
+        else {
+            PMC_size(SELF) = newsize;
+        }
         item += offset;
-        if (tail > 0 && sizediff < 0) {
+        if (tail > 0 && sizediff < 0) { /* elems1 > count */
             TRACE_RPAd("splice grow", SELF);
-            //TRACE_PMC(off+elems1, item[off+elems1]);
+            TRACE_SPLC;
+            //TODO: wrong write
             /* the array grew, so move the tail to the right */
             memmove(item + off + elems1, item + off + count,
                     tail * sizeof (PMC *));
@@ -859,9 +872,9 @@ Note that the C<from> PMC can be of any of the various array types.
         /* now copy C<from>'s elements into SELF */
         if (elems1 > 0) {
             INTVAL i;
-            TRACE_RPAd("splice copy", SELF);
-            //TRACE_PMC(off, item[off]);
             PMC *iter = VTABLE_get_iter(INTERP, from);
+            TRACE_RPAd("splice fill", SELF);
+            TRACE_SPLC;
             for (i = 0; i < elems1; i++)
                 item[off + i] = VTABLE_shift_pmc(INTERP, iter);
         }
