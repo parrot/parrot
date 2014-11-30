@@ -268,16 +268,18 @@ Resizes the array to C<size> elements.
             /* we could shrink here, but this would need a GC mark */
             return;
         }
-        else if (offset > 0 && n + offset > size && n <= threshold) {
+        else if (offset > 0 && n + offset > size && n + offset <= threshold) {
             /* if there aren't enough slots at the end, shift off empty
              * slots from the beginning first */
             if (size > 0) {
                 size_t i;
                 TRACE_RPAs("resize off move");
                 memmove(array, array + offset, size * sizeof (PMC *));
+#ifndef NDEBUG
                 for (i=0; i < offset; ++i) { /* fill the slack */
                     array[i+size] = PMCNULL; /* TODO: memset NULL */
                 }
+#endif
             }
 #ifndef NDEBUG
             else {
@@ -290,7 +292,8 @@ Resizes the array to C<size> elements.
         else {
             INTVAL old;
             old = threshold;
-            if (threshold < 8192) {
+            n += offset;
+            if (n < 8192) {
                 threshold = (n < 2 * threshold) ? (2 * threshold) : n;
                 if (threshold < 8) threshold = 8;
             }
@@ -301,11 +304,13 @@ Resizes the array to C<size> elements.
             }
             array = mem_gc_realloc_n_typed(INTERP,
                         array, threshold, PMC *);
+#ifndef NDEBUG
             for (; old < threshold; ++old) { /* fill the slack (or not) */
                 array[old] = PMCNULL; /* TODO: memset NULL is more efficient (calloc) */
             }
+#endif
             PMC_threshold(SELF) = threshold;
-            PMC_size(SELF)      = n;
+            PMC_size(SELF)      = n - offset;
             if (PMC_array(SELF) != array) { /* data moved? */
                 PObj_custom_mark_destroy_SETALL(SELF);
                 PMC_array(SELF) = array;
@@ -862,6 +867,7 @@ Note that the C<from> PMC can be of any of the various array types.
         if (tail > 0 && sizediff < 0) { /* elems1 > count */
             TRACE_RPAd("splice grow", SELF);
             TRACE_SPLC;
+            PARROT_ASSERT(offset + newsize <= PMC_threshold(SELF));
             //TODO: wrong write
             /* the array grew, so move the tail to the right */
             memmove(item + off + elems1, item + off + count,
