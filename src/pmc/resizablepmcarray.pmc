@@ -859,7 +859,7 @@ Note that the C<from> PMC can be of any of the various array types.
             TRACE_RPAd("splice grow", SELF);
             TRACE_SPLC;
             PARROT_ASSERT(offset + newsize <= PMC_threshold(SELF));
-            //TODO: wrong write
+            /* TODO: wrong write (valgrind) */
             /* the array grew, so move the tail to the right */
             memmove(item + off + elems1, item + off + count,
                     tail * sizeof (PMC *));
@@ -875,6 +875,45 @@ Note that the C<from> PMC can be of any of the various array types.
             for (i = 0; i < elems1; i++)
                 item[off + i] = VTABLE_shift_pmc(INTERP, iter);
         }
+    }
+
+/*
+
+=item C<void visit(PMC *info)>
+
+This is used by freeze/thaw to visit the contents of the array.
+
+C<*info> is the visit info, (see F<include/parrot/pmc_freeze.h>).
+
+=item C<void freeze(PMC *info)>
+
+Used to archive the array.
+
+=item C<void thaw(PMC *info)>
+
+Used to unarchive the array.
+
+=cut
+
+*/
+
+    VTABLE void visit(PMC *info) :no_wb {
+        INTVAL  i;
+        const INTVAL n = VTABLE_elements(INTERP, SELF);
+        PMC   **pos    = PMC_array(SELF) + PMC_offset(SELF);
+
+        for (i = 0; i < n; ++i, ++pos) {
+            VISIT_PMC(INTERP, info, *pos);
+        }
+        SUPER(info);
+    }
+
+    VTABLE void freeze(PMC *info) :no_wb {
+        VTABLE_push_integer(INTERP, info, VTABLE_elements(INTERP, SELF));
+    }
+
+    VTABLE void thaw(PMC *info) :manual_wb {
+        SELF.init_int(VTABLE_shift_integer(INTERP, info));
     }
 
 /*

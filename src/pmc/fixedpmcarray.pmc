@@ -245,12 +245,9 @@ TT #1229: implement freeze/thaw and use that instead.
             PMC * const val = SELF.get_pmc_keyed_int(i);
             if (i > 0)
                 res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, ", "));
-
             res = Parrot_str_concat(INTERP, res, VTABLE_get_repr(INTERP, val));
         }
-
         res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, ")"));
-
         return res;
     }
 
@@ -757,7 +754,6 @@ Used to unarchive the array.
         for (i = 0; i < n; ++i, ++pos) {
             VISIT_PMC(INTERP, info, *pos);
         }
-
         SUPER(info);
     }
 
