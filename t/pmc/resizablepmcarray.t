@@ -22,7 +22,7 @@ out-of-bounds test. Checks INT and PMC keys.
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
 
-    plan(151)
+    plan(154)
 
     init_tests()
     resize_tests()
@@ -50,7 +50,8 @@ out-of-bounds test. Checks INT and PMC keys.
     append_tests()
     splice_tests()
     splice_replace1()
-    splice_replace2()
+    splice_replace_shrink()
+    splice_shrink_fast()
     iterate_subclass_of_rpa()
     method_forms_of_unshift_etc()
     sort_with_broken_cmp()
@@ -61,6 +62,7 @@ out-of-bounds test. Checks INT and PMC keys.
     test_assign_self()
     test_assign_non_array()
     method_reverse()
+    test_resize_off()
 .end
 
 .sub init_negative
@@ -976,7 +978,7 @@ too_low_end:
 .end
 
 
-.sub splice_replace2
+.sub splice_replace_shrink
     $P1 = new ['ResizablePMCArray']
     $P1 = 3
     $P1[0] = '1'
@@ -985,11 +987,26 @@ too_low_end:
     $P2 = new ['ResizablePMCArray']
     $P2 = 1
     $P2[0] = 'A'
-    splice $P1, $P2, 0, 2
+    splice $P1, $P2, 0, 2  # 0,3,8 off=0, count=2, elems1=1, tail=1, sizediff=1
     $S0 = join "", $P1
-    is($S0, "A3", "replacement via splice works")
+    is($S0, "A3", "splice shrink")
 .end
 
+.sub splice_shrink_fast
+    $P1 = new ['ResizablePMCArray']
+    $P1 = 4
+    $P1[0] = '0'
+    $P1[1] = '1'
+    $P1[2] = '2'
+    $P1[3] = '3'
+    $P2 = new ['ResizablePMCArray']
+    $P2 = 1
+    $P2[0] = 'A'
+    $I0 = shift $P1        # create offset to fill in $P2. now same as P1 above
+    splice $P1, $P2, 0, 2  # 1,3,8 off=0, count=2, elems1=1, tail=3, sizediff=1
+    $S0 = join "", $P1
+    is($S0, "A3", "splice shrink fast")
+.end
 
 .sub iterate_subclass_of_rpa
     .local pmc arr, it
@@ -1215,6 +1232,49 @@ CODE
     is($S0, "43156", "method_reverse - five elements second reverse")
 .end
 
+# coverage of other important codepaths
+#     perl -lne'/^\s+TRACE_RPA\w*\("(.+?)"/ && print $1' src/pmc/resizablepmcarray.pmc | sort | uniq > rpa.src
+# vs: ./parrot_old -t20 t/pmc/resizablepmcarray.t >rpa 2>&1
+#     perl -lne'/^# rpa (.+?):/ && print $1' rpa | sort | uniq -c > rpa.cover
+# diff -bu rpa.src rpa.cover:
+#   -resize off empty
+#   -resize off move
+#   -splice shrink fast
+.sub test_resize_off
+    .local pmc a
+    .local int i
+    a = new ['ResizablePMCArray']
+    a = 7
+
+    $P0 = new 'Integer', 1
+    unshift a, $P0
+    i = 0
+shift_fast:
+    $P1 = shift a
+    inc i
+    if i < 8 goto shift_fast
+
+resize_off_empty: #8,0,8
+    a = 6
+resize_off_move:  #2,6,8
+    push a, $P0   #1,7,8
+    $P1 = shift a #1,6,8
+    push a, $P0
+    $P1 = shift a
+    $P1 = shift a
+    $P1 = shift a
+    $P1 = shift a
+    push a, $P0
+    $P1 = shift a
+    $P1 = shift a
+    $P1 = shift a
+    $P1 = shift a
+
+    elements $I0, a
+    is(a, 0, "resize off elements")
+    $I0 = $P0
+    is($I0, 1, "resize off item")
+.end
 
 # don't forget to change the test plan
 

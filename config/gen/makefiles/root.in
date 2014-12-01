@@ -1087,7 +1087,6 @@ src/events$(O) : \
 	$(INC_DIR)/events.h \
 	src/events.c \
 	src/events.str \
-	$(INC_PMC_DIR)/pmc_arrayiterator.h \
 	$(INC_PMC_DIR)/pmc_exception.h \
 	$(INC_DIR)/runcore_api.h
 

@@ -127,22 +127,10 @@ do_shift(PARROT_INTERP, ARGIN(PMC *arr))
     const INTVAL    offset = PMC_offset(arr);
 
     PMC_size(arr)--;
-    if (UNLIKELY(offset > threshold)) {
-        /* offset overflow: move all to the left, and reset offset */
-        size_t i;
-        PMC_offset(arr) = 0;
-        TRACE_RPAn("shift slow");
-        memmove(array, array + offset, size * sizeof (PMC *));
-        for (i=0; i < (size_t)offset; ++i) { /* fill the slack */
-            array[i+size] = PMCNULL; /* TODO: memset NULL */
-        }
-        PARROT_GC_WRITE_BARRIER(interp, arr);
-    }
-    else {
-        PMC_offset(arr)++;
-        TRACE_RPAn("shift fast");
-        array[offset] = PMCNULL;
-    }
+    PARROT_ASSERT(size + offset < threshold);
+    PMC_offset(arr)++;
+    TRACE_RPAn("shift fast");
+    array[offset] = PMCNULL;
 }
 
 /*
@@ -268,7 +256,8 @@ Resizes the array to C<size> elements.
             /* we could shrink here, but this would need a GC mark */
             return;
         }
-        else if (offset > 0 && n + offset > size && n + offset <= threshold) {
+        /* enough room at the left. e.g. 7,0,8 n:6 */
+        else if (offset > 0 && n + offset > size && n <= threshold) {
             /* if there aren't enough slots at the end, shift off empty
              * slots from the beginning first */
             if (size > 0) {
@@ -286,7 +275,8 @@ Resizes the array to C<size> elements.
                 TRACE_RPAs("resize off empty");
             }
 #endif
-            PMC_offset(SELF) = 0;
+            PMC_size(SELF) = n;
+            PMC_offset(SELF) -= n - size;
             PObj_custom_mark_destroy_SETALL(SELF);
         }
         else {
@@ -838,11 +828,12 @@ Note that the C<from> PMC can be of any of the various array types.
         item = PMC_array(SELF);
         sizediff = count - elems1;
         if (tail > 0 && sizediff > 0) {
-            /* we're shrinking the array, so first move the tail left */
+            /* we're shrinking the array, so first move the tail left. */
+            /* maybe we can just adjust the offset. */
             if (offset >= sizediff) { /* enough room at the left to fill in from */
-                PMC_offset(SELF) = offset - sizediff;
-                item += offset - sizediff;
                 TRACE_RPAd("splice shrink fast", SELF);
+                PMC_offset(SELF) += elems1;
+                item += offset + elems1;
                 goto splice_copy;
             }
             else {

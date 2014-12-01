@@ -21,7 +21,6 @@ to the appropriate handler asynchronously.
 #include "parrot/events.h"
 
 #include "events.str"
-#include "pmc/pmc_arrayiterator.h"
 #include "pmc/pmc_exception.h"
 
 
