@@ -52,7 +52,7 @@ typedef enum {
     PARROT_TRACE_SUB_CALL_FLAG      = 0x04,  /* invoke/retcc, not with --optimizing */
     PARROT_TRACE_CORO_STATE_FLAG    = 0x08,  /* not with --optimizing */
     PARROT_TRACE_OPS_PMC_FLAG       = 0x10,  /* verbose op: pmc flags */
-    PARROT_TRACE_RPA_FLAG           = 0x20,  /* resizablepmcarray, not with --optimizing */
+    PARROT_TRACE_ARRAY_STATE_FLAG   = 0x20,  /* array state, not with --optimizing */
     PARROT_ALL_TRACE_FLAGS          = 0xffff
 } Parrot_trace_flags;
 /* &end_gen */

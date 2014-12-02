@@ -499,7 +499,8 @@ help_debug(void)
     printf(
     "    0004    function calls\n"
     "    0008    coro states\n"
-    "    0010    pmc flags\n");
+    "    0010    pmc flags\n"
+    "    0020    array states\n");
 #else
     printf(
     "    0010    pmc flags\n"
