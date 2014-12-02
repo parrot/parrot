@@ -531,8 +531,7 @@ Delete the element at index C<key> and shift the rest to the left.
         }
         else {
             PMC ** const off = &data[offset+key];
-            memmove(off, off + 1,
-                    (size - key) * sizeof (PMC *));
+            memmove(off, off + 1, (size - key - 1) * sizeof (PMC *));
         }
 #else
         for (i = key + offset; i < size - 1; ++i)
