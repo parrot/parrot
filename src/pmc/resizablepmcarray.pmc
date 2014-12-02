@@ -258,29 +258,29 @@ Resizes the array to C<size> elements.
             /* we could shrink here, but this would need a GC mark */
             return;
         }
-        /* enough room at the left. e.g. 7,0,8 n:6 */
+        /* enough room at the left. e.g. 7,1,8 n:6 */
         else if (offset > 0 && n + offset > size && n <= threshold) {
-            const INTVAL diff = n - size;
             /* if there aren't enough slots at the end, shift off empty
              * slots from the beginning first */
             if (size > 0) {
+                const INTVAL diff = n - size;
                 size_t i;
                 TRACE_RPAs("resize off move"); /* move diff to the left */
+                PARROT_ASSERT(offset >= diff);
                 memmove(array + offset - diff, array + offset, size * sizeof (PMC *));
 #ifdef DEBUG_FILL_SLACK
                 for (i=-diff; i<0; ++i) {      /* fill the slack */
                     array[offset+size+i] = PMCNULL;
                 }
 #endif
+                PMC_offset(SELF) -= diff;
+                PObj_custom_mark_destroy_SETALL(SELF);
             }
-#ifndef NDEBUG
-            else {
+            else { /* for empty arrays just reset the offset */
+                PMC_offset(SELF) = 0;
                 TRACE_RPAs("resize off empty");
             }
-#endif
             PMC_size(SELF) = n;
-            PMC_offset(SELF) -= diff;
-            PObj_custom_mark_destroy_SETALL(SELF);
         }
         else {
             INTVAL old;
@@ -365,6 +365,7 @@ Removes and returns an item from the start of the array.
 
         if (UNLIKELY(0 == size))
             throw_shift_empty(INTERP);
+        /* TODO invalid read: data_json/JSON.nqp */
         data = PMC_array(SELF)[offset];
         do_shift(INTERP, SELF);
         return data;
@@ -899,6 +900,7 @@ Note that the C<from> PMC can be of any of the various array types.
             TRACE_RPAd("splice fill", SELF);
             TRACE_SPLC;
             for (i = 0; i < elems1; i++)
+                /* TODO invalid write: data_json/JSON.nqp */
                 item[off + i] = VTABLE_shift_pmc(INTERP, iter);
         }
     }
