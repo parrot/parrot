@@ -45,10 +45,10 @@ interface.
 
 =item Deprecated
 
-This component or interface is no longer supported; it will be removed after
-the completion of its deprecation cycle (usually one release.) Items that
-have been deprecated but not yet removed are documented in the top level
-F<api.yaml>.
+This component or interface is no longer supported; it will be removed
+after the completion of its deprecation cycle (the next supported
+release.) Items that have been deprecated but not yet removed are
+documented in the top level F<api.yaml>.
 
 =back
 
@@ -63,8 +63,8 @@ component/interface
 
 =head1 STABILITY
 
-Experimental. This proposal has been reviewed and accepted by the Project Team,
-but some details remain to be filled in.
+Stable. This proposal has been reviewed and accepted by the Project Team,
+and is executed in practice for over 7 years.
 
 =head1 AUTHOR
 

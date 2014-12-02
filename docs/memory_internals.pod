@@ -26,10 +26,11 @@ Arena holds and manages a set number of items of a single size and shape.
 
 =item * GC
 
-Garbage collector. A garbage collector is a system that finds memory objects
-that are not being used by the system, and frees them automatically. Garbage
-collection is broken into two distinct phases: the I<mark phase> that searches
-for unreferenced objects, and the I<sweep phase> that frees all dead objects.
+Garbage collector. A garbage collector is a system that finds memory
+objects that are not being used by the system, and frees them
+automatically. Our used garbage collection is broken into two distinct
+phases: the I<mark phase> that searches for unreferenced objects, and
+the I<sweep phase> that frees all dead objects.
 
 =item * DOD
 
@@ -174,7 +175,7 @@ C<Parrot_str_compare()>.
 An alternative to the above is to use a memory allocator, which is as fast as
 the above and does reuse C<free()>ed items in a memory-conserving way.
 Actually, the malloc implementations in some systems' F<libc> efficiently
-provide this, such as the glibc malloc based on Doug Lea's allocator.
+provide this, such as the glibc malloc based on Doug Lea's F<ptmalloc>.
 
 Using this allocator, all variable sized items are just allocated via a plain
 C<malloc()> call, or resized with C<realloc()>, and after they lose their
@@ -246,21 +247,13 @@ filled in.
 
 =head1 FILES
 
-src/gc/api.c, src/gc/gc_private.h, pobj.h, mark_sweep.[ch],
-alloc_resources.[ch], string.[ch]. Other garbage collector
+F<src/gc/api.c>, F<src/gc/gc_private.h>, F<pobj.h>, F<mark_sweep.[ch]>,
+F<alloc_resources.[ch]>, F<string.[ch]>. Other garbage collector
 implementations may use separate files as well.
 
 =head1 BUGS
 
 To minimize this bugs section - please patch this document and keep it up to
 date - thanks.
-
-=head1 AUTHOR
-
-Leopold Tötsch C<lt@toetsch.at>
-
-=head1 VERSION
-
-0.1.1 June 2008
 
 =cut
