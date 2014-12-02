@@ -522,13 +522,13 @@ Delete the element at index C<key> and shift the rest to the left.
 
         TRACE_RPAd("delete keyed", SELF);
         TRACE_PMC(key+offset, data[key+offset]);
-        /* TODO: use memmove. if 0 just bump offset */
-#if 0
+#if 1
         if (0 == key) {
             PMC_offset(SELF)++;
         }
         else {
-            memmove(data + offset + key, data + offset + key + 1,
+            PMC ** const off = &data[offset+key];
+            memmove(off, off + 1,
                     (size - key) * sizeof (PMC *));
         }
 #else
