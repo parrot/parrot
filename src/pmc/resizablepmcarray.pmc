@@ -11,7 +11,7 @@ This class, ResizablePMCArray, implements an resizable array which stores
 PMCs.  It changes values into Integer, Float, or String PMCs as appropriate.
 
 Resize thresholds steps are 8 and 4096.
-Between a 8b - 4K resize it overallocates by 2, over 4K it aligns up to
+Between 8b and 4K resize it overallocates by factor 1.5, over 4K it aligns up to
 the next 4K block.
 
 We use now the faster nqp/qrpa model with O(1) shift/unshift
@@ -129,7 +129,7 @@ do_shift(PARROT_INTERP, ARGIN(PMC *arr))
     PMC_size(arr)--;
     PARROT_ASSERT(size + offset < threshold);
     PMC_offset(arr)++;
-    TRACE_RPAn("shift fast");
+    TRACE_RPAd("shift fast", arr);
     array[offset] = PMCNULL;
 }
 
@@ -258,17 +258,16 @@ Resizes the array to C<size> elements.
         }
         /* enough room at the left. e.g. 7,0,8 n:6 */
         else if (offset > 0 && n + offset > size && n <= threshold) {
+            const INTVAL diff = n - size;
             /* if there aren't enough slots at the end, shift off empty
              * slots from the beginning first */
             if (size > 0) {
                 size_t i;
-                TRACE_RPAs("resize off move");
-                memmove(array, array + offset, size * sizeof (PMC *));
-#ifndef NDEBUG
-                for (i=0; i < offset; ++i) { /* fill the slack */
-                    array[i+size] = PMCNULL; /* TODO: memset NULL */
+                TRACE_RPAs("resize off move"); /* move diff to the left */
+                memmove(array + offset - diff, array + offset, size * sizeof (PMC *));
+                for (i=0; i < diff; ++i) {     /* fill the slack */
+                    array[offset+size+i] = PMCNULL;
                 }
-#endif
             }
 #ifndef NDEBUG
             else {
@@ -276,7 +275,7 @@ Resizes the array to C<size> elements.
             }
 #endif
             PMC_size(SELF) = n;
-            PMC_offset(SELF) -= n - size;
+            PMC_offset(SELF) -= diff;
             PObj_custom_mark_destroy_SETALL(SELF);
         }
         else {

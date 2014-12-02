@@ -22,7 +22,7 @@ out-of-bounds test. Checks INT and PMC keys.
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
 
-    plan(154)
+    plan(156)
 
     init_tests()
     resize_tests()
@@ -1258,22 +1258,42 @@ resize_off_empty: #8,0,8
     a = 6
 resize_off_move:  #2,6,8
     push a, $P0   #1,7,8
-    $P1 = shift a #1,6,8
-    push a, $P0
-    $P1 = shift a
-    $P1 = shift a
-    $P1 = shift a
-    $P1 = shift a
-    push a, $P0
-    $P1 = shift a
+    $P1 = shift a #2,6,8
+    push a, $P0   #1,7,8
+    $P1 = shift a #2,6,8
+    $P1 = shift a #3,5,8
+    $P1 = shift a #4,4,8
+    $P1 = shift a #5,3,8
+    push a, $P0   #4,4,8 off move
+    $P1 = shift a #4,4,8
     $P1 = shift a
     $P1 = shift a
     $P1 = shift a
 
     elements $I0, a
     is(a, 0, "resize off elements")
-    $I0 = $P0
+    $I0 = $P1
     is($I0, 1, "resize off item")
+
+# freeze: shift fast until resize off move + push slow
+# testing the resize off move slack
+    push a, 1     #1    slow 7,1,8
+    push a, 2     #12   slow 6,2,8
+    push a, 3     #123  slow 5,3,8
+    push a, 4     #1234 slow
+    $P1 = shift a #234  fast
+    push a, 5     #2345 slow
+    $S0 = join "", a
+    is($S0, "2345", "freeze pattern 1")
+    $P1 = shift a #345  fast
+    a = 2         #34
+    $P1 = shift a #4    fast
+    unshift a, 0  #04   fast
+    push a, 6     #046  fast
+    push a, 7     #0467 slow
+    unshift a, 9  #90467 slow
+    $S0 = join "", a
+    is($S0, "90467", "freeze pattern 2")
 .end
 
 # don't forget to change the test plan
