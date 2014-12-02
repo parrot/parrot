@@ -367,7 +367,7 @@ EOT
     # For easier debugging, the generated pir is appended to the PIR
     # that is passed to pir_output_is().
     ( my $gen_parser_fn = $pg_fn ) =~s/pg$/pir/;
-    my ($out_f, undef) = create_tempfile(UNLINK => 1);
+    my (undef, $out_f) = create_tempfile(UNLINK => 1);
     my $rv = Parrot::Test::run_command(
        qq{"$PARROT" "$PERL6GRAMMAR" --output="$gen_parser_fn" "$pg_fn"},
        STDERR => $out_f
