@@ -489,8 +489,7 @@ help_debug(void)
     "    0100    GC traces\n"
     "    0200    every single alloc/free\n"
 #else
-    printf(
-    "    (more with --ccflags=-DMEMORY_DEBUG)\n");
+    "    (more with --ccflags=-DMEMORY_DEBUG)\n"
 #endif
     "\n"
     "--trace -t [Flags] ...\n"

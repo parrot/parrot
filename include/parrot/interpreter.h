@@ -253,9 +253,9 @@ struct parrot_interp_t {
     /* 9:   PMC *Executable              String PMC with name from argv[0]. */
 
 
-    PMC *HLL_info;                            /* HLL names and types */
-    PMC *HLL_namespace;                       /* cache of HLL toplevel ns */
-    PMC *HLL_entries;
+    PMC *HLL_info;                            /* OrderedHash of HLL names and types */
+    PMC *HLL_namespace;                       /* ResizablePMCArray cache of HLL toplevel ns */
+    PMC *HLL_entries;                         /* ResizablePMCArray */
 
     PMC *root_namespace;                      /* namespace hash */
     PMC *scheduler;                           /* concurrency scheduler */
