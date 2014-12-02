@@ -131,8 +131,9 @@ Destroys the array.
 */
 
     VTABLE void destroy() :no_wb {
-        if (PMC_array(SELF))
-            mem_gc_free(INTERP, PMC_array(SELF));
+        PMC ** array = PMC_array(SELF);
+        if (LIKELY(array))
+            mem_gc_free(INTERP, array);
     }
 
 /*
@@ -711,7 +712,7 @@ out of the range of this array.
     VTABLE void splice(PMC *value, INTVAL offset, INTVAL count) :manual_wb {
         const INTVAL elems0 = VTABLE_elements(INTERP, SELF);
         /* start from end? */
-        if UNLIKELY((offset < 0))
+        if (UNLIKELY(offset < 0))
             offset += elems0;
         if (UNLIKELY(count < 0))
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
@@ -798,7 +799,7 @@ Mark the array.
 
     VTABLE void mark() :no_wb {
         PMC ** const data = PMC_array(SELF);
-        if (data) {
+        if (LIKELY(data)) {
             INTVAL i;
             for (i = PMC_size(SELF) - 1; i >= 0; --i)
                 Parrot_gc_mark_PMC_alive(INTERP, data[i]);

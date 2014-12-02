@@ -283,21 +283,20 @@ Resizes the array to C<size> elements.
             old = threshold;
             n += offset;
             if (n < 8192) {
-                threshold = (n < 2 * threshold) ? (2 * threshold) : n;
+                INTVAL newsize = threshold;  /* overallocate small blocks by 1.5 */
+                newsize += newsize/2;
+                threshold = (n < newsize) ? newsize : n;
                 if (threshold < 8) threshold = 8;
             }
             else {
                 const INTVAL needed = n - threshold;
-                threshold   += needed + 4096;
-                threshold   &= ~0xfff;
+                threshold += needed + 4096;     /* next block */
+                threshold &= ~0xfff;
             }
-            array = mem_gc_realloc_n_typed(INTERP,
-                        array, threshold, PMC *);
-#ifndef NDEBUG
-            for (; old < threshold; ++old) { /* fill the slack (or not) */
-                array[old] = PMCNULL; /* TODO: memset NULL is more efficient (calloc) */
+            array = mem_gc_realloc_n_typed(INTERP, array, threshold, PMC *);
+            for (; old < threshold; ++old) { /* fill the slack */
+                array[old] = PMCNULL;
             }
-#endif
             PMC_threshold(SELF) = threshold;
             PMC_size(SELF)      = n - offset;
             if (PMC_array(SELF) != array) { /* data moved? */
@@ -590,14 +589,13 @@ the array.
         PMC   * const val = Parrot_pmc_new(INTERP, enum_class_Float);
 
         VTABLE_set_number_native(INTERP, val, value);
-        SELF.set_pmc_keyed_int(size, val);
+        SELF.push_pmc(val);
     }
 
     VTABLE void push_integer(INTVAL value) :manual_wb {
         const INTVAL size = PMC_size(SELF);
         PMC   * const val = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, value);
-
-        SELF.set_pmc_keyed_int(size, val);
+        SELF.push_pmc(val);
     }
 
     VTABLE void push_pmc(PMC *value) {
@@ -605,6 +603,7 @@ the array.
         const INTVAL size      = PMC_size(SELF);
         INTVAL       offset    = PMC_offset(SELF);
 
+        /* if there's enough room on the right */
         if (PMC_array(SELF) && (offset + size < threshold)) {
             PMC_size(SELF)++;
             TRACE_RPAd("push fast", SELF);
@@ -623,7 +622,7 @@ the array.
         PMC   * const val = Parrot_pmc_new(INTERP, enum_class_String);
 
         VTABLE_assign_string_native(INTERP, val, value);
-        SELF.set_pmc_keyed_int(size, val);
+        SELF.push_pmc(val);
     }
 
 /*
