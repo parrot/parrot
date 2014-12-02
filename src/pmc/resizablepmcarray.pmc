@@ -130,7 +130,9 @@ do_shift(PARROT_INTERP, ARGIN(PMC *arr))
     PARROT_ASSERT(size + offset < threshold);
     PMC_offset(arr)++;
     TRACE_RPAd("shift fast", arr);
+#ifdef DEBUG_FILL_SLACK
     array[offset] = PMCNULL;
+#endif
 }
 
 /*
@@ -265,9 +267,11 @@ Resizes the array to C<size> elements.
                 size_t i;
                 TRACE_RPAs("resize off move"); /* move diff to the left */
                 memmove(array + offset - diff, array + offset, size * sizeof (PMC *));
-                for (i=0; i < diff; ++i) {     /* fill the slack */
+#ifdef DEBUG_FILL_SLACK
+                for (i=-diff; i<0; ++i) {      /* fill the slack */
                     array[offset+size+i] = PMCNULL;
                 }
+#endif
             }
 #ifndef NDEBUG
             else {
@@ -294,9 +298,11 @@ Resizes the array to C<size> elements.
                 threshold &= ~0xfff;
             }
             array = mem_gc_realloc_n_typed(INTERP, array, threshold, PMC *);
+#ifdef DEBUG_FILL_SLACK
             for (; old < threshold; ++old) { /* fill the slack */
                 array[old] = PMCNULL;
             }
+#endif
             PMC_threshold(SELF) = threshold;
             PMC_size(SELF)      = n - offset;
             if (PMC_array(SELF) != array) { /* data moved? */
@@ -448,8 +454,14 @@ Sets the PMC value of the element keyed by C<key> to C<*src>.
         }
 #endif
         if (UNLIKELY(key >= size)) {
+            INTVAL i;
+            PMC ** array;
             SELF.set_integer_native(key + 1);
             offset = PMC_offset(SELF);
+            array = PMC_array(SELF);
+            for (i=size+offset; i<PMC_size(SELF)+offset; ++i) { /* fill the slack */
+                array[i] = PMCNULL;
+            }
         }
         PMC_array(SELF)[key + offset] = src;
     }
@@ -487,7 +499,7 @@ Sets the PMC value of the element keyed by C<key> to C<*src>.
 
 =item C<void delete_keyed(PMC *key)>
 
-Delete the element at index C<key>.
+Delete the element at index C<key> and shift the rest to the left.
 
 =cut
 
@@ -504,11 +516,25 @@ Delete the element at index C<key>.
         PMC ** const data = PMC_array(SELF);
         INTVAL i;
 
-        /* TODO: use memmove. if 0 just bump offset */
+        if (UNLIKELY(key < 0 || key >= size))
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
+                "index out of bounds");
+
         TRACE_RPAd("delete keyed", SELF);
         TRACE_PMC(key+offset, data[key+offset]);
+        /* TODO: use memmove. if 0 just bump offset */
+#if 0
+        if (0 == key) {
+            PMC_offset(SELF)++;
+        }
+        else {
+            memmove(data + offset + key, data + offset + key + 1,
+                    (size - key) * sizeof (PMC *));
+        }
+#else
         for (i = key + offset; i < size - 1; ++i)
             data[i] = data[i + 1];
+#endif
         --PMC_size(SELF);
     }
 
