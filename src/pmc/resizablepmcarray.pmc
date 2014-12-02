@@ -35,6 +35,7 @@ ops, by moving an extra offset index, with 8 slots reserve. See #1152
 #  define TRACE_RPAn(s)
 #  define TRACE_RPAs(s)
 #  define TRACE_RPAd(s, self)
+#  define TRACE_RPAdn(s, self)
 #  define TRACE_PMC(i, pmc)
 #  define TRACE_SPLC
 #else
@@ -53,6 +54,10 @@ ops, by moving an extra offset index, with 8 slots reserve. See #1152
                     (s), offset, size, threshold, n);
 #  define TRACE_RPAd(s, self)                           \
     if (Interp_trace_TEST(interp, PARROT_TRACE_ARRAY_STATE_FLAG)) \
+        fprintf(stderr, "# rpa %-12s: (%ld,%ld,%ld) ",  \
+        (s), PMC_offset(self), PMC_size(self), PMC_threshold(self));
+#  define TRACE_RPAdn(s, self)                           \
+    if (Interp_trace_TEST(interp, PARROT_TRACE_ARRAY_STATE_FLAG)) \
         fprintf(stderr, "# rpa %-12s: (%ld,%ld,%ld)\n",  \
         (s), PMC_offset(self), PMC_size(self), PMC_threshold(self));
 #  define TRACE_PMC(i, pmc)                 \
@@ -63,7 +68,7 @@ ops, by moving an extra offset index, with 8 slots reserve. See #1152
     }
 #  define TRACE_SPLC                        \
     if (Interp_trace_TEST(interp, PARROT_TRACE_ARRAY_STATE_FLAG)) \
-        fprintf(stderr, "      off=%ld, count=%ld, elems1=%ld, tail=%ld, sizediff=%ld\n", \
+        fprintf(stderr, " off=%ld, count=%ld, elems1=%ld, tail=%ld, sizediff=%ld\n", \
                 off, count, elems1, tail, sizediff)
 #endif
 
@@ -73,7 +78,8 @@ ops, by moving an extra offset index, with 8 slots reserve. See #1152
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_INLINE
-static void do_shift(PARROT_INTERP, ARGIN(PMC *arr))
+static void do_shift(PARROT_INTERP,
+    ARGIN(Parrot_ResizablePMCArray_attributes *data))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -95,7 +101,7 @@ static void throw_shift_empty(PARROT_INTERP)
 
 #define ASSERT_ARGS_do_shift __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(arr))
+    , PARROT_ASSERT_ARG(data))
 #define ASSERT_ARGS_do_unshift __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(arr) \
@@ -109,7 +115,8 @@ static void throw_shift_empty(PARROT_INTERP)
 
 /*
 
-=item C<static void do_shift(PARROT_INTERP, PMC *arr)>
+=item C<static void do_shift(PARROT_INTERP, Parrot_ResizablePMCArray_attributes
+*data)>
 
 Removes and returns an item from the start of the array.
 
@@ -118,20 +125,17 @@ Removes and returns an item from the start of the array.
 */
 PARROT_INLINE
 static void
-do_shift(PARROT_INTERP, ARGIN(PMC *arr))
+do_shift(PARROT_INTERP, ARGIN(Parrot_ResizablePMCArray_attributes *data))
 {
     ASSERT_ARGS(do_shift)
-    PMC ** const     array = PMC_array(arr);
-    const INTVAL threshold = PMC_threshold(arr);
-    const INTVAL     size  = PMC_size(arr) - 1;
-    const INTVAL    offset = PMC_offset(arr);
 
-    PMC_size(arr)--;
-    PARROT_ASSERT(size + offset < threshold);
-    PMC_offset(arr)++;
-    TRACE_RPAd("shift fast", arr);
+    data->size--;
+    PARROT_ASSERT(data->size + data->offset <= data->threshold);
+    data->offset++;
+    //TRACE_RPAd("shift fast", arr);
+    //TRACE_PMC(offset, array[offset]);
 #ifdef DEBUG_FILL_SLACK
-    array[offset] = PMCNULL;
+    data->pmc_array[data->offset] = PMCNULL;
 #endif
 }
 
@@ -334,52 +338,47 @@ Removes and returns an item from the start of the array.
 
 */
 
-    VTABLE FLOATVAL shift_float() :manual_wb {
-        const INTVAL size   = PMC_size(SELF);
-        const INTVAL offset = PMC_offset(SELF);
+    VTABLE FLOATVAL shift_float() :no_wb {
+        Parrot_ResizablePMCArray_attributes * const data = PARROT_RESIZABLEPMCARRAY(SELF);
         FLOATVAL value;
 
-        if (UNLIKELY(0 == size))
+        if (UNLIKELY(0 == data->size))
             throw_shift_empty(INTERP);
-        value = VTABLE_get_number(INTERP, PMC_array(SELF)[offset]);
-        do_shift(INTERP, SELF);
+        value = VTABLE_get_number(INTERP, data->pmc_array[data->offset]);
+        do_shift(INTERP, data);
         return value;
     }
 
-    VTABLE INTVAL shift_integer() :manual_wb {
-        const INTVAL size   = PMC_size(SELF);
-        const INTVAL offset = PMC_offset(SELF);
+    VTABLE INTVAL shift_integer() :no_wb {
+        Parrot_ResizablePMCArray_attributes * const data = PARROT_RESIZABLEPMCARRAY(SELF);
         INTVAL value;
 
-        if (UNLIKELY(0 == size))
+        if (UNLIKELY(0 == data->size))
             throw_shift_empty(INTERP);
-        value = VTABLE_get_integer(INTERP, PMC_array(SELF)[offset]);
-        do_shift(INTERP, SELF);
+        value = VTABLE_get_integer(INTERP, data->pmc_array[data->offset]);
+        do_shift(INTERP, data);
         return value;
     }
 
-    VTABLE PMC *shift_pmc() :manual_wb {
-        const INTVAL size   = PMC_size(SELF);
-        const INTVAL offset = PMC_offset(SELF);
-        PMC   *data;
+    VTABLE PMC *shift_pmc() :no_wb {
+        Parrot_ResizablePMCArray_attributes * const data = PARROT_RESIZABLEPMCARRAY(SELF);
+        PMC   *value;
 
-        if (UNLIKELY(0 == size))
+        if (UNLIKELY(0 == data->size))
             throw_shift_empty(INTERP);
-        /* TODO invalid read: data_json/JSON.nqp */
-        data = PMC_array(SELF)[offset];
-        do_shift(INTERP, SELF);
-        return data;
+        value = data->pmc_array[data->offset];
+        do_shift(INTERP, data);
+        return value;
     }
 
-    VTABLE STRING *shift_string() :manual_wb {
-        const INTVAL size   = PMC_size(SELF);
-        const INTVAL offset = PMC_offset(SELF);
+    VTABLE STRING *shift_string() :no_wb {
+        Parrot_ResizablePMCArray_attributes * const data = PARROT_RESIZABLEPMCARRAY(SELF);
         STRING  *value;
 
-        if (UNLIKELY(0 == size))
+        if (UNLIKELY(0 == data->size))
             throw_shift_empty(INTERP);
-        value = VTABLE_get_string(INTERP, PMC_array(SELF)[offset]);
-        do_shift(INTERP, SELF);
+        value = VTABLE_get_string(INTERP, data->pmc_array[data->offset]);
+        do_shift(INTERP, data);
         return value;
     }
 
@@ -857,7 +856,7 @@ Note that the C<from> PMC can be of any of the various array types.
             /* we're shrinking the array, so first move the tail left. */
             /* maybe we can just adjust the offset. */
             if (offset >= sizediff) { /* enough room at the left to fill in from */
-                TRACE_RPAd("splice shrink fast", SELF);
+                TRACE_RPAdn("splice shrink fast", SELF);
                 PMC_offset(SELF) += elems1;
                 item += offset + elems1;
                 goto splice_copy;
