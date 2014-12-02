@@ -33,9 +33,9 @@ ops, by moving an extra offset index, with 8 slots reserve. See #1152
 #ifdef NDEBUG
 #  define TRACE_RPA(s)
 #  define TRACE_RPAn(s)
-#  define TRACE_RPAs(s)
-#  define TRACE_RPAd(s, self)
-#  define TRACE_RPAdn(s, self)
+#  define TRACE_RPAsize(s)
+#  define TRACE_RPAself(s, self)
+#  define TRACE_RPAdata(s, data)
 #  define TRACE_PMC(i, pmc)
 #  define TRACE_SPLC
 #else
@@ -44,22 +44,22 @@ ops, by moving an extra offset index, with 8 slots reserve. See #1152
     if (Interp_trace_TEST(interp, PARROT_TRACE_ARRAY_STATE_FLAG)) \
         fprintf(stderr, "# rpa %-12s: (%ld,%ld,%ld) ",  \
                 (s), offset, size, threshold);
-#  define TRACE_RPAn(s)                                 \
-    if (Interp_trace_TEST(interp, PARROT_TRACE_ARRAY_STATE_FLAG)) \
-        fprintf(stderr, "# rpa %-12s: (%ld,%ld,%ld)\n", \
+#  define TRACE_RPAn(s)                                             \
+    if (Interp_trace_TEST(interp, PARROT_TRACE_ARRAY_STATE_FLAG))   \
+        fprintf(stderr, "# rpa %-12s: (%ld,%ld,%ld)\n",             \
                 (s), offset, size, threshold);
-#  define TRACE_RPAs(s)                                 \
+#  define TRACE_RPAsize(s)                                          \
     if (Interp_trace_TEST(interp, PARROT_TRACE_ARRAY_STATE_FLAG))   \
         fprintf(stderr, "# rpa %-12s: (%ld,%ld,%ld) -> size=%ld\n", \
-                    (s), offset, size, threshold, n);
-#  define TRACE_RPAd(s, self)                           \
+                (s), offset, size, threshold, n);
+#  define TRACE_RPAself(s, self)                                    \
+    if (Interp_trace_TEST(interp, PARROT_TRACE_ARRAY_STATE_FLAG))   \
+        fprintf(stderr, "# rpa %-12s: (%ld,%ld,%ld) ",              \
+                (s), PMC_offset(self), PMC_size(self), PMC_threshold(self));
+#  define TRACE_RPAdata(s, data)                                  \
     if (Interp_trace_TEST(interp, PARROT_TRACE_ARRAY_STATE_FLAG)) \
-        fprintf(stderr, "# rpa %-12s: (%ld,%ld,%ld) ",  \
-        (s), PMC_offset(self), PMC_size(self), PMC_threshold(self));
-#  define TRACE_RPAdn(s, self)                           \
-    if (Interp_trace_TEST(interp, PARROT_TRACE_ARRAY_STATE_FLAG)) \
-        fprintf(stderr, "# rpa %-12s: (%ld,%ld,%ld)\n",  \
-        (s), PMC_offset(self), PMC_size(self), PMC_threshold(self));
+        fprintf(stderr, "# rpa %-12s: (%ld,%ld,%ld) ",            \
+                (s), (data)->offset, (data)->size, (data)->threshold);
 #  define TRACE_PMC(i, pmc)                 \
     if (Interp_trace_TEST(interp, PARROT_TRACE_ARRAY_STATE_FLAG)) {  \
         fprintf(stderr, " rpa[%ld]=", (i)); \
@@ -132,8 +132,8 @@ do_shift(PARROT_INTERP, ARGIN(Parrot_ResizablePMCArray_attributes *data))
     data->size--;
     PARROT_ASSERT(data->size + data->offset <= data->threshold);
     data->offset++;
-    //TRACE_RPAd("shift fast", arr);
-    //TRACE_PMC(offset, array[offset]);
+    TRACE_RPAdata("shift fast", data);
+    TRACE_PMC(data->offset, data->pmc_array[data->offset]);
 #ifdef DEBUG_FILL_SLACK
     data->pmc_array[data->offset] = PMCNULL;
 #endif
@@ -251,13 +251,13 @@ Resizes the array to C<size> elements.
                 SUPER(n);
                 PMC_threshold(SELF) = n;
             }
-            TRACE_RPAs("resize init");
+            TRACE_RPAsize("resize init");
         }
         else if (n == size) {
             return;
         }
         else if (n <= threshold - offset) {
-            TRACE_RPAs("resize skip");
+            TRACE_RPAsize("resize skip");
             PMC_size(SELF) = n;
             /* we could shrink here, but this would need a GC mark */
             return;
@@ -269,7 +269,7 @@ Resizes the array to C<size> elements.
             if (size > 0) {
                 const INTVAL diff = n - size;
                 size_t i;
-                TRACE_RPAs("resize off move"); /* move diff to the left */
+                TRACE_RPAsize("resize off move"); /* move diff to the left */
                 PARROT_ASSERT(offset >= diff);
                 memmove(array + offset - diff, array + offset, size * sizeof (PMC *));
 #ifdef DEBUG_FILL_SLACK
@@ -282,7 +282,7 @@ Resizes the array to C<size> elements.
             }
             else { /* for empty arrays just reset the offset */
                 PMC_offset(SELF) = 0;
-                TRACE_RPAs("resize off empty");
+                TRACE_RPAsize("resize off empty");
             }
             PMC_size(SELF) = n;
         }
@@ -312,11 +312,11 @@ Resizes the array to C<size> elements.
             if (PMC_array(SELF) != array) { /* data moved? */
                 PObj_custom_mark_destroy_SETALL(SELF);
                 PMC_array(SELF) = array;
-                TRACE_RPAs("resize move");
+                TRACE_RPAsize("resize move");
             }
 #ifndef NDEBUG
             else {
-                TRACE_RPAs("resize fast realloc");
+                TRACE_RPAsize("resize fast realloc");
             }
 #endif
         }
@@ -522,7 +522,7 @@ Delete the element at index C<key> and shift the rest to the left.
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "index out of bounds");
 
-        TRACE_RPAd("delete keyed", SELF);
+        TRACE_RPAself("delete keyed", SELF);
         TRACE_PMC(key+offset, data[key+offset]);
 #if 1
         if (0 == key) {
@@ -633,12 +633,12 @@ the array.
         /* if there's enough room on the right */
         if (PMC_array(SELF) && (offset + size < threshold)) {
             PMC_size(SELF)++;
-            TRACE_RPAd("push fast", SELF);
+            TRACE_RPAself("push fast", SELF);
         }
         else {
             SELF.set_integer_native(size + 1);
             offset = PMC_offset(SELF);
-            TRACE_RPAd("push slow", SELF);
+            TRACE_RPAself("push slow", SELF);
         }
         ((PMC **)PMC_array(SELF))[offset + size] = value;
         TRACE_PMC(offset+size, value);
@@ -856,14 +856,15 @@ Note that the C<from> PMC can be of any of the various array types.
             /* we're shrinking the array, so first move the tail left. */
             /* maybe we can just adjust the offset. */
             if (offset >= sizediff) { /* enough room at the left to fill in from */
-                TRACE_RPAdn("splice shrink fast", SELF);
+                TRACE_RPAself("splice shrink fast", SELF);
+                TRACE_SPLC;
                 PMC_offset(SELF) += elems1;
                 item += offset + elems1;
                 goto splice_copy;
             }
             else {
                 item += offset;
-                TRACE_RPAd("splice shrink", SELF);
+                TRACE_RPAself("splice shrink", SELF);
                 TRACE_SPLC;
                 memmove(item + off + elems1, item + off + count,
                         tail * sizeof (PMC *));
@@ -881,7 +882,7 @@ Note that the C<from> PMC can be of any of the various array types.
         }
         item += offset;
         if (tail > 0 && sizediff < 0) { /* elems1 > count */
-            TRACE_RPAd("splice grow", SELF);
+            TRACE_RPAself("splice grow", SELF);
             TRACE_SPLC;
             PARROT_ASSERT(offset + newsize <= PMC_threshold(SELF));
             /* TODO: wrong write (valgrind) */
@@ -895,7 +896,7 @@ Note that the C<from> PMC can be of any of the various array types.
         if (elems1 > 0) {
             INTVAL i;
             PMC *iter = VTABLE_get_iter(INTERP, from);
-            TRACE_RPAd("splice fill", SELF);
+            TRACE_RPAself("splice fill", SELF);
             TRACE_SPLC;
             for (i = 0; i < elems1; i++)
                 /* TODO invalid write: data_json/JSON.nqp */
