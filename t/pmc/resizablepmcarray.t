@@ -22,7 +22,7 @@ out-of-bounds test. Checks INT and PMC keys.
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
 
-    plan(156)
+    plan(158)
 
     init_tests()
     resize_tests()
@@ -45,7 +45,7 @@ out-of-bounds test. Checks INT and PMC keys.
     pop_empty()
     multikey_access()
     exists_and_defined()
-    delete_keyed()
+    test_delete()
     get_rep()
     append_tests()
     splice_tests()
@@ -753,7 +753,7 @@ handle_p:
     is(def, 0, "element at idx 5 is not defined")
 .end
 
-.sub delete_keyed
+.sub test_delete
     .local pmc array
     array = new ['ResizablePMCArray']
     push array, 'a'
@@ -761,8 +761,16 @@ handle_p:
     push array, 'c'
     $P0 = new 'Integer', 1
     delete array[$P0]
-    $S0 = array[1]
-    is($S0, 'c', 'delete_keyed with PMC key')
+    $S0 = join "", array
+    is($S0, "ac", 'delete_keyed with PMC key')
+    delete array[0]
+    $S0 = join "", array
+    is($S0, 'c', 'delete[0]')
+    push array, 'b'
+    push array, 'a'
+    delete array[1]
+    $S0 = join "", array
+    is($S0, 'ca', 'delete[1]')
 .end
 
 .sub get_rep
@@ -974,7 +982,7 @@ too_low_end:
     $P2[0] = 'A'
     splice $P1, $P2, 1, 2
     $S0 = join "", $P1
-    is($S0, "1A", "replacement via splice works")
+    is($S0, "1A", "splice replace 1,2")
 .end
 
 
@@ -989,7 +997,7 @@ too_low_end:
     $P2[0] = 'A'
     splice $P1, $P2, 0, 2  # 0,3,8 off=0, count=2, elems1=1, tail=1, sizediff=1
     $S0 = join "", $P1
-    is($S0, "A3", "splice shrink")
+    is($S0, "A3", "splice shrink slow")
 .end
 
 .sub splice_shrink_fast

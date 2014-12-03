@@ -133,7 +133,7 @@ do_shift(PARROT_INTERP, ARGIN(Parrot_ResizablePMCArray_attributes *data))
     PARROT_ASSERT(data->size + data->offset <= data->threshold);
     data->offset++;
     TRACE_RPAdata("shift fast", data);
-    TRACE_PMC(data->offset, data->pmc_array[data->offset]);
+    TRACE_PMC(data->offset-1, data->pmc_array[data->offset-1]); /* XXX GC problem */
 #ifdef DEBUG_FILL_SLACK
     data->pmc_array[data->offset] = PMCNULL;
 #endif
@@ -154,11 +154,12 @@ static void
 do_unshift(PARROT_INTERP, ARGIN(PMC *arr), ARGIN(PMC *val))
 {
     ASSERT_ARGS(do_unshift)
+
 #ifndef NDEBUG
     const INTVAL threshold = PMC_threshold(arr);
 #endif
-    const INTVAL size = PMC_size(arr);
-    INTVAL     offset = PMC_offset(arr);
+    INTVAL   size = PMC_size(arr);
+    INTVAL offset = PMC_offset(arr);
 
     if (offset > 0) {
         TRACE_RPA("unshift fast");
@@ -172,10 +173,16 @@ do_unshift(PARROT_INTERP, ARGIN(PMC *arr), ARGIN(PMC *val))
         PMC  **array;
         TRACE_RPA("unshift slow");
         TRACE_PMC(offset, val);
-        /* TODO: check which size and offset is convenient here. depends on alignment.
-           we want to add at least offset = 3, anticipating more unshift ops */
         VTABLE_set_integer_native(interp, arr, size + 1);
         array = PMC_array(arr);
+        /* if there's enough room on the right, move the offset right by 3
+           anticipating more unshifts. we have to move the items anyway. */
+#if 0
+        if (PMC_threshold(arr) - size > 3) {
+            PMC_offset(arr) += 3;
+            size += 3;
+        }
+#endif
         memmove(array + 1, array, size * sizeof (PMC *));
         array[0] = val;
         PARROT_GC_WRITE_BARRIER(interp, arr);
@@ -513,30 +520,24 @@ Delete the element at index C<key> and shift the rest to the left.
     }
 
     VTABLE void delete_keyed_int(INTVAL key) {
-        const INTVAL offset = PMC_offset(SELF);
-        const INTVAL size = PMC_size(SELF);
-        PMC ** const data = PMC_array(SELF);
-        INTVAL i;
+        Parrot_ResizablePMCArray_attributes * const data = PARROT_RESIZABLEPMCARRAY(SELF);
 
-        if (UNLIKELY(key < 0 || key >= size))
+        if (UNLIKELY(key < 0 || key >= data->size))
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "index out of bounds");
 
-        TRACE_RPAself("delete keyed", SELF);
-        TRACE_PMC(key+offset, data[key+offset]);
-#if 1
+        data->size--;
         if (0 == key) {
-            PMC_offset(SELF)++;
+            data->offset++;
+            TRACE_RPAdata("delete fast", data);
+            TRACE_PMC(0, data->pmc_array[0]);
         }
         else {
-            PMC ** const off = &data[offset+key];
-            memmove(off, off + 1, (size - key - 1) * sizeof (PMC *));
+            PMC ** const off = &data->pmc_array[data->offset+key];
+            TRACE_RPAdata("delete slow", data);
+            TRACE_PMC(key+data->offset, data->pmc_array[key+data->offset]);
+            memmove(off, off + 1, (data->size - key) * sizeof (PMC *));
         }
-#else
-        for (i = key + offset; i < size - 1; ++i)
-            data[i] = data[i + 1];
-#endif
-        --PMC_size(SELF);
     }
 
 /*
@@ -885,7 +886,6 @@ Note that the C<from> PMC can be of any of the various array types.
             TRACE_RPAself("splice grow", SELF);
             TRACE_SPLC;
             PARROT_ASSERT(offset + newsize <= PMC_threshold(SELF));
-            /* TODO: wrong write (valgrind) */
             /* the array grew, so move the tail to the right */
             memmove(item + off + elems1, item + off + count,
                     tail * sizeof (PMC *));
@@ -899,7 +899,6 @@ Note that the C<from> PMC can be of any of the various array types.
             TRACE_RPAself("splice fill", SELF);
             TRACE_SPLC;
             for (i = 0; i < elems1; i++)
-                /* TODO invalid write: data_json/JSON.nqp */
                 item[off + i] = VTABLE_shift_pmc(INTERP, iter);
         }
     }
