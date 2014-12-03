@@ -522,6 +522,13 @@ Delete the element at index C<key> and shift the rest to the left.
     VTABLE void delete_keyed_int(INTVAL key) {
         Parrot_ResizablePMCArray_attributes * const data = PARROT_RESIZABLEPMCARRAY(SELF);
 
+        /* TODO ignore delete[0] for empty array for now to keep PGE happy. GH #1154.
+           But add a new warning */
+        if (!data->size && !key) {
+            Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
+                        "invalid delete argument ignored");
+            return;
+        }
         if (UNLIKELY(key < 0 || key >= data->size))
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "delete: index out of bounds");
