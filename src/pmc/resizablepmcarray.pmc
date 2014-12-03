@@ -410,7 +410,7 @@ Returns the PMC value of the element at index C<key>.
             key += size;
         if (UNLIKELY(key < 0))
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
-                "index out of bounds");
+                "get: index out of bounds");
         if (UNLIKELY(key >= size))
             return PMCNULL;
 #ifndef NDEBUG
@@ -452,7 +452,7 @@ Sets the PMC value of the element keyed by C<key> to C<*src>.
             key += size;
         if (UNLIKELY(key < 0))
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
-                "index out of bounds");
+                "set: index out of bounds");
 #ifndef NDEBUG
         if (Interp_trace_TEST(interp, PARROT_TRACE_ARRAY_STATE_FLAG)
          && Interp_trace_TEST(interp, PARROT_TRACE_OPS_FLAG)) {
@@ -524,7 +524,7 @@ Delete the element at index C<key> and shift the rest to the left.
 
         if (UNLIKELY(key < 0 || key >= data->size))
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
-                "index out of bounds");
+                    "delete: index out of bounds");
 
         data->size--;
         if (0 == key) {
@@ -533,9 +533,9 @@ Delete the element at index C<key> and shift the rest to the left.
             TRACE_PMC(0, data->pmc_array[0]);
         }
         else {
-            PMC ** const off = &data->pmc_array[data->offset+key];
+            PMC ** const off = &data->pmc_array[key + data->offset];
             TRACE_RPAdata("delete slow", data);
-            TRACE_PMC(key+data->offset, data->pmc_array[key+data->offset]);
+            TRACE_PMC(key + data->offset, data->pmc_array[key + data->offset]);
             memmove(off, off + 1, (data->size - key) * sizeof (PMC *));
         }
     }
@@ -843,7 +843,7 @@ Note that the C<from> PMC can be of any of the various array types.
                     "illegal argument");
         if (UNLIKELY(off < 0))
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
-                    "index out of bounds");
+                    "splice: index out of bounds");
 
         /* number of elements to the right of the splice (the "tail") */
         tail = size - off - count;
