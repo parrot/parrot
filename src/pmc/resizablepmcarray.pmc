@@ -543,7 +543,8 @@ Delete the element at index C<key> and shift the rest to the left.
             PMC ** const off = &data->pmc_array[key + data->offset];
             TRACE_RPAdata("delete slow", data);
             TRACE_PMC(key + data->offset, data->pmc_array[key + data->offset]);
-            memmove(off, off + 1, (data->size - key) * sizeof (PMC *));
+            if (data->size > key) /* skip when last element */
+                memmove(off, off + 1, (data->size - key) * sizeof (PMC *));
         }
     }
 

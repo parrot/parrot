@@ -605,7 +605,7 @@ extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_delete_keyed");
     Parrot_PMC_delete_keyed(interp, rpa, key_int);
 CODE
 Failed!
-Exception is: type 33 severity 2 message 'index out of bounds'
+Exception is: type 33 severity 2 message 'delete: index out of bounds'
 OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_exists_keyed");
