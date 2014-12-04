@@ -201,7 +201,7 @@ do_unshift(PARROT_INTERP, ARGIN(PMC *arr), ARGIN(PMC *val))
 */
 
 pmclass ResizablePMCArray extends FixedPMCArray auto_attrs provides array {
-    /* inheriting: size, array */
+    /* inheriting: size, pmc_array */
     ATTR INTVAL offset;    /* of first index, to leave max 8 slots in front for unshift */
     ATTR INTVAL threshold; /* allocated number of elements, max size before array needs resizing */
 
