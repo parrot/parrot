@@ -73,7 +73,7 @@ sub dump {
     # gen_parent_reverse_lookup_info( $self, $pmcs, $vtable_dump );
     my $filename = $self->filename('.dump');
     Storable::nstore( $self, $filename );
-    add_to_generated( $filename, "[devel]", "src") unless $self->is_dynamic;
+    # add_to_generated( $filename, "[devel]", "src") unless $self->is_dynamic;
 }
 
 # methods

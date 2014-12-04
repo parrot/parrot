@@ -136,6 +136,7 @@ include/pmc/pmc_$pmc.h src/pmc/$pmc.c : src/pmc/$pmc.dump
 
 src/pmc/$pmc.dump : vtable.dump $parent_dumps src/pmc/$pmc.pmc \$(PMC2C_FILES) $pccmethod_depend
 \t\$(PMC2CD) src/pmc/$pmc.pmc
+\t\@\$(ADDGENERATED) "src/pmc/$pmc.dump" "[devel]" src
 
 ## SUFFIX OVERRIDE -Warnings
 src/pmc/$pmc\$(O): \\
