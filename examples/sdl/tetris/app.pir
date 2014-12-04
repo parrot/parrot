@@ -34,10 +34,10 @@ it parent classes nor is it subclassed.
     $P0 = get_class "Tetris::App"
     unless null $P0 goto END
 
-    load_bytecode "library/SDL/App.pir"
-    load_bytecode "library/SDL/Color.pir"
-    load_bytecode "library/SDL/Event.pir"
-    load_bytecode "library/SDL/Rect.pir"
+    load_bytecode "SDL/App.pir"
+    load_bytecode "SDL/Color.pir"
+    load_bytecode "SDL/Event.pir"
+    load_bytecode "SDL/Rect.pir"
 
     load_bytecode "examples/sdl/tetris/eventhandler.pir"
     load_bytecode "examples/sdl/tetris/board.pir"
