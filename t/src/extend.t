@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -740,7 +740,7 @@ CODE
 Result is 300.
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', 'multiple Parrot_interp_new/Parrot_x_exit cycles', $^O eq 'darwin' ? (todo => "GH #856 may fail on darwin threaded") : () );
+c_output_is( <<'CODE', <<'OUTPUT', 'multiple Parrot_interp_new/Parrot_x_exit cycles', $^O eq 'darwin' ? (todo => "GH #856 SIGABRT with darwin threads") : () );
 
 #include <stdio.h>
 #include "parrot/parrot.h"

@@ -110,6 +110,8 @@ CODE
   loop:
     unless $I0 < N goto done
     $P0 = new ['ResizablePMCArray']
+    $P0 = 8
+    push $P0, $I0  # force realloc
     inc $I0
     goto loop
   done:
