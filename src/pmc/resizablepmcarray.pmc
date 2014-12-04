@@ -237,7 +237,7 @@ Resizes the array to C<size> elements.
 
 */
 
-    VTABLE void set_integer_native(INTVAL n) :manual_wb {
+    VTABLE void set_integer_native(INTVAL n) {
         INTVAL   size      = PMC_size(SELF);
         INTVAL   offset    = PMC_offset(SELF);
         INTVAL   threshold = PMC_threshold(SELF); /* i.e. allocated size */
@@ -346,7 +346,7 @@ Removes and returns an item from the start of the array.
 
 */
 
-    VTABLE FLOATVAL shift_float() :no_wb {
+    VTABLE FLOATVAL shift_float() {
         Parrot_ResizablePMCArray_attributes * const data = PARROT_RESIZABLEPMCARRAY(SELF);
         FLOATVAL value;
 
@@ -357,7 +357,7 @@ Removes and returns an item from the start of the array.
         return value;
     }
 
-    VTABLE INTVAL shift_integer() :no_wb {
+    VTABLE INTVAL shift_integer() {
         Parrot_ResizablePMCArray_attributes * const data = PARROT_RESIZABLEPMCARRAY(SELF);
         INTVAL value;
 
@@ -368,7 +368,7 @@ Removes and returns an item from the start of the array.
         return value;
     }
 
-    VTABLE PMC *shift_pmc() :no_wb {
+    VTABLE PMC *shift_pmc() {
         Parrot_ResizablePMCArray_attributes * const data = PARROT_RESIZABLEPMCARRAY(SELF);
         PMC   *value;
 
@@ -379,7 +379,7 @@ Removes and returns an item from the start of the array.
         return value;
     }
 
-    VTABLE STRING *shift_string() :no_wb {
+    VTABLE STRING *shift_string() {
         Parrot_ResizablePMCArray_attributes * const data = PARROT_RESIZABLEPMCARRAY(SELF);
         STRING  *value;
 
@@ -480,7 +480,7 @@ Sets the PMC value of the element keyed by C<key> to C<*src>.
         SUPER(key, src);
     }
 
-    VTABLE void set_pmc(PMC *value) :manual_wb {
+    VTABLE void set_pmc(PMC *value) {
         INTVAL size;
         INTVAL i;
         PMC ** data = PMC_array(SELF);
@@ -500,7 +500,6 @@ Sets the PMC value of the element keyed by C<key> to C<*src>.
             data[i] = VTABLE_get_pmc_keyed_int(INTERP, value, i);
 
         PObj_custom_mark_destroy_SETALL(SELF);
-        PARROT_GC_WRITE_BARRIER(INTERP, SELF);
     }
 
 /*
@@ -728,22 +727,22 @@ the array.
 
 */
 
-    VTABLE void unshift_float(FLOATVAL value) :manual_wb {
+    VTABLE void unshift_float(FLOATVAL value) {
         PMC * const val = Parrot_pmc_new(INTERP, enum_class_Float);
         VTABLE_set_number_native(INTERP, val, value);
         do_unshift(INTERP, SELF, val);
     }
 
-    VTABLE void unshift_integer(INTVAL value) :manual_wb {
+    VTABLE void unshift_integer(INTVAL value) {
         PMC * const val = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, value);
         do_unshift(INTERP, SELF, val);
     }
 
-    VTABLE void unshift_pmc(PMC *value) :manual_wb {
+    VTABLE void unshift_pmc(PMC *value) {
         do_unshift(INTERP, SELF, value);
     }
 
-    VTABLE void unshift_string(STRING *value) :manual_wb {
+    VTABLE void unshift_string(STRING *value) {
         PMC * const val = Parrot_pmc_new(INTERP, enum_class_String);
         VTABLE_set_string_native(INTERP, val, value);
         do_unshift(INTERP, SELF, val);
