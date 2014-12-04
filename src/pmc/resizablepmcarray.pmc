@@ -269,16 +269,17 @@ Resizes the array to C<size> elements.
             /* we could shrink here, but this would need a GC mark */
             return;
         }
-        /* enough room at the left. e.g. 7,1,8 n:6 */
+        /* enough room at the left */
         else if (offset > 0 && n + offset > size && n <= threshold) {
             /* if there aren't enough slots at the end, shift off empty
              * slots from the beginning first */
             if (size > 0) {
-                const INTVAL diff = n - size;
+                 /* 7,1,8 n:6 =>5. 1,5,10 n=10 =>1 */
+                const INTVAL diff = n - size > offset ? offset : n - size;
                 size_t i;
                 TRACE_RPAsize("resize off move"); /* move diff to the left */
                 PARROT_ASSERT(offset >= diff);
-                memmove(array + offset - diff, array + offset, size * sizeof (PMC *));
+                memmove(&array[offset - diff], &array[offset], size * sizeof (PMC *));
 #ifdef DEBUG_FILL_SLACK
                 for (i=-diff; i<0; ++i) {      /* fill the slack */
                     array[offset+size+i] = PMCNULL;
@@ -525,13 +526,16 @@ Delete the element at index C<key> and shift the rest to the left.
         /* TODO ignore delete[0] for empty array for now to keep PGE happy. GH #1154.
            But add a new warning */
         if (!data->size && !key) {
+            TRACE_RPAdata("delete oob", data);
             Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
                         "invalid delete argument ignored");
             return;
         }
-        if (UNLIKELY(key < 0 || key >= data->size))
+        if (UNLIKELY(key < 0 || key >= data->size)) {
+            TRACE_RPAdata("delete oob", data);
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "delete: index out of bounds");
+        }
 
         data->size--;
         if (0 == key) {
