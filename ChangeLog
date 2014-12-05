@@ -17,6 +17,7 @@
           but just warn on deprecated delete[0] with size 0 for backcompat. #1153
         + Add check for illegal delete of capture blocks in PGE.match #1154
         + Add new traceflag -t20 for ResizablePMCArray states.
+        + Add experimental vms support by mvorl. Untested. GH #866
     - Build
         + Extend auto::infnan probe to other --floatval #1146
         + Warn in Configure on experimental flags intval, floatval and gc #1148
