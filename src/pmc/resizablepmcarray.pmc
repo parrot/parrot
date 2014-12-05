@@ -266,6 +266,7 @@ Resizes the array to C<size> elements.
         else if (n <= threshold - offset) {
             TRACE_RPAsize("resize skip");
             PMC_size(SELF) = n;
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF); /* XXX? */
             /* we could shrink here, but this would need a GC mark */
             return;
         }
@@ -779,7 +780,7 @@ Creates and returns a copy of the array.
 */
 
     VTABLE PMC *clone() :no_wb {
-#if 0   /* keep the slack and offset */
+        /* keep the slack and offset */
         PMC * const copy   = Parrot_pmc_new(INTERP, SELF->vtable->base_type);
         const INTVAL size  = PMC_size(SELF);
         const INTVAL tresh = PMC_threshold(SELF);
@@ -791,11 +792,6 @@ Creates and returns a copy of the array.
         }
         PMC_threshold(copy) = tresh;
         PMC_offset(copy)    = PMC_offset(SELF);
-#else   /* or compact the copy */
-        PMC * const copy = SUPER();
-        PMC_threshold(copy) = PMC_size(SELF);
-        PMC_offset(copy)    = 0;
-#endif
         return copy;
     }
 

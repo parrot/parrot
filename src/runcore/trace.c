@@ -100,7 +100,7 @@ debugger_or_interp(PARROT_INTERP)
 {
     ASSERT_ARGS(debugger_or_interp)
 
-    return interp->pdb && interp->pdb->debugger
+    return interp && interp->pdb && interp->pdb->debugger
             ? interp->pdb->debugger
             : interp;
 }
