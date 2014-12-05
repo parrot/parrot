@@ -544,7 +544,7 @@ Delete the element at index C<key> and shift the rest to the left.
         if (0 == key) {
             data->offset++;
             TRACE_RPAdata("delete fast", data);
-            TRACE_PMC(0, data->pmc_array[0]);
+            TRACE_PMC(key, data->pmc_array[0]);
         }
         else {
             PMC ** const off = &data->pmc_array[key + data->offset];
