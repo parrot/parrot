@@ -4,7 +4,8 @@ perl:
     - "5.14"
 install: "echo"
 before_script:
-    - sudo apt-get install libffi-dev libicu-dev libgmp3-dev clang llvm-dev zlib1g-dev gcc-multilib
+    - sudo apt-get update
+    - sudo apt-get install libffi-dev libicu-dev libgmp3-dev clang zlib1g-dev
     # No, we are not going to run the tests for all these dependencies on every commit
     - cpanm -n LWP::UserAgent TAP::Harness::Archive TAP::Harness::ReportByDescription Test::Perl::Critic
     - gcc --version

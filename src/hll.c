@@ -77,15 +77,13 @@ new_hll_entry(PARROT_INTERP, ARGIN(STRING *entry_name))
     ASSERT_ARGS(new_hll_entry)
     PMC * const hll_info = interp->HLL_info;
     const INTVAL id      = VTABLE_elements(interp, hll_info);
-
     PMC *entry_id;
 
     PMC * const entry = Parrot_pmc_new_init_int(interp,
             enum_class_FixedPMCArray, e_HLL_MAX);
 
-    if (entry_name && !STRING_IS_EMPTY(entry_name)) {
+    if (entry_name && !STRING_IS_EMPTY(entry_name))
         VTABLE_set_pmc_keyed_str(interp, hll_info, entry_name, entry);
-    }
     else
         VTABLE_push_pmc(interp, hll_info, entry);
 
@@ -93,7 +91,6 @@ new_hll_entry(PARROT_INTERP, ARGIN(STRING *entry_name))
     VTABLE_set_pmc_keyed_int(interp, entry, e_HLL_id, entry_id);
 
     VTABLE_push_pmc(interp, interp->HLL_entries, entry);
-
     return entry;
 }
 

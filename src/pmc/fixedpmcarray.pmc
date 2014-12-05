@@ -131,8 +131,9 @@ Destroys the array.
 */
 
     VTABLE void destroy() :no_wb {
-        if (PMC_array(SELF))
-            mem_gc_free(INTERP, PMC_array(SELF));
+        PMC ** array = PMC_array(SELF);
+        if (LIKELY(array))
+            mem_gc_free(INTERP, array);
     }
 
 /*
@@ -205,7 +206,8 @@ Returns the number of elements in the array.
 
 =item C<FLOATVAL get_number()>
 
-Returns the number of elements in the array.
+Returns the number of elements in the array, as FLOATVAL.
+You rather want to use C<elements()> instead.
 
 =cut
 
@@ -244,12 +246,9 @@ TT #1229: implement freeze/thaw and use that instead.
             PMC * const val = SELF.get_pmc_keyed_int(i);
             if (i > 0)
                 res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, ", "));
-
             res = Parrot_str_concat(INTERP, res, VTABLE_get_repr(INTERP, val));
         }
-
         res = Parrot_str_concat(INTERP, res, CONST_STRING(INTERP, ")"));
-
         return res;
     }
 
@@ -423,12 +422,11 @@ array.
             return;
         if (size < 0)
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
-                                        "illegal argument");
+                    "illegal argument");
 
         PMC_size(SELF) = size;
         data           = mem_gc_allocate_n_typed(INTERP, size, PMC *);
-
-        for (i = 0; i < size; ++i)
+        for (i = 0; i < size; ++i) /* TODO: zero */
             data[i] = PMCNULL;
 
         PObj_custom_mark_destroy_SETALL(SELF);
@@ -575,9 +573,9 @@ Sets the PMC value of the element at index C<key> to C<*src>.
         INTVAL    size;
         GET_ATTR_size(INTERP, SELF, size);
 
-        if (key < 0)
+        if (UNLIKELY(key < 0))
             key += size;
-        if (key < 0 || key >= size)
+        if (UNLIKELY(key < 0 || key >= size))
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "index out of bounds");
 
@@ -674,13 +672,15 @@ Return a new iterator for SELF.
 =item C<INTVAL exists_keyed_int(PMC *key)>
 
 Returns TRUE is the element at C<key> exists; otherwise returns false.
+Unlike with ResizablePMCArray, and invalid index throws an out of bounds
+exception.
 
 =cut
 
 */
     VTABLE INTVAL exists_keyed_int(INTVAL key) :no_wb {
         PMC **data;
-        if (key < 0 || key >= PMC_size(SELF))
+        if (UNLIKELY(key < 0 || key >= PMC_size(SELF)))
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                 "index out of bounds");
 
@@ -702,8 +702,8 @@ Replaces C<count> elements starting at C<offset> with the elements in C<value>.
 If C<count> is 0 then the elements in C<value> will be inserted after
 C<offset>.
 
-This throws an exception if any of the spliced in values are out of the range
-of this array.
+This throws an out of bounds exception if any of the spliced in values are
+out of the range of this array.
 
 =cut
 
@@ -712,12 +712,12 @@ of this array.
     VTABLE void splice(PMC *value, INTVAL offset, INTVAL count) :manual_wb {
         const INTVAL elems0 = VTABLE_elements(INTERP, SELF);
         /* start from end? */
-        if (offset < 0)
+        if (UNLIKELY(offset < 0))
             offset += elems0;
-        if (count < 0)
+        if (UNLIKELY(count < 0))
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "illegal argument");
-        if (offset < 0 || count + offset > PMC_size(SELF))
+        if (UNLIKELY(offset < 0 || count + offset > PMC_size(SELF)))
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "index out of bounds");
         /* TODO: use faster memmove as in ResizablePMCArray */
@@ -755,7 +755,6 @@ Used to unarchive the array.
         for (i = 0; i < n; ++i, ++pos) {
             VISIT_PMC(INTERP, info, *pos);
         }
-
         SUPER(info);
     }
 
@@ -773,6 +772,9 @@ Used to unarchive the array.
 
 Returns TRUE is the element at C<key> is defined; otherwise returns false.
 
+Unlike with ResizablePMCArray, and invalid index throws an out of bounds
+exception.
+
 =cut
 
 */
@@ -782,7 +784,6 @@ Returns TRUE is the element at C<key> is defined; otherwise returns false.
 
         if (PMC_IS_NULL(val))
             return 0;
-
         return VTABLE_defined(INTERP, val);
     }
 
@@ -798,7 +799,7 @@ Mark the array.
 
     VTABLE void mark() :no_wb {
         PMC ** const data = PMC_array(SELF);
-        if (data) {
+        if (LIKELY(data)) {
             INTVAL i;
             for (i = PMC_size(SELF) - 1; i >= 0; --i)
                 Parrot_gc_mark_PMC_alive(INTERP, data[i]);

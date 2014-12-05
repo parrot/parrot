@@ -158,6 +158,7 @@ create_buffer(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGMOD(PMC *info))
 {
     ASSERT_ARGS(create_buffer)
 
+    Parrot_ImageIOFreeze_attributes * const data = PARROT_IMAGEIOFREEZE(info);
     INTVAL  len;
 
     if (!PMC_IS_NULL(pmc)) {
@@ -167,18 +168,15 @@ create_buffer(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc), ARGMOD(PMC *info))
 
         if (VTABLE_does(interp, pmc, array) || VTABLE_does(interp, pmc, hash))
             items += VTABLE_elements(interp, pmc);
-
         len = items * FREEZE_BYTES_PER_ITEM;
     }
     else
         len = FREEZE_BYTES_PER_ITEM;
 
-    PARROT_IMAGEIOFREEZE(info)->buffer =
-        Parrot_gc_new_bufferlike_header(interp, sizeof (Parrot_Buffer));
-    Parrot_gc_allocate_buffer_storage_aligned(interp,
-        PARROT_IMAGEIOFREEZE(info)->buffer, len);
+    data->buffer = Parrot_gc_new_bufferlike_header(interp, sizeof (Parrot_Buffer));
+    Parrot_gc_allocate_buffer_storage_aligned(interp, data->buffer, len);
     SET_VISIT_CURSOR(info,
-        (const char *)Buffer_bufstart(PARROT_IMAGEIOFREEZE(info)->buffer));
+        (const char *)Buffer_bufstart(data->buffer));
 }
 
 /*
@@ -198,14 +196,15 @@ ensure_buffer_size(PARROT_INTERP, ARGIN(PMC *io), size_t len)
 {
     ASSERT_ARGS(ensure_buffer_size)
 
-    Parrot_Buffer * const buf  = PARROT_IMAGEIOFREEZE(io)->buffer;
-    const size_t used   = PARROT_IMAGEIOFREEZE(io)->pos;
+    Parrot_ImageIOFreeze_attributes * const data = PARROT_IMAGEIOFREEZE(io);
+    Parrot_Buffer * const buf  = data->buffer;
+    const size_t used   = data->pos;
     const int need_free = Buffer_buflen(buf) - used - len;
 
-    /* grow by factor 1.5 or such */
+    /* grow by factor 1.5. the golden ratio 1.61803 would ideal */
     if (need_free <= 16) {
-        size_t new_size = (size_t) (Buffer_buflen(buf) * 1.5);
-
+        size_t new_size = Buffer_buflen(buf);
+        new_size += new_size/2;
         if (new_size < Buffer_buflen(buf) - need_free + 512)
             new_size = Buffer_buflen(buf) - need_free + 512;
 
@@ -247,7 +246,7 @@ pmclass ImageIOFreeze auto_attrs {
     ATTR size_t               pos;         /* current read/write buf position */
     ATTR PMC                 *seen;        /* seen hash */
     ATTR PMC                 *todo;        /* todo list */
-    ATTR UINTVAL              id;          /* freze ID of PMC */
+    ATTR UINTVAL              id;          /* freeze ID of PMC */
     ATTR struct PackFile     *pf;
     ATTR PackFile_ConstTable *pf_ct;
 
@@ -273,15 +272,12 @@ Initializes the PMC.
 
 */
     VTABLE void init() {
+        Parrot_ImageIOFreeze_attributes * const data = PARROT_IMAGEIOFREEZE(SELF);
         PObj_custom_mark_SET(SELF);
 
-        PARROT_IMAGEIOFREEZE(SELF)->seen = Parrot_pmc_new(INTERP, enum_class_Hash);
-        VTABLE_set_pointer(INTERP, PARROT_IMAGEIOFREEZE(SELF)->seen,
-            Parrot_hash_new_intval_hash(INTERP));
-
-        PARROT_IMAGEIOFREEZE(SELF)->todo =
-            Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-
+        data->seen = Parrot_pmc_new(INTERP, enum_class_Hash);
+        VTABLE_set_pointer(INTERP, data->seen, Parrot_hash_new_intval_hash(INTERP));
+        data->todo = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
         PObj_flag_CLEAR(private1, SELF);
     }
 
@@ -296,8 +292,9 @@ Destroys the PMC.
 
 */
     VTABLE void destroy() :no_wb {
-        PackFile_destroy(INTERP, PARROT_IMAGEIOFREEZE(SELF)->pf);
-        PARROT_IMAGEIOFREEZE(SELF)->pf = NULL;
+        Parrot_ImageIOFreeze_attributes * const data = PARROT_IMAGEIOFREEZE(SELF);
+        PackFile_destroy(INTERP, data->pf);
+        data->pf = NULL;
     }
 
 
@@ -311,11 +308,12 @@ Marks the PMC as alive.
 
 */
     VTABLE void mark() :no_wb {
-        PObj * const buffer = (PObj *)(PARROT_IMAGEIOFREEZE(SELF)->buffer);
+        Parrot_ImageIOFreeze_attributes * const data = PARROT_IMAGEIOFREEZE(SELF);
+        PObj * const buffer = (PObj *)(data->buffer);
         if (buffer)
             Parrot_gc_mark_PObj_alive(INTERP, buffer);
-        Parrot_gc_mark_PMC_alive(INTERP, PARROT_IMAGEIOFREEZE(SELF)->todo);
-        Parrot_gc_mark_PMC_alive(INTERP, PARROT_IMAGEIOFREEZE(SELF)->seen);
+        Parrot_gc_mark_PMC_alive(INTERP, data->todo);
+        Parrot_gc_mark_PMC_alive(INTERP, data->seen);
     }
 
 
@@ -330,9 +328,8 @@ Returns the content of the image as a string.
 */
 
     VTABLE STRING *get_string() :no_wb {
-        return Parrot_str_new_from_buffer(INTERP,
-                                          PARROT_IMAGEIOFREEZE(SELF)->buffer,
-                                          PARROT_IMAGEIOFREEZE(SELF)->pos);
+        Parrot_ImageIOFreeze_attributes * const data = PARROT_IMAGEIOFREEZE(SELF);
+        return Parrot_str_new_from_buffer(INTERP, data->buffer, data->pos);
     }
 
 /*
@@ -458,6 +455,7 @@ hasn't been seen yet, it is also pushed onto the todo list.
 
     VTABLE void push_pmc(PMC *v) :manual_wb {
         UINTVAL id;
+        Parrot_ImageIOFreeze_attributes * const data = PARROT_IMAGEIOFREEZE(SELF);
 
         if (PMC_IS_NULL(v))
             SELF.push_integer(PackID_new(0, enum_PackID_seen));
@@ -465,11 +463,9 @@ hasn't been seen yet, it is also pushed onto the todo list.
             SELF.push_integer(PackID_new(id, enum_PackID_seen));
         else {
             INTVAL constno, idx;
-            PackFile_ConstTable * const table = PARROT_IMAGEIOFREEZE(SELF)->pf_ct;
-            Hash * const seen = (Hash *)VTABLE_get_pointer(INTERP,
-                                                    PARROT_IMAGEIOFREEZE(SELF)->seen);
-
-            id = ++PARROT_IMAGEIOFREEZE(SELF)->id;
+            PackFile_ConstTable * const table = data->pf_ct;
+            Hash * const seen = (Hash *)VTABLE_get_pointer(INTERP, data->seen);
+            id = ++data->id;
 
             if (PObj_flag_TEST(private1, SELF)
             &&  PackFile_ConstTable_rlookup_pmc(INTERP, table, v, &constno, &idx)) {
@@ -483,7 +479,7 @@ hasn't been seen yet, it is also pushed onto the todo list.
                                     : v->vtable->base_type;
                 SELF.push_integer(PackID_new(id, enum_PackID_normal));
                 SELF.push_integer(base_type);
-                VTABLE_push_pmc(INTERP, PARROT_IMAGEIOFREEZE(SELF)->todo, v);
+                VTABLE_push_pmc(INTERP, data->todo, v);
                 PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             }
 
@@ -509,28 +505,29 @@ Sets the constant table of this ImageIO PMC.
 
 
     VTABLE void set_pmc(PMC *p) :manual_wb {
+        Parrot_ImageIOFreeze_attributes * const data = PARROT_IMAGEIOFREEZE(SELF);
         create_buffer(INTERP, p, SELF);
 
         if (PObj_flag_TEST(private1, SELF)) {
-            PARROT_IMAGEIOFREEZE(SELF)->pf = PARROT_IMAGEIOFREEZE(SELF)->pf_ct->base.pf;
+            data->pf = data->pf_ct->base.pf;
         }
         else {
             const UINTVAL header_length =
                 GROW_TO_16_BYTE_BOUNDARY(PACKFILE_HEADER_BYTES);
 
-            PARROT_IMAGEIOFREEZE(SELF)->pf = PackFile_new(INTERP, 0);
+            data->pf = PackFile_new(INTERP, 0);
             PObj_custom_destroy_SET(SELF);
 
             ensure_buffer_size(INTERP, SELF, header_length);
             memcpy(GET_VISIT_CURSOR(SELF),
-                PARROT_IMAGEIOFREEZE(SELF)->pf->header, PACKFILE_HEADER_BYTES);
+                data->pf->header, PACKFILE_HEADER_BYTES);
             INC_VISIT_CURSOR(SELF, header_length);
         }
 
         STATICSELF.push_pmc(p);
 
         {
-            PMC * const todo = PARROT_IMAGEIOFREEZE(SELF)->todo;
+            PMC * const todo = data->todo;
             while (VTABLE_elements(INTERP, todo)) {
                 PMC * const current = VTABLE_shift_pmc(INTERP, todo);
                 VTABLE_freeze(INTERP, current, SELF);

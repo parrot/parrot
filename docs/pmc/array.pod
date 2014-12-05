@@ -1,19 +1,19 @@
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 =pod
 
 =head1 NAME
 
-docs/pmc/array.pod - Array base class.
+docs/pmc/array.pod - Virtual base class Array
 
 =head1 SYNOPSIS
 
 =begin PIR_FRAGMENT
 
-  new $P0, 'Array'    # initialize P0 as an array
+  new $P0, 'ResizablePMCArray' # initialize P0 as an resizable array for PMC items
 
-  set $I0, $P0        # set I0 to the size of the array in P0
-  set $P0, 2          # set the size of the array in P0 to 2
+  $P0 = 2             # set the size of the array in P0 to 2
+  $I0 = $P0           # get the size of the array in P0 into I0
 
   set $P0[0], "foo "  # put "foo" into the array at position 0
   set $I1, $P0[1]     # get an integer value from the entry 
@@ -26,9 +26,10 @@ docs/pmc/array.pod - Array base class.
 
 =head1 DESCRIPTION
 
-This pod file documents the Array base class usage. For implementation details
-you should look inside the class file, found at F<src/pmc/array.pmc> in the
-parrot source code.
+This pod file documents the virtual base Array base class usage. For
+implementation details you should look inside the class files, found
+at F<src/pmc/{Fixed,Resizable}{PMC,Integer,Float,String,Boolean}Array.pmc> in
+the parrot source code.
 
 =head2 Creation
 
@@ -37,9 +38,12 @@ C<P0>:
 
 =begin PIR_FRAGMENT
 
-  new $P0, 'Array'
+  $S0 = 'ResizablePMCArray' # or any other array type
+  new $P0, $S0
 
 =end PIR_FRAGMENT
+
+The virtual 'Array' class itself cannot be instantiated.
 
 =head2 Array sizes
 
@@ -48,51 +52,57 @@ You can retrieve the size of the array using
 =begin PIR_FRAGMENT
 
   set $I0, $P0
+  # or
+  $I0 = $P0
 
 =end PIR_FRAGMENT
 
 This will put the size of the array in register C<P0> into C<I0>. In the same
-way, assigning an integer directly to the array sets the size of the  array.
+way, assigning an integer directly to the array sets the size of the array.
 For instance:
 
 =begin PIR_FRAGMENT
 
-  new $P0, 'Array'
+  new $P0, 'FixedPMCArray'
   set $P0, 2
+
+  # or faster
+
+  new $P0, 'FixedPMCArray', 2
 
 =end PIR_FRAGMENT
 
-creates a new Array (with default size 0) and then expands the size of the 
-array to two.
+creates a new fixed size array for PMCs (with default size 0) and then
+expands the size of the array to two, or with the second integer argument
+initializes the size immediately.
 
-Arrays do not automatically resize themselves when you access out-of-bounds
-elements. This means that you must remember to size an Array appropriately
-before storing anything in it.
+Fixed arrays do not automatically resize themselves when you access
+out-of-bounds elements. This means that you must remember to size a
+fixed array appropriately before storing anything in it, or use a
+resiable array instead.
 
 =head2 Accessing elements
 
 Elements are accessed using indexes, as in any programming language.
 
-The following code initializes an array in C<P0> with size two, and sets the
-first position to the integer C<-8> and second position to the floating point
-number C<3.1415>.
+The following code initializes an array in C<P0> with size two, and
+sets the first position to the integer C<-8> and second position to
+the floating point number C<3.1415>.
 
 =begin PIR_FRAGMENT
 
-  new $P0, 'Array'
-  set $P0, 2
+  new $P0, 'FixedPMCArray', 2
 
   set $P0[0], -8
   set $P0[1], 3.1415
 
 =end PIR_FRAGMENT
 
-You can also assign directly from registers; for instance:
+You can also assign indirectly via registers; for instance:
 
 =begin PIR_FRAGMENT
 
-  new $P0, 'Array'
-  set $P0, 2
+  new $P0, 'FixedPMCArray', 2
 
   set $I0, -8
   set $N0, 3.1415
@@ -125,7 +135,7 @@ assigning a new value:
 =end PIR_FRAGMENT
 
 Accessing an out-of-bounds array element raises an exception; if you want an
-Array that will automatically resize, then use a C<ResizablePMCArray>.
+array that will automatically resize use a B<resizable array>.
 
 You can test if there is a defined element at an array position by using
 
@@ -145,9 +155,25 @@ the C<exists> op instead:
 
 =end PIR_FRAGMENT
 
-=head1 TODO
+With exists you are safe to check even out of bounds indices.
 
-Explain a little more which exception will be raised in case you access a
-out-of-bounds index on the array (as soon we have exceptions).
+=head2 Resizable vs Fixed
+
+There exist two array types, B<Resizable> and B<Fixed> size for all
+base types: PMC, Integer, String, Float and Boolean.  With resizable
+arrays you can explicitly or implicitly grow an array by setting a
+value at an index C<< >= >> size, but not with fixed arrays.
+
+All methods throw an out of bounds exception on invalid
+index or size arguments, just not on C<exists>.
+
+Using negative indices is supported to count the index from the back.
+E.g index C<-1> accesses the last element of an array.
+
+Common non-vtable array methods are sort and reverse, which are
+destructive. They do not return a copy.
+
+Resizable arrays additionally support the shift, unshift, push, pull
+methods.
 
 =cut

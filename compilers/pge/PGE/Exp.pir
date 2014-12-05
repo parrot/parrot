@@ -328,9 +328,18 @@ tree as a PIR code object that can be compiled.
     push captsave, 'captscope['
         push captsave, cname
         push captsave, "] = captob\n"
+    # TODO GH #1154 check for invalid cname index
+    push captback, '$I5 = exists captscope['
+        push captback, cname
+        push captback, "]\n"
+    push captback, 'unless $I5, '
+        push captback, label
+        push captback, "_nodel\n"
     push captback, 'delete captscope['
         push captback, cname
         push captback, "]\n"
+    push captback, label
+        push captback, "_nodel:\n"
     goto end
   capt_array:
     push captsave, '$P2 = captscope['

@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -10,7 +10,7 @@ use Parrot::Test tests => 25;
 
 =head1 NAME
 
-t/pmc/freeze.t - Archiving
+t/pmc/freeze.t - Archiving code
 
 =head1 SYNOPSIS
 
@@ -508,8 +508,7 @@ pir_output_is( <<'CODE', <<'OUTPUT', "thaw class w attr same interp" );
     addattribute $P10, ".aa"
     addattribute $P10, ".bb"
     $S10 = $P10
-    print $S10
-    print "\n"
+    say $S10
 
     $S3 = freeze $P10
     $P0 = new ['FileHandle']
@@ -809,7 +808,7 @@ ResizablePMCArray
 three.14
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a Conure" );
+pir_output_is( <<'CODE', <<'OUTPUT', "freeze/thaw a custom class" );
 .sub main :main
     .local pmc cl, o
     cl = newclass 'Conure'

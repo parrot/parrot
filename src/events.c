@@ -21,7 +21,6 @@ to the appropriate handler asynchronously.
 #include "parrot/events.h"
 
 #include "events.str"
-#include "pmc/pmc_arrayiterator.h"
 #include "pmc/pmc_exception.h"
 
 
@@ -49,7 +48,6 @@ Parrot_cx_add_handler_local(PARROT_INTERP, ARGIN(PMC *handler))
                                 Parrot_pmc_new(interp, enum_class_ResizablePMCArray));
 
     VTABLE_unshift_pmc(interp, Parrot_pcc_get_handlers(interp, interp->ctx), handler);
-
 }
 
 /*

@@ -570,7 +570,6 @@ CODE
 Done!
 OUTPUT
 
-
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_get_pmc_keyed_int");
     pmc2 = Parrot_PMC_get_pmc_keyed_int(interp, rpa, 0);
 CODE
@@ -578,6 +577,7 @@ Done!
 OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_delete_keyed_int");
+    Parrot_PMC_push_pmc(interp, rpa, pmc);
     Parrot_PMC_delete_keyed_int(interp, rpa, 0);
 CODE
 Done!
@@ -591,8 +591,6 @@ CODE
 Done!
 OUTPUT
 
-
-
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_exists_keyed_str");
     string = createstring(interp,"foo");
     integer = Parrot_PMC_exists_keyed_str(interp, hash, string);
@@ -603,9 +601,11 @@ Done!
 OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_delete_keyed");
+    Parrot_PMC_push_pmc(interp, rpa, pmc);
     Parrot_PMC_delete_keyed(interp, rpa, key_int);
 CODE
-Done!
+Failed!
+Exception is: type 33 severity 2 message 'delete: index out of bounds'
 OUTPUT
 
 extend_vtable_output_is(<<'CODE', <<'OUTPUT', "Parrot_PMC_exists_keyed");

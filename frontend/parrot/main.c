@@ -488,6 +488,8 @@ help_debug(void)
 #ifdef MEMORY_DEBUG
     "    0100    GC traces\n"
     "    0200    every single alloc/free\n"
+#else
+    "    (more with --ccflags=-DMEMORY_DEBUG)\n"
 #endif
     "\n"
     "--trace -t [Flags] ...\n"
@@ -497,7 +499,8 @@ help_debug(void)
     printf(
     "    0004    function calls\n"
     "    0008    coro states\n"
-    "    0010    pmc flags\n");
+    "    0010    pmc flags\n"
+    "    0020    array states\n");
 #else
     printf(
     "    0010    pmc flags\n"

@@ -64,15 +64,6 @@ module ResizablePMCArray {
         @grepped;
     }
 
-    =begin item reverse
-    Return a reversed copy of the invocant.
-    =end item
-
-    method reverse () {
-        my @reversed;
-        for self { @reversed.unshift($_); }
-        @reversed;
-    }
 }
 
 
