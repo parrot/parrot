@@ -34,9 +34,9 @@ my %platforms = map { $_ => 1 } qw/
     /;
 
 if ( $platforms{$^O} ) {
-    plan tests => 6;
-    $ENV{DYLD_LIBRARY_PATH} = "" if $^O eq 'darwin';
-    #plan skip_all => 'Instable signal tests currently disabled';
+    #plan tests => 6;
+    #$ENV{DYLD_LIBRARY_PATH} = "" if $^O eq 'darwin';
+    plan skip_all => 'signal tests too instable in parallel, run it alone';
 }
 else {
     plan skip_all => 'Missing portable getpid and kill';

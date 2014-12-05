@@ -32,8 +32,6 @@
         + Fix most --floatval='long double' tests, just embed API broken #1111
         + Adjust tests for VALGRIND=valgrind #1150
         + Added tests to t/pmc/resizablepmcarray.t to cover all offset cases. #1152
-        + Re-enabled instable signals tests as TODO. signals do work fine,
-          just the tests not.
         + Replace included IO::CaptureOutput with our own capture function. #892
     - Community
 
