@@ -17,6 +17,7 @@
           but just warn on deprecated delete[0] with size 0 for backcompat. #1153
         + Add check for illegal delete of capture blocks in PGE.match #1154
         + Add new traceflag -t20 for ResizablePMCArray states.
+        + Add experimental vms support by mvorl. Untested. GH #866
     - Build
         + Extend auto::infnan probe to other --floatval #1146
         + Warn in Configure on experimental flags intval, floatval and gc #1148
@@ -64,7 +65,6 @@
         + Fix self heuristic with vtable overridden method calls.
           $P0($P0) instead of $P0() is now invalid, it is always a method.
           https://trac.parrot.org/parrot/ticket/103 #1013
-        + Add vms support by mvorl. GH #866
     - Build
         + Set -mabi=64 for gcc --m=64 on mips, -m64 on powerpc #1110
         + Add --{en,dis}able-static #1104
