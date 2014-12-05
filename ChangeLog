@@ -18,6 +18,7 @@
         + Add check for illegal delete of capture blocks in PGE.match #1154
         + Add new traceflag -t20 for ResizablePMCArray states.
         + Add experimental vms support by mvorl. Untested. GH #866
+        + Provide Parrot_new_string and Parrot_compile_string in the extend api
     - Build
         + Extend auto::infnan probe to other --floatval #1146
         + Warn in Configure on experimental flags intval, floatval and gc #1148
@@ -34,6 +35,7 @@
         + Adjust tests for VALGRIND=valgrind #1150
         + Added tests to t/pmc/resizablepmcarray.t to cover all offset cases. #1152
         + Replace included IO::CaptureOutput with our own capture function. #892
+        + Fixed most embed and extend tests. #41511 #829
     - Community
 
 2014-11-18    release 6.10.0
