@@ -23,6 +23,7 @@ members, beside setting C<bufstart>/C<buflen> for external strings.
 */
 
 #include <stdio.h>
+#include <math.h>
 
 #include "parrot/parrot.h"
 #include "parrot/events.h"
@@ -2145,7 +2146,7 @@ Parrot_str_to_num(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
             return PARROT_FLOATVAL_INF_NEGATIVE;
     }
 
-#ifdef PARROT_HAS_POWL
+#if defined(PARROT_HAS_POWL) && !defined(__CYGWIN__)
 #  define POW powl
 #else
 #  define POW pow
