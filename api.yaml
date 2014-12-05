@@ -674,3 +674,12 @@
     - deprecated
   ticket:  'https://github.com/parrot/parrot/issues/1101'
 -
+-
+  name:  'ResizablePMCArray.delete[0] on empty array'
+  note:
+    This NOP was previously silently ignored. Throw now a warning, and when deprecated,
+    throw an out of bounds exception.
+  tags:
+    - deprecated
+  ticket:  'https://github.com/parrot/parrot/issues/1153'
+-

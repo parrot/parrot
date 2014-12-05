@@ -869,14 +869,16 @@ loop_end:
 
 .sub splice_tests
     .local pmc ar1, ar2
-    ar1 = new ['ResizablePMCArray']
-    ar1[0] = 1
-    ar1[1] = 2
-    ar1[2] = 3
-    ar1[3] = 4
-    ar1[4] = 5
+    ar1 = new ['ResizablePMCArray'], 6
+    ar1[0] = 0
+    ar1[1] = 1
+    ar1[2] = 2
+    ar1[3] = 3
+    ar1[4] = 4
+    ar1[5] = 5
+    shift $P0, ar1
 
-    ar2 = new ['ResizablePMCArray']
+    ar2 = new ['ResizablePMCArray'], 5
     ar2[0] = 'A'
     ar2[1] = 'B'
     ar2[2] = 'C'

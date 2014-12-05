@@ -237,7 +237,7 @@ Resizes the array to C<size> elements.
 
 */
 
-    VTABLE void set_integer_native(INTVAL n) {
+    VTABLE void set_integer_native(INTVAL n) :manual_wb {
         INTVAL   size      = PMC_size(SELF);
         INTVAL   offset    = PMC_offset(SELF);
         INTVAL   threshold = PMC_threshold(SELF); /* i.e. allocated size */
@@ -259,6 +259,7 @@ Resizes the array to C<size> elements.
                 PMC_threshold(SELF) = n;
             }
             TRACE_RPAsize("resize init");
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
         else if (n == size) {
             return;
@@ -266,7 +267,7 @@ Resizes the array to C<size> elements.
         else if (n <= threshold - offset) {
             TRACE_RPAsize("resize skip");
             PMC_size(SELF) = n;
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF); /* XXX? */
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF); /* needed? */
             /* we could shrink here, but this would need a GC mark */
             return;
         }
@@ -294,6 +295,7 @@ Resizes the array to C<size> elements.
                 TRACE_RPAsize("resize off empty");
             }
             PMC_size(SELF) = n;
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
         else {
             INTVAL old;
@@ -328,6 +330,7 @@ Resizes the array to C<size> elements.
                 TRACE_RPAsize("resize fast realloc");
             }
 #endif
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
     }
 
@@ -528,7 +531,7 @@ Delete the element at index C<key> and shift the rest to the left.
         if (!data->size && !key) {
             TRACE_RPAdata("delete oob", data);
             Parrot_warn(interp, PARROT_WARNINGS_UNDEF_FLAG,
-                        "invalid delete argument ignored");
+                        "invalid delete argument ignored (deprecated)");
             return;
         }
         if (UNLIKELY(key < 0 || key >= data->size)) {
@@ -728,22 +731,22 @@ the array.
 
 */
 
-    VTABLE void unshift_float(FLOATVAL value) {
+    VTABLE void unshift_float(FLOATVAL value) :manual_wb {
         PMC * const val = Parrot_pmc_new(INTERP, enum_class_Float);
         VTABLE_set_number_native(INTERP, val, value);
         do_unshift(INTERP, SELF, val);
     }
 
-    VTABLE void unshift_integer(INTVAL value) {
+    VTABLE void unshift_integer(INTVAL value) :manual_wb {
         PMC * const val = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, value);
         do_unshift(INTERP, SELF, val);
     }
 
-    VTABLE void unshift_pmc(PMC *value) {
+    VTABLE void unshift_pmc(PMC *value) :manual_wb {
         do_unshift(INTERP, SELF, value);
     }
 
-    VTABLE void unshift_string(STRING *value) {
+    VTABLE void unshift_string(STRING *value) :manual_wb {
         PMC * const val = Parrot_pmc_new(INTERP, enum_class_String);
         VTABLE_set_string_native(INTERP, val, value);
         do_unshift(INTERP, SELF, val);
