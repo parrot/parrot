@@ -121,7 +121,8 @@ END_DUMMY
     open my $IN, '>', $dummy or croak "Unable to open temp file for writing";
     if ($^O eq 'MSWin32') {
         print $IN q{This c:\path\to\some\file ends in a backslash \\}, "\n";
-    } else {
+    }
+    else {
         print $IN q{This /path/to/some/file ends in a backslash \\}, "\n";
     }
     close $IN or croak "Unable to close temp file";

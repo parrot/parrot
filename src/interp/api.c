@@ -152,7 +152,7 @@ Parrot_interp_make_interpreter(ARGIN_NULLOK(Interp *parent), INTVAL flags)
     ASSERT_ARGS(Parrot_interp_make_interpreter)
     int stacktop;
     Parrot_GC_Init_Args args;
-    Interp * const interp = Parrot_interp_allocate_interpreter(parent, flags);
+    Parrot_Interp const interp = Parrot_interp_allocate_interpreter(parent, flags);
     memset(&args, 0, sizeof (args));
     args.stacktop = &stacktop;
     Parrot_interp_initialize_interpreter(interp, &args);
@@ -450,13 +450,14 @@ Parrot_interp_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg)
 
     /*
      * now all objects that need timely destruction should be finalized
-     * so terminate the event loop
+     * so terminate the event loop.
      */
-  /*  if (!interp->parent_interpreter) {
+#if 0
+    if (!interp->parent_interpreter) {
         PIO_internal_shutdown(interp);
         Parrot_kill_event_loop(interp);
     }
-  */
+#endif
 
     /* we destroy all child interpreters and the last one too,
      * if the --leak-test commandline was given, and there is no

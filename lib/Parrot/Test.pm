@@ -1009,6 +1009,7 @@ sub _generate_test_functions {
 
             # $test_no will be part of temporary files
             my $test_no = $builder->current_test() + 1;
+            my $verbose = $ENV{TEST_VERBOSE} ? $ENV{TEST_VERBOSE} : 0;
 
             convert_line_endings($expected);
 
@@ -1039,8 +1040,7 @@ sub _generate_test_functions {
                 );
                 $builder->diag("'$cmd' failed with exit code $exit_code")
                     if $exit_code;
-                $builder->diag($cmd)
-                    if $ENV{TEST_VERBOSE} and $ENV{TEST_VERBOSE} > 1;
+                $builder->diag( $cmd."\n" ) if $verbose > 1;
 
                 if ( !-e $obj_f ) {
                     $builder->diag( "Failed to build '$obj_f': " . slurp_file($build_f) );
@@ -1073,8 +1073,7 @@ sub _generate_test_functions {
                 );
                 $builder->diag("'$cmd' failed with exit code $exit_code")
                     if $exit_code;
-                $builder->diag($cmd)
-                    if $ENV{TEST_VERBOSE} and $ENV{TEST_VERBOSE} > 1;
+                $builder->diag( $cmd."\n" ) if $verbose > 1;
 
                 if ( !-e $exe_f ) {
                     $builder->diag( "Failed to build '$exe_f': " . slurp_file($build_f) );

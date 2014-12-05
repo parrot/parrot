@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -25,7 +25,7 @@ t/src/embed.t - Embedding parrot
 
 =head1 DESCRIPTION
 
-Embedding parrot in C
+Test the embed API from C
 
 =cut
 
@@ -44,8 +44,6 @@ my $common = linedirective(__LINE__) . <<'CODE';
 #include <string.h>
 #include "parrot/parrot.h"
 #include "parrot/extend.h"
-#include "parrot/extend_vtable.h"
-#include "imcc/api.h"
 
 static void fail(const char *msg);
 static Parrot_String createstring(Parrot_Interp interp, const char * value);

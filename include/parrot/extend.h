@@ -1,5 +1,5 @@
 /* extend.h
- *  Copyright (C) 2001-2008, Parrot Foundation.
+ *  Copyright (C) 2001-2014, Parrot Foundation.
  *  Overview:
  *     This is the Parrot extension mechanism, the face we present to
  *     extension modules and whatnot
@@ -38,8 +38,22 @@ typedef const void * Parrot_Const_CharType;
 
 #include "parrot/extend_vtable.h" /* the auto-generated prototypes    */
 
+/* Backcompat versions for old embed API functions, not yet deprecated */
+#define Parrot_new_string(interp, buf, len, encoding, flags) \
+    Parrot_str_new_init((interp), (buf), (len), (encoding), (flags))
+
 /* HEADERIZER BEGIN: src/extend.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
+
+PARROT_EXPORT
+Parrot_PMC Parrot_compile_string(PARROT_INTERP,
+    Parrot_String type,
+    ARGIN(const char *code),
+    ARGOUT(Parrot_String *error))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*error);
 
 PARROT_EXPORT
 void Parrot_ext_call(PARROT_INTERP,
@@ -65,6 +79,10 @@ Parrot_Int Parrot_PMC_typenum(PARROT_INTERP,
     ARGIN_NULLOK(const char *_class))
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_Parrot_compile_string __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(code) \
+    , PARROT_ASSERT_ARG(error))
 #define ASSERT_ARGS_Parrot_ext_call __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sub_pmc) \
