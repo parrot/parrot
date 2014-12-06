@@ -42,6 +42,7 @@ sub runstep {
 sub _probe {
     my $conf = shift;
     my $probe = shift;
+    my $res;
     $conf->cc_gen('config/auto/mathl/test_c.in');
     if ($probe) { # single probes
         $conf->debug(" probe: $probe ");
@@ -50,8 +51,14 @@ sub _probe {
     else { # default: probe all at once
         eval { $conf->cc_build( join(" ", map{"-D".uc$_} @probes) ); }
     }
-    my $res = $conf->cc_run() or $conf->debug("$!");
-    $conf->debug(" ($res) ");
+    if ($@) {
+        $conf->debug($@);
+        $res = "";
+    }
+    else {
+        $res = $conf->cc_run() or $conf->debug("$!");
+        $conf->debug(" ($res) ");
+    }
     $conf->cc_clean();
     return $res;
 }
