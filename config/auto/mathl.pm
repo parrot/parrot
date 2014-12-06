@@ -86,7 +86,11 @@ sub _check {
                 $result++;
             }
         }
-        if ($result > 0) {
+        if ($result >= @probes - 2) {
+            $self->set_result('most');
+            return 1;
+        }
+        elsif ($result > 0) {
             $self->set_result('some');
             return 1;
         }
