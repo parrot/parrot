@@ -37,7 +37,9 @@ const string C_HEADER = <<:HEADER
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#ifndef _WIN32
+#ifdef _WIN32
+#  include <windows.h> /* for GetModuleFileName() */
+#else
 #  include <unistd.h> /* for readlink() */
 #endif
 #ifdef __APPLE__
