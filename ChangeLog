@@ -25,6 +25,7 @@
         + Die in Configure on unsupported intval sizes #1148, #642, ...
         + Renamed auto::labs to auto::mathl, probe and use more long math
           functions: fabsl powl ceill floorl fmodl expl logl #1111
+        + Fixed pbc_to_exe and wrong Parrot_{g,s,uns}etenv declarations on windows #1156
     - Documentation
         + Rewrote docs/pmc/array.pod
     - Tests

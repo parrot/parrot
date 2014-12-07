@@ -51,7 +51,7 @@ Parrot_get_entropy(PARROT_INTERP) {
         else
             PANIC(interp, msg);
     }
-    if (!CryptGenRandom(hCryptProv, sizeof (INTVAL), &entropy)) {
+    if (!CryptGenRandom(hCryptProv, sizeof (INTVAL), (BYTE*)&entropy)) {
         const char *msg = "Couldn't get entropy from crypt context";
         if (interp->gc_registry)
             Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_EXTERNAL_ERROR, msg);
