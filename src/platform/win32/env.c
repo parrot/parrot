@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2004-2008, Parrot Foundation.
+ * Copyright (C) 2004-2014, Parrot Foundation.
  */
 
 /*
@@ -38,7 +38,8 @@ whichever is more convenient.
 
 /*
 
-=item C<void Parrot_setenv(PARROT_INTERP, STRING *str_name, STRING *str_value)>
+=item C<void Parrot_setenv(PARROT_INTERP, const STRING *str_name, const STRING
+*str_value)>
 
 Sets the environment variable C<str_name> to the value C<str_value>. Creates the
 environment variable if it does not exist, and silently overwrite a variable if
@@ -49,7 +50,7 @@ it does exist.
 */
 
 void
-Parrot_setenv(PARROT_INTERP, STRING *str_name, STRING *str_value)
+Parrot_setenv(PARROT_INTERP, const STRING *str_name, const STRING *str_value)
 {
     char * const name  = Parrot_str_to_cstring(interp, str_name);
     char * const value = Parrot_str_to_cstring(interp, str_value);
@@ -92,7 +93,7 @@ Parrot_setenv(PARROT_INTERP, STRING *str_name, STRING *str_value)
 
 /*
 
-=item C<STRING * Parrot_getenv(PARROT_INTERP, STRING *str_name)>
+=item C<STRING * Parrot_getenv(PARROT_INTERP, const STRING *str_name)>
 
 Gets the environment variable C<str_name>, if it exists.
 
@@ -101,7 +102,7 @@ Gets the environment variable C<str_name>, if it exists.
 */
 
 STRING *
-Parrot_getenv(PARROT_INTERP, ARGIN(STRING *str_name))
+Parrot_getenv(PARROT_INTERP, const STRING *str_name)
 {
     char   * const name = Parrot_str_to_cstring(interp, str_name);
     const   DWORD size  = GetEnvironmentVariable(name, NULL, 0);
@@ -123,7 +124,7 @@ Parrot_getenv(PARROT_INTERP, ARGIN(STRING *str_name))
 
 /*
 
-=item C<void Parrot_unsetenv(PARROT_INTERP, STRING *name)>
+=item C<void Parrot_unsetenv(PARROT_INTERP, const STRING *str_name)>
 
 Deletes an environment variable by assigning an empty string to the specified variable.
 
@@ -132,13 +133,13 @@ Deletes an environment variable by assigning an empty string to the specified va
 */
 
 void
-Parrot_unsetenv(PARROT_INTERP, STRING *name)
+Parrot_unsetenv(PARROT_INTERP, const STRING *str_name)
 {
     /* You can remove a variable from the environment by specifying an empty
        string -- in other words, by specifying only varname=.
            -- _putenv, _wputenv (CRT) documentation
     */
-    Parrot_setenv(interp, name, Parrot_str_new(interp, "", 0));
+    Parrot_setenv(interp, str_name, Parrot_str_new(interp, "", 0));
 }
 
 /*
