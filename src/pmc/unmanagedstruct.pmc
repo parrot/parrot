@@ -9,6 +9,11 @@ src/pmc/unmanagedstruct.pmc - UnManagedStruct PMC
 
 PMC class to hold C C<struct>s that Parrot's not responsible for
 disposing of, C struct for unmanaged memory in NCI.
+They are typically used to access structures returned by NCI calls.
+Members of this struct are not subject to garbage collection
+during run-time.
+
+But if you can, rather use PtrBuf objects instead.
 
 Buffer can be accessed using keyed assignments to PMC. Out of
 bounds access will very likely segfault.
@@ -535,7 +540,7 @@ ret_pmc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(char *p), int type, INTVAL idx)
             PMC * const sig = Parrot_pmc_getprop(interp, ptr, signature_str);
             if (VTABLE_defined(interp, sig)) {
                 STRING * const sig_str = VTABLE_get_string(interp, sig);
-                ret             = Parrot_pmc_new(interp, enum_class_NCI);
+                ret = Parrot_pmc_new(interp, enum_class_NCI);
                 VTABLE_set_pointer_keyed_str(interp, ret, sig_str,
                             *(PMC **)p);
             }

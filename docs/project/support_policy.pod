@@ -79,9 +79,9 @@ a deprecation notification in the 2.0 release may be removed from any monthly
 developer release between 2.0 and the next supported release, though we're
 likely to stagger the removals.
 
-api.yaml is the definitive source of information about deprecations. If
+F<api.yaml> is the definitive source of information about deprecations. If
 conflicting information is presented on the wiki, in tickets or elsewhere,
-api.yaml should be considered correct.
+F<api.yaml> should be considered correct.
 
 =head2 Deprecation Notifications
 

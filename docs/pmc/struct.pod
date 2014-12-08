@@ -177,7 +177,7 @@ in this example:
   static struct {
       int (*f)(char *);
   } t = {
-       call_back
+      call_back
   };
   return &t;
 
