@@ -2040,8 +2040,9 @@ src/vtables$(O) : $(PARROT_H_HEADERS) src/vtables.c
 ## SUFFIX OVERRIDE
 src/gc/system$(O) : \
   $(PARROT_H_HEADERS) \
+  $(INC_DIR)/runcore_trace.h \
   src/gc/gc_private.h \
-  src/gc/system.c\
+  src/gc/system.c \
   src/gc/variable_size_pool.h
 	$(CC) $(CFLAGS) @optimize::src/gc/system.c@ @ccwarn::src/gc/system.c@ \
 	  -I$(@D)/. @cc_o_out@$@ -c src/gc/system.c

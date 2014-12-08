@@ -27,6 +27,9 @@ TT #273: This file needs to be cleaned up significantly.
 
 #include "parrot/parrot.h"
 #include "gc_private.h"
+#ifdef MEMORY_DEBUG
+#  include "parrot/runcore_trace.h"
+#endif
 
 /* HEADERIZER HFILE: src/gc/gc_private.h */
 
@@ -467,6 +470,14 @@ trace_mem_block(PARROT_INTERP,
                 ? mask & buffer_min
                 : 0;
 
+#if (GC_USE_PRECISE == 1) && defined(MEMORY_DEBUG)
+#  define GC_PRECISE_WARN(msg)                                          \
+    if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG | PARROT_GC_DETAIL_DEBUG_FLAG)) \
+        fprintf(stderr, "GC_USE_PRECISE: "msg, (void *)ptr, (void *)cur_var_ptr)
+#else
+#  define GC_PRECISE_WARN(msg)
+#endif
+
     for (cur_var_ptr = (size_t *)lo_var_ptr; (size_t)cur_var_ptr < hi_var_ptr; cur_var_ptr++) {
 
         /* FIXME yes, ptr may be uninitialized here. valgrind and asan complains. */
@@ -483,28 +494,23 @@ trace_mem_block(PARROT_INTERP,
             if ((pmc_min <= ptr)
             &&  (ptr < pmc_max)
             &&  interp->gc_sys->is_pmc_ptr(interp, (void *)ptr)) {
-#if GC_USE_PRECISE == 1
-                fprintf(stderr, "GC_USE_PRECISE: Found PMC %x at stack location %x\n", ptr, cur_var_ptr);
-#endif
+                GC_PRECISE_WARN("Found PMC %p at stack location %p\n");
                 Parrot_gc_mark_PMC_alive(interp, (PMC *)ptr);
             }
             else if ((buffer_min <= ptr) && (ptr < buffer_max)
             &&        interp->gc_sys->is_string_ptr(interp, (void *)ptr)) {
                 if (PObj_is_string_TEST((PObj *)ptr)) {
-#if GC_USE_PRECISE == 1
-                    fprintf(stderr, "GC_USE_PRECISE: Found STRING %x at stack location %x\n", ptr, cur_var_ptr);
-#endif
+                    GC_PRECISE_WARN("Found STRING %p at stack location %p\n");
                     Parrot_gc_mark_STRING_alive(interp, (STRING *)ptr);
                 }
                 else {
-#if GC_USE_PRECISE == 1
-                    fprintf(stderr, "GC_USE_PRECISE: Found random PObj (???) %x at stack location %x\n", ptr, cur_var_ptr);
-#endif
+                    GC_PRECISE_WARN("Found random unknown PObj %p at stack location %p\n");
                     PObj_live_SET((PObj *)ptr);
                 }
             }
         }
     }
+#undef GC_PRECISE_WARN
 
     return;
 }

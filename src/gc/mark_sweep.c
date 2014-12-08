@@ -271,7 +271,7 @@ mark_interp(PARROT_INTERP)
 
 #if GC_USE_PRECISE != 0
     {
-        gc_anchor_storage * gcas = interp->gc_anchor_storage;
+        gc_anchor_storage_t * gcas = interp->gc_anchor_storage;
         while(gcas) {
             const size_t num_p = gcas->num_p;
             const size_t num_s = gcas->num_s;

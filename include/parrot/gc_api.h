@@ -147,11 +147,11 @@ typedef enum {
                                                       mem_alloc to sweep dead strings */
                                                    /* garbage collect. */
 
-typedef struct __gc_anchor_storage {
-    struct __gc_anchor_storage *prev;
+typedef struct gc_anchor_storage_s {
+    struct gc_anchor_storage_s *prev;
     size_t num_p;
     size_t num_s;
-} gc_anchor_storage;
+} gc_anchor_storage_t;
 
 #if GC_USE_PRECISE != 0
 
@@ -159,8 +159,8 @@ typedef struct __gc_anchor_storage {
         const size_t __num_pmc_slots = ; \
         const size_t __num_str_slots = s; \
         const size_t __slot_storage_size = ((p) * sizeof (PMC *)) + ((s) * sizeof(STRING*)); \
-        const size_t __total_storage_size = __slot_storage_size + sizeof (gc_anchor_storage); \
-        gc_anchor_storage * const  __anchor_storage = (gc_anchor_storage *) \
+        const size_t __total_storage_size = __slot_storage_size + sizeof (gc_anchor_storage_t); \
+        gc_anchor_storage_t * const  __anchor_storage = (gc_anchor_storage_t *) \
             Parrot_gc_allocate_fixed_size_storage((i), __total_storage_size); \
         PMC ** const __pmc_storage_slots = (PMC **) (__anchor_storage + 1); \
         STRING ** const __str_storage_slots = (STRING **) (__pmc_storage_slots + __num_pmc_slots); \
@@ -174,9 +174,9 @@ typedef struct __gc_anchor_storage {
 #define GC_CLEANUP_ANCHOR_STORAGE(i) \
         } \
         { \
-            gc_anchor_storage * __current_storage = (i)->gc_anchor_storage; \
+            gc_anchor_storage_t * __current_storage = (i)->gc_anchor_storage; \
             while (__current_storage && __current_storage != __anchor_storage) { \
-                gc_anchor_storage * const __tmp = __current_storage->prev; \
+                gc_anchor_storage_t * const __tmp = __current_storage->prev; \
                 Parrot_gc_free_fixed_size_storage((i), __anchor_storage_size, __current_storage); \
                 __current_storage = __tmp; \
             } \
