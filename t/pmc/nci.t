@@ -2620,6 +2620,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "nci_cstring_cstring - as_string and Byte
     arg = s
     arg[l] = 0
     result = nci_cstring_cstring(arg)
+    sweep 1 # just for testing GH #1155
     r = result.'as_string'("ascii")
     say r
 .end
