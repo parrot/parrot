@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2006-2009, Parrot Foundation.
+# Copyright (C) 2006-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -98,7 +98,8 @@ sub check_indent {
                 my ($prespace, $condition) = ($1,$2);
                 # stay where we are, but indenting should be
                 # back even with the opening brace.
-                my $indent = q{  } x ( @{ $state{stack} } - 1 );
+                my $i = @{ $state{stack} } - 1;
+                my $indent = $i > 0 ? q{  } x $i : '';
                 if ( $prespace ne $indent ) {
                     push @pp_indent => "$path:$state{line_cnt}\n"
                         . "     got: $line"
@@ -111,7 +112,8 @@ sub check_indent {
             if ( $line =~ m/^\s*\#(\s*)(endif)/)
             {
                 my ($prespace, $condition) = ($1,$2);
-                my $indent = q{  } x ( @{ $state{stack} } - 1 );
+                my $i = @{ $state{stack} } - 1;
+                my $indent = $i > 0 ? q{  } x $i : '';
                 if ( $prespace ne $indent ) {
                     push @pp_indent => "$path:$state{line_cnt}\n"
                         . "     got: $line"
