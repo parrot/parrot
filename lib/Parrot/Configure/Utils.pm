@@ -280,7 +280,8 @@ sub capture {
 
     # slurp stderr
     my $out     = _slurp("./test_$$.out");
-    my $out_err = _slurp("./test_$$.err") if -f "./test_$$.err";
+    my $out_err = '';
+    $out_err = _slurp("./test_$$.err") if -f "./test_$$.err";
 
     # cleanup
     unlink "test_$$.out";
