@@ -44,11 +44,9 @@ our @EXPORT_OK = qw(
     add_to_generated
 );
 our %EXPORT_TAGS = (
-    inter => [qw(prompt integrate)],
-    auto  => [
-        qw(capture_output check_progs)
-    ],
-    gen => [qw( copy_if_diff move_if_diff add_to_generated )],
+    inter => [qw( prompt integrate )],
+    auto  => [qw( capture_output check_progs )],
+    gen   => [qw( copy_if_diff move_if_diff add_to_generated )],
     cache => [qw( print_to_cache read_from_cache ) ],
 );
 
@@ -262,7 +260,7 @@ after the command's run.
 =cut
 
 sub capture {
-    my $command = shift;
+    my $coderef = shift;
 
     # disable STDOUT/STDERR
     open my $OLDOUT, '>&', \*STDOUT;
@@ -270,7 +268,7 @@ sub capture {
     open my $OLDERR, '>&', \*STDERR;
     open STDERR, '>', "test_$$.err";
 
-    my $output = eval { &$command; };
+    my $output = eval { &$coderef; };
     my $retval = $@;
     $@ = '';
 
@@ -281,14 +279,16 @@ sub capture {
     open STDERR, '>&', $OLDERR;
 
     # slurp stderr
-    my $out = _slurp("./test_$$.out");
-    my $out_err = _slurp("./test_$$.err");
+    my $out     = _slurp("./test_$$.out");
+    my $out_err = _slurp("./test_$$.err") if -f "./test_$$.err";
 
     # cleanup
     unlink "test_$$.out";
     unlink "test_$$.err";
 
     return ( $output, $out, $out_err, $retval ) if wantarray;
+    ${$_[0]} = $out     if ref $_[0];
+    ${$_[1]} = $out_err if ref $_[1];
     return $output;
 }
 

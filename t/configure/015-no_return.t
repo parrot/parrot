@@ -49,7 +49,7 @@ $conf->options->set(%args);
 {
     my $rv;
     my $stdout;
-    capture ( sub {$rv    = $conf->runsteps}, \$stdout );
+    capture ( sub {$rv = $conf->runsteps}, \$stdout );
     ok( $rv, "runsteps successfully ran $step" );
     like( $stdout, qr/$description/s, "Got correct description for $step" );
     like( $stdout, qr/done\.\z/,      "got 'done' in lieu of result set by step" );

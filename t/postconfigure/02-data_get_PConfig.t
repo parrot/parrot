@@ -10,11 +10,7 @@ use Carp;
 use lib qw( lib );
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use_ok(
-    'Parrot::Configure::Step::List', qw|
-        get_steps_list
-        |
-);
+use_ok('Parrot::Configure::Step::List', qw| get_steps_list |);
 use Parrot::Configure::Utils qw | capture |;
 
 $| = 1;
