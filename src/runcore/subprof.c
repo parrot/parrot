@@ -825,6 +825,12 @@ dump_profile_data(PARROT_INTERP, ARGIN(subprofiledata *spdata))
     unsigned int totalops   = 0;
     UHUGEINTVAL  totalticks = 0;
 
+#ifdef HAS_LONGLONG
+#  define UHUGEINTVAL_FMT "%llu"
+#else
+#  define UHUGEINTVAL_FMT "%lu"
+#endif
+
     if (!spdata->profile_type)
         return;
 
@@ -846,7 +852,7 @@ dump_profile_data(PARROT_INTERP, ARGIN(subprofiledata *spdata))
         });
 
     fprintf(stderr, "events: ops ticks\n");
-    fprintf(stderr, "summary: %d %lld\n", totalops, totalticks);
+    fprintf(stderr, "summary: %d "UHUGEINTVAL_FMT"\n", totalops, totalticks);
 
     parrot_hash_iterate(spdata->sphash,
         subprofile *hsp = (subprofile*)_bucket->value;
@@ -896,7 +902,7 @@ dump_profile_data(PARROT_INTERP, ARGIN(subprofiledata *spdata))
 
                 if (li->ops || li->ticks)
                     fprintf(stderr,
-                            "%d %u %llu\n",
+                            "%d %u "UHUGEINTVAL_FMT"\n",
                             (int) srcline,
                             (unsigned int) li->ops,
                             (unsigned long long) li->ticks);
@@ -909,7 +915,7 @@ dump_profile_data(PARROT_INTERP, ARGIN(subprofiledata *spdata))
                     fprintf(stderr, "\n");
                     fprintf(stderr, "calls=%u %d\n", (unsigned int) ci->count, (int) csp->srcline);
                     fprintf(stderr,
-                            "%d %u %llu\n",
+                            "%d %u "UHUGEINTVAL_FMT"\n",
                             (int) srcline,
                             (unsigned int) ci->ops,
                             (unsigned long long) ci->ticks);
@@ -937,14 +943,14 @@ dump_profile_data(PARROT_INTERP, ARGIN(subprofiledata *spdata))
             fprintf(stderr, "\n");
             fprintf(stderr, "calls=%u %d\n", (unsigned int) ci->count, (int) csp->srcline);
             fprintf(stderr,
-                    "%d %u %llu\n",
+                    "%d %u "UHUGEINTVAL_FMT"\n",
                     0,
                     (unsigned int) ci->ops,
                     (unsigned long long) ci->ticks);
         }
     }
 
-    fprintf(stderr, "\ntotals: %d %lld\n", totalops, totalticks);
+    fprintf(stderr, "\ntotals: %d "UHUGEINTVAL_FMT"\n", totalops, totalticks);
 }
 
 
