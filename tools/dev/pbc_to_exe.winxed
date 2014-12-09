@@ -665,6 +665,7 @@ function link_file(string objfile, string exefile, string extra_obj, var opts)
     string libdir       = $P0['libdir'];
     string versiondir   = $P0['versiondir'];
     string optimize     = $P0['optimize'];
+    int    has_mt       = $P0['has_mt'];
 
     string pathquote  = '"';
     string config     = pathquote;
@@ -703,7 +704,7 @@ function link_file(string objfile, string exefile, string extra_obj, var opts)
     var file = new [ 'File' ];
     string manifest_file_name = exefile + '.manifest';
     var manifest_exists = file.exists(manifest_file_name);
-    if (manifest_exists != 0) {
+    if (manifest_exists != 0 && has_mt) {
         # MSVC app manifest exists, embed it
         string embed_manifest_str = 'mt.exe -nologo -manifest ' +
                 manifest_file_name +
