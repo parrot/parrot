@@ -196,13 +196,26 @@ Tests for C<Inf> and C<NaN> handling of transcendental ops in the C<trans_ops> d
     is($N1, 'NaN', '... coth NaN')
 .end
 
+.include 'iglobals.pasm'
+
 .sub test_acot
+    .local pmc interp
+    interp = getinterp
+    .local pmc config
+    config = interp[.IGLOBALS_CONFIG_HASH]
+    $I0 = config['has_negative_zero']
+
     $N0 = 'Inf'
     $N1 = acot $N0
     is($N1, '0', 'acot: acot Inf')
     $N0 = '-Inf'
     $N1 = acot $N0
-    is($N1, '-0', '... acot -Inf')
+    unless $I0 goto no_neg_zero
+    is($N1, '-0', '... acot -Inf -0')
+    goto neg_zero
+no_neg_zero:
+    is($N1, '0', '... acot -Inf 0')
+neg_zero:
     $N0 = 'NaN'
     $N1 = acot $N0
     is($N1, 'NaN', '... acot NaN')
