@@ -79,9 +79,14 @@ sub test_native_pbc {
         $skip_msg  = "$file has old PBC_COMPAT $pbc_bc_version. "
           . "Need $id platform to generate it.";
     }
-    if ($type eq 'number' and $cvt =~ /^8_16_[bl]e=>4_8_/) {
-        # 16 -> 8 drops some mantissa bits
-        $expected =~ s/1\.12589990684262e\+15/1.12589990684058e+15/;
+    if ($type eq 'number') {
+        if ($cvt =~ /^8_16_[bl]e=>4_8_/) {
+            # 16 -> 8 drops some mantissa bits
+            $expected =~ s/1\.12589990684262e\+15/1.12589990684058e+15/;
+        }
+        if ($^O eq 'MSWin32') { # windows likes to play games with the exponent
+            $expected =~ s/e\+15/e\+015/;
+        }
     }
     # check if skip or todo
   SKIP: {
