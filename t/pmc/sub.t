@@ -991,7 +991,7 @@ OUTPUT
 
 unlink( $l1_pbc, $l2_pbc );
 
-pir_output_is( <<'CODE', <<'OUTPUT', "immediate code as const" );
+pir_output_like( <<'CODE', qr/^1\.618033988749/, "immediate code as const" );
 .sub make_phi :immediate :anon
     $N0 = sqrt 5
     $N0 += 1
@@ -1007,8 +1007,6 @@ pir_output_is( <<'CODE', <<'OUTPUT', "immediate code as const" );
     print "\n"
 .end
 CODE
-1.61803398874989
-OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "immediate code as const - obj" );
 .sub make_obj :immediate :anon
