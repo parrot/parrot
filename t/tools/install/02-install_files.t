@@ -28,15 +28,9 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
     create_directories($tdir, { map { $_ => 1 } @dirs });
 
     {
-        my ( $stdout, $stderr, $rv );
-        eval {
-            capture(
-                sub { $rv = install_files("destdir", 1); },
-                \$stdout,
-                \$stderr,
-            );
-        };
-        like($@, qr/Error: parameter \$options must be a hashref/s,
+        my ( $rv, $stdout, $stderr, $retval ) =
+          capture(sub { install_files("destdir", 1); });
+        like($retval, qr/Error: parameter \$options must be a hashref/s,
              "Catches non-HASH \$options");
     }
 }
@@ -49,15 +43,9 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
     create_directories($tdir, { map { $_ => 1 } @dirs });
 
     {
-        my ( $stdout, $stderr, $rv );
-        eval {
-            capture(
-                sub { $rv = install_files({}); },
-                \$stdout,
-                \$stderr,
-            );
-        };
-        like($@, qr/Error: parameter \$files must be an array/s,
+        my ( $rv, $stdout, $stderr, $retval ) =
+          capture( sub { install_files({}); });
+        like($retval, qr/Error: parameter \$files must be an array/s,
              "Catches non-ARRAY \$files");
     }
 }
