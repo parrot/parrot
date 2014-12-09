@@ -30,7 +30,7 @@ use Parrot::Headerizer::Functions qw(
     add_headerizer_markers
 );
 
-use IO::CaptureOutput qw| capture |;
+use Parrot::Configure::Utils qw| capture |;
 
 my $cwd = cwd();
 my (@ofiles, $rv, $expected);

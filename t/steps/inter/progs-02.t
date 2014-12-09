@@ -15,7 +15,7 @@ use Parrot::Configure::Test qw(
     test_step_constructor_and_description
 );
 use Tie::Filehandle::Preempt::Stdin;
-use IO::CaptureOutput qw| capture |;
+use Parrot::Configure::Utils qw| capture |;
 
 =for hints_for_testing Testing and refactoring of inter::progs should
 entail understanding of issues discussed in

@@ -22,7 +22,7 @@ use lib qw( lib . ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
 use Parrot::Test tests => 1;
-use IO::CaptureOutput qw{ qxx };
+use Parrot::Configure::Utils qw{ qxx };
 
 my $PARROT_DEBUGGER = ".$PConfig{slash}parrot_debugger";
 

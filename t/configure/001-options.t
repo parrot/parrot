@@ -17,7 +17,7 @@ use Parrot::Configure::Options qw| process_options |;
 use Parrot::Configure::Options::Conf::CLI ();
 use Parrot::Configure::Options::Conf::File ();
 use Parrot::Configure::Options::Reconf ();
-use IO::CaptureOutput qw| capture |;
+use Parrot::Configure::Utils qw| capture |;
 
 my %valid;
 my $badoption = q{samsonanddelilah};

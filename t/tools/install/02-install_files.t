@@ -15,7 +15,7 @@ use Parrot::Install qw(
     install_files
     create_directories
 );
-use IO::CaptureOutput qw( capture );
+use Parrot::Configure::Utils qw( capture );
 
 my $cwd = cwd();
 my $testsourcedir = qq{$cwd/t/tools/install/testlib};

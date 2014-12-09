@@ -15,7 +15,7 @@ use_ok(
         get_steps_list
         |
 );
-use IO::CaptureOutput qw | capture |;
+use Parrot::Configure::Utils qw | capture |;
 
 $| = 1;
 is( $|, 1, "output autoflush is set" );

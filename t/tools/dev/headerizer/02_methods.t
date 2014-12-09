@@ -15,7 +15,7 @@ use lib qw( lib );
 use Parrot::Config;
 use Parrot::Headerizer::Functions qw( read_file );
 use Parrot::Headerizer;
-use IO::CaptureOutput qw| capture |;
+use Parrot::Configure::Utils qw| capture |;
 
 my $cwd = cwd();
 my $self;

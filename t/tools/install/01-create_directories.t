@@ -13,7 +13,7 @@ use lib qw( lib );
 use Parrot::Install qw(
     create_directories
 );
-use IO::CaptureOutput qw( capture );
+use Parrot::Configure::Utils qw( capture );
 
 {
     my $tdir = tempdir( CLEANUP => 1 );

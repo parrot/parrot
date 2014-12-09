@@ -13,7 +13,7 @@ use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(
     test_step_constructor_and_description
 );
-use IO::CaptureOutput qw| capture |;
+use Parrot::Configure::Utils qw| capture |;
 
 ########## regular ##########
 

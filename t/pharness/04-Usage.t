@@ -15,7 +15,7 @@ plan( skip_all => 't/harness only runs once configuration has completed' )
 plan( tests =>  2 );
 use Carp;
 use Parrot::Harness::Options qw( Usage );
-use IO::CaptureOutput qw| capture |;
+use Parrot::Configure::Utils qw| capture |;
 
 {
     my $stdout;

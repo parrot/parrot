@@ -23,7 +23,7 @@ use_ok(
         @valid_options
         |
 );
-use IO::CaptureOutput qw | capture |;
+use Parrot::Configure::Utils qw | capture |;
 
 my %valid;
 my $badoption = q{samsonanddelilah};

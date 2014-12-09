@@ -12,7 +12,7 @@ use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Test qw( test_step_thru_runstep);
 use Parrot::Configure::Step::List qw( get_steps_list );
-use IO::CaptureOutput qw | capture |;
+use Parrot::Configure::Utils qw | capture |;
 
 $| = 1;
 is( $|, 1, "output autoflush is set" );

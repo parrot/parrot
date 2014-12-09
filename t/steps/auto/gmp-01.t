@@ -16,7 +16,7 @@ use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(
     test_step_constructor_and_description
 );
-use IO::CaptureOutput qw( capture );
+use Parrot::Configure::Utils qw( capture );
 
 =for hints_for_testing The documentation for this package is skimpy;
 please try to improve it, e.g., by providing a link to an introduction

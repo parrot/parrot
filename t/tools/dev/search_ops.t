@@ -7,7 +7,7 @@ use lib qw(lib t/tools/dev/search_ops);
 
 use File::Temp        qw(tempdir);
 use Test::More        tests => 10;
-use IO::CaptureOutput qw(capture);
+use Parrot::Configure::Utils qw(capture);
 
 use Parrot::SearchOps qw(search_all_ops_files help);
 use samples           qw($core $debug $mangled $string);

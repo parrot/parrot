@@ -11,7 +11,7 @@ use Parrot::Configure::Messages qw|
     print_introduction
     print_conclusion
 |;
-use IO::CaptureOutput qw| capture |;
+use Parrot::Configure::Utils qw| capture |;
 
 my $parrot_version = '0.4.10';
 my $make_version   = 'gnu make';

@@ -11,7 +11,7 @@ use File::Copy;
 use File::Temp qw( tempdir );
 use lib qw( lib );
 use Parrot::Pmc2c::PMC::PrintTree;
-use IO::CaptureOutput qw| capture |;
+use Parrot::Configure::Utils qw| capture |;
 
 my ( %opt, @include, @args );
 my $dump_file;

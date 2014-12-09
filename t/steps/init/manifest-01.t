@@ -13,7 +13,7 @@ use lib qw( lib );
 use_ok('config::init::manifest');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use IO::CaptureOutput qw | capture |;
+use Parrot::Configure::Utils qw | capture |;
 
 ########## no manifest check ##########
 

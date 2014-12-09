@@ -9,7 +9,7 @@ use Carp;
 use lib qw( lib t/configure/testlib );
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use IO::CaptureOutput qw | capture |;
+use Parrot::Configure::Utils qw | capture |;
 use Tie::Filehandle::Preempt::Stdin;
 
 $| = 1;

@@ -9,7 +9,7 @@ use Carp;
 use Cwd;
 use File::Temp 0.13 qw/ tempdir /;
 use lib qw( lib t/configure/testlib );
-use IO::CaptureOutput qw| capture |;
+use Parrot::Configure::Utils qw| capture |;
 
 BEGIN { use Parrot::Configure::Utils; }
 

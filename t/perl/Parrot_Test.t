@@ -22,7 +22,7 @@ use Carp;
 use File::Spec;
 use lib qw( lib );
 use Parrot::Config;
-use IO::CaptureOutput qw| capture |;
+use Parrot::Configure::Utils qw| capture |;
 
 BEGIN {
     eval "use Test::Builder::Tester;";

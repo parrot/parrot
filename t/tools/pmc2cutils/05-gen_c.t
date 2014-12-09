@@ -24,7 +24,7 @@ use File::Basename;
 use File::Copy;
 use FindBin;
 use_ok('Parrot::Pmc2c::Pmc2cMain');
-use IO::CaptureOutput qw| capture |;
+use Parrot::Configure::Utils qw| capture |;
 use_ok('Cwd');
 use_ok( 'File::Temp', qw| tempdir | );
 

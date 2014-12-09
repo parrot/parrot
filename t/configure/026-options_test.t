@@ -8,7 +8,7 @@ use Carp;
 use Cwd;
 use Test::More tests => 20;
 use lib qw( lib );
-use IO::CaptureOutput qw| capture |;
+use Parrot::Configure::Utils qw| capture |;
 use Parrot::Configure::Options qw| process_options |;
 use Parrot::Configure::Options::Test;
 use Parrot::Configure::Options::Test::Prepare qw|
