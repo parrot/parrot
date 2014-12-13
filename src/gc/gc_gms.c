@@ -2294,10 +2294,10 @@ gc_gms_check_sanity(PARROT_INTERP)
             const size_t gen  = POBJ2GEN(pmc);
             PARROT_GC_ASSERT_INTERP(pmc, interp);
             if (i < 3) { /* too many objects in gen3 */
-                GC_DEBUG_DETAIL_1_FLAGS("GC live gen %ld ", gen, pmc);
+                GC_DEBUG_DETAIL_1_FLAGS("GC live gen "SIZE_FMT" ", gen, pmc);
             }
             if (gen != i) {
-                fprintf(stderr, "GC live gen %ld != %ld ", gen, i);
+                fprintf(stderr, "GC live gen "SIZE_FMT" != "SIZE_FMT" ", gen, i);
                 trace_pmc_dump(interp, pmc);
                 fprintf(stderr, "\n");
             }
