@@ -1,8 +1,8 @@
 {
-    "release.version"  : "6.10.0",
-    "release.name"     : "New Caledonian lorikeet",
+    "release.version"  : "6.11.0",
+    "release.name"     : "Fischer's Lovebird",
     "release.day"      : "Tuesday",
-    "release.nextdate" : "16 Dec 2014",
+    "release.nextdate" : "20 Jan 2015",
     "release.type"     : "devel",
 
     "web.root"         : "http://parrot.org/",
@@ -12,10 +12,10 @@
     "web.org_root"     : "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "13 Dec 2014",
+    "bugday.date"      : "17 Jan 2015",
 
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
-    "wiki.bugday"      : "bug_day_2014_12_13",
+    "wiki.bugday"      : "bug_day_2015_01_17",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/6.10.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/6.11.0/"
 }

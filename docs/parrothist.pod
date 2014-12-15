@@ -178,5 +178,6 @@ Starred release numbers indicate supported releases.
  Util        6.8.0          2014-Sep-16     "Little Lorikeet"
  rurban      6.9.0 *        2014-Oct-21     "Rosy-faced Lovebird"
  Util        6.10.0         2014-Nov-18     "New Caledonian lorikeet"
+ rurban      6.11.0         2014-Dec-16     "Fischer's Lovebird"
 
 =cut
