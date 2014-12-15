@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2009-2013, Parrot Foundation.
+# Copyright (C) 2009-2014, Parrot Foundation.
 # auto/llvm-01.t
 
 use strict;
@@ -52,12 +52,8 @@ $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
 {
-    my $stdout;
-    my $ret = capture(
-        sub { $step->runstep($conf) },
-        \$stdout
-    );
-    ok( $ret, "runstep() returned true value" );
+    my ($out, $stdout) = capture( sub { $step->runstep($conf) } );
+    ok( $out, "runstep() returned true value" );
     like( $step->result(), qr/skipped/,
       "LLVM not requested; hence result is 'skipped'" );
     ok( ! $conf->data->get( 'has_llvm' ),
@@ -77,17 +73,13 @@ $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
 {
-    my $stdout;
-    my $ret = capture(
-        sub { $step->runstep($conf) },
-        \$stdout
-    );
+    my ($ret, $stdout) = capture( sub { $step->runstep($conf) } );
     ok( $ret, "runstep() returned true value" );
     like( $step->result(), qr/yes|no/,
         "Result was either 'yes' or 'no'" );
     SKIP: {
         skip 'No sense testing for verbose output if LLVM not present',
-        1 unless ( $step->result() =~ /yes/ );
+          1 unless ( $step->result() =~ /yes/ );
         like( $stdout, qr/version/s,
             "Got expected verbose output" );
     }
@@ -127,30 +119,18 @@ ok( ! $conf->data->get( 'has_llvm' ),
 $output[1] = 'llvm version 2.7',
 $verbose = 1;
 {
-    my ($stdout, $stderr);
-    capture(
-        sub { $step->version_check($conf, \@output, $verbose); },
-        \$stdout,
-        \$stderr,
-    );
-    like(
-        $stdout,
-        qr/Found 'lli' version/,
+    my ($out, $stdout) =
+      capture( sub { $step->version_check($conf, \@output, $verbose) } );
+    like($stdout, qr/Found 'lli' version/,
         "Got expected verbose output: version_check() with sufficient version"
     );
 }
 $output[1] = 'llvm version 1.0';
 $verbose = 1;
 {
-    my ($stdout, $stderr);
-    capture(
-        sub { $step->version_check($conf, \@output, $verbose); },
-        \$stdout,
-        \$stderr,
-    );
-    like(
-        $stdout,
-        qr/LLVM component 'lli' must be at least version/,
+    my ($out, $stdout) =
+      capture( sub { $step->version_check($conf, \@output, $verbose) } );
+    like($stdout, qr/LLVM component 'lli' must be at least version/,
         "Got expected verbose output: version_check() with insufficient version"
     );
 }
@@ -167,15 +147,9 @@ ok( ! $conf->data->get( 'has_llvm' ),
 $output[1] = 'foobar';
 $verbose = 1;
 {
-    my ($stdout, $stderr);
-    capture(
-        sub { $step->version_check($conf, \@output, $verbose); },
-        \$stdout,
-        \$stderr,
-    );
-    like(
-        $stdout,
-        qr/Unable to extract version for LLVM component/,
+    my ($out, $stdout) =
+      capture( sub { $step->version_check($conf, \@output, $verbose) } );
+    like($stdout, qr/Unable to extract version for LLVM component/,
         "Got expected verbose output: version_check() with version not detected"
     );
 }

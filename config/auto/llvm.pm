@@ -1,4 +1,4 @@
-# Copyright (C) 2009-2012, Parrot Foundation.
+# Copyright (C) 2009-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -79,15 +79,19 @@ sub runstep {
     my ($cflags, $cxxflags, $ldflags, $libs);
     if ($ldflags = $self->_llvm_config($llvm_config, '--ldflags')) {
         $conf->data->set( llvm_ldflags  => $ldflags );
+        $conf->debug( "llvm_ldflags  => $ldflags\n" );
     }
     if ($libs = $self->_llvm_config($llvm_config, '--libs')) {
         $conf->data->set( llvm_libs  => $libs );
+        $conf->debug( "llvm_libs  => $libs\n" );
     }
     if ($cflags = $self->_llvm_config($llvm_config, '--cflags')) {
         $conf->data->set( llvm_cflags  => $cflags );
+        $conf->debug( "llvm_cflags  => $cflags\n" );
     }
     if ($cxxflags = $self->_llvm_config($llvm_config, '--cxxflags')) {
         $conf->data->set( llvm_cxxflags  => $cxxflags );
+        $conf->debug( "llvm_cxxflags  => $cxxflags\n" );
     }
 
     # $self->_handle_result($conf, $version);
@@ -116,6 +120,7 @@ sub runstep {
         (undef,undef,$err) = capture_output( qq{$cc $cflags -emit-llvm -O3 $fullcfile -c -o $bcfile} );
         if (!$err and -e $bcfile and $self->_check_bcfile($bcfile)) {
             $conf->data->set( llvm_gcc  => $cc );
+            $conf->debug( "llvm_gcc  => $cc" );
             last;
         }
     }
@@ -220,9 +225,7 @@ sub version_check {
             return;
         }
         else {
-            if ($verbose) {
-                print "Found 'lli' version $version\n";
-            }
+            print "Found 'lli' version $version\n" if $verbose;
             return $version;
         }
     }

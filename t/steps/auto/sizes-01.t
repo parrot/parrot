@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007-2012, Parrot Foundation.
+# Copyright (C) 2007-2014, Parrot Foundation.
 # auto/sizes-01.t
 
 use strict;
@@ -142,12 +142,8 @@ ok( $ret, "runstep() returned true value" );
     my $iv = 'foobar';
     $conf->data->set('iv' => $iv);
     $conf->data->set('intvalsize' => $intvalsize);
-    my ($stdout, $stderr);
-    capture(
-        sub { auto::sizes::_set_intval_range($conf); },
-        \$stdout,
-        \$stderr,
-    );
+    my ($out, $stdout, $stderr, $retval) =
+      capture( sub { auto::sizes::_set_intval_range($conf) } );
     is( $conf->data->get( 'intvalmin' ), -2 ** 15,
         "_set_intval_range(): got expected intvalmin" );
     is( $conf->data->get( 'intvalmax' ), 2 ** 15 - 1,
@@ -209,16 +205,12 @@ ok( $ret, "runstep() returned true value" );
 {
     my $nv = 'foobar';
     $conf->data->set( nv => $nv );
-    my ($stdout, $stderr);
-    capture(
-        sub { eval { auto::sizes::_set_floatval_range($conf); };},
-        \$stdout,
-        \$stderr,
-    );
+    my ($out, $stdout, $stderr, $retval) =
+      capture( sub { auto::sizes::_set_floatval_range($conf) } );
     like($stdout,
         qr/Your chosen numeric type '$nv' does not look like a standard type/,
         "_set_floatval_range(): got expected explanatory message");
-    like($@, qr/Configure\.pl: Cannot find limits for type '$nv'/,
+    like($retval, qr/Configure\.pl: Cannot find limits for type '$nv'/,
         "_set_floatval_range(): got expected die message");
 }
 

@@ -41,7 +41,7 @@ sub runstep {
             $infnan = 1;
         }
     }
-    #$conf->cc_clean();
+    $conf->cc_clean();
     $self->_handle_infnan($conf, $infnan);
     return 1;
 }

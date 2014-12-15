@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007,2014, Parrot Foundation.
 # auto/attributes-01.t
 
 use strict;
@@ -32,10 +32,7 @@ my $step = test_step_constructor_and_description($conf);
 {
     my $rv;
     my $stdout;
-    capture(
-        sub { $rv = $step->runstep($conf); },
-        \$stdout,
-    );
+    capture( sub { $rv = $step->runstep($conf); } );
     ok( defined $rv, "runstep() returned defined value" );
     unlike($conf->data->get('ccflags'),
         qr/HASATTRIBUTE_NEVER_WORKS/,

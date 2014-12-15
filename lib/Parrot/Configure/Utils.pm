@@ -252,10 +252,11 @@ sub move_if_diff {    ## no critic Subroutines::RequireFinalReturn
 Evals the given function without argument. The function return value,
 the captured stdout and stderr value, and its return status is returned as
 a 4-tuple.
-B<STDOUT> is redirected to F<test.out> during the execution, and deleted
+B<STDOUT> is redirected to F<test_$$.out> during the execution, and deleted
 after the command's run.
-B<STDERR> is redirected to F<test.err> during the execution, and deleted
+B<STDERR> is redirected to F<test_$$.err> during the execution, and deleted
 after the command's run.
+C<chdir> inside the coderef is forbidden.
 
 =cut
 
@@ -279,9 +280,9 @@ sub capture {
     open STDERR, '>&', $OLDERR;
 
     # slurp stderr
-    my $out     = _slurp("./test_$$.out");
-    my $out_err = '';
-    $out_err = _slurp("./test_$$.err") if -f "./test_$$.err";
+    my ($out, $out_err) = ('', '');
+    $out     = _slurp("test_$$.out") if -f "./test_$$.out";
+    $out_err = _slurp("test_$$.err") if -f "./test_$$.err";
 
     # cleanup
     unlink "test_$$.out";
@@ -316,7 +317,7 @@ sub capture_output {
     open STDERR, '>&', $OLDERR;
 
     # slurp stderr
-    my $out_err = _slurp("./test_$$.err");
+    my $out_err = _slurp("test_$$.err");
 
     # cleanup
     unlink "test_$$.err";

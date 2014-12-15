@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2010-2013, Parrot Foundation.
+# Copyright (C) 2010-2014, Parrot Foundation.
 # auto/libffi-01.t
 
 use strict;
@@ -55,11 +55,7 @@ $conf->add_steps($pkg);
 $conf->options->set( %{$args} );
 $step = test_step_constructor_and_description($conf);
 {
-    my $stdout;
-    my $ret = capture(
-        sub { $step->runstep($conf) },
-        \$stdout
-    );
+    my ($ret, $stdout) = capture( sub { $step->runstep($conf) } );
     ok( $ret, "runstep() returned true value" );
     ok( defined( $step->result ), 'result defined' );
     ok( $stdout, 'Some verbose output captured' );
