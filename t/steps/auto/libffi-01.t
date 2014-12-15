@@ -4,7 +4,7 @@
 
 use strict;
 use warnings;
-use Test::More tests => 17;
+use Test::More tests => 16;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::libffi');
@@ -58,7 +58,6 @@ $step = test_step_constructor_and_description($conf);
     my ($ret, $stdout) = capture( sub { $step->runstep($conf) } );
     ok( $ret, "runstep() returned true value" );
     ok( defined( $step->result ), 'result defined' );
-    ok( $stdout, 'Some verbose output captured' );
 }
 # Prepare for next tests
 $step->set_result( undef );

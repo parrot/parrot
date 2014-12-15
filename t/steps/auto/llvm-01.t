@@ -5,7 +5,7 @@
 use strict;
 use warnings;
 use File::Temp qw( tempdir );
-use Test::More tests =>  58;
+use Test::More tests =>  56;
 use Carp;
 use lib qw( lib t/configure/testlib );
 use_ok('config::auto::llvm');
@@ -65,7 +65,7 @@ $step = test_step_constructor_and_description($conf);
 ########### --verbose ##########
 
 ($args, $step_list_ref) = process_options( {
-    argv => [ q{--verbose}, q{--with-llvm} ],
+    argv => [ q{--verbose-step=auto::llvm}, q{--with-llvm} ],
     mode => q{configure},
 } );
 
@@ -75,14 +75,9 @@ $step = test_step_constructor_and_description($conf);
 {
     my ($ret, $stdout) = capture( sub { $step->runstep($conf) } );
     ok( $ret, "runstep() returned true value" );
-    like( $step->result(), qr/yes|no/,
+    my $result = $step->result();
+    like( $result, qr/yes|no/,
         "Result was either 'yes' or 'no'" );
-    SKIP: {
-        skip 'No sense testing for verbose output if LLVM not present',
-          1 unless ( $step->result() =~ /yes/ );
-        like( $stdout, qr/version/s,
-            "Got expected verbose output" );
-    }
 }
 
 $step->set_result( undef );
@@ -269,11 +264,6 @@ my $output = '';
         \$stderr,
     );
     is( $step->result(), 'no', "Got expected 'no' result" );
-    like(
-        $stdout,
-        qr/Unable to execute native assembly program successfully/,
-        "Got expected verbose output: native assembly program",
-    );
 }
 
 {

@@ -281,12 +281,14 @@ sub capture {
 
     # slurp stderr
     my ($out, $out_err) = ('', '');
-    $out     = _slurp("test_$$.out") if -f "./test_$$.out";
-    $out_err = _slurp("test_$$.err") if -f "./test_$$.err";
-
-    # cleanup
-    unlink "test_$$.out";
-    unlink "test_$$.err";
+    if (-f "./test_$$.out") {
+        $out = _slurp("test_$$.out");
+        unlink "test_$$.out";
+    }
+    if (-f "./test_$$.err") {
+        $out_err = _slurp("test_$$.err");
+        unlink "test_$$.err";
+    }
 
     return ( $output, $out, $out_err, $retval ) if wantarray;
     ${$_[0]} = $out     if ref $_[0];
