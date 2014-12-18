@@ -163,7 +163,7 @@ typedef struct GC_Statistics {
     size_t  gc_mark_runs;       /* Number of times we've done a mark run */
     size_t  gc_lazy_mark_runs;  /* Number of successful lazy mark runs */
     size_t  gc_collect_runs;    /* Number of times we've done a memory
-                                   compaction */
+                                   compaction, currently for strings only. */
     size_t  mem_allocs_since_last_collect;      /* The number of memory
                                                  * allocations from the
                                                  * system since the last

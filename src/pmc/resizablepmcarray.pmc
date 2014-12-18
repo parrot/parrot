@@ -259,7 +259,6 @@ Resizes the array to C<size> elements.
                 PMC_threshold(SELF) = n;
             }
             TRACE_RPAsize("resize init");
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
         else if (n == size) {
             return;
@@ -267,7 +266,7 @@ Resizes the array to C<size> elements.
         else if (n <= threshold - offset) {
             TRACE_RPAsize("resize skip");
             PMC_size(SELF) = n;
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF); /* needed? */
+            /* PARROT_GC_WRITE_BARRIER(INTERP, SELF); needed? */
             /* we could shrink here, but this would need a GC mark */
             return;
         }

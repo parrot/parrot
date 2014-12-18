@@ -47,7 +47,7 @@ typedef struct _Parrot_GC_Init_Args {
 typedef enum _gc_sys_type_enum {
     MS,  /* mark and sweep */
     INF, /* infinite memory core */
-    MS2,
+    MS2, /* non-recursive mark and sweep */
     GMS  /* generational mark & sweep */
 } gc_sys_type_enum;
 
@@ -122,7 +122,10 @@ typedef enum {
     PARROT_OS_VERSION,
     PARROT_OS_VERSION_NUMBER,
     CPU_ARCH,
-    CPU_TYPE
+    CPU_TYPE,
+
+    /* additional gc constants */
+    MAX_GENERATIONS
 } Interpinfo_enum;
 
 /* &end_gen */
@@ -300,6 +303,10 @@ void Parrot_gc_mark_STRING_alive_fun(PARROT_INTERP,
     ARGMOD_NULLOK(STRING *obj))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*obj);
+
+PARROT_EXPORT
+int Parrot_gc_max_generations(PARROT_INTERP)
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 size_t Parrot_gc_mem_alloc_since_last_collect(PARROT_INTERP)
@@ -494,6 +501,8 @@ void Parrot_unblock_GC_sweep(PARROT_INTERP)
     , PARROT_ASSERT_ARG(obj))
 #define ASSERT_ARGS_Parrot_gc_mark_STRING_alive_fun \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_gc_max_generations __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_mem_alloc_since_last_collect \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

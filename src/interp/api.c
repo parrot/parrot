@@ -795,6 +795,13 @@ Parrot_interp_info(PARROT_INTERP, INTVAL what)
     INTVAL ret;
 
     switch (what) {
+      case MAX_GENERATIONS:
+          Parrot_warn_experimental(interp, "MAX_GENERATIONS option is experimental");
+          if (interp->gc_sys->sys_type == GMS)
+              ret = Parrot_gc_max_generations(interp);
+          else
+              ret = 0;
+          break;
       case TOTAL_MEM_ALLOC:
         ret = Parrot_gc_total_memory_allocated(interp);
         break;

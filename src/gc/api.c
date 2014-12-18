@@ -50,12 +50,12 @@ A separate compacting garbage collector is used to keep track of them.
 
 These files are the individual GC cores which implement the primary tracing
 and sweeping logic.
-gc_ms.c is the mark & sweep collector core,
-gc_ms2.c implements a generational mark & sweep allocator,
+gc_ms.c implements the default mark & sweep collector core,
+gc_ms2.c implements a non-recursive mark & sweep allocator,
 gc_gms.c implements a generational, non-compacting, mark and sweep allocator,
 gc_inf.c implements an "infinite" allocator which never frees any memory.
 The infinite allocator is not recommended except for debugging.
-The default is currently gc_gms.c, it was gc_ms2.c until RELEASE_3_3_0.
+The default is currently F<gc_gms.c>, it was F<gc_ms2.c> until RELEASE_3_3_0.
 
 =item F<src/gc/mark_sweep.c>
 
@@ -815,6 +815,24 @@ Parrot_gc_total_pmcs(PARROT_INTERP)
 {
     ASSERT_ARGS(Parrot_gc_total_pmcs)
     return interp->gc_sys->get_gc_info(interp, TOTAL_PMCS);
+}
+
+/*
+
+=item C<int Parrot_gc_max_generations(PARROT_INTERP)>
+
+Returns the number of generations being allocated.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+int
+Parrot_gc_max_generations(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_gc_max_generations)
+    return interp->gc_sys->get_gc_info(interp, MAX_GENERATIONS);
 }
 
 /*

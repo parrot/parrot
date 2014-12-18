@@ -121,12 +121,19 @@ TBD
 #endif
 
 /*
- * Maximum number of collections
- * NB:
- *  1. Maximum number is 8 due limit number of bits in PMC.flags.
- *  2. Don't forget to update gc_gms_select_generation_to_collect after changing it!
+ * Maximum number of generation lists for gms.
+ * Max. 8 due to limited number of bits in PMC.flags, but practically 0-2 = 3
+ * Best performance with 3 and 4 in parrot-bench
  */
-#define MAX_GENERATIONS     4
+#ifndef GC_MAX_GENERATIONS
+#  define GC_MAX_GENERATIONS  3
+#endif
+#if GC_MAX_GENERATIONS > 8
+#  error GC_MAX_GENERATIONS > 8
+#endif
+#if GC_MAX_GENERATIONS < 1
+#  error GC_MAX_GENERATIONS < 1
+#endif
 
 /* We allocate additional space in front of PObj* to store additional pointer */
 typedef struct pmc_alloc_struct {
@@ -176,13 +183,13 @@ typedef struct MarkSweep_GC {
     size_t    youngest_child;
 
     /* Currently allocate objects. */
-    struct Parrot_Pointer_Array     *objects[MAX_GENERATIONS];
+    struct Parrot_Pointer_Array     *objects[GC_MAX_GENERATIONS];
 
     /* Allocator for strings */
     struct Pool_Allocator           *string_allocator;
 
     /* MAX_GENERATIONS generations of strings */
-    struct Parrot_Pointer_Array     *strings[MAX_GENERATIONS];
+    struct Parrot_Pointer_Array     *strings[GC_MAX_GENERATIONS];
 
     /* Fixed-size allocator */
     struct Fixed_Allocator *fixed_size_allocator;
@@ -762,7 +769,7 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
         self->work_list  = NULL;
         self->dirty_list = Parrot_pa_new(interp);
 
-        for (i = 0; i < MAX_GENERATIONS; i++) {
+        for (i = 0; i < GC_MAX_GENERATIONS; i++) {
             self->objects[i] = Parrot_pa_new(interp);
             self->strings[i] = Parrot_pa_new(interp);
         }
@@ -931,24 +938,38 @@ gc_gms_select_generation_to_collect(PARROT_INTERP)
     /* TODO Use less naive approach. E.g. count amount of allocated memory in
      * older generations */
     size_t runs = interp->gc_sys->stats.gc_mark_runs;
-/*
+#if GC_MAX_GENERATIONS >= 8
     if (runs % 100000000 == 0)
         return 8;
+#  if GC_MAX_GENERATIONS >= 7
     if (runs % 10000000 == 0)
         return 7;
+#    if GC_MAX_GENERATIONS >= 6
     if (runs % 1000000 == 0)
         return 6;
+#      if GC_MAX_GENERATIONS >= 5
     if (runs % 100000 == 0)
         return 5;
+#        if GC_MAX_GENERATIONS >= 4
     if (runs % 10000 == 0)
         return 4;
-*/
+#          if GC_MAX_GENERATIONS >= 3
     if (runs % 1000 == 0)
         return 3;
+#            if GC_MAX_GENERATIONS >= 2
     if (runs % 100 == 0)
         return 2;
+#              if GC_MAX_GENERATIONS >= 1
     if (runs % 10 == 0)
         return 1;
+#              endif
+#            endif
+#          endif
+#        endif
+#      endif
+#    endif
+#  endif
+#endif
     return 0;
 }
 
@@ -1001,7 +1022,7 @@ gc_gms_cleanup_dirty_list(PARROT_INTERP,
         else {
             /* Survival */
             /* This check used to be
-             * if ((gen <= self->gen_to_collect) && (gen < MAX_GENERATIONS - 1))
+             * if ((gen <= self->gen_to_collect) && (gen < GC_MAX_GENERATIONS - 1))
              * Unfortunatelly it's wrong.
              * Consider this:
              * A1* -> B1* -> C0. (Object in generation notation. Star denotes "dirt
@@ -1012,7 +1033,7 @@ gc_gms_cleanup_dirty_list(PARROT_INTERP,
              * And after collecting of gen2 we'll collect B and C incorrectly.
              * Because A(3) will be in older generation than B and C.
              */
-            if (gen < MAX_GENERATIONS - 1) {
+            if (gen < GC_MAX_GENERATIONS - 1) {
                 SET_GEN_FLAGS(pmc, gen + 1);
             }
         };);
@@ -1114,7 +1135,7 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
 
     for (i = self->gen_to_collect; i >= 0; i--) {
         /* Don't move to generation beyond last */
-        const int move_to_old = (i + 1) != MAX_GENERATIONS;
+        const int move_to_old = (i + 1) != GC_MAX_GENERATIONS;
 
         POINTER_ARRAY_ITER(self->objects[i],
             pmc_alloc_struct * const item = (pmc_alloc_struct *)ptr;
@@ -1216,9 +1237,12 @@ gc_gms_mark_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
     pmc_alloc_struct  * const item = PMC2PAC(pmc);
     const size_t gen  = POBJ2GEN(pmc);
 
+#ifdef MEMORY_DEBUG
+    if (PObj_on_free_list_TEST(pmc))
+        GC_DEBUG_DETAIL_FLAGS("GC mark free pmc ", pmc); /* GH #1159 */
+#endif
     PARROT_ASSERT(!PObj_on_free_list_TEST(pmc)
         || !"Resurrecting of dead objects is not supported");
-
     PARROT_GC_ASSERT_INTERP(pmc, interp);
 
     /* Object was already marked as grey. Or live. Or dead. Skip it */
@@ -1430,28 +1454,32 @@ gc_gms_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
     ASSERT_ARGS(gc_gms_get_gc_info)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
-    if (which == IMPATIENT_PMCS)
+    switch (which) {
+      case MAX_GENERATIONS:
+        return GC_MAX_GENERATIONS;
+      case IMPATIENT_PMCS:
         return self->num_early_gc_PMCs;
-    if (which == TOTAL_PMCS) {
+      case TOTAL_PMCS: {
         /* It's higher than actual number of allocated PMCs */
         size_t ret = 0;
         size_t i;
-        for (i = 0; i < MAX_GENERATIONS; i++) {
+        for (i = 0; i < GC_MAX_GENERATIONS; i++) {
             ret += Parrot_pa_count_allocated(interp, self->objects[i]);
         }
         return ret;
-    }
-    if (which == ACTIVE_PMCS) {
+      }
+      case ACTIVE_PMCS: {
         /* It's higher than actual number of allocated PMCs */
         size_t ret = 0;
         size_t i;
-        for (i = 0; i < MAX_GENERATIONS; i++) {
+        for (i = 0; i < GC_MAX_GENERATIONS; i++) {
             ret += Parrot_pa_count_used(interp, self->objects[i]);
         }
         return ret;
+      }
+      default:
+        return Parrot_gc_get_info(interp, which, &interp->gc_sys->stats);
     }
-
-    return Parrot_gc_get_info(interp, which, &interp->gc_sys->stats);
 }
 
 
@@ -1474,7 +1502,7 @@ gc_gms_finalize(PARROT_INTERP)
 
     Parrot_gc_str_finalize(interp, &self->string_gc);
 
-    for (i = 0; i < MAX_GENERATIONS; i++) {
+    for (i = 0; i < GC_MAX_GENERATIONS; i++) {
         Parrot_pa_destroy(interp, self->objects[i]);
         Parrot_pa_destroy(interp, self->strings[i]);
     }
@@ -1832,7 +1860,7 @@ gc_gms_iterate_live_strings(PARROT_INTERP,
 
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t i;
-    for (i = 0; i < MAX_GENERATIONS; i++) {
+    for (i = 0; i < GC_MAX_GENERATIONS; i++) {
         POINTER_ARRAY_ITER(self->strings[i],
             STRING *s = &((string_alloc_struct *)ptr)->str;
             callback(interp, (Parrot_Buffer *)s, data););
@@ -2288,7 +2316,7 @@ gc_gms_check_sanity(PARROT_INTERP)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t i;
 
-    for (i = 0; i < MAX_GENERATIONS; i++) {
+    for (i = 0; i < GC_MAX_GENERATIONS; i++) {
         POINTER_ARRAY_ITER(self->objects[i],
             PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
             const size_t gen  = POBJ2GEN(pmc);
@@ -2365,7 +2393,7 @@ gc_gms_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
               ? (unsigned long)Parrot_pa_count_used(interp, self->work_list)
               : 0);
 
-    for (i = 0; i < MAX_GENERATIONS; i++)
+    for (i = 0; i < GC_MAX_GENERATIONS; i++)
         fprintf(stderr, "GEN %lu: %6lu objects, %6lu strings\n",
                 (unsigned long)i,
                 (unsigned long)Parrot_pa_count_used(interp, self->objects[i]),
@@ -2474,7 +2502,7 @@ gc_gms_validate_objects(PARROT_INTERP)
 #  ifdef MEMORY_DEBUG
     fprintf(stderr, "GMS Clear Generations\n");
 #  endif
-    for (i = 0; i < MAX_GENERATIONS; i++) {
+    for (i = 0; i < GC_MAX_GENERATIONS; i++) {
         POINTER_ARRAY_ITER(self->objects[i],
             PMC * const pmc = &((pmc_alloc_struct *)ptr)->pmc;
             PARROT_GC_ASSERT_INTERP(pmc, interp);
