@@ -293,12 +293,10 @@ op new_call_context(out PMC) {
 inline op invokecc(invar PMC, invar PMC) :flow {
     PMC      * const p     = $1;
     opcode_t *dest         = expr NEXT();
-    PMC      * const signature = $2;
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
-
     Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), dest);
-    dest                   = VTABLE_invoke(interp, p, dest);
+    dest = VTABLE_invoke(interp, p, dest);
 
     goto ADDRESS(dest);
 }

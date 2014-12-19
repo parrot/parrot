@@ -110,7 +110,6 @@ inline op say(in INT) :base_io {
 
 inline op say(in NUM) :base_io {
     char buf[128];
-    size_t ignore;
 #ifdef PARROT_HAS_SNPRINTF
     snprintf(buf, 128, FLOATVAL_FMT "\n", $1);
 #else
