@@ -248,7 +248,6 @@ Parrot_Interp
 Parrot_interp_initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 {
     ASSERT_ARGS(Parrot_interp_initialize_interpreter)
-    int numthr;
 
     /* Set up the memory allocation system */
     interp->debug_flags = args->debug_flags;
@@ -334,7 +333,7 @@ Parrot_interp_initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *a
 
     /* all sys running, init the threads, event and signal stuff */
     if (args->numthreads)
-        numthr = Parrot_set_num_threads(interp, args->numthreads);
+        args->numthreads = Parrot_set_num_threads(interp, args->numthreads);
     Parrot_cx_init_scheduler(interp);
 
 #ifdef PARROT_HAS_THREADS
