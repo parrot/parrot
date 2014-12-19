@@ -336,7 +336,6 @@ Parrot_io_open(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *path),
 
     {
         const INTVAL flags = Parrot_io_parse_open_flags(interp, mode);
-        IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
         INTVAL status = vtable->open(interp, handle, path, flags, mode);
 
         if (!status)
@@ -383,7 +382,7 @@ Parrot_io_socket_handle(PARROT_INTERP, ARGMOD_NULLOK(PMC *socket), INTVAL fam,
             INTVAL type, INTVAL proto)
 {
     ASSERT_ARGS(Parrot_io_socket_handle)
-    (void)Parrot_io_socket(interp, socket, fam, type, proto);
+    socket = Parrot_io_socket(interp, socket, fam, type, proto);
     /* For historical reasons, this function always returns 0 to signal
        unconditional success */
     return 0;
@@ -560,7 +559,7 @@ Parrot_io_close(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL autoflush)
         /* TODO: We need to better-document the autoflush values, and maybe
            turn it into an enum or a series of typedefs */
         if (autoflush == -1)
-            autoflush == (vtable->flags & PIO_VF_FLUSH_ON_CLOSE) ? 1 : 0;
+            autoflush = (vtable->flags & PIO_VF_FLUSH_ON_CLOSE) ? 1 : 0;
         if (autoflush == 1)
             vtable->flush(interp, handle);
         return vtable->close(interp, handle);
@@ -952,9 +951,6 @@ Parrot_io_readline_s(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING * terminat
         const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
         IO_BUFFER * read_buffer = IO_GET_READ_BUFFER(interp, handle);
         IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
-        INTVAL flags = Parrot_io_get_flags(interp, handle);
-        size_t bytes_read;
-        STRING *result;
         size_t max_delimiter_byte_size = 0;
 
         io_sync_buffers_for_read(interp, handle, vtable, read_buffer, write_buffer);
@@ -1021,7 +1017,7 @@ Parrot_io_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(const void *buffer),
         io_verify_is_open_for(interp, handle, vtable, PIO_F_WRITE);
         io_sync_buffers_for_write(interp, handle, vtable, read_buffer, write_buffer);
         bytes_written = Parrot_io_buffer_write_b(interp, write_buffer, handle, vtable,
-                                                 (char *)buffer, byte_length);
+                                                 (char *)PTR2INTVAL(buffer), byte_length);
         vtable->adv_position(interp, handle, bytes_written);
 
         /* If we are writing to a r/w handle, advance the pointer in the
@@ -1253,8 +1249,6 @@ INTVAL
 Parrot_io_eof(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(Parrot_io_eof)
-    INTVAL flags, result;
-
     /* io could be null here, but rather than return a negative error
      * we just fake EOF since eof test is usually in a boolean context.
      */
@@ -1360,7 +1354,6 @@ Parrot_io_pprintf(PARROT_INTERP, PIOHANDLE os_handle, ARGIN(const char *s), ...)
     ASSERT_ARGS(Parrot_io_pprintf)
     va_list  args;
     STRING  *str;
-    INTVAL   ret;
 
     va_start(args, s);
     str = Parrot_vsprintf_c(interp, s, args);

@@ -675,7 +675,6 @@ numthreads is invalid, e.g. it exceeds the hard-coded constant
 MAX_THREADS (16), or if Parrot_set_num_threads() was called too late
 and threads were already initialized.
 
-
 =cut
 
 */

@@ -41,23 +41,12 @@ static int is_invokable(PARROT_INTERP, ARGIN(PMC *sub_obj))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static void Parrot_pcc_add_invocant(PARROT_INTERP,
-    ARGIN(PMC *call_obj),
-    ARGIN(PMC *pmc))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3);
-
 #define ASSERT_ARGS_do_run_ops __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sub_obj))
 #define ASSERT_ARGS_is_invokable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(sub_obj))
-#define ASSERT_ARGS_Parrot_pcc_add_invocant __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(call_obj) \
-    , PARROT_ASSERT_ARG(pmc))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -143,28 +132,6 @@ Parrot_pcc_invoke_sub_from_c_args(PARROT_INTERP, ARGIN(PMC *sub_obj),
             PARROT_ERRORS_RESULT_COUNT_FLAG);
     va_end(args);
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), old_call_obj);
-}
-
-
-/*
-
-=item C<static void Parrot_pcc_add_invocant(PARROT_INTERP, PMC *call_obj, PMC
-*pmc)>
-
-Adds the given PMC as an invocant to the given CallContext PMC.  You should
-never have to use this, and it should go away with interp->current_object.
-
-=cut
-
-*/
-
-static void
-Parrot_pcc_add_invocant(PARROT_INTERP, ARGIN(PMC *call_obj), ARGIN(PMC *pmc))
-{
-    ASSERT_ARGS(Parrot_pcc_add_invocant)
-    PMC *arg_flags = PARROT_CALLCONTEXT(call_obj)->arg_flags;
-    VTABLE_unshift_integer(interp, arg_flags, PARROT_ARG_PMC | PARROT_ARG_INVOCANT);
-    Parrot_CallContext_unshift_pmc(interp, call_obj, pmc);
 }
 
 /*

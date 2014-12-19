@@ -59,6 +59,12 @@
    fun:trace_mem_block
 }
 {
+   trace_system_stack_5
+   Memcheck:Cond
+   fun:gc_gms_is_pmc_ptr
+   fun:trace_mem_block
+}
+{
    contained_1
    Memcheck:Cond
    fun:contained_in_pool

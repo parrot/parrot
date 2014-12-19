@@ -428,7 +428,7 @@ Open the pipe with the command in C<path>.
 
 static INTVAL
 io_pipe_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTVAL flags,
-        ARGIN(STRING *mode))
+             ARGIN(STRING *mode))
 {
     ASSERT_ARGS(io_pipe_open)
 
@@ -440,8 +440,8 @@ io_pipe_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTVAL fla
     /* Hack! If we're opening in file mode, turn this FileHandle into a file
        and use that vtable instead. */
     if ((flags & PIO_F_PIPE) == 0) {
-        const IO_VTABLE * const vtable = Parrot_io_get_vtable(interp, IO_VTABLE_FILEHANDLE, NULL);
-        VTABLE_set_pointer_keyed_int(interp, handle, IO_PTR_IDX_VTABLE, (void *)vtable);
+        const IO_VTABLE * vtable = Parrot_io_get_vtable(interp, IO_VTABLE_FILEHANDLE, NULL);
+        VTABLE_set_pointer_keyed_int(interp, handle, IO_PTR_IDX_VTABLE, (void *)PTR2INTVAL(vtable));
         return vtable->open(interp, handle, path, flags, mode);
     }
 

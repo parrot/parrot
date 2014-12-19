@@ -379,7 +379,6 @@ inline op invokecc(invar PMC) :flow {
     PMC      * const p     = $1;
     opcode_t *dest         = expr NEXT();
     PMC      * const ctx   = CURRENT_CONTEXT(interp);
-    PMC      * const signature = Parrot_pcc_get_signature(interp, ctx);
 
     Parrot_pcc_set_pc(interp, ctx, dest);
     Parrot_pcc_reuse_continuation(interp, ctx, dest);
@@ -391,7 +390,6 @@ inline op invoke(invar PMC, invar PMC) :flow {
     opcode_t   *dest       = expr NEXT();
     PMC * const p          = $1;
     PMC * const ctx        = CURRENT_CONTEXT(interp);
-    PMC * const signature  = Parrot_pcc_get_signature(interp, ctx);
 
     Parrot_pcc_set_pc(interp, ctx, dest);
     interp->current_cont   = $2;
@@ -424,7 +422,7 @@ inline op tailcall(invar PMC) :flow {
 }
 
 inline op returncc() :flow {
-    PMC * const p = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
+    PMC *      const p    = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
     opcode_t * const dest = VTABLE_invoke(interp, p, expr NEXT());
     goto ADDRESS(dest);
 }
@@ -475,7 +473,7 @@ op set_args(inconst PMC) :flow {
     opcode_t * const raw_args = CUR_OPCODE;
     PMC * const signature = $1;
     PMC * const call_sig = Parrot_pcc_build_sig_object_from_op(interp,
-            PMCNULL, signature, raw_args);
+                               PMCNULL, signature, raw_args);
     INTVAL argc;
     GETATTR_FixedIntegerArray_size(interp, signature, argc);
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), call_sig);

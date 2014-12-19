@@ -13890,7 +13890,6 @@ Parrot_invokecc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC       * const  p = PREG(1);
     opcode_t  * dest =  cur_opcode + 2;
     PMC       * const  ctx = CURRENT_CONTEXT(interp);
-    PMC       * const  signature = Parrot_pcc_get_signature(interp, ctx);
 
     Parrot_pcc_set_pc(interp, ctx, dest);
     Parrot_pcc_reuse_continuation(interp, ctx, dest);
@@ -13903,7 +13902,6 @@ Parrot_invoke_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t    * dest =  cur_opcode + 3;
     PMC  * const  p = PREG(1);
     PMC  * const  ctx = CURRENT_CONTEXT(interp);
-    PMC  * const  signature = Parrot_pcc_get_signature(interp, ctx);
 
     Parrot_pcc_set_pc(interp, ctx, dest);
     interp->current_cont = PREG(2);
@@ -13939,7 +13937,7 @@ Parrot_tailcall_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_returncc(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * const  p = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
+    PMC  *      const  p = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
     opcode_t  * const  dest = VTABLE_invoke(interp, p,  cur_opcode + 1);
 
     return (opcode_t *)dest;
@@ -17064,7 +17062,6 @@ Parrot_say_ic(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_say_n(opcode_t *cur_opcode, PARROT_INTERP) {
     char   buf[128];
-    size_t   ignore;
 
     #if defined(PARROT_HAS_SNPRINTF)
         snprintf(buf, 128, FLOATVAL_FMT "\n", NREG(1));
@@ -17093,7 +17090,6 @@ Parrot_say_n(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_say_nc(opcode_t *cur_opcode, PARROT_INTERP) {
     char   buf[128];
-    size_t   ignore;
 
     #if defined(PARROT_HAS_SNPRINTF)
         snprintf(buf, 128, FLOATVAL_FMT "\n", NCONST(1));
@@ -18579,8 +18575,6 @@ Parrot_callmethodcc_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
     if (!PMC_IS_NULL(method_pmc)) {
-        PMC  * const  signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
-
         Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), next);
         dest = VTABLE_invoke(interp, method_pmc, next);
     }
@@ -18619,8 +18613,6 @@ Parrot_callmethodcc_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
     if (!PMC_IS_NULL(method_pmc)) {
-        PMC  * const  signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
-
         Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), next);
         dest = VTABLE_invoke(interp, method_pmc, next);
     }
@@ -18646,7 +18638,6 @@ opcode_t *
 Parrot_callmethodcc_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t         * dest;
     opcode_t  * const  next =  cur_opcode + 3;
-    PMC       *        signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
     Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), next);
@@ -18661,7 +18652,6 @@ Parrot_callmethod_p_s_p(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t  * const  next =  cur_opcode + 4;
     PMC       * const  method_pmc = VTABLE_find_method(interp, object, meth);
     opcode_t  * dest;
-    PMC       *        signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
     if (PMC_IS_NULL(method_pmc)) {
@@ -18682,7 +18672,6 @@ Parrot_callmethod_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t  * const  next =  cur_opcode + 4;
     PMC       * const  method_pmc = VTABLE_find_method(interp, object, meth);
     opcode_t  * dest;
-    PMC       *        signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
     if (PMC_IS_NULL(method_pmc)) {
@@ -18698,11 +18687,9 @@ Parrot_callmethod_p_sc_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_callmethod_p_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC       * const  object = PREG(1);
     PMC       * const  method_pmc = PREG(2);
     opcode_t  * const  next =  cur_opcode + 4;
     opcode_t  * dest;
-    PMC       *        signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), next);
     interp->current_cont = PREG(3);
@@ -18717,7 +18704,6 @@ Parrot_tailcallmethod_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING    * const  meth = SREG(2);
     PMC       * const  method_pmc = VTABLE_find_method(interp, object, meth);
     opcode_t  * dest;
-    PMC       *        signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
     if (PMC_IS_NULL(method_pmc)) {
         dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND, "Method '%Ss' not found for invocant of class '%Ss'", meth, VTABLE_get_string(interp, VTABLE_get_class(interp, object)));
@@ -18738,7 +18724,6 @@ Parrot_tailcallmethod_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING    * const  meth = SCONST(2);
     PMC       * const  method_pmc = VTABLE_find_method(interp, object, meth);
     opcode_t  * dest;
-    PMC       *        signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
     if (PMC_IS_NULL(method_pmc)) {
         dest = Parrot_ex_throw_from_op_args(interp, next, EXCEPTION_METHOD_NOT_FOUND, "Method '%Ss' not found for invocant of class '%Ss'", meth, VTABLE_get_string(interp, VTABLE_get_class(interp, object)));
@@ -18755,10 +18740,8 @@ Parrot_tailcallmethod_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_tailcallmethod_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t  * const  next =  cur_opcode + 3;
-    PMC       * const  object = PREG(1);
     PMC       * const  method_pmc = PREG(2);
     opcode_t  * dest;
-    PMC       *        signature = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
     interp->current_cont = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
     (PObj_get_FLAGS(interp->current_cont) |= SUB_FLAG_TAILCALL);
@@ -24603,7 +24586,6 @@ opcode_t *
 Parrot_invokecc_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC       * const  p = PREG(1);
     opcode_t  * dest =  cur_opcode + 3;
-    PMC       * const  signature = PREG(2);
 
     Parrot_pcc_set_pc(interp, CURRENT_CONTEXT(interp), dest);
     Parrot_pcc_reuse_continuation(interp, CURRENT_CONTEXT(interp), dest);

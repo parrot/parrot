@@ -1,6 +1,6 @@
 /*
 
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -203,7 +203,6 @@ main(int argc, const char *argv[])
 
     if (argv[nextarg]) {
         const char * const filename = argv[nextarg];
-        const char * const ext      = strrchr(filename, '.');
 
         if (*filename == '-') {
             fprintf(stderr, "parrot_debugger takes no -x or --xxxx flag arguments\n");
@@ -228,9 +227,10 @@ main(int argc, const char *argv[])
     else {
         /* Generate some code to be able to enter into runloop */
         STRING * const compiler_s = Parrot_str_new_constant(interp, "PIR");
-        PMC * const compiler = Parrot_interp_get_compiler(interp, compiler_s);
-        STRING * const source = Parrot_str_new_constant(interp, ".sub aux :main\nexit 0\n.end\n");
-        PMC * const code = Parrot_interp_compile_string(interp, compiler, source);
+        PMC *    const compiler   = Parrot_interp_get_compiler(interp, compiler_s);
+        STRING * const source     = Parrot_str_new_constant(interp,
+                                        ".sub aux :main\nexit 0\n.end\n");
+        PMC *    const code       = Parrot_interp_compile_string(interp, compiler, source);
 
         if (PMC_IS_NULL(code))
             Parrot_warn(interp, PARROT_WARNINGS_NONE_FLAG,
