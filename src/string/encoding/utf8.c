@@ -649,7 +649,6 @@ utf8_substr(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset, INTVAL lengt
     ASSERT_ARGS(utf8_substr)
     const UINTVAL  strlen = STRING_length(src);
     STRING        *return_string;
-    String_iter    iter;
     UINTVAL        start = 0;
 
     if (offset < 0)

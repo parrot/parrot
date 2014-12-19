@@ -1189,7 +1189,6 @@ include_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *file_name), void *yyscanner
     macro_frame_t * const frame = new_frame(imcc);
     STRING *s = Parrot_locate_runtime_file_str(imcc->interp,
                                     file_name, PARROT_RUNTIME_FT_INCLUDE);
-    char      *ext;
     PIOHANDLE  file;
 
     if (STRING_IS_NULL(s)
@@ -1374,6 +1373,7 @@ imcc_compile_buffer_safe(ARGMOD(imc_info_t *imcc), yyscan_t yyscanner,
     return success;
 }
 
+#if 0
 static void
 do_a_better_error_message(imc_info_t * imcc, SHIM(void * yyscanner))
 {
@@ -1390,6 +1390,7 @@ do_a_better_error_message(imc_info_t * imcc, SHIM(void * yyscanner))
         "\tLast line reported is %d\n"
         "\tLast file reported is %S", imcc->line, loc);
 }
+#endif
 
 INTVAL
 imcc_run_compilation(ARGMOD(imc_info_t *imcc), void *yyscanner) {

@@ -344,8 +344,6 @@ io_buffer_transfer_to_mem(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
     PARROT_ASSERT(length > 0);
 
     {
-        const size_t length_left = length == PIO_READ_SIZE_ANY ?
-                                             BUFFER_USED_SIZE(buffer) : length;
         const size_t used_length = BUFFER_USED_SIZE(buffer);
         const size_t copy_length = used_length <= length ? used_length : length;
 
@@ -464,9 +462,7 @@ Parrot_io_buffer_write_b(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
         return 0;
 
     else {
-        size_t written = 0;
         const size_t total_size  = buffer->buffer_size;
-        const size_t used_size   = BUFFER_USED_SIZE(buffer);
         const size_t avail_size  = BUFFER_FREE_END_SPACE(buffer);
         const INTVAL needs_flush = io_buffer_requires_flush(interp, buffer, s, length);
 
@@ -547,7 +543,6 @@ Parrot_io_buffer_flush(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
     ASSERT_ARGS(Parrot_io_buffer_flush)
     size_t bytes_written = 0;
     if (buffer && !BUFFER_IS_EMPTY(buffer)) {
-        size_t used_length = BUFFER_USED_SIZE(buffer);
         bytes_written += vtable->write_b(interp, handle, (char *)buffer->buffer_start,
                                          BUFFER_USED_SIZE(buffer));
         Parrot_io_buffer_clear(interp, buffer);

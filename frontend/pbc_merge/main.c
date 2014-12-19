@@ -846,6 +846,7 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
     ASSERT_ARGS(pbc_merge_begin)
     PackFile_ByteCode    *bc;
     PackFile_ConstTable  *ct;
+    PackFile_Annotations *at;
     int                   i;
 
     /* Create a new empty packfile. */
@@ -880,6 +881,7 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
     ct->code        = bc;
     interp->code    = bc;
 
+    at = pbc_merge_annotations(interp, inputs, num_inputs, merged, bc);
     pbc_merge_debugs(interp, inputs, num_inputs, bc);
 
     /* Walk bytecode and fix ops that reference the constants table. */

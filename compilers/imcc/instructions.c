@@ -40,8 +40,6 @@ These functions operate over this array and its contents.
 /* HEADERIZER BEGIN: static */
 /* HEADERIZER END: static */
 
-static const char types[] = "INPS";
-
 /*
 
 =item C<Instruction * _mk_instruction(const char *op, const char *fmt, int n,
@@ -649,9 +647,6 @@ ins_print(ARGMOD(imc_info_t * imcc), PIOHANDLE io, ARGIN(const Instruction *ins)
 
     return len;
 }
-
-/* for debug */
-static PIOHANDLE output;
 
 /*
 
