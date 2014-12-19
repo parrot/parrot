@@ -1017,7 +1017,8 @@ gc_gms_cleanup_dirty_list(PARROT_INTERP,
             PObj_GC_on_dirty_list_CLEAR(pmc);
             Parrot_pa_remove(interp, dirty_list, item->ptr);
             item->ptr = Parrot_pa_insert(self->objects[gen], item);
-            gc_gms_seal_object(interp, pmc);
+            /* inlined gc_gms_seal_object(interp, pmc); */
+            PObj_GC_need_write_barrier_SET(pmc);
         }
         else {
             /* Survival */
@@ -2329,11 +2330,10 @@ gc_gms_check_sanity(PARROT_INTERP)
                 trace_pmc_dump(interp, pmc);
                 fprintf(stderr, "\n");
             }
-            /*PARROT_ASSERT((gen == i) || !PObj_GC_on_dirty_list_TEST(pmc)
-                             || !"Dirty live object from wrong generation");*/
-            PARROT_ASSERT((gen == i) || (pmc->vtable->base_type == enum_class_Coroutine)
-              || !"Object from wrong generation");
-
+            PARROT_ASSERT((gen == i) || !PObj_GC_on_dirty_list_TEST(pmc)
+                          || !"Dirty live object from wrong generation");
+            PARROT_ASSERT((gen == i)
+                          || !"Object from wrong generation");
             if (i)
                 PARROT_ASSERT(PObj_GC_need_write_barrier_TEST(pmc)
                     || !"Unsealed object in old generation"););

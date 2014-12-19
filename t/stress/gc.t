@@ -173,7 +173,7 @@ CODE
 .end
 CODE
 
-    my $cmd = qq{$parrot -D101 $gc_arg --gc-debug --gc-nursery-size=0.0001 -- parrot-nqp.pbc --target=pir compilers/data_json/JSON.nqp};
+    my $cmd = qq{$parrot -D1 $gc_arg --gc-debug --gc-nursery-size=0.0001 -- parrot-nqp.pbc --target=pir compilers/data_json/JSON.nqp};
     my $exit_code = run_command($cmd, CD  => $PConfig{build_dir}, STDOUT => "test_$$.out", STDERR => "test_$$.err" );
     $exit_code ? diag("'$cmd' failed with exit code $exit_code.") : unlink("test_$$.out", "test_$$.err");
     is($exit_code, 0, "GC nqp-rx Regex;Cursor $gc_arg GH #1159");

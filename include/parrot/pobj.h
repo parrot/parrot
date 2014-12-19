@@ -133,57 +133,57 @@ typedef enum PObj_enum {
 
 /* Object specification FLAGs */
     /* PObj is a string */
-    PObj_is_string_FLAG         = POBJ_FLAG(8),
+    PObj_is_string_FLAG         = POBJ_FLAG(8), /* 0x100 */
     /* PObj is a PMC */
-    PObj_is_PMC_FLAG            = POBJ_FLAG(9),
+    PObj_is_PMC_FLAG            = POBJ_FLAG(9), /* 0x200 */
     /* PObj is a copy of a string that doesn't own the string buffer */
-    PObj_is_string_copy_FLAG    = POBJ_FLAG(10),
+    PObj_is_string_copy_FLAG    = POBJ_FLAG(10),/* 0x400 */
     /* the PMC is a shared PMC */
-    PObj_is_PMC_shared_FLAG     = POBJ_FLAG(11), /* Same as PObj_is_shared_FLAG */
+    PObj_is_PMC_shared_FLAG     = POBJ_FLAG(11),/* 0x800 Same as PObj_is_shared_FLAG */
     /* PObj is otherwise shared */
-    PObj_is_shared_FLAG         = POBJ_FLAG(11), /* Same as PObj_is_PMC_shared_FLAG */
+    PObj_is_shared_FLAG         = POBJ_FLAG(11),/* Same as PObj_is_PMC_shared_FLAG */
 
 /* Memory management FLAGs */
     /* This is a constant--don't kill it! */
-    PObj_constant_FLAG          = POBJ_FLAG(12),
+    PObj_constant_FLAG          = POBJ_FLAG(12), /* 0x1000 */
     /* Marks the contents as coming from a non-Parrot source */
-    PObj_external_FLAG          = POBJ_FLAG(13),
+    PObj_external_FLAG          = POBJ_FLAG(13), /* 0x2000 */
     /* Mark the buffer as pointing to system memory */
-    PObj_sysmem_FLAG            = POBJ_FLAG(14),
+    PObj_sysmem_FLAG            = POBJ_FLAG(14), /* 0x4000 */
 
 /* PObj usage FLAGs, COW & GC */
     /* The Buffer allows COW copies, and may have some. */
-    PObj_is_COWable_FLAG        = POBJ_FLAG(15),
+    PObj_is_COWable_FLAG        = POBJ_FLAG(15), /* 0x8000 */
     /* Private flag for the GC system. Set if the PObj's in use as
      * far as the GC's concerned */
-    b_PObj_live_FLAG            = POBJ_FLAG(16),
+    b_PObj_live_FLAG            = POBJ_FLAG(16), /* 0x10000 */
     /* Mark the object as on the free list */
-    b_PObj_on_free_list_FLAG    = POBJ_FLAG(17),
+    b_PObj_on_free_list_FLAG    = POBJ_FLAG(17), /* 0x20000 */
 
 /* GC FLAGS */
     /* Set to true if the PObj has a custom mark routine */
-    PObj_custom_mark_FLAG       = POBJ_FLAG(18),
+    PObj_custom_mark_FLAG       = POBJ_FLAG(18), /* 0x40000 */
     /* Set if the PObj has a destroy method that must be called */
-    PObj_custom_destroy_FLAG    = POBJ_FLAG(19),
+    PObj_custom_destroy_FLAG    = POBJ_FLAG(19), /* 0x80000 */
     /* For debugging, report when this buffer gets moved around */
-    PObj_report_FLAG            = POBJ_FLAG(20),
+    PObj_report_FLAG            = POBJ_FLAG(20), /* 0x100000 */
 
     /* used by Proxy PMC to identify PMCs created on the current interp */
-    PObj_is_new_FLAG            = POBJ_FLAG(21),
+    PObj_is_new_FLAG            = POBJ_FLAG(21), /* 0x200000 */
 
     /* Flags used by generation GC to determine generation object belong */
-    PObj_GC_generation_0_FLAG   = POBJ_FLAG(22),
-    PObj_GC_generation_1_FLAG   = POBJ_FLAG(23),
-    PObj_GC_generation_2_FLAG   = POBJ_FLAG(24),
+    PObj_GC_generation_0_FLAG   = POBJ_FLAG(22), /* 0x400000 */
+    PObj_GC_generation_1_FLAG   = POBJ_FLAG(23), /* 0x800000 */
+    PObj_GC_generation_2_FLAG   = POBJ_FLAG(24), /* 0x1000000 */
 
     /* Object was marked dirty by write barrier */
-    PObj_GC_on_dirty_list_FLAG  = POBJ_FLAG(25),
+    PObj_GC_on_dirty_list_FLAG  = POBJ_FLAG(25), /* 0x2000000 */
 
     /* Object requires write barrier */
-    PObj_GC_need_write_barrier_FLAG = POBJ_FLAG(26),
+    PObj_GC_need_write_barrier_FLAG = POBJ_FLAG(26),/* 0x4000000 */
 
     /* Object on C stack will require implicit put to dirty list in GMS */
-    PObj_GC_soil_root_FLAG      = POBJ_FLAG(27),
+    PObj_GC_soil_root_FLAG      = POBJ_FLAG(27), /* 0x8000000 */
 
     /* For simplify some cleanup/setup */
     PObj_GC_all_generation_FLAGS = PObj_GC_generation_0_FLAG
@@ -196,12 +196,12 @@ typedef enum PObj_enum {
 
 /* PMC specific FLAGs */
     /* true if this is connected by some route to a needs_early_gc object */
-    PObj_needs_early_gc_FLAG    = POBJ_FLAG(28),
+    PObj_needs_early_gc_FLAG    = POBJ_FLAG(28), /* 0x10000000 */
 
     /* True if the PMC is a class */
-    PObj_is_class_FLAG          = POBJ_FLAG(29),
+    PObj_is_class_FLAG          = POBJ_FLAG(29), /* 0x20000000 */
     /* True if the PMC is a parrot object */
-    PObj_is_object_FLAG         = POBJ_FLAG(30)
+    PObj_is_object_FLAG         = POBJ_FLAG(30)  /* 0x40000000 */
 
 } PObj_flags;
 #undef POBJ_FLAG
