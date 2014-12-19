@@ -121,9 +121,9 @@ TBD
 #endif
 
 /*
- * Maximum number of generation lists for gms.
+ * Maximum number of generation buffers for gms.
  * Max. 8 due to limited number of bits in PMC.flags, but practically 0-2 = 3
- * Best performance with 3 and 4 in parrot-bench
+ * Best performance with 2 and 3 in parrot-bench
  */
 #ifndef GC_MAX_GENERATIONS
 #  define GC_MAX_GENERATIONS  3
@@ -758,24 +758,19 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
         size_t i;
 
         self = mem_internal_allocate_zeroed_typed(MarkSweep_GC);
-
         self->pmc_allocator = Parrot_gc_pool_new(interp,
             sizeof (pmc_alloc_struct));
-
         self->string_allocator = Parrot_gc_pool_new(interp,
             sizeof (string_alloc_struct));
-
         /* Allocate list for gray objects */
         self->work_list  = NULL;
         self->dirty_list = Parrot_pa_new(interp);
-
-        for (i = 0; i < GC_MAX_GENERATIONS; i++) {
+        for (i = 0; i < GC_MAX_GENERATIONS; i++) { /* 0,1,2*/
             self->objects[i] = Parrot_pa_new(interp);
             self->strings[i] = Parrot_pa_new(interp);
         }
 
         self->fixed_size_allocator = Parrot_gc_fixed_allocator_new(interp);
-
         /*
          * Collect every nursery_size/100 of system memory.
          *
@@ -938,28 +933,28 @@ gc_gms_select_generation_to_collect(PARROT_INTERP)
     /* TODO Use less naive approach. E.g. count amount of allocated memory in
      * older generations */
     size_t runs = interp->gc_sys->stats.gc_mark_runs;
-#if GC_MAX_GENERATIONS >= 8
+#if GC_MAX_GENERATIONS > 8
     if (runs % 100000000 == 0)
         return 8;
-#  if GC_MAX_GENERATIONS >= 7
+#  if GC_MAX_GENERATIONS > 7
     if (runs % 10000000 == 0)
         return 7;
-#    if GC_MAX_GENERATIONS >= 6
+#    if GC_MAX_GENERATIONS > 6
     if (runs % 1000000 == 0)
         return 6;
-#      if GC_MAX_GENERATIONS >= 5
+#      if GC_MAX_GENERATIONS > 5
     if (runs % 100000 == 0)
         return 5;
-#        if GC_MAX_GENERATIONS >= 4
+#        if GC_MAX_GENERATIONS > 4
     if (runs % 10000 == 0)
         return 4;
-#          if GC_MAX_GENERATIONS >= 3
+#          if GC_MAX_GENERATIONS > 3
     if (runs % 1000 == 0)
         return 3;
-#            if GC_MAX_GENERATIONS >= 2
+#            if GC_MAX_GENERATIONS > 2
     if (runs % 100 == 0)
         return 2;
-#              if GC_MAX_GENERATIONS >= 1
+#              if GC_MAX_GENERATIONS > 1
     if (runs % 10 == 0)
         return 1;
 #              endif
@@ -1023,8 +1018,8 @@ gc_gms_cleanup_dirty_list(PARROT_INTERP,
         else {
             /* Survival */
             /* This check used to be
-             * if ((gen <= self->gen_to_collect) && (gen < GC_MAX_GENERATIONS - 1))
-             * Unfortunatelly it's wrong.
+             * if ((gen <= self->gen_to_collect) && (gen < GC_MAX_GENERATIONS))
+             * Unfortunately it's wrong.
              * Consider this:
              * A1* -> B1* -> C0. (Object in generation notation. Star denotes "dirt
              * During gen0 collecting will "sink" A object, but not B. This picture
@@ -1034,7 +1029,7 @@ gc_gms_cleanup_dirty_list(PARROT_INTERP,
              * And after collecting of gen2 we'll collect B and C incorrectly.
              * Because A(3) will be in older generation than B and C.
              */
-            if (gen < GC_MAX_GENERATIONS - 1) {
+            if (gen < GC_MAX_GENERATIONS) {
                 SET_GEN_FLAGS(pmc, gen + 1);
             }
         };);
@@ -1136,7 +1131,7 @@ gc_gms_sweep_pools(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
 
     for (i = self->gen_to_collect; i >= 0; i--) {
         /* Don't move to generation beyond last */
-        const int move_to_old = (i + 1) != GC_MAX_GENERATIONS;
+        const int move_to_old = i != GC_MAX_GENERATIONS;
 
         POINTER_ARRAY_ITER(self->objects[i],
             pmc_alloc_struct * const item = (pmc_alloc_struct *)ptr;
@@ -2322,7 +2317,7 @@ gc_gms_check_sanity(PARROT_INTERP)
             PMC *pmc = &(((pmc_alloc_struct*)ptr)->pmc);
             const size_t gen  = POBJ2GEN(pmc);
             PARROT_GC_ASSERT_INTERP(pmc, interp);
-            if (i < 3) { /* too many objects in gen3 */
+            if (i < 3) { /* do not display older generations, too many */
                 GC_DEBUG_DETAIL_1_FLAGS("GC live gen "SIZE_FMT" ", gen, pmc);
             }
             if (gen != i) {
@@ -2332,8 +2327,7 @@ gc_gms_check_sanity(PARROT_INTERP)
             }
             PARROT_ASSERT((gen == i) || !PObj_GC_on_dirty_list_TEST(pmc)
                           || !"Dirty live object from wrong generation");
-            PARROT_ASSERT((gen == i)
-                          || !"Object from wrong generation");
+            PARROT_ASSERT((gen == i) || !"Object from wrong generation");
             if (i)
                 PARROT_ASSERT(PObj_GC_need_write_barrier_TEST(pmc)
                     || !"Unsealed object in old generation"););
