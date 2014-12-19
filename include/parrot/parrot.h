@@ -138,7 +138,7 @@ typedef struct parrot_interp_t Interp;
 #define PTR2UINTVAL(p)   UINTVAL2PTR(UINTVAL, (p))
 #define PTR2ULONG(p)     UINTVAL2PTR(unsigned long, (p))
 /* cast a const qualifier away. */
-#define PTR_UNCONST(any, p) INTVAL2PTR(any, INTVAL2PTR(INTVAL, (p)))
+#define PTR_UNCONST(any, p) INTVAL2PTR((any), INTVAL2PTR(INTVAL, (p)))
 
 /*
  * some compilers don't like lvalue casts, so macroize them

@@ -228,7 +228,8 @@ main(int argc, const char *argv[])
         /* Generate some code to be able to enter into runloop */
         STRING * const compiler_s = Parrot_str_new_constant(interp, "PIR");
         PMC *    const compiler   = Parrot_interp_get_compiler(interp, compiler_s);
-        STRING * const source     = Parrot_str_new_constant(interp, ".sub aux :main\nexit 0\n.end\n");
+        STRING * const source     = Parrot_str_new_constant(interp,
+                                        ".sub aux :main\nexit 0\n.end\n");
         PMC *    const code       = Parrot_interp_compile_string(interp, compiler, source);
 
         if (PMC_IS_NULL(code))
