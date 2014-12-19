@@ -5,6 +5,7 @@
           --ccflags adjustable, renamed to GC_MAX_GENERATIONS, and use the correct number.
           Default 3 for generations 0,1,2.
     - Build
+         + More code cleanup to reduce compiler warnings, code size and unneeded calls.
     - Documentation
     - Tests
     - Community
