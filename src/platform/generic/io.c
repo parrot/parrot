@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -212,7 +212,7 @@ Parrot_io_internal_async(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL async)
     if (Parrot_io_is_closed(interp, pmc))
         return 0;
 
-#if defined(linux)
+#if defined(__linux__)
     file_descriptor = Parrot_io_get_os_handle(interp, pmc);
 
     if ((rflags = fcntl(file_descriptor, F_GETFL, 0)) >= 0) {
