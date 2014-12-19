@@ -185,7 +185,6 @@ do_unshift(PARROT_INTERP, ARGIN(PMC *arr), ARGIN(PMC *val))
 #endif
         memmove(array + 1, array, size * sizeof (PMC *));
         array[0] = val;
-        PARROT_GC_WRITE_BARRIER(interp, arr);
     }
 }
 /*
@@ -266,7 +265,7 @@ Resizes the array to C<size> elements.
         else if (n <= threshold - offset) {
             TRACE_RPAsize("resize skip");
             PMC_size(SELF) = n;
-            /* PARROT_GC_WRITE_BARRIER(INTERP, SELF); needed? */
+            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             /* we could shrink here, but this would need a GC mark */
             return;
         }
@@ -730,22 +729,22 @@ the array.
 
 */
 
-    VTABLE void unshift_float(FLOATVAL value) :manual_wb {
+    VTABLE void unshift_float(FLOATVAL value) {
         PMC * const val = Parrot_pmc_new(INTERP, enum_class_Float);
         VTABLE_set_number_native(INTERP, val, value);
         do_unshift(INTERP, SELF, val);
     }
 
-    VTABLE void unshift_integer(INTVAL value) :manual_wb {
+    VTABLE void unshift_integer(INTVAL value) {
         PMC * const val = Parrot_pmc_new_init_int(INTERP, enum_class_Integer, value);
         do_unshift(INTERP, SELF, val);
     }
 
-    VTABLE void unshift_pmc(PMC *value) :manual_wb {
+    VTABLE void unshift_pmc(PMC *value) {
         do_unshift(INTERP, SELF, value);
     }
 
-    VTABLE void unshift_string(STRING *value) :manual_wb {
+    VTABLE void unshift_string(STRING *value) {
         PMC * const val = Parrot_pmc_new(INTERP, enum_class_String);
         VTABLE_set_string_native(INTERP, val, value);
         do_unshift(INTERP, SELF, val);

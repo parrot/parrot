@@ -1,5 +1,9 @@
 2014-01-20    release 7.0.0 - supported
     - Core
+        + Fix a GC regression from 6.11 with ResizablePMCArray #1159 (1.2% slower)
+        + Added experimental INTERPINFO_MAX_GENERATIONS api, made MAX_GENERATIONS
+          --ccflags adjustable, renamed to GC_MAX_GENERATIONS, and use the correct number.
+          Default 3 for generations 0,1,2.
     - Build
     - Documentation
     - Tests
