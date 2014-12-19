@@ -168,8 +168,8 @@ struct _ParrotIOData {
     } while (0);
 
 /* Get an editable version of the IO_VTABLE structure, typically used during
-   vtable initialization. */
-#define IO_EDITABLE_IO_VTABLE(i, idx) &((i)->piodata->vtables[(idx)])
+   vtable initialization. Fight -Wconst-qual */
+#define IO_EDITABLE_IO_VTABLE(i, idx) ((IO_VTABLE *)(void *)(&((i)->piodata->vtables[(idx)])))
 
 
 /* HEADERIZER BEGIN: src/io/utilities.c */

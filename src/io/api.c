@@ -383,7 +383,7 @@ Parrot_io_socket_handle(PARROT_INTERP, ARGMOD_NULLOK(PMC *socket), INTVAL fam,
             INTVAL type, INTVAL proto)
 {
     ASSERT_ARGS(Parrot_io_socket_handle)
-    (void)Parrot_io_socket(interp, socket, fam, type, proto);
+    socket = Parrot_io_socket(interp, socket, fam, type, proto);
     /* For historical reasons, this function always returns 0 to signal
        unconditional success */
     return 0;
@@ -1021,7 +1021,7 @@ Parrot_io_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(const void *buffer),
         io_verify_is_open_for(interp, handle, vtable, PIO_F_WRITE);
         io_sync_buffers_for_write(interp, handle, vtable, read_buffer, write_buffer);
         bytes_written = Parrot_io_buffer_write_b(interp, write_buffer, handle, vtable,
-                                                 (char *)buffer, byte_length);
+                                                 INTVAL2PTR(char *,PTR2INTVAL(buffer)), byte_length);
         vtable->adv_position(interp, handle, bytes_written);
 
         /* If we are writing to a r/w handle, advance the pointer in the
