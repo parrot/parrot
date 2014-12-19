@@ -164,10 +164,16 @@ longopt_get_longopt(int argc, ARGIN(const char* argv[]),
                         info_buf->opt_arg = &argv[dex][optlen+1];
                     }
                     else {
+#ifdef PARROT_HAS_SNPRINTF
                         snprintf(longopt_error_buffer,
                                  sizeof (longopt_error_buffer),
                                  "Option %s does not expect an argument",
                                  dptr->opt_long[sptr]);
+#else
+                        sprintf(longopt_error_buffer,
+                                "Option %s does not expect an argument",
+                                dptr->opt_long[sptr]);
+#endif
                         info_buf->opt_error = longopt_error_buffer;
                         return -1;
                     }

@@ -46,6 +46,7 @@ C<*ptr> to C<update>. Otherwise sets C<expect> to C<*ptr>.
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PARROT_INLINE
 void *
 parrot_i386_cmpxchg(ARGMOD(void *volatile *ptr), ARGIN_NULLOK(void *expect),
                                         ARGIN_NULLOK(void *update))
@@ -80,6 +81,7 @@ C<l> = C<result>;
 
 
 PARROT_EXPORT
+PARROT_INLINE
 long
 parrot_i386_xadd(ARGIN(volatile long *l), long amount)
 {

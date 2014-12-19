@@ -1567,11 +1567,9 @@ gc_ms2_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
 
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     GC_Statistics        stats = interp->gc_sys->stats;
-    size_t               i;
 
     fprintf(stderr, "GC %-25s | total: %lu, ", header,
             (unsigned long)stats.gc_mark_runs);
-
     fprintf(stderr, "old: %lu, new: %lu\n",
             (unsigned long)Parrot_pa_count_used(interp, self->objects),
             self->new_objects

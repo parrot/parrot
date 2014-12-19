@@ -18,6 +18,7 @@
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PARROT_INLINE
 void * parrot_i386_cmpxchg(
     ARGMOD(void *volatile *ptr),
     ARGIN_NULLOK(void *expect),
@@ -26,6 +27,7 @@ void * parrot_i386_cmpxchg(
         FUNC_MODIFIES(*ptr);
 
 PARROT_EXPORT
+PARROT_INLINE
 long parrot_i386_xadd(ARGIN(volatile long *l), long amount)
         __attribute__nonnull__(1);
 
@@ -43,14 +45,6 @@ typedef struct Parrot_atomic_pointer {
 typedef struct Parrot_atomic_integer {
     volatile long val;
 } Parrot_atomic_integer;
-
-/*
- * if both I386 and X86_64 cmpxchg are defined, we are on x86_64 -
- * reuse existing code
- */
-PARROT_INLINE
-void *parrot_i386_cmpxchg(void *volatile *ptr, void *expect,
-                                        void *update);
 
 #define PARROT_ATOMIC_PTR_GET(result, a) ((result) = (a).val)
 
@@ -89,9 +83,6 @@ void *parrot_i386_cmpxchg(void *volatile *ptr, void *expect,
             (result) = 0; \
         } \
     } while (0)
-
-PARROT_INLINE
-long parrot_i386_xadd(volatile long *l, long amount);
 
 #define PARROT_ATOMIC_INT_INC(result, a) \
     do { \

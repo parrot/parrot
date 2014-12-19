@@ -18,6 +18,7 @@ and its utility functions.
 
 */
 
+#include <stdio.h>
 #include "parrot/parrot.h"
 #include "spf_private.h"
 #include "spf_render.str"

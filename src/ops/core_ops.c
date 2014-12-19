@@ -13890,7 +13890,6 @@ Parrot_invokecc_p(opcode_t *cur_opcode, PARROT_INTERP) {
     PMC       * const  p = PREG(1);
     opcode_t  * dest =  cur_opcode + 2;
     PMC       * const  ctx = CURRENT_CONTEXT(interp);
-    PMC       * const  signature = Parrot_pcc_get_signature(interp, ctx);
 
     Parrot_pcc_set_pc(interp, ctx, dest);
     Parrot_pcc_reuse_continuation(interp, ctx, dest);
@@ -13903,7 +13902,6 @@ Parrot_invoke_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     opcode_t    * dest =  cur_opcode + 3;
     PMC  * const  p = PREG(1);
     PMC  * const  ctx = CURRENT_CONTEXT(interp);
-    PMC  * const  signature = Parrot_pcc_get_signature(interp, ctx);
 
     Parrot_pcc_set_pc(interp, ctx, dest);
     interp->current_cont = PREG(2);
@@ -13939,7 +13937,7 @@ Parrot_tailcall_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_returncc(opcode_t *cur_opcode, PARROT_INTERP) {
-    PMC  * const  p = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
+    PMC  *      const  p = Parrot_pcc_get_continuation(interp, CURRENT_CONTEXT(interp));
     opcode_t  * const  dest = VTABLE_invoke(interp, p,  cur_opcode + 1);
 
     return (opcode_t *)dest;
