@@ -133,15 +133,15 @@ typedef enum PObj_enum {
 
 /* Object specification FLAGs */
     /* PObj is a string */
-    PObj_is_string_FLAG         = POBJ_FLAG(8), /* 0x100 */
+    PObj_is_string_FLAG         = POBJ_FLAG(8),  /* 0x100 */
     /* PObj is a PMC */
-    PObj_is_PMC_FLAG            = POBJ_FLAG(9), /* 0x200 */
+    PObj_is_PMC_FLAG            = POBJ_FLAG(9),  /* 0x200 */
     /* PObj is a copy of a string that doesn't own the string buffer */
-    PObj_is_string_copy_FLAG    = POBJ_FLAG(10),/* 0x400 */
+    PObj_is_string_copy_FLAG    = POBJ_FLAG(10), /* 0x400 */
     /* the PMC is a shared PMC */
-    PObj_is_PMC_shared_FLAG     = POBJ_FLAG(11),/* 0x800 Same as PObj_is_shared_FLAG */
+    PObj_is_PMC_shared_FLAG     = POBJ_FLAG(11), /* 0x800 Same as PObj_is_shared_FLAG */
     /* PObj is otherwise shared */
-    PObj_is_shared_FLAG         = POBJ_FLAG(11),/* Same as PObj_is_PMC_shared_FLAG */
+    PObj_is_shared_FLAG         = POBJ_FLAG(11), /* Same as PObj_is_PMC_shared_FLAG */
 
 /* Memory management FLAGs */
     /* This is a constant--don't kill it! */
@@ -180,7 +180,7 @@ typedef enum PObj_enum {
     PObj_GC_on_dirty_list_FLAG  = POBJ_FLAG(25), /* 0x2000000 */
 
     /* Object requires write barrier */
-    PObj_GC_need_write_barrier_FLAG = POBJ_FLAG(26),/* 0x4000000 */
+    PObj_GC_need_write_barrier_FLAG = POBJ_FLAG(26), /* 0x4000000 */
 
     /* Object on C stack will require implicit put to dirty list in GMS */
     PObj_GC_soil_root_FLAG      = POBJ_FLAG(27), /* 0x8000000 */
