@@ -1869,7 +1869,8 @@ Parrot_str_boolean(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 
 /*
 
-=item C<STRING * Parrot_str_format_data(PARROT_INTERP, const char *format, ...)>
+=item C<STRING * Parrot_str_format_data(PARROT_INTERP, ARGIN_FORMAT(const char
+*format), ...)>
 
 Writes and returns a Parrot string.
 
@@ -1880,7 +1881,7 @@ Writes and returns a Parrot string.
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-Parrot_str_format_data(PARROT_INTERP, ARGIN(const char *format), ...)
+Parrot_str_format_data(PARROT_INTERP, ARGIN_FORMAT(const char *format), ...)
 {
     ASSERT_ARGS(Parrot_str_format_data)
     STRING *output;

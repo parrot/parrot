@@ -664,8 +664,8 @@ try_rev_cmp(ARGIN(const char *name), ARGMOD(SymReg **r))
 
 /*
 
-=item C<int imcc_vfprintf(imc_info_t * imcc, PMC *io, const char *format,
-va_list ap)>
+=item C<int imcc_vfprintf(imc_info_t * imcc, PMC *io, ARGIN_FORMAT(const char
+*format), va_list ap)>
 
 Formats a given series of arguments per a given format string and prints it to
 the given Parrot IO PMC.
@@ -677,7 +677,7 @@ the given Parrot IO PMC.
 PARROT_IGNORABLE_RESULT
 int
 imcc_vfprintf(ARGMOD(imc_info_t * imcc), ARGMOD(PMC *io),
-        ARGIN(const char *format), va_list ap)
+        ARGIN_FORMAT(const char *format), va_list ap)
 {
     ASSERT_ARGS(imcc_vfprintf)
     return Parrot_io_putps(imcc->interp, io, Parrot_vsprintf_c(imcc->interp, format, ap));

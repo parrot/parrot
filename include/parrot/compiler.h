@@ -183,6 +183,7 @@
     /* The pointer passed may be NULL */
 
 #  define ARGIN(x)                    /*@in@*/ /*@notnull@*/ __in x
+#  define ARGIN_FORMAT(x)             /*@in@*/ /*@notnull@*/ __in x
 #  define ARGIN_NULLOK(x)             /*@in@*/ /*@null@*/ __in_opt x
     /* The pointer target must be completely defined before being passed */
     /* to the function. */
@@ -208,6 +209,7 @@
     /* The pointer passed may be NULL */
 
 #  define ARGIN(x)                    /*@in@*/ /*@notnull@*/ x
+#  define ARGIN_FORMAT(x)             /*@in@*/ /*@notnull@*/ x
 #  define ARGIN_NULLOK(x)             /*@in@*/ /*@null@*/ x
     /* The pointer target must be completely defined before being passed */
     /* to the function. */

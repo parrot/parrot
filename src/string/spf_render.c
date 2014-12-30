@@ -90,7 +90,6 @@ static STRING * handle_flags(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_CANNOT_RETURN_NULL
 static void str_concat_w_flags(PARROT_INTERP,
     ARGOUT(PMC * sb),
     ARGIN(const SpfInfo *info),
@@ -231,7 +230,6 @@ Returns the pointer to the modified string.
 
 */
 
-PARROT_CANNOT_RETURN_NULL
 static void
 str_concat_w_flags(PARROT_INTERP, ARGOUT(PMC * sb), ARGIN(const SpfInfo *info),
         ARGMOD(STRING *src), ARGIN_NULLOK(STRING *prefix))

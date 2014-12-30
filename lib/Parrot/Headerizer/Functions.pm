@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2011, Parrot Foundation.
+# Copyright (C) 2004-2014, Parrot Foundation.
 #
 
 package Parrot::Headerizer::Functions;
@@ -329,13 +329,15 @@ Performs some validation on prototype arguments.
 
 sub validate_prototype_args {
     my ($args, $proto) = @_;
+    $args =~ s/__attribute__format__\(\d, \d//;
     my @args = split( /\s*,\s*/, $args );
     for (@args) {
         /\S+\s+\S+/
             || ( $_ eq '...' )
+            || ( $_ =~ /^\.\.\.\)? ?/ )
             || ( $_ eq 'void' )
             || ( $_ =~ /(PARROT|NULLOK|SHIM)_INTERP/ )
-            or die "Bad args in $proto";
+            or die "Bad arg '$_' in '$proto'";
     }
     return @args;
 }

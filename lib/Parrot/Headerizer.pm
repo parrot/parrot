@@ -1,10 +1,10 @@
-# Copyright (C) 2004-2012, Parrot Foundation.
+# Copyright (C) 2004-2014, Parrot Foundation.
 
 package Parrot::Headerizer;
 
 =head1 NAME
 
-Parrot::Headerizer - Parrot header generation functionality
+Parrot::Headerizer - Generate parrot function header declarations automatically
 
 =head1 SYNOPSIS
 
@@ -102,6 +102,7 @@ sub new {
         PARROT_EXPORT
         PARROT_INLINE
         PARROT_NOINLINE
+        PARROT_DEPRECATED
 
         PARROT_CAN_RETURN_NULL
         PARROT_CANNOT_RETURN_NULL
@@ -117,6 +118,7 @@ sub new {
 
         PARROT_MALLOC
         PARROT_OBSERVER
+        PARROT_EXPOSED
 
         PARROT_HOT
         PARROT_COLD
@@ -427,6 +429,7 @@ sub function_components_from_declaration {
     my $args = join( ' ', @lines );
 
     $args =~ s/\s+/ /g;
+    $args =~ s/__attribute__format__\(\d, \d\)//g;
     $args =~ s{([^(]+)\s*\((.+)\);?}{$2}
         or die qq{Couldn't handle "$proto" in $file\n};
 
@@ -927,6 +930,13 @@ sub attrs_from_args {
     for my $arg (@args) {
         ++$n;
         @mods = func_modifies($arg, \@mods);
+        if ( $arg =~ m{ARGIN_FORMAT\(}) {
+            my $idx = $n;
+            my $next = $idx + 1;
+            $next = 0 if $args[$idx] ne '...';
+            push( @attrs, "__attribute__format__($idx, $next)" );
+            $arg =~ s/ARGIN_FORMAT\(/ARGIN(/;
+        }
         if ( $arg =~ m{(ARGIN|ARGOUT|ARGMOD|ARGFREE_NOTNULL|NOTNULL)\(} || $arg eq 'PARROT_INTERP' ) {
             push( @attrs, "__attribute__nonnull__($n)" );
         }
@@ -940,7 +950,7 @@ sub attrs_from_args {
         }
     }
 
-    return (@attrs,@mods);
+    return (@attrs, @mods);
 }
 
 =head2 C<print_final_message()>
