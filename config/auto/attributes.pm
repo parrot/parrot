@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2012, Parrot Foundation.
+# Copyright (C) 2007-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -6,8 +6,8 @@ config/auto/attributes.pm - Attributes detection
 
 =head1 DESCRIPTION
 
-Automagically detect what attributes, like HASATTRIBUTE_CONST, that
-the compiler can support.
+Automagically detect all attributes or declspec, like HASATTRIBUTE_CONST,
+that the compiler can support.
 
 =cut
 
@@ -32,7 +32,9 @@ sub _init {
 our @potential_attributes = qw(
     HASATTRIBUTE_CONST
     HASATTRIBUTE_DEPRECATED
-    HASATTRIBUTE_FORMAT
+    HASATTRIBUTE_FORMAT_GNU_PRINTF
+    HASATTRIBUTE_FORMAT_MS_PRINTF
+    HASATTRIBUTE_FORMAT_PRINTF
     HASATTRIBUTE_MALLOC
     HASATTRIBUTE_NONNULL
     HASATTRIBUTE_NORETURN
@@ -41,6 +43,7 @@ our @potential_attributes = qw(
     HASATTRIBUTE_WARN_UNUSED_RESULT
     HASATTRIBUTE_HOT
     HASATTRIBUTE_COLD
+    HASATTRIBUTE_RETURNS_NONNULL
     HASATTRIBUTE_NEVER_WORKS
 );
 # HASATTRIBUTE_NEVER_WORKS is at the end just to prove that it's possible to fail.
@@ -94,7 +97,7 @@ sub try_attr {
     }
 
     my $output = Parrot::BuildUtil::slurp_file($output_file);
-    $conf->debug("  output: $output\n");
+    $conf->debug("  output: $output\n") if $output;
 
     if ( $output !~ /error|warning/i ) {
         $conf->data->set( ccflags => $tryflags );

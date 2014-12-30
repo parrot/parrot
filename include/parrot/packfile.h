@@ -345,7 +345,6 @@ FLOATVAL PF_fetch_number(
     ARGIN(const opcode_t **stream))
         __attribute__nonnull__(2);
 
-PARROT_CANNOT_RETURN_NULL
 opcode_t PF_fetch_opcode(
     ARGIN_NULLOK(const PackFile *pf),
     ARGMOD(const opcode_t **stream))

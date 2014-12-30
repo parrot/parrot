@@ -1075,7 +1075,6 @@ When used for freeze/thaw the C<pf> argument might be NULL.
 
 */
 
-PARROT_CANNOT_RETURN_NULL
 opcode_t
 PF_fetch_opcode(ARGIN_NULLOK(const PackFile *pf), ARGMOD(const opcode_t **stream))
 {

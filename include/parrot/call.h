@@ -439,7 +439,6 @@ void Parrot_pcc_set_context_func(PARROT_INTERP, ARGIN(PMC *ctx))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
 void Parrot_pcc_set_regs_ni(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN(Regs_ni *bp))
@@ -447,7 +446,6 @@ void Parrot_pcc_set_regs_ni(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
 void Parrot_pcc_set_regs_ps(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN(Regs_ps *bp_ps))

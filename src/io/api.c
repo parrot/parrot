@@ -376,7 +376,6 @@ Legacy wrapper function for Parrot_io_socket. This is deprecated, do not use.
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
 INTVAL
 Parrot_io_socket_handle(PARROT_INTERP, ARGMOD_NULLOK(PMC *socket), INTVAL fam,
             INTVAL type, INTVAL proto)

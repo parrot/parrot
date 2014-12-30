@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -655,7 +655,6 @@ Parrot_gc_reallocate_memory_chunk(PARROT_INTERP, ARGFREE(void *data), size_t new
 }
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
 void
 Parrot_gc_free_memory_chunk(PARROT_INTERP, ARGIN_NULLOK(void *data))
 {
