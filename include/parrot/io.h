@@ -233,8 +233,9 @@ PARROT_IGNORABLE_RESULT
 INTVAL /*@alt void@*/
 Parrot_io_eprintf(
     NULLOK(PARROT_INTERP),
-    ARGIN(const char *s),
+    ARGIN_FORMAT(const char *s),
     ...)
+        __attribute__format__(2, 3)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
@@ -280,10 +281,11 @@ PARROT_IGNORABLE_RESULT
 INTVAL /*@alt void@*/
 Parrot_io_fprintf(PARROT_INTERP,
     ARGMOD(PMC *pmc),
-    ARGIN(const char *s),
+    ARGIN_FORMAT(const char *s),
     ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__format__(3, 4)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pmc);
 
@@ -385,18 +387,20 @@ PARROT_IGNORABLE_RESULT
 INTVAL /*@alt void@*/
 Parrot_io_pprintf(PARROT_INTERP,
     PIOHANDLE os_handle,
-    ARGIN(const char *s),
+    ARGIN_FORMAT(const char *s),
     ...)
         __attribute__nonnull__(1)
+        __attribute__format__(3, 4)
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 INTVAL /*@alt void@*/
 Parrot_io_printf(PARROT_INTERP,
-    ARGIN(const char *s),
+    ARGIN_FORMAT(const char *s),
     ...)
         __attribute__nonnull__(1)
+        __attribute__format__(2, 3)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
@@ -712,8 +716,7 @@ INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_io_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))
-#define ASSERT_ARGS_Parrot_io_eprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_Parrot_io_eprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_io_fdopen __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc) \
@@ -731,8 +734,7 @@ INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP,
     , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_io_fprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pmc) \
-    , PARROT_ASSERT_ARG(s))
+    , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_io_get_vtable __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_getfd __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -771,11 +773,9 @@ INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_io_pprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(s))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_printf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(s))
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_putps __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc) \

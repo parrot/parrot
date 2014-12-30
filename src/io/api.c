@@ -1302,7 +1302,8 @@ Parrot_io_putps(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(STRING *s))
 
 /*
 
-=item C<INTVAL Parrot_io_fprintf(PARROT_INTERP, PMC *pmc, const char *s, ...)>
+=item C<INTVAL Parrot_io_fprintf(PARROT_INTERP, PMC *pmc, ARGIN_FORMAT(const
+char *s), ...)>
 
 Writes a C string format with varargs to C<*pmc>. Uses Parrot_io_write_s to
 write the formatted string, and is subject to all the limitations thereof.
@@ -1314,7 +1315,7 @@ write the formatted string, and is subject to all the limitations thereof.
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 INTVAL
-Parrot_io_fprintf(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const char *s), ...)
+Parrot_io_fprintf(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN_FORMAT(const char *s), ...)
 {
     ASSERT_ARGS(Parrot_io_fprintf)
     va_list args;
@@ -1334,8 +1335,8 @@ Parrot_io_fprintf(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const char *s), ...)
 
 /*
 
-=item C<INTVAL Parrot_io_pprintf(PARROT_INTERP, PIOHANDLE os_handle, const char
-*s, ...)>
+=item C<INTVAL Parrot_io_pprintf(PARROT_INTERP, PIOHANDLE os_handle,
+ARGIN_FORMAT(const char *s), ...)>
 
 Writes a C string format with varargs to PIOHANDLE C<os_handle>. Writes
 directly to the givem C<os_handle> without any intermediate buffering or other
@@ -1348,7 +1349,7 @@ logic common to Parrot Handle PMCs.
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 INTVAL
-Parrot_io_pprintf(PARROT_INTERP, PIOHANDLE os_handle, ARGIN(const char *s), ...)
+Parrot_io_pprintf(PARROT_INTERP, PIOHANDLE os_handle, ARGIN_FORMAT(const char *s), ...)
 {
     ASSERT_ARGS(Parrot_io_pprintf)
     va_list  args;
@@ -1363,7 +1364,8 @@ Parrot_io_pprintf(PARROT_INTERP, PIOHANDLE os_handle, ARGIN(const char *s), ...)
 
 /*
 
-=item C<INTVAL Parrot_io_printf(PARROT_INTERP, const char *s, ...)>
+=item C<INTVAL Parrot_io_printf(PARROT_INTERP, ARGIN_FORMAT(const char *s),
+...)>
 
 Writes a C string format with varargs to C<stdout>. This routine uses
 Parrot_io_write_s to perform the actual right, and is therefore subject to
@@ -1376,7 +1378,7 @@ all the same semantics and limitations.
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 INTVAL
-Parrot_io_printf(PARROT_INTERP, ARGIN(const char *s), ...)
+Parrot_io_printf(PARROT_INTERP, ARGIN_FORMAT(const char *s), ...)
 {
     ASSERT_ARGS(Parrot_io_printf)
     va_list args;
@@ -1398,7 +1400,8 @@ Parrot_io_printf(PARROT_INTERP, ARGIN(const char *s), ...)
 
 /*
 
-=item C<INTVAL Parrot_io_eprintf(PARROT_INTERP, const char *s, ...)>
+=item C<INTVAL Parrot_io_eprintf(PARROT_INTERP, ARGIN_FORMAT(const char *s),
+...)>
 
 Writes a C string format with varargs to C<stderr>. This routine uses
 Parrot_io_write_s to perform the actual right, and is therefore subject to
@@ -1411,7 +1414,7 @@ all the same semantics and limitations.
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 INTVAL
-Parrot_io_eprintf(NULLOK(PARROT_INTERP), ARGIN(const char *s), ...)
+Parrot_io_eprintf(NULLOK(PARROT_INTERP), ARGIN_FORMAT(const char *s), ...)
 {
     ASSERT_ARGS(Parrot_io_eprintf)
     va_list args;
