@@ -42,7 +42,8 @@ sub runstep {
         ignore_pattern    => 'PARROT_CONFIG_DATE',
         conditioned_lines => 1,
         manifest => [ "[main]", "include" ]
-    );
+                  );
+
     $conf->genfile($self->{templates}->{feature_h}, 'include/parrot/feature.h',
         ignore_pattern => 'PARROT_CONFIG_DATE',
         feature_file   => 1,
@@ -74,6 +75,12 @@ sub runstep {
     $conf->data->set( TEMP_cli_define =>
         join "\n", map { "#define PARROT_DEF_" . uc($_) . " 1" }
                    split /,/, $conf->options->get('define') || ''
+    );
+
+    $conf->data->set( TEMP_hasattributes =>
+        join "\n", map { $conf->data->get($_) ? "#define $_ \t1" : "#undef  $_" }
+                   grep { /^HASATTRIBUTE_\w+/ }
+                   @sorted_keys
     );
 
     $conf->genfile($self->{templates}->{has_header_h}, 'include/parrot/has_header.h',

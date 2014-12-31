@@ -70,7 +70,6 @@ sub try_attr {
     $conf->cc_gen('config/auto/attributes/test_c.in');
 
     my $disable_warnings = '';
-
     # work around msvc warning for unused variable
     if ( defined $conf->option_or_data('msvcversion') ) {
         $disable_warnings = '-wd4101';
@@ -86,7 +85,13 @@ sub try_attr {
     my $exit_code =
         Parrot::Configure::Utils::_run_command( $command_line, $output_file, $output_file );
     $conf->debug("  exit code: $exit_code\n");
+    my $output = Parrot::BuildUtil::slurp_file($output_file);
+    $conf->debug("  output: $output\n") if $output;
 
+    if ( !$exit_code and $output =~ /error|warning/i ) {
+        $exit_code = 1;
+        $conf->debug("Error or Warning: rejected $attr\n");
+    }
     $conf->cc_clean();
     $conf->data->set( $attr => !$exit_code | 0 );
 
@@ -96,14 +101,11 @@ sub try_attr {
         return;
     }
 
-    my $output = Parrot::BuildUtil::slurp_file($output_file);
-    $conf->debug("  output: $output\n") if $output;
-
-    if ( $output !~ /error|warning/i ) {
-        $conf->data->set( ccflags => $tryflags );
-        my $ccflags = $conf->data->get("ccflags");
-        $conf->debug("  ccflags: $ccflags\n");
-    }
+    #if ( $output !~ /error|warning/i ) {
+    #    $conf->data->set( ccflags => $tryflags );
+    #    my $ccflags = $conf->data->get("ccflags");
+    #    $conf->debug("  ccflags: $ccflags\n");
+    #}
     unlink $output_file or die "Unable to unlink $output_file: $!";
 
     return;

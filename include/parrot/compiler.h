@@ -86,7 +86,7 @@
 #  define __attribute__cold__
 #endif
 #ifdef HASATTRIBUTE_RETURNS_NONNULL
-/* Note that enabling this with gcc, breaks IO. (double io size, all optimizitions).
+/* Note that enabling this with gcc, breaks IO. (double io size, all optimizations).
    clang and the MSVC variant __notnull appear to work fine.
    Impl: https://gcc.gnu.org/ml/gcc-patches/2013-10/msg00405.html */
 #  ifdef __clang__
