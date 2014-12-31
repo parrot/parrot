@@ -356,7 +356,7 @@ my ($args, $proto);
     eval {
         @args_out = validate_prototype_args( $args, $proto );
     };
-    like($@, qr/Bad arg 'single' in $proto/,
+    like($@, qr/Bad arg 'single' in '$proto'/,
         "Detected invalid prototype arg");
 }
 

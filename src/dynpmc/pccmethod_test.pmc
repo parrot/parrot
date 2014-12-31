@@ -33,7 +33,8 @@ pmclass PCCMETHOD_Test dynpmc provides hash {
     {
         UNUSED(SELF);
         Parrot_io_printf(INTERP, "test_method1\n");
-        Parrot_io_printf(INTERP, INTVAL_FMT","INTVAL_FMT","INTVAL_FMT","INTVAL_FMT","INTVAL_FMT","INTVAL_FMT"\n", a1, a2, a3, a4, a5, a6);
+        Parrot_io_printf(INTERP, INTVAL_FMT","INTVAL_FMT","INTVAL_FMT","
+                         INTVAL_FMT","INTVAL_FMT","INTVAL_FMT"\n", a1, a2, a3, a4, a5, a6);
     }
 
     METHOD test_method2(int a1 :optional, int a1o :opt_flag,

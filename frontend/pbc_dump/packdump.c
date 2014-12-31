@@ -348,7 +348,8 @@ PackFile_Constant_dump_pmc(PARROT_INTERP, ARGIN(const PackFile_ConstTable *ct),
                         "\t\tnsentry     => '%Ss',\n"
                         "\t\tnamespace   => %Ss,\n"
                         "\t\tHLL_id      => "INTVAL_FMT",\n"
-                        "\t\tn_regs_used => [ "UINTVAL_FMT", "UINTVAL_FMT", "UINTVAL_FMT", "UINTVAL_FMT" ],\n",
+                        "\t\tn_regs_used => [ "UINTVAL_FMT", "UINTVAL_FMT", "
+                                               UINTVAL_FMT", "UINTVAL_FMT" ],\n",
                         self->vtable->whoami,
                         sub->start_offs,
                         sub->end_offs,

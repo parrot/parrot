@@ -3715,7 +3715,8 @@ PDB_get_continuation_backtrace(PARROT_INTERP, ARGIN(PMC *ctx))
     }
 
     if (rec_level != 0) {
-        STRING * const fmt = Parrot_sprintf_c(interp, "... call repeated "UINTVAL_FMT" times\n", rec_level);
+        STRING * const fmt = Parrot_sprintf_c(interp,
+                               "... call repeated "UINTVAL_FMT" times\n", rec_level);
         VTABLE_push_string(interp, output, fmt);
     }
     return VTABLE_get_string(interp, output);

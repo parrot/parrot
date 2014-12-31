@@ -1412,6 +1412,8 @@ all the same semantics and limitations.
 
 =cut
 
+Note: We cannot use ARGIN_FORMAT here as it is used with non-standard P%vd formats.
+
 */
 
 PARROT_EXPORT
@@ -1419,7 +1421,6 @@ PARROT_IGNORABLE_RESULT
 INTVAL
 Parrot_io_eprintf(NULLOK(PARROT_INTERP), ARGIN(const char *s), ...)
 {
-    /* We cannot use ARGIN_FORMAT here as it is used with non-standard P%vd formats */
     ASSERT_ARGS(Parrot_io_eprintf)
     va_list args;
     INTVAL ret;
