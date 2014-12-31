@@ -136,8 +136,8 @@ static size_t directory_packed_size(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*self);
 
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
 static const opcode_t * directory_unpack(PARROT_INTERP,
     ARGMOD(PackFile_Segment *segp),
     ARGIN(const opcode_t *cursor))
@@ -1222,8 +1222,8 @@ Unpacks the directory from the provided cursor.
 
 */
 
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
 static const opcode_t *
 directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opcode_t *cursor))
 {
