@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -60,14 +60,14 @@ print_constant_table(PARROT_INTERP, ARGIN(PMC *output))
     Parrot_io_fprintf(interp, output, "=head1 Constant-table\n\n");
 
     for (i = 0; i < ct->num.const_count; i++)
-        Parrot_io_fprintf(interp, output, "NUM_CONST(%d): %f\n", i, ct->num.constants[i]);
+        Parrot_io_fprintf(interp, output, "NUM_CONST("INTVAL_FMT"): %f\n", i, ct->num.constants[i]);
 
     for (i = 0; i < ct->str.const_count; i++)
-        Parrot_io_fprintf(interp, output, "STR_CONST(%d): %S\n", i, ct->str.constants[i]);
+        Parrot_io_fprintf(interp, output, "STR_CONST("INTVAL_FMT"): %S\n", i, ct->str.constants[i]);
 
     for (i = 0; i < ct->pmc.const_count; i++) {
         PMC * const c = ct->pmc.constants[i];
-        Parrot_io_fprintf(interp, output, "PMC_CONST(%d): ", i);
+        Parrot_io_fprintf(interp, output, "PMC_CONST("INTVAL_FMT"): ", i);
 
         switch (c->vtable->base_type) {
             /* each PBC file has a ParrotInterpreter, but it can't
@@ -85,7 +85,7 @@ print_constant_table(PARROT_INTERP, ARGIN(PMC *output))
 
                     for (j = 0; j < n; ++j) {
                         const INTVAL val = VTABLE_get_integer_keyed_int(interp, c, j);
-                        Parrot_io_fprintf(interp, output, "%d", val);
+                        Parrot_io_fprintf(interp, output, INTVAL_FMT, val);
                         if (j < n - 1)
                             Parrot_io_fprintf(interp, output, ",");
                     }
@@ -148,9 +148,9 @@ Parrot_disassemble(PARROT_INTERP,
     PMC *output;
 
     if (outfile != NULL) {
-        output = Parrot_io_open_handle(interp, PMCNULL,
-                Parrot_str_new(interp, outfile, 0),
-                Parrot_str_new_constant(interp, "tw"));
+        output = Parrot_io_open(interp, PMCNULL,
+                     Parrot_str_new(interp, outfile, 0),
+                     Parrot_str_new_constant(interp, "tw"));
     }
     else
         output = Parrot_io_stdhandle(interp, PIO_STDOUT_FILENO, PMCNULL);
@@ -197,11 +197,11 @@ Parrot_disassemble(PARROT_INTERP,
         }
 
         if (!(options & enum_DIS_BARE))
-            Parrot_io_fprintf(interp, output, "%012i-%012i",
+            Parrot_io_fprintf(interp, output, "%012i-%012li",
                              op_code_seq_num, line->opcode - interp->code->base.data);
 
         if (debugs && !(options & enum_DIS_BARE))
-            Parrot_io_fprintf(interp, output, " %06i: ",
+            Parrot_io_fprintf(interp, output, " %06li: ",
                     interp->code->debugs->base.data[op_code_seq_num]);
 
         /* If it has a label print it */
@@ -220,7 +220,7 @@ Parrot_disassemble(PARROT_INTERP,
         ++op_code_seq_num;
     }
     if (outfile != NULL)
-        Parrot_io_close_handle(interp, output);
+        Parrot_io_close(interp, output, -1);
 
     return;
 }

@@ -22,14 +22,14 @@
 #    define __attribute__deprecated__       __attribute__((__deprecated__))
 #  endif
 #else
-#    define __attribute__deprecated__
+#  define __attribute__deprecated__
 #endif
 #if defined(HASATTRIBUTE_FORMAT_GNU_PRINTF)
-#  define __attribute__format__(y, z)    __attribute__ ((format (gnu_printf, y, z)))
+#  define __attribute__format__(y, z)    __attribute__ ((format (gnu_printf, (y), (z))))
 #elif defined(HASATTRIBUTE_FORMAT_MS_PRINTF)
-#  define __attribute__format__(y, z)    __attribute__ ((format (ms_printf, y, z)))
+#  define __attribute__format__(y, z)    __attribute__ ((format (ms_printf, (y), (z))))
 #elif defined(HASATTRIBUTE_FORMAT_PRINTF)
-#  define __attribute__format__(y, z)    __attribute__ ((format (printf, y, z)))
+#  define __attribute__format__(y, z)    __attribute__ ((format (printf, (y), (z))))
 #else
 #  define __attribute__format__(y, z)
 #endif

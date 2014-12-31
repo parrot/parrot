@@ -753,6 +753,17 @@ void Parrot_pf_tag_constant(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+opcode_t Parrot_pf_unpack(PARROT_INTERP,
+    ARGMOD(PackFile *self),
+    ARGIN(const opcode_t *packed),
+    size_t packed_size)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*self);
+
+PARROT_EXPORT
 void Parrot_pf_write_pbc_file(PARROT_INTERP,
     ARGIN(PMC *pf_pmc),
     ARGIN(STRING *filename))
@@ -922,6 +933,10 @@ void Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD_NULLOK(PackFile * pf))
 #define ASSERT_ARGS_Parrot_pf_tag_constant __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ct))
+#define ASSERT_ARGS_Parrot_pf_unpack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(packed))
 #define ASSERT_ARGS_Parrot_pf_write_pbc_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pf_pmc) \

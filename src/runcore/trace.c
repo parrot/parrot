@@ -545,7 +545,7 @@ trace_op_dump(PARROT_INTERP,
         if (len < ARGS_COLUMN)  {
             STRING * const fill = Parrot_str_repeat(debugger,
                     Parrot_str_new_constant(debugger, " "), ARGS_COLUMN - len);
-            Parrot_io_putps(debugger, Parrot_io_STDERR(debugger), fill);
+            Parrot_io_write_s(debugger, Parrot_io_STDERR(debugger), fill);
         }
         else
             Parrot_io_eprintf(debugger, "\t");

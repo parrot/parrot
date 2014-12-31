@@ -293,7 +293,7 @@ Destroys the PMC.
 */
     VTABLE void destroy() :no_wb {
         Parrot_ImageIOFreeze_attributes * const data = PARROT_IMAGEIOFREEZE(SELF);
-        PackFile_destroy(INTERP, data->pf);
+        Parrot_pf_destroy(INTERP, data->pf);
         data->pf = NULL;
     }
 
@@ -515,7 +515,7 @@ Sets the constant table of this ImageIO PMC.
             const UINTVAL header_length =
                 GROW_TO_16_BYTE_BOUNDARY(PACKFILE_HEADER_BYTES);
 
-            data->pf = PackFile_new(INTERP, 0);
+            data->pf = Parrot_pf_new(INTERP, 0);
             PObj_custom_destroy_SET(SELF);
 
             ensure_buffer_size(INTERP, SELF, header_length);

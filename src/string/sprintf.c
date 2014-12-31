@@ -297,13 +297,9 @@ Parrot_vfprintf(PARROT_INTERP, ARGIN(Parrot_PMC pio),
         ARGIN_FORMAT(const char *s), va_list args)
 {
     ASSERT_ARGS(Parrot_vfprintf)
-    STRING * str;
-    INTVAL retval;
 
-    str = Parrot_vsprintf_c(interp, s, args);
-    retval = Parrot_io_putps(interp, pio, str);
-
-    return retval;
+    STRING * str = Parrot_vsprintf_c(interp, s, args);
+    return Parrot_io_write_s(interp, pio, str);
 }
 
 PARROT_EXPORT

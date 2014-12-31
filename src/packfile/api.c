@@ -327,13 +327,13 @@ PackFile *
 Parrot_pf_deserialize(PARROT_INTERP, ARGIN(STRING *str))
 {
     ASSERT_ARGS(Parrot_pf_deserialize)
-    PackFile       * const pf  = PackFile_new(interp, 0);
+    PackFile       * const pf  = Parrot_pf_new(interp, 0);
     const opcode_t * const ptr =
             (const opcode_t *)Parrot_str_cstring(interp, str);
     const int length           = Parrot_str_byte_length(interp, str);
 
-    if (!PackFile_unpack(interp, pf, ptr, length)) {
-        PackFile_destroy(interp, pf);
+    if (!Parrot_pf_unpack(interp, pf, ptr, length)) {
+        Parrot_pf_destroy(interp, pf);
         Parrot_ex_throw_from_c_noargs(interp,
             EXCEPTION_MALFORMED_PACKFILE, "Can't unpack packfile");
     }
@@ -1126,7 +1126,7 @@ PackFile_Header_read_uuid(PARROT_INTERP, ARGMOD(PackFile_Header *self),
     else
         /* Don't know this UUID type. */
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-            "PackFile_unpack: Invalid UUID type %d\n", self->uuid_type);
+            "PackFile unpack: Invalid UUID type %d\n", self->uuid_type);
 }
 
 
@@ -1155,7 +1155,7 @@ PackFile_Header_unpack(PARROT_INTERP, ARGMOD(PackFile_Header *self),
     /* Verify that the packfile isn't too small to contain a proper header */
     if (packed_size < PACKFILE_HEADER_BYTES) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-        "PackFile_unpack: Buffer length %d is shorter than PACKFILE_HEADER_BYTES %d.",
+        "PackFile unpack: Buffer length %d is shorter than PACKFILE_HEADER_BYTES %d.",
             packed_size, PACKFILE_HEADER_BYTES);
     }
 
@@ -1175,7 +1175,7 @@ PackFile_Header_unpack(PARROT_INTERP, ARGMOD(PackFile_Header *self),
 
 /*
 
-=item C<opcode_t PackFile_unpack(PARROT_INTERP, PackFile *self, const opcode_t
+=item C<opcode_t Parrot_pf_unpack(PARROT_INTERP, PackFile *self, const opcode_t
 *packed, size_t packed_size)>
 
 Unpacks a C<PackFile> from a block of memory, ensuring that the magic number is
@@ -1184,8 +1184,10 @@ any required endian and word size transforms.
 
 Returns size of unpacked opcodes if everything is okay, else zero (0).
 
-Deprecated: This function should either be renamed to C<Parrot_pf_unpack> or should
-not be exposed through this API. See TT #2140
+=item C<opcode_t PackFile_unpack(PARROT_INTERP, PackFile *self, const opcode_t
+*packed, size_t packed_size)>
+
+Deprecated: Use C<Parrot_pf_unpack> instead. See TT #2140
 
 =cut
 
@@ -1193,12 +1195,11 @@ not be exposed through this API. See TT #2140
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_DEPRECATED
 opcode_t
-PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
+Parrot_pf_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     ARGIN(const opcode_t *packed), size_t packed_size)
 {
-    ASSERT_ARGS(PackFile_unpack)
+    ASSERT_ARGS(Parrot_pf_unpack)
     PackFile_Header * const header = self->header;
     const opcode_t         *cursor;
     int                     header_read_length;
@@ -1226,7 +1227,7 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
 
     if (header->dir_format != PF_DIR_FORMAT) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-            "PackFile_unpack: Dir format was %d not %d\n",
+            "PackFile unpack: Dir format was %d not %d\n",
             header->dir_format, PF_DIR_FORMAT);
     }
 
@@ -1258,6 +1259,18 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
 #endif
 
     return cursor - packed;
+}
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_DEPRECATED
+opcode_t
+PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
+    ARGIN(const opcode_t *packed), size_t packed_size)
+{
+    ASSERT_ARGS(PackFile_unpack)
+
+    return Parrot_pf_unpack(interp, self, packed, packed_size);
 }
 
 
@@ -2656,10 +2669,10 @@ read_pbc_file_packfile_handle(PARROT_INTERP, ARGIN(STRING * const fullname),
 {
     ASSERT_ARGS(read_pbc_file_packfile_handle)
     char * const program_code = read_pbc_file_bytes_handle(interp, io, program_size);
-    PackFile * const pf = PackFile_new(interp, 0);
+    PackFile * const pf = Parrot_pf_new(interp, 0);
     pf->options = 0;
 
-    if (!PackFile_unpack(interp, pf, (opcode_t *)program_code, (size_t)program_size))
+    if (!Parrot_pf_unpack(interp, pf, (opcode_t *)program_code, (size_t)program_size))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Can't unpack packfile %Ss", fullname);
     return pf;
@@ -2765,10 +2778,10 @@ read_pbc_file_packfile(PARROT_INTERP, ARGIN(STRING * const fullname),
 
 #endif
 
-    pf = PackFile_new(interp, is_mapped);
+    pf = Parrot_pf_new(interp, is_mapped);
     pf->options = 0;
 
-    if (!PackFile_unpack(interp, pf, (opcode_t *)program_code, (size_t)program_size))
+    if (!Parrot_pf_unpack(interp, pf, (opcode_t *)program_code, (size_t)program_size))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Can't unpack packfile %Ss", fullname);
 

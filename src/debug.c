@@ -2700,7 +2700,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
             }
             break;
           case PARROT_ARG_PC:
-            Parrot_snprintf(interp, buf, sizeof (buf), "PMC_CONST(%d)", op[j]);
+            Parrot_snprintf(interp, buf, sizeof (buf), "PMC_CONST(%ld)", op[j]);
             strcpy(&dest[size], buf);
             size += strlen(buf);
             break;
@@ -3677,7 +3677,7 @@ PDB_get_continuation_backtrace(PARROT_INTERP, ARGIN(PMC *ctx))
         }
         else if (rec_level != 0) {
             STRING * const fmt =
-                Parrot_sprintf_c(interp, "... call repeated %d times\n", rec_level);
+                Parrot_sprintf_c(interp, "... call repeated "UINTVAL_FMT" times\n", rec_level);
             VTABLE_push_string(interp, output, fmt);
             rec_level = 0;
         }
@@ -3715,7 +3715,7 @@ PDB_get_continuation_backtrace(PARROT_INTERP, ARGIN(PMC *ctx))
     }
 
     if (rec_level != 0) {
-        STRING * const fmt = Parrot_sprintf_c(interp, "... call repeated %d times\n", rec_level);
+        STRING * const fmt = Parrot_sprintf_c(interp, "... call repeated "UINTVAL_FMT" times\n", rec_level);
         VTABLE_push_string(interp, output, fmt);
     }
     return VTABLE_get_string(interp, output);

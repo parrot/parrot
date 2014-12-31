@@ -1,9 +1,9 @@
 /*
-Copyright (C) 2001-2010, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
-pbc_info - PackFile demo
+pbc_info - Old PackFile demo (deprecated API)
 
 =head1 SYNOPSIS
 
@@ -13,6 +13,8 @@ pbc_info - PackFile demo
 
 Sample program for dumping PackFile segment names by iterating
 over the main directory.
+
+Note this still uses the old deprecated API.
 
 =head2 Functions
 

@@ -152,7 +152,7 @@ Read the given number of bytes from the handle and return them in a string.
 */
 
     METHOD read(INTVAL length) :no_wb {
-        STRING * const string_result = Parrot_io_reads(INTERP, SELF, length);
+        STRING * const string_result = Parrot_io_read_s(INTERP, SELF, length);
         RETURN(STRING *string_result);
     }
 

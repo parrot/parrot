@@ -138,7 +138,7 @@ Creates PackFile for given directory.
     VTABLE void *get_pointer() :no_wb {
         Parrot_PackfileDirectory_attributes * attrs =
                 PARROT_PACKFILEDIRECTORY(SELF);
-        PackFile           * const pf    = PackFile_new(INTERP, 0); /* dummy PackFile... */
+        PackFile           * const pf    = Parrot_pf_new(INTERP, 0); /* dummy PackFile... */
         PackFile_Directory * const pfdir = &pf->directory;
         PMC                * const iter  = VTABLE_get_iter(INTERP, attrs->hash);
 

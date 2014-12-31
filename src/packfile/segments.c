@@ -705,7 +705,7 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
     for (i = 0; i < self->num_keys; ++i) {
         const PackFile_Annotations_Key * const key = &self->keys[i];
         const size_t                       key_end = key->start + key->len;
-        Parrot_io_printf(interp, "    #%d\n    [\n", i);
+        Parrot_io_printf(interp, "    #"INTVAL_FMT"\n    [\n", i);
         Parrot_io_printf(interp, "        NAME => %Ss\n",
                 self->code->const_table->str.constants[key->name]);
         Parrot_io_printf(interp, "        TYPE => %s\n",
@@ -714,10 +714,10 @@ PackFile_Annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
                 key->type == PF_ANNOTATION_KEY_TYPE_PMC ? "pmc" :
                 "<ERROR>");
         for (j = key->start; j < key_end; j++) {
-            Parrot_io_printf(interp, "      [\n", i);
-            Parrot_io_printf(interp, "          BYTECODE_OFFSET => %d\n",
+            Parrot_io_printf(interp, "      [\n");
+            Parrot_io_printf(interp, "          BYTECODE_OFFSET => %ld\n",
                     self->base.data[j * 2 + ANN_ENTRY_OFF]);
-            Parrot_io_printf(interp, "          VALUE => %d\n",
+            Parrot_io_printf(interp, "          VALUE => %ld\n",
                     self->base.data[j * 2 + ANN_ENTRY_VAL]);
             Parrot_io_printf(interp, "      ],\n");
         }
@@ -1189,7 +1189,7 @@ directory_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 
     default_dump_header(interp, self);
 
-    Parrot_io_printf(interp, "\n\t# %d segments\n", dir->num_segments);
+    Parrot_io_printf(interp, "\n\t# "SIZE_FMT" segments\n", dir->num_segments);
 
     for (i = 0; i < dir->num_segments; ++i) {
         const PackFile_Segment * const seg = dir->segments[i];
@@ -1198,10 +1198,10 @@ directory_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
                 "\ttype %d\t%Ss\t", (int)seg->type, seg->name);
 
         Parrot_io_printf(interp,
-                " offs 0x%x(0x%x)\top_count %d\n",
-                (int)seg->file_offset,
-                (int)seg->file_offset * sizeof (opcode_t),
-                (int)seg->op_count);
+                " offs 0x%lx(0x%lx)\top_count %ld\n",
+                seg->file_offset,
+                seg->file_offset * sizeof (opcode_t),
+                seg->op_count);
     }
 
     Parrot_io_printf(interp, "]\n");
@@ -2177,8 +2177,8 @@ pf_debug_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 
     Parrot_io_printf(interp, "\n  mappings => [\n");
     for (i = 0; i < debug->num_mappings; ++i) {
-        Parrot_io_printf(interp, "    #%d\n    [\n", i);
-        Parrot_io_printf(interp, "        OFFSET => %d,\n",
+        Parrot_io_printf(interp, "    #%ld\n    [\n", i);
+        Parrot_io_printf(interp, "        OFFSET => %ld,\n",
                    debug->mappings[i].offset);
         Parrot_io_printf(interp, "        FILENAME => %Ss\n",
                 debug->code->const_table->str.constants[debug->mappings[i].filename]);

@@ -262,7 +262,7 @@ IMCC_debug_ins(ARGMOD(imc_info_t *imcc), int level, ARGIN(const Instruction *ins
     if (!(level & imcc->debug))
         return;
     pstderr = Parrot_io_internal_std_os_handle(imcc->interp, PIO_STDERR_FILENO);
-    Parrot_io_pprintf(imcc->interp, pstderr, "0x%x %s ", ins, ins->opname);
+    Parrot_io_pprintf(imcc->interp, pstderr, "0x%lx %s ", ins, ins->opname);
     ins_print(imcc, pstderr, ins);
     Parrot_io_pprintf(imcc->interp, pstderr, "\n");
 }
