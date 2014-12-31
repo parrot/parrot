@@ -130,7 +130,7 @@ $(DYNEXT_DIR)/io_ops$(LOAD_EXT): src/dynoplibs/io_ops$(O) $(LIBPARROT)
 	$(ADDGENERATED) "$@" "[library]"
 
 src/dynoplibs/io_ops$(O): $(DYNOP_O_DEPS) \
-    src/dynoplibs/io_ops.c src/dynoplibs/io_ops.h src/io/io_private.h
+    src/dynoplibs/io_ops.c src/dynoplibs/io_ops.h src/io/io_private.h include/pmc/pmc_handle.h
 
 src/dynoplibs/io_ops.h: src/dynoplibs/io_ops.c
 
