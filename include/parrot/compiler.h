@@ -70,6 +70,8 @@
 #endif
 #ifdef HASATTRIBUTE_WARN_UNUSED_RESULT
 #  define __attribute__warn_unused_result__ __attribute__((__warn_unused_result__))
+#elif defined(_MSC_VER) && defined(PARROT_HAS_HEADER_SAL)
+#  define __attribute__warn_unused_result__ _Check_return_
 #else
 #  define __attribute__warn_unused_result__
 #endif
@@ -84,7 +86,14 @@
 #  define __attribute__cold__
 #endif
 #ifdef HASATTRIBUTE_RETURNS_NONNULL
-#  define __attribute__returns_nonnull__         __attribute__((returns_nonnull))
+/* Note that enabling this with gcc, breaks IO. (double io size, all optimizitions).
+   clang and the MSVC variant __notnull appear to work fine.
+   Impl: https://gcc.gnu.org/ml/gcc-patches/2013-10/msg00405.html */
+#  ifdef __clang__
+#    define __attribute__returns_nonnull__    __attribute__((returns_nonnull))
+#  else
+#    define __attribute__returns_nonnull__    /* __attribute__((returns_nonnull)) */
+#  endif
 #else
 #  define __attribute__returns_nonnull__
 #endif
@@ -111,15 +120,17 @@
  * Microsoft provides two annotations mechanisms.  __declspec, which has been
  * around for a while, and Microsoft's standard source code annotation
  * language (SAL), introduced with Visual C++ 8.0.
- * See <http://msdn2.microsoft.com/en-us/library/ms235402(VS.80).aspx>,
+ * See <http://msdn.microsoft.com/en-us/library/ms182032.aspx>,
+ * <http://msdn2.microsoft.com/en-us/library/ms235402(VS.80).aspx>,
  * <http://msdn2.microsoft.com/en-us/library/dabb5z75(VS.80).aspx>.
  */
 #  include <sal.h>
+/* TODO: New syntax: _Ret_maybenull_  http://msdn.microsoft.com/en-us/library/jj159525.aspx */
 #  define PARROT_CAN_RETURN_NULL      /*@null@*/ __maybenull
 #  define PARROT_CANNOT_RETURN_NULL   /*@notnull@*/ __notnull
 #else
 #  define PARROT_CAN_RETURN_NULL      /*@null@*/
-#  define PARROT_CANNOT_RETURN_NULL   /*@notnull@*/__attribute__returns_nonnull__
+#  define PARROT_CANNOT_RETURN_NULL   /*@notnull@*/ __attribute__returns_nonnull__
 #endif /* PARROT_HAS_HEADER_SAL */
 
 #define PARROT_DEPRECATED           __attribute__deprecated__

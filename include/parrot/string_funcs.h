@@ -558,7 +558,8 @@ STRING * Parrot_str_new_from_cstring(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_str_finish __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_str_format_data __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(format))
 #define ASSERT_ARGS_Parrot_str_free_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_str_from_int __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -791,33 +792,42 @@ STRING * Parrot_vsprintf_s(PARROT_INTERP, ARGIN(STRING *pat), va_list args)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-#define ASSERT_ARGS_Parrot_eprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_eprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_Parrot_fprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pio))
-#define ASSERT_ARGS_Parrot_printf __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+    , PARROT_ASSERT_ARG(pio) \
+    , PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_Parrot_printf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_Parrot_psprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pat) \
     , PARROT_ASSERT_ARG(ary))
 #define ASSERT_ARGS_Parrot_secret_snprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(buffer))
+       PARROT_ASSERT_ARG(buffer) \
+    , PARROT_ASSERT_ARG(format))
 #define ASSERT_ARGS_Parrot_snprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(targ))
+    , PARROT_ASSERT_ARG(targ) \
+    , PARROT_ASSERT_ARG(pat))
 #define ASSERT_ARGS_Parrot_sprintf_c __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pat))
 #define ASSERT_ARGS_Parrot_sprintf_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pat))
 #define ASSERT_ARGS_Parrot_vfprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pio))
+    , PARROT_ASSERT_ARG(pio) \
+    , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_Parrot_vsnprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(targ))
+    , PARROT_ASSERT_ARG(targ) \
+    , PARROT_ASSERT_ARG(pat))
 #define ASSERT_ARGS_Parrot_vsprintf_c __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pat))
 #define ASSERT_ARGS_Parrot_vsprintf_s __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pat))

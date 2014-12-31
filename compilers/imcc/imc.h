@@ -264,7 +264,8 @@ void op_fullname(
     , PARROT_ASSERT_ARG(ext))
 #define ASSERT_ARGS_imcc_vfprintf __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
-    , PARROT_ASSERT_ARG(io))
+    , PARROT_ASSERT_ARG(io) \
+    , PARROT_ASSERT_ARG(format))
 #define ASSERT_ARGS_INS __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit) \

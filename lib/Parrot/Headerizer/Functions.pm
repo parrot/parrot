@@ -454,7 +454,7 @@ sub asserts_from_args {
     my @asserts;
 
     for my $arg (@args) {
-        if ( $arg =~ m{(ARGIN|ARGOUT|ARGMOD|ARGFREE_NOTNULL|NOTNULL)\((.+?)\)} ) {
+        if ( $arg =~ m{(ARGIN|ARGIN_FORMAT|ARGOUT|ARGMOD|ARGFREE_NOTNULL|NOTNULL)\((.+?)\)} ) {
             my $var = $2;
             my $was_shimmed = ( $var =~ /SHIM/ );
 

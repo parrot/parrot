@@ -429,7 +429,7 @@ sub function_components_from_declaration {
     my $args = join( ' ', @lines );
 
     $args =~ s/\s+/ /g;
-    $args =~ s/__attribute__format__\(\d, \d\)//g;
+    # $args =~ s/__attribute__format__\(\d, \d\)//g;
     $args =~ s{([^(]+)\s*\((.+)\);?}{$2}
         or die qq{Couldn't handle "$proto" in $file\n};
 
