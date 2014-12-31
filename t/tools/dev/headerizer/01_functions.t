@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2010-2011, Parrot Foundation.
+# Copyright (C) 2010-2014, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -356,7 +356,7 @@ my ($args, $proto);
     eval {
         @args_out = validate_prototype_args( $args, $proto );
     };
-    like($@, qr/Bad args in $proto/,
+    like($@, qr/Bad arg 'single' in $proto/,
         "Detected invalid prototype arg");
 }
 
