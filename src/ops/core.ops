@@ -162,7 +162,7 @@ Branch forward or backward by the amount in $1.
 =cut
 
 inline op branch(in LABEL) :base_loop :flow {
-    if(Parrot_cx_check_scheduler(interp, cur_opcode + $1) == 0)
+    if (Parrot_cx_check_scheduler(interp, cur_opcode + $1) == NULL)
         goto ADDRESS(0);
     goto OFFSET($1);
 }

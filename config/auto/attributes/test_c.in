@@ -9,12 +9,6 @@ see parrot/compiler.h for attribute value definitions.
 #include <stdlib.h>
 #include "parrot/compiler.h"
 
-/* override the gcc bugfix in compile.h */
-#if defined(HASATTRIBUTE_RETURNS_NONNULL) && defined(__GNUC__)
-#  undef __attribute__returns_nonnull__
-#  define __attribute__returns_nonnull__    __attribute__((returns_nonnull))
-#endif
-
 __attribute__malloc__
 __attribute__noreturn__
 __attribute__warn_unused_result__

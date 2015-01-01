@@ -76,7 +76,7 @@ void Parrot_cx_check_quantum(PARROT_INTERP, ARGIN(PMC *scheduler))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 opcode_t* Parrot_cx_check_scheduler(PARROT_INTERP, ARGIN(opcode_t *next))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

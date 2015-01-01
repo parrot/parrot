@@ -13724,7 +13724,7 @@ Parrot_load_language_sc(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_branch_i(opcode_t *cur_opcode, PARROT_INTERP) {
-    if (Parrot_cx_check_scheduler(interp, (cur_opcode + IREG(1))) == 0) {
+    if (Parrot_cx_check_scheduler(interp, (cur_opcode + IREG(1))) == NULL) {
         return (opcode_t *)0;
     }
 
@@ -13733,7 +13733,7 @@ Parrot_branch_i(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_branch_ic(opcode_t *cur_opcode, PARROT_INTERP) {
-    if (Parrot_cx_check_scheduler(interp, (cur_opcode + ICONST(1))) == 0) {
+    if (Parrot_cx_check_scheduler(interp, (cur_opcode + ICONST(1))) == NULL) {
         return (opcode_t *)0;
     }
 

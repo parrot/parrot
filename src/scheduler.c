@@ -241,7 +241,7 @@ Does the scheduler need to wake up and do anything? If so, do that now.
 
 */
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 opcode_t*
 Parrot_cx_check_scheduler(PARROT_INTERP, ARGIN(opcode_t *next))
 {
