@@ -13,6 +13,7 @@
         + Add the _Check_return_ MSVC SAL variant #1163
         + Check and fix that PARROT_EXPORT being the first function attribute (C++) #1164
         + Allow PARROT_DOES_NOT_RETURN without PARROT_CANNOT_RETURN_NULL #1163
+        + Move -Wformat to --cage #1165
     - Documentation
     - Tests
     - Community

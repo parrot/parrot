@@ -129,10 +129,7 @@ sub _init {
         -Wdisabled-optimization
         -Wdiv-by-zero
         -Wendif-labels
-        -Wformat-extra-args
-        -Wformat-nonliteral
-        -Wformat-security
-        -Wformat-y2k
+        -Wno-format
         -Wimplicit
         -Wimport
         -Winit-self
@@ -178,18 +175,24 @@ sub _init {
     my @gcc_or_gpp_cage = qw(
         -std=c89
         -Wfloat-equal
+        -Wformat-extra-args
+        -Wformat-nonliteral
+        -Wformat-security
+        -Wformat-y2k
         -Wformat=2
         -Wlarger-than-4096
         -Wmissing-format-attribute
         -Wdeprecated-declarations
-        -Wno-format-extra-args
         -Wno-import
         -Wredundant-decls
         -Wshadow
         -Wstrict-overflow=5
         -Wsuggest-attribute=const
         -Wsuggest-attribute=noreturn
+        -Wsuggest-attribute=returns_nonnull
         -Wsuggest-attribute=pure
+        -Wsuggest-attribute=warn_unused_result
+        -Wsuggest-attribute=hot
         -Wtrampolines
         -Wunreachable-code
         -Wunsafe-loop-optimizations
