@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007-2011, Parrot Foundation.
+Copyright (C) 2007-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -271,8 +271,8 @@ needs to be pre-empted.
 
 */
 
-PARROT_CANNOT_RETURN_NULL
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 opcode_t*
 Parrot_cx_run_scheduler(PARROT_INTERP, ARGIN(PMC *scheduler), ARGIN(opcode_t *next))
 {

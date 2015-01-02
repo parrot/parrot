@@ -48,8 +48,8 @@ void Parrot_nci_libffi_register(PARROT_INTERP)
 /* HEADERIZER BEGIN: src/nci/signatures.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-PARROT_CANNOT_RETURN_NULL
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PMC * Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
