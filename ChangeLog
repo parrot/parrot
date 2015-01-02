@@ -11,6 +11,8 @@
         + Fix PARROT_CANNOT_RETURN_NULL #1163
         + Move HASATTRIBUTE_* definitions from ccflags via cmdline to has_header.h #1163
         + Add the _Check_return_ MSVC SAL variant #1163
+        + Check and fix that PARROT_EXPORT being the first function attribute (C++) #1164
+        + Allow PARROT_DOES_NOT_RETURN without PARROT_CANNOT_RETURN_NULL #1163
     - Documentation
     - Tests
     - Community

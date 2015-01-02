@@ -303,9 +303,11 @@ Returns true value upon success.
 
 sub no_both_PARROT_EXPORT_and_PARROT_INLINE {
     my $args = shift;
-    my $death =
-        "$args->{file} $args->{name}: Can't have both PARROT_EXPORT and PARROT_INLINE";
-    die $death if $args->{parrot_inline} && $args->{parrot_api};
+    my $macros = shift;
+    die "Error: $args->{file} $args->{name}: Can't have both PARROT_EXPORT and PARROT_INLINE\n"
+      if $args->{parrot_inline} && $args->{parrot_api};
+    die "Error: $args->{file} $args->{name}: PARROT_EXPORT must be the first function attribute\n"
+      if $args->{parrot_api} and $macros->[0] ne 'PARROT_EXPORT';
     return 1;
 }
 
@@ -315,7 +317,7 @@ sub no_both_PARROT_EXPORT_and_PARROT_INLINE {
 
 =item * Purpose
 
-Performs some validation on prototype arguments.
+Performs some basic and rudimentary validation on prototype arguments.
 
 =item * Arguments
 

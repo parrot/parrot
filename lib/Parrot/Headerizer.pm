@@ -374,6 +374,9 @@ sub extract_function_declarations_and_update_source {
 Creates a data structure in which information about a particular function can
 be looked up.
 
+Check that PARROT_EXPORT is the first declaration if defined, as with C++ the
+export "C" prefix must be the first expression in the declaration. See GH #1164.
+
 =item * Arguments
 
 List of two strings, the filename and the function declaration.
@@ -431,7 +434,7 @@ sub function_components_from_declaration {
     $args =~ s/\s+/ /g;
     # $args =~ s/__attribute__format__\(\d, \d\)//g;
     $args =~ s{([^(]+)\s*\((.+)\);?}{$2}
-        or die qq{Couldn't handle "$proto" in $file\n};
+        or die qq{Error: Couldn't handle "$proto" in $file\n};
 
     my $name = $1;
     $args = $2;
@@ -441,7 +444,7 @@ sub function_components_from_declaration {
         name            => $name,
         parrot_inline   => $parrot_inline,
         parrot_api      => $parrot_api,
-    } );
+    }, \@macros );
 
     my @args = validate_prototype_args( $args, $proto );
 
@@ -493,6 +496,10 @@ sub function_components_from_declaration {
 Performs some validation in the case where a function's return value is a
 pointer.
 
+We require one of PARROT_CANNOT_RETURN_NULL, PARROT_CAN_RETURN_NULL, PARROT_DOES_NOT_RETURN.
+
+We cannot have both of PARROT_CANNOT_RETURN_NULL, PARROT_CAN_RETURN_NULL.
+
 =item * Arguments
 
     $headerizer->check_pointer_return_type( {
@@ -516,7 +523,8 @@ sub check_pointer_return_type {
     my ($self, $args) = @_;
     if ( $args->{return_type} =~ /\*/ ) {
         if ( !$args->{macros}->{PARROT_CAN_RETURN_NULL} &&
-             !$args->{macros}->{PARROT_CANNOT_RETURN_NULL} ) {
+             !$args->{macros}->{PARROT_CANNOT_RETURN_NULL} &&
+             !$args->{macros}->{PARROT_DOES_NOT_RETURN} ) {
             if ( $args->{name} !~ /^yy/ ) { # Don't complain about lexer-created functions
                 $self->squawk( $args->{file}, $args->{name},
                     'Returns a pointer, but no PARROT_CAN(NOT)_RETURN_NULL macro found.' );

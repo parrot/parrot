@@ -1,9 +1,9 @@
 #! perl
-# Copyright (C) 2010-2014, Parrot Foundation.
+# Copyright (C) 2010-2015, Parrot Foundation.
 
 use strict;
 use warnings;
-use Test::More tests => 67;
+use Test::More tests => 68;
 use Carp;
 use Cwd;
 use File::Copy;
@@ -300,7 +300,7 @@ my ($text_in, $text_out, $name, $heading, $cfile_name);
     }
 }
 
-# no_both_PARROT_EXPORT_and_PARROT_INLINE()
+# no_both_PARROT_EXPORT_and_PARROT_INLINE
 my ($text, $parrot_inline, $parrot_api);
 {
     local $@ = '';
@@ -334,6 +334,26 @@ my ($text, $parrot_inline, $parrot_api);
     };
     like($@, qr/$filename $name: Can't have both PARROT_EXPORT and PARROT_INLINE/,
         "PARROT_EXPORT and PARROT_INLINE  both true: Got expected 'die' message" );
+}
+
+# no_both_PARROT_EXPORT_and_PARROT_INLINE
+{
+    local $@ = '';
+    $filename = 'foobar';
+    $name = 'alpha';
+    $parrot_inline = 0;
+    $parrot_api = 1;
+    my @macros = qw(PARROT_CAN_RETURN_NULL PARROT_EXPORT);
+    eval {
+        no_both_PARROT_EXPORT_and_PARROT_INLINE( {
+            file            => $filename,
+            name            => $name,
+            parrot_inline   => $parrot_inline,
+            parrot_api      => $parrot_api,
+        }, \@macros );
+    };
+    like($@, qr/$filename $name: PARROT_EXPORT must be the first function attribute/,
+        "PARROT_EXPORT must be the first function attribute: Got expected 'die' message" );
 }
 
 # validate_prototype_args
