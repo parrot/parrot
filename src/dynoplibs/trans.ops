@@ -28,7 +28,7 @@ Set $1 to the arc cosine (in radians) of $2.
 =cut
 
 inline op acos(out NUM, in NUM) :base_math {
-    $1 = acos((FLOATVAL)$2);
+    $1 = acos($2);
 }
 
 ########################################
@@ -40,7 +40,7 @@ Set $1 to the arc cotangent (in radians) of $2.
 =cut
 
 inline op acot(out NUM, in NUM) :base_math {
-    $1 = atan((FLOATVAL)1 / (FLOATVAL)$2);
+    $1 = atan(1.0 / $2);
 }
 
 ########################################
@@ -52,7 +52,7 @@ Set $1 to the arc secant (in radians) of $2.
 =cut
 
 inline op asec(out NUM, in NUM) :base_math {
-    $1 = acos(((FLOATVAL)1) / ((FLOATVAL)$2));
+    $1 = acos(1.0 / ($2));
 }
 
 ########################################
@@ -65,7 +65,7 @@ Set $1 to the arc sine (in radians) of $2.
 =cut
 
 inline op asin(out NUM, in NUM) :base_math {
-    $1 = asin((FLOATVAL)$2);
+    $1 = asin($2);
 }
 
 ########################################
@@ -83,11 +83,11 @@ quadrant of the result.
 =cut
 
 inline op atan(out NUM, in NUM) :base_math {
-    $1 = atan((FLOATVAL)$2);
+    $1 = atan($2);
 }
 
 inline op atan(out NUM, in NUM, in NUM) :base_math {
-    $1 = atan2((FLOATVAL)$2, (FLOATVAL)$3);
+    $1 = atan2($2, $3);
 }
 
 ########################################
@@ -99,7 +99,7 @@ Set $1 to the cosine of $2 (given in radians).
 =cut
 
 inline op cos(out NUM, in NUM) :base_math {
-    $1 = cos((FLOATVAL)$2);
+    $1 = cos($2);
 }
 
 ########################################
@@ -111,7 +111,7 @@ Set $1 to the hyperbolic cosine of $2 (given in radians).
 =cut
 
 inline op cosh(out NUM, in NUM) :base_math {
-    $1 = cosh((FLOATVAL)$2);
+    $1 = cosh($2);
 }
 
 ########################################
@@ -123,7 +123,7 @@ Set $1 to the cotangent of $2 (given in radians).
 =cut
 
 inline op cot(out NUM, in NUM) :base_math {
-    $1 = ((FLOATVAL)1) / tan((FLOATVAL)$2);
+    $1 = 1.0 / tan($2);
 }
 
 ########################################
@@ -135,7 +135,7 @@ Set $1 to the hyperbolic cotangent of $2 (given in radians).
 =cut
 
 inline op coth(out NUM, in NUM) :base_math {
-    $1 = ((FLOATVAL)1) / tanh((FLOATVAL)$2);
+    $1 = 1.0 / tanh($2);
 }
 
 ########################################
@@ -147,7 +147,7 @@ Set $1 to the cosecant of $2 (given in radians).
 =cut
 
 inline op csc(out NUM, in NUM) :base_math {
-    $1 = ((FLOATVAL)1) / sin((FLOATVAL)$2);
+    $1 = 1.0 / sin($2);
 }
 
 ########################################
@@ -160,7 +160,7 @@ logarithm.
 =cut
 
 inline op exp(out NUM, in NUM) :base_math {
-    $1 = exp((FLOATVAL)$2);
+    $1 = exp($2);
 }
 
 ########################################
@@ -172,7 +172,7 @@ Set $1 to the natural (base I<e>) logarithm of $2.
 =cut
 
 inline op ln(out NUM, in NUM) :base_math {
-    $1 = log((FLOATVAL)$2);
+    $1 = log($2);
 }
 
 ########################################
@@ -184,7 +184,7 @@ Set $1 to the base 10 logarithm of $2.
 =cut
 
 inline op log10(out NUM, in NUM) :base_math {
-    $1 = log10((FLOATVAL)$2);
+    $1 = log10($2);
 }
 
 ########################################
@@ -196,8 +196,8 @@ Set $1 to the base 2 logarithm of $2.
 =cut
 
 op log2(out NUM, in NUM) :base_math {
-    const FLOATVAL temp = log((FLOATVAL)2.0);
-    $1 = log((FLOATVAL)$2) / temp;
+    const FLOATVAL temp = log(2.0);
+    $1 = log($2) / temp;
 }
 
 ########################################
@@ -209,7 +209,7 @@ Set $1 to the secant of $2 (given in radians).
 =cut
 
 inline op sec(out NUM, in NUM) :base_math {
-    $1 = ((FLOATVAL)1) / cos((FLOATVAL)$2);
+    $1 = 1.0 / cos($2);
 }
 
 ########################################
@@ -221,7 +221,7 @@ Set $1 to the hyperbolic secant of $2 (given in radians).
 =cut
 
 inline op sech(out NUM, in NUM) :base_math {
-    $1 = ((FLOATVAL)1) / cosh((FLOATVAL)$2);
+    $1 = 1.0 / cosh($2);
 }
 
 ########################################
@@ -233,7 +233,7 @@ Set $1 to the sine of $2 (given in radians).
 =cut
 
 inline op sin(out NUM, in NUM) :base_math {
-    $1 = sin((FLOATVAL)$2);
+    $1 = sin($2);
 }
 
 ########################################
@@ -245,7 +245,7 @@ Set $1 to the hyperbolic sine of $2 (given in radians).
 =cut
 
 inline op sinh(out NUM, in NUM) :base_math {
-    $1 = sinh((FLOATVAL)$2);
+    $1 = sinh($2);
 }
 
 ########################################
@@ -257,7 +257,7 @@ Set $1 to the tangent of $2 (given in radians).
 =cut
 
 inline op tan(out NUM, in NUM) :base_math {
-    $1 = tan((FLOATVAL)$2);
+    $1 = tan($2);
 }
 
 ########################################
@@ -269,7 +269,7 @@ Set $1 to the hyperbolic tangent of $2 (given in radians).
 =cut
 
 inline op tanh(out NUM, in NUM) :base_math {
-    $1 = tanh((FLOATVAL)$2);
+    $1 = tanh($2);
 }
 
 =item B<pow>(out NUM, in NUM, in NUM)
@@ -287,7 +287,7 @@ Set $1 to $2 raised to the power $3.
 =cut
 
 inline op pow(out NUM, in NUM, in NUM)  {
-    $1 = pow((FLOATVAL)$2, (FLOATVAL)$3);
+    $1 = pow($2, $3);
 }
 
 inline op pow(invar PMC, invar PMC, invar PMC)  {
@@ -350,7 +350,7 @@ inline op pow(out NUM, in NUM, in INT)  {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2010-2011, Parrot Foundation.
+Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 LICENSE
 

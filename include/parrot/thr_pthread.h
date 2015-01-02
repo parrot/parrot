@@ -16,8 +16,8 @@
 
 #  include <pthread.h>
 
-#  define LOCK(m) pthread_mutex_lock((pthread_mutex_t*)&(m))
-#  define UNLOCK(m) pthread_mutex_unlock((pthread_mutex_t*)&(m))
+#  define LOCK(m) pthread_mutex_lock(&(m))
+#  define UNLOCK(m) pthread_mutex_unlock(&(m))
 #  define COND_WAIT(c, m) pthread_cond_wait(&(c), &(m))
 #  define COND_TIMED_WAIT(c, m, t, rc) \
     do { (rc) = pthread_cond_timedwait(&(c), &(m), (t)); } while (0)

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007-2014, Parrot Foundation.
+Copyright (C) 2007-2015, Parrot Foundation.
 
 figure out if the compiler supports attributes.
 see parrot/compiler.h for attribute value definitions.

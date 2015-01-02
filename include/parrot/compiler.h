@@ -1,5 +1,5 @@
 /* compiler.h
- *  Copyright (C) 2007-2014, Parrot Foundation.
+ *  Copyright (C) 2007-2015, Parrot Foundation.
  *  Overview:
  *     defines compiler capabilities and attributes
  */
