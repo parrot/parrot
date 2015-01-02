@@ -1331,7 +1331,7 @@ directory_unpack(PARROT_INTERP, ARGMOD(PackFile_Segment *segp), ARGIN(const opco
         else
             delta = pos - cursor;
 
-        if ((size_t)delta != tmp || dir->segments[i]->op_count != tmp)
+        if (delta != tmp || dir->segments[i]->op_count != tmp)
             Parrot_io_eprintf(interp, "PackFile_unpack segment '%Ss' directory length %d "
                     "length in file %d needed %d for unpack\n",
                     dir->segments[i]->name,

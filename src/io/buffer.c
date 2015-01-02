@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2014, Parrot Foundation.
+Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -543,7 +543,7 @@ Parrot_io_buffer_flush(PARROT_INTERP, ARGMOD_NULLOK(IO_BUFFER *buffer),
     ASSERT_ARGS(Parrot_io_buffer_flush)
     size_t bytes_written = 0;
     if (buffer && !BUFFER_IS_EMPTY(buffer)) {
-        bytes_written += vtable->write_b(interp, handle, (char *)buffer->buffer_start,
+        bytes_written += vtable->write_b(interp, handle, buffer->buffer_start,
                                          BUFFER_USED_SIZE(buffer));
         Parrot_io_buffer_clear(interp, buffer);
     }

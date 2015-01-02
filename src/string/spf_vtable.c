@@ -583,12 +583,18 @@ getstring_pmc(PARROT_INTERP, SHIM(INTVAL size), ARGIN(SPRINTF_OBJ *obj))
 {
     ASSERT_ARGS(getstring_pmc)
 
+#if 0
+    /* XXX This produces wrong code */
+    return VTABLE_get_string(interp,
+               VTABLE_get_pmc_keyed_int(interp, (PMC *)obj->data, obj->index++));
+#else
     PMC * const tmp = VTABLE_get_pmc_keyed_int(interp,
             ((PMC *)obj->data),
             (obj->index++));
 
-    STRING * const str = (STRING *)(VTABLE_get_string(interp, tmp));
+    STRING * const str = VTABLE_get_string(interp, tmp);
     return str;
+#endif
 }
 
 /*

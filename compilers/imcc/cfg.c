@@ -974,7 +974,7 @@ sort_loops(ARGMOD(imc_info_t *imcc), ARGIN(IMC_Unit *unit))
 
     Loop_info   *li;
     Loop_info  **loop_info = unit->loop_info;
-    int          n_loops   = (int)unit->n_loops;
+    int          n_loops   = unit->n_loops;
     int          i, k, changed;
     unsigned int j;
 

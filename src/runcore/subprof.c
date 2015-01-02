@@ -905,7 +905,7 @@ dump_profile_data(PARROT_INTERP, ARGIN(subprofiledata *spdata))
                             "%d %u "UHUGEINTVAL_FMT"\n",
                             (int) srcline,
                             (unsigned int) li->ops,
-                            (unsigned long long) li->ticks);
+                            li->ticks);
 
                 for (ci = li->calls; ci && ci->callee; ci++) {
                     subprofile *csp = ci->callee;
@@ -918,7 +918,7 @@ dump_profile_data(PARROT_INTERP, ARGIN(subprofiledata *spdata))
                             "%d %u "UHUGEINTVAL_FMT"\n",
                             (int) srcline,
                             (unsigned int) ci->ops,
-                            (unsigned long long) ci->ticks);
+                            ci->ticks);
                 }
             }
         });
@@ -946,7 +946,7 @@ dump_profile_data(PARROT_INTERP, ARGIN(subprofiledata *spdata))
                     "%d %u "UHUGEINTVAL_FMT"\n",
                     0,
                     (unsigned int) ci->ops,
-                    (unsigned long long) ci->ticks);
+                    ci->ticks);
         }
     }
 

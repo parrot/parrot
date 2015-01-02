@@ -99,7 +99,7 @@ void *
 mem_sys_allocate_zeroed(size_t size)
 {
     ASSERT_ARGS(mem_sys_allocate_zeroed)
-    void * const ptr = calloc(1, (size_t)size);
+    void * const ptr = calloc(1, size);
 
     if (size==0)
         PANIC_ZERO_ALLOCATION("mem_sys_allocate_zeroed");

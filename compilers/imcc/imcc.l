@@ -86,7 +86,7 @@ static int handle_identifier(ARGMOD(imc_info_t *imcc), YYSTYPE *valp, ARGIN(cons
   } while (0)
 
 #define YY_INPUT(buf, result, max_size) \
-    (result) = Parrot_io_internal_read((Interp *)yyextra->interp, (PIOHANDLE)yyin, (buf), (max_size))
+    (result) = Parrot_io_internal_read(yyextra->interp, (PIOHANDLE)yyin, (buf), (max_size))
 
 %}
 

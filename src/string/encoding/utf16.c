@@ -481,7 +481,7 @@ utf16_iter_get(PARROT_INTERP,
     ASSERT_ARGS(utf16_iter_get)
     const utf16_t *ptr = (utf16_t *)(str->strstart + i->bytepos);
 
-    PARROT_ASSERT((UINTVAL)(i->charpos + offset) <= str->strlen);
+    PARROT_ASSERT((i->charpos + offset) <= str->strlen);
 
     if (offset > 0)
         ptr = utf16_skip_forward(ptr, offset);

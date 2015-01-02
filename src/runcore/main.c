@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2014, Parrot Foundation.
+Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -211,8 +211,7 @@ runops_int(PARROT_INTERP, size_t offset)
     interp->resume_flag  |= RESUME_RESTART;
 
     while (interp->resume_flag & RESUME_RESTART) {
-        opcode_t * const pc = (opcode_t *)
-            interp->code->base.data + interp->resume_offset;
+        opcode_t * const pc = interp->code->base.data + interp->resume_offset;
         const runcore_runops_fn_type core = interp->run_core->runops;
 
         interp->resume_offset = 0;

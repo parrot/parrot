@@ -1289,7 +1289,7 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
 
     /* abs(-offset) may not be > strlen-1 */
     if (offset < 0)
-        true_offset = (UINTVAL)(src->strlen + offset);
+        true_offset = src->strlen + offset;
 
     /* Can replace 1 past end of string which is technically outside the string
      * but is same as a concat().
@@ -1301,7 +1301,7 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
             "Can only replace inside string or index after end of string");
 
     if (true_length > (src->strlen - true_offset))
-        true_length = (UINTVAL)(src->strlen - true_offset);
+        true_length = src->strlen - true_offset;
 
     if (STRING_IS_NULL(rep)) {
         enc = src->encoding;

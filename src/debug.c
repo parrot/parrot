@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2014, Parrot Foundation.
+Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -1262,14 +1262,14 @@ Parrot_debugger_break(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
 
         interp->pdb->state     |= PDB_BREAK;
         interp->pdb->state     |= PDB_STOPPED;
-        interp->pdb->cur_opcode = (opcode_t *)cur_opcode + 1;
+        interp->pdb->cur_opcode = cur_opcode + 1;
 
         /*PDB_set_break(interp, NULL);*/
 
         debugger_cmdline(interp);
     }
     else {
-        interp->pdb->cur_opcode = (opcode_t *)cur_opcode + 1;
+        interp->pdb->cur_opcode = cur_opcode + 1;
         /*PDB_set_break(interp, NULL);*/
     }
     TRACEDEB_MSG("Parrot_debugger_break done");

@@ -106,7 +106,7 @@ static void rat_add_float(PARROT_INTERP, PMC *self, FLOATVAL value) {
     UNUSED(interp)
 
     mpq_init(t);
-    mpq_set_d(t, (double) value);
+    mpq_set_d(t, (double)value);
     mpq_add(RT(self), RT(self), t);
     mpq_clear(t);
   #else
@@ -152,7 +152,7 @@ static void rat_multiply_float(PARROT_INTERP, PMC *self, FLOATVAL value) {
     UNUSED(interp)
 
     mpq_init(t);
-    mpq_set_d(t, (double) value);
+    mpq_set_d(t, (double)value);
     mpq_mul(RT(self), RT(self), t);
     mpq_clear(t);
   #else
@@ -202,7 +202,7 @@ static void rat_divide_float(PARROT_INTERP, PMC *self, FLOATVAL value) {
     UNUSED(interp)
 
     mpq_init(t);
-    mpq_set_d(t, (double) value);
+    mpq_set_d(t, (double)value);
     mpq_div(RT(self), RT(self), t);
     mpq_clear(t);
   #else
@@ -334,7 +334,7 @@ Returns the version of GNU Multiple Precision library. Returns 0.0.0, if GMP is 
       #ifdef PARROT_HAS_GMP
         UNUSED(INTERP)
 
-        mpq_set_d(RT(SELF), (double) value);
+        mpq_set_d(RT(SELF), (double)value);
         mpq_canonicalize(RT(SELF));
       #else
         UNUSED(SELF)

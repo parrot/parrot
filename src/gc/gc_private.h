@@ -87,7 +87,7 @@ PARROT_DOES_NOT_RETURN
 static void
 panic_failed_allocation(unsigned int line, size_t size)
 {
-    fprintf(stderr, "Failed allocation of %lu bytes\n", (unsigned long)size);
+    fprintf(stderr, "Failed allocation of "SIZE_FMT" bytes\n", size);
     Parrot_x_panic_and_exit(NULL, "Out of mem", __FILE__, line);
 }
 

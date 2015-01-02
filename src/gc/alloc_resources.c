@@ -423,7 +423,7 @@ check_buffer_ptr(ARGMOD(Parrot_Buffer * pobj), ARGMOD(Variable_Size_Pool * pool)
         bufstart -= sizeof (void*);
 
     while (cur_block) {
-        if ((char *)bufstart >= cur_block->start &&
+        if (bufstart >= cur_block->start &&
             (char *)Buffer_bufstart(pobj) +
             Buffer_buflen(pobj) < cur_block->start + cur_block->size) {
             if (PObj_is_string_TEST(pobj)) {

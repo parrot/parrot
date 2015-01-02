@@ -675,14 +675,14 @@ allocate_uniq(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit), int usage)
                 Set         *avail     = sets[j];
                 unsigned int first_reg = avail
                                        ? set_first_zero(avail)
-                                       : first_avail(imcc, unit, (int)r->set, &avail);
+                                       : first_avail(imcc, unit, r->set, &avail);
                 set_add(avail, first_reg);
                 r->color = first_reg++;
 
                 IMCC_debug(imcc, DEBUG_IMC,
                         "allocate %s sym %c '%s'  color %d\n",
                         usage & U_LEXICAL ? "Lexical" : "Non-vol",
-                        (int)r->set, r->name, r->color);
+                        r->set, r->name, r->color);
 
                 unit->first_avail[j] = first_reg;
 
