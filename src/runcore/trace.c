@@ -224,7 +224,7 @@ trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
         return;
     }
     if (PObj_on_free_list_TEST(pmc)) {
-        EPRINTF("**************** PMC is on free list *****\n");
+        EPRINTF_1("**************** PMC(%p) is on free list *****\n", pmc);
     }
     if (!pmc->vtable) {
         EPRINTF("<!!no vtable!!>");

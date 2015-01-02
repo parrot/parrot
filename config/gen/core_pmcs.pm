@@ -1,8 +1,8 @@
-# Copyright (C) 2001-2014, Parrot Foundation.
+# Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
-config/gen/core_pmcs.pm - Core PMC List
+config/gen/core_pmcs.pm - Generates the core PMC List
 
 =head1 DESCRIPTION
 
