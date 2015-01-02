@@ -88,7 +88,7 @@ PARROT_WARN_UNUSED_RESULT
 static int int_overflows(ARGIN(const SymReg *r))
         __attribute__nonnull__(1);
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static SymReg * mk_pmc_const_2(
     ARGMOD(imc_info_t * imcc),
@@ -643,7 +643,7 @@ Makes a constant PMC and inserts instructions to access it.
 
 */
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static SymReg *
 mk_pmc_const_2(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),

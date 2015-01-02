@@ -250,7 +250,6 @@ void Parrot_gc_free_fixed_size_storage(PARROT_INTERP,
         FUNC_MODIFIES(*data);
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
 void Parrot_gc_free_memory_chunk(PARROT_INTERP, ARGIN_NULLOK(void *data))
         __attribute__nonnull__(1);
 

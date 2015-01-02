@@ -13724,7 +13724,7 @@ Parrot_load_language_sc(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_branch_i(opcode_t *cur_opcode, PARROT_INTERP) {
-    if (Parrot_cx_check_scheduler(interp, (cur_opcode + IREG(1))) == 0) {
+    if (Parrot_cx_check_scheduler(interp, (cur_opcode + IREG(1))) == NULL) {
         return (opcode_t *)0;
     }
 
@@ -13733,7 +13733,7 @@ Parrot_branch_i(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_branch_ic(opcode_t *cur_opcode, PARROT_INTERP) {
-    if (Parrot_cx_check_scheduler(interp, (cur_opcode + ICONST(1))) == 0) {
+    if (Parrot_cx_check_scheduler(interp, (cur_opcode + ICONST(1))) == NULL) {
         return (opcode_t *)0;
     }
 
@@ -16998,7 +16998,7 @@ Parrot_print_s(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING  * const  s = SREG(1);
 
     if (s && Parrot_str_byte_length(interp, s)) {
-        Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
+        Parrot_io_write_s(interp, _PIO_STDOUT(interp), s);
     }
 
     return cur_opcode + 2;
@@ -17009,7 +17009,7 @@ Parrot_print_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING  * const  s = SCONST(1);
 
     if (s && Parrot_str_byte_length(interp, s)) {
-        Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
+        Parrot_io_write_s(interp, _PIO_STDOUT(interp), s);
     }
 
     return cur_opcode + 2;
@@ -17021,7 +17021,7 @@ Parrot_print_p(opcode_t *cur_opcode, PARROT_INTERP) {
     STRING  * const  s = (VTABLE_get_string(interp, p));
 
     if (s) {
-        Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
+        Parrot_io_write_s(interp, _PIO_STDOUT(interp), s);
     }
 
     return cur_opcode + 2;
@@ -17125,23 +17125,23 @@ Parrot_say_s(opcode_t *cur_opcode, PARROT_INTERP) {
             int   len = STRING_IS_NULL(s) ? 0 : s->bufused;
 
             if (len < 80) {
-                Parrot_io_putps(interp, _PIO_STDOUT(interp), Parrot_str_concat(interp, s, nl));
+                Parrot_io_write_s(interp, _PIO_STDOUT(interp), Parrot_str_concat(interp, s, nl));
             }
             else {
-                Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
-                Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
+                Parrot_io_write_s(interp, _PIO_STDOUT(interp), s);
+                Parrot_io_write_s(interp, _PIO_STDOUT(interp), nl);
             }
 
         }
         else {
-            Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
+            Parrot_io_write_s(interp, _PIO_STDOUT(interp), nl);
         }
 
 #else
         if (s) {
-            Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
+            Parrot_io_write_s(interp, _PIO_STDOUT(interp), s);
         }
-        Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
+        Parrot_io_write_s(interp, _PIO_STDOUT(interp), nl);
 
 #endif
 ;
@@ -17158,23 +17158,23 @@ Parrot_say_sc(opcode_t *cur_opcode, PARROT_INTERP) {
             int   len = STRING_IS_NULL(s) ? 0 : s->bufused;
 
             if (len < 80) {
-                Parrot_io_putps(interp, _PIO_STDOUT(interp), Parrot_str_concat(interp, s, nl));
+                Parrot_io_write_s(interp, _PIO_STDOUT(interp), Parrot_str_concat(interp, s, nl));
             }
             else {
-                Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
-                Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
+                Parrot_io_write_s(interp, _PIO_STDOUT(interp), s);
+                Parrot_io_write_s(interp, _PIO_STDOUT(interp), nl);
             }
 
         }
         else {
-            Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
+            Parrot_io_write_s(interp, _PIO_STDOUT(interp), nl);
         }
 
 #else
         if (s) {
-            Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
+            Parrot_io_write_s(interp, _PIO_STDOUT(interp), s);
         }
-        Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
+        Parrot_io_write_s(interp, _PIO_STDOUT(interp), nl);
 
 #endif
 ;
@@ -17199,23 +17199,23 @@ Parrot_say_p(opcode_t *cur_opcode, PARROT_INTERP) {
                 int   len = STRING_IS_NULL(s) ? 0 : s->bufused;
 
                 if (len < 80) {
-                    Parrot_io_putps(interp, _PIO_STDOUT(interp), Parrot_str_concat(interp, s, nl));
+                    Parrot_io_write_s(interp, _PIO_STDOUT(interp), Parrot_str_concat(interp, s, nl));
                 }
                 else {
-                    Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
-                    Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
+                    Parrot_io_write_s(interp, _PIO_STDOUT(interp), s);
+                    Parrot_io_write_s(interp, _PIO_STDOUT(interp), nl);
                 }
 
             }
             else {
-                Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
+                Parrot_io_write_s(interp, _PIO_STDOUT(interp), nl);
             }
 
 #else
             if (s) {
-                Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
+                Parrot_io_write_s(interp, _PIO_STDOUT(interp), s);
             }
-            Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
+            Parrot_io_write_s(interp, _PIO_STDOUT(interp), nl);
 
 #endif
 ;
@@ -17229,7 +17229,7 @@ Parrot_print_p_i(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PREG(1)) {
         STRING  * const  s = Parrot_str_from_int(interp, IREG(2));
 
-        Parrot_io_putps(interp, PREG(1), s);
+        Parrot_io_write_s(interp, PREG(1), s);
     }
 
     return cur_opcode + 3;
@@ -17240,7 +17240,7 @@ Parrot_print_p_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PREG(1)) {
         STRING  * const  s = Parrot_str_from_int(interp, ICONST(2));
 
-        Parrot_io_putps(interp, PREG(1), s);
+        Parrot_io_write_s(interp, PREG(1), s);
     }
 
     return cur_opcode + 3;
@@ -17251,7 +17251,7 @@ Parrot_print_p_n(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PREG(1)) {
         STRING  * const  s = Parrot_sprintf_c(interp, FLOATVAL_FMT, NREG(2));
 
-        Parrot_io_putps(interp, PREG(1), s);
+        Parrot_io_write_s(interp, PREG(1), s);
     }
 
     return cur_opcode + 3;
@@ -17262,7 +17262,7 @@ Parrot_print_p_nc(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PREG(1)) {
         STRING  * const  s = Parrot_sprintf_c(interp, FLOATVAL_FMT, NCONST(2));
 
-        Parrot_io_putps(interp, PREG(1), s);
+        Parrot_io_write_s(interp, PREG(1), s);
     }
 
     return cur_opcode + 3;
@@ -17271,7 +17271,7 @@ Parrot_print_p_nc(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_print_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
     if (SREG(2) && PREG(1)) {
-        Parrot_io_putps(interp, PREG(1), SREG(2));
+        Parrot_io_write_s(interp, PREG(1), SREG(2));
     }
 
     return cur_opcode + 3;
@@ -17280,7 +17280,7 @@ Parrot_print_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
 opcode_t *
 Parrot_print_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     if (SCONST(2) && PREG(1)) {
-        Parrot_io_putps(interp, PREG(1), SCONST(2));
+        Parrot_io_write_s(interp, PREG(1), SCONST(2));
     }
 
     return cur_opcode + 3;
@@ -17291,7 +17291,7 @@ Parrot_print_p_p(opcode_t *cur_opcode, PARROT_INTERP) {
     if (PREG(2) && PREG(1)) {
         STRING  * const  s = VTABLE_get_string(interp, PREG(2));
 
-        Parrot_io_putps(interp, PREG(1), s);
+        Parrot_io_write_s(interp, PREG(1), s);
     }
 
     return cur_opcode + 3;

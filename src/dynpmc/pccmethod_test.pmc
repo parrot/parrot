@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2008, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -26,14 +26,15 @@ pmclass PCCMETHOD_Test dynpmc provides hash {
     {
         UNUSED(SELF);
         Parrot_io_printf(INTERP, "test_method0\n");
-        Parrot_io_printf(INTERP, "%d\n", a1);
+        Parrot_io_printf(INTERP, INTVAL_FMT"\n", a1);
     }
 
     METHOD test_method1(int a1, int a2, int a3, int a4, int a5, int a6)
     {
         UNUSED(SELF);
         Parrot_io_printf(INTERP, "test_method1\n");
-        Parrot_io_printf(INTERP, "%d,%d,%d,%d,%d,%d\n", a1, a2, a3, a4, a5, a6);
+        Parrot_io_printf(INTERP, INTVAL_FMT","INTVAL_FMT","INTVAL_FMT","
+                         INTVAL_FMT","INTVAL_FMT","INTVAL_FMT"\n", a1, a2, a3, a4, a5, a6);
     }
 
     METHOD test_method2(int a1 :optional, int a1o :opt_flag,
@@ -42,7 +43,7 @@ pmclass PCCMETHOD_Test dynpmc provides hash {
         STRING *kevin = CONST_STRING(INTERP, "KEVIN");
         UNUSED(SELF);
         Parrot_io_printf(INTERP, "test_method2\n");
-        Parrot_io_printf(INTERP, "%d, %d, %Ss %Ss\n", a1, a1o,
+        Parrot_io_printf(INTERP, INTVAL_FMT", "INTVAL_FMT", %Ss %Ss\n", a1, a1o,
             VTABLE_name(INTERP, slurpy_pos),
             VTABLE_get_repr(INTERP, slurpy_pos));
 

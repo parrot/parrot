@@ -22,7 +22,7 @@ INTVAL encoding_compare(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_DOES_NOT_RETURN
 STRING* encoding_decompose(PARROT_INTERP, const STRING *src)
         __attribute__nonnull__(1);
 
@@ -253,7 +253,7 @@ STRING* unicode_downcase(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_DOES_NOT_RETURN
 STRING* unicode_downcase_first(PARROT_INTERP, const STRING *src)
         __attribute__nonnull__(1);
 
@@ -262,7 +262,7 @@ STRING* unicode_titlecase(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_DOES_NOT_RETURN
 STRING* unicode_titlecase_first(PARROT_INTERP, const STRING *src)
         __attribute__nonnull__(1);
 
@@ -271,7 +271,7 @@ STRING* unicode_upcase(PARROT_INTERP, ARGIN(const STRING *src))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_DOES_NOT_RETURN
 STRING* unicode_upcase_first(PARROT_INTERP, const STRING *src)
         __attribute__nonnull__(1);
 

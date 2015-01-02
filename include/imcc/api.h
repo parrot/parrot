@@ -21,6 +21,7 @@ Parrot_Int imcc_compile_file_api(
         FUNC_MODIFIES(*pbc);
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 Parrot_Int imcc_get_pasm_compreg_api(
     Parrot_PMC interp_pmc,
     int add_compreg,
@@ -29,7 +30,7 @@ Parrot_Int imcc_get_pasm_compreg_api(
         FUNC_MODIFIES(*compiler);
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 Parrot_Int imcc_get_pir_compreg_api(
     Parrot_PMC interp_pmc,
     int add_compreg,

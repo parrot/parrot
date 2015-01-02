@@ -345,7 +345,6 @@ FLOATVAL PF_fetch_number(
     ARGIN(const opcode_t **stream))
         __attribute__nonnull__(2);
 
-PARROT_CANNOT_RETURN_NULL
 opcode_t PF_fetch_opcode(
     ARGIN_NULLOK(const PackFile *pf),
     ARGMOD(const opcode_t **stream))
@@ -495,6 +494,7 @@ void PackFile_ConstTable_dump(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 void do_sub_pragmas(PARROT_INTERP,
     ARGIN(PMC *pfpmc),
     pbc_action_enum_t action,
@@ -503,6 +503,7 @@ void do_sub_pragmas(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 void PackFile_add_segment(PARROT_INTERP,
     ARGMOD(PackFile_Directory *dir),
     ARGMOD(PackFile_Segment *seg))
@@ -513,6 +514,7 @@ void PackFile_add_segment(PARROT_INTERP,
         FUNC_MODIFIES(*seg);
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 void PackFile_Annotations_add_entry(PARROT_INTERP,
     ARGMOD(PackFile_Annotations *self),
     opcode_t offset,
@@ -524,6 +526,7 @@ void PackFile_Annotations_add_entry(PARROT_INTERP,
         FUNC_MODIFIES(*self);
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 void PackFile_destroy(PARROT_INTERP, ARGMOD(PackFile *pf))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -532,6 +535,7 @@ void PackFile_destroy(PARROT_INTERP, ARGMOD(PackFile *pf))
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
+PARROT_DEPRECATED
 PackFile_Segment * PackFile_find_segment(PARROT_INTERP,
     ARGIN_NULLOK(PackFile_Directory *dir),
     ARGIN(const STRING *name),
@@ -540,12 +544,14 @@ PackFile_Segment * PackFile_find_segment(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 void PackFile_fixup_subs(PARROT_INTERP,
     pbc_action_enum_t what,
     ARGIN_NULLOK(PMC *eval))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 INTVAL PackFile_map_segments(PARROT_INTERP,
     ARGIN(const PackFile_Directory *dir),
     PackFile_map_segments_func_t callback,
@@ -556,11 +562,13 @@ INTVAL PackFile_map_segments(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_DEPRECATED
 PackFile * PackFile_new(PARROT_INTERP, INTVAL is_mapped)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+PARROT_DEPRECATED
 opcode_t PackFile_unpack(PARROT_INTERP,
     ARGMOD(PackFile *self),
     ARGIN(const opcode_t *packed),
@@ -571,6 +579,7 @@ opcode_t PackFile_unpack(PARROT_INTERP,
         FUNC_MODIFIES(*self);
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 void Parrot_debug_add_mapping(PARROT_INTERP,
     ARGMOD(PackFile_Debug *debug),
     opcode_t offset,
@@ -583,6 +592,7 @@ void Parrot_debug_add_mapping(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_DEPRECATED
 STRING * Parrot_debug_pc_to_filename(PARROT_INTERP,
     ARGIN(const PackFile_Debug *debug),
     opcode_t pc)
@@ -590,17 +600,20 @@ STRING * Parrot_debug_pc_to_filename(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 void Parrot_load_bytecode(PARROT_INTERP,
     ARGIN_NULLOK(Parrot_String file_str))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 void Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_DEPRECATED
 PackFile_Debug * Parrot_new_debug_seg(PARROT_INTERP,
     ARGMOD(PackFile_ByteCode *cs),
     size_t size)
@@ -740,6 +753,17 @@ void Parrot_pf_tag_constant(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+opcode_t Parrot_pf_unpack(PARROT_INTERP,
+    ARGMOD(PackFile *self),
+    ARGIN(const opcode_t *packed),
+    size_t packed_size)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*self);
+
+PARROT_EXPORT
 void Parrot_pf_write_pbc_file(PARROT_INTERP,
     ARGIN(PMC *pf_pmc),
     ARGIN(STRING *filename))
@@ -750,6 +774,7 @@ void Parrot_pf_write_pbc_file(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_DEPRECATED
 PackFile_ByteCode * Parrot_switch_to_cs(PARROT_INTERP,
     ARGIN(PackFile_ByteCode *new_cs),
     int really)
@@ -757,6 +782,7 @@ PackFile_ByteCode * Parrot_switch_to_cs(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
+PARROT_DEPRECATED
 PMC * PackFile_Annotations_lookup(PARROT_INTERP,
     ARGIN(PackFile_Annotations *self),
     opcode_t offset,
@@ -907,6 +933,10 @@ void Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD_NULLOK(PackFile * pf))
 #define ASSERT_ARGS_Parrot_pf_tag_constant __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ct))
+#define ASSERT_ARGS_Parrot_pf_unpack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(packed))
 #define ASSERT_ARGS_Parrot_pf_write_pbc_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pf_pmc) \

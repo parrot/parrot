@@ -1,7 +1,7 @@
 /* compiler.h
- *  Copyright (C) 2007-2011, Parrot Foundation.
+ *  Copyright (C) 2007-2015, Parrot Foundation.
  *  Overview:
- *     defines compiler capabilities
+ *     defines compiler capabilities and attributes
  */
 
 #ifndef PARROT_COMPILER_H_GUARD
@@ -9,7 +9,7 @@
 
 /*
  * This set of macros define capabilities that may or may not be available
- * for a given compiler.  They are based on GCC's __attribute__ functionality.
+ * for a given compiler.  They are based on GCC's and CLANG's __attribute__ functionality.
  */
 
 #ifdef HASATTRIBUTE_NEVER_WORKS
@@ -21,18 +21,28 @@
 #  else
 #    define __attribute__deprecated__       __attribute__((__deprecated__))
 #  endif
+#else
+#  define __attribute__deprecated__
 #endif
-#ifdef HASATTRIBUTE_FORMAT
-#  define __attribute__format__(x, y, z)    __attribute__((format((x), (y), (z))))
+#if defined(HASATTRIBUTE_FORMAT_GNU_PRINTF)
+#  define __attribute__format__(y, z)    __attribute__ ((format (gnu_printf, (y), (z))))
+#elif defined(HASATTRIBUTE_FORMAT_MS_PRINTF)
+#  define __attribute__format__(y, z)    __attribute__ ((format (ms_printf, (y), (z))))
+#elif defined(HASATTRIBUTE_FORMAT_PRINTF)
+#  define __attribute__format__(y, z)    __attribute__ ((format (printf, (y), (z))))
+#else
+#  define __attribute__format__(y, z)
 #endif
 #ifdef HASATTRIBUTE_MALLOC
 #  define __attribute__malloc__             __attribute__((__malloc__))
+#else
+#  define __attribute__malloc__
 #endif
-#ifdef HASATTRIBUTE_NONNULL
-#ifndef __cplusplus
+#if defined(HASATTRIBUTE_NONNULL) && !defined(__cplusplus)
 /* g++ has some problem with this attribute */
 #  define __attribute__nonnull__(a)         __attribute__((__nonnull__(a)))
-#endif
+#else
+#  define __attribute__nonnull__(a)
 #endif
 #ifdef HASATTRIBUTE_NORETURN
 #  ifdef _MSC_VER
@@ -40,61 +50,46 @@
 #  else
 #    define __attribute__noreturn__         __attribute__((__noreturn__))
 #  endif
+#else
+#  define __attribute__noreturn__
 #endif
 #ifdef HASATTRIBUTE_PURE
 #  define __attribute__pure__               __attribute__((__pure__))
+#else
+#  define __attribute__pure__
 #endif
 #ifdef HASATTRIBUTE_CONST
 #  define __attribute__const__              __attribute__((__const__))
+#else
+#  define __attribute__const__
 #endif
 #ifdef HASATTRIBUTE_UNUSED
 #  define __attribute__unused__             __attribute__((__unused__))
+#else
+#  define __attribute__unused__
 #endif
 #ifdef HASATTRIBUTE_WARN_UNUSED_RESULT
 #  define __attribute__warn_unused_result__ __attribute__((__warn_unused_result__))
+#elif defined(_MSC_VER) && defined(PARROT_HAS_HEADER_SAL)
+#  define __attribute__warn_unused_result__ _Check_return_
+#else
+#  define __attribute__warn_unused_result__
 #endif
 #ifdef HASATTRIBUTE_HOT
 #  define __attribute__hot__                __attribute__((__hot__))
+#else
+#  define __attribute__hot__
 #endif
 #ifdef HASATTRIBUTE_COLD
 #  define __attribute__cold__               __attribute__((__cold__))
-#endif
-
-/* If we haven't defined the attributes yet, define them to blank. */
-#ifndef __attribute__deprecated__
-#  define __attribute__deprecated__
-#endif
-#ifndef __attribute__format__
-#  define __attribute__format__(x, y, z)
-#endif
-#ifndef __attribute__malloc__
-#  define __attribute__malloc__
-#endif
-#ifndef __attribute__nonnull__
-#  define __attribute__nonnull__(a)
-#endif
-#ifndef __attribute__noreturn__
-#  define __attribute__noreturn__
-#endif
-#ifndef __attribute__const__
-#  define __attribute__const__
-#endif
-#ifndef __attribute__pure__
-#  define __attribute__pure__
-#endif
-#ifndef __attribute__unused__
-#  define __attribute__unused__
-#endif
-#ifndef __attribute__warn_unused_result__
-#  define __attribute__warn_unused_result__
-#endif
-#ifndef __attribute__hot__
-#  define __attribute__hot__
-#endif
-#ifndef __attribute__cold__
+#else
 #  define __attribute__cold__
 #endif
-
+#ifdef HASATTRIBUTE_RETURNS_NONNULL
+#  define __attribute__returns_nonnull__    __attribute__((returns_nonnull))
+#else
+#  define __attribute__returns_nonnull__
+#endif
 
 /* Shim arguments are arguments that must be included in your function,
  * but serve no purpose inside.  Mark them with the SHIM() macro so that
@@ -118,15 +113,17 @@
  * Microsoft provides two annotations mechanisms.  __declspec, which has been
  * around for a while, and Microsoft's standard source code annotation
  * language (SAL), introduced with Visual C++ 8.0.
- * See <http://msdn2.microsoft.com/en-us/library/ms235402(VS.80).aspx>,
+ * See <http://msdn.microsoft.com/en-us/library/ms182032.aspx>,
+ * <http://msdn2.microsoft.com/en-us/library/ms235402(VS.80).aspx>,
  * <http://msdn2.microsoft.com/en-us/library/dabb5z75(VS.80).aspx>.
  */
 #  include <sal.h>
+/* TODO: New syntax: _Ret_maybenull_  http://msdn.microsoft.com/en-us/library/jj159525.aspx */
 #  define PARROT_CAN_RETURN_NULL      /*@null@*/ __maybenull
 #  define PARROT_CANNOT_RETURN_NULL   /*@notnull@*/ __notnull
 #else
 #  define PARROT_CAN_RETURN_NULL      /*@null@*/
-#  define PARROT_CANNOT_RETURN_NULL   /*@notnull@*/
+#  define PARROT_CANNOT_RETURN_NULL   /*@notnull@*/ __attribute__returns_nonnull__
 #endif /* PARROT_HAS_HEADER_SAL */
 
 #define PARROT_DEPRECATED           __attribute__deprecated__
@@ -190,6 +187,7 @@
     /* The pointer passed may be NULL */
 
 #  define ARGIN(x)                    /*@in@*/ /*@notnull@*/ __in x
+#  define ARGIN_FORMAT(x)             /*@in@*/ /*@notnull@*/ __in x
 #  define ARGIN_NULLOK(x)             /*@in@*/ /*@null@*/ __in_opt x
     /* The pointer target must be completely defined before being passed */
     /* to the function. */
@@ -215,6 +213,7 @@
     /* The pointer passed may be NULL */
 
 #  define ARGIN(x)                    /*@in@*/ /*@notnull@*/ x
+#  define ARGIN_FORMAT(x)             /*@in@*/ /*@notnull@*/ x
 #  define ARGIN_NULLOK(x)             /*@in@*/ /*@null@*/ x
     /* The pointer target must be completely defined before being passed */
     /* to the function. */
@@ -243,6 +242,7 @@
 #define ARGFREE_NOTNULL(x)                  /*@only@*/ /*@out@*/ /*@notnull@*/ x
 
 #define PARROT_NO_ADDRESS_SAFETY_ANALYSIS
+/* We violate ASAN in Parrot_x_execute_on_exit_handlers() and trace_mem_block() */
 #if defined(__clang__) && defined(__has_feature)
 #  if __has_feature(address_sanitizer)
 #    undef PARROT_NO_ADDRESS_SAFETY_ANALYSIS

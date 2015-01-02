@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -132,21 +132,22 @@ die_from_exception(PARROT_INTERP, ARGIN(PMC *exception))
         /* In some cases we have a fatal exception before the IO system
          * is completely initialized. Do some attempt to output the
          * message to stderr, to help diagnosing. */
-        const int use_perr = !PMC_IS_NULL(Parrot_io_STDERR(interp));
+        PMC * const pout =  Parrot_io_STDOUT(interp);
+        PMC * const perr =  Parrot_io_STDERR(interp);
         interp->final_exception = exception;
         interp->exit_code = 1;
 
         /* flush interpreter output to get things printed in order */
-        if (!PMC_IS_NULL(Parrot_io_STDOUT(interp)))
-            Parrot_io_flush_handle(interp, Parrot_io_STDOUT(interp));
-        if (use_perr)
-            Parrot_io_flush_handle(interp, Parrot_io_STDERR(interp));
+        if (!PMC_IS_NULL(pout))
+            Parrot_io_flush(interp, pout);
+        if (!PMC_IS_NULL(perr))
+            Parrot_io_flush(interp, perr);
 
         if (interp->pdb) {
             Interp * const interpdeb = interp->pdb->debugger;
             if (interpdeb) {
-                Parrot_io_flush_handle(interpdeb, Parrot_io_STDOUT(interpdeb));
-                Parrot_io_flush_handle(interpdeb, Parrot_io_STDERR(interpdeb));
+                Parrot_io_flush(interpdeb, Parrot_io_STDOUT(interpdeb));
+                Parrot_io_flush(interpdeb, Parrot_io_STDERR(interpdeb));
             }
         }
 

@@ -1,6 +1,6 @@
 #! perl
 
-# Copyright (C) 2001-2014, Parrot Foundation.
+# Copyright (C) 2001-2015, Parrot Foundation.
 
 use 5.008;
 use strict;

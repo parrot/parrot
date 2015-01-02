@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2011, Parrot Foundation.
+Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -73,11 +73,11 @@ Parrot_api_load_bytecode_bytes(Parrot_PMC interp_pmc,
 {
     ASSERT_ARGS(Parrot_api_load_bytecode_bytes)
     EMBED_API_CALLIN(interp_pmc, interp)
-    PackFile * const pf = PackFile_new(interp, 0);
+    PackFile * const pf = Parrot_pf_new(interp, 0);
     PARROT_ASSERT(pf);
 
     Parrot_block_GC_mark(interp);
-    if (!PackFile_unpack(interp, pf, (const opcode_t *)pbc, bytecode_size)) {
+    if (!Parrot_pf_unpack(interp, pf, (const opcode_t *)pbc, bytecode_size)) {
         Parrot_unblock_GC_mark(interp);
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_MALFORMED_PACKFILE,
             "Could not unpack packfile");

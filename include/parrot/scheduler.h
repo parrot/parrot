@@ -1,5 +1,5 @@
 /* scheduler.h
- *  Copyright (C) 2007, Parrot Foundation.
+ *  Copyright (C) 2007-2015, Parrot Foundation.
  *  Overview:
  *     Parrot concurrency scheduler header stuff
  *  Data Structure and Algorithms:
@@ -31,8 +31,8 @@ void Parrot_cx_check_alarms(PARROT_INTERP, ARGIN(PMC *scheduler))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_CANNOT_RETURN_NULL
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 opcode_t* Parrot_cx_run_scheduler(PARROT_INTERP,
     ARGIN(PMC *scheduler),
     ARGIN(opcode_t *next))
@@ -76,7 +76,7 @@ void Parrot_cx_check_quantum(PARROT_INTERP, ARGIN(PMC *scheduler))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 opcode_t* Parrot_cx_check_scheduler(PARROT_INTERP, ARGIN(opcode_t *next))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);

@@ -90,7 +90,6 @@ static STRING * handle_flags(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-PARROT_CANNOT_RETURN_NULL
 static void str_concat_w_flags(PARROT_INTERP,
     ARGOUT(PMC * sb),
     ARGIN(const SpfInfo *info),
@@ -231,7 +230,6 @@ Returns the pointer to the modified string.
 
 */
 
-PARROT_CANNOT_RETURN_NULL
 static void
 str_concat_w_flags(PARROT_INTERP, ARGOUT(PMC * sb), ARGIN(const SpfInfo *info),
         ARGMOD(STRING *src), ARGIN_NULLOK(STRING *prefix))
@@ -422,7 +420,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
     INTVAL i;
     INTVAL len     = 0;
     INTVAL old     = 0;
-    const INTVAL pat_len = (INTVAL)Parrot_str_length(interp, pat);
+    const INTVAL pat_len = Parrot_str_length(interp, pat);
     HUGEINTVAL num;
     HUGEINTVAL sharedint = 0;
     SpfInfo info = { 0, 0, 0, 0, (PHASE)0 }; /* Storage for flags, etc. */

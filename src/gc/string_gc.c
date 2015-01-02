@@ -126,7 +126,6 @@ static Variable_Size_Pool * new_memory_pool(
     size_t min_block,
     NULLOK(compact_f compact));
 
-PARROT_CANNOT_RETURN_NULL
 static UINTVAL pad_pool_size(ARGIN(const Variable_Size_Pool *pool))
         __attribute__nonnull__(1);
 
@@ -858,7 +857,6 @@ problem easily.
 
 */
 
-PARROT_CANNOT_RETURN_NULL
 static UINTVAL
 pad_pool_size(ARGIN(const Variable_Size_Pool *pool))
 {

@@ -183,9 +183,10 @@ void Parrot_str_finish(PARROT_INTERP)
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 STRING * Parrot_str_format_data(PARROT_INTERP,
-    ARGIN(const char *format),
+    ARGIN_FORMAT(const char *format),
     ...)
         __attribute__nonnull__(1)
+        __attribute__format__(2, 3)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
@@ -682,20 +683,23 @@ STRING * Parrot_str_new_from_cstring(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-int Parrot_eprintf(NULLOK_INTERP, ARGIN(const char *s), ...)
+int Parrot_eprintf(NULLOK_INTERP, ARGIN_FORMAT(const char *s), ...)
+        __attribute__format__(2, 3)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 int Parrot_fprintf(PARROT_INTERP,
     ARGIN(Parrot_PMC pio),
-    ARGIN(const char *s),
+    ARGIN_FORMAT(const char *s),
     ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__format__(3, 4)
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-int Parrot_printf(NULLOK_INTERP, ARGIN(const char *s), ...)
+int Parrot_printf(NULLOK_INTERP, ARGIN_FORMAT(const char *s), ...)
+        __attribute__format__(2, 3)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
@@ -715,9 +719,10 @@ int /*@alt void@*/
 Parrot_secret_snprintf(
     ARGOUT(char *buffer),
     size_t len,
-    ARGIN(const char *format),
+    ARGIN_FORMAT(const char *format),
     ...)
         __attribute__nonnull__(1)
+        __attribute__format__(3, 4)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*buffer);
 
@@ -725,18 +730,20 @@ PARROT_EXPORT
 void Parrot_snprintf(PARROT_INTERP,
     ARGOUT(char *targ),
     size_t len,
-    ARGIN(const char *pat),
+    ARGIN_FORMAT(const char *pat),
     ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__format__(4, 5)
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*targ);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-STRING * Parrot_sprintf_c(PARROT_INTERP, ARGIN(const char *pat), ...)
+STRING * Parrot_sprintf_c(PARROT_INTERP, ARGIN_FORMAT(const char *pat), ...)
         __attribute__nonnull__(1)
+        __attribute__format__(2, 3)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
@@ -749,20 +756,22 @@ STRING * Parrot_sprintf_s(PARROT_INTERP, ARGIN(STRING *pat), ...)
 PARROT_EXPORT
 int Parrot_vfprintf(PARROT_INTERP,
     ARGIN(Parrot_PMC pio),
-    ARGIN(const char *s),
+    ARGIN_FORMAT(const char *s),
     va_list args)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__format__(3, 0)
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
 void Parrot_vsnprintf(PARROT_INTERP,
     ARGMOD(char *targ),
     size_t len,
-    ARGIN(const char *pat),
+    ARGIN_FORMAT(const char *pat),
     va_list args)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__format__(4, 0)
         __attribute__nonnull__(4)
         FUNC_MODIFIES(*targ);
 
@@ -770,9 +779,10 @@ PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING * Parrot_vsprintf_c(PARROT_INTERP,
-    ARGIN(const char *pat),
+    ARGIN_FORMAT(const char *pat),
     va_list args)
         __attribute__nonnull__(1)
+        __attribute__format__(2, 0)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT

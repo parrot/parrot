@@ -27,23 +27,23 @@
 
 typedef @iv@                    Parrot_Int;
 typedef unsigned @iv@           Parrot_UInt;
-typedef @nv@                    Parrot_Float;
-typedef @opcode_t@              Parrot_Opcode;
+typedef @nv@                  Parrot_Float;
+typedef @opcode_t@                    Parrot_Opcode;
 typedef void *                  Parrot_Pointer;
 
 typedef signed char             Parrot_Int1;
 typedef unsigned char           Parrot_UInt1;
-typedef @int2_t@                Parrot_Int2;
-typedef unsigned @int2_t@       Parrot_UInt2;
-typedef @int4_t@                Parrot_Int4;
-typedef unsigned @int4_t@       Parrot_UInt4;
+typedef @int2_t@                   Parrot_Int2;
+typedef unsigned @int2_t@          Parrot_UInt2;
+typedef @int4_t@                     Parrot_Int4;
+typedef unsigned @int4_t@            Parrot_UInt4;
 #if @HAS_INT64@
-typedef @int8_t@                Parrot_Int8;
-typedef unsigned @int8_t@       Parrot_UInt8;
+typedef @int8_t@                    Parrot_Int8;
+typedef unsigned @int8_t@           Parrot_UInt8;
 #endif
 
-typedef @float4_t@              Parrot_Float4;
-typedef @float8_t@              Parrot_Float8;
+typedef @float4_t@                   Parrot_Float4;
+typedef @float8_t@                  Parrot_Float8;
 
 /* Required for proper compilation of StructView PMC */
 #define HAS_LONGLONG            @HAS_LONGLONG@
@@ -119,18 +119,18 @@ typedef @hugeintval@ HUGEINTVAL;
 typedef unsigned @hugeintval@ UHUGEINTVAL;
 typedef @hugefloatval@ HUGEFLOATVAL;
 
-#define INTVAL_SIZE @intvalsize@
-#define NUMVAL_SIZE @nvsize@
+#define INTVAL_SIZE   @intvalsize@
+#define NUMVAL_SIZE   @nvsize@
 #define OPCODE_T_SIZE @opcodesize@
-#define PTR_SIZE @ptrsize@
-#define SHORT_SIZE @shortsize@
-#define INT_SIZE @intsize@
-#define LONG_SIZE @longsize@
+#define PTR_SIZE      @ptrsize@
+#define SHORT_SIZE    @shortsize@
+#define INT_SIZE      @intsize@
+#define LONG_SIZE     @longsize@
 #if @HAS_LONGLONG@
 #  define LONGLONG_SIZE @longlongsize@
 #endif
 #define HUGEINTVAL_SIZE @hugeintvalsize@
-#define DOUBLE_SIZE @doublesize@
+#define DOUBLE_SIZE   @doublesize@
 
 typedef Parrot_Opcode opcode_t;
 typedef @ptrcast@ ptrcast_t;
@@ -152,9 +152,9 @@ typedef void DPOINTER;
 #define UINTVAL_FMT  "@uintvalfmt@"
 #define INTVAL_FMT   "@intvalfmt@"
 #if PTR_SIZE == 4
-#  define SIZE_FMT     "%d"
+#  define SIZE_FMT   "%d"
 #else
-#  define SIZE_FMT     "%ld"
+#  define SIZE_FMT   "%ld"
 #endif
 #define FLOATVAL_FMT "@floatvalfmt@"
 

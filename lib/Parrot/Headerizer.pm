@@ -1,10 +1,10 @@
-# Copyright (C) 2004-2012, Parrot Foundation.
+# Copyright (C) 2004-2014, Parrot Foundation.
 
 package Parrot::Headerizer;
 
 =head1 NAME
 
-Parrot::Headerizer - Parrot header generation functionality
+Parrot::Headerizer - Generate parrot function header declarations automatically
 
 =head1 SYNOPSIS
 
@@ -102,6 +102,7 @@ sub new {
         PARROT_EXPORT
         PARROT_INLINE
         PARROT_NOINLINE
+        PARROT_DEPRECATED
 
         PARROT_CAN_RETURN_NULL
         PARROT_CANNOT_RETURN_NULL
@@ -117,6 +118,7 @@ sub new {
 
         PARROT_MALLOC
         PARROT_OBSERVER
+        PARROT_EXPOSED
 
         PARROT_HOT
         PARROT_COLD
@@ -372,6 +374,9 @@ sub extract_function_declarations_and_update_source {
 Creates a data structure in which information about a particular function can
 be looked up.
 
+Check that PARROT_EXPORT is the first declaration if defined, as with C++ the
+export "C" prefix must be the first expression in the declaration. See GH #1164.
+
 =item * Arguments
 
 List of two strings, the filename and the function declaration.
@@ -427,8 +432,9 @@ sub function_components_from_declaration {
     my $args = join( ' ', @lines );
 
     $args =~ s/\s+/ /g;
+    # $args =~ s/__attribute__format__\(\d, \d\)//g;
     $args =~ s{([^(]+)\s*\((.+)\);?}{$2}
-        or die qq{Couldn't handle "$proto" in $file\n};
+        or die qq{Error: Couldn't handle "$proto" in $file\n};
 
     my $name = $1;
     $args = $2;
@@ -438,7 +444,7 @@ sub function_components_from_declaration {
         name            => $name,
         parrot_inline   => $parrot_inline,
         parrot_api      => $parrot_api,
-    } );
+    }, \@macros );
 
     my @args = validate_prototype_args( $args, $proto );
 
@@ -490,6 +496,10 @@ sub function_components_from_declaration {
 Performs some validation in the case where a function's return value is a
 pointer.
 
+We require one of PARROT_CANNOT_RETURN_NULL, PARROT_CAN_RETURN_NULL, PARROT_DOES_NOT_RETURN.
+
+We cannot have both of PARROT_CANNOT_RETURN_NULL, PARROT_CAN_RETURN_NULL.
+
 =item * Arguments
 
     $headerizer->check_pointer_return_type( {
@@ -513,7 +523,8 @@ sub check_pointer_return_type {
     my ($self, $args) = @_;
     if ( $args->{return_type} =~ /\*/ ) {
         if ( !$args->{macros}->{PARROT_CAN_RETURN_NULL} &&
-             !$args->{macros}->{PARROT_CANNOT_RETURN_NULL} ) {
+             !$args->{macros}->{PARROT_CANNOT_RETURN_NULL} &&
+             !$args->{macros}->{PARROT_DOES_NOT_RETURN} ) {
             if ( $args->{name} !~ /^yy/ ) { # Don't complain about lexer-created functions
                 $self->squawk( $args->{file}, $args->{name},
                     'Returns a pointer, but no PARROT_CAN(NOT)_RETURN_NULL macro found.' );
@@ -927,6 +938,13 @@ sub attrs_from_args {
     for my $arg (@args) {
         ++$n;
         @mods = func_modifies($arg, \@mods);
+        if ( $arg =~ m{ARGIN_FORMAT\(}) {
+            my $idx = $n;
+            my $next = $idx + 1;
+            $next = 0 if $args[$idx] ne '...';
+            push( @attrs, "__attribute__format__($idx, $next)" );
+            $arg =~ s/ARGIN_FORMAT\(/ARGIN(/;
+        }
         if ( $arg =~ m{(ARGIN|ARGOUT|ARGMOD|ARGFREE_NOTNULL|NOTNULL)\(} || $arg eq 'PARROT_INTERP' ) {
             push( @attrs, "__attribute__nonnull__($n)" );
         }
@@ -940,7 +958,7 @@ sub attrs_from_args {
         }
     }
 
-    return (@attrs,@mods);
+    return (@attrs, @mods);
 }
 
 =head2 C<print_final_message()>

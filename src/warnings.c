@@ -69,10 +69,12 @@ static INTVAL
 print_warning(PARROT_INTERP, ARGIN_NULLOK(STRING *msg))
 {
     ASSERT_ARGS(print_warning)
-    if (!msg)
-        Parrot_io_puts(interp, Parrot_io_STDERR(interp), "Unknown warning\n");
+    if (!msg) {
+        const char *w = "Unknown warning\n";
+        Parrot_io_write_b(interp, Parrot_io_STDERR(interp), w, sizeof (w));
+    }
     else {
-        Parrot_io_putps(interp, Parrot_io_STDERR(interp), msg);
+        Parrot_io_write_s(interp, Parrot_io_STDERR(interp), msg);
         if (STRING_ord(interp, msg, -1) != '\n')
             Parrot_io_eprintf(interp, "%c", '\n');
     }

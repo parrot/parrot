@@ -208,10 +208,11 @@ int /*@alt void@*/
 imcc_vfprintf(
     ARGMOD(imc_info_t * imcc),
     ARGMOD(PMC *io),
-    ARGIN(const char *format),
+    ARGIN_FORMAT(const char *format),
     va_list ap)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__format__(3, 0)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*io);

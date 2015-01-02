@@ -99,8 +99,8 @@ PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
 struct Fixed_Allocator* Parrot_gc_fixed_allocator_new(PARROT_INTERP);
 
-PARROT_CANNOT_RETURN_NULL
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 void * Parrot_gc_pool_allocate(PARROT_INTERP, ARGMOD(Pool_Allocator * pool))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)

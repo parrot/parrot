@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2014, Parrot Foundation.
+Copyright (C) 2010-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -45,8 +45,8 @@ Parse a signature string to a NCI signature PMC.
 
 */
 
-PARROT_CANNOT_RETURN_NULL
 PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
 {

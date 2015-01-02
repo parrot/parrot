@@ -772,7 +772,7 @@ and memory address.
 
     VTABLE STRING *get_string() :no_wb {
         const STRING * const classname = VTABLE_name(INTERP, SELF);
-        return Parrot_sprintf_c(INTERP, "%S[0x%x]", classname, SELF);
+        return Parrot_sprintf_c(INTERP, "%S[0x%lx]", classname, PTR2ULONG(SELF));
     }
 
 /*

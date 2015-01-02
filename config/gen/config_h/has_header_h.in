@@ -1,4 +1,4 @@
-/* Copyright (C) 2009, Parrot Foundation.
+/* Copyright (C) 2009-2014, Parrot Foundation.
  */
 
 #ifndef PARROT_HAS_HEADER_H_GUARD
@@ -29,6 +29,13 @@
  */
 
 @TEMP_d_config@
+
+/*
+ * Compiler HASATTRIBUTE config entries from auto::attributes
+ */
+
+@TEMP_hasattributes@
+
 
 #endif /* PARROT_HAS_HEADER_H_GUARD */
 

@@ -850,7 +850,7 @@ pbc_merge_begin(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs), int num_inputs)
     int                   i;
 
     /* Create a new empty packfile. */
-    PackFile * const merged = PackFile_new(interp, 0);
+    PackFile * const merged = Parrot_pf_new(interp, 0);
     if (merged == NULL) {
         Parrot_io_eprintf(interp, "PBC Merge: Error creating new packfile.\n");
         Parrot_x_exit(interp, 1);

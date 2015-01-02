@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2011, Parrot Foundation.
+# Copyright (C) 2004-2014, Parrot Foundation.
 #
 
 package Parrot::Headerizer::Functions;
@@ -303,9 +303,11 @@ Returns true value upon success.
 
 sub no_both_PARROT_EXPORT_and_PARROT_INLINE {
     my $args = shift;
-    my $death =
-        "$args->{file} $args->{name}: Can't have both PARROT_EXPORT and PARROT_INLINE";
-    die $death if $args->{parrot_inline} && $args->{parrot_api};
+    my $macros = shift;
+    die "Error: $args->{file} $args->{name}: Can't have both PARROT_EXPORT and PARROT_INLINE\n"
+      if $args->{parrot_inline} && $args->{parrot_api};
+    die "Error: $args->{file} $args->{name}: PARROT_EXPORT must be the first function attribute\n"
+      if $args->{parrot_api} and $macros->[0] ne 'PARROT_EXPORT';
     return 1;
 }
 
@@ -315,7 +317,7 @@ sub no_both_PARROT_EXPORT_and_PARROT_INLINE {
 
 =item * Purpose
 
-Performs some validation on prototype arguments.
+Performs some basic and rudimentary validation on prototype arguments.
 
 =item * Arguments
 
@@ -329,13 +331,15 @@ Performs some validation on prototype arguments.
 
 sub validate_prototype_args {
     my ($args, $proto) = @_;
+    $args =~ s/__attribute__format__\(\d, \d//;
     my @args = split( /\s*,\s*/, $args );
     for (@args) {
         /\S+\s+\S+/
             || ( $_ eq '...' )
+            || ( $_ =~ /^\.\.\.\)? ?/ )
             || ( $_ eq 'void' )
             || ( $_ =~ /(PARROT|NULLOK|SHIM)_INTERP/ )
-            or die "Bad args in $proto";
+            or die "Bad arg '$_' in '$proto'";
     }
     return @args;
 }
@@ -452,7 +456,7 @@ sub asserts_from_args {
     my @asserts;
 
     for my $arg (@args) {
-        if ( $arg =~ m{(ARGIN|ARGOUT|ARGMOD|ARGFREE_NOTNULL|NOTNULL)\((.+?)\)} ) {
+        if ( $arg =~ m{(ARGIN|ARGIN_FORMAT|ARGOUT|ARGMOD|ARGFREE_NOTNULL|NOTNULL)\((.+?)\)} ) {
             my $var = $2;
             my $was_shimmed = ( $var =~ /SHIM/ );
 

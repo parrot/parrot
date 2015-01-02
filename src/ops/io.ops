@@ -76,14 +76,14 @@ inline op print(in NUM) :base_io {
 op print(in STR) :base_io {
     STRING * const s = $1;
     if (s && Parrot_str_byte_length(interp, s))
-        Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
+        Parrot_io_write_s(interp, _PIO_STDOUT(interp), s);
 }
 
 op print(invar PMC) :base_io {
     PMC * const p = $1;
     STRING * const s = (VTABLE_get_string(interp, p));
     if (s)
-        Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
+        Parrot_io_write_s(interp, _PIO_STDOUT(interp), s);
 }
 
 =item B<say>(in INT)
@@ -129,7 +129,7 @@ inline op say(in NUM) :base_io {
 /*
 
 If the string argument can be extended by \n without copying,
-concat the strings before calling io_putps to provider better atomicity
+concat the strings before calling io_write_s to provider better atomicity
 with threads. To avoid mixing strings with newlines in most cases.
 This is not foolproof of course. [GH #893]
 
@@ -143,20 +143,20 @@ op say(in STR) :base_io {
     if (s) {
         int len = STRING_IS_NULL(s) ? 0 : s->bufused;
         if (len < 80) {
-            Parrot_io_putps(interp, _PIO_STDOUT(interp),
-                            Parrot_str_concat(interp, s, nl));
+            Parrot_io_write_s(interp, _PIO_STDOUT(interp),
+                              Parrot_str_concat(interp, s, nl));
         }
         else {
-            Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
-            Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
+            Parrot_io_write_s(interp, _PIO_STDOUT(interp), s);
+            Parrot_io_write_s(interp, _PIO_STDOUT(interp), nl);
         }
     }
     else
-        Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
+        Parrot_io_write_s(interp, _PIO_STDOUT(interp), nl);
 #else
     if (s)
-        Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
-    Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
+        Parrot_io_write_s(interp, _PIO_STDOUT(interp), s);
+    Parrot_io_write_s(interp, _PIO_STDOUT(interp), nl);
 #endif
 
 }
@@ -178,20 +178,20 @@ op say(invar PMC) :base_io {
         if (s) {
             int len = STRING_IS_NULL(s) ? 0 : s->bufused;
             if (len < 80) {
-                Parrot_io_putps(interp, _PIO_STDOUT(interp),
+                Parrot_io_write_s(interp, _PIO_STDOUT(interp),
                                 Parrot_str_concat(interp, s, nl));
             }
             else {
-                Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
-                Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
+                Parrot_io_write_s(interp, _PIO_STDOUT(interp), s);
+                Parrot_io_write_s(interp, _PIO_STDOUT(interp), nl);
             }
         }
         else
-            Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
+            Parrot_io_write_s(interp, _PIO_STDOUT(interp), nl);
 #else
         if (s)
-            Parrot_io_putps(interp, _PIO_STDOUT(interp), s);
-        Parrot_io_putps(interp, _PIO_STDOUT(interp), nl);
+            Parrot_io_write_s(interp, _PIO_STDOUT(interp), s);
+        Parrot_io_write_s(interp, _PIO_STDOUT(interp), nl);
 #endif
     }
 }
@@ -216,27 +216,27 @@ Print $2 on the IO stream object $1.
 op print(invar PMC, in INT) :base_io {
     if ($1) {
         STRING * const s = Parrot_str_from_int(interp, $2);
-        Parrot_io_putps(interp, $1, s);
+        Parrot_io_write_s(interp, $1, s);
     }
 }
 
 op print(invar PMC, in NUM) :base_io {
     if ($1) {
         STRING * const s = Parrot_sprintf_c(interp, FLOATVAL_FMT, $2);
-        Parrot_io_putps(interp, $1, s);
+        Parrot_io_write_s(interp, $1, s);
     }
 }
 
 op print(invar PMC, in STR) :base_io {
     if ($2 && $1) {
-        Parrot_io_putps(interp, $1, $2);
+        Parrot_io_write_s(interp, $1, $2);
     }
 }
 
 op print(invar PMC, invar PMC) :base_io {
     if ($2 && $1) {
         STRING * const s = VTABLE_get_string(interp, $2);
-        Parrot_io_putps(interp, $1, s);
+        Parrot_io_write_s(interp, $1, s);
     }
 }
 

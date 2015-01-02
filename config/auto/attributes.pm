@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2012, Parrot Foundation.
+# Copyright (C) 2007-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -6,8 +6,8 @@ config/auto/attributes.pm - Attributes detection
 
 =head1 DESCRIPTION
 
-Automagically detect what attributes, like HASATTRIBUTE_CONST, that
-the compiler can support.
+Automagically detect all attributes or declspec, like HASATTRIBUTE_CONST,
+that the compiler can support.
 
 =cut
 
@@ -32,7 +32,9 @@ sub _init {
 our @potential_attributes = qw(
     HASATTRIBUTE_CONST
     HASATTRIBUTE_DEPRECATED
-    HASATTRIBUTE_FORMAT
+    HASATTRIBUTE_FORMAT_GNU_PRINTF
+    HASATTRIBUTE_FORMAT_MS_PRINTF
+    HASATTRIBUTE_FORMAT_PRINTF
     HASATTRIBUTE_MALLOC
     HASATTRIBUTE_NONNULL
     HASATTRIBUTE_NORETURN
@@ -41,6 +43,7 @@ our @potential_attributes = qw(
     HASATTRIBUTE_WARN_UNUSED_RESULT
     HASATTRIBUTE_HOT
     HASATTRIBUTE_COLD
+    HASATTRIBUTE_RETURNS_NONNULL
     HASATTRIBUTE_NEVER_WORKS
 );
 # HASATTRIBUTE_NEVER_WORKS is at the end just to prove that it's possible to fail.
@@ -67,7 +70,6 @@ sub try_attr {
     $conf->cc_gen('config/auto/attributes/test_c.in');
 
     my $disable_warnings = '';
-
     # work around msvc warning for unused variable
     if ( defined $conf->option_or_data('msvcversion') ) {
         $disable_warnings = '-wd4101';
@@ -83,7 +85,13 @@ sub try_attr {
     my $exit_code =
         Parrot::Configure::Utils::_run_command( $command_line, $output_file, $output_file );
     $conf->debug("  exit code: $exit_code\n");
+    my $output = Parrot::BuildUtil::slurp_file($output_file);
+    $conf->debug("  output: $output\n") if $output;
 
+    if ( !$exit_code and $output =~ /error|warning/i ) {
+        $exit_code = 1;
+        $conf->debug("Error or Warning: rejected $attr\n");
+    }
     $conf->cc_clean();
     $conf->data->set( $attr => !$exit_code | 0 );
 
@@ -93,14 +101,11 @@ sub try_attr {
         return;
     }
 
-    my $output = Parrot::BuildUtil::slurp_file($output_file);
-    $conf->debug("  output: $output\n");
-
-    if ( $output !~ /error|warning/i ) {
-        $conf->data->set( ccflags => $tryflags );
-        my $ccflags = $conf->data->get("ccflags");
-        $conf->debug("  ccflags: $ccflags\n");
-    }
+    #if ( $output !~ /error|warning/i ) {
+    #    $conf->data->set( ccflags => $tryflags );
+    #    my $ccflags = $conf->data->get("ccflags");
+    #    $conf->debug("  ccflags: $ccflags\n");
+    #}
     unlink $output_file or die "Unable to unlink $output_file: $!";
 
     return;

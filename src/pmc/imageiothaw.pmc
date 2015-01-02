@@ -68,7 +68,7 @@ Destroys the PMC.
 */
 
     VTABLE void destroy() :no_wb {
-        PackFile_destroy(INTERP, PARROT_IMAGEIOTHAW(SELF)->pf);
+        Parrot_pf_destroy(INTERP, PARROT_IMAGEIOTHAW(SELF)->pf);
         PARROT_IMAGEIOTHAW(SELF)->pf = NULL;
     }
 
@@ -115,11 +115,11 @@ Thaws the PMC contained in C<image>.
                  GROW_TO_16_BYTE_BOUNDARY(PACKFILE_HEADER_BYTES);
             int unpacked_length;
 
-            PARROT_IMAGEIOTHAW(SELF)->pf   = PackFile_new(INTERP, 0);
+            PARROT_IMAGEIOTHAW(SELF)->pf   = Parrot_pf_new(INTERP, 0);
             PObj_custom_destroy_SET(SELF);
 
             PARROT_IMAGEIOTHAW(SELF)->pf->options |= PFOPT_PMC_FREEZE_ONLY;
-            unpacked_length = PackFile_unpack(INTERP, PARROT_IMAGEIOTHAW(SELF)->pf,
+            unpacked_length = Parrot_pf_unpack(INTERP, PARROT_IMAGEIOTHAW(SELF)->pf,
                                 PARROT_IMAGEIOTHAW(SELF)->curs,
                                 Parrot_str_byte_length(interp, image));
 

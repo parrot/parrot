@@ -16,6 +16,7 @@ A richer I/O API than that available in core Parrot.
 =cut
 
 BEGIN_OPS_PREAMBLE
+#include "pmc/pmc_handle.h"
 #include "../io/io_private.h"
 END_OPS_PREAMBLE
 
@@ -101,7 +102,9 @@ This switches the filehandle to linebuffer-mode.
 =cut
 
 inline op readline(out STR, invar PMC) :base_io {
-    $1 = Parrot_io_readline(interp, $2);
+    STRING * terminator;
+    GETATTR_Handle_record_separator(interp, $2, terminator);
+    $1 = Parrot_io_readline_s(interp, $2, terminator);
 }
 
 ##########################################

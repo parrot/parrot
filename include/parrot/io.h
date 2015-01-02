@@ -216,6 +216,7 @@ INTVAL Parrot_io_close(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL autoflush)
         FUNC_MODIFIES(*handle);
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 INTVAL Parrot_io_close_handle(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -270,6 +271,7 @@ size_t Parrot_io_flush(PARROT_INTERP, ARGMOD(PMC *handle))
         FUNC_MODIFIES(*handle);
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 void Parrot_io_flush_handle(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -280,10 +282,11 @@ PARROT_IGNORABLE_RESULT
 INTVAL /*@alt void@*/
 Parrot_io_fprintf(PARROT_INTERP,
     ARGMOD(PMC *pmc),
-    ARGIN(const char *s),
+    ARGIN_FORMAT(const char *s),
     ...)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
+        __attribute__format__(3, 4)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*pmc);
 
@@ -297,6 +300,7 @@ const IO_VTABLE * Parrot_io_get_vtable(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+PARROT_DEPRECATED
 PIOHANDLE Parrot_io_getfd(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -353,6 +357,7 @@ PMC * Parrot_io_open(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_DEPRECATED
 PMC * Parrot_io_open_handle(PARROT_INTERP,
     ARGIN(PMC *pmc),
     ARGIN(STRING *path),
@@ -385,21 +390,24 @@ PARROT_IGNORABLE_RESULT
 INTVAL /*@alt void@*/
 Parrot_io_pprintf(PARROT_INTERP,
     PIOHANDLE os_handle,
-    ARGIN(const char *s),
+    ARGIN_FORMAT(const char *s),
     ...)
         __attribute__nonnull__(1)
+        __attribute__format__(3, 4)
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 INTVAL /*@alt void@*/
 Parrot_io_printf(PARROT_INTERP,
-    ARGIN(const char *s),
+    ARGIN_FORMAT(const char *s),
     ...)
         __attribute__nonnull__(1)
+        __attribute__format__(2, 3)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 INTVAL Parrot_io_putps(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(STRING *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -408,6 +416,7 @@ INTVAL Parrot_io_putps(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(STRING *s))
         FUNC_MODIFIES(*s);
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 INTVAL Parrot_io_puts(PARROT_INTERP, ARGMOD(PMC *pmc), ARGIN(const char *s))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -444,6 +453,7 @@ STRING * Parrot_io_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_DEPRECATED
 STRING * Parrot_io_readline(PARROT_INTERP, ARGMOD(PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -463,6 +473,7 @@ STRING * Parrot_io_readline_s(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_DEPRECATED
 STRING * Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -470,6 +481,7 @@ STRING * Parrot_io_reads(PARROT_INTERP, ARGMOD(PMC *pmc), size_t length)
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
+PARROT_DEPRECATED
 STRING * Parrot_io_recv_handle(PARROT_INTERP, ARGMOD(PMC *pmc), size_t len)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -536,7 +548,7 @@ void Parrot_io_socket_connect(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
+PARROT_DEPRECATED
 INTVAL Parrot_io_socket_handle(PARROT_INTERP,
     ARGMOD_NULLOK(PMC *socket),
     INTVAL fam,

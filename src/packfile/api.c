@@ -36,6 +36,7 @@ format of bytecode.
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
+PARROT_DEPRECATED
 static void compile_file(PARROT_INTERP, ARGIN(STRING *path), INTVAL is_pasm)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -152,6 +153,7 @@ static PackFile* read_pbc_file_packfile_handle(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
+PARROT_DEPRECATED
 static PMC* set_current_sub(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -234,7 +236,7 @@ to other things in the packfile which are destroyed. Use with caution.
 
 =item C<void PackFile_destroy(PARROT_INTERP, PackFile *pf)>
 
-Deprecated. Same as C<Parrot_pf_destroy>. Use Parrot_pf_destroy instead.
+Deprecated. Same as C<Parrot_pf_destroy>. Use C<Parrot_pf_destroy> instead.
 
 =cut
 
@@ -265,6 +267,7 @@ Parrot_pf_destroy(PARROT_INTERP, ARGMOD(PackFile *pf))
 }
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 void
 PackFile_destroy(PARROT_INTERP, ARGMOD(PackFile *pf))
 {
@@ -324,13 +327,13 @@ PackFile *
 Parrot_pf_deserialize(PARROT_INTERP, ARGIN(STRING *str))
 {
     ASSERT_ARGS(Parrot_pf_deserialize)
-    PackFile       * const pf  = PackFile_new(interp, 0);
+    PackFile       * const pf  = Parrot_pf_new(interp, 0);
     const opcode_t * const ptr =
             (const opcode_t *)Parrot_str_cstring(interp, str);
     const int length           = Parrot_str_byte_length(interp, str);
 
-    if (!PackFile_unpack(interp, pf, ptr, length)) {
-        PackFile_destroy(interp, pf);
+    if (!Parrot_pf_unpack(interp, pf, ptr, length)) {
+        Parrot_pf_destroy(interp, pf);
         Parrot_ex_throw_from_c_noargs(interp,
             EXCEPTION_MALFORMED_PACKFILE, "Can't unpack packfile");
     }
@@ -968,6 +971,7 @@ removed. See GH #428 for details.
 */
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 void
 do_sub_pragmas(PARROT_INTERP, ARGIN(PMC *pfpmc),
                pbc_action_enum_t action, SHIM(PMC *eval_pmc))
@@ -1122,7 +1126,7 @@ PackFile_Header_read_uuid(PARROT_INTERP, ARGMOD(PackFile_Header *self),
     else
         /* Don't know this UUID type. */
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-            "PackFile_unpack: Invalid UUID type %d\n", self->uuid_type);
+            "PackFile unpack: Invalid UUID type %d\n", self->uuid_type);
 }
 
 
@@ -1151,7 +1155,7 @@ PackFile_Header_unpack(PARROT_INTERP, ARGMOD(PackFile_Header *self),
     /* Verify that the packfile isn't too small to contain a proper header */
     if (packed_size < PACKFILE_HEADER_BYTES) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-        "PackFile_unpack: Buffer length %d is shorter than PACKFILE_HEADER_BYTES %d.",
+        "PackFile unpack: Buffer length %d is shorter than PACKFILE_HEADER_BYTES %d.",
             packed_size, PACKFILE_HEADER_BYTES);
     }
 
@@ -1171,7 +1175,7 @@ PackFile_Header_unpack(PARROT_INTERP, ARGMOD(PackFile_Header *self),
 
 /*
 
-=item C<opcode_t PackFile_unpack(PARROT_INTERP, PackFile *self, const opcode_t
+=item C<opcode_t Parrot_pf_unpack(PARROT_INTERP, PackFile *self, const opcode_t
 *packed, size_t packed_size)>
 
 Unpacks a C<PackFile> from a block of memory, ensuring that the magic number is
@@ -1180,8 +1184,10 @@ any required endian and word size transforms.
 
 Returns size of unpacked opcodes if everything is okay, else zero (0).
 
-Deprecated: This function should either be renamed to Parrot_pf_* or should
-not be exposed through this API. See TT #2140
+=item C<opcode_t PackFile_unpack(PARROT_INTERP, PackFile *self, const opcode_t
+*packed, size_t packed_size)>
+
+Deprecated: Use C<Parrot_pf_unpack> instead. See TT #2140
 
 =cut
 
@@ -1190,10 +1196,10 @@ not be exposed through this API. See TT #2140
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 opcode_t
-PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
+Parrot_pf_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     ARGIN(const opcode_t *packed), size_t packed_size)
 {
-    ASSERT_ARGS(PackFile_unpack)
+    ASSERT_ARGS(Parrot_pf_unpack)
     PackFile_Header * const header = self->header;
     const opcode_t         *cursor;
     int                     header_read_length;
@@ -1221,7 +1227,7 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
 
     if (header->dir_format != PF_DIR_FORMAT) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_MALFORMED_PACKFILE,
-            "PackFile_unpack: Dir format was %d not %d\n",
+            "PackFile unpack: Dir format was %d not %d\n",
             header->dir_format, PF_DIR_FORMAT);
     }
 
@@ -1255,6 +1261,18 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     return cursor - packed;
 }
 
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_DEPRECATED
+opcode_t
+PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
+    ARGIN(const opcode_t *packed), size_t packed_size)
+{
+    ASSERT_ARGS(PackFile_unpack)
+
+    return Parrot_pf_unpack(interp, self, packed, packed_size);
+}
+
 
 /*
 
@@ -1266,7 +1284,7 @@ C<dir> called. The pointer C<user_data> is included in each call.
 
 If a callback returns non-zero, segment processing stops, returning this value.
 
-Deprecated: This function should not be exposed as a part of the pubic API.
+Deprecated: This function should not be exposed as a part of the public API.
 See TT #2140 for details.
 
 =cut
@@ -1274,6 +1292,7 @@ See TT #2140 for details.
 */
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 INTVAL
 PackFile_map_segments(PARROT_INTERP, ARGIN(const PackFile_Directory *dir),
                        PackFile_map_segments_func_t callback,
@@ -1308,6 +1327,7 @@ not be exposed through this API. TT #2140
 */
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 void
 PackFile_add_segment(PARROT_INTERP, ARGMOD(PackFile_Directory *dir),
         ARGMOD(PackFile_Segment *seg))
@@ -1343,6 +1363,7 @@ src/packfile/segments.c
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
+PARROT_DEPRECATED
 PackFile_Segment *
 PackFile_find_segment(PARROT_INTERP, ARGIN_NULLOK(PackFile_Directory *dir),
     ARGIN(const STRING *name), int sub_dir)
@@ -1512,6 +1533,7 @@ Parrot_pf_new(PARROT_INTERP, INTVAL is_mapped)
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_DEPRECATED
 PackFile *
 PackFile_new(PARROT_INTERP, INTVAL is_mapped)
 {
@@ -1689,6 +1711,7 @@ not be exposed through this API. TT #2140
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_DEPRECATED
 PackFile_Debug *
 Parrot_new_debug_seg(PARROT_INTERP, ARGMOD(PackFile_ByteCode *cs), size_t size)
 {
@@ -1744,6 +1767,7 @@ TODO: Refactor this function, it is too large and complicated.
 */
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 void
 Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
                          opcode_t offset, ARGIN(STRING *filename))
@@ -1836,6 +1860,7 @@ not be exposed through this API. TT #2140
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_DEPRECATED
 STRING *
 Parrot_debug_pc_to_filename(PARROT_INTERP, ARGIN(const PackFile_Debug *debug),
     opcode_t pc)
@@ -1876,6 +1901,7 @@ not be exposed through this API. TT #2140
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
+PARROT_DEPRECATED
 PackFile_ByteCode *
 Parrot_switch_to_cs(PARROT_INTERP, ARGIN(PackFile_ByteCode *new_cs), int really)
 {
@@ -1976,6 +2002,7 @@ not be exposed through this API. TT #2140
 */
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 void
 PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self),
         opcode_t offset, opcode_t key, opcode_t type, opcode_t value)
@@ -2061,6 +2088,7 @@ not be exposed through this API. TT #2140
 */
 
 PARROT_CANNOT_RETURN_NULL
+PARROT_DEPRECATED
 PMC *
 PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
         opcode_t offset, ARGIN_NULLOK(STRING *name))
@@ -2190,6 +2218,7 @@ a compiler object and the interface there to get a packfile or equivalent.
 
 */
 
+PARROT_DEPRECATED
 static void
 compile_file(PARROT_INTERP, ARGIN(STRING *path), INTVAL is_pasm)
 {
@@ -2271,6 +2300,7 @@ TODO: Refactor this function and try to reduce the size of it. It is too big.
 */
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 void
 Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
 {
@@ -2359,6 +2389,7 @@ major changes.
 
 /* intermediate hook during changes */
 PARROT_EXPORT
+PARROT_DEPRECATED
 void
 Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
 {
@@ -2470,6 +2501,7 @@ in the future) instead.
 */
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 void
 PackFile_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, ARGIN_NULLOK(PMC *eval))
 {
@@ -2546,7 +2578,7 @@ Take a Packfile or PackfileView PMC and write its contents out as a .pbc file
 =item C<PackFile * Parrot_pf_read_pbc_file(PARROT_INTERP, STRING * const
 fullname)>
 
-Read a .pbc file with the given C<fullname> into a PackFile structure.
+Read a F<.pbc> file with the given C<fullname> into a PackFile structure.
 
 =cut
 
@@ -2637,10 +2669,10 @@ read_pbc_file_packfile_handle(PARROT_INTERP, ARGIN(STRING * const fullname),
 {
     ASSERT_ARGS(read_pbc_file_packfile_handle)
     char * const program_code = read_pbc_file_bytes_handle(interp, io, program_size);
-    PackFile * const pf = PackFile_new(interp, 0);
+    PackFile * const pf = Parrot_pf_new(interp, 0);
     pf->options = 0;
 
-    if (!PackFile_unpack(interp, pf, (opcode_t *)program_code, (size_t)program_size))
+    if (!Parrot_pf_unpack(interp, pf, (opcode_t *)program_code, (size_t)program_size))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Can't unpack packfile %Ss", fullname);
     return pf;
@@ -2746,10 +2778,10 @@ read_pbc_file_packfile(PARROT_INTERP, ARGIN(STRING * const fullname),
 
 #endif
 
-    pf = PackFile_new(interp, is_mapped);
+    pf = Parrot_pf_new(interp, is_mapped);
     pf->options = 0;
 
-    if (!PackFile_unpack(interp, pf, (opcode_t *)program_code, (size_t)program_size))
+    if (!Parrot_pf_unpack(interp, pf, (opcode_t *)program_code, (size_t)program_size))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Can't unpack packfile %Ss", fullname);
 
@@ -2774,6 +2806,7 @@ DEPRECATED: use Parrot_pf_get_packfile_main_sub instead
 */
 
 PARROT_CANNOT_RETURN_NULL
+PARROT_DEPRECATED
 static PMC*
 set_current_sub(PARROT_INTERP)
 {

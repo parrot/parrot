@@ -160,7 +160,7 @@ inline op cmod(out NUM, in NUM, in NUM)  {
 #if defined(PARROT_HAS_FMODL) && NUMVAL_SIZE > 8
     $1 = (FLOATVAL)fmodl($2, den);
 #else
-    $1 = (FLOATVAL)fmod($2, den);
+    $1 = fmod($2, den);
 #endif
 }
 
@@ -176,7 +176,7 @@ inline op cmod(invar PMC, invar PMC, in NUM)  {
 #if defined(PARROT_HAS_FMODL) && NUMVAL_SIZE > 8
     result = (FLOATVAL)fmodl(VTABLE_get_number(interp, $2), value);
 #else
-    result = (FLOATVAL)fmod(VTABLE_get_number(interp, $2), value);
+    result = fmod(VTABLE_get_number(interp, $2), value);
 #endif
 
     if (PARROT_FLOATVAL_IS_INF_OR_NAN(result)) {

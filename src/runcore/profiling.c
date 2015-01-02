@@ -832,8 +832,8 @@ record_values_ascii_pprof(SHIM_INTERP, ARGIN(Parrot_profiling_runcore_t * runcor
 
         case PPROF_LINE_OP:
             {
-                const PPROF_DATA line     = (PPROF_DATA) pprof_data[PPROF_DATA_LINE];
-                const PPROF_DATA time     = (PPROF_DATA) pprof_data[PPROF_DATA_TIME];
+                const PPROF_DATA line     = pprof_data[PPROF_DATA_LINE];
+                const PPROF_DATA time     = pprof_data[PPROF_DATA_TIME];
                 const char * const opname = (const char *) pprof_data[PPROF_DATA_OPNAME];
                 fprintf(runcore->profile_fd, "OP:{x{line:%d}x}{x{time:%d}x}{x{op:%s}x}\n",
                         (int) line, (int) time, opname);

@@ -80,8 +80,9 @@ PARROT_COLD
 void Parrot_x_force_error_exit(
     NULLOK_INTERP,
     int exitcode,
-    ARGIN(const char * format),
+    ARGIN_FORMAT(const char * format),
     ...)
+        __attribute__format__(3, 4)
         __attribute__nonnull__(3);
 
 #define ASSERT_ARGS_Parrot_x_exit __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

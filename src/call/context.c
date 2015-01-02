@@ -797,7 +797,6 @@ Copy Regs_ni into Context.
 */
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
 void
 Parrot_pcc_set_regs_ni(SHIM_INTERP, ARGIN(PMC *ctx), ARGIN(Regs_ni *bp))
 {
@@ -836,7 +835,6 @@ Copy Regs_ps into Context.
 */
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
 void
 Parrot_pcc_set_regs_ps(SHIM_INTERP, ARGIN(PMC *ctx), ARGIN(Regs_ps *bp_ps))
 {

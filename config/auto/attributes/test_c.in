@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2007-2009, Parrot Foundation.
+Copyright (C) 2007-2015, Parrot Foundation.
 
 figure out if the compiler supports attributes.
 see parrot/compiler.h for attribute value definitions.
@@ -9,17 +9,16 @@ see parrot/compiler.h for attribute value definitions.
 #include <stdlib.h>
 #include "parrot/compiler.h"
 
-
 __attribute__malloc__
 __attribute__noreturn__
 __attribute__warn_unused_result__
 __attribute__deprecated__
+__attribute__returns_nonnull__
 void *
 dummyfunc(const char *my_format, ...)
-    __attribute__format__(printf, 1, 2)
+    __attribute__format__(1, 2)
     __attribute__nonnull__(1)
     ;
-
 
 __attribute__const__
 int
@@ -31,18 +30,18 @@ int
 purefunc(int x);
 
 
-__attribute__hot__
+PARROT_HOT
 int
 hotfunc(int x);
 
 
-__attribute__cold__
+PARROT_COLD
 int
 coldfunc(int x);
 
 
 static int
-useless(void) { int x __attribute__unused__; return 0; }
+useless(SHIM(int x)) { return 0; }
 
 
 /* as long as the file compiles, everything is okay */

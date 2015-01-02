@@ -214,7 +214,6 @@ const string C_MAIN = <<:MAIN
             return class_pmc;
         }
 
-        PARROT_CANNOT_RETURN_NULL
         static void
         get_imcc_compiler_pmc(Parrot_PMC interp, Parrot_PMC class_pmc, Parrot_Int is_pasm)
         {

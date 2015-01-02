@@ -765,7 +765,7 @@ Decompose function. This function is not yet implemented.
 
 */
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_DOES_NOT_RETURN
 STRING*
 encoding_decompose(PARROT_INTERP, SHIM(const STRING *src))
 {
@@ -1649,7 +1649,7 @@ grapheme supports it. Not implemented.
 
 */
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_DOES_NOT_RETURN
 STRING*
 unicode_upcase_first(PARROT_INTERP, SHIM(const STRING *src))
 {
@@ -1671,7 +1671,7 @@ the grapheme supports it. Not implemented
 
 */
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_DOES_NOT_RETURN
 STRING*
 unicode_downcase_first(PARROT_INTERP, SHIM(const STRING *src))
 {
@@ -1693,7 +1693,7 @@ string supports it. Not implemented.
 
 */
 
-PARROT_CANNOT_RETURN_NULL
+PARROT_DOES_NOT_RETURN
 STRING*
 unicode_titlecase_first(PARROT_INTERP, SHIM(const STRING *src))
 {

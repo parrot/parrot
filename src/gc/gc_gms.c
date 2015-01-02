@@ -2377,19 +2377,19 @@ gc_gms_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     size_t            i;
 
-    fprintf(stderr, "GC %-25s | total: %lu, gen: %lu, ", header,
-            (unsigned long)interp->gc_sys->stats.gc_mark_runs,
-            (unsigned long)self->gen_to_collect);
+    fprintf(stderr, "GC %-25s | total: "SIZE_FMT", gen: "SIZE_FMT", ", header,
+            interp->gc_sys->stats.gc_mark_runs,
+            self->gen_to_collect);
 
-    fprintf(stderr, "dirty: %lu, work: %lu\n",
-            (unsigned long)Parrot_pa_count_used(interp, self->dirty_list),
+    fprintf(stderr, "dirty: "SIZE_FMT", work: "SIZE_FMT"\n",
+            Parrot_pa_count_used(interp, self->dirty_list),
             self->work_list
-              ? (unsigned long)Parrot_pa_count_used(interp, self->work_list)
+              ? Parrot_pa_count_used(interp, self->work_list)
               : 0);
 
     for (i = 0; i < GC_MAX_GENERATIONS; i++)
-        fprintf(stderr, "GEN %lu: %6lu objects, %6lu strings\n",
-                (unsigned long)i,
+        fprintf(stderr, "GEN "SIZE_FMT": %6lu objects, %6lu strings\n",
+                i,
                 (unsigned long)Parrot_pa_count_used(interp, self->objects[i]),
                 (unsigned long)Parrot_pa_count_used(interp, self->strings[i]));
 

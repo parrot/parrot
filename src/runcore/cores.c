@@ -590,7 +590,7 @@ runops_trace_core(PARROT_INTERP, ARGIN(opcode_t *pc))
         }
     }
 
-    Parrot_io_flush_handle(debugger, Parrot_io_STDERR(debugger));
+    Parrot_io_flush(debugger, Parrot_io_STDERR(debugger));
 
     return pc;
 }

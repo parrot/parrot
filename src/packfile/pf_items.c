@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2014, Parrot Foundation.
+Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -958,9 +958,9 @@ fetch_op_be_4(ARGIN(const unsigned char *b))
 #  endif
 #else
 #  if OPCODE_T_SIZE == 8
-    return (Parrot_Int4)(fetch_iv_le((INTVAL)u.o) & 0xffffffff);
+    return (Parrot_Int4)(fetch_iv_le(u.o) & 0xffffffff);
 #  else
-    return (opcode_t) fetch_iv_le((INTVAL)u.o);
+    return (opcode_t) fetch_iv_le(u.o);
 #  endif
 #endif
 }
@@ -1075,7 +1075,6 @@ When used for freeze/thaw the C<pf> argument might be NULL.
 
 */
 
-PARROT_CANNOT_RETURN_NULL
 opcode_t
 PF_fetch_opcode(ARGIN_NULLOK(const PackFile *pf), ARGMOD(const opcode_t **stream))
 {

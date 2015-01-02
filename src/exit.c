@@ -146,8 +146,8 @@ Parrot_x_execute_on_exit_handlers(PARROT_INTERP, int status)
 
 /*
 
-=item C<void Parrot_x_force_error_exit(NULLOK_INTERP, int exitcode, const char *
-format, ...)>
+=item C<void Parrot_x_force_error_exit(NULLOK_INTERP, int exitcode,
+ARGIN_FORMAT(const char * format), ...)>
 
 Error handler of last resort, under normal circumstances. Print out an error
 message to C<stderr> and exit from the interpreter. If possible attempt to
@@ -160,7 +160,7 @@ jump out of libparrot. If not, hard exit back to the system.
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
 void
-Parrot_x_force_error_exit(NULLOK_INTERP, int exitcode, ARGIN(const char * format), ...)
+Parrot_x_force_error_exit(NULLOK_INTERP, int exitcode, ARGIN_FORMAT(const char * format), ...)
 {
     ASSERT_ARGS(Parrot_x_force_error_exit)
 

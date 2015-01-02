@@ -131,9 +131,9 @@ Create a new PackFile from an existing PackFileView.
         attrs->directory = Parrot_pmc_new(INTERP, enum_class_PackfileDirectory);
 
         /* Create dummy PackFile and copy default attributes to self */
-        pf = PackFile_new(INTERP, 0);
+        pf = Parrot_pf_new(INTERP, 0);
         copy_packfile_header(INTERP, SELF, pf);
-        PackFile_destroy(INTERP, pf);
+        Parrot_pf_destroy(INTERP, pf);
     }
 
     VTABLE void init_pmc(PMC *view) :manual_wb {
@@ -183,7 +183,7 @@ Implementation note: all hard stuff done by PackfileDirectory.
 
         str = Parrot_pf_serialize(INTERP, pf);
 
-        PackFile_destroy(INTERP, pf);
+        Parrot_pf_destroy(INTERP, pf);
         return str;
     }
 
@@ -217,7 +217,7 @@ Implementation note: taken from the bottom end of Parrot_pbc_read().
          * A memory leak is better than an invalid memory access
          */
 #if 0
-        PackFile_destroy(INTERP, pf);
+        Parrot_pf_destroy(INTERP, pf);
 #endif
     }
 

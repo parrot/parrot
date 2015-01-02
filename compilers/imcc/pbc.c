@@ -2404,7 +2404,7 @@ e_pbc_emit(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(const IMC_Unit *u
 
         interp_code->base.size = old_size + code_size;
 
-        imcc->pc   = (opcode_t *)interp_code->base.data + old_size;
+        imcc->pc   = interp_code->base.data + old_size;
         imcc->npc  = 0;
 
         /* FIXME length and multiple subs */
@@ -2521,7 +2521,7 @@ e_pbc_emit(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(const IMC_Unit *u
                 if (r->type & VT_CONSTP)
                     r = r->reg;
 
-                *(imcc->pc)++ = (opcode_t) r->color;
+                *(imcc->pc)++ = r->color;
                 IMCC_debug(imcc, DEBUG_PBC, " %d", r->color);
                 break;
               case PARROT_ARG_KC:
@@ -2553,7 +2553,7 @@ e_pbc_emit(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(const IMC_Unit *u
                 r = ins->symregs[i];
                 if (r->type & VT_CONSTP)
                     r = r->reg;
-                *(imcc->pc)++ = (opcode_t) r->color;
+                *(imcc->pc)++ = r->color;
                 IMCC_debug(imcc, DEBUG_PBC, " %d", r->color);
             }
         }

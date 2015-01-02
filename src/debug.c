@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2014, Parrot Foundation.
+Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -1262,14 +1262,14 @@ Parrot_debugger_break(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
 
         interp->pdb->state     |= PDB_BREAK;
         interp->pdb->state     |= PDB_STOPPED;
-        interp->pdb->cur_opcode = (opcode_t *)cur_opcode + 1;
+        interp->pdb->cur_opcode = cur_opcode + 1;
 
         /*PDB_set_break(interp, NULL);*/
 
         debugger_cmdline(interp);
     }
     else {
-        interp->pdb->cur_opcode = (opcode_t *)cur_opcode + 1;
+        interp->pdb->cur_opcode = cur_opcode + 1;
         /*PDB_set_break(interp, NULL);*/
     }
     TRACEDEB_MSG("Parrot_debugger_break done");
@@ -2700,7 +2700,7 @@ PDB_disassemble_op(PARROT_INTERP, ARGOUT(char *dest), size_t space,
             }
             break;
           case PARROT_ARG_PC:
-            Parrot_snprintf(interp, buf, sizeof (buf), "PMC_CONST(%d)", op[j]);
+            Parrot_snprintf(interp, buf, sizeof (buf), "PMC_CONST(%ld)", op[j]);
             strcpy(&dest[size], buf);
             size += strlen(buf);
             break;
@@ -3677,7 +3677,7 @@ PDB_get_continuation_backtrace(PARROT_INTERP, ARGIN(PMC *ctx))
         }
         else if (rec_level != 0) {
             STRING * const fmt =
-                Parrot_sprintf_c(interp, "... call repeated %d times\n", rec_level);
+                Parrot_sprintf_c(interp, "... call repeated "UINTVAL_FMT" times\n", rec_level);
             VTABLE_push_string(interp, output, fmt);
             rec_level = 0;
         }
@@ -3715,7 +3715,8 @@ PDB_get_continuation_backtrace(PARROT_INTERP, ARGIN(PMC *ctx))
     }
 
     if (rec_level != 0) {
-        STRING * const fmt = Parrot_sprintf_c(interp, "... call repeated %d times\n", rec_level);
+        STRING * const fmt = Parrot_sprintf_c(interp,
+                               "... call repeated "UINTVAL_FMT" times\n", rec_level);
         VTABLE_push_string(interp, output, fmt);
     }
     return VTABLE_get_string(interp, output);

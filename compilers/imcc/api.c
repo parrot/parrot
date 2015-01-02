@@ -85,7 +85,7 @@ is 1, register that compiler with Parrot under the name "PIR".
 */
 
 PARROT_EXPORT
-PARROT_CANNOT_RETURN_NULL
+PARROT_WARN_UNUSED_RESULT
 Parrot_Int
 imcc_get_pir_compreg_api(Parrot_PMC interp_pmc, int add_compreg, ARGOUT(Parrot_PMC *compiler))
 {
@@ -111,6 +111,7 @@ is 1, register that compiler with Parrot under the name "PASM".
 */
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 Parrot_Int
 imcc_get_pasm_compreg_api(Parrot_PMC interp_pmc, int add_compreg, ARGOUT(Parrot_PMC *compiler))
 {
