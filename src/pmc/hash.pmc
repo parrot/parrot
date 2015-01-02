@@ -282,7 +282,7 @@ Return a representation of the hash contents.
 */
 
     VTABLE STRING *get_string() :no_wb {
-        return Parrot_sprintf_c(INTERP, "Hash[0x%lx]", SELF);
+        return Parrot_sprintf_c(INTERP, "Hash[0x%lx]", PTR2ULONG(SELF));
     }
 
     VTABLE STRING *get_repr() :no_wb {
