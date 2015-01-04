@@ -11,6 +11,7 @@ sub runstep {
     my $share_ext = $conf->option_or_data('share_ext');
     my $version   = $conf->option_or_data('VERSION');
     my $libs = $conf->data->get('libs');
+    my $cxx  = $conf->option_or_data('cxx');
 
     # get rid of old pthread-stuff, if any
     $libs =~ s/(-lpthreads|-lc_r)\b\s*//g;
@@ -28,10 +29,11 @@ sub runstep {
     chomp $osvers;
 
     $libs .= ' -pthread';
+    my $default_cxx = $osvers > 1000000 ? 'c++' : 'g++';
 
     $conf->data->set(
         libs  => $libs,
-        link  => 'g++',
+        link  => $cxx ? $cxx : $default_cxx,
         rpath => '-Wl,-R',
         has_dynamic_linking     => 1,
         parrot_is_shared        => 1,
