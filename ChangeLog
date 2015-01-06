@@ -15,6 +15,7 @@
         + Allow PARROT_DOES_NOT_RETURN without PARROT_CANNOT_RETURN_NULL #1163
         + Move -Wformat to --cage #1165
         + Fix and allow --cxx on FreeBSD 10 (clang, not g++) #1166
+        + Fix git_describe config probe on tag-less repos, e.g. git clone --depth #1167
     - Documentation
     - Tests
     - Community

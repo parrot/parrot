@@ -1,4 +1,4 @@
-# Copyright (C) 2010-2011, Parrot Foundation.
+# Copyright (C) 2010-2014, Parrot Foundation.
 
 =head1 NAME
 
@@ -31,7 +31,7 @@ sub _get_git_describe {
     my $git_describe = 0;
 
     if ( -d '.git' && has_git()) {
-        $git_describe = `git describe --tags`;
+        $git_describe = `git describe --tags --always`;
         chomp( $git_describe );
     }
     return $git_describe;
