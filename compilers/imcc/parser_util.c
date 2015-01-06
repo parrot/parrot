@@ -647,7 +647,7 @@ try_rev_cmp(ARGIN(const char *name), ARGMOD(SymReg **r))
             const int to_swap = br_pairs[i].to_swap;
             SymReg *t;
 
-            if (r[to_swap + 1]->set == 'P')
+            if (!r[to_swap + 1] || r[to_swap + 1]->set == 'P')
                 return NULL;
 
             t              = r[to_swap];
