@@ -88,13 +88,15 @@ One file in a new directory per keyword.
 
     mkdir -p afl-out2 afl-testcase2/keywords
 
-    perl -e'`echo $_ > afl-testcase2/keywords/$_` for qw(.sym .arg prototyped non_prototyped .class
-    .endclass .param inc dec new defined global clone .call .result .return .local .const .globalconst
-    end goto if unless call branch jump jsr ret invoke invokecc throw
-    rethrow die_hard .emit .eom .sub .end .begin_call
-    .end_call .pcc_sub .begin_return .end_return .begin_yield
-    .end_yield .loadlib .namespace .endnamespace .macro .include int float string pmc
-    ne eq le lt ge gt == =head1 =end =pod)'
+    perl -e'`echo $_ > afl-testcase2/keywords/$_` for qw(.sym .arg prototyped
+      non_prototyped .class
+      .endclass .param inc dec new defined global clone .call .result .return
+      .local .const .globalconst
+      end goto if unless call branch jump jsr ret invoke invokecc throw
+      rethrow die_hard .emit .eom .sub .end .begin_call
+      .end_call .pcc_sub .begin_return .end_return .begin_yield
+      .end_yield .loadlib .namespace .endnamespace .macro .include int float
+      string pmc ne eq le lt ge gt == =head1 =end =pod)'
 
     afl-fuzz -m4000 -i afl-testcase2 -x afl-testcase2/keywords -o afl-out2 -- parrot -r @@
 
