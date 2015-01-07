@@ -1071,22 +1071,33 @@ IMCC_string_from_reg(ARGMOD(imc_info_t * imcc), ARGIN(const SymReg *r))
         len = p - buf - 1;
         if (len > MAX_NAME)
             len = MAX_NAME;
+        if (len < 2)
+            IMCC_fatal(imcc, 1, "string_from_reg: "
+                       "invalid encoding '%s'\n", buf);
         memcpy(encoding_name, buf, len);
         encoding_name[len] = '\0';
 
         return Parrot_str_unescape(imcc->interp, p + 1, '"', encoding_name);
     }
     else if (*buf == '"') {
+        size_t len = strlen(buf);
+        if (len < 2)
+            IMCC_fatal(imcc, 1, "string_from_reg: "
+                       "invalid name '%s'\n", buf);
         buf++;
         if (r->usage & U_LEXICAL) /* GH 1095 quirks, treat as single-quote */
-            return Parrot_str_new_init(imcc->interp, buf, strlen(buf) - 1,
+            return Parrot_str_new_init(imcc->interp, buf, len - 2,
                        Parrot_ascii_encoding_ptr, PObj_constant_FLAG);
         else
             return Parrot_str_unescape(imcc->interp, buf, '"', NULL);
     }
     else if (*buf == '\'') {
+        size_t len = strlen(buf);
+        if (len < 2)
+            IMCC_fatal(imcc, 1, "string_from_reg: "
+                       "invalid name '%s'\n", buf);
         buf++;
-        return Parrot_str_new_init(imcc->interp, buf, strlen(buf) - 1,
+        return Parrot_str_new_init(imcc->interp, buf, len - 2,
                 Parrot_ascii_encoding_ptr, PObj_constant_FLAG);
     }
 

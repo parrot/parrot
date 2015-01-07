@@ -5,7 +5,7 @@
           --ccflags adjustable, renamed to GC_MAX_GENERATIONS, and use the correct number.
           Default 3 for generations 0,1,2.
         + Add the DEPRECATED attribute to all deprecated functions. #1163
-        + Fix a parser crash detected by the american fuzzy lop (1.06b) #1168
+        + Fix parser crashes detected by the american fuzzy lop (1.06b) #1168
     - Build
         + More code cleanup to reduce compiler warnings, code size and unneeded calls.
         + Add ARGIN_FORMAT declarations, probe for gnu_printf, ms_printf, printf. #1163
