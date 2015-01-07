@@ -1,0 +1,125 @@
+# Copyright (C) 2014, Parrot Foundation.
+
+=head1 NAME
+
+docs/dev/fuzzing.pod - Fuzzing Parrot with afl - the american fuzzy lop
+
+=head1 DESCRIPTION
+
+This document describes how to find parrot crashes on invalid input
+with the american fuzzy lop.
+
+This will not work on MS Windows. It is tested on x86_64 linux, but
+should also work on darwin and other POSIX intel systems.
+
+=head2 Setup afl
+
+Download B<afl> from L<http://lcamtuf.coredump.cx/afl/>
+
+Make and install afl.
+
+    cd ~/
+
+    wget http://lcamtuf.coredump.cx/afl/releases/afl-latest.tgz
+    tar xfz afl-latest.tgz
+
+    cd afl-<TAB>
+
+    # be sure to unset ASAN_OPTIONS
+    grep ASAN | env
+    unset ASAN_OPTIONS
+    export ASAN_OPTIONS
+
+    make
+    sudo make install
+
+Compile parrot with the instrumenting C<afl-gcc>:
+
+    cd <your-parrot>
+    perl Configure.pl --cc=afl-gcc --ld=afl-gcc --link=afl-gcc
+    make -s -j4
+
+=head2 Read the afl documentation
+
+See L<http://lcamtuf.coredump.cx/afl/> and under F<afl-VERSION/docs>.
+And maybe also L<https://en.wikipedia.org/wiki/Fuzz_testing>
+
+Some notes:
+
+afl can work with C<clang>, but C<gcc> is preferred.
+
+afl can work with ASAN or MSAN, but since parrot is too slow it is
+advised to run it without.  Our coverage with the normal testsuite is
+pretty good, so you better smoke the normal testsuite with C<ASAN> or
+C<MSAN> or C<VALGRIND=valgrind> instead.
+
+afl tries to create bad input files, to crash or hang the process.
+Bad and uncontrolled input may impact the stability of your testmachine.
+E.g. it might randomly overwrite files or memory or fill up your logs or
+harddisc space.
+Use a fast kvm VM, only one core is needed.
+
+C<parrot_old> has faster startup, but does not play nice with the afl forkserver.
+You can use it with C<-C>, the crash mode though. Get a testcase which crashes and
+find more crashes. This way I found L<https://github.com/parrot/parrot/issues/1168>
+
+With C<perl5> or C<potion> I got exec speeds of C<1500/sec>, with
+C<parrot_old> C<150/sec>, with C<parrot> C<100/sec>. This is very slow.
+So strip your input testcases to the absolute minimum. An B<afl-fuzz>
+run usually lasts a day or more, but at least a few hours.
+I did not dare yet to fuzz C<nqp> or C<perl6> yet,
+as it would be even slower.
+
+=head2 imcc Parser
+
+You can fuzz F<.pir> and F<.pasm> input to check the imcc parser.
+
+    mkdir afl-out afl-testcase
+    cp t/op/literal.t testcase/
+
+    afl-fuzz -m4000 -o afl-out -i afl-testcase -- parrot -r @@
+
+=head2 With keywords
+
+Adding our regular pir and pasm keywords helps creating more meaningful permutations.
+
+    mkdir -p afl-out2 afl-testcase2/keywords
+
+    perl -e'`echo $_ > afl-testcase2/keywords/$_` for qw(.sym .arg prototyped non_prototyped .class
+    .endclass .param inc dec new defined global clone .call .result .return .local .const .globalconst
+    end goto if unless call branch jump jsr ret invoke invokecc throw
+    rethrow die_hard .emit .eom .sub .end .begin_call
+    .end_call .pcc_sub .begin_return .end_return .begin_yield
+    .end_yield .loadlib .namespace .endnamespace .macro .include int float string pmc
+    ne eq le lt ge gt == =head1 =end =pod)'
+
+    afl-fuzz -m4000 -i afl-testcase2 -x afl-testcase2/keywords -o afl-out2 -- parrot -r @@
+
+=head2 pbc packfiles
+
+afl is more used to fuzz binary input to check the PackFile reader.
+See L<https://github.com/parrot/parrot/issues/1169>
+
+    mkdir -p afl-out3 afl-testcase3
+    cp t/native_pbc/*_8_le.pbc afl-testcase3/
+    afl-fuzz -m4000 -i afl-testcase3 -o afl-out3 -- parrot -r @@
+
+=head2 Other tools
+
+There exist also less intelligent blackbox fuzzers, like B<csmith>.
+
+And more intelligent whitebox fuzzers, which do taint symbolic input
+and use constraint solvers to track fishy source paths back to the input,
+e.g. B<mayhem>, B<cbmc> or the mythical smart Microsoft fuzzer
+(L<https://en.wikipedia.org/wiki/Fuzz_testing#cite_ref-AutoDO-14_16-0>).
+
+However B<afl> is usually the best option for now. It is fast, simple
+and good enough.
+
+=head1 AUTHOR
+
+Reini Urban <rurban@cpan.org>
+
+=cut
+
+# vim: expandtab shiftwidth=2 textwidth=70:
