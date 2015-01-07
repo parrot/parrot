@@ -69,7 +69,7 @@ So strip your input testcases to the absolute minimum. An B<afl-fuzz>
 run usually lasts a day or more, but at least a few hours.
 I did not dare yet to fuzz C<nqp> or C<perl6> yet, as it would be even slower.
 
-Set your terminal screen to black background, seriuosly. You hardly
+Set your terminal screen to black background, seriously. You hardly
 see anything on white.
 
 =head2 imcc Parser
