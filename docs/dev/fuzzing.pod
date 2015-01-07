@@ -57,7 +57,7 @@ afl tries to create bad input files, to crash or hang the process.
 Bad and uncontrolled input may impact the stability of your testmachine.
 E.g. it might randomly overwrite files or memory or fill up your logs or
 harddisc space.
-Use a fast kvm VM, only one core is needed.
+Use a fast kvm VM or docker. Only one core is needed if you don't fuzz in parallel.
 
 C<parrot_old> has faster startup, but does not play nice with the afl forkserver.
 You can use it with C<-C>, the crash mode though. Get a testcase which crashes and
@@ -67,8 +67,10 @@ With C<perl5> or C<potion> I got exec speeds of C<1500/sec>, with
 C<parrot_old> C<150/sec>, with C<parrot> C<100/sec>. This is very slow.
 So strip your input testcases to the absolute minimum. An B<afl-fuzz>
 run usually lasts a day or more, but at least a few hours.
-I did not dare yet to fuzz C<nqp> or C<perl6> yet,
-as it would be even slower.
+I did not dare yet to fuzz C<nqp> or C<perl6> yet, as it would be even slower.
+
+Set your terminal screen to black background, seriuosly. You hardly
+see anything on white.
 
 =head2 imcc Parser
 
@@ -82,6 +84,7 @@ You can fuzz F<.pir> and F<.pasm> input to check the imcc parser.
 =head2 With keywords
 
 Adding our regular pir and pasm keywords helps creating more meaningful permutations.
+One file in a new directory per keyword.
 
     mkdir -p afl-out2 afl-testcase2/keywords
 
@@ -97,7 +100,8 @@ Adding our regular pir and pasm keywords helps creating more meaningful permutat
 
 =head2 pbc packfiles
 
-afl is more used to fuzz binary input to check the PackFile reader.
+Fuzz binary input to check the PackFile reader. Binary files are the
+typical usecase for afl.
 See L<https://github.com/parrot/parrot/issues/1169>
 
     mkdir -p afl-out3 afl-testcase3
