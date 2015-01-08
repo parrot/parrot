@@ -110,6 +110,24 @@ See L<https://github.com/parrot/parrot/issues/1169>
     cp t/native_pbc/*_8_le.pbc afl-testcase3/
     afl-fuzz -m4000 -i afl-testcase3 -o afl-out3 -- parrot -r @@
 
+=head2 During fuzzing
+
+You can examine the results while running the fuzzer, and you can even fix the
+found error, recompile, Ctrl-C the fuzzer and resume it with C<-i->, i.e.
+C<afl-fuzz -m4000 -i- -o afl-out3 -- parrot -r @@>
+
+It will reinstrument the existing paths and cases, and save away the old results.
+
+=head2 Crosscheck the results for false positives
+
+C<afl-fuzz> does sometimes categorize all exit codes > 0 as crash, while
+it should do only do it with > 128.
+So you need to verify the found crashes, like this:
+
+    for c in afl-out/crashes/*; do ./parrot $c >/dev/null 2>&1 || echo $? $c; done
+
+and check only the exit codes > 128.
+
 =head2 Other tools
 
 There exist also less intelligent blackbox fuzzers, like B<csmith>.
