@@ -128,6 +128,13 @@ So you need to verify the found crashes, like this:
 
 and check only the exit codes > 128.
 
+=head2 Further investigations - crash explorer
+
+If you found a new crash, try out the crash explorer mode C<-C>
+by copying this crash result as new testcase and start a new afl-fuzz with C<-C>.
+This will find other variations of the crash faster than in the normal mode.
+See L<http://lcamtuf.blogspot.de/2014/11/afl-fuzz-crash-exploration-mode.html>
+
 =head2 Other tools
 
 There exist also less intelligent blackbox fuzzers, like B<csmith>.
