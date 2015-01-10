@@ -54,7 +54,11 @@ internal use only; don't emit these opcodes.
 
 =item B<end>()
 
-Halts the interpreter. See also B<exit>.
+Halts the current interpreter. See also B<exit>.
+
+Note that a user-defined method currently creates its own interpreter,
+so end inside a method is like a return without any context.
+This is unspecified behaviour. Currently it is replaced by the returncc op.
 
 =cut
 

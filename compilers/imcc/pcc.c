@@ -413,6 +413,7 @@ expand_pcc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit), ARGIN(Instruct
         && !sub->pcc_sub->object
         /* s. src/inter_call.c:119 */
         && sub->pcc_sub->tailcall) {
+            IMCC_debug(imcc, DEBUG_IMC, "sub tailcall - %s\n", unit->last_ins->opname);
             return;
         }
     }
@@ -441,8 +442,15 @@ expand_pcc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit), ARGIN(Instruct
             tmp = INS(imcc, unit, "returncc", NULL, regs, 0, 0, 0);
         }
 
-        IMCC_debug(imcc, DEBUG_IMC, "add sub ret - %d\n", tmp);
+        IMCC_debug(imcc, DEBUG_IMC, "add sub ret - %d %s\n", tmp, unit->last_ins->opname);
         insert_ins(unit, unit->last_ins, tmp);
+    }
+    /* end is currently forbidden inside methods. it will be translated to a returncc */
+    else if (STREQ(unit->last_ins->opname, "end") && sub && sub->pcc_sub) {
+        Instruction *tmp;
+        IMCC_debug(imcc, DEBUG_IMC, "sub ret via end => returncc\n");
+        tmp = INS(imcc, unit, "returncc", NULL, regs, 0, 0, 0);
+        subst_ins(unit, unit->last_ins, tmp, 1);
     }
 }
 

@@ -6,6 +6,9 @@
           Default 3 for generations 0,1,2.
         + Add the DEPRECATED attribute to all deprecated functions. #1163
         + Fix parser crashes detected by the american fuzzy lop (1.06b) #1168
+        + Replace an end op inside pcc methods by a returncc op, #1168.
+          This used to crash the last years, now it returns. It is now documented as
+          unspecified behavior.
     - Build
         + More code cleanup to reduce compiler warnings, code size and unneeded calls.
         + Add ARGIN_FORMAT declarations, probe for gnu_printf, ms_printf, printf. #1163
