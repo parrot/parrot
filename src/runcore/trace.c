@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2014, Parrot Foundation.
+Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -364,7 +364,7 @@ trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
           case KEY_string_FLAG|KEY_register_FLAG:
             {
             const UINTVAL keynum = (UINTVAL)VTABLE_get_integer(interp, key);
-            if (keynum < Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), REGNO_STR)) {
+            if (keynum < PCC_GET_REGS_USED(CURRENT_CONTEXT(interp), REGNO_STR)) {
                 const STRING * const s = REG_STR(interp, keynum);
                 STRING * const escaped = Parrot_str_escape_truncate(interp, s, 20);
                 if (escaped)

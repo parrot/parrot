@@ -27,6 +27,8 @@ typedef union {
 typedef struct Parrot_CallContext_attributes Parrot_Context;
 
 #define CONTEXT_STRUCT(c) (PMC_data_typed((c), Parrot_Context *))
+/* ((Parrot_Context *)ctx->data)->n_regs_used */
+#define PCC_GET_REGS_USED(ctx, type) CONTEXT_STRUCT(ctx)->n_regs_used[type]
 
 /*
  * Macros to make accessing registers more convenient/readable.

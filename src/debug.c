@@ -2256,7 +2256,7 @@ PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
 
     if (condition->type & PDB_cond_int) {
         INTVAL   i,  j;
-        if (condition->reg >= Parrot_pcc_get_regs_used(interp, ctx, REGNO_INT))
+        if (condition->reg >= PCC_GET_REGS_USED(ctx, REGNO_INT))
             return 0;
         i = CTX_REG_INT(interp, ctx, condition->reg);
 
@@ -2278,7 +2278,7 @@ PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
     else if (condition->type & PDB_cond_num) {
         FLOATVAL k,  l;
 
-        if (condition->reg >= Parrot_pcc_get_regs_used(interp, ctx, REGNO_NUM))
+        if (condition->reg >= PCC_GET_REGS_USED(ctx, REGNO_NUM))
             return 0;
         k = CTX_REG_NUM(interp, ctx, condition->reg);
 
@@ -2300,7 +2300,7 @@ PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
     else if (condition->type & PDB_cond_str) {
         STRING  *m, *n;
 
-        if (condition->reg >= Parrot_pcc_get_regs_used(interp, ctx, REGNO_STR))
+        if (condition->reg >= PCC_GET_REGS_USED(ctx, REGNO_STR))
             return 0;
         m = CTX_REG_STR(interp, ctx, condition->reg);
 
@@ -2331,7 +2331,7 @@ PDB_check_condition(PARROT_INTERP, ARGIN(const PDB_condition_t *condition))
     else if (condition->type & PDB_cond_pmc) {
         PMC *m;
 
-        if (condition->reg >= Parrot_pcc_get_regs_used(interp, ctx, REGNO_PMC))
+        if (condition->reg >= PCC_GET_REGS_USED(ctx, REGNO_PMC))
             return 0;
         m = CTX_REG_PMC(interp, ctx, condition->reg);
 
@@ -3322,8 +3322,7 @@ PDB_assign(PARROT_INTERP, ARGIN(const char *command))
         Parrot_io_eprintf(debugger, "Invalid register type %c\n", reg_type_id);
         return;
     }
-    if (register_num >= Parrot_pcc_get_regs_used(debugee,
-                                CURRENT_CONTEXT(debugee), reg_type)) {
+    if (register_num >= PCC_GET_REGS_USED(CURRENT_CONTEXT(debugee), reg_type)) {
         no_such_register(debugger, reg_type_id, register_num);
         return;
     }
@@ -3755,7 +3754,7 @@ GDB_print_reg(PARROT_INTERP, int t, int n)
     ASSERT_ARGS(GDB_print_reg)
     char * string;
 
-    if (n >= 0 && (UINTVAL)n < Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), t)) {
+    if (n >= 0 && (UINTVAL)n < PCC_GET_REGS_USED(CURRENT_CONTEXT(interp), t)) {
         switch (t) {
           case REGNO_INT:
             return Parrot_str_from_int(interp, IREG(n));
@@ -3820,7 +3819,7 @@ GDB_P(PARROT_INTERP, ARGIN(const char *s))
     }
     if (! s[1]) {
         /* Print all registers of this type. */
-        const int max_reg = Parrot_pcc_get_regs_used(interp, CURRENT_CONTEXT(interp), t);
+        const int max_reg = PCC_GET_REGS_USED(CURRENT_CONTEXT(interp), t);
         int n;
 
         for (n = 0; n < max_reg; ++n) {

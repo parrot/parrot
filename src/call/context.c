@@ -651,7 +651,7 @@ Parrot_pcc_get_INTVAL_reg(PARROT_INTERP, ARGIN(const PMC *ctx), UINTVAL idx)
 #ifdef NDEBUG
     UNUSED(interp)
 #endif
-    PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_INT) > idx);
+    PARROT_ASSERT(PCC_GET_REGS_USED(ctx, REGNO_INT) > idx);
     return &(CONTEXT_STRUCT(ctx)->bp.regs_i[idx]);
 }
 
@@ -682,7 +682,7 @@ Parrot_pcc_get_FLOATVAL_reg(PARROT_INTERP, ARGIN(const PMC *ctx), UINTVAL idx)
 #ifdef NDEBUG
     UNUSED(interp)
 #endif
-    PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_NUM) > idx);
+    PARROT_ASSERT(PCC_GET_REGS_USED(ctx, REGNO_NUM) > idx);
     return &(CONTEXT_STRUCT(ctx)->bp.regs_n[-1L - idx]);
 }
 
@@ -710,7 +710,7 @@ STRING **
 Parrot_pcc_get_STRING_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_STRING_reg)
-    PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_STR) > idx);
+    PARROT_ASSERT(PCC_GET_REGS_USED(ctx, REGNO_STR) > idx);
     PARROT_GC_WRITE_BARRIER(interp, ctx);
     return &(CONTEXT_STRUCT(ctx)->bp_ps.regs_s[idx]);
 }
@@ -739,7 +739,7 @@ Parrot_pcc_get_PMC_reg(PARROT_INTERP, ARGIN(PMC *ctx), UINTVAL idx)
 {
     ASSERT_ARGS(Parrot_pcc_get_PMC_reg)
     PMC **res;
-    PARROT_ASSERT(Parrot_pcc_get_regs_used(interp, ctx, REGNO_PMC) > idx);
+    PARROT_ASSERT(PCC_GET_REGS_USED(ctx, REGNO_PMC) > idx);
     PARROT_GC_WRITE_BARRIER(interp, ctx);
     res = &(CONTEXT_STRUCT(ctx)->bp_ps.regs_p[-1L - idx]);
     PARROT_ASSERT(!*res || !PObj_on_free_list_TEST(*res));
@@ -763,7 +763,7 @@ UINTVAL
 Parrot_pcc_get_regs_used(SHIM_INTERP, ARGIN(const PMC *ctx), int type)
 {
     ASSERT_ARGS(Parrot_pcc_get_regs_used)
-    return CONTEXT_STRUCT(ctx)->n_regs_used[type];
+    return PCC_GET_REGS_USED(ctx, type);
 }
 
 /*
