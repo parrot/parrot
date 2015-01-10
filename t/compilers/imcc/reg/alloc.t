@@ -153,20 +153,11 @@ pir_output_is( <<'CODE', <<'OUT', "Wrong regs_used[S], afl crash 3 - GH #1168" )
     eq $S1, 'stringy thingy', ok
   ok:
 .end
-
 .namespace [ "Foo11" ]
-
 .sub 'get_string' :vtable
-    self.'bar'()
     end # <== this is the inserted statement, leading to the wrong n_regs_used[S]
-    .return ("stringy thingy")
-.end
-
-.sub bar :method
-    say "ok"
 .end
 CODE
-ok
 OUT
 
 # Local Variables:
