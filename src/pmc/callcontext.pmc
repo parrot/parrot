@@ -1636,7 +1636,7 @@ sub, or for the point of the call a level deeper for the rest.
                                              ? cont->address
                                              : Parrot_pcc_get_pc(INTERP, cur_ctx);
 
-                    annotations = PackFile_Annotations_lookup(INTERP,
+                    annotations = Parrot_pf_annotations_lookup(INTERP,
                         seg->annotations, pc - seg->base.data,
                         NULL);
                 }

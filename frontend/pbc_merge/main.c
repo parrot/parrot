@@ -275,7 +275,7 @@ pbc_merge_bytecode(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 
     /* Add a bytecode segment. */
     PackFile_ByteCode * const bc_seg =
-        (PackFile_ByteCode *)PackFile_Segment_new_seg(interp,
+        (PackFile_ByteCode *)Parrot_pf_new_segment(interp,
             &pf->directory, PF_BYTEC_SEG, BYTE_CODE_SEGMENT_NAME, 1);
 
     if (!bc_seg) {
@@ -371,7 +371,7 @@ pbc_merge_constants(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 
     /* Add a constant table segment. */
     PackFile_ConstTable * const const_seg = (PackFile_ConstTable *)
-        PackFile_Segment_new_seg(interp, &pf->directory,
+        Parrot_pf_new_segment(interp, &pf->directory,
         PF_CONST_SEG, CONSTANT_SEGMENT_NAME, 1);
 
     if (const_seg == NULL) {
@@ -607,7 +607,7 @@ pbc_merge_debugs(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
 
     /* Create merged debug segment. Replace created data and mappings
        with merged ones we have created. */
-    debug_seg = Parrot_new_debug_seg(interp, bc, num_lines);
+    debug_seg = Parrot_pf_new_debug_segment(interp, bc, num_lines);
     mem_gc_free(interp, debug_seg->base.data);
     debug_seg->base.data    = lines;
     mem_gc_free(interp, debug_seg->mappings);

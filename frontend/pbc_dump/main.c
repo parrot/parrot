@@ -204,7 +204,7 @@ nums_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
     ASSERT_ARGS(nums_dump)
     const STRING           *debug_name = Parrot_str_concat(interp, self->name,
             Parrot_str_new_constant(interp, "_DB"));
-    const PackFile_Segment *debug      = PackFile_find_segment(interp,
+    const PackFile_Segment *debug      = Parrot_pf_find_segment(interp,
                                             self->dir, debug_name, 1);
 
     opcode_t   * pc            = self->data;
@@ -496,7 +496,7 @@ main(int argc, const char **argv)
     }
 
     /* do a directory dump, which dumps segs then */
-    PackFile_Segment_dump(interp, &pf->directory.base);
+    Parrot_pf_dump_segment(interp, &pf->directory.base);
 
     Parrot_x_exit(interp, 0);
 }

@@ -521,7 +521,7 @@ ARGIN(PPROF_DATA *pprof_data), ARGIN(opcode_t *pc))
 
     ASSERT_ARGS(record_annotations)
 
-    PMC * const annot = PackFile_Annotations_lookup(interp,
+    PMC * const annot = Parrot_pf_annotations_lookup(interp,
             interp->code->annotations, pc - code_start + 1, NULL);
 
     if (!PMC_IS_NULL(annot)) {

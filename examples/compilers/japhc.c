@@ -182,7 +182,7 @@ japh_compiler(PARROT_INTERP, const char *program)
      * need some packfile segments
      */
     cur_cs = PF_create_default_segs(interp, "JAPHc", 1);
-    old_cs = Parrot_switch_to_cs(interp, cur_cs, 0);
+    old_cs = Parrot_pf_switch_to_cs(interp, cur_cs, 0);
     /*
      * alloc byte code mem
      */
@@ -225,7 +225,7 @@ japh_compiler(PARROT_INTERP, const char *program)
     }
     if (old_cs) {
         /* restore old byte_code, */
-        (void)Parrot_switch_to_cs(interp, old_cs, 0);
+        (void)Parrot_pf_switch_to_cs(interp, old_cs, 0);
     }
     /*
      * create sub PMC

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2014, Parrot Foundation.
+Copyright (C) 2001-2015, Parrot Foundation.
 This program is free software. It is subject to the same license as
 Parrot itself.
 
@@ -234,10 +234,6 @@ Notice that this can cause problems, if a Packfile is destroyed, but some of
 its contents are not destroyed, but those contents contain indirect references
 to other things in the packfile which are destroyed. Use with caution.
 
-=item C<void PackFile_destroy(PARROT_INTERP, PackFile *pf)>
-
-Deprecated. Same as C<Parrot_pf_destroy>. Use C<Parrot_pf_destroy> instead.
-
 =cut
 
 */
@@ -262,9 +258,19 @@ Parrot_pf_destroy(PARROT_INTERP, ARGMOD(PackFile *pf))
     pf->header = NULL;
     mem_gc_free(interp, pf->dirp);
     pf->dirp   = NULL;
-    PackFile_Segment_destroy(interp, &pf->directory.base);
+    Parrot_pf_destroy_segment(interp, &pf->directory.base);
     return;
 }
+
+/*
+
+=item C<void PackFile_destroy(PARROT_INTERP, PackFile *pf)>
+
+Deprecated. Use C<Parrot_pf_destroy> instead. TT #2140
+
+=cut
+
+*/
 
 PARROT_EXPORT
 PARROT_DEPRECATED
@@ -1273,129 +1279,6 @@ PackFile_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
     return Parrot_pf_unpack(interp, self, packed, packed_size);
 }
 
-
-/*
-
-=item C<INTVAL PackFile_map_segments(PARROT_INTERP, const PackFile_Directory
-*dir, PackFile_map_segments_func_t callback, void *user_data)>
-
-Calls the callback function C<callback> for each segment in the directory
-C<dir> called. The pointer C<user_data> is included in each call.
-
-If a callback returns non-zero, segment processing stops, returning this value.
-
-Deprecated: This function should not be exposed as a part of the public API.
-See TT #2140 for details.
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_DEPRECATED
-INTVAL
-PackFile_map_segments(PARROT_INTERP, ARGIN(const PackFile_Directory *dir),
-                       PackFile_map_segments_func_t callback,
-                       ARGIN_NULLOK(void *user_data))
-{
-    ASSERT_ARGS(PackFile_map_segments)
-    size_t i;
-
-    for (i = 0; i < dir->num_segments; ++i) {
-        const INTVAL ret = callback(interp, dir->segments[i], user_data);
-        if (ret)
-            return ret;
-    }
-
-    return 0;
-}
-
-
-/*
-
-=item C<void PackFile_add_segment(PARROT_INTERP, PackFile_Directory *dir,
-PackFile_Segment *seg)>
-
-Adds the Segment C<seg> to the directory C<dir>.  The PackFile becomes the
-owner of the segment; it gets destroyed when the PackFile does.
-
-Deprecated: This function should either be renamed to Parrot_pf_*, or should
-not be exposed through this API. TT #2140
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_DEPRECATED
-void
-PackFile_add_segment(PARROT_INTERP, ARGMOD(PackFile_Directory *dir),
-        ARGMOD(PackFile_Segment *seg))
-{
-    ASSERT_ARGS(PackFile_add_segment)
-    dir->segments = mem_gc_realloc_n_typed_zeroed(interp, dir->segments,
-            dir->num_segments + 1, dir->num_segments, PackFile_Segment *);
-    dir->segments[dir->num_segments] = seg;
-    ++dir->num_segments;
-    seg->dir = dir;
-
-    return;
-}
-
-
-/*
-
-=item C<PackFile_Segment * PackFile_find_segment(PARROT_INTERP,
-PackFile_Directory *dir, const STRING *name, int sub_dir)>
-
-Finds the segment with the name C<name> in the C<PackFile_Directory> if
-C<sub_dir> is true, searches directories recursively.  The returned segment is
-still owned by the C<PackFile>.
-
-Deprecated: This function should either be renamed to Parrot_pf_*, or should
-not be exposed through this API. TT #2140. Consider moving this to
-src/packfile/segments.c
-
-=cut
-
-*/
-
-PARROT_EXPORT
-PARROT_WARN_UNUSED_RESULT
-PARROT_CAN_RETURN_NULL
-PARROT_DEPRECATED
-PackFile_Segment *
-PackFile_find_segment(PARROT_INTERP, ARGIN_NULLOK(PackFile_Directory *dir),
-    ARGIN(const STRING *name), int sub_dir)
-{
-    ASSERT_ARGS(PackFile_find_segment)
-    size_t i;
-
-    if (!dir)
-        return NULL;
-
-    for (i = 0; i < dir->num_segments; ++i) {
-        PackFile_Segment *seg = dir->segments[i];
-
-        if (!seg)
-            continue;
-
-        if (STRING_equal(interp, seg->name, name))
-            return seg;
-
-        if (sub_dir && seg->type == PF_DIR_SEG) {
-            seg = PackFile_find_segment(interp,
-                    (PackFile_Directory *)seg, name, sub_dir);
-
-            if (seg)
-                return seg;
-        }
-    }
-
-    return NULL;
-}
-
-
 /*
 
 =back
@@ -1487,10 +1370,6 @@ A Segment Header has these entries:
  - size         size of following op array, 0 if none
  * data         possibly empty data, or e.g. byte code
 
-=item C<PackFile * PackFile_new(PARROT_INTERP, INTVAL is_mapped)>
-
-Same as C<Parrot_pf_new>. Deprecated. Use Parrot_pf_new instead. See TT #2140
-
 =cut
 
 */
@@ -1517,7 +1396,7 @@ Parrot_pf_new(PARROT_INTERP, INTVAL is_mapped)
     /* create the master directory, all sub-dirs go there */
     pf->directory.base.pf = pf;
     pf->dirp              = (PackFile_Directory *)
-        PackFile_Segment_new_seg(interp, &pf->directory,
+        Parrot_pf_new_segment(interp, &pf->directory,
             PF_DIR_SEG, DIRECTORY_SEGMENT_NAME, 0);
     pf->directory         = *pf->dirp;
 
@@ -1529,6 +1408,16 @@ Parrot_pf_new(PARROT_INTERP, INTVAL is_mapped)
 
     return pf;
 }
+
+/*
+
+=item C<PackFile * PackFile_new(PARROT_INTERP, INTVAL is_mapped)>
+
+Same as C<Parrot_pf_new>. Deprecated: Use C<Parrot_pf_new> instead. See TT #2140
+
+=cut
+
+*/
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -1648,7 +1537,7 @@ Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PMC *pbc))
             "Cannot set null packfile");
     else {
         PackFile * const pf = (PackFile *)VTABLE_get_pointer(interp, pbc);
-        Parrot_switch_to_cs(interp, pf->cur_cs, 1);
+        Parrot_pf_switch_to_cs(interp, pf->cur_cs, 1);
         PARROT_GC_WRITE_BARRIER(interp, pbc);
     }
 }
@@ -1695,14 +1584,11 @@ Parrot_pf_create_default_segments(PARROT_INTERP, ARGIN(PMC * const pf_pmc),
 
 /*
 
-=item C<PackFile_Debug * Parrot_new_debug_seg(PARROT_INTERP, PackFile_ByteCode
-*cs, size_t size)>
+=item C<PackFile_Debug * Parrot_pf_new_debug_segment(PARROT_INTERP,
+PackFile_ByteCode *cs, size_t size)>
 
 Creates and appends (or resizes) a new debug seg for a code segment.  Uses the
 given size as its size.
-
-Deprecated: This function should either be renamed to Parrot_pf_*, or should
-not be exposed through this API. TT #2140
 
 =cut
 
@@ -1711,11 +1597,10 @@ not be exposed through this API. TT #2140
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PARROT_DEPRECATED
 PackFile_Debug *
-Parrot_new_debug_seg(PARROT_INTERP, ARGMOD(PackFile_ByteCode *cs), size_t size)
+Parrot_pf_new_debug_segment(PARROT_INTERP, ARGMOD(PackFile_ByteCode *cs), size_t size)
 {
-    ASSERT_ARGS(Parrot_new_debug_seg)
+    ASSERT_ARGS(Parrot_pf_new_debug_segment)
     PackFile_Debug *debug;
 
     /* it exists already, resize it */
@@ -1736,7 +1621,7 @@ Parrot_new_debug_seg(PARROT_INTERP, ARGMOD(PackFile_ByteCode *cs), size_t size)
         PARROT_GC_WRITE_BARRIER(interp, current_pfpmc);
 
         name = Parrot_sprintf_c(interp, "%Ss_DB", cs->base.name);
-        debug = (PackFile_Debug *)PackFile_Segment_new_seg(interp, dir,
+        debug = (PackFile_Debug *)Parrot_pf_new_segment(interp, dir,
                                     PF_DEBUG_SEG, name, add);
 
         debug->base.data = mem_gc_allocate_n_zeroed_typed(interp, size, opcode_t);
@@ -1749,16 +1634,34 @@ Parrot_new_debug_seg(PARROT_INTERP, ARGMOD(PackFile_ByteCode *cs), size_t size)
     return debug;
 }
 
+/*
+
+=item C<PackFile_Debug * Parrot_new_debug_seg(PARROT_INTERP, PackFile_ByteCode
+*cs, size_t size)>
+
+Deprecated: Use C<Parrot_pf_new_debug_segment> instead. TT #2140
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PARROT_DEPRECATED
+PackFile_Debug *
+Parrot_new_debug_seg(PARROT_INTERP, ARGMOD(PackFile_ByteCode *cs), size_t size)
+{
+    ASSERT_ARGS(Parrot_new_debug_seg)
+    return Parrot_pf_new_debug_segment(interp, cs, size);
+}
 
 /*
 
-=item C<void Parrot_debug_add_mapping(PARROT_INTERP, PackFile_Debug *debug,
+=item C<void Parrot_pf_debug_add_mapping(PARROT_INTERP, PackFile_Debug *debug,
 opcode_t offset, STRING *filename)>
 
 Adds a bytecode offset to a filename mapping for a PackFile_Debug.
-
-Deprecated: This function should either be renamed to Parrot_pf_*, or should
-not be exposed through this API. TT #2140
 
 TODO: Refactor this function, it is too large and complicated.
 
@@ -1767,12 +1670,11 @@ TODO: Refactor this function, it is too large and complicated.
 */
 
 PARROT_EXPORT
-PARROT_DEPRECATED
 void
-Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
-                         opcode_t offset, ARGIN(STRING *filename))
+Parrot_pf_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
+                            opcode_t offset, ARGIN(STRING *filename))
 {
-    ASSERT_ARGS(Parrot_debug_add_mapping)
+    ASSERT_ARGS(Parrot_pf_debug_add_mapping)
     PackFile_ConstTable * const    ct         = debug->code->const_table;
     int                            insert_pos = 0;
 
@@ -1842,16 +1744,33 @@ Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
     }
 }
 
+/*
+
+=item C<void Parrot_debug_add_mapping(PARROT_INTERP, PackFile_Debug *debug,
+opcode_t offset, STRING *filename)>
+
+Deprecated: Use C<Parrot_pf_debug_add_mapping> instead. TT #2140
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_DEPRECATED
+void
+Parrot_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
+                         opcode_t offset, ARGIN(STRING *filename))
+{
+    ASSERT_ARGS(Parrot_debug_add_mapping)
+    Parrot_pf_debug_add_mapping(interp, debug, offset, filename);
+}
 
 /*
 
-=item C<STRING * Parrot_debug_pc_to_filename(PARROT_INTERP, const PackFile_Debug
-*debug, opcode_t pc)>
+=item C<STRING * Parrot_pf_debug_pc_to_filename(PARROT_INTERP, const
+PackFile_Debug *debug, opcode_t pc)>
 
 Returns the filename of the source for the given position in the bytecode.
-
-Deprecated: This function should either be renamed to Parrot_pf_*, or should
-not be exposed through this API. TT #2140
 
 =cut
 
@@ -1860,12 +1779,11 @@ not be exposed through this API. TT #2140
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
-PARROT_DEPRECATED
 STRING *
-Parrot_debug_pc_to_filename(PARROT_INTERP, ARGIN(const PackFile_Debug *debug),
+Parrot_pf_debug_pc_to_filename(PARROT_INTERP, ARGIN(const PackFile_Debug *debug),
     opcode_t pc)
 {
-    ASSERT_ARGS(Parrot_debug_pc_to_filename)
+    ASSERT_ARGS(Parrot_pf_debug_pc_to_filename)
     /* Look through mappings until we find one that maps the passed
        bytecode offset. */
 
@@ -1883,16 +1801,35 @@ Parrot_debug_pc_to_filename(PARROT_INTERP, ARGIN(const PackFile_Debug *debug),
     return CONST_STRING(interp, "(unknown file)");
 }
 
+/*
+
+=item C<STRING * Parrot_debug_pc_to_filename(PARROT_INTERP, const PackFile_Debug
+*debug, opcode_t pc)>
+
+Deprecated: Use C<Parrot_pf_debug_pc_to_filename> instead. TT #2140
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PARROT_DEPRECATED
+STRING *
+Parrot_debug_pc_to_filename(PARROT_INTERP, ARGIN(const PackFile_Debug *debug),
+    opcode_t pc)
+{
+    ASSERT_ARGS(Parrot_debug_pc_to_filename)
+    return Parrot_pf_debug_pc_to_filename(interp, debug, pc);
+}
 
 /*
 
-=item C<PackFile_ByteCode * Parrot_switch_to_cs(PARROT_INTERP, PackFile_ByteCode
-*new_cs, int really)>
+=item C<PackFile_ByteCode * Parrot_pf_switch_to_cs(PARROT_INTERP,
+PackFile_ByteCode *new_cs, int really)>
 
 Switches to a bytecode segment C<new_cs>, returning the old segment.
-
-Deprecated: This function should either be renamed to Parrot_pf_*, or should
-not be exposed through this API. TT #2140
 
 =cut
 
@@ -1901,11 +1838,10 @@ not be exposed through this API. TT #2140
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
-PARROT_DEPRECATED
 PackFile_ByteCode *
-Parrot_switch_to_cs(PARROT_INTERP, ARGIN(PackFile_ByteCode *new_cs), int really)
+Parrot_pf_switch_to_cs(PARROT_INTERP, ARGIN(PackFile_ByteCode *new_cs), int really)
 {
-    ASSERT_ARGS(Parrot_switch_to_cs)
+    ASSERT_ARGS(Parrot_pf_switch_to_cs)
     PackFile_ByteCode * const cur_cs = interp->code;
 
     if (!new_cs)
@@ -1935,6 +1871,27 @@ Parrot_switch_to_cs(PARROT_INTERP, ARGIN(PackFile_ByteCode *new_cs), int really)
     return cur_cs;
 }
 
+/*
+
+=item C<PackFile_ByteCode * Parrot_switch_to_cs(PARROT_INTERP, PackFile_ByteCode
+*new_cs, int really)>
+
+Deprecated: Use C<Parrot_pf_switch_to_cs> instead. TT #2140
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
+PARROT_CANNOT_RETURN_NULL
+PARROT_DEPRECATED
+PackFile_ByteCode *
+Parrot_switch_to_cs(PARROT_INTERP, ARGIN(PackFile_ByteCode *new_cs), int really)
+{
+    ASSERT_ARGS(Parrot_switch_to_cs)
+    return Parrot_pf_switch_to_cs(interp, new_cs, really);
+}
 
 /*
 
@@ -1983,7 +1940,7 @@ find_pf_ann_idx(ARGIN(PackFile_Annotations *pfa),
 
 /*
 
-=item C<void PackFile_Annotations_add_entry(PARROT_INTERP, PackFile_Annotations
+=item C<void Parrot_pf_annotations_add_entry(PARROT_INTERP, PackFile_Annotations
 *self, opcode_t offset, opcode_t key, opcode_t type, opcode_t value)>
 
 Adds a new bytecode annotation entry. Takes the annotations segment to add the
@@ -1994,20 +1951,16 @@ PF_ANNOTATION_KEY_TYPE_STR or PF_ANNOTATION_KEY_TYPE_NUM) and the value. The
 value will be an integer literal in the case of type being
 PF_ANNOTATION_KEY_TYPE_INT, or an index into the constants table otherwise.
 
-Deprecated: This function should either be renamed to Parrot_pf_*, or should
-not be exposed through this API. TT #2140
-
 =cut
 
 */
 
 PARROT_EXPORT
-PARROT_DEPRECATED
 void
-PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self),
+Parrot_pf_annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self),
         opcode_t offset, opcode_t key, opcode_t type, opcode_t value)
 {
-    ASSERT_ARGS(PackFile_Annotations_add_entry)
+    ASSERT_ARGS(Parrot_pf_annotations_add_entry)
     opcode_t key_id   = -1;
     INTVAL   i, idx;
 
@@ -2068,10 +2021,30 @@ PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self)
     self->keys[key_id].len++;
 }
 
+/*
+
+=item C<void PackFile_Annotations_add_entry(PARROT_INTERP, PackFile_Annotations
+*self, opcode_t offset, opcode_t key, opcode_t type, opcode_t value)>
+
+Deprecated: Use C<Parrot_pf_annotations_add_entry> instead. TT #2140
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_DEPRECATED
+void
+PackFile_Annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self),
+        opcode_t offset, opcode_t key, opcode_t type, opcode_t value)
+{
+    ASSERT_ARGS(PackFile_Annotations_add_entry)
+    Parrot_pf_annotations_add_entry(interp, self, offset, key, type, value);
+}
 
 /*
 
-=item C<PMC * PackFile_Annotations_lookup(PARROT_INTERP, PackFile_Annotations
+=item C<PMC * Parrot_pf_annotations_lookup(PARROT_INTERP, PackFile_Annotations
 *self, opcode_t offset, STRING *name)>
 
 Looks up the annotation(s) in force at the given bytecode offset. If just one
@@ -2080,20 +2053,16 @@ will be returned (or a NULL PMC if no annotation of that name is in force).
 Otherwise, a Hash will be returned of the all annotations. If there are none in
 force, an empty hash will be returned.
 
-Deprecated: This function should either be renamed to Parrot_pf_*, or should
-not be exposed through this API. TT #2140
-
 =cut
 
 */
 
 PARROT_CANNOT_RETURN_NULL
-PARROT_DEPRECATED
 PMC *
-PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
+Parrot_pf_annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
         opcode_t offset, ARGIN_NULLOK(STRING *name))
 {
-    ASSERT_ARGS(PackFile_Annotations_lookup)
+    ASSERT_ARGS(Parrot_pf_annotations_lookup)
 
     if (STRING_IS_NULL(name)) {
         /* find all annotations for this offset */
@@ -2101,7 +2070,7 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
         INTVAL i;
         for (i = 0; i < self->num_keys; i++) {
             STRING * const k = self->code->const_table->str.constants[self->keys[i].name];
-            PMC    * const v = PackFile_Annotations_lookup(interp, self, offset, k);
+            PMC    * const v = Parrot_pf_annotations_lookup(interp, self, offset, k);
             if (!PMC_IS_NULL(v))
                 VTABLE_set_pmc_keyed_str(interp, result, k, v);
         }
@@ -2151,7 +2120,7 @@ PackFile_Annotations_lookup(PARROT_INTERP, ARGIN(PackFile_Annotations *self),
 =item C<PackFile_Annotations * Parrot_pf_get_annotations_segment(PARROT_INTERP,
 PackFile *pf, PackFile_ByteCode *bc)>
 
-TK: Whiteknight please fill in.
+Returns the annotations segment. If none exists, create an empty one.
 
 =cut
 
@@ -2173,7 +2142,7 @@ Parrot_pf_get_annotations_segment(PARROT_INTERP, ARGMOD(PackFile *pf),
         PackFile_Directory * const dir = bc->base.dir ? bc->base.dir :
                     &pf->directory;
         PackFile_Annotations * const annotations = (PackFile_Annotations *)
-            PackFile_Segment_new_seg(interp, dir, PF_ANNOTATIONS_SEG, name, 1);
+            Parrot_pf_new_segment(interp, dir, PF_ANNOTATIONS_SEG, name, 1);
         bc->annotations = annotations;
         annotations->code = bc;
         return annotations;
@@ -2290,8 +2259,9 @@ load_file(PARROT_INTERP, ARGIN(STRING *path))
 Load the compiler libraries for a given high-level language into the
 interpreter.
 
-Deprecated: This function should either be renamed to Parrot_pf_*, or should
-not be exposed through this API. TT #2140
+Deprecated: This function should either be renamed to
+C<Parrot_pf_load_language>, or should not be exposed through this
+API. TT #2140
 
 TODO: Refactor this function and try to reduce the size of it. It is too big.
 
@@ -2377,8 +2347,9 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
 
 Load a bytecode, PIR, or PASM file into the interpreter.
 
-Deprecated: This function should either be renamed to Parrot_pf_*, or should
-not be exposed through this API. TT #2140
+Deprecated: This function should either be renamed to
+C<Parrot_pf_load_bytecode>, or should not be exposed through this
+API. TT #2140
 
 TODO: We need to cleanup the way bytecode is loaded. This probably needs some
 major changes.
@@ -2484,17 +2455,34 @@ Parrot_pf_load_bytecode_search(PARROT_INTERP, ARGIN(STRING *file))
 
 /*
 
-=item C<void PackFile_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, PMC
+=item C<void Parrot_pf_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, PMC
 *eval)>
 
 Calls C<:load>, C<:init>, C<:main>, C<:immediate> and/or C<:postcomp>
 subroutines in the current packfile, depending on the value of C<action>.
 See C<do_sub_pragmas> for more details.
 
-Deprecated: This function should either be renamed to Parrot_pf_*, or should
-not be exposed through this API. TT #2140. Use Parrot_pf_prepare_packfile_init
-and Parrot_pf_prepare_packfile_load (and any other variants we need to create
-in the future) instead.
+Use C<Parrot_pf_prepare_packfile_init> and C<Parrot_pf_prepare_packfile_load>
+(and any other variants we need to create in the future) instead.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_pf_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, ARGIN_NULLOK(PMC *eval))
+{
+    ASSERT_ARGS(Parrot_pf_fixup_subs)
+    do_sub_pragmas(interp, Parrot_pf_get_current_packfile(interp), what, eval);
+}
+
+/*
+
+=item C<void PackFile_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, PMC
+*eval)>
+
+Deprecated: Use <Parrot_pf_fixup_subs> instead. TT #2140.
 
 =cut
 
@@ -2924,7 +2912,7 @@ Parrot_pf_get_version_string(PARROT_INTERP, ARGIN(PMC * pbc))
 *dir, pack_file_types t, STRING *name, STRING *file_name, int add)>
 
 Creates a new PackFile_Segment for the given C<file_name>.  See
-C<PackFile_Segment_new_seg()> for the other arguments.
+C<Parrot_pf_new_segment()> for the other arguments.
 
 =cut
 
@@ -2938,7 +2926,7 @@ create_seg(PARROT_INTERP, ARGMOD(PackFile_Directory *dir), pack_file_types t,
 {
     ASSERT_ARGS(create_seg)
     STRING *           const seg_name = Parrot_sprintf_c(interp, "%Ss_%Ss", name, file_name);
-    PackFile_Segment * const seg      = PackFile_Segment_new_seg(interp, dir, t, seg_name, add);
+    PackFile_Segment * const seg      = Parrot_pf_new_segment(interp, dir, t, seg_name, add);
     return seg;
 }
 

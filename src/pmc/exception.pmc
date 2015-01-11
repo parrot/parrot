@@ -859,7 +859,7 @@ annotation. If not, returns a Hash of all of them.
         if (!PMC_IS_NULL(resume)) {
             const Parrot_Continuation_attributes * const cont = PARROT_CONTINUATION(resume);
             if (cont->seg != NULL && cont->seg->annotations != NULL)
-                result = PackFile_Annotations_lookup(INTERP, cont->seg->annotations,
+                result = Parrot_pf_annotations_lookup(INTERP, cont->seg->annotations,
                         cont->address - cont->seg->base.data, name);
         }
 

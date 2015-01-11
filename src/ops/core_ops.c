@@ -14683,7 +14683,7 @@ Parrot_runinterp_p_i(opcode_t *cur_opcode, PARROT_INTERP) {
     Interp  * const  new_interp = (Interp *)VTABLE_get_pointer(interp, PREG(1));
 
     Interp_flags_SET(new_interp, PARROT_EXTERN_CODE_FLAG);
-    Parrot_switch_to_cs(new_interp, interp->code, 1);
+    Parrot_pf_switch_to_cs(new_interp, interp->code, 1);
     runops(new_interp, (REL_PC + IREG(2)));
     return cur_opcode + 3;
 }
@@ -14693,7 +14693,7 @@ Parrot_runinterp_p_ic(opcode_t *cur_opcode, PARROT_INTERP) {
     Interp  * const  new_interp = (Interp *)VTABLE_get_pointer(interp, PREG(1));
 
     Interp_flags_SET(new_interp, PARROT_EXTERN_CODE_FLAG);
-    Parrot_switch_to_cs(new_interp, interp->code, 1);
+    Parrot_pf_switch_to_cs(new_interp, interp->code, 1);
     runops(new_interp, (REL_PC + ICONST(2)));
     return cur_opcode + 3;
 }
@@ -15055,7 +15055,7 @@ Parrot_annotations_p(opcode_t *cur_opcode, PARROT_INTERP) {
     if (interp->code->annotations) {
         const opcode_t   cur_pos = (( cur_opcode + 2) - interp->code->base.data);
 
-        PREG(1) = PackFile_Annotations_lookup(interp, interp->code->annotations, cur_pos, NULL);
+        PREG(1) = Parrot_pf_annotations_lookup(interp, interp->code->annotations, cur_pos, NULL);
     }
     else {
         PREG(1) = Parrot_pmc_new(interp, enum_class_Hash);
@@ -15070,7 +15070,7 @@ Parrot_annotations_p_s(opcode_t *cur_opcode, PARROT_INTERP) {
     if (interp->code->annotations) {
         const opcode_t   cur_pos = (( cur_opcode + 3) - interp->code->base.data);
 
-        PREG(1) = PackFile_Annotations_lookup(interp, interp->code->annotations, cur_pos, SREG(2));
+        PREG(1) = Parrot_pf_annotations_lookup(interp, interp->code->annotations, cur_pos, SREG(2));
     }
     else {
         PREG(1) = PMCNULL;
@@ -15085,7 +15085,7 @@ Parrot_annotations_p_sc(opcode_t *cur_opcode, PARROT_INTERP) {
     if (interp->code->annotations) {
         const opcode_t   cur_pos = (( cur_opcode + 3) - interp->code->base.data);
 
-        PREG(1) = PackFile_Annotations_lookup(interp, interp->code->annotations, cur_pos, SCONST(2));
+        PREG(1) = Parrot_pf_annotations_lookup(interp, interp->code->annotations, cur_pos, SCONST(2));
     }
     else {
         PREG(1) = PMCNULL;

@@ -522,7 +522,7 @@ Invokes the subroutine.
 
         /* switch code segment if needed */
         if (INTERP->code != sub->seg)
-            Parrot_switch_to_cs(INTERP, sub->seg, 1);
+            Parrot_pf_switch_to_cs(INTERP, sub->seg, 1);
 
         return pc;
     }

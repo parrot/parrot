@@ -3687,7 +3687,7 @@ PDB_get_continuation_backtrace(PARROT_INTERP, ARGIN(PMC *ctx))
             const PackFile_ByteCode * const seg = PARROT_SUB(sub)->seg;
             VTABLE_push_string(interp, output, info_str);
             if (seg->annotations) {
-                PMC * const annot = PackFile_Annotations_lookup(interp, seg->annotations,
+                PMC * const annot = Parrot_pf_annotations_lookup(interp, seg->annotations,
                         Parrot_pcc_get_pc(interp, ctx) - seg->base.data,
                         NULL);
 

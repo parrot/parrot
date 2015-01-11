@@ -375,7 +375,7 @@ yields are exhausted and the coro is dead.
         SET_ATTR_address(INTERP, SELF, (opcode_t *)next);
 
         if (INTERP->code != wanted_seg)
-            Parrot_switch_to_cs(INTERP, wanted_seg, 1);
+            Parrot_pf_switch_to_cs(INTERP, wanted_seg, 1);
 
         return dest;
     }

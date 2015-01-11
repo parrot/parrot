@@ -559,7 +559,7 @@ Introspection interface. C<key> can be:
                 seg = sub->seg;
 
                 if (sub->seg->annotations)
-                    return PackFile_Annotations_lookup(INTERP, seg->annotations,
+                    return Parrot_pf_annotations_lookup(INTERP, seg->annotations,
                         pc - seg->base.data, NULL);
             }
 

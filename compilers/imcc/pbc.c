@@ -2420,7 +2420,7 @@ e_pbc_emit(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(const IMC_Unit *u
 
         /* FIXME length and multiple subs */
         seg_size = (size_t)imcc->ins_line + ins_size + 1;
-        imcc->debug_seg = Parrot_new_debug_seg(imcc->interp, interp_code, seg_size);
+        imcc->debug_seg = Parrot_pf_new_debug_segment(imcc->interp, interp_code, seg_size);
 
         Parrot_debug_add_mapping(imcc->interp, imcc->debug_seg, old_size, unit->file);
 

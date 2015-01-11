@@ -76,11 +76,11 @@ main(SHIM(int argc), char *argv[])
     /*
      * add some more segments
      */
-    seg = PackFile_Segment_new_seg(interp,
+    seg = Parrot_pf_new_segment(interp,
                     &pf->directory, PF_DIR_SEG, "dir2", 1);
-    seg = PackFile_Segment_new_seg(interp,
+    seg = Parrot_pf_new_segment(interp,
                     (PackFile_Directory*)seg, PF_BYTEC_SEG, "code", 1);
-    seg = PackFile_Segment_new_seg(interp,
+    seg = Parrot_pf_new_segment(interp,
                     &pf->directory, PF_DIR_SEG, "dir3", 1);
 
     /*

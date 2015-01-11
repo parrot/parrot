@@ -441,7 +441,7 @@ Parrot_clone_code(Parrot_Interp d, Parrot_Interp s)
     Parrot_block_GC_mark(d);
     Interp_flags_SET(d, PARROT_EXTERN_CODE_FLAG);
     d->code = NULL;
-    Parrot_switch_to_cs(d, s->code, 1);
+    Parrot_pf_switch_to_cs(d, s->code, 1);
     Parrot_unblock_GC_mark(d);
 }
 
