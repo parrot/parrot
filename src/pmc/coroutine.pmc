@@ -98,7 +98,7 @@ print_sub_name(PARROT_INTERP, ARGIN(PMC *sub_pmc))
     }
 
     Parrot_io_eprintf(tracer, "\n# ");
-    print_pbc_location(interp);
+    Parrot_print_pbc_location(interp);
 }
 
 pmclass Coroutine extends Sub provides invokable auto_attrs {

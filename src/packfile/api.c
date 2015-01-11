@@ -128,6 +128,12 @@ static void PackFile_set_header(ARGOUT(PackFile_Header *header))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*header);
 
+static void pf_do_sub_pragmas(PARROT_INTERP,
+    ARGIN(PMC *pfpmc),
+    pbc_action_enum_t action)
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 static void push_context(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -153,7 +159,6 @@ static PackFile* read_pbc_file_packfile_handle(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
-PARROT_DEPRECATED
 static PMC* set_current_sub(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -204,6 +209,9 @@ static int sub_pragma(PARROT_INTERP,
        PARROT_ASSERT_ARG(bc))
 #define ASSERT_ARGS_PackFile_set_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(header))
+#define ASSERT_ARGS_pf_do_sub_pragmas __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pfpmc))
 #define ASSERT_ARGS_push_context __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_read_pbc_file_bytes_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -304,7 +312,7 @@ INTVAL
 Parrot_pf_serialized_size(PARROT_INTERP, ARGMOD(PackFile *pf))
 {
     ASSERT_ARGS(Parrot_pf_serialized_size)
-    return PackFile_pack_size(interp, pf);
+    return Parrot_pf_pack_size(interp, pf);
 }
 
 PARROT_EXPORT
@@ -315,11 +323,11 @@ Parrot_pf_serialize(PARROT_INTERP, ARGIN(PackFile * const pf))
     ASSERT_ARGS(Parrot_pf_serialize)
     STRING      *str;
     /* Calculate required memory */
-    const opcode_t length = PackFile_pack_size(interp, pf) * sizeof (opcode_t);
+    const opcode_t length = Parrot_pf_pack_size(interp, pf) * sizeof (opcode_t);
     opcode_t * const ptr  = (opcode_t*)Parrot_gc_allocate_memory_chunk(interp, length);
 
     /* And pack it! */
-    PackFile_pack(interp, pf, ptr);
+    Parrot_pf_pack(interp, pf, ptr);
 
     str = Parrot_str_new_init(interp, (const char*)ptr, length,
             Parrot_binary_encoding_ptr, 0);
@@ -871,7 +879,7 @@ find_const_iter(PARROT_INTERP, ARGMOD(PackFile_Segment *seg), ARGIN_NULLOK(void 
 
     switch (seg->type) {
       case PF_DIR_SEG:
-        PackFile_map_segments(interp, (const PackFile_Directory *)seg,
+        Parrot_pf_map_segments(interp, (const PackFile_Directory *)seg,
                 find_const_iter, user_data);
         break;
 
@@ -912,7 +920,7 @@ Parrot_pf_mark_packfile(PARROT_INTERP, ARGMOD_NULLOK(PackFile * pf))
         PackFile_Directory * const dir = &pf->directory;
 
         /* iterate over all dir/segs */
-        PackFile_map_segments(interp, dir, find_const_iter, NULL);
+        Parrot_pf_map_segments(interp, dir, find_const_iter, NULL);
     }
 }
 
@@ -955,8 +963,8 @@ packfile_main(ARGIN(PackFile_ByteCode *bc))
 
 /*
 
-=item C<void do_sub_pragmas(PARROT_INTERP, PMC *pfpmc, pbc_action_enum_t action,
-PMC *eval_pmc)>
+=item C<static void pf_do_sub_pragmas(PARROT_INTERP, PMC *pfpmc,
+pbc_action_enum_t action)>
 
 C<action> is one of C<PBC_LOADED>, C<PBC_INIT>, or C<PBC_MAIN>.
 These determine which subs get executed at this point. Some rules:
@@ -969,20 +977,17 @@ These determine which subs get executed at this point. Some rules:
 
 The argument C<eval_pmc> is ignored.
 
-This function and the entire underlying mechanism should be deprecated and
+TODO: This function and the entire underlying mechanism should be deprecated and
 removed. See GH #428 for details.
 
 =cut
 
 */
 
-PARROT_EXPORT
-PARROT_DEPRECATED
-void
-do_sub_pragmas(PARROT_INTERP, ARGIN(PMC *pfpmc),
-               pbc_action_enum_t action, SHIM(PMC *eval_pmc))
+static void
+pf_do_sub_pragmas(PARROT_INTERP, ARGIN(PMC *pfpmc), pbc_action_enum_t action)
 {
-    ASSERT_ARGS(do_sub_pragmas)
+    ASSERT_ARGS(pf_do_sub_pragmas)
     PackFile            * const pf = (PackFile*)VTABLE_get_pointer(interp, pfpmc);
     PackFile_ByteCode   * const self = pf->cur_cs;
     PackFile_ConstTable * const ct = self->const_table;
@@ -1030,6 +1035,29 @@ do_sub_pragmas(PARROT_INTERP, ARGIN(PMC *pfpmc),
     }
 }
 
+/*
+
+=item C<void do_sub_pragmas(PARROT_INTERP, PMC *pfpmc, pbc_action_enum_t action,
+PMC *eval_pmc)>
+
+This function and the entire underlying mechanism is deprecated and will be
+removed. See GH #428 for details.
+
+For now use C<pf_do_sub_pragmas> instead.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_DEPRECATED
+void
+do_sub_pragmas(PARROT_INTERP, ARGIN(PMC *pfpmc),
+               pbc_action_enum_t action, SHIM(PMC *eval_pmc))
+{
+    ASSERT_ARGS(do_sub_pragmas)
+    pf_do_sub_pragmas(interp, pfpmc, action);
+}
 /*
 
 =item C<static void PackFile_Header_validate(PARROT_INTERP, const
@@ -1248,8 +1276,7 @@ Parrot_pf_unpack(PARROT_INTERP, ARGMOD(PackFile *self),
 
     /* now unpack dir, which unpacks its contents ... */
     Parrot_block_GC_mark(interp);
-    cursor = PackFile_Segment_unpack(interp,
-                                     &self->directory.base, cursor);
+    cursor = pf_segment_unpack(interp, &self->directory.base, cursor);
     Parrot_unblock_GC_mark(interp);
 
 #ifdef PARROT_HAS_HEADER_SYSMMAN
@@ -2208,7 +2235,7 @@ compile_file(PARROT_INTERP, ARGIN(STRING *path), INTVAL is_pasm)
         if (cs) {
             interp->code = cur_code;
             VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pf_pmc);
-            do_sub_pragmas(interp, pf_pmc, PBC_LOADED, NULL);
+            pf_do_sub_pragmas(interp, pf_pmc, PBC_LOADED);
         }
         else {
             interp->code = cur_code;
@@ -2248,7 +2275,7 @@ load_file(PARROT_INTERP, ARGIN(STRING *path))
         VTABLE_set_pmc_keyed_str(interp, pbc_cache, path, pf_pmc);
         Parrot_pcc_invoke_method_from_c_args(interp, pf_pmc, method, "S->",
                 load_str);
-        do_sub_pragmas(interp, pf_pmc, PBC_LOADED, pf_pmc);
+        pf_do_sub_pragmas(interp, pf_pmc, PBC_LOADED);
     }
 }
 
@@ -2269,8 +2296,8 @@ TODO: Refactor this function and try to reduce the size of it. It is too big.
 
 */
 
+/*PARROT_DEPRECATED*/
 PARROT_EXPORT
-PARROT_DEPRECATED
 void
 Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
 {
@@ -2359,8 +2386,8 @@ major changes.
 */
 
 /* intermediate hook during changes */
+/*PARROT_DEPRECATED*/
 PARROT_EXPORT
-PARROT_DEPRECATED
 void
 Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
 {
@@ -2471,10 +2498,10 @@ Use C<Parrot_pf_prepare_packfile_init> and C<Parrot_pf_prepare_packfile_load>
 
 PARROT_EXPORT
 void
-Parrot_pf_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, ARGIN_NULLOK(PMC *eval))
+Parrot_pf_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, SHIM(PMC *eval))
 {
     ASSERT_ARGS(Parrot_pf_fixup_subs)
-    do_sub_pragmas(interp, Parrot_pf_get_current_packfile(interp), what, eval);
+    pf_do_sub_pragmas(interp, Parrot_pf_get_current_packfile(interp), what);
 }
 
 /*
@@ -2491,10 +2518,10 @@ Deprecated: Use <Parrot_pf_fixup_subs> instead. TT #2140.
 PARROT_EXPORT
 PARROT_DEPRECATED
 void
-PackFile_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, ARGIN_NULLOK(PMC *eval))
+PackFile_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, SHIM(PMC *eval))
 {
     ASSERT_ARGS(PackFile_fixup_subs)
-    do_sub_pragmas(interp, Parrot_pf_get_current_packfile(interp), what, eval);
+    pf_do_sub_pragmas(interp, Parrot_pf_get_current_packfile(interp), what);
 }
 
 /*
@@ -2523,7 +2550,7 @@ Parrot_pf_prepare_packfile_init(PARROT_INTERP, ARGIN(PMC * const pfpmc))
             Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_MALFORMED_PACKFILE,
                 "Could not load packfile: Invalid Pointer");
         if (!(pf->options & PFOPT_HEADERONLY))
-            do_sub_pragmas(interp, pfpmc, PBC_MAIN, pfpmc);
+            pf_do_sub_pragmas(interp, pfpmc, PBC_MAIN);
     }
 }
 
@@ -2552,7 +2579,7 @@ Parrot_pf_prepare_packfile_load(PARROT_INTERP, ARGIN(PMC * const pfpmc))
             Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_MALFORMED_PACKFILE,
                 "Could not load packfile: Invalid Pointer");
         if (!(pf->options & PFOPT_HEADERONLY))
-            do_sub_pragmas(interp, pfpmc, PBC_LOADED, NULL);
+            pf_do_sub_pragmas(interp, pfpmc, PBC_LOADED);
     }
 }
 
@@ -2591,9 +2618,9 @@ Parrot_pf_write_pbc_file(PARROT_INTERP, ARGIN(PMC *pf_pmc), ARGIN(STRING *filena
                 "Cannot open output file %Ss", filename);
         }
         else {
-            const Parrot_Int size = PackFile_pack_size(interp, pf) * sizeof (opcode_t);
+            const Parrot_Int size = Parrot_pf_pack_size(interp, pf) * sizeof (opcode_t);
             opcode_t * const packed = (opcode_t*)mem_sys_allocate(size);
-            PackFile_pack(interp, pf, packed);
+            Parrot_pf_pack(interp, pf, packed);
             Parrot_io_internal_write(interp, fp, (char *)packed, size);
         }
         Parrot_io_internal_close(interp, fp);
@@ -2787,14 +2814,12 @@ set up the appropriate context.
 If no match, set up a dummy PMC entry.  In either case, return a
 pointer to the PMC.
 
-DEPRECATED: use Parrot_pf_get_packfile_main_sub instead
-
 =cut
 
 */
 
+/*PARROT_DEPRECATED*/
 PARROT_CANNOT_RETURN_NULL
-PARROT_DEPRECATED
 static PMC*
 set_current_sub(PARROT_INTERP)
 {
@@ -2811,7 +2836,6 @@ set_current_sub(PARROT_INTERP)
      * Walk the fixup table.  The first Sub-like entry should be our
      * entry point with the address at our resume_offset.
      */
-
     for (i = 0; i < ct->pmc.const_count; i++) {
         PMC * const sub_pmc = ct->pmc.constants[i];
         if (VTABLE_isa(interp, sub_pmc, SUB)) {
@@ -2826,14 +2850,13 @@ set_current_sub(PARROT_INTERP)
                     Parrot_pcc_set_HLL(interp, CURRENT_CONTEXT(interp), sub->HLL_id);
                     return sub_pmc;
                 }
-
                 break;
             }
         }
     }
 
     /* If we didn't find anything, put a dummy PMC into current_sub.
-       The default values set by SUb.init are appropriate for the
+       The default values set by Sub.init are appropriate for the
        dummy, don't need additional settings. */
     new_sub_pmc = Parrot_pmc_new(interp, enum_class_Sub);
     Parrot_pcc_set_sub(interp, CURRENT_CONTEXT(interp), new_sub_pmc);

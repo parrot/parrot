@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2014, Parrot Foundation.
+Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -116,7 +116,7 @@ const_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *segp))
 {
     ASSERT_ARGS(const_dump)
     Parrot_io_printf(interp, "%Ss => [\n", segp->name);
-    PackFile_ConstTable_dump(interp, (const PackFile_ConstTable *)segp);
+    pf_const_dump(interp, (const PackFile_ConstTable *)segp);
     Parrot_io_printf(interp, "],\n");
 }
 
@@ -441,7 +441,7 @@ main(int argc, const char **argv)
     Parrot_pf_set_current_packfile(interp, pfpmc);
 
     if (convert) {
-        const size_t size = PackFile_pack_size(interp,
+        const size_t size = Parrot_pf_pack_size(interp,
                             interp->code->base.pf) * sizeof (opcode_t);
         opcode_t *pack = (opcode_t *)Parrot_gc_allocate_memory_chunk(interp,
                                         size);
@@ -452,7 +452,7 @@ main(int argc, const char **argv)
             exit(EXIT_FAILURE);
         }
 
-        PackFile_pack(interp, interp->code->base.pf, pack);
+        Parrot_pf_pack(interp, interp->code->base.pf, pack);
 
         if (STREQ(file, "-"))
             fp = stdout;

@@ -340,7 +340,7 @@ Create PackFile_Annotations* from self.
             }
 
             /* store entity */
-            PackFile_Annotations_add_entry(interp, res, entity_attrs->offset, name_id,
+            Parrot_pf_annotations_add_entry(interp, res, entity_attrs->offset, name_id,
                     entity_attrs->value_type, value_id);
 
         }

@@ -12,6 +12,8 @@ examples/compiler/japhc.c
 
 example compiler used by japh16.pasm
 
+Note that this example is broken and needs to be refactored to changed Parrot APIs.
+
 =head1 SYNOPSIS
 
 
@@ -146,7 +148,7 @@ add_const_str(PARROT_INTERP, PackFile_ConstTable *consts, char *str)
         consts->constants = mem_sys_realloc(consts->constants,
                 k * sizeof (PackFile_Constant *));
 
-    /* Allocate a new constant */
+    /* Allocate a new constant. FIXME! */
     consts->constants[--k] = PackFile_Constant_new(interp);
     consts->constants[k]->type = PFC_STRING;
     consts->constants[k]->u.string = Parrot_str_new_init(interp, buf,

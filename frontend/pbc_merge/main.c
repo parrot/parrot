@@ -534,7 +534,7 @@ pbc_merge_annotations(PARROT_INTERP, ARGMOD(pbc_merge_input **inputs),
                         exit(1);
                 }
 
-                PackFile_Annotations_add_entry(interp, merged,
+                Parrot_pf_annotations_add_entry(interp, merged,
                     old_offset + inputs[i]->code_start,
                     new_key,
                     in_ann->keys[j].type,
@@ -919,13 +919,13 @@ pbc_merge_write(PARROT_INTERP, ARGMOD(PackFile *pf), ARGIN(const char *filename)
     FILE     *fp;
 
     /* Get size of packfile we'll write. */
-    const size_t size = PackFile_pack_size(interp, pf) * sizeof (opcode_t);
+    const size_t size = Parrot_pf_pack_size(interp, pf) * sizeof (opcode_t);
 
     /* Allocate memory. */
     opcode_t * const pack = (opcode_t*) Parrot_gc_allocate_memory_chunk(interp, size);
 
     /* Write and clean up. */
-    PackFile_pack(interp, pf, pack);
+    Parrot_pf_pack(interp, pf, pack);
     if ((fp = fopen(filename, "wb")) == 0) {
         Parrot_io_eprintf(interp, "PBC Merge: Couldn't open %s\n", filename);
         exit(1);

@@ -695,6 +695,12 @@
     * C<free_runloop_jump_point> => C<Parrot_runloop_free_jump_point>,
     * C<parrot_split_path_ext> => C<Parrot_split_path_ext>,
     * C<print_pbc_location> => C<Parrot_print_pbc_location>
+
+    Deprecated:
+      PackFile_ConstTable_*
+    Removed:
+      PackFile_Annotations_*, PackFile_ConstTable_*, PackFile_funcs_register,
+      PackFile_Segment_*, PackFile_Constant_pack.
   tags:
     - api
     - deprecated

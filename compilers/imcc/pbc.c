@@ -1179,7 +1179,7 @@ add_const_str(ARGMOD(imc_info_t * imcc), ARGIN(STRING *s),
 {
     ASSERT_ARGS(add_const_str)
     PackFile_ConstTable * const ct = bc->const_table;
-    const int i = PackFile_ConstTable_rlookup_str(imcc->interp, ct, s);
+    const int i = Parrot_pf_ConstTable_rlookup_str(imcc->interp, ct, s);
 
     if (i >= 0)
         return i;
@@ -2283,7 +2283,7 @@ e_pbc_end_sub(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(IMC_Unit *unit
         IMCC_debug(imcc, DEBUG_PBC, "immediate sub '%s'", ins->symregs[0]->name);
         /* TODO: Don't use this function, it is deprecated (TT #2140). We need
            to find a better mechanism to do this. */
-        PackFile_fixup_subs(imcc->interp, PBC_IMMEDIATE, NULL);
+        Parrot_pf_fixup_subs(imcc->interp, PBC_IMMEDIATE, NULL);
 
         imcc->globals  = g;
         memmove(&imcc->ghash, &ghash, sizeof (SymHash));
@@ -2422,7 +2422,7 @@ e_pbc_emit(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(const IMC_Unit *u
         seg_size = (size_t)imcc->ins_line + ins_size + 1;
         imcc->debug_seg = Parrot_pf_new_debug_segment(imcc->interp, interp_code, seg_size);
 
-        Parrot_debug_add_mapping(imcc->interp, imcc->debug_seg, old_size, unit->file);
+        Parrot_pf_debug_add_mapping(imcc->interp, imcc->debug_seg, old_size, unit->file);
 
         /* if item is a PCC_SUB entry then store it constants */
         if (ins->symregs[0] && ins->symregs[0]->pcc_sub) {
@@ -2465,7 +2465,7 @@ e_pbc_emit(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(const IMC_Unit *u
           default:
             IMCC_fatal(imcc, 1, "e_pbc_emit:invalid type for annotation value\n");
         }
-        PackFile_Annotations_add_entry(imcc->interp, interp_code->annotations,
+        Parrot_pf_annotations_add_entry(imcc->interp, interp_code->annotations,
                     imcc->pc - interp_code->base.data,
                     ins->symregs[0]->color, annotation_type, ins->symregs[1]->color);
     }
