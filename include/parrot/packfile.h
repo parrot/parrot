@@ -1348,7 +1348,6 @@ void default_dump_header(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
         __attribute__nonnull__(2);
 
 void pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
-        __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pf);
 
@@ -1432,8 +1431,7 @@ const opcode_t * pf_segment_unpack(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_pf_register_standard_funcs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(pf))
+       PARROT_ASSERT_ARG(pf))
 #define ASSERT_ARGS_pf_segment_pack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \

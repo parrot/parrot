@@ -1148,7 +1148,7 @@ Registers a PackFile's functions; called from within C<Parrot_pf_new()>.
 */
 
 void
-pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
+pf_register_standard_funcs(SHIM_INTERP, ARGMOD(PackFile *pf))
 {
     ASSERT_ARGS(pf_register_standard_funcs)
 
