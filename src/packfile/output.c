@@ -270,7 +270,8 @@ Parrot_pf_ConstTable_pack_size(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
 =item C<size_t PackFile_ConstTable_pack_size(PARROT_INTERP, PackFile_Segment
 *seg)>
 
-Deprecated: Use C<Parrot_pf_ConstTable_pack_size> instead. Will not be exported anymore. See GH #1170
+Deprecated: Use C<Parrot_pf_ConstTable_pack_size> instead. Will not be exported
+anymore. See GH #1170
 
 =cut
 

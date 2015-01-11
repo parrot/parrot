@@ -419,7 +419,7 @@ Parrot_pf_map_segments(PARROT_INTERP, ARGIN(const PackFile_Directory *dir),
                        PackFile_map_segments_func_t callback,
                        ARGIN_NULLOK(void *user_data))
 {
-    ASSERT_ARGS(PackFile_map_segments)
+    ASSERT_ARGS(Parrot_pf_map_segments)
     size_t i;
 
     for (i = 0; i < dir->num_segments; ++i) {
@@ -806,6 +806,7 @@ PARROT_CANNOT_RETURN_NULL
 static PackFile_Segment *
 annotations_new(PARROT_INTERP)
 {
+    ASSERT_ARGS(annotations_new)
     /* Allocate annotations structure; create it all zeroed, and we will
      * allocate memory for each of the arrays on demand. */
     PackFile_Annotations * const seg = mem_gc_allocate_zeroed_typed(interp,
