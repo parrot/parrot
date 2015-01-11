@@ -2342,7 +2342,7 @@ Parrot_load_language(PARROT_INTERP, ARGIN_NULLOK(STRING *lang_name))
     /* Add the include and dynext paths to the global search */
 
     /* Get the base path of the located module */
-    parrot_split_path_ext(interp, path, &found_path, &found_ext);
+    Parrot_split_path_ext(interp, path, &found_path, &found_ext);
     name_length = Parrot_str_length(interp, lang_name);
     found_path = STRING_substr(interp, found_path, 0,
             Parrot_str_length(interp, found_path)-name_length);
@@ -2403,7 +2403,7 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_LIBRARY_ERROR,
             "\"load_bytecode\" no file name");
 
-    parrot_split_path_ext(interp, file_str, &wo_ext, &ext);
+    Parrot_split_path_ext(interp, file_str, &wo_ext, &ext);
 
     /* check if wo_ext is loaded */
     is_loaded_hash = VTABLE_get_pmc_keyed_int(interp,
@@ -2429,7 +2429,7 @@ Parrot_load_bytecode(PARROT_INTERP, ARGIN_NULLOK(Parrot_String file_str))
     /* remember wo_ext => full_path mapping */
     VTABLE_set_string_keyed_str(interp, is_loaded_hash, wo_ext, path);
 
-    parrot_split_path_ext(interp, path, &found_path, &found_ext);
+    Parrot_split_path_ext(interp, path, &found_path, &found_ext);
 
     /* Check if the file found was actually a bytecode file (.pbc
      * extension) or a source file (.pir or .pasm extension). */

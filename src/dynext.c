@@ -580,7 +580,7 @@ Parrot_dyn_clone_lib_into(ARGMOD(Interp *d), ARGMOD(Interp *s), ARGIN(PMC *lib_p
 
     if (STRING_equal(s, type, ops)) {
         /* we can't clone oplibs in the normal way, since they're actually
-         * shared between interpreters dynop_register modifies the (statically
+         * shared between interpreters Parrot_dynop_register modifies the (statically
          * allocated) op_lib_t structure from core_ops.c, for example.
          * Anyways, if we hope to share bytecode at runtime, we need to have
          * them have identical opcodes anyways.
@@ -667,7 +667,7 @@ Parrot_dyn_load_lib(PARROT_INTERP,
      * LOCK()
      */
     if (!STRING_IS_NULL(lib))
-        lib_name = parrot_split_path_ext(interp, lib, &wo_ext, &ext);
+        lib_name = Parrot_split_path_ext(interp, lib, &wo_ext, &ext);
     else {
         wo_ext   = CONST_STRING(interp, "");
         lib_name = STRINGNULL;

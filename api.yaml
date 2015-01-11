@@ -683,3 +683,20 @@
     - deprecated
   ticket:  'https://github.com/parrot/parrot/issues/1153'
 -
+-
+  name:  'Deprecated non Parrot_ exported functions'
+  note:
+    All remaining exported functions with non C<Parrot_>, C<PDB_>, C<imcc_>, and C<mem_>
+    prefixes got now C<Parrot_> prefixes, and the old functions are deprecated.
+
+    * C<PackFile_> => C<Parrot_pf_>,
+    * C<dynop_register> => C<Parrot_dynop_register>,
+    * C<new_runloop_jump_point> => C<Parrot_runloop_new_jump_point>,
+    * C<free_runloop_jump_point> => C<Parrot_runloop_free_jump_point>,
+    * C<parrot_split_path_ext> => C<Parrot_split_path_ext>,
+    * C<print_pbc_location> => C<Parrot_print_pbc_location>
+  tags:
+    - api
+    - deprecated
+  ticket:  'https://github.com/parrot/parrot/issues/1122'
+-

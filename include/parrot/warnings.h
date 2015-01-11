@@ -73,6 +73,7 @@ void Parrot_warn_experimental(PARROT_INTERP, ARGIN(const char *message))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 void print_pbc_location(PARROT_INTERP)
         __attribute__nonnull__(1);
 

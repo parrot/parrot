@@ -90,6 +90,21 @@ STRING* Parrot_locate_runtime_file_str(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
+STRING * Parrot_split_path_ext(PARROT_INTERP,
+    ARGIN(STRING *in),
+    ARGOUT(STRING **wo_ext),
+    ARGOUT(STRING **ext))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(*wo_ext)
+        FUNC_MODIFIES(*ext);
+
+PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
+PARROT_DEPRECATED
+PARROT_CANNOT_RETURN_NULL
 STRING * parrot_split_path_ext(PARROT_INTERP,
     ARGIN(STRING *in),
     ARGOUT(STRING **wo_ext),
@@ -126,6 +141,11 @@ void parrot_init_library_paths(PARROT_INTERP)
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(file))
+#define ASSERT_ARGS_Parrot_split_path_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(in) \
+    , PARROT_ASSERT_ARG(wo_ext) \
+    , PARROT_ASSERT_ARG(ext))
 #define ASSERT_ARGS_parrot_split_path_ext __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(in) \

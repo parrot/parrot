@@ -269,9 +269,9 @@ PDB_run_code(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
     UNUSED(argc)
     UNUSED(argv)
 
-    new_runloop_jump_point(interp);
+    Parrot_runloop_new_jump_point(interp);
     if (setjmp(interp->current_runloop->resume)) {
-        free_runloop_jump_point(interp);
+        Parrot_runloop_free_jump_point(interp);
         fprintf(stderr, "Caught exception\n");
         return;
     }
@@ -282,7 +282,7 @@ PDB_run_code(PARROT_INTERP, int argc, ARGIN(const char *argv[]))
         /*Parrot_runcode(interp, argc, argv);*/
         interp->pdb->state |= PDB_STOPPED;
     } while (! (interp->pdb->state & PDB_EXIT));
-    free_runloop_jump_point(interp);
+    Parrot_runloop_free_jump_point(interp);
 }
 
 

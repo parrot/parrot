@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2014, Parrot Foundation.
+Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -82,7 +82,7 @@ runops(PARROT_INTERP, size_t offs)
     if (!interp->current_runloop)
 #endif
     {
-        new_runloop_jump_point(interp);
+        Parrot_runloop_new_jump_point(interp);
         our_runloop_id = interp->current_runloop_id;
         our_runloop_level = interp->current_runloop_level;
   reenter:
@@ -91,7 +91,7 @@ runops(PARROT_INTERP, size_t offs)
           case PARROT_JMP_EXCEPTION_HANDLED:
             /* an exception was handled */
             if (STACKED_EXCEPTIONS)
-                free_runloop_jump_point(interp);
+                Parrot_runloop_free_jump_point(interp);
 
             interp->current_runloop_level = our_runloop_level - 1;
             interp->current_runloop_id    = old_runloop_id;
@@ -125,7 +125,7 @@ runops(PARROT_INTERP, size_t offs)
     interp->current_runloop->handler_start = NULL;
     /* Remove the current runloop marker (put it on the free list). */
     if (STACKED_EXCEPTIONS || interp->current_runloop)
-        free_runloop_jump_point(interp);
+        Parrot_runloop_free_jump_point(interp);
 
 #if RUNLOOP_TRACE
     fprintf(stderr, "[exiting loop %d, level %d]\n",
@@ -160,7 +160,7 @@ reset_runloop_id_counter(PARROT_INTERP)
 
 =over 4
 
-=item C<void new_runloop_jump_point(PARROT_INTERP)>
+=item C<void Parrot_runloop_new_jump_point(PARROT_INTERP)>
 
 Create a new runloop jump point, either by allocating it or by
 getting one from the free list.
@@ -171,9 +171,9 @@ getting one from the free list.
 
 PARROT_EXPORT
 void
-new_runloop_jump_point(PARROT_INTERP)
+Parrot_runloop_new_jump_point(PARROT_INTERP)
 {
-    ASSERT_ARGS(new_runloop_jump_point)
+    ASSERT_ARGS(Parrot_runloop_new_jump_point)
     Parrot_runloop *jump_point;
 
     if (interp->runloop_jmp_free_list) {
@@ -192,7 +192,7 @@ new_runloop_jump_point(PARROT_INTERP)
 
 /*
 
-=item C<void free_runloop_jump_point(PARROT_INTERP)>
+=item C<void Parrot_runloop_free_jump_point(PARROT_INTERP)>
 
 Place runloop jump point back on the free list.
 
@@ -202,9 +202,9 @@ Place runloop jump point back on the free list.
 
 PARROT_EXPORT
 void
-free_runloop_jump_point(PARROT_INTERP)
+Parrot_runloop_free_jump_point(PARROT_INTERP)
 {
-    ASSERT_ARGS(free_runloop_jump_point)
+    ASSERT_ARGS(Parrot_runloop_free_jump_point)
     Parrot_runloop * const jump_point = interp->current_runloop;
     Parrot_runloop * const current    = jump_point->prev;
     interp->current_runloop           = current;
@@ -212,6 +212,44 @@ free_runloop_jump_point(PARROT_INTERP)
     interp->runloop_jmp_free_list     = jump_point;
     interp->current_runloop_id        = current ? current->id : 0;
     --interp->current_runloop_level;
+}
+
+/*
+
+=item C<void new_runloop_jump_point(PARROT_INTERP)>
+
+This name is deprecated, use C<Parrot_runloop_new_jump_point> instead.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_DEPRECATED
+void
+new_runloop_jump_point(PARROT_INTERP)
+{
+    ASSERT_ARGS(new_runloop_jump_point)
+    Parrot_runloop_new_jump_point(interp);
+}
+
+/*
+
+=item C<void free_runloop_jump_point(PARROT_INTERP)>
+
+This name is deprecated, use C<Parrot_runloop_free_jump_point> instead.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_DEPRECATED
+void
+free_runloop_jump_point(PARROT_INTERP)
+{
+    ASSERT_ARGS(free_runloop_jump_point)
+    Parrot_runloop_free_jump_point(interp);
 }
 
 /*
@@ -248,7 +286,7 @@ free_runloops_until(PARROT_INTERP, int id)
 {
     ASSERT_ARGS(free_runloops_until)
     while (interp->current_runloop && interp->current_runloop_id != id)
-        free_runloop_jump_point(interp);
+        Parrot_runloop_free_jump_point(interp);
 }
 
 /*

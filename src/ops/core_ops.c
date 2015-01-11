@@ -25020,7 +25020,7 @@ Parrot_lib_core_ops_load(PARROT_INTERP)
 {
     PMC *const lib = Parrot_pmc_new(interp, enum_class_ParrotLibrary);
     ((Parrot_ParrotLibrary_attributes*)PMC_data(lib))->oplib_init = (void *) PARROT_CORE_OPLIB_INIT;
-    dynop_register(interp, lib);
+    Parrot_dynop_register(interp, lib);
     return lib;
 }
 

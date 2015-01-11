@@ -123,11 +123,21 @@ PMC * Parrot_pcc_new_call_object(PARROT_INTERP)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 void free_runloop_jump_point(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 void new_runloop_jump_point(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+void Parrot_runloop_free_jump_point(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
+void Parrot_runloop_new_jump_point(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 void destroy_runloop_jump_points(PARROT_INTERP)
@@ -142,6 +152,11 @@ void runops(PARROT_INTERP, size_t offs)
 #define ASSERT_ARGS_free_runloop_jump_point __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_new_runloop_jump_point __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_runloop_free_jump_point \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_runloop_new_jump_point __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_destroy_runloop_jump_points __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))

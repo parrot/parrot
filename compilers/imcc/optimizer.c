@@ -933,12 +933,12 @@ eval_ins(ARGMOD(imc_info_t *imcc), ARGIN(const char *op), size_t ops,
     }
 
     /* eval the opcode */
-    new_runloop_jump_point(imcc->interp);
+    Parrot_runloop_new_jump_point(imcc->interp);
     if (setjmp(imcc->interp->current_runloop->resume))
         return -1;
 
     pc = (OP_INFO_OPFUNC(op_info)) (eval, imcc->interp);
-    free_runloop_jump_point(imcc->interp);
+    Parrot_runloop_free_jump_point(imcc->interp);
     /* the returned pc is either incremented by op_count or is eval,
      * as the branch offset is 0 - return true if it branched
      */

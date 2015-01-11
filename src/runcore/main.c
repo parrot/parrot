@@ -279,7 +279,7 @@ Parrot_runcore_destroy(PARROT_INTERP)
 
 =over 4
 
-=item C<void dynop_register(PARROT_INTERP, PMC *lib_pmc)>
+=item C<void Parrot_dynop_register(PARROT_INTERP, PMC *lib_pmc)>
 
 Register a dynamic oplib.
 
@@ -289,9 +289,9 @@ Register a dynamic oplib.
 
 PARROT_EXPORT
 void
-dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
+Parrot_dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
 {
-    ASSERT_ARGS(dynop_register)
+    ASSERT_ARGS(Parrot_dynop_register)
     op_lib_t     *lib;
     oplib_init_f  init_func;
 
@@ -316,6 +316,24 @@ dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
     parrot_hash_oplib(interp, lib);
 }
 
+/*
+
+=item C<void dynop_register(PARROT_INTERP, PMC *lib_pmc)>
+
+This function is deprecated, use C<Parrot_dynop_register> instead.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_DEPRECATED
+void
+dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
+{
+    ASSERT_ARGS(dynop_register)
+    Parrot_dynop_register(interp, lib_pmc);
+}
 
 /*
 

@@ -39,11 +39,14 @@ static INTVAL print_warning(PARROT_INTERP, ARGIN_NULLOK(STRING *msg))
 
 Prints the bytecode location of the warning or error to C<Parrot_io_STDERR>.
 
+This function is deprecated, use C<Parrot_print_pbc_location> instead
+
 =cut
 
 */
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 void
 print_pbc_location(PARROT_INTERP)
 {
