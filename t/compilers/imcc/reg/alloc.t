@@ -1,12 +1,12 @@
 #!perl
-# Copyright (C) 2005-2014, Parrot Foundation.
+# Copyright (C) 2005-2015, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 10;
+use Parrot::Test tests => 11;
 
 pir_output_is( <<'CODE', <<'OUT', "alligator" );
 # if the side-effect of set_label/continuation isn't
@@ -141,6 +141,23 @@ pasm_output_is( <<'CODE', <<'OUT', "Explicit large register: P, PASM" );
   end
 CODE
 ok
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', "Wrong regs_used[S], afl crash 3 - GH #1168" );
+# src/call/context.c:713: failed assertion 'get_regs_used(interp, ctx, REGNO_STR) > idx'
+
+.sub main :main
+    $P1 = newclass "Foo11"
+    $P2 = new "Foo11"
+    $S1 = $P2
+    eq $S1, 'stringy thingy', ok
+  ok:
+.end
+.namespace [ "Foo11" ]
+.sub 'get_string' :vtable
+    end # <== this is the inserted statement, leading to the wrong n_regs_used[S]
+.end
+CODE
 OUT
 
 # Local Variables:
