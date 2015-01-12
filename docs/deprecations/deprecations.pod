@@ -43,7 +43,7 @@ are already marked as deprecated and will be removed.
     free_runloop_jump_point       => Parrot_runloop_free_jump_point
     parrot_split_path_ext         => Parrot_split_path_ext
     print_pbc_location            => Parrot_print_pbc_location
-    clone_interpreter             => Parrot_interp_clone (??)
+    clone_interpreter             => Parrot_interp_clone
 
 C<PackFile_> functions are renamed to C<Parrot_pf_>.
 
