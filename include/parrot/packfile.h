@@ -1070,6 +1070,45 @@ size_t PackFile_pack_size(PARROT_INTERP, ARGMOD(PackFile *self))
         FUNC_MODIFIES(*self);
 
 PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+opcode_t * Parrot_pf_ConstTable_pack(PARROT_INTERP,
+    ARGMOD(PackFile_Segment *seg),
+    ARGOUT(opcode_t *cursor))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        FUNC_MODIFIES(*seg)
+        FUNC_MODIFIES(*cursor);
+
+PARROT_EXPORT
+size_t Parrot_pf_ConstTable_pack_size(PARROT_INTERP,
+    ARGMOD(PackFile_Segment *seg))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*seg);
+
+PARROT_EXPORT
+int Parrot_pf_ConstTable_rlookup_num(PARROT_INTERP,
+    ARGIN(const PackFile_ConstTable *ct),
+    FLOATVAL n)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+int Parrot_pf_ConstTable_rlookup_pmc(PARROT_INTERP,
+    ARGIN(PackFile_ConstTable *ct),
+    ARGIN(PMC *v),
+    ARGOUT(INTVAL *constno),
+    ARGOUT(INTVAL *idx))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3)
+        __attribute__nonnull__(4)
+        __attribute__nonnull__(5)
+        FUNC_MODIFIES(*constno)
+        FUNC_MODIFIES(*idx);
+
+PARROT_EXPORT
 int Parrot_pf_ConstTable_rlookup_str(PARROT_INTERP,
     ARGIN(const PackFile_ConstTable *ct),
     ARGIN(STRING *s))
@@ -1092,41 +1131,6 @@ size_t Parrot_pf_pack_size(PARROT_INTERP, ARGMOD(PackFile *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*self);
-
-PARROT_WARN_UNUSED_RESULT
-PARROT_CANNOT_RETURN_NULL
-opcode_t * Parrot_pf_ConstTable_pack(PARROT_INTERP,
-    ARGMOD(PackFile_Segment *seg),
-    ARGOUT(opcode_t *cursor))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*seg)
-        FUNC_MODIFIES(*cursor);
-
-size_t Parrot_pf_ConstTable_pack_size(PARROT_INTERP,
-    ARGMOD(PackFile_Segment *seg))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        FUNC_MODIFIES(*seg);
-
-int Parrot_pf_ConstTable_rlookup_num(PARROT_INTERP,
-    ARGIN(const PackFile_ConstTable *ct),
-    FLOATVAL n)
-        __attribute__nonnull__(2);
-
-int Parrot_pf_ConstTable_rlookup_pmc(PARROT_INTERP,
-    ARGIN(PackFile_ConstTable *ct),
-    ARGIN(PMC *v),
-    ARGOUT(INTVAL *constno),
-    ARGOUT(INTVAL *idx))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        __attribute__nonnull__(4)
-        __attribute__nonnull__(5)
-        FUNC_MODIFIES(*constno)
-        FUNC_MODIFIES(*idx);
 
 #define ASSERT_ARGS_PackFile_ConstTable_pack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -1157,18 +1161,6 @@ int Parrot_pf_ConstTable_rlookup_pmc(PARROT_INTERP,
 #define ASSERT_ARGS_PackFile_pack_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
-#define ASSERT_ARGS_Parrot_pf_ConstTable_rlookup_str \
-     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(ct) \
-    , PARROT_ASSERT_ARG(s))
-#define ASSERT_ARGS_Parrot_pf_pack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self) \
-    , PARROT_ASSERT_ARG(cursor))
-#define ASSERT_ARGS_Parrot_pf_pack_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_Parrot_pf_ConstTable_pack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(seg) \
@@ -1187,6 +1179,18 @@ int Parrot_pf_ConstTable_rlookup_pmc(PARROT_INTERP,
     , PARROT_ASSERT_ARG(v) \
     , PARROT_ASSERT_ARG(constno) \
     , PARROT_ASSERT_ARG(idx))
+#define ASSERT_ARGS_Parrot_pf_ConstTable_rlookup_str \
+     __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(ct) \
+    , PARROT_ASSERT_ARG(s))
+#define ASSERT_ARGS_Parrot_pf_pack __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self) \
+    , PARROT_ASSERT_ARG(cursor))
+#define ASSERT_ARGS_Parrot_pf_pack_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/packfile/output.c */
 

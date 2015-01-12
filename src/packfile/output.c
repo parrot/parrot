@@ -9,6 +9,8 @@ src/packfile/output.c - Functions for writing out packfiles
 
 This file implements various functions for creating and writing packfiles.
 
+The C<PackFile_> functions are deprecated and will be removed with Release 7.3.0
+
 =head2 Functions
 
 =over 4
@@ -86,7 +88,7 @@ Parrot_pf_pack_size(PARROT_INTERP, ARGMOD(PackFile *self))
 
 =item C<size_t PackFile_pack_size(PARROT_INTERP, PackFile *self)>
 
-Deprecated: Use C<Parrot_pf_pack_size> instead. See GH #1170
+Deprecated: Use C<Parrot_pf_pack_size> instead. GH #1170
 
 =cut
 
@@ -181,7 +183,7 @@ Parrot_pf_pack(PARROT_INTERP, ARGMOD(PackFile *self), ARGOUT(opcode_t *cursor))
 
 =item C<void PackFile_pack(PARROT_INTERP, PackFile *self, opcode_t *cursor)>
 
-Deprecated: Use C<Parrot_pf_pack> instead. GH #1170.
+Deprecated: Use C<Parrot_pf_pack> instead. GH #1170
 
 =cut
 
@@ -238,6 +240,7 @@ constant table into a contiguous region of memory.
 
 */
 
+PARROT_EXPORT
 size_t
 Parrot_pf_ConstTable_pack_size(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
 {
@@ -271,7 +274,7 @@ Parrot_pf_ConstTable_pack_size(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
 *seg)>
 
 Deprecated: Use C<Parrot_pf_ConstTable_pack_size> instead. Will not be exported
-anymore. See GH #1170
+anymore. GH #1170
 
 =cut
 
@@ -303,6 +306,7 @@ C<Parrot_pf_ConstTable_pack()>
 
 */
 
+PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 opcode_t *
@@ -347,7 +351,7 @@ Parrot_pf_ConstTable_pack(PARROT_INTERP,
 =item C<opcode_t * PackFile_ConstTable_pack(PARROT_INTERP, PackFile_Segment
 *seg, opcode_t *cursor)>
 
-Deprecated: Use C<Parrot_pf_ConstTable_pack> instead. Will not be exported anymore. See GH #1170
+Deprecated: Use C<Parrot_pf_ConstTable_pack> instead. GH #1170
 
 =cut
 
@@ -367,45 +371,31 @@ PackFile_ConstTable_pack(PARROT_INTERP,
 
 /*
 
-=item C<int Parrot_pf_ConstTable_rlookup_num(PARROT_INTERP, const
-PackFile_ConstTable *ct, FLOATVAL n)>
-
 =item C<int Parrot_pf_ConstTable_rlookup_str(PARROT_INTERP, const
 PackFile_ConstTable *ct, STRING *s)>
+
+=item C<int Parrot_pf_ConstTable_rlookup_num(PARROT_INTERP, const
+PackFile_ConstTable *ct, FLOATVAL n)>
 
 =item C<int Parrot_pf_ConstTable_rlookup_pmc(PARROT_INTERP, PackFile_ConstTable
 *ct, PMC *v, INTVAL *constno, INTVAL *idx)>
 
 Reverse lookup a constant in the constant table.
 
-=item C<int PackFile_ConstTable_rlookup_num(PARROT_INTERP, const
-PackFile_ConstTable *ct, FLOATVAL n)>
-
 =item C<int PackFile_ConstTable_rlookup_str(PARROT_INTERP, const
 PackFile_ConstTable *ct, STRING *s)>
+
+=item C<int PackFile_ConstTable_rlookup_num(PARROT_INTERP, const
+PackFile_ConstTable *ct, FLOATVAL n)>
 
 =item C<int PackFile_ConstTable_rlookup_pmc(PARROT_INTERP, PackFile_ConstTable
 *ct, PMC *v, INTVAL *constno, INTVAL *idx)>
 
-Deprecated. GH #1170
+Deprecated: Use C<Parrot_pf_ConstTable_rlookup_*> instead. GH #1170
 
 =cut
 
 */
-
-int
-Parrot_pf_ConstTable_rlookup_num(SHIM_INTERP, ARGIN(const PackFile_ConstTable *ct), FLOATVAL n)
-{
-    ASSERT_ARGS(Parrot_pf_ConstTable_rlookup_num)
-    int i;
-
-    for (i = 0; i < ct->num.const_count; i++) {
-        if (ct->num.constants[i] == n)
-            return i;
-    }
-    /* not found */
-    return -1;
-}
 
 PARROT_EXPORT
 int
@@ -435,6 +425,22 @@ Parrot_pf_ConstTable_rlookup_str(PARROT_INTERP,
     return -1;
 }
 
+PARROT_EXPORT
+int
+Parrot_pf_ConstTable_rlookup_num(SHIM_INTERP, ARGIN(const PackFile_ConstTable *ct), FLOATVAL n)
+{
+    ASSERT_ARGS(Parrot_pf_ConstTable_rlookup_num)
+    int i;
+
+    for (i = 0; i < ct->num.const_count; i++) {
+        if (ct->num.constants[i] == n)
+            return i;
+    }
+    /* not found */
+    return -1;
+}
+
+PARROT_EXPORT
 int
 Parrot_pf_ConstTable_rlookup_pmc(PARROT_INTERP,
         ARGIN(PackFile_ConstTable *ct), ARGIN(PMC *v),

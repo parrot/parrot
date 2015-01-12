@@ -274,7 +274,7 @@ Parrot_pf_destroy(PARROT_INTERP, ARGMOD(PackFile *pf))
 
 =item C<void PackFile_destroy(PARROT_INTERP, PackFile *pf)>
 
-Deprecated. Use C<Parrot_pf_destroy> instead. TT #2140
+Deprecated. Use C<Parrot_pf_destroy> instead. GH #1170
 
 =cut
 
@@ -1221,7 +1221,7 @@ Returns size of unpacked opcodes if everything is okay, else zero (0).
 =item C<opcode_t PackFile_unpack(PARROT_INTERP, PackFile *self, const opcode_t
 *packed, size_t packed_size)>
 
-Deprecated: Use C<Parrot_pf_unpack> instead. See TT #2140
+Deprecated: Use C<Parrot_pf_unpack> instead. See GH #1170
 
 =cut
 
@@ -1440,7 +1440,7 @@ Parrot_pf_new(PARROT_INTERP, INTVAL is_mapped)
 
 =item C<PackFile * PackFile_new(PARROT_INTERP, INTVAL is_mapped)>
 
-Same as C<Parrot_pf_new>. Deprecated: Use C<Parrot_pf_new> instead. See TT #2140
+Deprecated: Use C<Parrot_pf_new> instead. See GH #1170
 
 =cut
 
@@ -1666,7 +1666,7 @@ Parrot_pf_new_debug_segment(PARROT_INTERP, ARGMOD(PackFile_ByteCode *cs), size_t
 =item C<PackFile_Debug * Parrot_new_debug_seg(PARROT_INTERP, PackFile_ByteCode
 *cs, size_t size)>
 
-Deprecated: Use C<Parrot_pf_new_debug_segment> instead. TT #2140
+Deprecated: Use C<Parrot_pf_new_debug_segment> instead. GH #1170
 
 =cut
 
@@ -1776,7 +1776,7 @@ Parrot_pf_debug_add_mapping(PARROT_INTERP, ARGMOD(PackFile_Debug *debug),
 =item C<void Parrot_debug_add_mapping(PARROT_INTERP, PackFile_Debug *debug,
 opcode_t offset, STRING *filename)>
 
-Deprecated: Use C<Parrot_pf_debug_add_mapping> instead. TT #2140
+Deprecated: Use C<Parrot_pf_debug_add_mapping> instead. GH #1170
 
 =cut
 
@@ -1833,7 +1833,7 @@ Parrot_pf_debug_pc_to_filename(PARROT_INTERP, ARGIN(const PackFile_Debug *debug)
 =item C<STRING * Parrot_debug_pc_to_filename(PARROT_INTERP, const PackFile_Debug
 *debug, opcode_t pc)>
 
-Deprecated: Use C<Parrot_pf_debug_pc_to_filename> instead. TT #2140
+Deprecated: Use C<Parrot_pf_debug_pc_to_filename> instead. GH #1170
 
 =cut
 
@@ -1903,7 +1903,7 @@ Parrot_pf_switch_to_cs(PARROT_INTERP, ARGIN(PackFile_ByteCode *new_cs), int real
 =item C<PackFile_ByteCode * Parrot_switch_to_cs(PARROT_INTERP, PackFile_ByteCode
 *new_cs, int really)>
 
-Deprecated: Use C<Parrot_pf_switch_to_cs> instead. TT #2140
+Deprecated: Use C<Parrot_pf_switch_to_cs> instead. GH #1170
 
 =cut
 
@@ -2053,7 +2053,7 @@ Parrot_pf_annotations_add_entry(PARROT_INTERP, ARGMOD(PackFile_Annotations *self
 =item C<void PackFile_Annotations_add_entry(PARROT_INTERP, PackFile_Annotations
 *self, opcode_t offset, opcode_t key, opcode_t type, opcode_t value)>
 
-Deprecated: Use C<Parrot_pf_annotations_add_entry> instead. TT #2140
+Deprecated: Use C<Parrot_pf_annotations_add_entry> instead. GH #1170
 
 =cut
 
@@ -2288,7 +2288,7 @@ interpreter.
 
 Deprecated: This function should either be renamed to
 C<Parrot_pf_load_language>, or should not be exposed through this
-API. TT #2140
+API. GH #1170
 
 TODO: Refactor this function and try to reduce the size of it. It is too big.
 
@@ -2376,7 +2376,7 @@ Load a bytecode, PIR, or PASM file into the interpreter.
 
 Deprecated: This function should either be renamed to
 C<Parrot_pf_load_bytecode>, or should not be exposed through this
-API. TT #2140
+API. GH #1170
 
 TODO: We need to cleanup the way bytecode is loaded. This probably needs some
 major changes.
@@ -2509,7 +2509,7 @@ Parrot_pf_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, SHIM(PMC *eval))
 =item C<void PackFile_fixup_subs(PARROT_INTERP, pbc_action_enum_t what, PMC
 *eval)>
 
-Deprecated: Use <Parrot_pf_fixup_subs> instead. TT #2140.
+Deprecated: Use <Parrot_pf_fixup_subs> instead. GH #1170
 
 =cut
 

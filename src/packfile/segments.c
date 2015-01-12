@@ -214,13 +214,6 @@ static void make_code_pointers(ARGMOD(PackFile_Segment *seg))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*seg);
 
-static void PackFile_funcs_register(
-    ARGMOD(PackFile *pf),
-    UINTVAL type,
-    const PackFile_funcs funcs)
-        __attribute__nonnull__(1)
-        FUNC_MODIFIES(*pf);
-
 static void pf_debug_destroy(PARROT_INTERP, ARGMOD(PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -261,6 +254,13 @@ static const opcode_t * pf_debug_unpack(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*self);
+
+static void pf_register_funcs(
+    ARGMOD(PackFile *pf),
+    UINTVAL type,
+    const PackFile_funcs funcs)
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(*pf);
 
 static void segment_init(
     ARGOUT(PackFile_Segment *self),
@@ -363,8 +363,6 @@ static void sort_segs(ARGMOD(PackFile_Directory *dir))
     , PARROT_ASSERT_ARG(cursor))
 #define ASSERT_ARGS_make_code_pointers __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(seg))
-#define ASSERT_ARGS_PackFile_funcs_register __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(pf))
 #define ASSERT_ARGS_pf_debug_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self))
@@ -383,6 +381,8 @@ static void sort_segs(ARGMOD(PackFile_Directory *dir))
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(cursor))
+#define ASSERT_ARGS_pf_register_funcs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(pf))
 #define ASSERT_ARGS_segment_init __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(self) \
     , PARROT_ASSERT_ARG(pf) \
@@ -1003,7 +1003,7 @@ annotations_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *seg))
 
 /*
 
-=item C<static void PackFile_funcs_register(PackFile *pf, UINTVAL type, const
+=item C<static void pf_register_funcs(PackFile *pf, UINTVAL type, const
 PackFile_funcs funcs)>
 
 Registers the C<pack>/C<unpack>/... functions for a packfile type.
@@ -1013,10 +1013,10 @@ Registers the C<pack>/C<unpack>/... functions for a packfile type.
 */
 
 static void
-PackFile_funcs_register(ARGMOD(PackFile *pf), UINTVAL type,
+pf_register_funcs(ARGMOD(PackFile *pf), UINTVAL type,
                         const PackFile_funcs funcs)
 {
-    ASSERT_ARGS(PackFile_funcs_register)
+    ASSERT_ARGS(pf_register_funcs)
     pf->PackFuncs[type] = funcs;
 }
 
@@ -1206,12 +1206,12 @@ pf_register_standard_funcs(SHIM_INTERP, ARGMOD(PackFile *pf))
         annotations_dump
     };
 
-    PackFile_funcs_register(pf, PF_DIR_SEG,         dirf);
-    PackFile_funcs_register(pf, PF_UNKNOWN_SEG,     defaultf);
-    PackFile_funcs_register(pf, PF_CONST_SEG,       constf);
-    PackFile_funcs_register(pf, PF_BYTEC_SEG,       bytef);
-    PackFile_funcs_register(pf, PF_DEBUG_SEG,       debugf);
-    PackFile_funcs_register(pf, PF_ANNOTATIONS_SEG, annotationf);
+    pf_register_funcs(pf, PF_DIR_SEG,         dirf);
+    pf_register_funcs(pf, PF_UNKNOWN_SEG,     defaultf);
+    pf_register_funcs(pf, PF_CONST_SEG,       constf);
+    pf_register_funcs(pf, PF_BYTEC_SEG,       bytef);
+    pf_register_funcs(pf, PF_DEBUG_SEG,       debugf);
+    pf_register_funcs(pf, PF_ANNOTATIONS_SEG, annotationf);
 
     return;
 }
@@ -1221,7 +1221,7 @@ pf_register_standard_funcs(SHIM_INTERP, ARGMOD(PackFile *pf))
 
 =back
 
-=head2 Public PackFile Segment Methods
+=head2 PackFile Segment Methods
 
 =over 4
 
