@@ -1030,7 +1030,7 @@ Parrot_file_can_execute(PARROT_INTERP, ARGIN(STRING *path))
     STRING *wo_stem = NULL;
     STRING *ext     = NULL;
 
-    parrot_split_path_ext(interp, path, &wo_stem, &ext);
+    Parrot_split_path_ext(interp, path, &wo_stem, &ext);
     if (STRING_IS_NULL(ext) || Parrot_str_length(interp, ext) == 0)
         return 0;
     ext = Parrot_str_upcase(interp, ext);

@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2015, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -44,8 +44,7 @@ main(int argc, const char* argv[])
     int error_val;
 
     if (interp) {
-        print_pbc_location(interp);
-
+        Parrot_print_pbc_location(interp);
         Parrot_interp_destroy(interp);
     }
     return 0;

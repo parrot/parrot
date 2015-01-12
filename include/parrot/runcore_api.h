@@ -54,7 +54,13 @@ typedef enum Parrot_runcore_flags {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 void dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
+PARROT_EXPORT
+void Parrot_dynop_register(PARROT_INTERP, ARGIN(PMC *lib_pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -94,6 +100,9 @@ void runops_int(PARROT_INTERP, size_t offset)
         __attribute__nonnull__(1);
 
 #define ASSERT_ARGS_dynop_register __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(lib_pmc))
+#define ASSERT_ARGS_Parrot_dynop_register __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(lib_pmc))
 #define ASSERT_ARGS_Parrot_runcore_disable_event_checking \

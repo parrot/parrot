@@ -218,7 +218,7 @@ The argument C<next> is currently ignored.
 
         /* switch code segment if needed */
         if (INTERP->code != PARROT_CONTINUATION(SELF)->seg)
-            Parrot_switch_to_cs(INTERP, PARROT_CONTINUATION(SELF)->seg, 1);
+            Parrot_pf_switch_to_cs(INTERP, PARROT_CONTINUATION(SELF)->seg, 1);
 
         return pc;
     }

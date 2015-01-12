@@ -1254,7 +1254,7 @@ Parrot_debugger_break(PARROT_INTERP, ARGIN(opcode_t * cur_opcode))
 
     if (!(interp->pdb->state & PDB_BREAK)) {
         TRACEDEB_MSG("Parrot_debugger_break - in BREAK state");
-        new_runloop_jump_point(interp);
+        Parrot_runloop_new_jump_point(interp);
         if (setjmp(interp->current_runloop->resume)) {
             fprintf(stderr, "Unhandled exception in debugger\n");
             return;
@@ -1491,7 +1491,7 @@ PDB_next(PARROT_INTERP, ARGIN_NULLOK(const char *command))
 
     debugee     = pdb->debugee;
 
-    new_runloop_jump_point(debugee);
+    Parrot_runloop_new_jump_point(debugee);
     if (setjmp(debugee->current_runloop->resume)) {
         Parrot_io_eprintf(pdb->debugger, "Unhandled exception while tracing\n");
         pdb->state |= PDB_STOPPED;
@@ -1536,7 +1536,7 @@ PDB_trace(PARROT_INTERP, ARGIN_NULLOK(const char *command))
     debugee     = pdb->debugee;
 
     /* execute n ops */
-    new_runloop_jump_point(debugee);
+    Parrot_runloop_new_jump_point(debugee);
     if (setjmp(debugee->current_runloop->resume)) {
         Parrot_io_eprintf(pdb->debugger, "Unhandled exception while tracing\n");
         pdb->state |= PDB_STOPPED;
@@ -3687,7 +3687,7 @@ PDB_get_continuation_backtrace(PARROT_INTERP, ARGIN(PMC *ctx))
             const PackFile_ByteCode * const seg = PARROT_SUB(sub)->seg;
             VTABLE_push_string(interp, output, info_str);
             if (seg->annotations) {
-                PMC * const annot = PackFile_Annotations_lookup(interp, seg->annotations,
+                PMC * const annot = Parrot_pf_annotations_lookup(interp, seg->annotations,
                         Parrot_pcc_get_pc(interp, ctx) - seg->base.data,
                         NULL);
 

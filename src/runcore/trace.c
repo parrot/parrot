@@ -602,7 +602,7 @@ trace_op_dump(PARROT_INTERP,
 done:
 
     if (interp->code->annotations) {
-        PMC * const annot = PackFile_Annotations_lookup(interp,
+        PMC * const annot = Parrot_pf_annotations_lookup(interp,
                 interp->code->annotations, pc - code_start + 1, NULL);
 
         if (!PMC_IS_NULL(annot)) {

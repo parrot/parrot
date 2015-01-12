@@ -150,7 +150,7 @@ Creates PackFile for given directory.
 
             pfseg->pf   = pf;
             pfseg->name = name;
-            PackFile_add_segment(INTERP, pfdir, pfseg);
+            Parrot_pf_add_segment(INTERP, pfdir, pfseg);
         }
 
         return pf;

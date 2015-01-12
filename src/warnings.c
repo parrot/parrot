@@ -35,7 +35,7 @@ static INTVAL print_warning(PARROT_INTERP, ARGIN_NULLOK(STRING *msg))
 
 /*
 
-=item C<void print_pbc_location(PARROT_INTERP)>
+=item C<void Parrot_print_pbc_location(PARROT_INTERP)>
 
 Prints the bytecode location of the warning or error to C<Parrot_io_STDERR>.
 
@@ -45,14 +45,33 @@ Prints the bytecode location of the warning or error to C<Parrot_io_STDERR>.
 
 PARROT_EXPORT
 void
-print_pbc_location(PARROT_INTERP)
+Parrot_print_pbc_location(PARROT_INTERP)
 {
-    ASSERT_ARGS(print_pbc_location)
+    ASSERT_ARGS(Parrot_print_pbc_location)
     Interp * const tracer = (interp->pdb && interp->pdb->debugger) ?
         interp->pdb->debugger :
         interp;
     Parrot_io_eprintf(tracer, "%Ss\n",
             Parrot_sub_Context_infostr(interp, CURRENT_CONTEXT(interp), 1));
+}
+
+/*
+
+=item C<void print_pbc_location(PARROT_INTERP)>
+
+This function is deprecated, use C<Parrot_print_pbc_location> instead
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_DEPRECATED
+void
+print_pbc_location(PARROT_INTERP)
+{
+    ASSERT_ARGS(print_pbc_location)
+    Parrot_print_pbc_location(interp);
 }
 
 /*
@@ -78,7 +97,7 @@ print_warning(PARROT_INTERP, ARGIN_NULLOK(STRING *msg))
         if (STRING_ord(interp, msg, -1) != '\n')
             Parrot_io_eprintf(interp, "%c", '\n');
     }
-    print_pbc_location(interp);
+    Parrot_print_pbc_location(interp);
     return 1;
 }
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2014, Parrot Foundation.
+Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -116,7 +116,7 @@ const_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *segp))
 {
     ASSERT_ARGS(const_dump)
     Parrot_io_printf(interp, "%Ss => [\n", segp->name);
-    PackFile_ConstTable_dump(interp, (const PackFile_ConstTable *)segp);
+    pf_const_dump(interp, (const PackFile_ConstTable *)segp);
     Parrot_io_printf(interp, "],\n");
 }
 
@@ -204,7 +204,7 @@ nums_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
     ASSERT_ARGS(nums_dump)
     const STRING           *debug_name = Parrot_str_concat(interp, self->name,
             Parrot_str_new_constant(interp, "_DB"));
-    const PackFile_Segment *debug      = PackFile_find_segment(interp,
+    const PackFile_Segment *debug      = Parrot_pf_find_segment(interp,
                                             self->dir, debug_name, 1);
 
     opcode_t   * pc            = self->data;
@@ -441,7 +441,7 @@ main(int argc, const char **argv)
     Parrot_pf_set_current_packfile(interp, pfpmc);
 
     if (convert) {
-        const size_t size = PackFile_pack_size(interp,
+        const size_t size = Parrot_pf_pack_size(interp,
                             interp->code->base.pf) * sizeof (opcode_t);
         opcode_t *pack = (opcode_t *)Parrot_gc_allocate_memory_chunk(interp,
                                         size);
@@ -452,7 +452,7 @@ main(int argc, const char **argv)
             exit(EXIT_FAILURE);
         }
 
-        PackFile_pack(interp, interp->code->base.pf, pack);
+        Parrot_pf_pack(interp, interp->code->base.pf, pack);
 
         if (STREQ(file, "-"))
             fp = stdout;
@@ -496,7 +496,7 @@ main(int argc, const char **argv)
     }
 
     /* do a directory dump, which dumps segs then */
-    PackFile_Segment_dump(interp, &pf->directory.base);
+    Parrot_pf_dump_segment(interp, &pf->directory.base);
 
     Parrot_x_exit(interp, 0);
 }

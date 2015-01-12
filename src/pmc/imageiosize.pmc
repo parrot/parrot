@@ -228,7 +228,7 @@ Pushes the string C<*v> onto the end of the image.
         if (PObj_flag_TEST(private1, SELF)) {
             /* store a reference to constant table entry of string */
             const PackFile_ConstTable * const table = PARROT_IMAGEIOSIZE(SELF)->pf_ct;
-            const int idx = PackFile_ConstTable_rlookup_str(INTERP, table, v);
+            const int idx = Parrot_pf_ConstTable_rlookup_str(INTERP, table, v);
 
             if (idx >= 0) {
                 STATICSELF.push_integer(idx);
@@ -275,7 +275,7 @@ hasn't been seen yet, it is also pushed onto the todo list.
                                                     PARROT_IMAGEIOSIZE(SELF)->seen);
 
             if (PObj_flag_TEST(private1, SELF)
-            &&  PackFile_ConstTable_rlookup_pmc(INTERP, ct, v, &cno, &idx)) {
+            &&  Parrot_pf_ConstTable_rlookup_pmc(INTERP, ct, v, &cno, &idx)) {
                 SELF.push_integer(0);
                 SELF.push_integer(cno);
                 SELF.push_integer(idx);

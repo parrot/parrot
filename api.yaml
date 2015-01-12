@@ -683,3 +683,30 @@
     - deprecated
   ticket:  'https://github.com/parrot/parrot/issues/1153'
 -
+-
+  name:  'Deprecated non Parrot_ exported functions'
+  note:
+    All remaining exported functions with non C<Parrot_>, C<PDB_>, C<imcc_>, and C<mem_>
+    prefixes got now C<Parrot_> prefixes, and the old functions are deprecated.
+    Will be removed with Release 7.3.0.
+
+    * C<PackFile_> => C<Parrot_pf_>,
+    * C<clone_interpreter> => C<Parrot_interp_clone>,
+    * C<dynop_register> => C<Parrot_dynop_register>,
+    * C<new_runloop_jump_point> => C<Parrot_runloop_new_jump_point>,
+    * C<free_runloop_jump_point> => C<Parrot_runloop_free_jump_point>,
+    * C<parrot_split_path_ext> => C<Parrot_split_path_ext>,
+    * C<print_pbc_location> => C<Parrot_print_pbc_location>
+
+    Deprecated:
+      C<PackFile_funcs_register>, C<do_sub_pragmas>,
+      C<PackFile_Annotations_new>, C<PackFile_Annotations_destroy>, C<PackFile_Annotations_packed_size>,
+      C<PackFile_Annotations_pack>, C<PackFile_Annotations_unpack>, C<PackFile_Annotations_dump>
+      C<PackFile_ConstTable_unpack>,
+      C<PackFile_ConstTable_dump>, C<PackFile_ConstTable_dump_pmc>, C<PackFile_Constant_dump_str>
+
+  tags:
+    - api
+    - deprecated
+  ticket:  'https://github.com/parrot/parrot/issues/1122'
+-

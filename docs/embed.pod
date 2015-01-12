@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2014, Parrot Foundation.
+# Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -544,23 +544,21 @@ The list may also be augmented if additional functionality is required.
 
 =item C<mem_sys_realloc_zeroed>
 
-=item C<PackFile_Constant_pack>
+=item C<PackFile_ConstTable_pack> will be removed
 
-=item C<PackFile_ConstTable_pack>
+=item C<PackFile_ConstTable_pack_size> will be removed
 
-=item C<PackFile_ConstTable_pack_size>
+=item C<PackFile_destroy> renamed to C<Parrot_pf_new>
 
-=item C<PackFile_destroy>
+=item C<PackFile_fixup_subs> => C<Parrot_pf_fixup_subs>
 
-=item C<PackFile_fixup_subs>
-
-=item C<PackFile_new>
+=item C<PackFile_new> renamed to C<Parrot_pf_new>
 
 =item C<PackFile_new_dummy>
 
-=item C<PackFile_pack>
+=item C<PackFile_pack> renamed to C<Parrot_pf_pack>
 
-=item C<PackFile_pack_size>
+=item C<PackFile_pack_size> renamed to C<Parrot_pf_pack_size>
 
 =item C<Parrot_assert>
 

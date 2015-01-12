@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2014, Parrot Foundation.
+Copyright (C) 2010-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -415,7 +415,7 @@ Pushes the string C<*v> onto the end of the image.
             /* store a reference to constant table entry of string */
             PackFile_ConstTable * const table = PARROT_IMAGEIOFREEZE(SELF)->pf_ct;
             const int idx =
-                PackFile_ConstTable_rlookup_str(INTERP, table, v);
+                Parrot_pf_ConstTable_rlookup_str(INTERP, table, v);
 
             if (idx >= 0) {
                 STATICSELF.push_integer(idx);
@@ -468,7 +468,7 @@ hasn't been seen yet, it is also pushed onto the todo list.
             id = ++data->id;
 
             if (PObj_flag_TEST(private1, SELF)
-            &&  PackFile_ConstTable_rlookup_pmc(INTERP, table, v, &constno, &idx)) {
+            &&  Parrot_pf_ConstTable_rlookup_pmc(INTERP, table, v, &constno, &idx)) {
                 SELF.push_integer(PackID_new(id, enum_PackID_pbc_backref));
                 SELF.push_integer(constno);
                 SELF.push_integer(idx - 1);

@@ -9,6 +9,8 @@
         + Replace an end op inside pcc methods by a returncc op, #1168.
           This used to crash the last years, now it returns. It is now documented as
           unspecified behavior.
+        + Finish PackFile_ API deprecation and refactoring. No wrong exports anymore.
+          See api.yml. #1170 #1122
     - Build
         + More code cleanup to reduce compiler warnings, code size and unneeded calls.
         + Add ARGIN_FORMAT declarations, probe for gnu_printf, ms_printf, printf. #1163

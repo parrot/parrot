@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2014, Parrot Foundation.
+Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -55,7 +55,7 @@ print_sub_name(PARROT_INTERP, ARGIN_NULLOK(PMC *sub))
     Parrot_io_eprintf(tracer, "# Calling sub '%Ss'\n# ",
         Parrot_sub_full_sub_name(interp, sub));
 
-    print_pbc_location(interp);
+    Parrot_print_pbc_location(interp);
 }
 
 pmclass Sub auto_attrs provides invokable {
@@ -522,7 +522,7 @@ Invokes the subroutine.
 
         /* switch code segment if needed */
         if (INTERP->code != sub->seg)
-            Parrot_switch_to_cs(INTERP, sub->seg, 1);
+            Parrot_pf_switch_to_cs(INTERP, sub->seg, 1);
 
         return pc;
     }

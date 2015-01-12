@@ -866,7 +866,7 @@ Parrot_get_runtime_path(PARROT_INTERP)
 
 /*
 
-=item C<STRING * parrot_split_path_ext(PARROT_INTERP, STRING *in, STRING
+=item C<STRING * Parrot_split_path_ext(PARROT_INTERP, STRING *in, STRING
 **wo_ext, STRING **ext)>
 
 Split the pathstring C<in> into <path><filestem><ext>. Return the
@@ -881,10 +881,10 @@ PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CANNOT_RETURN_NULL
 STRING *
-parrot_split_path_ext(PARROT_INTERP, ARGIN(STRING *in),
+Parrot_split_path_ext(PARROT_INTERP, ARGIN(STRING *in),
         ARGOUT(STRING **wo_ext), ARGOUT(STRING **ext))
 {
-    ASSERT_ARGS(parrot_split_path_ext)
+    ASSERT_ARGS(Parrot_split_path_ext)
 
     /* This is a quick fix for TT #65
      * TODO: redo it with the string reimplementation
@@ -929,6 +929,30 @@ parrot_split_path_ext(PARROT_INTERP, ARGIN(STRING *in),
         *ext = STRINGNULL;
     }
     return stem;
+}
+
+
+/*
+
+=item C<STRING * parrot_split_path_ext(PARROT_INTERP, STRING *in, STRING
+**wo_ext, STRING **ext)>
+
+This is deprecated, use C<Parrot_split_path_ext> instead.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_IGNORABLE_RESULT
+PARROT_DEPRECATED
+PARROT_CANNOT_RETURN_NULL
+STRING *
+parrot_split_path_ext(PARROT_INTERP, ARGIN(STRING *in),
+        ARGOUT(STRING **wo_ext), ARGOUT(STRING **ext))
+{
+    ASSERT_ARGS(parrot_split_path_ext)
+    return Parrot_split_path_ext(interp, in, wo_ext, ext);
 }
 
 /*

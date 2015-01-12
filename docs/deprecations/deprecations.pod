@@ -1,4 +1,4 @@
-# Copyright (C) 2011-2013, Parrot Foundation.
+# Copyright (C) 2011-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -28,6 +28,56 @@ Notifications for the 2.6->2.9 transition and later will be complete.
 
 For instructions on how to deprecate Parrot code, please see:
  F<how_to_deprecate.pod>.
+
+=head2 Changes Between 7.0 and 7.3
+
+=over 4
+
+=item *
+
+All exported functions without the Parrot_, PDB_, imcc_, mem_ prefixes
+are already marked as deprecated and will be removed.
+
+    dynop_register                => Parrot_dynop_register
+    new_runloop_jump_point        => Parrot_runloop_new_jump_point
+    free_runloop_jump_point       => Parrot_runloop_free_jump_point
+    parrot_split_path_ext         => Parrot_split_path_ext
+    print_pbc_location            => Parrot_print_pbc_location
+    clone_interpreter             => Parrot_interp_clone
+
+C<PackFile_> functions are renamed to C<Parrot_pf_>.
+
+    Parrot_switch_to_cs           => Parrot_pf_switch_to_cs
+    Parrot_fixup_subs             => Parrot_pf_fixup_subs
+    PackFile_new                  => Parrot_pf_new
+    PackFile_destroy              => Parrot_pf_destroy
+    PackFile_pack                 => Parrot_pf_pack
+    PackFile_pack_size            => Parrot_pf_pack_size
+    Parrot_new_debug_seg          => Parrot_pf_new_debug_segment
+    Parrot_debug_add_mapping      => Parrot_pf_debug_add_mapping
+    Parrot_debug_pc_to_filename   => Parrot_pf_debug_pc_to_filename
+
+    PackFile_Annotations_add_entry => Parrot_pf_annotations_add_entry
+    PackFile_Annotations_lookup   => Parrot_pf_annotations_lookup
+    PackFile_ConstTable_rlookup_* => Parrot_pf_ConstTable_rlookup_*
+    PackFile_ConstTable_pack*     => Parrot_pf_ConstTable_pack*
+
+    PackFile_Segment_new_seg      => Parrot_pf_new_segment
+    PackFile_Segment_destroy      => Parrot_pf_destroy_segment
+    PackFile_Segment_dump         => Parrot_pf_dump_segment
+    PackFile_add_segment          => Parrot_pf_add_segment
+    PackFile_find_segment         => Parrot_pf_find_segment
+    PackFile_map_segments         => Parrot_pf_map_segments
+
+All other deprecated C<PackFile_> functions will be removed from the API:
+
+PackFile_funcs_register, do_sub_pragmas,
+PackFile_Annotations_new, PackFile_Annotations_destroy, PackFile_Annotations_packed_size,
+PackFile_Annotations_pack, PackFile_Annotations_unpack, PackFile_Annotations_dump
+PackFile_ConstTable_unpack,
+PackFile_ConstTable_dump, PackFile_ConstTable_dump_pmc, PackFile_Constant_dump_str
+
+=back
 
 =head2 Changes Between 4.9 and 5.0
 

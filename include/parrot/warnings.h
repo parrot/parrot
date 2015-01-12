@@ -53,6 +53,10 @@ typedef enum {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
+void Parrot_print_pbc_location(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 INTVAL /*@alt void@*/
 Parrot_warn(PARROT_INTERP,
@@ -73,9 +77,12 @@ void Parrot_warn_experimental(PARROT_INTERP, ARGIN(const char *message))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+PARROT_DEPRECATED
 void print_pbc_location(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_Parrot_print_pbc_location __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_warn __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(message))

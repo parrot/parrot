@@ -171,7 +171,7 @@ Parrot_sub_context_get_info(PARROT_INTERP, ARGIN(PMC *ctx),
             if (n >= offs) {
                 /* set source line and file */
                 info->line = debug->base.data[i];
-                info->file = Parrot_debug_pc_to_filename(interp, debug, i);
+                info->file = Parrot_pf_debug_pc_to_filename(interp, debug, i);
                 break;
             }
             ADD_OP_VAR_PART(interp, sub->seg, pc, var_args);
@@ -267,7 +267,7 @@ Parrot_sub_get_filename_from_pc(PARROT_INTERP, ARGIN_NULLOK(PMC *subpmc),
     debug    = sub->seg->debugs;
     position = pc - sub->seg->base.data;
 
-    return Parrot_debug_pc_to_filename(interp, debug, position);
+    return Parrot_pf_debug_pc_to_filename(interp, debug, position);
 }
 
 /*

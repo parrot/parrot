@@ -116,7 +116,10 @@ print the filename for each match
 
         .local int argc
         argc = elements argv
-        .Unless(argc>1, { showhelp() }) # need rule and at least one file
+        .Unless(argc>1, { # need rule and at least one file
+                         showhelp()
+                         .return()
+         })
 
 	.local string rule
 	.local pmc p6rule_compile, matchsub

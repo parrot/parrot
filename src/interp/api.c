@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2014, Parrot Foundation.
+Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -362,6 +362,155 @@ Parrot_interp_initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *a
 #endif
 
     return interp;
+}
+
+/*
+
+=item C<PMC * Parrot_interp_clone(Parrot_Interp s, INTVAL flags)>
+
+Clones the interpreter as specified by the flags.
+
+TODO: Move this logic into src/interp/api.c or src/threads.c, as appropriate.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_interp_clone(PARROT_INTERP, INTVAL flags)
+{
+    /* have to pass a parent to allocate_interpreter to prevent PMCNULL from being set to NULL */
+    Parrot_Interp d = Parrot_interp_allocate_interpreter(interp, flags);
+    int stacktop;
+    Parrot_GC_Init_Args args;
+
+    PMC * interp_pmc;
+    PMC * const config_hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_CONFIG_HASH);
+
+    memset(&args, 0, sizeof (args));
+    args.stacktop = &stacktop;
+
+    /* Set up the memory allocation system */
+    Parrot_gc_initialize(d, &args);
+    Parrot_block_GC_mark(d);
+    Parrot_block_GC_sweep(d);
+
+    d->ctx             = PMCNULL;
+    d->resume_flag     = RESUME_INITIAL;
+    d->recursion_limit = RECURSION_LIMIT;
+
+    /* PANIC will fail until this is done */
+    d->piodata = NULL;
+    Parrot_io_init(d);
+
+    /*
+     * Set up the string subsystem
+     * This also generates the constant string tables
+     * Do this before unsetting parent_interpreter to copy its hash_seed and constant string table
+     */
+    Parrot_str_init(d);
+
+    /* create caches structure */
+    init_object_cache(d);
+
+    d->n_vtable_max = interp->n_vtable_max;
+    d->vtables      = interp->vtables;
+    d->class_hash   = Parrot_thread_create_proxy(interp, d, interp->class_hash);
+
+    Parrot_cx_init_scheduler(d);
+
+    d->parent_interpreter = NULL;
+
+    /* create the root set registry */
+    d->gc_registry = Parrot_pmc_new(d, enum_class_AddrRegistry);
+
+    interp_pmc  = Parrot_pmc_new_noinit(d, enum_class_ParrotInterpreter);
+    VTABLE_set_pointer(d, interp_pmc, d);
+
+    /* init the interpreter globals array */
+    d->iglobals = Parrot_pmc_new_init_int(d, enum_class_FixedPMCArray, (INTVAL)IGLOBALS_SIZE);
+
+    VTABLE_set_pmc_keyed_int(d, d->iglobals, (INTVAL) IGLOBALS_INTERPRETER, interp_pmc);
+
+    /* initialize built-in runcores */
+    Parrot_runcore_init(d);
+
+    /* create a proxy for the config_hash */
+    VTABLE_set_pmc_keyed_int(d, d->iglobals, (INTVAL) IGLOBALS_CONFIG_HASH,
+        Parrot_thread_create_proxy(interp, d, config_hash));
+
+    /* can't copy directly, unless you want double-frees */
+    if (flags & PARROT_CLONE_RUNOPS)
+        Parrot_runcore_switch(d, interp->run_core->name);
+
+    if (flags & PARROT_CLONE_INTERP_FLAGS) {
+        /* XXX setting of IS_THREAD? */
+        d->flags       = interp->flags;
+        d->debug_flags = interp->debug_flags;
+    }
+
+    d->root_namespace = Parrot_thread_create_proxy(interp, d, interp->root_namespace);
+
+    if (flags & PARROT_CLONE_HLL) {
+        /* we'd like to share the HLL data. Give it a PMC_sync structure
+           if it doesn't have one already */
+
+        /* This used to be proxied:
+
+            d->HLL_info = Parrot_thread_create_proxy(s, d, s->HLL_info);
+
+            But src/hll.c:Parrot_hll_get_HLL_type() pokes directly into the
+            PMC attributes which is a problem if we're using a Proxy. Instead,
+            clone the structure so direct accesses continue working.
+        */
+        d->HLL_info = VTABLE_clone(d, interp->HLL_info);
+        d->HLL_namespace = Parrot_thread_create_proxy(interp, d, interp->HLL_namespace);
+        d->HLL_entries   = Parrot_thread_create_proxy(interp, d, interp->HLL_entries);
+    }
+
+    if (flags & (PARROT_CLONE_LIBRARIES | PARROT_CLONE_CLASSES)) {
+    }
+
+    if (flags & PARROT_CLONE_LIBRARIES) {
+        PMC * const pbc_libs = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_PBC_LIBS);
+        VTABLE_set_pmc_keyed_int(d, d->iglobals, (INTVAL) IGLOBALS_PBC_LIBS,
+            Parrot_thread_create_proxy(interp, d, pbc_libs));
+    }
+
+    create_initial_context(d);
+
+    if (flags & PARROT_CLONE_CODE)
+        Parrot_clone_code(d, interp);
+
+    /* setup stdio PMCs */
+    Parrot_io_init(d);
+
+    Parrot_unblock_GC_sweep(d);
+    Parrot_unblock_GC_mark(d);
+
+    return interp_pmc;
+}
+
+/*
+
+=item C<PMC * clone_interp(PARROT_INTERP, INTVAL flags)>
+
+Deprecated: Use C<Parrot_interp_clone> instead. GH #1122
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_DEPRECATED
+PARROT_CANNOT_RETURN_NULL
+PMC *
+clone_interp(PARROT_INTERP, INTVAL flags)
+{
+    ASSERT_ARGS(clone_interp)
+    return Parrot_interp_clone(interp, flags);
 }
 
 /*

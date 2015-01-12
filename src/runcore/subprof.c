@@ -455,7 +455,7 @@ createlines(PARROT_INTERP, ARGIN(subprofiledata *spdata), ARGIN(subprofile *sp))
             /* set srcfile and srcline */
             sp->srcline = anndata[ANN_ENTRY_VAL];
             /* + 1 needed because Annotations_lookup looks up the annotation _before_ the pc */
-            srcfilepmc = PackFile_Annotations_lookup(interp,
+            srcfilepmc = Parrot_pf_annotations_lookup(interp,
                                                      ann,
                                                      anndata[ANN_ENTRY_OFF] + 1,
                                                      Parrot_str_new_constant(interp, "file"));

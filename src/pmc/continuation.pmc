@@ -297,7 +297,7 @@ destination to continue execution.
 
         /* switch segment */
         if (INTERP->code != seg)
-            Parrot_switch_to_cs(INTERP, seg, 1);
+            Parrot_pf_switch_to_cs(INTERP, seg, 1);
 
         return pc;
     }

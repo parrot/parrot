@@ -364,6 +364,12 @@ typedef PMC *(*Parrot_compiler_func_t)(PARROT_INTERP,
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
+PARROT_DEPRECATED
+PARROT_CANNOT_RETURN_NULL
+PMC * clone_interp(PARROT_INTERP, INTVAL flags)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
 Parrot_Interp Parrot_interp_allocate_interpreter(
@@ -381,6 +387,10 @@ void Parrot_interp_clear_flag(PARROT_INTERP, INTVAL flag)
 PARROT_EXPORT
 void Parrot_interp_clear_trace(PARROT_INTERP, UINTVAL flag)
         __attribute__nonnull__(1);
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PMC * Parrot_interp_clone(Parrot_Interp s, INTVAL flags);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -543,6 +553,8 @@ Interp* Parrot_interp_get_emergency_interpreter(void);
 void Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, void *arg)
         __attribute__nonnull__(1);
 
+#define ASSERT_ARGS_clone_interp __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_interp_allocate_interpreter \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_interp_clear_debug __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -551,6 +563,7 @@ void Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, void *arg)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_interp_clear_trace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_interp_clone __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_interp_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(compiler) \
@@ -686,10 +699,6 @@ void Parrot_run_callback(PARROT_INTERP,
     , PARROT_ASSERT_ARG(external_data))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/interp/inter_cb.c */
-
-/* parrotinterpreter.pmc */
-/* XXX Would be nice if this could live in some headerized grouping */
-PMC * clone_interpreter(Parrot_Interp self, INTVAL flags);
 
 #else /* !PARROT_IN_CORE */
 

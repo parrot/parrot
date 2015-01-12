@@ -73,7 +73,7 @@ PMC *
 Parrot_thread_create(PARROT_INTERP, SHIM(INTVAL type), INTVAL clone_flags)
 {
     ASSERT_ARGS(Parrot_thread_create)
-    PMC    * const new_interp_pmc = clone_interpreter(interp, clone_flags);
+    PMC    * const new_interp_pmc = Parrot_interp_clone(interp, clone_flags);
     Interp * const new_interp     = (Interp *)VTABLE_get_pointer(interp, new_interp_pmc);
 
     /* Parrot_pmc_new sets parent_interpreter which would confuse the GC */
@@ -441,7 +441,7 @@ Parrot_clone_code(Parrot_Interp d, Parrot_Interp s)
     Parrot_block_GC_mark(d);
     Interp_flags_SET(d, PARROT_EXTERN_CODE_FLAG);
     d->code = NULL;
-    Parrot_switch_to_cs(d, s->code, 1);
+    Parrot_pf_switch_to_cs(d, s->code, 1);
     Parrot_unblock_GC_mark(d);
 }
 
