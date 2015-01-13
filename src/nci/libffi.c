@@ -219,6 +219,7 @@ build_ffi_thunk(PARROT_INTERP, SHIM(PMC *user_data), ARGIN(PMC *sig))
     ASSERT_ARGS(build_ffi_thunk)
     ffi_thunk_t *thunk_data = mem_gc_allocate_zeroed_typed(interp, ffi_thunk_t);
     PMC         *thunk      = init_thunk_pmc(interp, thunk_data);
+    ffi_status  ffi_err;
 
     STRING *pcc_ret_sig, *pcc_params_sig;
     Parrot_nci_sig_to_pcc(interp, sig, &pcc_params_sig, &pcc_ret_sig);
@@ -236,10 +237,10 @@ build_ffi_thunk(PARROT_INTERP, SHIM(PMC *user_data), ARGIN(PMC *sig))
         for (i = 3; i < argc; i++)
             arg_t[i] = &ffi_type_pointer; /* INSP pointer */
 
-        if (ffi_prep_cif(&thunk_data->pcc_arg_cif, FFI_DEFAULT_ABI, argc, &ffi_type_void, arg_t) !=
-            FFI_OK)
-            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_JIT_ERROR,
-                "invalid ffi signature");
+        ffi_err = ffi_prep_cif(&thunk_data->pcc_arg_cif, FFI_DEFAULT_ABI, argc, &ffi_type_void, arg_t);
+        if (ffi_err != FFI_OK)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
+                "Invalid ffi signature. libffi error code: %d", ffi_err);
     }
 
     /* generate target function dynamic call infrastructure */
@@ -254,10 +255,10 @@ build_ffi_thunk(PARROT_INTERP, SHIM(PMC *user_data), ARGIN(PMC *sig))
         for (i = 0; i < argc; i++)
             arg_t[i] = nci_to_ffi_type(interp,
                             (PARROT_DATA_TYPE)VTABLE_get_integer_keyed_int(interp, sig, i + 1));
-
-        if (ffi_prep_cif(&thunk_data->cif, FFI_DEFAULT_ABI, argc, ret_t, arg_t) != FFI_OK)
-            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_JIT_ERROR,
-                "invalid ffi signature");
+        ffi_err = ffi_prep_cif(&thunk_data->cif, FFI_DEFAULT_ABI, argc, ret_t, arg_t);
+        if (ffi_err != FFI_OK)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
+                "Invalid ffi signature. libffi error code: %d", ffi_err);
     }
 
     /* generate Parrot_pcc_build_call_from_c_args dynamic call infrastructure */
@@ -272,7 +273,8 @@ build_ffi_thunk(PARROT_INTERP, SHIM(PMC *user_data), ARGIN(PMC *sig))
         ret_t[2] = &ffi_type_pointer; /* pcc signature */
 
         for (i = 3; i < retc; i++) {
-            switch ((char)Parrot_str_indexed(interp, pcc_ret_sig, i - 3)) {
+            char c = (char)Parrot_str_indexed(interp, pcc_ret_sig, i - 3);
+            switch (c) {
               case 'I':
                 ret_t[i] = &ffi_type_parrot_intval;
                 break;
@@ -284,15 +286,16 @@ build_ffi_thunk(PARROT_INTERP, SHIM(PMC *user_data), ARGIN(PMC *sig))
                 ret_t[i] = &ffi_type_pointer;
                 break;
               default:
-                Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_JIT_ERROR,
-                    "invalid pcc signature");
+                Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
+                                            "Invalid pcc signature code: '%c'", c);
             }
         }
 
-        if (FFI_OK != ffi_prep_cif(&thunk_data->pcc_ret_cif, FFI_DEFAULT_ABI,
-                                    retc, &ffi_type_pointer, ret_t))
-            Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_JIT_ERROR,
-                "invalid ffi signature");
+        ffi_err = ffi_prep_cif(&thunk_data->pcc_ret_cif, FFI_DEFAULT_ABI,
+                               retc, &ffi_type_pointer, ret_t);
+        if (ffi_err != FFI_OK)
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
+                "Invalid ffi signature. libffi error code: %d", ffi_err);
     }
 
     return thunk;
@@ -539,14 +542,24 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
                 case 'P':
                     pcc_arg_ptr[i] = &pcc_arg[i].p;
                     break;
+                case 'v':
+                  if (i == 0 && 1 == pcc_argc) {
+                    call_arg[i + 3] = &pcc_arg_ptr[i];
+                    goto break_loop;
+                  }
+                  else {
+                      Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_JIT_ERROR,
+                          "Invalid pcc signature code: 'v'. v must be the only nci signature type");
+                  }
                 default:
-                    PARROT_ASSERT(!"Invalid PCC signature");
-                    break;
+                  Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
+                      "Invalid pcc signature code: '%c'", pcc_sig[i]);
+                  break;
             }
-
             call_arg[i + 3] = &pcc_arg_ptr[i];
         }
 
+      break_loop:
         ffi_call(&thunk->pcc_arg_cif, FFI_FN(Parrot_pcc_fill_params_from_c_args),
                 &ffi_ret_dummy, call_arg);
 
@@ -637,7 +650,7 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
                 break;
 #endif
               case enum_type_pint:
-                nci_val[i].i32 = VTABLE_get_integer(interp, pcc_arg[i].p);
+                nci_val[i].i32 = (int)VTABLE_get_integer(interp, pcc_arg[i].p);
                 nci_arg_ptr[i] = &nci_val[i].i32;
                 break;
               case enum_type_pshort:

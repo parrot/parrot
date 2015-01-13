@@ -173,8 +173,10 @@ ncidt_to_pcc(PARROT_INTERP, PARROT_DATA_TYPE t)
       case enum_type_ptr:
       case enum_type_PMC:
       case enum_type_struct_ptr:
-      case enum_type_void:
         return 'P';
+
+      case enum_type_void:
+        return 'v';
 
       default:
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_KEY_NOT_FOUND,
