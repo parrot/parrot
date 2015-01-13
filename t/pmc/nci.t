@@ -2712,7 +2712,7 @@ Triple: 6
 Sum: 12
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "conversion S <-> P" );
+pir_output_is( << 'CODE', << 'OUTPUT', "nci_tt - conversion S <-> P" );
 .sub test :main
     .local string library_name
     library_name = 'libnci_test'
@@ -2730,7 +2730,7 @@ CODE
 ok worked
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "conversion I <-> P" );
+pir_output_is( << 'CODE', << 'OUTPUT', "nci_i4i - conversion I <-> P" );
 .sub test :main
     .local string library_name
     library_name = 'libnci_test'
@@ -2774,12 +2774,12 @@ pir_output_is( << 'CODE', << 'OUTPUT', "nci_tt - as_string and ByteBuffer" );
     libnci_test = loadlib  library_name
 
     .local pmc nci_tt
-    nci_tt = dlfunc libnci_test, "nci_tt", "tt"
+    nci_tt = dlfunc libnci_test, "nci_tt", "pp"
     .local string s, r
     .local pmc arg, result
-    # Note: the nci_tt function does not need a zero terminated string,
-    # just uses the two first characters.
-    s = "AB"
+    # Note: the nci_tt function does not need a zero terminated string here,
+    # It just uses the two first characters.
+    s = "AB\0"
     arg = new ["ByteBuffer"]
     arg = s
     result = nci_tt(arg)
