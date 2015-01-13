@@ -518,7 +518,7 @@ OUTPUT
     nci_dlvar_int = dlvar libnci_test, "nci_dlvar_int"
 
     .local pmc nci_pv
-    nci_pv = dlfunc libnci_test, "nci_pv", "pv"
+    nci_pv = dlfunc libnci_test, "nci_pv", "p"
     $P0 = nci_pv()
     unless nci_dlvar_int goto NOT_LOADED
     say "nci_dlvar_int is a ptr"
