@@ -966,12 +966,12 @@ This method is called automatically when this module is loaded.
     .local int surface_type
 
     load_bytecode "examples/sdl/minesweeper/eventhandler.pir"
-    load_bytecode "library/SDL/Button.pir"
-    load_bytecode "library/SDL/StopWatch.pir"
-    load_bytecode "library/SDL/Image.pir"
+    load_bytecode "SDL/Button.pir"
+    load_bytecode "SDL/StopWatch.pir"
+    load_bytecode "SDL/Image.pir"
 
     # XXX: remove
-    load_bytecode "library/Data/Dumper.pir"
+    load_bytecode "Data/Dumper.pir"
 
     $P0 = new 'String'
     $P0 = "examples/sdl/minesweeper/mines.png"

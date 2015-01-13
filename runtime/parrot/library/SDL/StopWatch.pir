@@ -113,6 +113,7 @@ Starts the stopwatch.
     .local pmc total
     .local pmc precision
     .local pmc start
+    .local pmc addWatch
 
     # read the attributes
     total     = getattribute self, 'time'
@@ -124,9 +125,9 @@ Starts the stopwatch.
     total = 0
     time $N0
     start = $N0
-    # find_global opcodes no longer accept arrays
-    $P0 = find_global ['SDL'; 'StopWatch'; 'Timer'], "addWatch"
-    $P0( self )
+
+    addWatch = get_root_global ['SDL'; 'StopWatch'; 'Timer'], "addWatch"
+    addWatch( self )
 END:
 .end
 
@@ -140,6 +141,7 @@ Stops the stopwatch.
     .local pmc total
     .local pmc precision
     .local pmc start
+    .local pmc removeWatch
 
     # read the attributes
     total     = getattribute self, 'time'
@@ -161,8 +163,8 @@ Stops the stopwatch.
     total = $N0
     start = 0
 
-    #$P0   = find_global ['SDL'; 'StopWatch'; 'Timer'], "removeWatch"
-    $P0( self )
+    removeWatch = get_root_global ['SDL'; 'StopWatch'; 'Timer'], "removeWatch"
+    removeWatch( self )
 END:
 .end
 
@@ -242,11 +244,11 @@ It is drawn onto the screen consigned to the constructor.
 
     self = $S0
 
-    .local pmc screen
+    .local pmc screen, draw
     screen = getattribute self, 'screen'
-    #$P0    = find_global ['SDL'; 'LCD'], "draw"
+    draw   = get_root_global ['SDL'; 'LCD'], "draw"
 
-    $P0( screen )
+    draw( screen )
 .end
 
 .namespace ['SDL'; 'StopWatch'; 'Timer']
@@ -257,7 +259,7 @@ It is drawn onto the screen consigned to the constructor.
     store_global ['SDL'; 'StopWatch'; 'Timer'], "array", $P0
 
     $P0 = new 'FixedPMCArray'
-    #$P1 = find_global ['SDL'; 'StopWatch'; 'Timer'], "tick"
+    #$P1 = get_root_global ['SDL'; 'StopWatch'; 'Timer'], "tick"
     $P0 = 8
     $P0[0] = .PARROT_TIMER_NSEC
     $P0[1] = 0.1
@@ -276,8 +278,8 @@ It is drawn onto the screen consigned to the constructor.
     .local pmc timer
     .local pmc array
 
-    #timer = find_global ['SDL'; 'StopWatch'; 'Timer'], "timer"
-    #array = find_global ['SDL'; 'StopWatch'; 'Timer'], "array"
+    timer = get_root_global ['SDL'; 'StopWatch'; 'Timer'], "timer"
+    array = get_root_global ['SDL'; 'StopWatch'; 'Timer'], "array"
 
     $I0 = array
     if $I0 == 0 goto DISABLE
@@ -303,8 +305,8 @@ END:
     .local pmc timer
     .local pmc array
 
-    timer = find_global ['SDL'; 'StopWatch'; 'Timer'], "timer"
-    array = find_global ['SDL'; 'StopWatch'; 'Timer'], "array"
+    timer = get_root_global ['SDL'; 'StopWatch'; 'Timer'], "timer"
+    array = get_root_global ['SDL'; 'StopWatch'; 'Timer'], "array"
 
     push array, obj
     timer[.PARROT_TIMER_RUNNING] = 1
@@ -315,8 +317,8 @@ END:
     .local pmc timer
     .local pmc array
 
-    timer = find_global ['SDL'; 'StopWatch'; 'Timer'], "timer"
-    array = find_global ['SDL'; 'StopWatch'; 'Timer'], "array"
+    timer = get_root_global ['SDL'; 'StopWatch'; 'Timer'], "timer"
+    array = get_root_global ['SDL'; 'StopWatch'; 'Timer'], "array"
 
     # XXX: stops all watches ATM; just remove the timer from the array
     timer[.PARROT_TIMER_RUNNING] = 0
