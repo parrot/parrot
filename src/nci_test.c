@@ -693,16 +693,17 @@ Prints "ok" if C<PMC> is not null, prints "got null" otherwise.
 
 PARROT_DYNEXT_EXPORT
 void
-nci_vP(SHIM(void *pmc))
+nci_vP(void *pmc)
 {
     /* TODO:
      * Disable this test until someone figures a way to check for
      * PMCNULL without using libparrot.
     if (!PMC_IS_NULL(pmc))
+    */
+    if (pmc)
         puts("ok");
     else
-     */
-    puts("got null");
+        puts("got null");
 }
 
 

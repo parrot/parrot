@@ -1368,7 +1368,7 @@ CODE
 got null
 OUTPUT
 
-    pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_vP', todo => 'Disabled to avoid linkage problems, see src/nci_test.c' );
+    pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_vP' );
 .pcc_sub :main main:
   loadlib P1, "libnci_test"
   dlfunc P0, P1, "nci_vP", "vP"
@@ -1382,7 +1382,7 @@ OUTPUT
   end
 CODE
 ok
-got null
+ok
 OUTPUT
 
     pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_cb_C1 - PASM' );
