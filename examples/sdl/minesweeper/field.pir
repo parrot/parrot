@@ -960,6 +960,7 @@ This method is called automatically when this module is loaded.
     .local pmc size
     .local pmc size_rect
     .local pmc prop
+
     .local pmc from_rect
     .local pmc image
     .local int rect_type
