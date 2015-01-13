@@ -102,16 +102,10 @@ In fact, don't count on it sticking around.  It may not.  Then again, it might.
 default_locations:
     loadlib libsdl, 'libSDL'
     if libsdl goto OK
-
-    # second try
     loadlib libsdl, 'libSDL-1.2'
-    if libsdl goto OK_HINT1
-
-    # third try
+    if libsdl goto OK
     loadlib libsdl, 'libSDL-1.2.so.0'
-    if libsdl goto OK_HINT2
-
-    # cygwin
+    if libsdl goto OK
     loadlib libsdl, 'cygSDL-1-2-0'
     if libsdl goto OK
 
@@ -121,11 +115,6 @@ failed:
     $P0 = "libSDL not found!"
     throw $P0
     branch OK
-  OK_HINT1:
-    printerr "Hint: use -X or export SDLLIBPATH or create a link from libSDL-1.2.so to libSDL.so to disable the error messages.\n"
-    branch OK
-  OK_HINT2:
-    printerr "Hint: use -X or export SDLLIBPATH or create a link from libSDL-1.2.so.0 to libSDL_image.so to disable the error messages.\n"
   OK:
 
     .local string c_func_name
@@ -187,26 +176,17 @@ SDL::Image library anyway, which calls this for you.
 
     loadlib image_lib, 'libSDL_image'
     if image_lib goto OK
-
     loadlib image_lib, 'libSDL_image-1.2'
-    if image_lib goto OK_HINT1
-
+    if image_lib goto OK
     loadlib image_lib, 'libSDL_image-1.2.so.0'
-    if image_lib goto OK_HINT2
-
+    if image_lib goto OK
     loadlib image_lib, 'cygSDL_image-1-2-0'
     if image_lib goto OK
 
-    # failed to load libSDL
     $P0 = new 'Exception'
     $P0 = "libSDL_image not found!"
     throw $P0
     branch OK
-  OK_HINT1:
-    printerr "Hint: create a link from libSDL_image-1.2.so to libSDL_image.so to disable the error messages.\n"
-    branch OK
-  OK_HINT2:
-    printerr "Hint: create a link from libSDL_image-1.2.so.0 to libSDL_image.so to disable the error messages.\n"
   OK:
     dlfunc nci_sub, image_lib, 'IMG_Load', 'pt'
     set_hll_global ['SDL'; 'NCI'], 'IMG_Load', nci_sub
@@ -226,12 +206,12 @@ SDL::Font library anyway, which calls this for you.
     .local pmc ttf_lib
     loadlib ttf_lib, 'libSDL_ttf'
     if ttf_lib goto initialize
-    loadlib ttf_lib, 'cygSDL_ttf-2-0-0'
-# RNH this is not trapping a non-existent libSDL_ttf library
-    if ttf_lib goto initialize
     loadlib ttf_lib, 'libSDL_ttf-2.0'
     if ttf_lib goto initialize
     loadlib ttf_lib, 'libSDL_ttf-2.0.so.0'
+    if ttf_lib goto initialize
+    loadlib ttf_lib, 'cygSDL_ttf-2-0-0'
+    if ttf_lib goto initialize
     unless ttf_lib goto error
 
   initialize:
@@ -771,7 +751,7 @@ list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, Parrot Foundation.
+Copyright (C) 2004-2015, Parrot Foundation.
 
 =cut
 
