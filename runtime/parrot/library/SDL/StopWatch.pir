@@ -1,5 +1,4 @@
 
-
 =head1 NAME
 
 SDL::StopWatch - A stopwatch using SDL::LCD
@@ -73,10 +72,12 @@ The stopwatch will be drawn onto the specified screen.
     inc $I0
     $P0 = new 'Float'
     $P0 = 0
-    setattribute self, $I0, $P0
+    $S0 = $I0
+    setattribute self, $S0, $P0
 
     inc $I0
-    setattribute self, $I0, screen
+    $S0 = $I0
+    setattribute self, $S0, screen
 
     self.'_digits'( 10 )
     self = "000:00:00"
@@ -123,7 +124,7 @@ Starts the stopwatch.
     total = 0
     time $N0
     start = $N0
-
+    # find_global opcodes no longer accept arrays
     $P0 = find_global ['SDL'; 'StopWatch'; 'Timer'], "addWatch"
     $P0( self )
 END:
@@ -160,7 +161,7 @@ Stops the stopwatch.
     total = $N0
     start = 0
 
-    $P0   = find_global ['SDL'; 'StopWatch'; 'Timer'], "removeWatch"
+    #$P0   = find_global ['SDL'; 'StopWatch'; 'Timer'], "removeWatch"
     $P0( self )
 END:
 .end
@@ -243,7 +244,7 @@ It is drawn onto the screen consigned to the constructor.
 
     .local pmc screen
     screen = getattribute self, 'screen'
-    $P0    = find_global ['SDL'; 'LCD'], "draw"
+    #$P0    = find_global ['SDL'; 'LCD'], "draw"
 
     $P0( screen )
 .end
@@ -256,7 +257,7 @@ It is drawn onto the screen consigned to the constructor.
     store_global ['SDL'; 'StopWatch'; 'Timer'], "array", $P0
 
     $P0 = new 'FixedPMCArray'
-    $P1 = find_global ['SDL'; 'StopWatch'; 'Timer'], "tick"
+    #$P1 = find_global ['SDL'; 'StopWatch'; 'Timer'], "tick"
     $P0 = 8
     $P0[0] = .PARROT_TIMER_NSEC
     $P0[1] = 0.1
@@ -275,8 +276,8 @@ It is drawn onto the screen consigned to the constructor.
     .local pmc timer
     .local pmc array
 
-    timer = find_global ['SDL'; 'StopWatch'; 'Timer'], "timer"
-    array = find_global ['SDL'; 'StopWatch'; 'Timer'], "array"
+    #timer = find_global ['SDL'; 'StopWatch'; 'Timer'], "timer"
+    #array = find_global ['SDL'; 'StopWatch'; 'Timer'], "array"
 
     $I0 = array
     if $I0 == 0 goto DISABLE
@@ -331,7 +332,7 @@ Please send patches and suggestions to the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2004-2008, Parrot Foundation.
+Copyright (C) 2004-2015, Parrot Foundation.
 
 =cut
 
