@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2014, Parrot Foundation.
+# Copyright (C) 2001-2015, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -35,10 +35,11 @@ SKIP: {
     unless ($PConfig{HAS_EXTRA_NCI_THUNKS} || $PConfig{HAS_LIBFFI}) {
         plan skip_all => "Parrot built without libffi or extra NCI thunks";
     }
-    unless ( -e "runtime/parrot/dynext/libnci_test$PConfig{load_ext}" ) {
-        plan skip_all => "Please make libnci_test$PConfig{load_ext}";
+    my $load_ext = $PConfig{load_ext};
+    unless ( -e "runtime/parrot/dynext/libnci_test$load_ext" ) {
+        plan skip_all => "Please make libnci_test$load_ext";
     }
-    plan tests => 61;
+    plan tests => 69;
 
     pir_output_is( << 'CODE', << 'OUTPUT', 'load library fails' );
 .sub test :main
@@ -412,9 +413,30 @@ libnci_test was successfully loaded
 333
 OUTPUT
 
+    pir_output_is( << 'CODE', << "OUTPUT", "nci_t - return a C-string" );
+.include "datatypes.pasm"
+.sub test :main
+    # load library
+    .local pmc libnci_test
+    libnci_test = loadlib "libnci_test"
+    unless libnci_test goto NOT_LOADED
+    print "libnci_test was successfully loaded\n"
+
+    # calling a function in libnci_test
+    .local pmc nci_t
+    dlfunc nci_t, libnci_test, "nci_t", "t"
+    .local string nci_t_out
+    ( nci_t_out ) = nci_t( )
+    print nci_t_out
+NOT_LOADED:
+.end
+CODE
+libnci_test was successfully loaded
+This is a C-string.
+OUTPUT
+
 SKIP:
     {
-
         skip( "nci_dlvar_int hangs on HP-UX", 1 ) if $^O eq 'hpux';
 
         pir_output_is( << 'CODE', << 'OUTPUT', "nci_v and nci_dlvar_int" );
@@ -676,6 +698,37 @@ CODE
 loaded
 dlfunced
 ok 1
+OUTPUT
+
+    pir_output_is( <<'CODE', <<'OUTPUT', "nci_it" );
+
+.include "datatypes.pasm"
+.loadlib 'io_ops'
+
+.sub test :main
+  loadlib $P1, "libnci_test"
+  printerr "loaded\n"
+  .local pmc nci_it
+  nci_it = dlfunc $P1, "nci_it", "it"
+  printerr "dlfunced\n"
+  ( $I5 ) = nci_it( "ko" )
+  ne $I5, 2, nok_1
+  printerr "ok "
+  printerr $I5
+  printerr "\n"
+  end
+nok_1: printerr "nok 1\n"
+  printerr $I5
+  printerr "\n"
+  end
+nok_2: printerr "nok 2\n"
+.end
+
+CODE
+loaded
+dlfunced
+ok
+ok 2
 OUTPUT
 
     pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_dd - stress test' );
@@ -2577,6 +2630,142 @@ CODE
 1
 OUTPUT
 
+pasm_output_is( <<'CODE', <<'OUTPUT', "nci_i4i" );
+  loadlib P1, "libnci_test"
+  dlfunc P0, P1, "nci_i4i", "i4i"
+  new P5, ['Integer']
+  set P5, -6
+  set I5, -7
+  set_args "0,0", P5,I5
+  invokecc P0
+  get_results "0", I5
+  print I5
+  print "\n"
+  end
+CODE
+42
+OUTPUT
+
+pasm_output_is( <<'CODE', <<'OUTPUT', "nci_ii3" );
+.include "datatypes.pasm"
+  loadlib P1, "libnci_test"
+  dlfunc P0, P1, "nci_ii3", "ii3"
+  set I5, -6
+
+  new P5, ['Integer']
+  set P5, -7
+
+  set_args "0,0", I5,P5
+  invokecc P0
+  get_results "0", I5
+
+  print I5
+  print "\n"
+  print P5
+  print "\n"
+  end
+CODE
+42
+4711
+OUTPUT
+
+if (0) {
+    pasm_output_is( <<'CODE', <<'OUTPUT', "nci_tb" );
+  loadlib P1, "libnci_test"
+  dlfunc P0, P1, "nci_tb", "tb"
+  set S5, "ko\n"
+  set_args "0", S5
+  invokecc P0
+  get_results "0", S5
+  print S5
+  end
+CODE
+ok worked
+OUTPUT
+}
+
+pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_i33 - out parameters and return values' );
+  .include "datatypes.pasm"
+  new P2, ['Integer']
+  set P2, 3
+  new P3, ['Integer']
+  set P3, 2
+
+  loadlib P1, "libnci_test"
+  set_args "0,0", P2, P3
+  dlfunc P0, P1, "nci_i33", "i33"
+  invokecc P0
+  get_results "0", I5
+
+  print "Double: "
+  print P2
+  print "\nTriple: "
+  print P3
+  print "\nSum: "
+  print I5
+  print "\n"
+
+  end
+CODE
+Double: 6
+Triple: 6
+Sum: 12
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "conversion S <-> P" );
+.sub test :main
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib  library_name
+    .local pmc reverse
+    reverse = dlfunc libnci_test, "nci_tt", "tt"
+    .local pmc s, t
+    s = new ['String']
+    s = "ko"
+    t = reverse( s )
+    print t
+.end
+CODE
+ok worked
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "conversion I <-> P" );
+.sub test :main
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib  library_name
+    .local pmc mult
+    mult = dlfunc libnci_test, "nci_i4i", "i4i"
+    .local pmc i, j
+    i = new ['Integer']
+    i = 2
+    j = mult( 21, i )       # call signature is PI
+    say j
+.end
+CODE
+42
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "nci_ttt - t_tt parameter" );
+.sub test :main
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib  library_name
+
+    .local pmc nci_ttt
+    nci_ttt = dlfunc libnci_test, "nci_ttt", "ttt"
+
+    $S0 = nci_ttt("Hello", "Waldo")
+    say $S0
+.end
+CODE
+Waldo, Waldo, Hello
+Waldo, Waldo, Hello
+OUTPUT
+
 pir_output_is( << 'CODE', << 'OUTPUT', "nci_tt - as_string and ByteBuffer" );
 .sub test :main
     .local string library_name
@@ -2585,7 +2774,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "nci_tt - as_string and ByteBuffer" );
     libnci_test = loadlib  library_name
 
     .local pmc nci_tt
-    nci_tt = dlfunc libnci_test, "nci_tt", "pp"
+    nci_tt = dlfunc libnci_test, "nci_tt", "tt"
     .local string s, r
     .local pmc arg, result
     # Note: the nci_tt function does not need a zero terminated string,
