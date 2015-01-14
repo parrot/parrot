@@ -11,6 +11,8 @@
           unspecified behavior.
         + Finish PackFile_ API deprecation and refactoring. No wrong exports anymore.
           See api.yml. #1170 #1122
+        + Reenabled the following NCI signatures: t (cstring), 2 (Integer PMC -> short),
+          3 (-> int), 4 (-> long). SDL is now usable again. #436, #601, #605
     - Build
         + More code cleanup to reduce compiler warnings, code size and unneeded calls.
         + Add ARGIN_FORMAT declarations, probe for gnu_printf, ms_printf, printf. #1163

@@ -1512,7 +1512,7 @@ parse_signature_string(PARROT_INTERP, ARGIN(const char *signature),
                 default:
                     Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_INVALID_OPERATION,
-                        "invalid signature string element %c!", *x);
+                        "Invalid signature type '%c'", *x);
             }
 
         }
