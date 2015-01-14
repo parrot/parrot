@@ -381,13 +381,15 @@ PARROT_CANNOT_RETURN_NULL
 PMC *
 Parrot_interp_clone(PARROT_INTERP, INTVAL flags)
 {
+    ASSERT_ARGS(Parrot_interp_clone)
     /* have to pass a parent to allocate_interpreter to prevent PMCNULL from being set to NULL */
     Parrot_Interp d = Parrot_interp_allocate_interpreter(interp, flags);
     int stacktop;
     Parrot_GC_Init_Args args;
 
     PMC * interp_pmc;
-    PMC * const config_hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_CONFIG_HASH);
+    PMC * const config_hash = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
+                                                       IGLOBALS_CONFIG_HASH);
 
     memset(&args, 0, sizeof (args));
     args.stacktop = &stacktop;
@@ -474,7 +476,8 @@ Parrot_interp_clone(PARROT_INTERP, INTVAL flags)
     }
 
     if (flags & PARROT_CLONE_LIBRARIES) {
-        PMC * const pbc_libs = VTABLE_get_pmc_keyed_int(interp, interp->iglobals, IGLOBALS_PBC_LIBS);
+        PMC * const pbc_libs = VTABLE_get_pmc_keyed_int(interp, interp->iglobals,
+                                                        IGLOBALS_PBC_LIBS);
         VTABLE_set_pmc_keyed_int(d, d->iglobals, (INTVAL) IGLOBALS_PBC_LIBS,
             Parrot_thread_create_proxy(interp, d, pbc_libs));
     }
