@@ -1,4 +1,4 @@
-# Copyright (C) 2010-2012, Parrot Foundation.
+# Copyright (C) 2010-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -819,7 +819,7 @@ TEMPLATE
         $P0 = dlfunc $P0, "Parrot_dt_get_datatype_name", "SpI"
         $P1 = getinterp
         $S0 = $P0($P1, $I0)
-        $S0 = 'sprintf'("Unsupported type: `%s'", $S0)
+        $S0 = 'sprintf'("Unsupported nci signature type: `%s'", $S0)
         die $S0
     end_loop:
 
@@ -1039,6 +1039,15 @@ JSON
     $P1 = 'from_json'('{ "c_type": "Parrot_Int8", "sig_char": "I", "pcc_type": "INTVAL" }')
     table[.DATATYPE_INT64] = $P1
 
+    $P1 = 'from_json'('{ "c_type": "short *", "sig_char": "2", "pcc_type": "PMC *" }')
+    table[.DATATYPE_PSHORT] = $P1
+
+    $P1 = 'from_json'('{ "c_type": "int *",   "sig_char": "3", "pcc_type": "PMC *" }')
+    table[.DATATYPE_PINT] = $P1
+
+    $P1 = 'from_json'('{ "c_type": "long *",  "sig_char": "4", "pcc_type": "PMC *" }')
+    table[.DATATYPE_PLONG] = $P1
+
     $P1 = 'from_json'('{ "c_type": "float", "sig_char": "N", "pcc_type": "FLOATVAL" }')
     table[.DATATYPE_FLOAT] = $P1
 
@@ -1067,6 +1076,9 @@ JSON
 
     $P1 = 'from_json'('{ "c_type": "FLOATVAL", "pcc_type": "FLOATVAL", "sig_char": "N" }')
     table[.DATATYPE_FLOATVAL] = $P1
+
+    $P1 = 'from_json'('{ "c_type": "char *", "pcc_type": "STRING *", "sig_char": "t" }')
+    table[.DATATYPE_CSTR] = $P1
 
     # fixup table
     .local pmc table_iter

@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2010, Parrot Foundation.
+# Copyright (C) 2002-2015, Parrot Foundation.
 
 # Function signature declarations for Parrot Native Call Interface.
 # The first alphanumeric is the type of the return value,
@@ -6,29 +6,33 @@
 
 # Types
 
-# INT register stuff
+# INT register types
 # I - INTVAL
 # c - char
 # s - short
 # i - int
 # l - long
 
-# NUM register stuff
+# NUM register types
 # N - FLOATVAL
 # f - float
 # d - double
 
-# STR register stuff
+# STR register types
 # S - pointer to a STRING-register
+# t - pointer to a cstring
 
 # PMC register stuff
 # P - pointer to a PMC-register
 # p - data pointer from PMC (on store into a new UnManagedStruct PMC)
+# 2 - short pointer to a boxed Integer value
+# 3 - int pointer to a boxed Integer value
+# 4 - long pointer to a boxed Integer value
 
-# void stuff
+# void types
 # v - void
 
-# callback stuff
+# callback types
 # U - Single PMC parameter to pass into callback - user data
 
 # Signatures
@@ -277,6 +281,102 @@ i    pipii
 p    pS
 ptr  (ptr, int, ptr&, int&, ptr)
 int  (ptr, ptr, ptr,  int,  int, int, ptr, int)
+
+# ncurses
+# perl -alne'if (/dlfunc/) {print substr($F[4],1,1),"    ",substr($F[4],2,-1)}'  runtime/parrot/library/Curses.pir | sort -u > curses.nci
+c    
+i    
+i    4
+i    42p
+i    4i
+i    i
+i    ii
+i    ii4
+i    ii4i
+i    iiii
+i    iiilsp
+i    iil
+i    iili
+i    iip
+i    iit
+i    iiti
+i    ilsp
+i    iti
+i    l
+i    li
+i    lp
+i    lsp
+i    p
+i    p33
+i    p333
+i    p333333
+i    p4
+i    p42p
+i    p4i
+i    pb
+i    pi
+i    pii
+i    pii4
+i    pii4i
+i    piii
+i    piiiiii
+i    piiilsp
+i    piil
+i    piili
+i    piit
+i    piiti
+i    pilsp
+i    pit
+i    pl
+i    pli
+i    pll
+i    pllllllll
+i    plp
+i    plsp
+i    pp
+i    ppiiiiiiii
+i    psp
+i    pt
+i    pti
+i    s
+i    s22
+i    s222
+i    sp
+i    sss
+i    ssss
+i    t
+i    ti
+l    
+l    33l
+l    ii
+l    l4
+l    p
+l    p33l
+l    pi
+l    pii
+p    
+p    b
+p    ii
+p    iiii
+p    iiiiii
+p    p
+p    pii
+p    piiii
+p    t
+p    tpp
+s    i
+t    
+t    i
+t    ii
+t    pi
+t    t
+v    
+v    i
+v    illllllll
+v    l
+v    p
+v    pi
+v    pl
 
 # tools/dev/nci_thunk_gen.pir
 PMC    (ptr, STRING)
