@@ -1,13 +1,13 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
-src/platform/generic/socket.c - UNIX socket functions
+src/platform/generic/socket.c - POSIX and WIN32 socket functions
 
 =head1 DESCRIPTION
 
-This code implements UNIX socket functions for Parrot.
+This code implements POSIX and WIN32 socket functions for Parrot.
 
 =head2 Functions
 
@@ -302,6 +302,9 @@ Parrot_io_internal_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
     struct sockaddr_in *sa;
 
     Parrot_Sockaddr_attributes *sa_attrs;
+    UNUSED(protocol)
+    UNUSED(fam)
+    UNUSED(passive)
 
     sa       = (struct sockaddr_in *)Parrot_gc_allocate_memory_chunk(interp,
                                             addr_len);
@@ -431,9 +434,9 @@ Parrot_io_internal_getnameinfo(PARROT_INTERP, ARGIN(const void *addr), INTVAL le
     return Parrot_str_format_data(interp, "%s:%s", buf, portbuf);
 
 #else /* PARROT_HAS_IPV6 */
-
     const struct sockaddr_in *sa = (const struct sockaddr_in *)addr;
     char *buf = inet_ntoa(sa->sin_addr);
+    UNUSED(len)
 
     return Parrot_str_format_data(interp, "%s:%u", buf, ntohs(sa->sin_port));
 #endif /* PARROT_HAS_IPV6 */
