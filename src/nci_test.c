@@ -85,8 +85,8 @@ PARROT_DYNEXT_EXPORT int    nci_ii3(int, int *);
 PARROT_DYNEXT_EXPORT int    nci_ip(void *);
 PARROT_DYNEXT_EXPORT int    nci_isc(short, char);
 PARROT_DYNEXT_EXPORT int    nci_it(void *);
-PARROT_DYNEXT_EXPORT int    nci_i33(int *, int *);
-PARROT_DYNEXT_EXPORT int    nci_i4i(long *, int);
+PARROT_DYNEXT_EXPORT int    nci_i33(ARGMOD(int *), ARGMOD(int *));
+PARROT_DYNEXT_EXPORT int    nci_i4i(ARGMOD(long *), int);
 PARROT_DYNEXT_EXPORT long   nci_l(void);
 PARROT_DYNEXT_EXPORT int *  nci_p(void);
 PARROT_DYNEXT_EXPORT void * nci_pi(int);
@@ -97,16 +97,16 @@ PARROT_DYNEXT_EXPORT void * nci_pp(void *);
 PARROT_DYNEXT_EXPORT short  nci_s(void);
 PARROT_DYNEXT_EXPORT short  nci_ssc(short, char);
 PARROT_DYNEXT_EXPORT char * nci_t(void);
-PARROT_DYNEXT_EXPORT char * nci_tt(const char *);
-PARROT_DYNEXT_EXPORT char * nci_ttt(const char *, const char *);
+PARROT_DYNEXT_EXPORT char * nci_tt(ARGIN(const char *));
+PARROT_DYNEXT_EXPORT char * nci_ttt(ARGIN(const char *), ARGIN(const char *));
 PARROT_DYNEXT_EXPORT void   nci_v(void);
-PARROT_DYNEXT_EXPORT void   nci_vP(void *);
+PARROT_DYNEXT_EXPORT void   nci_vP(ARGIN(void *));
 PARROT_DYNEXT_EXPORT void   nci_vpii(ARGMOD(Outer *), int, int);
 PARROT_DYNEXT_EXPORT void   nci_vv(void);
 PARROT_DYNEXT_EXPORT void   nci_vp(ARGIN(const Opaque*));
 PARROT_DYNEXT_EXPORT void * nci_pv(void);
 PARROT_DYNEXT_EXPORT void   nci_vfff(float, float, float);
-PARROT_DYNEXT_EXPORT char * nci_cstring_cstring(const char *);
+PARROT_DYNEXT_EXPORT char * nci_cstring_cstring(ARGIN(const char *));
 
 /* Declarations for callback tests */
 
@@ -482,7 +482,7 @@ nci_i33(ARGMOD(int *double_me), ARGMOD(int *triple_me))
 
 /*
 
-=item C<PARROT_DYNEXT_EXPORT int nci_i4i(long * l, int i)>
+=item C<PARROT_DYNEXT_EXPORT int nci_i4i(long *l, int i)>
 
 Returns the product of C<*l> and C<i>, as an int.
 
@@ -715,7 +715,7 @@ Prints "ok" if C<PMC> is not null, prints "got null" otherwise.
 
 PARROT_DYNEXT_EXPORT
 void
-nci_vP(void *pmc)
+nci_vP(ARGIN(void *pmc))
 {
     /* TODO:
      * Disable this test until someone figures a way to check for
@@ -1030,7 +1030,7 @@ static char s[] = "xx worked\n";
 
 PARROT_DYNEXT_EXPORT
 char *
-nci_tt(const char *p)
+nci_tt(ARGIN(const char *p))
 {
     s[0] = p[1];
     s[1] = p[0];
@@ -1040,7 +1040,9 @@ nci_tt(const char *p)
 
 /*
 
-=item C<PARROT_DYNEXT_EXPORT char * nci_ttt(char *s1, char *s2)>
+=item C<PARROT_DYNEXT_EXPORT char * nci_ttt(const char *s1, const char *s2)>
+
+Returns a c string from two c strings.
 
 =cut
 
@@ -1048,7 +1050,7 @@ nci_tt(const char *p)
 
 PARROT_DYNEXT_EXPORT
 char *
-nci_ttt(const char *s1, const char *s2)
+nci_ttt(ARGIN(const char *s1), ARGIN(const char *s2))
 {
     char* s = (char*) malloc((2 * strlen(s2)) + strlen(s1) + 5);
     sprintf(s, "%s, %s, %s", s2, s2, s1);
@@ -1069,7 +1071,7 @@ return a pointer for the buffer.
 
 PARROT_DYNEXT_EXPORT
 char *
-nci_cstring_cstring(const char * src)
+nci_cstring_cstring(ARGIN(const char * src))
 {
     static char buffer[64];
     const int maxl = sizeof buffer - 1;

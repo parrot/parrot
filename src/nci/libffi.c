@@ -257,7 +257,8 @@ build_ffi_thunk(PARROT_INTERP, SHIM(PMC *user_data), ARGIN(PMC *sig))
         for (i = 3; i < argc; i++)
             arg_t[i] = &ffi_type_pointer; /* INSP pointer */
 
-        ffi_err = ffi_prep_cif(&thunk_data->pcc_arg_cif, FFI_DEFAULT_ABI, argc, &ffi_type_void, arg_t);
+        ffi_err = ffi_prep_cif(&thunk_data->pcc_arg_cif, FFI_DEFAULT_ABI, argc,
+                               &ffi_type_void, arg_t);
         if (ffi_err != FFI_OK)
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
                 "Invalid ffi signature. libffi error code: %d", ffi_err);
