@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2009, Parrot Foundation.
+# Copyright (C) 2004-2015, Parrot Foundation.
 
 .macro export_dl_func(lib, name, sig)
     .local pmc edlftmp
@@ -12,7 +12,15 @@
 loadlib $P1, 'libform'
 if $P1 goto has_lib
 loadlib $P1, 'cygform-8'
+if $P1 goto has_lib
+
+$P0 = new 'Exception'
+$P0 = "curses shared library 'libform' not found!"
+throw $P0
+branch has_lib
+
 has_lib:
+#export_dl_func($P1, 'new_field', 'piiiiii')
 dlfunc $P2, $P1, 'new_field', 'piiiiii'
 set_global 'new_field', $P2
 dlfunc $P2, $P1, 'dup_field', 'ppii'
@@ -73,7 +81,8 @@ dlfunc $P2, $P1, 'field_buffer', 'tpi'
 set_global 'field_buffer', $P2
 dlfunc $P2, $P1, 'field_opts', 'lp'
 set_global 'field_opts', $P2
-dlfunc $P2, $P1, 'new_form', 'pb'
+#dlfunc $P2, $P1, 'new_form', 'pb'
+dlfunc $P2, $P1, 'new_form', 'pt'
 set_global 'new_form', $P2
 dlfunc $P2, $P1, 'current_field', 'pp'
 set_global 'current_field', $P2
@@ -83,7 +92,8 @@ dlfunc $P2, $P1, 'form_sub', 'pp'
 set_global 'form_sub', $P2
 dlfunc $P2, $P1, 'free_form', 'ip'
 set_global 'free_form', $P2
-dlfunc $P2, $P1, 'set_form_fields', 'ipb'
+#dlfunc $P2, $P1, 'set_form_fields', 'ipb'
+dlfunc $P2, $P1, 'set_form_fields', 'ipt'
 set_global 'set_form_fields', $P2
 dlfunc $P2, $P1, 'field_count', 'ip'
 set_global 'field_count', $P2
@@ -134,6 +144,12 @@ loadlib $P1, 'libpanel'
 if $P1 goto has_panel_lib
 loadlib $P1, 'cygpanel-8'
 if $P1 goto has_panel_lib
+
+$P0 = new 'Exception'
+$P0 = "curses shared library 'libpanel' not found!"
+throw $P0
+branch has_panel_lib
+
 goto no_panel_lib
 has_panel_lib:
 .export_dl_func($P1, 'new_panel', 'pp')
@@ -155,7 +171,16 @@ no_panel_lib:
 
 loadlib $P1, 'libncurses'
 if $P1 goto has_lib1
+loadlib $P1, 'libncurses.so.5'
+if $P1 goto has_lib1
 loadlib $P1, 'cygncurses-8'
+if $P1 goto has_lib1
+
+$P0 = new 'Exception'
+$P0 = "ncurses shared library 'libncurses' not found!"
+throw $P0
+branch has_lib1
+
 has_lib1:
 dlfunc $P2, $P1, 'keybound', 'tii'
 set_global 'keybound', $P2

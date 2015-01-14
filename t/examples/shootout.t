@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2005-2008, Parrot Foundation.
+# Copyright (C) 2005-2015, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -7,6 +7,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Config;
 use vars qw($EXT $DIR @shootouts);
+use Time::HiRes qw(tv_interval gettimeofday);
 
 # find dynamically all shootouts from dir listing
 BEGIN {    # to be run before declaring the number of tests
@@ -29,18 +30,20 @@ t/examples/shootout.t - Test the shootout examples in "examples/shootout/*.pir".
 
 =head1 DESCRIPTION
 
-Test the PIR shootout examples in 'examples/shootout/*.pir'.
+Test the PIR shootout examples in F<examples/shootout/*.pir>.
 
 To add a new test, you do not have to modify this script:
 
- 1. add your script (toto.pir) to examples/shootout
- 2. put parrot options in the first line (e.g  "#!./parrot -Oc")
+ 1. add your script (toto.pir) to F<examples/shootout/>
+ 2. put parrot options in the first line (e.g  C<#!./parrot -O1>)
  3. make sure you have default argument values
- 4. put the expected output as a file : toto.pir_output
- 5. if you need an input file (to be read from stdin), call it toto.pir_input
+ 4. put the expected output as a file : F<toto.pir_output>
+ 5. if you need an input file (to be read from stdin), call it F<toto.pir_input>
+
+Use C<TEST_PROG_ARGS=-O2> for global options to be added to all individual options.
 
 See the explanation of benchmarks and sample data for reduced N benches at
-http://shootout.alioth.debian.org/sandbox/
+L<http://shootout.alioth.debian.org/sandbox/>
 
 =cut
 
@@ -48,6 +51,8 @@ my %skips = (
     'pidigits.pir'    => [ 'not exists $PConfig{HAS_GMP}', 'needs GMP' ],
 );
 my $INPUT_EXT = '_input';
+my $TEST_PROG_ARGS = $ENV{TEST_PROG_ARGS} || '';
+my $elapsed = 0;
 foreach my $script (@shootouts) {
     my $skip = $skips{$script};
     if ($skip) {
@@ -82,17 +87,21 @@ foreach my $script (@shootouts) {
     # look for input files
     my $input = "$file$INPUT_EXT";
     if ( -e $input ) {
-        $args .= " < $input ";
+        $args .= "< $input";
     }
 
-    $ENV{TEST_PROG_ARGS} = $args;
+    $ENV{TEST_PROG_ARGS} = $TEST_PROG_ARGS . " " . $args;
     warn "$file $args\n" if $ENV{TEST_VERBOSE};
     my @todo;
 
     # this is an example of todo syntax
     # @todo = ( todo => 'known GC segfault' ) if $file =~ /regexdna.pir/;
+    my $t0 = [gettimeofday];
     example_output_is( $file, $expected, @todo );
+    $elapsed += tv_interval( $t0 );
 }
+$ENV{TEST_PROG_ARGS} = $TEST_PROG_ARGS;
+diag "$elapsed secs";
 
 # Local Variables:
 #   mode: cperl

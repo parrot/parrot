@@ -1,4 +1,4 @@
-# Copyright (C) 2006-2012, Parrot Foundation.
+# Copyright (C) 2006-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -34,7 +34,7 @@ This is a PIR program which displays the Mandelbrot Set, using SDL.
 .sub _main :main
     .param pmc argv
     .local pmc opts, app, event, handler
-    'load_libs'()
+    'load_sdl_libs'()
     opts = 'get_opts'(argv)
     app  = 'make_app'(opts)
     app.'calc'()
@@ -48,13 +48,14 @@ ex:
 .end
 
 # utils
-.sub 'load_libs'
+.sub 'load_sdl_libs'
     # load the necessary libraries
     load_bytecode "SDL/App.pir"
     load_bytecode "SDL/Rect.pir"
     load_bytecode "SDL/Color.pir"
     load_bytecode "SDL/EventHandler.pir"
     load_bytecode "SDL/Event.pir"
+    load_bytecode "SDL/Surface.pir"
     load_bytecode "Getopt/Obj.pir"
 .end
 
@@ -253,6 +254,7 @@ get:
     .local pmc thr
     .local int h2
     h2 = h / 2
+    # TODO: Task
     thr = new 'ParrotThread'
     .const 'Sub' raw_calc_f = 'raw_calc'
     .include 'cloneflags.pasm'

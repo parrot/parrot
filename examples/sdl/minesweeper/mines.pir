@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -35,13 +35,13 @@ The main function.
     debug = args
     dec debug
 
-    load_bytecode "library/SDL/App.pir"
-    load_bytecode "library/SDL/Event.pir"
-    load_bytecode "library/SDL/EventHandler.pir"
-    load_bytecode "library/SDL/Rect.pir"
-    load_bytecode "library/SDL/Surface.pir"
-    load_bytecode "library/SDL/Color.pir"
-    load_bytecode "library/SDL/Image.pir"
+    load_bytecode "SDL/App.pir"
+    load_bytecode "SDL/Event.pir"
+    load_bytecode "SDL/EventHandler.pir"
+    load_bytecode "SDL/Rect.pir"
+    load_bytecode "SDL/Surface.pir"
+    load_bytecode "SDL/Color.pir"
+    load_bytecode "SDL/Image.pir"
     load_bytecode "examples/sdl/minesweeper/field.pir"
 
     # setup the screen properties
