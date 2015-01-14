@@ -39,7 +39,7 @@ SKIP: {
     unless ( -e "runtime/parrot/dynext/libnci_test$load_ext" ) {
         plan skip_all => "Please make libnci_test$load_ext";
     }
-    plan tests => 69;
+    plan tests => 70;
 
     pir_output_is( << 'CODE', << 'OUTPUT', 'load library fails' );
 .sub test :main
@@ -2483,7 +2483,7 @@ pir_output_is( << 'CODE', << 'OUTPUT', "conversion d <-> P" );
     .local string library_name
     library_name = 'libnci_test'
     .local pmc libnci_test
-    libnci_test = loadlib  library_name
+    libnci_test = loadlib library_name
     .local pmc twice
     twice = dlfunc libnci_test, "nci_dd", "dd"
     .local pmc f, g
@@ -2630,82 +2630,84 @@ CODE
 1
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "nci_i4i" );
-  loadlib P1, "libnci_test"
-  dlfunc P0, P1, "nci_i4i", "i4i"
-  new P5, ['Integer']
-  set P5, -6
-  set I5, -7
-  set_args "0,0", P5,I5
-  invokecc P0
-  get_results "0", I5
-  print I5
-  print "\n"
-  end
+pir_output_is( <<'CODE', <<'OUTPUT', "nci_i4i" );
+.sub test :main
+    .local pmc libnci_test
+    libnci_test = loadlib "libnci_test"
+
+    .local pmc nci_i4i
+    nci_i4i = dlfunc libnci_test, "nci_i4i", "i4i"
+
+    new $P0, ['Integer']
+    set $P0, -6
+    $I1 = nci_i4i($P0, -7)
+    say $I1
+.end
 CODE
 42
 OUTPUT
 
-pasm_output_is( <<'CODE', <<'OUTPUT', "nci_ii3" );
-.include "datatypes.pasm"
-  loadlib P1, "libnci_test"
-  dlfunc P0, P1, "nci_ii3", "ii3"
-  set I5, -6
+pir_output_is( <<'CODE', <<'OUTPUT', "nci_ii2" );
+.sub test :main
+  .local pmc libnci_test
+  libnci_test = loadlib "libnci_test"
+  .local pmc nci_ii2
+  nci_ii2 = dlfunc libnci_test, "nci_ii2", "ii2"
 
-  new P5, ['Integer']
-  set P5, -7
+  $I5 = -6
+  $P5 = new ['Integer']
+  $P5 = -7
+  $I5 = nci_ii2( $I5, $P5 )
 
-  set_args "0,0", I5,P5
-  invokecc P0
-  get_results "0", I5
-
-  print I5
-  print "\n"
-  print P5
-  print "\n"
-  end
+  say $I5
+  say $P5
+.end
 CODE
 42
 4711
 OUTPUT
 
-if (0) {
-    pasm_output_is( <<'CODE', <<'OUTPUT', "nci_tb" );
-  loadlib P1, "libnci_test"
-  dlfunc P0, P1, "nci_tb", "tb"
-  set S5, "ko\n"
-  set_args "0", S5
-  invokecc P0
-  get_results "0", S5
-  print S5
-  end
+pir_output_is( <<'CODE', <<'OUTPUT', "nci_ii3" );
+.sub test :main
+  .local pmc libnci_test
+  libnci_test = loadlib "libnci_test"
+  .local pmc nci_ii3
+  nci_ii3 = dlfunc libnci_test, "nci_ii3", "ii3"
+
+  $I5 = -6
+  $P5 = new ['Integer']
+  $P5 = -7
+  $I5 = nci_ii3( $I5, $P5 )
+
+  say $I5
+  say $P5
+.end
 CODE
-ok worked
+42
+4711
 OUTPUT
-}
 
-pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_i33 - out parameters and return values' );
-  .include "datatypes.pasm"
-  new P2, ['Integer']
-  set P2, 3
-  new P3, ['Integer']
-  set P3, 2
+pir_output_is( <<'CODE', <<'OUTPUT', 'nci_i33 - out parameters and return values' );
+.sub test :main
+  .local pmc libnci_test
+  libnci_test = loadlib "libnci_test"
+  .local pmc nci_i33
+  nci_i33 = dlfunc libnci_test, "nci_i33", "i33"
 
-  loadlib P1, "libnci_test"
-  set_args "0,0", P2, P3
-  dlfunc P0, P1, "nci_i33", "i33"
-  invokecc P0
-  get_results "0", I5
+  $P2 = new ['Integer']
+  $P2 = 3
+  $P3 = new ['Integer']
+  $P3 = 2
+
+  $I5 = nci_i33( $P2, $P3 )
 
   print "Double: "
-  print P2
-  print "\nTriple: "
-  print P3
-  print "\nSum: "
-  print I5
-  print "\n"
-
-  end
+  say $P2
+  print "Triple: "
+  say $P3
+  print "Sum: "
+  say $I5
+.end
 CODE
 Double: 6
 Triple: 6

@@ -53,7 +53,7 @@ Parrot_nci_parse_signature(PARROT_INTERP, ARGIN(STRING *sig_str))
 
     const size_t  sig_length = Parrot_str_byte_length(interp, sig_str);
     PMC          *sig_pmc    = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray,
-                                                                sig_length);
+                                                               sig_length);
     size_t i;
 
     if (!sig_length) {
@@ -161,9 +161,6 @@ ncidt_to_pcc(PARROT_INTERP, PARROT_DATA_TYPE t)
       case enum_type_int:
       case enum_type_long:
       case enum_type_INTVAL:
-      case enum_type_pshort:
-      case enum_type_pint:
-      case enum_type_plong:
         return 'I';
 
       case enum_type_STRING:
@@ -173,6 +170,9 @@ ncidt_to_pcc(PARROT_INTERP, PARROT_DATA_TYPE t)
       case enum_type_ptr:
       case enum_type_PMC:
       case enum_type_struct_ptr:
+      case enum_type_pshort:
+      case enum_type_pint:
+      case enum_type_plong:
         return 'P';
 
       case enum_type_void:

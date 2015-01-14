@@ -1987,6 +1987,7 @@ src/nci/core_thunks$(O) : src/nci/core_thunks.str \
 src/nci/libffi$(O) : src/nci/libffi.c \
 	$(PARROT_H_HEADERS) \
 	$(INC_PMC_DIR)/pmc_nci.h \
+	$(INC_PMC_DIR)/pmc_integer.h \
 	$(INC_PMC_DIR)/pmc_unmanagedstruct.h \
 	$(INC_PMC_DIR)/pmc_managedstruct.h \
 

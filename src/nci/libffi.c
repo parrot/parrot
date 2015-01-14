@@ -8,6 +8,18 @@ src/nci/libffi.c - LibFFI Native Call Interface frame builder
 
 This file implements a native call frame (thunk) factory using libffi.
 
+For each external call we do 3 libffi calls:
+
+1. Parrot_pcc_fill_params_from_c_args for the arg conversion from INPS to the ffi signature,
+
+2. the external dlfunc call with the ffi types, and finally
+
+3. Parrot_pcc_build_call_from_c_args conversion for the return type and call-by-reference
+conversion from the ffi signature back to INPS.
+
+Of course this needs to be optimized into one single call to bear the
+conversion overhead only on certain arg types.
+
 =head2 Functions
 
 =over 4
@@ -17,6 +29,7 @@ This file implements a native call frame (thunk) factory using libffi.
 */
 #include "parrot/parrot.h"
 #include "pmc/pmc_nci.h"
+#include "pmc/pmc_integer.h"
 #include "pmc/pmc_unmanagedstruct.h"
 #include "pmc/pmc_managedstruct.h"
 
@@ -54,6 +67,13 @@ This file implements a native call frame (thunk) factory using libffi.
 #  endif
 #endif
 
+/* Note that this looks non-sensical. One ffi_cif can hold all the arg types and
+   ret types properly.
+   But we prep the cif 3x in build_ffi_thunk:
+   1. pcc_arg_cif for the Parrot_pcc_fill_params_from_c_args conversion
+   2. cif for the external dlfunc call, and finally
+   3. pcc_ret_cif for the Parrot_pcc_build_call_from_c_args conversion
+*/
 typedef struct ffi_thunk_t {
     ffi_cif    cif;
     ffi_type **arg_types;
@@ -227,8 +247,8 @@ build_ffi_thunk(PARROT_INTERP, SHIM(PMC *user_data), ARGIN(PMC *sig))
     /* generate Parrot_pcc_fill_params_from_c_args dynamic call infrastructure */
     {
         INTVAL     argc  = Parrot_str_length(interp, pcc_params_sig) + 3;
-        ffi_type **arg_t =  thunk_data->pcc_arg_types =
-                            mem_gc_allocate_n_zeroed_typed(interp, argc, ffi_type *);
+        ffi_type **arg_t = thunk_data->pcc_arg_types =
+                           mem_gc_allocate_n_zeroed_typed(interp, argc, ffi_type *);
         int        i;
 
         arg_t[0] = &ffi_type_pointer; /* interp */
@@ -345,6 +365,9 @@ nci_to_ffi_type(SHIM_INTERP, PARROT_DATA_TYPE nci_t)
       case enum_type_cstr:
       case enum_type_ptr:
       case enum_type_PMC:
+      case enum_type_plong:
+      case enum_type_pint:
+      case enum_type_pshort:
                                  return &ffi_type_pointer;
 
       default:
@@ -515,7 +538,6 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
         char   *pcc_sig  = Parrot_str_to_cstring(interp, nci->pcc_params_signature);
 
         void **pcc_arg_ptr, **call_arg;
-
         ffi_arg ffi_ret_dummy;
 
         pcc_arg     = mem_gc_allocate_n_zeroed_typed(interp, pcc_argc, parrot_var_t);
@@ -543,23 +565,17 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
                     pcc_arg_ptr[i] = &pcc_arg[i].p;
                     break;
                 case 'v':
-                  if (i == 0 && 1 == pcc_argc) {
-                    call_arg[i + 3] = &pcc_arg_ptr[i];
-                    goto break_loop;
-                  }
-                  else {
-                      Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_JIT_ERROR,
-                          "Invalid pcc signature code: 'v'. v must be the only nci signature type");
-                  }
+                    Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_JIT_ERROR,
+                          "Invalid pcc signature code: 'v'. Leave it empty");
+                    break;
                 default:
-                  Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
-                      "Invalid pcc signature code: '%c'", pcc_sig[i]);
-                  break;
+                    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_JIT_ERROR,
+                          "Invalid pcc signature code: '%c'", pcc_sig[i]);
+                    break;
             }
             call_arg[i + 3] = &pcc_arg_ptr[i];
         }
 
-      break_loop:
         ffi_call(&thunk->pcc_arg_cif, FFI_FN(Parrot_pcc_fill_params_from_c_args),
                 &ffi_ret_dummy, call_arg);
 
@@ -644,18 +660,31 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
                 nci_arg_ptr[i] = &nci_val[i].S;
                 break;
               case enum_type_plong:
-#if PARROT_HAS_INT64
-                nci_val[i].i64 = (long)VTABLE_get_integer(interp, pcc_arg[i].p);
-                nci_arg_ptr[i] = &nci_val[i].i64;
-                break;
-#endif
               case enum_type_pint:
-                nci_val[i].i32 = (int)VTABLE_get_integer(interp, pcc_arg[i].p);
-                nci_arg_ptr[i] = &nci_val[i].i32;
-                break;
               case enum_type_pshort:
-                nci_val[i].i16 = (short)VTABLE_get_integer(interp, pcc_arg[i].p);
-                nci_arg_ptr[i] = &nci_val[i].i16;
+                nci_val[i].t = (char*)&(((Parrot_Integer_attributes *)PMC_data(pcc_arg[i].p))->iv);
+                if (t == enum_type_pint || t == enum_type_pshort) {
+                    /* on little-endian set the remainder to 0,
+                       the callback only manipulates the head. */
+#if !PARROT_BIGENDIAN
+                    memset(&nci_val[i].t[4], 0, 4);
+#else
+#  if PARROT_HAS_INT64
+                    /* on BE64 forward the ptr and mask the head. */
+                    memset(&nci_val[i].t, 0, 4);
+                    nci_val[i].t += 4;
+#  endif
+#endif
+                    if (t == enum_type_pshort) {
+#if !PARROT_BIGENDIAN
+                        memset(&nci_val[i].t[2], 0, 2);
+#else
+                        memset(&nci_val[i].t, 0, 2);
+                        nci_val[i].t += 2;
+#endif
+                    }
+                }
+                nci_arg_ptr[i] = &nci_val[i].t;
                 break;
 
               case enum_type_PMC:
@@ -727,9 +756,8 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
         for (j = 1; i < pcc_retc; j++) {
             arg_t = (PARROT_DATA_TYPE)VTABLE_get_integer_keyed_int(interp, nci->signature, j);
             if (arg_t & enum_type_ref_flag) {
-                /* TODO return t */
                 prep_pcc_ret_arg(interp, (PARROT_DATA_TYPE)(arg_t & ~enum_type_ref_flag),
-                                    &pcc_retv[i], &call_arg[i + 3], nci_arg[j - 1]);
+                                 &pcc_retv[i], &call_arg[i + 3], nci_arg[j - 1]);
                 i++;
             }
         }

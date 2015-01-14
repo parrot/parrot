@@ -80,6 +80,7 @@ PARROT_DYNEXT_EXPORT float  nci_fff(float, float);
 PARROT_DYNEXT_EXPORT int    nci_i(void);
 PARROT_DYNEXT_EXPORT int    nci_ib(int *);
 PARROT_DYNEXT_EXPORT int    nci_iiii(int, int, int);
+PARROT_DYNEXT_EXPORT int    nci_ii2(int, short *);
 PARROT_DYNEXT_EXPORT int    nci_ii3(int, int *);
 PARROT_DYNEXT_EXPORT int    nci_ip(void *);
 PARROT_DYNEXT_EXPORT int    nci_isc(short, char);
@@ -419,10 +420,10 @@ nci_iiii(int i1, int i2, int i3)
 
 /*
 
-=item C<PARROT_DYNEXT_EXPORT int nci_ii3(int a, int *bp)>
+=item C<PARROT_DYNEXT_EXPORT int nci_ii2(int a, short *bp)>
 
 Multiplies C<a> and C<*bp> together and returns the result. Updates C<*bp>
-to the value  4711.
+to the value 4711.
 
 =cut
 
@@ -430,7 +431,28 @@ to the value  4711.
 
 PARROT_DYNEXT_EXPORT
 int
-nci_ii3(int a, int *bp)
+nci_ii2(int a, ARGMOD(short *bp))
+{
+    int r = a * *bp;
+    *bp = 4711;
+
+    return r;
+}
+
+/*
+
+=item C<PARROT_DYNEXT_EXPORT int nci_ii3(int a, int *bp)>
+
+Multiplies C<a> and C<*bp> together and returns the result. Updates C<*bp>
+to the value 4711.
+
+=cut
+
+*/
+
+PARROT_DYNEXT_EXPORT
+int
+nci_ii3(int a, ARGMOD(int *bp))
 {
     int r = a * *bp;
     *bp = 4711;
@@ -471,7 +493,7 @@ Returns the product of C<*l> and C<i>, as an int.
 PARROT_DYNEXT_EXPORT
 PARROT_PURE_FUNCTION
 int
-nci_i4i(long * l, int i)
+nci_i4i(ARGIN(long *l), int i)
 {
 
     return (int) (*l * i);
