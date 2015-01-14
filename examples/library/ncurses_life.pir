@@ -60,7 +60,7 @@ Run faster.
 .sub _MAIN :main
     .param pmc argv
     # the command line
-    load_bytecode 'ncurses.pbc'
+    load_bytecode 'ncurses.pir'
 
     # should autogenerate these
     .globalconst int KEY_DOWN = 258

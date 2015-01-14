@@ -1,11 +1,28 @@
-# Copyright (C) 2004-2009, Parrot Foundation.
+# Copyright (C) 2004-2015, Parrot Foundation.
 
+.macro export_dl_func(lib, name, sig)
+    .local pmc edlftmp
+    .local string g_name
+    edlftmp = dlfunc .lib, .name, .sig
+    g_name = concat "ncurses::", .name
+    set_global g_name, edlftmp
+.endm
+
+#.namespace ['ncurses']
 .sub __ncurses_init :load
 
 loadlib $P1, 'libform'
 if $P1 goto has_lib
 loadlib $P1, 'cygform-8'
+if $P1 goto has_lib
+
+$P0 = new 'Exception'
+$P0 = "ncurses shared library 'libform' not found!"
+throw $P0
+branch has_lib
+
 has_lib:
+#export_dl_func($P1, 'new_field', 'piiiiii')
 dlfunc $P2, $P1, 'new_field', 'piiiiii'
 set_global 'ncurses::new_field', $P2
 dlfunc $P2, $P1, 'dup_field', 'ppii'
@@ -66,7 +83,8 @@ dlfunc $P2, $P1, 'field_buffer', 'tpi'
 set_global 'ncurses::field_buffer', $P2
 dlfunc $P2, $P1, 'field_opts', 'lp'
 set_global 'ncurses::field_opts', $P2
-dlfunc $P2, $P1, 'new_form', 'pb'
+#dlfunc $P2, $P1, 'new_form', 'pb'
+dlfunc $P2, $P1, 'new_form', 'pt'
 set_global 'ncurses::new_form', $P2
 dlfunc $P2, $P1, 'current_field', 'pp'
 set_global 'ncurses::current_field', $P2
@@ -76,7 +94,8 @@ dlfunc $P2, $P1, 'form_sub', 'pp'
 set_global 'ncurses::form_sub', $P2
 dlfunc $P2, $P1, 'free_form', 'ip'
 set_global 'ncurses::free_form', $P2
-dlfunc $P2, $P1, 'set_form_fields', 'ipb'
+#dlfunc $P2, $P1, 'set_form_fields', 'ipb'
+dlfunc $P2, $P1, 'set_form_fields', 'ipt'
 set_global 'ncurses::set_form_fields', $P2
 dlfunc $P2, $P1, 'field_count', 'ip'
 set_global 'ncurses::field_count', $P2
@@ -125,11 +144,19 @@ set_global 'ncurses::data_behind', $P2
 
 loadlib $P1, 'libncurses'
 if $P1 goto has_lib1
+loadlib $P1, 'libncurses.so.5'
+if $P1 goto has_lib1
 loadlib $P1, 'cygncurses-8'
+if $P1 goto has_lib1
+
+$P0 = new 'Exception'
+$P0 = "ncurses shared library 'libncurses' not found!"
+throw $P0
+branch has_lib1
+
 has_lib1:
 dlfunc $P2, $P1, 'keybound', 'tii'
 set_global 'ncurses::keybound', $P2
-
 dlfunc $P2, $P1, 'curses_version', 't'
 set_global 'ncurses::curses_version', $P2
 dlfunc $P2, $P1, 'assume_default_colors', 'iii'

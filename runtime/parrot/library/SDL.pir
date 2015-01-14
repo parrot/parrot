@@ -112,7 +112,7 @@ default_locations:
 failed:
     # failed to load libSDL
     $P0 = new 'Exception'
-    $P0 = "libSDL not found!"
+    $P0 = "sdl shared library 'libSDL' not found!"
     throw $P0
     branch OK
   OK:

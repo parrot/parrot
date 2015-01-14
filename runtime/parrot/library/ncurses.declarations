@@ -38,13 +38,15 @@ p field_type p
 t field_buffer p i
 l field_opts p
 
-p new_form b
+#p new_form b
+p new_form t
 #b form_fields p
 p current_field p
 p form_win p 
 p form_sub p
 i free_form p
-i set_form_fields p b
+#i set_form_fields p b
+i set_form_fields p t
 i field_count p
 i set_form_win p p
 i set_form_sub p p
