@@ -390,7 +390,8 @@ void Parrot_interp_clear_trace(PARROT_INTERP, UINTVAL flag)
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
-PMC * Parrot_interp_clone(Parrot_Interp s, INTVAL flags);
+PMC * Parrot_interp_clone(PARROT_INTERP, INTVAL flags)
+        __attribute__nonnull__(1);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -563,7 +564,8 @@ void Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, void *arg)
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_interp_clear_trace __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_Parrot_interp_clone __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_Parrot_interp_clone __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_interp_compile_file __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(compiler) \

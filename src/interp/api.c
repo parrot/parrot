@@ -366,7 +366,7 @@ Parrot_interp_initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *a
 
 /*
 
-=item C<PMC * Parrot_interp_clone(Parrot_Interp s, INTVAL flags)>
+=item C<PMC * Parrot_interp_clone(PARROT_INTERP, INTVAL flags)>
 
 Clones the interpreter as specified by the flags.
 
