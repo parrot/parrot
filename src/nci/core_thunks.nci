@@ -18,10 +18,13 @@ d    d
 f
 f    ff
 i
-i    33
-i    4i
-i    i2
-i    i3
+
+# prefer explicit libffi conversion over wrong cc optimizations of static thunks
+#i    33
+#i    4i
+#i    i2
+#i    i3
+
 i    iii
 i    p
 i    sc

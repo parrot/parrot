@@ -1054,11 +1054,13 @@ JSON
     $P1 = 'from_json'('{ "c_type": "Parrot_Int8", "sig_char": "I", "pcc_type": "INTVAL" }')
     table[.DATATYPE_INT64] = $P1
 
+    #XXX Warning! Those 3 thunks fail when compiled optimized, due to strict aliasing rules
+    # We rather use it via libfii, which does the concversion explicitly
     $P1 = 'from_json'(<<'JSON')
 { "c_type":   "short *",
   "pcc_type": "PMC  *",
   "sig_char": "P",
-  "preamble_tmpl": "{ INTVAL i = VTABLE_get_integer(interp, t_%i); v_%i = (short *)&i; }",
+  "preamble_tmpl": "{ short i = (short)VTABLE_get_integer(interp, t_%i); v_%i = &i; }",
   "postamble_tmpl": "VTABLE_set_integer_native(interp, t_%i, *(short*)v_%i)" }
 JSON
     # $I0 = .DATATYPE_PSHORT | .DATATYPE_REF_FLAG
@@ -1068,7 +1070,7 @@ JSON
 { "c_type":   "int *",
   "pcc_type": "PMC  *",
   "sig_char": "P",
-  "preamble_tmpl": "{ INTVAL i = VTABLE_get_integer(interp, t_%i); v_%i = (int *)&i; }",
+  "preamble_tmpl": "{ int i = (int)VTABLE_get_integer(interp, t_%i); v_%i = &i; }",
   "postamble_tmpl": "VTABLE_set_integer_native(interp, t_%i, *(int*)v_%i)" }
 JSON
     # $I0 = .DATATYPE_PINT | .DATATYPE_REF_FLAG
@@ -1078,7 +1080,7 @@ JSON
 { "c_type":   "long *",
   "pcc_type": "PMC  *",
   "sig_char": "P",
-  "preamble_tmpl": "{ INTVAL i = VTABLE_get_integer(interp, t_%i); v_%i = (long *)&i; }",
+  "preamble_tmpl": "{ long i = (long)VTABLE_get_integer(interp, t_%i); v_%i = &i; }",
   "postamble_tmpl": "VTABLE_set_integer_native(interp, t_%i, *(long*)v_%i)" }
 JSON
     # $I0 = .DATATYPE_PLONG | .DATATYPE_REF_FLAG

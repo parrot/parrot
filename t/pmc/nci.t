@@ -2627,7 +2627,11 @@ CODE
 1
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "nci_i4i" );
+SKIP: {
+    # strict-aliasing prevents optimized builds of those static thunks
+    skip "234 signatures only with libffi", 5 unless $PConfig{HAS_LIBFFI};
+
+    pir_output_is( <<'CODE', <<'OUTPUT', "nci_i4i" );
 .sub test :main
     .local pmc libnci_test
     libnci_test = loadlib "libnci_test"
@@ -2644,7 +2648,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "nci_ii2" );
+    pir_output_is( <<'CODE', <<'OUTPUT', "nci_ii2" );
 .sub test :main
   .local pmc libnci_test
   libnci_test = loadlib "libnci_test"
@@ -2664,7 +2668,7 @@ CODE
 4711
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "nci_ii3" );
+    pir_output_is( <<'CODE', <<'OUTPUT', "nci_ii3" );
 .sub test :main
   .local pmc libnci_test
   libnci_test = loadlib "libnci_test"
@@ -2684,7 +2688,7 @@ CODE
 4711
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'nci_i33 - out parameters and return values' );
+    pir_output_is( <<'CODE', <<'OUTPUT', 'nci_i33 - out parameters and return values' );
 .sub test :main
   .local pmc libnci_test
   libnci_test = loadlib "libnci_test"
@@ -2711,6 +2715,26 @@ Triple: 6
 Sum: 12
 OUTPUT
 
+    pir_output_is( << 'CODE', << 'OUTPUT', "nci_i4i - conversion I <-> P" );
+.sub test :main
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib  library_name
+    .local pmc mult
+    mult = dlfunc libnci_test, "nci_i4i", "i4i"
+    .local pmc i, j
+    i = new ['Integer']
+    i = 2
+    j = mult( 21, i )       # call signature is PI
+    say j
+.end
+CODE
+42
+OUTPUT
+
+}
+
 pir_output_is( << 'CODE', << 'OUTPUT', "nci_tt - conversion S <-> P" );
 .sub test :main
     .local string library_name
@@ -2727,24 +2751,6 @@ pir_output_is( << 'CODE', << 'OUTPUT', "nci_tt - conversion S <-> P" );
 .end
 CODE
 ok worked
-OUTPUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', "nci_i4i - conversion I <-> P" );
-.sub test :main
-    .local string library_name
-    library_name = 'libnci_test'
-    .local pmc libnci_test
-    libnci_test = loadlib  library_name
-    .local pmc mult
-    mult = dlfunc libnci_test, "nci_i4i", "i4i"
-    .local pmc i, j
-    i = new ['Integer']
-    i = 2
-    j = mult( 21, i )       # call signature is PI
-    say j
-.end
-CODE
-42
 OUTPUT
 
 pir_output_is( << 'CODE', << 'OUTPUT', "nci_ttt - t_tt parameter" );
