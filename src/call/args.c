@@ -572,7 +572,7 @@ Parrot_pcc_build_call_from_c_args(PARROT_INTERP,
 =item C<static void set_call_from_varargs(PARROT_INTERP, PMC *signature, const
 char *sig, va_list *args)>
 
-Helper for Parrot_pcc_build_call_from_varargs and Parrot_pcc_set_call_from_varargs.
+Helper for C<Parrot_pcc_build_call_from_varargs> and C<Parrot_pcc_set_call_from_varargs>.
 
 =cut
 
@@ -1527,11 +1527,12 @@ parse_signature_string(PARROT_INTERP, ARGIN(const char *signature),
                 case 'o': flags |= PARROT_ARG_OPTIONAL;     break;
                 case 'p': flags |= PARROT_ARG_OPT_FLAG;     break;
                 case 's': flags |= PARROT_ARG_SLURPY_ARRAY; break;
+                /* case 't': break; */
                 case ' ': break;
                 default:
                     Parrot_ex_throw_from_c_args(interp, NULL,
                         EXCEPTION_INVALID_OPERATION,
-                        "invalid signature string element %c!", *x);
+                        "Invalid signature string element %c!", *x);
             }
         }
     }

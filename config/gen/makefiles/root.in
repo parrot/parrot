@@ -3208,6 +3208,10 @@ $(LIBGLUTCB_SO): $(LIBPARROT) src/glut_callbacks$(O) src/glut_nci_thunks$(O)
 #src/nci/extra_thunks.c : src/nci/extra_thunks.nci $(DEV_TOOLS_DIR)/nci_thunk_gen.pir $(PARROT)
 #	$(PARROT) $(DEV_TOOLS_DIR)/nci_thunk_gen.pir --core --output=$@ --nowarn-dups \
 #	  <src/nci/extra_thunks.nci
+src/nci/core_thunks.c : src/nci/core_thunks.nci $(DEV_TOOLS_DIR)/nci_thunk_gen.pir
+	echo "Need to make bootstrap-nci. src/nci/core_thunks.c is outdated"
+src/nci/extra_thunks.c : src/nci/extra_thunks.nci $(DEV_TOOLS_DIR)/nci_thunk_gen.pir
+	echo "Need to make bootstrap-nci. src/nci/extra_thunks.c is outdated"
 
 bootstrap-nci : src/nci/core_thunks.nci src/nci/extra_thunks.nci
 	$(PERL) $(DEV_TOOLS_DIR)/mk_nci_thunks.pl

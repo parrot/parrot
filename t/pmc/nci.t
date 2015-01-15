@@ -32,9 +32,6 @@ Most tests are skipped when the F<libnci_test.so> shared library is not found.
 $ENV{TEST_PROG_ARGS} ||= '';
 
 SKIP: {
-    unless ($PConfig{HAS_EXTRA_NCI_THUNKS} || $PConfig{HAS_LIBFFI}) {
-        plan skip_all => "Parrot built without libffi or extra NCI thunks";
-    }
     my $load_ext = $PConfig{load_ext};
     unless ( -e "runtime/parrot/dynext/libnci_test$load_ext" ) {
         plan skip_all => "Please make libnci_test$load_ext";
@@ -701,7 +698,6 @@ ok 1
 OUTPUT
 
     pir_output_is( <<'CODE', <<'OUTPUT', "nci_it" );
-
 .include "datatypes.pasm"
 .loadlib 'io_ops'
 
@@ -1269,7 +1265,6 @@ CODE
 OUTPUT
 
     pir_output_is( << 'CODE', << "OUTPUT", "nci_pi - int" );
-
 .include "datatypes.pasm"
 
 .sub test :main
@@ -1344,7 +1339,6 @@ hello from Parrot
 OUTPUT
 
     pir_output_is( << 'CODE', << "OUTPUT", "nci_pi - null" );
-
 .include "datatypes.pasm"
 
 .sub test :main
@@ -1447,7 +1441,6 @@ done.
 OUTPUT
 
     pir_output_is( <<'CODE', <<'OUTPUT', "nci_cb_C1 - PIR" );
-
 .sub test :main
 
     # this flag will be set by the callback function
@@ -1580,7 +1573,6 @@ done.
 OUTPUT
 
     pir_output_is( <<'CODE', <<'OUTPUT', "nci_cb_C3 - PIR" );
-
 .include "datatypes.pasm"
 
 .sub test :main
@@ -1786,7 +1778,6 @@ done.
 OUTPUT
 
     pir_output_is( <<'CODE', <<'OUTPUT', "nci_cb_D2 - PIR" );
-
 .sub test :main
 
     # this flag will be set by the callback function
@@ -1860,8 +1851,6 @@ the callback has run
 OUTPUT
 
     pir_output_is( <<'CODE', <<'OUTPUT', "nci_cb_D3 - PIR" );
-
-
 .include "datatypes.pasm"
 
 .sub test :main
@@ -1948,8 +1937,6 @@ the callback has run
 OUTPUT
 
     pir_output_is( <<'CODE', <<'OUTPUT', "nci_cb_D4 - synchronous callbacks" );
-
-
 .include "datatypes.pasm"
 
 .sub test :main
@@ -2134,7 +2121,7 @@ W: 420
 H: 430
 OUTPUT
 
-        pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_vpii - nested structs' );
+    pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_vpii - nested structs' );
 .pcc_sub :main main:
 
 .include "datatypes.pasm"
@@ -2255,7 +2242,6 @@ Count: 4
 OUTPUT
 
     pir_output_is( << 'CODE', << "OUTPUT", "nci_pii - writing back to libnci_test.so" );
-
 .include "datatypes.pasm"
 
 .sub test :main
@@ -2307,8 +2293,7 @@ libnci_test was successfully loaded
 333
 OUTPUT
 
-SKIP:
-    {
+SKIP: {
 
         skip( "nci_dlvar_int hangs on HP-UX", 1 ) if $^O eq 'hpux';
 
@@ -2371,9 +2356,8 @@ libnci_test was successfully loaded
 -119988
 -359964
 OUTPUT
-    }
 
-    pir_output_is( << 'CODE', << 'OUTPUT', "dlvar - unknown symbol" );
+        pir_output_is( << 'CODE', << 'OUTPUT', "dlvar - unknown symbol" );
 
 .include "datatypes.pasm"
 
@@ -2403,8 +2387,7 @@ libnci_test was successfully loaded
 'non_existing' is not defined
 OUTPUT
 
-    pir_output_is( << 'CODE', << 'OUTPUT', "dlfunc - unknown symbol" );
-
+        pir_output_is( << 'CODE', << 'OUTPUT', "dlfunc - unknown symbol" );
 .include "datatypes.pasm"
 
 .sub test :main
@@ -2433,7 +2416,7 @@ libnci_test was successfully loaded
 'non_existing' is not defined
 OUTPUT
 
-    pasm_output_is( << 'CODE', << 'OUTPUT', 'loading same library twice' );
+        pasm_output_is( << 'CODE', << 'OUTPUT', 'loading same library twice' );
 .pcc_sub :main main:
       loadlib P1, "libnci_test"
       if P1, OK1
@@ -2456,7 +2439,7 @@ OUTPUT
 
 }    # SKIP hpux
 
-pir_output_is( << 'CODE', << 'OUTPUT', "opcode 'does'" );
+    pir_output_is( << 'CODE', << 'OUTPUT', "opcode 'does'" );
 .sub test :main
     .local pmc pmc1
     pmc1 = new ['ParrotLibrary']
@@ -2478,7 +2461,7 @@ CODE
 0
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "conversion d <-> P" );
+    pir_output_is( << 'CODE', << 'OUTPUT', "conversion d <-> P" );
 .sub test :main
     .local string library_name
     library_name = 'libnci_test'
@@ -2497,7 +2480,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is(
+    pir_output_is(
     << 'CODE', << 'OUTPUT', 'nested structs should be independent' );
 .include 'datatypes.pasm'
 
@@ -2584,7 +2567,7 @@ X: 2
 Y: 200
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "arity" );
+    pir_output_is( << 'CODE', << 'OUTPUT', "arity" );
 .sub test :main
     .local string library_name
     library_name = 'libnci_test'
@@ -2612,7 +2595,7 @@ CODE
 3
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "nci_vfff - v_fff parameter" );
+    pir_output_is( << 'CODE', << 'OUTPUT', "nci_vfff - v_fff parameter" );
 .sub test :main
     .local string library_name
     library_name = 'libnci_test'
@@ -2630,7 +2613,11 @@ CODE
 1
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "nci_i4i" );
+SKIP: {
+    # strict-aliasing prevents optimized builds of those static thunks
+    skip "234 signatures only with libffi", 5 unless $PConfig{HAS_LIBFFI};
+
+    pir_output_is( <<'CODE', <<'OUTPUT', "nci_i4i" );
 .sub test :main
     .local pmc libnci_test
     libnci_test = loadlib "libnci_test"
@@ -2647,7 +2634,7 @@ CODE
 42
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "nci_ii2" );
+    pir_output_is( <<'CODE', <<'OUTPUT', "nci_ii2" );
 .sub test :main
   .local pmc libnci_test
   libnci_test = loadlib "libnci_test"
@@ -2667,7 +2654,7 @@ CODE
 4711
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', "nci_ii3" );
+    pir_output_is( <<'CODE', <<'OUTPUT', "nci_ii3" );
 .sub test :main
   .local pmc libnci_test
   libnci_test = loadlib "libnci_test"
@@ -2687,7 +2674,7 @@ CODE
 4711
 OUTPUT
 
-pir_output_is( <<'CODE', <<'OUTPUT', 'nci_i33 - out parameters and return values' );
+    pir_output_is( <<'CODE', <<'OUTPUT', 'nci_i33 - out parameters and return values' );
 .sub test :main
   .local pmc libnci_test
   libnci_test = loadlib "libnci_test"
@@ -2714,25 +2701,7 @@ Triple: 6
 Sum: 12
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "nci_tt - conversion S <-> P" );
-.sub test :main
-    .local string library_name
-    library_name = 'libnci_test'
-    .local pmc libnci_test
-    libnci_test = loadlib  library_name
-    .local pmc reverse
-    reverse = dlfunc libnci_test, "nci_tt", "tt"
-    .local pmc s, t
-    s = new ['String']
-    s = "ko"
-    t = reverse( s )
-    print t
-.end
-CODE
-ok worked
-OUTPUT
-
-pir_output_is( << 'CODE', << 'OUTPUT', "nci_i4i - conversion I <-> P" );
+    pir_output_is( << 'CODE', << 'OUTPUT', "nci_i4i - conversion I <-> P" );
 .sub test :main
     .local string library_name
     library_name = 'libnci_test'
@@ -2750,7 +2719,27 @@ CODE
 42
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "nci_ttt - t_tt parameter" );
+}
+
+    pir_output_is( << 'CODE', << 'OUTPUT', "nci_tt - conversion S <-> P" );
+.sub test :main
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib  library_name
+    .local pmc reverse
+    reverse = dlfunc libnci_test, "nci_tt", "tt"
+    .local pmc s, t
+    s = new ['String']
+    s = "ko"
+    t = reverse( s )
+    print t
+.end
+CODE
+ok worked
+OUTPUT
+
+    pir_output_is( << 'CODE', << 'OUTPUT', "nci_ttt - t_tt parameter" );
 .sub test :main
     .local string library_name
     library_name = 'libnci_test'
@@ -2768,7 +2757,7 @@ Waldo, Waldo, Hello
 Waldo, Waldo, Hello
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "nci_tt - as_string and ByteBuffer" );
+    pir_output_is( << 'CODE', << 'OUTPUT', "nci_tt - as_string and ByteBuffer" );
 .sub test :main
     .local string library_name
     library_name = 'libnci_test'
@@ -2793,7 +2782,7 @@ BA worked
 
 OUTPUT
 
-pir_output_is( << 'CODE', << 'OUTPUT', "nci_cstring_cstring - as_string and ByteBuffer" );
+    pir_output_is( << 'CODE', << 'OUTPUT', "nci_cstring_cstring - as_string and ByteBuffer" );
 .sub test :main
     .local string library_name
     library_name = 'libnci_test'
@@ -2818,6 +2807,8 @@ pir_output_is( << 'CODE', << 'OUTPUT', "nci_cstring_cstring - as_string and Byte
 CODE
 HeLLo, worLd!
 OUTPUT
+
+}
 
 # Local Variables:
 #   mode: cperl

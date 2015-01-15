@@ -1,4 +1,4 @@
-# Copyright (C) 2010-2012, Parrot Foundation.
+# Copyright (C) 2010-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -6,22 +6,33 @@ tools/dev/nci_thunk_gen.pir - Build up native call thunk routines
 
 =head1 SYNOPSIS
 
-    % ./parrot tools/dev/nci_thunk_gen.pir -o src/nci/extra_thunks.c <src/nci/extra_thunks.nci
+    $ perl -alne'if (/dlfunc/) {print substr($F[4],1,1),"    ",substr($F[4],2,-1)}' \
+        runtime/parrot/library/SDL.pir | sort -u > src/nci/SDL.nci
+    $ ./parrot tools/dev/nci_thunk_gen.pir --dynext --target=loader-dynext \
+        -o src/dynext/SDL_thunks.c <src/nci/SDL.nci
+
+    $ ./parrot tools/dev/nci_thunk_gen.pir --core --loader-name=Parrot_nci_load_extra_thunks \
+       --no-warn-dups -o src/nci/extra_thunks.c <src/nci/extra_thunks.nci
+
+    $ tools/dev/mk_nci_thunks.pl
 
 =head1 DESCRIPTION
 
-This script creates Native Call Interface files. It parses a file of function
-signatures of the form:
+This script creates static Native Call Interface files useful to pre-cache ffi signatures
+or when I<libffi> is not available. It parses a file of function signatures of the form:
 
- <return-type-specifier><ws><parameter-type-specifiers>[<ws>][#<comment>]
-    ...
+  <return-type-specifier><ws><parameter-type-specifiers>[<ws>][#<comment>]
+  ...
+
 Empty lines and lines containing only whitespace or comment are ignored.
 The types specifiers are documented in F<src/nci/extra_thunks.nci>.
 
 =head1 SEE ALSO
 
-F<src/nci/extra_thunks.nci>.
-F<docs/pdds/pdd16_native_call.pod>.
+F<ols/dev/mk_nci_thunks.pl>,
+F<src/nci/core_thunks.nci>,
+F<src/nci/extra_thunks.nci>,
+F<docs/pdds/draft/pdd16_native_call.pod>.
 
 =cut
 
@@ -29,7 +40,7 @@ F<docs/pdds/pdd16_native_call.pod>.
 .include 'hash_key_type.pasm'
 .include 'datatypes.pasm'
 
-.macro_const VERSION 0.02
+.macro_const VERSION 0.03
 
 .macro_const SIG_TABLE_GLOBAL_NAME  'signature_table'
 .macro_const OPTS_GLOBAL_NAME       'options'
@@ -341,17 +352,16 @@ USAGE
  */
 
 /* %s
- *  Copyright (C) 2010-2012, Parrot Foundation.
+ *  Copyright (C) 2010-2015, Parrot Foundation.
  *  Overview:
  *     Native Call Interface routines.
- *     Code to call C from parrot.
+ *     Code to call C from parrot without libffi.
  */
 
 %s
 #include "parrot/parrot.h"
 #include "parrot/nci.h"
 #include "pmc/pmc_nci.h"
-
 
 #ifdef PARROT_IN_EXTENSION
 /* external libraries can't have strings statically compiled into parrot */
@@ -574,8 +584,13 @@ CODA
         $I1 = iseq i, 0
         $I2 = band sig_elt, .DATATYPE_REF_FLAG
         $I3 = or $I1, $I2
+        if sig_elt == .DATATYPE_PSHORT goto ref
+        if sig_elt == .DATATYPE_PINT   goto ref
+        if sig_elt == .DATATYPE_PLONG  goto ref
+        if sig_elt == .DATATYPE_CSTR   goto ref
         unless $I3 goto next
 
+       ref:
         $P0 = 'map_from_sig_table'('postamble_tmpl', sig_elt)
         $S0 = $P0[0]
         $S0 = 'fill_tmpl_int'($S0, i)
@@ -819,7 +834,7 @@ TEMPLATE
         $P0 = dlfunc $P0, "Parrot_dt_get_datatype_name", "SpI"
         $P1 = getinterp
         $S0 = $P0($P1, $I0)
-        $S0 = 'sprintf'("Unsupported type: `%s'", $S0)
+        $S0 = 'sprintf'("Unsupported nci signature type: `%s' %d", $S0, $I2)
         die $S0
     end_loop:
 
@@ -902,11 +917,11 @@ ERROR
     (empty_line_regex, pcre_errstr, pcre_errint) = pcre_comp($S0, pcre_extended)
     if pcre_errint goto pcre_comp_err
 
-    $S0 = "^ [[:space:]]* ( (?: [INSPcsilfdpv] [[:space:]]* )+ ) (?: [#] .* )? $"
+    $S0 = "^ [[:space:]]* ( (?: [INSPcsilfdpvt234] [[:space:]]* )+ ) (?: [#] .* )? $"
     (old_style_sig_line_regex, pcre_errstr, pcre_errint) = pcre_comp($S0, pcre_extended)
     if pcre_errint goto pcre_comp_err
 
-    $S0 = ".*? ([INSPcsilfdpv])"
+    $S0 = ".*? ([INSPcsilfdpvt234])"
     (old_style_sig_item_regex, pcre_errstr, pcre_errint) = pcre_comp($S0, pcre_extended)
     if pcre_errint goto pcre_comp_err
 
@@ -1039,6 +1054,47 @@ JSON
     $P1 = 'from_json'('{ "c_type": "Parrot_Int8", "sig_char": "I", "pcc_type": "INTVAL" }')
     table[.DATATYPE_INT64] = $P1
 
+    #XXX Warning! Those 3 thunks fail when compiled optimized, due to strict aliasing rules
+    # We rather use it via libfii, which does the concversion explicitly
+    $P1 = 'from_json'(<<'JSON')
+{ "c_type":   "short *",
+  "pcc_type": "PMC  *",
+  "sig_char": "P",
+  "preamble_tmpl": "{ short i = (short)VTABLE_get_integer(interp, t_%i); v_%i = &i; }",
+  "postamble_tmpl": "VTABLE_set_integer_native(interp, t_%i, *(short*)v_%i)" }
+JSON
+    # $I0 = .DATATYPE_PSHORT | .DATATYPE_REF_FLAG
+    table[.DATATYPE_PSHORT] = $P1
+
+    $P1 = 'from_json'(<<'JSON')
+{ "c_type":   "int *",
+  "pcc_type": "PMC  *",
+  "sig_char": "P",
+  "preamble_tmpl": "{ int i = (int)VTABLE_get_integer(interp, t_%i); v_%i = &i; }",
+  "postamble_tmpl": "VTABLE_set_integer_native(interp, t_%i, *(int*)v_%i)" }
+JSON
+    # $I0 = .DATATYPE_PINT | .DATATYPE_REF_FLAG
+    table[.DATATYPE_PINT] = $P1
+
+    $P1 = 'from_json'(<<'JSON')
+{ "c_type":   "long *",
+  "pcc_type": "PMC  *",
+  "sig_char": "P",
+  "preamble_tmpl": "{ long i = (long)VTABLE_get_integer(interp, t_%i); v_%i = &i; }",
+  "postamble_tmpl": "VTABLE_set_integer_native(interp, t_%i, *(long*)v_%i)" }
+JSON
+    # $I0 = .DATATYPE_PLONG | .DATATYPE_REF_FLAG
+    table[.DATATYPE_PLONG] = $P1
+
+    $P1 = 'from_json'(<<'JSON')
+{ "c_type":   "char *",
+  "pcc_type": "STRING *",
+  "sig_char": "S",
+  "preamble_tmpl": "v_%i = STRING_IS_NULL(t_%i) ? NULL : Parrot_str_to_cstring(interp, t_%i)",
+  "postamble_tmpl": "t_%i = Parrot_str_new(interp, v_%i, 0)" }
+JSON
+    table[.DATATYPE_CSTR] = $P1
+
     $P1 = 'from_json'('{ "c_type": "float", "sig_char": "N", "pcc_type": "FLOATVAL" }')
     table[.DATATYPE_FLOAT] = $P1
 
@@ -1103,16 +1159,9 @@ JSON
         v['func_call_assign'] = 'v_0 = '
     has_func_call_assign:
 
-    $I1 = exists v['preamble_tmpl']
-    if $I1 goto end_preamble_tmpl
-        v['preamble_tmpl'] = "v_%i = t_%i"
-    end_preamble_tmpl:
-
-    $I1 = exists v['postamble_tmpl']
-    if $I1 goto end_postamble_tmpl
-        v['postamble_tmpl'] = "t_%i = v_%i"
-    end_postamble_tmpl:
-
+    .local int pre_tmpl, post_tmpl
+    pre_tmpl = exists v['preamble_tmpl']
+    post_tmpl = exists v['postamble_tmpl']
 
     $I0 = exists v['c_type']
     $I1 = exists v['pcc_type']
@@ -1120,9 +1169,29 @@ JSON
     unless $I2 goto end_temp_tmpl
         $S0 = v['c_type']
         $S1 = v['pcc_type']
-        $S0 = 'sprintf'("%s t_%%i; %s v_%%i", $S1, $S0)
-        v['temp_tmpl'] = $S0
+        $S2 = 'sprintf'("%s t_%%i; %s v_%%i", $S1, $S0)
+        v['temp_tmpl'] = $S2
+        # cast the values: "c_type": "short", "pcc_type": "INTVAL" => INTVAL = (short)
+        eq $S0, $S1, end_temp_tmpl
+        if pre_tmpl goto no_pre
+            $S0 = 'sprintf'("v_%%i = (%s)t_%%i", $S0)
+            v['preamble_tmpl'] = $S0
+            pre_tmpl = 1
+        no_pre:
+        if post_tmpl goto end_temp_tmpl
+            $S0 = 'sprintf'("t_%%i = (%s)v_%%i", $S1)
+            v['postamble_tmpl'] = $S0
+            post_tmpl = 1
+
     end_temp_tmpl:
+
+    if pre_tmpl goto end_preamble_tmpl
+        v['preamble_tmpl'] = "v_%i = t_%i"
+    end_preamble_tmpl:
+
+    if post_tmpl goto end_postamble_tmpl
+        v['postamble_tmpl'] = "t_%i = v_%i"
+    end_postamble_tmpl:
 
     goto iter_loop
   iter_end:

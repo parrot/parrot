@@ -1,8 +1,51 @@
-# Copyright (C) 2002-2010, Parrot Foundation.
+# Copyright (C) 2002-2015, Parrot Foundation.
 
 # This file contains the Parrot Native Call Interface signature
-# declarations required by Parrot's core. To add signatures for extensions,
-# add to F<src/nci/extra_thunks.nci>
+# declarations required by Parrot's core --without-libffi.
+# To add signatures for extensions add to F<src/nci/extra_thunks.nci> or use libffi.
 
 # The format of this file is explained in F<src/nci/extra_thunks.nci>
 
+# t/pmc/nci.t:
+# perl -alne'if (/^\s+dlfunc/) {print substr($F[4],1,1),"    ",substr($F[4],2,-1)}' t/pmc/nci.t > tmp.nci
+# perl -alne'if (/= dlfunc/) {print substr($F[5],1,1),"    ",substr($F[5],2,-1)}' t/pmc/nci.t >> tmp.nci
+# cat tmp.nci | sort -u > test.nci
+
+c
+c    sc
+d
+d    d
+f
+f    ff
+i
+
+# prefer explicit libffi conversion over wrong cc optimizations of static thunks
+#i    33
+#i    4i
+#i    i2
+#i    i3
+
+i    iii
+i    p
+i    pp
+i    sc
+i    t
+l
+p
+p    i
+p    ii
+p    iiii
+p    ip
+p    p
+p    pS
+s
+s    sc
+t
+t    t
+t    tt
+v
+v    fff
+v    p
+v    P
+v    pii
+v    pP
