@@ -913,11 +913,11 @@ ERROR
     (empty_line_regex, pcre_errstr, pcre_errint) = pcre_comp($S0, pcre_extended)
     if pcre_errint goto pcre_comp_err
 
-    $S0 = "^ [[:space:]]* ( (?: [INSPcsilfdpv] [[:space:]]* )+ ) (?: [#] .* )? $"
+    $S0 = "^ [[:space:]]* ( (?: [INSPcsilfdpvt234] [[:space:]]* )+ ) (?: [#] .* )? $"
     (old_style_sig_line_regex, pcre_errstr, pcre_errint) = pcre_comp($S0, pcre_extended)
     if pcre_errint goto pcre_comp_err
 
-    $S0 = ".*? ([INSPcsilfdpv])"
+    $S0 = ".*? ([INSPcsilfdpvt234])"
     (old_style_sig_item_regex, pcre_errstr, pcre_errint) = pcre_comp($S0, pcre_extended)
     if pcre_errint goto pcre_comp_err
 
