@@ -40,7 +40,7 @@ F<docs/pdds/draft/pdd16_native_call.pod>.
 .include 'hash_key_type.pasm'
 .include 'datatypes.pasm'
 
-.macro_const VERSION 0.02
+.macro_const VERSION 0.03
 
 .macro_const SIG_TABLE_GLOBAL_NAME  'signature_table'
 .macro_const OPTS_GLOBAL_NAME       'options'
@@ -1126,16 +1126,9 @@ JSON
         v['func_call_assign'] = 'v_0 = '
     has_func_call_assign:
 
-    $I1 = exists v['preamble_tmpl']
-    if $I1 goto end_preamble_tmpl
-        v['preamble_tmpl'] = "v_%i = t_%i"
-    end_preamble_tmpl:
-
-    $I1 = exists v['postamble_tmpl']
-    if $I1 goto end_postamble_tmpl
-        v['postamble_tmpl'] = "t_%i = v_%i"
-    end_postamble_tmpl:
-
+    .local int pre_tmpl, post_tmpl
+    pre_tmpl = exists v['preamble_tmpl']
+    post_tmpl = exists v['postamble_tmpl']
 
     $I0 = exists v['c_type']
     $I1 = exists v['pcc_type']
@@ -1143,9 +1136,29 @@ JSON
     unless $I2 goto end_temp_tmpl
         $S0 = v['c_type']
         $S1 = v['pcc_type']
-        $S0 = 'sprintf'("%s t_%%i; %s v_%%i", $S1, $S0)
-        v['temp_tmpl'] = $S0
+        $S2 = 'sprintf'("%s t_%%i; %s v_%%i", $S1, $S0)
+        v['temp_tmpl'] = $S2
+        # cast the values: "c_type": "short", "pcc_type": "INTVAL" => INTVAL = (short)
+        eq $S0, $S1, end_temp_tmpl
+        if pre_tmpl goto no_pre
+            $S0 = 'sprintf'("v_%%i = (%s)t_%%i", $S0)
+            v['preamble_tmpl'] = $S0
+            pre_tmpl = 1
+        no_pre:
+        if post_tmpl goto end_temp_tmpl
+            $S0 = 'sprintf'("t_%%i = (%s)v_%%i", $S1)
+            v['postamble_tmpl'] = $S0
+            post_tmpl = 1
+
     end_temp_tmpl:
+
+    if pre_tmpl goto end_preamble_tmpl
+        v['preamble_tmpl'] = "v_%i = t_%i"
+    end_preamble_tmpl:
+
+    if post_tmpl goto end_postamble_tmpl
+        v['postamble_tmpl'] = "t_%i = v_%i"
+    end_postamble_tmpl:
 
     goto iter_loop
   iter_end:
