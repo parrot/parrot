@@ -363,7 +363,6 @@ USAGE
 #include "parrot/nci.h"
 #include "pmc/pmc_nci.h"
 
-
 #ifdef PARROT_IN_EXTENSION
 /* external libraries can't have strings statically compiled into parrot */
 #  define CONST_STRING(i, s) Parrot_str_new_constant((i), (s))
@@ -585,8 +584,13 @@ CODA
         $I1 = iseq i, 0
         $I2 = band sig_elt, .DATATYPE_REF_FLAG
         $I3 = or $I1, $I2
+        if sig_elt == .DATATYPE_PSHORT goto ref
+        if sig_elt == .DATATYPE_PINT   goto ref
+        if sig_elt == .DATATYPE_PLONG  goto ref
+        if sig_elt == .DATATYPE_CSTR   goto ref
         unless $I3 goto next
 
+       ref:
         $P0 = 'map_from_sig_table'('postamble_tmpl', sig_elt)
         $S0 = $P0[0]
         $S0 = 'fill_tmpl_int'($S0, i)
@@ -830,7 +834,7 @@ TEMPLATE
         $P0 = dlfunc $P0, "Parrot_dt_get_datatype_name", "SpI"
         $P1 = getinterp
         $S0 = $P0($P1, $I0)
-        $S0 = 'sprintf'("Unsupported nci signature type: `%s'", $S0)
+        $S0 = 'sprintf'("Unsupported nci signature type: `%s' %d", $S0, $I2)
         die $S0
     end_loop:
 
@@ -1050,14 +1054,44 @@ JSON
     $P1 = 'from_json'('{ "c_type": "Parrot_Int8", "sig_char": "I", "pcc_type": "INTVAL" }')
     table[.DATATYPE_INT64] = $P1
 
-    $P1 = 'from_json'('{ "c_type": "short *", "sig_char": "2", "pcc_type": "PMC *" }')
+    $P1 = 'from_json'(<<'JSON')
+{ "c_type":   "short *",
+  "pcc_type": "PMC  *",
+  "sig_char": "P",
+  "preamble_tmpl": "{ INTVAL i = VTABLE_get_integer(interp, t_%i); v_%i = (short *)&i; }",
+  "postamble_tmpl": "VTABLE_set_integer_native(interp, t_%i, *(short*)v_%i)" }
+JSON
+    # $I0 = .DATATYPE_PSHORT | .DATATYPE_REF_FLAG
     table[.DATATYPE_PSHORT] = $P1
 
-    $P1 = 'from_json'('{ "c_type": "int *",   "sig_char": "3", "pcc_type": "PMC *" }')
+    $P1 = 'from_json'(<<'JSON')
+{ "c_type":   "int *",
+  "pcc_type": "PMC  *",
+  "sig_char": "P",
+  "preamble_tmpl": "{ INTVAL i = VTABLE_get_integer(interp, t_%i); v_%i = (int *)&i; }",
+  "postamble_tmpl": "VTABLE_set_integer_native(interp, t_%i, *(int*)v_%i)" }
+JSON
+    # $I0 = .DATATYPE_PINT | .DATATYPE_REF_FLAG
     table[.DATATYPE_PINT] = $P1
 
-    $P1 = 'from_json'('{ "c_type": "long *",  "sig_char": "4", "pcc_type": "PMC *" }')
+    $P1 = 'from_json'(<<'JSON')
+{ "c_type":   "long *",
+  "pcc_type": "PMC  *",
+  "sig_char": "P",
+  "preamble_tmpl": "{ INTVAL i = VTABLE_get_integer(interp, t_%i); v_%i = (long *)&i; }",
+  "postamble_tmpl": "VTABLE_set_integer_native(interp, t_%i, *(long*)v_%i)" }
+JSON
+    # $I0 = .DATATYPE_PLONG | .DATATYPE_REF_FLAG
     table[.DATATYPE_PLONG] = $P1
+
+    $P1 = 'from_json'(<<'JSON')
+{ "c_type":   "char *",
+  "pcc_type": "STRING *",
+  "sig_char": "S",
+  "preamble_tmpl": "v_%i = STRING_IS_NULL(t_%i) ? NULL : Parrot_str_to_cstring(interp, t_%i)",
+  "postamble_tmpl": "t_%i = Parrot_str_new(interp, v_%i, 0)" }
+JSON
+    table[.DATATYPE_CSTR] = $P1
 
     $P1 = 'from_json'('{ "c_type": "float", "sig_char": "N", "pcc_type": "FLOATVAL" }')
     table[.DATATYPE_FLOAT] = $P1
@@ -1087,9 +1121,6 @@ JSON
 
     $P1 = 'from_json'('{ "c_type": "FLOATVAL", "pcc_type": "FLOATVAL", "sig_char": "N" }')
     table[.DATATYPE_FLOATVAL] = $P1
-
-    $P1 = 'from_json'('{ "c_type": "char *", "pcc_type": "STRING *", "sig_char": "t" }')
-    table[.DATATYPE_CSTR] = $P1
 
     # fixup table
     .local pmc table_iter

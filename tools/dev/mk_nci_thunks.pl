@@ -28,14 +28,14 @@ foreach (qw( core_thunks extra_thunks )) {
     my $c_file   = File::Spec->catfile("src", "nci", "$_.c");
     my $nci_file = File::Spec->catfile("src", "nci", "$_.nci");
     my $loader_name = "Parrot_nci_load_$_";
-    print "$nci_file > $c_file\n";
-    system("$parrot $nci_thunk_gen " .
+    my $cmd = "$parrot $nci_thunk_gen " .
             "--core " .
             "--loader-name=$loader_name " .
             "--output=$c_file " .
             "--no-warn-dups " .
-            "<$nci_file "
-    );
+            "<$nci_file";
+    print $cmd,"\n";
+    system($cmd);
 }
 
 # Local Variables:
