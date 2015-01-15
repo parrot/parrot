@@ -6,22 +6,33 @@ tools/dev/nci_thunk_gen.pir - Build up native call thunk routines
 
 =head1 SYNOPSIS
 
-    % ./parrot tools/dev/nci_thunk_gen.pir -o src/nci/extra_thunks.c <src/nci/extra_thunks.nci
+    $ perl -alne'if (/dlfunc/) {print substr($F[4],1,1),"    ",substr($F[4],2,-1)}' \
+        runtime/parrot/library/SDL.pir | sort -u > src/nci/SDL.nci
+    $ ./parrot tools/dev/nci_thunk_gen.pir --dynext --target=loader-dynext \
+        -o src/dynext/SDL_thunks.c <src/nci/SDL.nci
+
+    $ ./parrot tools/dev/nci_thunk_gen.pir --core --loader-name=Parrot_nci_load_extra_thunks \
+       --no-warn-dups -o src/nci/extra_thunks.c <src/nci/extra_thunks.nci
+
+    $ tools/dev/mk_nci_thunks.pl
 
 =head1 DESCRIPTION
 
-This script creates Native Call Interface files. It parses a file of function
-signatures of the form:
+This script creates static Native Call Interface files useful to pre-cache ffi signatures
+or when I<libffi> is not available. It parses a file of function signatures of the form:
 
- <return-type-specifier><ws><parameter-type-specifiers>[<ws>][#<comment>]
-    ...
+  <return-type-specifier><ws><parameter-type-specifiers>[<ws>][#<comment>]
+  ...
+
 Empty lines and lines containing only whitespace or comment are ignored.
 The types specifiers are documented in F<src/nci/extra_thunks.nci>.
 
 =head1 SEE ALSO
 
-F<src/nci/extra_thunks.nci>.
-F<docs/pdds/pdd16_native_call.pod>.
+F<ols/dev/mk_nci_thunks.pl>,
+F<src/nci/core_thunks.nci>,
+F<src/nci/extra_thunks.nci>,
+F<docs/pdds/draft/pdd16_native_call.pod>.
 
 =cut
 
@@ -341,10 +352,10 @@ USAGE
  */
 
 /* %s
- *  Copyright (C) 2010-2012, Parrot Foundation.
+ *  Copyright (C) 2010-2015, Parrot Foundation.
  *  Overview:
  *     Native Call Interface routines.
- *     Code to call C from parrot.
+ *     Code to call C from parrot without libffi.
  */
 
 %s

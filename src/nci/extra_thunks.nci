@@ -1,6 +1,9 @@
 # Copyright (C) 2002-2015, Parrot Foundation.
 
 # Function signature declarations for Parrot Native Call Interface.
+# This file contains the Parrot Native Call Interface signature
+# declarations required by Parrot's extensions --without-libffi.
+
 # The first alphanumeric is the type of the return value,
 # the other alphanumerics denote the input parameter types.
 
@@ -153,7 +156,7 @@ p    ppippppi    # PQexecParams
 p    pppip       # PQprepage
 
 # Used by SDL
-# perl -alne'if (/dlfunc/) {print substr($F[4],1,1),"    ",substr($F[4],2,-1)}'  runtime/parrot/library/SDL.pir > SDL.nci
+# perl -alne'if (/dlfunc/) {print substr($F[4],1,1),"    ",substr($F[4],2,-1)}'  runtime/parrot/library/SDL.pir | sort -u > SDL.nci
 i
 i    p
 i    pii
@@ -179,94 +182,6 @@ v    v
 
 # used by pcre
 i    ppiipi
-
-# t/pmc/nci.t
-c
-c    p
-c    pi
-
-d
-d    d
-
-f
-f    ff
-f    is
-
-i
-i    d
-i    i
-i    ii
-i    iiii
-i    iiilsp
-i    iil
-i    iili
-i    iip
-i    iipi
-i    ilsp
-i    l
-i    li
-i    lp
-i    lsp
-i    p
-i    pi
-i    pii
-i    piii
-i    piiiiii
-i    piiilsp
-i    piil
-i    piili
-i    piip
-i    pipl
-i    pilsp
-i    piipi
-i    pl
-i    pli
-i    pll
-i    pllllllll
-i    plp
-i    plsp
-i    pp
-i    ppi
-i    ppiiiiiiii
-i    pppp
-i    psp
-i    s
-i    sp
-i    sss
-i    ssss
-
-l
-l    ii
-l    p
-l    pi
-l    pii
-
-p
-p    i
-p    ii
-p    iiii
-p    iiiiii
-p    iiiiiiii
-p    p
-p    pi
-p    pii
-p    piiii
-p    ppp
-p    ppppppp
-
-s
-
-i    pP
-i    sc
-s    sc
-c    sc
-i    iii
-v    P
-v    pP
-p    ip
-v    pii
-
-v    p
 
 # Testing xlib
 
@@ -295,7 +210,7 @@ ptr  (ptr, int, ptr&, int&, ptr)
 int  (ptr, ptr, ptr,  int,  int, int, ptr, int)
 
 # ncurses
-# perl -alne'if (/dlfunc/) {print substr($F[4],1,1),"    ",substr($F[4],2,-1)}'  runtime/parrot/library/Curses.pir | sort -u > curses.nci
+# perl -alne'if (/dlfunc/) {print substr($F[4],1,1),"    ",substr($F[4],2,-1)}'  runtime/parrot/library/Curses.pir | sort -u > ncurses.nci
 c
 i
 i    4
