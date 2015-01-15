@@ -202,6 +202,26 @@ pcf_int_ptr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     Parrot_pcc_set_call_from_c_args(interp, call_object, "I", t_0);
 }
 static void
+pcf_int_ptr_ptr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
+{
+    typedef int(* func_t)(void *, void *);
+    func_t fn_pointer;
+    void *orig_func;
+    PMC * const ctx         = CURRENT_CONTEXT(interp);
+    PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
+    INTVAL t_0; int v_0;
+    PMC  * t_1; void * v_1;
+    PMC  * t_2; void * v_2;
+    Parrot_pcc_fill_params_from_c_args(interp, call_object, "PP", &t_1, &t_2);
+    v_1 = PMC_IS_NULL(t_1) ? NULL : VTABLE_get_pointer(interp, t_1);;
+    v_2 = PMC_IS_NULL(t_2) ? NULL : VTABLE_get_pointer(interp, t_2);;
+    GETATTR_NCI_orig_func(interp, nci, orig_func);
+    fn_pointer = (func_t)D2FPTR(orig_func);
+    v_0 =  (*fn_pointer)(v_1, v_2);
+    t_0 = (INTVAL)v_0;
+    Parrot_pcc_set_call_from_c_args(interp, call_object, "I", t_0);
+}
+static void
 pcf_int_short_char(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef int(* func_t)(short, char);
@@ -754,6 +774,18 @@ Parrot_nci_load_core_thunks(PARROT_INTERP) {
             VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
         temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
         VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_int_ptr);
+        VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
+    }
+
+    {
+        const int n = 3;
+        static const int sig[] = { 7, 30, 30, };
+        PMC *sig_pmc = Parrot_pmc_new_init_int(interp, enum_class_FixedIntegerArray, n);
+        int i;
+        for (i = 0; i < n; i++)
+            VTABLE_set_integer_keyed_int(interp, sig_pmc, i, sig[i]);
+        temp_pmc = Parrot_pmc_new(interp, enum_class_UnManagedStruct);
+        VTABLE_set_pointer(interp, temp_pmc, (void *)pcf_int_ptr_ptr);
         VTABLE_set_pmc_keyed(interp, nci_funcs, sig_pmc, temp_pmc);
     }
 
