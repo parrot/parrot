@@ -122,8 +122,8 @@ failed:
 
     .store_nci_func( 'Init', 'ii' )
 
-#    dlfunc sdl_function, libsdl, 'SDL_Init', 'ii'
-#    set_hll_global ['SDL'; 'NCI'], 'Init', sdl_function
+    #dlfunc sdl_function, libsdl, 'SDL_Init', 'ii'
+    #set_hll_global ['SDL'; 'NCI'], 'Init', sdl_function
     dlfunc sdl_function, libsdl, 'SDL_SetVideoMode', 'piiil'
     set_hll_global ['SDL'; 'NCI'], 'SetVideoMode', sdl_function
     dlfunc sdl_function, libsdl, 'SDL_Quit', 'v'

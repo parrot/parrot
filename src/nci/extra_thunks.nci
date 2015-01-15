@@ -153,17 +153,29 @@ p    ppippppi    # PQexecParams
 p    pppip       # PQprepage
 
 # Used by SDL
+# perl -alne'if (/dlfunc/) {print substr($F[4],1,1),"    ",substr($F[4],2,-1)}'  runtime/parrot/library/SDL.pir > SDL.nci
+i
+i    p
+i    pii
+i    ppi
+i    pppp
+i    pt33
+i    v
+p    iiiiiiii
 p    iiil
-i    ppl
+p    p
+p    pi
+p    pti
+p    ptii
+p    t
+p    ti
+t    i
+t    v
+v
+v    p
+v    piiii
 v    pip
-i    ppp
-# added by RNH for the RenderXXX_XXXX text routines 
-p    ppii
-
-
-# Used by SDL::Font
-p    ppp 
-
+v    v
 
 # used by pcre
 i    ppiipi
@@ -284,8 +296,8 @@ int  (ptr, ptr, ptr,  int,  int, int, ptr, int)
 
 # ncurses
 # perl -alne'if (/dlfunc/) {print substr($F[4],1,1),"    ",substr($F[4],2,-1)}'  runtime/parrot/library/Curses.pir | sort -u > curses.nci
-c    
-i    
+c
+i
 i    4
 i    42p
 i    4i
@@ -346,7 +358,7 @@ i    sss
 i    ssss
 i    t
 i    ti
-l    
+l
 l    33l
 l    ii
 l    l4
@@ -354,7 +366,7 @@ l    p
 l    p33l
 l    pi
 l    pii
-p    
+p
 p    b
 p    ii
 p    iiii
@@ -365,12 +377,12 @@ p    piiii
 p    t
 p    tpp
 s    i
-t    
+t
 t    i
 t    ii
 t    pi
 t    t
-v    
+v
 v    i
 v    illllllll
 v    l
