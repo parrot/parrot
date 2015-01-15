@@ -13,6 +13,9 @@
           See api.yml. #1170 #1122
         + Reenabled the following NCI signatures: t (cstring), 2 (Integer PMC -> short),
           3 (-> int), 4 (-> long). SDL and Curses is now usable again. #436, #601, #605
+        + Added a useful subset of static nci thunks to core-thunks. #1171
+          Updated the extra thunks to pass most nci examples even without libffi, just
+          234 requires libffi.
     - Build
         + More code cleanup to reduce compiler warnings, code size and unneeded calls.
         + Add ARGIN_FORMAT declarations, probe for gnu_printf, ms_printf, printf. #1163
