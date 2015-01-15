@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2013, Parrot Foundation.
+# Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 [DRAFT] PDD 16: Native Call Interface (NCI)
 
@@ -101,16 +101,6 @@ I<no> management of.
 This parameter is used for passing user data to a callback creation. More
 explanation in the L<callbacks> section.
 
-=back
-
-Note that not all types are valid as return types.
-
-=head3 Deprecated Symbols
-
-The following symbols have been deprecated:
-
-=over 4
-
 =item 2
 
 A pointer to a short, taken from an P register of an int-like PMC.
@@ -128,6 +118,8 @@ A pointer to a long, taken from an P register of an int-like PMC.
 string pointer.
 
 =back
+
+Note that not all types are valid as return types.
 
 =head3 Example NCI call
 
