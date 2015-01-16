@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2014, Parrot Foundation.
+# Copyright (C) 2004-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -18,15 +18,17 @@ use warnings;
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    # x86_64 on gcc has cmpxchg
+    # AMD64 on gcc has cmpxchg
     my $gcc = $conf->data->get('gccversion');
+    $conf->debug("gccversion: $gcc\n");
     if ( defined $gcc ) {
         # HAS_foo defines PARROT_HAS_`uc foo`
         $conf->data->set(
-            "HAS_I386_GCC_CMPXCHG"   => '1',
-            "HAS_X86_64_GCC_CMPXCHG" => '1',
+            "HAS_I386_gcc_cmpxchg"  => '1',
+            "HAS_AMD64_gcc_cmpxchg" => '1',
         );
-    }
+        $conf->debug(" (gcc_cmpxchg)\n");
+   }
 }
 
 1;
