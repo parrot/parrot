@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2014, Parrot Foundation.
+Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -864,7 +864,8 @@ Note that the C<from> PMC can be of any of the various array types.
         if (tail > 0 && sizediff > 0) {
             /* we're shrinking the array, so first move the tail left. */
             /* maybe we can just adjust the offset. */
-            if (offset >= sizediff) { /* enough room at the left to fill in from */
+            /* FIXME! See https://github.com/perl6/nqp/issues/209#issuecomment-70256067 */
+            if (0 && offset >= sizediff) { /* enough room at the left to fill in from */
                 TRACE_RPAself("splice shrink fast", SELF);
                 TRACE_SPLC;
                 PMC_offset(SELF) += elems1;
