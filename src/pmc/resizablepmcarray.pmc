@@ -885,16 +885,17 @@ Note that the C<from> PMC can be of any of the various array types.
         if (newsize > threshold - offset) {
             SELF.set_integer_native(newsize);
             offset = PMC_offset(SELF);
-            item = PMC_array(SELF);
+            item   = PMC_array(SELF);
         }
         else {
-            PMC_size(SELF) = newsize;
+            PMC_size(SELF) = newsize; /* enough room */
         }
         item += offset;
         if (tail > 0 && sizediff < 0) { /* elems1 > count */
             TRACE_RPAself("splice grow", SELF);
             TRACE_SPLC;
-            PARROT_ASSERT(offset + newsize <= PMC_threshold(SELF));
+            /* #1175 with (5,4,8) off=0 count=0 elems1=2 newsize=4 tail=2 sizediff=-2 */
+            PARROT_ASSERT(offset + newsize <= PMC_threshold(SELF)); /* FIXME */
             /* the array grew, so move the tail to the right */
             memmove(item + off + elems1, item + off + count,
                     tail * sizeof (PMC *));

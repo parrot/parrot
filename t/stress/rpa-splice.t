@@ -23,11 +23,12 @@ use strict;
 use warnings;
 use lib qw(lib ../../lib);
 use Parrot::Test tests => (3*3*5*5) +
-                          33;
+                          402;
 
 #TODO: check if running under asan or valgrind and diag if not
 
 # rpa GH #766 heap-buffer-overflow with asan, when negative counts were allowed
+if (1) {
 for my $i0 (0..2) {
     for my $i1 (0..2) {
         for my $offset (-2..2) {
@@ -48,36 +49,60 @@ CODE
     }
   }
 }
+}
 
-# test shrink fast, which deleted one too less
-for my $i0 (2..7) {                # size of p0
-    for my $o0 (0 .. $i0) {        # offsets in p0
-        for my $offset (0) {       # offset to splice
-            for my $count (1) {    # count to splice
+# test shrink fast with count-1, which deleted one too less #1174
+# also test splice grow with count=2 #1175
+for my $count (0,1,2) {                # count to splice
+    for my $i0 (1..9) {                # size of p0
+        for my $off (0 .. $i0) {       # create internal offsets in p0
+          CYCLE:
+            for my $offset (0..2) {    # offset to splice, positive only here
+                my (@result, @splice);
                 my $code = ".sub main :main
     .local pmc p0, p1
     p0 = new ['ResizablePMCArray']
     p1 = new ['ResizablePMCArray']
     p1 = 0
 ";
-                # fill p0
-                for my $i (0 .. $i0-1) {
-                    $code .= "    push p0, '".chr(65+$i)."'\n";
+                # fill p0, but not over 8
+                my $max = $i0-1 > 7 ? 7 : $i0-1;
+                for my $i (0 .. $max) {
+                    my $c = chr(65+$i);
+                    $code .= "    push p0, '$c'\n";
+                    push @result, $c;
+                }
+                if ($count) {
+                    for my $i (1 .. $count) {
+                        my $c = chr(96+$i);
+                        $code .= "    push p1, '$c'\n";
+                        push @splice, $c;
+                    }
                 }
                 # create offsets in p0
-                $code .= "    # create offset=$o0\n";
-                for my $i (1 .. $o0) {
+                $code .= "    # create offset=$off\n";
+                for my $i (1 .. $off) {
+                    next CYCLE unless @result;
                     $code .= "    \$I0 = shift p0\n";
+                    shift @result;
                 }
+                for my $i ($max+1 .. $i0-1) { # if we are over 8, push it
+                    my $c = chr(65+$i);
+                    $code .= "    push p0, '$c'\n";
+                    push @result, $c;
+                }
+                my $size = $i0 - $off;
+                next if $offset > $size;
+                splice @result, $offset, $count, @splice;
                 $code .= "    # push_eh eh
-    # rpa splice ($i0,$o0,8)
+    # rpa splice ($off,$size,8)
     splice p0, p1, $offset, $count
     \$S0 = join '', p0
-    \$I1 = length \$S0
-    print \$I1
+    say \$S0
 .end
 ";
-                pir_output_is( $code, $i0>$o0 ? $i0-$o0-1 : 0, "ResizablePMCArray.splice ($i0,$o0,8) $offset, $count");
+                my $expected = join("", @result)."\n"; #length: $size-$count+$insert;
+                pir_output_is( $code, $expected, "ResizablePMCArray.splice ($off,$size,8) $offset, $count");
             }
         }
     }
