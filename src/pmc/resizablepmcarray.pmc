@@ -864,10 +864,10 @@ Note that the C<from> PMC can be of any of the various array types.
         if (tail > 0 && sizediff > 0) {
             /* we're shrinking the array, so first move the tail left. */
             /* maybe we can just adjust the offset. */
-            /* FIXME! See https://github.com/perl6/nqp/issues/209#issuecomment-70256067 */
-            if (0 && offset >= sizediff) { /* enough room at the left to fill in from */
+            if (offset >= sizediff) { /* enough room at the left to fill in from */
                 TRACE_RPAself("splice shrink fast", SELF);
                 TRACE_SPLC;
+                /* #1174 with offset=3,size=2,tresh=8, off=0, count=1, elems1=0, tail=1, sizediff=1 */
                 PMC_offset(SELF) += elems1;
                 item += offset + elems1;
                 goto splice_copy;

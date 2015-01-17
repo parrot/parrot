@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2014, Parrot Foundation.
+# Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -22,7 +22,7 @@ out-of-bounds test. Checks INT and PMC keys.
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
 
-    plan(158)
+    plan(159)
 
     init_tests()
     resize_tests()
@@ -1016,6 +1016,25 @@ too_low_end:
     splice $P1, $P2, 0, 2  # 1,3,8 off=0, count=2, elems1=1, tail=3, sizediff=1
     $S0 = join "", $P1
     is($S0, "A3", "splice shrink fast")
+
+    # GH 1178
+    .local pmc p0, p1
+    p0 = new ['ResizablePMCArray']
+    p1 = new ['ResizablePMCArray']
+    p1 = 0
+    push p0, 'A'
+    push p0, 'B'
+    push p0, 'C'
+    push p0, 'D'
+    push p0, 'E'
+    # create offset=3
+    $I0 = shift p0
+    $I0 = shift p0
+    $I0 = shift p0
+    # rpa splice DE (5, 3, 8)
+    p0 = splice p1, 0, 1
+    $S0 = join '', p0
+    is($S0, "E", "splice shrink fast - GH #1174")
 .end
 
 .sub iterate_subclass_of_rpa
