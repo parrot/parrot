@@ -24,7 +24,7 @@ use warnings;
 use lib qw(lib ../../lib);
 use constant MEMCHECK => 0; # or 1
 use Parrot::Test tests => MEMCHECK * (3*3*5*5)
-                           + 402;
+                           + 396;
 
 #TODO: check if running under asan or valgrind and diag if not
 
@@ -97,7 +97,9 @@ for my $count (0,1,2) {                # count to splice
                 }
                 my $size = $i0 - $off;
                 next if $offset > $size;
-                # FIXME: throw 'splice() offset past end of array' in parrot #1176
+                if ($offset + $count > @result) {
+                    $code .= "    # throws splice() offset past end of array' #1176\n";
+                }
                 splice @result, $offset, $count, @splice;
                 $code .= "    # push_eh eh
     # rpa splice ($off,$size,8)
@@ -106,8 +108,13 @@ for my $count (0,1,2) {                # count to splice
     say \$S0
 .end
 ";
-                my $expected = join("", @result)."\n"; #length: $size-$count+$insert;
-                pir_output_is( $code, $expected, "ResizablePMCArray.splice ($off,$size,8) $offset, $count");
+                if ($offset + $count > @result) {
+                    pir_exit_code_is( $code, 1, "exit 1 ResizablePMCArray.splice ($off,$size,8) $offset, $count");
+                }
+                else {
+                    my $expected = join("", @result)."\n"; #length: $size-$count+$insert;
+                    pir_output_is( $code, $expected, "ResizablePMCArray.splice ($off,$size,8) $offset, $count");
+                }
             }
         }
     }
