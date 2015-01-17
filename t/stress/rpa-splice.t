@@ -22,13 +22,14 @@ params offset=3,size=2,tresh=8 and off=0, count=1, elems1=0, tail=1, sizediff=1.
 use strict;
 use warnings;
 use lib qw(lib ../../lib);
-use Parrot::Test tests => (3*3*5*5) +
-                          402;
+use constant MEMCHECK => 0; # or 1
+use Parrot::Test tests => MEMCHECK * (3*3*5*5)
+                           + 402;
 
 #TODO: check if running under asan or valgrind and diag if not
 
 # rpa GH #766 heap-buffer-overflow with asan, when negative counts were allowed
-if (1) {
+if (MEMCHECK) {
 for my $i0 (0..2) {
     for my $i1 (0..2) {
         for my $offset (-2..2) {
@@ -63,7 +64,6 @@ for my $count (0,1,2) {                # count to splice
     .local pmc p0, p1
     p0 = new ['ResizablePMCArray']
     p1 = new ['ResizablePMCArray']
-    p1 = 0
 ";
                 # fill p0, but not over 8
                 my $max = $i0-1 > 7 ? 7 : $i0-1;
@@ -82,17 +82,22 @@ for my $count (0,1,2) {                # count to splice
                 # create offsets in p0
                 $code .= "    # create offset=$off\n";
                 for my $i (1 .. $off) {
+                    # Note: Can't shift from an empty array in parrot, but perl5 accepts it
                     next CYCLE unless @result;
                     $code .= "    \$I0 = shift p0\n";
                     shift @result;
                 }
                 for my $i ($max+1 .. $i0-1) { # if we are over 8, push it
+                    next CYCLE unless @result;
+                    $code .= "    \$I0 = shift p0\n";
+                    shift @result;
                     my $c = chr(65+$i);
-                    $code .= "    push p0, '$c'\n";
-                    push @result, $c;
+                    $code .= "    unshift p0, '$c'\n";
+                    unshift @result, $c;
                 }
                 my $size = $i0 - $off;
                 next if $offset > $size;
+                # FIXME: throw 'splice() offset past end of array' in parrot #1176
                 splice @result, $offset, $count, @splice;
                 $code .= "    # push_eh eh
     # rpa splice ($off,$size,8)
