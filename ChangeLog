@@ -16,7 +16,7 @@
         + Added a useful subset of static nci thunks to core-thunks. #1171
           Updated the extra thunks to pass most nci examples even without libffi, just
           234 requires libffi.
-        + Temporarily disabled a rpa splice shrink fast optimization branch, which broke perl6.
+        + Fixed a blocking rpa splice shrink fast bug (delete from left), which broke perl6.
           See https://github.com/perl6/nqp/issues/209, GH #1174.
     - Build
         + More code cleanup to reduce compiler warnings, code size and unneeded calls.

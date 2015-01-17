@@ -867,8 +867,8 @@ Note that the C<from> PMC can be of any of the various array types.
             if (offset >= sizediff) { /* enough room at the left to fill in from */
                 TRACE_RPAself("splice shrink fast", SELF);
                 TRACE_SPLC;
-                /* #1174 with offset=3,size=2,tresh=8, off=0, count=1, elems1=0, tail=1, sizediff=1 */
-                PMC_offset(SELF) += elems1;
+                /* #1174: offset=3,size=2,tresh=8, off=0,count=1,elems1=0,tail=1,sizediff=1 */
+                PMC_offset(SELF) += sizediff;
                 item += offset + elems1;
                 goto splice_copy;
             }
