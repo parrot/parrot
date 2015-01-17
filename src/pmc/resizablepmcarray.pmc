@@ -344,6 +344,9 @@ Resizes the array to C<size> elements.
 
 Removes and returns an item from the start of the array.
 
+This throws an OUT_OF_BOUNDS exception if the array is already empty,
+unlike the perl5 and perl6 shift operator.
+
 =cut
 
 */
@@ -668,8 +671,6 @@ the array.
 
 /*
 
-Removes and returns the last element in the array.
-
 =item C<INTVAL pop_float()>
 
 =item C<INTVAL pop_integer()>
@@ -677,6 +678,11 @@ Removes and returns the last element in the array.
 =item C<PMC *pop_pmc()>
 
 =item C<STRING *pop_string()>
+
+Removes and returns the last element in the array.
+
+This throws an OUT_OF_BOUNDS exception if the array is already empty,
+unlike the perl5 and perl6 shift operator.
 
 =cut
 
@@ -852,6 +858,9 @@ Note that the C<from> PMC can be of any of the various array types.
         if (UNLIKELY(off < 0))
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "splice: index out of bounds");
+        if (UNLIKELY(off > size))
+            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
+                    "splice: offset past end of array");
 
         /* number of elements to the right of the splice (the "tail") */
         tail = size - off - count;
