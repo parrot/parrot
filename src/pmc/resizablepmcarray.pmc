@@ -848,6 +848,9 @@ Note that the C<from> PMC can be of any of the various array types.
         const INTVAL elems1    = VTABLE_elements(INTERP, from);
         PMC **item;
         INTVAL tail, sizediff, newsize;
+#ifndef NDEBUG
+        int no_debug = 0; /* if we didn't branch into a TRACE_RPA */
+#endif
 
         /* start from end? */
         if (UNLIKELY(off < 0))
@@ -858,9 +861,15 @@ Note that the C<from> PMC can be of any of the various array types.
         if (UNLIKELY(off < 0))
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "splice: index out of bounds");
-        if (UNLIKELY(off > size))
+        if (UNLIKELY(off > size)) {
             Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, /* _MISC in perl5 */
                     "splice: offset past end of array");
+            TRACE_RPAself("splice off > size", SELF);
+            TRACE_SPLC;
+            SELF.set_integer_native(off);
+            offset = PMC_offset(SELF);
+            item   = PMC_array(SELF);
+        }
 
         /* number of elements to the right of the splice (the "tail") */
         tail = size - off - count;
@@ -873,22 +882,27 @@ Note that the C<from> PMC can be of any of the various array types.
         if (tail > 0 && sizediff > 0) {
             /* we're shrinking the array, so first move the tail left. */
             /* maybe we can just adjust the offset. */
-            if (offset >= sizediff) { /* enough room at the left to fill in from */
+            if (!off && offset >= sizediff) { /* enough room at the left to fill in from */
                 TRACE_RPAself("splice shrink fast", SELF);
                 TRACE_SPLC;
-                /* #1174: offset=3,size=2,tresh=8, off=0,count=1,elems1=0,tail=1,sizediff=1 */
-                PMC_offset(SELF) += sizediff;
                 item += offset + elems1;
+                offset += sizediff;
+                PMC_offset(SELF) = offset;
+                PMC_size(SELF) -= sizediff;
                 goto splice_copy;
             }
             else {
-                item += offset;
                 TRACE_RPAself("splice shrink", SELF);
                 TRACE_SPLC;
-                memmove(item + off + elems1, item + off + count,
+                memmove(item + offset + off + elems1, item + offset + off + count,
                         tail * sizeof (PMC *));
             }
         }
+#ifndef NDEBUG
+        else {
+            no_debug = 1;
+        }
+#endif
         /* now resize the array */
         newsize = off + elems1 + tail;
         if (newsize > threshold - offset) {
@@ -903,12 +917,16 @@ Note that the C<from> PMC can be of any of the various array types.
         if (tail > 0 && sizediff < 0) { /* elems1 > count */
             TRACE_RPAself("splice grow", SELF);
             TRACE_SPLC;
-            /* #1175 with (5,4,8) off=0 count=0 elems1=2 newsize=4 tail=2 sizediff=-2 */
-            PARROT_ASSERT(offset + newsize <= PMC_threshold(SELF)); /* FIXME */
+            PARROT_ASSERT(offset + newsize <= PMC_threshold(SELF));
             /* the array grew, so move the tail to the right */
             memmove(item + off + elems1, item + off + count,
                     tail * sizeof (PMC *));
         }
+#ifndef NDEBUG
+        else if (!no_debug) {
+            no_debug = 1;
+        }
+#endif
 
       splice_copy:
         /* now copy C<from>'s elements into SELF */
@@ -920,6 +938,13 @@ Note that the C<from> PMC can be of any of the various array types.
             for (i = 0; i < elems1; i++)
                 item[off + i] = VTABLE_shift_pmc(INTERP, iter);
         }
+#ifndef NDEBUG
+        else if (no_debug) {
+            /* we are better of with a simple resize here */
+            TRACE_RPAself("splice noop", SELF);
+            TRACE_SPLC;
+        }
+#endif
     }
 
 /*

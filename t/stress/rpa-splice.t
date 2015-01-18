@@ -26,7 +26,9 @@ Test offset past end of array warnings and correctness. #1176
 use strict;
 use warnings;
 use lib qw(lib ../../lib);
-use constant MAXSIZE  => 5; # 3 .. 9
+my $maxsize;
+BEGIN { $maxsize = @ARGV ? shift : 7}
+use constant MAXSIZE => $maxsize; # 3 .. 9
 use Parrot::Test;
 
 sub is_memcheck {
@@ -109,16 +111,20 @@ for my $count (0,1,2) {                # count to splice
                     }
                     my $size = scalar @result; #$i0 - $off;
                     next if $offset > $size + 1; # test only off-by-one (enlarge by 1, no 2++)
+                    my $splice = join("", @splice);
+                    my $p0 = join("", @result);
                     if ($offset > $size) {
                         $code .= "    # warn 'splice() offset past end of array' #1176
     .include \"warnings.pasm\"
     warningson .PARROT_WARNINGS_UNDEF_FLAG\n";
+                        no warnings;
+                        splice @result, $offset, $count, @splice;
                     }
-                    my $splice = join("", @splice);
-                    my $p0 = join("", @result);
-                    splice @result, $offset, $count, @splice;
+                    else {
+                        splice @result, $offset, $count, @splice;
+                    }
                     my $expected = join("", @result); #length: $size-$count+$insert;
-                    $code .= "    # push_eh eh
+                    $code .= "
     # rpa splice ($off,$size,8)
     # p0: $p0, p1: $splice
     splice p0, p1, $offset, $count
