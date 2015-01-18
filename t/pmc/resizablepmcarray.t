@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2014, Parrot Foundation.
+# Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -22,7 +22,7 @@ out-of-bounds test. Checks INT and PMC keys.
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
 
-    plan(158)
+    plan(163)
 
     init_tests()
     resize_tests()
@@ -970,6 +970,34 @@ too_low:
     finalize $P9
 too_low_end:
     ok($I0, "splice with negative offset too low")
+
+    .local pmc p0, p1
+    p0 = new ['ResizablePMCArray']
+    p1 = new ['ResizablePMCArray']
+    push p0, 'A'
+    push p0, 'B'
+    push p0, 'C'
+    push p0, 'D'
+    push p0, 'E'
+    push p0, 'F'
+    push p0, 'G'
+    push p0, 'H'
+    push p1, 'a'
+    push p1, 'b'
+    # create offset=7
+    $I0 = shift p0
+    $I0 = shift p0
+    $I0 = shift p0
+    $I0 = shift p0
+    $I0 = shift p0
+    $I0 = shift p0
+    $I0 = shift p0
+    # warn 'splice() offset past end of array' #1176
+    # rpa splice (7,1,8)
+    # p0: H, p1: ab
+    splice p0, p1, 2, 2
+    $S0 = join '', p0
+    is($S0, "Hab", "splice with offset arg > size, adjust offset - GH #1176")
 .end
 
 
@@ -1000,6 +1028,38 @@ too_low_end:
     splice $P1, $P2, 0, 2  # 0,3,8 off=0, count=2, elems1=1, tail=1, sizediff=1
     $S0 = join "", $P1
     is($S0, "A3", "splice shrink slow")
+
+    .local pmc p0, p1
+    p0 = new ['ResizablePMCArray']
+    p1 = new ['ResizablePMCArray']
+    push p0, 'A'
+    push p0, 'B'
+    push p0, 'C'
+    push p0, 'D'
+    push p0, 'E'
+    push p1, 'a'
+    # create offset=1
+    $I0 = shift p0
+    # rpa splice (1,4,8)
+    # p0: BCDE, p1: a
+    splice p0, p1, 1, 2
+    $S0 = join '', p0
+    is($S0, "BaE", "splice shrink - GH #1174")
+
+    p0 = 0
+    p1 = 0
+    push p0, 'A'
+    push p0, 'B'
+    push p0, 'C'
+    push p0, 'D'
+    push p1, 'a'
+    # create offset=1
+    $I0 = shift p0
+    # rpa splice (1,3,8)
+    # p0: BCD, p1: a
+    splice p0, p1, 0, 2
+    $S0 = join '', p0
+    is($S0, "aD", "splice shrink - GH #1174")
 .end
 
 .sub splice_shrink_fast
@@ -1016,6 +1076,43 @@ too_low_end:
     splice $P1, $P2, 0, 2  # 1,3,8 off=0, count=2, elems1=1, tail=3, sizediff=1
     $S0 = join "", $P1
     is($S0, "A3", "splice shrink fast")
+
+    # GH 1174
+    .local pmc p0, p1
+    p0 = new ['ResizablePMCArray']
+    p1 = new ['ResizablePMCArray']
+    p1 = 0
+    push p0, 'A'
+    push p0, 'B'
+    push p0, 'C'
+    push p0, 'D'
+    push p0, 'E'
+    # create offset=3
+    $I0 = shift p0
+    $I0 = shift p0
+    $I0 = shift p0
+    # rpa splice DE (5, 3, 8)
+    p0 = splice p1, 0, 1
+    $S0 = join '', p0
+    is($S0, "E", "splice shrink fast - GH #1174")
+
+    p0 = 0
+    p1 = 0
+    push p0, 'A'
+    push p0, 'B'
+    push p0, 'C'
+    push p0, 'D'
+    push p0, 'E'
+    push p0, 'F'
+    push p0, 'G'
+    # create offset=2
+    $I0 = shift p0
+    $I0 = shift p0
+    # rpa splice (2,5,8)
+    # p0: CDEFG, p1:
+    splice p0, p1, 0, 2
+    $S0 = join '', p0
+    is($S0, "EFG", "splice shrink fast - jump to copy, adjust new size also")
 .end
 
 .sub iterate_subclass_of_rpa
