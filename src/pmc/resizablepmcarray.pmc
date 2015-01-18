@@ -866,9 +866,7 @@ Note that the C<from> PMC can be of any of the various array types.
                     "splice: offset past end of array");
             TRACE_RPAself("splice off > size", SELF);
             TRACE_SPLC;
-            SELF.set_integer_native(off);
-            offset = PMC_offset(SELF);
-            item   = PMC_array(SELF);
+            off = size;
         }
 
         /* number of elements to the right of the splice (the "tail") */

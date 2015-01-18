@@ -22,7 +22,7 @@ out-of-bounds test. Checks INT and PMC keys.
     .include 'fp_equality.pasm'
     .include 'test_more.pir'
 
-    plan(162)
+    plan(163)
 
     init_tests()
     resize_tests()
@@ -970,6 +970,34 @@ too_low:
     finalize $P9
 too_low_end:
     ok($I0, "splice with negative offset too low")
+
+    .local pmc p0, p1
+    p0 = new ['ResizablePMCArray']
+    p1 = new ['ResizablePMCArray']
+    push p0, 'A'
+    push p0, 'B'
+    push p0, 'C'
+    push p0, 'D'
+    push p0, 'E'
+    push p0, 'F'
+    push p0, 'G'
+    push p0, 'H'
+    push p1, 'a'
+    push p1, 'b'
+    # create offset=7
+    $I0 = shift p0
+    $I0 = shift p0
+    $I0 = shift p0
+    $I0 = shift p0
+    $I0 = shift p0
+    $I0 = shift p0
+    $I0 = shift p0
+    # warn 'splice() offset past end of array' #1176
+    # rpa splice (7,1,8)
+    # p0: H, p1: ab
+    splice p0, p1, 2, 2
+    $S0 = join '', p0
+    is($S0, "Hab", "splice with offset arg > size, adjust offset - GH #1176")
 .end
 
 
