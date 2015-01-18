@@ -4,6 +4,7 @@
         + Fixed and improved --m={32,64} cross-compilation support and
           automatic libpath adjustments for gcc. #1181, #1182, #1110
         + Actually link with libicu when probing for it. #1182
+        + Optimize away ExtUtils::Command on posix systems. #1177
     - Documentation
     - Tests
     - Community

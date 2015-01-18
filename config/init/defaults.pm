@@ -86,6 +86,7 @@ sub runstep {
     my $debugging = $conf->options->get('debugging');
     my $disable_static = $conf->options->get('disable-static');
     my $disable_shared = $conf->options->get('disable-shared');
+    my $POSIX = $^O !~ /^(MSWin|VMS|riscos|amiga|beos|mpeix|os390|os400|vmesa|VOS|dos|os2)/;
     # We need a Glossary somewhere!
     $conf->data->set(
         debugging => $debugging ? 1 : 0,
@@ -197,14 +198,14 @@ sub runstep {
         test_prog => 'parrot',
 
         # some utilities in Makefile
-        cat       => '$(PERL) -MExtUtils::Command -e cat',
-        chmod     => '$(PERL) -MExtUtils::Command -e chmod',
-        cp        => '$(PERL) -MExtUtils::Command -e cp',
-        mkpath    => '$(PERL) -MExtUtils::Command -e mkpath',
-        mv        => '$(PERL) -MExtUtils::Command -e mv',
-        rm_f      => '$(PERL) -MExtUtils::Command -e rm_f',
-        rm_rf     => '$(PERL) -MExtUtils::Command -e rm_rf',
-        touch     => '$(PERL) -MExtUtils::Command -e touch',
+        cat       => $POSIX ? 'cat'    : '$(PERL) -MExtUtils::Command -e cat',
+        chmod     => $POSIX ? 'chmod'  : '$(PERL) -MExtUtils::Command -e chmod',
+        cp        => $POSIX ? 'cp'     : '$(PERL) -MExtUtils::Command -e cp',
+        mkpath    => $POSIX ? 'mkdir -p' : '$(PERL) -MExtUtils::Command -e mkpath',
+        mv        => $POSIX ? 'mv'     : '$(PERL) -MExtUtils::Command -e mv',
+        rm_f      => $POSIX ? 'rm -f'  : '$(PERL) -MExtUtils::Command -e rm_f',
+        rm_rf     => $POSIX ? 'rm -rf' : '$(PERL) -MExtUtils::Command -e rm_rf',
+        touch     => $POSIX ? 'touch'  : '$(PERL) -MExtUtils::Command -e touch',
 
         # added with 6.9.0 to hint at the rename ops2c => parrot-ops2c
         ops2c     => 'parrot-ops2c',
