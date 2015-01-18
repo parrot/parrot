@@ -307,12 +307,17 @@ sub _64_bit_adjustments {
     my $m = $conf->options->get('m');
     if ($m) {
         my $archname = $conf->data->get('archname');
-        if ( $archname =~ /x86_64/ && $m eq '32' ) {
+        if ( $archname =~ /(64$|64-)/ && $m eq '32' ) {
             $archname =~ s/x86_64/i386/;
 
-            # adjust gcc?
-            for my $cc (qw(cc cxx link ld)) {
-                $conf->data->add( ' ', $cc, '-m32' );
+            # adjust gcc or as fallback the flags
+            for my $cc (qw(cc ld link cxx)) {
+                if (!$conf->options->get($cc)) {
+                    $conf->data->add( ' ', $cc, '-m32' );
+                }
+                else {
+                    $conf->data->add( ' ', $cc.'flags', '-m32' );
+                }
             }
 
             # and lib flags
