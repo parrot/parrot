@@ -98,22 +98,30 @@ for my $count (0,1,2) {                # count to splice
                 my $size = $i0 - $off;
                 next if $offset > $size;
                 if ($offset + $count > @result) {
-                    $code .= "    # throws splice() offset past end of array' #1176\n";
+                    $code .= "    # warn 'splice() offset past end of array' #1176
+    .include \"warnings.pasm\"
+    warningson .PARROT_WARNINGS_UNDEF_FLAG\n";
                 }
+                my $splice = join("", @splice);
+                my $p0 = join("", @result);
                 splice @result, $offset, $count, @splice;
+                my $expected = join("", @result); #length: $size-$count+$insert;
                 $code .= "    # push_eh eh
     # rpa splice ($off,$size,8)
+    # p0: $p0, p1: $splice
     splice p0, p1, $offset, $count
+    # => $expected
     \$S0 = join '', p0
     say \$S0
 .end
 ";
                 if ($offset + $count > @result) {
-                    pir_exit_code_is( $code, 1, "exit 1 ResizablePMCArray.splice ($off,$size,8) $offset, $count");
+                    pir_output_like( $code, qr/splice: offset past end of array\ncurrent instr.: .*\n${expected}\n/,
+                                     "ResizablePMCArray.splice ($off,$size,8) $offset, $count" );
                 }
                 else {
-                    my $expected = join("", @result)."\n"; #length: $size-$count+$insert;
-                    pir_output_is( $code, $expected, "ResizablePMCArray.splice ($off,$size,8) $offset, $count");
+                    pir_output_is( $code, $expected."\n",
+                                   "ResizablePMCArray.splice ($off,$size,8) $offset, $count" );
                 }
             }
         }

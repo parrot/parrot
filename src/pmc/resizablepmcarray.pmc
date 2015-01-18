@@ -859,7 +859,7 @@ Note that the C<from> PMC can be of any of the various array types.
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                     "splice: index out of bounds");
         if (UNLIKELY(off > size))
-            Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
+            Parrot_warn(INTERP, PARROT_WARNINGS_UNDEF_FLAG, /* _MISC in perl5 */
                     "splice: offset past end of array");
 
         /* number of elements to the right of the splice (the "tail") */
