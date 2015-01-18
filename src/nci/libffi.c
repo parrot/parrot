@@ -591,6 +591,7 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
         nci_arg_ptr = mem_gc_allocate_n_zeroed_typed(interp, nci->arity, void *);
 
         for (i = 0; i < nci->arity; i++) {
+            unsigned int slack = 0;
             PARROT_DATA_TYPE t = (PARROT_DATA_TYPE)
                                     VTABLE_get_integer_keyed_int(interp, nci->signature, i + 1);
             switch (t & ~enum_type_ref_flag) {
@@ -661,29 +662,23 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
                 nci_arg_ptr[i] = &nci_val[i].S;
                 break;
               case enum_type_plong:
+                slack = sizeof (INTVAL) - sizeof (long) + 1;
               case enum_type_pint:
+                slack = slack ? slack : sizeof (INTVAL) - sizeof (int) + 1;
               case enum_type_pshort:
+                slack = slack ? slack : sizeof (INTVAL) - sizeof (short) + 1;
                 nci_val[i].t = (char*)&(((Parrot_Integer_attributes *)PMC_data(pcc_arg[i].p))->iv);
-                if (t == enum_type_pint || t == enum_type_pshort) {
-                    /* on little-endian set the remainder to 0,
-                       the callback only manipulates the head. */
+                /* on little-endian set the remainder to 0,
+                   the callback only manipulates the head. */
+                --slack;
+                if (slack) {
 #if !PARROT_BIGENDIAN
-                    memset(&nci_val[i].t[4], 0, 4);
+                    memset(&nci_val[i].t[sizeof (INTVAL) - slack], 0, slack);
 #else
-#  if PARROT_HAS_INT64
-                    /* on BE64 forward the ptr and mask the head. */
-                    memset(&nci_val[i].t, 0, 4);
-                    nci_val[i].t += 4;
-#  endif
+                    /* on BE forward the ptr and mask the head. */
+                    memset(&nci_val[i].t, 0, slack);
+                    nci_val[i].t += slack;
 #endif
-                    if (t == enum_type_pshort) {
-#if !PARROT_BIGENDIAN
-                        memset(&nci_val[i].t[2], 0, 2);
-#else
-                        memset(&nci_val[i].t, 0, 2);
-                        nci_val[i].t += 2;
-#endif
-                    }
                 }
                 nci_arg_ptr[i] = &nci_val[i].t;
                 break;
