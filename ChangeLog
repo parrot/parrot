@@ -20,6 +20,8 @@
         + Added an optional rpa splice warning as in perl5, when an overlarge offset is
           adjusted. #1176
         + Fix a GC regression from 6.11 with ResizablePMCArray #1159 (1.2% slower)
+        + Skip startup warnings "Unknown codeset `', defaulting to ASCII" when
+          nl_langinfo() failed, and silently use ASCII. #1180
     - Build
         + More code cleanup to reduce compiler warnings, code size and unneeded calls.
         + Add ARGIN_FORMAT declarations, probe for gnu_printf, ms_printf, printf. #1163
