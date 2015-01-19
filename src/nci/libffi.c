@@ -669,14 +669,14 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
                 slack = slack ? slack : sizeof (INTVAL) - sizeof (short) + 1;
                 nci_val[i].t = (char*)&(((Parrot_Integer_attributes *)PMC_data(pcc_arg[i].p))->iv);
                 /* on little-endian set the remainder to 0,
-                   the callback only manipulates the head. */
+                   the callback only manipulates the head, on big-endian the tail. */
                 --slack;
                 if (slack) {
 #if !PARROT_BIGENDIAN
                     memset(&nci_val[i].t[sizeof (INTVAL) - slack], 0, slack);
 #else
                     /* on BE forward the ptr and mask the head. */
-                    memset(&nci_val[i].t, 0, slack);
+                    memset(&nci_val[i].t[0], 0, slack);
                     nci_val[i].t += slack;
 #endif
                 }
