@@ -58,6 +58,8 @@ Parrot_init_platform_encoding(SHIM_INTERP)
               || STREQ(codeset, "US-ASCII")   /* freebsd */
               || STREQ(codeset, "646"))       /* bsd */
             Parrot_platform_encoding_ptr = Parrot_ascii_encoding_ptr;
+        else if (!*codeset) /* do not warn on empty  */
+            Parrot_platform_encoding_ptr = Parrot_ascii_encoding_ptr;
         else {
             /* Can't use Parrot_warn here, the interpreter is not ready */
             fprintf(stderr,
