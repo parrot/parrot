@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2014, Parrot Foundation.
+# Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -10,8 +10,9 @@ Determines the CPU architecture, the operating system.
 
 This code was formerly part of configuration step class auto::jit.
 
-TODO #356: This checks for the perl5 architecture, not for possible
-commandline overrides, such as -m64, -m32 or -Wl,-melf_x86_64.
+This checks for the inherited perl5 architecture, not for possible
+commandline overrides, such as -m64, -m32, mabi=64 or -Wl,-melf_x86_64.
+See auto::gcc for those as they are compiler specific. (TT 356, GH #1181)
 
 =cut
 
@@ -76,7 +77,7 @@ sub runstep {
         $osname = 'MSWin32';
     }
     elsif ( $osname =~ /cygwin/i || $cpuarch =~ /cygwin/i ) {
-        $cpuarch = 'x86'; # 64 how?
+        $cpuarch = 'x86'; # TODO 64 how?
         $osname  = 'cygwin';
     }
     elsif ( $osname =~ /msys/i || $cpuarch =~ /msys/i ) {
