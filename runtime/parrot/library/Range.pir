@@ -3,7 +3,7 @@
 =head1 DESCRIPTION
 
 Based on the Range object described in S03:
-L<http://perlcabal.org/syn/S03.html#Range_semantics>
+L<http://design.perl6.org/S03.html#Range_semantics>
 
 =cut
 

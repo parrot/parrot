@@ -1322,7 +1322,7 @@ Parrot_mmd_cache_mark(PARROT_INTERP, ARGMOD(MMD_Cache *cache))
 =head1 SEE ALSO
 
 F<include/parrot/multidispatch.h>,
-L<http://perlcabal.org/syn/S12.html>,
+L<http://design.perl6.org/S12.html>,
 L<http://dev.perl.org/perl6/doc/design/apo/A12.html>
 
 =cut

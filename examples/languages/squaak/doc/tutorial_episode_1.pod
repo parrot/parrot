@@ -277,7 +277,7 @@ F<compilers/pct/src/PCT/HLLCompiler.pir>.
 
 =item * Operator Precedence Parsing with PCT: docs/pct/pct_optable_guide.pod
 
-=item * Perl 6/NQP rules syntax: Synopsis 5 at http://perlcabal.org/syn/S05.html or http://svn.pugscode.org/pugs/docs/Perl6/Spec/S05-regex.pod
+=item * Perl 6/NQP rules syntax: Synopsis 5 at http://design.perl6.org/S05.html or http://svn.pugscode.org/pugs/docs/Perl6/Spec/S05-regex.pod
 
 =item * List of HLL projects: https://github.com/parrot/parrot/wiki/Languages
 

@@ -234,7 +234,7 @@ None.
   http://en.wikipedia.org/wiki/Associativity
   http://en.wikipedia.org/wiki/Bottom-up_parsing
   http://www.ozonehouse.com/mark/blog/code/PeriodicTable.html
-  http://perlcabal.org/syn/S03.html
+  http://design.perl6.org/S03.html
 
   compilers/tge
   compilers/past
