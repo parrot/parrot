@@ -91,9 +91,9 @@ sub _evaluate_gcc {
         my $archname = $conf->data->get('archname');
         # other multilib platforms usually default to 32bit.
         # untested: sparc64, arm64
-        if ( $archname =~ /^(mips|powerpc|arm|sparc)64/ && $m eq '32' ) {
+        if ( $archname =~ /^(amd|mips|powerpc|arm|sparc)64/ && $m eq '32' ) {
             my $abi = $1 eq 'mips' ? '-mabi=32' : '-m32';
-            $archname =~ s/64//;
+            $archname =~ s/64// unless $archname =~ /amd64/;
             for my $cc (qw(cc cxx link ld)) {
                 $conf->data->add( ' ', $cc, $abi );
             }
@@ -106,11 +106,13 @@ sub _evaluate_gcc {
                     my $olditem = $item;
                     $item =~ s/lib64/lib/g;
                     $conf->data->set( $lib, $item ) if $olditem ne $item;
+                    $conf->debug( "Set has_libpath_override to lib64, changing $lib to $item" );
+                    $conf->data->set( 'has_libpath_override', 'lib64' );
                 }
             }
         }
         # GH #1181: override the default, ignore the inherited libpaths.
-        elsif ( $archname =~ /^(mips|powerpc|arm|sparc)/ && $m eq '64' ) {
+        elsif ( $archname =~ /^(i386|mips|powerpc|arm|sparc)/ && $m eq '64' ) {
             my $abi = $1 eq 'mips' ? '-mabi=64' : '-m64';
             # 'mips' or 'powerpc-linux-gnu-thread-multi'
             $archname =~ s/(mips|powerpc|arm|sparc)([^6]|$)/${1}64${2}/;
@@ -125,6 +127,8 @@ sub _evaluate_gcc {
                     my $olditem = $item;
                     $item =~ s/\/lib([^6]|$)/\/lib64${1}/g;
                     $conf->data->set( $lib, $item ) if $olditem ne $item;
+                    $conf->debug( "Set has_libpath_override to lib, changing $lib to $item" );
+                    $conf->data->set( 'has_libpath_override', 'lib' );
                 }
             }
         }
