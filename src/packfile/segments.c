@@ -1139,7 +1139,7 @@ default_dump(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
 
 /*
 
-=item C<void pf_register_standard_funcs(PARROT_INTERP, PackFile *pf)>
+=item C<void pf_register_standard_funcs(PackFile *pf)>
 
 Registers a PackFile's functions; called from within C<Parrot_pf_new()>.
 
@@ -1148,7 +1148,7 @@ Registers a PackFile's functions; called from within C<Parrot_pf_new()>.
 */
 
 void
-pf_register_standard_funcs(SHIM_INTERP, ARGMOD(PackFile *pf))
+pf_register_standard_funcs(ARGMOD(PackFile *pf))
 {
     ASSERT_ARGS(pf_register_standard_funcs)
 

@@ -1351,8 +1351,8 @@ void default_dump_header(PARROT_INTERP, ARGIN(const PackFile_Segment *self))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-void pf_register_standard_funcs(PARROT_INTERP, ARGMOD(PackFile *pf))
-        __attribute__nonnull__(2)
+void pf_register_standard_funcs(ARGMOD(PackFile *pf))
+        __attribute__nonnull__(1)
         FUNC_MODIFIES(*pf);
 
 PARROT_WARN_UNUSED_RESULT

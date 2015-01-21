@@ -1,6 +1,9 @@
 2014-02-17    release 7.1.0
     - Core
     - Build
+        + Fixed and improved --m={32,64} cross-compilation support and
+          automatic libpath adjustments for gcc. #1181, #1182, #1110
+        + Actually link with libicu when probing for it. #1182
     - Documentation
     - Tests
     - Community

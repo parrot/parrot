@@ -147,38 +147,54 @@ sub runstep {
     return unless defined $icuheaders;
 
     my $icudir = dirname($icuheaders);
-    $conf->data->set(
-        has_icu    => 1,
-        icu_shared => $icushared,
-        icu_dir    => $icudir,
-        $icuversion ? ( icu_version    => $icuversion ) : (),
-    );
-
     # Add -I $Icuheaders if necessary.
-    my $header = "unicode/ucnv.h";
-    $conf->data->set( TEMP_testheaders => "#include <$header>\n" );
-    $conf->data->set( TEMP_testheader  => "$header" );
-    $conf->cc_gen('config/auto/headers/test_c.in');
-
-    # Clean up.
-    $conf->data->set( TEMP_testheaders => undef );
-    $conf->data->set( TEMP_testheader  => undef );
-    eval { $conf->cc_build(); };
-    my $ccflags_status = ( ! $@ && $conf->cc_run() =~ /^$header OK/ );
-    _handle_ccflags_status(
-        $conf,
-        {
-            ccflags_status  => $ccflags_status,
-            icuheaders      => $icuheaders,
-        },
-    );
-    $conf->cc_clean();
-    $self->set_result("yes, $icuversion");
+    my $ccbuild_ok = $self->_probe_icu($conf, $icuheaders, $icushared);
+    if (!$ccbuild_ok) {
+        my $incflag = defined $conf->data->get('gccversion')
+            ? '-isystem'
+            : '-I';
+        my $more_icuflags = qq{$incflag $icuheaders};
+        $conf->debug( "Trying adding '$more_icuflags' to ccflags for icu headers");
+        if ($ccbuild_ok = $self->_probe_icu($conf, $more_icuflags, $icushared)) {
+            $conf->data->add( ' ', ccflags => $more_icuflags );
+        }
+        elsif (my $m = $conf->options->get( 'm' )) {
+            warn( "\nFailed icu-config $icushared probably caused by --m override.\n");
+        }
+    }
+    if ($ccbuild_ok) {
+        $conf->debug("Found the icu headers and libraries... good!\n");
+        $self->set_result("yes, $icuversion");
+        $conf->data->set(
+                         has_icu    => 1,
+                         icu_shared => $icushared,
+                         icu_dir    => $icudir,
+                         $icuversion ? ( icu_version    => $icuversion ) : (),
+                        );
+    }
+    else {
+        $self->_set_no_configure_with_icu($conf, "no, failed test");
+    }
     # 5th possible return point; this is the only really successful return.
     return 1;
 }
 
 ########## INTERNAL SUBROUTINES ##########
+
+sub _probe_icu {
+    my ($self, $conf, $icuheaders, $icushared) = @_;
+    my $header = "unicode/ucnv.h";
+    $conf->data->set( TEMP_testheaders => "#include <$header>\n" );
+    $conf->data->set( TEMP_testheader  => "$header" );
+    $conf->cc_gen('config/auto/headers/test_c.in');
+    # Clean up.
+    $conf->data->set( TEMP_testheaders => undef );
+    $conf->data->set( TEMP_testheader  => undef );
+    eval { $conf->cc_build('', $icushared); };
+    my $ccbuild_ok = ( ! $@ && $conf->cc_run() =~ /^$header OK/ );
+    $conf->cc_clean();
+    return $ccbuild_ok;
+}
 
 sub _set_no_configure_with_icu {
     my ($self, $conf, $result) = @_;
@@ -288,7 +304,7 @@ sub _try_icuconfig {
         $icushared =~ s/\n/ /g;
         $conf->debug("icushared:  captured $icushared\n");
         ($icushared, $arg->{without}) =
-            $self->_handle_icushared($icushared, $arg->{without});
+            $self->_handle_icushared($conf, $arg, $icushared);
         $conf->debug("For icushared, found $icushared and $arg->{without}\n");
 
         # location of header files
@@ -314,13 +330,12 @@ sub _try_icuconfig {
 }
 
 sub _handle_icushared {
-    my $self = shift;
-    my ($icushared, $without) = @_;
+    my ($self, $conf, $arg, $icushared) = @_;
     if ( defined $icushared ) {
         chomp $icushared;
         $icushared =~ s/$self->{icu_shared_pattern}//;    # "-licui18n32" too
         if (length $icushared == 0) {
-            $without = 1;
+            $arg->{without} = 1;
         }
         else {
             # on MacOS X there's sometimes an errornous \c at the end of the
@@ -328,9 +343,17 @@ sub _handle_icushared {
             # see TT #1722
             $icushared =~ s/\s\\c\s?/ /g;
         }
+        if (my $override = $conf->data->get('has_libpath_override')) {
+            $conf->debug("We have a libpath override caused by --m\n");
+            # invalidate -L/usr/lib searchpath on lib64
+            if ($icushared =~ m{/$override\W}) {
+                $conf->debug("Disabling $arg->{icuconfig} because of --m architecture libpath override\n");
+                $arg->{without} = 1;
+            }
+        }
     }
 
-    return ($icushared, $without);
+    return ($icushared, $arg->{without});
 }
 
 sub _handle_icuheaders {
@@ -385,25 +408,6 @@ sub _handle_icuconfig_errors {
     }
     else {
         return $arg->{icuheaders};
-    }
-}
-
-sub _handle_ccflags_status {
-    my $conf = shift;
-    my $arg = shift;
-    if ($arg->{ccflags_status}) {
-        # Ok, we don't need anything more.
-        $conf->debug("Your compiler found the icu headers... good!\n");
-    }
-    else {
-        my $icuheaders = $arg->{icuheaders};
-        my $incflag = defined $conf->data->get('gccversion')
-            ? '-isystem'
-            : '-I';
-
-        my $icuflags = qq{$incflag "$icuheaders"};
-        $conf->debug( "Adding $icuflags to ccflags for icu headers.\n");
-        $conf->data->add( ' ', ccflags => $icuflags );
     }
 }
 

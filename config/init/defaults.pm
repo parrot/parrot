@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2014, Parrot Foundation.
+# Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -307,20 +307,37 @@ sub _64_bit_adjustments {
     my $m = $conf->options->get('m');
     if ($m) {
         my $archname = $conf->data->get('archname');
-        if ( $archname =~ /x86_64/ && $m eq '32' ) {
+        # crude logic for m32, mostly for non-gcc compilers.
+        # do it better for gcc and non-standard platforms in auto::gcc
+        if ( $archname =~ /(64$|64-)/ && $m eq '32' ) {
             $archname =~ s/x86_64/i386/;
 
-            # adjust gcc?
-            for my $cc (qw(cc cxx link ld)) {
-                $conf->data->add( ' ', $cc, '-m32' );
+            # adjust gcc or as fallback the flags
+            for my $cc (qw(cc ld link cxx)) {
+                if (!$conf->options->get($cc)) {
+                    $conf->debug( "Add -m32 to $cc" );
+                    $conf->data->add( ' ', $cc, '-m32' );
+                }
+                else {
+                    $conf->debug( "Add -m32 to $cc"."flags" );
+                    $conf->data->add( ' ', $cc.'flags', '-m32' );
+                }
             }
-
+            my $has_libpath_override;
             # and lib flags
             for my $lib (qw(ld_load_flags ld_share_flags ldflags linkflags)) {
                 my $item = $conf->data->get($lib);
-                ( my $ni = $item ) =~ s/lib64/lib/g;
-                $conf->data->set( $lib, $ni );
+                if ($item) {
+                    my $olditem = $item;
+                    $item =~ s/lib64/lib/g;
+                    if ($olditem ne $item and !$conf->options->get($lib)) {
+                        $conf->data->set( $lib, $item ) ;
+                        $conf->debug( "Set has_libpath_override to lib64, changing $lib to $item" );
+                        $has_libpath_override++;
+                    }
+                }
             }
+            $conf->data->set( 'has_libpath_override', 'lib64') if $has_libpath_override;
         }
         $conf->data->set( 'archname', $archname );
     }

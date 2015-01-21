@@ -1418,7 +1418,7 @@ Parrot_pf_new(PARROT_INTERP, INTVAL is_mapped)
 
     /* Other fields empty for now */
     pf->cur_cs = NULL;
-    pf_register_standard_funcs(interp, pf);
+    pf_register_standard_funcs(pf);
 
     /* create the master directory, all sub-dirs go there */
     pf->directory.base.pf = pf;
