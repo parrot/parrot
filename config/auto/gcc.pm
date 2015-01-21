@@ -89,6 +89,7 @@ sub _evaluate_gcc {
     my $m = $conf->options->get('m');
     if ($m) {
         my $archname = $conf->data->get('archname');
+        my $has_libpath_override;
         # other multilib platforms usually default to 32bit.
         # untested: sparc64, arm64
         if ( $archname =~ /^(amd|mips|powerpc|arm|sparc)64/ && $m eq '32' ) {
@@ -105,11 +106,14 @@ sub _evaluate_gcc {
                 if ($item) {
                     my $olditem = $item;
                     $item =~ s/lib64/lib/g;
-                    $conf->data->set( $lib, $item ) if $olditem ne $item;
-                    $conf->debug( "Set has_libpath_override to lib64, changing $lib to $item" );
-                    $conf->data->set( 'has_libpath_override', 'lib64' );
+                    if ($olditem ne $item and !$conf->options->get($lib)) {
+                        $conf->data->set( $lib, $item );
+                        $conf->debug( "Set has_libpath_override to lib64, changing $lib to $item" );
+                        $has_libpath_override++;
+                    }
                 }
             }
+            $conf->data->set( 'has_libpath_override', 'lib64' ) if $has_libpath_override;
         }
         # GH #1181: override the default, ignore the inherited libpaths.
         elsif ( $archname =~ /^(i386|mips|powerpc|arm|sparc)/ && $m eq '64' ) {
@@ -126,11 +130,14 @@ sub _evaluate_gcc {
                 if ($item) {
                     my $olditem = $item;
                     $item =~ s/\/lib([^6]|$)/\/lib64${1}/g;
-                    $conf->data->set( $lib, $item ) if $olditem ne $item;
-                    $conf->debug( "Set has_libpath_override to lib, changing $lib to $item" );
-                    $conf->data->set( 'has_libpath_override', 'lib' );
+                    if ($olditem ne $item and !$conf->options->get($lib)) {
+                        $conf->data->set( $lib, $item );
+                        $conf->debug( "Set has_libpath_override to lib, changing $lib to $item" );
+                        $has_libpath_override++;
+                    }
                 }
             }
+            $conf->data->set( 'has_libpath_override', 'lib' ) if $has_libpath_override;
         }
         $conf->data->set( 'archname', $archname );
         $gnucref = _probe_for_gcc($conf);

@@ -323,20 +323,21 @@ sub _64_bit_adjustments {
                     $conf->data->add( ' ', $cc.'flags', '-m32' );
                 }
             }
-
+            my $has_libpath_override;
             # and lib flags
             for my $lib (qw(ld_load_flags ld_share_flags ldflags linkflags)) {
                 my $item = $conf->data->get($lib);
                 if ($item) {
                     my $olditem = $item;
                     $item =~ s/lib64/lib/g;
-                    if ($olditem ne $item) {
+                    if ($olditem ne $item and !$conf->options->get($lib)) {
                         $conf->data->set( $lib, $item ) ;
                         $conf->debug( "Set has_libpath_override to lib64, changing $lib to $item" );
-                        $conf->data->set( 'has_libpath_override', 'lib64');
+                        $has_libpath_override++;
                     }
                 }
             }
+            $conf->data->set( 'has_libpath_override', 'lib64') if $has_libpath_override;
         }
         $conf->data->set( 'archname', $archname );
     }
