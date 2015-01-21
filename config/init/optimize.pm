@@ -67,7 +67,7 @@ sub runstep {
     $conf->data->set( cc_debug => '' );
     $conf->data->add( ' ', ccflags => "-DDISABLE_GC_DEBUG=1 -DNDEBUG" );
 
-    # TT #405
+    # TT #405 and GH #1184, Testcase: t/stress/gc.t (any)
     if ($conf->data->get('cpuarch') eq 'amd64') {
         $conf->data->set('optimize::src/gc/system.c','');
     }
