@@ -5,6 +5,9 @@
           automatic libpath adjustments for gcc. #1181, #1182, #1110
         + Actually link with libicu when probing for it. #1182
         + Optimize away ExtUtils::Command on posix systems. #1177
+        + Fix cpu config values for gcc_cmpxchg to include atomic/gcc_x86.o on amd64.
+          Harmonized the cpu config keys, no $platform_has_$feature keys anymore, just
+          HAS_$PLATFORM_$feature. #1173
     - Documentation
     - Tests
     - Community
@@ -45,9 +48,6 @@
         + Fix and allow --cxx on FreeBSD 10 (clang, not g++) #1166
         + Fix git_describe config probe on tag-less repos, e.g. git clone --depth #1167
         + Fix solaris asctime_r with _POSIX_C_SOURCE #858
-        + Fix cpu config values for gcc_cmpxchg to include atomic/gcc_x86.o on amd64.
-          Harmonized the cpu config keys, no $platform_has_$feature keys anymore, just
-          HAS_$PLATFORM_$feature. #1173
     - Documentation
     - Tests
     - Community
