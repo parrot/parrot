@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -52,6 +52,9 @@ sub runstep {
         my $gccversion = $conf->data->get( 'gccversion' );
         if ( defined $gccversion and $gccversion > 3.3 ) {
             $optimization_level =~ s/-mcpu=/-march=/;
+            # However, perl5 is not really optimize clean. But we can use -O3 safely
+            # on clang and gcc.
+            $optimization_level =~ s/-O2/-O3/;
         }
     }
     else {
