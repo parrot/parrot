@@ -491,7 +491,7 @@ to keep the main page fresh.
 To update both the C<parrot.github.com> and the relevant C<parrot-docsx> repositories,
 execute the following command:
 
-    perl tools/release/parrot_github_release.pl --docs=[/path/to/old/docs/]
+    perl tools/release/parrot_github_release.pl --docs=[/fullpath/to/old/docs/]
 
 Please note: To review the available options, use the C<-h | --help> option.
 In addition, you may also want to review the pod with,
