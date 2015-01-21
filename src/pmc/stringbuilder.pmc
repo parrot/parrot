@@ -338,17 +338,17 @@ For testing purpose only?
 
 =item C<VTABLE substr()>
 
+Returns a copied substring of the STRING.
+
 =cut
 
 */
 
-    VTABLE STRING *substr(INTVAL offset, INTVAL length) :no_wb {
+    VTABLE STRING *substr(INTVAL offset, INTVAL length) { /* note: was ': n o _ w b' */
         STRING *buffer;
         GET_ATTR_buffer(INTERP, SELF, buffer);
-        /* We must clone here because we cannot reallocate buffer behind the scene... */
-        /* TODO Optimize it to avoid creation of redundant STRING [GH #1123] */
-        return Parrot_str_clone(INTERP,
-                STRING_substr(INTERP, buffer, offset, length));
+        /* STRING_substr already creates a copy for us, GH #1123 */
+        return STRING_substr(INTERP, buffer, offset, length);
     }
 
 /*
