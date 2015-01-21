@@ -180,4 +180,6 @@ Starred release numbers indicate supported releases.
  Util        6.10.0         2014-Nov-18     "New Caledonian lorikeet"
  rurban      6.11.0         2014-Dec-16     "Fischer's Lovebird"
 
+ Util        7.0.0 *        2015-Jan-20     "Crimson Shining Parrot"
+
 =cut
