@@ -147,13 +147,6 @@ sub runstep {
     return unless defined $icuheaders;
 
     my $icudir = dirname($icuheaders);
-    $conf->data->set(
-        has_icu    => 1,
-        icu_shared => $icushared,
-        icu_dir    => $icudir,
-        $icuversion ? ( icu_version    => $icuversion ) : (),
-    );
-
     # Add -I $Icuheaders if necessary.
     my $ccbuild_ok = $self->_probe_icu($conf, $icuheaders, $icushared);
     if (!$ccbuild_ok) {
@@ -172,9 +165,15 @@ sub runstep {
     if ($ccbuild_ok) {
         $conf->debug("Found the icu headers and libraries... good!\n");
         $self->set_result("yes, $icuversion");
+        $conf->data->set(
+                         has_icu    => 1,
+                         icu_shared => $icushared,
+                         icu_dir    => $icudir,
+                         $icuversion ? ( icu_version    => $icuversion ) : (),
+                        );
     }
     else {
-        $self->set_result("no, failed test");
+        $self->_set_no_configure_with_icu($conf, "no, failed test");
     }
     # 5th possible return point; this is the only really successful return.
     return 1;
