@@ -1,4 +1,4 @@
-# Copyright (C) 2007-2014, Parrot Foundation.
+# Copyright (C) 2007-2015, Parrot Foundation.
 
 =pod
 
@@ -572,6 +572,7 @@ Make sure that at least the next two releases are covered.
 
     - Feb 17, 2015 -  7.1.0   - rurban
     - Mar 17, 2015 -  7.2.0   - Util
+    - Apr 21, 2015 - *7.3.0   - rurban
 
 =cut
 
