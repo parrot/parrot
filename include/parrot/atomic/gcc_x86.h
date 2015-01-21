@@ -1,13 +1,9 @@
 /* atomic/gcc_x86.h
- *  Copyright (C) 2006-2008, Parrot Foundation.
- *  Overview:
- *     This header provides an implementation of atomic
- *     operations on x86 platforms with GCC-style
- *     inline assembly suppport.
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
+ * Copyright (C) 2006-2015, Parrot Foundation.
+ *
+ * This header provides an implementation of atomic
+ * operations on x86 platforms with GCC-style
+ * inline assembly suppport.
  */
 
 #ifndef PARROT_ATOMIC_GCC_X86_H_GUARD
@@ -37,6 +33,8 @@ long parrot_i386_xadd(ARGIN(volatile long *l), long amount)
        PARROT_ASSERT_ARG(l)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/atomic/gcc_x86.c */
+
+#ifdef PARROT_HAS_THREADS
 
 typedef struct Parrot_atomic_pointer {
     void *volatile val;
@@ -93,6 +91,8 @@ typedef struct Parrot_atomic_integer {
     do { \
         (result) = parrot_i386_xadd(&(a).val, -1); \
     } while (0)
+
+#endif /* PARROT_HAS_THREADS */
 
 #endif /* PARROT_ATOMIC_GCC_X86_H_GUARD */
 

@@ -1,11 +1,7 @@
 /* atomic.h
- *  Copyright (C) 2006-2008, Parrot Foundation.
- *  Overview:
- *     This header implements portable atomic operations.
- *  Data Structure and Algorithms:
- *  History:
- *  Notes:
- *  References:
+ * Copyright (C) 2006-2015, Parrot Foundation.
+ *
+ * This header implements portable atomic operations.
  */
 
 
@@ -25,6 +21,7 @@
 #    include "parrot/atomic/fallback.h"
 #  endif
 #else
+
 typedef struct Parrot_atomic_pointer {
     void *val;
 } Parrot_atomic_pointer;
