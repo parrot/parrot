@@ -344,7 +344,7 @@ Returns a copied substring of the STRING.
 
 */
 
-    VTABLE STRING *substr(INTVAL offset, INTVAL length) { /* note: was ': n o _ w b' */
+    VTABLE STRING *substr(INTVAL offset, INTVAL length) :no_wb {
         STRING *buffer;
         GET_ATTR_buffer(INTERP, SELF, buffer);
         /* STRING_substr already creates a copy for us, GH #1123 */
