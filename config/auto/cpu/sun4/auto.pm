@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2013, Parrot Foundation.
+# Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -44,7 +44,7 @@ sub runstep {
     my @files = qw( test_atomic_c.in );
     for my $f (@files) {
         $conf->debug(" $f ");
-        my ($suffix) = $f =~ /test_(\w+)/;
+        my ($suffix) = $f =~ /test_(\w+)_c.in/;
         $f = "config/auto/cpu/sun4/$f";
         $conf->cc_gen($f);
         eval { $conf->cc_build("-DPARROT_CONFIG_TEST", "sparcasm" . $conf->data->get('o') ) };
@@ -54,7 +54,6 @@ sub runstep {
         else {
             if ( $conf->cc_run() =~ /ok/ ) {
                 $conf->data->set(
-                    "sparc_has_$suffix" => '1',
                     "HAS_SPARC_$suffix" => '1',
                 );
                 $conf->debug(" (\U$suffix) ");

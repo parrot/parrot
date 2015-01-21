@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2013, Parrot Foundation.
+# Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -6,9 +6,9 @@ config/auto/cpu/i386/auto.pm
 
 =head1 DESCRIPTION
 
-Test for cmpxchg ASM functionality. Creates these Config entries
+Test for cmpxchg ASM functionality. Creates this Config entry:
 
- i386_has_gcc_cmpxchg_c   => 1
+   HAS_I386_gcc_cmpxchg   => 1
 
 =cut
 
@@ -23,7 +23,7 @@ sub runstep {
     my @files = qw( test_gcc_cmpxchg_c.in );
     for my $f (@files) {
         $conf->debug(" $f ");
-        my ($suffix) = $f =~ /test_(\w+)/;
+        my ($suffix) = $f =~ /test_(\w+)_c.in/;
         my $path_f = "config/auto/cpu/i386/$f";
         $conf->cc_gen($path_f);
         eval { $conf->cc_build("-DPARROT_CONFIG_TEST") };
@@ -44,10 +44,9 @@ sub runstep {
 sub _handle_cc_run_ok {
     my ($conf, $suffix, $path_f) = @_;
     $conf->data->set(
-        "i386_has_$suffix" => '1',
-        "HAS_i386_$suffix" => '1',
+        "HAS_I386_$suffix" => '1',
     );
-    $conf->debug(" (\U$suffix) ");
+    $conf->debug(" ($suffix) ");
 }
 
 1;

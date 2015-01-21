@@ -109,14 +109,6 @@ sub runstep {
     $cpuarch =~ s/i[456]86/i386/i;
     $cpuarch =~ s/x86_64/amd64/i;
     $cpuarch =~ s/x86/i386/i;
-    if ($conf->options->get('m')) {
-        if ($conf->options->get('m') eq '64' and $cpuarch eq 'i386') {
-            $cpuarch = 'amd64';
-        }
-        elsif ($conf->options->get('m') eq '32' and $cpuarch eq 'amd64') {
-            $cpuarch = 'i386';
-        }
-    }
 
     my $cpu_type = "unknown";
     eval {
@@ -134,6 +126,14 @@ sub runstep {
             $cpu_type = $ENV{PROCESSOR_IDENTIFIER};
         }
     };
+    if ($conf->options->get('m')) {
+        if ($conf->options->get('m') eq '64' and $cpuarch eq 'i386') {
+            $cpuarch = 'amd64';
+        }
+        elsif ($conf->options->get('m') eq '32' and $cpuarch eq 'amd64') {
+            $cpuarch = 'i386';
+        }
+    }
 
     $conf->data->set(
         cpuarch  => $cpuarch,
