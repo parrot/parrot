@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2010-2014, Parrot Foundation.
+Copyright (C) 2010-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -488,7 +488,8 @@ Returns length of currently built string.
 
 =item C<static size_t calculate_capacity(PARROT_INTERP, size_t needed)>
 
-Calculate capacity for string. We allocate double the amount needed.
+Calculate capacity for string. We overallocate by 2 for smaller buffers
+resp. onto the next block size.
 
 =cut
 
@@ -501,9 +502,18 @@ calculate_capacity(SHIM_INTERP, size_t needed)
 {
     ASSERT_ARGS(calculate_capacity)
 
-    needed *= 2;
-    /* round up to 16 */
-    needed  = (needed + 15) & ~15;
+    if (needed < 8192) {
+#if 1
+        needed += needed/2;           /* overallocate by 1.5 */
+#else
+        needed *= 2;                  /* overallocate by 2 */
+#endif
+        needed = (needed + 15) & ~15; /* round up to 16 */
+    }
+    else {
+        needed &= ~0xfff;
+        needed += 4096;               /* next block */
+    }
 
     return needed;
 }
