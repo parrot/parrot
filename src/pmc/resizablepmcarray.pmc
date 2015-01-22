@@ -222,7 +222,6 @@ Initializes the array.
         PMC_offset(SELF) = 0;
         if (LIKELY(n > 0)) {
             PMC_threshold(SELF) = n;
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
     }
 
@@ -286,7 +285,6 @@ Resizes the array to C<size> elements.
                 }
 #endif
                 PMC_offset(SELF) -= diff;
-                PObj_custom_mark_destroy_SETALL(SELF);
             }
             else { /* for empty arrays just reset the offset */
                 PMC_offset(SELF) = 0;
@@ -319,7 +317,6 @@ Resizes the array to C<size> elements.
             PMC_threshold(SELF) = threshold;
             PMC_size(SELF)      = n - offset;
             if (PMC_array(SELF) != array) { /* data moved? */
-                PObj_custom_mark_destroy_SETALL(SELF);
                 PMC_array(SELF) = array;
                 TRACE_RPAsize("resize move");
             }
@@ -503,8 +500,6 @@ Sets the PMC value of the element keyed by C<key> to C<*src>.
         data = PMC_array(SELF) = mem_gc_allocate_n_typed(INTERP, size, PMC *);
         for (i = 0; i < size; ++i)
             data[i] = VTABLE_get_pmc_keyed_int(INTERP, value, i);
-
-        PObj_custom_mark_destroy_SETALL(SELF);
     }
 
 /*
@@ -545,14 +540,15 @@ Delete the element at index C<key> and shift the rest to the left.
         if (0 == key) {
             data->offset++;
             TRACE_RPAdata("delete fast", data);
-            TRACE_PMC(key, data->pmc_array[0]);
+            TRACE_PMC(key, data->pmc_array[data->offset-1]);
         }
         else {
             PMC ** const off = &data->pmc_array[key + data->offset];
             TRACE_RPAdata("delete slow", data);
             TRACE_PMC(key + data->offset, data->pmc_array[key + data->offset]);
-            if (data->size > key) /* skip when last element */
+            if (data->size > key) { /* skip when last element */
                 memmove(off, off + 1, (data->size - key) * sizeof (PMC *));
+            }
         }
     }
 

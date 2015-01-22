@@ -334,10 +334,8 @@ typedef enum PObj_enum {
         (PObj_sysmem_FLAG | PObj_is_string_copy_FLAG | \
          PObj_constant_FLAG | PObj_external_FLAG)))
 
-#define PObj_custom_mark_destroy_SETALL(o) do { \
-        PObj_custom_mark_SET(o); \
-        PObj_custom_destroy_SET(o); \
-} while (0)
+#define PObj_custom_mark_destroy_SETALL(o) \
+    (PObj_get_FLAGS(o) |= PObj_custom_mark_FLAG | PObj_custom_destroy_FLAG)
 
 #define PObj_gc_CLEAR(o) (PObj_get_FLAGS(o) \
     &= ~PObj_custom_destroy_FLAG \
