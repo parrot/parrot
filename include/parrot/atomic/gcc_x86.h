@@ -44,33 +44,33 @@ typedef struct Parrot_atomic_integer {
     volatile long val;
 } Parrot_atomic_integer;
 
-#define PARROT_ATOMIC_PTR_GET(result, a) ((result) = (a).val)
+#  define PARROT_ATOMIC_PTR_GET(result, a) ((result) = (a).val)
 
-#define PARROT_ATOMIC_PTR_SET(a, b) ((a).val = (b))
+#  define PARROT_ATOMIC_PTR_SET(a, b) ((a).val = (b))
 
-#define PARROT_ATOMIC_PTR_CAS(result, a, expect, update) \
-    do { \
-        if ((expect) == parrot_i386_cmpxchg(&(a).val, (expect), (update))) { \
-            (result) = 1; \
-        } \
-        else { \
-            (result) = 0; \
-        } \
-    } while (0)
+#  define PARROT_ATOMIC_PTR_CAS(result, a, expect, update) \
+      do { \
+          if ((expect) == parrot_i386_cmpxchg(&(a).val, (expect), (update))) { \
+              (result) = 1; \
+          } \
+          else { \
+              (result) = 0; \
+          } \
+      } while (0)
 
-#define PARROT_ATOMIC_PTR_INIT(a)
+#  define PARROT_ATOMIC_PTR_INIT(a)
 
-#define PARROT_ATOMIC_PTR_DESTROY(a)
+#  define PARROT_ATOMIC_PTR_DESTROY(a)
 
-#define PARROT_ATOMIC_INT_INIT(a)
+#  define PARROT_ATOMIC_INT_INIT(a)
 
-#define PARROT_ATOMIC_INT_DESTROY(a)
+#  define PARROT_ATOMIC_INT_DESTROY(a)
 
-#define PARROT_ATOMIC_INT_GET(result, a) ((result) = (a).val)
+#  define PARROT_ATOMIC_INT_GET(result, a) ((result) = (a).val)
 
-#define PARROT_ATOMIC_INT_SET(a, b) ((a).val = (b))
+#  define PARROT_ATOMIC_INT_SET(a, b) ((a).val = (b))
 
-#define PARROT_ATOMIC_INT_CAS(result, a, expect, update) \
+#  define PARROT_ATOMIC_INT_CAS(result, a, expect, update)      \
     do { \
         void *res = parrot_i386_cmpxchg((void * volatile *) &(a).val, \
                 (void *) (expect), (void *) (update)); \
@@ -82,12 +82,12 @@ typedef struct Parrot_atomic_integer {
         } \
     } while (0)
 
-#define PARROT_ATOMIC_INT_INC(result, a) \
+#  define PARROT_ATOMIC_INT_INC(result, a) \
     do { \
         (result) = parrot_i386_xadd(&(a).val, 1); \
     } while (0)
 
-#define PARROT_ATOMIC_INT_DEC(result, a) \
+#  define PARROT_ATOMIC_INT_DEC(result, a) \
     do { \
         (result) = parrot_i386_xadd(&(a).val, -1); \
     } while (0)
