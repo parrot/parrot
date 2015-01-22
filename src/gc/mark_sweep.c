@@ -282,9 +282,9 @@ mark_code_segment(PARROT_INTERP)
 {
     ASSERT_ARGS(mark_code_segment)
     int i;
-    PackFile_ByteCode   *bc = Parrot_pf_get_current_code_segment(interp);
+    PackFile_ByteCode *bc = Parrot_pf_get_current_code_segment(interp);
 
-    if (bc != NULL) {
+    if (bc) {
         PackFile_ConstTable *ct = bc->const_table;
 
         for (i = 0; i < ct->pmc.const_count; i++) {

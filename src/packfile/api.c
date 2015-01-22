@@ -1536,7 +1536,7 @@ Get's the interpreter's currently active bytecode segment
 */
 
 PARROT_PURE_FUNCTION
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PackFile_ByteCode *
 Parrot_pf_get_current_code_segment(PARROT_INTERP)
 {

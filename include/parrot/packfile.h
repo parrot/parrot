@@ -824,7 +824,7 @@ PMC * Parrot_pf_annotations_lookup(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 PARROT_PURE_FUNCTION
-PARROT_CANNOT_RETURN_NULL
+PARROT_CAN_RETURN_NULL
 PackFile_ByteCode * Parrot_pf_get_current_code_segment(PARROT_INTERP)
         __attribute__nonnull__(1);
 
