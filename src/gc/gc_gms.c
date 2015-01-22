@@ -799,9 +799,6 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     int gen = -1;
 
-    if (interp->thread_data)
-        LOCK(interp->thread_data->interp_lock);
-
     /* GC is blocked */
     if (self->gc_mark_block_level || self->gc_mark_block_level_locked)
         goto DONE;
@@ -814,6 +811,8 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     if (flags & GC_strings_cb_FLAG)
         goto DONE;
 
+    if (interp->thread_data)
+        LOCK(interp->thread_data->interp_lock);
     /* Block further GC calls */
     ++self->gc_mark_block_level;
     self->work_list = Parrot_pa_new(interp);
