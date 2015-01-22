@@ -1,9 +1,9 @@
 /*
-Copyright (C) 2010-2012, Parrot Foundation.
+Copyright (C) 2010-2015, Parrot Foundation.
 
 =head1 NAME
 
-src/alarm.c - Implements a mechanism for alarms, setting a flag after a delay.
+src/alarm.c - Portable alarm, setting a flag after a delay.
 
 =head1 DESCRIPTION
 

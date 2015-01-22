@@ -471,7 +471,7 @@ Parrot_cx_schedule_task(PARROT_INTERP, ARGIN(PMC *task_or_sub))
             }
         if (candidate == NULL)
             Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
-            "Could not find a free thread");
+                "Could not find a free thread");
 
         Parrot_thread_schedule_task(interp, candidate, task);
         Parrot_thread_notify_thread(candidate);

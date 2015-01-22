@@ -3,7 +3,7 @@ Copyright (C) 2011-2012, Parrot Foundation.
 
 =head1 NAME
 
-src/thread.c - Thread handling stuff
+src/thread.c - Native threads, posix or Win32
 
 =head1 DESCRIPTION
 
@@ -60,7 +60,7 @@ static int      num_threads = -1;
 =item C<PMC * Parrot_thread_create(PARROT_INTERP, INTVAL type, INTVAL
 clone_flags)>
 
-Create a new thread, cloning the current interpreter.
+Create a new thread (i.e. Task), cloning the current interpreter.
 
 The argument C<type> is currently ignored.
 
