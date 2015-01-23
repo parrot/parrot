@@ -724,7 +724,7 @@ CODE
 Result is 300.
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', 'multiple Parrot_interp_new/Parrot_x_exit cycles', $^O eq 'darwin' ? (todo => "GH #856 SIGABRT with darwin threads") : () );
+c_output_is( <<'CODE', <<'OUTPUT', 'multiple Parrot_interp_new/Parrot_x_exit cycles');
 
 #include <stdio.h>
 #include "parrot/parrot.h"
