@@ -188,7 +188,7 @@ sub _probe_icu {
     # Clean up.
     $conf->data->set( TEMP_testheaders => undef );
     $conf->data->set( TEMP_testheader  => undef );
-    eval { $conf->cc_build('', $icushared); };
+    eval { $conf->cc_build($icuheaders, $icushared); };
     my $ccbuild_ok = ( ! $@ && $conf->cc_run() =~ /^$header OK/ );
     $conf->cc_clean();
     return $ccbuild_ok;
