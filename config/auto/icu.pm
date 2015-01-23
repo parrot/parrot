@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2014, Parrot Foundation.
+# Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -327,6 +327,7 @@ sub _try_icuconfig {
 
 sub _handle_icushared {
     my ($self, $conf, $arg, $icushared) = @_;
+    $arg->{without} = 0;
     if ( defined $icushared ) {
         chomp $icushared;
         $icushared =~ s/$self->{icu_shared_pattern}//;    # "-licui18n32" too

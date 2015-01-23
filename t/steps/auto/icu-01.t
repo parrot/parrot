@@ -1,10 +1,10 @@
 #! perl
-# Copyright (C) 2007-2013, Parrot Foundation.
+# Copyright (C) 2007-2015, Parrot Foundation.
 # auto/icu-01.t
 
 use strict;
 use warnings;
-use Test::More tests => 134;
+use Test::More tests => 127;
 use Carp;
 use Cwd;
 use File::Path qw( mkpath );
@@ -19,8 +19,7 @@ use Parrot::Configure::Test qw(
     rerun_defaults_for_testing
     test_step_constructor_and_description
 );
-use Parrot::Configure::Utils qw( capture_output );
-use Parrot::Configure::Utils qw( capture );
+use Parrot::Configure::Utils qw( capture capture_output );
 
 ########## --without-icu ##########
 
@@ -178,17 +177,17 @@ is($without, 0, "Continuing to try to configure with ICU");
 my $icushared;
 
 $icushared = qq{-licui18n -lalpha\n};
-($icushared, $without) = $step->_handle_icushared($icushared, 0);
+($icushared, $without) = $step->_handle_icushared($conf, {}, $icushared);
 like($icushared, qr/-lalpha/, "Got expected ld flags");
 is($without, 0, "Continuing to try to configure with ICU");
 
 $icushared = qq{-licui18n\n};
-($icushared, $without) = $step->_handle_icushared($icushared, 0);
+($icushared, $without) = $step->_handle_icushared($conf, {}, $icushared);
 ok(! $icushared, "No icushared, as expected");
 is($without, 1, "No longer trying to configure with ICU");
 
 $icushared = undef;
-($icushared, $without) = $step->_handle_icushared($icushared, 0);
+($icushared, $without) = $step->_handle_icushared($conf, {}, $icushared);
 ok(! defined $icushared, "icushared remains undefined, as expected");
 is($without, 0, "Continuing to try to configure with ICU");
 
@@ -253,23 +252,8 @@ my $cwd = cwd();
     $step->_try_icuconfig(
         $conf,
         {
-            without         => 1,
-            autodetect      => 1,
-            icuconfig       => 1,
-        }
-    );
-is($without, 1, "Not trying to configure with ICU");
-ok(! defined $icushared, "icushared undefined, as expected");
-ok(! defined $icuheaders, "icuheaders undefined, as expected");
-is($step->result(), q{}, "result is still empty string, as expected");
-
-($without, $icushared, $icuheaders) =
-    $step->_try_icuconfig(
-        $conf,
-        {
-            without         => 0,
             autodetect      => 0,
-            icuconfig       => 1,
+            icuconfig       => '',
         }
     );
 is($without, 0, "Still trying to configure with ICU");
@@ -281,9 +265,8 @@ is($step->result(), q{}, "result is still empty string, as expected");
     $step->_try_icuconfig(
         $conf,
         {
-            without         => 0,
             autodetect      => 1,
-            icuconfig       => q{},
+            icuconfig       => '',
         }
     );
 is($without, 0, "Still trying to configure with ICU");
@@ -356,17 +339,13 @@ like($die, qr/Something is wrong with your ICU installation/s,
 
 {
     $conf->options->set( verbose => undef );
-    my ($stdout, $stderr);
-    capture(
-        sub {
-            $icuheaders = $step->_handle_icuconfig_errors( {
-                icushared   => undef,
-                icuheaders  => undef,
-            } );
-        },
-        \$stdout,
-        \$stderr,
-    );
+    my ( $rv, $stdout, $stderr, $retval ) =
+      capture( sub { $icuheaders = $step->_handle_icuconfig_errors
+                     ( {
+                        icushared   => undef,
+                        icuheaders  => undef,
+                       } );
+                 });
     like($stderr, qr/error: icushared not defined/s,
         "Got expected warnings");
     like($stderr, qr/error: icuheaders not defined or invalid/s,
@@ -374,84 +353,6 @@ like($die, qr/Something is wrong with your ICU installation/s,
     like($stderr, qr/Something is wrong with your ICU installation/s,
         "Got expected warnings");
 }
-
-########## _handle_ccflags_status() ##########
-
-$icuheaders = q{alpha};
-my $status = $conf->data->get( 'ccflags' );
-my $gccversion = $conf->data->get( 'gccversion' );
-
-{
-    $conf->options->set(verbose => 1);
-    my ($stdout, $stderr);
-    capture(
-        sub {
-           auto::icu::_handle_ccflags_status(
-               $conf,
-               {
-                   ccflags_status  => 1,
-                   icuheaders      => $icuheaders,
-               },
-           );
-       },
-       \$stdout,
-       \$stderr,
-   );
-   like($stdout, qr/Your compiler found the icu headers/,
-       "Got expected verbose output");
-}
-
-{
-    $conf->options->set(verbose => 1);
-    $conf->data->set(gccversion => '4.2');
-    my ($stdout, $stderr);
-    capture(
-        sub {
-           auto::icu::_handle_ccflags_status(
-               $conf,
-               {
-                   ccflags_status  => 0,
-                   icuheaders      => $icuheaders,
-               },
-           );
-       },
-       \$stdout,
-       \$stderr,
-   );
-   like(
-       $stdout,
-       qr/Adding -isystem \"\Q$icuheaders\E\" to ccflags for icu headers/,
-       "Got expected verbose output"
-   );
-}
-$conf->data->set( ccflags => $status ); # re-set for next test
-$conf->data->set( gccversion => $gccversion ); # re-set for next test
-
-{
-    $conf->options->set(verbose => 1);
-    $conf->data->set(gccversion => undef);
-    my ($stdout, $stderr);
-    capture(
-        sub {
-           auto::icu::_handle_ccflags_status(
-               $conf,
-               {
-                   ccflags_status  => 0,
-                   icuheaders      => $icuheaders,
-               },
-           );
-       },
-       \$stdout,
-       \$stderr,
-   );
-   like(
-       $stdout,
-       qr/Adding -I \"\Q$icuheaders\E\" to ccflags for icu headers/,
-       "Got expected verbose output"
-   );
-}
-$conf->data->set( ccflags => $status ); # re-set for next test
-$conf->data->set( gccversion => $gccversion ); # re-set for next test
 
 ########## _set_no_configure_with_icu() ##########
 
@@ -518,13 +419,9 @@ $conf->replenish($serialized);
         $conf->options->set( %{$args} );
         $step = test_step_constructor_and_description($conf);
         {
-            my ($stdout, $stderr, $ret);
-            capture(
-                sub { $ret = $step->runstep($conf); },
-                \$stdout,
-                \$stderr,
-            );
-            ok(! defined $ret, "runstep() returned undefined value as expected");
+            my ( $rv, $stdout, $stderr, $retval ) =
+              capture( sub { $ret = $step->runstep($conf); });
+            ok(! defined $rv, "runstep() returned undefined value as expected");
             like($stderr, qr/error: icuheaders not defined or invalid/s,
                 "Got expected warnings");
             like($stderr, qr/Something is wrong with your ICU installation/s,
@@ -669,13 +566,13 @@ $conf->replenish($serialized);
                 "Got expected verbose output re --ldflags");
             like($stdout, qr/icushared:  captured/s,
                 "Got expected verbose output re icushared");
-            like($stdout, qr/For icushared, found \Q$icushared\E and $without/s,
+            like($stdout, qr/For icushared, found \Q$icushared\E and without=$without/s,
                 "Got expected verbose output re icushared");
             like($stdout, qr/Trying $icuconfig with '--prefix'/s,
                 "Got expected verbose output re --prefix");
             like($stdout, qr/icuheaders:  captured/s,
                 "Got expected verbose output re icuheaders");
-            like($stdout, qr/For icuheaders, found \Q$icuheaders\E and $without/s,
+            like($stdout, qr/For icuheaders, found \Q$icuheaders\E and without=$without/s,
                 "Got expected verbose output re icuheaders");
         }
     }
