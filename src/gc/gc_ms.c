@@ -680,7 +680,6 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
            function to the PMC pool and all the sized pools. */
        header_pools_iterate_callback(interp, mem_pools,
             POOL_BUFFER | POOL_PMC, (void *)&total_free, gc_ms_sweep_cb);
-
     }
     else {
         ++interp->gc_sys->stats.gc_lazy_mark_runs;
@@ -893,7 +892,9 @@ gc_ms_free_pmc_header(PARROT_INTERP, ARGMOD(PMC *pmc))
 
     PObj_flags_SETTO((PObj *)pmc, PObj_on_free_list_FLAG);
     pool->add_free_object(interp, mem_pools, pool, (PObj *)pmc);
+#ifdef GC_STATS
     ++pool->num_free_objects;
+#endif
 }
 
 /*
@@ -1023,7 +1024,9 @@ gc_ms_free_string_header(PARROT_INTERP, ARGMOD(STRING *s))
         Fixed_Size_Pool * const pool = mem_pools->string_header_pool;
         PObj_flags_SETTO((PObj *)s, PObj_on_free_list_FLAG);
         pool->add_free_object(interp, mem_pools, pool, s);
+#ifdef GC_STATS
         ++pool->num_free_objects;
+#endif
     }
 }
 
@@ -1164,7 +1167,9 @@ Parrot_gc_get_attributes_from_pool(PARROT_INTERP, ARGMOD(PMC_Attribute_Pool * po
         return Parrot_gc_get_attributes_from_pool(interp, pool);
     }
 
+#ifdef GC_STATS
     --pool->num_free_objects; /* the hottest op in --gc ms: 11.64% */
+#endif
     return (void *)item;
 }
 
@@ -1191,7 +1196,9 @@ Parrot_gc_allocate_new_attributes_arena(ARGMOD(PMC_Attribute_Pool *pool))
     pool->newfree   = next;
     pool->newlast   = (PMC_Attribute_Free_List *)((char *)next + item_space);
 
+#ifdef GC_STATS
     pool->num_free_objects += num_items;
+#endif
     pool->total_objects    += num_items;
 }
 
@@ -1269,7 +1276,9 @@ Parrot_gc_create_attrib_pool(size_t attrib_idx)
     newpool->attr_size         = attrib_size;
     newpool->total_objects     = 0;
     newpool->objects_per_alloc = num_objs;
+#ifdef GC_STATS
     newpool->num_free_objects  = 0;
+#endif
     newpool->free_list         = NULL;
     newpool->top_arena         = NULL;
 
@@ -1384,7 +1393,9 @@ gc_ms_free_attributes_from_pool(ARGMOD(PMC_Attribute_Pool *pool), ARGMOD(void *d
     item->next      = pool->free_list;
     pool->free_list = item;
 
+#ifdef GC_STATS
     ++pool->num_free_objects;
+#endif
 }
 
 /*
@@ -1578,8 +1589,9 @@ gc_ms_sweep_cb(PARROT_INTERP,
 
     Parrot_gc_sweep_pool(interp, mem_pools, pool);
 
+#ifdef GC_STATS
     *total_free += pool->num_free_objects;
-
+#endif
     return 0;
 }
 
@@ -1638,8 +1650,9 @@ gc_ms_more_traceable_objects(PARROT_INTERP,
          &&  Parrot_gc_ms_needed(interp)))
             Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 
-    /* requires that num_free_objects be updated in Parrot_gc_mark_and_sweep.
-       If gc is disabled, then we must check the free list directly. */
+    /* Requires that num_free_objects be updated in Parrot_gc_mark_and_sweep.
+       Keeping num_free_objects is expensive, so we disable it with --optimize.
+       Also if gc is disabled, then we must check the free list directly. */
     if ((!pool->free_list || pool->num_free_objects < pool->replenish_level)
         && !pool->newfree)
         (*pool->alloc_objects) (interp, mem_pools, pool);

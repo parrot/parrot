@@ -419,6 +419,7 @@ Static implementation of public methods.
 
 */
 
+PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
 static void *
 get_free_list_item(ARGMOD(Pool_Allocator *pool))
@@ -427,7 +428,9 @@ get_free_list_item(ARGMOD(Pool_Allocator *pool))
 
     Pool_Allocator_Free_List * const item = pool->free_list;
     pool->free_list = item->next;
+#ifdef GC_STATS
     --pool->num_free_objects;
+#endif
     return item;
 }
 
@@ -446,6 +449,7 @@ pool_allocate(PARROT_INTERP, ARGMOD(Pool_Allocator *pool))
     return get_newfree_list_item(pool);
 }
 
+PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
 static void *
 get_newfree_list_item(ARGMOD(Pool_Allocator *pool))
@@ -453,13 +457,16 @@ get_newfree_list_item(ARGMOD(Pool_Allocator *pool))
     ASSERT_ARGS(get_newfree_list_item)
 
     Pool_Allocator_Free_List * const item = pool->newfree;
+#ifdef GC_STATS
+    --pool->num_free_objects;
+#endif
     pool->newfree = (Pool_Allocator_Free_List *)
                     ((char *)(pool->newfree) + pool->object_size);
 
-    --pool->num_free_objects;
     return item;
 }
 
+PARROT_INLINE
 static void
 pool_free(SHIM_INTERP, ARGMOD(Pool_Allocator *pool), ARGMOD(void *data))
 {
@@ -473,9 +480,12 @@ pool_free(SHIM_INTERP, ARGMOD(Pool_Allocator *pool), ARGMOD(void *data))
     item->next      = pool->free_list;
     pool->free_list = item;
 
+#ifdef GC_STATS
     ++pool->num_free_objects;
+#endif
 }
 
+PARROT_INLINE
 PARROT_WARN_UNUSED_RESULT
 PARROT_PURE_FUNCTION
 static int
@@ -490,6 +500,7 @@ pool_is_maybe_owned(ARGIN(const Pool_Allocator *pool), ARGIN(const void *ptr))
     return (ptr >= pool->lo_arena_ptr && ptr < pool->hi_arena_ptr);
 }
 
+PARROT_INLINE
 PARROT_WARN_UNUSED_RESULT
 static int
 pool_is_owned(ARGIN(const Pool_Allocator *pool), ARGIN(const void *ptr))
@@ -500,8 +511,8 @@ pool_is_owned(ARGIN(const Pool_Allocator *pool), ARGIN(const void *ptr))
         int p;
 
         for (p = 0; p < pool->num_arenas; p++) {
-            const size_t idx = 2 * p;
-            void * const low = pool->arena_bounds[idx];
+            const size_t idx  = 2 * p;
+            void * const low  = pool->arena_bounds[idx];
             void * const high = pool->arena_bounds[idx + 1];
             if (ptr >= low && ptr < high) {
                 const ptrdiff_t ptrdiff = (const char *)ptr - (const char *)low;
@@ -551,8 +562,9 @@ allocate_new_pool_arena(PARROT_INTERP, ARGMOD(Pool_Allocator *pool))
     pool->newfree   = next;
     pool->newlast   = last;
 
+#ifdef GC_STATS
     pool->num_free_objects += num_items;
-
+#endif
     if (pool->lo_arena_ptr > (void *)next)
         pool->lo_arena_ptr = next;
 
