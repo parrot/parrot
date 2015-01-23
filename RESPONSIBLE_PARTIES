@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2013, Parrot Foundation.
+# Copyright (C) 2002-2015, Parrot Foundation.
 
 This is a list of project roles, with a partial list of the folks who have
 taken responsibility for them.  This does not list all the people with
@@ -73,13 +73,12 @@ Compiler Developer              Patrick Michaud (PGE, PCT)
 
 Platform Porter                 Allison Randal (Debian, Ubuntu)
                                 Francois Perrad (MinGW32)
-                                Reini Urban (cygwin)
+                                Reini Urban (all)
                                 Will Coleda (MacPorts)
                                 Jerry Gay (Windows)
                                 Gerd Pokorra (Fedora)
 
 Patch Monster                   chromatic
-                                Reini Urban
                                 Jonathan Worthington
                                 Jerry Gay
                                 Will Coleda

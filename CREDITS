@@ -109,7 +109,7 @@ D: typo squisher
 E: yDNA@cpan.org
 
 N: Andrew Whitworth
-D: Product Manager (2.9.0 - current)
+D: Product Manager (2.9 - 4.9)
 D: Internals development
 D: Documentation
 D: Release manager for 0.8.2, 1.3.0, 1.5.0, 2.4.0, 2.11.0, 3.3.0, 3.10.0, 4.0.0, 4.4.0 and 4.7.0
@@ -275,7 +275,7 @@ D: Rakudo patches
 
 N: Christoph Otto
 U: cotto
-D: Architect (2.9.0 - current)
+D: Architect (2.9 - 5.0)
 D: Range check in Env PMC
 A: christoph_googleacct@mksig.org
 A: christop...@mksig.org
@@ -989,10 +989,9 @@ N: Reini Urban
 U: rurban
 E: rurban@cpan.org
 E: rurban@cpanel.net
-D: cygwin, install, native_pbc
-D: various optimizations and maintenance
+D: Internals development
 D: Release manager and GSOC mentor
-S: Houston, TX (formerly Graz, A)
+S: Dresden, D (formerly Graz, A and Houston, TX)
 
 N: Richard Hainsworth
 U: finanalyst
