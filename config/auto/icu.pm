@@ -145,13 +145,13 @@ sub runstep {
     return unless defined $icuheaders;
 
     my $icudir = dirname($icuheaders);
-    # Add -I $icuheaders if necessary.
-    my $ccbuild_ok = $self->_probe_icu($conf, $icuheaders, $icushared);
+    # Add -I $icuheaders if necessary
+    my $ccbuild_ok = $self->_probe_icu($conf, '', $icushared);
     if (!$ccbuild_ok) {
         my $incflag = defined $conf->data->get('gccversion')
             ? '-isystem'
             : '-I';
-        my $more_icuflags = qq{$incflag $icuheaders};
+        my $more_icuflags = $incflag.' '.$icuheaders;
         $conf->debug( "Trying adding '$more_icuflags' to ccflags for icu headers");
         if ($ccbuild_ok = $self->_probe_icu($conf, $more_icuflags, $icushared)) {
             $conf->data->add( ' ', ccflags => $more_icuflags );
@@ -180,7 +180,7 @@ sub runstep {
 ########## INTERNAL SUBROUTINES ##########
 
 sub _probe_icu {
-    my ($self, $conf, $icuheaders, $icushared) = @_;
+    my ($self, $conf, $icuinc, $icushared) = @_;
     my $header = "unicode/ucnv.h";
     $conf->data->set( TEMP_testheaders => "#include <$header>\n" );
     $conf->data->set( TEMP_testheader  => "$header" );
@@ -188,7 +188,7 @@ sub _probe_icu {
     # Clean up.
     $conf->data->set( TEMP_testheaders => undef );
     $conf->data->set( TEMP_testheader  => undef );
-    eval { $conf->cc_build($icuheaders, $icushared); };
+    eval { $conf->cc_build($icuinc, $icushared); };
     my $ccbuild_ok = ( ! $@ && $conf->cc_run() =~ /^$header OK/ );
     $conf->cc_clean();
     return $ccbuild_ok;
