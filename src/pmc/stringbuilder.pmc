@@ -269,11 +269,25 @@ Append string. Synonym for push_string
     }
 
     VTABLE void i_concatenate(PMC *p) :manual_wb {
-        STATICSELF.push_string(VTABLE_get_string(INTERP, p));
+        if (p->vtable->base_type == enum_class_StringBuilder) {
+            STRING *buffer;
+            GET_ATTR_buffer(INTERP, p, buffer);
+            STATICSELF.push_string(buffer);
+        }
+        else {
+            STATICSELF.push_string(VTABLE_get_string(INTERP, p));
+        }
     }
 
     VTABLE void push_pmc(PMC *p) :manual_wb {
-        STATICSELF.push_string(VTABLE_get_string(INTERP, p));
+        if (p->vtable->base_type == enum_class_StringBuilder) {
+            STRING *buffer;
+            GET_ATTR_buffer(INTERP, p, buffer);
+            STATICSELF.push_string(buffer);
+        }
+        else {
+            STATICSELF.push_string(VTABLE_get_string(INTERP, p));
+        }
     }
 
 /*
@@ -312,7 +326,14 @@ Set content of buffer to passed string or PMC
     }
 
     VTABLE void set_pmc(PMC *s) :manual_wb {
-        STATICSELF.set_string_native(VTABLE_get_string(INTERP, s));
+        if (s->vtable->base_type == enum_class_StringBuilder) {
+            STRING *buffer;
+            GET_ATTR_buffer(INTERP, s, buffer);
+            STATICSELF.push_string(buffer);
+        }
+        else {
+            STATICSELF.set_string_native(VTABLE_get_string(INTERP, s));
+        }
     }
 
 
