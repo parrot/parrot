@@ -1,9 +1,6 @@
 2014-02-17    release 7.1.0
     - Core
     - Build
-        + Fixed and improved --m={32,64} cross-compilation support and
-          automatic libpath adjustments for gcc. #1181, #1182, #1110
-        + Actually link with libicu when probing for it. #1182
         + Optimize away ExtUtils::Command on posix systems. #1177
         + Fix cpu config values for gcc_cmpxchg to include atomic/gcc_x86.o on amd64.
           Harmonized the cpu config keys, no $platform_has_$feature keys anymore, just
@@ -11,6 +8,16 @@
     - Documentation
     - Tests
     - Community
+
+2014-01-23    release 7.0.1 - supported
+    - Core
+        + Fixed a serious GC regression with --optimize and the default GC gms. #1186
+        + Fixed a threads deadlock with the default GC gms. #1187
+    - Build
+        + Fixed and improved --m={32,64} cross-compilation support and
+          automatic libpath adjustments for gcc, esp. on mips64 and ppc64.
+          #1181, #1182, #1178, #1110
+        + Actually link with libicu when probing for it. #1182, #1188
 
 2014-01-20    release 7.0.0 - supported
     - Core

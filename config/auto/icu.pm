@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2014, Parrot Foundation.
+# Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -106,7 +106,6 @@ sub runstep {
         {
             icuconfig   => $icuconfig,
             autodetect  => $autodetect,
-            without     => $without,
         }
     );
     # Inside _handle_autodetect(), $without can be set to 1 by
@@ -123,7 +122,6 @@ sub runstep {
         $self->_try_icuconfig(
             $conf,
             {
-                without         => $without,
                 autodetect      => $autodetect,
                 icuconfig       => $icuconfig,
                 icushared       => $icushared,
@@ -147,13 +145,13 @@ sub runstep {
     return unless defined $icuheaders;
 
     my $icudir = dirname($icuheaders);
-    # Add -I $Icuheaders if necessary.
-    my $ccbuild_ok = $self->_probe_icu($conf, $icuheaders, $icushared);
+    # Add -I $icuheaders if necessary
+    my $ccbuild_ok = $self->_probe_icu($conf, '', $icushared);
     if (!$ccbuild_ok) {
         my $incflag = defined $conf->data->get('gccversion')
             ? '-isystem'
             : '-I';
-        my $more_icuflags = qq{$incflag $icuheaders};
+        my $more_icuflags = $incflag.' '.$icuheaders;
         $conf->debug( "Trying adding '$more_icuflags' to ccflags for icu headers");
         if ($ccbuild_ok = $self->_probe_icu($conf, $more_icuflags, $icushared)) {
             $conf->data->add( ' ', ccflags => $more_icuflags );
@@ -182,7 +180,7 @@ sub runstep {
 ########## INTERNAL SUBROUTINES ##########
 
 sub _probe_icu {
-    my ($self, $conf, $icuheaders, $icushared) = @_;
+    my ($self, $conf, $icuinc, $icushared) = @_;
     my $header = "unicode/ucnv.h";
     $conf->data->set( TEMP_testheaders => "#include <$header>\n" );
     $conf->data->set( TEMP_testheader  => "$header" );
@@ -190,7 +188,7 @@ sub _probe_icu {
     # Clean up.
     $conf->data->set( TEMP_testheaders => undef );
     $conf->data->set( TEMP_testheader  => undef );
-    eval { $conf->cc_build('', $icushared); };
+    eval { $conf->cc_build($icuinc, $icushared); };
     my $ccbuild_ok = ( ! $@ && $conf->cc_run() =~ /^$header OK/ );
     $conf->cc_clean();
     return $ccbuild_ok;
@@ -266,13 +264,14 @@ sub _handle_autodetect {
                     {
                         icuconfig   => $arg->{icuconfig},
                         autodetect  => $arg->{autodetect},
-                        without     => $arg->{without},
+                        without     => 0,
                         ret         => $ret,
                     }
                 );
         }
     } # end $autodetect true
     else {
+        $arg->{without} = 0;
         $conf->debug(
             "Specified an ICU config parameter,\n",
             "ICU autodetection disabled.\n",
@@ -291,12 +290,9 @@ sub _try_icuconfig {
     my $icuheaders = ( defined $arg->{icuheaders} )
         ? $arg->{icuheaders}
         : undef;
+    $arg->{without} = 0;
     my $icuversion;
-    if (
-        ( ! $arg->{without} )  &&
-        $arg->{autodetect}    &&
-        $arg->{icuconfig}
-    ) {
+    if ($arg->{autodetect} && $arg->{icuconfig}) {
         # ldflags
         $conf->debug("Trying $arg->{icuconfig} with '--ldflags-searchpath --ldflags-libsonly'\n");
         $icushared = capture_output("$arg->{icuconfig} --ldflags-searchpath --ldflags-libsonly");
@@ -305,7 +301,7 @@ sub _try_icuconfig {
         $conf->debug("icushared:  captured $icushared\n");
         ($icushared, $arg->{without}) =
             $self->_handle_icushared($conf, $arg, $icushared);
-        $conf->debug("For icushared, found $icushared and $arg->{without}\n");
+        $conf->debug("For icushared, found $icushared and without=$arg->{without}\n");
 
         # location of header files
         $conf->debug("Trying $arg->{icuconfig} with '--prefix'\n");
@@ -314,7 +310,7 @@ sub _try_icuconfig {
         $conf->debug("icuheaders:  captured $icuheaders\n");
         ($icuheaders, $arg->{without}) =
             $self->_handle_icuheaders($conf, $icuheaders, $arg->{without});
-        $conf->debug("For icuheaders, found $icuheaders and $arg->{without}\n");
+        $conf->debug("For icuheaders, found $icuheaders and without=$arg->{without}\n");
 
         # icu-config --version for missing (void) declarations with 4.4
         $conf->debug("Trying $arg->{icuconfig} with '--version'\n");
@@ -331,6 +327,7 @@ sub _try_icuconfig {
 
 sub _handle_icushared {
     my ($self, $conf, $arg, $icushared) = @_;
+    $arg->{without} = 0;
     if ( defined $icushared ) {
         chomp $icushared;
         $icushared =~ s/$self->{icu_shared_pattern}//;    # "-licui18n32" too

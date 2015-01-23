@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2012-2014, Parrot Foundation.
+# Copyright (C) 2012-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -39,7 +39,7 @@ use Parrot::Config;
     system($parrot, '-o', $pbc, $src);
     my $todo = $PConfig{ccflags} =~ /-DTHREAD_DEBUG/;
     pbc_exit_code_is( $pbc, 0, 'chameneos',
-        $todo ? (todo => 'GH880 GC walks into thread interp') : ());
+        $todo ? (todo => 'GH #880 GC walks into thread interp') : ());
     unlink $pbc;
 }
 
@@ -49,7 +49,7 @@ use Parrot::Config;
 {
     local $ENV{TEST_PROG_ARGS} .= '-t11 --gc-nursery-size=0.001 --gc-debug ';
 
-    pir_exit_code_is( << 'CODE', 0, "IO Stress with -t" );
+    pir_exit_code_is( << 'CODE', 0, "IO Stress with -t", todo => 'stringbuilder gc stress #1132');
 .sub test :main
     load_bytecode "dumper.pbc"
     load_bytecode 'Test/More.pbc'
