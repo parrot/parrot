@@ -280,15 +280,24 @@ io_stringhandle_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(char *buffer),
 {
     ASSERT_ARGS(io_stringhandle_write_b)
     STRING *old_string, *new_string;
+    size_t new_length;
     const STR_VTABLE * const encoding = io_stringhandle_get_encoding(interp, handle);
 
     GETATTR_StringHandle_stringhandle(interp, handle, old_string);
+    new_length = old_string->bufused + byte_length;
 
-    /* TODO: Only allocate more space if we don'thave enough available already */
-    new_string = io_get_new_empty_string(interp, encoding, -1, old_string->bufused + byte_length);
-    memcpy(new_string->_bufstart, old_string->_bufstart, old_string->bufused);
+    /* Only allocate more space if we don't have enough available already */
+    if (Buffer_buflen(old_string) < new_length) {
+        new_string = io_get_new_empty_string(interp, encoding, -1, new_length);
+        memcpy(new_string->_bufstart, old_string->_bufstart, old_string->bufused);
+    }
+    else {
+        /*fprintf(stderr, "** reuse io_stringhandle_write_b() len:%d, used:%d, new:+%d\n",
+          Buffer_buflen(old_string), old_string->bufused, byte_length); */
+        new_string = old_string;
+    }
     memcpy(((char*)new_string->_bufstart) + old_string->bufused, buffer, byte_length);
-    new_string->bufused = old_string->bufused + byte_length;
+    new_string->bufused = new_length;
     STRING_scan(interp, new_string);
 
     SETATTR_StringHandle_stringhandle(interp, handle, new_string);
