@@ -1276,9 +1276,7 @@ Parrot_gc_create_attrib_pool(size_t attrib_idx)
     newpool->attr_size         = attrib_size;
     newpool->total_objects     = 0;
     newpool->objects_per_alloc = num_objs;
-#ifdef GC_STATS
     newpool->num_free_objects  = 0;
-#endif
     newpool->free_list         = NULL;
     newpool->top_arena         = NULL;
 
@@ -1737,7 +1735,9 @@ gc_ms_get_free_object(PARROT_INTERP,
         goto HAVE_FREE;
     }
 
+#ifdef GC_STATS
     --pool->num_free_objects;
+#endif
     interp->gc_sys->stats.memory_used += pool->object_size;
 
     return ptr;

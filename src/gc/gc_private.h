@@ -25,14 +25,12 @@ Parrot.
 #include "parrot/settings.h"
 #include "variable_size_pool.h"
 
-/* Do not calculate private gc statistics, only used in gc_ms.
-   Currently skipped: num_free_objects.
- */
+/* Do not calculate num_free_objects, only used in gc_ms. */
 #ifndef GC_STATS
-#  ifdef NDEBUG
-#    undef GC_STATS
-#  else
+#  if !defined(NDEBUG) || defined(PARROT_GC_DEFAULT_MS) || defined(PARROT_GC_DEFAULT_MS2)
 #    define GC_STATS
+#  else
+#    undef GC_STATS
 #  endif
 #endif
 
@@ -338,11 +336,9 @@ typedef struct PMC_Attribute_Arena {
 
 typedef struct PMC_Attribute_Pool {
     size_t attr_size;                    /* Size of attribute object. */
+    size_t num_free_objects;             /* Number of objects on the free list. */
     size_t total_objects;                /* Total objects in the pool. */
     size_t objects_per_alloc;            /* Number of object slots to allocate. */
-#ifdef GC_STATS
-    size_t num_free_objects;             /* Number of objects on the free list. */
-#endif
     PMC_Attribute_Free_List * free_list; /* List of free object slots, or NULL. */
     PMC_Attribute_Arena     * top_arena; /* Pointer to most recent arena. */
     PMC_Attribute_Free_List * newfree;   /* Pointer to next object slot in
