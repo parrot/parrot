@@ -533,16 +533,8 @@ If not, ask someone to do this.
 
 =item 4
 
-Update the wiki frontpage at L<https://github.com/parrot/parrot/wiki>
-
-=item 5
-
 Update the Wikipedia entry at
 L<http://en.wikipedia.org/wiki/Parrot_virtual_machine>.
-
-=item 6
-
-Update the C2 wiki entry at L<http://c2.com/cgi/wiki?ParrotCode>.
 
 =back
 
