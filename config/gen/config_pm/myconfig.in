@@ -5,6 +5,7 @@ Summary of my parrot @VERSION@ configuration:
     perl=@perl@
   Compiler:
     cc='@cc@', ccflags='@ccflags@',
+    optimize='@optimize@'
   Linker and Libraries:
     link='@link@', linkflags='@linkflags@',
     ld='@ld@', ldflags='@ldflags@',
