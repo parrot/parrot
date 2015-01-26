@@ -843,7 +843,7 @@ Note that the C<from> PMC can be of any of the various array types.
         INTVAL       offset    = PMC_offset(SELF);
         const INTVAL elems1    = VTABLE_elements(INTERP, from);
         PMC **item;
-        INTVAL tail, sizediff, newsize;
+        INTVAL tail = 0, sizediff = 0, newsize;
 #ifndef NDEBUG
         int no_debug = 0; /* if we didn't branch into a TRACE_RPA */
 #endif
