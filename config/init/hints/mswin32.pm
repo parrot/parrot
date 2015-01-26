@@ -80,6 +80,7 @@ sub runstep {
 
         my $disable_static = $conf->options->get('disable-static');
         my $debugging = $conf->options->get('debugging');
+        my $optimize = $conf->data->get( 'optimize_provisional' );
 
         # 'link' needs to be link.exe, not cl.exe.
         # This makes 'link' and 'ld' the same.
@@ -89,7 +90,13 @@ sub runstep {
             $ld = 'link';
             $conf->data->set( ld   => $ld );
             $conf->data->set( link => $ld ) unless $conf->options->get('link');
+            $conf->data->set( optimize_provisional => '-O2' );
         }
+        elsif ($optimize =~ /^-s /) {
+            $optimize =~ s/^-s //;
+            $conf->data->set( optimize_provisional => $optimize );
+        }
+
         $conf->data->set( cxx  => $conf->data->get('cc') ) unless $conf->options->get('cxx');
         my $link_is_cl = $conf->data->get('link') =~ /cl/;
         # -MD cannot be used, because we use _environ directly

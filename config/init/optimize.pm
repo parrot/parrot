@@ -53,6 +53,9 @@ sub runstep {
         if ( defined $gccversion and $gccversion > 3.3 ) {
             $optimization_level =~ s/-mcpu=/-march=/;
         }
+        if (!$optimization_level) {
+            $optimization_level = '-O2' if $gccversion or $conf->data->get( 'msvcversion' );
+        }
     }
     else {
         # Otherwise, use the command-line verbatim, e.g. '--optimize=O3'
