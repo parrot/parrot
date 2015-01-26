@@ -198,9 +198,15 @@ typedef void (*funcptr_t)(void);
  * turns out, ANSI C does appear to permit you to do this conversion if you
  * convert the value to a long (well, a value type large enough to hold
  * a pointer) in between.  Believe it or not, this even works on TenDRA (tcc).
+ * Note that on win64 MSVC a long is 4 bytes, not 8.
  */
-#define D2FPTR(x) UINTVAL2PTR(funcptr_t, PTR2ULONG(x))
-#define F2DPTR(x) UINTVAL2PTR(void *, PTR2ULONG((funcptr_t) (x)))
+#ifdef _MSC_VER
+#  define D2FPTR(x) UINTVAL2PTR(funcptr_t, PTR2UINTVAL(x))
+#  define F2DPTR(x) UINTVAL2PTR(void *, PTR2UINTVAL((funcptr_t) (x)))
+#else
+#  define D2FPTR(x) UINTVAL2PTR(funcptr_t, PTR2ULONG(x))
+#  define F2DPTR(x) UINTVAL2PTR(void *, PTR2ULONG((funcptr_t) (x)))
+#endif
 
 /* On Win32 we need the constant O_BINARY for open() (at least for Borland C),
    but on UNIX it doesn't exist, so set it to 0 if it's not defined
