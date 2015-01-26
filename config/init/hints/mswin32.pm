@@ -68,6 +68,7 @@ sub runstep {
         # if we want pbc_to_exe to work, need to let some versions of the
         # compiler use more memory than they normally would
         $ccflags .= " -Zm1500 " if $msvcversion < 13;
+        $ccflags .= " -nologo" unless $ccflags =~ /nologo/; # strawberry
 
         my $ccwarn = '';
         # disable certain very noisy warnings
@@ -78,28 +79,52 @@ sub runstep {
         }
 
         my $disable_static = $conf->options->get('disable-static');
+        my $debugging = $conf->options->get('debugging');
+
+        # 'link' needs to be link.exe, not cl.exe.
+        # This makes 'link' and 'ld' the same.
+        # Note that on win64 we mostly only have a strawberry perl, thus g++ as ld.
+        my $ld   = $conf->option_or_data('ld');
+        if ($ld =~ /g\+\+/) {
+            $ld = 'link';
+            $conf->data->set( ld   => $ld );
+            $conf->data->set( link => $ld ) unless $conf->options->get('link');
+        }
+        $conf->data->set( cxx  => $conf->data->get('cc') ) unless $conf->options->get('cxx');
+        my $link_is_cl = $conf->data->get('link') =~ /cl/;
+        # -MD cannot be used, because we use _environ directly
+        my $ldflags = $link_is_cl ? '-nologo' : '-nologo -nodefaultlib';
+        my $linkflags = $ldflags;
+        my $libs = $link_is_cl ? 'ws2_32.lib oldnames.lib advapi32.lib '
+                               : 'kernel32.lib ws2_32.lib msvcrt.lib oldnames.lib advapi32.lib ';
+        if ($msvcversion >= 17) { # Since Visual C 2005
+            $libs =~ s/msvcrt.lib/libcmt.lib/; # we need _environ as symbol. The dll exposes it only as function
+        }
+
         $conf->data->set(
             share_ext  => '.dll',
             load_ext   => '.dll',
             a          => '.lib',
             o          => '.obj',
             cc_o_out   => '-Fo',
-            cc_exe_out => '-out:',
-            cc_ldflags => '/link',
+            # well, cl uses -Fe, link uses -out:
+            cc_exe_out => $link_is_cl ? '-Fe' : '-out:',
+            cc_ldflags => '-link',
 
             make_c => q{$(PERL) -e "chdir shift @ARGV;}
                 . q{system '$(MAKE)', '-nologo', @ARGV; exit $$? >> 8;"},
             make => 'nmake',
 
-            # ZI messes with __LINE__
+            # ZI messes with __LINE__, /Z7 is preferred for gdb
             cc_debug            => '-Zi',
             ld_debug            => '-debug',
-            ld_share_flags      => '-dll',
-            ld_load_flags       => '-dll',
-            ld_out              => '-out:',
-            ldflags             => '-nologo -nodefaultlib',
+            ld_share_flags      => $link_is_cl ? '-LD' : '-dll',
+            ld_load_flags       => $link_is_cl ? '-LD' : '-dll',
+            ld_out              => $link_is_cl ? '-Fe' : '-out:',
+            ldflags             => $ldflags,
+            linkflags           => $linkflags,
             # advapi32 needed for src/platform/win32/entropy.c
-            libs                => 'kernel32.lib ws2_32.lib msvcrt.lib oldnames.lib advapi32.lib ',
+            libs                => $link_is_cl ? 'ws2_32.lib oldnames.lib advapi32.lib ' : 'kernel32.lib ws2_32.lib msvcrt.lib oldnames.lib advapi32.lib ',
             libparrot_static    => $disable_static ? '' : 'libparrot' . $conf->data->get('a'),
             libparrot_shared    => "libparrot$share_ext",
             ar                  => 'lib',
@@ -123,12 +148,8 @@ sub runstep {
         $conf->data->set( inst_libparrot_ldflags   => "\"$bindir\\libparrot.lib\"" );
         $conf->data->set( inst_libparrot_linkflags   => "\"$bindir\\libparrot.lib\"" );
 
-        # 'link' needs to be link.exe, not cl.exe.
-        # This makes 'link' and 'ld' the same.
-        $conf->data->set( link => $conf->data->get('ld') );
-
         # We can't use -opt: and -debug together.
-        if ( $conf->data->get('ld_debug') =~ /-debug/ ) {
+        if ( $debugging ) {
             my $linkflags = $conf->option_or_data('linkflags');
             $linkflags =~ s/-opt:\S+//;
             $conf->data->set( linkflags => $linkflags );
@@ -142,7 +163,7 @@ sub runstep {
             o          => '.obj',
             cc_o_out   => '-Fo',
             cc_exe_out => '-out:',
-            cc_ldflags => '/link',
+            cc_ldflags => '-link',
 
             # ZI messes with __LINE__
             cc_debug            => '-Zi',
