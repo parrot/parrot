@@ -42,8 +42,8 @@ a Unicode context is meaningless when /MD or /MDd linkage is used"
 
 /*
 
-=item C<static void win32_setenv_ascii(PARROT_INTERP, char * const name,
-char * const value)>
+=item C<static void win32_setenv_ascii(PARROT_INTERP, char * const name, char *
+const value)>
 
 Helper function for ascii keys and values.
 

@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -108,10 +108,7 @@ loopend:
     is($I0, 2, 'assigned env vars showed up in the iterator')
 .end
 
-    # This will not work on our unsetenv implementation
-    #skip( "no native unsetenv", 1 ) unless $PConfig{"unsetenv"};
 .sub exists_delete
-
     .include "iglobals.pasm"
     .local pmc config_hash, interp
     interp = getinterp

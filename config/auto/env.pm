@@ -69,16 +69,17 @@ sub _evaluate_env {
         $self->set_result('all');
     }
     elsif ($result > 0) {
-      # only win32 + msvc is supposed to support _putenv_s
-      if ($^O ne 'MSWin32' and $string eq 'environ,setenv,unsetenv') {
-        $self->set_result('all');
-      } else {
-        $self->set_result($string);
-      }
+        # only win32 + msvc is supposed to support _putenv_s
+        if ($^O ne 'MSWin32' and $string eq 'environ,setenv,unsetenv') {
+            $self->set_result('all');
+        }
+        else {
+            $self->set_result($string);
+        }
     }
     else {
-      $conf->debug(" (no) ");
-      $self->set_result('no');
+        $conf->debug(" (no) ");
+        $self->set_result('no');
     }
 }
 
