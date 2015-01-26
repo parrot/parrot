@@ -38,10 +38,6 @@ a Unicode context is meaningless when /MD or /MDd linkage is used"
 
 #include <windows.h>
 
-#ifdef _MSC_VER
-#  define PARROT_HAS_PUTENV_S
-#endif
-
 /* HEADERIZER HFILE: none */
 
 /*
@@ -128,7 +124,7 @@ win32_setenv_unicode(PARROT_INTERP, wchar_t * const name, wchar_t * const value)
 #endif
 
         if (result) {
-            wfprintf(stderr, L"Unable to set environment variable %s=%s", name, value);
+            fwprintf(stderr, L"Unable to set environment variable %s=%s", name, value);
             Parrot_x_jump_out(interp, 1);
         }
     }
@@ -143,8 +139,6 @@ Sets the environment variable C<str_name> to the value C<str_value>. Creates the
 environment variable if it does not exist, and silently overwrite a variable if
 it does exist.
 
-Latin1 strings only
-
 =cut
 
 */
@@ -152,16 +146,31 @@ Latin1 strings only
 void
 Parrot_setenv(PARROT_INTERP, const STRING *str_name, const STRING *str_value)
 {
-    /* TODO: unicode versions */
-    char * const name  = Parrot_str_to_cstring(interp, str_name);
-    char * const value = Parrot_str_to_cstring(interp, str_value);
-    assert(name  != NULL);
-    assert(value != NULL);
+    if (str_name->encoding->max_bytes_per_codepoint == 1
+     && str_value->encoding->max_bytes_per_codepoint == 1) {
+        char * const name  = Parrot_str_to_cstring(interp, str_name);
+        char * const value = Parrot_str_to_cstring(interp, str_value);
+        assert(name  != NULL);
+        assert(value != NULL);
 
-    win32_setenv_ascii(interp, name, value);
+        win32_setenv_ascii(interp, name, value);
 
-    Parrot_str_free_cstring(name);
-    Parrot_str_free_cstring(value);
+        Parrot_str_free_cstring(name);
+        Parrot_str_free_cstring(value);
+    }
+    else {
+        char * const wname  = Parrot_str_to_encoded_cstring(interp, str_name,
+                                                            Parrot_ucs2_encoding_ptr);
+        char * const wvalue = Parrot_str_to_encoded_cstring(interp, str_value,
+                                                            Parrot_ucs2_encoding_ptr);
+        assert(wname != NULL);
+        assert(wvalue != NULL);
+
+        win32_setenv_unicode(interp, (wchar_t*)wname, (wchar_t*)wvalue);
+
+        Parrot_str_free_cstring(wname);
+        Parrot_str_free_cstring(wvalue);
+    }
 }
 
 /*
@@ -170,8 +179,6 @@ Parrot_setenv(PARROT_INTERP, const STRING *str_name, const STRING *str_value)
 
 Gets the environment variable C<str_name>, if it exists.
 
-Latin1 strings only
-
 =cut
 
 */
@@ -179,23 +186,41 @@ Latin1 strings only
 STRING *
 Parrot_getenv(PARROT_INTERP, const STRING *str_name)
 {
-    /* TODO: unicode versions */
-    char   * const name = Parrot_str_to_cstring(interp, str_name);
-    const   DWORD size  = GetEnvironmentVariable(name, NULL, 0);
-    char   *buffer      = NULL;
-    STRING *retv;
+    if (str_name->encoding->max_bytes_per_codepoint == 1) {
+        char   * const name = Parrot_str_to_cstring(interp, str_name);
+        const   DWORD size  = GetEnvironmentVariableA(name, NULL, 0);
+        char   *buffer      = NULL;
+        STRING *retv;
 
-    if (size == 0) {
+        if (size == 0) {
+            Parrot_str_free_cstring(name);
+            return NULL;
+        }
+        buffer = (char *)mem_sys_allocate(size);
+        GetEnvironmentVariableA(name, buffer, size);
         Parrot_str_free_cstring(name);
-        return NULL;
+        retv = Parrot_str_from_platform_cstring(interp, buffer);
+        mem_sys_free(buffer);
+        return retv;
     }
-    buffer = (char *)mem_sys_allocate(size);
-    GetEnvironmentVariable(name, buffer, size);
-    Parrot_str_free_cstring(name);
-    retv = Parrot_str_from_platform_cstring(interp, buffer);
-    mem_sys_free(buffer);
+    else {
+        char * const wname  = Parrot_str_to_encoded_cstring(interp, str_name,
+                                  Parrot_ucs2_encoding_ptr);
+        const   DWORD size  = GetEnvironmentVariableW((wchar_t*)wname, NULL, 0);
+        char   *buffer      = NULL;
+        STRING *retv;
 
-    return retv;
+        if (size == 0) {
+            Parrot_str_free_cstring(wname);
+            return NULL;
+        }
+        buffer = (char *)mem_sys_allocate(size);
+        GetEnvironmentVariableW((wchar_t*)wname, (wchar_t*)buffer, size);
+        Parrot_str_free_cstring(wname);
+        retv = Parrot_str_from_platform_cstring(interp, buffer);
+        mem_sys_free(buffer);
+        return retv;
+    }
 }
 
 /*
@@ -204,8 +229,6 @@ Parrot_getenv(PARROT_INTERP, const STRING *str_name)
 
 Deletes an environment variable by assigning an empty string to the specified variable.
 
-Latin1 strings only
-
 =cut
 
 */
@@ -213,14 +236,21 @@ Latin1 strings only
 void
 Parrot_unsetenv(PARROT_INTERP, const STRING *str_name)
 {
-    /* TODO: unicode versions */
     /* You can remove a variable from the environment by specifying an empty
        string -- in other words, by specifying only varname=.
            -- _putenv, _wputenv (CRT) documentation
     */
-    char * const name  = Parrot_str_to_cstring(interp, str_name);
-    assert(name  != NULL);
-    win32_setenv_ascii(interp, name, NULL);
+    if (str_name->encoding->max_bytes_per_codepoint == 1) {
+        char * const name  = Parrot_str_to_cstring(interp, str_name);
+        assert(name  != NULL);
+        win32_setenv_ascii(interp, name, NULL);
+    }
+    else {
+        char * const wname  = Parrot_str_to_encoded_cstring(interp, str_name,
+                                  Parrot_ucs2_encoding_ptr);
+        assert(wname  != NULL);
+        win32_setenv_unicode(interp, (wchar_t*)wname, NULL);
+    }
 }
 
 /*
