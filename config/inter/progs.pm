@@ -35,19 +35,16 @@ sub runstep {
 
     my $ask = _prepare_for_interactivity($conf);
 
-    my $cc;
-    ($conf, $cc) = _get_programs($conf, $ask);
+    _get_programs($conf, $ask);
 
     my $debug = _get_debug($conf, $ask);
 
     my $debug_validity = _is_debug_setting_valid($debug);
     return unless defined $debug_validity;
 
-    $conf = _set_debug_and_warn($conf, $debug);
+    _set_debug_and_warn($conf, $debug);
 
-    # Beware!  Inside test_compiler(), cc_build() and cc_run() both silently
-    # reference the Parrot::Configure object ($conf) at its current state.
-    test_compiler($conf, $cc);
+    test_compiler($conf);
 
     return 1;
 }
@@ -89,8 +86,7 @@ sub _get_programs {
     $ld = prompt( "What program do you want to use to build shared libraries?", $ld ) if $ask;
     $conf->data->set( ld => $ld );
 
-    $ccflags = integrate( $conf->data->get('ccflags'),
-        $conf->options->get('ccflags') );
+    $ccflags = integrate( $conf->data->get('ccflags'), $conf->options->get('ccflags') );
 
     # Remove some perl5-isms.
     $ccflags =~ s/-D((PERL|HAVE)_\w+\s*|USE_PERLIO)//g;
@@ -140,7 +136,6 @@ sub _get_programs {
     $cxx = integrate( $conf->data->get('cxx'), $conf->options->get('cxx') );
     $cxx = prompt( "What C++ compiler do you want to use?", $cxx ) if $ask;
     $conf->data->set( cxx => $cxx );
-    return ($conf, $cc);
 }
 
 sub _get_debug {
@@ -178,19 +173,28 @@ sub _set_debug_and_warn {
 }
 
 sub test_compiler {
-    my ($conf, $cc) = @_;
+    my ($conf) = @_;
+    my ($cc, $link) = $conf->data->get('cc', 'link');
 
     open( my $out_fh, '>', "test_$$.c" )
         or die "Unable to open 'test_$$.c': $@\n";
     print {$out_fh} <<END_C;
+#include <stdio.h>
 int main() {
+    puts("ok");
     return 0;
 }
 END_C
     close $out_fh;
 
+    $conf->debug("\ncc=$cc, link=$link\n");
     unless ( eval { $conf->cc_build(); 1 } ) {
-        warn "Compilation failed with '$cc'\n";
+        if ($cc eq $link) {
+            warn "Compilation failed with '$cc''\n";
+        }
+        else {
+            warn "Compilation failed with '$cc' and '$link'\n";
+        }
         exit 1;
     }
 
