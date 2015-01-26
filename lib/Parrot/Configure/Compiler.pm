@@ -86,7 +86,7 @@ These items are used from current config settings:
 
 Calls the compiler and linker on F<test_$$.c>.
 
-Returns the last error code
+Returns the last error code.
 
 =cut
 
@@ -129,7 +129,7 @@ sub cc_build {
 Calls the F<test> (or F<test.exe>) executable. Any output is directed to
 F<test.out>.
 
-Returns the captured stdout, the exit code is ignored.
+Returns the captured stdout, and in array context with the additional exit code.
 
 =cut
 
@@ -151,7 +151,7 @@ sub cc_run {
     }
 
     my $output = _slurp("./$test.out");
-    return $output;
+    return wantarray ? ($output, $run_error) : $output;
 }
 
 =item C<cc_run_capture()>
@@ -161,7 +161,8 @@ sub cc_run {
 Same as C<cc_run()> except that warnings and errors are also directed to
 F<test.out>.
 
-Returns the captured stdout combined with stderr, the exit code is ignored.
+Returns the captured stdout combined with stderr, and in array context
+with the additional exit code.
 
 =cut
 
@@ -171,17 +172,18 @@ sub cc_run_capture {
     my $slash   = $conf->data->get('slash');
     my $verbose = $conf->options->get('verbose');
     my $test    = 'test_' . $$;
+    my $run_error;
 
     if ( defined( $_[0] ) && length( $_[0] ) ) {
         local $" = ' ';
-        _run_command( ".${slash}$test${exe} @_", "./$test.out", "./$test.out", $verbose );
+        $run_error = _run_command( ".${slash}$test${exe} @_", "./$test.out", "./$test.out", $verbose );
     }
     else {
-        _run_command( ".${slash}$test${exe}", "./$test.out", "./$test.out", $verbose );
+        $run_error = _run_command( ".${slash}$test${exe}", "./$test.out", "./$test.out", $verbose );
     }
 
     my $output = _slurp("./$test.out");
-    return $output;
+    return wantarray ? ($output, $run_error) : $output;
 }
 
 =item C<cc_clean()>
