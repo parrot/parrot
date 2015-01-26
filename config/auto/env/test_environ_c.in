@@ -1,0 +1,45 @@
+/*
+Copyright (C) 2003-2015, Parrot Foundation.
+
+test for environ
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+
+/* array of environment variables,
+   speced in POSIX.1, but not in ISO-C
+   MS C compilers know about environ, as it is declared in stdlib.h.
+   OS X doesn't allow access to "environ" from within shared libraries.
+*/
+#ifndef WIN32
+#  ifdef __APPLE_CC__
+#    include <crt_externs.h>
+#    define environ (*_NSGetEnviron())
+#  else /* !__APPLE_CC__ */
+extern char **environ;
+#  endif /* __APPLE_CC__ */
+#endif /* !WIN32 */
+
+int main(int argc, char **argv)
+{
+
+    int rv = 0;
+    while (environ[rv] != NULL)
+        ++rv;
+
+    if (rv) {
+        puts("ok");
+    }
+    else {
+        puts("borken");
+    }
+    return 0;
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */

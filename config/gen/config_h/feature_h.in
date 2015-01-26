@@ -113,6 +113,16 @@ if (@unsetenv@) {
 #define PARROT_HAS_UNSETENV 1
 END_PRINT
 }
+if (@putenv_s@) {
+    print OUT <<'END_PRINT';
+#define PARROT_HAS_PUTENV_S 1
+END_PRINT
+}
+if (@environ@) {
+    print OUT <<'END_PRINT';
+#define PARROT_HAS_ENVIRON 1
+END_PRINT
+}
 
 print OUT <<'END_PRINT';
 

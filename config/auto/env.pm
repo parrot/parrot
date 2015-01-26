@@ -1,12 +1,12 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
-config/auto/env.pm - System Environment
+config/auto/env.pm - Probe get/setenv functions
 
 =head1 DESCRIPTION
 
-Determining if the C library has C<setenv()> and C<unsetenv()>.
+Determining if the C library has C<setenv()>, C<putenv_s()>, C<unsetenv()> and C<environ>.
 
 More information about these functions can be found at
 L<http://www.gnu.org/software/libc/manual/html_node/Environment-Access.html>,
@@ -26,56 +26,59 @@ use Parrot::Configure::Utils ':auto';
 sub _init {
     my $self = shift;
     my %data;
-    $data{description} = q{Does your C library have setenv / unsetenv};
+    $data{description} = q{Probe for C library *env functions};
     $data{result}      = q{};
     return \%data;
 }
 
 sub runstep {
     my ( $self, $conf ) = ( shift, shift );
+    my @probes = qw(setenv unsetenv putenv_s environ);
+    my $args = {};
 
-    my ( $setenv, $unsetenv ) = ( 0, 0 );
-
-    $conf->cc_gen('config/auto/env/test_setenv_c.in');
-    eval { $conf->cc_build(); };
-    unless ( $@ || $conf->cc_run() !~ /ok/ ) {
-        $setenv = 1;
+    for my $f (@probes) {
+      $args->{$f} = 0;
+      $conf->cc_gen("config/auto/env/test_${f}_c.in");
+      eval { $conf->cc_build(); };
+      unless ( $@ || $conf->cc_run() !~ /ok/ ) {
+        $args->{$f} = 1;
+      }
+      $conf->cc_clean();
     }
-    $conf->cc_clean();
-    $conf->cc_gen('config/auto/env/test_unsetenv_c.in');
-    eval { $conf->cc_build(); };
-    unless ( $@ || $conf->cc_run() !~ /ok/ ) {
-        $unsetenv = 1;
-    }
-    $conf->cc_clean();
 
-    $self->_evaluate_env($conf, $setenv, $unsetenv);
-
+    $self->_evaluate_env($conf, $args);
     return 1;
 }
 
 sub _evaluate_env {
-    my ($self, $conf, $setenv, $unsetenv) = @_;
-    $conf->data->set(
-        setenv   => $setenv,
-        unsetenv => $unsetenv
-    );
+    my ($self, $conf, $args) = @_;
+    $conf->data->set( %$args );
+    my $result = 0;
+    my $string = '';
 
-    if ( $setenv && $unsetenv ) {
-        $conf->debug(" (both) ");
-        $self->set_result('both');
+    my @probes = sort keys %$args;
+    for my $f (@probes) {
+      $conf->debug(" $f => $args->{$f} ");
+      $result++ if $args->{$f};
+      $string .= "$f," if $args->{$f};
     }
-    elsif ($setenv) {
-        $conf->debug(" (setenv) ");
-        $self->set_result('setenv');
+    $string = substr($string,0,-1) if $string;
+
+    if ($result == @probes) {
+        $conf->debug(" (all) ");
+        $self->set_result('all');
     }
-    elsif ($unsetenv) {
-        $conf->debug(" (unsetenv) ");
-        $self->set_result('unsetenv');
+    elsif ($result > 0) {
+      # only win32 + msvc is supposed to support _putenv_s
+      if ($^O ne 'MSWin32' and $string eq 'environ,setenv,unsetenv') {
+        $self->set_result('all');
+      } else {
+        $self->set_result($string);
+      }
     }
     else {
-        $conf->debug(" (no) ");
-        $self->set_result('no');
+      $conf->debug(" (no) ");
+      $self->set_result('no');
     }
 }
 

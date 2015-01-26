@@ -1,0 +1,27 @@
+/*
+Copyright (C) 2003-2015, Parrot Foundation.
+
+test for putenv_s
+*/
+
+#include <stdio.h>
+#include <stdlib.h>
+
+int main(int argc, char **argv)
+{
+    if (_putenv_s("PARROT_TEST", "flaf")) {
+        puts("borken");
+    }
+    else {
+        puts("ok");
+    }
+
+    return 0;
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */
