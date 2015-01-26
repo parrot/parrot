@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2014, Parrot Foundation.
+# Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -86,6 +86,8 @@ These items are used from current config settings:
 
 Calls the compiler and linker on F<test_$$.c>.
 
+Returns the last error code
+
 =cut
 
 sub cc_build {
@@ -117,6 +119,7 @@ sub cc_build {
     if ($link_result) {
         return $link_result;
     }
+    return undef;
 }
 
 =item C<cc_run()>
@@ -125,6 +128,8 @@ sub cc_build {
 
 Calls the F<test> (or F<test.exe>) executable. Any output is directed to
 F<test.out>.
+
+Returns the captured stdout, the exit code is ignored.
 
 =cut
 
@@ -146,7 +151,6 @@ sub cc_run {
     }
 
     my $output = _slurp("./$test.out");
-
     return $output;
 }
 
@@ -156,6 +160,8 @@ sub cc_run {
 
 Same as C<cc_run()> except that warnings and errors are also directed to
 F<test.out>.
+
+Returns the captured stdout combined with stderr, the exit code is ignored.
 
 =cut
 
@@ -175,7 +181,6 @@ sub cc_run_capture {
     }
 
     my $output = _slurp("./$test.out");
-
     return $output;
 }
 
@@ -192,7 +197,7 @@ sub cc_clean {    ## no critic Subroutines::RequireFinalReturn
     unlink map "test_${$}$_", qw( .c .cco .ldo .out ),
         $conf->data->get(qw( o exe )),
         # MSVC
-        qw( .exe.manifest .ilk .pdb );
+        ($^O eq 'MSWin32' ? qw( .exe.manifest .ilk .pdb ) : ());
 }
 
 =item C<shebang_mod()>
