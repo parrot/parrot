@@ -70,17 +70,21 @@ sub runstep {
 
         my $disable_static = $conf->options->get('disable-static');
         my $debugging = $conf->options->get('debugging');
+        my $optimize = $conf->data->get('optimize_provisional');
 
         # 'link' needs to be link.exe, not cl.exe.
         # This makes 'link' and 'ld' the same.
         # Note that on win64 we mostly only have a strawberry perl, thus g++ as ld.
-        my $link_is_cl = $conf->data->get('link') =~ /cl/;
+        my $link_is_cl = $conf->data->get('link') =~ /cl(\.exe)?$/i;
         my $ld      = $conf->option_or_data('ld');
         my $ldflags = $conf->option_or_data('ldflags');
         if ($ld =~ /g\+\+/) {
             # now we are sure that we have to convert from a strawberry mingw perl to msvc
             if ($ccflags !~ /nologo/) {
                 $ccflags = "-nologo -GF -W4 -MD -DWIN32 -D_CONSOLE -DNO_STRICT";
+                $optimize =~ s/-s //;
+                $optimize =~ s/-O3/-O2/;
+                $conf->data->set('optimize_provisional', $optimize);
             }
             $ld = 'link';
             $conf->data->set( ld   => $ld );
@@ -99,9 +103,9 @@ sub runstep {
         my $linkflags = $ldflags;
         my $libs = $link_is_cl ? 'ws2_32.lib oldnames.lib advapi32.lib '
                                : 'kernel32.lib ws2_32.lib msvcrt.lib oldnames.lib advapi32.lib ';
-        if ($msvcversion >= 17) { # Since Visual C 2005
-            $libs =~ s/msvcrt.lib/libcmt.lib/; # we need _environ as symbol. The dll exposes it only as function
-        }
+        #if ($msvcversion >= 17) { # Since Visual C 2005
+        #    $libs =~ s/msvcrt.lib/libcmt.lib/; # we need _environ as symbol. The dll exposes it only as function
+        #}
 
         $conf->data->set(
             share_ext  => '.dll',
@@ -126,7 +130,7 @@ sub runstep {
             ldflags             => $ldflags,
             linkflags           => $linkflags,
             # advapi32 needed for src/platform/win32/entropy.c
-            libs                => $link_is_cl ? 'ws2_32.lib oldnames.lib advapi32.lib ' : 'kernel32.lib ws2_32.lib msvcrt.lib oldnames.lib advapi32.lib ',
+            libs                => $libs,
             libparrot_static    => $disable_static ? '' : 'libparrot' . $conf->data->get('a'),
             libparrot_shared    => "libparrot$share_ext",
             ar                  => 'lib',
