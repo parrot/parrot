@@ -119,7 +119,7 @@ sub cc_build {
     if ($link_result) {
         return $link_result;
     }
-    return undef;
+    return;
 }
 
 =item C<cc_run()>

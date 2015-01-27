@@ -1,6 +1,8 @@
 2014-02-17    release 7.1.0
     - Core
         + Fix 2 regressions from 6.11.0 on win64 with Visual C++. GH #1190, #1192
+          Wrong SAL annotations, and a wrong function ptr cast.
+        + Fixed reading big-endian long doubles from .pbc on win64. GH #1193
     - Build
         + Optimize away ExtUtils::Command on posix systems. #1177
         + Fix cpu config values for gcc_cmpxchg to include atomic/gcc_x86.o on amd64.

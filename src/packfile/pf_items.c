@@ -601,87 +601,12 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
     }
     else {
-        /* FIXME: This codepath fails */
-        int expo, i, s;
-#  ifdef __LCC__
-        int expo2;
-#  endif
-
-#if !PARROT_BIGENDIAN
+#  if !PARROT_BIGENDIAN
         /* assume intel 10-byte padded to 16 byte, not a true __float128 */
         cvt_num12_num8(dest, src);
         return;
-#endif
-        /*Parrot_x_force_error_exit(NULL, 1, "cvt_num16_num8: long double conversion unsupported");*/
-
-    /* Have only 10/12-byte long double, or no long double at all. Need to disect it */
-
-    /*
-       16-byte double (128 bits):
-       sign  1  bit 127
-       exp  15 bits 126-112
-       man 112 bits 111-0
-    to 8-byte double (64 bits):
-       sign  1  bit 63
-       exp  11 bits 62-52
-       man  52 bits 51-0
-
-    +-------+-------+-------+-------+-------+-------+--...--+-------+
-    |src[15]|src[14]|src[13]|src[12]|src[11]|src[10]| ...   |src[0] |
-    S|     E        |                    F                          |
-    +-------+-------+-------+-------+-------+-------+--...--+-------+
-    1|<-----15----->|<----------------112 bits--------------------->|
-    <---------------------------128 bits---------------------------->
-            16-byte LONG DOUBLE FLOATING-POINT (IA64 or BE 64-bit)
-
-    +-------+-------+-------+-------+-------+-------+-------+-------+
-    |dest[7]|dest[6]|dest[5]|dest[4]|dest[3]|dest[2]|dest[1]|dest[0]|
-    S|    E    |                           F                        |
-    +-------+-------+-------+-------+-------+-------+-------+-------+
-    1|<---11-->|<---------------------52 bits---------------------->|
-    <----------------------------64 bits---------------------------->
-                       8-byte DOUBLE FLOATING-POINT
-
-   */
-
-        memset(dest, 0, 8);
-        s = src[15] & 0x80; /* 10000000 */
-        /* 15->11 exponents bits */
-        expo = ((src[15] & 0x7f)<< 8 | src[14]);
-        if (expo == 0) {
-          nul:
-            if (s)
-                dest[7] |= 0x80;
-            return;
-        }
-#  ifdef __LCC__
-        /* LCC blows up mysteriously until a temporary variable is
-         * added. */
-        expo2 = expo - 16383;
-        expo  = expo2;
-#  else
-        expo -= 16383;       /* - same bias as with 12-byte */
 #  endif
-        expo += 1023;       /* + bias 8byte */
-        if (expo <= 0)       /* underflow */
-            goto nul;
-        if (expo > 0x7ff) {  /* inf/nan */
-            dest[7] = 0x7f;
-            dest[6] = src[7] == 0xc0 ? 0xf8 : 0xf0 ;
-            goto nul;
-        }
-        expo <<= 4;
-        dest[6] = (expo & 0xff);
-        dest[7] = (expo & 0x7f00) >> 8;
-        if (s)
-            dest[7] |= 0x80;
-        /* long double frac 112 bits => 52 bits
-           src[13] &= 0x7f; reset integer bit */
-        for (i = 0; i < 6; ++i) {
-            dest[i+1] |= (i==5 ? src[13]&0x7f : src[i+7]) >> 3;
-            dest[i] |= (src[i+7] & 0x1f) << 5;
-        }
-        dest[0] |= src[1] >> 3;
+        Parrot_x_force_error_exit(NULL, 1, "cvt_num16_num8: long double conversion unsupported");
     }
 }
 #endif
@@ -819,8 +744,6 @@ cvt_num12_num16_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 
 Converts a little-endian 12-byte i386 long double into a big-endian IEEE 754 8-byte double.
 
-Tested nok.
-
 =cut
 
 */
@@ -833,7 +756,6 @@ cvt_num12_num8_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     unsigned char b[12];
     fetch_buf_le_12(b, src);  /* TODO test endianize */
     cvt_num12_num8(dest, b);
-    /*Parrot_x_force_error_exit(NULL, 1, "cvt_num12_num8_le: long double conversion unsupported");*/
 }
 #endif
 
@@ -842,10 +764,10 @@ cvt_num12_num8_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 =item C<static void cvt_num16_num8_le(unsigned char *dest, const unsigned char
 *src)>
 
-Converts a little-endian IEEE 754 intel 16-byte long double into a
-big-endian IEEE 754 8-byte double.
+Converts a little-endian intel 16-byte long double (i.e. 10-byte)
+into a big-endian IEEE 754 8-byte double.
 
-Tested nok. Produces all zeros.
+For a true little-endian __float128, see C<cvt_num16_num8_be()>.
 
 =cut
 
@@ -859,7 +781,6 @@ cvt_num16_num8_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     unsigned char b[16];
     fetch_buf_le_16(b, src);
     cvt_num16_num8(dest, b);
-    /*Parrot_x_force_error_exit(NULL, 1, "cvt_num16_num8_le: long double conversion unsupported");*/
 }
 #endif
 
@@ -868,7 +789,8 @@ cvt_num16_num8_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 =item C<static void cvt_num16_num8_be(unsigned char *dest, const unsigned char
 *src)>
 
-Converts a big-endian IEEE 754 16-byte long double into a IEEE 754 8-byte double.
+Converts a big-endian IEEE 754 16-byte __float128 (not a powerpc double-double)
+into a little-endian IEEE 754 8-byte double.
 
 Untested.
 
@@ -882,8 +804,79 @@ cvt_num16_num8_be(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 {
     ASSERT_ARGS(cvt_num16_num8_be)
     unsigned char b[16];
+    int expo, i, s;
+#  ifdef __LCC__
+    int expo2;
+#  endif
+
     fetch_buf_be_16(b, src);
-    cvt_num16_num8(dest, b);
+
+    /*
+       16-byte double (128 bits):
+       sign  1  bit 127
+       exp  15 bits 126-112
+       man 112 bits 111-0
+    to 8-byte double (64 bits):
+       sign  1  bit 63
+       exp  11 bits 62-52
+       man  52 bits 51-0
+
+    +-------+-------+-------+-------+-------+-------+--...--+-------+
+    |src[15]|src[14]|src[13]|src[12]|src[11]|src[10]| ...   |src[0] |
+    S|     E        |                    F                          |
+    +-------+-------+-------+-------+-------+-------+--...--+-------+
+    1|<-----15----->|<----------------112 bits--------------------->|
+    <---------------------------128 bits---------------------------->
+            16-byte __float128 (BE 64-bit)
+
+    +-------+-------+-------+-------+-------+-------+-------+-------+
+    |dest[7]|dest[6]|dest[5]|dest[4]|dest[3]|dest[2]|dest[1]|dest[0]|
+    S|    E    |                           F                        |
+    +-------+-------+-------+-------+-------+-------+-------+-------+
+    1|<---11-->|<---------------------52 bits---------------------->|
+    <----------------------------64 bits---------------------------->
+                       8-byte DOUBLE FLOATING-POINT
+
+   */
+
+    memset(dest, 0, 8);
+    s = b[15] & 0x80; /* 10000000 */
+    /* 15->11 exponents bits */
+    expo = ((b[15] & 0x7f)<< 8 | b[14]);
+    if (expo == 0) {
+      nul:
+        if (s)
+            dest[7] |= 0x80;
+        return;
+    }
+#  ifdef __LCC__
+    /* LCC blows up mysteriously until a temporary variable is
+     * added. */
+    expo2 = expo - 16383;
+    expo  = expo2;
+#  else
+    expo -= 16383;       /* - same bias as with 12-byte */
+#  endif
+    expo += 1023;       /* + bias 8byte */
+    if (expo <= 0)       /* underflow */
+        goto nul;
+    if (expo > 0x7ff) {  /* inf/nan */
+        dest[7] = 0x7f;
+        dest[6] = b[7] == 0xc0 ? 0xf8 : 0xf0 ;
+        goto nul;
+    }
+    expo <<= 4;
+    dest[6] = (expo & 0xff);
+    dest[7] = (expo & 0x7f00) >> 8;
+    if (s)
+        dest[7] |= 0x80;
+    /* long double frac 112 bits => 52 bits
+       b[13] &= 0x7f; reset integer bit */
+    for (i = 0; i < 6; ++i) {
+        dest[i+1] |= (i==5 ? b[13]&0x7f : b[i+7]) >> 3;
+        dest[i] |= (b[i+7] & 0x1f) << 5;
+    }
+    dest[0] |= b[1] >> 3;
 }
 #endif
 
