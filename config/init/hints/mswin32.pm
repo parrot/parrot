@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2014, Parrot Foundation.
+# Copyright (C) 2005-2015, Parrot Foundation.
 
 package init::hints::mswin32;
 
@@ -32,15 +32,17 @@ sub runstep {
     );
 
     my $build_dir = $conf->data->get('build_dir');
-
     if ( $build_dir =~ /\s/ ) {
-        $conf->data->set( build_dir => Win32::GetShortPathName($build_dir) );
+        $build_dir = Win32::GetShortPathName($build_dir);
+        $conf->debug(" build_dir => $build_dir, ");
+        $conf->data->set( build_dir => $build_dir );
     }
 
     my $bindir = $conf->data->get('bindir');
-
     if ( $bindir =~ /\s/ ) {
-        $conf->data->set( bindir => Win32::GetShortPathName($bindir) );
+        $bindir = Win32::GetShortPathName($bindir);
+        $conf->debug(" bindir => $bindir, ");
+        $conf->data->set( bindir => $bindir );
     }
 
     $conf->data->set( clock_best => ' ' );
@@ -75,7 +77,6 @@ sub runstep {
         # 'link' needs to be link.exe, not cl.exe.
         # This makes 'link' and 'ld' the same.
         # Note that on win64 we mostly only have a strawberry perl, thus g++ as ld.
-        my $link_is_cl = $conf->data->get('link') =~ /cl(\.exe)?$/i;
         my $ld      = $conf->option_or_data('ld');
         my $ldflags = $conf->option_or_data('ldflags');
         if ($ld =~ /g\+\+/) {
@@ -84,12 +85,19 @@ sub runstep {
                 $ccflags = "-nologo -GF -W4 -MD -DWIN32 -D_CONSOLE -DNO_STRICT";
                 $optimize =~ s/-s //;
                 $optimize =~ s/-O3/-O2/;
+                $conf->debug(" optimize => '$optimize', ");
                 $conf->data->set('optimize_provisional', $optimize);
             }
             $ld = 'link';
             $conf->data->set( ld   => $ld );
-            $conf->data->set( link => $ld ) unless $conf->options->get('link');
-            $ldflags = $link_is_cl ? '-nologo' : '-nologo -nodefaultlib';
+            my $link = $conf->options->get('link');
+            $conf->data->set( link => $ld ) unless $link;
+            if ($link =~ /cl(\.exe)?$/i) {
+                $conf->data->set( link => $ld );
+                $conf->debug(" link => '$ld', ");
+            }
+            $conf->debug(" ld => '$ld', ");
+            $conf->debug(" ldflags => '$ldflags', ");
         }
 
         $ccflags =~ s/-Gf/-GF/ if $msvcversion >= 13;
@@ -101,11 +109,10 @@ sub runstep {
 
         $conf->data->set( cxx  => $conf->data->get('cc') ) unless $conf->options->get('cxx');
         my $linkflags = $ldflags;
-        my $libs = $link_is_cl ? 'ws2_32.lib oldnames.lib advapi32.lib '
-                               : 'kernel32.lib ws2_32.lib msvcrt.lib oldnames.lib advapi32.lib ';
-        #if ($msvcversion >= 17) { # Since Visual C 2005
-        #    $libs =~ s/msvcrt.lib/libcmt.lib/; # we need _environ as symbol. The dll exposes it only as function
-        #}
+        # advapi32 needed for src/platform/win32/entropy.c
+        my $libs = 'kernel32.lib ws2_32.lib msvcrt.lib oldnames.lib advapi32.lib ';
+        $conf->debug(" ccflags => '$ccflags', ");
+        $conf->debug(" libs => '$libs', ");
 
         $conf->data->set(
             share_ext  => '.dll',
@@ -113,8 +120,7 @@ sub runstep {
             a          => '.lib',
             o          => '.obj',
             cc_o_out   => '-Fo',
-            # well, cl uses -Fe, link uses -out:
-            cc_exe_out => $link_is_cl ? '-Fe' : '-out:',
+            cc_exe_out => '-out:',
             cc_ldflags => '-link',
 
             make_c => q{$(PERL) -e "chdir shift @ARGV;}
@@ -124,12 +130,11 @@ sub runstep {
             # ZI messes with __LINE__, /Z7 is preferred for gdb
             cc_debug            => '-Zi',
             ld_debug            => '-debug',
-            ld_share_flags      => $link_is_cl ? '-LD' : '-dll',
-            ld_load_flags       => $link_is_cl ? '-LD' : '-dll',
-            ld_out              => $link_is_cl ? '-Fe' : '-out:',
+            ld_share_flags      => '-dll',
+            ld_load_flags       => '-dll',
+            ld_out              => '-out:',
             ldflags             => $ldflags,
             linkflags           => $linkflags,
-            # advapi32 needed for src/platform/win32/entropy.c
             libs                => $libs,
             libparrot_static    => $disable_static ? '' : 'libparrot' . $conf->data->get('a'),
             libparrot_shared    => "libparrot$share_ext",
