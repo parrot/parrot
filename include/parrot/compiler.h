@@ -70,7 +70,7 @@
 #endif
 #ifdef HASATTRIBUTE_WARN_UNUSED_RESULT
 #  define __attribute__warn_unused_result__ __attribute__((__warn_unused_result__))
-#elif defined(_MSC_VER) && defined(PARROT_HAS_HEADER_SAL)
+#elif defined(_MSC_VER) && _MSC_VER > 1600 && defined(PARROT_HAS_HEADER_SAL)
 #  define __attribute__warn_unused_result__ _Check_return_
 #else
 #  define __attribute__warn_unused_result__
