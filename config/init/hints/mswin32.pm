@@ -60,16 +60,6 @@ sub runstep {
         my $cc_output = `$cc /? 2>&1` || '';
         $ccflags =~ s/-O1 // if $cc_output =~ m/Standard/ || $cc_output =~ m{/ZI};
         unless ($msvcversion) { $cc_output =~ m/Version (\d+)/; $msvcversion = $1; }
-        $ccflags =~ s/-Gf/-GF/ if $msvcversion >= 13;
-
-        # override perl's warnings level
-        $ccflags =~ s/-W\d/-W4/;
-
-        # if we want pbc_to_exe to work, need to let some versions of the
-        # compiler use more memory than they normally would
-        $ccflags .= " -Zm1500 " if $msvcversion < 13;
-        $ccflags .= " -nologo" unless $ccflags =~ /nologo/; # strawberry
-
         my $ccwarn = '';
         # disable certain very noisy warnings
         if ($msvcversion >= 13) {
@@ -84,16 +74,28 @@ sub runstep {
         # 'link' needs to be link.exe, not cl.exe.
         # This makes 'link' and 'ld' the same.
         # Note that on win64 we mostly only have a strawberry perl, thus g++ as ld.
-        my $ld   = $conf->option_or_data('ld');
+        my $link_is_cl = $conf->data->get('link') =~ /cl/;
+        my $ld      = $conf->option_or_data('ld');
+        my $ldflags = $conf->option_or_data('ldflags');
         if ($ld =~ /g\+\+/) {
+            # now we are sure that we have to convert from a strawberry mingw perl to msvc
+            if ($ccflags !~ /nologo/) {
+                $ccflags = "-nologo -GF -W4 -MD -DWIN32 -D_CONSOLE -DNO_STRICT";
+            }
             $ld = 'link';
             $conf->data->set( ld   => $ld );
             $conf->data->set( link => $ld ) unless $conf->options->get('link');
+            $ldflags = $link_is_cl ? '-nologo' : '-nologo -nodefaultlib';
         }
+
+        $ccflags =~ s/-Gf/-GF/ if $msvcversion >= 13;
+        # override perl's warnings level
+        $ccflags =~ s/-W\d/-W4/;
+        # if we want pbc_to_exe to work, need to let some versions of the
+        # compiler use more memory than they normally would
+        $ccflags .= " -Zm1500 " if $msvcversion < 13;
+
         $conf->data->set( cxx  => $conf->data->get('cc') ) unless $conf->options->get('cxx');
-        my $link_is_cl = $conf->data->get('link') =~ /cl/;
-        # -MD cannot be used, because we use _environ directly
-        my $ldflags = $link_is_cl ? '-nologo' : '-nologo -nodefaultlib';
         my $linkflags = $ldflags;
         my $libs = $link_is_cl ? 'ws2_32.lib oldnames.lib advapi32.lib '
                                : 'kernel32.lib ws2_32.lib msvcrt.lib oldnames.lib advapi32.lib ';
