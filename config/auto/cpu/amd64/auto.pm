@@ -20,15 +20,18 @@ sub runstep {
 
     # AMD64 on gcc has cmpxchg
     my $gcc = $conf->data->get('gccversion');
-    $conf->debug("gccversion: $gcc\n");
     if ( defined $gcc ) {
+        $conf->debug("gccversion: $gcc\n");
         # HAS_foo defines PARROT_HAS_`uc foo`
         $conf->data->set(
             "HAS_I386_gcc_cmpxchg"  => '1',
             "HAS_AMD64_gcc_cmpxchg" => '1',
         );
         $conf->debug(" (gcc_cmpxchg)\n");
-   }
+    }
+    else {
+        $conf->debug("gccversion: (none)\n");
+    }
 }
 
 1;

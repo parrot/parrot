@@ -1,4 +1,4 @@
-# Copyright (C) 2005-2007, Parrot Foundation.
+# Copyright (C) 2005-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -38,9 +38,7 @@ sub runstep {
         return 1;
     }
     my $msvcref = _probe_for_msvc($conf);
-
     $self->_evaluate_msvc($conf, $msvcref);
-
     return 1;
 }
 
@@ -74,12 +72,10 @@ sub _evaluate_msvc {
     return 1 if $status;
 
     my $msvcversion = $self->_compose_msvcversion($major, $minor);
-
     $conf->data->set( msvcversion => $msvcversion );
 
     # Add Visual C++ specifics here
     if ( $msvcversion >= 14.00 ) {
-
         # Version 14 (aka Visual C++ 2005) warns about unsafe, deprecated
         # functions with the following message.
         #
