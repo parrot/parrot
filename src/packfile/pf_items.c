@@ -606,9 +606,15 @@ cvt_num16_num8(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
 #  ifdef __LCC__
         int expo2;
 #  endif
-        Parrot_x_force_error_exit(NULL, 1, "cvt_num16_num8: long double conversion unsupported");
 
-    /* Have only 12-byte long double, or no long double at all. Need to disect it */
+#if !PARROT_BIGENDIAN
+        /* assume intel 10-byte padded to 16 byte, not a true __float128 */
+        cvt_num12_num8(dest, src);
+        return;
+#endif
+        /*Parrot_x_force_error_exit(NULL, 1, "cvt_num16_num8: long double conversion unsupported");*/
+
+    /* Have only 10/12-byte long double, or no long double at all. Need to disect it */
 
     /*
        16-byte double (128 bits):
@@ -827,7 +833,7 @@ cvt_num12_num8_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     unsigned char b[12];
     fetch_buf_le_12(b, src);  /* TODO test endianize */
     cvt_num12_num8(dest, b);
-    Parrot_x_force_error_exit(NULL, 1, "cvt_num12_num8_le: long double conversion unsupported");
+    /*Parrot_x_force_error_exit(NULL, 1, "cvt_num12_num8_le: long double conversion unsupported");*/
 }
 #endif
 
@@ -853,7 +859,7 @@ cvt_num16_num8_le(ARGOUT(unsigned char *dest), ARGIN(const unsigned char *src))
     unsigned char b[16];
     fetch_buf_le_16(b, src);
     cvt_num16_num8(dest, b);
-    Parrot_x_force_error_exit(NULL, 1, "cvt_num16_num8_le: long double conversion unsupported");
+    /*Parrot_x_force_error_exit(NULL, 1, "cvt_num16_num8_le: long double conversion unsupported");*/
 }
 #endif
 
