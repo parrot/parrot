@@ -1,8 +1,8 @@
 {
-    "release.version"  : "7.0.1",
+    "release.version"  : "7.0.2",
     "release.name"     : "Crimson Shining Parrot",
-    "release.day"      : "Friday",
-    "release.nextdate" : "23 Feb 2015",
+    "release.day"      : "Thursday",
+    "release.nextdate" : "17 Feb 2015",
     "release.type"     : "supported",
 
     "web.root"         : "http://parrot.org/",
@@ -17,5 +17,5 @@
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
     "wiki.bugday"      : "bug_day_2015_02_14",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/7.0.1/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/7.0.2/"
 }

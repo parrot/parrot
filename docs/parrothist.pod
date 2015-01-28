@@ -182,5 +182,6 @@ Starred release numbers indicate supported releases.
 
  Util        7.0.0 *        2015-Jan-20     "Crimson Shining Parrot"
  rurban      7.0.1 *        2015-Jan-23     (bugfix release)
+ rurban      7.0.2 *        2015-Jan-29     (bugfix release)
 
 =cut
