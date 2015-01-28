@@ -71,8 +71,7 @@ isa_ok( $object, 'Tie::Filehandle::Preempt::Stdin' );
 
 capture( sub {
     my $ask = inter::progs::_prepare_for_interactivity($conf);
-    my $cc;
-    ($conf, $cc) = inter::progs::_get_programs($conf, $ask);
+    inter::progs::_get_programs($conf, $ask);
     $debug = inter::progs::_get_debug($conf, $ask);
     $debug_validity = inter::progs::_is_debug_setting_valid($debug);
 }, \$stdout);
