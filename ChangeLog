@@ -1,3 +1,11 @@
+2014-02-17    release 7.1.0
+    - Core
+        +
+    - Build
+    - Documentation
+    - Tests
+    - Community
+
 2014-01-29    release 7.0.2 - supported
     - Core
         + Fix 2 regressions from 6.11.0 on win64 with Visual C++. GH #1190, #1192
