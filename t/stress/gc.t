@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2014, Parrot Foundation.
+# Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -12,6 +12,7 @@ t/stress/gc.t - Garbage Collection
 =head1 DESCRIPTION
 
 Stress tests all garbage collectors.
+May require >10 min, but should reliably detect all GC assertions and segfaults.
 
 =cut
 
@@ -21,13 +22,35 @@ use warnings;
 use lib qw(lib . ../lib ../../lib);
 my @gc;
 BEGIN { @gc = qw(gms ms2 ms inf); }
-use Parrot::Test tests => 5 * (1+@gc);
+use Parrot::Test tests => 6 * (1+@gc);
 use Test::More;
 use Parrot::PMC qw(%pmc_types);
 use Parrot::Config;
 use File::Spec;
 
-my $parrot = File::Spec->join( File::Spec->curdir(), 'parrot' . $PConfig{exe} );
+my $parrot  = File::Spec->join( File::Spec->curdir(), 'parrot' . $PConfig{exe} );
+my $JSONnqp = File::Spec->join( qw(compilers data_json JSON.nqp) );
+my $opsc_03past = File::Spec->join( qw(t compilers opsc 03-past.t) );
+
+sub gc_exit_test {
+    my ($cmd, $gc, $msg) = @_;
+    my $exit_code;
+    if ($exit_code = run_command($cmd,
+                                 CD  => $PConfig{build_dir},
+                                 STDOUT => "test_$$.out",
+                                 STDERR => "test_$$.err" ))
+    {
+        diag("'$cmd' failed with exit code $exit_code.")
+    }
+    else {
+        unlink("test_$$.out", "test_$$.err");
+    }
+  TODO:
+    {
+        local $TODO = 'inf instability GH #1136' if $gc eq 'inf';
+        is($exit_code, 0, $msg);
+    }
+}
 
 for my $gc (@gc, '--no-gc') {
 
@@ -37,7 +60,7 @@ for my $gc (@gc, '--no-gc') {
     my @TODO = $gc =~ /^ms/ ? ('todo' => 'ms instability GH #1143') : ();
     @TODO = $gc eq 'inf' ? ('todo' => 'inf instability GH #1136') : @TODO;
 
-    pir_exit_code_is( <<'CODE', 0, "array stress $gc_arg", @TODO );
+    pir_exit_code_is( <<'CODE', 0, "GC array stress $gc_arg", @TODO );
 .sub 'main' :main
     print "starting\n"
     .local int arr_size
@@ -103,7 +126,7 @@ Y_DONE:
 .end
 CODE
 
-    pir_exit_code_is( <<'CODE', 0, "ResizablePMCArray stress $gc_arg" );
+    pir_exit_code_is( <<'CODE', 0, "GC rpa stress $gc_arg" );
 .sub 'main' :main
     .param pmc args
     $I0 = 0
@@ -122,7 +145,7 @@ CODE
 .end
 CODE
 
-    pir_exit_code_is( <<'CODE', 0, "GC subs $gc_arg" );
+    pir_exit_code_is( <<'CODE', 0, "GC subs stress $gc_arg" );
 .sub 'main' :main
     .param pmc args
 
@@ -173,23 +196,17 @@ CODE
 .end
 CODE
 
-    # And now a big one: involving lots of strings and rpa's.
-    # Another one would be `./parrot_old -D1 --gc-debug -- ./parrot-nqp.pbc t/compilers/opsc/03-past.t`
-    my $cmd = qq{$parrot -D1 $gc_arg --gc-debug --gc-nursery-size=0.0001 -- parrot-nqp.pbc --target=pir compilers/data_json/JSON.nqp};
-    my $exit_code = run_command($cmd, CD  => $PConfig{build_dir}, STDOUT => "test_$$.out", STDERR => "test_$$.err" );
-    $exit_code ? diag("'$cmd' failed with exit code $exit_code.")
-               : unlink("test_$$.out", "test_$$.err");
-    if ($gc eq 'inf') {
-      TODO: {
-        local $TODO = 'inf instability GH #1136';
-        is($exit_code, 0, "CallContext GC assertion $gc_arg GH #1159");
-      }
-    }
-    else {
-        is($exit_code, 0, "CallContext GC assertion $gc_arg GH #1159");
-    }
+    # And now a two big ones: involving lots of ops, strings and rpa's.
+    gc_exit_test
+      ("$parrot -D1 $gc_arg --gc-debug --gc-nursery-size=0.0001 -- parrot-nqp.pbc --target=pir $JSONnqp",
+       $gc,
+       "GC CallContext - GH #1159");
+
+    gc_exit_test
+      ("$parrot -D1 $gc_arg --gc-debug --gc-nursery-size=0.001 -- parrot-nqp.pbc $opsc_03past",
+       $gc,
+       "GC opsc/03-past.t");
 }
-1;
 
 # Local Variables:
 #   mode: cperl
