@@ -264,7 +264,7 @@ Resizes the array to C<size> elements.
         else if (n <= threshold - offset) {
             TRACE_RPAsize("resize skip");
             PMC_size(SELF) = n;
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
+            /* PARROT_GC_WRITE_BARRIER(INTERP, SELF); */
             /* we could shrink here, but this would need a GC mark */
             return;
         }
@@ -285,13 +285,13 @@ Resizes the array to C<size> elements.
                 }
 #endif
                 PMC_offset(SELF) -= diff;
+                PARROT_GC_WRITE_BARRIER(INTERP, SELF);
             }
             else { /* for empty arrays just reset the offset */
                 PMC_offset(SELF) = 0;
                 TRACE_RPAsize("resize off empty");
             }
             PMC_size(SELF) = n;
-            PARROT_GC_WRITE_BARRIER(INTERP, SELF);
         }
         else {
             INTVAL old;
@@ -348,7 +348,7 @@ unlike the perl5 and perl6 shift operator.
 
 */
 
-    VTABLE FLOATVAL shift_float() {
+    VTABLE FLOATVAL shift_float() :no_wb {
         Parrot_ResizablePMCArray_attributes * const data = PARROT_RESIZABLEPMCARRAY(SELF);
         FLOATVAL value;
 
@@ -359,7 +359,7 @@ unlike the perl5 and perl6 shift operator.
         return value;
     }
 
-    VTABLE INTVAL shift_integer() {
+    VTABLE INTVAL shift_integer() :no_wb {
         Parrot_ResizablePMCArray_attributes * const data = PARROT_RESIZABLEPMCARRAY(SELF);
         INTVAL value;
 
@@ -370,7 +370,7 @@ unlike the perl5 and perl6 shift operator.
         return value;
     }
 
-    VTABLE PMC *shift_pmc() {
+    VTABLE PMC *shift_pmc() :no_wb {
         Parrot_ResizablePMCArray_attributes * const data = PARROT_RESIZABLEPMCARRAY(SELF);
         PMC   *value;
 
@@ -381,7 +381,7 @@ unlike the perl5 and perl6 shift operator.
         return value;
     }
 
-    VTABLE STRING *shift_string() {
+    VTABLE STRING *shift_string() :no_wb {
         Parrot_ResizablePMCArray_attributes * const data = PARROT_RESIZABLEPMCARRAY(SELF);
         STRING  *value;
 
