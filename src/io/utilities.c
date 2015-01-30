@@ -225,8 +225,8 @@ io_verify_has_read_buffer(PARROT_INTERP, ARGIN(PMC *handle),
 
 /*
 
-=item C<STRING * io_verify_string_encoding(PARROT_INTERP, PMC *handle, const
-IO_VTABLE *vtable, STRING *s, INTVAL flags)>
+=item C<STRING * io_verify_string_encoding(PARROT_INTERP, const PMC *handle,
+const IO_VTABLE *vtable, const STRING *s, const INTVAL flags)>
 
 Verify that the given string C<s> has a suitable encoding for use with
 C<handle>. If not, re-encode the string to be compatible. Return a string that
@@ -239,8 +239,8 @@ is compatible with C<handle>.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING *
-io_verify_string_encoding(PARROT_INTERP, ARGIN(PMC *handle),
-        ARGIN(const IO_VTABLE *vtable), ARGIN(STRING *s), INTVAL flags)
+io_verify_string_encoding(PARROT_INTERP, ARGIN(const PMC *handle),
+        ARGIN(const IO_VTABLE *vtable), ARGIN(const STRING *s), const INTVAL flags)
 {
     ASSERT_ARGS(io_verify_string_encoding)
     const STR_VTABLE * const encoding = io_get_encoding(interp, handle, vtable, flags);
@@ -343,7 +343,7 @@ io_read_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
 /*
 
 =item C<void io_read_chars_append_string(PARROT_INTERP, STRING * s, PMC *handle,
-const IO_VTABLE *vtable, IO_BUFFER *buffer, size_t byte_length)>
+const IO_VTABLE *vtable, IO_BUFFER *buffer, const size_t byte_length)>
 
 Read characters out of the buffer and append them to the end of the existing
 STRING. The STRING should be in "edit" mode and should not be referenced
@@ -361,7 +361,7 @@ byte_length are characters which are discarded).
 void
 io_read_chars_append_string(PARROT_INTERP, ARGMOD(STRING * s),
         ARGMOD(PMC *handle), ARGIN(const IO_VTABLE *vtable),
-        ARGMOD_NULLOK(IO_BUFFER *buffer), size_t byte_length)
+        ARGMOD_NULLOK(IO_BUFFER *buffer), const size_t byte_length)
 {
     ASSERT_ARGS(io_read_chars_append_string)
     const size_t alloc_size = s->bufused + byte_length;

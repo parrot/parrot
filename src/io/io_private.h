@@ -216,7 +216,7 @@ void io_read_chars_append_string(PARROT_INTERP,
     ARGMOD(PMC *handle),
     ARGIN(const IO_VTABLE *vtable),
     ARGMOD_NULLOK(IO_BUFFER *buffer),
-    size_t byte_length)
+    const size_t byte_length)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -300,10 +300,10 @@ void io_verify_is_open_for(PARROT_INTERP,
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 STRING * io_verify_string_encoding(PARROT_INTERP,
-    ARGIN(PMC *handle),
+    ARGIN(const PMC *handle),
     ARGIN(const IO_VTABLE *vtable),
-    ARGIN(STRING *s),
-    INTVAL flags)
+    ARGIN(const STRING *s),
+    const INTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -452,7 +452,7 @@ void io_socket_setup_vtable(PARROT_INTERP,
 
 void io_stringhandle_setup_vtable(PARROT_INTERP,
     ARGMOD_NULLOK(IO_VTABLE *vtable),
-    INTVAL idx)
+    const INTVAL idx)
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*vtable);
 

@@ -323,7 +323,7 @@ trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
 
 /*
 
-=item C<int trace_key_dump(PARROT_INTERP, PMC *key)>
+=item C<int trace_key_dump(PARROT_INTERP, const PMC *key)>
 
 Prints a key to C<stderr>, returns the length of the output.
 
@@ -332,7 +332,7 @@ Prints a key to C<stderr>, returns the length of the output.
 */
 
 int
-trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
+trace_key_dump(PARROT_INTERP, ARGIN(const PMC *key))
 {
     ASSERT_ARGS(trace_key_dump)
     Interp * const debugger = debugger_or_interp(interp);
@@ -400,6 +400,45 @@ trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
     return len;
 }
 
+/*
+
+=item C<void trace_str_dump(PARROT_INTERP, const STRING *str)>
+
+Prints a STRING to C<stderr>.
+
+=cut
+
+*/
+
+void
+trace_str_dump(PARROT_INTERP, ARGIN_NULLOK(const STRING *str))
+{
+    ASSERT_ARGS(trace_str_dump)
+    Interp * const debugger = debugger_or_interp(interp);
+    STRING * escaped;
+
+    if (!str) {
+        EPRINTF("(null)");
+        return;
+    }
+    if (!str->strstart) {
+        EPRINTF_1("%p \"\"", str);
+        return;
+    }
+    escaped = Parrot_str_escape_truncate(interp, str, 20);
+    if (escaped) {
+        if (str->encoding == Parrot_ascii_encoding_ptr
+         || str->encoding == Parrot_latin1_encoding_ptr) {
+            EPRINTF_2("%p \"%s\"", str, escaped->strstart);
+        }
+        else {
+            EPRINTF_3("%p %s:\"%s\"", str, str->encoding->name, escaped->strstart);
+        }
+    }
+    else {
+        EPRINTF_1("%p \"\"", str);
+    }
+}
 
 /*
 

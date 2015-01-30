@@ -132,9 +132,9 @@ http://msdn.microsoft.com/en-us/library/windows/desktop/aa366551(v=vs.85).aspx
 */
 
 typedef INTVAL      (*io_vtable_read_b)       (PARROT_INTERP, PMC *handle,
-                                                ARGOUT(char * buffer), size_t byte_length);
+                                                ARGOUT(const char * buffer), const size_t byte_length);
 typedef INTVAL      (*io_vtable_write_b)      (PARROT_INTERP, PMC *handle,
-                                                ARGIN(char * buffer), size_t byte_length);
+                                                ARGIN(const char * buffer), const size_t byte_length);
 typedef INTVAL      (*io_vtable_flush)        (PARROT_INTERP, PMC *handle);
 typedef INTVAL      (*io_vtable_is_eof)       (PARROT_INTERP, PMC *handle);
 typedef void        (*io_vtable_set_eof)      (PARROT_INTERP, PMC *handle, INTVAL is_set);
@@ -961,9 +961,9 @@ size_t io_buffer_find_string_marker(PARROT_INTERP,
 
 void Parrot_io_buffer_add_to_handle(PARROT_INTERP,
     ARGMOD(PMC *handle),
-    INTVAL idx,
-    size_t length,
-    INTVAL flags)
+    const INTVAL idx,
+    const size_t length,
+    const INTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
@@ -1045,7 +1045,7 @@ size_t Parrot_io_buffer_read_b(PARROT_INTERP,
 
 void Parrot_io_buffer_remove_from_handle(PARROT_INTERP,
     ARGMOD(PMC *handle),
-    INTVAL idx)
+    const INTVAL idx)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
@@ -1083,8 +1083,8 @@ size_t Parrot_io_buffer_write_b(PARROT_INTERP,
     ARGMOD_NULLOK(IO_BUFFER *buffer),
     ARGMOD(PMC * handle),
     ARGIN(const IO_VTABLE *vtable),
-    ARGIN(char *s),
-    size_t length)
+    ARGIN(const char *s),
+    const size_t length)
         __attribute__nonnull__(1)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
