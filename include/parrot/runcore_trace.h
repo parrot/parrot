@@ -16,7 +16,7 @@
 /* HEADERIZER BEGIN: src/runcore/trace.c */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-int trace_key_dump(PARROT_INTERP, ARGIN(PMC *key))
+int trace_key_dump(PARROT_INTERP, ARGIN(const PMC *key))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
@@ -41,6 +41,9 @@ void trace_pmc_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
 void trace_pmc_flags_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
         __attribute__nonnull__(1);
 
+void trace_str_dump(PARROT_INTERP, ARGIN_NULLOK(const STRING *str))
+        __attribute__nonnull__(1);
+
 #define ASSERT_ARGS_trace_key_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(key))
@@ -55,6 +58,8 @@ void trace_pmc_flags_dump(PARROT_INTERP, ARGIN_NULLOK(PMC *pmc))
 #define ASSERT_ARGS_trace_pmc_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_trace_pmc_flags_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_trace_str_dump __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/runcore/trace.c */

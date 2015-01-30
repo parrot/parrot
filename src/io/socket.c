@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2014, Parrot Foundation.
+Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -76,7 +76,7 @@ static INTVAL io_socket_open(PARROT_INTERP,
 static INTVAL io_socket_read_b(PARROT_INTERP,
     ARGMOD(PMC *handle),
     ARGOUT(char *buffer),
-    size_t byte_length)
+    const size_t byte_length)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -115,8 +115,8 @@ static size_t io_socket_total_size(PARROT_INTERP, ARGIN(PMC *handle))
 
 static INTVAL io_socket_write_b(PARROT_INTERP,
     ARGMOD(PMC *handle),
-    ARGIN(char *buffer),
-    size_t byte_length)
+    ARGIN(const char *buffer),
+    const size_t byte_length)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -209,7 +209,7 @@ io_socket_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), INTVAL i
 /*
 
 =item C<static INTVAL io_socket_read_b(PARROT_INTERP, PMC *handle, char *buffer,
-size_t byte_length)>
+const size_t byte_length)>
 
 Read a number of bytes from the socket with C<recv>. Notice that C<recv> may
 hang if there is no data to read, so don't call it too often.
@@ -219,7 +219,8 @@ hang if there is no data to read, so don't call it too often.
 */
 
 static INTVAL
-io_socket_read_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGOUT(char *buffer), size_t byte_length)
+io_socket_read_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGOUT(char *buffer),
+                 const size_t byte_length)
 {
     ASSERT_ARGS(io_socket_read_b)
     PIOHANDLE os_handle;
@@ -229,8 +230,8 @@ io_socket_read_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGOUT(char *buffer), size_
 
 /*
 
-=item C<static INTVAL io_socket_write_b(PARROT_INTERP, PMC *handle, char
-*buffer, size_t byte_length)>
+=item C<static INTVAL io_socket_write_b(PARROT_INTERP, PMC *handle, const char
+*buffer, const size_t byte_length)>
 
 Write a number of bytes to the socket with C<send>.
 
@@ -239,7 +240,8 @@ Write a number of bytes to the socket with C<send>.
 */
 
 static INTVAL
-io_socket_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(char *buffer), size_t byte_length)
+io_socket_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(const char *buffer),
+                  const size_t byte_length)
 {
     ASSERT_ARGS(io_socket_write_b)
     PIOHANDLE os_handle;

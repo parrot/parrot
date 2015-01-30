@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2014, Parrot Foundation.
+Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -1300,7 +1300,7 @@ gc_ms2_sweep_string_pool(PARROT_INTERP,
             PObj_live_CLEAR(obj);
 
         else if (!PObj_constant_TEST(obj)) {
-            GC_DEBUG_DETAIL_2("GC remove %s %s", "str", obj->strstart);
+            GC_DEBUG_DETAIL_STR("GC remove str ", obj);
             Parrot_pa_remove(interp, list, STR2PAC(obj)->ptr);
             if (Buffer_bufstart(obj) && !PObj_external_TEST(obj))
                 Parrot_gc_str_free_buffer_storage(interp, &self->string_gc, (Parrot_Buffer*)obj);

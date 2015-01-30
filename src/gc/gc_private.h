@@ -34,6 +34,7 @@ extern int CONSERVATIVE_POINTER_CHASING;
 #  define MEMORY_DEBUG_DETAIL_2(s, a1, a2)
 #  define GC_DEBUG_DETAIL(s)
 #  define GC_DEBUG_DETAIL_FLAGS(s, pmc)
+#  define GC_DEBUG_DETAIL_STR(s, str)
 #  define GC_DEBUG_DETAIL_1_FLAGS(s, a1, pmc)
 #  define GC_DEBUG_DETAIL_1(s, a1)
 #  define GC_DEBUG_DETAIL_2(s, a1, a2)
@@ -53,6 +54,10 @@ extern int CONSERVATIVE_POINTER_CHASING;
     if (Interp_debug_TEST(interp, \
                 PARROT_MEM_STAT_DEBUG_FLAG | PARROT_GC_DETAIL_DEBUG_FLAG)) { \
         fprintf(stderr, (s)); trace_pmc_dump(interp, (pmc)); fprintf(stderr, "\n"); }
+#  define GC_DEBUG_DETAIL_STR(s, str) \
+    if (Interp_debug_TEST(interp, \
+                PARROT_MEM_STAT_DEBUG_FLAG | PARROT_GC_DETAIL_DEBUG_FLAG)) { \
+        fprintf(stderr, (s)); trace_str_dump(interp, (str)); fprintf(stderr, "\n"); }
 #  define GC_DEBUG_DETAIL_1_FLAGS(s, a1, pmc) \
     if (Interp_debug_TEST(interp, \
                 PARROT_MEM_STAT_DEBUG_FLAG | PARROT_GC_DETAIL_DEBUG_FLAG)) { \
