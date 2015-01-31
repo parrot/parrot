@@ -461,8 +461,8 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
 
 /*
 
-=item C<const STR_VTABLE * io_get_encoding(PARROT_INTERP, PMC *handle, const
-IO_VTABLE *vtable, INTVAL flags)>
+=item C<const STR_VTABLE * io_get_encoding(PARROT_INTERP, const PMC *handle,
+const IO_VTABLE *vtable, const INTVAL flags)>
 
 Get the encoding of C<handle>. If C<handle> doesn't have an encoding specified
 pick one that this suitable for the operation described in C<flags>. If
@@ -476,7 +476,8 @@ If C<flags> is PIO_F_READ, return the platform default encoding.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 const STR_VTABLE *
-io_get_encoding(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(const IO_VTABLE *vtable), INTVAL flags)
+io_get_encoding(PARROT_INTERP, ARGIN(const PMC *handle), ARGIN(const IO_VTABLE *vtable),
+                const INTVAL flags)
 {
     ASSERT_ARGS(io_get_encoding)
     const STR_VTABLE * const encoding = vtable->get_encoding(interp, handle);
