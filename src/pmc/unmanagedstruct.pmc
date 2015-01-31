@@ -330,7 +330,7 @@ char_offset_key(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(PMC *key), ARGOUT(int *typ
             offs = VTABLE_get_integer(interp, init);
 
 #ifdef STRUCT_DEBUG
-            Parrot_io_eprintf(interp, "offs = %d\n", (int)offs);
+            Parrot_io_eprintf(interp, "# offs = %d\n", (int)offs);
 #endif
 
             p += offs * count;

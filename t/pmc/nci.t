@@ -803,6 +803,10 @@ CODE
 2
 OUTPUT
 
+SKIP:
+{
+    skip "--ccflags=-DSTRUCT_DEBUG", 2 if $PConfig{ccflags} =~ /-DSTRUCT_DEBUG/;
+
     pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_pi - struct with ints' );
 .pcc_sub :main main:
   loadlib P1, "libnci_test"
@@ -869,6 +873,7 @@ CODE
 100
 47.11
 OUTPUT
+}
 
     pasm_output_like( <<'CODE', <<'OUTPUT', 'nci_pi - align' );
 .pcc_sub :main main:
@@ -933,6 +938,10 @@ CODE
 hello
 20
 OUTPUT
+
+SKIP:
+{
+    skip "--ccflags=-DSTRUCT_DEBUG", 2 if $PConfig{ccflags} =~ /-DSTRUCT_DEBUG/;
 
     pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_pi - nested struct *' );
 .pcc_sub :main main:
@@ -1060,6 +1069,7 @@ CODE
 100
 77
 OUTPUT
+}
 
     pir_output_is( <<'CODE', <<'OUTPUT', "nci_pi - func_ptr* with signature" );
 .include "datatypes.pasm"
@@ -1095,6 +1105,10 @@ CODE
 hello call_back
 4711
 OUTPUT
+
+SKIP:
+{
+    skip "--ccflags=-DSTRUCT_DEBUG", 3 if $PConfig{ccflags} =~ /-DSTRUCT_DEBUG/;
 
     pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_pi - nested struct aligned' );
 .pcc_sub :main main:
@@ -1263,6 +1277,7 @@ CODE
 12345
 33
 OUTPUT
+}
 
     pir_output_is( << 'CODE', << "OUTPUT", "nci_pi - int" );
 .include "datatypes.pasm"
@@ -2048,6 +2063,10 @@ external data: 11111111
 external data: 111111111
 OUTPUT
 
+SKIP:
+{
+    skip "--ccflags=-DSTRUCT_DEBUG", 3 if $PConfig{ccflags} =~ /-DSTRUCT_DEBUG/;
+
     pasm_output_is( <<'CODE', <<'OUTPUT', 'nci_pip - array of structs' );
 .pcc_sub :main main:
 
@@ -2240,7 +2259,7 @@ Count: 4
 2: 400
 3: 800
 OUTPUT
-
+}
     pir_output_is( << 'CODE', << "OUTPUT", "nci_pii - writing back to libnci_test.so" );
 .include "datatypes.pasm"
 
@@ -2480,6 +2499,9 @@ CODE
 42
 OUTPUT
 
+SKIP:
+{
+    skip "--ccflags=-DSTRUCT_DEBUG", 1 if $PConfig{ccflags} =~ /-DSTRUCT_DEBUG/;
     pir_output_is(
     << 'CODE', << 'OUTPUT', 'nested structs should be independent' );
 .include 'datatypes.pasm'
@@ -2566,7 +2588,7 @@ Y: 100
 X: 2
 Y: 200
 OUTPUT
-
+}
     pir_output_is( << 'CODE', << 'OUTPUT', "arity" );
 .sub test :main
     .local string library_name

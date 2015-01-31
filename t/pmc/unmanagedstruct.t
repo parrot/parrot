@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2011, Parrot Foundation.
+# Copyright (C) 2006-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -25,6 +25,19 @@ Tests the UnManagedStruct PMC.
     is_defined()
     is_equal()
     initialize()
+
+    .include 'iglobals.pasm'
+    .local pmc interp, config
+    interp = getinterp
+    config = interp[.IGLOBALS_CONFIG_HASH]
+    $S0 = config['ccflags']
+    set $S1, "-DSTRUCT_DEBUG"
+    $I1 = index $S0, $S1
+    if $I1 == -1 goto go_ahead
+
+    skip(1, 'does not work with --ccflags=-DSTRUCT_DEBUG')
+    exit 0
+go_ahead:
     can_clone()
 .end
 

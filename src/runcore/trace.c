@@ -337,7 +337,7 @@ trace_key_dump(PARROT_INTERP, ARGIN(const PMC *key))
     ASSERT_ARGS(trace_key_dump)
     Interp * const debugger = debugger_or_interp(interp);
 
-    int len = Parrot_io_eprintf(debugger, "[");
+    int len = Parrot_io_eprintf(debugger, "# [");
 
     while (key) {
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {

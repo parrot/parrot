@@ -7,6 +7,7 @@
     - Documentation
     - Tests
         + Add a common GC stress test to the normal testsuite. #1189
+        + Fix tests for --ccflags=-DSTRUCT_DEBUG. #1195
     - Community
 
 2014-01-29    release 7.0.2 - supported
