@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -17,6 +17,20 @@ Tests the ManagedStruct PMC. Checks element access and memory allocation.
 
 .sub main :main
     .include 'test_more.pir'
+
+    .include 'iglobals.pasm'
+    .local pmc interp, config
+    interp = getinterp
+    config = interp[.IGLOBALS_CONFIG_HASH]
+    $S0 = config['ccflags']
+    set $S1, "-DSTRUCT_DEBUG"
+    $I1 = index $S0, $S1
+    if $I1 == -1 goto go_ahead
+
+    skip_all('does not work with --ccflags=-DSTRUCT_DEBUG')
+    finish()
+    exit 0
+go_ahead:
     plan(26)
 
     set_managedstruct_size()

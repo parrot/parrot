@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2014, Parrot Foundation.
+# Copyright (C) 2001-2015, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -46,15 +46,14 @@ if ($had_pcre && $has_pcre && ($^O !~ /MSWin32/)) {
 }
 
 SKIP: {
-    skip( 'no pcre',
-        Test::Builder->new()->expected_tests()
-    ) unless $had_pcre;
-    skip( ($^O eq 'MSWin32' ? 'no pcregrep' : 'no pcre-config'),
-        Test::Builder->new()->expected_tests()
-    ) unless $has_pcre;
-    skip( 'Parrot built without libffi or extra NCI thunks',
-        Test::Builder->new()->expected_tests()
-    ) unless ($PConfig{HAS_EXTRA_NCI_THUNKS} || $PConfig{HAS_LIBFFI});
+    my $tests = Test::Builder->new()->expected_tests();
+    skip( 'no pcre', $tests) unless $had_pcre;
+    skip( ($^O eq 'MSWin32' ? 'no pcregrep' : 'no pcre-config'), $tests)
+      unless $has_pcre;
+    skip( 'Parrot built without libffi or extra NCI thunks', $tests)
+      unless ($PConfig{HAS_EXTRA_NCI_THUNKS} || $PConfig{HAS_LIBFFI});
+    skip( 'Does not work with --ccflags=-DSTRUCT_DEBUG', $tests)
+      if $PConfig{ccflags} =~ /-DSTRUCT_DEBUG/;
 
 ## 1
 ## Check that the library can be loaded and initialized,
