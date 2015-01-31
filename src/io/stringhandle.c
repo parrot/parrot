@@ -29,15 +29,17 @@ The StringHandle IO_VTABLE and helper methods.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void io_stringhandle_adv_position(PARROT_INTERP,
-    PMC *handle,
-    size_t offset);
+    const PMC *handle,
+    const size_t offset);
 
-static INTVAL io_stringhandle_close(PARROT_INTERP, ARGMOD(PMC *handle))
+static INTVAL io_stringhandle_close(PARROT_INTERP,
+    ARGMOD(const PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
-static INTVAL io_stringhandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
+static INTVAL io_stringhandle_flush(PARROT_INTERP,
+    ARGMOD(const PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
@@ -74,7 +76,7 @@ static INTVAL io_stringhandle_is_open(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 static INTVAL io_stringhandle_open(PARROT_INTERP,
-    ARGMOD(PMC *handle),
+    ARGMOD(const PMC *handle),
     ARGIN(const STRING *path),
     const INTVAL flags,
     ARGIN(const STRING *mode))
@@ -85,8 +87,8 @@ static INTVAL io_stringhandle_open(PARROT_INTERP,
         FUNC_MODIFIES(*handle);
 
 static INTVAL io_stringhandle_read_b(PARROT_INTERP,
-    ARGMOD(PMC *handle),
-    ARGOUT(char *buffer),
+    ARGMOD(const PMC *handle),
+    ARGOUT(const char *buffer),
     const size_t byte_length)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
@@ -95,7 +97,7 @@ static INTVAL io_stringhandle_read_b(PARROT_INTERP,
         FUNC_MODIFIES(*buffer);
 
 static PIOOFF_T io_stringhandle_seek(PARROT_INTERP,
-    ARGMOD(PMC *handle),
+    ARGMOD(const PMC *handle),
     const PIOOFF_T offset,
     const INTVAL whence)
         __attribute__nonnull__(1)
@@ -103,7 +105,7 @@ static PIOOFF_T io_stringhandle_seek(PARROT_INTERP,
         FUNC_MODIFIES(*handle);
 
 static void io_stringhandle_set_eof(PARROT_INTERP,
-    PMC *handle,
+    const PMC *handle,
     const INTVAL is_set);
 
 static void io_stringhandle_set_flags(PARROT_INTERP,
@@ -112,8 +114,8 @@ static void io_stringhandle_set_flags(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 static void io_stringhandle_set_position(PARROT_INTERP,
-    PMC *handle,
-    PIOOFF_T pos);
+    const PMC *handle,
+    const PIOOFF_T pos);
 
 static PIOOFF_T io_stringhandle_tell(PARROT_INTERP,
     ARGIN(const PMC *handle))
@@ -126,13 +128,13 @@ static size_t io_stringhandle_total_size(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 static INTVAL io_stringhandle_write_b(PARROT_INTERP,
-    ARGMOD(PMC *handle),
+    ARGMOD(PMC * const handle),
     ARGIN(const char * buffer),
     const size_t byte_length)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*handle);
+        FUNC_MODIFIES(* const handle);
 
 #define ASSERT_ARGS_io_stringhandle_adv_position __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_io_stringhandle_close __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -238,8 +240,8 @@ io_stringhandle_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), co
 
 /*
 
-=item C<static INTVAL io_stringhandle_read_b(PARROT_INTERP, PMC *handle, char
-*buffer, const size_t byte_length)>
+=item C<static INTVAL io_stringhandle_read_b(PARROT_INTERP, const PMC *handle,
+const char *buffer, const size_t byte_length)>
 
 Attempt to read C<byte_length> bytes from the stringhandle.
 
@@ -248,7 +250,8 @@ Attempt to read C<byte_length> bytes from the stringhandle.
 */
 
 static INTVAL
-io_stringhandle_read_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGOUT(char *buffer), const size_t byte_length)
+io_stringhandle_read_b(PARROT_INTERP, ARGMOD(const PMC *handle), ARGOUT(const char *buffer),
+                       const size_t byte_length)
 {
     ASSERT_ARGS(io_stringhandle_read_b)
     INTVAL read_offs;
@@ -270,8 +273,8 @@ io_stringhandle_read_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGOUT(char *buffer),
 
 /*
 
-=item C<static INTVAL io_stringhandle_write_b(PARROT_INTERP, PMC *handle, const
-char * buffer, const size_t byte_length)>
+=item C<static INTVAL io_stringhandle_write_b(PARROT_INTERP, PMC * const handle,
+const char * buffer, const size_t byte_length)>
 
 Write a number of bytes to the StringHandle.
 
@@ -280,7 +283,7 @@ Write a number of bytes to the StringHandle.
 */
 
 static INTVAL
-io_stringhandle_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(const char * buffer),
+io_stringhandle_write_b(PARROT_INTERP, ARGMOD(PMC * const handle), ARGIN(const char * buffer),
                         const size_t byte_length)
 {
     ASSERT_ARGS(io_stringhandle_write_b)
@@ -311,7 +314,7 @@ io_stringhandle_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(const char * b
 
 /*
 
-=item C<static INTVAL io_stringhandle_flush(PARROT_INTERP, PMC *handle)>
+=item C<static INTVAL io_stringhandle_flush(PARROT_INTERP, const PMC *handle)>
 
 Clear the StringHandle.
 
@@ -320,7 +323,7 @@ Clear the StringHandle.
 */
 
 static INTVAL
-io_stringhandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
+io_stringhandle_flush(PARROT_INTERP, ARGMOD(const PMC *handle))
 {
     ASSERT_ARGS(io_stringhandle_flush)
     SETATTR_StringHandle_stringhandle(interp, handle, STRINGNULL);
@@ -334,8 +337,8 @@ io_stringhandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
 The StringHandle is at eof if the current read cursor is passed the end of the
 string contents.
 
-=item C<static void io_stringhandle_set_eof(PARROT_INTERP, PMC *handle, const
-INTVAL is_set)>
+=item C<static void io_stringhandle_set_eof(PARROT_INTERP, const PMC *handle,
+const INTVAL is_set)>
 
 Do nothing.
 
@@ -355,7 +358,7 @@ io_stringhandle_is_eof(PARROT_INTERP, ARGIN(const PMC *handle))
 }
 
 static void
-io_stringhandle_set_eof(SHIM_INTERP, SHIM(PMC *handle), SHIM(const INTVAL is_set))
+io_stringhandle_set_eof(SHIM_INTERP, SHIM(const PMC *handle), SHIM(const INTVAL is_set))
 {
     ASSERT_ARGS(io_stringhandle_set_eof)
 }
@@ -381,8 +384,8 @@ io_stringhandle_tell(PARROT_INTERP, ARGIN(const PMC *handle))
 
 /*
 
-=item C<static PIOOFF_T io_stringhandle_seek(PARROT_INTERP, PMC *handle, const
-PIOOFF_T offset, const INTVAL whence)>
+=item C<static PIOOFF_T io_stringhandle_seek(PARROT_INTERP, const PMC *handle,
+const PIOOFF_T offset, const INTVAL whence)>
 
 Seek to the given position in the stringhandle.
 
@@ -391,7 +394,7 @@ Seek to the given position in the stringhandle.
 */
 
 static PIOOFF_T
-io_stringhandle_seek(PARROT_INTERP, ARGMOD(PMC *handle), const PIOOFF_T offset,
+io_stringhandle_seek(PARROT_INTERP, ARGMOD(const PMC *handle), const PIOOFF_T offset,
                      const INTVAL whence)
 {
     ASSERT_ARGS(io_stringhandle_seek)
@@ -424,14 +427,14 @@ io_stringhandle_seek(PARROT_INTERP, ARGMOD(PMC *handle), const PIOOFF_T offset,
 
 /*
 
-=item C<static void io_stringhandle_adv_position(PARROT_INTERP, PMC *handle,
-size_t offset)>
+=item C<static void io_stringhandle_adv_position(PARROT_INTERP, const PMC
+*handle, const size_t offset)>
 
 Do nothing. StringHandle keeps track of position directly and doesn't need
 to do it separately.
 
-=item C<static void io_stringhandle_set_position(PARROT_INTERP, PMC *handle,
-PIOOFF_T pos)>
+=item C<static void io_stringhandle_set_position(PARROT_INTERP, const PMC
+*handle, const PIOOFF_T pos)>
 
 Do nothing. StringHandle keeps track of position directly and doesn't need to
 do it separately.
@@ -446,14 +449,14 @@ Fall back to io_stringhandle_tell;
 */
 
 static void
-io_stringhandle_adv_position(SHIM_INTERP, SHIM(PMC *handle), SHIM(size_t offset))
+io_stringhandle_adv_position(SHIM_INTERP, SHIM(const PMC *handle), SHIM(const size_t offset))
 {
     ASSERT_ARGS(io_stringhandle_adv_position)
     /* StringHandle keeps track of position directly. Ignore this. */
 }
 
 static void
-io_stringhandle_set_position(SHIM_INTERP, SHIM(PMC *handle), SHIM(PIOOFF_T pos))
+io_stringhandle_set_position(SHIM_INTERP, SHIM(const PMC *handle), SHIM(const PIOOFF_T pos))
 {
     ASSERT_ARGS(io_stringhandle_set_position)
     /* StringHandle keeps track of position directly. Ignore this. */
@@ -468,8 +471,8 @@ io_stringhandle_get_position(PARROT_INTERP, ARGIN(const PMC *handle))
 
 /*
 
-=item C<static INTVAL io_stringhandle_open(PARROT_INTERP, PMC *handle, const
-STRING *path, const INTVAL flags, const STRING *mode)>
+=item C<static INTVAL io_stringhandle_open(PARROT_INTERP, const PMC *handle,
+const STRING *path, const INTVAL flags, const STRING *mode)>
 
 Open the StringHandle with the given mode and settings.
 
@@ -478,7 +481,7 @@ Open the StringHandle with the given mode and settings.
 */
 
 static INTVAL
-io_stringhandle_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(const STRING *path),
+io_stringhandle_open(PARROT_INTERP, ARGMOD(const PMC *handle), ARGIN(const STRING *path),
                      const INTVAL flags, ARGIN(const STRING *mode))
 {
     ASSERT_ARGS(io_stringhandle_open)
@@ -517,7 +520,7 @@ io_stringhandle_is_open(PARROT_INTERP, ARGIN(const PMC *handle))
 
 /*
 
-=item C<static INTVAL io_stringhandle_close(PARROT_INTERP, PMC *handle)>
+=item C<static INTVAL io_stringhandle_close(PARROT_INTERP, const PMC *handle)>
 
 StringHandle doesn't really close. Reset the read offset.
 
@@ -526,7 +529,7 @@ StringHandle doesn't really close. Reset the read offset.
 */
 
 static INTVAL
-io_stringhandle_close(PARROT_INTERP, ARGMOD(PMC *handle))
+io_stringhandle_close(PARROT_INTERP, ARGMOD(const PMC *handle))
 {
     ASSERT_ARGS(io_stringhandle_close)
     SETATTR_StringHandle_read_offset(interp, handle, 0);

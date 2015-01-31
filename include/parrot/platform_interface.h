@@ -74,21 +74,24 @@ typedef off_t PIOOFF_T;
 #endif
 
 PIOHANDLE Parrot_io_internal_std_os_handle(PARROT_INTERP, INTVAL fileno);
-PIOHANDLE Parrot_io_internal_open(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags);
+PIOHANDLE Parrot_io_internal_open(PARROT_INTERP, ARGIN(const STRING * const path),
+                                  INTVAL flags);
 PIOHANDLE Parrot_io_internal_dup(PARROT_INTERP, PIOHANDLE handle);
 INTVAL Parrot_io_internal_close(PARROT_INTERP, PIOHANDLE handle);
 INTVAL Parrot_io_internal_is_tty(PARROT_INTERP, PIOHANDLE fd);
 PARROT_CONST_FUNCTION
 INTVAL Parrot_io_internal_getblksize(PIOHANDLE fd);
 INTVAL Parrot_io_internal_flush(PARROT_INTERP, PIOHANDLE os_handle);
-size_t Parrot_io_internal_read(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(char *buf), size_t len);
+size_t Parrot_io_internal_read(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(char *buf),
+                               size_t len);
 size_t Parrot_io_internal_write(PARROT_INTERP, PIOHANDLE os_handle,
         ARGIN(const char *buf), size_t len);
 PIOOFF_T Parrot_io_internal_seek(PARROT_INTERP, PIOHANDLE os_handle,
         PIOOFF_T offset, INTVAL whence);
 PIOOFF_T Parrot_io_internal_tell(PARROT_INTERP, PIOHANDLE os_handle);
-PIOHANDLE Parrot_io_internal_open_pipe(PARROT_INTERP, ARGIN(STRING *command), INTVAL flags,
-        ARGOUT(INTVAL *pid_out));
+PIOHANDLE Parrot_io_internal_open_pipe(PARROT_INTERP, ARGIN(const STRING * const command),
+                                       INTVAL flags,
+                                       ARGOUT(INTVAL *pid_out));
 INTVAL Parrot_io_internal_pipe(PARROT_INTERP, ARGMOD(PIOHANDLE *reader),
         ARGMOD(PIOHANDLE *writer));
 

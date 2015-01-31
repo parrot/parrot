@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2014, Parrot Foundation.
+Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -31,17 +31,17 @@ src/platform/xxx/io.c.
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 static void io_filehandle_adv_position(PARROT_INTERP,
-    ARGMOD(PMC *handle),
-    size_t len)
+    ARGMOD(const PMC *handle),
+    const size_t len)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
-static INTVAL io_filehandle_close(PARROT_INTERP, ARGMOD(PMC *handle))
+static INTVAL io_filehandle_close(PARROT_INTERP, ARGMOD(const PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
-static INTVAL io_filehandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
+static INTVAL io_filehandle_flush(PARROT_INTERP, ARGMOD(const PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
@@ -49,38 +49,40 @@ static INTVAL io_filehandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const STR_VTABLE * io_filehandle_get_encoding(PARROT_INTERP,
-    ARGIN(PMC *handle))
+    ARGIN(const PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
-static INTVAL io_filehandle_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
+static INTVAL io_filehandle_get_flags(PARROT_INTERP,
+    ARGIN(const PMC *handle))
         __attribute__nonnull__(2);
 
 static PIOHANDLE io_filehandle_get_piohandle(PARROT_INTERP,
-    ARGIN(PMC *handle))
+    ARGIN(const PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static PIOOFF_T io_filehandle_get_position(PARROT_INTERP,
-    ARGMOD(PMC *handle))
+    ARGMOD(const PMC *handle))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
-static INTVAL io_filehandle_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
+static INTVAL io_filehandle_is_eof(PARROT_INTERP, ARGMOD(const PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
-static INTVAL io_filehandle_is_open(PARROT_INTERP, ARGMOD(PMC *handle))
+static INTVAL io_filehandle_is_open(PARROT_INTERP,
+    ARGMOD(const PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
 static INTVAL io_filehandle_open(PARROT_INTERP,
-    ARGMOD(PMC *handle),
-    ARGIN(STRING *path),
-    INTVAL flags,
-    ARGIN(STRING *mode))
+    ARGMOD(const PMC *handle),
+    ARGIN(const STRING *path),
+    const INTVAL flags,
+    ARGIN(const STRING *mode))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -88,53 +90,54 @@ static INTVAL io_filehandle_open(PARROT_INTERP,
         FUNC_MODIFIES(*handle);
 
 static INTVAL io_filehandle_read_b(PARROT_INTERP,
-    ARGMOD(PMC *handle),
-    ARGOUT(char *buffer),
-    size_t byte_length)
+    ARGMOD(const PMC * const handle),
+    ARGOUT(const char *buffer),
+    const size_t byte_length)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*handle)
+        FUNC_MODIFIES(* const handle)
         FUNC_MODIFIES(*buffer);
 
 static PIOOFF_T io_filehandle_seek(PARROT_INTERP,
-    ARGMOD(PMC *handle),
-    PIOOFF_T offset,
-    INTVAL whence)
+    ARGMOD(const PMC *handle),
+    const PIOOFF_T offset,
+    const INTVAL whence)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
 static void io_filehandle_set_eof(PARROT_INTERP,
-    ARGMOD(PMC *handle),
-    INTVAL is_set)
+    ARGMOD(const PMC *handle),
+    const INTVAL is_set)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
 static void io_filehandle_set_flags(PARROT_INTERP,
-    ARGIN(PMC *handle),
-    INTVAL flags)
+    ARGIN(const PMC *handle),
+    const INTVAL flags)
         __attribute__nonnull__(2);
 
 static void io_filehandle_set_position(PARROT_INTERP,
-    ARGMOD(PMC *handle),
-    PIOOFF_T pos)
+    ARGMOD(const PMC *handle),
+    const PIOOFF_T pos)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
-static PIOOFF_T io_filehandle_tell(PARROT_INTERP, ARGMOD(PMC *handle))
+static PIOOFF_T io_filehandle_tell(PARROT_INTERP, ARGMOD(const PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*handle);
 
-static size_t io_filehandle_total_size(PARROT_INTERP, ARGIN(PMC *handle))
+static size_t io_filehandle_total_size(PARROT_INTERP,
+    ARGIN(const PMC *handle))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static INTVAL io_filehandle_write_b(PARROT_INTERP,
-    ARGMOD(PMC *handle),
-    ARGIN(char *buffer),
-    size_t byte_length)
+    ARGMOD(const PMC *handle),
+    ARGIN(const char *buffer),
+    const size_t byte_length)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -197,8 +200,8 @@ static INTVAL io_filehandle_write_b(PARROT_INTERP,
 
 /*
 
-=item C<void io_filehandle_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable, INTVAL
-idx)>
+=item C<void io_filehandle_setup_vtable(PARROT_INTERP, IO_VTABLE *vtable, const
+INTVAL idx)>
 
 Setup the VTABLE for FileHandles.
 
@@ -207,7 +210,7 @@ Setup the VTABLE for FileHandles.
 */
 
 void
-io_filehandle_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), INTVAL idx)
+io_filehandle_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), const INTVAL idx)
 {
     ASSERT_ARGS(io_filehandle_setup_vtable)
     if (vtable == NULL)
@@ -241,8 +244,8 @@ io_filehandle_setup_vtable(PARROT_INTERP, ARGMOD_NULLOK(IO_VTABLE *vtable), INTV
 
 /*
 
-=item C<static INTVAL io_filehandle_read_b(PARROT_INTERP, PMC *handle, char
-*buffer, size_t byte_length)>
+=item C<static INTVAL io_filehandle_read_b(PARROT_INTERP, const PMC * const
+handle, const char *buffer, const size_t byte_length)>
 
 Read the given number of bytes from the C<handle>. Does some bookkeeping and
 redirects to C<Parrot_io_internal_read>. Returns the number of bytes read.
@@ -252,7 +255,8 @@ redirects to C<Parrot_io_internal_read>. Returns the number of bytes read.
 */
 
 static INTVAL
-io_filehandle_read_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGOUT(char *buffer), size_t byte_length)
+io_filehandle_read_b(PARROT_INTERP, ARGMOD(const PMC * const handle), ARGOUT(const char *buffer),
+                     const size_t byte_length)
 {
     ASSERT_ARGS(io_filehandle_read_b)
     const PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
@@ -262,8 +266,8 @@ io_filehandle_read_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGOUT(char *buffer), s
 
 /*
 
-=item C<static INTVAL io_filehandle_write_b(PARROT_INTERP, PMC *handle, char
-*buffer, size_t byte_length)>
+=item C<static INTVAL io_filehandle_write_b(PARROT_INTERP, const PMC *handle,
+const char *buffer, const size_t byte_length)>
 
 Write the given bytes to the file descriptor. Redirect to
 C<Parrot_io_internal_write>. Return the number of bytes written.
@@ -273,7 +277,8 @@ C<Parrot_io_internal_write>. Return the number of bytes written.
 */
 
 static INTVAL
-io_filehandle_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(char *buffer), size_t byte_length)
+io_filehandle_write_b(PARROT_INTERP, ARGMOD(const PMC *handle), ARGIN(const char *buffer),
+                      const size_t byte_length)
 {
     ASSERT_ARGS(io_filehandle_write_b)
     const PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
@@ -282,7 +287,7 @@ io_filehandle_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(char *buffer), s
 
 /*
 
-=item C<static INTVAL io_filehandle_flush(PARROT_INTERP, PMC *handle)>
+=item C<static INTVAL io_filehandle_flush(PARROT_INTERP, const PMC *handle)>
 
 Flush the handle at the OS level.
 
@@ -291,7 +296,7 @@ Flush the handle at the OS level.
 */
 
 static INTVAL
-io_filehandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
+io_filehandle_flush(PARROT_INTERP, ARGMOD(const PMC *handle))
 {
     ASSERT_ARGS(io_filehandle_flush)
     /* TODO: In read mode, don't do what this does. */
@@ -301,12 +306,12 @@ io_filehandle_flush(PARROT_INTERP, ARGMOD(PMC *handle))
 
 /*
 
-=item C<static INTVAL io_filehandle_is_eof(PARROT_INTERP, PMC *handle)>
+=item C<static INTVAL io_filehandle_is_eof(PARROT_INTERP, const PMC *handle)>
 
 Determine if this handle as at end-of-file.
 
-=item C<static void io_filehandle_set_eof(PARROT_INTERP, PMC *handle, INTVAL
-is_set)>
+=item C<static void io_filehandle_set_eof(PARROT_INTERP, const PMC *handle,
+const INTVAL is_set)>
 
 Set or clear the EOF flag.
 
@@ -315,7 +320,7 @@ Set or clear the EOF flag.
 */
 
 static INTVAL
-io_filehandle_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
+io_filehandle_is_eof(PARROT_INTERP, ARGMOD(const PMC *handle))
 {
     ASSERT_ARGS(io_filehandle_is_eof)
     INTVAL flags;
@@ -326,7 +331,7 @@ io_filehandle_is_eof(PARROT_INTERP, ARGMOD(PMC *handle))
 }
 
 static void
-io_filehandle_set_eof(SHIM_INTERP, ARGMOD(PMC *handle), INTVAL is_set)
+io_filehandle_set_eof(SHIM_INTERP, ARGMOD(const PMC *handle), const INTVAL is_set)
 {
     ASSERT_ARGS(io_filehandle_set_eof)
     if (is_set)
@@ -337,7 +342,7 @@ io_filehandle_set_eof(SHIM_INTERP, ARGMOD(PMC *handle), INTVAL is_set)
 
 /*
 
-=item C<static PIOOFF_T io_filehandle_tell(PARROT_INTERP, PMC *handle)>
+=item C<static PIOOFF_T io_filehandle_tell(PARROT_INTERP, const PMC *handle)>
 
 Get the current offset of the file descriptor.
 
@@ -346,7 +351,7 @@ Get the current offset of the file descriptor.
 */
 
 static PIOOFF_T
-io_filehandle_tell(PARROT_INTERP, ARGMOD(PMC *handle))
+io_filehandle_tell(PARROT_INTERP, ARGMOD(const PMC *handle))
 {
     ASSERT_ARGS(io_filehandle_tell)
     const PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
@@ -355,8 +360,8 @@ io_filehandle_tell(PARROT_INTERP, ARGMOD(PMC *handle))
 
 /*
 
-=item C<static PIOOFF_T io_filehandle_seek(PARROT_INTERP, PMC *handle, PIOOFF_T
-offset, INTVAL whence)>
+=item C<static PIOOFF_T io_filehandle_seek(PARROT_INTERP, const PMC *handle,
+const PIOOFF_T offset, const INTVAL whence)>
 
 Perform a seek on the file descriptor. C<whence> is one of C<SEEK_SET>,
 C<SEEK_CUR> or C<SEEK_END>.
@@ -366,7 +371,8 @@ C<SEEK_CUR> or C<SEEK_END>.
 */
 
 static PIOOFF_T
-io_filehandle_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL whence)
+io_filehandle_seek(PARROT_INTERP, ARGMOD(const PMC *handle), const PIOOFF_T offset,
+                   const INTVAL whence)
 {
     ASSERT_ARGS(io_filehandle_seek)
     const PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
@@ -380,18 +386,19 @@ io_filehandle_seek(PARROT_INTERP, ARGMOD(PMC *handle), PIOOFF_T offset, INTVAL w
 
 /*
 
-=item C<static void io_filehandle_adv_position(PARROT_INTERP, PMC *handle,
-size_t len)>
+=item C<static void io_filehandle_adv_position(PARROT_INTERP, const PMC *handle,
+const size_t len)>
 
 Advance the in-memory file position of the FileHandle PMC by a given number of
 bytes.
 
-=item C<static void io_filehandle_set_position(PARROT_INTERP, PMC *handle,
-PIOOFF_T pos)>
+=item C<static void io_filehandle_set_position(PARROT_INTERP, const PMC *handle,
+const PIOOFF_T pos)>
 
 Set the in-memory file position of the FileHandle PMC.
 
-=item C<static PIOOFF_T io_filehandle_get_position(PARROT_INTERP, PMC *handle)>
+=item C<static PIOOFF_T io_filehandle_get_position(PARROT_INTERP, const PMC
+*handle)>
 
 Get the current in-memory offset from the FileHandle.
 
@@ -400,7 +407,7 @@ Get the current in-memory offset from the FileHandle.
 */
 
 static void
-io_filehandle_adv_position(SHIM_INTERP, ARGMOD(PMC *handle), size_t len)
+io_filehandle_adv_position(SHIM_INTERP, ARGMOD(const PMC *handle), const size_t len)
 {
     ASSERT_ARGS(io_filehandle_adv_position)
     Parrot_FileHandle_attributes * const attrs = PARROT_FILEHANDLE(handle);
@@ -409,7 +416,7 @@ io_filehandle_adv_position(SHIM_INTERP, ARGMOD(PMC *handle), size_t len)
 }
 
 static void
-io_filehandle_set_position(SHIM_INTERP, ARGMOD(PMC *handle), PIOOFF_T pos)
+io_filehandle_set_position(SHIM_INTERP, ARGMOD(const PMC *handle), const PIOOFF_T pos)
 {
     ASSERT_ARGS(io_filehandle_set_position)
     Parrot_FileHandle_attributes * const attrs = PARROT_FILEHANDLE(handle);
@@ -417,7 +424,7 @@ io_filehandle_set_position(SHIM_INTERP, ARGMOD(PMC *handle), PIOOFF_T pos)
 }
 
 static PIOOFF_T
-io_filehandle_get_position(SHIM_INTERP, ARGMOD(PMC *handle))
+io_filehandle_get_position(SHIM_INTERP, ARGMOD(const PMC *handle))
 {
     ASSERT_ARGS(io_filehandle_get_position)
     Parrot_FileHandle_attributes * const attrs = PARROT_FILEHANDLE(handle);
@@ -426,8 +433,8 @@ io_filehandle_get_position(SHIM_INTERP, ARGMOD(PMC *handle))
 
 /*
 
-=item C<static INTVAL io_filehandle_open(PARROT_INTERP, PMC *handle, STRING
-*path, INTVAL flags, STRING *mode)>
+=item C<static INTVAL io_filehandle_open(PARROT_INTERP, const PMC *handle, const
+STRING *path, const INTVAL flags, const STRING *mode)>
 
 Open the filehandle for the operation specified by C<flags> and the C<path>.
 
@@ -436,11 +443,12 @@ Open the filehandle for the operation specified by C<flags> and the C<path>.
 */
 
 static INTVAL
-io_filehandle_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTVAL flags,
-        ARGIN(STRING *mode))
+io_filehandle_open(PARROT_INTERP, ARGMOD(const PMC *handle), ARGIN(const STRING *path),
+                   const INTVAL flags, ARGIN(const STRING *mode))
 {
     ASSERT_ARGS(io_filehandle_open)
     PIOHANDLE os_handle;
+    INTVAL new_flags = flags;
 
     /* Hack! If we're opening in pipe mode, turn this FileHandle into a pipe
        and use that vtable instead. */
@@ -473,10 +481,10 @@ io_filehandle_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTV
      * so we would setup linebuffering.
      */
     if (Parrot_io_internal_is_tty(interp, os_handle))
-        flags |= PIO_F_CONSOLE;
+        new_flags |= PIO_F_CONSOLE;
 
     SETATTR_FileHandle_os_handle(interp, handle, os_handle);
-    SETATTR_FileHandle_flags(interp, handle, flags);
+    SETATTR_FileHandle_flags(interp, handle, new_flags);
     SETATTR_FileHandle_filename(interp, handle, path);
     SETATTR_FileHandle_mode(interp, handle, mode);
     SETATTR_FileHandle_file_pos(interp, handle, 0);
@@ -486,7 +494,7 @@ io_filehandle_open(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING *path), INTV
 
 /*
 
-=item C<static INTVAL io_filehandle_is_open(PARROT_INTERP, PMC *handle)>
+=item C<static INTVAL io_filehandle_is_open(PARROT_INTERP, const PMC *handle)>
 
 Determine if the FileHandle is currently open.
 
@@ -495,7 +503,7 @@ Determine if the FileHandle is currently open.
 */
 
 static INTVAL
-io_filehandle_is_open(PARROT_INTERP, ARGMOD(PMC *handle))
+io_filehandle_is_open(PARROT_INTERP, ARGMOD(const PMC *handle))
 {
     ASSERT_ARGS(io_filehandle_is_open)
     const PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
@@ -504,7 +512,7 @@ io_filehandle_is_open(PARROT_INTERP, ARGMOD(PMC *handle))
 
 /*
 
-=item C<static INTVAL io_filehandle_close(PARROT_INTERP, PMC *handle)>
+=item C<static INTVAL io_filehandle_close(PARROT_INTERP, const PMC *handle)>
 
 Close the FileHandle, if it's open.
 
@@ -513,7 +521,7 @@ Close the FileHandle, if it's open.
 */
 
 static INTVAL
-io_filehandle_close(PARROT_INTERP, ARGMOD(PMC *handle))
+io_filehandle_close(PARROT_INTERP, ARGMOD(const PMC *handle))
 {
     ASSERT_ARGS(io_filehandle_close)
     const PIOHANDLE os_handle = io_filehandle_get_os_handle(interp, handle);
@@ -535,8 +543,8 @@ io_filehandle_close(PARROT_INTERP, ARGMOD(PMC *handle))
 
 /*
 
-=item C<static const STR_VTABLE * io_filehandle_get_encoding(PARROT_INTERP, PMC
-*handle)>
+=item C<static const STR_VTABLE * io_filehandle_get_encoding(PARROT_INTERP,
+const PMC *handle)>
 
 Get the current encoding of the FileHandle.
 
@@ -547,7 +555,7 @@ Get the current encoding of the FileHandle.
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const STR_VTABLE *
-io_filehandle_get_encoding(PARROT_INTERP, ARGIN(PMC *handle))
+io_filehandle_get_encoding(PARROT_INTERP, ARGIN(const PMC *handle))
 {
     ASSERT_ARGS(io_filehandle_get_encoding)
     STRING           *encoding_str;
@@ -560,12 +568,12 @@ io_filehandle_get_encoding(PARROT_INTERP, ARGIN(PMC *handle))
 
 /*
 
-=item C<static void io_filehandle_set_flags(PARROT_INTERP, PMC *handle, INTVAL
-flags)>
+=item C<static void io_filehandle_set_flags(PARROT_INTERP, const PMC *handle,
+const INTVAL flags)>
 
 Set the mode flags on the FileHandle.
 
-=item C<static INTVAL io_filehandle_get_flags(PARROT_INTERP, PMC *handle)>
+=item C<static INTVAL io_filehandle_get_flags(PARROT_INTERP, const PMC *handle)>
 
 Get the mode flags from the FileHandle.
 
@@ -574,14 +582,14 @@ Get the mode flags from the FileHandle.
 */
 
 static void
-io_filehandle_set_flags(SHIM_INTERP, ARGIN(PMC *handle), INTVAL flags)
+io_filehandle_set_flags(SHIM_INTERP, ARGIN(const PMC *handle), const INTVAL flags)
 {
     ASSERT_ARGS(io_filehandle_set_flags)
     PARROT_FILEHANDLE(handle)->flags = flags;
 }
 
 static INTVAL
-io_filehandle_get_flags(SHIM_INTERP, ARGIN(PMC *handle))
+io_filehandle_get_flags(SHIM_INTERP, ARGIN(const PMC *handle))
 {
     ASSERT_ARGS(io_filehandle_get_flags)
     return PARROT_FILEHANDLE(handle)->flags;
@@ -589,7 +597,8 @@ io_filehandle_get_flags(SHIM_INTERP, ARGIN(PMC *handle))
 
 /*
 
-=item C<static size_t io_filehandle_total_size(PARROT_INTERP, PMC *handle)>
+=item C<static size_t io_filehandle_total_size(PARROT_INTERP, const PMC
+*handle)>
 
 Determine the total on-disk size of the file.
 
@@ -598,7 +607,7 @@ Determine the total on-disk size of the file.
 */
 
 static size_t
-io_filehandle_total_size(PARROT_INTERP, ARGIN(PMC *handle))
+io_filehandle_total_size(PARROT_INTERP, ARGIN(const PMC *handle))
 {
     ASSERT_ARGS(io_filehandle_total_size)
     INTVAL flags;
@@ -614,7 +623,7 @@ io_filehandle_total_size(PARROT_INTERP, ARGIN(PMC *handle))
 
 /*
 
-=item C<static PIOHANDLE io_filehandle_get_piohandle(PARROT_INTERP, PMC
+=item C<static PIOHANDLE io_filehandle_get_piohandle(PARROT_INTERP, const PMC
 *handle)>
 
 Get the file descriptor.
@@ -624,7 +633,7 @@ Get the file descriptor.
 */
 
 static PIOHANDLE
-io_filehandle_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
+io_filehandle_get_piohandle(PARROT_INTERP, ARGIN(const PMC *handle))
 {
     ASSERT_ARGS(io_filehandle_get_piohandle)
     return io_filehandle_get_os_handle(interp, handle);
@@ -634,8 +643,8 @@ io_filehandle_get_piohandle(PARROT_INTERP, ARGIN(PMC *handle))
 
 /*
 
-=item C<void io_filehandle_set_os_handle(PARROT_INTERP, PMC *filehandle,
-PIOHANDLE file_descriptor)>
+=item C<void io_filehandle_set_os_handle(PARROT_INTERP, const PMC *filehandle,
+const PIOHANDLE file_descriptor)>
 
 Sets the C<os_handle> attribute of the FileHandle object, which stores the
 low-level filehandle for the OS.
@@ -653,7 +662,8 @@ buffer and file positions) to their default values.
 */
 
 void
-io_filehandle_set_os_handle(SHIM_INTERP, ARGMOD(PMC *filehandle), PIOHANDLE file_descriptor)
+io_filehandle_set_os_handle(SHIM_INTERP, ARGMOD(const PMC *filehandle),
+                            const PIOHANDLE file_descriptor)
 {
     ASSERT_ARGS(io_filehandle_set_os_handle)
     PARROT_FILEHANDLE(filehandle)->os_handle = file_descriptor;
@@ -723,8 +733,8 @@ io_filehandle_get_file_position(SHIM_INTERP, ARGIN(const PMC *filehandle))
 
 /*
 
-=item C<void io_filehandle_set_file_position(PARROT_INTERP, PMC *filehandle,
-PIOOFF_T file_pos)>
+=item C<void io_filehandle_set_file_position(PARROT_INTERP, const PMC
+*filehandle, const PIOOFF_T file_pos)>
 
 Get the C<file_pos> attribute of the FileHandle object, which stores the
 current file position of the filehandle. Also set the C<last_pos> attribute to
@@ -740,7 +750,8 @@ it can be cleanly changed later.
 */
 
 void
-io_filehandle_set_file_position(SHIM_INTERP, ARGMOD(PMC *filehandle), PIOOFF_T file_pos)
+io_filehandle_set_file_position(SHIM_INTERP, ARGMOD(const PMC *filehandle),
+                                const PIOOFF_T file_pos)
 {
     ASSERT_ARGS(io_filehandle_set_file_position)
     Parrot_FileHandle_attributes * const handle_struct = PARROT_FILEHANDLE(filehandle);
@@ -750,7 +761,7 @@ io_filehandle_set_file_position(SHIM_INTERP, ARGMOD(PMC *filehandle), PIOOFF_T f
 
 /*
 
-=item C<const IO_VTABLE * io_filehandle_convert_to_pipe(PARROT_INTERP, PMC
+=item C<const IO_VTABLE * io_filehandle_convert_to_pipe(PARROT_INTERP, const PMC
 *handle)>
 
 Convert FileHandle C<handle> from file mode to pipe mode by swapping vtables.
@@ -766,7 +777,7 @@ PMC types.
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 const IO_VTABLE *
-io_filehandle_convert_to_pipe(PARROT_INTERP, ARGMOD(PMC *handle))
+io_filehandle_convert_to_pipe(PARROT_INTERP, ARGMOD(const PMC *handle))
 {
     ASSERT_ARGS(io_filehandle_convert_to_pipe)
     const IO_VTABLE * vtable = Parrot_io_get_vtable(interp, IO_VTABLE_PIPE, NULL);

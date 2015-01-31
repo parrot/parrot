@@ -1,5 +1,5 @@
 /* io.h
- *  Copyright (C) 2001-2011, Parrot Foundation.
+ *  Copyright (C) 2001-2015, Parrot Foundation.
  *  Overview:
  *      Parrot IO subsystem
  *  References:
@@ -131,25 +131,30 @@ http://msdn.microsoft.com/en-us/library/windows/desktop/aa366551(v=vs.85).aspx
     _b: This function operates on a raw char* buffer (Possibly from ByteBuffer)
 */
 
-typedef INTVAL      (*io_vtable_read_b)       (PARROT_INTERP, PMC *handle,
-                                                ARGOUT(const char * buffer), const size_t byte_length);
-typedef INTVAL      (*io_vtable_write_b)      (PARROT_INTERP, PMC *handle,
-                                                ARGIN(const char * buffer), const size_t byte_length);
-typedef INTVAL      (*io_vtable_flush)        (PARROT_INTERP, PMC *handle);
+typedef INTVAL      (*io_vtable_read_b)       (PARROT_INTERP, const PMC * const handle,
+                                               ARGOUT(const char * buffer),
+                                               const size_t byte_length);
+typedef INTVAL      (*io_vtable_write_b)      (PARROT_INTERP, const PMC *handle,
+                                               ARGIN(const char * buffer),
+                                               const size_t byte_length);
+typedef INTVAL      (*io_vtable_flush)        (PARROT_INTERP, const PMC *handle);
 typedef INTVAL      (*io_vtable_is_eof)       (PARROT_INTERP, const PMC *handle);
-typedef void        (*io_vtable_set_eof)      (PARROT_INTERP, PMC *handle, INTVAL is_set);
+typedef void        (*io_vtable_set_eof)      (PARROT_INTERP, const PMC *handle,
+                                               INTVAL is_set);
 typedef PIOOFF_T    (*io_vtable_tell)         (PARROT_INTERP, const PMC *handle);
-typedef PIOOFF_T    (*io_vtable_seek)         (PARROT_INTERP, PMC *handle,
-                                                PIOOFF_T offset, INTVAL whence);
-typedef void        (*io_vtable_adv_position) (PARROT_INTERP, PMC *handle, size_t len);
-typedef void        (*io_vtable_set_position) (PARROT_INTERP, PMC *handle, PIOOFF_T pos);
+typedef PIOOFF_T    (*io_vtable_seek)         (PARROT_INTERP, const PMC *handle,
+                                                const PIOOFF_T offset, const INTVAL whence);
+typedef void        (*io_vtable_adv_position) (PARROT_INTERP, const PMC *handle,
+                                               const size_t len);
+typedef void        (*io_vtable_set_position) (PARROT_INTERP, const PMC *handle,
+                                               const PIOOFF_T pos);
 typedef PIOOFF_T    (*io_vtable_get_position) (PARROT_INTERP, const PMC *handle);
-typedef INTVAL      (*io_vtable_open)         (PARROT_INTERP, PMC *handle,
-                                                ARGIN(STRING *path), INTVAL flags,
-                                                ARGIN(STRING *mode));
+typedef INTVAL      (*io_vtable_open)         (PARROT_INTERP, const PMC *handle,
+                                                ARGIN(const STRING *path), const INTVAL flags,
+                                                ARGIN(const STRING *mode));
 typedef INTVAL      (*io_vtable_is_open)      (PARROT_INTERP, const PMC *handle);
-typedef INTVAL      (*io_vtable_close)        (PARROT_INTERP, PMC *handle);
-typedef void        (*io_vtable_set_flags)    (PARROT_INTERP, PMC *handle, INTVAL flags);
+typedef INTVAL      (*io_vtable_close)        (PARROT_INTERP, const PMC *handle);
+typedef void        (*io_vtable_set_flags)    (PARROT_INTERP, const PMC *handle, const INTVAL flags);
 typedef INTVAL      (*io_vtable_get_flags)    (PARROT_INTERP, const PMC *handle);
 typedef size_t      (*io_vtable_total_size)   (PARROT_INTERP, const PMC *handle);
 typedef PIOHANDLE   (*io_vtable_get_piohandle)(PARROT_INTERP, const PMC *handle);
