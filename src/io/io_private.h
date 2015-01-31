@@ -185,13 +185,12 @@ INTVAL Parrot_io_parse_open_flags(PARROT_INTERP,
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 const STR_VTABLE * io_get_encoding(PARROT_INTERP,
-    ARGMOD(PMC *handle),
+    ARGIN(const PMC *handle),
     ARGIN(const IO_VTABLE *vtable),
-    INTVAL flags)
+    const INTVAL flags)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
-        __attribute__nonnull__(3)
-        FUNC_MODIFIES(*handle);
+        __attribute__nonnull__(3);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
@@ -424,7 +423,7 @@ void io_filehandle_setup_vtable(PARROT_INTERP,
 
 void io_pipe_setup_vtable(PARROT_INTERP,
     ARGMOD_NULLOK(IO_VTABLE *vtable),
-    INTVAL idx)
+    const INTVAL idx)
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*vtable);
 
