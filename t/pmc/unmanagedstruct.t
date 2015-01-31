@@ -18,14 +18,6 @@ Tests the UnManagedStruct PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(10)
-
-    test_new()
-    test_bool()
-    is_defined()
-    is_equal()
-    initialize()
-
     .include 'iglobals.pasm'
     .local pmc interp, config
     interp = getinterp
@@ -35,9 +27,18 @@ Tests the UnManagedStruct PMC.
     $I1 = index $S0, $S1
     if $I1 == -1 goto go_ahead
 
-    skip(1, 'does not work with --ccflags=-DSTRUCT_DEBUG')
+    skip_all('does not work with --ccflags=-DSTRUCT_DEBUG')
+    finish()
     exit 0
 go_ahead:
+
+    plan(10)
+
+    test_new()
+    test_bool()
+    is_defined()
+    is_equal()
+    initialize()
     can_clone()
 .end
 
