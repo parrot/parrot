@@ -343,11 +343,11 @@ trace_key_dump(PARROT_INTERP, ARGIN(const PMC *key))
         switch (PObj_get_FLAGS(key) & KEY_type_FLAGS) {
           case KEY_integer_FLAG:
               len += Parrot_io_eprintf(debugger, "%vi",
-                 VTABLE_get_integer(interp, key));
+                  VTABLE_get_integer(interp, (PMC *)key));
             break;
           case KEY_string_FLAG:
             {
-            const STRING * const s = Parrot_key_string(interp, key);
+            const STRING * const s = Parrot_key_string(interp, (PMC *)key);
             STRING * const escaped = Parrot_str_escape_truncate(interp, s, 20);
 
             if (escaped)
@@ -358,12 +358,12 @@ trace_key_dump(PARROT_INTERP, ARGIN(const PMC *key))
             break;
           case KEY_integer_FLAG|KEY_register_FLAG:
               len += Parrot_io_eprintf(debugger, "I%vd=%vd",
-                  VTABLE_get_integer(interp, key),
-                    REG_INT(interp, VTABLE_get_integer(interp, key)));
+                  VTABLE_get_integer(interp, (PMC *)key),
+                    REG_INT(interp, VTABLE_get_integer(interp, (PMC *)key)));
             break;
           case KEY_string_FLAG|KEY_register_FLAG:
             {
-            const UINTVAL keynum = (UINTVAL)VTABLE_get_integer(interp, key);
+            const UINTVAL keynum = (UINTVAL)VTABLE_get_integer(interp, (PMC *)key);
             if (keynum < PCC_GET_REGS_USED(CURRENT_CONTEXT(interp), REGNO_STR)) {
                 const STRING * const s = REG_STR(interp, keynum);
                 STRING * const escaped = Parrot_str_escape_truncate(interp, s, 20);
@@ -379,9 +379,9 @@ trace_key_dump(PARROT_INTERP, ARGIN(const PMC *key))
             break;
           case KEY_pmc_FLAG|KEY_register_FLAG:
               len += Parrot_io_eprintf(debugger, "P%vd=",
-                  VTABLE_get_integer(interp, key));
+                  VTABLE_get_integer(interp, (PMC *)key));
               trace_pmc_dump(debugger, REG_PMC(interp,
-                  VTABLE_get_integer(interp, key)));
+                  VTABLE_get_integer(interp, (PMC *)key)));
             break;
           default:
             len += Parrot_io_eprintf(debugger, "??");
@@ -390,7 +390,7 @@ trace_key_dump(PARROT_INTERP, ARGIN(const PMC *key))
         }
 
         if (key) {
-            key = VTABLE_shift_pmc(interp, key);
+            key = VTABLE_shift_pmc(interp, (PMC *)key);
             if (key)
                 len += Parrot_io_eprintf(debugger, ";");
         }

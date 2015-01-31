@@ -248,7 +248,7 @@ io_verify_string_encoding(PARROT_INTERP, ARGIN(const PMC *handle),
     /* If we still don't have an encoding or if we don't need to do any
        converting, we're good. Return. */
     if (encoding == NULL || encoding == s->encoding || encoding == Parrot_binary_encoding_ptr)
-        return s;
+        return (STRING*)s;
 
     /* Else, convert to the necessary encoding */
     return encoding->to_encoding(interp, s);

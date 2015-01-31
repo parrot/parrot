@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008-2014, Parrot Foundation.
+Copyright (C) 2008-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -156,15 +156,13 @@ Mark active filehandle data as live.
 
 =item C<void destroy()>
 
-Free structures.
+Flushes the buffer and handle and closes the handle.
 
 =cut
 
 */
     VTABLE void destroy() :no_wb {
         Parrot_io_close(INTERP, SELF, 1);
-
-        /* TODO: flush and free the buffers */
     }
 
 
@@ -179,7 +177,7 @@ For internal usage only, subject to change without notice.
 
 */
 
-    VTABLE INTVAL get_integer_keyed_int(INTVAL key) :no_wb {
+    VTABLE INTVAL get_integer_keyed_int(const INTVAL key) :no_wb {
         INTVAL result;
         switch (key) {
           case 0:

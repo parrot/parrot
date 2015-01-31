@@ -384,19 +384,19 @@ PIOHANDLE io_filehandle_get_os_handle(PARROT_INTERP,
 
 void io_filehandle_set_file_position(PARROT_INTERP,
     ARGMOD(PMC *filehandle),
-    PIOOFF_T file_pos)
+    const PIOOFF_T file_pos)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*filehandle);
 
 void io_filehandle_set_os_handle(PARROT_INTERP,
     ARGMOD(PMC *filehandle),
-    PIOHANDLE file_descriptor)
+    const PIOHANDLE file_descriptor)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*filehandle);
 
 void io_filehandle_setup_vtable(PARROT_INTERP,
     ARGMOD_NULLOK(IO_VTABLE *vtable),
-    INTVAL idx)
+    const INTVAL idx)
         __attribute__nonnull__(1)
         FUNC_MODIFIES(*vtable);
 

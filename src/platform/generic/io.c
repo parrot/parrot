@@ -54,7 +54,7 @@ APitUE - W. Richard Stevens, AT&T SFIO, Perl 5 (Nick Ing-Simmons)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_CONST_FUNCTION
-static int convert_flags_to_unix(INTVAL flags);
+static int convert_flags_to_unix(const INTVAL flags);
 
 #define ASSERT_ARGS_convert_flags_to_unix __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
@@ -63,7 +63,7 @@ static int convert_flags_to_unix(INTVAL flags);
 
 /*
 
-=item C<static int convert_flags_to_unix(INTVAL flags)>
+=item C<static int convert_flags_to_unix(const INTVAL flags)>
 
 Returns a UNIX-specific interpretation of C<flags> suitable for passing
 to C<open()> and C<fopen()> in C<Parrot_io_open_unix()>.
@@ -74,7 +74,7 @@ to C<open()> and C<fopen()> in C<Parrot_io_open_unix()>.
 
 PARROT_CONST_FUNCTION
 static int
-convert_flags_to_unix(INTVAL flags)
+convert_flags_to_unix(const INTVAL flags)
 {
     ASSERT_ARGS(convert_flags_to_unix)
     int oflags = 0;
@@ -100,7 +100,7 @@ convert_flags_to_unix(INTVAL flags)
 
 /*
 
-=item C<PIOHANDLE Parrot_io_internal_std_os_handle(PARROT_INTERP, INTVAL
+=item C<PIOHANDLE Parrot_io_internal_std_os_handle(PARROT_INTERP, const INTVAL
 fileno)>
 
 Returns a standard file handle.
@@ -110,7 +110,7 @@ Returns a standard file handle.
 */
 
 PIOHANDLE
-Parrot_io_internal_std_os_handle(SHIM_INTERP, INTVAL fileno)
+Parrot_io_internal_std_os_handle(SHIM_INTERP, const INTVAL fileno)
 {
     PIOHANDLE os_handle;
 
@@ -132,8 +132,8 @@ Parrot_io_internal_std_os_handle(SHIM_INTERP, INTVAL fileno)
 
 /*
 
-=item C<PIOHANDLE Parrot_io_internal_open(PARROT_INTERP, STRING *path, INTVAL
-flags)>
+=item C<PIOHANDLE Parrot_io_internal_open(PARROT_INTERP, const STRING * const
+path, const INTVAL flags)>
 
 Opens a string C<path>. C<flags> is a bitwise C<or> combination of C<PIO_F_*>
 flag values.
@@ -144,19 +144,19 @@ flag values.
 
 PARROT_WARN_UNUSED_RESULT
 PIOHANDLE
-Parrot_io_internal_open(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags)
+Parrot_io_internal_open(PARROT_INTERP, ARGIN(const STRING * const path), const INTVAL flags)
 {
     struct stat  buf;
     PIOHANDLE    fd;
 
     const int oflags   = convert_flags_to_unix(flags);
-    char * const spath = Parrot_str_to_platform_cstring(interp, path);
+    const char * const spath = Parrot_str_to_platform_cstring(interp, path);
 
     while ((fd = open(spath, oflags, DEFAULT_OPEN_MODE)) < 0
     &&      errno == EINTR)
         errno = 0;
 
-    Parrot_str_free_cstring(spath);
+    Parrot_str_free_cstring((char*)spath);
 
     if (fd < 0)
         return PIO_INVALID_HANDLE;
@@ -173,7 +173,7 @@ Parrot_io_internal_open(PARROT_INTERP, ARGIN(STRING *path), INTVAL flags)
 
 /*
 
-=item C<PIOHANDLE Parrot_io_internal_dup(PARROT_INTERP, PIOHANDLE handle)>
+=item C<PIOHANDLE Parrot_io_internal_dup(PARROT_INTERP, const PIOHANDLE handle)>
 
 Duplicates file handle C<handle>.
 
@@ -183,14 +183,15 @@ Duplicates file handle C<handle>.
 
 PARROT_WARN_UNUSED_RESULT
 PIOHANDLE
-Parrot_io_internal_dup(SHIM_INTERP, PIOHANDLE handle)
+Parrot_io_internal_dup(SHIM_INTERP, const PIOHANDLE handle)
 {
     return dup(handle);
 }
 
 /*
 
-=item C<INTVAL Parrot_io_internal_async(PARROT_INTERP, PMC *pmc, INTVAL async)>
+=item C<INTVAL Parrot_io_internal_async(PARROT_INTERP, PMC * const pmc, const
+INTVAL async)>
 
 Sets a handle C<*pmc> to blocking or non-blocking mode
 
@@ -204,7 +205,7 @@ to query it from the pmc.
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_io_internal_async(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL async)
+Parrot_io_internal_async(PARROT_INTERP, ARGMOD(PMC * const pmc), const INTVAL async)
 {
     int rflags;
     PIOHANDLE file_descriptor;
@@ -238,7 +239,7 @@ Parrot_io_internal_async(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL async)
 
 /*
 
-=item C<INTVAL Parrot_io_internal_close(PARROT_INTERP, PIOHANDLE
+=item C<INTVAL Parrot_io_internal_close(PARROT_INTERP, const PIOHANDLE
 file_descriptor)>
 
 Closes C<*io>'s file descriptor.
@@ -248,7 +249,7 @@ Closes C<*io>'s file descriptor.
 */
 
 INTVAL
-Parrot_io_internal_close(SHIM_INTERP, PIOHANDLE file_descriptor)
+Parrot_io_internal_close(SHIM_INTERP, const PIOHANDLE file_descriptor)
 {
     INTVAL result = 0;
 
@@ -266,7 +267,7 @@ Parrot_io_internal_close(SHIM_INTERP, PIOHANDLE file_descriptor)
 
 /*
 
-=item C<INTVAL Parrot_io_internal_is_tty(PARROT_INTERP, PIOHANDLE fd)>
+=item C<INTVAL Parrot_io_internal_is_tty(PARROT_INTERP, const PIOHANDLE fd)>
 
 Returns a boolean value indicating whether C<fd> is a console/tty.
 
@@ -276,14 +277,14 @@ Returns a boolean value indicating whether C<fd> is a console/tty.
 
 PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_io_internal_is_tty(SHIM_INTERP, PIOHANDLE fd)
+Parrot_io_internal_is_tty(SHIM_INTERP, const PIOHANDLE fd)
 {
     return isatty(fd);
 }
 
 /*
 
-=item C<INTVAL Parrot_io_internal_getblksize(PIOHANDLE fd)>
+=item C<INTVAL Parrot_io_internal_getblksize(const PIOHANDLE fd)>
 
 Various ways of determining block size.
 
@@ -299,7 +300,7 @@ if it was available at compile time, otherwise C<PIO_BLKSIZE> is returned.
 
 PARROT_CONST_FUNCTION
 INTVAL
-Parrot_io_internal_getblksize(PIOHANDLE fd)
+Parrot_io_internal_getblksize(const PIOHANDLE fd)
 {
     if (fd >= 0) {
         /* Try to get the block size of a regular file */
@@ -329,7 +330,8 @@ Parrot_io_internal_getblksize(PIOHANDLE fd)
 
 /*
 
-=item C<INTVAL Parrot_io_internal_flush(PARROT_INTERP, PIOHANDLE os_handle)>
+=item C<INTVAL Parrot_io_internal_flush(PARROT_INTERP, const PIOHANDLE
+os_handle)>
 
 At lowest layer all we can do for C<flush> is to ask the kernel to
 C<sync()>.
@@ -339,15 +341,15 @@ C<sync()>.
 */
 
 INTVAL
-Parrot_io_internal_flush(SHIM_INTERP, PIOHANDLE os_handle)
+Parrot_io_internal_flush(SHIM_INTERP, const PIOHANDLE os_handle)
 {
     return fsync(os_handle);
 }
 
 /*
 
-=item C<size_t Parrot_io_internal_read(PARROT_INTERP, PIOHANDLE os_handle, char
-*buf, size_t len)>
+=item C<size_t Parrot_io_internal_read(PARROT_INTERP, PIOHANDLE const os_handle,
+char * const buf, const size_t len)>
 
 Calls C<read()> to return up to C<len> bytes in the memory starting at
 C<buffer>.
@@ -357,7 +359,8 @@ C<buffer>.
 */
 
 size_t
-Parrot_io_internal_read(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(char *buf), size_t len)
+Parrot_io_internal_read(PARROT_INTERP, PIOHANDLE const os_handle, ARGMOD(char * const buf),
+                        const size_t len)
 {
 
     for (;;) {
@@ -374,8 +377,8 @@ Parrot_io_internal_read(PARROT_INTERP, PIOHANDLE os_handle, ARGOUT(char *buf), s
 
 /*
 
-=item C<size_t Parrot_io_internal_write(PARROT_INTERP, PIOHANDLE os_handle,
-const char *buf, size_t len)>
+=item C<size_t Parrot_io_internal_write(PARROT_INTERP, const PIOHANDLE
+os_handle, const char * const buf, const size_t len)>
 
 Calls C<write()> to write C<len> bytes from the memory starting at
 C<buffer> to the file descriptor in C<*io>.
@@ -385,8 +388,8 @@ C<buffer> to the file descriptor in C<*io>.
 */
 
 size_t
-Parrot_io_internal_write(PARROT_INTERP, PIOHANDLE os_handle,
-        ARGIN(const char *buf), size_t len)
+Parrot_io_internal_write(PARROT_INTERP, const PIOHANDLE os_handle,
+        ARGIN(const char * const buf), const size_t len)
 {
     const char *ptr      = buf;
     size_t      to_write = len;
@@ -420,8 +423,8 @@ Parrot_io_internal_write(PARROT_INTERP, PIOHANDLE os_handle,
 
 /*
 
-=item C<PIOOFF_T Parrot_io_internal_seek(PARROT_INTERP, PIOHANDLE os_handle,
-PIOOFF_T offset, INTVAL whence)>
+=item C<PIOOFF_T Parrot_io_internal_seek(PARROT_INTERP, PIOHANDLE const
+os_handle, const PIOOFF_T offset, const INTVAL whence)>
 
 Hard seek.
 
@@ -433,16 +436,17 @@ descriptor to C<offset> bytes from the location indicated by C<whence>.
 */
 
 PIOOFF_T
-Parrot_io_internal_seek(SHIM_INTERP, PIOHANDLE os_handle, PIOOFF_T offset, INTVAL whence)
+Parrot_io_internal_seek(SHIM_INTERP, PIOHANDLE const os_handle, const PIOOFF_T offset,
+                        const INTVAL whence)
 {
     const PIOOFF_T pos = lseek(os_handle, offset, whence);
-
     return pos;
 }
 
 /*
 
-=item C<PIOOFF_T Parrot_io_internal_tell(PARROT_INTERP, PIOHANDLE os_handle)>
+=item C<PIOOFF_T Parrot_io_internal_tell(PARROT_INTERP, PIOHANDLE const
+os_handle)>
 
 Returns the current read/write position on C<*io>'s file descriptor.
 
@@ -451,17 +455,16 @@ Returns the current read/write position on C<*io>'s file descriptor.
 */
 
 PIOOFF_T
-Parrot_io_internal_tell(SHIM_INTERP, PIOHANDLE os_handle)
+Parrot_io_internal_tell(SHIM_INTERP, PIOHANDLE const os_handle)
 {
     const PIOOFF_T pos = lseek(os_handle, (PIOOFF_T)0, SEEK_CUR);
-
     return pos;
 }
 
 /*
 
-=item C<PIOHANDLE Parrot_io_internal_open_pipe(PARROT_INTERP, STRING *command,
-INTVAL flags, INTVAL *pid_out)>
+=item C<PIOHANDLE Parrot_io_internal_open_pipe(PARROT_INTERP, const STRING *
+const command, const INTVAL flags, INTVAL *pid_out)>
 
 Very limited C<exec> for now.
 
@@ -471,18 +474,18 @@ Very limited C<exec> for now.
 
 PARROT_WARN_UNUSED_RESULT
 PIOHANDLE
-Parrot_io_internal_open_pipe(PARROT_INTERP, ARGIN(STRING *command), INTVAL flags,
-        ARGOUT(INTVAL *pid_out))
+Parrot_io_internal_open_pipe(PARROT_INTERP, ARGIN(const STRING * const command),
+                             const INTVAL flags, ARGOUT(INTVAL *pid_out))
 {
     PIOHANDLE handles[3];
 
     if (flags & PIO_F_READ) {
-        *pid_out = Parrot_proc_exec(interp, command, PARROT_EXEC_STDOUT,
+        *pid_out = Parrot_proc_exec(interp, (STRING*)command, PARROT_EXEC_STDOUT,
                         handles);
         return handles[1];
     }
     else {
-        *pid_out = Parrot_proc_exec(interp, command, PARROT_EXEC_STDIN,
+        *pid_out = Parrot_proc_exec(interp, (STRING*)command, PARROT_EXEC_STDIN,
                         handles);
         return handles[0];
     }
