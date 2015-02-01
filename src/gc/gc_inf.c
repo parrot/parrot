@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2014, Parrot Foundation.
+Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -259,8 +259,12 @@ flags)>
 =item C<static Parrot_Buffer* gc_inf_allocate_bufferlike_header(PARROT_INTERP,
 size_t size)>
 
+Deprecated. define PARROT_BUFFERLIKE_LIST in config.h to use it.
+
 =item C<static void gc_inf_free_bufferlike_header(PARROT_INTERP, Parrot_Buffer
 *b, size_t size)>
+
+Deprecated. define PARROT_BUFFERLIKE_LIST in config.h to use it.
 
 =item C<static void* gc_inf_allocate_pmc_attributes(PARROT_INTERP, PMC *pmc)>
 
@@ -338,6 +342,8 @@ gc_inf_free_string_header(PARROT_INTERP, ARGFREE(STRING *s))
     }
 }
 
+#ifdef PARROT_BUFFERLIKE_LIST
+
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
 static Parrot_Buffer*
@@ -362,6 +368,8 @@ gc_inf_free_bufferlike_header(PARROT_INTERP, ARGFREE(Parrot_Buffer *b), SHIM(siz
         free(b);
     }
 }
+
+#endif
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
@@ -532,8 +540,10 @@ Parrot_gc_inf_init(PARROT_INTERP, SHIM(Parrot_GC_Init_Args *args))
     interp->gc_sys->allocate_string_header  = gc_inf_allocate_string_header;
     interp->gc_sys->free_string_header      = gc_inf_free_string_header;
 
+#ifdef PARROT_BUFFERLIKE_LIST
     interp->gc_sys->allocate_bufferlike_header  = gc_inf_allocate_bufferlike_header;
     interp->gc_sys->free_bufferlike_header      = gc_inf_free_bufferlike_header;
+#endif
 
     interp->gc_sys->allocate_pmc_attributes = gc_inf_allocate_pmc_attributes;
     interp->gc_sys->free_pmc_attributes     = gc_inf_free_pmc_attributes;

@@ -633,8 +633,10 @@ Parrot_gc_ms2_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     gc_sys->allocate_string_header      = gc_ms2_allocate_string_header;
     gc_sys->free_string_header          = gc_ms2_free_string_header;
 
+#ifdef PARROT_BUFFERLIKE_LIST
     gc_sys->allocate_bufferlike_header  = gc_ms2_allocate_buffer_header;
     gc_sys->free_bufferlike_header      = gc_ms2_free_buffer_header;
+#endif
 
     gc_sys->allocate_pmc_attributes     = gc_ms2_allocate_pmc_attributes;
     gc_sys->free_pmc_attributes         = gc_ms2_free_pmc_attributes;
@@ -837,15 +839,21 @@ gc_ms2_is_pmc_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 
 =item C<gc_ms2_allocate_string_header()>
 
+Allocate string headers.
+
 =item C<gc_ms2_free_string_header()>
+
+Free string headers.
 
 =item C<static Parrot_Buffer* gc_ms2_allocate_buffer_header(PARROT_INTERP,
 size_t size)>
 
+Deprecated. define PARROT_BUFFERLIKE_LIST in config.h to use it.
+
 =item C<static void gc_ms2_free_buffer_header(PARROT_INTERP, Parrot_Buffer *s,
 size_t size)>
 
-Allocate/free string/buffer headers.
+Deprecated. define PARROT_BUFFERLIKE_LIST in config.h to use it.
 
 */
 
@@ -897,6 +905,7 @@ gc_ms2_free_string_header(PARROT_INTERP, ARGFREE(STRING *s))
     }
 }
 
+#ifdef PARROT_BUFFERLIKE_LIST
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
@@ -915,6 +924,7 @@ gc_ms2_free_buffer_header(PARROT_INTERP, ARGFREE(Parrot_Buffer *s), SHIM(size_t 
     gc_ms2_free_string_header(interp, (STRING*)s);
 }
 
+#endif
 
 /*
 

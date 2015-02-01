@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2014, Parrot Foundation.
+Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -244,8 +244,10 @@ Parrot_gc_initialize(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     PARROT_ASSERT(interp->gc_sys->allocate_string_header);
     PARROT_ASSERT(interp->gc_sys->free_string_header);
 
+#ifdef PARROT_BUFFERLIKE_LIST
     PARROT_ASSERT(interp->gc_sys->allocate_bufferlike_header);
     PARROT_ASSERT(interp->gc_sys->free_bufferlike_header);
+#endif
 
     PARROT_ASSERT(interp->gc_sys->allocate_pmc_attributes);
     PARROT_ASSERT(interp->gc_sys->free_pmc_attributes);
@@ -397,6 +399,8 @@ Parrot_gc_free_string_header(PARROT_INTERP, ARGMOD(STRING *s))
     interp->gc_sys->free_string_header(interp, s);
 }
 
+#ifdef PARROT_BUFFERLIKE_LIST
+
 /*
 
 =item C<Parrot_Buffer * Parrot_gc_new_bufferlike_header(PARROT_INTERP, size_t
@@ -405,7 +409,7 @@ size)>
 Returns a new buffer-like header from the appropriate sized pool.
 A "bufferlike object" is an object that is considered to be isomorphic to the
 PObj, so it will participate in normal GC. At the moment these are only used
-to create ListChunk objects in src/list.c.
+to create ListChunk objects in src/list.c, which is unused.
 
 =cut
 
@@ -441,6 +445,7 @@ Parrot_gc_free_bufferlike_header(PARROT_INTERP, ARGMOD(Parrot_Buffer *obj),
     ASSERT_ARGS(Parrot_gc_free_bufferlike_header)
     interp->gc_sys->free_bufferlike_header(interp, obj, size);
 }
+#endif
 
 /*
 

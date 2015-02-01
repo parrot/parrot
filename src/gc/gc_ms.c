@@ -431,9 +431,10 @@ Parrot_gc_ms_init(PARROT_INTERP, SHIM(Parrot_GC_Init_Args *args))
     interp->gc_sys->allocate_string_header  = gc_ms_allocate_string_header;
     interp->gc_sys->free_string_header      = gc_ms_free_string_header;
 
+#ifdef PARROT_BUFFERLIKE_LIST
     interp->gc_sys->allocate_bufferlike_header  = gc_ms_allocate_bufferlike_header;
     interp->gc_sys->free_bufferlike_header      = gc_ms_free_bufferlike_header;
-
+#endif
     interp->gc_sys->is_pmc_ptr              = gc_ms_is_pmc_ptr;
     interp->gc_sys->is_string_ptr           = gc_ms_is_string_ptr;
     interp->gc_sys->mark_pmc_header         = gc_ms_mark_pmc_header;
@@ -621,11 +622,15 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     }
 
     if (flags & GC_finish_FLAG) {
+#ifndef NDEBUG
         gc_ms_print_stats(interp, "finish: finalize_memory_pools");
+#endif
         gc_ms_finalize_memory_pools(interp, mem_pools);
         return;
     }
+#ifndef NDEBUG
     gc_ms_print_stats(interp, "Mark phase");
+#endif
 
     ++mem_pools->gc_mark_block_level;
     mem_pools->lazy_gc = flags & GC_lazy_FLAG;
@@ -641,7 +646,9 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
         mem_pools->gc_trace_ptr = NULL;
         mem_pools->gc_mark_ptr  = NULL;
 
+#ifndef NDEBUG
         gc_ms_print_stats(interp, "Sweep phase");
+#endif
         /* We've done the mark, now do the sweep. Pass the sweep callback
            function to the PMC pool and all the sized pools. */
        header_pools_iterate_callback(interp, mem_pools,
@@ -650,12 +657,16 @@ gc_ms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     }
     else {
         ++interp->gc_sys->stats.gc_lazy_mark_runs;
+#ifndef NDEBUG
         gc_ms_print_stats(interp, "Lazy trace");
+#endif
         Parrot_gc_clear_live_bits(interp, mem_pools->pmc_pool);
     }
 
     /* compact STRING pools to collect free headers and allocated buffers */
+#ifndef NDEBUG
     gc_ms_print_stats(interp, "Compact memory");
+#endif
     Parrot_gc_compact_memory_pool(interp);
 
     /* Note it */
@@ -940,6 +951,7 @@ gc_ms_is_string_ptr(PARROT_INTERP, ARGIN_NULLOK(void *ptr))
 flags)>
 
 Allocate new STRING header from pool.
+If flags & PObj_constant_FLAG from the constant_string_header_pool.
 
 =cut
 
@@ -1005,6 +1017,8 @@ gc_ms_mark_str_header(SHIM_INTERP, ARGMOD_NULLOK(STRING *obj))
     }
 }
 
+#ifdef PARROT_BUFFERLIKE_LIST
+
 /*
 
 =item C<static Parrot_Buffer * gc_ms_allocate_bufferlike_header(PARROT_INTERP,
@@ -1013,7 +1027,9 @@ size_t size)>
 Returns a new buffer-like header from the appropriate sized pool.
 A "bufferlike object" is an object that is considered to be isomorphic to the
 PObj, so it will participate in normal GC. At the moment these are only used
-to create ListChunk objects in src/list.c.
+to create ListChunk objects in src/list.c, which are unused.
+
+Deprecated. define PARROT_BUFFERLIKE_LIST in config.h to use it.
 
 =cut
 
@@ -1040,6 +1056,8 @@ gc_ms_allocate_bufferlike_header(PARROT_INTERP, size_t size)
 Free a bufferlike header that is not being used, so that Parrot can recycle
 it and use it again.
 
+Deprecated. define PARROT_BUFFERLIKE_LIST in config.h to use it.
+
 =cut
 
 */
@@ -1053,6 +1071,8 @@ gc_ms_free_bufferlike_header(PARROT_INTERP, ARGMOD(Parrot_Buffer *obj),
     Fixed_Size_Pool * const pool = get_bufferlike_pool(interp, mem_pools, size);
     pool->add_free_object(interp, mem_pools, pool, obj);
 }
+
+#endif
 
 /*
 
@@ -1990,7 +2010,7 @@ gc_ms_iterate_live_strings(PARROT_INTERP,
 
 /*
 
-=item C<void gc_ms_print_stats_always(PARROT_INTERP, const char* header)>
+=item C<static void gc_ms_print_stats_always(PARROT_INTERP, const char* header)>
 
 =item C<static void gc_ms_print_stats(PARROT_INTERP, const char* header)>
 
@@ -2000,10 +2020,10 @@ Debug function, only enabled with C<-DMEMORY_DEBUG> in C<ccflags>.
 
 */
 
-void
+static void
 gc_ms_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
 {
-    ASSERT_ARGS(gc_ms_print_stats_always)
+    /*ASSERT_ARGS(gc_ms_print_stats_always)*/
 
     Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
     GC_Statistics        stats     = interp->gc_sys->stats;
