@@ -642,6 +642,10 @@ void gc_ms_pmc_needs_early_collection(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
 
+void gc_ms_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
+
 void gc_ms_reallocate_buffer_storage(PARROT_INTERP,
     ARGIN(Parrot_Buffer *str),
     size_t size)
@@ -692,6 +696,9 @@ int Parrot_gc_ms_needed(PARROT_INTERP)
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_gc_ms_print_stats_always __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(header))
 #define ASSERT_ARGS_gc_ms_reallocate_buffer_storage \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \

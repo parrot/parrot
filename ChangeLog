@@ -1,6 +1,7 @@
 2015-10-20    release 7.9.0
     - Core
         + StringBuilder.clone and ResizablePMCArray write barrier optimizations. GH #1123
+        + Support -D1 GC stats with --ccflags=-DMEMORY_DEBUG for --gc=ms
     - Build
         + --optimize: Replace -O2 from perl5 with -O3 on clang or gcc. GH #1185
           5% faster
