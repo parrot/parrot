@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2009, Parrot Foundation.
+# Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -13,7 +13,7 @@ several garbage collectors.  Current available options are:
 
 =over 4
 
-=item ms
+=item ms (default)
 
 Stop-the-world mark & sweep
 
@@ -25,7 +25,7 @@ Infinite memory "collector"
 
 New style mark & sweep
 
-=item gms (default)
+=item gms
 
 Generational M&S based on MS2
 
@@ -58,7 +58,7 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $gc = $conf->options->get('gc') || 'gms';
+    my $gc = $conf->options->get('gc') || 'ms';
     $conf->debug(" ($gc) ");
 
     my @known_gcs = qw<gms ms ms2 inf>;
