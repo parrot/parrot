@@ -26,7 +26,7 @@ typedef void (*compact_f) (Interp *, GC_Statistics *stats, Variable_Size_Pool *)
 
 /* show allocated blocks on stderr */
 #define RESOURCE_DEBUG 0
-#define RESOURCE_DEBUG_SIZE 1000000
+#define RESOURCE_DEBUG_SIZE 10000
 
 #define RECLAMATION_FACTOR 0.20
 #define WE_WANT_EVER_GROWING_ALLOCATIONS 0
@@ -548,10 +548,9 @@ alloc_new_block(PARROT_INTERP, ARGMOD(GC_Statistics *stats),
 
     const size_t alloc_size = (size > pool->minimum_block_size)
             ? size : pool->minimum_block_size;
-
-#if RESOURCE_DEBUG
-    fprintf(stderr, "new_block (%s) size %u -> %u\n",
-        why, size, alloc_size);
+#ifndef NDEBUG
+    MEMORY_DEBUG_DETAIL_3("new_block (%s) size %u -> %u\n",
+                          why, size, alloc_size);
 #else
     UNUSED(why)
 #endif
@@ -668,6 +667,7 @@ memory alignment.
 
 */
 
+PARROT_INLINE
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static char *
@@ -694,7 +694,8 @@ string C<"???">.
 
 */
 
-#if RESOURCE_DEBUG
+#ifndef NDEBUG
+
 PARROT_CANNOT_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
 static const char *
@@ -798,7 +799,6 @@ compact_pool(PARROT_INTERP,
     stats->memory_used      += new_size;
 
     free_old_mem_blocks(stats, pool, new_block, total_size);
-
     Parrot_unblock_GC_sweep(interp);
 }
 
@@ -821,8 +821,11 @@ move_buffer_callback(PARROT_INTERP, ARGIN(Parrot_Buffer *b), ARGIN(void *data))
     if (Buffer_buflen(b) && PObj_is_movable_TESTALL(b)) {
         Memory_Block * const old_block = Buffer_pool(b);
 
-        if (!is_block_almost_full(old_block))
+        if (!is_block_almost_full(old_block)) {
+            MEMORY_DEBUG_DETAIL_3("Move buffer %2u %p => %p\n",
+                                  (unsigned)Buffer_buflen(b), old_block, new_block);
             move_one_buffer(interp, new_block, b);
+        }
     }
 
 }
@@ -918,9 +921,11 @@ move_one_buffer(PARROT_INTERP, ARGIN(Memory_Block *pool),
 
     INTVAL       *flags     = NULL;
     ptrdiff_t     offset    = 0;
-#if RESOURCE_DEBUG
-    if (Buffer_buflen(old_buf) >= RESOURCE_DEBUG_SIZE)
-        debug_print_buf(interp, old_buf);
+#ifndef NDEBUG
+    if (Interp_debug_TEST(interp,
+            PARROT_MEM_STAT_DEBUG_FLAG | PARROT_MEM_DETAIL_DEBUG_FLAG))
+        if (Buffer_buflen(old_buf) >= RESOURCE_DEBUG_SIZE)
+            debug_print_buf(interp, old_buf);
 #else
     UNUSED(interp);
 #endif

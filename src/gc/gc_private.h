@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2014, Parrot Foundation.
+Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -32,6 +32,7 @@ extern int CONSERVATIVE_POINTER_CHASING;
 
 #ifndef MEMORY_DEBUG
 #  define MEMORY_DEBUG_DETAIL_2(s, a1, a2)
+#  define MEMORY_DEBUG_DETAIL_3(s, a1, a2, a3)
 #  define GC_DEBUG_DETAIL(s)
 #  define GC_DEBUG_DETAIL_FLAGS(s, pmc)
 #  define GC_DEBUG_DETAIL_STR(s, str)
@@ -46,6 +47,10 @@ extern int CONSERVATIVE_POINTER_CHASING;
     if (Interp_debug_TEST(interp, \
                 PARROT_MEM_STAT_DEBUG_FLAG | PARROT_MEM_DETAIL_DEBUG_FLAG)) \
         fprintf(stderr, (s), (a1), (a2))
+#  define MEMORY_DEBUG_DETAIL_3(s, a1, a2, a3)  \
+    if (Interp_debug_TEST(interp, \
+                PARROT_MEM_STAT_DEBUG_FLAG | PARROT_MEM_DETAIL_DEBUG_FLAG)) \
+        fprintf(stderr, (s), (a1), (a2), (a3))
 #  define GC_DEBUG_DETAIL(s) \
     if (Interp_debug_TEST(interp, \
                 PARROT_MEM_STAT_DEBUG_FLAG | PARROT_GC_DETAIL_DEBUG_FLAG)) \
