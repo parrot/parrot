@@ -18145,25 +18145,53 @@ Parrot_inc_p(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_mod_i_i(opcode_t *cur_opcode, PARROT_INTERP) {
-    IREG(1) = Parrot_util_intval_mod(IREG(1), IREG(2));
+    #if defined(PARROT_SLOW_MOD)
+        IREG(1) = Parrot_util_intval_mod(IREG(1), IREG(2));
+
+#else
+        IREG(1) = (IREG(1) % IREG(2));
+
+#endif
+;
     return cur_opcode + 3;
 }
 
 opcode_t *
 Parrot_mod_i_ic(opcode_t *cur_opcode, PARROT_INTERP) {
-    IREG(1) = Parrot_util_intval_mod(IREG(1), ICONST(2));
+    #if defined(PARROT_SLOW_MOD)
+        IREG(1) = Parrot_util_intval_mod(IREG(1), ICONST(2));
+
+#else
+        IREG(1) = (IREG(1) % ICONST(2));
+
+#endif
+;
     return cur_opcode + 3;
 }
 
 opcode_t *
 Parrot_mod_n_n(opcode_t *cur_opcode, PARROT_INTERP) {
-    NREG(1) = Parrot_util_floatval_mod(NREG(1), NREG(2));
+    #if defined(PARROT_SLOW_MOD)
+        NREG(1) = Parrot_util_floatval_mod(NREG(1), NREG(2));
+
+#else
+        NREG(1) = ((NREG(1) - (NREG(2) * floor((NREG(1) / NREG(2))))));
+
+#endif
+;
     return cur_opcode + 3;
 }
 
 opcode_t *
 Parrot_mod_n_nc(opcode_t *cur_opcode, PARROT_INTERP) {
-    NREG(1) = Parrot_util_floatval_mod(NREG(1), NCONST(2));
+    #if defined(PARROT_SLOW_MOD)
+        NREG(1) = Parrot_util_floatval_mod(NREG(1), NCONST(2));
+
+#else
+        NREG(1) = ((NREG(1) - (NCONST(2) * floor((NREG(1) / NCONST(2))))));
+
+#endif
+;
     return cur_opcode + 3;
 }
 
@@ -18199,37 +18227,79 @@ Parrot_mod_p_nc(opcode_t *cur_opcode, PARROT_INTERP) {
 
 opcode_t *
 Parrot_mod_i_i_i(opcode_t *cur_opcode, PARROT_INTERP) {
-    IREG(1) = Parrot_util_intval_mod(IREG(2), IREG(3));
+    #if defined(PARROT_SLOW_MOD)
+        IREG(1) = Parrot_util_intval_mod(IREG(2), IREG(3));
+
+#else
+        IREG(1) = (IREG(2) % IREG(3));
+
+#endif
+;
     return cur_opcode + 4;
 }
 
 opcode_t *
 Parrot_mod_i_ic_i(opcode_t *cur_opcode, PARROT_INTERP) {
-    IREG(1) = Parrot_util_intval_mod(ICONST(2), IREG(3));
+    #if defined(PARROT_SLOW_MOD)
+        IREG(1) = Parrot_util_intval_mod(ICONST(2), IREG(3));
+
+#else
+        IREG(1) = (ICONST(2) % IREG(3));
+
+#endif
+;
     return cur_opcode + 4;
 }
 
 opcode_t *
 Parrot_mod_i_i_ic(opcode_t *cur_opcode, PARROT_INTERP) {
-    IREG(1) = Parrot_util_intval_mod(IREG(2), ICONST(3));
+    #if defined(PARROT_SLOW_MOD)
+        IREG(1) = Parrot_util_intval_mod(IREG(2), ICONST(3));
+
+#else
+        IREG(1) = (IREG(2) % ICONST(3));
+
+#endif
+;
     return cur_opcode + 4;
 }
 
 opcode_t *
 Parrot_mod_n_n_n(opcode_t *cur_opcode, PARROT_INTERP) {
-    NREG(1) = Parrot_util_floatval_mod(NREG(2), NREG(3));
+    #if defined(PARROT_SLOW_MOD)
+        NREG(1) = Parrot_util_floatval_mod(NREG(2), NREG(3));
+
+#else
+        NREG(1) = ((NREG(2) - (NREG(3) * floor((NREG(2) / NREG(3))))));
+
+#endif
+;
     return cur_opcode + 4;
 }
 
 opcode_t *
 Parrot_mod_n_nc_n(opcode_t *cur_opcode, PARROT_INTERP) {
-    NREG(1) = Parrot_util_floatval_mod(NCONST(2), NREG(3));
+    #if defined(PARROT_SLOW_MOD)
+        NREG(1) = Parrot_util_floatval_mod(NCONST(2), NREG(3));
+
+#else
+        NREG(1) = ((NCONST(2) - (NREG(3) * floor((NCONST(2) / NREG(3))))));
+
+#endif
+;
     return cur_opcode + 4;
 }
 
 opcode_t *
 Parrot_mod_n_n_nc(opcode_t *cur_opcode, PARROT_INTERP) {
-    NREG(1) = Parrot_util_floatval_mod(NREG(2), NCONST(3));
+    #if defined(PARROT_SLOW_MOD)
+        NREG(1) = Parrot_util_floatval_mod(NREG(2), NCONST(3));
+
+#else
+        NREG(1) = ((NREG(2) - (NCONST(3) * floor((NREG(2) / NCONST(3))))));
+
+#endif
+;
     return cur_opcode + 4;
 }
 

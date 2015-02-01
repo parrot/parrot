@@ -257,6 +257,14 @@ END_PRINT
 
 print OUT <<'END_PRINT';
 
+/* No configure probe or cmdline option for this yet.
+   Optionally use fast '%' for mod, or the "corrected mod" for negative arguments.
+   See src/utils.c:Parrot_util_intval_mod(). This is ~3.5% slower. */
+#define PARROT_SLOW_MOD
+END_PRINT
+
+print OUT <<'END_PRINT';
+
 #endif /* PARROT_FEATURE_H_GUARD */
 END_PRINT
 

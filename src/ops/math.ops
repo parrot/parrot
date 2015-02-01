@@ -564,11 +564,19 @@ References:
 =cut
 
 op mod(inout INT, in INT)  {
-    $1 = Parrot_util_intval_mod($1, $2);
+#ifdef PARROT_SLOW_MOD
+  $1 = Parrot_util_intval_mod($1, $2);
+#else
+  $1 = $1 % $2;
+#endif
 }
 
 op mod(inout NUM, in NUM)  {
+#ifdef PARROT_SLOW_MOD
     $1 = Parrot_util_floatval_mod($1, $2);
+#else
+    $1 = ($1 - $2 * floor($1 / $2));
+#endif
 }
 
 inline op mod(invar PMC, invar PMC)  {
@@ -584,11 +592,19 @@ inline op mod(invar PMC, in NUM)  {
 }
 
 op mod(out INT, in INT, in INT)  {
-    $1 = Parrot_util_intval_mod($2, $3);
+#ifdef PARROT_SLOW_MOD
+  $1 = Parrot_util_intval_mod($2, $3);
+#else
+  $1 = $2 % $3;
+#endif
 }
 
 op mod(out NUM, in NUM, in NUM)  {
+#ifdef PARROT_SLOW_MOD
     $1 = Parrot_util_floatval_mod($2, $3);
+#else
+    $1 = ($2 - $3 * floor($2 / $3));
+#endif
 }
 
 inline op mod(invar PMC, invar PMC, invar PMC)  {
@@ -813,7 +829,7 @@ inline op is_inf_or_nan(out INT, in NUM)  {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2014, Parrot Foundation.
+Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 LICENSE
 

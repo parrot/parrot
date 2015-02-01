@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003-2014, Parrot Foundation.
+Copyright (C) 2003-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -945,25 +945,39 @@ Calculates modulus in place.
 
     MULTI PMC *modulus(DEFAULT value, PMC *dest) :no_wb {
         UNUSED(dest)
-        const INTVAL d = VTABLE_get_integer(INTERP, value);
+        const volatile INTVAL d = VTABLE_get_integer(INTERP, value);
+        volatile INTVAL result;
+        const volatile INTVAL i1 = SELF.get_integer();
 
         if (d == 0)
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                     "int modulus by zero");
-
+#ifdef PARROT_SLOW_MOD
+        result = Parrot_util_intval_mod(i1, d);
+#else
+        result = i1 % d;
+#endif
         return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
-                Parrot_util_intval_mod(SELF.get_integer(), d));
+                                       result);
     }
 
 
     VTABLE PMC *modulus_int(INTVAL value, PMC *dest) :no_wb {
         UNUSED(dest)
+        volatile INTVAL result;
+        const volatile INTVAL i1 = SELF.get_integer();
+
         if (value == 0)
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                     "int modulus by zero");
 
+#ifdef PARROT_SLOW_MOD
+        result = Parrot_util_intval_mod(i1, value);
+#else
+        result = i1 % value;
+#endif
         return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
-                Parrot_util_intval_mod(SELF.get_integer(), value));
+                                       result);
     }
 
 
@@ -993,23 +1007,36 @@ Calculates modulus in place.
 
     MULTI void i_modulus(DEFAULT value) :manual_wb {
         const INTVAL d = VTABLE_get_integer(INTERP, value);
+        const volatile INTVAL i1 = SELF.get_integer();
+        volatile INTVAL result;
 
         if (d == 0)
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                     "int modulus by zero");
 
-        VTABLE_set_integer_native(INTERP, SELF,
-                Parrot_util_intval_mod(SELF.get_integer(), d));
+#ifdef PARROT_SLOW_MOD
+        result = Parrot_util_intval_mod(i1, d);
+#else
+        result = i1 % d;
+#endif
+        VTABLE_set_integer_native(INTERP, SELF, result);
     }
 
 
     VTABLE void i_modulus_int(INTVAL value) :manual_wb {
+        const volatile INTVAL i1 = SELF.get_integer();
+        volatile INTVAL result;
+
         if (value == 0)
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                     "int modulus by zero");
 
-        VTABLE_set_integer_native(INTERP, SELF,
-                Parrot_util_intval_mod(SELF.get_integer(), value));
+#ifdef PARROT_SLOW_MOD
+        result = Parrot_util_intval_mod(i1, value);
+#else
+        result = i1 % value;
+#endif
+        VTABLE_set_integer_native(INTERP, SELF, result);
     }
 
 
