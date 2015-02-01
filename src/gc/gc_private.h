@@ -669,11 +669,6 @@ PARROT_PURE_FUNCTION
 int Parrot_gc_ms_needed(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-static void gc_ms_print_stats_always(PARROT_INTERP,
-    ARGIN(const char* header))
-        __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
-
 #define ASSERT_ARGS_gc_ms_allocate_buffer_storage __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str))
@@ -711,9 +706,6 @@ static void gc_ms_print_stats_always(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_gc_ms_needed __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
-#define ASSERT_ARGS_void gc_ms_print_stats_always __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(header))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/gc/gc_ms.c */
 
