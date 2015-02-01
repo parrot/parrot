@@ -150,7 +150,8 @@ typedef void        (*io_vtable_set_position) (PARROT_INTERP, PMC *handle,
                                                const PIOOFF_T pos);
 typedef PIOOFF_T    (*io_vtable_get_position) (PARROT_INTERP, const PMC *handle);
 typedef INTVAL      (*io_vtable_open)         (PARROT_INTERP, PMC *handle,
-                                                ARGIN(const STRING *path), const INTVAL flags,
+                                                ARGIN(const STRING *path),
+                                                const INTVAL flags,
                                                 ARGIN(const STRING *mode));
 typedef INTVAL      (*io_vtable_is_open)      (PARROT_INTERP, const PMC *handle);
 typedef INTVAL      (*io_vtable_close)        (PARROT_INTERP, PMC *handle);
