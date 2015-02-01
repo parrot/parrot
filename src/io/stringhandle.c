@@ -263,7 +263,7 @@ io_stringhandle_read_b(PARROT_INTERP, ARGMOD(const PMC *handle), ARGOUT(const ch
     available_bytes = stringhandle->bufused - read_offs;
     if (byte_length > available_bytes)
         new_byte_length = available_bytes;
-    else 
+    else
         new_byte_length = byte_length;
 
     memcpy(buffer, (char*)stringhandle->_bufstart + read_offs, new_byte_length);

@@ -154,7 +154,8 @@ typedef INTVAL      (*io_vtable_open)         (PARROT_INTERP, const PMC *handle,
                                                 ARGIN(const STRING *mode));
 typedef INTVAL      (*io_vtable_is_open)      (PARROT_INTERP, const PMC *handle);
 typedef INTVAL      (*io_vtable_close)        (PARROT_INTERP, const PMC *handle);
-typedef void        (*io_vtable_set_flags)    (PARROT_INTERP, const PMC *handle, const INTVAL flags);
+typedef void        (*io_vtable_set_flags)    (PARROT_INTERP, const PMC *handle,
+                                               const INTVAL flags);
 typedef INTVAL      (*io_vtable_get_flags)    (PARROT_INTERP, const PMC *handle);
 typedef size_t      (*io_vtable_total_size)   (PARROT_INTERP, const PMC *handle);
 typedef PIOHANDLE   (*io_vtable_get_piohandle)(PARROT_INTERP, const PMC *handle);
