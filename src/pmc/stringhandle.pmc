@@ -83,13 +83,14 @@ Initializes a newly created StringHandle object.
                 (Parrot_StringHandle_attributes *) PMC_data(SELF);
 
         data_struct->flags        = 0;
+        data_struct->read_offset  = 0;
         data_struct->stringhandle = NULL;
         data_struct->mode         = NULL;
-        data_struct->encoding     = STRINGNULL;
         data_struct->filename     = NULL;
-        data_struct->read_offset  = 0;
+        /* inherited from Handle: */
+        data_struct->encoding     = STRINGNULL;
         data_struct->io_vtable    = (IO_VTABLE *)Parrot_io_get_vtable(interp,
-                                                                    IO_VTABLE_STRINGHANDLE, NULL);
+                                                     IO_VTABLE_STRINGHANDLE, NULL);
         data_struct->read_buffer  = NULL;
         data_struct->write_buffer = NULL;
         data_struct->record_separator = CONST_STRING(interp, "\n");
@@ -113,9 +114,15 @@ Create a copy of the stringhandle.
         Parrot_StringHandle_attributes * const data_struct = PARROT_STRINGHANDLE(copy);
 
         data_struct->stringhandle = old_struct->stringhandle;
-        data_struct->mode     = old_struct->mode;
-        data_struct->encoding = old_struct->encoding;
-        data_struct->flags    = old_struct->flags;
+        data_struct->mode         = old_struct->mode;
+        data_struct->encoding     = old_struct->encoding;
+        data_struct->flags        = old_struct->flags;
+
+        data_struct->read_offset  = old_struct->read_offset;
+        data_struct->filename     = old_struct->filename;
+        data_struct->read_buffer  = old_struct->read_buffer;
+        data_struct->write_buffer = old_struct->write_buffer;
+        data_struct->record_separator = old_struct->record_separator;
 
         return copy;
     }

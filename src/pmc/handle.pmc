@@ -38,7 +38,7 @@ pmclass Handle provides Handle manual_attrs {
     ATTR IO_VTABLE *io_vtable;          /* Function dispatch table */
     ATTR IO_BUFFER *read_buffer;        /* Read Buffer */
     ATTR IO_BUFFER *write_buffer;       /* Write Buffer */
-    ATTR STRING *encoding;              /* The encoding for read/write  */
+    ATTR STRING    *encoding;           /* The encoding for read/write */
 
 
     VTABLE void init() :no_wb {
