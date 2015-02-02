@@ -176,12 +176,6 @@ typedef struct MarkSweep_GC {
     /* During M&S gather new live objects in this list */
     struct Parrot_Pointer_Array     *dirty_list;
 
-    /*
-     * During checking of dirty_list it will be set to generation of youngest
-     * child
-     */
-    size_t    youngest_child;
-
     /* Currently allocate objects. */
     struct Parrot_Pointer_Array     *objects[GC_MAX_GENERATIONS];
 
@@ -197,23 +191,24 @@ typedef struct MarkSweep_GC {
     /* String GC */
     struct String_GC        string_gc;
 
-    /* Amount of allocated memory before trigger gc */
-    size_t                  gc_threshold;
-
     /* During GC phase - which generation we are collecting */
     size_t                  gen_to_collect;
 
+    /* During checking of dirty_list it will be set to generation of youngest
+     * child  */
+    size_t    youngest_child;
+
+    /* Amount of allocated memory before trigger gc */
+    size_t                  gc_threshold;
+
     /* GC blocking */
-    UINTVAL gc_mark_block_level;  /* How many outstanding GC block
-                                     requests are there? */
-    UINTVAL gc_mark_block_level_locked;  /* How many outstanding GC block
-                                     requests are there from other threads? */
-    UINTVAL gc_sweep_block_level; /* How many outstanding GC block
-                                     requests are there? */
+    UINTVAL gc_mark_block_level:8;  /* Num of outstanding GC block requests */
+    UINTVAL gc_sweep_block_level:8; /* Num of outstanding GC block requests */
+    UINTVAL gc_mark_block_level_locked:8;  /* GC block requests from other threads? */
+    UINTVAL locked:8;               /* is the GC lock already taken? */
 
     UINTVAL num_early_gc_PMCs;    /* how many PMCs want immediate destruction */
 
-    UINTVAL locked;               /* is the GC lock already taken? */
 
 } MarkSweep_GC;
 
@@ -727,6 +722,11 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     interp->gc_sys->block_sweep                 = gc_gms_block_GC_sweep;
     interp->gc_sys->unblock_sweep               = gc_gms_unblock_GC_sweep;
     interp->gc_sys->is_blocked_sweep            = gc_gms_is_blocked_GC_sweep;
+
+    /* already zeroed
+    interp->gc_sys->block_move                  = NULL;
+    interp->gc_sys->unblock_move                = NULL;
+    interp->gc_sys->is_blocked_move             = NULL; */
 
     interp->gc_sys->allocate_string_storage     = gc_gms_allocate_string_storage;
     interp->gc_sys->reallocate_string_storage   = gc_gms_reallocate_string_storage;

@@ -256,15 +256,18 @@ typedef struct GC_Subsystem {
             size_t oldsize, size_t newsize);
     void (*free_memory_chunk)(PARROT_INTERP, ARGFREE(void *data));
 
+    /* locks and semaphores for the 3 phases or threaded access */
     void (*block_mark)(PARROT_INTERP);
     void (*unblock_mark)(PARROT_INTERP);
+    unsigned int (*is_blocked_mark)(PARROT_INTERP);
     void (*block_mark_locked)(PARROT_INTERP);
     void (*unblock_mark_locked)(PARROT_INTERP);
-    unsigned int (*is_blocked_mark)(PARROT_INTERP);
-
     void (*block_sweep)(PARROT_INTERP);
     void (*unblock_sweep)(PARROT_INTERP);
     unsigned int (*is_blocked_sweep)(PARROT_INTERP);
+    void (*block_move)(PARROT_INTERP);
+    void (*unblock_move)(PARROT_INTERP);
+    unsigned int (*is_blocked_move)(PARROT_INTERP);
 
     /* Introspection. Each GC must provide this function. Even with fake data */
     /* Return by value to simplify memory management */
@@ -397,16 +400,14 @@ typedef struct Memory_Pools {
     Fixed_Size_Pool     *constant_pmc_pool;
     Fixed_Size_Pool     *constant_string_header_pool;
     Fixed_Size_Pool    **sized_header_pools;
-    size_t               num_sized;
-
     PMC_Attribute_Pool **attrib_pools;
+    size_t               num_sized;
     size_t               num_attribs;
 
     /* GC blocking */
-    UINTVAL gc_mark_block_level;  /* How many outstanding GC block
-                                     requests are there? */
-    UINTVAL gc_sweep_block_level; /* How many outstanding GC block
-                                     requests are there? */
+    UINTVAL gc_mark_block_level:8;  /* Num of outstanding GC block requests */
+    UINTVAL gc_sweep_block_level:8; /* Num of outstanding GC block requests */
+    UINTVAL gc_move_block_level:8;  /* for the compacting/move phase */
 
     PMC    *gc_mark_start;        /* first PMC marked during a GC run */
     PMC    *gc_mark_ptr;          /* last PMC marked during a GC run */

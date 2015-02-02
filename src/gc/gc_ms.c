@@ -8,7 +8,7 @@ src/gc/gc_ms.c - Basic mark & sweep garbage collector
 =head1 DESCRIPTION
 
 This code implements a basic mark and sweep garbage collector
-without generations.
+without generations, but a final string pool compaction phase.
 
 =cut
 
@@ -87,6 +87,9 @@ static STRING* gc_ms_allocate_string_header(PARROT_INTERP, UINTVAL flags)
 static void gc_ms_block_GC_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+static void gc_ms_block_GC_move(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 static void gc_ms_block_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -148,6 +151,9 @@ static size_t gc_ms_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
         __attribute__nonnull__(1);
 
 static unsigned int gc_ms_is_blocked_GC_mark(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+static unsigned int gc_ms_is_blocked_GC_move(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 static unsigned int gc_ms_is_blocked_GC_sweep(PARROT_INTERP)
@@ -236,6 +242,9 @@ static int gc_ms_trace_active_PMCs(PARROT_INTERP,
 static void gc_ms_unblock_GC_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+static void gc_ms_unblock_GC_move(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 static void gc_ms_unblock_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -300,6 +309,8 @@ static void Parrot_gc_initialize_fixed_size_pools(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms_block_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_ms_block_GC_move __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms_block_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms_destroy_child_interp __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -332,6 +343,8 @@ static void Parrot_gc_initialize_fixed_size_pools(PARROT_INTERP,
 #define ASSERT_ARGS_gc_ms_get_gc_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms_is_blocked_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_ms_is_blocked_GC_move __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms_is_blocked_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -374,6 +387,8 @@ static void Parrot_gc_initialize_fixed_size_pools(PARROT_INTERP,
 #define ASSERT_ARGS_gc_ms_trace_active_PMCs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms_unblock_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_ms_unblock_GC_move __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms_unblock_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -476,6 +491,10 @@ Parrot_gc_ms_init(PARROT_INTERP, SHIM(Parrot_GC_Init_Args *args))
     interp->gc_sys->block_sweep      = gc_ms_block_GC_sweep;
     interp->gc_sys->unblock_sweep    = gc_ms_unblock_GC_sweep;
     interp->gc_sys->is_blocked_sweep = gc_ms_is_blocked_GC_sweep;
+
+    interp->gc_sys->block_move       = gc_ms_block_GC_move;
+    interp->gc_sys->unblock_move     = gc_ms_unblock_GC_move;
+    interp->gc_sys->is_blocked_move  = gc_ms_is_blocked_GC_move;
 
     interp->gc_sys->get_gc_info      = gc_ms_get_gc_info;
 
@@ -1192,7 +1211,8 @@ Parrot_gc_initialize_fixed_size_pools(PARROT_INTERP,
     mem_pools->num_attribs = init_num_pools;
 #ifndef NDEBUG
         if (Interp_debug_TEST(interp, PARROT_MEM_STAT_DEBUG_FLAG)) {
-            fprintf(stderr, "GC initialize_fixed_size_pools: size="SIZE_FMT" num_pools="SIZE_FMT"\n",
+            fprintf(stderr, "GC initialize_fixed_size_pools: size="SIZE_FMT
+                            " num_pools="SIZE_FMT"\n",
                     total_size, init_num_pools);
         }
 #endif
@@ -1777,6 +1797,14 @@ Blocks the GC from performing its sweep phase.
 
 Unblocks GC sweep.
 
+=item C<static void gc_ms_block_GC_move(PARROT_INTERP)>
+
+Blocks the GC from performing its compacting/move phase.
+
+=item C<static void gc_ms_unblock_GC_move(PARROT_INTERP)>
+
+Unblocks GC compacting/move phase.
+
 =item C<static unsigned int gc_ms_is_blocked_GC_mark(PARROT_INTERP)>
 
 Determines if the GC mark is currently blocked.
@@ -1784,6 +1812,10 @@ Determines if the GC mark is currently blocked.
 =item C<static unsigned int gc_ms_is_blocked_GC_sweep(PARROT_INTERP)>
 
 Determines if the GC sweep is currently blocked.
+
+=item C<static unsigned int gc_ms_is_blocked_GC_move(PARROT_INTERP)>
+
+Determines if the GC compacting/move phase is currently blocked.
 
 =cut
 
@@ -1823,6 +1855,23 @@ gc_ms_unblock_GC_sweep(PARROT_INTERP)
         --mem_pools->gc_sweep_block_level;
 }
 
+static void
+gc_ms_block_GC_move(PARROT_INTERP)
+{
+    ASSERT_ARGS(gc_ms_block_GC_move)
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
+    ++mem_pools->gc_move_block_level;
+}
+
+static void
+gc_ms_unblock_GC_move(PARROT_INTERP)
+{
+    ASSERT_ARGS(gc_ms_unblock_GC_move)
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
+    if (mem_pools->gc_move_block_level)
+        --mem_pools->gc_move_block_level;
+}
+
 static unsigned int
 gc_ms_is_blocked_GC_mark(PARROT_INTERP)
 {
@@ -1837,6 +1886,14 @@ gc_ms_is_blocked_GC_sweep(PARROT_INTERP)
     ASSERT_ARGS(gc_ms_is_blocked_GC_sweep)
     Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
     return mem_pools->gc_sweep_block_level;
+}
+
+static unsigned int
+gc_ms_is_blocked_GC_move(PARROT_INTERP)
+{
+    ASSERT_ARGS(gc_ms_is_blocked_GC_move)
+    Memory_Pools * const mem_pools = (Memory_Pools *)interp->gc_sys->gc_private;
+    return mem_pools->gc_move_block_level;
 }
 
 /*

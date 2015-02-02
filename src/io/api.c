@@ -699,12 +699,12 @@ Parrot_io_read_s(PARROT_INTERP, ARGMOD(PMC *handle), size_t length)
 
     {
         const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
-        IO_BUFFER * read_buffer = IO_GET_READ_BUFFER(interp, handle);
+        IO_BUFFER *       read_buffer  = IO_GET_READ_BUFFER(interp, handle);
         IO_BUFFER * const write_buffer = IO_GET_WRITE_BUFFER(interp, handle);
-        const STR_VTABLE * encoding = vtable->get_encoding(interp, handle);
+        const STR_VTABLE * encoding    = vtable->get_encoding(interp, handle);
         STRING * s;
 
-        Parrot_block_GC_sweep(interp); /* Our local strings may not move away. GH #1196 */
+        Parrot_block_GC_move(interp); /* Our local strings may not move away. GH #1196 */
         /* read_s requires us to read in a whole number of characters, which
            might be multi-byte. This requires a read buffer. */
         /* TODO: If we have a fixed8 encoding or similar, we should be able to
@@ -717,7 +717,7 @@ Parrot_io_read_s(PARROT_INTERP, ARGMOD(PMC *handle), size_t length)
 
         s = io_read_encoded_string(interp, handle, vtable, read_buffer, encoding, length);
         PARROT_ASSERT(s->strlen <= length);
-        Parrot_unblock_GC_sweep(interp);
+        Parrot_unblock_GC_move(interp);
         return s;
     }
 }

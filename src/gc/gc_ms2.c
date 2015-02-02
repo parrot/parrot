@@ -56,21 +56,16 @@ typedef struct MarkSweep_GC {
     /* String GC */
     struct String_GC        string_gc;
 
-    /* Maximum percentage of memory wasted */
-    size_t dynamic_threshold;
-    /* Minimum GC threhshold */
-    size_t min_threshold;
-    /* Number of allocated bytes before GC is triggered */
-    size_t gc_threshold;
-
     /* GC blocking */
-    UINTVAL gc_mark_block_level;  /* How many outstanding GC block
-                                     requests are there? */
-    UINTVAL gc_sweep_block_level; /* How many outstanding GC block
-                                     requests are there? */
+    UINTVAL gc_mark_block_level:8;  /* Num of outstanding GC block requests */
+    UINTVAL gc_sweep_block_level:8; /* Num of outstanding GC block requests */
+    UINTVAL gc_move_block_level:8;  /* for the compacting/move phase */
+
+    size_t dynamic_threshold; /* Maximum percentage of memory wasted */
+    size_t min_threshold;     /* Minimum GC threshold */
+    size_t gc_threshold;      /* Number of allocated bytes before GC is triggered */
 
     UINTVAL num_early_gc_PMCs;    /* how many PMCs want immediate destruction */
-
 } MarkSweep_GC;
 
 /* HEADERIZER HFILE: src/gc/gc_private.h */
@@ -133,6 +128,9 @@ static void gc_ms2_allocate_string_storage(PARROT_INTERP,
 static void gc_ms2_block_GC_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+static void gc_ms2_block_GC_move(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 static void gc_ms2_block_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -178,6 +176,9 @@ static size_t gc_ms2_get_gc_info(PARROT_INTERP, Interpinfo_enum which)
         __attribute__nonnull__(1);
 
 static unsigned int gc_ms2_is_blocked_GC_mark(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+static unsigned int gc_ms2_is_blocked_GC_move(PARROT_INTERP)
         __attribute__nonnull__(1);
 
 static unsigned int gc_ms2_is_blocked_GC_sweep(PARROT_INTERP)
@@ -276,6 +277,9 @@ static void gc_ms2_sweep_string_pool(PARROT_INTERP,
 static void gc_ms2_unblock_GC_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
 
+static void gc_ms2_unblock_GC_move(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 static void gc_ms2_unblock_GC_sweep(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -317,6 +321,8 @@ static void gc_ms2_validate_str(PARROT_INTERP, ARGIN(STRING *str))
     , PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_gc_ms2_block_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_ms2_block_GC_move __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_block_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_compact_memory_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -345,6 +351,8 @@ static void gc_ms2_validate_str(PARROT_INTERP, ARGIN(STRING *str))
 #define ASSERT_ARGS_gc_ms2_get_gc_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_is_blocked_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_ms2_is_blocked_GC_move __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_is_blocked_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -398,6 +406,8 @@ static void gc_ms2_validate_str(PARROT_INTERP, ARGIN(STRING *str))
     , PARROT_ASSERT_ARG(pool) \
     , PARROT_ASSERT_ARG(list))
 #define ASSERT_ARGS_gc_ms2_unblock_GC_mark __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_ms2_unblock_GC_move __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_ms2_unblock_GC_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
@@ -653,6 +663,10 @@ Parrot_gc_ms2_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     gc_sys->block_sweep                 = gc_ms2_block_GC_sweep;
     gc_sys->unblock_sweep               = gc_ms2_unblock_GC_sweep;
     gc_sys->is_blocked_sweep            = gc_ms2_is_blocked_GC_sweep;
+
+    gc_sys->block_move                  = gc_ms2_block_GC_move;
+    gc_sys->unblock_move                = gc_ms2_unblock_GC_move;
+    gc_sys->is_blocked_move             = gc_ms2_is_blocked_GC_move;
 
     gc_sys->allocate_string_storage     = gc_ms2_allocate_string_storage;
     gc_sys->reallocate_string_storage   = gc_ms2_reallocate_string_storage;
@@ -1378,6 +1392,14 @@ Blocks the GC from performing its sweep phase.
 
 Unblocks GC sweep.
 
+=item C<static void gc_ms2_block_GC_move(PARROT_INTERP)>
+
+Blocks the GC from performing its move phase.
+
+=item C<static void gc_ms2_unblock_GC_move(PARROT_INTERP)>
+
+Unblocks GC move.
+
 =item C<static unsigned int gc_ms2_is_blocked_GC_mark(PARROT_INTERP)>
 
 Determines if the GC mark is currently blocked.
@@ -1385,6 +1407,10 @@ Determines if the GC mark is currently blocked.
 =item C<static unsigned int gc_ms2_is_blocked_GC_sweep(PARROT_INTERP)>
 
 Determines if the GC sweep is currently blocked.
+
+=item C<static unsigned int gc_ms2_is_blocked_GC_move(PARROT_INTERP)>
+
+Determines if the GC compacting/move is currently blocked.
 
 =cut
 
@@ -1398,7 +1424,6 @@ gc_ms2_block_GC_mark(PARROT_INTERP)
     ++self->gc_mark_block_level;
 }
 
-
 static void
 gc_ms2_unblock_GC_mark(PARROT_INTERP)
 {
@@ -1408,7 +1433,6 @@ gc_ms2_unblock_GC_mark(PARROT_INTERP)
         --self->gc_mark_block_level;
 }
 
-
 static void
 gc_ms2_block_GC_sweep(PARROT_INTERP)
 {
@@ -1416,7 +1440,6 @@ gc_ms2_block_GC_sweep(PARROT_INTERP)
     MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
     ++self->gc_sweep_block_level;
 }
-
 
 static void
 gc_ms2_unblock_GC_sweep(PARROT_INTERP)
@@ -1427,6 +1450,22 @@ gc_ms2_unblock_GC_sweep(PARROT_INTERP)
         --self->gc_sweep_block_level;
 }
 
+static void
+gc_ms2_block_GC_move(PARROT_INTERP)
+{
+    ASSERT_ARGS(gc_ms2_block_GC_move)
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    ++self->gc_move_block_level;
+}
+
+static void
+gc_ms2_unblock_GC_move(PARROT_INTERP)
+{
+    ASSERT_ARGS(gc_ms2_unblock_GC_move)
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    if (self->gc_move_block_level)
+        --self->gc_move_block_level;
+}
 
 static unsigned int
 gc_ms2_is_blocked_GC_mark(PARROT_INTERP)
@@ -1436,7 +1475,6 @@ gc_ms2_is_blocked_GC_mark(PARROT_INTERP)
     return self->gc_mark_block_level;
 }
 
-
 static unsigned int
 gc_ms2_is_blocked_GC_sweep(PARROT_INTERP)
 {
@@ -1445,6 +1483,13 @@ gc_ms2_is_blocked_GC_sweep(PARROT_INTERP)
     return self->gc_sweep_block_level;
 }
 
+static unsigned int
+gc_ms2_is_blocked_GC_move(PARROT_INTERP)
+{
+    ASSERT_ARGS(gc_ms2_is_blocked_GC_move)
+    MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
+    return self->gc_move_block_level;
+}
 
 /*
 

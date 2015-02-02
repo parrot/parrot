@@ -3,7 +3,7 @@ Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
-src/gc/api.c - general Parrot API for GC functions
+src/gc/api.c - general Parrot API for all GC functions
 
 =head1 DESCRIPTION
 
@@ -15,6 +15,8 @@ of the GC. This is documented in PDD 9 with supplementary notes in
 F<docs/memory_internals.pod>.
 
 =head1 GC OVERVIEW
+
+GC subsystems can be selected at run-time.
 
 The GC is broken into a number of different files that each represent different
 components.
@@ -50,10 +52,15 @@ A separate compacting garbage collector is used to keep track of them.
 
 These files are the individual GC cores which implement the primary tracing
 and sweeping logic.
-gc_ms.c implements the default mark & sweep collector core,
+
+gc_ms.c  implements the default mark & sweep collector core,
+
 gc_ms2.c implements a non-recursive mark & sweep allocator,
+
 gc_gms.c implements a generational, non-compacting, mark and sweep allocator,
+
 gc_inf.c implements an "infinite" allocator which never frees any memory.
+
 The infinite allocator is not recommended except for debugging.
 The default is currently F<gc_gms.c>, it was F<gc_ms2.c> until RELEASE_3_3_0.
 
@@ -981,6 +988,14 @@ Blocks the GC from performing its sweep phase.
 
 Unblocks GC sweep.
 
+=item C<void Parrot_block_GC_move(PARROT_INTERP)>
+
+Blocks the GC from performing its compact/move phase.
+
+=item C<void Parrot_unblock_GC_move(PARROT_INTERP)>
+
+Unblocks the GC compact/move phase.
+
 =item C<unsigned int Parrot_is_blocked_GC_mark(PARROT_INTERP)>
 
 Determines if the GC mark is currently blocked.
@@ -989,10 +1004,14 @@ Determines if the GC mark is currently blocked.
 
 Determines if the GC sweep is currently blocked.
 
+=item C<unsigned int Parrot_is_blocked_GC_move(PARROT_INTERP)>
+
+Determines if the GC string compacting phase is currently blocked.
+
 =item C<void Parrot_gc_completely_unblock(PARROT_INTERP)>
 
-Completely unblock the GC mark and sweep. This is only used at interpreter
-destruction, using it anywhere else will cause problems.
+Completely unblock the GC mark, sweep and move. This is only used at
+interpreter destruction, using it anywhere else will cause problems.
 
 =cut
 
@@ -1054,6 +1073,25 @@ Parrot_unblock_GC_sweep(PARROT_INTERP)
 }
 
 PARROT_EXPORT
+void
+Parrot_block_GC_move(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_block_GC_move)
+    if (interp->gc_sys->block_move)
+        interp->gc_sys->block_move(interp);
+
+}
+
+PARROT_EXPORT
+void
+Parrot_unblock_GC_move(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_unblock_GC_move)
+    if (interp->gc_sys->unblock_move)
+        interp->gc_sys->unblock_move(interp);
+}
+
+PARROT_EXPORT
 unsigned int
 Parrot_is_blocked_GC_mark(PARROT_INTERP)
 {
@@ -1075,6 +1113,18 @@ Parrot_is_blocked_GC_sweep(PARROT_INTERP)
         return 0;
 }
 
+
+PARROT_EXPORT
+unsigned int
+Parrot_is_blocked_GC_move(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_is_blocked_GC_move)
+    if (interp->gc_sys->is_blocked_move)
+        return interp->gc_sys->is_blocked_move(interp);
+    else
+        return 0;
+}
+
 PARROT_EXPORT
 void
 Parrot_gc_completely_unblock(PARROT_INTERP)
@@ -1084,6 +1134,8 @@ Parrot_gc_completely_unblock(PARROT_INTERP)
            Parrot_unblock_GC_mark(interp);
     while (Parrot_is_blocked_GC_sweep(interp))
            Parrot_unblock_GC_sweep(interp);
+    while (Parrot_is_blocked_GC_move(interp))
+           Parrot_unblock_GC_move(interp);
 }
 
 /*

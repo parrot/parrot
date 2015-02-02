@@ -557,6 +557,17 @@ Parrot_gc_inf_init(PARROT_INTERP, SHIM(Parrot_GC_Init_Args *args))
     interp->gc_sys->allocate_fixed_size_storage = gc_inf_allocate_fixed_size_storage;
     interp->gc_sys->free_fixed_size_storage     = gc_inf_free_fixed_size_storage;
 
+    /* already zeroed
+    interp->gc_sys->block_mark                  = NULL;
+    interp->gc_sys->unblock_mark                = NULL;
+    interp->gc_sys->is_blocked_mark             = NULL;
+    interp->gc_sys->block_sweep                 = NULL;
+    interp->gc_sys->unblock_sweep               = NULL;
+    interp->gc_sys->is_blocked_sweep            = NULL;
+    interp->gc_sys->block_move                  = NULL;
+    interp->gc_sys->unblock_move                = NULL;
+    interp->gc_sys->is_blocked_move             = NULL; */
+
     /* We don't distinguish between chunk and chunk_with_pointers */
     interp->gc_sys->allocate_memory_chunk   = gc_inf_allocate_memory_chunk;
     interp->gc_sys->reallocate_memory_chunk = gc_inf_reallocate_memory_chunk;
