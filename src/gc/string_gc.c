@@ -24,7 +24,7 @@ typedef void (*compact_f) (Interp *, GC_Statistics *stats, Variable_Size_Pool *)
 
 #define POOL_SIZE (65536 * 2)
 
-/* show allocated blocks on stderr */
+/* show allocated blocks on stderr. Replaced by --ccflags=-DMEMORY_DEBUG and -D201 */
 #define RESOURCE_DEBUG 0
 #define RESOURCE_DEBUG_SIZE 10000
 
@@ -127,8 +127,10 @@ static Variable_Size_Pool * new_memory_pool(
     size_t min_block,
     NULLOK(compact_f compact));
 
-static UINTVAL pad_pool_size(ARGIN(const Variable_Size_Pool *pool))
-        __attribute__nonnull__(1);
+static UINTVAL pad_pool_size(PARROT_INTERP,
+    ARGIN(const Variable_Size_Pool *pool))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2);
 
 #define ASSERT_ARGS_aligned_mem __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(buffer_unused) \
@@ -169,7 +171,8 @@ static UINTVAL pad_pool_size(ARGIN(const Variable_Size_Pool *pool))
     , PARROT_ASSERT_ARG(old_buf))
 #define ASSERT_ARGS_new_memory_pool __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_pad_pool_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(pool))
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pool))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: static */
 
@@ -775,7 +778,7 @@ compact_pool(PARROT_INTERP,
     ++stats->gc_collect_runs;
 
     /* Snag a block big enough for everything */
-    total_size = pad_pool_size(pool);
+    total_size = pad_pool_size(interp, pool);
 
     if (total_size == 0) {
         free_old_mem_blocks(stats, pool, pool->top_block, total_size);
@@ -833,7 +836,8 @@ move_buffer_callback(PARROT_INTERP, ARGIN(Parrot_Buffer *b), ARGIN(void *data))
 
 /*
 
-=item C<static UINTVAL pad_pool_size(const Variable_Size_Pool *pool)>
+=item C<static UINTVAL pad_pool_size(PARROT_INTERP, const Variable_Size_Pool
+*pool)>
 
 Calculate the size of the new pool. The currently used size equals the total
 size minus the reclaimable size. Add a minimum block to the current amount, so
@@ -862,13 +866,13 @@ problem easily.
 */
 
 static UINTVAL
-pad_pool_size(ARGIN(const Variable_Size_Pool *pool))
+pad_pool_size(PARROT_INTERP, ARGIN(const Variable_Size_Pool *pool))
 {
     ASSERT_ARGS(pad_pool_size)
     Memory_Block *cur_block = pool->top_block->prev;
 
     UINTVAL total_size   = 0;
-#if RESOURCE_DEBUG
+#ifndef NDEBUG
     size_t  total_blocks = 1;
 #endif
 
@@ -876,7 +880,7 @@ pad_pool_size(ARGIN(const Variable_Size_Pool *pool))
         if (!is_block_almost_full(cur_block))
             total_size += cur_block->size - cur_block->freed - cur_block->free;
         cur_block   = cur_block->prev;
-#if RESOURCE_DEBUG
+#ifndef NDEBUG
         ++total_blocks;
 #endif
     }
@@ -893,8 +897,8 @@ pad_pool_size(ARGIN(const Variable_Size_Pool *pool))
     total_size += pool->minimum_block_size;
 #endif
 
-#if RESOURCE_DEBUG
-    fprintf(stderr, "Total blocks: %d\n", total_blocks);
+#ifndef NDEBUG
+    MEMORY_DEBUG_DETAIL_2("Total blocks: %lu, size %lu\n", total_blocks, total_size);
 #endif
 
     return total_size;
