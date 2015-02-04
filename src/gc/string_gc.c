@@ -811,7 +811,7 @@ compact_pool(PARROT_INTERP,
 =item C<static void move_buffer_callback(PARROT_INTERP, Parrot_Buffer *b, void
 *data)>
 
-Callback for live STRING/Buffer for compating.
+Callback for live STRING/Buffer for compacting.
 
 =cut
 
