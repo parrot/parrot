@@ -1,6 +1,7 @@
 2014-02-17    release 7.1.0
     - Core
-        +
+        + Fix SIGBUS in GC trace_mem_block on alignment-strict CPUs (arm), #1200.
+          We traced all pointers by +1 and not by +4 or +8.
     - Build
     - Documentation
     - Tests
