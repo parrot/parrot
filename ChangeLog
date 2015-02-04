@@ -1,6 +1,10 @@
-2016-??-??    release 8.3.0
+2025-??-??    release 8.3.0
     - Core
-        + fix binding AF_UNIX sockets GH #1233 by Andrew Aldridge
+        + Fix binding AF_UNIX sockets GH #1233 by Andrew Aldridge
+        + Fix SIGBUS in GC trace_mem_block on alignment-strict CPUs (arm), #1200.
+          We traced all pointers +1 and not by +4 or +8.
+    - Build
+        + Fix most modern compiler warnings (gcc and clang)
 
 2016-03-15    release 8.2.0
     - Core
@@ -81,6 +85,7 @@
     - Core
         + structview
             = Added missing returns to switch/case.
+)
     - Build
     - Documentation
     - Tests
