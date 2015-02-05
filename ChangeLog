@@ -2,7 +2,7 @@
     - Core
         + Fix binding AF_UNIX sockets GH #1233 by Andrew Aldridge
         + Fix SIGBUS in GC trace_mem_block on alignment-strict CPUs (arm), #1200.
-          We traced all pointers +1 and not by +4 or +8.
+          We traced all pointers by +1 and not by +4 or +8.
     - Build
         + Fix most modern compiler warnings (gcc and clang)
 
