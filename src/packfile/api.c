@@ -341,10 +341,11 @@ PackFile *
 Parrot_pf_deserialize(PARROT_INTERP, ARGIN(STRING *str))
 {
     ASSERT_ARGS(Parrot_pf_deserialize)
-    PackFile       * const pf  = Parrot_pf_new(interp, 0);
-    const opcode_t * const ptr =
-            (const opcode_t *)Parrot_str_cstring(interp, str);
-    const int length           = Parrot_str_byte_length(interp, str);
+    PackFile       * const pf   = Parrot_pf_new(interp, 0);
+    const char     * const cstr = Parrot_str_cstring(interp, str);
+    /* XXX -Wcast-align Need to check alignment for RISC, or memcpy */
+    const opcode_t * const ptr  = (const opcode_t *)cstr;
+    const int length            = Parrot_str_byte_length(interp, str);
 
     if (!Parrot_pf_unpack(interp, pf, ptr, length)) {
         Parrot_pf_destroy(interp, pf);
@@ -2687,6 +2688,7 @@ read_pbc_file_packfile_handle(PARROT_INTERP, ARGIN(STRING * const fullname),
     PackFile * const pf = Parrot_pf_new(interp, 0);
     pf->options = 0;
 
+    /* XXX -Wcast-align Need to check alignment for RISC, or memcpy */
     if (!Parrot_pf_unpack(interp, pf, (opcode_t *)program_code, (size_t)program_size))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Can't unpack packfile %Ss", fullname);
@@ -2796,6 +2798,7 @@ read_pbc_file_packfile(PARROT_INTERP, ARGIN(STRING * const fullname),
     pf = Parrot_pf_new(interp, is_mapped);
     pf->options = 0;
 
+    /* XXX -Wcast-align Need to check alignment for RISC, or memcpy */
     if (!Parrot_pf_unpack(interp, pf, (opcode_t *)program_code, (size_t)program_size))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Can't unpack packfile %Ss", fullname);

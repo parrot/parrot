@@ -77,6 +77,7 @@ Parrot_api_load_bytecode_bytes(Parrot_PMC interp_pmc,
     PARROT_ASSERT(pf);
 
     Parrot_block_GC_mark(interp);
+    /* XXX -Wcast-align Need to check alignment for RISC, or memcpy #1201 */
     if (!Parrot_pf_unpack(interp, pf, (const opcode_t *)pbc, bytecode_size)) {
         Parrot_unblock_GC_mark(interp);
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_MALFORMED_PACKFILE,
