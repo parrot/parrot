@@ -2,12 +2,11 @@
     - Core
         + Fix SIGBUS in GC trace_mem_block on alignment-strict CPUs (arm), #1200.
           We traced all pointers by +1 and not by +4 or +8.
-    - Build
-    - Documentation
     - Tests
         + Add a common GC stress test to the normal testsuite. #1189
         + Fix tests for --ccflags=-DSTRUCT_DEBUG. #1195
     - Community
+        + rakudo perl6 announced to drop parrot support.
 
 2014-01-29    release 7.0.2 - supported
     - Core

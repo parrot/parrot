@@ -1,9 +1,9 @@
 {
-    "release.version"  : "7.0.2",
-    "release.name"     : "Crimson Shining Parrot",
+    "release.version"  : "7.1.0",
+    "release.name"     : "Lilian's Lovebird",
     "release.day"      : "Thursday",
-    "release.nextdate" : "17 Feb 2015",
-    "release.type"     : "supported",
+    "release.nextdate" : "17 Mar 2015",
+    "release.type"     : "devel",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -12,10 +12,10 @@
     "web.org_root"     : "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "14 Feb 2015",
+    "bugday.date"      : "14 Mar 2015",
 
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
-    "wiki.bugday"      : "bug_day_2015_02_14",
+    "wiki.bugday"      : "bug_day_2015_03_14",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/7.0.2/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/7.1.0/"
 }
