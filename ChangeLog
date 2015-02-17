@@ -1,3 +1,10 @@
+2014-03-17    release 7.2.0
+    - Core
+    - Build
+    - Documentation
+    - Tests
+    - Community
+
 2014-02-17    release 7.1.0
     - Core
         + Fix SIGBUS in GC trace_mem_block on alignment-strict CPUs (arm), #1200.
