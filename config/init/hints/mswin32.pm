@@ -91,7 +91,10 @@ sub runstep {
             $ld = 'link';
             $conf->data->set( ld   => $ld );
             my $link = $conf->options->get('link');
-            $conf->data->set( link => $ld ) unless $link;
+            if (!$link) {
+                $conf->data->set( link => $ld );
+                $link = $ld;
+            }
             if ($link =~ /cl(\.exe)?$/i) {
                 $conf->data->set( link => $ld );
                 $conf->debug(" link => '$ld', ");
