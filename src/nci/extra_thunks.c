@@ -9,9 +9,9 @@
 
 /* src/nci/extra_thunks.c
  *  Copyright (C) 2010-2015, Parrot Foundation.
- *
- *  Native Call Interface routines.
- *  Code to call C from parrot without libffi.
+ *  Overview:
+ *     Native Call Interface routines.
+ *     Code to call C from parrot without libffi.
  */
 
 
