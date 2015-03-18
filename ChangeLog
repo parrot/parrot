@@ -1,9 +1,13 @@
-2014-03-17    release 7.2.0
+2014-04-21    release 7.3.0 - supported
     - Core
     - Build
     - Documentation
     - Tests
     - Community
+
+2014-03-17    release 7.2.0
+    - Build
+        + Fix warning on Win32 (with cl.exe)  when `link` is not explicitly set.
 
 2014-02-17    release 7.1.0
     - Core
