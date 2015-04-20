@@ -12,33 +12,36 @@ Supported platforms:
 Platform                     B8 Feature Comp Test Inst YYYYMMDD
                                 Thr Sig
 --------------------------------------------------------------------
-darwin10.[6-9]-x86_64-clang      Y   ?   Y    Y     Y  20140617
-darwin10.9-x86_64-gcc-mp         Y   ?   Y    Y     Y  20140617
-linux-x86/x64_86-gcc4            Y   ?   Y    Y     Y  20140617
-linux-x86/x64_86-clang3          Y   ?   Y    Y     Y  20140617
-win32-x86-msvc_10.0              Y   -   Y    Y     Y  20140617
-win32-x86-mingw32                Y   -   Y    Y     Y  20140617
-cygwin-x86-gcc4                  Y   ?   Y    Y     Y  20140617
-cygwin-x64_86-gcc4               Y   ?   Y    Y     Y  20140617
+darwin10.[6-10]-x86_64-clang     Y   ?   Y    Y    Y   20150420
+darwin10.[9-10]-x86_64-gcc-mp    Y   ?   Y    Y    Y   20150420
+linux-x86/x64_86-gcc[45]         Y   ?   Y    Y    Y   20150420
+linux-x86/x64_86-clang3          Y   ?   Y    Y    Y   20150420
+win32-x86-msvc_10.0              Y   -   Y    Y    Y   20150420
+win32-x86-mingw32                Y   -   Y    Y    Y   20150420
+cygwin-x86-gcc4                  Y   ?   Y    Y    Y   20150420
+cygwin-x64_86-gcc4               Y   ?   Y    Y    Y   20150420
 
 Extra Platforms:
 
 Platform                     B8 Feature Comp Test Inst YYYYMMDD
                                 Thr Sig
 --------------------------------------------------------------------
-darwin9.8.0-x86-gcc4.0.1         Y   ?   Y    Y     Y  20100215
+darwin9.8.0-x86-gcc4.0.1         Y   ?   Y    Y    Y   20100215
 linux-sparc64-gcc-4.3.2       ?          Y    Y        20110114
-linux-amd64-gcc4.4.1          8  Y   ?   Y    Y     Y  20100215
-linux-ppc-gcc_4.4.2              Y   Y   Y    Y     Y  20100118
-linux-ppc64-gcc_4.4.2            Y   Y   Y    Y     Y  20100118
-linux-arm-gcc_4.4.2              Y   Y   Y    Y     Y  20100118
-linux-x86-icc_11.1            4  Y   Y   Y    Y     Y  20100209
-linux-amd64-icc_11.1          8  Y   Y   Y    Y     Y  20100209
-netbsd4.0-x86_64-gcc-4.1.2    8  Y   Y   Y    Y     ?  20110418
-win-x64-msvc_16.0             8  ?   ?   Y    Y     ?  20110718
-darwin8.11.0-ppc-4.0          B  Y   ?   Y    Y     Y  20140617
-opensolaris11-x86-gcc         8  Y   ?   Y    Y     Y  20140617
-opensolaris11-x86-cc          8  Y   ?   Y    Y     Y  20140617
+linux-ppc-gcc_4.4.2              Y   Y   Y    Y    Y   20100118
+linux-ppc64-gcc_4.4.2            Y   Y   Y    Y    Y   20100118
+linux-arm-gcc_4.4.2              Y   Y   Y    Y    Y   20100118
+linux-mips-gcc_4.4.2          4  Y   Y   Y    Y    Y   20150420
+linux-mips64-gcc_4.4.2        8  Y   Y   Y    Y    Y   20150420
+linux-x86-icc_11.1            4  Y   Y   Y    Y    Y   20100209
+linux-amd64-icc_11.1          8  Y   Y   Y    Y    Y   20100209
+netbsd4.0-x86_64-gcc-4.1.2    8  Y   Y   Y    Y    ?   20110418
+win-x64-msvc_16.0             8  Y   ?   Y    Y    ?   20150420
+darwin8.11.0-ppc-4.0          B  Y   ?   Y    Y    Y   20140617
+opensolaris11-x86-gcc         8  Y   ?   Y    Y    Y   20150420
+opensolaris11-x86-cc          8  Y   ?   Y    Y    Y   20150420
+freebsd10-x86_64-gcc          8  Y   ?   Y    Y    Y   20150420
+openbsd49-x86_64-gcc          8  Y   ?   Y    Y    Y   20150420
 
 Legend:
 ?   ... unknown or untested
