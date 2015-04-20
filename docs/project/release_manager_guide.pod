@@ -564,6 +564,7 @@ Make sure that at least the next two releases are covered.
 
     - Apr 21, 2015 - *7.3.0   - rurban
     - May 19, 2015 -  7.4.0   - Util
+    - Jun 16, 2015 -  7.5.0   - rurban
 
 =cut
 

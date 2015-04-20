@@ -1,9 +1,9 @@
 {
-    "release.version"  : "7.2.0",
-    "release.name"     : "Blue-crowned racquet-tail",
+    "release.version"  : "7.3.0",
+    "release.name"     : "Peach-faced Lovebird",
     "release.day"      : "Thursday",
-    "release.nextdate" : "21 Apr 2015",
-    "release.type"     : "devel",
+    "release.nextdate" : "19 May 2015",
+    "release.type"     : "supported",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -12,10 +12,10 @@
     "web.org_root"     : "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "18 Apr 2015",
+    "bugday.date"      : "16 May 2015",
 
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
-    "wiki.bugday"      : "bug_day_2015_04_18",
+    "wiki.bugday"      : "bug_day_2015_05_16",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/7.2.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/7.3.0/"
 }
