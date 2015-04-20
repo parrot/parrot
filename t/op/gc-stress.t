@@ -20,13 +20,13 @@ use strict;
 use warnings;
 
 use lib 'lib';
-use Parrot::Test tests => 1;
+use Parrot::Test tests => 2;
 use Test::More;
 use Parrot::Config;
 use File::Spec;
 
 my $parrot = File::Spec->join( File::Spec->curdir(), 'parrot' . $PConfig{exe} );
-#my $JSONnqp = File::Spec->join( qw(compilers data_json JSON.nqp) );
+my $JSONnqp = File::Spec->join( qw(compilers data_json JSON.nqp) );
 my $opsc_03past = File::Spec->join( qw(t compilers opsc 03-past.t) );
 
 sub gc_test {
@@ -47,10 +47,10 @@ sub gc_test {
 
 # involving lots of strings and rpa's
 # This times out at travis >10min
-#gc_test("$parrot -D1 --gc-debug --gc-nursery-size=0.0001 -- parrot-nqp.pbc --target=pir $JSONnqp",
-#        "GC CallContext - GH #1159");
+gc_test("$parrot -D1 --gc-debug --gc-nursery-size=0.01 -- parrot-nqp.pbc --target=pir $JSONnqp",
+        "GC CallContext - GH #1159");
 
-gc_test("$parrot -D1 --gc-debug --gc-nursery-size=0.001 -- parrot-nqp.pbc $opsc_03past",
+gc_test("$parrot -D1 --gc-debug --gc-nursery-size=0.01 -- parrot-nqp.pbc $opsc_03past",
         "GC opsc/03-past.t");
 
 # Local Variables:

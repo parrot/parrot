@@ -1,6 +1,8 @@
 2014-04-21    release 7.3.0 - supported
     - Build
         + Fixed windows link regression from 7.0.2 with cl.exe. #1203
+    - Tests
+        + Relaxed the common GC stress test and re-add the JSON.nqp variant.
 
 2014-03-17    release 7.2.0
     - Build
