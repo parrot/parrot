@@ -102,6 +102,9 @@ sub runstep {
             $conf->debug(" ld => '$ld', ");
             $conf->debug(" ldflags => '$ldflags', ");
         }
+        else {
+            $conf->data->set( link   => $ld );
+        }
 
         $ccflags =~ s/-Gf/-GF/ if $msvcversion >= 13;
         # override perl's warnings level
