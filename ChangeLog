@@ -1,3 +1,10 @@
+2014-05-19    release 7.4.0
+     - Core
+     - Build
+     - Documentation
+     - Tests
+     - Community
+
 2014-04-21    release 7.3.0 - supported
     - Build
         + Fixed windows link regression from 7.0.2 with cl.exe. #1203
