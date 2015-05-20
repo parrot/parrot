@@ -87,7 +87,7 @@ there are any showstopping bugs. Check-in again with the language project
 leads. It's also good to ask for updates to
 L<http://github.com/parrot/parrot/blob/master/ChangeLog>,
 L<http://github.com/parrot/parrot/blob/master/CREDITS>,
-L<http://github.com/parrot/parrot/blob/master/PLATFORMS>.
+L<http://github.com/parrot/parrot/blob/master/PLATFORMS>,
 L<http://github.com/parrot/parrot/blob/master/RESPONSIBLE_PARTIES>,
 L<http://github.com/parrot/parrot/blob/master/api.yaml>,
 and L<https://github.com/parrot/parrot/wiki/Languages>.
