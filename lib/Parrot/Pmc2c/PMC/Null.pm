@@ -19,7 +19,7 @@ PMC to C Instance Methods
 
 Auto generates methods for the NULL PMC.
 
-The C<Null> PMC throws an execption for all methods.
+The C<Null> PMC throws an exception for all methods.
 
 =back
 

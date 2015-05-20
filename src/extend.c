@@ -15,7 +15,7 @@ API with c files in directory src/embed/.
 Extending situations are things like NCI function libraries, dyn-pmc and
 dyn-op libraries which are loaded into Parrot and called from Parrot (as
 opposed to embedding, where an external program calls into Parrot). These
-functions assume the existance of an interpreter, memory management through
+functions assume the existence of an interpreter, memory management through
 GC and stackwalking, and the presence of an exception-handling infrastructure.
 
 =head2 Functions

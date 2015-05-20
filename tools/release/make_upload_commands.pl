@@ -68,7 +68,7 @@ These commands will:
     2. Link the "all" directory to the receiving directory.
     3. Copy the 2 tarballs and 2 checksums to the receiving directory.
     4. Trigger the replication of files to the FTP mirrors.
-    5. Verify that the replication occured (Wait a few minutes for sync.)
+    5. Verify that the replication occurred (Wait a few minutes for sync.)
 In other words, they make the new Parrot available to the whole world.
 
 On Win32 with PuTTY, you may need `pscp` instead of `scp`.

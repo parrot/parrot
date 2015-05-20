@@ -48,7 +48,7 @@ the type for the format.
 
 Almost all the other sprintf variants in this file are implemented in
 terms of this function (see C<Parrot_psprintf()> for the exception). It
-in turn calls C<Parrot_sprintf_format()> (see F<src/spf_render.c>).
+in turn calls C<Parrot_sprintf_format()> (see F<src/string/spf_render.c>).
 
 =cut
 

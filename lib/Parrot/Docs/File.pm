@@ -41,7 +41,7 @@ sub write {
 
 my $UNDEFINED = 'Undefined';
 
-# These are the Parrot file types excluding the ICU specifc ones.
+# These are the Parrot file types excluding the ICU specific ones.
 
 my %type_for_suffix = (
     'BASIC'        => 'README file',

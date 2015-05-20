@@ -215,7 +215,7 @@ static int used_once(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
 
 =item C<int pre_optimize(imc_info_t *imcc, IMC_Unit *unit)>
 
-Handles optimizations occuring before the construction of the CFG.
+Handles optimizations occurring before the construction of the CFG.
 
 =cut
 
@@ -240,7 +240,7 @@ pre_optimize(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
 
 =item C<int cfg_optimize(imc_info_t *imcc, IMC_Unit *unit)>
 
-Handles optimizations occuring during the construction of the CFG.
+Handles optimizations occurring during the construction of the CFG.
 Returns TRUE if any optimization was performed. Otherwise, returns
 FALSE.
 

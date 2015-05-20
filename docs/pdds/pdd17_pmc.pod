@@ -738,7 +738,7 @@ be made.
 Set the boolean state of the PMC to TRUE if the native integer value passed in
 is TRUE, or FALSE if the value is FALSE. The definition of truth is left open
 to the particular PMC. For a scalar, it may be as simple as setting false when
-a 0 value is passed in, and seting true when any other value is passed in.
+a 0 value is passed in, and setting true when any other value is passed in.
 
 =item assign_pmc
 

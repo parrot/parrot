@@ -145,7 +145,7 @@ method _read_scalar($string, $indent, @lines) {
    # Trim trailing whitespace
    $string := subst($string, /\s*$/, '');
 
-   # Explitic null/undef
+   # Explicit null/undef
    return undef if $string eq '~';
 
    # Single quote

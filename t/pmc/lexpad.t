@@ -143,7 +143,7 @@ iter_done:
     pad = pad['lexpad']
 
     type = pad.'register_type'('?')
-    is(type, -1, 'type for non-existant lexical')
+    is(type, -1, 'type for non-existent lexical')
     type = pad.'register_type'('I')
     is(type,  0, 'type for integer lexical')
     type = pad.'register_type'('N')

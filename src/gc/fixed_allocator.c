@@ -483,7 +483,7 @@ pool_is_maybe_owned(ARGIN(const Pool_Allocator *pool), ARGIN(const void *ptr))
 {
     ASSERT_ARGS(pool_is_maybe_owned)
 
-    /* Poiners are aligned */
+    /* Pointers are aligned */
     if (PTR2UINTVAL(ptr) & 3)
         return 0;
 

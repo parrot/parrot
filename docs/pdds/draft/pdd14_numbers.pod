@@ -284,9 +284,9 @@ similar manner to strings.
 Additionally the library provides special values which represent the result of
 otherwise undefined operations (division by zero, for instance).  Positive and
 negative infinity (C<Inf> or C<+Inf> and C<-Inf>, respectively) and both quiet
-and signalling Not a Number (C<NaN>) are available.  In general, the result of
+and signaling Not a Number (C<NaN>) are available.  In general, the result of
 an operation with at least one argument which is C<NaN> will be C<NaN>. If the
-argument is a signalling C<NaN>, an exception will also be raised.  See the
+argument is a signaling C<NaN>, an exception will also be raised.  See the
 EDA for full details.
 
 =head3 Context

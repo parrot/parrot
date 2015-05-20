@@ -457,7 +457,7 @@ Tests OO features related to subclassing.
     addattribute $P0, 'storage'
     $P1 = new 'Frog'
     $I1 = $P1.'count_strings'()
-    is ($I1, 3, 'correct array length in vtable overriden init method')
+    is ($I1, 3, 'correct array length in vtable overridden init method')
 .end
 
 .namespace [ 'Frog' ]

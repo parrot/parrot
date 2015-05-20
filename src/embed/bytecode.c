@@ -37,7 +37,7 @@ returns a true value if this call is successful and false value otherwise.
 
 */
 
-/* TODO: This only works with the inital bytecode. After this we should use
+/* TODO: This only works with the initial bytecode. After this we should use
          Parrot_append_bytecode or something similar */
 
 PARROT_API
@@ -88,7 +88,7 @@ Parrot_api_load_bytecode_bytes(Parrot_PMC interp_pmc,
 }
 
 /* Load the bytecode into the interpreter, but don't execute it */
-/* TODO: This only works with the inital bytecode. After this we should use
+/* TODO: This only works with the initial bytecode. After this we should use
        Parrot_append_bytecode or something similar */
 
 /*

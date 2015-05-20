@@ -109,7 +109,7 @@ END
     $P0 = newclass 'Obj'
     $P2 = new 'Obj'
     $I0 = $P2.'some_method'(42)
-    is ($I0, 42, 'calling overriden method')
+    is ($I0, 42, 'calling overridden method')
 .end
 
 .namespace ['Obj']

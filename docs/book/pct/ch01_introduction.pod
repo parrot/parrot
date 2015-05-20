@@ -69,7 +69,7 @@ X<development cycles>
 
 Parrot's first release occurred in September 2001.  It reached 1.0 in March
 2009. The Parrot project makes releases on the third Tuesday of each month. Two
-releases a year E<mdash> occuring every January and July E<mdash> are
+releases a year E<mdash> occurring every January and July E<mdash> are
 "supported" releases intended for production use.  The other ten releases are
 development releases for language implementers and testers.
 

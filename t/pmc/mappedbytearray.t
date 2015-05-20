@@ -81,7 +81,7 @@ Tests the MappedByteArray PMC.
 
     $I0 = elements mm
     # The test file is one line of text, and line ending may have been
-    # converted, so the lenght can be one byte different.
+    # converted, so the length can be one byte different.
     $I1 = $I0 == 43
     $I2 = $I0 == 44
     $I0 = $I1 + $I2

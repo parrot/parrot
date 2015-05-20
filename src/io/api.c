@@ -1372,7 +1372,7 @@ Parrot_io_pprintf(PARROT_INTERP, PIOHANDLE os_handle, ARGIN_FORMAT(const char *s
 ...)>
 
 Writes a C string format with varargs to C<stdout>. This routine uses
-Parrot_io_write_s to perform the actual right, and is therefore subject to
+Parrot_io_write_s to perform the actual write, and is therefore subject to
 all the same semantics and limitations.
 
 =cut
@@ -1407,7 +1407,7 @@ Parrot_io_printf(PARROT_INTERP, ARGIN_FORMAT(const char *s), ...)
 =item C<INTVAL Parrot_io_eprintf(PARROT_INTERP, const char *s, ...)>
 
 Writes a C string format with varargs to C<stderr>. This routine uses
-C<Parrot_io_write_s> to perform the actual right, and is therefore subject to
+C<Parrot_io_write_s> to perform the actual write, and is therefore subject to
 all the same semantics and limitations.
 
 =cut

@@ -571,7 +571,7 @@ Parrot_pmc_list_insert_by_number(PARROT_INTERP, PMC *list, PMC *value)
 
 =item C<static void throw_pop_empty(PARROT_INTERP)>
 
-Throws with the appropiate message.
+Throws with the appropriate message.
 
 =cut
 

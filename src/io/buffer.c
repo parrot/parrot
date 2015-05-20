@@ -205,7 +205,7 @@ Parrot_io_buffer_remove_from_handle(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL i
 =item C<size_t Parrot_io_buffer_resize(PARROT_INTERP, IO_BUFFER *buffer, size_t
 new_size)>
 
-Resize the C<buffer> to be able to accomodate the C<new_size>. The buffer may
+Resize the C<buffer> to be able to accommodate the C<new_size>. The buffer may
 grow but probably will not shrink to avoid data loss. Return the new size of
 the buffer.
 

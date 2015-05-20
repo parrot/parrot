@@ -34,7 +34,7 @@ For instance, normally,
 inspects various paths, and paths that are controlled by C<%ENV> to
 find relevant documentation for "perldoc".
 
-And because of this, it is a little security concious, and
+And because of this, it is a little security conscious, and
 pre-emptively drops root to UID=nobody
 
 But Parrot is not using this feature of C<perldoc>.

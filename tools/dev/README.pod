@@ -46,7 +46,7 @@ Resolves deprecated features list in api.yaml by querying Trac.
 
 =head1 NOTES
 
-[1] These programs, templates, etc., occassionally require additional
+[1] These programs, templates, etc., occasionally require additional
 dependencies to function fully, such as CPAN modules or third-party programs,
 like 'valgrind'.
 

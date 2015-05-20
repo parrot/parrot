@@ -202,7 +202,7 @@ C<PObj_custom_destroy_FLAG> is set on a PMC, the GC will call the C<destroy>
 VTABLE on that PMC to do custom cleanup. This flag is ignored in STRINGs.
 
 The GC does not collect dead PMCs in any particular order and does not
-guarantee any ordering of collection between dependant PMCs. Some GC cores may
+guarantee any ordering of collection between dependent PMCs. Some GC cores may
 enforce some ordering or dependency recognition, but this is not guaranteed.
 
 =head3 Finalization
@@ -338,7 +338,7 @@ void *data, size_t oldsize, size_t newsize)>
 
 =item C<void (*block_mark)(PARROT_INTERP)>
 
-Block the GC mark from occuring.
+Block the GC mark from occurring.
 
 =item C<void (*unblock_mark)(PARROT_INTERP)>
 

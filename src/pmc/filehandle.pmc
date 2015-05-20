@@ -47,7 +47,7 @@ pmclass FileHandle extends Handle auto_attrs {
 
 /*
  * Using INTVAL for process_id is a temporary solution.
- * We may need to define a custom type to store it in a platform dependant way.
+ * We may need to define a custom type to store it in a platform dependent way.
  */
 
 /*

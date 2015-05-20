@@ -11,7 +11,7 @@ t/oo/vtableoverride.t - test various vtable overrides from PIR
 
 =head1 DESCRIPTION
 
-Tests the behavior of VTABLE interfaces that have been overriden from PIR.
+Tests the behavior of VTABLE interfaces that have been overridden from PIR.
 
 =cut
 

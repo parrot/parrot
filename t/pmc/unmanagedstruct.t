@@ -80,7 +80,7 @@ OK:
     push_eh eh1
     $S0 = $P0[$P1]
 
-    ok(0, "no error thrown when trying to get key of unintialized struct")
+    ok(0, "no error thrown when trying to get key of uninitialized struct")
     goto finally1
 eh1:
     .get_results($P1)
@@ -90,7 +90,7 @@ finally1:
 
     push_eh eh2
     $P0[$P1] = "test"
-    ok(0, "no error thrown when trying to set key of unintialized struct")
+    ok(0, "no error thrown when trying to set key of uninitialized struct")
     goto finally2
 eh2:
     .get_results($P1)
