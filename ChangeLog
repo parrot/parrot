@@ -1,9 +1,8 @@
 2014-05-19    release 7.4.0
-     - Core
-     - Build
      - Documentation
-     - Tests
+         + Many minor corrections
      - Community
+         + Coverity scans to resume RSN.
 
 2014-04-21    release 7.3.0 - supported
     - Build

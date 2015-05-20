@@ -1,9 +1,9 @@
 {
-    "release.version"  : "7.3.0",
-    "release.name"     : "Peach-faced Lovebird",
-    "release.day"      : "Thursday",
-    "release.nextdate" : "19 May 2015",
-    "release.type"     : "supported",
+    "release.version"  : "7.4.0",
+    "release.name"     : "Festive Amazon",
+    "release.day"      : "Tuesday",
+    "release.nextdate" : "16 Jun 2015",
+    "release.type"     : "devel",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -12,10 +12,10 @@
     "web.org_root"     : "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "16 May 2015",
+    "bugday.date"      : "13 Jun 2015",
 
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
-    "wiki.bugday"      : "bug_day_2015_05_16",
+    "wiki.bugday"      : "bug_day_2015_06_13",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/7.3.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/7.4.0/"
 }
