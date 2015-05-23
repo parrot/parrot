@@ -4,6 +4,9 @@
     - Documentation
     - Tests
     - Community
+         + Coverity static analysis scans of the Parrot source code
+           have resumed. Many thanks for providing the service to
+           the open-source community!
 
 2014-05-19    release 7.4.0
      - Documentation
