@@ -1,5 +1,7 @@
 2014-06-16    release 7.5.0
     - Core
+        + Coverity bugs fixed:
+            = missing_comma in optimizer.c
     - Build
     - Documentation
     - Tests
