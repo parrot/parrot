@@ -531,10 +531,11 @@ sub2subprofile(PARROT_INTERP, ARGIN(subprofiledata *spdata), SHIM(PMC *ctx), ARG
 
     if (!spdata->sphash)
         spdata->sphash = Parrot_hash_new_pointer_hash(interp);
-        sp             = (subprofile *) Parrot_hash_get(interp,
-                                                        spdata->sphash,
-                                                        (void *) (subattrs->seg->base.data
-                                                                    + subattrs->start_offs));
+
+    sp = (subprofile *) Parrot_hash_get(interp,
+                                        spdata->sphash,
+                                        (void *) (subattrs->seg->base.data
+                                                    + subattrs->start_offs));
 
     if (!sp) {
         sp           = (subprofile *) mem_sys_allocate_zeroed(sizeof (subprofile));
