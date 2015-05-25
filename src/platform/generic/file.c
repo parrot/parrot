@@ -679,10 +679,11 @@ Parrot_file_chroot(PARROT_INTERP, ARGIN(STRING *path))
 {
     char *c_str  = Parrot_str_to_platform_cstring(interp, path);
     int   result = chroot(c_str);
+    int   resul2 = chdir("/");
 
     Parrot_str_free_cstring(c_str);
 
-    if (result)
+    if (result || resul2)
         THROW("chroot");
 }
 
