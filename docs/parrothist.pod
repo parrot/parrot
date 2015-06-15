@@ -187,5 +187,6 @@ Starred release numbers indicate supported releases.
  Util        7.2.0          2015-Mar-17     "Blue-crowned racquet-tail"
  rurban      7.3.0 *        2015-Apr-21     "Peach-faced Lovebird"
  Util        7.4.0          2015-May-19     "Festive Amazon"
+ rurban      7.5.0          2016-Jun-16     "Yellow-collared Lovebird"
 
 =cut
