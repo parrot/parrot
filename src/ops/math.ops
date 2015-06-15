@@ -564,7 +564,12 @@ References:
 =cut
 
 op mod(inout INT, in INT)  {
-    $1 = Parrot_util_intval_mod($1, $2);
+    if ($2 == 0)
+        $1 = $1;
+    else if ($1 > 0 && $2 > 0)
+        $1 = $1 % $2;
+    else
+        $1 = Parrot_util_intval_mod($1, $2);
 }
 
 op mod(inout NUM, in NUM)  {
@@ -584,7 +589,12 @@ inline op mod(invar PMC, in NUM)  {
 }
 
 op mod(out INT, in INT, in INT)  {
-    $1 = Parrot_util_intval_mod($2, $3);
+    if ($3 == 0)
+        $1 = $2;
+    else if ($2 > 0 && $3 > 0)
+        $1 = $2 % $3;
+    else
+        $1 = Parrot_util_intval_mod($2, $3);
 }
 
 op mod(out NUM, in NUM, in NUM)  {
@@ -813,7 +823,7 @@ inline op is_inf_or_nan(out INT, in NUM)  {
 
 =head1 COPYRIGHT
 
-Copyright (C) 2001-2014, Parrot Foundation.
+Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 LICENSE
 

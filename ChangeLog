@@ -1,5 +1,6 @@
 2014-06-16    release 7.5.0
     - Core
+        + Optimize mod_i_* ops and Integer pmc to avoid util_intval_mod
         + Coverity bugs fixed:
             = missing_comma in optimizer.c
             = nesting_indent_mismatch in runcore/subprof.c

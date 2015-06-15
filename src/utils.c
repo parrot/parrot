@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2014, Parrot Foundation.
+Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -112,11 +112,11 @@ INTVAL
 Parrot_util_intval_mod(INTVAL i2, INTVAL i3)
 {
     ASSERT_ARGS(Parrot_util_intval_mod)
-    INTVAL z = i3;
 
-    if (z == 0)
+    if (i3 == 0)
         return i2;
     else {
+        INTVAL z = i3;
         INTVAL r;
         INTVAL y;
         int s = 0;

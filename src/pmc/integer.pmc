@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003-2014, Parrot Foundation.
+Copyright (C) 2003-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -950,9 +950,12 @@ Calculates modulus in place.
         if (d == 0)
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                     "int modulus by zero");
-
-        return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
-                Parrot_util_intval_mod(SELF.get_integer(), d));
+        {
+            const INTVAL m = SELF.get_integer();
+            return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
+                                           (m > 0 && d > 0) ? m % d
+                                           : Parrot_util_intval_mod(m, d));
+        }
     }
 
 
@@ -961,9 +964,12 @@ Calculates modulus in place.
         if (value == 0)
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                     "int modulus by zero");
-
-        return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
-                Parrot_util_intval_mod(SELF.get_integer(), value));
+        {
+            const INTVAL m = SELF.get_integer();
+            return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
+                                           (m > 0 && value > 0) ? m % value
+                                           : Parrot_util_intval_mod(m, value));
+        }
     }
 
 
@@ -978,9 +984,12 @@ Calculates modulus in place.
             VTABLE_set_number_native(INTERP, result, value);
             return result;
         }
-        else
+        else {
+            const INTVAL m = SELF.get_integer();
             return Parrot_pmc_new_init_int(INTERP, VTABLE_type(INTERP, SELF),
-                     Parrot_util_intval_mod(SELF.get_integer(), (INTVAL)value));
+                                           (m > 0 && value > 0) ? m % (INTVAL)value
+                                           : Parrot_util_intval_mod(m, (INTVAL)value));
+        }
     }
 
 
@@ -997,9 +1006,12 @@ Calculates modulus in place.
         if (d == 0)
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                     "int modulus by zero");
-
-        VTABLE_set_integer_native(INTERP, SELF,
-                Parrot_util_intval_mod(SELF.get_integer(), d));
+        {
+            const INTVAL m = SELF.get_integer();
+            VTABLE_set_integer_native(INTERP, SELF,
+                                      (m > 0 && d > 0) ? m % d
+                                      : Parrot_util_intval_mod(m, d));
+        }
     }
 
 
@@ -1007,9 +1019,12 @@ Calculates modulus in place.
         if (value == 0)
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                     "int modulus by zero");
-
-        VTABLE_set_integer_native(INTERP, SELF,
-                Parrot_util_intval_mod(SELF.get_integer(), value));
+        {
+            const INTVAL m = SELF.get_integer();
+            VTABLE_set_integer_native(INTERP, SELF,
+                                      (m > 0 && value > 0) ? m % value
+                                      : Parrot_util_intval_mod(m, value));
+        }
     }
 
 
@@ -1018,11 +1033,15 @@ Calculates modulus in place.
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_DIV_BY_ZERO,
                     "int modulus by zero");
 
-        if (PARROT_FLOATVAL_IS_INF_OR_NAN(value))
+        if (PARROT_FLOATVAL_IS_INF_OR_NAN(value)) {
             VTABLE_set_number_native(INTERP, SELF, value);
-        else
+        }
+        else {
+            const INTVAL m = SELF.get_integer();
             VTABLE_set_integer_native(INTERP, SELF,
-                Parrot_util_intval_mod(SELF.get_integer(), (INTVAL)value));
+                                      (m > 0 && value > 0) ? m % (INTVAL)value
+                                      : Parrot_util_intval_mod(m, (INTVAL)value));
+        }
     }
 
 /*
