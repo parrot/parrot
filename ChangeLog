@@ -5,9 +5,8 @@
             = missing_comma in optimizer.c
             = nesting_indent_mismatch in runcore/subprof.c
             = insecure chroot in platform/generic/file.c
-    - Build
-    - Documentation
     - Tests
+        + Remove executable file permissions from some .t files
     - Community
          + Coverity static analysis scans of the Parrot source code
            have resumed. Many thanks for providing the service to
