@@ -44,13 +44,11 @@ is_deeply(  [grep {
 
 # check for appropriate contents
 my %contained_files = map {$$_[0] => 1} @records;
-is_deeply(  [],
-        [grep {not exists $contained_files{$_}} glob('include/pmc/*.h')],
-        'MANIFEST.generated lists all core PMC headers' );
+is_deeply( [grep {not exists $contained_files{$_}} glob('include/pmc/*.h')],
+    [], 'MANIFEST.generated lists all core PMC headers' );
 
-is_deeply(  [],
-        [grep {not exists $contained_files{$_}} glob('src/pmc/*.dump')],
-        'MANIFEST.generated lists all core PMC dump files' )
+is_deeply( [grep {not exists $contained_files{$_}} glob('src/pmc/*.dump')],
+    [], 'MANIFEST.generated lists all core PMC dump files' );
 
 # Local Variables:
 #   mode: cperl
