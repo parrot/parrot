@@ -42,13 +42,16 @@ is_deeply(  [grep {
         [],
         'MANIFEST.generated contains no irregular records' );
 
-# check for appropriate contents
-my %contained_files = map {$$_[0] => 1} @records;
-is_deeply( [grep {not exists $contained_files{$_}} glob('include/pmc/*.h')],
-    [], 'MANIFEST.generated lists all core PMC headers' );
+# Check for appropriate contents
+my %contained_files = map  { $_->[0] => 1 } @records;
+my @missing_headers = grep {!$contained_files{$_}} glob('include/pmc/*.h');
+my @missing_dumps   = grep {!$contained_files{$_}} glob('src/pmc/*.dump');
 
-is_deeply( [grep {not exists $contained_files{$_}} glob('src/pmc/*.dump')],
-    [], 'MANIFEST.generated lists all core PMC dump files' );
+ok( !@missing_headers, 'MANIFEST.generated lists all core PMC headers' )
+    or diag( join "\n\t", 'Missing:', @missing_headers);
+
+ok( !@missing_dumps, 'MANIFEST.generated lists all core PMC dump files' )
+    or diag( join "\n\t", 'Missing:', @missing_dumps);
 
 # Local Variables:
 #   mode: cperl
