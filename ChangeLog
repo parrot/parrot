@@ -1,3 +1,15 @@
+2014-07-21    release 7.6.0
+    - Core
+        + structview
+            = Added missing returns to switch/case.
+    - Build
+    - Documentation
+    - Tests
+        + distro/manifest_generated.t
+            = Corrected reversed order of got/expected.
+            = Added reference to GH#1206 .
+    - Community
+
 2014-06-16    release 7.5.0
     - Core
         + Optimize mod_i_* ops and Integer pmc to avoid util_intval_mod

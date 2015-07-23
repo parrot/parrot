@@ -1,9 +1,9 @@
 {
-    "release.version"  : "7.5.0",
-    "release.name"     : "Yellow-collared Lovebird",
+    "release.version"  : "7.6.0",
+    "release.name"     : "Yellow-throated Hanging Parrot",
     "release.day"      : "Tuesday",
-    "release.nextdate" : "21 Jul 2015",
-    "release.type"     : "devel",
+    "release.nextdate" : "18 Aug 2015",
+    "release.type"     : "supported",
 
     "web.root"         : "http://parrot.org/",
     "web.source"       : "download",
@@ -12,10 +12,10 @@
     "web.org_root"     : "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "18 Jul 2015",
+    "bugday.date"      : "15 Aug 2015",
 
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
-    "wiki.bugday"      : "bug_day_2015_07_18",
+    "wiki.bugday"      : "bug_day_2015_08_15",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/7.6.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/supported/7.6.0/"
 }
