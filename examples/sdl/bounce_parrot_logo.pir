@@ -340,10 +340,6 @@ return:
     end
 .end
 
-=head1 AUTHOR
-
-chromatic, E<lt>chromatic at wgz dot orgE<gt>.
-
 =cut
 
 # Local Variables:

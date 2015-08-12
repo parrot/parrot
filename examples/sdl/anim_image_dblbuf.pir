@@ -108,10 +108,6 @@ _loop:
     if x_pos != end_pos goto _loop
 .end
 
-=head1 AUTHOR
-
-chromatic, E<lt>chromatic at wgz dot orgE<gt>.
-
 =cut
 
 # Local Variables:

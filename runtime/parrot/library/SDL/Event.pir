@@ -337,9 +337,8 @@ return:
 
 =head1 AUTHOR
 
-Written and maintained by chromatic, E<lt>chromatic at wgz dot orgE<gt>, with
-some design from Allison Randal.  Please send patches, feedback, and
-suggestions to the Perl 6 Internals mailing list.
+Please send patches, feedback, and suggestions to the Perl 6 Internals mailing
+list.
 
 =head1 COPYRIGHT
 

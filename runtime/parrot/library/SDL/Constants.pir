@@ -294,9 +294,8 @@ For example, C<8> corresponds to C<backspace>.
 
 =head1 AUTHOR
 
-Written by Jens Rieks, maintained by chromatic, E<lt>chromatic at wgz dot
-orgE<gt>.  Please send patches, feedback, and suggestions to the Perl 6
-Internals mailing list.
+Written by Jens Rieks. Please send patches, feedback, and suggestions to the
+Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
 

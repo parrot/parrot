@@ -367,8 +367,7 @@ At the very least, you should override C<quit()>.
 
 =head1 AUTHOR
 
-Written and maintained by chromatic, E<lt>chromatic at wgz dot orgE<gt>.
-Designed by Allison Randal.  Please send patches, feedback, and suggestions to
+Designed by Allison Randal. Please send patches, feedback, and suggestions to
 the Perl 6 Internals mailing list.
 
 =head1 COPYRIGHT
