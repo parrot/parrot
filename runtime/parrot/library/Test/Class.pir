@@ -293,10 +293,8 @@ everything.
 
 =head1 AUTHOR
 
-Written and maintained by chromatic, C<< chromatic at wgz dot org >>, based on
-Test::Class in Perl 5, L<http://search.cpan.org/perldoc?Test::Class>, written
-by Adrian Howard.  Please send patches, feedback, and suggestions to the Perl 6
-internals mailing list.
+Please send patches, feedback, and suggestions to the Perl 6 internals mailing
+list.
 
 =head1 COPYRIGHT
 

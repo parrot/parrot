@@ -88,10 +88,6 @@ This is a PIR program which draws a message to the screen.
     end
 .end
 
-=head1 AUTHOR
-
-chromatic, E<lt>chromatic at wgz dot orgE<gt>.
-
 =cut
 
 # Local Variables:

@@ -745,7 +745,6 @@ felt when I wrote it!
 
 =head1 AUTHOR
 
-Written and maintained by chromatic, E<lt>chromatic at wgz dot orgE<gt>.
 Please send patches, feedback, and suggestions to the Perl 6 Internals mailing
 list.
 

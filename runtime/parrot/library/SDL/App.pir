@@ -235,9 +235,8 @@ Returns the bit depth of the main window, in pixels.
 
 =head1 AUTHOR
 
-Written and maintained by chromatic, E<lt>chromatic at wgz dot orgE<gt>, with
-suggestions from Jens Rieks.  Please send patches, feedback, and suggestions to
-the Perl 6 Internals mailing list.
+Please send patches, feedback, and suggestions to the Perl 6 Internals mailing
+list.
 
 =head1 COPYRIGHT
 

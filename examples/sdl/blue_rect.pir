@@ -53,10 +53,6 @@ This is a PIR program which draws a blue rectangle with SDL Parrot bindings.
     end
 .end
 
-=head1 AUTHOR
-
-chromatic, E<lt>chromatic at wgz dot orgE<gt>.
-
 =cut
 
 # Local Variables:

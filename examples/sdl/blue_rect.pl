@@ -57,7 +57,6 @@ $app.quit();
 =head1 AUTHOR
 
 blue_rect.pl created by Patrick R. Michaud (pmichaud@pobox.com)
-based on blue_rect.pir by chromatic (chromatic at wgz dot org).
 
 =head1 COPYRIGHT
 

@@ -188,10 +188,6 @@ _draw:
 	end
 .end
 
-=head1 AUTHOR
-
-chromatic, E<lt>chromatic at wgz dot orgE<gt>.
-
 =head1 COPYRIGHT
 
 Copyright (C) 2004-2008, Parrot Foundation.

@@ -243,10 +243,8 @@ plan.
 
 =head1 AUTHOR
 
-Written and maintained by chromatic, C<< chromatic at wgz dot org >>, based on
-the Perl 6 port he wrote, based on the original Perl 5 version he wrote with
-ideas from Michael G. Schwern.  Please send patches, feedback, and suggestions
-to the Perl 6 internals mailing list.
+Please send patches, feedback, and suggestions to the Perl 6 internals mailing
+list.
 
 =head1 COPYRIGHT
 

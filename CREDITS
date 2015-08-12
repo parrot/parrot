@@ -284,10 +284,6 @@ E: christoph@mksig.org
 
 N: chromatic
 U: chromatic
-D: SDL library and examples; PIR Test::*; test suite cleanup; Parrot::Embed
-D: freaky bugs; cool features; Pheme
-E: chromatic@wgz.org
-W: http://wgz.org/chromatic/
 
 N: Chirag Agrawal
 U: ZYROz

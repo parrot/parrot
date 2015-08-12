@@ -19,7 +19,6 @@ Release Manager                 Bob Rogers
                                 Patrick Michaud
                                 Bernhard Schmalhofer
                                 Jerry Gay
-                                chromatic
                                 Will Coleda
                                 Andrew Whitworth
                                 Klaas-Jan Stol
@@ -39,7 +38,6 @@ Release Manager                 Bob Rogers
 Metacommitter                   Allison Randal
                                 Jerry Gay
                                 Will Coleda
-                                chromatic
                                 Jeff Horwitz
                                 Andrew Whitworth
                                 James E Keenan
@@ -58,7 +56,6 @@ Core Developer
                                 Jonathan Worthington
                                 Bob Rogers
                                 Nuno Carvalho
-                                chromatic
                                 Allison Randal
                                 Christoph Otto
                                 Julian Albo
@@ -78,8 +75,7 @@ Platform Porter                 Allison Randal (Debian, Ubuntu)
                                 Jerry Gay (Windows)
                                 Gerd Pokorra (Fedora)
 
-Patch Monster                   chromatic
-                                Jonathan Worthington
+Patch Monster                   Jonathan Worthington
                                 Jerry Gay
                                 Will Coleda
                                 James E Keenan
@@ -95,7 +91,6 @@ Contributors
 
 Cage Cleaner                    James E Keenan
                                 Jerry Gay
-                                chromatic
                                 Andy Lester
                                 Francois Perrad
                                 Mark Glines
