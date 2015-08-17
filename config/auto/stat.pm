@@ -72,6 +72,20 @@ sub runstep {
 
     $conf->data->set( HAS_STAT_ATIMESPEC => $stat_atimespec );
 
+    my $stat_st_timespec_t = 0;
+
+    $conf->cc_gen('config/auto/stat/test_st_timespec_t_c.in');
+    eval { $conf->cc_build(); };
+    if (!$@) {
+        my $output = eval { $conf->cc_run() };
+        if (!$@ && $output =~ /OK/) {
+            $stat_st_timespec_t = 1;
+        }
+    }
+    $conf->cc_clean();
+
+    $conf->data->set( HAS_STAT_ST_TIMESPEC_T => $stat_st_timespec_t );
+
     return 1;
 }
 
