@@ -165,10 +165,17 @@ typedef struct _Parrot_Stat_Buf {
     INTVAL     block_size;
     INTVAL     blocks;
 
+#ifdef PARROT_HAS_STAT_ST_TIMESPEC_T
+    st_timespec_t create_time;
+    st_timespec_t access_time;
+    st_timespec_t modify_time;
+    st_timespec_t change_time;
+#else
     struct timespec create_time;
     struct timespec access_time;
     struct timespec modify_time;
     struct timespec change_time;
+#endif
 } Parrot_Stat_Buf;
 
 PARROT_EXPORT
