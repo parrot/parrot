@@ -189,5 +189,6 @@ Starred release numbers indicate supported releases.
  Util        7.4.0          2015-May-19     "Festive Amazon"
  rurban      7.5.0          2016-Jun-16     "Yellow-collared Lovebird"
  Util        7.6.0 *        2016-Jul-21     "Yellow-throated Hanging Parrot"
+ rurban      7.7.0          2016-Aug-18     "Red-headed Lovebird"
 
 =cut

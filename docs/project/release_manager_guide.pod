@@ -561,7 +561,6 @@ L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.cal
 
 Make sure that at least the next two releases are covered.
 
-    - Aug 18, 2015 -  7.7.0   - rurban
     - Sep 15, 2015 -  7.8.0   - Util
     - Oct 20, 2015 - *7.9.0   - rurban
     - Nov 17, 2015 -  7.10.0  - Util

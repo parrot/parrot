@@ -1,9 +1,6 @@
 2014-08-18    release 7.7.0
-    - Core
-    - Build
     - Documentation
-    - Tests
-    - Community
+        + remove bitrotted author contributions
 
 2014-07-21    release 7.6.0
     - Core
