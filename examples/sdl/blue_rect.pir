@@ -53,8 +53,6 @@ This is a PIR program which draws a blue rectangle with SDL Parrot bindings.
     end
 .end
 
-=cut
-
 # Local Variables:
 #   mode: pir
 #   fill-column: 100

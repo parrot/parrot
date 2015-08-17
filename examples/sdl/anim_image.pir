@@ -114,8 +114,6 @@ _loop:
         if x_pos != end_pos goto _loop
 .end
 
-=cut
-
 # Local Variables:
 #   mode: pir
 #   fill-column: 100

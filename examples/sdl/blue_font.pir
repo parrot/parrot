@@ -88,8 +88,6 @@ This is a PIR program which draws a message to the screen.
     end
 .end
 
-=cut
-
 # Local Variables:
 #   mode: pir
 #   fill-column: 100
