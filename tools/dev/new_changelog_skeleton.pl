@@ -46,7 +46,7 @@ sub run {
 
     return unless $year && $x;
 
-    $month eq '12' ? $month=1 : $month++;
+    $month eq '12' ? ($month=1, $year++) : $month++;
 
     $y     eq '11' ? ($x++, $y = 0, $z =0 ) : $y++;
 
