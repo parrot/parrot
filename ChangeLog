@@ -1,8 +1,16 @@
-2014-08-18    release 7.7.0
+2015-09-15    release 7.8.0
+    - Core
+    - Build
+        + Added fixes for AIX7.1 by tkob <ether4@gmail.com>
+    - Documentation
+    - Tests
+    - Community
+
+2015-08-18    release 7.7.0
     - Documentation
         + remove bitrotted author contributions
 
-2014-07-21    release 7.6.0
+2015-07-21    release 7.6.0
     - Core
         + structview
             = Added missing returns to switch/case.
@@ -14,7 +22,7 @@
             = Added reference to GH#1206 .
     - Community
 
-2014-06-16    release 7.5.0
+2015-06-16    release 7.5.0
     - Core
         + Optimize mod_i_* ops and Integer pmc to avoid util_intval_mod
         + Coverity bugs fixed:
@@ -28,24 +36,24 @@
            have resumed. Many thanks for providing the service to
            the open-source community!
 
-2014-05-19    release 7.4.0
+2015-05-19    release 7.4.0
      - Documentation
          + Many minor corrections
      - Community
          + Coverity scans to resume RSN.
 
-2014-04-21    release 7.3.0 - supported
+2015-04-21    release 7.3.0 - supported
     - Build
         + Fixed windows link regression from 7.0.2 with cl.exe. #1203
         + Fixed rlimit compilation for OpenBSD
     - Tests
         + Relaxed the common GC stress test and re-add the JSON.nqp variant.
 
-2014-03-17    release 7.2.0
+2015-03-17    release 7.2.0
     - Build
         + Fix warning on Win32 (with cl.exe)  when `link` is not explicitly set.
 
-2014-02-17    release 7.1.0
+2015-02-17    release 7.1.0
     - Core
         + Fix SIGBUS in GC trace_mem_block on alignment-strict CPUs (arm), #1200.
           We traced all pointers by +1 and not by +4 or +8.
@@ -55,7 +63,7 @@
     - Community
         + rakudo perl6 announced to drop parrot support.
 
-2014-01-29    release 7.0.2 - supported
+2015-01-29    release 7.0.2 - supported
     - Core
         + Fix 2 regressions from 6.11.0 on win64 with Visual C++. GH #1190, #1192
           Wrong SAL annotations, and a wrong function ptr cast.
@@ -67,7 +75,7 @@
           HAS_$PLATFORM_$feature. #1173
         + Improved msvc configuration from a mingw perl. #1191
 
-2014-01-23    release 7.0.1 - supported
+2015-01-23    release 7.0.1 - supported
     - Core
         + Fixed a serious GC regression with --optimize and the default GC gms. #1186
         + Fixed a threads deadlock with the default GC gms. #1187
@@ -77,7 +85,7 @@
           #1181, #1182, #1178, #1110
         + Actually link with libicu when probing for it. #1182, #1188
 
-2014-01-20    release 7.0.0 - supported
+2015-01-20    release 7.0.0 - supported
     - Core
         + Added a experimental INTERPINFO_MAX_GENERATIONS api, made MAX_GENERATIONS
           --ccflags adjustable, renamed to GC_MAX_GENERATIONS, and use the correct number.
