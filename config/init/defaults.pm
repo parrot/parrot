@@ -79,6 +79,10 @@ sub runstep {
 
     my $ccdlflags = $Config{ccdlflags};
     $ccdlflags =~ s/\s*-Wl,-rpath,\S*//g if $conf->options->get('disable-rpath');
+    $ccdlflags =~ s/-Xlink.*perl\.exp// if $Config{osname} eq 'aix';
+
+    my $lddlflags = $Config{lddlflags};
+    $lddlflags =~ s/-Wl,-bI:\$\(PERL_INC\)\/perl\.exp -Wl,-bE:\$\(BASEEXT\)\.exp// if $Config{osname} eq 'aix';
 
     my $build_dir =  abs_path($FindBin::Bin);
 
@@ -139,11 +143,11 @@ sub runstep {
         # Some operating systems (e.g. Darwin) distinguish between shared
         # libraries and modules that can be dynamically loaded.  Flags to tell
         # ld to build a shared library, e.g.  -shared for GNU ld.
-        ld_share_flags => $Config{lddlflags},
+        ld_share_flags => $lddlflags,
 
         # Flags to tell ld to build a dynamically loadable module, e.g.
         # -shared for GNU ld, -bundle -undefined dynamic_lookup on darwin.
-        ld_load_flags => $Config{lddlflags},
+        ld_load_flags => $lddlflags,
 
         libs => $Config{libs},
 

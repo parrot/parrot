@@ -192,7 +192,11 @@ static void
 convert_stat_buf(ARGIN(struct stat *stat_buf), ARGOUT(Parrot_Stat_Buf *buf))
 {
     ASSERT_ARGS(convert_stat_buf)
+#ifdef PARROT_HAS_STAT_ST_TIMESPEC_T
+    static const st_timespec_t zero = { 0, 0 };
+#else
     static const struct timespec zero = { 0, 0 };
+#endif
 
     INTVAL type;
 

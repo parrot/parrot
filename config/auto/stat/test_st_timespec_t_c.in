@@ -1,0 +1,25 @@
+/*
+Copyright (C) 2015, Parrot Foundation.
+
+check if type st_timespec_t is defined
+
+*/
+
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/stat.h>
+
+int
+main()
+{
+    st_timespec_t timespec = { 0, 0 };
+    printf("OK\n");
+    return EXIT_SUCCESS;
+}
+
+/*
+ * Local variables:
+ *   c-file-style: "parrot"
+ * End:
+ * vim: expandtab shiftwidth=4 cinoptions='\:2=2' :
+ */
