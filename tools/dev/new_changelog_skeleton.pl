@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2012-2013, 2015, Parrot Foundation.
+# Copyright (C) 2012-2015, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -34,7 +34,7 @@ sub military_to_iso_date {
     my $c = 1;
     my @months = qw( Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec );
     my %months = map { uc($_) => sprintf('%02d', $c++) } @months;
-    my $months = join '|', @months;    
+    my $months = join '|', @months;
     $in_date =~ m{ \A \s* (\d{2}) \s ($months) \s (\d{4}) \s* \z }msix
         or die;
     return sprintf '%04d-%02d-%02d', $3, $months{uc $2}, $1;
