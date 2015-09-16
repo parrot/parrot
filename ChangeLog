@@ -2,6 +2,7 @@
     - Core
     - Build
         + Added fixes for AIX7.1 by tkob <ether4@gmail.com>
+        + Rewrote new_changelog_skeleton.pl to use JSON release data.
     - Documentation
     - Tests
     - Community
