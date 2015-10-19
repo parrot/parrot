@@ -12,6 +12,8 @@
     - Build
         + --optimize: Replace -O2 from perl5 with -O3 on clang or gcc. GH #1185
           5% faster
+        + Fixed make clean realclean and install which sometimes forgot pmc_default.h
+          GH #1194, GH #1206
     - Tests
         + Use the faster travis docker infrastructure without sudo
 
