@@ -78,10 +78,13 @@ ok($step->runstep($conf), "runstep() returned true value");
 # This test is fragile, as it depends on the current state of --cage,
 # which changes over time, and on the compiler, which may not support
 # this option.
-like($conf->data->get( 'ccwarn' ),
-    qr/-Wunreachable-code/,
-    "'cage' warning set as expected"
-);
+{
+    local $TODO = 'fragile test';
+    like($conf->data->get( 'ccwarn' ),
+         qr/-Wunreachable-code/,
+         "'cage' warning set as expected"
+        );
+}
 
 } # End SKIP block for Sun/Solaris
 

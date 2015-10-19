@@ -13,6 +13,9 @@ t/op/gc-non-recursive.t - test for marking very large linked-list
 
 See http://trac.parrot.org/parrot/ticket/1723
 
+It is a good test to detect GC problems with the string compactor
+in ms and ms2.
+
 =cut
 
 
