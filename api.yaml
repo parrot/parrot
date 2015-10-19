@@ -710,3 +710,19 @@
     - deprecated
   ticket:  'https://github.com/parrot/parrot/issues/1122'
 -
+  name:  'Deprecated ListChunk GC API and src/list.c'
+  note:
+    Only imageiofreeze still uses it.
+    Set #define PARROT_BUFFERLIKE_LIST to use it
+    Will be removed with Release 8.0.0.
+
+    Deprecated:
+    * C<gc_sys->allocate_bufferlike_header>
+    * C<gc_sys->free_bufferlike_header>
+    and it's implementations in the gms, ms, ms2 and inf GC's.
+
+  tags:
+    - api
+    - deprecated
+  ticket:  'https://github.com/parrot/parrot/issues/1179'
+-

@@ -1,9 +1,13 @@
 2015-10-20    release 7.9.0
     - Core
-        + StringBuilder.clone and ResizablePMCArray write barrier optimizations. GH #1123
+        + StringBuilder.clone and ResizablePMCArray write barrier optimizations.
+          GH #1123
         + Support -D1 GC stats with --ccflags=-DMEMORY_DEBUG for --gc=ms
-        + Added a Parrot_{un,}block_GC_move API for the 2 string compacting collectors
-          ms and ms2
+        + Added a Parrot_{un,}block_GC_move API for the 2 string compacting
+          collectors ms and ms2
+        + Deprecated ListChunk GC API and src/list.c GH #1179
+        + Fixed a --gc=ms segv in Parrot_io_write_s GH #1196
+        + const/ARGIN all read-only IO api arguments
     - Build
         + --optimize: Replace -O2 from perl5 with -O3 on clang or gcc. GH #1185
           5% faster
