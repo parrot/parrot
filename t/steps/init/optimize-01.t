@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007,2015, Parrot Foundation.
 # init/optimize-01.t
 use strict;
 use warnings;
@@ -82,8 +82,8 @@ $ret = $step->runstep($conf);
 ok( defined $ret, "runstep() returned defined value" );
 my $perl5_setting = $conf->data->get('optimize_provisional');
 like( $conf->data->get('optimize'),
-   qr/$perl5_setting/,
-   "Simple '--optimize' defaulted to Perl 5 optimization level" );
+   qr/$perl5_setting|-O3/,
+   "Simple '--optimize' defaulted to Perl 5 optimization level or -O3" );
 
 $conf->replenish($serialized);
 
