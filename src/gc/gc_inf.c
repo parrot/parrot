@@ -115,6 +115,10 @@ PARROT_WARN_UNUSED_RESULT
 static size_t gc_inf_get_gc_info(PARROT_INTERP, Interpinfo_enum what);
 
 static void gc_inf_mark_and_sweep(PARROT_INTERP, UINTVAL flags);
+static void gc_inf_mark_str_header(PARROT_INTERP,
+    ARGMOD_NULLOK(STRING *obj))
+        FUNC_MODIFIES(*obj);
+
 static void gc_inf_reallocate_buffer_storage(PARROT_INTERP,
     ARGMOD(Parrot_Buffer *buffer),
     size_t size)
@@ -185,6 +189,7 @@ static void gc_inf_reallocate_string_storage(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_inf_get_gc_info __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_inf_mark_and_sweep __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
+#define ASSERT_ARGS_gc_inf_mark_str_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_gc_inf_reallocate_buffer_storage \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
@@ -323,11 +328,13 @@ gc_inf_allocate_string_header(PARROT_INTERP, SHIM(UINTVAL flags))
 {
     ASSERT_ARGS(gc_inf_allocate_string_header)
     const size_t new_size = ALIGNED_STRING_SIZE(sizeof (STRING));
-    char * const mem = (char *)mem_internal_allocate(new_size);
+    STRING *s = (STRING*)mem_internal_allocate(new_size);
     MEMORY_DEBUG_UNUSED(interp)
+    memset(s, 0, sizeof (STRING));
     GC_DEBUG_DETAIL_2("allocate_string_header %p "SIZE_FMT" bytes)\n",
-                      mem, sizeof (STRING));
-    return (STRING*)(mem + sizeof (void*));
+                      s, sizeof (STRING));
+    return s;
+    /*return (STRING*)(mem + sizeof (void*));*/
 }
 
 static void
@@ -338,7 +345,8 @@ gc_inf_free_string_header(PARROT_INTERP, ARGFREE(STRING *s))
         MEMORY_DEBUG_UNUSED(interp)
         GC_DEBUG_DETAIL_2("free_string_header %p "SIZE_FMT" bytes)\n",
                           s, sizeof (STRING));
-        free(s - sizeof (void*));
+        free(s);
+        /*free(s - sizeof (void*));*/
     }
 }
 
@@ -504,6 +512,25 @@ gc_inf_get_gc_info(SHIM_INTERP, SHIM(Interpinfo_enum what))
 
 /*
 
+=item C<static void gc_inf_mark_str_header(PARROT_INTERP, STRING *obj)>
+
+mark *obj as live
+
+=cut
+
+*/
+
+static void
+gc_inf_mark_str_header(SHIM_INTERP, ARGMOD_NULLOK(STRING *obj))
+{
+    ASSERT_ARGS(gc_inf_mark_str_header)
+    if (obj) {
+        PObj_live_SET(obj);
+    }
+}
+
+/*
+
 =item C<void Parrot_gc_inf_init(PARROT_INTERP, Parrot_GC_Init_Args *args)>
 
 Initializes the infinite memory collector. Installs the necessary function
@@ -528,6 +555,9 @@ Parrot_gc_inf_init(PARROT_INTERP, SHIM(Parrot_GC_Init_Args *args))
     interp->gc_sys->maybe_gc_mark           = gc_inf_mark_and_sweep; /* dummy */
     interp->gc_sys->do_gc_mark              = gc_inf_mark_and_sweep;
     interp->gc_sys->compact_string_pool     = gc_inf_compact_memory_pool;
+
+    /*interp->gc_sys->mark_pmc_header       = gc_inf_mark_pmc_header;*/
+    interp->gc_sys->mark_str_header         = gc_inf_mark_str_header;
 
     /*
     interp->gc_sys->mark_special                = gc_inf_mark_special;

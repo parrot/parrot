@@ -8,6 +8,7 @@
         + Deprecated ListChunk GC API and src/list.c GH #1179
         + Fixed a --gc=ms segv in Parrot_io_write_s GH #1196
         + const/ARGIN all read-only IO api arguments
+        + Fixed --gc=inf string header allocation and failing tests
     - Build
         + --optimize: Replace -O2 from perl5 with -O3 on clang or gcc. GH #1185
           5% faster
