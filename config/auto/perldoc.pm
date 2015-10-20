@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2013, Parrot Foundation.
+# Copyright (C) 2001-2015, Parrot Foundation.
 
 =head1 NAME
 
@@ -40,11 +40,23 @@ sub runstep {
     my ( $fh, $filename ) = tempfile( UNLINK => 1 );
     # try to execute 'perldoc perldoc' || 'perldoc Pod::Perldoc' to
     # read the documentation of perldoc
-    my $content = capture_output("$cmd -ud $filename perldoc") || capture_output("$cmd -ud $filename Pod::Perldoc") || undef;
+    $conf->debug("$cmd\n");
+    my $content = capture_output("$cmd -ud $filename perldoc")
+      || capture_output("$cmd -ud $filename Pod::Perldoc")
+      || undef;
 
+    $conf->debug($content ? substr($content,0,100)." ...\n" : "<empty content>\n");
+    if (!defined $content and $conf->data->get_p5('usecperl')) {
+        $cmd = File::Spec->catfile($conf->data->get('scriptdirexp_provisional'), q{cperldoc});
+        $conf->debug("$cmd\n");
+        $content = capture_output("$cmd -ud $filename perldoc")
+          || capture_output("$cmd -ud $filename Pod::Perldoc")
+          || undef;
+    }
     return 1 unless defined( $self->_initial_content_check($conf, $content) );
 
     my $version = $self->_analyze_perldoc($cmd, $filename, $content);
+    $conf->debug("version: $version");
 
     _handle_version($conf, $version, $cmd);
 
@@ -140,15 +152,19 @@ sub _handle_no_perldoc {
     return 0;
 }
 
+sub _handle_cperldoc {
+    my $self = shift;
+    $self->set_result('yes, cperldoc');
+    return 1;
+}
+
 sub _handle_version {
     my ($conf, $version, $cmd) = @_;
     $conf->data->set(
         has_perldoc => $version != 0 ? 1 : 0,
         new_perldoc => $version == 2 ? 1 : 0
     );
-
     $conf->data->set( perldoc => $cmd ) if $version;
-
     return 1;
 }
 
