@@ -711,8 +711,8 @@ buffer_location(PARROT_INTERP, ARGIN(const Parrot_Buffer *b))
     UINTVAL i;
 
     for (i = 0; i < ctx->n_regs_used[REGNO_STR]; ++i) {
-        PObj * const obj = (PObj *)Parrot_pcc_get_STRING_reg(interp, ctx, i);
-        if ((PObj *)obj == b) {
+        PObj * const obj = (PObj *)Parrot_pcc_get_STRING_reg(interp, (PMC*)ctx, i);
+        if ((PObj *)obj == (PObj *)b) {
             sprintf(reg, "S%d", (int)i);
             return reg;
         }
