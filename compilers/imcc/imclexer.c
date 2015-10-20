@@ -1777,7 +1777,7 @@ PIOHANDLE determine_input_file_type(ARGMOD(imc_info_t * imcc), ARGIN(STRING *sou
   } while (0)
 
 #define YY_INPUT(buf, result, max_size) \
-    (result) = Parrot_io_internal_read((Interp *)yyextra->interp, (PIOHANDLE)yyin, (buf), (max_size))
+    (result) = Parrot_io_internal_read(yyextra->interp, (PIOHANDLE)yyin, (buf), (max_size))
 
 
 
