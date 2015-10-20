@@ -1,14 +1,16 @@
 2015-10-20    release 7.9.0
     - Core
         + StringBuilder.clone and ResizablePMCArray write barrier optimizations.
-          GH #1123
+          1.14% faster, GH #1123
+        + More StringBuilder optimizations with substr, set_pmc, push_pmc,
+          i_concatenate, and do less overallocation. <1% faster. GH #1123
         + Support -D1 GC stats with --ccflags=-DMEMORY_DEBUG for --gc=ms
         + Added a Parrot_{un,}block_GC_move API for the 2 string compacting
           collectors ms and ms2
-        + Deprecated ListChunk GC API and src/list.c GH #1179
         + Fixed a --gc=ms segv in Parrot_io_write_s GH #1196
-        + const/ARGIN all read-only IO api arguments
         + Fixed --gc=inf string header allocation and failing tests
+        + const/ARGIN all read-only IO api arguments
+        + Deprecated ListChunk GC API and src/list.c GH #1179
     - Build
         + --optimize: Replace -O2 from perl5 with -O3 on clang or gcc. GH #1185
           5% faster
@@ -18,13 +20,9 @@
         + Use the faster travis docker infrastructure without sudo
 
 2015-09-15    release 7.8.0
-    - Core
     - Build
         + Added fixes for AIX7.1 by tkob <ether4@gmail.com>
         + Rewrote new_changelog_skeleton.pl to use JSON release data.
-    - Documentation
-    - Tests
-    - Community
 
 2015-08-18    release 7.7.0
     - Documentation

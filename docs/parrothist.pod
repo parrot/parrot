@@ -191,5 +191,6 @@ Starred release numbers indicate supported releases.
  Util        7.6.0 *        2015-Jul-21     "Yellow-throated Hanging Parrot"
  rurban      7.7.0          2015-Aug-18     "Red-headed Lovebird"
  Util        7.8.0          2015-Sep-15     "Military Macaw"
+ rurban      7.9.0 *        2015-Oct-20     "Sangihe hanging parrot"
 
 =cut
