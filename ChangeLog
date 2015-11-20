@@ -2,7 +2,7 @@
     - Core
     - Build
     - Documentation
-        + accept cperldoc as fallback to perldoc GH #1211
+        + Accept cperldoc as fallback to perldoc GH #1211
     - Tests
     - Community
 
