@@ -1,18 +1,16 @@
-2015-12-15    release 7.12.0
+2015-12-15    release 7.11.0
     - Build
         + Improve darwin and cygwin build, seperate installable libparrot.
           GH #1212, 1096
         + Honor --disable-rpath on darwin, skip -install_name then
         + Update default cygwin compiler and linker to gcc with 1.7
-        + Add darwin and windows smokers (travis + appveyor) to prev. linux only
+        + Add darwin and windows smokers (travis + appveyor), prev. linux only
+        + use a smaller default target: core (most parrot_utils, not all)
+          make all builds now all, including docs and installables
 
 2015-11-17    release 7.10.0
-    - Core
-    - Build
     - Documentation
         + Accept cperldoc as fallback to perldoc GH #1211
-    - Tests
-    - Community
 
 2015-10-20    release 7.9.0
     - Core

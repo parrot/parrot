@@ -1,8 +1,8 @@
 {
-    "release.version"  : "7.10.0",
-    "release.name"     : "Wyrd Parrot",
+    "release.version"  : "7.11.0",
+    "release.name"     : "Amazonian parrotlet",
     "release.day"      : "Tuesday",
-    "release.nextdate" : "15 Dec 2015",
+    "release.nextdate" : "19 Jan 2015",
     "release.type"     : "devel",
 
     "web.root"         : "http://parrot.org/",
@@ -12,10 +12,10 @@
     "web.org_root"     : "https://github.com/parrot",
 
     "bugday.day"       : "Saturday",
-    "bugday.date"      : "12 Dec 2015",
+    "bugday.date"      : "15 Jan 2015",
 
     "wiki.root"        : "https://github.com/parrot/parrot/wiki",
-    "wiki.bugday"      : "bug_day_2015_12_12",
+    "wiki.bugday"      : "bug_day_2016_01_15",
 
-    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/7.10.0/"
+    "ftp.path"         : "ftp://ftp.parrot.org/pub/parrot/releases/devel/7.11.0/"
 }

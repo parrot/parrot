@@ -193,5 +193,6 @@ Starred release numbers indicate supported releases.
  Util        7.8.0          2015-Sep-15     "Military Macaw"
  rurban      7.9.0 *        2015-Oct-20     "Sangihe hanging parrot"
  Util        7.10.0         2015-Nov-17     "Wyrd Parrot"
+ rurban      7.11.0         2015-Dec-15     "Amazonian parrotlet"
 
 =cut

@@ -1,4 +1,4 @@
-# Copyright (C) 2012, Parrot Foundation.
+# Copyright (C) 2012-2015, Parrot Foundation.
 
 =pod
 
@@ -80,7 +80,8 @@ This rearranges B<PASM> code to make it run faster.
 
 =item Status
 
-Untested. IMCC no longer has the ability to output PASM code, only PBC.
+B<Poor>. IMCC no longer has the ability to output PASM code, only PBC.
+Testing -O2 is included in the travis smokes.
 
 =back
 
@@ -100,7 +101,7 @@ B<Fair>. A breakdown of Interpreter subsystems below lists individual status.
 
 =item PMCs
 
-B<Fair>. Each PMC file has a corresponding test file. Some PMCs are heavily
+B<Fair>. Each PMC file has a corresponding test file. Some PMCs are
 undertested. Tests under B<t/pmc/>.
 
 =item Operators
@@ -124,8 +125,8 @@ weak. Tests under B<t/dynops/>.
 
 =item Packfiles
 
-B<Poor>. For more exotic platforms tests under B<t/native_pbc> are
-rarely updated.
+B<Fair>. Only 64bit bin-endian platforms B<t/native_pbc> are
+rarely updated and are B<Poor>.
 
 =back
 
@@ -204,7 +205,7 @@ B<t/examples/> and B<t/benchmark/>.
 
 =item Status
 
-B<Poor>. Few tests exist, and coverage is sparse. Tests under B<t/tools/>.
+B<Fair>. Most tools are covered. Tests under B<t/tools/>.
 
 =back
 
