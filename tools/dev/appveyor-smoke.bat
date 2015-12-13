@@ -1,5 +1,3 @@
-@echo off
-
 if not "%PLATFORM%" == "x64" set WIN64=undef
 if "%MSVC_VERSION%" == "10" goto msvc_10
 if "%MSVC_VERSION%" == "12" goto msvc_12
