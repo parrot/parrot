@@ -18,7 +18,7 @@ addons:
 
 before_script:
     # No, we are not going to run the tests for all these dependencies on every commit
-    - if [ $TRAVIS_OS_NAME == osx ]; then brew update; brew install cpanminus; brew install icu4c; fi
+    - if [ $TRAVIS_OS_NAME == osx ]; then brew update; brew install cpanminus; brew install icu4c; export PERL5LIB=~/perl5; fi
     - cpanm -n LWP::UserAgent TAP::Harness::Archive TAP::Harness::ReportByDescription Test::Perl::Critic
     - gcc --version
     - g++ --version
@@ -45,11 +45,11 @@ notifications:
 env:
   matrix:
     # use --optimize for most since it's stable and runs fastest
-    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize"  PARROT_TEST="smoke"  CC="clang"
-    - PARROT_CONFIG_ARGS="--without-gettext --without-gmp --without-libffi --without-extra-nci-thunks --without-opengl --without-readline --without-pcre --without-zlib --without-threads --without-icu" PARROT_OPTIMIZE="" PARROT_TEST="smoke" CC="clang"
-    #- PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize"  PARROT_TEST="smoke"  CC="gcc"
+    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize"  PARROT_TEST="test"  CC="clang"
+    - PARROT_CONFIG_ARGS="--without-gettext --without-gmp --without-libffi --without-extra-nci-thunks --without-opengl --without-readline --without-pcre --without-zlib --without-threads --without-icu" PARROT_OPTIMIZE="" PARROT_TEST="test" CC="clang"
+    #- PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize"  PARROT_TEST="test"  CC="gcc"
     #- PARROT_CONFIG_ARGS="--without-gettext --without-gmp --without-libffi --without-extra-nci-thunks --without-opengl --without-readline --without-pcre --without-zlib --without-threads --without-icu" PARROT_OPTIMIZE="" PARROT_TEST="smoke" CC="gcc"
-    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize"  PARROT_TEST="smoke"  CC="g++"
+    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize"  PARROT_TEST="test"  CC="g++"
     - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize"  PARROT_TEST="testO2" CC="clang"
     # Use clang to run our coding standard and manifest tests, because it is the fastest
     # These will cause Travis to report a build failure when somebody breaks the manifest
