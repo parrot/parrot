@@ -1,7 +1,7 @@
 /*
-Copyright (C) 2007-2009, Parrot Foundation.
+Copyright (C) 2007-2015, Parrot Foundation.
 
-test for cmpxchg support with gcc-style inline ASM
+Test for cmpxchg support with gcc-style inline ASM
 */
 
 #include <assert.h>
@@ -9,6 +9,11 @@ test for cmpxchg support with gcc-style inline ASM
 
 #include <stdio.h>
 #include <stdint.h>
+
+/* darwin clang: */
+#ifndef __WORDSIZE
+#  define __WORDSIZE (sizeof(void*) * 8)
+#endif
 
 inline static void *docmpxchg(void **ptr, void *oldval, void *newval) {
 #if __WORDSIZE == 64

@@ -7,6 +7,11 @@
 #ifndef PARROT_COMPILER_H_GUARD
 #define PARROT_COMPILER_H_GUARD
 
+/* darwin clang! */
+#ifndef __WORDSIZE
+#  define __WORDSIZE (sizeof(void*) * 8)
+#endif
+
 /*
  * This set of macros define capabilities that may or may not be available
  * for a given compiler.  They are based on GCC's and CLANG's __attribute__ functionality.
