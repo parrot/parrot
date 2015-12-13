@@ -24,7 +24,7 @@ init:
 build: off
 
 test_script:
-  - 'tools\build\appveyor-smoke.bat'
+  - 'tools\dev\appveyor-smoke.bat'
 
 # nope: https://ci.appveyor.com/project/rurban/cperl/build/job/ui7b0dk0gprw1eo2
 #  - cinst ruby.devkit
