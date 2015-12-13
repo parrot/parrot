@@ -1,11 +1,11 @@
-language: "perl"
-perl:
-    - "5.20"
+language: perl
 install: "echo"
 sudo: false
 os:
-  - linux
   - osx
+  - linux
+cache:
+  apt: true
 addons:
   apt:
     packages:
@@ -18,6 +18,7 @@ addons:
 
 before_script:
     # No, we are not going to run the tests for all these dependencies on every commit
+    - if [ $TRAVIS_OS_NAME == osx ]; then brew update; brew install cpanminus; brew install icu4c; fi
     - cpanm -n LWP::UserAgent TAP::Harness::Archive TAP::Harness::ReportByDescription Test::Perl::Critic
     - gcc --version
     - g++ --version
@@ -46,8 +47,8 @@ env:
     # use --optimize for most since it's stable and runs fastest
     - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize"  PARROT_TEST="smoke"  CC="clang"
     - PARROT_CONFIG_ARGS="--without-gettext --without-gmp --without-libffi --without-extra-nci-thunks --without-opengl --without-readline --without-pcre --without-zlib --without-threads --without-icu" PARROT_OPTIMIZE="" PARROT_TEST="smoke" CC="clang"
-    - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize"  PARROT_TEST="smoke"  CC="gcc"
-    - PARROT_CONFIG_ARGS="--without-gettext --without-gmp --without-libffi --without-extra-nci-thunks --without-opengl --without-readline --without-pcre --without-zlib --without-threads --without-icu" PARROT_OPTIMIZE="" PARROT_TEST="smoke" CC="gcc"
+    #- PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize"  PARROT_TEST="smoke"  CC="gcc"
+    #- PARROT_CONFIG_ARGS="--without-gettext --without-gmp --without-libffi --without-extra-nci-thunks --without-opengl --without-readline --without-pcre --without-zlib --without-threads --without-icu" PARROT_OPTIMIZE="" PARROT_TEST="smoke" CC="gcc"
     - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize"  PARROT_TEST="smoke"  CC="g++"
     - PARROT_CONFIG_ARGS="" PARROT_OPTIMIZE="--optimize"  PARROT_TEST="testO2" CC="clang"
     # Use clang to run our coding standard and manifest tests, because it is the fastest
