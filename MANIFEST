@@ -25,6 +25,7 @@ RESPONSIBLE_PARTIES                                         [main]doc
 TODO                                                        [devel]doc
 VERSION                                                     [devel]
 api.yaml                                                    []
+appveyor.yml                                                []
 compilers/README.pod                                        []doc
 compilers/data_json/Defines.mak                             [data_json]
 compilers/data_json/JSON.nqp                                [data_json]
@@ -2180,6 +2181,7 @@ tools/dev/.gdbinit                                          []
 tools/dev/README.pod                                        []doc
 tools/dev/addopstags.pl                                     []
 tools/dev/all_hll_test.pl                                   []
+tools/dev/appveyor-smoke.bat                                []
 tools/dev/as2c.pl                                           []
 tools/dev/bench_op.pir                                      []
 tools/dev/create_language.pl                                [devel]

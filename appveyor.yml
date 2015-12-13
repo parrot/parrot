@@ -1,0 +1,49 @@
+version: 5.22.2.{build}
+skip_tags: true
+#os: MinGW
+#os: Visual Studio 2015
+#os: Default Azure
+#build:
+#  verbosity: minimal
+platform:
+  - x64
+  - x86
+environment:
+  matrix:
+#   - MSVC_VERSION: 10
+    - MSVC_VERSION: 12  
+clone_depth: 1
+branches:
+  only:
+    - master
+    - /smoke/
+init:
+  - git config --global core.autocrlf input
+
+# from https://github.com/apache/lucy-clownfish/blob/master/appveyor.yml  
+build: off
+
+test_script:
+  - 'tools\build\appveyor-smoke.bat'
+
+# nope: https://ci.appveyor.com/project/rurban/cperl/build/job/ui7b0dk0gprw1eo2
+#  - cinst ruby.devkit
+#  - cinst make
+#install:
+#  - cinst mingw
+#  - SET PATH=%PATH%;C:\tools\mingw64\bin;C:\tools\mingw64\opt\bin
+#  - mingw-get install mingw-developer-toolkit
+#build_script:
+#  - cd win32
+#  - mingw32-make
+#test_script:
+#  - mingw32-make test
+
+notifications:
+- provider: Email
+  to:
+    - parrot-ci@lists.parrot.org
+  subject: [parrot appveyor]
+  on_build_success: true
+  on_build_failure: true
+  on_build_status_changed: false

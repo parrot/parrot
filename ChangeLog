@@ -4,6 +4,7 @@
           GH #1212, 1096
         + Honor --disable-rpath on darwin, skip -install_name then
         + Update default cygwin compiler and linker to gcc with 1.7
+        + Add darwin and windows smokers (travis + appveyor) to prev. linux only
 
 2015-11-17    release 7.10.0
     - Core

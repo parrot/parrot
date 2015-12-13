@@ -3,6 +3,9 @@ perl:
     - "5.20"
 install: "echo"
 sudo: false
+os:
+  - linux
+  - osx
 addons:
   apt:
     packages:
