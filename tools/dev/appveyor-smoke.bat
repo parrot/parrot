@@ -5,14 +5,15 @@ if "%MSVC_VERSION%" == "12" goto msvc_12
 :msvc_12
 if "%PLATFORM%" == "x64" set PLATFORM=amd64
 call "C:\Program Files (x86)\Microsoft Visual Studio %MSVC_VERSION%.0\VC\vcvarsall.bat" %PLATFORM%
-
-perl Configure.pl --optimize --cc=cl --ld=cl
-nmake test
-exit /b
+goto start
 
 :msvc_10
 call "C:\Program Files\Microsoft SDKs\Windows\v7.1\Bin\SetEnv.cmd" /%PLATFORM%
 
-perl Configure.pl --optimize --cc=cl --ld=link
+:start
+echo %PLATFORM%
+echo %MSVC_VERSION%
+perl Configure.pl --verbose --optimize --cc=cl --ld=link --ccflags="-nologo -GF -W3 -MD -Zi -DNDEBUG -O2 -DWIN32 -D_CONSOLE -DNO_STRICT" --ldflags="-nologo -release" --linkflags="-nologo -release" --libs="ws2_32.lib"
 nmake test
 exit /b
+

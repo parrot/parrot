@@ -10,7 +10,7 @@ platform:
   - x86
 environment:
   matrix:
-#   - MSVC_VERSION: 10
+    - MSVC_VERSION: 10
     - MSVC_VERSION: 12  
 clone_depth: 1
 branches:
