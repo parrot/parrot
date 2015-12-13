@@ -986,13 +986,14 @@ $(MINIPARROT) : $(FRP_DIR)/main$(O) $(INC_DIR)/api.h $(INC_DIR)/longopt.h $(LIBP
 $(INSTALLABLEPARROT) : $(FRPTWO_DIR)/main$(O) $(GEN_HEADERS) $(LIBPARROT) \
   src/install_config$(O) \
   $(FRPTWO_DIR)/prt0.pbc$(O) $(PARROT)
-#IF(darwin):	$(RM) $(LIBPARROT_SHARED)
+#IF(darwin):	$(MV) $(LIBPARROT_SHARED) $(LIBPARROT_SHARED).orig
 #IF(darwin):	$(MAKE) $(INSTALLABLELIBPARROT)
-#IF(darwin):	$(MV) $(INSTALLABLELIBPARROT) $(LIBPARROT_SHARED)
+#IF(darwin):	$(CP) $(INSTALLABLELIBPARROT) $(LIBPARROT_SHARED)
 	$(LINK) @ld_out@$@ \
 	  $(FRPTWO_DIR)/main$(O) src/install_config$(O) \
 	  $(FRPTWO_DIR)/prt0.pbc$(O) @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
+#IF(darwin):	$(MV) $(LIBPARROT_SHARED).orig $(LIBPARROT_SHARED)
 	$(ADDGENERATED) "$@" "[main]" bin
 
 $(INC_DIR)/context.h : $(INC_PMC_DIR)/pmc_callcontext.h
@@ -1225,11 +1226,15 @@ $(PDB) : $(FR_DIR)/parrot_debugger/main$(O) src/parrot_config$(O) $(LIBPARROT)
 # broken. do not install
 #IF(cygwin and optimize):$(INSTALLABLEPDB) : LINK += -s
 $(INSTALLABLEPDB) : $(FR_DIR)/parrot_debugger/main$(O) $(LIBPARROT) src/install_config$(O)
+#IF(darwin):	$(MV) $(LIBPARROT_SHARED) $(LIBPARROT_SHARED).orig
+#IF(darwin):	$(MAKE) $(INSTALLABLELIBPARROT)
+#IF(darwin):	$(CP) $(INSTALLABLELIBPARROT) $(LIBPARROT_SHARED)
 	$(LINK) @ld_out@$@ \
 	  $(FR_DIR)/parrot_debugger/main$(O) \
 	  src/install_config$(O) \
 	  @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
+#IF(darwin):	$(MV) $(LIBPARROT_SHARED).orig $(LIBPARROT_SHARED)
 	@echo $(ADDGENERATED) "$@" "[main]" bin
 
 #
@@ -1251,10 +1256,14 @@ $(DIS) : $(FR_DIR)/pbc_disassemble/main$(O) $(LIBPARROT)
 #IF(cygwin and optimize):$(INSTALLABLEDIS) : LINK += -s
 $(INSTALLABLEDIS) : $(FR_DIR)/pbc_disassemble/main$(O) \
   src/install_config$(O) $(LIBPARROT)
+#IF(darwin):	$(MV) $(LIBPARROT_SHARED) $(LIBPARROT_SHARED).orig
+#IF(darwin):	$(MAKE) $(INSTALLABLELIBPARROT)
+#IF(darwin):	$(CP) $(INSTALLABLELIBPARROT) $(LIBPARROT_SHARED)
 	$(LINK) @ld_out@$@ \
 	  $(FR_DIR)/pbc_disassemble/main$(O) \
 	  @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
+#IF(darwin):	$(MV) $(LIBPARROT_SHARED).orig $(LIBPARROT_SHARED)
 	$(ADDGENERATED) "$@" "[main]" bin
 
 #
@@ -1281,11 +1290,15 @@ $(FR_DIR)/pbc_dump/main$(O) : \
 #IF(cygwin and optimize):$(INSTALLABLEPDUMP) : LINK += -s
 $(INSTALLABLEPDUMP) : $(FR_DIR)/pbc_dump/main$(O) $(FR_DIR)/pbc_dump/packdump$(O) \
   src/install_config$(O) $(LIBPARROT)
+#IF(darwin):	$(MV) $(LIBPARROT_SHARED) $(LIBPARROT_SHARED).orig
+#IF(darwin):	$(MAKE) $(INSTALLABLELIBPARROT)
+#IF(darwin):	$(CP) $(INSTALLABLELIBPARROT) $(LIBPARROT_SHARED)
 	$(LINK) @ld_out@$@ \
 	  $(FR_DIR)/pbc_dump/main$(O) \
 	  $(FR_DIR)/pbc_dump/packdump$(O) \
 	  @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
+#IF(darwin):	$(MV) $(LIBPARROT_SHARED).orig $(LIBPARROT_SHARED)
 	$(ADDGENERATED) "$@" "[main]" bin
 
 #
@@ -1301,11 +1314,15 @@ $(PBC_MERGE) : $(FR_DIR)/pbc_merge/main$(O) $(LIBPARROT) src/parrot_config$(O)
 
 #IF(cygwin and optimize):$(INSTALLABLEPBC_MERGE) : LINK += -s
 $(INSTALLABLEPBC_MERGE) : $(FR_DIR)/pbc_merge/main$(O) $(LIBPARROT) $(INSTALLABLECONFIG)
+#IF(darwin):	$(MV) $(LIBPARROT_SHARED) $(LIBPARROT_SHARED).orig
+#IF(darwin):	$(MAKE) $(INSTALLABLELIBPARROT)
+#IF(darwin):	$(CP) $(INSTALLABLELIBPARROT) $(LIBPARROT_SHARED)
 	$(LINK) @ld_out@$@ \
 	  $(FR_DIR)/pbc_merge/main$(O) \
 	  src/install_config$(O) \
 	  @rpath_lib@ $(ALL_PARROT_LIBS) $(LINKFLAGS)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;1
+#IF(darwin):	$(MV) $(LIBPARROT_SHARED).orig $(LIBPARROT_SHARED)
 	$(ADDGENERATED) "$@" "[main]" bin
 
 #
