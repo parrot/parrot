@@ -877,7 +877,7 @@ all : world installable
 world : core parrot_utils
 
 some_utils : $(PDUMP) $(DIS) $(PDB) $(PBC_MERGE) $(PBC_TO_EXE) $(PARROT_CONFIG) \
-  $(WINXED) $(NQP-RX)
+  $(WINXED) $(NQP_RX)
 
 parrot_utils : core some_utils src/install_config$(O) $(PARROT_PROVE) $(OPS2C)
 
