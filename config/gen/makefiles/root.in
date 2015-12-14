@@ -1161,7 +1161,7 @@ $(LIBPARROT_STATIC) : $(O_FILES)
 	$(MKPATH) @blib_dir@
 	$(AR_CR) @ar_out@$@ @ar_extra@ $(O_FILES)
 #IF(win32 and has_mt):	if exist $@.manifest mt.exe -nologo -manifest $@.manifest -outputresource:$@;2
-	$(RANLIB) $@
+#UNLESS(win32):	$(RANLIB) $@
 	$(ADDGENERATED) "$@" "[main]" lib
 
 $(LIBPARROT_SHARED) : $(O_FILES)

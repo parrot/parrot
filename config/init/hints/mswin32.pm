@@ -81,6 +81,7 @@ sub runstep {
         my $ldflags = $conf->option_or_data('ldflags');
         if ($ld =~ /g\+\+/) {
             # now we are sure that we have to convert from a strawberry mingw perl to msvc
+            $conf->debug("convert strawberry mingw perl config to msvc...");
             if ($ccflags !~ /nologo/) {
                 $ccflags = "-nologo -GF -W4 -MD -DWIN32 -D_CONSOLE -DNO_STRICT";
                 $optimize =~ s/-s //;
@@ -88,6 +89,7 @@ sub runstep {
                 $conf->debug(" optimize => '$optimize', ");
                 $conf->data->set('optimize_provisional', $optimize);
             }
+            $conf->data->set('a', '.lib');
             $ld = 'link';
             $conf->data->set( ld   => $ld );
             my $link = $conf->options->get('link');
