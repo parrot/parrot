@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2012, Parrot Foundation.
+# Copyright (C) 2001-2015, Parrot Foundation.
 
 =pod
 
@@ -230,6 +230,19 @@ TODO test actually executed, so that unexpected success can be detected.
 In the case of missing requirements and in the case of serious breakdowns
 the execution of tests can be skipped.
 See L<Test::More> on how to do that.
+
+=head1 SMOKE TESTS
+
+Parrot uses several smoker services.
+
+Our own C<make smoke> test results are at
+L<http://smolder.parrot.org/app/projects/smoke_reports/1>.
+
+All C<smoke-me/> and C<master> branch changes are automatically smoked
+on linux and darwin at L<https://ci.appveyor.com/project/rurban/parrot/>.
+
+You can trigger manual win32 and win64 smokes with MSVC 10 and 12 for the
+C<smoke-me/appveyor> branch at L<https://ci.appveyor.com/project/rurban/parrot/>.
 
 =head1 SEE ALSO
 
