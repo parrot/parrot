@@ -2306,7 +2306,10 @@ CODINGSTD_TEST_FILES = \
 	t/codingstd/*.t
 CONFIGURE_TEST_FILES = \
 	t/configure/*.t \
-	t/steps/*.t
+	t/steps/init/*.t \
+	t/steps/inter/*.t \
+	t/steps/auto/*.t \
+	t/steps/gen/*.t
 DISTRO_TEST_FILES = \
 	t/distro/*.t
 DYNOPLIBS_TEST_FILES = $(DYNOPLIBS_TESTS_DIR)/*.t
