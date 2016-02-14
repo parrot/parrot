@@ -195,4 +195,6 @@ Starred release numbers indicate supported releases.
  Util        7.10.0         2015-Nov-17     "Wyrd Parrot"
  rurban      7.11.0         2015-Dec-15     "Amazonian parrotlet"
 
+ Util        8.0.0 *        2016-Jan-19     (No release; pining for the fjords)
+
 =cut

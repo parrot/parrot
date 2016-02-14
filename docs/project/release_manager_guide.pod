@@ -563,8 +563,8 @@ L<http://www.google.com/calendar/render?cid=ldhctdamsgfg5a1cord52po9h8@group.cal
 
 Make sure that at least the next two releases are covered.
 
-    - Jan 19, 2016 - *8.0.0   - Util
     - Feb 16, 2016 -  8.1.0   - rurban
+    - Mar 15, 2016 -  8.2.0   - Util
 
 =cut
 
