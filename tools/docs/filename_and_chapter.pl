@@ -52,6 +52,7 @@ print $TEX_FH <<'HEADER';
 \documentclass[11pt,a4paper,oneside]{report}
 \usepackage{graphics,graphicx}
 \usepackage{colortbl}
+\usepackage{hyperref}
 %
 %\setcounter{secnumdepth}{2}
 %\setcounter{tocdepth}{2}
