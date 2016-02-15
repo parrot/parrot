@@ -196,5 +196,6 @@ Starred release numbers indicate supported releases.
  rurban      7.11.0         2015-Dec-15     "Amazonian parrotlet"
 
  Util        8.0.0 *        2016-Jan-19     (No release; pining for the fjords)
+ rurban      8.1.0 *        2016-Feb-16     "Andean Parakeet"
 
 =cut
