@@ -112,7 +112,7 @@ fi
 echo ""
 if [ "$1" != "--noconf" ]; then
     make -s prog-clean
-    perl Configure.pl --debugging $conf --nomanicheck --without-icu --without-pcre --without-gmp --without-libffi
+    perl Configure.pl $conf --nomanicheck --without-icu --without-pcre --without-gmp --without-libffi
 fi
 tail myconfig
 make -s parrot parrot_config pbc_dump || exit 1

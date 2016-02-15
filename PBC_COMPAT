@@ -25,6 +25,7 @@
 
 # please insert tab separated entries at the top of the list
 
+13.1	2016.02.15	rurban	add foldcase op, 8.2.0
 13.0	2012.12.04	rurban	opslib bytecode version, threads, Proxy
 12.1	2012.09.03	rurban	moved dynpmc os back to pmc
 12.0	2011.10.18	dukeleto	released 3.9.0
