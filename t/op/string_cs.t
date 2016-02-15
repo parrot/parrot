@@ -1,11 +1,11 @@
 #!perl
-# Copyright (C) 2001-2008, Parrot Foundation.
+# Copyright (C) 2001-2016, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 use Test::More;
-use Parrot::Test tests => 58;
+use Parrot::Test tests => 61;
 use Parrot::Config;
 
 =head1 NAME
@@ -72,7 +72,7 @@ CODE
 /encoding 'no_such' not found/
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "downcase" );
+pasm_output_is( <<'CODE', <<OUTPUT, "downcase latin1" );
 .pcc_sub :main main:
     set S0, iso-8859-1:"AEIOU_ÄÖÜ\n"
     downcase S1, S0
@@ -82,7 +82,7 @@ CODE
 aeiou_äöü
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "upcase" );
+pasm_output_is( <<'CODE', <<OUTPUT, "upcase latin1" );
 .pcc_sub :main main:
     set S0, iso-8859-1:"aeiou_äöüß\n"
     upcase S1, S0
@@ -92,7 +92,7 @@ CODE
 AEIOU_ÄÖÜß
 OUTPUT
 
-pasm_output_is( <<'CODE', <<OUTPUT, "titlecase" );
+pasm_output_is( <<'CODE', <<OUTPUT, "titlecase latin1" );
 .pcc_sub :main main:
     set S0, iso-8859-1:"zAEIOU_ÄÖÜ\n"
     titlecase S1, S0
@@ -104,6 +104,20 @@ pasm_output_is( <<'CODE', <<OUTPUT, "titlecase" );
 CODE
 Zaeiou_äöü
 Äaeiou_äöü
+OUTPUT
+
+pasm_output_is( <<'CODE', <<OUTPUT, "foldcase latin1" );
+.pcc_sub :main main:
+    set S0, iso-8859-1:"zAEIOU_ÄÖÜ\n"
+    foldcase S1, S0
+    print S1
+    set S0, iso-8859-1:"äAEIOU_ÄÖÜ\n"
+    foldcase S1, S0
+    print S1
+    end
+CODE
+zaeiou_äöü
+äaeiou_äöü
 OUTPUT
 
 pasm_output_is( <<'CODE', <<OUTPUT, "is_whitespace" );
@@ -772,7 +786,7 @@ CODE
 OUTPUT
 
 SKIP: {
-    skip( 'no ICU lib', 10 ) unless $PConfig{has_icu};
+    skip( 'no ICU lib', 12 ) unless $PConfig{has_icu};
 
     pir_output_is( <<'CODE', <<"OUTPUT", "unicode downcase" );
 .sub main :main
@@ -872,6 +886,24 @@ Hacek J J\xcc\x8c
 10
 OUTPUT
 
+    pir_output_is( <<'CODE', <<"OUTPUT", "unicode foldcase to combined char" );
+.sub main :main
+    set $S1, utf8:"hacek j \u01f0"
+    foldcase $S1, $S1
+    getstdout $P0          # need to convert back to utf8
+    $P0.'encoding'("utf8") # set utf8 output
+    print $S1
+    print "\n"
+    length $I0, $S1
+    print $I0
+    print "\n"
+    end
+.end
+CODE
+hacek j j\xcc\x8c
+10
+OUTPUT
+
     pir_output_is( <<'CODE', <<"OUTPUT", "unicode downcase to combined char" );
 .sub main :main
     set $S1, utf8:"I WITH DOT ABOVE \u0130"
@@ -934,6 +966,22 @@ OUTPUT
 .end
 CODE
 T\x{c3}\x{b6}tsch Leo
+OUTPUT
+
+    pir_output_is( <<'CODE', <<"OUTPUT", "unicode foldcase" );
+.sub main :main
+    set $S0, iso-8859-1:"tötsch leo"
+    find_encoding $I0, "utf8"
+    trans_encoding $S1, $S0, $I0
+    foldcase $S1, $S1
+    getstdout $P0          # need to convert back to utf8
+    $P0.'encoding'("utf8") # set utf8 output
+    print $S1
+    print "\n"
+    end
+.end
+CODE
+t\x{c3}\x{b6}tsch leo
 OUTPUT
 
     pir_output_is( <<'CODE', <<OUTPUT, "compose combined char" );
