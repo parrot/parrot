@@ -400,7 +400,10 @@ io_stringhandle_seek(PARROT_INTERP, ARGMOD(PMC *handle), const PIOOFF_T offset,
     INTVAL old_offs;
     STRING *stringhandle;
     INTVAL read_offs = 0;
-    /* TODO: Need more error checking */
+    INTVAL buffer_size;
+    GETATTR_StringHandle_stringhandle(interp, handle, stringhandle);
+    buffer_size = stringhandle->_buflen;
+
     switch (whence) {
         case SEEK_SET:
             /* Absolute seek, start from the beginning of the string */
@@ -420,6 +423,9 @@ io_stringhandle_seek(PARROT_INTERP, ARGMOD(PMC *handle), const PIOOFF_T offset,
             Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "Cannot seek with mode %d", whence);
     }
+    if (read_offs < 0 || read_offs >= buffer_size)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "seek to %ld out of bounds", read_offs);
     SETATTR_StringHandle_read_offset(interp, handle, read_offs);
     return (PIOOFF_T)read_offs;
 }

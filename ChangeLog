@@ -2,6 +2,8 @@
     - Core
         + add foldcase string ops GH #786
         + bump PBC_COMPAT to 13.1 for foldcase ops
+        + add missing StringHandle methods seek, peek, tell,
+          analog to FileHandle. Better seek error handling. GH #1011
     - Build
         + Improve darwin install: make -j0 not needed anymore.
           Use libparrotsrc.VER.dylib locally, libparrot installed.

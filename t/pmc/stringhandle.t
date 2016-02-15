@@ -1,12 +1,12 @@
 #!perl
-# Copyright (C) 2006-2010, Parrot Foundation.
+# Copyright (C) 2006-2016, Parrot Foundation.
 
 use strict;
 use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 25;
+use Parrot::Test tests => 26;
 
 =head1 NAME
 
@@ -719,6 +719,53 @@ pir_output_is( <<'CODE', <<'OUTPUT', "clone an uninitialized stringhandle" );
 CODE
 ok
 OUTPUT
+
+# GH 1011 FileHandle analog methods
+pir_output_is( <<'CODE', <<"OUTPUT", "seek/tell/peek stringhandle" );
+.sub 'main' :main
+    .local pmc ifh
+    ifh = new ['StringHandle']
+    ifh.'encoding'('utf8')
+    ifh.'open'('README.pod', 'rw')
+    ifh.'puts'('# Copyright (C) 2001-2014, Parrot Foundation.')
+
+    ifh.'seek'(0, 27)
+    $S0 = ifh.'read'(17)
+    if $S0 == 'Parrot Foundation' goto ok_1
+    print 'not '
+    print $S0
+  ok_1:
+    say 'ok 1 - seek 0,28'
+
+    $I0 = ifh.'tell'()
+    if $I0 == 45 goto ok_2
+    print 'not '
+    print $I0
+  ok_2:
+    say 'ok 2 - tell'
+
+    $S0 = ifh.'peek'() # one byte
+    if $S0 == '.' goto ok_3
+    print 'not '
+    print $S0
+  ok_3:
+    say 'ok 3 - peek value'
+
+    $I0 = ifh.'tell'()
+    if $I0 == 45 goto ok_4
+    print 'not '
+    print $I0
+  ok_4:
+    say 'ok 4 - peek does not advance'
+    ifh.'close'()
+.end
+CODE
+ok 1 - seek 0,28
+ok 2 - tell
+ok 3 - peek value
+ok 4 - peek does not advance
+OUTPUT
+
 
 # GH #465
 # L<PDD22/I\/O PMC API/=item get_fd>

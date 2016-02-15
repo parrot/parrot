@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008-2014, Parrot Foundation.
+Copyright (C) 2008-2016, Parrot Foundation.
 
 =head1 NAME
 
@@ -152,7 +152,7 @@ Mark active stringhandle data as live.
 
 =item C<INTVAL get_bool()>
 
-Returns whether the StringHandle has reached the end of the file.
+Returns whether the StringHandle has reached the end of the buffer.
 
 =cut
 
@@ -390,6 +390,61 @@ string data).
         RETURN(INTVAL 0);
     }
 
+/*
+
+=item C<METHOD tell()>
+
+Get the current position in the stream. 2 C<INTVAL>s are returned. The first is
+the position. The second is the position shifted down by 32 bits to handle
+overflows on 32-bit systems.
+
+=cut
+
+*/
+
+    METHOD tell() :no_wb {
+        PIOOFF_T pos;
+        GET_ATTR_read_offset(INTERP, SELF, pos);
+        RETURN(INTVAL pos, INTVAL pos>>32);
+    }
+
+/*
+
+=item C<METHOD seek(INTVAL whence, INTVAL offs, INTVAL offs_overflow)>
+
+Set the position to an offset specified by C<offs> (and optionally
+C<offs_overflow>). C<whence> determines from where in the buffer the
+offset is taken.
+
+ Whence Value      Meaning
+ 0                 Seek from the beginning of the buffer
+ 1                 Seek from the current position
+ 2                 Seek from the end of the buffer
+
+=cut
+
+*/
+
+    METHOD seek(INTVAL whence, INTVAL offs) {
+        IO_VTABLE * vtable;
+        GETATTR_StringHandle_io_vtable(INTERP, SELF, vtable);
+        vtable->seek(INTERP, SELF, offs, whence);
+    }
+
+/*
+
+=item C<METHOD peek()>
+
+Returns the next byte from the stream, but does not remove it.
+
+=cut
+
+*/
+
+    METHOD peek() :no_wb {
+        STRING * const s = Parrot_io_peek(INTERP, SELF);
+        RETURN(STRING* s);
+    }
 
 /*
 
