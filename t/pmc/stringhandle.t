@@ -6,7 +6,7 @@ use warnings;
 use lib qw( . lib ../lib ../../lib );
 
 use Test::More;
-use Parrot::Test tests => 26;
+use Parrot::Test tests => 27;
 
 =head1 NAME
 
@@ -249,7 +249,7 @@ ok 5 - read integer back from file
 ok 6 - read string back from file
 OUT
 
-pir_output_is( <<'CODE', <<'OUT', 'print' );
+pir_output_is( <<'CODE', <<'OUT', 'print errors', todo => 'no errors until 8.3.0' );
 .include 'except_types.pasm'
 .sub 'test' :main
     .local pmc sh, eh
@@ -270,11 +270,49 @@ handle1:
 done1:
     say result
 
-    # print to SH opened for reading
+    # print to SH opened for reading throws an error
     result = 0
     set_label eh, handle2
     sh.'open'('mockname', 'r')
     sh.'print'('something')
+    result = 1
+    goto done2
+handle2:
+    finalize eh
+done2:
+    say result
+.end
+CODE
+0
+0
+OUT
+
+pir_output_is( <<'CODE', <<'OUT', 'read/write mode errors', todo => 'no errors until 8.3.0' );
+.include 'except_types.pasm'
+.sub 'test' :main
+    .local pmc sh, eh
+    .local int result
+    sh = new ['StringHandle']
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_PIO_ERROR)
+    push_eh eh
+
+    # read from SH not yet opened
+    result = 0
+    set_label eh, handle1
+    $S0 = sh.'read'(1)
+    result = 1
+    goto done1
+handle1:
+    finalize eh
+done1:
+    say result
+
+    # read from SH opened for writing throws an error
+    result = 0
+    set_label eh, handle2
+    sh.'open'('mockname', 'w')
+    result = sh.'peek'()
     result = 1
     goto done2
 handle2:
@@ -580,7 +618,7 @@ CODE
 ok 1 - $S0 = $P0.mode() # get read mode
 OUT
 
-pir_output_is( <<"CODE", <<"OUTPUT", "readall - closed stringhandle" );
+pir_output_is( <<"CODE", <<"OUTPUT", "readall an reopened handle" );
 .sub main :main
     \$S0 = <<"EOS"
 line 1
@@ -603,7 +641,7 @@ CODE
 ok
 OUTPUT
 
-pir_output_is( <<"CODE", <<"OUTPUT", "readall - stringhandle with null content" );
+pir_output_is( <<"CODE", <<"OUTPUT", "readall - flushed stringhandle errors", todo => 'no errors until 8.3.0' );
 .sub main :main
     .local pmc sh
     .local string s
@@ -613,16 +651,33 @@ pir_output_is( <<"CODE", <<"OUTPUT", "readall - stringhandle with null content" 
     # and that is the case we are testing here.
     # Also, ensures coverage of the flush method.
     sh.'flush'()
+    push_eh E1
+    sh.'readall'()
+    s = "error1"
+E1:
+    pop_eh
+    print '['
+    print s
+    say ']'
+
+    sh.'open'('mockname', 'r')
+    sh.'seek'(0, 0)
+    push_eh E2
     s = sh.'readall'()
+    s = "error2"
+E2:
+    pop_eh
+
     print '['
     print s
     say ']'
 .end
 CODE
+[error1]
 []
 OUTPUT
 
-pir_output_is( <<"CODE", <<"OUTPUT", "readall() - opened stringhandle" );
+pir_output_is( <<"CODE", <<"OUTPUT", "readall() - rw stringhandle" );
 .sub main :main
     \$S0 = <<"EOS"
 line 1
@@ -631,11 +686,9 @@ line 3
 EOS
     .local pmc pio, pio2
     pio = new ['StringHandle']
-    pio.'open'("temp_file", "w")
+    pio.'open'("temp_file", "rw")
     pio.'print'(\$S0)
-    pio.'close'()
-
-    pio.'open'("temp_file", "r")
+    pio.'seek'(0, 0)
     \$S1 = pio.'readall'()
     if \$S0 == \$S1 goto ok
     print "not "
@@ -675,21 +728,30 @@ CODE
 0
 OUTPUT
 
-pir_output_is( <<"CODE", <<"OUTPUT", "readall() - utf8 on closed stringhandle" );
+pir_output_is( <<"CODE", <<"OUTPUT", "readall() - on closed stringhandle", todo => 'no errors until 8.3.0' );
+.include 'except_types.pasm'
 .sub 'main' :main
-    .local pmc ifh
+    .local pmc ifh, eh
+    .local int result
     ifh = new ['StringHandle']
     ifh.'encoding'('utf8')
 
-    \$S0 = ifh.'readall'('temp_file')
+    eh = new ['ExceptionHandler']
+    eh.'handle_types'(.EXCEPTION_PIO_ERROR)
+    push_eh eh
+    result = 0
+    set_label eh, handle1
+    \$S0 = ifh.'readall'()
+    result = 1
+    goto done1
+handle1:
+    finalize eh
+done1:
 
-    \$I0 = encoding \$S0
-    \$S1 = encodingname \$I0
-
-    say \$S1
+    say result
 .end
 CODE
-utf8
+0
 OUTPUT
 
 pir_output_is( <<"CODE", <<"OUTPUT", "readall() - utf8 on opened stringhandle" );

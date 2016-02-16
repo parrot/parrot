@@ -182,6 +182,8 @@ Returns whether the StringHandle has reached the end of the buffer.
 Opens a string handle with the given mode. The filename is not used, but is
 stored for mocking.
 
+The mode defaults to "r".
+
 =cut
 
 */
@@ -203,6 +205,27 @@ stored for mocking.
         RETURN(PMC *handle);
     }
 
+/*
+
+=item C<METHOD set_mode(STRING *mode)>
+
+Changes the direction of the StringHandle, e.g. switching from
+read to write or vice-versa.
+
+This is faster then close and re-open, esp. since open ignores
+the filename argument.
+
+=cut
+
+*/
+
+    METHOD set_mode(STRING *mode) {
+        STRING *open_mode;
+        PMC * handle;
+
+        if (!STRING_IS_NULL(mode))
+            SET_ATTR_mode(INTERP, SELF, mode);
+    }
 
 /*
 

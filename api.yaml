@@ -714,7 +714,7 @@
   note:
     Only imageiofreeze still uses it.
     Set #define PARROT_BUFFERLIKE_LIST to use it
-    Will be removed with Release 8.0.0.
+    Will be removed with Release 8.3.0.
 
     Deprecated:
     * C<gc_sys->allocate_bufferlike_header>
@@ -726,3 +726,14 @@
     - deprecated
   ticket:  'https://github.com/parrot/parrot/issues/1179'
 -
+  name :  'stricter StringHandle PMC, no auto-reopen, auto-read'
+  note:
+    StringHandle auto-read and auto-reopen semantics is deprecated. It behaves
+    now as the FileHandle PMC.
+    Reading from a handle open for writing fails, readall() for a closed handle fails.
+    Either use the "rw" mode or the new set_mode() method, and the new seek(0, 0) method.
+    Will fail with Release 8.3.0.
+  tags:
+    - api
+    - deprecated
+  ticket : 'https://github.com/parrot/parrot/issues/245'
