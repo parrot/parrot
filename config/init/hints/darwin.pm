@@ -85,8 +85,11 @@ sub runstep {
         # of the library.
 
         parrot_is_shared       => $flags->{debugging} ? 0 : 1,
-        libparrot_shared       => "libparrot.$version$share_ext",
+
+        # GH #1213: use libparrotsrc$version locally and libparrot when installed
+        libparrot_shared       => "libparrotsrc.$version$share_ext",
         libparrot_shared_alias => "libparrot$share_ext",
+        inst_libparrot_shared  => "libparrot.$version$share_ext",
         rpath                  => "-L",
         inst_libparrot_soname  => "-install_name "
             . '"'
@@ -94,7 +97,7 @@ sub runstep {
             . '/libparrot'
             . $conf->data->get('share_ext')
             . '"',
-        libparrot_soname       => "-install_name \"$lib_dir/libparrot.$version$share_ext\""
+        libparrot_soname       => "-install_name \"$lib_dir/libparrotsrc.$version$share_ext\""
                             );
     $darwin_selections{dynext_dirs} = $flags->{dynext_dirs} if $flags->{dynext_dirs};
     if ( $conf->options->get('disable-rpath') ) {

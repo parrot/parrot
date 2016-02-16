@@ -3,6 +3,9 @@
         + add foldcase string ops GH #786
         + bump PBC_COMPAT to 13.1 for foldcase ops
     - Build
+        + Improve darwin install: make -j0 not needed anymore.
+          Use libparrotsrc.VER.dylib locally, libparrot installed.
+          GH #1213, #1212, #1096
     - Documentation
     - Tests
     - Community

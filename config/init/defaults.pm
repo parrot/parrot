@@ -187,6 +187,7 @@ sub runstep {
         # libparrot library names
         libparrot_static => $disable_static ? '' : 'libparrot' . $Config{_a},
         libparrot_shared => $disable_shared ? '' : 'libparrot.' . $Config{so},
+        inst_libparrot_shared => $disable_shared ? '' : 'libparrot.' . $Config{so},
 
         # does the system know about static/dynamic linking?
         has_static_linking  => $disable_static ? 0 : 1,
