@@ -1,5 +1,7 @@
 2016-03-15    release 8.2.0
     - Core
+        + add foldcase string ops GH #786
+        + bump PBC_COMPAT to 13.1 for foldcase ops
     - Build
     - Documentation
     - Tests
