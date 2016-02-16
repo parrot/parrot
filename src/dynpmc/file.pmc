@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2011,2014, Parrot Foundation.
+Copyright (C) 2001-2016, Parrot Foundation.
 
 =head1 NAME
 
@@ -116,7 +116,7 @@ Returns a true value (1) if the supplied path is a plain file.
 
 =item C<INTVAL is_link(STRING *path)>
 
-Returns a true value (1) if the supplied path is a link.
+Returns a true value (1) if the supplied path is a symbolic link, using C<lstat()>.
 
 =cut
 
@@ -134,7 +134,8 @@ Returns a true value (1) if the supplied path is a link.
 =item C<void copy(STRING *from, STRING *to)>
 
 Copy the contents from file represented by path C<from> to the path
-C<to>.
+C<to>. C<to> may not be a directory, both arguments must point to
+valid file paths.
 
 Uses the "work everywhere method". It is good enough to start with.
 

@@ -9,8 +9,10 @@
           Use libparrotsrc.VER.dylib locally, libparrot installed.
           GH #1213, #1212, #1096
     - Documentation
+        + dynpmc file.copy does not allow dir arguments, GH #229
     - Tests
         + Check in pcre.t the returned error string, GH #258
+        + Test that file.copy to dir must fail, GH #229
     - Community
 
 2016-02-16    release 8.1.0
