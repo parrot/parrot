@@ -5,19 +5,21 @@
 # Generate/update t/native_pbc/*_*.pbc
 # This should only be run on known systems to regenerate the native pbcs.
 # You need at least a multilib 64bit intel and powerpc machine to generate all.
-# QEMU images of big-endian 64bit machines are still being worked on, openbios
-# problems on SPARC64.
+# Good QEMU images for big-endian 64bit machines are PPC64 and MIPS64 from debian.
+# Use -m64 there.
 #
 # NOTE: Installing ccache speeds this process up considerably.
 
 # Supported versions:
 #  i386 32 bit opcode_t, 32 bit intval, 8 byte double (linux-gcc-ix86, freebsd-gcc, cygwin)
 #  i386 32 bit opcode_t, 32 bit intval, 12 byte long double (linux-gcc-ix86)
-#  big-endian 32 bit opcode_t, 32 bit intval (darwin-ppc or mips)
+#  big-endian 32 bit opcode_t, 32 bit intval (darwin-ppc, mips or arm)
 #  x86_64 8 byte double 64 bit opcode_t   (linux-gcc-x86_64, solaris-cc-64int)
 #  x86_64 16 byte long double 64 bit opcode_t (linux-gcc-x86_64, solaris-cc-64int)
-#  big-endian 64-bit 8 byte double       (sparc64, irix or similar)
-#  big-endian 64-bit 16-byte long double (sparc64, irix, mips or similar)
+#  big-endian 64-bit 8 byte double       (ppc64, mips64, sparc64, irix or similar)
+#  big-endian 64-bit 16-byte long double (ppc64, mips64, sparc64, irix or similar)
+# Note:
+#  ppc32 --long-double on darwin not, this is a double-double format.
 # Not yet: (branch float)
 #  i386 32 bit opcode_t, 32 bit intval, 4-byte float --floatval=float
 #  big-endian 32 bit opcode_t, 4 byte intval, 4 byte single float
@@ -61,6 +63,10 @@ then
             enable_long_double=1
             # force double on 2nd run not to default to long double
             conf=" --floatval=double"
+        else if [ "$numvalsize" = "16" ]; then
+                 # well, intel uses 10 byte for its long double...
+                 n_id=4_12_le
+             fi
         fi
     else
 	i_id=4_be
@@ -91,6 +97,7 @@ else
                 echo "${n_id} x86_64 64 bit opcode_t, 16-byte long double"
             fi
         else
+	    i_id=8_be
             n_id=8_${numvalsize}_be
             if [ "$numvalsize" = "8" ]
             then
@@ -142,7 +149,7 @@ if [ "$enable_long_double" = "1" ]; then
       exit
     fi
     make -s prog-clean
-    perl Configure.pl --floatval="long double" --nomanicheck
+    perl Configure.pl --floatval="long double" --nomanicheck --without-icu --without-pcre --without-gmp --without-libffi
     tail myconfig
     make -s || exit 1
     hugefloatvalsize=$(./parrot_config hugefloatvalsize)
