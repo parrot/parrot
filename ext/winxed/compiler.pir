@@ -25691,7 +25691,7 @@
     null $P1
     unless_null __ARG_3, __label_2
     new $P1, [ 'StringHandle' ]
-    $P1.'open'("__eval__", "w")
+    $P1.'open'("__eval__", "rw")
     goto __label_3
   __label_2: # else
     set $P1, __ARG_3
@@ -25711,7 +25711,7 @@
     .return(__ARG_3)
     goto __label_7
   __label_6: # else
-    $P1.'close'()
+    $P1.'seek'(0, 0)
     $P5 = $P1.'readall'()
     null $S1
     if_null $P5, __label_8
@@ -25749,7 +25749,7 @@
     null $P1
     unless_null __ARG_2, __label_1
     new $P1, [ 'StringHandle' ]
-    $P1.'open'("__eval__", "w")
+    $P1.'open'("__eval__", "rw")
     goto __label_2
   __label_1: # else
     set $P1, __ARG_2
@@ -25763,7 +25763,7 @@
     .return(__ARG_2)
     goto __label_4
   __label_3: # else
-    $P1.'close'()
+    $P1.'seek'(0, 0)
     .tailcall $P1.'readall'()
   __label_4: # endif
 

@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2014, Parrot Foundation.
+Copyright (C) 2001-2016, Parrot Foundation.
 
 =head1 NAME
 
@@ -1225,7 +1225,9 @@ Parrot_io_peek(PARROT_INTERP, ARGMOD(PMC *handle))
     {
         const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
         IO_BUFFER * const read_buffer = IO_GET_READ_BUFFER(interp, handle);
-        const INTVAL c = Parrot_io_buffer_peek(interp, read_buffer, handle, vtable);
+        INTVAL c;
+        io_verify_is_open_for(interp, handle, vtable, PIO_F_READ);
+        c = Parrot_io_buffer_peek(interp, read_buffer, handle, vtable);
 
         if (c == -1)
             return STRINGNULL;

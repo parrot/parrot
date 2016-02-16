@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2012, Parrot Foundation.
+Copyright (C) 2001-2016, Parrot Foundation.
 
 =head1 NAME
 
@@ -159,8 +159,9 @@ C<flags>. C<flags> can be one of C<PIO_F_READ> or C<PIO_F_WRITE>. This
 function throws an exception if this handle is closed or if it is not open
 for the specified mode.
 
-There is an exception that certain types are flagged C<PIO_VF_ALWAYS_READABLE>
+There is an exception that certain types are flagged C<PIO_VF_AWAYS_READABLE>
 on the vtable. Those types are always readable, so take that into account.
+But this behavior for the StringHandle PMC was deprecated with 8.2.0.
 
 =cut
 
@@ -172,22 +173,32 @@ io_verify_is_open_for(PARROT_INTERP, ARGIN(PMC *handle),
 {
     ASSERT_ARGS(io_verify_is_open_for)
 
+    /* Deprecated with 8.2.0, removed with 8.3.0 */
     /* Some types like StringHandle are always readable, even if only opened
        in 'w' mode or when closed. Several parts of the build, test suite and
        libraries depend on this. */
-    if (vtable->flags & PIO_VF_AWAYS_READABLE) {
-        if (flags == PIO_F_READ)
-            return;
-        else
-            flags &= ~PIO_F_READ;
-    }
+    /* DONE: fixed those places: opsc, winxed, ... */
 
-    if (Parrot_io_is_closed(interp, handle))
+    if (Parrot_io_is_closed(interp, handle)) {
+#if PARROT_MAJOR_VERSION <= 8 || (PARROT_MAJOR_VERSION == 8 && PARROT_MINOR_VERSION < 3)
+        if (vtable->flags & PIO_VF_AWAYS_READABLE) {
+            Parrot_warn_deprecated(interp, "StringHandle auto-reopen is deprecated with 8.2.0");
+            return;
+        }
+#endif
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "IO PMC %s is not open", vtable->name);
-    if ((vtable->get_flags(interp, handle) & flags) == 0)
+    }
+    if ((vtable->get_flags(interp, handle) & flags) == 0) {
+#if PARROT_MAJOR_VERSION <= 8 || (PARROT_MAJOR_VERSION == 8 && PARROT_MINOR_VERSION < 3)
+        if (vtable->flags & PIO_VF_AWAYS_READABLE) {
+            Parrot_warn_deprecated(interp, "StringHandle auto-read is deprecated with 8.2.0");
+            return;
+        }
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "IO PMC %s is not in mode %d", vtable->name, flags);
+#endif
+    }
 }
 
 /*

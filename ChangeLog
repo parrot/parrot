@@ -4,6 +4,8 @@
         + bump PBC_COMPAT to 13.1 for foldcase ops
         + add missing StringHandle methods seek, peek, tell,
           analog to FileHandle. Better seek error handling. GH #1011
+        + Deprecate StringHandle auto-reopen, auto-read, and
+          PIO_VF_AWAYS_READABLE. Will be removed with 8.3.0. GH #245
     - Build
         + Improve darwin install: make -j0 not needed anymore.
           Use libparrotsrc.VER.dylib locally, libparrot installed.
