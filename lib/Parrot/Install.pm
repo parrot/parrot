@@ -292,7 +292,7 @@ sub install_files {
     ref($options) eq 'HASH' or die "Error: parameter \$options must be a hashref\n";
 
     my ($destdir, $datadir, $versiondir, $dryrun) =
-      @$options{qw(destdir datadir versiondir dryrun)};
+      @$options{qw(destdir datadir versiondir dry-run)};
     ref($files) eq 'ARRAY' or die "Error: parameter \$files must be an arrayref\n";
 
     my ($src, $dest, $mdest, $mode, $manifest);

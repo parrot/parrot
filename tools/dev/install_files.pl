@@ -1,6 +1,6 @@
 #! perl
 ################################################################################
-# Copyright (C) 2001-2013, Parrot Foundation.
+# Copyright (C) 2001-2016, Parrot Foundation.
 ################################################################################
 
 =head1 NAME
@@ -95,6 +95,9 @@ foreach (@ARGV) {
     if (/^--([^=]+)=(.*)/) {
         $options{$1} = $2;
     }
+    elsif (/^--(dry-run)/) {
+        $options{$1} = 1;
+    }
     else {
         push @manifests, $_;
     }
@@ -122,6 +125,11 @@ my(%metatransforms) = (
                 s/^src//; # strip off leading src/ dir
                 $filehash->{DestDirs} = [$parrotdir];
                 $filehash->{Dest} = $_;
+            }
+            elsif ( /inst_libparrot/ ) {
+                $filehash->{Installable} = 1;
+                $filehash->{Dest} =~ s{blib/lib/inst_}{};
+                $filehash->{DestDirs} = [];
             }
             else {
                 # don't allow libraries to be installed into subdirs of libdir
@@ -195,11 +203,19 @@ unless ( $options{'dry-run'} ) {
 my($filehash, @removes, $removes);
 foreach $filehash (grep { $_->{Installable} } @$filehashes) {
     my( $src, $dest ) = map { $filehash->{$_} } qw(Source Dest);
-    my ($file) = $src =~ /installable_(.+)$/;
+    my (undef,$file) = $src =~ /inst(allable)?_(.+)$/;
     next unless $file;
     if((grep { $_->{Source} =~ /^$file$/ } @$filehashes) and -e $file) {
-        print "skipping $file, using installable_$file instead\n";
+        print "skipping $file, using $src instead\n";
         push @removes, $file;
+    }
+    # remove blib/lib/libparrot.$VERSION.$SOEXT
+    if($src =~ m{^blib/lib/inst_libparrot\.(\d.*)$}) {
+        $file = 'blib/lib/libparrot.'.$1;
+        if ((grep { $_->{Source} =~ m{^blib/lib/libparrot\.\d} } @$filehashes) and -e $file) {
+            print "skipping $file, using $src instead\n";
+            push @removes, $file;
+        }
     }
 }
 $removes = join '|', @removes;

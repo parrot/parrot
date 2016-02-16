@@ -64,7 +64,7 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
         my ( $stdout, $stderr, $rv );
         eval {
             capture(
-                sub { $rv = install_files({dryrun=>1}, '', $files_ref); },
+                sub { $rv = install_files({'dry-run'=>1}, '', $files_ref); },
                 \$stdout,
                 \$stderr,
             );
@@ -93,7 +93,7 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
         my ( $stdout, $stderr, $rv );
 
         capture(
-            sub { $rv = install_files({dryrun=>1},'',$files_ref); },
+            sub { $rv = install_files({'dry-run'=>1},'',$files_ref); },
             \$stdout,
             \$stderr,
         );
@@ -114,7 +114,7 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
     {
         my ( $stdout, $stderr, $rv );
         capture(
-            sub { $rv = install_files({destdir=>$tdir, dryrun=>0}, '',
+            sub { $rv = install_files({destdir=>$tdir, 'dry-run'=>0}, '',
                                       $files_ref); },
             \$stdout,
             \$stderr,
@@ -160,7 +160,7 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
     {
         my ( $stdout, $stderr, $rv );
         capture(
-            sub { $rv = install_files({destdir=>$tdir, dryrun=>0}, '',
+            sub { $rv = install_files({destdir=>$tdir, 'dry-run'=>0}, '',
                                       $files_ref); },
             \$stdout,
             \$stderr,
@@ -198,7 +198,7 @@ my $testsourcedir = qq{$cwd/t/tools/install/testlib};
     {
         my ( $stdout, $stderr, $rv );
         capture(
-            sub { $rv = install_files({destdir=>$tdir, dryrun=>0}, '', $files_ref); },
+            sub { $rv = install_files({destdir=>$tdir, 'dry-run'=>0}, '', $files_ref); },
             \$stdout,
             \$stderr,
         );
