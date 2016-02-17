@@ -1,12 +1,12 @@
 #! perl
-# Copyright (C) 2014, Parrot Foundation.
+# Copyright (C) 2014-2016, Parrot Foundation.
 
 use warnings;
 use strict;
 
 =head1 NAME
 
-tools/build/namealias_c.pl - Create src/parrot_config.c and variants
+tools/build/namealias_c.pl - Create src/string/namealias.c
 
 =head1 SYNOPSIS
 
@@ -60,6 +60,11 @@ while (<$IN>) {
     s/{-1},/{-1, 0},/g;
 
     # skip inline. we use it twice in core_ops.c. Note that on windows this regex fails.
+    s/\Q#if (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || defined(__cplusplus) || defined(__GNUC_STDC_INLINE__)
+inline
+#elif defined(__GNUC__)
+__inline
+#endif\E//;
     s/\Q#ifdef __GNUC__
 __inline
 #if defined __GNUC_STDC_INLINE__ || defined __GNUC_GNU_INLINE__
