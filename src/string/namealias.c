@@ -93,7 +93,11 @@ struct Parrot_namealias { int name; const INTVAL codepoint; };
 #define MAX_HASH_VALUE 136
 /* maximum key range = 135, duplicates = 0 */
 
-
+#if (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || defined(__cplusplus) || defined(__GNUC_STDC_INLINE__)
+inline
+#elif defined(__GNUC__)
+__inline
+#endif
 static unsigned int
 Parrot_namealias_hash(register const char *str, register unsigned int len)
 {
