@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2016, Parrot Foundation.
 
 =head1 NAME
 
@@ -20,12 +20,13 @@ specified behavior for :method, :vtable, :nsentry, and :anon.
 
 .sub 'main' :main
     .include 'test_more.pir'
-    plan(17)
+    plan(18)
     anon_sub_and_method()
     anon_vtable()
     store_method()
     store_nsentry()
     store_multisub()
+    method_with_builtin()
 .end
 
 
@@ -116,6 +117,21 @@ specified behavior for :method, :vtable, :nsentry, and :anon.
 
 .end
 
+# Subs in "built-in PMC" namespaces should not be treated as PMC methods
+# unless they have the :method attribute.
+
+.sub method_with_builtin
+    $P1 = new 'Integer'
+    push_eh method_not_found
+    $S1 = $P1.'foo'()
+    todo(0, "sub of builtin pmc treated as method. GH #304")
+    pop_eh
+    goto failed
+  method_not_found:
+    ok(1, "sub of builtin pmc. GH #304")
+  failed:
+.end
+
 .namespace ['AnonTest']
 .sub 'anonsub' :anon
     .return(14)
@@ -157,6 +173,10 @@ specified behavior for :method, :vtable, :nsentry, and :anon.
    .return("called num variant")
 .end
 
+.namespace ['Integer']
+.sub 'foo'
+    .return(1)
+.end
 
 # Local Variables:
 #   mode: pir
