@@ -103,6 +103,11 @@ typedef enum {
 #define Sub_comp_INIT_SET(o) Sub_comp_flag_SET(PF_INIT, o)
 #define Sub_comp_INIT_CLEAR(o) Sub_comp_flag_CLEAR(PF_INIT, o)
 
+#define Sub_comp_METHOD_TEST(o) Sub_comp_flag_TEST(METHOD, o)
+#define Sub_comp_METHOD_SET(o) Sub_comp_flag_SET(METHOD, o)
+#define Sub_comp_METHOD_CLEAR(o) Sub_comp_flag_CLEAR(METHOD, o)
+
+
 /*
  * maximum sub recursion depth
  */

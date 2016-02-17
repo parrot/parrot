@@ -22,6 +22,7 @@ Handles class and object manipulation.
 #include "pmc/pmc_class.h"
 #include "pmc/pmc_object.h"
 #include "pmc/pmc_namespace.h"
+#include "pmc/pmc_sub.h"
 
 #include "oo.str"
 
@@ -926,6 +927,9 @@ Parrot_invalidate_method_cache(PARROT_INTERP, ARGIN_NULLOK(STRING *_class))
 Find a method PMC for a named method, given the class PMC, current
 interpreter, and name of the method. Don't use a possible method cache.
 
+Note that this function with DISPATCH_NAMESPACE is wrong. It needs to skip all
+non-methods, esp. for builtin PMCs. See GH #304.
+
 =cut
 
 */
@@ -938,6 +942,8 @@ Parrot_find_method_direct(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *metho
 {
     ASSERT_ARGS(Parrot_find_method_direct)
 
+    /* old pre-8.2 behavior. see GH #304 */
+#ifdef DISPATCH_NAMESPACE
     STRING * const class_str   = CONST_STRING(interp, "class");
     STRING * const methods_str = CONST_STRING(interp, "methods");
     PMC    * const mro         = _class->vtable->mro;
@@ -971,9 +977,50 @@ Parrot_find_method_direct(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *metho
             return method;
         }
     }
-
     TRACE_FM(interp, _class, method_name, NULL);
     return PMCNULL;
+#else
+    STRING * const class_str   = CONST_STRING(interp, "class");
+    STRING * const methods_str = CONST_STRING(interp, "methods");
+    PMC    * const mro         = _class->vtable->mro;
+    const INTVAL   n           = VTABLE_elements(interp, mro);
+    INTVAL         i;
+
+    for (i = 0; i < n; ++i) {
+        PMC * const _class_i  = VTABLE_get_pmc_keyed_int(interp, mro, i);
+        PMC * const ns        = VTABLE_get_namespace(interp, _class_i);
+        PMC * const class_obj = VTABLE_inspect_str(interp, ns, class_str);
+        STRING * const is_method = CONST_STRING(interp, "method_name");
+        PMC        *method    = PMCNULL;
+        PMC        *method_hash = PMCNULL;
+
+        if (PMC_IS_NULL(class_obj))
+            method_hash = VTABLE_inspect_str(interp, ns, methods_str);
+        else
+            method_hash = VTABLE_inspect_str(interp, class_obj, methods_str);
+        if (!PMC_IS_NULL(method_hash))
+            method = VTABLE_get_pmc_keyed_str(interp, method_hash, method_name);
+        if (PMC_IS_NULL(method))
+            method = VTABLE_get_pmc_keyed_str(interp, ns, method_name);
+        /* Ignore subs, only methods.
+           From all DOES->invokable NCI and NativePCCMethod are methods, so just Sub */
+        if (!PMC_IS_NULL(method)
+            && method->vtable->base_type == enum_class_Sub
+            && !Sub_comp_flag_TEST(METHOD, PMC_data_typed(method, Parrot_Sub_attributes *)))
+            method = PMCNULL;
+
+        TRACE_FM(interp, _class_i, method_name, method);
+
+        if (!PMC_IS_NULL(method)) {
+            if (interp->thread_data != NULL)
+                method = VTABLE_clone(interp, method);
+            PARROT_ASSERT_INTERP(method, interp);
+            return method;
+        }
+    }
+    TRACE_FM(interp, _class, method_name, NULL);
+    return PMCNULL;
+#endif
 }
 
 
@@ -987,8 +1034,8 @@ interp, and name of the method.
 
 This routine should use the current scope's method cache, if there is
 one. If not, it creates a new method cache. Or, rather, it will when
-we've got that bit working. For now it unconditionally goes and looks up
-the name in the global stash.
+we've got that bit working. For now it unconditionally goes and looks
+up the name in the global stash.
 
 =cut
 

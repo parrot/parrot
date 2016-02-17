@@ -1065,7 +1065,7 @@ src/pointer_array$(O) : \
 
 src/oo$(O) : $(PARROT_H_HEADERS) $(INC_PMC_DIR)/pmc_class.h src/oo.c \
 	$(INC_PMC_DIR)/pmc_object.h src/oo.str $(INC_DIR)/oo_private.h \
-	$(INC_PMC_DIR)/pmc_namespace.h
+	$(INC_PMC_DIR)/pmc_namespace.h $(INC_PMC_DIR)/pmc_sub.h
 
 src/scheduler$(O) : \
 	$(PARROT_H_HEADERS) \

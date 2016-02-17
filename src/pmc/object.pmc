@@ -520,8 +520,7 @@ Queries this object's class to find the method with the given name.
         Parrot_Object_attributes * const obj    = PARROT_OBJECT(SELF);
         Parrot_Class_attributes  * const _class = PARROT_CLASS(obj->_class);
 
-        PMC                             *method =
-                 find_cached(INTERP, obj->_class, name);
+        PMC *method = find_cached(INTERP, obj->_class, name);
 
         if (!PMC_IS_NULL(method))
             return method;

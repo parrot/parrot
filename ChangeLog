@@ -6,6 +6,9 @@
           analog to FileHandle. Better seek error handling. GH #1011
         + Deprecate StringHandle auto-reopen, auto-read, and
           PIO_VF_AWAYS_READABLE. Will be removed with 8.3.0. GH #245
+        + Fix method dispatch with builtin namespaces. Subs are now ignored,
+          they need a :method attribute. It's now safer to define or override
+          class methods for builtin PMCs. GH #304
     - Build
         + Improve darwin install: make -j0 not needed anymore.
           Use libparrotsrc.VER.dylib locally, libparrot installed.
