@@ -95,7 +95,7 @@ foreach (@ARGV) {
 my $parrotdir = $options{versiondir};
 
 # Set up transforms on filenames
-my(@transformorder) = qw(lib bin include doc pkgconfig ^compilers);
+my(@transformorder) = qw(lib bin include doc ^compilers);
 my(%metatransforms) = (
     lib => {
         ismeta => 1,
@@ -148,21 +148,6 @@ my(%metatransforms) = (
         transform => sub {
             my($filehash) = @_;
             $filehash->{DestDirs} = [$parrotdir];
-            return($filehash);
-        },
-    },
-    pkgconfig => {
-        ismeta => 1,
-        optiondir => 'lib',
-        transform => sub {
-            my($filehash) = @_;
-            # For the time being this is hardcoded as being installed under
-            # libdir as it is typically done with automake installed packages.
-            # If the --pkgconfigdir option is used, then the default value will
-            # be overwritten with the specified subdirectory under libdir.
-            $filehash->{DestDirs} = ['pkgconfig', $parrotdir];
-            $filehash->{DestDirs} = [$options{pkgconfigdir}]
-                if $options{pkgconfigdir};
             return($filehash);
         },
     },

@@ -178,6 +178,13 @@ PIOHANDLE Parrot_io_getfd(PARROT_INTERP, ARGIN(const PMC *pmc))
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
+INTVAL Parrot_io_is_async(PARROT_INTERP, ARGMOD(PMC *pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pmc);
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL Parrot_io_is_closed(PARROT_INTERP, ARGIN(PMC *pmc))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
@@ -356,6 +363,9 @@ PIOOFF_T Parrot_io_make_offset_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
     , PARROT_ASSERT_ARG(pmc) \
     , PARROT_ASSERT_ARG(s))
 #define ASSERT_ARGS_Parrot_io_getfd __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_Parrot_io_is_async __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_Parrot_io_is_closed __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -546,36 +556,37 @@ void Parrot_io_flush_filehandle(PARROT_INTERP, ARGMOD(PMC *pmc))
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-unsigned char * Parrot_io_get_buffer_end(SHIM_INTERP,
+unsigned char * Parrot_io_get_buffer_end(PARROT_INTERP,
     ARGIN(const PMC *filehandle))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-unsigned char * Parrot_io_get_buffer_next(SHIM_INTERP,
+unsigned char * Parrot_io_get_buffer_next(PARROT_INTERP,
     ARGIN(const PMC *filehandle))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
-unsigned char * Parrot_io_get_buffer_start(SHIM_INTERP,
+unsigned char * Parrot_io_get_buffer_start(PARROT_INTERP,
     ARGIN(PMC *filehandle))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PIOOFF_T Parrot_io_get_file_position(SHIM_INTERP,
+PIOOFF_T Parrot_io_get_file_position(PARROT_INTERP,
     ARGIN(const PMC *filehandle))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-INTVAL Parrot_io_get_flags(SHIM_INTERP, ARGIN(const PMC *filehandle))
+INTVAL Parrot_io_get_flags(PARROT_INTERP, ARGIN(const PMC *filehandle))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-PIOHANDLE Parrot_io_get_os_handle(SHIM_INTERP, ARGIN(const PMC *filehandle))
+PIOHANDLE Parrot_io_get_os_handle(PARROT_INTERP,
+    ARGIN(const PMC *filehandle))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
@@ -585,18 +596,20 @@ INTVAL Parrot_io_is_closed_filehandle(PARROT_INTERP, ARGIN(const PMC *pmc))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_io_set_file_position(SHIM_INTERP,
+void Parrot_io_set_file_position(PARROT_INTERP,
     ARGMOD(PMC *filehandle),
     PIOOFF_T file_pos)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*filehandle);
 
 PARROT_EXPORT
-void Parrot_io_set_flags(SHIM_INTERP, ARGIN(PMC *filehandle), INTVAL flags)
+void Parrot_io_set_flags(PARROT_INTERP,
+    ARGIN(PMC *filehandle),
+    INTVAL flags)
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_io_set_os_handle(SHIM_INTERP,
+void Parrot_io_set_os_handle(PARROT_INTERP,
     ARGMOD(PMC *filehandle),
     PIOHANDLE file_descriptor)
         __attribute__nonnull__(2)
@@ -609,12 +622,14 @@ void Parrot_io_clear_buffer(PARROT_INTERP, ARGMOD(PMC *filehandle))
         FUNC_MODIFIES(*filehandle);
 
 PARROT_CAN_RETURN_NULL
-INTVAL Parrot_io_get_buffer_flags(SHIM_INTERP, ARGIN(const PMC *filehandle))
+INTVAL Parrot_io_get_buffer_flags(PARROT_INTERP,
+    ARGIN(const PMC *filehandle))
         __attribute__nonnull__(2);
 
 PARROT_CAN_RETURN_NULL
 PARROT_WARN_UNUSED_RESULT
-size_t Parrot_io_get_buffer_size(SHIM_INTERP, ARGIN(const PMC *filehandle))
+size_t Parrot_io_get_buffer_size(PARROT_INTERP,
+    ARGIN(const PMC *filehandle))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
@@ -626,31 +641,31 @@ STRING * Parrot_io_make_string(PARROT_INTERP,
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*buf);
 
-void Parrot_io_set_buffer_end(SHIM_INTERP,
+void Parrot_io_set_buffer_end(PARROT_INTERP,
     ARGMOD(PMC *filehandle),
     ARGIN_NULLOK(unsigned char *new_end))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*filehandle);
 
-void Parrot_io_set_buffer_flags(SHIM_INTERP,
+void Parrot_io_set_buffer_flags(PARROT_INTERP,
     ARGMOD(PMC *filehandle),
     INTVAL new_flags)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*filehandle);
 
-void Parrot_io_set_buffer_next(SHIM_INTERP,
+void Parrot_io_set_buffer_next(PARROT_INTERP,
     ARGMOD(PMC *filehandle),
     ARGIN_NULLOK(unsigned char *new_next))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*filehandle);
 
-void Parrot_io_set_buffer_size(SHIM_INTERP,
+void Parrot_io_set_buffer_size(PARROT_INTERP,
     ARGMOD(PMC *filehandle),
     size_t new_size)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*filehandle);
 
-void Parrot_io_set_buffer_start(SHIM_INTERP,
+void Parrot_io_set_buffer_start(PARROT_INTERP,
     ARGMOD(PMC *filehandle),
     ARGIN_NULLOK(unsigned char *new_start))
         __attribute__nonnull__(2)
@@ -792,7 +807,7 @@ INTVAL Parrot_io_socket_handle(PARROT_INTERP,
         FUNC_MODIFIES(*socket);
 
 PARROT_EXPORT
-void Parrot_io_socket_initialize_handle(SHIM_INTERP, ARGMOD(PMC *socket))
+void Parrot_io_socket_initialize_handle(PARROT_INTERP, ARGMOD(PMC *socket))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*socket);
 

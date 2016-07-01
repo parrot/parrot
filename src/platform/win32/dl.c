@@ -76,15 +76,55 @@ you would write something similar to:
         Foo_ptr = Parrot_dlsym(lib, "Foo");
     }
 
+=item C<static void* find_hmodule_from_func(void * func)>
+
+Attempt a lookup of an owning HMODULE with nothing but the address of an
+exported function pointer from that HMODULE. This relies on a trick where the
+HMODULE value is the pointer to the base address of allocated memory for that
+module. This relationship appears to hold for almost all non-ancient 32- and
+64-bit versions of windows. There is no guarantee that this relationship will
+hold on future versions of windows. Passing tests, expecially t/pmc/nci.t and
+t/library/nciutils.t are a good indicator that this code is working as
+expected
+
+IF NCI-RELATED THINGS START BREAKING WHEN YOU UPDATE WINDOWS, THIS IS A VERY
+GOOD PLACE TO LOOK FOR THE CAUSE OF THE FAILURES.
+
+Visit TT #2150 to register a complaint.
+
 =cut
 
 */
 
+static void*
+find_hmodule_from_func(void * func)
+{
+    MEMORY_BASIC_INFORMATION mbi;
+    if (VirtualQuery(func, &mbi, sizeof (mbi)))
+        return mbi.AllocationBase;
+    return NULL;
+}
+
 void *
 Parrot_dlsym(void *handle, const char *symbol)
 {
+    /* This is a hack, but it appears to work well enough and should be
+       compatible for most versions of windows. It's not pretty, however, and
+       it would be awesome if we could find a better, documented way to
+       perform module lookups.
+       See TT #2150 for more insults about this code. */
+    if (handle == NULL) {
+        void * proc = NULL;
+        handle = find_hmodule_from_func(Parrot_dlsym);
+        proc = (void *)GetProcAddress((HINSTANCE)handle, symbol);
+        if (proc)
+            return proc;
+        handle = find_hmodule_from_func(atoi);
+        return (void *)GetProcAddress((HINSTANCE)handle, symbol);
+    }
     return (void *)GetProcAddress((HINSTANCE)handle, symbol);
 }
+
 
 /*
 

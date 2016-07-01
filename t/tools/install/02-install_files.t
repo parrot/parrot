@@ -259,7 +259,7 @@ pass("Completed all tests in $0");
 
 =head1 DESCRIPTION
 
-The files in this directory test functionality used by the the scripts
+The files in this directory test functionality used by the scripts
 F<tools/dev/install_files.pl>, F<tools/dev/install_doc_files.pl> and F<tools/dev/install_dev_files.pl>
 and are exported by F<lib/Parrot/Install.pm>.
 

@@ -133,7 +133,7 @@ easiest way to do this is by setting up precedence levels in an C<INIT> block:
 
 In this C<INIT> block, we use the C<O> method of the compiler to set up two precedence levels: one
 for operators like addition (named C<%additive>), and one for operators like multiplication (named
-C<%multiplicative>). Each of themhas a ":prec" value and an ":assoc" value. ":prec" determines the
+C<%multiplicative>). Each of them has a ":prec" value and an ":assoc" value. ":prec" determines the
 precedence. Lexicographically greater values indicate higher precedence, so C<%additive> operators,
 with a precedence value of "t", have lower precedence than C<%multiplicative> operators with a
 precedence value of "u".":assoc" defines the associativity of the operators. If C<@> is a left

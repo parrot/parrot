@@ -266,7 +266,7 @@ true or false before jumping:
 
   if $I0 > 5 goto GREET
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 You can construct any traditional control structure from PIR's built-in control structures.
 

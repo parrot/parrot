@@ -11,6 +11,15 @@ hasn't been run yet, it dies with a message explaining that parrot needs to be
 configured first. It contains the C<%PConfig> hash which is exported with the
 values loaded from F<lib/Parrot/Config/Generated.pm>.
 
+A list of valid keys can be found from running
+
+    parrot_config --dump
+
+=head1 SYNOPSIS
+
+    use Parrot::Config;
+    my $has_ipv6 = $PConfig{HAS_IPV6};
+
 =cut
 
 package Parrot::Config;

@@ -445,9 +445,7 @@ expand_pcc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit), ARGIN(Instruct
             Parrot_ex_throw_from_c_args(imcc->interp, NULL, 1,
                 "NULL sub->pcc_sub detected");
 
-        if (sub->pcc_sub->pragma & P_MAIN)
-            tmp = INS(imcc, unit, "end", NULL, regs, 0, 0, 0);
-        else {
+        {
             Instruction *unused_ins = pcc_get_args(imcc, unit, unit->last_ins,
                     "set_returns", 0, NULL, NULL);
             UNUSED(unused_ins);

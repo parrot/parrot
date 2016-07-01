@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2011, Parrot Foundation.
 # inter/types-01.t
 
 use strict;
@@ -55,8 +55,7 @@ my ( @prompts, $object );
 
 $conf->options->set('intval' => 'alpha');
 $conf->options->set('floatval' => 'beta');
-$conf->options->set('opcode' => 'gamma');
-@prompts = qw( delta epsilon zeta );
+@prompts = qw( delta epsilon );
 
 $object = tie *STDIN, 'Tie::Filehandle::Preempt::Stdin', @prompts;
 can_ok( 'Tie::Filehandle::Preempt::Stdin', ('READLINE') );

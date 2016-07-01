@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2011, Parrot Foundation.
 # auto/platform-01.t
 
 use strict;
@@ -10,7 +10,6 @@ use Cwd;
 use File::Copy;
 use File::Path qw( mkpath );
 use File::Temp qw( tempdir );
-use File::Spec;
 use lib qw( lib );
 use_ok('config::auto::platform');
 use Parrot::Configure::Options qw( process_options );

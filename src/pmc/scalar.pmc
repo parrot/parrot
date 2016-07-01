@@ -819,7 +819,7 @@ Always returns true.
 
 /*
 
-=item C<STRING *substr_str(INTVAL offset, INTVAL length)>
+=item C<STRING *substr(INTVAL offset, INTVAL length)>
 
 Returns the substring of length C<length> of the scalar starting at
 C<offset>.
@@ -828,7 +828,7 @@ C<offset>.
 
 */
 
-    VTABLE STRING *substr_str(INTVAL offset, INTVAL length) {
+    VTABLE STRING *substr(INTVAL offset, INTVAL length) {
         return STRING_substr(INTERP, VTABLE_get_string(INTERP, SELF),
                 offset, length);
     }

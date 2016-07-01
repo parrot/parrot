@@ -403,28 +403,6 @@ array.
         PMC_array(SELF) = data;
     }
 
-    VTABLE void set_pmc(PMC *value) {
-        INTVAL size;
-        INTVAL i;
-
-        if (SELF == value)
-            return;
-
-        if (!VTABLE_does(INTERP, value, CONST_STRING(INTERP, "array")))
-            Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_OUT_OF_BOUNDS,
-                    _("Can't set self from this type"));
-
-        if (PMC_array(SELF))
-            mem_gc_free(INTERP, PMC_array(SELF));
-
-        size            = PMC_size(SELF) = VTABLE_elements(INTERP, value);
-        PMC_array(SELF) = mem_gc_allocate_n_typed(INTERP, size, PMC *);
-
-        for (i = 0; i < size; ++i)
-            (PMC_array(SELF))[i] = VTABLE_get_pmc_keyed_int(INTERP, value, i);
-
-        PObj_custom_mark_destroy_SETALL(SELF);
-    }
 /*
 
 =item C<void set_integer_keyed_int(INTVAL key, INTVAL value)>

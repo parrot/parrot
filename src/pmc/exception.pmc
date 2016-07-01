@@ -870,6 +870,13 @@ which holds the PMC representing the sub, and C<annotations> which is a hash
 of the annotations at the point where the exception was thrown for the current
 sub, or for the point of the call a level deeper for the rest.
 
+=item C<PMC *backtrace_strings>
+
+Return an array of strings representing a displayable backtrace. Each element
+in the array is the backtrace at the time when the exception was thrown.
+Rethrowing the exception adds a new entry. The first item in the list is the
+most recent throw of the Exception.
+
 =cut
 
 */
@@ -907,7 +914,7 @@ sub, or for the point of the call a level deeper for the rest.
         GET_ATTR_bt_strings(INTERP, SELF, bt_strings);
         if (PMC_IS_NULL(bt_strings))
             bt_strings = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
-        VTABLE_unshift_string(INTERP, bt_strings, bt);
+        VTABLE_push_string(INTERP, bt_strings, bt);
         RETURN(PMC *bt_strings);
     }
 

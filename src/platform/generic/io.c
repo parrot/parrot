@@ -186,46 +186,50 @@ Parrot_io_dup(SHIM_INTERP, PIOHANDLE handle)
     return dup(handle);
 }
 
-#if PARROT_ASYNC_DEVEL
-
 /*
 
-=item C<INTVAL Parrot_io_async_unix(PARROT_INTERP, PMC *filehandle, INTVAL b)>
+=item C<INTVAL Parrot_io_async(PARROT_INTERP, PMC *pmc, INTVAL async)>
 
-Experimental asynchronous IO.
-
-This is available if C<PARROT_ASYNC_DEVEL> is defined.
-
-Only works on Linux at the moment.
-
-Toggles the C<O_ASYNC> flag on the IO file descriptor.
+Sets a handle C<*pmc> to blocking or non-blocking mode
 
 =cut
 
 */
 
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
 INTVAL
-Parrot_io_async_unix(PARROT_INTERP, ARGMOD(PMC *filehandle), INTVAL b)
+Parrot_io_async(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL async)
 {
-#  if defined(linux)
+    ASSERT_ARGS(Parrot_io_is_async)
     int rflags;
-    PIOHANDLE file_descriptor = Parrot_io_get_os_handle(interp, filehandle);
+    PIOHANDLE file_descriptor;
+
+    if (Parrot_io_is_closed(interp, pmc))
+        return 0;
+
+#if defined(linux)
+    file_descriptor = Parrot_io_get_os_handle(interp, pmc);
 
     if ((rflags = fcntl(file_descriptor, F_GETFL, 0)) >= 0) {
-        if (b)
+        if (async)
             rflags |= O_ASYNC;
         else
             rflags &= ~O_ASYNC;
-        return fcntl(file_descriptor, F_SETFL, rflags);
+        if ((rflags = fcntl(file_descriptor, F_SETFL, rflags)) == 0) {
+            if (async)
+               Parrot_io_set_flags(interp, pmc, Parrot_io_get_flags(interp, pmc) | PIO_F_ASYNC);
+            else
+               Parrot_io_set_flags(interp, pmc, Parrot_io_get_flags(interp, pmc) & ~PIO_F_ASYNC);
+        }
+        return rflags;
     }
-#  else
+#else
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_NOT_IMPLEMENTED,
         "Async support not available");
-#  endif
+#endif
     return -1;
 }
-
-#endif
 
 /*
 

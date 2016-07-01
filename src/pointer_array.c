@@ -152,6 +152,17 @@ Parrot_pa_is_owned(PARROT_INTERP, ARGIN(Parrot_Pointer_Array *self),
     return 0;
 }
 
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/pointer_array.h>
+
+=cut
+
+*/
 
 /*
  * Local variables:

@@ -227,7 +227,6 @@ sub _get_special {
         DEPRECATED.yaml                                  [devel]doc
         DONORS.pod                                      [main]doc
         LICENSE                                         [main]doc
-        NEWS                                            [main]doc
         PBC_COMPAT                                      [main]doc
         PLATFORMS                                       [devel]doc
         README                                          [devel]doc

@@ -20,6 +20,7 @@ for compiling programs in Parrot.
 
     p6meta.'new_class'('PAST::Op', 'parent'=>base)
     p6meta.'new_class'('PAST::Stmts', 'parent'=>base)
+    p6meta.'new_class'('PAST::Stmt', 'parent'=>base)
     p6meta.'new_class'('PAST::Val', 'parent'=>base)
     p6meta.'new_class'('PAST::Var', 'parent'=>base)
     p6meta.'new_class'('PAST::Block', 'parent'=>base)
@@ -123,6 +124,35 @@ variable is being used in an lvalue context.
     .tailcall self.'attr'('lvalue', value, has_value)
 .end
 
+
+=item signature([signature])
+
+Get/set the signature to be used for evaluating any
+children nodes.
+
+=cut
+
+.sub 'signature' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('signature', value, has_value)
+.end
+
+
+=item childorder([order])
+
+Get/set the order in which children nodes should be evaluated
+(via Compiler::post_children).  If C<order> is 'right' then
+children are evaluated last-to-first, otherwise they're
+evaluated first-to-last.
+
+=cut
+
+.sub 'childorder' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('childorder', value, has_value)
+.end
 
 =back
 
@@ -464,6 +494,11 @@ to traits in the grammar.
 
 =back
 
+=head2 PAST::Stmt
+
+C<PAST::Stmt> encapsulates sequence points within a program, particularly
+with respect to allocation and use of temporary registers.
+
 =head2 PAST::Stmts
 
 C<PAST::Stmts> is a container of C<PAST::Node> without any specific methods.
@@ -791,6 +826,22 @@ Get/set any pirflags for this block.
 .end
 
 
+=item tempregs([tempregs])
+
+Get/set whether this block is allowed to create a fresh
+bank of temporary registers.  Default is disabled -- i.e.,
+the block uses the same temporary register bank as its
+outer statement.
+
+=cut
+
+.sub 'tempregs' :method
+    .param pmc value           :optional
+    .param int has_value       :opt_flag
+    .tailcall self.'attr'('tempregs', value, has_value)
+.end
+
+
 .namespace [ 'PAST';'Control' ]
 
 .sub 'handle_types' :method
@@ -830,7 +881,7 @@ Perl 6 compilers mailing lists.
 
 =head1 COPYRIGHT
 
-Copyright (C) 2006-2008, Parrot Foundation.
+Copyright (C) 2006-2011, Parrot Foundation.
 
 =cut
 

@@ -20,11 +20,10 @@ Tests the LexInfo PMC.
 
 .sub main :main
     .include 'test_more.pir'
-    plan(5)
+    plan(4)
 
     inspect_test()
     inspect_invalid_test()
-    declare_lex_preg_test()
 .end
 
 .sub inspect_test
@@ -75,17 +74,6 @@ Tests the LexInfo PMC.
     r = iseq type, .EXCEPTION_INVALID_OPERATION
   done:
     ok(r, 'invalid introspection key throws as expected')
-.end
-
-.sub declare_lex_preg_test
-    .const string preg_name = 'foo'
-    .const int preg_value = 42
-    .local pmc li
-    li = new ['LexInfo']
-    li.'declare_lex_preg'(preg_name, preg_value)
-    .local int r
-    r = li[preg_name]
-    is(r, preg_value, 'declare_lex_preg method')
 .end
 
 # Local Variables:

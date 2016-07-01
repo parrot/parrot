@@ -20,6 +20,7 @@ table, which should be created by your sysadmin.
 
 ## XXX
 ## .include 'postgres.pasm'
+.include 'iglobals.pasm'
 .const int CONNECTION_OK = 0
 
 .const int PGRES_COMMAND_OK = 1
@@ -29,6 +30,16 @@ table, which should be created by your sysadmin.
     load_bytecode 'Test/Builder.pir'
     .local pmc test
     test = new [ 'Test'; 'Builder' ]
+    $P0 = getinterp
+    $P1 = $P0[.IGLOBALS_CONFIG_HASH]
+    $I1 = $P1['HAS_EXTRA_NCI_THUNKS']
+
+    if $I1 == 1 goto have_enough_nci
+
+    test.'skip_all'('Extra NCI thunks not available')
+    exit 0
+
+  have_enough_nci:
     test.'plan'(N_TESTS)
     push_eh no_pg
 
@@ -47,6 +58,7 @@ table, which should be created by your sysadmin.
     .local pmc cl, con, res
     cl = new 'Pg'
     test.'ok'(1, 'Pg class exists')
+
     con = cl.'connectdb'('')           # assume table = user is present
     $I0 = isa con, ['Pg'; 'Conn']
     test.'ok'($I0, 'con isa Pg;Conn')

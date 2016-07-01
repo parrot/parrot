@@ -94,7 +94,7 @@ INTVAL Parrot_get_vtable_index(PARROT_INTERP, ARGIN(const STRING *name))
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CAN_RETURN_NULL
-const char * Parrot_get_vtable_name(SHIM_INTERP, INTVAL idx);
+const char * Parrot_get_vtable_name(PARROT_INTERP, INTVAL idx);
 
 PARROT_EXPORT
 void Parrot_invalidate_method_cache(PARROT_INTERP,

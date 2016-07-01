@@ -21,14 +21,14 @@ Tests the ParrotInterpreter PMC.
 .sub main :main
 .include 'test_more.pir'
 
-    plan(13)
+    plan(14)
     test_new()      # 1 test
     test_hll_map()  # 3 tests
     test_hll_map_invalid()  # 1 tests
 
 # Need for testing
 .annotate 'foo', 'bar'
-    test_inspect()  # 8 tests
+    test_inspect()  # 9 tests
 .end
 
 .sub test_new
@@ -117,6 +117,10 @@ Tests the ParrotInterpreter PMC.
     $I0 = isa $P0, 'CallContext'
     ok($I0, 'Got ParrotInterp.context')
     # Add more tests for Context. E.g. it is correct Context by inspecting it.
+
+    $P0 = interp['packfile']
+    $I0 = isa $P0, 'PackfileView'
+    ok($I0, 'Got ParrotInterpreter.packfile')
 
     push_eh caught
     $I0 = 1

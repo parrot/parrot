@@ -233,6 +233,10 @@ Parrot_list_contains(SHIM_INTERP,
 
 =back
 
+=head1 SEE ALSO
+
+F<include/parrot/list.h>
+
 =cut
 
 */

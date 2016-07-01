@@ -313,8 +313,8 @@ my @hlls = (
 
     {
         name       => 'winxed',
-        scm        => 'SVN',
-        repository => 'http://winxed.googlecode.com/svn/trunk/'
+        scm        => 'GIT',
+        repository => 'git://github.com/NotFound/winxed.git'
     },
 
     {

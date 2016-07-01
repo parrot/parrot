@@ -23,28 +23,35 @@ src/gc/fixed_allocator.h - implementation of allocator for small-size objects.
    increase *_HEADERS_PER_ALLOC and GC_FIXED_SIZE_POOL_SIZE to be large
    enough to satisfy most startup costs. */
 
+#define ARENA_BOUNDS_PADDING 128
+#define NEXT_ARENA_BOUNDS_SIZE(n) (2 * ((n) + ARENA_BOUNDS_PADDING) * sizeof (void*))
+
 typedef struct Pool_Allocator_Free_List {
     struct Pool_Allocator_Free_List * next;
+
 } Pool_Allocator_Free_List;
 
 typedef struct Pool_Allocator_Arena {
     struct Pool_Allocator_Arena * next;
-    struct Pool_Allocator_Arena * prev;
 } Pool_Allocator_Arena;
 
 typedef struct Pool_Allocator {
     size_t object_size;
-    size_t total_objects;
     size_t objects_per_alloc;
     size_t num_free_objects;
-    Pool_Allocator_Free_List * free_list;
+
     Pool_Allocator_Arena     * top_arena;
+    Pool_Allocator_Free_List * free_list;
     Pool_Allocator_Free_List * newfree;
     Pool_Allocator_Free_List * newlast;
 
     /* Pointers of arena bounds. Used in .is_owned check */
     void *lo_arena_ptr;
     void *hi_arena_ptr;
+
+    int num_arenas;      /* number of arenas, for keeping track of the
+                            size of arena_bounds */
+    void **arena_bounds; /* Array of low/high pairs for each arena. */
 } Pool_Allocator;
 
 typedef struct Fixed_Allocator
@@ -89,7 +96,7 @@ void Parrot_gc_fixed_allocator_free(PARROT_INTERP,
 
 PARROT_EXPORT
 PARROT_CAN_RETURN_NULL
-struct Fixed_Allocator* Parrot_gc_fixed_allocator_new(SHIM_INTERP);
+struct Fixed_Allocator* Parrot_gc_fixed_allocator_new(PARROT_INTERP);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_EXPORT
@@ -100,12 +107,12 @@ void * Parrot_gc_pool_allocate(PARROT_INTERP, ARGMOD(Pool_Allocator * pool))
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-size_t Parrot_gc_pool_allocated_size(SHIM_INTERP,
+size_t Parrot_gc_pool_allocated_size(PARROT_INTERP,
     ARGIN(const Pool_Allocator *pool))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
-void Parrot_gc_pool_destroy(SHIM_INTERP, ARGMOD(Pool_Allocator *pool))
+void Parrot_gc_pool_destroy(PARROT_INTERP, ARGMOD(Pool_Allocator *pool))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pool);
 
@@ -120,7 +127,7 @@ void Parrot_gc_pool_free(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
-int Parrot_gc_pool_is_maybe_owned(SHIM_INTERP,
+int Parrot_gc_pool_is_maybe_owned(PARROT_INTERP,
     ARGMOD(Pool_Allocator *pool),
     ARGMOD(void *ptr))
         __attribute__nonnull__(2)
@@ -130,7 +137,7 @@ int Parrot_gc_pool_is_maybe_owned(SHIM_INTERP,
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
-int Parrot_gc_pool_is_owned(SHIM_INTERP,
+int Parrot_gc_pool_is_owned(PARROT_INTERP,
     ARGMOD(Pool_Allocator *pool),
     ARGMOD(void *ptr))
         __attribute__nonnull__(2)
@@ -139,16 +146,16 @@ int Parrot_gc_pool_is_owned(SHIM_INTERP,
         FUNC_MODIFIES(*ptr);
 
 PARROT_CAN_RETURN_NULL
-void* Parrot_gc_pool_high_ptr(SHIM_INTERP, ARGIN(Pool_Allocator *pool))
+void* Parrot_gc_pool_high_ptr(PARROT_INTERP, ARGIN(Pool_Allocator *pool))
         __attribute__nonnull__(2);
 
 PARROT_CAN_RETURN_NULL
-void* Parrot_gc_pool_low_ptr(SHIM_INTERP, ARGIN(Pool_Allocator *pool))
+void* Parrot_gc_pool_low_ptr(PARROT_INTERP, ARGIN(Pool_Allocator *pool))
         __attribute__nonnull__(2);
 
 PARROT_CANNOT_RETURN_NULL
 PARROT_MALLOC
-Pool_Allocator * Parrot_gc_pool_new(SHIM_INTERP, size_t object_size);
+Pool_Allocator * Parrot_gc_pool_new(PARROT_INTERP, size_t object_size);
 
 #define ASSERT_ARGS_Parrot_gc_fixed_allocator_allocate \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\

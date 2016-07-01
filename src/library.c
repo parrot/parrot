@@ -855,6 +855,46 @@ parrot_split_path_ext(PARROT_INTERP, ARGIN(STRING *in),
 
 /*
 
+=item C<STRING* Parrot_lib_search_paths_as_string(PARROT_INTERP, enum_runtime_ft
+type)>
+
+Returns a STRING that contains the specified search path, separated by colons (:).
+
+The C<enum_runtime_ft type> is one or more of the types defined in
+F<include/parrot/library.h>.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_WARN_UNUSED_RESULT
+PARROT_CAN_RETURN_NULL
+STRING*
+Parrot_lib_search_paths_as_string(PARROT_INTERP, enum_runtime_ft type)
+{
+    ASSERT_ARGS(Parrot_lib_search_paths_as_string)
+    PMC    *paths;
+
+/* TODO: Get the real separator, not this hacked-together stuff */
+#ifdef WIN32
+    STRING * const env_search_path_sep = CONST_STRING(interp, ";");
+#else
+    STRING * const env_search_path_sep = CONST_STRING(interp, ":");
+#endif
+
+    if (type & PARROT_RUNTIME_FT_DYNEXT)
+        paths = get_search_paths(interp, PARROT_LIB_PATH_DYNEXT);
+    else if (type & (PARROT_RUNTIME_FT_PBC | PARROT_RUNTIME_FT_SOURCE))
+        paths = get_search_paths(interp, PARROT_LIB_PATH_LIBRARY);
+    else
+        paths = get_search_paths(interp, PARROT_LIB_PATH_INCLUDE);
+
+    return Parrot_str_join(interp, env_search_path_sep, paths);
+}
+
+/*
+
 =back
 
 =head1 SEE ALSO

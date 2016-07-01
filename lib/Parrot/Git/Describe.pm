@@ -1,4 +1,4 @@
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -22,7 +22,6 @@ package Parrot::Git::Describe;
 
 use strict;
 use warnings;
-use File::Spec;
 use lib qw( lib );
 
 our $current = _get_git_describe();

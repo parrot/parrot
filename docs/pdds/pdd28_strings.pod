@@ -702,11 +702,6 @@ strings, and -1 if the passed in string argument is shorter.
 =item substr
 
 Extract a substring of a given length starting from a given offset (in
-graphemes) and store the result in the string argument.
-
-=item substr_str
-
-Extract a substring of a given length starting from a given offset (in
 graphemes) and return the string.
 
 =item exists_keyed

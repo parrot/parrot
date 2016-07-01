@@ -166,6 +166,7 @@ t/compilers/data_json/*.t
 t/dynoplibs/*.t
 t/dynpmc/*.t
 t/library/*.t
+t/ext/winxed/*.t
 t/tools/*.t
 t/profiling/*.t
 TEST

@@ -238,7 +238,7 @@ See L<Test::More> on how to do that.
 L<http://qa.perl.org/>
 L<http://testanything.org/>
 L<http://en.wikipedia.org/wiki/Test_Anything_Protocol>
-F<t/TESTS.STATUS.pod>
-F<t/README>
+L<https://github.com/parrot/parrot/blob/master/t/TESTS.STATUS.pod>
+L<https://github.com/parrot/parrot/blob/master/t/README.pod>
 
 =cut

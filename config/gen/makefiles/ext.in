@@ -9,7 +9,7 @@ RM_F      = @rm_f@
 # add new languages here
 # remove obsolete languages here
 EXT = \
-    Parrot-Embed
+	Parrot-Embed
 
 # the default target
 all: $(EXT)
@@ -43,7 +43,7 @@ help:
 	@echo ""
 
 clean: \
-    Parrot-Embed.clean
+	Parrot-Embed.clean
 
 #
 # Extension specific targets

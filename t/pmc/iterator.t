@@ -727,7 +727,7 @@ Iterator get_integer: 7
 OUTPUT
 
 TODO: {
-    pasm_output_is( <<'CODE', <<'OUTPUT', "shift + index access", todo => "N/Y: length of rest of array ");
+    pasm_output_is( <<'CODE', <<'OUTPUT', "shift + index access" );
     .pcc_sub :main main:
     .include "iterator.pasm"
 
@@ -761,7 +761,8 @@ ok3:    print "ok 3\n"
     print " not "
 ok6:    print "ok 6\n"
 
-        print P1
+    print I0
+    print "\n"
     end
 CODE
 ok 1

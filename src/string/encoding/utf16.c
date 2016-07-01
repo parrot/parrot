@@ -27,7 +27,7 @@ UTF-16 encoding
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_WARN_UNUSED_RESULT
-static UINTVAL utf16_decode(SHIM_INTERP, ARGIN(const utf16_t *p))
+static UINTVAL utf16_decode(PARROT_INTERP, ARGIN(const utf16_t *p))
         __attribute__nonnull__(2);
 
 PARROT_WARN_UNUSED_RESULT
@@ -66,7 +66,7 @@ static void utf16_iter_set_and_advance(PARROT_INTERP,
         FUNC_MODIFIES(*str)
         FUNC_MODIFIES(*i);
 
-static void utf16_iter_skip(SHIM_INTERP,
+static void utf16_iter_skip(PARROT_INTERP,
     ARGIN(const STRING *str),
     ARGMOD(String_iter *i),
     INTVAL skip)

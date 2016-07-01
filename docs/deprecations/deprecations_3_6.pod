@@ -1,0 +1,59 @@
+# Copyright (C) 2011, Parrot Foundation.
+
+=head1 NAME
+
+docs/deprecations/deprecations_3_6.pod - Parrot Deprecations for 3.6
+
+=head1 Parrot Deprecations for 3.6
+
+=head2 Special Purpose NCI Parameter Types
+
+The NCI parameter types 'J', '@', 't', '0', 'V', '2', '3', '4', 'B', 'b', 'L',
+and 'T' have been removed.
+
+=head3 Rationale
+
+These types are special-purpose and their function can be accomplished by other
+means.
+
+=head3 Replacement
+
+=head4 B<'J', '@', 't', '0'>
+
+These types accomplish tasks which can be accomplished from PIR and are
+therefore redundant
+
+=over 4
+
+=item 'J'
+
+getinterp + pointer NCI types
+
+=item '@'
+
+slurpy param on a wrapping PIR sub
+
+=item 't'
+
+manual lifetime management of C string buffer through NCI access to
+Parrot_str_to_cstring() and Parrot_str_free_cstring()
+
+=item '0'
+
+null + pointer NCI type
+
+=back
+
+=head4 B<'V', '2', '3', '4', 'B'>
+
+A less type-specific pass-by-reference mechanism is available.
+
+See the bindings for pcre_compile() in runtime/parrot/library/pcre.pir
+for an example of its use.
+
+=head4 B<'b', 'L', 'T'>
+
+These were poorly documented and were broken in their implementation.
+No replacement has been provided as these do not represent desirable behaviour.
+
+=cut

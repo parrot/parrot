@@ -32,6 +32,7 @@ pmclass PackfileConstantTable auto_attrs extends PackfileSegment {
     ATTR PMC *num_constants;
     ATTR PMC *str_constants;
     ATTR PMC *pmc_constants;
+    ATTR PMC *tag_map;
 
 /*
 
@@ -50,6 +51,7 @@ Create empty PackfileConstantTable.
         attrs->num_constants = Parrot_pmc_new(INTERP, enum_class_ResizableFloatArray);
         attrs->str_constants = Parrot_pmc_new(INTERP, enum_class_ResizableStringArray);
         attrs->pmc_constants = Parrot_pmc_new(INTERP, enum_class_ResizablePMCArray);
+        attrs->tag_map = Parrot_pmc_new(INTERP, enum_class_ResizableIntegerArray);
 
         PObj_custom_mark_SET(SELF);
         PMC_data(SELF) = attrs;
@@ -72,6 +74,7 @@ Marks the object as live.
         Parrot_gc_mark_PMC_alive(INTERP, attrs->num_constants);
         Parrot_gc_mark_PMC_alive(INTERP, attrs->str_constants);
         Parrot_gc_mark_PMC_alive(INTERP, attrs->pmc_constants);
+        Parrot_gc_mark_PMC_alive(INTERP, attrs->tag_map);
 
         SUPER();
     }
@@ -98,6 +101,7 @@ Set pointer to underlying PackFile_ConstTable
         VTABLE_set_integer_native(INTERP, attrs->num_constants, table->num.const_count);
         VTABLE_set_integer_native(INTERP, attrs->str_constants, table->str.const_count);
         VTABLE_set_integer_native(INTERP, attrs->pmc_constants, table->pmc.const_count);
+        VTABLE_set_integer_native(INTERP, attrs->tag_map, table->ntags * 2);
 
         for (i = 0; i < table->num.const_count; i++)
             SELF.set_number_keyed_int(i, table->num.constants[i]);
@@ -107,6 +111,12 @@ Set pointer to underlying PackFile_ConstTable
 
         for (i = 0; i < table->pmc.const_count; i++)
             SELF.set_pmc_keyed_int(i, table->pmc.constants[i]);
+
+        for (i = 0; i < table->ntags; i++) {
+            const INTVAL ptr = i * 2;
+            VTABLE_set_integer_keyed_int(INTERP, attrs->tag_map, ptr, table->tag_map[i].tag_idx);
+            VTABLE_set_integer_keyed_int(INTERP, attrs->tag_map, ptr, table->tag_map[i].const_idx);
+        }
     }
 
 /*
@@ -121,6 +131,7 @@ Set pointer to underlying PackFile_ConstTable
         PackFile_ConstTable * const pftable =
                 mem_gc_allocate_zeroed_typed(INTERP, PackFile_ConstTable);
         opcode_t              i;
+        const int tag_elts = VTABLE_elements(INTERP, attrs->tag_map);
 
         pftable->base.type = PF_CONST_SEG;
 
@@ -147,6 +158,12 @@ Set pointer to underlying PackFile_ConstTable
         for (i = 0; i < pftable->pmc.const_count; i++)
             pftable->pmc.constants[i] =
                 VTABLE_get_pmc_keyed_int(INTERP, attrs->pmc_constants, i);
+
+        for (i = 0; i < tag_elts; i += 2) {
+            Parrot_pf_tag_constant(interp, pftable,
+                VTABLE_get_integer_keyed_int(INTERP, attrs->tag_map, i),
+                VTABLE_get_integer_keyed_int(INTERP, attrs->tag_map, i + 1));
+        }
 
         return pftable;
     }
@@ -399,6 +416,21 @@ Set segment type.
         RETURN(INTVAL PF_CONST_SEG);
     }
 
+/*
+
+=item C<METHOD add_tag_mapping(INTVAL pmc_idx, INTVAL str_idx)>
+
+Add a string->pmc tag mapping
+
+*/
+
+    METHOD add_tag_mapping(INTVAL pmc_idx, INTVAL str_idx) {
+        Parrot_PackfileConstantTable_attributes * const attrs =
+                PARROT_PACKFILECONSTANTTABLE(SELF);
+        INTVAL idx = VTABLE_elements(INTERP, attrs->tag_map);
+        VTABLE_set_integer_keyed_int(INTERP, attrs->tag_map, idx, pmc_idx);
+        VTABLE_set_integer_keyed_int(INTERP, attrs->tag_map, idx, str_idx);
+    }
 
 }
 /*

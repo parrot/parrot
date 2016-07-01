@@ -682,7 +682,7 @@ PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC *
-Parrot_ns_find_named_item(PARROT_INTERP, ARGIN(STRING *name), SHIM(void *next))
+Parrot_ns_find_named_item(PARROT_INTERP, ARGIN(STRING *name), ARGIN(SHIM(void *next)))
 {
     ASSERT_ARGS(Parrot_ns_find_named_item)
     PMC * const ctx     = CURRENT_CONTEXT(interp);

@@ -13,7 +13,7 @@
 # NIST = National Institute of Standards and Technology
 # FIPS = Federal Information Processing Standards
 
-# This is the start of the implemation and sha224 is not done yet!
+# This is the start of the implementation and sha224 is not done yet!
 
 =head1 NAME
 
@@ -40,8 +40,7 @@ or using the object oriented interface:
 
 =head1 DESCRIPTION
 
-This is a pure Parrot sha256 hash routine. You should run it with the JIT
-core if possible.
+This is a pure Parrot sha256 hash routine.
 
 =head1 SUBROUTINES
 

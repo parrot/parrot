@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2011, Parrot Foundation.
 # auto/readline-01.t
 
 use strict;
@@ -7,7 +7,6 @@ use warnings;
 use Test::More tests => 15;
 use Carp;
 use Cwd;
-use File::Spec;
 use File::Temp qw( tempdir );
 use lib qw( lib );
 use_ok('config::auto::readline');

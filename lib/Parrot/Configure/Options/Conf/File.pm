@@ -1,4 +1,5 @@
-# Copyright (C) 2007-2008, Parrot Foundation.
+# Copyright (C) 2007-2011, Parrot Foundation.
+
 package Parrot::Configure::Options::Conf::File;
 
 use strict;
@@ -10,7 +11,7 @@ our @EXPORT_OK = qw(
     %options_components
     $parrot_version
 );
-use File::Spec;
+
 use lib qw( lib );
 use Parrot::BuildUtil;
 use Parrot::Configure::Options::Conf qw(

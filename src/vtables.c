@@ -244,6 +244,18 @@ Parrot_vtbl_initialize_core_vtables(PARROT_INTERP)
 }
 
 /*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/vtables.h>
+
+=cut
+
+*/
+
+/*
  * Local variables:
  *   c-file-style: "parrot"
  * End:

@@ -73,6 +73,57 @@ is_env_var_set(PARROT_INTERP, ARGIN(STRING* var))
 
 /*
 
+=item C<Parrot_Interp Parrot_new(Parrot_Interp parent)>
+
+Returns a new Parrot interpreter.
+
+The first created interpreter (C<parent> is C<NULL>) is the last one
+to get destroyed.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+PARROT_CANNOT_RETURN_NULL
+PARROT_MALLOC
+Parrot_Interp
+Parrot_new(ARGIN_NULLOK(Parrot_Interp parent))
+{
+    ASSERT_ARGS(Parrot_new)
+    /* inter_create.c:make_interpreter builds a new Parrot_Interp. */
+    return make_interpreter(parent, PARROT_NO_FLAGS);
+}
+
+/*
+
+=item C<void Parrot_init_stacktop(PARROT_INTERP, void *stack_top)>
+
+Initializes the new interpreter when it hasn't been initialized before.
+
+Additionally sets the stack top, so that Parrot objects created
+in inner stack frames will be visible during GC stack walking code.
+B<stack_top> should be the address of an automatic variable in the caller's
+stack frame. All unanchored Parrot objects (PMCs) must live in inner stack
+frames so that they are not destroyed during GC runs.
+
+Use this function when you call into Parrot before entering a run loop.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_init_stacktop(PARROT_INTERP, ARGIN(void *stack_top))
+{
+    ASSERT_ARGS(Parrot_init_stacktop)
+    interp->lo_var_ptr = stack_top;
+    Parrot_gbl_init_world_once(interp);
+}
+
+/*
+
 =item C<Parrot_Interp make_interpreter(Interp *parent, INTVAL flags)>
 
 Create the Parrot interpreter. Allocate memory and clear the registers.
@@ -257,7 +308,6 @@ initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     interp->all_op_libs         = NULL;
     interp->evc_func_table      = NULL;
     interp->evc_func_table_size = 0;
-    interp->current_pf          = PMCNULL;
     interp->code                = NULL;
 
     /* create exceptions list */
@@ -425,10 +475,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 
     destroy_runloop_jump_points(interp);
 
-    /* XXX Fix abstraction leak. packfile */
-    if (!PMC_IS_NULL(interp->current_pf))
-        PackFile_destroy(interp, (PackFile*) VTABLE_get_pointer(interp, interp->current_pf));
-
     /* cache structure */
     destroy_object_cache(interp);
 
@@ -492,7 +538,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 
 Provide access to a (possibly) valid interp pointer.  This is intended B<only>
 for use cases when an interp is not available otherwise, which shouldn't be
-often.  There are no guarantees about what what this function returns.  If you
+often.  There are no guarantees about what this function returns.  If you
 have access to a valid interp, use that instead.  Don't use this for anything
 other than error handling.
 

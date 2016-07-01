@@ -75,7 +75,7 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CAN_RETURN_NULL
 opcode_t *
 Parrot_freeze_pbc(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(const PackFile_ConstTable *pf),
-    ARGIN(opcode_t *cursor), ARGOUT(Hash **seen))
+    ARGOUT(opcode_t *cursor), ARGOUT(Hash **seen))
 {
     ASSERT_ARGS(Parrot_freeze_pbc)
     PMC    *visitor;

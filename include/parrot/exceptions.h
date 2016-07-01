@@ -192,7 +192,7 @@ PARROT_EXPORT
 PARROT_DOES_NOT_RETURN
 PARROT_COLD
 void Parrot_ex_throw_from_c_args(PARROT_INTERP,
-    SHIM(void *ret_addr),
+    ARGIN_NULLOK(void *ret_addr),
     int exitcode,
     ARGIN(const char *format),
     ...)

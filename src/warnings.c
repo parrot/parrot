@@ -52,7 +52,7 @@ print_pbc_location(PARROT_INTERP)
         interp->pdb->debugger :
         interp;
     Parrot_io_eprintf(tracer, "%Ss\n",
-            Parrot_sub_Context_infostr(interp, CURRENT_CONTEXT(interp)));
+            Parrot_sub_Context_infostr(interp, CURRENT_CONTEXT(interp), 1));
 }
 
 /*
@@ -108,7 +108,7 @@ Parrot_warn(PARROT_INTERP, INTVAL warnclass,
             ARGIN(const char *message), ...)
 {
     ASSERT_ARGS(Parrot_warn)
-    if (!PARROT_WARNINGS_test(interp, warnclass))
+    if (!PMC_IS_NULL(interp->ctx) && !PARROT_WARNINGS_test(interp, warnclass))
         return 2;
     else {
         STRING *targ;

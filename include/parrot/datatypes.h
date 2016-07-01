@@ -178,7 +178,7 @@ const struct _data_types data_types[] = {
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-FLOATVAL Parrot_dt_divide_floatval_by_zero(SHIM_INTERP, FLOATVAL num);
+FLOATVAL Parrot_dt_divide_floatval_by_zero(PARROT_INTERP, FLOATVAL num);
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT

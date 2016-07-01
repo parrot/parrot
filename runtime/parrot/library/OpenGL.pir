@@ -226,14 +226,16 @@ alternating function names and Parrot NCI signatures.
     .local pmc list_iter
     list_iter = iter nci_list
 
-    .local string func_name, signature
+    .local string func_name, signature, cstrings
     .local pmc    function
   list_loop:
     unless list_iter goto done
     func_name = shift list_iter
     signature = shift list_iter
+    cstrings  = shift list_iter
     $P0       = '_parse_signature'(signature)
     function  = dlfunc library, func_name, $P0
+    function  = '_wrap_cstrings'(function, cstrings)
     unless first_arg_interp goto done_interp_wrap
         .const 'Sub' $P0 = '_call_with_interp'
         $P0 = clone $P0
@@ -282,6 +284,16 @@ alternating function names and Parrot NCI signatures.
     end_loop:
 
     .return (retv)
+.end
+
+.sub '_wrap_cstrings' :anon
+    .param pmc    func
+    .param string cstrings
+    $P0 = split ',', cstrings
+    load_bytecode 'NCI/Utils.pbc'
+    $P1 = get_root_global ['parrot';'NCI';'Utils'], 'call_with_cstring'
+    func = $P1(func, $P0 :flat)
+    .return (func)
 .end
 
 =back

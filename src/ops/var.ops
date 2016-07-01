@@ -32,9 +32,37 @@ Operations to create, modify and delete lexical variables.
 
 Store object $2 as lexical symbol $1. The opcode might succeed
 or throw an exception on unknown lexical names depending on the
-implementation of the LexPad PMC.
+implementation of the LexPad PMC. Requires that the lexical is
+stored in a PMC register.
+
 Parrot's LexPad throws an exception for unknown names.
 
+=item B<store_lex>(in STR, in STR)
+
+Store object $2 as lexical symbol $1. The opcode might succeed
+or throw an exception on unknown lexical names depending on the
+implementation of the LexPad PMC. Requires that the lexical is
+stored in a STR register.
+
+Parrot's LexPad throws an exception for unknown names.
+
+=item B<store_lex>(in STR, in INT)
+
+Store object $2 as lexical symbol $1. The opcode might succeed
+or throw an exception on unknown lexical names depending on the
+implementation of the LexPad PMC. Requires that the lexical is
+stored in an INT register.
+
+Parrot's LexPad throws an exception for unknown names.
+
+=item B<store_lex>(in STR, in NUM)
+
+Store object $2 as lexical symbol $1. The opcode might succeed
+or throw an exception on unknown lexical names depending on the
+implementation of the LexPad PMC. Requires that the lexical is
+stored in a NUM register.
+
+Parrot's LexPad throws an exception for unknown names.
 
 =cut
 
@@ -50,6 +78,48 @@ op store_lex(in STR, invar PMC) {
         goto ADDRESS(handler);
     }
     VTABLE_set_pmc_keyed_str(interp, lex_pad, lex_name, $2);
+}
+
+op store_lex(in STR, in STR) {
+    PMC     * const ctx      = CURRENT_CONTEXT(interp);
+    STRING  * const lex_name = $1;
+    PMC     * const lex_pad  = Parrot_sub_find_pad(interp, lex_name, ctx);
+
+    if (PMC_IS_NULL(lex_pad)) {
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
+                EXCEPTION_LEX_NOT_FOUND,
+                "Lexical '%Ss' not found", lex_name);
+        goto ADDRESS(handler);
+    }
+    VTABLE_set_string_keyed_str(interp, lex_pad, lex_name, $2);
+}
+
+op store_lex(in STR, in INT) {
+    PMC     * const ctx      = CURRENT_CONTEXT(interp);
+    STRING  * const lex_name = $1;
+    PMC     * const lex_pad  = Parrot_sub_find_pad(interp, lex_name, ctx);
+
+    if (PMC_IS_NULL(lex_pad)) {
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
+                EXCEPTION_LEX_NOT_FOUND,
+                "Lexical '%Ss' not found", lex_name);
+        goto ADDRESS(handler);
+    }
+    VTABLE_set_integer_keyed_str(interp, lex_pad, lex_name, $2);
+}
+
+op store_lex(in STR, in NUM) {
+    PMC     * const ctx      = CURRENT_CONTEXT(interp);
+    STRING  * const lex_name = $1;
+    PMC     * const lex_pad  = Parrot_sub_find_pad(interp, lex_name, ctx);
+
+    if (PMC_IS_NULL(lex_pad)) {
+        opcode_t * const handler = Parrot_ex_throw_from_op_args(interp, NULL,
+                EXCEPTION_LEX_NOT_FOUND,
+                "Lexical '%Ss' not found", lex_name);
+        goto ADDRESS(handler);
+    }
+    VTABLE_set_number_keyed_str(interp, lex_pad, lex_name, $2);
 }
 
 ########################################
@@ -86,7 +156,23 @@ op store_dynamic_lex(in STR, invar PMC) {
 =item B<find_lex>(out PMC, in STR)
 
 Find the lexical variable named $2 and store it in $1. Return a
-Null PMC if the variable is not found.
+Null PMC if the variable is not found. Requires that the lexical
+be in a PMC register.
+
+=item B<find_lex>(out STR, in STR)
+
+Find the lexical variable named $2 and store it in $1. Requires
+that the lexical be in a STR register.
+
+=item B<find_lex>(out INT, in STR)
+
+Find the lexical variable named $2 and store it in $1. Requires
+that the lexical be in a INT register.
+
+=item B<find_lex>(out NUM, in STR)
+
+Find the lexical variable named $2 and store it in $1. Requires
+that the lexical be in a NUM register.
 
 =cut
 
@@ -99,6 +185,42 @@ op find_lex(out PMC, in STR) {
         PMC_IS_NULL(lex_pad)
             ? PMCNULL
             : VTABLE_get_pmc_keyed_str(interp, lex_pad, lex_name);
+    $1 = result;
+}
+
+op find_lex(out STR, in STR) {
+    PMC     * const ctx      = CURRENT_CONTEXT(interp);
+    STRING  * const lex_name = $2;
+    PMC     * const lex_pad  = Parrot_sub_find_pad(interp, lex_name, ctx);
+
+    STRING * const result =
+        PMC_IS_NULL(lex_pad)
+            ? STRINGNULL
+            : VTABLE_get_string_keyed_str(interp, lex_pad, lex_name);
+    $1 = result;
+}
+
+op find_lex(out INT, in STR) {
+    PMC     * const ctx      = CURRENT_CONTEXT(interp);
+    STRING  * const lex_name = $2;
+    PMC     * const lex_pad  = Parrot_sub_find_pad(interp, lex_name, ctx);
+
+    INTVAL result =
+        PMC_IS_NULL(lex_pad)
+            ? 0
+            : VTABLE_get_integer_keyed_str(interp, lex_pad, lex_name);
+    $1 = result;
+}
+
+op find_lex(out NUM, in STR) {
+    PMC     * const ctx      = CURRENT_CONTEXT(interp);
+    STRING  * const lex_name = $2;
+    PMC     * const lex_pad  = Parrot_sub_find_pad(interp, lex_name, ctx);
+
+    FLOATVAL result =
+        PMC_IS_NULL(lex_pad)
+            ? 0.0
+            : VTABLE_get_number_keyed_str(interp, lex_pad, lex_name);
     $1 = result;
 }
 

@@ -48,7 +48,7 @@ use Parrot::Headerizer::Functions qw(
     validate_prototype_args
     no_both_static_and_PARROT_EXPORT
     handle_split_declaration
-    shim_test
+    clean_args_for_declarations
     handle_modified_args
     add_newline_if_multiline
     add_asserts_to_declarations
@@ -859,11 +859,10 @@ sub make_function_decls {
         my @args    = @{ $func->{args} };
         my @attrs   = $self->attrs_from_args( $func, @args );
 
-        my @modified_args = shim_test($func, \@args);
+        my @modified_args = clean_args_for_declarations($func, \@args);
 
         my $multiline;
-        ($decl, $multiline) = handle_modified_args(
-            $decl, \@modified_args);
+        ($decl, $multiline) = handle_modified_args($decl, \@modified_args);
 
         my $attrs = join( "", map { "\n\t\t$_" } @attrs );
         if ($attrs) {

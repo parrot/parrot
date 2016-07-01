@@ -26,19 +26,19 @@ UCS-4 encoding
 /* HEADERIZER BEGIN: static */
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
-static size_t ucs4_hash(SHIM_INTERP,
+static size_t ucs4_hash(PARROT_INTERP,
     ARGIN(const STRING *src),
     size_t hashval)
         __attribute__nonnull__(2);
 
-static UINTVAL ucs4_iter_get(SHIM_INTERP,
+static UINTVAL ucs4_iter_get(PARROT_INTERP,
     ARGIN(const STRING *str),
     ARGIN(const String_iter *i),
     INTVAL offset)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
-static UINTVAL ucs4_iter_get_and_advance(SHIM_INTERP,
+static UINTVAL ucs4_iter_get_and_advance(PARROT_INTERP,
     ARGIN(const STRING *str),
     ARGMOD(String_iter *i))
         __attribute__nonnull__(2)
@@ -55,8 +55,8 @@ static void ucs4_iter_set_and_advance(PARROT_INTERP,
         FUNC_MODIFIES(*str)
         FUNC_MODIFIES(*i);
 
-static void ucs4_iter_skip(SHIM_INTERP,
-    SHIM(const STRING *str),
+static void ucs4_iter_skip(PARROT_INTERP,
+    const STRING *str,
     ARGMOD(String_iter *i),
     INTVAL skip)
         __attribute__nonnull__(3)

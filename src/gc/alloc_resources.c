@@ -81,16 +81,16 @@ static void Parrot_gc_merge_buffer_pools(PARROT_INTERP,
 static int sweep_cb_buf(PARROT_INTERP,
     ARGIN(Memory_Pools *mem_pools),
     ARGFREE(Fixed_Size_Pool *pool),
-    SHIM(int flag),
-    SHIM(void *arg))
+    int flag,
+    void *arg)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
 static int sweep_cb_pmc(PARROT_INTERP,
     ARGMOD(Memory_Pools *mem_pools),
     ARGMOD(Fixed_Size_Pool *pool),
-    SHIM(int flag),
-    SHIM(void *arg))
+    int flag,
+    void *arg)
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
@@ -151,7 +151,7 @@ buffer_location(PARROT_INTERP, ARGIN(const Buffer *b))
     ASSERT_ARGS(buffer_location)
     Parrot_Context * const ctx = CONTEXT(interp);
     static char reg[10];
-    UINTVAL i;
+    int i;
 
     for (i = 0; i < ctx->n_regs_used[REGNO_STR]; ++i) {
         PObj * const obj = (PObj *)Parrot_pcc_get_STRING_reg(interp, ctx, i);
@@ -309,7 +309,7 @@ check_fixed_size_obj_pool(ARGIN(const Fixed_Size_Pool *pool))
                     /* should happen only once at the end */
                     --last_free_list_count;
                 else {
-                    /* next item on free list should also be flaged as free item */
+                    /* next item on free list should also be flagged as free item */
                     pobj_walker = (GC_MS_PObj_Wrapper*)pobj_walker->next_ptr;
                     PARROT_ASSERT(PObj_on_free_list_TEST((PObj*)pobj_walker));
                 }

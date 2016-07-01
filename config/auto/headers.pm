@@ -101,7 +101,7 @@ sub _list_extra_headers {
 
     # more extra_headers needed on mingw/msys; *BSD fails if they are present
     if ( $conf->data->get('OSNAME_provisional') eq "msys" ) {
-        push @extra_headers, qw(sysmman.h netdb.h);
+        push @extra_headers, qw(sysmman.h netdb.h sys/utsname.h);
     }
 
     if ( $conf->data->get('OSNAME_provisional') eq "MSWin32" ) {

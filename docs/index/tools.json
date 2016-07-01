@@ -46,7 +46,6 @@
       {
          "source" : [
             "tools/dev/gen_class.pl",
-            "tools/dev/nm.pl",
             "tools/dev/ncidef2pir.pl",
             "tools/dev/pbc_header.pl"
          ],

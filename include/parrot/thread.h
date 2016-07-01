@@ -120,10 +120,10 @@ VAR_SCOPE Shared_gc_info *shared_gc_info;
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 
 PARROT_EXPORT
-void Parrot_shared_gc_block(SHIM_INTERP);
+void Parrot_shared_gc_block(PARROT_INTERP);
 
 PARROT_EXPORT
-void Parrot_shared_gc_unblock(SHIM_INTERP);
+void Parrot_shared_gc_unblock(PARROT_INTERP);
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -140,7 +140,7 @@ void pt_clone_globals(Parrot_Interp d, Parrot_Interp s);
 void pt_free_pool(PARROT_INTERP)
         __attribute__nonnull__(1);
 
-void pt_gc_mark_root_finished(SHIM_INTERP);
+void pt_gc_mark_root_finished(PARROT_INTERP);
 void pt_gc_start_mark(PARROT_INTERP)
         __attribute__nonnull__(1);
 
@@ -173,7 +173,7 @@ PMC* pt_thread_join(ARGIN(Parrot_Interp parent), UINTVAL tid)
         __attribute__nonnull__(1);
 
 void pt_thread_kill(UINTVAL tid);
-void pt_thread_prepare_for_run(Parrot_Interp d, NULLOK(Parrot_Interp s));
+void pt_thread_prepare_for_run(Parrot_Interp d, Parrot_Interp s);
 int pt_thread_run(PARROT_INTERP,
     ARGMOD(PMC *thread_interp_pmc),
     ARGIN(PMC *sub),

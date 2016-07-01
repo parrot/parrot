@@ -41,7 +41,7 @@ to activate this core.
 PARROT_DOES_NOT_RETURN
 static void failed_allocation(unsigned int line, unsigned long size);
 
-static void gc_inf_allocate_buffer_storage(SHIM_INTERP,
+static void gc_inf_allocate_buffer_storage(PARROT_INTERP,
     ARGMOD(Buffer *buffer),
     size_t size)
         __attribute__nonnull__(2)
@@ -49,62 +49,61 @@ static void gc_inf_allocate_buffer_storage(SHIM_INTERP,
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static Buffer* gc_inf_allocate_bufferlike_header(SHIM_INTERP,
-    SHIM(size_t size));
+static Buffer* gc_inf_allocate_bufferlike_header(PARROT_INTERP, size_t size);
 
 PARROT_CAN_RETURN_NULL
-static void* gc_inf_allocate_fixed_size_storage(SHIM_INTERP, size_t size);
-
-PARROT_MALLOC
-PARROT_CAN_RETURN_NULL
-static void * gc_inf_allocate_memory_chunk(SHIM_INTERP, size_t size);
+static void* gc_inf_allocate_fixed_size_storage(PARROT_INTERP, size_t size);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static void * gc_inf_allocate_memory_chunk_zeroed(SHIM_INTERP, size_t size);
+static void * gc_inf_allocate_memory_chunk(PARROT_INTERP, size_t size);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static void* gc_inf_allocate_pmc_attributes(SHIM_INTERP, ARGMOD(PMC *pmc))
+static void * gc_inf_allocate_memory_chunk_zeroed(PARROT_INTERP,
+    size_t size);
+
+PARROT_MALLOC
+PARROT_CAN_RETURN_NULL
+static void* gc_inf_allocate_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static PMC* gc_inf_allocate_pmc_header(SHIM_INTERP, SHIM(UINTVAL flags));
+static PMC* gc_inf_allocate_pmc_header(PARROT_INTERP, UINTVAL flags);
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static STRING* gc_inf_allocate_string_header(SHIM_INTERP,
-    SHIM(UINTVAL flags));
+static STRING* gc_inf_allocate_string_header(PARROT_INTERP, UINTVAL flags);
 
-static void gc_inf_allocate_string_storage(SHIM_INTERP,
+static void gc_inf_allocate_string_storage(PARROT_INTERP,
     ARGMOD(STRING *str),
     size_t size)
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*str);
 
-static void gc_inf_compact_memory_pool(SHIM_INTERP);
-static void gc_inf_free_bufferlike_header(SHIM_INTERP,
+static void gc_inf_compact_memory_pool(PARROT_INTERP);
+static void gc_inf_free_bufferlike_header(PARROT_INTERP,
     ARGFREE(Buffer *b),
-    SHIM(size_t size));
+    size_t size);
 
-static void gc_inf_free_fixed_size_storage(SHIM_INTERP,
-    SHIM(size_t size),
+static void gc_inf_free_fixed_size_storage(PARROT_INTERP,
+    size_t size,
     ARGFREE(void *data));
 
-static void gc_inf_free_memory_chunk(SHIM_INTERP, ARGFREE(void *data));
-static void gc_inf_free_pmc_attributes(SHIM_INTERP, ARGMOD(PMC *pmc))
+static void gc_inf_free_memory_chunk(PARROT_INTERP, ARGFREE(void *data));
+static void gc_inf_free_pmc_attributes(PARROT_INTERP, ARGMOD(PMC *pmc))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*pmc);
 
-static void gc_inf_free_pmc_header(SHIM_INTERP, ARGFREE(PMC *pmc));
-static void gc_inf_free_string_header(SHIM_INTERP, ARGFREE(STRING *s));
+static void gc_inf_free_pmc_header(PARROT_INTERP, ARGFREE(PMC *pmc));
+static void gc_inf_free_string_header(PARROT_INTERP, ARGFREE(STRING *s));
 PARROT_WARN_UNUSED_RESULT
-static size_t gc_inf_get_gc_info(SHIM_INTERP, SHIM(Interpinfo_enum what));
+static size_t gc_inf_get_gc_info(PARROT_INTERP, Interpinfo_enum what);
 
-static void gc_inf_mark_and_sweep(SHIM_INTERP, UINTVAL flags);
-static void gc_inf_reallocate_buffer_storage(SHIM_INTERP,
+static void gc_inf_mark_and_sweep(PARROT_INTERP, UINTVAL flags);
+static void gc_inf_reallocate_buffer_storage(PARROT_INTERP,
     ARGMOD(Buffer *buffer),
     size_t size)
         __attribute__nonnull__(2)
@@ -112,18 +111,18 @@ static void gc_inf_reallocate_buffer_storage(SHIM_INTERP,
 
 PARROT_MALLOC
 PARROT_CAN_RETURN_NULL
-static void * gc_inf_reallocate_memory_chunk(SHIM_INTERP,
+static void * gc_inf_reallocate_memory_chunk(PARROT_INTERP,
     ARGFREE(void *from),
     size_t size);
 
 PARROT_MALLOC
 PARROT_CANNOT_RETURN_NULL
-static void * gc_inf_reallocate_memory_chunk_zeroed(SHIM_INTERP,
+static void * gc_inf_reallocate_memory_chunk_zeroed(PARROT_INTERP,
     ARGFREE(void *data),
     size_t newsize,
     size_t oldsize);
 
-static void gc_inf_reallocate_string_storage(SHIM_INTERP,
+static void gc_inf_reallocate_string_storage(PARROT_INTERP,
     ARGMOD(STRING *str),
     size_t size)
         __attribute__nonnull__(2)

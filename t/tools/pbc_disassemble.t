@@ -48,11 +48,13 @@ BEGIN {
 }
 
 my $helpregex = <<OUTPUT;
-/pbc_disassemble - dump or convert parrot bytecode [(]PBC[)] files
-usage:
+/pbc_disassemble - parrot bytecode disassembler
+
+Usage:
 pbc_disassemble .* [[]file.pbc[]]
-pbc_disassemble -o converted[.]pasm file[.]pbc
-\\s+(-.*\\s+[.]{3}\\s+.*
+pbc_disassemble -o file[.]pasm file[.]pbc
+
+\\s+(-.{1},\\s+--.*(["]\\w+["])?\\s+.*
 )+/m
 OUTPUT
 

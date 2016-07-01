@@ -8,7 +8,7 @@ use lib qw( . lib ../lib ../../lib );
 use Test::More;
 use Parrot::Test::Util 'create_tempfile';
 
-use Parrot::Test tests => 17;
+use Parrot::Test tests => 18;
 
 =head1 NAME
 
@@ -504,6 +504,31 @@ EOC
 CODE
 foo
 bar
+OUTPUT
+
+pir_output_is( <<'CODE', <<'OUTPUT', "get_main method" );
+.sub main :main
+    .local string code
+    .local pmc compi, e, smain
+    code = <<"EOC"
+    .sub notmain
+        say "NOOOO"
+    .end
+    .sub main
+        say "My name is main but I'm not main"
+    .end
+    .sub thisismain :main
+        .param pmc args :optional
+        say "This is main"
+    .end
+EOC
+    compi = compreg "PIR"
+    e = compi(code)
+    smain = e.'get_main'()
+    smain()
+.end
+CODE
+This is main
 OUTPUT
 
 pir_output_is( <<'CODE', <<'OUTPUT', "catch compile err" );

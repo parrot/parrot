@@ -78,26 +78,9 @@ Initializes the timer.
 
     VTABLE void init() {
         Parrot_Timer_attributes * const core_struct = PARROT_TIMER(SELF);
-
-        /* Set flags for custom GC mark and destroy. */
-        PObj_custom_mark_SET(SELF);
+        SUPER();
         PObj_custom_destroy_SET(SELF);
-
-        /* Set up the core struct. */
-        core_struct->id          = 0;
         core_struct->type        = CONST_STRING(INTERP, "timer");
-        core_struct->subtype     = CONST_STRING(INTERP, "");
-        core_struct->priority    = 0;
-        core_struct->status      = CONST_STRING(interp, "created");
-        core_struct->birthtime   = 0.0;
-        core_struct->codeblock   = PMCNULL;
-        core_struct->interp      = INTERP;
-        core_struct->duration    = 0.0;
-        core_struct->interval    = 0.0;
-        core_struct->repeat      = 0;
-
-        /* Make sure the flag is cleared by default */
-        TASK_terminate_runloop_CLEAR(SELF);
     }
 
 /*

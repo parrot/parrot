@@ -1,4 +1,4 @@
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -23,11 +23,9 @@ package Parrot::Configure::Compiler;
 use strict;
 use warnings;
 
-use base qw( Exporter );
-
 use Carp;
-use File::Spec;
-use lib ("lib");
+use File::Spec ();
+use lib ('lib');
 use Parrot::Configure::Utils qw(
     prompt copy_if_diff move_if_diff integrate
     capture_output check_progs _slurp

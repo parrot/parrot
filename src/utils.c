@@ -7,8 +7,6 @@ src/utils.c - Some utility functions
 
 =head1 DESCRIPTION
 
-Prototypes are in F<src/misc.h>.
-
 Opcode helper functions that don't really fit elsewhere.
 
 =head2 Functions
@@ -760,6 +758,12 @@ Parrot_util_quicksort(PARROT_INTERP, ARGMOD(void **data), UINTVAL n,
 /*
 
 =back
+
+=head1 SEE ALSO
+
+F<include/parrot/misc.h>
+
+=cut
 
 */
 

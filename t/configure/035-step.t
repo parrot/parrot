@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2005, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -24,7 +24,7 @@ $command = q{echo Hello world};
     my $err     = q{err};
     my $verbose = 0;
     my $rv      = Parrot::Configure::Utils::_run_command( $command, $out, $err, $verbose );
-    is( $rv, 0, "Got expected exit code of 0" );
+    is( $rv, 0, "<$command>: Got expected 0 exit code" );
 
     chdir $cwd or croak "Unable to change back to starting directory";
 }
@@ -43,7 +43,7 @@ $command = q{echo Hello world};
                 $command, $out, $err, $verbose ); },
         \$stdout,
     );
-    is( $rv, 0, "Got expected exit code of 0" );
+    is( $rv, 0, "<$command> -- verbose: Got expected 0 exit code" );
 
     chdir $cwd or croak "Unable to change back to starting directory";
 }
@@ -57,7 +57,7 @@ $command = q{echo Hello world};
     my $err     = $out;
     my $verbose = 0;
     my $rv      = Parrot::Configure::Utils::_run_command( $command, $out, $err, $verbose );
-    is( $rv, 0, "Got expected exit code of 0" );
+    is( $rv, 0, "<$command> -- out hard-coded: Got expected 0 exit code" );
 
     chdir $cwd or croak "Unable to change back to starting directory";
 }
@@ -70,7 +70,7 @@ $command = q{echo Hello world};
     my $err     = q{/dev/null};
     my $verbose = 0;
     my $rv      = Parrot::Configure::Utils::_run_command( $command, $out, $err, $verbose );
-    is( $rv, 0, "Got expected exit code of 0" );
+    is( $rv, 0, "<$command> out hard-coded, err to /dev/null: Got expected 0 exit code" );
 
     chdir $cwd or croak "Unable to change back to starting directory";
 }
@@ -89,7 +89,7 @@ $command = $^O eq 'MSWin32' ? q{dir} : q{date};
         },
         \$stdout,
     );
-    is( $rv, 0, "Got expected exit code of 0" );
+    is( $rv, 0, "<$command>: Got expected 0 exit code" );
 
     chdir $cwd or croak "Unable to change back to starting directory";
 }
@@ -109,7 +109,7 @@ $command = $^O eq 'MSWin32' ? q{dir} : q{date};
         \$stdout,
         \$stderr,
     );
-    is( $rv, 0, "Got expected exit code of 0" );
+    is( $rv, 0, "<$command>: Got expected 0 exit code" );
 
     chdir $cwd or croak "Unable to change back to starting directory";
 }
@@ -129,7 +129,7 @@ $command = $^O eq 'MSWin32' ? q{dir} : q{date};
         \$stdout,
         \$stderr,
     );
-    is( $rv, 0, "Got expected exit code of 0" );
+    is( $rv, 0, "<$command>: Got expected 0 exit code" );
 
     chdir $cwd or croak "Unable to change back to starting directory";
 }
@@ -149,7 +149,7 @@ $command = $^O eq 'MSWin32' ? q{dir} : q{date};
         \$stdout,
         \$stderr,
     );
-    is( $rv, 0, "Got expected exit code of 0" );
+    is( $rv, 0, "<$command>: Got expected 0 exit code" );
 
     chdir $cwd or croak "Unable to change back to starting directory";
 }

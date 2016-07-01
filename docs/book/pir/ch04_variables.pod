@@ -1314,7 +1314,7 @@ reached the end of the aggregate:
 
       if $P1 goto iter_repeat
 
-=end PIR_FRAGMENT
+=end PIR_FRAGMENT_INVALID
 
 Parrot provides predefined constants for working with iterators.
 C<.ITERATE_FROM_START> and C<.ITERATE_FROM_END> constants select whether an

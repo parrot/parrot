@@ -58,7 +58,7 @@ INTVAL Parrot_str_boolean(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
-UINTVAL Parrot_str_byte_length(SHIM_INTERP, ARGIN_NULLOK(const STRING *s));
+UINTVAL Parrot_str_byte_length(PARROT_INTERP, ARGIN_NULLOK(const STRING *s));
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -110,7 +110,7 @@ STRING * Parrot_str_copy(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_CANNOT_RETURN_NULL
-const char * Parrot_str_cstring(SHIM_INTERP, ARGIN(const STRING *str))
+const char * Parrot_str_cstring(PARROT_INTERP, ARGIN(const STRING *str))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
@@ -231,7 +231,7 @@ INTVAL Parrot_str_is_cclass(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_HOT
 PARROT_PURE_FUNCTION
-INTVAL Parrot_str_is_null(SHIM_INTERP, ARGIN_NULLOK(const STRING *s));
+INTVAL Parrot_str_is_null(PARROT_INTERP, ARGIN_NULLOK(const STRING *s));
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -245,7 +245,7 @@ STRING* Parrot_str_join(PARROT_INTERP,
 PARROT_EXPORT
 PARROT_PURE_FUNCTION
 PARROT_WARN_UNUSED_RESULT
-INTVAL Parrot_str_length(SHIM_INTERP, ARGIN_NULLOK(const STRING *s));
+INTVAL Parrot_str_length(PARROT_INTERP, ARGIN_NULLOK(const STRING *s));
 
 PARROT_EXPORT
 PARROT_WARN_UNUSED_RESULT
@@ -298,7 +298,7 @@ INTVAL Parrot_str_not_equal(PARROT_INTERP,
         __attribute__nonnull__(1);
 
 PARROT_EXPORT
-void Parrot_str_pin(SHIM_INTERP, ARGMOD(STRING *s))
+void Parrot_str_pin(PARROT_INTERP, ARGMOD(STRING *s))
         __attribute__nonnull__(2)
         FUNC_MODIFIES(*s);
 
@@ -306,7 +306,7 @@ PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 PARROT_CAN_RETURN_NULL
 PARROT_PURE_FUNCTION
-const STR_VTABLE * Parrot_str_rep_compatible(SHIM_INTERP,
+const STR_VTABLE * Parrot_str_rep_compatible(PARROT_INTERP,
     ARGIN(const STRING *a),
     ARGIN(const STRING *b))
         __attribute__nonnull__(2)
@@ -489,6 +489,13 @@ STRING * Parrot_str_iter_substr(PARROT_INTERP,
         __attribute__nonnull__(2)
         __attribute__nonnull__(3);
 
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+STRING * Parrot_str_new_from_cstring(PARROT_INTERP,
+    ARGIN_NULLOK(const char *buffer),
+    ARGIN_NULLOK(STRING *encodingname))
+        __attribute__nonnull__(1);
+
 #define ASSERT_ARGS_Parrot_str_bitwise_and __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_str_bitwise_not __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -652,6 +659,8 @@ STRING * Parrot_str_iter_substr(PARROT_INTERP,
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(str) \
     , PARROT_ASSERT_ARG(l))
+#define ASSERT_ARGS_Parrot_str_new_from_cstring __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/string/api.c */
 

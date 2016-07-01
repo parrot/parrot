@@ -206,6 +206,9 @@ init_world(PARROT_INTERP)
     VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_PBC_LIBS, pmc);
 
     pmc = Parrot_pmc_new(interp, enum_class_Hash);
+    VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_LOADED_PBCS, pmc);
+
+    pmc = Parrot_pmc_new(interp, enum_class_Hash);
     VTABLE_set_pmc_keyed_int(interp, iglobals, IGLOBALS_DYN_LIBS, pmc);
 
     pmc = Parrot_pmc_new(interp, enum_class_Hash);
@@ -266,6 +269,18 @@ Parrot_gbl_setup_2(PARROT_INTERP)
     interp->iglobals = Parrot_pmc_new_init_int(interp,
             enum_class_FixedPMCArray, (INTVAL)IGLOBALS_SIZE);
 }
+
+/*
+
+=back
+
+=head1 SEE ALSO
+
+F<include/parrot/global_setup.h>
+
+=cut
+
+*/
 
 /*
  * Local variables:

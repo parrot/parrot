@@ -124,13 +124,14 @@ PARROT_CAN_RETURN_NULL
 opcode_t * Parrot_freeze_pbc(PARROT_INTERP,
     ARGIN(PMC *pmc),
     ARGIN(const PackFile_ConstTable *pf),
-    ARGIN(opcode_t *cursor),
+    ARGOUT(opcode_t *cursor),
     ARGOUT(Hash **seen))
         __attribute__nonnull__(1)
         __attribute__nonnull__(2)
         __attribute__nonnull__(3)
         __attribute__nonnull__(4)
         __attribute__nonnull__(5)
+        FUNC_MODIFIES(*cursor)
         FUNC_MODIFIES(*seen);
 
 PARROT_EXPORT

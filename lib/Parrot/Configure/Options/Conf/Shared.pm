@@ -59,7 +59,6 @@ our @shared_valid_options = qw{
     ops
     optimize
     parrot_is_shared
-    pkgconfigdir
     prefix
     profile
     sbindir

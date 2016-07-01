@@ -106,7 +106,7 @@
  * get "_unused" added to them so that you can't accidentally use them
  * without removing the shim designation.
  */
-#define SHIM(a) /*@unused@*/ /*@null@*/ a ##_unused __attribute__unused__
+#define SHIM(a) /*@unused@*/ a ##_unused __attribute__unused__
 
 /* UNUSED() is the old way we handled shim arguments Should still be
    used in cases where the argument should, at some point be used.

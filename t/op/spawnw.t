@@ -95,7 +95,7 @@ pasm_output_is( <<"CODE", <<'OUTPUT', "exit code: 0" );
 .pcc_sub :main main:
         new     P0, 'ResizablePMCArray'
         set     P0, 3
-        set     P0[0], "$perl"
+        set     P0[0], '$perl'
         set     P0[1], "-e"
         set     P0[2], "exit(0)"
         set     I1, 99
@@ -113,7 +113,7 @@ pasm_output_is( <<"CODE", <<'OUTPUT', "exit code: 123" );
 .pcc_sub :main main:
         new     P0, 'ResizablePMCArray'
         set     P0, 3
-        set     P0[0], "$perl"
+        set     P0[0], '$perl'
         set     P0[1], "-e"
         set     P0[2], "exit(123)"
         set     I1, 99
@@ -131,7 +131,7 @@ pasm_output_is( <<"CODE", <<'OUTPUT', "exit code: 3" );
 .pcc_sub :main main:
         new     P0, 'ResizablePMCArray'
         set     P0, 3
-        set     P0[0], "$perl"
+        set     P0[0], '$perl'
         set     P0[1], "-e"
         set     P0[2], "exit(3)"
         set     I1, 99
@@ -159,7 +159,7 @@ loop:
 end:
         \$S0 = concat \$S0, "}) / 100"
         new args, 'ResizablePMCArray'
-        push args, "$perl"
+        push args, '$perl'
         push args, "-e"
         push args, \$S0
         \$I0 = spawnw args

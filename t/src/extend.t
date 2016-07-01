@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -12,9 +12,11 @@ use Parrot::Test;
 use Parrot::Config;
 use File::Spec::Functions;
 
-plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile(qw/src parrot_config.o/);
+my $parrot_config = "parrot_config" . $PConfig{o};
 
-plan tests => 18;
+plan skip_all => 'src/parrot_config.o does not exist' unless -e catfile("src", $parrot_config);
+
+plan tests => 24;
 
 =head1 NAME
 
@@ -30,9 +32,63 @@ Tests the extension API.
 
 =cut
 
+sub linedirective
+{
+    # Provide a #line directive for the C code in the heredoc
+    # starting immediately after where this sub is called.
+    my $linenum = shift() + 1;
+    return "#line " . $linenum . ' "' . __FILE__ . '"' . "\n";
+}
+
+c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_PMC_null' );
+#include <stdio.h>
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+int
+main(int argc, const char *argv[])
+{
+    Parrot_Interp interp  = Parrot_new(NULL);
+    Parrot_PMC    pmcnull;
+
+    /* Interpreter set-up */
+    if (interp) {
+        pmcnull  = Parrot_PMC_null();
+        Parrot_destroy(interp);
+    }
+    return 0;
+}
+CODE
+OUTPUT
+
+
+c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_get_root_namespace/Parrot_(un)register_pmc' );
+#include <stdio.h>
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+int
+main(int argc, const char *argv[])
+{
+    Parrot_Interp interp  = Parrot_new(NULL);
+    Parrot_PMC    ns;
+
+    /* Interpreter set-up */
+    if (interp) {
+        ns  = Parrot_get_root_namespace(interp);
+        Parrot_register_pmc(interp, ns);
+        Parrot_unregister_pmc(interp, ns);
+
+        Parrot_printf(interp,"%P\n", ns);
+        Parrot_destroy(interp);
+    }
+    return 0;
+}
+CODE
+
+OUTPUT
 
 c_output_is( <<'CODE', <<'OUTPUT', 'set/get_intreg' );
-
 #include <stdio.h>
 #include "parrot/embed.h"
 #include "parrot/extend.h"
@@ -57,6 +113,49 @@ main(int argc, const char *argv[])
 }
 
 CODE
+42
+OUTPUT
+
+c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_fprintf');
+#include <stdio.h>
+// This is to get Parrot_io_STDOUT, is there a better way?
+#include "parrot/parrot.h"
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+int
+main(int argc, const char *argv[])
+{
+    Parrot_PMC pio;
+    Parrot_Interp interp  = Parrot_new(NULL);
+    pio = Parrot_io_STDOUT(interp);
+
+    /* Interpreter set-up */
+    if (interp) {
+        Parrot_fprintf(interp, pio,"42\n");
+    }
+    return 0;
+}
+
+CODE
+42
+OUTPUT
+
+c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_printf/Parrot_eprintf with no interp');
+#include <stdio.h>
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+int
+main(int argc, const char *argv[])
+{
+    Parrot_printf(NULL,"42\n");
+    Parrot_eprintf(NULL,"42\n");
+    return 0;
+}
+
+CODE
+42
 42
 OUTPUT
 
@@ -100,7 +199,7 @@ int
 main(int argc, const char *argv[])
 {
     Parrot_Interp interp = Parrot_new(NULL);
-    Parrot_String output;
+    Parrot_String output, output2;
 
     /* Interpreter set-up */
     if (interp) {
@@ -114,6 +213,36 @@ main(int argc, const char *argv[])
 
 CODE
 Test
+OUTPUT
+
+c_output_is( <<'CODE', <<'OUTPUT', 'Parrot_new_string/Parrot_(un)register_string' );
+
+#include <stdio.h>
+	#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+int
+main(int argc, const char *argv[])
+{
+    Parrot_Interp interp = Parrot_new(NULL);
+    Parrot_String output, output2;
+
+    /* Interpreter set-up */
+    if (interp) {
+        output = Parrot_new_string(interp, "Test_reg_unreg", 14, "iso-8859-1", 0);
+
+        Parrot_register_string(interp, output);
+        Parrot_unregister_string(interp, output);
+
+        Parrot_eprintf(interp, "%S\n", output);
+
+        Parrot_destroy(interp);
+    }
+    return 0;
+}
+
+CODE
+Test_reg_unreg
 OUTPUT
 
 c_output_is( <<'CODE', <<'OUTPUT', 'set/get_strreg' );
@@ -176,6 +305,56 @@ main(int argc, const char *argv[])
 }
 CODE
 101010
+OUTPUT
+
+c_output_is( linedirective(__LINE__) . <<'CODE', <<'OUTPUT', 'Parrot_free_cstring');
+#include <stdio.h>
+#include "parrot/parrot.h"
+#include "parrot/embed.h"
+#include "parrot/extend.h"
+
+static void fail(const char *msg);
+static Parrot_String createstring(Parrot_Interp interp, const char * value);
+static Parrot_Interp new_interp();
+
+static void fail(const char *msg)
+{
+    fprintf(stderr, "failed: %s\n", msg);
+    exit(EXIT_FAILURE);
+}
+
+static Parrot_String createstring(Parrot_Interp interp, const char * value)
+{
+    return Parrot_new_string(interp, value, strlen(value), (const char*)NULL, 0);
+}
+
+static Parrot_Interp new_interp()
+{
+    Parrot_Interp interp = Parrot_new(NULL);
+    if (!interp)
+        fail("Cannot create parrot interpreter");
+    return interp;
+
+}
+
+int main(int argc, const char **argv)
+{
+    Parrot_Interp interp;
+    Parrot_String err, string;
+    Parrot_PMC func_pmc;
+    char *str;
+
+    interp = new_interp();
+
+    string = createstring(interp, "PIR");
+    str    = Parrot_str_to_cstring(interp, string);
+
+    Parrot_free_cstring(str);
+
+    Parrot_destroy(interp);
+    return 0;
+}
+CODE
 OUTPUT
 
 c_output_is( <<'CODE', <<'OUTPUT', 'PMC_set/get_integer_keyed_int' );

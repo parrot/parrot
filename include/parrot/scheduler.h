@@ -135,9 +135,10 @@ void Parrot_cx_schedule_timer(PARROT_INTERP,
 PARROT_EXPORT
 void Parrot_cx_send_message(PARROT_INTERP,
     ARGIN(STRING *messagetype),
-    SHIM(PMC *payload))
+    ARGIN(PMC *payload))
         __attribute__nonnull__(1)
-        __attribute__nonnull__(2);
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(3);
 
 void Parrot_cx_check_tasks(PARROT_INTERP, ARGMOD(PMC *scheduler))
         __attribute__nonnull__(1)
@@ -228,7 +229,8 @@ void Parrot_cx_timer_invoke(PARROT_INTERP, ARGIN(PMC *timer))
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_cx_send_message __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(messagetype))
+    , PARROT_ASSERT_ARG(messagetype) \
+    , PARROT_ASSERT_ARG(payload_unused))
 #define ASSERT_ARGS_Parrot_cx_check_tasks __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(scheduler))

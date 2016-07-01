@@ -19,7 +19,7 @@ Tests the Class PMC.
 .sub 'main' :main
     .include 'test_more.pir'
 
-     plan(90)
+     plan(89)
      'new op'()
      'class flag'()
      'name'()
@@ -380,14 +380,6 @@ t_class_meth:
 
     $P0 = new ['Role']
     addrole obj, $P0
-
-    $I0 = 1
-    push_eh t_duplicated_override
-    class.'add_vtable_override'('add_role', $P0)
-    $I0 = 0
-    pop_eh
-  t_duplicated_override:
-    ok($I0, 'add_vtable_override() with duplicated name fails')
 
     $I0 = 1
     push_eh t_invalid_name

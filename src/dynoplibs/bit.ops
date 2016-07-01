@@ -402,7 +402,7 @@ inline op lsr(invar PMC, invar PMC, invar PMC) :base_core {
 =item B<rot>(out INT, in INT, in INT, inconst INT)
 
 Rotate $2 left or right by $3 and place result in $1.
-$4 is the the size of the word to rotate, max 32 on a 32-bit CPU and 64
+$4 is the size of the word to rotate, max 32 on a 32-bit CPU and 64
 on a 64-bit CPU. If the rotate count is negative a rotate right by abs($3)
 is performed.
 

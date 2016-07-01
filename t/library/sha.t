@@ -26,11 +26,24 @@ regressions in the parrot VM, JIT and GC
     load_bytecode "Digest/sha256.pbc"
 
     .include 'test_more.pir'
-    plan(6)
+    plan(7)
 
     test_basic()
     test_miscellaneous_words()
     test_object_interface()
+    test_large_string()
+.end
+
+
+.sub test_large_string
+    $P0 = sha256sum(<<'STUFF')
+8b7df143d91c716ecfa5fc1730022f6b421b05cedee8fd52b1fc65a96030ad52
+8b7df143d91c716ecfa5fc1730022f6b421b05cedee8fd52b1fc65a96030ad52
+8b7df143d91c716ecfa5fc1730022f6b421b05cedee8fd52b1fc65a96030ad52
+8b7df143d91c716ecfa5fc1730022f6b421b05cedee8fd52b1fc65a96030ad52
+STUFF
+    $S0 = sha256_hex($P0)
+    is($S0, "ccfde36946f532554229ff876ab56a3170a78cc2e02c9893c5b7e5bcfe27681b", "sha256: large string")
 .end
 
 .sub test_basic

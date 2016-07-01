@@ -670,7 +670,7 @@ SKIP: {
 .end
 CODE
 /\/
-chroot failed
+chroot failed(: Too many levels of symbolic links)*
 /
 OUT
     rmtree("my-super-chroot", 0, 1);
@@ -758,29 +758,27 @@ CODE
 $ra
 OUT
 
-TODO: {
-    local $TODO = "Cannot test writability on Win32" if $MSWin32;
-    # test can_write
-    $wa = -w "test_f_a" ? 1 : 0;
-    $wb = -w "test_f_b" ? 1 : 0;
-    pir_output_is( <<'CODE', <<"OUT", 'Test can_write' );
-    .sub main :main
-            $P0 = loadlib 'os'
-            $P1 = new ['OS']
+# test can_write
+$wa = -w "test_f_a" ? 1 : 0;
+$wb = -w "test_f_b" ? 1 : 0;
+pir_output_is( <<'CODE', <<"OUT", 'Test can_write' );
+.sub main :main
+        $P0 = loadlib 'os'
+        $P1 = new ['OS']
 
-            $I0 = $P1."can_write"("test_f_a")
-            say $I0
+        $I0 = $P1."can_write"("test_f_a")
+        say $I0
 
-            $I1 = $P1."can_write"("test_f_b")
-            say $I1
+        $I1 = $P1."can_write"("test_f_b")
+        say $I1
 
-            end
-    .end
+        end
+.end
 CODE
 $wa
 $wb
 OUT
-}
+
 
 # test can_execute
 $xa = -x "README" ? 1 : 0;

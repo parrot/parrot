@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2010, Parrot Foundation.
+# Copyright (C) 2006-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -101,34 +101,45 @@ stack, so we don't need to check if this parrot is IPv6-aware.
     ok($I0, 'Cloned PMC has correct type TT#1820')
 .end
 
-.sub test_tcp_socket
-    .local pmc sock
+.sub test_create_socket
+    .param int pio_pf
+    .param int pio_sock
+    .param int pio_proto
+    .param string msg
+
+    .local pmc sock, ex
+    .local int r
+    r = 0
+    push_eh failed
     sock = new 'Socket'
-    sock.'socket'(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
-    ok(1, 'Created a TCP Socket')
+    sock.'socket'(pio_pf, pio_sock, pio_proto)
+    pop_eh
+    r = 1
+    goto check
+  failed:
+    .get_results(ex)
+    finalize ex
+    pop_eh
+    $S0 = ex['message']
+    diag($S0)
+  check:
+    is(r, 1, msg)
+.end
+
+.sub test_tcp_socket
+    test_create_socket(.PIO_PF_INET, .PIO_SOCK_STREAM, .PIO_PROTO_TCP, 'Created a TCP Socket')
 .end
 
 .sub test_tcp_socket6
-    .local pmc sock
-    sock = new 'Socket'
-    sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_STREAM, .PIO_PROTO_TCP)
-    ok(1, 'Created a IPv6 TCP Socket')
+    test_create_socket(.PIO_PF_INET6, .PIO_SOCK_STREAM, .PIO_PROTO_TCP, 'Created a IPv6 TCP Socket')
 .end
 
 .sub test_udp_socket6
-    .local pmc sock
-    sock = new 'Socket'
-
-    sock.'socket'(.PIO_PF_INET6, .PIO_SOCK_DGRAM, .PIO_PROTO_UDP)
-    ok(1, 'Created a IPv6 UDP Socket')
+    test_create_socket(.PIO_PF_INET6, .PIO_SOCK_DGRAM, .PIO_PROTO_UDP, 'Created a IPv6 UDP Socket')
 .end
 
 .sub test_udp_socket
-    .local pmc sock
-    sock = new 'Socket'
-
-    sock.'socket'(.PIO_PF_INET, .PIO_SOCK_DGRAM, .PIO_PROTO_UDP)
-    ok(1, 'Created a UDP Socket')
+    test_create_socket(.PIO_PF_INET, .PIO_SOCK_DGRAM, .PIO_PROTO_UDP, 'Created a UDP Socket')
 .end
 
 .sub test_server

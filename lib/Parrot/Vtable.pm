@@ -318,6 +318,9 @@ sub vtbl_embed {
 
         next if $@;
 
+        # these are internals-ish and should not be exposed
+        next if $name =~ m/^(destroy|mark|invoke)$/;
+
         my $signature = join( ', ', @sig );
         my $arguments = join( ', ', @args );
 
@@ -345,10 +348,8 @@ sub vtbl_embed {
         $funcs .= sprintf $func_header, ( $ret_type, $name, $signature ) x 2;
 
         $funcs .= "    $ret_type retval;\n" unless $ret_type eq 'void';
-        $funcs .= "    PARROT_CALLIN_START( interp );\n    ";
         $funcs .= "retval = " unless $ret_type eq 'void';
         $funcs .= "VTABLE_$name( $arguments );
-    PARROT_CALLIN_END( interp );
     return";
         $funcs .= " retval" unless $ret_type eq 'void';
         $funcs .= ";\n}\n\n";

@@ -91,12 +91,15 @@ PARROT_DYNEXT_EXPORT void   nci_pip(int, ARGIN(const Rect_Like *));
 PARROT_DYNEXT_EXPORT void * nci_pp(void *);
 PARROT_DYNEXT_EXPORT short  nci_s(void);
 PARROT_DYNEXT_EXPORT short  nci_ssc(short, char);
+PARROT_DYNEXT_EXPORT char * nci_t(void);
+PARROT_DYNEXT_EXPORT char * nci_tt(const char *);
 PARROT_DYNEXT_EXPORT void   nci_v(void);
 PARROT_DYNEXT_EXPORT void   nci_vP(void *);
 PARROT_DYNEXT_EXPORT void   nci_vpii(ARGMOD(Outer *), int, int);
 PARROT_DYNEXT_EXPORT void   nci_vv(void);
 PARROT_DYNEXT_EXPORT void   nci_vp(ARGIN(const Opaque*));
 PARROT_DYNEXT_EXPORT void   nci_vfff(float, float, float);
+PARROT_DYNEXT_EXPORT char * nci_cstring_cstring(const char *);
 
 /* Declarations for callback tests */
 
@@ -130,6 +133,7 @@ PARROT_DYNEXT_EXPORT int    nci_dlvar_int;
 PARROT_DYNEXT_EXPORT long   nci_dlvar_long;
 PARROT_DYNEXT_EXPORT float  nci_dlvar_float;
 PARROT_DYNEXT_EXPORT double nci_dlvar_double;
+PARROT_DYNEXT_EXPORT char   nci_dlvar_cstring[];
 
 int    int_cb_D4           = -55555;
 int    nci_dlvar_char      = 22;
@@ -138,6 +142,7 @@ int    nci_dlvar_int       = -4444;
 long   nci_dlvar_long      = -7777777;
 float  nci_dlvar_float     = -333.0;
 double nci_dlvar_double    = -55555.55555;
+char   nci_dlvar_cstring[] = "This is a C-string.\n";
 
 
 /* Function definitions */
@@ -889,6 +894,50 @@ nci_pii(int fac1, int fac2)
     return &nci_dlvar_int;
 }
 
+
+/*
+
+=item C<PARROT_DYNEXT_EXPORT char * nci_t(void)>
+
+Returns the value of C<nci_dlvar_cstring>.
+
+=cut
+
+*/
+
+PARROT_DYNEXT_EXPORT
+PARROT_CONST_FUNCTION
+char *
+nci_t(void)
+{
+    return nci_dlvar_cstring;
+}
+
+
+/*
+
+=item C<PARROT_DYNEXT_EXPORT char * nci_tt(const char *p)>
+
+Returns "xx worked", where "xx" is replaced with the first two character values
+of C<p>, in reverse order.
+
+=cut
+
+*/
+
+static char s[] = "xx worked\n";
+
+PARROT_DYNEXT_EXPORT
+char *
+nci_tt(const char *p)
+{
+    s[0] = p[1];
+    s[1] = p[0];
+
+    return s;
+}
+
+
 /*
 
 =item C<PARROT_DYNEXT_EXPORT void nci_v(void)>
@@ -985,6 +1034,37 @@ nci_vfff(float l1, float l2, float l3)
     validate_float(l3, 14245.567);
 }
 
+/*
+
+=item C<PARROT_DYNEXT_EXPORT char * nci_cstring_cstring(const char * src)>
+
+Copy the content of src to a static buffer, replacing 'l' with 'L' and
+return a pointer for the buffer.
+
+=cut
+
+*/
+
+PARROT_DYNEXT_EXPORT
+char *
+nci_cstring_cstring(const char * src)
+{
+    static char buffer[64];
+    const int maxl = sizeof buffer - 1;
+    int l = strlen(src);
+    int i;
+    if (l > maxl)
+        l = maxl;
+    for (i = 0; i < l; ++i) {
+        char c = src[i];
+        if (c == 'l')
+            c = 'L';
+        buffer[i] = c;
+    }
+    buffer[i] = '\0';
+    return buffer;
+}
+
 #ifdef TEST
 
 char l2 = 4;
@@ -1023,11 +1103,9 @@ main(void)
 
 =back
 
-=head1 SEE ALSO:
+=head1 SEE ALSO
 
-  F<docs/pdds/pdd16_native_call.pod>
-  F<config/gen/makefiles/root.in>
-  F<t/pmc/nci.t>
+F<docs/pdds/draft/pdd16_native_call.pod>, F<config/gen/makefiles/root.in>, F<t/pmc/nci.t>
 
 =cut
 

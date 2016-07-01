@@ -200,9 +200,7 @@ static int get_old_size(
         FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*ins_line);
 
-static void imcc_globals_destroy(SHIM_INTERP,
-    SHIM(int ex),
-    ARGMOD(void *param))
+static void imcc_globals_destroy(PARROT_INTERP, int ex, ARGMOD(void *param))
         __attribute__nonnull__(3)
         FUNC_MODIFIES(*param);
 
@@ -261,6 +259,17 @@ static void store_sub_size(
     size_t ins_line)
         __attribute__nonnull__(1)
         FUNC_MODIFIES(* imcc);
+
+static void store_sub_tags(
+    ARGMOD(imc_info_t * imcc),
+    ARGIN(pcc_sub_t * sub),
+    const int sub_idx,
+    ARGMOD(PackFile_ConstTable * ct))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        __attribute__nonnull__(4)
+        FUNC_MODIFIES(* imcc)
+        FUNC_MODIFIES(* ct);
 
 static void verify_signature(
     ARGMOD(imc_info_t * imcc),
@@ -352,6 +361,10 @@ static void verify_signature(
     , PARROT_ASSERT_ARG(str))
 #define ASSERT_ARGS_store_sub_size __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
+#define ASSERT_ARGS_store_sub_tags __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc) \
+    , PARROT_ASSERT_ARG(sub) \
+    , PARROT_ASSERT_ARG(ct))
 #define ASSERT_ARGS_verify_signature __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(ins) \
@@ -477,12 +490,7 @@ e_pbc_open(ARGMOD(imc_info_t * imcc))
     else
         cs->prev->next = cs;
 
-    /* we need some segments */
-    if (!current_bc) {
-        STRING * const name = imcc->state->file;
-
-        cs->seg = PF_create_default_segs(imcc->interp, name, 1, 1);
-    }
+    PARROT_ASSERT(current_bc);
 
     imcc->globals->cs = cs;
 
@@ -662,34 +670,39 @@ get_code_size(ARGMOD(imc_info_t * imcc), ARGIN(const IMC_Unit *unit),
     *src_lines = 0;
 
     for (code_size = 0; ins ; ins = ins->next) {
+        char * const opname = ins->opname;
+        const int opsize = ins->opsize;
+
         if (ins->type & ITLABEL)
             ins->symregs[0]->color = code_size;
 
-        if (ins->opname && STREQ(ins->opname, ".annotate")) {
+        if (!opname || !*opname) {
+            if (opsize)
+                IMCC_fatal(imcc, 1, "get_code_size: non instruction with size found\n");
+            continue;
+        }
+
+        if (STREQ(opname, ".annotate")) {
             /* Annotations contribute nothing to code size, since they do not
              * end up in bytecode segment. */
-            (*src_lines)++;
+            continue;
         }
-        else if (ins->opname && *ins->opname) {
-            (*src_lines)++;
-            if (!ins->op)
-                IMCC_fatal(imcc, 1, "get_code_size: "
-                        "no opnum ins#%d %d\n",
-                        ins->index, ins);
+        (*src_lines)++;
+        if (!ins->op)
+            IMCC_fatal(imcc, 1, "get_code_size: "
+                    "no opnum ins#%d %d\n",
+                    ins->index, ins);
 
-            if (ins->op == &core_ops->op_info_table[PARROT_OP_set_p_pc]) {
-                /* set_p_pc opcode */
-                IMCC_debug(imcc, DEBUG_PBC_FIXUP, "PMC constant %s\n",
-                        ins->symregs[1]->name);
+        if (ins->op == &core_ops->op_info_table[PARROT_OP_set_p_pc]) {
+            /* set_p_pc opcode */
+            IMCC_debug(imcc, DEBUG_PBC_FIXUP, "PMC constant %s\n",
+                    ins->symregs[1]->name);
 
-                if (ins->symregs[1]->usage & U_FIXUP)
-                    store_fixup(imcc, ins->symregs[1], code_size, 2);
-            }
-
-            code_size += ins->opsize;
+            if (ins->symregs[1]->usage & U_FIXUP)
+                store_fixup(imcc, ins->symregs[1], code_size, 2);
         }
-        else if (ins->opsize)
-            IMCC_fatal(imcc, 1, "get_code_size: non instruction with size found\n");
+
+        code_size += opsize;
     }
 
     return code_size;
@@ -1035,7 +1048,7 @@ IMCC_string_from_reg(ARGMOD(imc_info_t * imcc), ARGIN(const SymReg *r))
         buf++;
         return Parrot_str_unescape(imcc->interp, buf, '"', NULL);
     }
-    else if (*buf == '\'') {   /* TODO handle python raw strings */
+    else if (*buf == '\'') {
         buf++;
         return Parrot_str_new_init(imcc->interp, buf, strlen(buf) - 1,
                 Parrot_ascii_encoding_ptr, PObj_constant_FLAG);
@@ -1271,7 +1284,7 @@ create_lexinfo(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
         SymReg *r;
 
         for (r = hsh->data[i]; r; r = r->next) {
-            if (r->set == 'P' && r->usage & U_LEXICAL) {
+            if (r->usage & U_LEXICAL) {
                 SymReg *n;
                 if (!lex_info) {
                     lex_info = Parrot_pmc_new_noinit(imcc->interp, lex_info_id);
@@ -1284,6 +1297,7 @@ create_lexinfo(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
 
                 while (n) {
                     STRING     *lex_name;
+                    INTVAL      reg_type;
                     const int   k = n->color;
                     Parrot_Sub_attributes *sub;
                     PARROT_ASSERT(k >= 0);
@@ -1300,8 +1314,12 @@ create_lexinfo(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit),
                         IMCC_fataly(imcc, EXCEPTION_INVALID_OPERATION,
                             "Multiple declarations of lexical '%S'\n", lex_name);
 
+                    reg_type = r->set == 'I' ? REGNO_INT :
+                               r->set == 'N' ? REGNO_NUM :
+                               r->set == 'S' ? REGNO_STR :
+                                               REGNO_PMC;
                     VTABLE_set_integer_keyed_str(imcc->interp, lex_info,
-                            lex_name, r->color);
+                            lex_name, (r->color << 2) | reg_type);
 
                     /* next possible name */
                     n = n->reg;
@@ -1420,8 +1438,8 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
     PMC                   *ns_pmc;
     PMC                   *sub_pmc;
     Parrot_Sub_attributes *sub;
-    PackFile_ByteCode * const interp_code = Parrot_pf_get_current_code_segment(imcc->interp);
-    PackFile_ConstTable * const ct    = interp_code->const_table;
+    PackFile_ByteCode   * const interp_code = Parrot_pf_get_current_code_segment(imcc->interp);
+    PackFile_ConstTable * const ct          = interp_code->const_table;
     IMC_Unit * const unit = imcc->globals->cs->subs->unit;
 
     int i;
@@ -1437,12 +1455,14 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
             /* Unfortunately, there is no strrstr, then iterate until last */
             char *aux = strstr(real_name + 3, ns_sep);
 
-            while (aux) {
-                real_name = aux;
-                aux       = strstr(real_name + 3, ns_sep);
-            }
+            if (aux) {
+                while (aux) {
+                    real_name = aux;
+                    aux       = strstr(real_name + 3, ns_sep);
+                }
 
-            real_name += 3;
+                real_name += 3;
+            }
         }
 
         IMCC_debug(imcc, DEBUG_PBC_CONST,
@@ -1481,7 +1501,6 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
         const INTVAL type = r->pcc_sub->yield ? enum_class_Coroutine : enum_class_Sub;
         const INTVAL hlltype = Parrot_hll_get_ctx_HLL_type(imcc->interp, type);
 
-        /* TODO create constant - see also src/packfile.c */
         sub_pmc = Parrot_pmc_new(imcc->interp, hlltype);
     }
 
@@ -1583,9 +1602,7 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
             sub->method_name = sub->name;
     }
     else
-        /* TODO: Any reason why we need to have a new empty GCable here for a
-                 value which we don't use? Can we use STRINGNULL? */
-        sub->method_name = Parrot_str_new(imcc->interp, "", 0);
+        sub->method_name = STRINGNULL;
 
     if (unit->has_ns_entry_name == 1) {
         /* Work out the name of the ns entry. */
@@ -1644,10 +1661,39 @@ add_const_pmc_sub(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), size_t offs,
             }
         }
 
+        store_sub_tags(imcc, r->pcc_sub, k, ct);
+
         return k;
     }
 }
 
+
+/*
+
+=item C<static void store_sub_tags(imc_info_t * imcc, pcc_sub_t * sub, const int
+sub_idx, PackFile_ConstTable * ct)>
+
+Store the tags associated with a sub in the provided constant table.
+
+=cut
+
+*/
+
+static void
+store_sub_tags(ARGMOD(imc_info_t * imcc), ARGIN(pcc_sub_t * sub), const int sub_idx,
+                ARGMOD(PackFile_ConstTable * ct))
+{
+    ASSERT_ARGS(store_sub_tags)
+    opcode_t i;
+    for (i = 0; i < sub->nflags; i++) {
+        SymReg * const flag = sub->flags[i];
+
+        STRING * const tag = Parrot_str_new(imcc->interp, flag->name + 1,
+                    strlen(flag->name) - 2);
+        const int tag_idx = add_const_str(imcc, tag, ct->code);
+        Parrot_pf_tag_constant(imcc->interp, ct, tag_idx, sub_idx);
+    }
+}
 
 /*
 
@@ -2144,9 +2190,6 @@ e_pbc_end_sub(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(IMC_Unit *unit
 
     pragma = ins->symregs[0]->pcc_sub->pragma;
 
-    if (!(pragma & P_ANON))
-        return;
-
     if (pragma & P_IMMEDIATE && (pragma & P_ANON)) {
         /* clear global symbols temporarily -- TT #1324, for example */
         imcc_globals *g = imcc->globals;
@@ -2158,6 +2201,8 @@ e_pbc_end_sub(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(IMC_Unit *unit
         memset(&imcc->ghash, 0, sizeof (SymHash));
 
         IMCC_debug(imcc, DEBUG_PBC, "immediate sub '%s'", ins->symregs[0]->name);
+        /* TODO: Don't use this function, it is deprecated (TT #2140). We need
+           to find a better mechanism to do this. */
         PackFile_fixup_subs(imcc->interp, PBC_IMMEDIATE, NULL);
 
         imcc->globals  = g;

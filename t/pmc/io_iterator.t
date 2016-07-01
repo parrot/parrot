@@ -33,7 +33,7 @@ ok 1 - $P0 = iter $P1
 OUT
 
 # L<PDD22/I\/O Iterator PMC API/=item shift>
-pir_output_is( <<'CODE', <<'OUT', 'shift', todo => 'not yet implemented' );
+pir_output_is( <<'CODE', <<'OUT', 'shift', todo => 'not yet implemented: TT #1206' );
 .sub 'test' :main
     $P99 = 1 # TT #1242 replace with io object
     $P0 = iter $P99

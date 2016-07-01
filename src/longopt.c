@@ -307,7 +307,7 @@ longopt_get_shortopt(int argc, ARGIN(const char* argv[]),
 
 =head1 SEE ALSO
 
-F<include/parrot/longopt.h> and F<docs/dev/longopt.dev>.
+F<include/parrot/longopt.h>, F<docs/dev/longopt.pod>
 
 =cut
 

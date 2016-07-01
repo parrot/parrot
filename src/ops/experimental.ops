@@ -2,34 +2,6 @@
 ** experimental.ops
 */
 
-BEGIN_OPS_PREAMBLE
-
-PARROT_WARN_UNUSED_RESULT
-PMC *
-parrot_pmc_new_from_type(PARROT_INTERP, ARGIN(PMC *key))
-{
-    PMC *pmc;
-    PMC *const classobj = Parrot_oo_get_class(interp, key);
-
-    if (!PMC_IS_NULL(classobj))
-        pmc = VTABLE_instantiate(interp, classobj, PMCNULL);
-    else {
-        const INTVAL type = Parrot_pmc_get_type(interp, key);
-
-        if (type <= 0) {
-            Parrot_ex_throw_from_c_args(interp, NULL,
-                EXCEPTION_NO_CLASS, "Class '%Ss' not found",
-                VTABLE_get_repr(interp, key));
-        }
-
-        pmc = Parrot_pmc_new(interp, type);
-    }
-
-    return pmc;
-}
-
-END_OPS_PREAMBLE
-
 =head1 NAME
 
 experimental.ops - Experimental Opcodes
@@ -114,7 +86,7 @@ inline op fetch(out PMC, in PMC, in PMC, in PMC) :base_core {
     $1 = VTABLE_get_pmc_keyed(interp, $2, $3);
 
     if (PMC_IS_NULL($1)) {
-        $1 = parrot_pmc_new_from_type(interp, $4);
+        $1 = Parrot_pmc_new_from_type(interp, $4);
     }
 }
 
@@ -122,7 +94,7 @@ inline op fetch(out PMC, in PMC, in INT, in PMC) :base_core {
     $1 = VTABLE_get_pmc_keyed_int(interp, $2, $3);
 
     if (PMC_IS_NULL($1)) {
-        $1 = parrot_pmc_new_from_type(interp, $4);
+        $1 = Parrot_pmc_new_from_type(interp, $4);
     }
 }
 
@@ -130,7 +102,7 @@ inline op fetch(out PMC, in PMC, in STR, in PMC) :base_core {
     $1 = VTABLE_get_pmc_keyed_str(interp, $2, $3);
 
     if (PMC_IS_NULL($1)) {
-        $1 = parrot_pmc_new_from_type(interp, $4);
+        $1 = Parrot_pmc_new_from_type(interp, $4);
     }
 }
 
@@ -149,7 +121,7 @@ inline op vivify(out PMC, in PMC, in PMC, in PMC) :base_core {
     $1 = VTABLE_get_pmc_keyed(interp, $2, $3);
 
     if (PMC_IS_NULL($1)) {
-        $1 = parrot_pmc_new_from_type(interp, $4);
+        $1 = Parrot_pmc_new_from_type(interp, $4);
 
         VTABLE_set_pmc_keyed(interp, $2, $3, $1);
     }
@@ -159,7 +131,7 @@ inline op vivify(out PMC, in PMC, in INT, in PMC) :base_core {
     $1 = VTABLE_get_pmc_keyed_int(interp, $2, $3);
 
     if (PMC_IS_NULL($1)) {
-        $1 = parrot_pmc_new_from_type(interp, $4);
+        $1 = Parrot_pmc_new_from_type(interp, $4);
 
         VTABLE_set_pmc_keyed_int(interp, $2, $3, $1);
     }
@@ -169,7 +141,7 @@ inline op vivify(out PMC, in PMC, in STR, in PMC) :base_core {
     $1 = VTABLE_get_pmc_keyed_str(interp, $2, $3);
 
     if (PMC_IS_NULL($1)) {
-        $1 = parrot_pmc_new_from_type(interp, $4);
+        $1 = Parrot_pmc_new_from_type(interp, $4);
 
         VTABLE_set_pmc_keyed_str(interp, $2, $3, $1);
     }

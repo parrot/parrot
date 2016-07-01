@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2009-2010, Parrot Foundation.
+# Copyright (C) 2009-2011, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -24,7 +24,7 @@ Tests instantiation
 
 plan tests => 1;
 
-pir_output_is( <<'CODE', <<'OUT', "exception in new", todo => 'TT #1151' );
+pir_output_is( <<'CODE', <<'OUT', "exception in new" );
 .sub main :main
     .local pmc type
     newclass type, 'Parent'
@@ -40,6 +40,7 @@ pir_output_is( <<'CODE', <<'OUT', "exception in new", todo => 'TT #1151' );
 
   handler:
     .get_results(exception)
+    finalize exception
     pop_eh
     message = exception
 

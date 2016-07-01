@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2006-2010, Parrot Foundation.
+# Copyright (C) 2006-2011, Parrot Foundation.
 
 =head1 NAME
 
@@ -18,9 +18,10 @@ Tests the UnManagedStruct PMC.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(9)
+    plan(10)
 
     test_new()
+    test_bool()
     is_defined()
     is_equal()
     initialize()
@@ -30,6 +31,16 @@ Tests the UnManagedStruct PMC.
 .sub test_new
     new $P0, ['UnManagedStruct']
     ok(1, 'Instantiated an UnManagedStruct PMC')
+.end
+
+.sub test_bool
+    new $P0, ['UnManagedStruct']
+
+    $I0 = 0
+    if $P0 goto check
+    $I0 = 1
+  check:
+    is($I0, 1, 'undefined struct is false')
 .end
 
 .sub is_defined
@@ -100,7 +111,7 @@ finally3:
     goto finally4
 eh4:
     .get_results($P2)
-    is($P2, "Illegal type in initializer for struct", "error correctly thrown for bad initializer type")
+    is($P2, "Illegal type (-1) in initializer for struct", "error correctly thrown for bad initializer type")
 finally4:
     pop_eh
 

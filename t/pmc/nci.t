@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2001-2010, Parrot Foundation.
+# Copyright (C) 2001-2011, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -32,10 +32,13 @@ Most tests are skipped when the F<libnci_test.so> shared library is not found.
 $ENV{TEST_PROG_ARGS} ||= '';
 
 SKIP: {
+    unless ($PConfig{HAS_EXTRA_NCI_THUNKS} || $PConfig{HAS_LIBFFI}) {
+        plan skip_all => "Parrot built without libffi or extra NCI thunks";
+    }
     unless ( -e "runtime/parrot/dynext/libnci_test$PConfig{load_ext}" ) {
         plan skip_all => "Please make libnci_test$PConfig{load_ext}";
     }
-    plan tests => 58;
+    plan tests => 60;
 
     pir_output_is( << 'CODE', << 'OUTPUT', 'load library fails' );
 .sub test :main
@@ -2537,6 +2540,56 @@ CODE
 1
 1
 1
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "nci_tt - as_string and ByteBuffer" );
+.sub test :main
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib  library_name
+
+    .local pmc nci_tt
+    nci_tt = dlfunc libnci_test, "nci_tt", "pp"
+    .local string s, r
+    .local pmc arg, result
+    # Note: the nci_tt function does not need a zero terminated string,
+    # just uses the two first characters.
+    s = "AB"
+    arg = new ["ByteBuffer"]
+    arg = s
+    result = nci_tt(arg)
+    r = result.'as_string'("ascii")
+    say r
+.end
+CODE
+BA worked
+
+OUTPUT
+
+pir_output_is( << 'CODE', << 'OUTPUT', "nci_cstring_cstring - as_string and ByteBuffer" );
+.sub test :main
+    .local string library_name
+    library_name = 'libnci_test'
+    .local pmc libnci_test
+    libnci_test = loadlib library_name
+
+    .local pmc nci_cstring_cstring
+    nci_cstring_cstring = dlfunc libnci_test, "nci_cstring_cstring", "pp"
+    .local string s, r
+    .local int l
+    .local pmc arg, result
+    s = "Hello, world!"
+    l = bytelength s
+    arg = new ["ByteBuffer"]
+    arg = s
+    arg[l] = 0
+    result = nci_cstring_cstring(arg)
+    r = result.'as_string'("ascii")
+    say r
+.end
+CODE
+HeLLo, worLd!
 OUTPUT
 
 # Local Variables:

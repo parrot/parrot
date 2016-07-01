@@ -16,7 +16,7 @@ our @EXPORT_OK = qw(
     no_both_static_and_PARROT_EXPORT
     handle_split_declaration
     asserts_from_args
-    shim_test
+    clean_args_for_declarations
     handle_modified_args
     add_asserts_to_declarations
     add_newline_if_multiline
@@ -41,7 +41,7 @@ Parrot::Headerizer::Functions - Functions used in headerizer programs
         no_both_static_and_PARROT_EXPORT
         handle_split_declaration
         asserts_from_args
-        shim_test
+        clean_args_for_declarations
         handle_modified_args
         add_asserts_to_declarations
         add_newline_if_multiline
@@ -452,23 +452,20 @@ sub asserts_from_args {
     my @asserts;
 
     for my $arg (@args) {
-        if ( $arg =~ m{(ARGIN|ARGOUT|ARGMOD|ARGFREE_NOTNULL|NOTNULL)\((.+)\)} ) {
+        if ( $arg =~ m{(ARGIN|ARGOUT|ARGMOD|ARGFREE_NOTNULL|NOTNULL)\((.+?)\)} ) {
             my $var = $2;
-            if($var =~ /\(*\s*([a-zA-Z_][a-zA-Z0-9_]*)\s*\)\s*\(/) {
-                # argument is a function pointer
-                # Is this branch ever reached?
-                $var = $1;
-            }
-            else {
-                # try to isolate the variable's name;
-                # strip off everything before the final space or asterisk.
-                $var =~ s{.+[* ]([^* ]+)$}{$1};
-                # strip off a trailing "[]", if any.
-                $var =~ s{\[\]$}{};
-            }
+            my $was_shimmed = ( $var =~ /SHIM/ );
+
+            # try to isolate the variable's name;
+            # strip off everything before the final space or asterisk.
+            $var =~ s{.+[* ]([^* ]+)$}{$1};
+            # strip off a trailing "[]", if any.
+            $var =~ s{\[\]$}{};
+
+            $var .= '_unused' if $was_shimmed;
             push( @asserts, "PARROT_ASSERT_ARG($var)" );
         }
-        if( $arg eq 'PARROT_INTERP' ) {
+        if ( $arg eq 'PARROT_INTERP' ) {
             push( @asserts, "PARROT_ASSERT_ARG(interp)" );
         }
     }
@@ -476,42 +473,18 @@ sub asserts_from_args {
     return (@asserts);
 }
 
-=head2 C<shim_test()>
+=head2 C<clean_args_for_declarations()>
 
-=over 4
-
-=item * Purpose
-
-Determine whether an argument needs to include C<SHIM> or <NULLOK>.
-
-=item * Arguments
-
-    @modified_args = shim_test($func, \@args);
-
-List of two elements: hash reference holding function characteristics;
-reference to array holding list of arguments.
-
-=item * Return Value
-
-List of modified arguments.
-
-=back
+Removes SHIM()s from args for putting into declarations.
 
 =cut
 
-sub shim_test {
+sub clean_args_for_declarations {
     my ($func, $argsref) = @_;
     my @args = @{$argsref};
     for my $arg (@args) {
-        if ( $arg =~ m{SHIM\((.+)\)} ) {
-            $arg = $1;
-            if ( $func->{is_static} || ( $arg =~ /\*/ ) ) {
-                $arg = "SHIM($arg)";
-            }
-            else {
-                $arg = "NULLOK($arg)";
-            }
-        }
+        $arg =~ s{SHIM\((.+?)\)}{$1};
+        $arg =~ s{SHIM_INTERP}{PARROT_INTERP};
     }
     return @args;
 }
@@ -550,8 +523,10 @@ sub handle_modified_args {
     }
     else {
         if ( $modified_args[0] =~ /^(?:(?:SHIM|PARROT)_INTERP|Interp)\b/ ) {
-            $decl .= ( shift @modified_args );
-            $decl .= "," if @modified_args;
+            my $arg = shift @modified_args;
+            $arg =~ s/\bSHIM_INTERP/PARROT_INTERP/;
+            $decl .= $arg;
+            $decl .= ',' if @modified_args;
         }
         $argline   = join( ",", map { "\n\t$_" } @modified_args );
         $decl      = "$decl$argline)";
@@ -624,7 +599,7 @@ sub add_asserts_to_declarations {
         $assert .= " __attribute__unused__ int _ASSERT_ARGS_CHECK = (";
 
         my @asserts = asserts_from_args( @{ $func->{args} } );
-        if(@asserts) {
+        if (@asserts) {
             $assert .= "\\\n       ";
             $assert .= join(" \\\n    , ", @asserts);
         }

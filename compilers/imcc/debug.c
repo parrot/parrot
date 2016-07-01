@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2010, Parrot Foundation.
+ * Copyright (C) 2002-2011, Parrot Foundation.
  */
 
 /*
@@ -59,11 +59,16 @@ IMCC_fatal(ARGMOD(imc_info_t * imcc), SHIM(int code), ARGIN(const char *fmt), ..
     va_list ap;
 
     va_start(ap, fmt);
-    imcc->error_message = Parrot_vsprintf_c(imcc->interp, fmt, ap);
-    va_end(ap);
     location = IMCC_get_err_location(imcc);
+    imcc->error_message = Parrot_str_concat(imcc->interp,
+        imcc->error_message,
+        Parrot_sprintf_c(imcc->interp,
+        "error:imcc:%Ss\n\t%Ss",
+        Parrot_vsprintf_c(imcc->interp, fmt, ap),
+        location));
+    va_end(ap);
     Parrot_ex_throw_from_c_args(imcc->interp, NULL, IMCC_FATAL_EXCEPTION,
-        "error:imcc:%Ss\n\t%Ss", imcc->error_message, location);
+         "%Ss", imcc->error_message);
 }
 
 /*
@@ -85,11 +90,15 @@ IMCC_fataly(ARGMOD(imc_info_t * imcc), SHIM(int code), ARGIN(const char *fmt), .
     va_list ap;
 
     va_start(ap, fmt);
-    imcc->error_message = Parrot_vsprintf_c(imcc->interp, fmt, ap);
-    va_end(ap);
     location = IMCC_get_err_location(imcc);
+    imcc->error_message = Parrot_str_concat(imcc->interp,
+        imcc->error_message,
+        Parrot_sprintf_c(imcc->interp, "error:imcc:%Ss\n\t%Ss",
+        Parrot_vsprintf_c(imcc->interp, fmt, ap),
+        location));
+    va_end(ap);
     Parrot_ex_throw_from_c_args(imcc->interp, NULL, IMCC_FATALY_EXCEPTION,
-        "error:imcc:%Ss\n\t%Ss", imcc->error_message, location);
+        "%Ss", imcc->error_message);
 }
 
 /*
@@ -168,17 +177,15 @@ cause Parrot to exit.
 
 */
 
-/* TODO: Don't print this out to stderr. Store a list of warning messages
-         in the imcc structure, and be able to read them back out again
-         later through the API */
-
 void
 IMCC_warning(ARGMOD(imc_info_t * imcc), ARGIN(const char *fmt), ...)
 {
     ASSERT_ARGS(IMCC_warning)
     va_list ap;
     va_start(ap, fmt);
-    imcc_vfprintf(imcc, Parrot_io_STDERR(imcc->interp), fmt, ap);
+    imcc->error_message = Parrot_str_concat(imcc->interp,
+                                            imcc->error_message,
+                                            Parrot_vsprintf_c(imcc->interp, fmt, ap));
     va_end(ap);
 }
 

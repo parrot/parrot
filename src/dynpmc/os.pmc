@@ -7,7 +7,7 @@ src/pmc/os.pmc - Files and Directories PMC
 
 =head1 DESCRIPTION
 
-C<OS> is a singleton class which provides access to the filesystem
+C<OS> is a PMC type which provides access to the filesystem
 files and directories.
 
 =head2 Methods
@@ -71,34 +71,7 @@ stat_buf_to_array(PARROT_INTERP, ARGIN(const Parrot_Stat_Buf *buf))
     return array;
 }
 
-static PMC *OS_PMC;
-pmclass OS dynpmc singleton {
-
-/*
-
-=item C<void *get_pointer()>
-
-=item C<void set_pointer(void *ptr)>
-
-These two functions are part of the singleton creation interface. For more
-information see F<src/pmc.c>.
-
-=cut
-
-*/
-
-    void class_init() {
-        OS_PMC = NULL;
-    }
-
-    VTABLE void *get_pointer() {
-        return OS_PMC;
-    }
-
-    VTABLE void set_pointer(void *ptr) {
-        OS_PMC = (PMC *)ptr;
-    }
-
+pmclass OS dynpmc {
 
 /*
 
@@ -366,6 +339,21 @@ Returns the ID number of the current user. This is platform-dependent.
     METHOD can_write(STRING *filename) {
         const INTVAL can = Parrot_file_can_write(INTERP, filename);
         RETURN(INTVAL can);
+    }
+
+/*
+
+=item C<exists(STRING *filename)>
+
+Determine if the file exists. Return C<1> if it exists. Return C<0> otherwise.
+
+=cut
+
+*/
+
+    METHOD exists(STRING *filename) {
+        const INTVAL e = Parrot_file_stat_intval(INTERP, filename, STAT_EXISTS);
+        RETURN(INTVAL e);
     }
 
 }

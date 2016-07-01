@@ -1,4 +1,4 @@
-# Copyright (C) 2008, Parrot Foundation.
+# Copyright (C) 2008-2011, Parrot Foundation.
 
 
 =head1 NAME
@@ -140,7 +140,6 @@ package auto::opengl;
 
 use strict;
 use warnings;
-use File::Spec;
 
 use base qw(Parrot::Configure::Step);
 
