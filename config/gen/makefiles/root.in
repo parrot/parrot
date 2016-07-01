@@ -281,6 +281,7 @@ GEN_LIBRARY = \
 	$(LIBRARY_DIR)/yaml_dumper.pbc \
 	$(LIBRARY_DIR)/YAML/Tiny.pbc \
 	$(LIBRARY_DIR)/Getopt/Obj.pbc \
+	$(LIBRARY_DIR)/HTTP/Daemon.pbc \
 	$(LIBRARY_DIR)/HTTP/Message.pbc \
 	$(LIBRARY_DIR)/Iter.pbc \
 	$(LIBRARY_DIR)/JSON.pbc \
