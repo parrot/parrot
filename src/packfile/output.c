@@ -225,6 +225,7 @@ PackFile_ConstTable_pack_size(PARROT_INTERP, ARGMOD(PackFile_Segment *seg))
     }
     Parrot_hash_destroy(interp, self->pmc_hash);
     self->pmc_hash = NULL;
+    size += 1 + (self->ntags * 2);
 
     return size;
 }
@@ -276,6 +277,12 @@ PackFile_ConstTable_pack(PARROT_INTERP,
     }
     Parrot_hash_destroy(interp, self->pmc_hash);
     self->pmc_hash = NULL;
+
+    *cursor++ = self->ntags;
+    for (i = 0; i < self->ntags; i++) {
+        *cursor++ = self->tag_map[i].tag_idx;
+        *cursor++ = self->tag_map[i].const_idx;
+    }
 
     return cursor;
 }

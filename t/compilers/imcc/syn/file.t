@@ -398,7 +398,7 @@ END_PIR
 
     $err_msg =~ s/\r//g if $^O =~ /^(MSWin32|msys)$/i;
     is( $err_msg, << "OUT", 'including a non-existent file' );
-error:imcc:$enoent_err_msg
+error:imcc:$enoent_err_msg 'non_existent.pir'
 \tin file '$temp_pir' line 1
 OUT
 }

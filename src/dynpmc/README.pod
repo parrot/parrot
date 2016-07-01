@@ -57,9 +57,10 @@ and then in your .pir or .pasm file:
 
 =item 2
 
-Edit C<../../config/gen/makefiles/dynpmc.in> and append your PMC(s) to
-the build target. The dynpmc.in file is processed by Configure.pl to 
-create the real makefiles. So, invoke the configure script, then make:
+Edit C<src/dynpmc/Defines.in> and C<src/dynpmc/Rules.in>, appending your PMC(s)
+to the build target. These files are processed by Configure.pl to create the
+real makefile fragments.
+Next invoke the configure script, then make:
 		
 	$ perl Configure.pl
 	$ make

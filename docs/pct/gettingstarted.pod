@@ -6,14 +6,13 @@ Getting Started with the Parrot Compiler Tools
 
 =head1 DESCRIPTION
 
-This document can be considered your Number One entry point for starting to use
-the Parrot Compiler Tools (PCT). As there's a whole lot of acronyms flying
-around (see Parrot's glossary at
-L<https://github.com/parrot/parrot/blob/master/docs/glossary.pod>),
-this document will get you up and running within 10 minutes (that excludes
-building Parrot). Once you begin, it's a matter of getting your hands dirty and
-get experienced using the tools. Feel free to ask questions in
-the #parrot channel on irc.parrot.org .
+This document can be considered your Number One entry point for starting to
+use the Parrot Compiler Tools (PCT). There will be a whole lot of acronyms
+flying around.  Consult L<< Parrot's glossary|http://docs.parrot.org/parrot/latest/html/docs/glossary.html >> about
+them.  This document will get you up and running within 10 minutes (that
+excludes building Parrot). Once you begin, it's a matter of getting your hands
+dirty and get experienced using the tools. Feel free to ask questions in the
+#parrot channel on irc.parrot.org .
 
 =head1 GETTING STARTED
 

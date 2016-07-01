@@ -53,7 +53,7 @@ Initializes a new empty Eval.
 
 =item C<void destroy()>
 
-Destroy the Eval and its asscociated bytecode.
+Destroy the Eval and its associated bytecode.
 
 =item C<void mark()>
 
@@ -300,9 +300,6 @@ Unarchives the code.
                 packed->strlen))
             Parrot_ex_throw_from_c_args(INTERP, NULL, EXCEPTION_EXTERNAL_ERROR,
                 "couldn't unpack packfile");
-
-        /* Parrot_pf_prepare_packfile_init(INTERP, pfpmc); */
-        do_sub_pragmas(INTERP, pfpmc, PBC_PBC, SELF);
 
         for (i = 0; i < pf->directory.num_segments; ++i) {
             PackFile_Segment * const seg = pf->directory.segments[i];

@@ -486,6 +486,27 @@ add_pcc_multi(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r), ARGIN_NULLOK(SymReg 
 
 /*
 
+=item C<void add_pcc_flag_str(imc_info_t * imcc, SymReg * r, SymReg * arg)>
+
+Associate a tag with a sub.
+
+=cut
+
+*/
+
+void
+add_pcc_flag_str(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg * r), ARGIN(SymReg * arg))
+{
+    ASSERT_ARGS(add_pcc_flag_str)
+    pcc_sub_t * const sub = r->pcc_sub;
+    const int n = sub->nflags;
+    sub->flags = mem_gc_realloc_n_typed(imcc->interp, sub->flags, n + 1, SymReg*);
+    sub->flags[n] = arg;
+    sub->nflags++;
+}
+
+/*
+
 =item C<void add_pcc_sub(SymReg *r, SymReg *arg)>
 
 Sets the current sub in the given SymReg to the second SymReg.

@@ -81,7 +81,7 @@
         print   "\n"
         print   N25
         print   "\n"
-        end
+        returncc
 
 # Local Variables:
 #   mode: pir

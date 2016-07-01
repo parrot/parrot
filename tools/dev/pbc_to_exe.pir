@@ -110,7 +110,7 @@ HEADER
                 fprintf(stderr, "PARROT VM: Could not load bytecode\n");
                 show_last_error_and_exit(interp);
             }
-            if (!Parrot_api_run_bytecode(interp, pbc, argsarray)) {
+            if (!Parrot_api_run_bytecode(interp, pbc, argsarray, NULL)) {
                 show_last_error_and_exit(interp);
             }
 

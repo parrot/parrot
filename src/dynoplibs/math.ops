@@ -208,7 +208,7 @@ inline op rand(out INT) {
 
 =item B<rand>(out NUM, in NUM)
 
-Set $1 to a random floating point number between 0 and and $2, inclusive.
+Set $1 to a random floating point number between 0 and $2, inclusive.
 
 =cut
 
@@ -218,7 +218,7 @@ inline op rand(out NUM, in NUM) {
 
 =item B<rand>(out INT, in INT)
 
-Set $1 to a integer between 0 and and $2, inclusive.
+Set $1 to a integer between 0 and $2, inclusive.
 
 =cut
 
@@ -228,7 +228,7 @@ inline op rand(out INT, in INT) {
 
 =item B<rand>(out NUM, in NUM, in NUM)
 
-Set $1 to a random floating point number between $2 and and $3, inclusive.
+Set $1 to a random floating point number between $2 and $3, inclusive.
 
 =cut
 
@@ -258,7 +258,7 @@ inline op srand(in INT) {
 
 =item B<rand>(out INT, in INT, in INT)
 
-Set $1 to a integer between $2 and and $3, inclusive.
+Set $1 to a integer between $2 and $3, inclusive.
 
 =cut
 

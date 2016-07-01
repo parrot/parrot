@@ -117,7 +117,6 @@ my %type_for_name = (
     'MAINTAINER'           => 'Maintainer info',
     'Makefile'             => 'Makefile',
     'MANIFEST'             => 'Manifest file',
-    'NEWS'                 => 'Project info',
     'PBC_COMPAT'           => 'Bytecode compatibility file',
     'PLATFORMS'            => 'Project info',
     'README'               => 'README file',

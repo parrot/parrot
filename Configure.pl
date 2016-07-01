@@ -5,7 +5,6 @@
 use 5.008;
 use strict;
 use warnings;
-use Data::Dumper;$Data::Dumper::Indent=1;
 use lib 'lib';
 
 use Parrot::Configure;
@@ -42,7 +41,6 @@ my ($args, $steps_list_ref) = process_options(
     }
 );
 exit(1) unless defined $args;
-#print STDERR Dumper $args;
 
 my $opttest = Parrot::Configure::Options::Test->new($args);
 

@@ -145,7 +145,7 @@
        you would be far better off obtaining ptmalloc, which is
        derived from a version of this malloc, and is well-tuned for
        concurrent programs. (See http://www.malloc.de) Note that
-       even when USE_MALLOC_LOCK is defined, you can can guarantee
+       even when USE_MALLOC_LOCK is defined, you can guarantee
        full thread-safety only if no threads acquire memory through
        direct calls to MORECORE or other system-level allocators.
 
@@ -376,7 +376,7 @@ extern "C" {
 #endif
 
 /*
-  The unsigned integer type used to hold addresses when they are are
+  The unsigned integer type used to hold addresses when they are
   manipulated as integers. Except that it is not defined on all
   systems, intptr_t would suffice.
 */
@@ -833,7 +833,7 @@ extern Void_t*     sbrk();
   The main declaration needed is the mallinfo struct that is returned
   (by-copy) by mallinfo().  The SVID/XPG malloinfo struct contains a
   bunch of fields that are not even meaningful in this version of
-  malloc.  These fields are are instead filled by mallinfo() with
+  malloc.  These fields are instead filled by mallinfo() with
   other numbers that might be of interest.
 
   HAVE_USR_INCLUDE_MALLOC_H should be set if you have a
@@ -2273,7 +2273,7 @@ static int largebin_index(unsigned int sz) {
     To help compensate for the large number of bins, a one-level index
     structure is used for bin-by-bin searching.  `binmap' is a
     bitvector recording whether bins are definitely empty so they can
-    be skipped over during during traversals.  The bits are NOT always
+    be skipped over during traversals.  The bits are NOT always
     cleared as soon as bins are empty, but instead only
     when they are noticed to be empty during traversal in malloc.
 */
@@ -2719,7 +2719,7 @@ static void do_check_malloced_chunk(p, s) mchunkptr p; INTERNAL_SIZE_T s;
       always true of any allocated chunk; i.e., that each allocated
       chunk borders either a previously allocated and still in-use
       chunk, or the base of its memory arena. This is ensured
-      by making all allocations from the the `lowest' part of any found
+      by making all allocations from the `lowest' part of any found
       chunk.  This does not necessarily hold however for chunks
       recycled via fastbins.
     */

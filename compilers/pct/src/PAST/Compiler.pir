@@ -1066,7 +1066,7 @@ Return the POST representation of a C<PAST::Block>.
     $I0 = defined symtable['']
     if $I0 goto have_symtable
     ##  merge the Block's symtable with outersym
-    symtable = clone symtable
+    symtable = 'shallow_clone_hash'(symtable)
   symtable_merge:
     .local pmc it
     it = iter outersym
@@ -1224,6 +1224,20 @@ Return the POST representation of a C<PAST::Block>.
     ##  remove current block from @*BLOCKPAST
     $P99 = shift blockpast
     .return (bpost)
+.end
+
+.sub 'shallow_clone_hash'
+    .param pmc to_clone
+    $P0 = new ['Hash']
+    $P1 = iter to_clone
+  it_loop:
+    unless $P1 goto it_loop_end
+    $S0 = shift $P1
+    $P2 = to_clone[$S0]
+    $P0[$S0] = $P2
+    goto it_loop
+  it_loop_end:
+    .return ($P0)
 .end
 
 

@@ -247,9 +247,8 @@ Initializes the interpreter.
                 mem_gc_allocate_zeroed_typed(INTERP, Parrot_ParrotInterpreter_attributes);
             PMC_data(SELF) = attrs;
         }
-        if (!PMC_interp(SELF)) {
+        if (!PMC_interp(SELF))
             create_interp(SELF, INTERP);
-        }
         PObj_custom_destroy_SET(SELF);
     }
 
@@ -266,17 +265,13 @@ C<parent> and uses that thread.
 */
 
     VTABLE void init_pmc(PMC *parent) {
-        /* XXX Can this be moved inside the block where it's used */
-        Parrot_Interp p = PMC_interp(parent);
-
         if (!PMC_data(SELF)) {
             Parrot_ParrotInterpreter_attributes * const attrs =
                 mem_gc_allocate_zeroed_typed(INTERP, Parrot_ParrotInterpreter_attributes);
             PMC_data(SELF) = attrs;
         }
-        if (!PMC_interp(SELF)) {
-            create_interp(SELF, p);
-        }
+        if (!PMC_interp(SELF))
+            create_interp(SELF, PMC_interp(parent));
         PObj_custom_destroy_SET(SELF);
     }
 

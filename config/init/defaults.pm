@@ -18,6 +18,7 @@ use warnings;
 use base qw(Parrot::Configure::Step);
 
 use Config;
+use File::Which;
 use FindBin;    # see build_dir
 use Parrot::BuildUtil;
 use Parrot::Configure::Step;
@@ -61,7 +62,6 @@ sub runstep {
         osvers
         scriptdirexp
         sig_name
-        sPRIgldbl
         sPRIgldbl
     | ) {
         $conf->data->set( qq|${orig}_provisional| => $Config{$orig} );
@@ -202,6 +202,9 @@ sub runstep {
         rm_f      => '$(PERL) -MExtUtils::Command -e rm_f',
         rm_rf     => '$(PERL) -MExtUtils::Command -e rm_rf',
         touch     => '$(PERL) -MExtUtils::Command -e touch',
+
+        # tar is currently used only in 'make release'.
+        tar       => which('tar') || '',
 
         ar        => $Config{ar},
         arflags   => 'cr',

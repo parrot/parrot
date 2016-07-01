@@ -1221,7 +1221,7 @@ Used by the Class and Object PMCs internally to compose a role into either of
 them. The C<role> parameter is the role that we are composing into the class
 or role. C<methods_hash> is the hash of method names to invokable PMCs that
 contains the methods the class or role has. C<roles_list> is the list of roles
-the the class or method does.
+the class or method does.
 
 The C<role> parameter is only dealt with by its external interface. Whether
 this routine is usable by any other object system implemented in Parrot very

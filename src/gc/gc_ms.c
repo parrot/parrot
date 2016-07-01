@@ -1257,7 +1257,7 @@ contained_in_attr_pool(ARGIN(const PMC_Attribute_Pool *pool), ARGIN(const void *
 
 =item C<void gc_ms_free_pmc_attributes(PARROT_INTERP, PMC *pmc)>
 
-Deallocates an attibutes structure from a PMC if it has the auto_attrs
+Deallocates an attributes structure from a PMC if it has the auto_attrs
 flag set.
 
 */

@@ -70,7 +70,7 @@ get the latest commits with:
 
 Then use this syntax to track the remote branch with a local branch:
 
-  git checkout -b username/foo origin/username/foo
+  git checkout -t origin/username/foo
 
 If you are using a very old version of Git, such as 1.5.x.x or older, you will
 want to tell it to track the remote branch:
@@ -139,7 +139,7 @@ the --force flag:
     git add --force ports/foo
 
 NOTE: Make sure these files should actually be added. Most files in .gitignore
-should never be added, but some, such as some files in "ports/" will need need
+should never be added, but some, such as some files in "ports/" will need
 the --force flag.
 
 Now for actually creating your commit! Since Git is a distributed version
@@ -489,6 +489,20 @@ This follows the general pattern of
 
 When local_branch_name is empty, you are pushing "nothing" to the remote
 branch, which deletes it.
+
+=head2 How Can I Tell If A Branch Is Merged?
+
+To see a list of all remote branches that are not merged into branch foo
+
+    git branch -r --no-merged foo
+
+If you leave out the last argument, it defaults to HEAD (the tip of the current
+branch). So, to see a list of all remote branches that have not been merged
+into master:
+
+    git checkout master
+    git branch -r --no-merged
+
 
 =cut
 

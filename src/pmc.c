@@ -692,7 +692,7 @@ allow the storage of any regular PMC in this PMC. Temporary PMCs do not
 participate in garbage collection, and mixing them with PMCs that are
 garbage-collected will cause bugs.
 
-If you don't know what this means means, or you can't tell if either case
+If you don't know what this means, or you can't tell if either case
 will happen as the result of any call you make on or with this PMC,
 B<DO NOT> use this function, lest you cause weird crashes and memory errors.
 Use C<Parrot_pmc_new()> instead.

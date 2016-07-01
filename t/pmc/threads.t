@@ -58,7 +58,7 @@ ok 2
 OUTPUT
 
 SKIP: {
-    skip 'busted on win32' => 2 if $^O eq 'MSWin32';
+    skip 'busted on win32' => 2 if $^O eq 'MSWin32' || $^O eq 'msys';
 
     pir_output_is( <<'CODE', <<'OUTPUT', "thread type 1" );
 .sub main :main

@@ -432,13 +432,6 @@ void Parrot_pcc_set_regs_ps(PARROT_INTERP,
         __attribute__nonnull__(3);
 
 PARROT_EXPORT
-void Parrot_pcc_set_regs_used(PARROT_INTERP,
-    ARGIN(PMC *ctx),
-    int type,
-    INTVAL num)
-        __attribute__nonnull__(2);
-
-PARROT_EXPORT
 void Parrot_pcc_set_sub(PARROT_INTERP,
     ARGIN(PMC *ctx),
     ARGIN_NULLOK(PMC *sub))
@@ -526,8 +519,6 @@ PMC * Parrot_set_new_context(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_pcc_set_regs_ps __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(ctx) \
     , PARROT_ASSERT_ARG(bp_ps))
-#define ASSERT_ARGS_Parrot_pcc_set_regs_used __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(ctx))
 #define ASSERT_ARGS_Parrot_pcc_set_sub __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(ctx))

@@ -99,6 +99,7 @@ PARROT_DYNEXT_EXPORT void   nci_vpii(ARGMOD(Outer *), int, int);
 PARROT_DYNEXT_EXPORT void   nci_vv(void);
 PARROT_DYNEXT_EXPORT void   nci_vp(ARGIN(const Opaque*));
 PARROT_DYNEXT_EXPORT void   nci_vfff(float, float, float);
+PARROT_DYNEXT_EXPORT char * nci_cstring_cstring(const char *);
 
 /* Declarations for callback tests */
 
@@ -1031,6 +1032,37 @@ nci_vfff(float l1, float l2, float l3)
     validate_float(l1, 3456.54);
     validate_float(l2, 10.1999);
     validate_float(l3, 14245.567);
+}
+
+/*
+
+=item C<PARROT_DYNEXT_EXPORT char * nci_cstring_cstring(const char * src)>
+
+Copy the content of src to a static buffer, replacing 'l' with 'L' and
+return a pointer for the buffer.
+
+=cut
+
+*/
+
+PARROT_DYNEXT_EXPORT
+char *
+nci_cstring_cstring(const char * src)
+{
+    static char buffer[64];
+    const int maxl = sizeof buffer - 1;
+    int l = strlen(src);
+    int i;
+    if (l > maxl)
+        l = maxl;
+    for (i = 0; i < l; ++i) {
+        char c = src[i];
+        if (c == 'l')
+            c = 'L';
+        buffer[i] = c;
+    }
+    buffer[i] = '\0';
+    return buffer;
 }
 
 #ifdef TEST

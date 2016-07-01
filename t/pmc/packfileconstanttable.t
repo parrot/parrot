@@ -25,13 +25,14 @@ Tests the PackfileConstantTable PMC.
 
 .sub 'main' :main
 .include 'test_more.pir'
-    'plan'(15)
+    'plan'(17)
 
     'test_sanity'()
     'test_counts'()
     'test_get'()
     'test_set'()
     'test_get_or_create'()
+    'test_subs_intact'()
 .end
 
 
@@ -188,6 +189,43 @@ load_error:
     is($I0, $I1, "get_or_create_constant returns same index for equal PMCs")
     $I2 = pfc.'get_or_create_constant'($P2)
     isnt($I0, $I2, "get_or_create_constant returns different index for different PMCs")
+.end
+
+.sub 'test_subs_intact'
+    .local pmc pf, ct
+    push_eh load_error
+    pf = _pbc()
+    pop_eh
+    ct = _get_consttable(pf)
+
+    # force a GC run
+    sweep 1
+
+    .local pmc sub
+    sub = ct[0]
+
+    # validate assumption that ct[0] is a sub
+    $S0 = typeof sub
+    is($S0, 'Sub', 'First entry in constant table is a sub')
+
+    # sub will perform I/O, mock output fh
+    $P0 = getinterp
+    $P1 = new ['StringHandle']
+    $P1.'open'('','w')
+    $P2 = $P0.'stdout_handle'($P1)
+
+    sub()
+    $P0.'stdout_handle'($P2) # restore normal output handle
+
+    # if we're still here (no segfault), we pass
+    ok(1, "Can call Sub from PackfileConstantTable")
+
+    .return ()
+load_error:
+    .get_results($P0)
+    pop_eh
+    report_load_error($P0,  "Can call Sub from PackfileConstantTable")
+    .return()
 .end
 
 .sub '_get_consttable'

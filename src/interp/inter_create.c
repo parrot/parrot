@@ -308,7 +308,6 @@ initialize_interpreter(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
     interp->all_op_libs         = NULL;
     interp->evc_func_table      = NULL;
     interp->evc_func_table_size = 0;
-    interp->current_pf          = PMCNULL;
     interp->code                = NULL;
 
     /* create exceptions list */
@@ -476,10 +475,6 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 
     destroy_runloop_jump_points(interp);
 
-    /* XXX Fix abstraction leak. packfile */
-    if (!PMC_IS_NULL(interp->current_pf))
-        PackFile_destroy(interp, (PackFile*) VTABLE_get_pointer(interp, interp->current_pf));
-
     /* cache structure */
     destroy_object_cache(interp);
 
@@ -543,7 +538,7 @@ Parrot_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg))
 
 Provide access to a (possibly) valid interp pointer.  This is intended B<only>
 for use cases when an interp is not available otherwise, which shouldn't be
-often.  There are no guarantees about what what this function returns.  If you
+often.  There are no guarantees about what this function returns.  If you
 have access to a valid interp, use that instead.  Don't use this for anything
 other than error handling.
 

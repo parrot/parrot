@@ -309,7 +309,7 @@ check_fixed_size_obj_pool(ARGIN(const Fixed_Size_Pool *pool))
                     /* should happen only once at the end */
                     --last_free_list_count;
                 else {
-                    /* next item on free list should also be flaged as free item */
+                    /* next item on free list should also be flagged as free item */
                     pobj_walker = (GC_MS_PObj_Wrapper*)pobj_walker->next_ptr;
                     PARROT_ASSERT(PObj_on_free_list_TEST((PObj*)pobj_walker));
                 }

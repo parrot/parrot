@@ -87,7 +87,7 @@ LOOP:
 The _text sub is used as a source of the text stream.
 It just writes some text to the stream.
 
-The stream is automatically diconnected when the sub returns, which
+The stream is automatically disconnected when the sub returns, which
 will also terminate the combined stream.
 
 =cut

@@ -683,10 +683,10 @@ l1:
 
 .sub PMC_as_classes
     get_class $P0, "Integer"
-    ok( 1, "get_class of Integer did't croak" )
+    ok( 1, "get_class of Integer didn't croak" )
 
     get_class $P0, "Integer"
-    ok( 1, "get_class of Integer did't croak second time" )
+    ok( 1, "get_class of Integer didn't croak second time" )
 
     typeof $S0, $P0
     is( $S0, 'PMCProxy', 'typeof PMCProxy' )
