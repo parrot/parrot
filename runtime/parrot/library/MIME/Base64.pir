@@ -1,4 +1,3 @@
-
 =head1 NAME
 
 MIME::Base64 -  Encoding and decoding of base64 strings
@@ -189,7 +188,7 @@ Characters occurring after a '=' padding character are never decoded.
     .local int    enc_num
     base64_cleaned = ''
     if has_enc goto HAS_ENC
-      enc = 'ascii'
+      enc = 'utf8'
   HAS_ENC:
 
     .local pmc eight_to_six, bb
