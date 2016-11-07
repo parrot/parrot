@@ -104,6 +104,7 @@ INTVAL Parrot_io_internal_async(PARROT_INTERP, ARGMOD(PMC *pmc), INTVAL async);
 
 PMC *Parrot_io_internal_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
         INTVAL protocol, INTVAL family, INTVAL passive);
+PMC *Parrot_io_internal_getaddrinfo_unix(PARROT_INTERP, ARGIN(STRING *addr));
 INTVAL Parrot_io_internal_addr_match(PARROT_INTERP, ARGIN(PMC *sa), INTVAL family, INTVAL type,
             INTVAL protocol);
 STRING *Parrot_io_internal_getnameinfo(PARROT_INTERP, ARGIN(const void *addr), INTVAL addr_len);
