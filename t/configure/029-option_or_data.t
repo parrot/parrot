@@ -1,5 +1,5 @@
 #! perl
-# Copyright (C) 2007, Parrot Foundation.
+# Copyright (C) 2007-2016, Parrot Foundation.
 # 029-option_or_data.t
 
 use strict;
@@ -7,7 +7,7 @@ use warnings;
 
 use Test::More tests => 14;
 use Carp;
-use lib qw( lib );
+use lib qw( . lib );
 use_ok('config::init::defaults');
 use_ok('config::init::install');
 use Parrot::Configure;
