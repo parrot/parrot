@@ -19,7 +19,8 @@ addons:
 before_script:
     # No, we are not going to run the tests for all these dependencies on every commit
     - if [ $TRAVIS_OS_NAME == osx ]; then brew update; brew install cpanminus; brew install icu4c; export PERL5LIB=~/perl5; fi
-    - cpanm -n LWP::UserAgent TAP::Harness::Archive TAP::Harness::ReportByDescription Test::Perl::Critic
+    # Test::Perl::Critic currently broken github.com/Perl-Critic/Perl-Critic/issues/707
+    #- cpanm -n LWP::UserAgent TAP::Harness::Archive TAP::Harness::ReportByDescription
     - gcc --version
     - g++ --version
     - clang --version
