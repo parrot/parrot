@@ -19,13 +19,16 @@ HAS_IPV6, see GH #1068.
 
 =cut
 
+.loadlib 'io_ops'
+.loadlib 'sys_ops'
 .include 'socket.pasm'
+.include 'sysinfo.pasm'
 .include 'iglobals.pasm'
 
 .sub main :main
     .include 'test_more.pir'
 
-    plan(23)
+    plan(24)
 
     test_init()
     test_get_fd()
@@ -36,6 +39,7 @@ HAS_IPV6, see GH #1068.
     test_is_closed()
     test_tcp_socket()
     test_udp_socket()
+    test_unix_socket()
     test_getprotobyname()
     test_server()
 
@@ -141,6 +145,8 @@ CODE
     diag($S0)
   check:
     is(r, 1, msg)
+
+    .return(sock)
 .end
 
 .sub test_tcp_socket
@@ -149,6 +155,34 @@ CODE
 
 .sub test_udp_socket
     test_create_socket(.PIO_PF_INET, .PIO_SOCK_DGRAM, .PIO_PROTO_UDP, 'Created a UDP Socket')
+.end
+
+.sub test_unix_socket
+    .local pmc sock, addr, os
+    .local string os_str
+
+    # Skip this test on Windows: sockaddr.t already tests that sockaddr()
+    # fails.
+    os_str = sysinfo .SYSINFO_PARROT_OS
+    if os_str == 'MSWin32' goto windows
+
+    sock = test_create_socket(.PIO_PF_UNIX, .PIO_SOCK_STREAM, 0, 'Created a Unix Socket')
+    addr = sock.'sockaddr'('sock.local', 0, .PIO_PF_UNIX)
+
+    os = new 'OS'
+
+    push_eh null_handler
+    os.'unlink'('sock.local')
+null_handler:
+    pop_eh
+    sock.'bind'(addr)
+
+    # This will throw an exception if no socket was created
+    os.'unlink'('sock.local')
+    goto end
+windows:
+    ok(1, "unix sockets not supported on windows")
+end:
 .end
 
 .sub test_server

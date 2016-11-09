@@ -63,6 +63,10 @@ This code implements POSIX and WIN32 socket functions for Parrot.
 #    include <netdb.h>
 #  endif /* PARROT_HAS_HEADER_NETDB */
 
+#  ifdef PARROT_HAS_HEADER_SYSUN
+#    include <sys/un.h>
+#  endif /* PARROT_HAS_HEADER_SYSUN */
+
 #endif /* _WIN32 */
 
 #include "parrot/parrot.h"
@@ -263,10 +267,10 @@ Parrot_io_internal_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
         Parrot_str_free_cstring(s);
     }
 
-    if (ret != 0)
+    if (ret != 0) {
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
-                "getaddrinfo failed: %Ss: %Ss", addr,
-                Parrot_platform_strerror(interp, PIO_SOCK_ERRNO));
+                "getaddrinfo failed: %Ss: %s", addr, gai_strerror(ret));
+    }
 
     array = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
 
@@ -370,6 +374,60 @@ Parrot_io_internal_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
 
 /*
 
+=item C<PMC * Parrot_io_internal_getaddrinfo_unix(PARROT_INTERP, STRING *addr, INTVAL fam)>
+
+C<Parrot_io_internal_getaddrinfo_unix()> calls get_addrinfo() to convert a unix socket
+path to a sockaddr and returns an Addrinfo PMC which can be
+passed to C<Parrot_io_internal_connect_unix()> or C<Parrot_io_internal_bind_unix()>.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+PARROT_CANNOT_RETURN_NULL
+PMC *
+Parrot_io_internal_getaddrinfo_unix(PARROT_INTERP, ARGIN(STRING *addr)) {
+#ifdef PARROT_HAS_HEADER_SYSUN
+    PMC *array;
+    PMC *sockaddr;
+    Parrot_Sockaddr_attributes *sa_attrs;
+    char *cstring;
+    struct sockaddr_un *sa;
+
+    if (STRING_IS_NULL(addr)) {
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "empty unix socket path");
+    }
+
+    array = Parrot_pmc_new(interp, enum_class_ResizablePMCArray);
+    sockaddr = Parrot_pmc_new(interp, enum_class_Sockaddr);
+    sa_attrs = PARROT_SOCKADDR(sockaddr);
+
+    sa_attrs->family   = AF_UNIX;
+    sa_attrs->type     = SOCK_STREAM;
+    sa_attrs->protocol = 0;
+    sa_attrs->len      = sizeof(struct sockaddr_un);
+    sa_attrs->pointer  = Parrot_gc_allocate_memory_chunk(interp,
+                                sizeof(struct sockaddr_un));
+
+    cstring = Parrot_str_to_cstring(interp, addr);
+    sa = sa_attrs->pointer;
+    sa->sun_family = AF_UNIX;
+    snprintf(sa->sun_path, sizeof(sa->sun_path), "%s", cstring);
+    Parrot_str_free_cstring(cstring);
+
+    VTABLE_push_pmc(interp, array, sockaddr);
+
+    return array;
+#else /* PARROT_HAS_HEADER_SYSUN */
+    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+            "unix sockets not supported");
+#endif /* PARROT_HAS_HEADER_SYSUN */
+}
+
+/*
+
 =item C<INTVAL Parrot_io_internal_addr_match(PARROT_INTERP, PMC *sa, INTVAL fam,
 INTVAL type, INTVAL protocol)>
 
@@ -423,23 +481,37 @@ Parrot_io_internal_getnameinfo(PARROT_INTERP, ARGIN(const void *addr), INTVAL le
 {
     /* TODO: get hostname, not only numeric */
 
+    if (((const struct sockaddr *)addr)->sa_family == AF_UNIX) {
+#ifdef PARROT_HAS_HEADER_SYSUN
+        return Parrot_str_format_data(interp, "%s",
+            ((const struct sockaddr_un *)addr)->sun_path);
+#else /* PARROT_HAS_HEADER_SYSUN */
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                "unix sockets not supported");
+#endif /* PARROT_HAS_HEADER_SYSUN */
+    } else {
 #ifdef PARROT_HAS_IPV6
-    char buf[INET6_ADDRSTRLEN+1];
-    /* numeric port maximum is 65535, so 5 chars */
-    char portbuf[6];
+        char buf[INET6_ADDRSTRLEN+1];
+        /* numeric port maximum is 65535, so 5 chars */
+        char portbuf[6];
 
-    getnameinfo((const struct sockaddr *)addr, len, buf, sizeof (buf),
-            portbuf, sizeof (portbuf), NI_NUMERICHOST | NI_NUMERICSERV);
+        int ret = getnameinfo((const struct sockaddr *)addr, len, buf, sizeof (buf),
+                portbuf, sizeof (portbuf), NI_NUMERICHOST | NI_NUMERICSERV);
 
-    return Parrot_str_format_data(interp, "%s:%s", buf, portbuf);
+        if (ret != 0) {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                        "getnameinfo failed: %s", gai_strerror(ret));
+        }
 
+        return Parrot_str_format_data(interp, "%s:%s", buf, portbuf);
 #else /* PARROT_HAS_IPV6 */
-    const struct sockaddr_in *sa = (const struct sockaddr_in *)addr;
-    char *buf = inet_ntoa(sa->sin_addr);
-    UNUSED(len)
+        const struct sockaddr_in *sa = (const struct sockaddr_in *)addr;
+        char *buf = inet_ntoa(sa->sin_addr);
+        UNUSED(len)
 
-    return Parrot_str_format_data(interp, "%s:%u", buf, ntohs(sa->sin_port));
+        return Parrot_str_format_data(interp, "%s:%u", buf, ntohs(sa->sin_port));
 #endif /* PARROT_HAS_IPV6 */
+    }
 }
 
 /*

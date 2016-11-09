@@ -193,8 +193,12 @@ family (integer). If no address family is given, it defaults to IPv4.
         if (!family)
             family = PIO_PF_INET;
 
-        array = Parrot_io_internal_getaddrinfo(INTERP, address, port, PIO_PROTO_TCP,
-                    family, 0);
+        if (family == PIO_PF_UNIX) {
+            array = Parrot_io_internal_getaddrinfo_unix(INTERP, address);
+        } else {
+            array = Parrot_io_internal_getaddrinfo(INTERP, address, port,
+                    PIO_PROTO_TCP, family, 0);
+        }
 
         if (VTABLE_elements(interp, array))
             res = VTABLE_get_pmc_keyed_int(interp, array, 0);
