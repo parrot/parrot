@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2015, Parrot Foundation.
+Copyright (C) 2001-2016, Parrot Foundation.
 
 =head1 NAME
 
@@ -374,7 +374,7 @@ Parrot_io_internal_getaddrinfo(PARROT_INTERP, ARGIN(STRING *addr), INTVAL port,
 
 /*
 
-=item C<PMC * Parrot_io_internal_getaddrinfo_unix(PARROT_INTERP, STRING *addr, INTVAL fam)>
+=item C<PMC * Parrot_io_internal_getaddrinfo_unix(PARROT_INTERP, STRING *addr)>
 
 C<Parrot_io_internal_getaddrinfo_unix()> calls get_addrinfo() to convert a unix socket
 path to a sockaddr and returns an Addrinfo PMC which can be
@@ -407,14 +407,14 @@ Parrot_io_internal_getaddrinfo_unix(PARROT_INTERP, ARGIN(STRING *addr)) {
     sa_attrs->family   = AF_UNIX;
     sa_attrs->type     = SOCK_STREAM;
     sa_attrs->protocol = 0;
-    sa_attrs->len      = sizeof(struct sockaddr_un);
+    sa_attrs->len      = sizeof (struct sockaddr_un);
     sa_attrs->pointer  = Parrot_gc_allocate_memory_chunk(interp,
-                                sizeof(struct sockaddr_un));
+                                sizeof (struct sockaddr_un));
 
     cstring = Parrot_str_to_cstring(interp, addr);
-    sa = sa_attrs->pointer;
+    sa = (struct sockaddr_un *)sa_attrs->pointer;
     sa->sun_family = AF_UNIX;
-    snprintf(sa->sun_path, sizeof(sa->sun_path), "%s", cstring);
+    snprintf(sa->sun_path, sizeof (sa->sun_path), "%s", cstring);
     Parrot_str_free_cstring(cstring);
 
     VTABLE_push_pmc(interp, array, sockaddr);
@@ -489,7 +489,8 @@ Parrot_io_internal_getnameinfo(PARROT_INTERP, ARGIN(const void *addr), INTVAL le
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                 "unix sockets not supported");
 #endif /* PARROT_HAS_HEADER_SYSUN */
-    } else {
+    }
+    else {
 #ifdef PARROT_HAS_IPV6
         char buf[INET6_ADDRSTRLEN+1];
         /* numeric port maximum is 65535, so 5 chars */

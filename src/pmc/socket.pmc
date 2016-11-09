@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2008-2014, Parrot Foundation.
+Copyright (C) 2008-2016, Parrot Foundation.
 
 =head1 NAME
 
@@ -195,7 +195,8 @@ family (integer). If no address family is given, it defaults to IPv4.
 
         if (family == PIO_PF_UNIX) {
             array = Parrot_io_internal_getaddrinfo_unix(INTERP, address);
-        } else {
+        }
+        else {
             array = Parrot_io_internal_getaddrinfo(INTERP, address, port,
                     PIO_PROTO_TCP, family, 0);
         }

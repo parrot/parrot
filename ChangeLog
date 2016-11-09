@@ -1,3 +1,7 @@
+2016-??-??    release 8.3.0
+    - Core
+        + fix binding AF_UNIX sockets GH #1233 by Andrew Aldridge
+
 2016-03-15    release 8.2.0
     - Core
         + add foldcase string ops GH #786
