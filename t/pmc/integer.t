@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2001-2011, Parrot Foundation.
+# Copyright (C) 2001-2016, Parrot Foundation.
 
 =head1 NAME
 
@@ -26,7 +26,7 @@ Tests the Integer PMC.
 
     get_max_min()
 
-    plan(142)
+    plan(145)
     test_init()
     test_basic_math()
     test_truthiness_and_definedness()
@@ -583,12 +583,17 @@ fin:
     $P1 = "256"
     mul $P0, $P0, $P1
     is($P0, 256, 'multiply Integer PMC by String PMC')
+    $S0 = typeof $P0
+    is($S0, "Integer", 'multiply Integer PMC by String PMC => Integer')
 
     $P1 = new ['Float']
     $P0 = 2
     $P1 = 3.14
     mul $P0, $P0, $P1
-    is($P0, 6, 'multiply Integer PMC by Float PMC')
+    # fixed with 8.3.0 was Integer before
+    is($P0, 6.28, 'multiply Integer PMC by Float PMC')
+    $S0 = typeof $P0
+    is($S0, "Float", 'multiply Integer PMC by Float PMC => Float')
 
     $P1 = new ['Integer']
     $P1 = 4
@@ -692,6 +697,14 @@ CODE
     $P1 = .5
     div $P0, $P1
     is($P0, 100, 'i_divide DEFAULT multi')
+
+    $P0 = new ['Integer']
+    $P1 = new ['Float']
+    $P0 = 50
+    $P1 = 2.1
+    div $P0, $P0, $P1
+    $S0 = typeof $P0
+    is($S0, "Float", 'divide Float multi')
 
     throws_substring(<<'CODE', 'float division by zero', 'i_divide by 0 (Float PMC)')
     .sub main :main

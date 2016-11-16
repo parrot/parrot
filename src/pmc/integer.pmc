@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2003-2015, Parrot Foundation.
+Copyright (C) 2003-2016, Parrot Foundation.
 
 =head1 NAME
 
@@ -7,7 +7,7 @@ src/pmc/integer.pmc - Integer PMC
 
 =head1 DESCRIPTION
 
-C<Integer> provides an integer for languages that want a value-restricted
+C<Integer> provides an integer PMC for languages that want a value-restricted
 integer type without going to an I register.
 
 =head2 Functions
@@ -631,6 +631,22 @@ Multiplies the integer by C<*value> and returns the result in C<*dest>.
         }
     }
 
+    /* int * float => float */
+    MULTI PMC *multiply(Float value, PMC *dest) :no_wb {
+        const INTVAL a  = VTABLE_get_integer(INTERP, SELF);
+        const double b  = VTABLE_get_number(INTERP, value);
+        const INTVAL ci  = a * b;
+        const double cf = (double)a * b;
+        UNUSED(dest)
+
+        if ((double) ci == cf)
+            return Parrot_pmc_new_init_int(INTERP,
+                    VTABLE_type(INTERP, SELF), ci);
+        else {
+            return Parrot_pmc_new_init_int(INTERP,
+                    VTABLE_type(INTERP, value), cf);
+        }
+    }
 
     MULTI PMC *multiply(Complex value, PMC *dest) :no_wb {
         return VTABLE_multiply(INTERP, value, SELF, dest);
@@ -744,6 +760,23 @@ Divides C<SELF> by C<value> inplace.
         temp = Parrot_pmc_new_init_int(INTERP, enum_class_BigInt,
             SELF.get_integer());
         return VTABLE_divide(INTERP, temp, value, dest);
+    }
+
+    /* int / float => float */
+    MULTI PMC *divide(Float value, PMC *dest) :no_wb {
+        const INTVAL a  = VTABLE_get_integer(INTERP, SELF);
+        const double b  = VTABLE_get_number(INTERP, value);
+        const INTVAL ci  = a * b;
+        const double cf = (double)a / b;
+        UNUSED(dest)
+
+        if ((double) ci == cf)
+            return Parrot_pmc_new_init_int(INTERP,
+                    VTABLE_type(INTERP, SELF), ci);
+        else {
+            return Parrot_pmc_new_init_int(INTERP,
+                    VTABLE_type(INTERP, value), cf);
+        }
     }
 
     MULTI PMC *divide(DEFAULT value, PMC *dest) :no_wb {
