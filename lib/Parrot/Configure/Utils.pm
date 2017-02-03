@@ -181,6 +181,8 @@ sub prompt {
         $value = $input;
     }
 
+    print("<promptanswer $input>\n");
+
     return integrate( $value, $input );
 }
 
