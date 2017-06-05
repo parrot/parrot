@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2002-2014, Parrot Foundation.
+ * Copyright (C) 2002-2017, Parrot Foundation.
  */
 
 /*
@@ -927,7 +927,7 @@ eval_ins(ARGMOD(imc_info_t *imcc), ARGIN(const char *op), size_t ops,
             break;
           default:
             IMCC_fatal(imcc, 1, "eval_ins"
-                    "invalid arg #%d for op '%s' not found\n",
+                    ": invalid arg #%d for op '%s' not found\n",
                     i, op);
         }
     }
@@ -939,11 +939,16 @@ eval_ins(ARGMOD(imc_info_t *imcc), ARGIN(const char *op), size_t ops,
 
     pc = (OP_INFO_OPFUNC(op_info)) (eval, imcc->interp);
     Parrot_runloop_free_jump_point(imcc->interp);
-    /* the returned pc is either incremented by op_count or is eval,
-     * as the branch offset is 0 - return true if it branched
+    /* The returned pc is either incremented by op_count or is eval,
+     * as the branch offset is 0 - return true if it branched.
+     * Or if the op threw an exception (e.g. DIV_BY_ZERO) -1.
      */
-    PARROT_ASSERT(pc == eval + op_info->op_count || pc == eval);
-    return pc == eval;
+    if (pc == eval)
+        return 1;
+    else if (pc == eval + op_info->op_count)
+        return 0;
+    else /* Exception */
+        return -1;
 }
 
 /*

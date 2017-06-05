@@ -1,5 +1,5 @@
 #!perl
-# Copyright (C) 2001-2014, Parrot Foundation.
+# Copyright (C) 2001-2017, Parrot Foundation.
 
 use strict;
 use warnings;
@@ -8,7 +8,7 @@ use vars qw($TODO);
 
 use Test::More;
 use Parrot::Config;
-use Parrot::Test tests => 40;
+use Parrot::Test tests => 41;
 
 pir_output_is( <<'CODE', <<'OUT', "globalconst 1" );
 .sub 'main' :main
@@ -667,6 +667,15 @@ OUT
 #was:
 #/Method 'new' not found for non-object/
 #OUT
+
+# TODO: This really should just exit with Divide by zero, as parrot_old did
+pir_error_output_like( <<'CODE', <<'OUT', 'exception in constant folding [GH #1236]')
+.sub a
+  $N0=0//0
+.end
+CODE
+/error:imcc:The opcode 'fdiv_n_ic_ic' \(fdiv<3>\) was not found/
+OUT
 
 # Local Variables:
 #   mode: cperl

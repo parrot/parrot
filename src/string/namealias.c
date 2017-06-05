@@ -1,5 +1,5 @@
-/* ANSI-C code produced by gperf version 3.0.4 */
-/* Command-line: gperf --output-file=tmp_namealias.c src/string/namealias_c.in  */
+/* ANSI-C code produced by gperf version 3.1 */
+/* Command-line: gperf --output-file=tmp_namealias.c src/string/namealias_c.in */
 /* Computed positions: -k'1,14,$' */
 
 #if !((' ' == 32) && ('!' == 33) && ('"' == 34) && ('#' == 35) \
