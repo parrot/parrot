@@ -1,5 +1,5 @@
 /* compiler.h
- *  Copyright (C) 2007-2015, Parrot Foundation.
+ *  Copyright (C) 2007-2017, Parrot Foundation.
  *  Overview:
  *     defines compiler capabilities and attributes
  */
@@ -7,9 +7,13 @@
 #ifndef PARROT_COMPILER_H_GUARD
 #define PARROT_COMPILER_H_GUARD
 
-/* darwin clang! */
+/* clang on darwin/freebsd */
 #ifndef __WORDSIZE
-#  define __WORDSIZE (sizeof(void*) * 8)
+#  ifdef __SIZE_WIDTH__
+#    define __WORDSIZE __SIZE_WIDTH__
+#  else
+#    define __WORDSIZE (8 * sizeof void*)
+#  endif
 #endif
 
 /*
