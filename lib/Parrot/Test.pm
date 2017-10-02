@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2012, Parrot Foundation.
+# Copyright (C) 2004-2017, Parrot Foundation.
 
 =head1 NAME
 
@@ -314,9 +314,9 @@ my $builder = Test::Builder->new();
 _generate_test_functions();
 
 sub import {
-    my ( $class, $plan, @args ) = @_;
+    my ( $class, $plan, $num ) = @_;
 
-    $builder->plan( $plan, @args );
+    $builder->plan( $plan, $num );
 
     __PACKAGE__->export_to_level( 2, __PACKAGE__ );
 }
@@ -805,7 +805,7 @@ sub _generate_test_functions {
                             'parrot' . $PConfig{exe} );
 
     ##### 1: Parrot test map #####
-    my %parrot_test_map = map {
+    my @parrot_test_map = map {
         $_ . '_output_is'           => 'is_eq',
         $_ . '_error_output_is'     => 'is_eq',
         $_ . '_exit_code_is'        => 'is_eq',
@@ -816,6 +816,7 @@ sub _generate_test_functions {
         $_ . '_output_unlike'       => 'unlike',
         $_ . '_error_output_unlike' => 'unlike',
     } qw( pasm pbc pir );
+    my %parrot_test_map = @parrot_test_map;
     for my $func ( keys %parrot_test_map ) {
         push @EXPORT, $func;
 

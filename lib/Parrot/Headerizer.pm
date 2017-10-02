@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2014, Parrot Foundation.
+# Copyright (C) 2004-2017, Parrot Foundation.
 
 package Parrot::Headerizer;
 
@@ -261,7 +261,7 @@ sub extract_function_declarations {
     $text =~ s{^#(\\\n|.)*}{}mg;
 
     # Strip code blocks
-    $text =~ s/^{.+?^}//msg;
+    $text =~ s/^\{.+?^\}//msg;
 
     # Split on paragraphs
     my @funcs = split /\n{2,}/, $text;

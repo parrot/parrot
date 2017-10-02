@@ -1,6 +1,6 @@
 #! perl
 
-# Copyright (C) 2001-2015, Parrot Foundation.
+# Copyright (C) 2001-2017, Parrot Foundation.
 
 use 5.008;
 use strict;
@@ -81,7 +81,7 @@ $conf->{active_configuration} = 1;
 
 # Create a fresh MANIFEST for make install
 unlink 'MANIFEST.generated';
-if (do 'lib/Parrot/Config/Generated.pm') {
+if (do './lib/Parrot/Config/Generated.pm') {
     my $make = $Parrot::Config::Generated::PConfig{make};
     if ($make and -f 'Makefile') {
         $Parrot::Config::Generated::PConfig{gmake_version}
