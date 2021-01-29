@@ -1,1 +1,1 @@
-{"version":1,"ops":[{"type":1,"author":{"id":"2da6485217cbb88ff96be8f3dcc7f9ae44cf6bf0"},"timestamp":1329252130,"metadata":{"github-id":"MDU6SXNzdWUzMjI1NzQx","github-url":"https://github.com/parrot/parrot/issues/716","origin":"github"},"title":"Make parrotfaces script generate Github-friendly format","message":"Current it generates Trac-style links.","files":null}]}
+{"version":1,"ops":[{"type":4,"author":{"id":"0782f66a529ccd24e18226f5eebab20a90bea166"},"timestamp":1329255286,"metadata":{"github-id":"MDExOkNsb3NlZEV2ZW50OTU1NTE2OA=="},"status":2}]}
