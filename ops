@@ -1,0 +1,1 @@
+{"version":1,"ops":[{"type":1,"author":{"id":"8c86ede03c8e80b0dad5131138f96e957a4ee66b"},"timestamp":1400677263,"metadata":{"github-id":"MDU6SXNzdWUzMzk3OTc2MA==","github-url":"https://github.com/parrot/parrot/issues/1071","origin":"github"},"title":"debug_break test fails in t/dynoplibs/debug.t on darwin and Win32.","message":"","files":null}]}
