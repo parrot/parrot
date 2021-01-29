@@ -1,0 +1,1 @@
+{"version":1,"ops":[{"type":1,"author":{"id":"86141a663c2eb7543d1a51ec6253a1d54de912fd"},"timestamp":1357099409,"metadata":{"github-id":"MDU6SXNzdWU5NjA5MjUy","github-url":"https://github.com/parrot/parrot/issues/905","origin":"github"},"title":"darwin -Wno-long-double with ports gcc","message":"Only apple cc understands -Wno-long-double.","files":null}]}
