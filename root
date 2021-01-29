@@ -1,0 +1,1 @@
+{"version":1,"ops":[{"type":1,"author":{"id":"86141a663c2eb7543d1a51ec6253a1d54de912fd"},"timestamp":1341691391,"metadata":{"github-id":"MDU6SXNzdWU1NDgyNjA5","github-url":"https://github.com/parrot/parrot/issues/796","origin":"github"},"title":"Implement io_userhandle vtable functions","message":"t/codingstd/c_arg_assert.t needs to skip those tests","files":null}]}
