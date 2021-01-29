@@ -1,0 +1,1 @@
+{"version":1,"ops":[{"type":1,"author":{"id":"2e07d1e375724352b47c35e84b16d7b9852990d2"},"timestamp":1261467894,"metadata":{"github-id":"MDU6SXNzdWUyODQ4NjI1","github-url":"https://github.com/parrot/parrot/issues/419","origin":"github"},"title":"Convert t/pmc/exporter.t to PIR","message":"Originally http://trac.parrot.org/parrot/ticket/1386","files":null}]}
