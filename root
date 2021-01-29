@@ -1,0 +1,1 @@
+{"version":1,"ops":[{"type":1,"author":{"id":"4fb4d0813c4a8ce8e1dee50feb91464c67ac79db"},"timestamp":1305171759,"metadata":{"github-id":"MDU6SXNzdWUyODQ4NDk5","github-url":"https://github.com/parrot/parrot/issues/302","origin":"github"},"title":"\"Failed to load libpcre\" during build","message":"Originally http://trac.parrot.org/parrot/ticket/2107","files":null}]}
