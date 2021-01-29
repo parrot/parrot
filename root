@@ -1,0 +1,1 @@
+{"version":1,"ops":[{"type":1,"author":{"id":"2da6485217cbb88ff96be8f3dcc7f9ae44cf6bf0"},"timestamp":1358235571,"metadata":{"github-id":"MDU6SXNzdWU5OTcwNDI5","github-url":"https://github.com/parrot/parrot/issues/925","origin":"github"},"title":"FixedFloatArrays do not have a sort method","message":"Seems like they should.","files":null}]}
