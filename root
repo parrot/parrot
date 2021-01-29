@@ -1,0 +1,1 @@
+{"version":1,"ops":[{"type":1,"author":{"id":"86141a663c2eb7543d1a51ec6253a1d54de912fd"},"timestamp":1416666060,"metadata":{"github-id":"MDU6SXNzdWU0OTc5MjUxNg==","github-url":"https://github.com/parrot/parrot/issues/1148","origin":"github"},"title":"warn in Configure about experimental flags","message":"esp. intval, floatval and gc","files":null}]}
