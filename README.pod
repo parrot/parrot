@@ -11,6 +11,15 @@ README.pod - Parrot Virtual Machine
 Parrot is a virtual machine designed to efficiently compile and execute
 bytecode for dynamic languages.
 
+=head1 IMPORTANT NOTICE
+
+The Parrot VM is no longer being actively developed.
+
+The role of Parrot as VM for Perl 6 (now "Raku") has been filled by MoarVM, supporting the Rakudo compiler.
+    https://raku.org/
+    https://rakudo.org/
+    https://moarvm.org/
+
 =head1 LICENSE
 
 This code is distributed under the terms of the Artistic License 2.0.
