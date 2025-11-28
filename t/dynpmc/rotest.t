@@ -85,7 +85,6 @@ CODE
 
             # first make sure it works without the make_readonly
             pir_output_is( $code, "reached end\n", "ROTest (dry run) ($test)" );
-            local $TODO = $todo;
             $code =~ s/#READONLYTEST/make_readonly(value)/;
             if ($readonly) {
                 pir_output_is( $code, "reached end\n", "ROTest (read-only/okay) ($test)" );
