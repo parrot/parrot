@@ -2132,10 +2132,11 @@ add_1_const(ARGMOD(imc_info_t * imcc), ARGMOD(SymReg *r),
         {
             SymReg *key = r;
 
-            for (r = r->nextkey; r; r = r->nextkey)
+            for (r = r->nextkey; r; r = r->nextkey) {
                 if (r->type & (VTCONST|VT_CONSTP))
                     add_1_const(imcc, r, bc);
-                build_key(imcc, key, bc);
+            }
+            build_key(imcc, key, bc);
         }
         break;
       case 'P':
