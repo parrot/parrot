@@ -476,10 +476,9 @@ sub _finish_printing_result {
         );
     }
     else {
-        print '.' x (
-            $linelength -
-            ( $argsref->{length_message} + length($result) + 1 )
-        );
+        my $sum = $linelength -
+            ( $argsref->{length_message} + length($result) + 1 );
+        print '.' x $sum if $sum > 0;
     }
     unless ( $argsref->{step_name} =~ m{^inter} && $argsref->{args}->{ask} ) {
         print "$result.";
