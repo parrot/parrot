@@ -15,7 +15,6 @@ package auto::byteorder;
 use strict;
 use warnings;
 
-use Parrot::Configure::Step qw(:auto);
 use base qw(Parrot::Configure::Step);
 
 

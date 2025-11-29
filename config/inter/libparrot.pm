@@ -18,7 +18,7 @@ use warnings;
 
 use base qw(Parrot::Configure::Step);
 
-use File::Spec ();
+use File::Spec::Functions qw/catfile/;
 use Parrot::Configure::Utils ':inter';
 
 
@@ -55,7 +55,7 @@ sub runstep {
     if ($disable_rpath or !$conf->data->get('rpath')) {
         foreach my $f (@libs) {
             foreach my $d (@libpaths) {
-                my $oldversion = File::Spec->catfile($d, $f);
+                my $oldversion = catfile($d, $f);
                 if (-e $oldversion) {
                     warn("\nWarning: Building a shared parrot library may conflict " .
                          "with your previously-installed $oldversion\n");
