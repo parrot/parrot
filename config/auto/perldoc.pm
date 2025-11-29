@@ -20,7 +20,7 @@ use strict;
 use warnings;
 
 use File::Temp qw (tempfile );
-use File::Spec qw (catfile );
+use File::Spec::Functions qw/catfile/;
 use base qw(Parrot::Configure::Step);
 use Parrot::Configure::Utils ':auto';
 
@@ -36,7 +36,7 @@ sub _init {
 sub runstep {
     my ( $self, $conf ) = @_;
 
-    my $cmd = File::Spec->catfile($conf->data->get('scriptdirexp_provisional'), q{perldoc});
+    my $cmd = catfile($conf->data->get('scriptdirexp_provisional'), q{perldoc});
     my ( $fh, $filename ) = tempfile( UNLINK => 1 );
     # try to execute 'perldoc perldoc' || 'perldoc Pod::Perldoc' to
     # read the documentation of perldoc
@@ -47,7 +47,7 @@ sub runstep {
 
     $conf->debug($content ? substr($content,0,100)." ...\n" : "<empty content>\n");
     if (!defined $content and $conf->data->get_p5('usecperl')) {
-        $cmd = File::Spec->catfile($conf->data->get('scriptdirexp_provisional'), q{cperldoc});
+        $cmd = catfile($conf->data->get('scriptdirexp_provisional'), q{cperldoc});
         $conf->debug("$cmd\n");
         $content = capture_output("$cmd -ud $filename perldoc")
           || capture_output("$cmd -ud $filename Pod::Perldoc")

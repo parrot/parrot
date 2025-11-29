@@ -24,7 +24,7 @@ use Parrot::BuildUtil;
 use Parrot::Configure::Step;
 use Parrot::Harness::DefaultTests ();
 use Cwd qw(abs_path);
-use File::Spec;
+use File::Spec::Functions qw/tmpdir/;
 
 
 sub _init {
@@ -269,7 +269,7 @@ sub runstep {
         # debugging internals.
         no_lines_flag => $conf->options->get('no-line-directives') ? '--no-lines' : '',
 
-        tempdir => File::Spec->tmpdir,
+        tempdir => tmpdir(),
 
         coveragedir => $conf->options->get('coveragedir') || $build_dir,
     );
