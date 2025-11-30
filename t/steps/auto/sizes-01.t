@@ -7,8 +7,8 @@ use warnings;
 use Test::More tests => 31;
 use Carp;
 #use Data::Dumper;$Data::Dumper::Indent=1;
-use lib qw( lib t/configure/testlib );
-use_ok('config::auto::sizes');
+use lib qw( lib config t/configure/testlib );
+use_ok('auto::sizes');
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(

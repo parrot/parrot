@@ -6,9 +6,9 @@ use strict;
 use warnings;
 use Test::More tests =>   7;
 use Carp;
-use lib qw( lib t/configure/testlib );
+use lib qw( lib config t/configure/testlib );
 $ENV{TEST_YACC} = 'foobar';
-use_ok('config::inter::yacc');
+use_ok('inter::yacc');
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(

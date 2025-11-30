@@ -6,8 +6,8 @@ use strict;
 use warnings;
 use Test::More tests => 29;
 use Carp;
-use lib qw( lib );
-use_ok('config::auto::opengl');
+use lib qw( lib config );
+use_ok('auto::opengl');
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(

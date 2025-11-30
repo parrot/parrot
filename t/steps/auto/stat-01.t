@@ -5,8 +5,8 @@
 use strict;
 use warnings;
 use Test::More tests =>  10;
-use lib qw( lib t/configure/testlib );
-use_ok('config::auto::stat');
+use lib qw( lib config t/configure/testlib );
+use_ok('auto::stat');
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Step::Test;

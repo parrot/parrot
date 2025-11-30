@@ -74,7 +74,7 @@ use Test::More tests => (7 + @cond_tests);
 use Carp;
 use lib qw( . lib );
 
-use_ok('config::gen::makefiles');
+use_ok('gen::makefiles');
 
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Step::Test;

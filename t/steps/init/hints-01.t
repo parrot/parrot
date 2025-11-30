@@ -10,8 +10,8 @@ use Cwd;
 use File::Path ();
 use File::Spec::Functions qw/catfile/;
 use File::Temp qw(tempdir);
-use lib qw( lib t/configure/testlib );
-use_ok('config::init::hints');
+use lib qw( lib config t/configure/testlib );
+use_ok('init::hints');
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(

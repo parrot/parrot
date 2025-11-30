@@ -7,8 +7,8 @@ use warnings;
 use Test::More tests => 26;
 use Carp;
 use Data::Dumper;
-use lib qw( lib t/configure/testlib );
-use_ok('config::inter::yacc');
+use lib qw( lib config t/configure/testlib );
+use_ok('inter::yacc');
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(

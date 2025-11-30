@@ -5,8 +5,8 @@ use strict;
 use warnings;
 use Test::More tests => 23;
 use Carp;
-use lib qw( lib );
-use_ok('config::auto::pcre');
+use lib qw( lib config );
+use_ok('auto::pcre');
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(
