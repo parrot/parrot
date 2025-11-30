@@ -9,8 +9,8 @@ use Carp;
 use Cwd;
 use File::Path qw| mkpath |;
 use File::Temp qw| tempdir |;
-use lib qw( lib t/configure/testlib );
-use_ok('config::auto::pmc');
+use lib qw( lib config t/configure/testlib );
+use_ok('auto::pmc');
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(

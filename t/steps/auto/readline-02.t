@@ -7,8 +7,8 @@ use warnings;
 use Test::More tests =>  14;
 use Carp;
 use Cwd;
-use lib qw( lib );
-use_ok('config::auto::readline');
+use lib qw( lib config );
+use_ok('auto::readline');
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(

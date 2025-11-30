@@ -10,8 +10,8 @@ use Cwd;
 use File::Copy;
 use File::Path qw( mkpath );
 use File::Temp qw( tempdir );
-use lib qw( lib );
-use_ok('config::auto::platform');
+use lib qw( lib config );
+use_ok('auto::platform');
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(

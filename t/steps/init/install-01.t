@@ -7,10 +7,10 @@ use Test::More tests => 36;
 use Carp;
 use Cwd;
 use File::Temp qw(tempdir);
-use lib qw( lib t/configure/testlib );
+use lib qw( lib config t/configure/testlib );
 use Parrot::Configure;
 use Parrot::Configure::Options qw( process_options );
-use_ok('config::init::install');
+use_ok('init::install');
 use Parrot::Configure::Test qw(
     test_step_thru_runstep
     test_step_constructor_and_description
