@@ -6,8 +6,8 @@ use strict;
 use warnings;
 use Test::More tests => 74;
 use Carp;
-use lib qw( lib t/configure/testlib );
-use_ok('config::inter::libparrot');
+use lib qw( lib config t/configure/testlib );
+use_ok('inter::libparrot');
 use Parrot::Configure::Options qw( process_options );
 use Parrot::Configure::Step::Test;
 use Parrot::Configure::Test qw(
