@@ -1,0 +1,53 @@
+name: Github CI
+on:
+  push:
+    branches:
+      - master
+      - smoke-me/*
+    tags:
+      - 'RELEASE_*_*_*'
+  pull_request:
+    branches:
+      - '*'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    strategy:
+      fail-fast: true
+      matrix:
+        CONFIGURE_ARGS:
+          -
+          - --optimize
+          - --debugging
+          - --optimize --cc=clang --ld=clang --link=clang
+          - --optimize --cc="g++ -fPIE" --ld="g++ -fPIE" --link="g++ -fPIE"
+          #- --ccflags="-O2 -fsanitize=address -fPIE" --linkflags="-fsanitize=address -fPIE" --ldflags="-fsanitize=address"
+    steps:
+    - name: checkout
+      uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+      with:
+        fetch-depth: 1
+        submodules: recursive
+    - uses: hendrikmuhs/ccache-action@5ebbd400eff9e74630f759d94ddd7b6c26299639 # v1.2.20
+      with:
+        create-symlink: true
+        key: ${{ github.job }}-${{ matrix.CONFIGURE_ARGS }}
+    - if: ${{ matrix.CONFIGURE_ARGS == '--optimize' }}
+      name: install cpan deps
+      uses: perl-actions/install-with-cpm@8b1a9840b26cc3885ae2889749a48629be2501b0 # v1.9
+      with:
+        install: |
+          Pod::Find
+          Test::Perl::Critic
+    - run: perl Configure.pl ${{ matrix.CONFIGURE_ARGS }}
+    - run: make -j -s
+    - if: ${{ matrix.CONFIGURE_ARGS != '--optimize' }}
+      run: make -j -s test
+    - if: ${{ matrix.CONFIGURE_ARGS == '--optimize' }}
+      run: make -j -s fulltest

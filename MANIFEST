@@ -6,7 +6,9 @@
 #
 # See docs/submissions.pod and the documentation in
 # tools/dev/mk_manifest_and_skip.pl.
+.github/workflows/main.yml                                  []
 .gitignore                                                  []
+.mailmap                                                    []
 .travis.yml                                                 []
 CREDITS                                                     [main]doc
 ChangeLog                                                   []
