@@ -67,7 +67,7 @@ CODE
 /
 OUTPUT
 
-open STDERR, ">>&STDOUT";
+open STDERR, ">>&", "\*STDOUT";
 pir_output_like( <<'CODE', <<"OUTPUT", "debug_print without debugger" );
 .loadlib 'debug_ops'
 .sub main :main

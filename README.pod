@@ -15,7 +15,8 @@ bytecode for dynamic languages.
 
 The Parrot VM is no longer being actively developed.
 
-The role of Parrot as VM for Perl 6 (now "Raku") has been filled by MoarVM, supporting the Rakudo compiler.
+The role of Parrot as VM for Perl 6 (now "Raku") has been filled by
+MoarVM, supporting the Rakudo compiler.
     https://raku.org/
     https://rakudo.org/
     https://moarvm.org/

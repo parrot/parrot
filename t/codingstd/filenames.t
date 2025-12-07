@@ -73,7 +73,7 @@ else {
         }
     }
     # Give ports a little more leeway
-    @files = grep {! /^ports/} sort keys %$manifest;
+    @files = grep {! m{^ports|\.github/workflows/}} sort keys %$manifest;
 }
 my ( @multi_dots, @strange_chars, @too_long );
 

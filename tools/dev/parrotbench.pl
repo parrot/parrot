@@ -221,7 +221,7 @@ else {
 }
 print "\n";
 
-open( my $COPYOUT, ">&STDOUT" ) or die "Unable to copy STDOUT";
+open( my $COPYOUT, ">&", "\*STDOUT" ) or die "Unable to copy STDOUT";
 open( STDOUT, '>', File::Spec->devnull ) or die "Unable to redirect STDOUT";
 select $COPYOUT;
 $| = 1;
