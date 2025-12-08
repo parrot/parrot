@@ -188,6 +188,7 @@ main(int argc, const char *argv[])
             fprintf(stderr, "PARROT VM: No interpreter. Cannot get error details\n");
         exit(EXIT_FAILURE);
     }
+    free(initargs);
     if (!(Parrot_set_config_hash(interp) &&
           Parrot_api_set_executable_name(interp, argv[0]))) {
         fprintf(stderr, "PARROT VM: Could not initialize new interpreter\n");
