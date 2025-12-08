@@ -22,6 +22,7 @@ main(int argc, char *argv[])
      */
     int i = posix_memalign(&p, s, 177);
     puts(((@ptrcast@)p & 0xff) == 0 && i == 0 ? "ok" : "nix");
+    free(p);
     return i;
 }
 

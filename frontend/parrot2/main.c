@@ -150,8 +150,10 @@ main(int argc, const char *argv[])
             show_last_error_and_exit(interp);
         else
             fprintf(stderr, "PARROT VM: No interpreter. Cannot get error details\n");
+        free(initargs);
         exit(EXIT_FAILURE);
     }
+    free(initargs);
     if (!(Parrot_set_config_hash(interp) &&
           Parrot_api_set_executable_name(interp, argv[0]))) {
         fprintf(stderr, "PARROT VM: Could not initialize new interpreter\n");
@@ -500,12 +502,14 @@ parseflags_minimal(ARGMOD(Parrot_Init_Args * initargs), int argc, ARGIN(const ch
 
                 if (initargs->gc_dynamic_threshold > 1000) {
                     fprintf(stderr, "error: maximum GC threshold is 1000\n");
+                    free(initargs);
                     exit(EXIT_FAILURE);
                 }
             }
             else {
                 fprintf(stderr, "error: invalid GC dynamic threshold specified:"
                         "'%s'\n", opt.opt_arg);
+                free(initargs);
                 exit(EXIT_FAILURE);
             }
             break;
@@ -517,6 +521,7 @@ parseflags_minimal(ARGMOD(Parrot_Init_Args * initargs), int argc, ARGIN(const ch
             else {
                 fprintf(stderr, "error: invalid GC min threshold specified:"
                         "'%s'\n", opt.opt_arg);
+                free(initargs);
                 exit(EXIT_FAILURE);
             }
             break;
@@ -526,12 +531,14 @@ parseflags_minimal(ARGMOD(Parrot_Init_Args * initargs), int argc, ARGIN(const ch
 
                 if (initargs->gc_nursery_size > 50) {
                     fprintf(stderr, "error: maximum GC nursery size is 50%%\n");
+                    free(initargs);
                     exit(EXIT_FAILURE);
                 }
             }
             else {
                 fprintf(stderr, "error: invalid GC nursery size specified:"
                         "'%s'\n", opt.opt_arg);
+                free(initargs);
                 exit(EXIT_FAILURE);
             }
             break;
@@ -542,12 +549,14 @@ parseflags_minimal(ARGMOD(Parrot_Init_Args * initargs), int argc, ARGIN(const ch
 
                 if (initargs->numthreads < 2 || initargs->numthreads > 1e8) {
                     fprintf(stderr, "error: minimum number of threads is 2\n");
+                    free(initargs);
                     exit(EXIT_FAILURE);
                 }
             }
             else {
                 fprintf(stderr, "error: invalid number of threads specified:"
                         "'%s'\n", opt.opt_arg);
+                free(initargs);
                 exit(EXIT_FAILURE);
             }
             break;
@@ -559,6 +568,7 @@ parseflags_minimal(ARGMOD(Parrot_Init_Args * initargs), int argc, ARGIN(const ch
             else {
                 fprintf(stderr, "error: invalid hash seed specified:"
                         "'%s'\n", opt.opt_arg);
+                free(initargs);
                 exit(EXIT_FAILURE);
             }
             break;
@@ -599,6 +609,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
 
     if (argc == 1) {
         usage(stderr);
+        free(pargs);
         exit(EXIT_SUCCESS);
     }
 
@@ -739,6 +750,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
         if (!result) {
             fprintf(stderr, "Parrot VM: Error parsing option %s\n", argv[opt.opt_index]);
             usage(stderr);
+            free(pargs);
             exit(EXIT_FAILURE);
         }
     }
@@ -746,6 +758,7 @@ parseflags(Parrot_PMC interp, int argc, ARGIN(const char *argv[]),
     if (status == -1) {
         fprintf(stderr, "%s\n", opt.opt_error);
         usage(stderr);
+        free(pargs);
         exit(EXIT_FAILURE);
     }
     for (i = opt.opt_index; i < argc; i++) {

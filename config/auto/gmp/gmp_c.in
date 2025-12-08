@@ -42,6 +42,7 @@ main(int argc, char *argv[])
         __GNU_MP_VERSION_MINOR,
         __GNU_MP_VERSION_PATCHLEVEL);
     free(s);
+    mpz_clear(prime);
     return 0;
 }
 

@@ -36,6 +36,7 @@ int main(int argc, char *argv[]) {
     if (socket(AF_INET6, SOCK_STREAM, 0) > 0)
         printf("OK\n");
 
+    free(ai);
     return EXIT_SUCCESS;
 }
 
