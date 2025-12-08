@@ -27,7 +27,7 @@ jobs:
           - --debugging
           - --optimize --cc=clang --ld=clang --link=clang
           - --optimize --cc="g++ -fPIE" --ld="g++ -fPIE" --link="g++ -fPIE"
-          #- --ccflags="-O2 -fsanitize=address -fPIE" --linkflags="-fsanitize=address -fPIE" --ldflags="-fsanitize=address"
+          #- --debugging --ccflags="-O1 -fsanitize=address -fPIE" --linkflags="-fsanitize=address -fPIE" --ldflags="-fsanitize=address"
     steps:
     - name: checkout
       uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0

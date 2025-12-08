@@ -12,6 +12,7 @@ main(int argc, char **argv)
 {
     void *ptr = memalign(256, 17);
     puts(ptr && ((@ptrcast@)ptr & 0xff) == 0 ? "ok" : "nix");
+    free(ptr);
     return 0;
 }
 
