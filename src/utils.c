@@ -595,22 +595,20 @@ Parrot_util_byte_index(SHIM_INTERP, ARGIN(const STRING *base),
     if (len_remain < search_len) /* too short */
         return -1;
     /* find the next position of the first character in the search string
-     * Parrot strings can have NULLs, so strchr() won't work here */
+     * Parrot strings can have NULLs, so strchr() won't work here.
+     * TODO: probe for a faster memmem() */
     while ((search_pos = (const char *)memchr(str_pos, *search_str, len_remain))) {
         const INTVAL offset = search_pos - str_start;
-
+        /* check if too short already */
+        len_remain = str_len - offset;
+        if (len_remain < search_len)
+            return -1;
         /* now look for the entire string */
         if (memcmp(search_pos, search_str, search_len) == 0)
             return offset;
 
-        /* otherwise loop and memchr() with the rest of the string */
-        len_remain = str_len    - offset;
-        str_pos    = search_pos + 1;
-
-        if (len_remain < search_len)
-            return -1;
+        str_pos = search_pos + 1;
     }
-
     return -1;
 }
 
