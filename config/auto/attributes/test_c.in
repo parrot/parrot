@@ -14,6 +14,7 @@ __attribute__noreturn__
 __attribute__warn_unused_result__
 __attribute__deprecated__
 __attribute__returns_nonnull__
+__attribute__no_address_safety_analysis__
 void *
 dummyfunc(const char *my_format, ...)
     __attribute__format__(1, 2)

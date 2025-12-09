@@ -44,6 +44,7 @@ our @potential_attributes = qw(
     HASATTRIBUTE_HOT
     HASATTRIBUTE_COLD
     HASATTRIBUTE_RETURNS_NONNULL
+    HASATTRIBUTE_NO_ADDRESS_SAFETY_ANALYSIS
     HASATTRIBUTE_NEVER_WORKS
 );
 # HASATTRIBUTE_NEVER_WORKS is at the end just to prove that it's possible to fail.

@@ -469,7 +469,7 @@ trace_mem_block(PARROT_INTERP,
 
     for (cur_var_ptr = (size_t *)lo_var_ptr; (size_t)cur_var_ptr < hi_var_ptr; cur_var_ptr++) {
 
-        /* XXX yes, ptr may be uninitialized here. valgrind and asan complains. */
+        /* FIXME yes, ptr may be uninitialized here. valgrind and asan complains. */
         const size_t ptr = *cur_var_ptr;
         if (!ptr)
             continue;
