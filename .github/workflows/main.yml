@@ -17,7 +17,7 @@ concurrency:
 jobs:
   linux:
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 15
     strategy:
       fail-fast: true
       matrix:
@@ -27,7 +27,7 @@ jobs:
           - --debugging
           - --optimize --cc=clang --ld=clang --link=clang
           - --optimize --cc="g++ -fPIE" --ld="g++ -fPIE" --link="g++ -fPIE"
-          #- --debugging --ccflags="-O1 -fsanitize=address -fPIE" --linkflags="-fsanitize=address -fPIE" --ldflags="-fsanitize=address"
+          - --debugging --ccflags="-O1 -fsanitize=address -fPIE" --linkflags="-fsanitize=address -fPIE" --ldflags="-fsanitize=address"
     steps:
     - name: checkout
       uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
@@ -46,8 +46,15 @@ jobs:
           Pod::Find
           Test::Perl::Critic
     - run: perl Configure.pl ${{ matrix.CONFIGURE_ARGS }}
-    - run: make -j -s
-    - if: ${{ matrix.CONFIGURE_ARGS != '--optimize' }}
+    - if: ${{ contains(matrix.CONFIGURE_ARGS, '-fsanitize=address') }}
+      run: ASAN_OPTIONS=detect_leaks=0 make -j -s
+    - if: ${{ !contains(matrix.CONFIGURE_ARGS, '-fsanitize=address') }}
+      run: make -j -s
+    - if: ${{ contains(matrix.CONFIGURE_ARGS, '-fsanitize=address') }}
+      # FIXME still remaining asan errors
+      continue-on-error: true
+      run: ASAN_OPTIONS=detect_leaks=0 make -j -s || true
+    - if: ${{ matrix.CONFIGURE_ARGS != '--optimize' && !contains(matrix.CONFIGURE_ARGS, '-fsanitize=address') }}
       run: make -j -s test
     - if: ${{ matrix.CONFIGURE_ARGS == '--optimize' }}
       run: make -j -s fulltest
