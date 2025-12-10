@@ -714,9 +714,11 @@ constant_propagation(ARGMOD(imc_info_t *imcc), ARGMOD(IMC_Unit *unit))
     IMCC_info(imcc, 2, "\tconstant_propagation\n");
     for (ins = unit->instructions; ins; ins = ins->next) {
         int found = 0;
-        if ((STREQ(ins->opname, "set") || (0 == memcmp(ins->opname, "set_", 4))) &&
-            ins->opsize == 3 &&             /* no keyed set */
+        if (ins->opsize == 3 && /* no keyed set */
             ins->symregs[1]->type == VTCONST && /* const rhs */
+            (STREQ(ins->opname, "set") ||
+               (strlen(ins->opname) > 4 &&
+                0 == memcmp(ins->opname, "set_", 4))) &&
             ins->symregs[0]->set != 'P' &&  /* no PMC consts */
             /* skip type coercions, only same type GH #1043 */
             ins->symregs[0]->set == ins->symregs[1]->set)
