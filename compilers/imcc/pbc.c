@@ -335,7 +335,7 @@ static void verify_signature(
     , PARROT_ASSERT_ARG(bc) \
     , PARROT_ASSERT_ARG(ins_line))
 #define ASSERT_ARGS_imcc_globals_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
-       PARROT_ASSERT_ARG(param))
+       PARROT_ASSERT_ARG(_imcc))
 #define ASSERT_ARGS_init_fixedintegerarray_from_string \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
@@ -373,7 +373,7 @@ static void verify_signature(
 
 /*
 
-=item C<static void imcc_globals_destroy(PARROT_INTERP, int ex, void *param)>
+=item C<static void imcc_globals_destroy(PARROT_INTERP, int exit_status, void *_imcc)>
 
 Frees memory allocated for IMCC globals for one particular compilation unit.
 
@@ -382,10 +382,10 @@ Frees memory allocated for IMCC globals for one particular compilation unit.
 */
 
 static void
-imcc_globals_destroy(SHIM_INTERP, SHIM(int ex), ARGMOD(void *param))
+imcc_globals_destroy(SHIM_INTERP, SHIM(int exit_status), ARGMOD(void *_imcc))
 {
     ASSERT_ARGS(imcc_globals_destroy)
-    imc_info_t * const imcc = (imc_info_t*)param;
+    imc_info_t * const imcc = (imc_info_t*)_imcc;
 
     /* In an exit within :immediate there will no globals. See TT #629 */
     if (imcc->globals) {
@@ -406,7 +406,14 @@ imcc_globals_destroy(SHIM_INTERP, SHIM(int ex), ARGMOD(void *param))
             mem_sys_free(cs);
             cs = prev_cs;
         }
-        imcc->globals->cs = NULL;
+        /* double-free. apparently all ok here
+        if (imcc->globals->first) {
+            mem_sys_free(imcc->globals->first);
+            imcc->globals->cs = NULL;
+        }
+        */
+        mem_sys_free(imcc->globals);
+        imcc->globals = NULL;
     }
 }
 
@@ -469,10 +476,8 @@ e_pbc_open(ARGMOD(imc_info_t * imcc))
 
     if (imcc->globals->cs)
         clear_sym_hash(&imcc->globals->cs->key_consts);
-    else {
-        /* register cleanup code */
-        Parrot_x_on_exit(imcc->interp, imcc_globals_destroy, imcc);
-    }
+    /* push cleanup code for the globals */
+    Parrot_x_on_exit(imcc->interp, imcc_globals_destroy, imcc);
 
     /* free previous cached key constants if any */
     create_symhash(imcc, &cs->key_consts);
