@@ -1113,6 +1113,8 @@ Parrot_debugger_init(PARROT_INTERP)
         pdb->cur_command = mem_gc_allocate_n_typed(interp, DEBUG_CMD_BUFFER_LENGTH + 1, char);
         pdb->last_command = mem_gc_allocate_n_typed(interp, DEBUG_CMD_BUFFER_LENGTH + 1, char);
         pdb->file = mem_gc_allocate_zeroed_typed(interp, PDB_file_t);
+        interp->pdb->cur_command[0] = '\0';
+        interp->pdb->last_command[0] = '\0';
     }
 
     /* PDB_disassemble(interp, NULL); */
