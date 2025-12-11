@@ -25,12 +25,22 @@ called by C<Parrot_x_exit()> when the interpreter exits.
 
 /* HEADERIZER HFILE: include/parrot/exit.h */
 
+#ifndef MEMORY_DEBUG
+#  define MEMORY_DEBUG_DETAIL_2(s, a1, a2)
+#else
+#  define MEMORY_DEBUG_DETAIL_2(s, a1, a2)                              \
+    if (Interp_debug_TEST(interp,                                       \
+                PARROT_MEM_STAT_DEBUG_FLAG | PARROT_MEM_DETAIL_DEBUG_FLAG)) \
+        fprintf(stderr, (s), (a1), (a2))
+#endif
+
 /*
 
 =item C<void Parrot_x_on_exit(PARROT_INTERP, exit_handler_f function, void
 *arg)>
 
-Register the specified function to be called on interpreter exit.
+Register the specified function to be called on exit.
+arg is only used for imcc.
 
 =cut
 
@@ -48,6 +58,7 @@ Parrot_x_on_exit(PARROT_INTERP, ARGIN(exit_handler_f function), ARGIN_NULLOK(voi
     new_node->arg             = arg;
     new_node->next            = interp->exit_handler_list;
     interp->exit_handler_list = new_node;
+    MEMORY_DEBUG_DETAIL_2("Pushed new exit handler %p for %p\n", new_node, function);
 }
 
 /*
@@ -129,6 +140,7 @@ Parrot_x_execute_on_exit_handlers(PARROT_INTERP, int status)
 
     while (node) {
         handler_node_t * const next = node->next;
+        MEMORY_DEBUG_DETAIL_2("Run exit handler %p for %p\n", node, node->function);
 
         (node->function)(interp, status, node->arg);
         mem_internal_free(node);

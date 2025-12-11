@@ -376,6 +376,8 @@ static void verify_signature(
 =item C<static void imcc_globals_destroy(PARROT_INTERP, int exit_status, void *_imcc)>
 
 Frees memory allocated for IMCC globals for one particular compilation unit.
+This is called by the exit handlers registered with Parrot_x_on_exit().
+exit_status is the argument to exit(), but is unused here.
 
 =cut
 
@@ -398,12 +400,15 @@ imcc_globals_destroy(SHIM_INTERP, SHIM(int exit_status), ARGMOD(void *_imcc))
             while (s) {
                 subs_t * const prev_s = s->prev;
                 clear_sym_hash(&s->fixup);
+                MEMORY_DEBUG_DETAIL_2("Freed %s at %p\n", "subs", s);
                 mem_sys_free(s);
                 s = prev_s;
             }
+            cs->subs = NULL;
 
             clear_sym_hash(&cs->key_consts);
             mem_sys_free(cs);
+            MEMORY_DEBUG_DETAIL_2("Freed %s at %p\n", "cs", cs);
             cs = prev_cs;
         }
         /* double-free. apparently all ok here
@@ -413,6 +418,7 @@ imcc_globals_destroy(SHIM_INTERP, SHIM(int exit_status), ARGMOD(void *_imcc))
         }
         */
         mem_sys_free(imcc->globals);
+        MEMORY_DEBUG_DETAIL_2("Freed %s at %p\n", "imcc->globals", imcc->globals);
         imcc->globals = NULL;
     }
 }
@@ -435,13 +441,16 @@ add_const_table_pmc(ARGMOD(imc_info_t * imcc), ARGIN(PMC *pmc))
     PackFile_ByteCode * const bc = Parrot_pf_get_current_code_segment(imcc->interp);
     PackFile_ConstTable * const ct = bc->const_table;
 
-    if (!ct->pmc.constants)
+    if (!ct->pmc.constants) {
         ct->pmc.constants =
             mem_gc_allocate_n_zeroed_typed(imcc->interp, 1, PMC *);
-    else
+        MEMORY_DEBUG_DETAIL_2("Allocated %s at %p\n", "ct->pmc.constants", ct->pmc.constants);
+    } else {
         ct->pmc.constants =
             mem_gc_realloc_n_typed_zeroed(imcc->interp, ct->pmc.constants,
                 ct->pmc.const_count + 1, ct->pmc.const_count, PMC *);
+        MEMORY_DEBUG_DETAIL_2("Reallocated %s at %p\n", "ct->pmc.constants", ct->pmc.constants);
+    }
 
     PObj_is_shared_SET(pmc); /* packfile constants will be shared among threads */
 
@@ -470,9 +479,12 @@ e_pbc_open(ARGMOD(imc_info_t * imcc))
     ASSERT_ARGS(e_pbc_open)
     PackFile_ByteCode * const current_bc = Parrot_pf_get_current_code_segment(imcc->interp);
     code_segment_t * const cs = mem_gc_allocate_zeroed_typed(imcc->interp, code_segment_t);
+    MEMORY_DEBUG_DETAIL_2("Allocated %s at %p\n", "cs", cs);
 
-    if (!imcc->globals)
+    if (!imcc->globals) {
         imcc->globals = mem_gc_allocate_zeroed_typed(imcc->interp, imcc_globals);
+        MEMORY_DEBUG_DETAIL_2("Allocated %s at %p\n", "imcc->globals", imcc->globals);
+    }
 
     if (imcc->globals->cs)
         clear_sym_hash(&imcc->globals->cs->key_consts);
@@ -515,6 +527,7 @@ make_new_sub(ARGMOD(imc_info_t * imcc), ARGIN(IMC_Unit *unit))
 {
     ASSERT_ARGS(make_new_sub)
     subs_t * const s = mem_gc_allocate_zeroed_typed(imcc->interp, subs_t);
+    MEMORY_DEBUG_DETAIL_2("Allocated %s at %p\n", "sub", s);
 
     s->prev          = imcc->globals->cs->subs;
     s->unit          = unit;
@@ -797,7 +810,9 @@ bytecode_map_op(ARGMOD(imc_info_t * imcc), op_info_t *info) {
     om->lib       = lib;
     om->n_ops     = 0;
     om->lib_ops   = mem_gc_allocate_n_zeroed_typed(imcc->interp, 0, opcode_t);
+    MEMORY_DEBUG_DETAIL_2("Allocated %s at %p\n", "om->lib_ops", om->lib_ops);
     om->table_ops = mem_gc_allocate_n_zeroed_typed(imcc->interp, 0, opcode_t);
+    MEMORY_DEBUG_DETAIL_2("Allocated %s at %p\n", "om->table_ops", om->table_ops);
 
   found_lib:
     for (i = 0; i < om->n_ops; i++) {
@@ -1190,12 +1205,15 @@ add_const_str(ARGMOD(imc_info_t * imcc), ARGIN(STRING *s),
         return i;
 
 
-    if (!ct->str.constants)
+    if (!ct->str.constants) {
         ct->str.constants = mem_gc_allocate_n_zeroed_typed(imcc->interp, 1, STRING *);
-
-    else
+        MEMORY_DEBUG_DETAIL_2("Allocated %s at %p\n", "ct->str.constants", ct->str.constants);
+    }
+    else {
         ct->str.constants = mem_gc_realloc_n_typed_zeroed(imcc->interp,
                 ct->str.constants, ct->str.const_count + 1, ct->str.const_count, STRING *);
+        MEMORY_DEBUG_DETAIL_2("Reallocated %s at %p\n", "ct->str.constants", ct->str.constants);
+    }
 
     /* initialize rlookup cache */
     if (!ct->string_hash)
@@ -1231,11 +1249,14 @@ add_const_num(ARGMOD(imc_info_t * imcc), ARGIN_NULLOK(const char *buf),
     PackFile_ConstTable *ct = bc->const_table;
     STRING * const s        = Parrot_str_new(imcc->interp, buf, 0);
 
-    if (!ct->num.constants)
+    if (!ct->num.constants) {
         ct->num.constants = mem_gc_allocate_n_zeroed_typed(imcc->interp, 1, FLOATVAL);
-    else
+        MEMORY_DEBUG_DETAIL_2("Allocated %s at %p\n", "ct->num.constants", ct->num.constants);
+    } else {
         ct->num.constants = mem_gc_realloc_n_typed_zeroed(imcc->interp,
                 ct->num.constants, ct->num.const_count + 1, ct->num.const_count, FLOATVAL);
+        MEMORY_DEBUG_DETAIL_2("Reallocated %s at %p\n", "ct->num.constants", ct->num.constants);
+    }
 
     ct->num.constants[ct->num.const_count] = Parrot_str_to_num(imcc->interp, s);
 
@@ -2439,6 +2460,7 @@ e_pbc_emit(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(const IMC_Unit *u
             SymReg * const r = mk_sub_label(imcc, "(null)");
             r->type    = VT_PCC_SUB;
             r->pcc_sub = mem_gc_allocate_zeroed_typed(imcc->interp, pcc_sub_t);
+            MEMORY_DEBUG_DETAIL_2("Allocated %s at %p\n", "r->pcc_sub", r->pcc_sub);
 
             add_const_pmc_sub(imcc, r, old_size, old_size + code_size);
         }

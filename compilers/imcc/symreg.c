@@ -1595,7 +1595,7 @@ clear_locals(ARGIN_NULLOK(IMC_Unit *unit))
 
 =item C<void clear_globals(imc_info_t * imcc)>
 
-Clears global symbols.
+Clears global symbols only. TODO: Also subs and key_consts.
 
 =cut
 
@@ -1606,7 +1606,28 @@ clear_globals(ARGMOD(imc_info_t * imcc))
 {
     ASSERT_ARGS(clear_globals)
     SymHash * const hsh = &imcc->ghash;
+#if 0
+    code_segment_t *cs = imcc->globals->cs;
 
+    while (cs) {
+        subs_t         *s              = cs->subs;
+        code_segment_t * const prev_cs = cs->prev;
+
+        while (s) {
+            subs_t * const prev_s = s->prev;
+            clear_sym_hash(&s->fixup);
+            MEMORY_DEBUG_DETAIL_2("Freed %s at %p\n", "subs", s);
+            mem_sys_free(s);
+            s = prev_s;
+        }
+
+        clear_sym_hash(&cs->key_consts);
+        cs->subs = NULL;
+        mem_sys_free(cs);
+        MEMORY_DEBUG_DETAIL_2("Freed %s at %p\n", "cs", cs);
+        cs = prev_cs;
+    }
+#endif
     if (hsh->data)
         clear_sym_hash(hsh);
 }
