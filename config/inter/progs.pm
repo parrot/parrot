@@ -97,6 +97,23 @@ sub _get_programs {
     $conf->data->set( ccflags => $ccflags );
 
     $conf->debug("\nccflags: $ccflags\n");
+    my $asan = $ccflags =~ /-fsanitize=address/;
+    # for makefile rules, but not config_lib.pir
+    $conf->data->set('TEMP_asan' => $asan);
+    if ($asan) {
+        $conf->debug("AddressSanitizer enabled\n");
+        if ($ENV{ASAN_OPTIONS} and $ENV{ASAN_OPTIONS} =~ /detect_leaks=0/) {
+            $conf->debug("ASAN_OPTIONS already has detect_leaks=0\n");
+        }
+        else {
+            if ($conf->data->get('OSNAME_provisional') =~ /VMS|MSWin/) {
+                $conf->data->set('TEMP_memleak' => "set ASAN_OPTIONS=detect_leaks=0 & ");
+            }
+            else {
+                $conf->data->set('TEMP_memleak' => "env ASAN_OPTIONS=detect_leaks=0 ");
+            }
+        }
+    }
 
     $ar = integrate( $conf->data->get('ar'), $conf->options->get('ar') );
     $ar = prompt( "What archiver do you want to use to build static libraries?", $ar ) if $ask;
