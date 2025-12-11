@@ -10,7 +10,7 @@ $(LIBRARY_DIR)/PGE.pbc: $(PARROT) \
     $(LIBRARY_DIR)/PCT/HLLCompiler.pbc
 	$(PERL) -e "" > compilers/pge/PGE/builtins_gen.pir
 	$(PARROT) -o $@ compilers/pge/PGE.pir
-	$(PARROT) $(LIBRARY_DIR)/PGE/Perl6Grammar.pir --output=compilers/pge/PGE/builtins_gen.pir compilers/pge/PGE/builtins.pg
+	$(NO_MEMLEAK)$(PARROT) $(LIBRARY_DIR)/PGE/Perl6Grammar.pir --output=compilers/pge/PGE/builtins_gen.pir compilers/pge/PGE/builtins.pg
 	$(PARROT) -o $@ compilers/pge/PGE.pir
 	$(ADDGENERATED) "$@" "[main]"
 

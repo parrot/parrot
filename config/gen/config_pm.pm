@@ -89,7 +89,6 @@ sub runstep {
     $conf->data->add( ' ', 'embed-ldflags' => join(' ' => @deduped) );
 
     my $cwd = cwd();
-
     # expand msys virtual paths
     $cwd = `cd '$cwd' && pwd -W`, chomp $cwd
         if $conf->data->get('osname') eq 'msys';
@@ -122,6 +121,8 @@ END
     close $IN  or die "Can't close $template: $!";
     close $OUT or die "Can't close $gen_pm: $!";
 
+    $conf->data->clean('TEMP_asan');
+    $conf->data->clean('TEMP_memleak');
     $template = $self->{templates}->{config_lib};
     open( $IN,  "<", $template ) or die "Can't open '$template': $!";
     my $c_l_pir = q{config_lib.pir};

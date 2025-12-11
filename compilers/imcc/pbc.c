@@ -373,7 +373,8 @@ static void verify_signature(
 
 /*
 
-=item C<static void imcc_globals_destroy(PARROT_INTERP, int exit_status, void *_imcc)>
+=item C<static void imcc_globals_destroy(PARROT_INTERP, int exit_status, void
+*_imcc)>
 
 Frees memory allocated for IMCC globals for one particular compilation unit.
 This is called by the exit handlers registered with Parrot_x_on_exit().
@@ -445,7 +446,8 @@ add_const_table_pmc(ARGMOD(imc_info_t * imcc), ARGIN(PMC *pmc))
         ct->pmc.constants =
             mem_gc_allocate_n_zeroed_typed(imcc->interp, 1, PMC *);
         MEMORY_DEBUG_DETAIL_2("Allocated %s at %p\n", "ct->pmc.constants", ct->pmc.constants);
-    } else {
+    }
+    else {
         ct->pmc.constants =
             mem_gc_realloc_n_typed_zeroed(imcc->interp, ct->pmc.constants,
                 ct->pmc.const_count + 1, ct->pmc.const_count, PMC *);
@@ -1252,7 +1254,8 @@ add_const_num(ARGMOD(imc_info_t * imcc), ARGIN_NULLOK(const char *buf),
     if (!ct->num.constants) {
         ct->num.constants = mem_gc_allocate_n_zeroed_typed(imcc->interp, 1, FLOATVAL);
         MEMORY_DEBUG_DETAIL_2("Allocated %s at %p\n", "ct->num.constants", ct->num.constants);
-    } else {
+    }
+    else {
         ct->num.constants = mem_gc_realloc_n_typed_zeroed(imcc->interp,
                 ct->num.constants, ct->num.const_count + 1, ct->num.const_count, FLOATVAL);
         MEMORY_DEBUG_DETAIL_2("Reallocated %s at %p\n", "ct->num.constants", ct->num.constants);

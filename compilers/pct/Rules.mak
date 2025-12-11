@@ -2,7 +2,7 @@
 
 $(LIBRARY_DIR)/PCT.pbc : $(PARROT) compilers/pct/PCT.pir \
     $(LIBRARY_DIR)/PCT/Grammar.pbc $(LIBRARY_DIR)/PCT/PAST.pbc
-	$(PARROT) -o $@ compilers/pct/PCT.pir
+	$(NO_MEMLEAK)$(PARROT) -o $@ compilers/pct/PCT.pir
 	@$(ADDGENERATED) "$@" "[main]"
 
 $(LIBRARY_DIR)/PCT/PAST.pbc : compilers/pct/src/PAST.pir $(PARROT) $(PBC_MERGE) \
