@@ -361,6 +361,15 @@ SymReg* get_pasm_reg(ARGMOD(imc_info_t * imcc), ARGIN(const char *name))
 #define PARROT_MAX_RECOVER_ERRORS 40
 /* this is the number of times parrot will try to retry while compiling. */
 
+#ifndef MEMORY_DEBUG
+#  define MEMORY_DEBUG_DETAIL_2(s, a1, a2)
+#else
+#  define MEMORY_DEBUG_DETAIL_2(s, a1, a2)                              \
+    if (Interp_debug_TEST(imcc->interp,                                 \
+                PARROT_MEM_STAT_DEBUG_FLAG | PARROT_MEM_DETAIL_DEBUG_FLAG)) \
+        fprintf(stderr, (s), (a1), (a2))
+#endif
+
 typedef enum _enum_opt {
     OPT_NONE,
     OPT_PRE, /*0x001 */

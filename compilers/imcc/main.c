@@ -615,9 +615,11 @@ exit_reentrant_compile(ARGIN(imc_info_t *imcc), ARGMOD_NULLOK(struct _imc_info_t
     if (new_info && new_info->prev == imcc) {
         PARROT_ASSERT(imcc == new_info->prev);
         imc_cleanup(new_info, NULL);
-        if (new_info->globals)
+        if (new_info->globals) {
             mem_sys_free(new_info->globals);
-
+            MEMORY_DEBUG_DETAIL_2("Freed %s at %p\n", "new_info->globals", new_info->globals);
+            new_info->globals = NULL;
+        }
         mem_sys_free(new_info);
     }
     return imcc;
@@ -642,8 +644,11 @@ imcc_destroy(ARGFREE(imc_info_t * imcc))
     if (macros)
         Parrot_hash_chash_destroy_values(imcc->interp, macros, imcc_destroy_macro_values);
 
-    if (imcc->globals)
+    if (imcc->globals) {
         mem_sys_free(imcc->globals);
+        MEMORY_DEBUG_DETAIL_2("Freed %s at %p\n", "imcc->globals", imcc->globals);
+        imcc->globals = NULL;
+    }
 
     mem_sys_free(imcc);
 }
