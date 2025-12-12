@@ -663,8 +663,10 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
                 break;
               case enum_type_plong:
                 slack = sizeof (INTVAL) - sizeof (long) + 1;
+                /* fall through */
               case enum_type_pint:
                 slack = slack ? slack : sizeof (INTVAL) - sizeof (int) + 1;
+                /* fall through */
               case enum_type_pshort:
                 slack = slack ? slack : sizeof (INTVAL) - sizeof (short) + 1;
                 nci_val[i].t = (char*)&(((Parrot_Integer_attributes *)PMC_data(pcc_arg[i].p))->iv);
