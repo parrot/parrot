@@ -676,8 +676,8 @@ fail_if_type_exists(PARROT_INTERP, ARGIN(PMC *name))
             const INTVAL type = VTABLE_get_integer(interp, value);
             if (type < enum_type_undef)  {
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                            "native type with name '%s' already exists - "
-                            "can't register Class", data_types[type].name);
+                            "native type '%d' is invalid - "
+                            "can't register Class", type);
             }
             return type;
         }
