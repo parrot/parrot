@@ -1108,6 +1108,7 @@ src/thread$(O) : \
 	src/thread.c
 
 src/io/utilities$(O) : $(PARROT_H_HEADERS) src/io/io_private.h src/io/utilities.c
+	$(CC) $(CFLAGS) @optimize::src/io/utilities.c@ @ccwarn::src/io/utilities.c@ -I$(@D)/. -Isrc @cc_o_out@$@ -c src/io/utilities.c
 
 src/io/socket$(O) : \
 	$(PARROT_H_HEADERS) \
@@ -1116,18 +1117,21 @@ src/io/socket$(O) : \
 	$(INC_PMC_DIR)/pmc_socket.h \
 	$(INC_PMC_DIR)/pmc_sockaddr.h \
 	src/io/socket.c
+	$(CC) $(CFLAGS) @optimize::src/io/socket.c@ @ccwarn::src/io/socket.c@ -I$(@D)/. -Isrc @cc_o_out@$@ -c src/io/socket.c
 
 src/io/stringhandle$(O) : \
 	$(PARROT_H_HEADERS) \
 	src/io/io_private.h \
 	$(INC_PMC_DIR)/pmc_stringhandle.h \
 	src/io/stringhandle.c
+	$(CC) $(CFLAGS) @optimize::src/io/stringhandle.c@ @ccwarn::src/io/stringhandle.c@ -I$(@D)/. -Isrc @cc_o_out@$@ -c src/io/stringhandle.c
 
 src/io/pipe$(O) : \
 	$(PARROT_H_HEADERS) \
 	src/io/io_private.h \
 	$(INC_PMC_DIR)/pmc_filehandle.h \
 	src/io/pipe.c
+	$(CC) $(CFLAGS) @optimize::src/io/pipe.c@ @ccwarn::src/io/pipe.c@ -I$(@D)/. -Isrc @cc_o_out@$@ -c src/io/pipe.c
 
 src/io/userhandle$(O) : \
 	$(PARROT_H_HEADERS) \
@@ -1608,11 +1612,13 @@ src/gc/api$(O) : $(PARROT_H_HEADERS) src/gc/gc_private.h src/gc/api.c
 src/gc/variable_size_pool$(O) : $(PARROT_H_HEADERS) \
 	src/gc/variable_size_pool.h src/gc/variable_size_pool.c
 
+## SUFFIX OVERRIDE - no -Wcast-qual
 src/gc/string_gc$(O) : \
 	$(PARROT_H_HEADERS) \
 	src/gc/gc_private.h \
 	src/gc/string_gc.c \
 	src/gc/variable_size_pool.h
+	$(CC) $(CFLAGS) @optimize::src/gc/string_gc.c@ @ccwarn::src/gc/string_gc.c@ -I$(@D)/. -Isrc @cc_o_out@$@ -c src/gc/string_gc.c
 
 src/gc/fixed_allocator$(O) : $(PARROT_H_HEADERS) \
 	src/gc/fixed_allocator.h src/gc/fixed_allocator.c
@@ -1632,6 +1638,7 @@ src/hll$(O) : \
 
 src/core_pmcs$(O) : $(PARROT_H_HEADERS) src/core_pmcs.c
 
+## SUFFIX OVERRIDE - no -Wcast-qual
 src/runcore/trace$(O) : \
 	$(INC_PMC_DIR)/pmc_sub.h \
 	src/runcore/trace.c \
@@ -1640,6 +1647,7 @@ src/runcore/trace$(O) : \
 	$(PARROT_H_HEADERS) \
 	$(INC_DIR)/oplib/core_ops.h \
 	$(INC_DIR)/runcore_api.h
+	$(CC) $(CFLAGS) @optimize::src/runcore/trace.c@ @ccwarn::src/runcore/trace.c@ -I$(@D)/. -Isrc @cc_o_out@$@ -c src/runcore/trace.c
 
 src/debug$(O) : \
 	$(PARROT_H_HEADERS) src/debug.c \
@@ -1761,7 +1769,7 @@ src/call/ops$(O) : $(INC_DIR)/oplib/ops.h \
 	$(PARROT_H_HEADERS) $(INC_PMC_DIR)/pmc_continuation.h \
 	$(INC_DIR)/runcore_api.h src/call/ops.c
 
-## SUFFIX OVERRIDE - no -Wformat-nonliteral
+## SUFFIX OVERRIDE - no -Wformat-nonliteral and -Wcast-qual
 src/io/api$(O) : \
   $(PARROT_H_HEADERS) \
   src/io/io_private.h \
@@ -1875,8 +1883,10 @@ src/platform/generic/hires_timer$(O) : src/platform/generic/hires_timer.c $(PARR
 
 src/platform/generic/itimer$(O) : src/platform/generic/itimer.c $(PARROT_H_HEADERS)
 
+## SUFFIX OVERRIDE - no -Wcast-qual
 src/platform/generic/io$(O) : $(PARROT_H_HEADERS) src/io/io_private.h \
 	src/platform/generic/io.c
+	$(CC) $(CFLAGS) @optimize::src/platform/generic/io.c@ @ccwarn::src/platform/generic/io.c@ -I$(@D)/. -Isrc @cc_o_out@$@ -c src/platform/generic/io.c
 
 src/platform/generic/math$(O) : src/platform/generic/math.c $(PARROT_H_HEADERS)
 
@@ -2147,8 +2157,10 @@ $(FR_DIR)/pbc_merge/main$(O) : \
 	$(INC_DIR)/runcore_api.h \
 	$(PARROT_H_HEADERS)
 
+## SUFFIX OVERRIDE - no -Wcast-qual
 src/io/filehandle$(O) : $(PARROT_H_HEADERS) $(INC_PMC_DIR)/pmc_filehandle.h \
 	src/io/io_private.h src/io/filehandle.c
+	$(CC) $(CFLAGS) @optimize::src/io/filehandle.c@ @ccwarn::src/io/filehandle.c@ -I$(@D)/. -Isrc @cc_o_out@$@ -c src/io/filehandle.c
 
 src/gc/malloc_trace$(O) : src/gc/malloc.c src/gc/malloc_trace.c
 
