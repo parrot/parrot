@@ -328,7 +328,7 @@ C<uint16>, C<int32>, C<uint32>, C<int64>(*), and C<uint64>(*)
                 /* arbitrary buffers extended with size and align fields */
                 elt->size = elt_size = VTABLE_get_integer_keyed_int(INTERP, p, ++i);
                 elt_align            = VTABLE_get_integer_keyed_int(INTERP, p, ++i);
-                /* fallthrough */
+                /* fall through */
               case enum_type_PMC:
               case enum_type_ptr:
               case enum_type_func_ptr:

@@ -2546,8 +2546,8 @@ e_pbc_emit(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(const IMC_Unit *u
                     *(imcc->pc)++ = last_label;
                     last_label = 1;
                     break;
-                    /* else fall through */
                 }
+                /* fall through */
               case PARROT_ARG_I:
               case PARROT_ARG_N:
               case PARROT_ARG_S:

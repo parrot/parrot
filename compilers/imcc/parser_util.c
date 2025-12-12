@@ -401,7 +401,7 @@ INS(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
             switch (op->dirs[i]) {
               case PARROT_ARGDIR_INOUT:
                 dirs |= 1 << (16 + i);
-                /* go on */
+                /* fall through */
               case PARROT_ARGDIR_IN:
                 dirs |= 1 << i ;
                 break;

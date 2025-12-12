@@ -557,7 +557,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
             const INTVAL ch = STRING_ord(interp, pat, i);
 
             switch (info.phase) {
-            /*@fallthrough@ */ case PHASE_FLAGS:
+              case PHASE_FLAGS:
                 switch (ch) {
                   case '-':
                     info.flags |= FLAG_MINUS;
@@ -582,9 +582,9 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                   default:
                     info.phase = PHASE_WIDTH;
                 }
+                /* fall through */
 
-
-            /*@fallthrough@ */ case PHASE_WIDTH:
+              case PHASE_WIDTH:
                 switch (ch) {
                   case '0':
                   case '1':
@@ -620,9 +620,9 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                   default:
                     info.phase = PHASE_PREC;
                 }
+                /* fall through */
 
-
-            /*@fallthrough@ */ case PHASE_PREC:
+              case PHASE_PREC:
                 switch (ch) {
                   case '0':
                   case '1':
@@ -649,8 +649,9 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                   default:
                     info.phase = PHASE_TYPE;
                 }
+                /* fall through */
 
-            /*@fallthrough@ */ case PHASE_TYPE:
+              case PHASE_TYPE:
                 switch (ch) {
                   case 'h':
                     info.type = SIZE_SHORT;
@@ -684,9 +685,9 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                   default:
                     info.phase = PHASE_TERM;
                 }
+                /* fall through */
 
-
-            /*@fallthrough@ */ case PHASE_TERM:
+              case PHASE_TERM:
                 switch (ch) {
                     /* INTEGERS */
                   case 'c':
@@ -818,7 +819,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                     }
                     break;
 
-                    /* FLOATS - We cheat on these and use snprintf. */
+                  /* FLOATS - We cheat on these and use snprintf. */
                   case 'e':
                   case 'E':
                   case 'f':
@@ -904,6 +905,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                         VTABLE_push_string(interp, targ, ts);
                         break;
                     }
+                    /* fall through */
 
                   case 's':
                   CASE_s:
