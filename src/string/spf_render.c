@@ -684,6 +684,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
 
                   default:
                     info.phase = PHASE_TERM;
+                    /* fall through */
                 }
                 /* fall through */
 
