@@ -678,8 +678,8 @@ fail_if_type_exists(PARROT_INTERP, ARGIN(PMC *name))
             if (type < enum_type_undef)  {
                 /* TODO data_types[-1] doesn't look right */
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
-                            "native type with name '%s' already exists - "
-                            "can't register Class", data_types[type].name);
+                            "native type '%d' is invalid - "
+                            "can't register Class", type);
             }
             return type;
         }
