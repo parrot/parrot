@@ -303,7 +303,7 @@ static PMC*
 gc_inf_allocate_pmc_header(PARROT_INTERP, SHIM(UINTVAL flags))
 {
     ASSERT_ARGS(gc_inf_allocate_pmc_header)
-    PMC *mem = (PMC*)calloc(sizeof (PMC), 1);
+    PMC *mem = (PMC*)calloc(1, sizeof (PMC));
     MEMORY_DEBUG_UNUSED(interp)
     GC_DEBUG_DETAIL_2("allocate_pmc_header %p "SIZE_FMT" bytes)\n",
                       mem, sizeof (PMC));
@@ -358,7 +358,7 @@ static Parrot_Buffer*
 gc_inf_allocate_bufferlike_header(PARROT_INTERP, SHIM(size_t size))
 {
     ASSERT_ARGS(gc_inf_allocate_bufferlike_header)
-    Parrot_Buffer * mem = (Parrot_Buffer*)calloc(sizeof (Parrot_Buffer), 1);
+    Parrot_Buffer * mem = (Parrot_Buffer*)calloc(1, sizeof (Parrot_Buffer));
     MEMORY_DEBUG_UNUSED(interp)
     GC_DEBUG_DETAIL_2("allocate_bufferlike_header %p "SIZE_FMT" bytes)\n",
                       mem, sizeof (Parrot_Buffer));
