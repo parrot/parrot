@@ -50,8 +50,10 @@
 #if defined(HASATTRIBUTE_NONNULL) && !defined(__cplusplus)
 /* g++ has some problem with this attribute */
 #  define __attribute__nonnull__(a)         __attribute__((__nonnull__(a)))
+#  define HAVE_NONNULL
 #else
 #  define __attribute__nonnull__(a)
+#  undef HAVE_NONNULL
 #endif
 #ifdef HASATTRIBUTE_NORETURN
 #  ifdef _MSC_VER

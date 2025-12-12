@@ -342,7 +342,7 @@ static UINTVAL
 utf8_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
 {
     ASSERT_ARGS(utf8_ord)
-    const UINTVAL len = STRING_length(src);
+    const UINTVAL len = STRING_NN_length(src);
     const utf8_t *start;
 
     if (idx < 0)
@@ -647,7 +647,7 @@ static STRING *
 utf8_substr(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset, INTVAL length)
 {
     ASSERT_ARGS(utf8_substr)
-    const UINTVAL  strlen = STRING_length(src);
+    const UINTVAL  strlen = STRING_NN_length(src);
     STRING        *return_string;
     UINTVAL        start = 0;
 

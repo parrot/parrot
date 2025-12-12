@@ -372,7 +372,7 @@ static int
 is_abs_path(PARROT_INTERP, ARGIN(const STRING *file))
 {
     ASSERT_ARGS(is_abs_path)
-    UINTVAL len = STRING_length(file);
+    UINTVAL len = STRING_NN_length(file);
     INTVAL  c;
 
     if (len <= 1)
@@ -518,7 +518,7 @@ add_env_paths(PARROT_INTERP, ARGIN(PMC *libpath),
 {
     ASSERT_ARGS(add_env_paths)
 
-    if (!STRING_IS_NULL(envstr) && !STRING_IS_EMPTY(envstr)) {
+    if (!STRINGARG_IS_NULL(envstr) && !STRING_IS_EMPTY(envstr)) {
 #ifdef WIN32
         STRING * const env_search_path_sep = CONST_STRING(interp, ";");
 #else
@@ -537,7 +537,7 @@ add_env_paths(PARROT_INTERP, ARGIN(PMC *libpath),
                 }
                 start = index + 1;
             } while ((index = STRING_index(interp, envstr, env_search_path_sep, start)) >= 0);
-            entry = STRING_substr(interp, envstr, start, STRING_length(envstr) - start);
+            entry = STRING_substr(interp, envstr, start, STRING_NN_length(envstr) - start);
             if (!STRING_IS_EMPTY(entry))
                 VTABLE_push_string(interp, libpath,
                                    path_guarantee_trailing_separator(interp, entry));
@@ -893,7 +893,7 @@ Parrot_split_path_ext(PARROT_INTERP, ARGIN(STRING *in),
     STRING * const slash2 = CONST_STRING(interp, "\\");
     STRING * const dot    = CONST_STRING(interp, ".");
 
-    const INTVAL len = STRING_length(in);
+    const INTVAL len = STRING_NN_length(in);
     STRING *stem;
     INTVAL pos_sl, pos_dot;
 

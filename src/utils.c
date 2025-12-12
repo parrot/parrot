@@ -678,7 +678,7 @@ COMPARE(PARROT_INTERP, ARGIN(void *_a), ARGIN(void *_b),
 {
     ASSERT_ARGS(COMPARE)
     INTVAL result = 0;
-    if (PMC_IS_NULL(cmp))
+    if (PMCARG_IS_NULL(cmp))
         return VTABLE_cmp(interp, (PMC *)_a, (PMC *)_b);
 
     if (cmp->vtable->base_type == enum_class_NCI) {

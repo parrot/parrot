@@ -1395,7 +1395,7 @@ size_t
 PF_size_buf(ARGIN(const STRING *s))
 {
     ASSERT_ARGS(PF_size_buf)
-    if (STRING_IS_NULL(s))
+    if (STRINGARG_IS_NULL(s))
         return 1;
     else
         return PF_size_strlen(s->bufused) - 1;
@@ -1486,7 +1486,7 @@ PF_store_string(ARGOUT(opcode_t *cursor), ARGIN(const STRING *s))
         padded_size += sizeof (opcode_t) - (padded_size % sizeof (opcode_t));
     }
 
-    if (STRING_IS_NULL(s)) {
+    if (STRINGARG_IS_NULL(s)) {
         /* preserve NULL-ness of strings */
         *cursor++ = -1;
         return cursor;
@@ -1542,7 +1542,7 @@ PF_size_string(ARGIN(const STRING *s))
     ASSERT_ARGS(PF_size_string)
     /* TODO: don't break encapsulation on strings */
     const UINTVAL len = s->bufused;
-    if (STRING_IS_NULL(s))
+    if (STRINGARG_IS_NULL(s))
         return 1;
     else
         return PF_size_strlen(len);
@@ -1643,7 +1643,6 @@ PF_size_cstring(ARGIN(const char *s))
     ASSERT_ARGS(PF_size_cstring)
     size_t str_len;
 
-    PARROT_ASSERT(s);
     str_len = strlen(s);
     return ROUND_UP(str_len + 1, sizeof (opcode_t));
 }

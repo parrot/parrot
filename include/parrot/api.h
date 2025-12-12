@@ -52,16 +52,18 @@ Parrot_confess(ARGIN(const char *cond), ARGIN(const char *file), unsigned int li
 #else
 #  define PARROT_ASSERTS_ON 1
 #  define PARROT_ASSERT(x) (x) ? ((void)0) : Parrot_confess(#x, __FILE__, __LINE__)
-#  define PARROT_ASSERT_ARG(x) ((x) ? (0) : (Parrot_confess(#x, __FILE__, __LINE__), 0))
 #  define PARROT_FAILURE(x) Parrot_confess((x), __FILE__, __LINE__)
 #  define PARROT_ASSERT_MSG(x, s) ((x) ? (0) : (Parrot_confess(s, __FILE__, __LINE__), 0))
-
 #  ifdef __GNUC__
 #    define ASSERT_ARGS(a) ASSERT_ARGS_ ## a ;
 #  else
 #    define ASSERT_ARGS(a)
 #  endif /* __GNUC__ */
-
+#  ifdef HAVE_NONNULL
+#    define PARROT_ASSERT_ARG(x) (0)
+#  else
+#    define PARROT_ASSERT_ARG(x) ((x) ? (0) : (Parrot_confess(#x, __FILE__, __LINE__), 0))
+#  endif /* HAVE_NONNULL */
 #endif /* NDEBUG */
 
 /* Static assertions are checked at compile type */

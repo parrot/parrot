@@ -1344,8 +1344,8 @@ parrot_hash_get_bucket_string(PARROT_INTERP, ARGIN(const Hash *hash),
         /* manually inline part of string_equal  */
         if (hashval == s2->hashval) {
             if (s->encoding == s2->encoding) {
-                if ((STRING_byte_length(s) == STRING_byte_length(s2))
-                && (memcmp(s->strstart, s2->strstart, STRING_byte_length(s)) == 0))
+                if ((STRING_NN_byte_length(s) == STRING_byte_length(s2))
+                && (memcmp(s->strstart, s2->strstart, STRING_NN_byte_length(s)) == 0))
                     break;
             }
             else if (STRING_equal(interp, s, s2)) {

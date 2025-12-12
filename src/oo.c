@@ -159,7 +159,7 @@ Parrot_oo_extract_methods_from_namespace(PARROT_INTERP, ARGIN(PMC *self), ARGIN(
     PMC *methods, *vtable_overrides;
 
     /* Pull in methods from the namespace, if any. */
-    if (PMC_IS_NULL(ns))
+    if (PMCARG_IS_NULL(ns))
         return;
 
     nsattrs = PARROT_NAMESPACE(ns);
@@ -224,7 +224,7 @@ Parrot_oo_get_class(PARROT_INTERP, ARGIN(PMC *key))
     ASSERT_ARGS(Parrot_oo_get_class)
     PMC *classobj = PMCNULL;
 
-    if (PMC_IS_NULL(key))
+    if (PMCARG_IS_NULL(key))
         return PMCNULL;
 
     if (PObj_is_class_TEST(key))
@@ -664,7 +664,8 @@ fail_if_type_exists(PARROT_INTERP, ARGIN(PMC *name))
     ASSERT_ARGS(fail_if_type_exists)
     PMC * const value = (PMC *)VTABLE_get_pointer_keyed(interp, interp->class_hash, name);
 
-    if (PMC_IS_NULL(value))
+    /* value is never NULL */
+    if (PMCARG_IS_NULL(value))
         return 0;
 
     switch (VTABLE_type(interp, value)) {
@@ -675,6 +676,7 @@ fail_if_type_exists(PARROT_INTERP, ARGIN(PMC *name))
         {
             const INTVAL type = VTABLE_get_integer(interp, value);
             if (type < enum_type_undef)  {
+                /* TODO data_types[-1] doesn't look right */
                 Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                             "native type '%d' is invalid - "
                             "can't register Class", type);

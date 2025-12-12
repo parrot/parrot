@@ -328,9 +328,19 @@ typedef enum {
 
 PARROT_DATA STRING *STRINGNULL; /* a single null STRING */
 #define STRING_IS_NULL(s) ((s) == STRINGNULL || (s) == NULL)
+#ifdef HAVE_NONNULL
+#  define STRINGARG_IS_NULL(s) ((s) == STRINGNULL)
+#else
+#  define STRINGARG_IS_NULL(s) STRING_IS_NULL(s)
+#endif
 
 PARROT_DATA PMC *PMCNULL;    /* Holds single null PMC */
 #define PMC_IS_NULL(pmc)  ((pmc) == PMCNULL || (pmc) == NULL)
+#ifdef HAVE_NONNULL
+#  define PMCARG_IS_NULL(pmc)  ((pmc) == PMCNULL)
+#else
+#  define PMCARG_IS_NULL(pmc)  PMC_IS_NULL(pmc)
+#endif
 
 #define STRING_IS_EMPTY(s) ((s)->strlen == 0)
 
