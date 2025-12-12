@@ -48,7 +48,7 @@ Parrot_io_parse_open_flags(PARROT_INTERP, ARGIN(const STRING *mode_str))
     INTVAL i, mode_len;
     INTVAL flags = 0;
 
-    if (STRING_IS_NULL(mode_str))
+    if (STRINGARG_IS_NULL(mode_str))
         return PIO_F_READ;
 
     mode_len = Parrot_str_byte_length(interp, mode_str);
@@ -424,7 +424,7 @@ io_readline_encoded_string(PARROT_INTERP, ARGMOD(PMC *handle),
     size_t total_bytes_read = 0;
     const size_t raw_reads = buffer->raw_reads;
     size_t available_bytes = BUFFER_USED_SIZE(buffer);
-    const size_t delim_size = STRING_byte_length(rs);
+    const size_t delim_size = STRING_NN_byte_length(rs);
 
     s->bufused  = 0;
     s->strlen   = 0;

@@ -197,7 +197,7 @@ Parrot_find_encoding_by_string(PARROT_INTERP, ARGIN(STRING *encodingname))
 {
     ASSERT_ARGS(Parrot_find_encoding_by_string)
 
-    if (STRING_IS_NULL(encodingname))
+    if (STRINGARG_IS_NULL(encodingname))
         return Parrot_default_encoding_ptr;
     else {
         const STR_VTABLE * const result = find_encoding(interp, encodingname);
@@ -540,7 +540,7 @@ Parrot_str_internal_find_codepoint(PARROT_INTERP, ARGIN(const STRING *name))
 #endif
     {
         const struct Parrot_namealias *namealias
-            = Parrot_namealias_lookup(cstr, STRING_byte_length(name));
+            = Parrot_namealias_lookup(cstr, STRING_NN_byte_length(name));
         if (namealias)
             retval = (INTVAL) namealias->codepoint;
     }

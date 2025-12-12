@@ -42,8 +42,8 @@ Parrot_api_string_export_ascii(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String
         ARGOUT(char ** strout))
 {
     ASSERT_ARGS(Parrot_api_string_export_ascii)
-    EMBED_API_CALLIN(interp_pmc, interp);
-    if (!STRING_IS_NULL(string))
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp);
+    if (!STRINGARG_IS_NULL(string))
         *strout = Parrot_str_to_cstring(interp, string);
     else
         *strout = NULL;
@@ -67,8 +67,10 @@ Parrot_Int
 Parrot_api_string_free_exported_ascii(ARGIN(Parrot_PMC interp_pmc), ARGIN(char * const str))
 {
     ASSERT_ARGS(Parrot_api_string_free_exported_ascii)
-    EMBED_API_CALLIN(interp_pmc, interp);
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp);
+#ifndef HAVE_NONNULL
     if (str != NULL)
+#endif
         Parrot_str_free_cstring(str);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
@@ -92,9 +94,9 @@ Parrot_api_string_export_wchar(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String
         ARGOUT(wchar_t ** strout))
 {
     ASSERT_ARGS(Parrot_api_string_export_wchar)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp)
 
-    if (!STRING_IS_NULL(string)) {
+    if (!STRINGARG_IS_NULL(string)) {
         char * const cstr       = Parrot_str_to_cstring(interp, string);
         const size_t len        = strlen(cstr);
         wchar_t * const wstrout = (wchar_t *) malloc(sizeof (wchar_t) * (len + 1));
@@ -126,8 +128,10 @@ Parrot_Int
 Parrot_api_string_free_exported_wchar(ARGIN(Parrot_PMC interp_pmc), ARGIN(wchar_t * const str))
 {
     ASSERT_ARGS(Parrot_api_string_free_exported_wchar)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp)
+#ifndef HAVE_NONNULL
     if (str != NULL)
+#endif
         free(str);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
@@ -151,7 +155,7 @@ Parrot_api_string_import(ARGIN(Parrot_PMC interp_pmc), ARGIN(const char * str),
         ARGOUT(Parrot_String * out))
 {
     ASSERT_ARGS(Parrot_api_string_import)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp)
     *out = Parrot_str_from_platform_cstring(interp, str);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
@@ -175,7 +179,7 @@ Parrot_api_string_import_ascii(ARGIN(Parrot_PMC interp_pmc), ARGIN(const char * 
         ARGOUT(Parrot_String * out))
 {
     ASSERT_ARGS(Parrot_api_string_import_ascii)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp)
     *out = Parrot_str_new(interp, str, 0);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
@@ -199,7 +203,7 @@ Parrot_api_string_import_wchar(ARGIN(Parrot_PMC interp_pmc), ARGIN(wchar_t * str
         ARGOUT(Parrot_String * out))
 {
     ASSERT_ARGS(Parrot_api_string_import_wchar)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp)
 
     const size_t len  = wcslen(str);
     char * const cstr = (char *) malloc(sizeof (char) * (len + 1));
@@ -238,7 +242,7 @@ Parrot_api_string_import_binary(ARGIN(Parrot_PMC interp_pmc), ARGIN(const unsign
         ARGOUT(Parrot_String *out))
 {
     ASSERT_ARGS(Parrot_api_string_import_binary)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp)
     const STR_VTABLE * const encoding = Parrot_find_encoding(interp, encoding_name);
     *out = Parrot_str_new_init(interp, (const char *)bytes, length,
                 encoding, 0);

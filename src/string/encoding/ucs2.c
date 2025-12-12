@@ -266,7 +266,7 @@ ucs2_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
 {
     ASSERT_ARGS(ucs2_ord)
     const utf16_t * const ptr = (utf16_t *)src->strstart;
-    const UINTVAL         len = STRING_length(src);
+    const UINTVAL         len = STRING_NN_length(src);
 
     if (idx < 0)
         idx += len;

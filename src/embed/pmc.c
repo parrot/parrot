@@ -42,7 +42,7 @@ Parrot_api_pmc_new_from_class(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC cla
         ARGIN_NULLOK(Parrot_PMC init), ARGOUT(Parrot_PMC * pmc))
 {
     ASSERT_ARGS(Parrot_api_pmc_new_from_class)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp)
     Parrot_PMC initializer = init ? init : PMCNULL;
     *pmc = VTABLE_instantiate(interp, class_pmc, initializer);
     EMBED_API_CALLOUT(interp_pmc, interp)
@@ -67,7 +67,7 @@ Parrot_api_pmc_deserialize(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String fpm
         ARGOUT(Parrot_PMC * pmc))
 {
     ASSERT_ARGS(Parrot_api_pmc_deserialize)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp)
     Parrot_pf_verify_image_string(interp, fpmc);
     *pmc = Parrot_thaw(interp, fpmc);
     EMBED_API_CALLOUT(interp_pmc, interp);
@@ -92,7 +92,7 @@ Parrot_api_pmc_deserialize_bytes(ARGIN(Parrot_PMC interp_pmc), ARGIN(const unsig
         Parrot_Int length, ARGOUT(Parrot_PMC *pmc))
 {
     ASSERT_ARGS(Parrot_api_pmc_deserialize_bytes)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp)
     STRING * const fpmc_str = Parrot_str_new_init(interp, (const char *)fpmc,
         length, Parrot_binary_encoding_ptr, PObj_external_FLAG);
     *pmc = Parrot_thaw(interp, fpmc_str);
@@ -116,7 +116,7 @@ Parrot_Int
 Parrot_api_pmc_null(ARGIN(Parrot_PMC interp_pmc), ARGOUT(Parrot_PMC *pmctonull))
 {
     ASSERT_ARGS(Parrot_api_pmc_null)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp)
     *pmctonull = PMCNULL;
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
@@ -140,7 +140,7 @@ Parrot_api_pmc_get_string(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC pmc),
         ARGOUT(Parrot_String * str))
 {
     ASSERT_ARGS(Parrot_api_pmc_get_string)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp)
     *str = VTABLE_get_string(interp, pmc);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
@@ -164,7 +164,7 @@ Parrot_api_pmc_get_integer(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC pmc),
         ARGOUT(Parrot_Int * value))
 {
     ASSERT_ARGS(Parrot_api_pmc_get_integer)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp)
     *value = VTABLE_get_integer(interp, pmc);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
@@ -188,7 +188,7 @@ Parrot_api_pmc_get_float(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC pmc),
         ARGOUT(Parrot_Float * value))
 {
     ASSERT_ARGS(Parrot_api_pmc_get_float)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp)
     *value = VTABLE_get_number(interp, pmc);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
@@ -235,7 +235,7 @@ Parrot_api_pmc_get_keyed_int(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC pmc)
         Parrot_Int key, ARGOUT(Parrot_PMC *value))
 {
     ASSERT_ARGS(Parrot_api_pmc_get_keyed_int)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp)
     *value = VTABLE_get_pmc_keyed_int(interp, pmc, key);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
@@ -259,7 +259,7 @@ Parrot_api_pmc_get_keyed_string(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC p
         ARGIN(Parrot_String key), ARGOUT(Parrot_PMC * value))
 {
     ASSERT_ARGS(Parrot_api_pmc_get_keyed_string)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp)
     *value = VTABLE_get_pmc_keyed_str(interp, pmc, key);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
@@ -282,7 +282,7 @@ Parrot_api_pmc_set_string(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC pmc),
         ARGIN(Parrot_String value))
 {
     ASSERT_ARGS(Parrot_api_pmc_set_string)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp)
     VTABLE_set_string_native(interp, pmc, value);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
@@ -305,7 +305,7 @@ Parrot_api_pmc_set_integer(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC pmc),
         Parrot_Int value)
 {
     ASSERT_ARGS(Parrot_api_pmc_set_integer)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp)
     VTABLE_set_integer_native(interp, pmc, value);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
@@ -328,7 +328,7 @@ Parrot_api_pmc_set_float(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC pmc),
         Parrot_Float value)
 {
     ASSERT_ARGS(Parrot_api_pmc_set_float)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp)
     VTABLE_set_number_native(interp, pmc, value);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
@@ -375,7 +375,7 @@ Parrot_api_pmc_set_keyed_int(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC pmc)
         Parrot_Int key, ARGIN(Parrot_PMC value))
 {
     ASSERT_ARGS(Parrot_api_pmc_set_keyed_int)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp)
     VTABLE_set_pmc_keyed_int(interp, pmc, key, value);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
@@ -399,7 +399,7 @@ Parrot_api_pmc_set_keyed_string(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC p
         ARGIN(Parrot_String key), ARGIN(Parrot_PMC value))
 {
     ASSERT_ARGS(Parrot_api_pmc_set_keyed_string)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp)
     VTABLE_set_pmc_keyed_str(interp, pmc, key, value);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
@@ -423,7 +423,7 @@ Parrot_api_pmc_box_string(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String str)
         ARGOUT(Parrot_PMC * str_pmc))
 {
     ASSERT_ARGS(Parrot_api_pmc_box_string)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp)
     *str_pmc = Parrot_pmc_box_string(interp, str);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
@@ -514,7 +514,7 @@ Parrot_Int
 Parrot_api_add_exception_handler(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC handler))
 {
     ASSERT_ARGS(Parrot_api_add_exception_handler)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp)
     Parrot_cx_add_handler(interp, handler);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }*/
@@ -538,7 +538,7 @@ Parrot_api_pmc_invoke(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC sub),
         ARGIN(Parrot_PMC signature))
 {
     ASSERT_ARGS(Parrot_api_pmc_invoke)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp)
     PMC  * const old_call_obj = Parrot_pcc_get_signature(interp,
         CURRENT_CONTEXT(interp));
     Parrot_pcc_invoke_from_sig_object(interp, sub, signature);
@@ -565,7 +565,7 @@ Parrot_api_pmc_wrap_string_array(ARGIN(Parrot_PMC interp_pmc), Parrot_Int argc,
         ARGIN(const char ** argv), ARGOUT(Parrot_PMC * args))
 {
     ASSERT_ARGS(Parrot_api_pmc_wrap_string_array)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp)
     *args = Parrot_pmc_box_c_string_array(interp, argc, argv);
     EMBED_API_CALLOUT(interp_pmc, interp)
 }
@@ -589,7 +589,7 @@ Parrot_api_pmc_get_class(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_PMC key),
         ARGOUT(Parrot_PMC *class_pmc))
 {
     ASSERT_ARGS(Parrot_api_pmc_get_class)
-    EMBED_API_CALLIN(interp_pmc, interp)
+    EMBED_API_CALLIN_NONNULL(interp_pmc, interp)
     *class_pmc = Parrot_oo_get_class(interp, key);
     EMBED_API_CALLOUT(interp_pmc, interp);
 }
@@ -712,10 +712,11 @@ Parrot_api_pmc_setup_signature(Parrot_PMC interp_pmc, Parrot_PMC callcontext,
     if (PMC_IS_NULL(callcontext))
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
             "You must provide a CallContext to Parrot_api_pmc_setup_signature");
+#ifndef HAVE_NONNULL
     if (!signature)
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_INVALID_OPERATION,
             "You must provide a signature to Parrot_api_pmc_setup_signature");
-
+#endif
     va_start(args, signature);
     callcontext = Parrot_pcc_build_call_from_varargs(interp, callcontext,
             signature, &args);

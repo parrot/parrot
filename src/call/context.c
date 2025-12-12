@@ -236,7 +236,7 @@ init_context(ARGMOD(PMC *pmcctx), ARGIN_NULLOK(PMC *pmcold))
     ASSERT_ARGS(init_context)
     Parrot_Context * const ctx = CONTEXT_STRUCT(pmcctx);
 
-    PARROT_ASSERT_MSG(!PMC_IS_NULL(pmcctx), "Can't initialise Null CallContext");
+    PARROT_ASSERT_MSG(!PMCARG_IS_NULL(pmcctx), "Can't initialise Null CallContext");
 
     PARROT_ASSERT(PMC_IS_NULL(pmcold) || pmcold->vtable->base_type == enum_class_CallContext);
 

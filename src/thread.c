@@ -146,7 +146,7 @@ PMC*
 Parrot_thread_create_proxy(PARROT_INTERP, ARGIN(Parrot_Interp const thread), ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_thread_create_proxy)
-    if (PMC_IS_NULL(pmc))
+    if (PMCARG_IS_NULL(pmc))
         return pmc;
 
     if (pmc->vtable->base_type == enum_class_Sub) {
@@ -492,7 +492,7 @@ Parrot_thread_make_local_copy(PARROT_INTERP, ARGIN(Parrot_Interp from), ARGIN(PM
     STRING * const  _sub       = interp->vtables[enum_class_Sub]->whoami;
     STRING * const  _multi_sub = interp->vtables[enum_class_MultiSub]->whoami;
 
-    if (PMC_IS_NULL(arg))
+    if (PMCARG_IS_NULL(arg))
         ret_val = PMCNULL;
     else if (VTABLE_isa(from, arg, _multi_sub)) {
         INTVAL i = 0;
