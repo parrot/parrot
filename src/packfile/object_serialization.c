@@ -166,7 +166,7 @@ void
 Parrot_pf_verify_image_string(PARROT_INTERP, ARGIN(STRING *image))
 {
     ASSERT_ARGS(Parrot_pf_verify_image_string)
-    if (STRING_length(image) < 16)
+    if (STRING_NN_length(image) < 16)
         Parrot_ex_throw_from_c_noargs(interp,
             EXCEPTION_INVALID_STRING_REPRESENTATION,
             "Cannot deserialize PMC: Incorrect Length");

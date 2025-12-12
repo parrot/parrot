@@ -150,9 +150,9 @@ encoding_equal(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs)
 {
     ASSERT_ARGS(encoding_equal)
     String_iter l_iter, r_iter;
-    const UINTVAL len = STRING_length(lhs);
+    const UINTVAL len = STRING_NN_length(lhs);
 
-    if (len != STRING_length(rhs))
+    if (len != STRING_NN_length(rhs))
         return 0;
     if (len == 0)
         return 1;
@@ -161,7 +161,7 @@ encoding_equal(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs)
     if (lhs->hashval && rhs->hashval && lhs->hashval != rhs->hashval)
         return 0;
     if (lhs->encoding == rhs->encoding)
-        return memcmp(lhs->strstart, rhs->strstart, STRING_byte_length(lhs)) == 0;
+        return memcmp(lhs->strstart, rhs->strstart, STRING_NN_byte_length(lhs)) == 0;
 
     STRING_ITER_INIT(interp, &l_iter);
     STRING_ITER_INIT(interp, &r_iter);
@@ -196,8 +196,8 @@ encoding_compare(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rh
 {
     ASSERT_ARGS(encoding_compare)
     String_iter l_iter, r_iter;
-    const UINTVAL l_len = STRING_length(lhs);
-    const UINTVAL r_len = STRING_length(rhs);
+    const UINTVAL l_len = STRING_NN_length(lhs);
+    const UINTVAL r_len = STRING_NN_length(rhs);
     UINTVAL min_len;
 
     if (r_len == 0)
@@ -250,8 +250,8 @@ encoding_index(PARROT_INTERP, ARGIN(const STRING *src),
     ASSERT_ARGS(encoding_index)
     String_iter start, end;
 
-    if ((UINTVAL)offset >= STRING_length(src)
-    ||  !STRING_length(search))
+    if ((UINTVAL)offset >= STRING_NN_length(src)
+    ||  !STRING_NN_length(search))
         return -1;
 
     STRING_ITER_INIT(interp, &start);
@@ -483,7 +483,7 @@ void
 encoding_ord_error(PARROT_INTERP, ARGIN(const STRING *s), INTVAL offset)
 {
     ASSERT_ARGS(encoding_ord_error)
-    const UINTVAL len = STRING_length(s);
+    const UINTVAL len = STRING_NN_length(s);
     const char   *err_msg;
 
     if (!len)
@@ -519,7 +519,7 @@ STRING *
 encoding_substr(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset, INTVAL length)
 {
     ASSERT_ARGS(encoding_substr)
-    const UINTVAL  strlen = STRING_length(src);
+    const UINTVAL  strlen = STRING_NN_length(src);
     STRING        *return_string;
     String_iter    iter;
     UINTVAL        start;
@@ -858,9 +858,9 @@ INTVAL
 fixed8_equal(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))
 {
     ASSERT_ARGS(fixed8_equal)
-    const UINTVAL len = STRING_length(lhs);
+    const UINTVAL len = STRING_NN_length(lhs);
 
-    if (len != STRING_length(rhs))
+    if (len != STRING_NN_length(rhs))
         return 0;
     if (len == 0)
         return 1;
@@ -907,8 +907,8 @@ INTVAL
 fixed8_compare(PARROT_INTERP, ARGIN(const STRING *lhs), ARGIN(const STRING *rhs))
 {
     ASSERT_ARGS(fixed8_compare)
-    const UINTVAL l_len = STRING_length(lhs);
-    const UINTVAL r_len = STRING_length(rhs);
+    const UINTVAL l_len = STRING_NN_length(lhs);
+    const UINTVAL r_len = STRING_NN_length(rhs);
     UINTVAL min_len;
 
     if (r_len == 0)
@@ -969,8 +969,8 @@ fixed8_index(PARROT_INTERP, ARGIN(const STRING *src),
     if (STRING_max_bytes_per_codepoint(search) != 1)
         return encoding_index(interp, src, search, offset);
 
-    if ((UINTVAL)offset >= STRING_length(src)
-    ||  !STRING_length(search))
+    if ((UINTVAL)offset >= STRING_NN_length(src)
+    ||  !STRING_NN_length(search))
         return -1;
 
     return Parrot_util_byte_index(interp, src, search, offset);
@@ -1000,7 +1000,7 @@ fixed8_rindex(PARROT_INTERP, ARGIN(const STRING *src),
         return encoding_rindex(interp, src, search_string, offset);
 
     if (offset < 0
-    ||  !STRING_length(search_string))
+    ||  !STRING_NN_length(search_string))
         return -1;
 
     return Parrot_util_byte_rindex(interp, src, search_string, offset);
@@ -1045,7 +1045,7 @@ UINTVAL
 fixed8_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
 {
     ASSERT_ARGS(fixed8_ord)
-    const UINTVAL len = STRING_length(src);
+    const UINTVAL len = STRING_NN_length(src);
 
     if (idx < 0)
         idx += len;
@@ -1075,7 +1075,7 @@ STRING *
 fixed_substr(PARROT_INTERP, ARGIN(const STRING *src), INTVAL offset, INTVAL length)
 {
     ASSERT_ARGS(fixed_substr)
-    const UINTVAL  strlen = STRING_length(src);
+    const UINTVAL  strlen = STRING_NN_length(src);
     STRING        *return_string;
     UINTVAL        maxlen, bytes_per_codepoint;
 

@@ -173,7 +173,7 @@ utf16_to_encoding(PARROT_INTERP, ARGIN(const STRING *src))
     STRING  *result;
     UINTVAL  src_len;
 
-    src_len = STRING_length(src);
+    src_len = STRING_NN_length(src);
 
     if (STRING_max_bytes_per_codepoint(src) == 1) {
         result           = Parrot_gc_new_string_header(interp, 0);
@@ -448,7 +448,7 @@ static UINTVAL
 utf16_ord(PARROT_INTERP, ARGIN(const STRING *src), INTVAL idx)
 {
     ASSERT_ARGS(utf16_ord)
-    const UINTVAL  len = STRING_length(src);
+    const UINTVAL  len = STRING_NN_length(src);
     const utf16_t *start;
 
     if (idx < 0)

@@ -25,6 +25,13 @@
 
 #define STRING_length(src) ((src) ? (src)->strlen : 0U)
 #define STRING_byte_length(src) ((src) ? (src)->bufused : 0U)
+#ifdef HAVE_NONNULL
+#  define STRING_NN_length(src) (src)->strlen
+#  define STRING_NN_byte_length(src) (src)->bufused
+#else
+#  define STRING_NN_length(src) STRING_length(src)
+#  define STRING_NN_byte_length(src) STRING_byte_length(src)
+#endif
 #define STRING_max_bytes_per_codepoint(src) ((src)->encoding)->max_bytes_per_codepoint
 
 #define STRING_equal(interp, lhs, rhs) ((lhs)->encoding)->equal((interp), (lhs), (rhs))

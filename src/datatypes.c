@@ -44,7 +44,7 @@ Parrot_dt_get_datatype_enum(PARROT_INTERP, ARGIN(STRING *type_name))
     int flags = 0;
     int i;
 
-    if (STRING_IS_NULL(type_name) || STRING_IS_EMPTY(type_name))
+    if (STRINGARG_IS_NULL(type_name) || STRING_IS_EMPTY(type_name))
         return enum_type_undef;
 
     if ('&' == Parrot_str_indexed(interp, type_name, Parrot_str_length(interp, type_name) - 1)) {

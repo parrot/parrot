@@ -12,6 +12,7 @@
 /* Don't add ';' at the end of these macros.
  * they are expressions, not statements */
 #define GET_RAW_INTERP(p) (((Parrot_ParrotInterpreter_attributes*)(p)->data)->interp)
+#define GET_INTERPARG(p) (PMCARG_IS_NULL(p) ? NULL : GET_RAW_INTERP(p))
 #define GET_INTERP(p) (PMC_IS_NULL(p) ? NULL : GET_RAW_INTERP(p))
 
 #define EMBED_API_CALLIN(p, i)                   \
@@ -23,6 +24,22 @@
     }                                            \
     else {                                       \
         Interp * const (i) = GET_INTERP(p);      \
+        void * _oldtop = (i)->lo_var_ptr;        \
+        if (_oldtop == NULL)                     \
+            (i)->lo_var_ptr = &_oldtop;          \
+        (i)->api_jmp_buf = &env;                 \
+        {
+
+/* A variant where the Parrot_PMC argument is guaranteed non-NULL */
+#define EMBED_API_CALLIN_NONNULL(p, i)           \
+    Parrot_jump_buff env;                        \
+    if (setjmp(env)) {                           \
+        Interp * const __interp = GET_INTERPARG(p); \
+        __interp->api_jmp_buf = NULL;            \
+        return !__interp->exit_code;             \
+    }                                            \
+    else {                                       \
+        Interp * const (i) = GET_INTERPARG(p);   \
         void * _oldtop = (i)->lo_var_ptr;        \
         if (_oldtop == NULL)                     \
             (i)->lo_var_ptr = &_oldtop;          \

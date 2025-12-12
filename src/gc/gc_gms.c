@@ -1425,7 +1425,10 @@ static void
 gc_gms_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGMOD(void *data))
 {
     ASSERT_ARGS(gc_gms_free_fixed_size_storage)
-    if (data) {
+#ifndef HAVE_NONNULL
+    if (data)
+#endif
+    {
         const MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 
         interp->gc_sys->stats.memory_used           -= size;

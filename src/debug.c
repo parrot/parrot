@@ -2469,8 +2469,10 @@ PDB_escape(PARROT_INTERP, ARGIN(const char *string), UINTVAL length)
     end    = string + length;
 
     /* Return if there is no string to escape*/
+#ifndef HAVE_NONNULL
     if (!string)
         return NULL;
+#endif
 
     fill = _new = mem_gc_allocate_n_typed(interp, length * 2 + 1, char);
 

@@ -1560,7 +1560,7 @@ void
 Parrot_pf_set_current_packfile(PARROT_INTERP, ARGIN(PMC *pbc))
 {
     ASSERT_ARGS(Parrot_pf_set_current_packfile)
-    if (PMC_IS_NULL(pbc))
+    if (PMCARG_IS_NULL(pbc))
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNEXPECTED_NULL,
             "Cannot set null packfile");
     else {
@@ -1872,9 +1872,11 @@ Parrot_pf_switch_to_cs(PARROT_INTERP, ARGIN(PackFile_ByteCode *new_cs), int real
     ASSERT_ARGS(Parrot_pf_switch_to_cs)
     PackFile_ByteCode * const cur_cs = interp->code;
 
+#ifndef HAVE_NONNULL
     if (!new_cs)
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_NO_PREV_CS,
             "No code segment to switch to");
+#endif
 
     interp->code = new_cs;
     Parrot_pcc_set_constants(interp, CURRENT_CONTEXT(interp),
@@ -2542,7 +2544,7 @@ void
 Parrot_pf_prepare_packfile_init(PARROT_INTERP, ARGIN(PMC * const pfpmc))
 {
     ASSERT_ARGS(Parrot_pf_prepare_packfile_init)
-    if (PMC_IS_NULL(pfpmc))
+    if (PMCARG_IS_NULL(pfpmc))
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_MALFORMED_PACKFILE,
             "Could not load packfile: Invalid PMC");
     else {
@@ -2571,7 +2573,7 @@ void
 Parrot_pf_prepare_packfile_load(PARROT_INTERP, ARGIN(PMC * const pfpmc))
 {
     ASSERT_ARGS(Parrot_pf_prepare_packfile_load)
-    if (PMC_IS_NULL(pfpmc))
+    if (PMCARG_IS_NULL(pfpmc))
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_MALFORMED_PACKFILE,
             "Could not load packfile: Invalid PMC");
     else {

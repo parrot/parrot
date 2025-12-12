@@ -558,7 +558,10 @@ static void
 gc_ms2_free_fixed_size_storage(PARROT_INTERP, size_t size, ARGFREE_NOTNULL(void *data))
 {
     ASSERT_ARGS(gc_ms2_free_fixed_size_storage)
-    if (data) {
+#ifndef HAVE_NONNULL
+    if (data)
+#endif
+    {
         struct GC_Subsystem * const gc_sys = interp->gc_sys;
         MarkSweep_GC * const self = (MarkSweep_GC *)interp->gc_sys->gc_private;
 

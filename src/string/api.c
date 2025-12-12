@@ -829,7 +829,7 @@ char *
 Parrot_str_to_platform_cstring(PARROT_INTERP, ARGIN(const STRING *s))
 {
     ASSERT_ARGS(Parrot_str_to_platform_cstring)
-    if (STRING_IS_NULL(s)) {
+    if (STRINGARG_IS_NULL(s)) {
         return NULL;
     }
     else {
@@ -930,9 +930,10 @@ Parrot_str_indexed(PARROT_INTERP, ARGIN(const STRING *s), INTVAL idx)
 {
     ASSERT_ARGS(Parrot_str_indexed)
 
+#ifndef HAVE_NONNULL
     if (s == NULL)
         s = STRINGNULL;
-
+#endif
     return STRING_ord(interp, s, idx);
 }
 
@@ -971,8 +972,10 @@ Parrot_str_find_index(PARROT_INTERP, ARGIN(const STRING *src),
 {
     ASSERT_ARGS(Parrot_str_find_index)
 
+#ifndef HAVE_NONNULL
     if (src == NULL)
         src = STRINGNULL;
+#endif
 
     return STRING_index(interp, src, search, start);
 }
@@ -1282,7 +1285,7 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
     UINTVAL         start_byte, end_byte, start_char, end_char;
     INTVAL          buf_size;
 
-    if (STRING_IS_NULL(src)) {
+    if (STRINGARG_IS_NULL(src)) {
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNEXPECTED_NULL,
             "Can't replace in NULL string");
     }
@@ -1303,7 +1306,7 @@ Parrot_str_replace(PARROT_INTERP, ARGIN(const STRING *src),
     if (true_length > (src->strlen - true_offset))
         true_length = src->strlen - true_offset;
 
-    if (STRING_IS_NULL(rep)) {
+    if (STRINGARG_IS_NULL(rep)) {
         enc = src->encoding;
     }
     else {
@@ -1393,7 +1396,7 @@ Parrot_str_chopn(PARROT_INTERP, ARGIN(const STRING *s), INTVAL n)
     INTVAL end = -n;
 
     if (n >= 0)
-        end += STRING_length(s);
+        end += STRING_NN_length(s);
 
     return STRING_substr(interp, s, 0, end);
 }
@@ -1536,7 +1539,11 @@ Parrot_str_bitwise_and(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
 
 #if ! DISABLE_GC_DEBUG
     /* trigger GC for debug */
-    if (interp && GC_DEBUG(interp))
+    if (
+#  ifndef HAVE_NONNULL
+        interp &&
+#  endif
+        GC_DEBUG(interp))
         Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 #endif
 
@@ -1680,7 +1687,11 @@ Parrot_str_bitwise_or(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
 
 #if ! DISABLE_GC_DEBUG
     /* trigger GC for debug */
-    if (interp && GC_DEBUG(interp))
+    if (
+#  ifndef HAVE_NONNULL
+        interp &&
+#  endif
+        GC_DEBUG(interp))
         Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 #endif
 
@@ -1746,7 +1757,11 @@ Parrot_str_bitwise_xor(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
 
 #if ! DISABLE_GC_DEBUG
     /* trigger GC for debug */
-    if (interp && GC_DEBUG(interp))
+    if (
+#  ifndef HAVE_NONNULL
+        interp &&
+#  endif
+        GC_DEBUG(interp))
         Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 #endif
 
@@ -1814,7 +1829,11 @@ Parrot_str_bitwise_not(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 
 #if ! DISABLE_GC_DEBUG
     /* trigger GC for debug */
-    if (interp && GC_DEBUG(interp))
+    if (
+#  ifndef HAVE_NONNULL
+        interp &&
+#  endif
+        GC_DEBUG(interp))
         Parrot_gc_mark_and_sweep(interp, GC_trace_stack_FLAG);
 #endif
 
@@ -2268,7 +2287,7 @@ Parrot_str_to_encoded_cstring(PARROT_INTERP, ARGIN(const STRING *s),
     size_t  trail;
     char   *p;
 
-    if (STRING_IS_NULL(s))
+    if (STRINGARG_IS_NULL(s))
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_UNEXPECTED_NULL,
             "Can't convert NULL string");
 
@@ -2446,7 +2465,7 @@ Parrot_str_reverse(PARROT_INTERP, ARGIN(const STRING *src))
     STRING_ITER_INIT(interp, &iter);
     sb = Parrot_pmc_new(interp, enum_class_StringBuilder);
 
-    for (pos = STRING_length(src) - 1; pos >= 0; pos--) {
+    for (pos = STRING_NN_length(src) - 1; pos >= 0; pos--) {
         VTABLE_push_string(interp, sb, Parrot_str_chr(interp,
             STRING_iter_get(interp, src, &iter, pos)));
     }

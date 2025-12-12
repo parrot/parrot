@@ -90,7 +90,7 @@ null_equal(SHIM_INTERP, SHIM(const STRING *lhs), ARGIN(const STRING *rhs))
 {
     ASSERT_ARGS(null_equal)
 
-    return STRING_length(rhs) == 0;
+    return STRING_NN_length(rhs) == 0;
 }
 
 
@@ -112,7 +112,7 @@ null_compare(SHIM_INTERP, SHIM(const STRING *lhs), ARGIN(const STRING *rhs))
 {
     ASSERT_ARGS(null_compare)
 
-    return STRING_length(rhs) ? -1 : 0;
+    return STRING_NN_length(rhs) ? -1 : 0;
 }
 
 

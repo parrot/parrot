@@ -287,7 +287,7 @@ Parrot_pcc_invoke_from_sig_object(PARROT_INTERP, ARGIN(PMC *sub_obj),
 
     opcode_t    *dest;
     PMC * const  ret_cont = Parrot_pmc_new(interp, enum_class_Continuation);
-    if (UNLIKELY(PMC_IS_NULL(call_object)))
+    if (UNLIKELY(PMCARG_IS_NULL(call_object)))
         call_object = Parrot_pmc_new(interp, enum_class_CallContext);
 
     Parrot_pcc_set_signature(interp, CURRENT_CONTEXT(interp), call_object);

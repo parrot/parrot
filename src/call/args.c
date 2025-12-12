@@ -1588,7 +1588,7 @@ void
 Parrot_pcc_merge_signature_for_tailcall(PARROT_INTERP, ARGMOD(PMC *parent), ARGMOD(PMC *tailcall))
 {
     ASSERT_ARGS(Parrot_pcc_merge_signature_for_tailcall)
-    if (LIKELY(PMC_IS_NULL(parent) || PMC_IS_NULL(tailcall) || (parent == tailcall)))
+    if (LIKELY(PMCARG_IS_NULL(parent) || PMCARG_IS_NULL(tailcall) || (parent == tailcall)))
         return;
     else {
         /* Broke encapsulation. Direct poking into CallContext is much faster */
