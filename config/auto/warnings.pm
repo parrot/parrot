@@ -237,6 +237,15 @@ sub _init {
         ) ],
         '-Wcast-qual' => [ qw(
             compilers/imcc/imcparser.c
+            src/gc/string_gc.c
+            src/io/api.c
+            src/io/filehandle.c
+            src/io/pipe.c
+            src/io/socket.c
+            src/io/stringhandle.c
+            src/io/utilities.c
+            src/platform/generic/io.c
+            src/runcore/trace.c
         ) ],
         '-Wsign-compare' => [ qw(
             compilers/imcc/imclexer.c
