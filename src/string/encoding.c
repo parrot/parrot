@@ -206,6 +206,7 @@ Parrot_find_encoding_by_string(PARROT_INTERP, ARGIN(STRING *encodingname))
     }
     Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
             "invalid encoding '%Ss'", encodingname);
+    return NULL; /* not reached */
 }
 
 
