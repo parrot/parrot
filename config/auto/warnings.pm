@@ -155,7 +155,6 @@ sub _init {
         -Wno-unused
         -Wvariadic-macros
         -Wwrite-strings
-        -Wstack-usage=500
     );
 
     # gcc-only warnings that would break g++
@@ -337,6 +336,9 @@ sub runstep {
         return 1;
     }
 
+    if (!$conf->data->get('TEMP_asan') and !$conf->options->get('debugging')) {
+        push @{$self->{'warnings'}{$compiler}{'basic'}}, '-Wstack-usage=500';
+    }
     if (
         ( $compiler eq 'gcc' or $compiler eq 'g++' ) and
         ( $conf->data->get('gccversion') >= 4.0    )
