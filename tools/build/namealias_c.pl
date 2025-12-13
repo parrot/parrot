@@ -50,7 +50,24 @@ while (<$IN>) {
 
     # overlong line, and don't bother bug-gnu-gperf\@gnu.org with crazy encodings
     # also c_indent.t
-    s/^#?error "gperf generated tables don't work with this execution character set. Please report a bug to <bug-gnu-gperf\@gnu.org>."/#  error "gperf generated tables don't work with this execution character set."/m;
+    s/^#?error "gperf generated tables don't work with this execution character set. Please report a bug to <bug-(gnu-)?gperf\@gnu.org>."/#  error "gperf generated tables don't work with this execution character set."/m;
+    s/^\Q#if (defined __cplusplus && (__cplusplus >= 201703L || (__cplusplus >= 201103L && defined __clang__ && __clang_major__ + (__clang_minor__ >= 9) > 3))) || (__STDC_VERSION__ >= 202000L && ((defined __GNUC__ && __GNUC__ >= 10) || (defined __clang__ && __clang_major__ >= 9)))\E\n/#if (defined __cplusplus && \\
+     (__cplusplus >= 201703L || \\
+      (__cplusplus >= 201103L && \\
+       defined __clang__ && __clang_major__ + (__clang_minor__ >= 9) > 3))) \\
+    || (__STDC_VERSION__ >= 202000L && \\
+        ((defined __GNUC__ && __GNUC__ >= 10) || \\
+         (defined __clang__ && __clang_major__ >= 9)))\n/m;
+    s/^\Q#elif (defined __GNUC__ && __GNUC__ >= 7) || (defined __clang__ && __clang_major__ >= 10)\E\n/#elif (defined __GNUC__ && __GNUC__ >= 7) || \\
+      (defined __clang__ && __clang_major__ >= 10)\n/m;
+    s/^\Q#if (defined __GNUC__ && __GNUC__ + (__GNUC_MINOR__ >= 6) > 4) || (defined __clang__ && __clang_major__ >= 3)\E\n/#if (defined __GNUC__ && __GNUC__ + (__GNUC_MINOR__ >= 6) > 4) \\
+    || (defined __clang__ && __clang_major__ >= 3)\n/mg;
+
+    s/^#?pragma/#  pragma/gm;
+    s/\Q__attribute__ ((__fallthrough__));\E/__attribute__((__fallthrough__));/m;
+
+    # skip register, ISO C++17 does not allow ‘register’ storage class specifier
+    s/register //g;
 
     # skip line directives. would be nice but they are wrong with gperf version 3.0.4
     s/^#line .*?\n//gm;

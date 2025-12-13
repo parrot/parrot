@@ -17,7 +17,7 @@ gperf generated icu control character namealias lookup
 struct Parrot_namealias { int name; const INTVAL codepoint; };
 
 const struct Parrot_namealias *
-Parrot_namealias_lookup(const char *str, unsigned int len);
+Parrot_namealias_lookup(const char *str, size_t len);
 
 #endif /* PARROT_IN_CORE */
 #endif /* PARROT_NAMEALIAS_H_GUARD */

@@ -1,5 +1,5 @@
-/* ANSI-C code produced by gperf version 3.1 */
-/* Command-line: gperf --output-file=tmp_namealias.c src/string/namealias_c.in */
+/* ANSI-C code produced by gperf version 3.2 */
+/* Command-line: gperf --output-file=tmp_namealias.c src/string/namealias_c.in  */
 /* Computed positions: -k'1,14,$' */
 
 #if !((' ' == 32) && ('!' == 33) && ('"' == 34) && ('#' == 35) \
@@ -60,11 +60,10 @@ Generated hash table with name and key.
 
 =over 4
 
-=item C<static unsigned int Parrot_namealias_hash(const char *str,
-unsigned int len)>
+=item C<static unsigned int Parrot_namealias_hash(const char *str, size_t len)>
 
 =item C<const struct Parrot_namealias * Parrot_namealias_lookup(const
-char *str, unsigned int len)>
+char *str, size_t len)>
 
 Generated lookup function used by the C<find_codepoint> op for name aliases not found
 by some ICU versions.
@@ -81,9 +80,8 @@ by some ICU versions.
 
 /* HEADERIZER HFILE: include/parrot/namealias.h */
 /* HEADERIZER STOP */
-
 const struct Parrot_namealias *
-Parrot_namealias_lookup(const char *str, unsigned int len);
+Parrot_namealias_lookup(const char *str, size_t len);
 struct Parrot_namealias { int name; const INTVAL codepoint; };
 
 #define TOTAL_KEYWORDS 65
@@ -95,7 +93,7 @@ struct Parrot_namealias { int name; const INTVAL codepoint; };
 
 
 static unsigned int
-Parrot_namealias_hash(const char *str, unsigned int len)
+Parrot_namealias_hash(const char *str, size_t len)
 {
   static const unsigned char asso_values[] =
     {
@@ -126,12 +124,24 @@ Parrot_namealias_hash(const char *str, unsigned int len)
       137, 137, 137, 137, 137, 137, 137, 137, 137, 137,
       137, 137, 137, 137, 137, 137
     };
-  int hval = len;
+  unsigned int hval = len;
 
   switch (hval)
     {
       default:
         hval += asso_values[(unsigned char)str[13]];
+#if (defined __cplusplus && \
+     (__cplusplus >= 201703L || \
+      (__cplusplus >= 201103L && \
+       defined __clang__ && __clang_major__ + (__clang_minor__ >= 9) > 3))) \
+    || (__STDC_VERSION__ >= 202000L && \
+        ((defined __GNUC__ && __GNUC__ >= 10) || \
+         (defined __clang__ && __clang_major__ >= 9)))
+      [[fallthrough]];
+#elif (defined __GNUC__ && __GNUC__ >= 7) || \
+      (defined __clang__ && __clang_major__ >= 10)
+      __attribute__((__fallthrough__));
+#endif
       /*FALLTHROUGH*/
       case 13:
       case 12:
@@ -289,111 +299,119 @@ static const struct stringpool_t stringpool_contents =
     "PARTIAL LINE BACKWARD"
   };
 #define stringpool ((const char *) &stringpool_contents)
-
 const struct Parrot_namealias *
-Parrot_namealias_lookup(const char *str, unsigned int len)
+Parrot_namealias_lookup(const char *str, size_t len)
 {
+#if (defined __GNUC__ && __GNUC__ + (__GNUC_MINOR__ >= 6) > 4) \
+    || (defined __clang__ && __clang_major__ >= 3)
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#endif
   static const struct Parrot_namealias wordlist[] =
     {
       {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str2,	0x000C},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str2,	0x000C},
       {-1, 0}, {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str6,	0x001B},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str7,	0x0005},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str6,	0x001B},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str7,	0x0005},
       {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str10,	0x001A},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str11,	0x007F},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str10,	0x001A},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str11,	0x007F},
       {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str14,	0x000C},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str14,	0x000C},
       {-1, 0}, {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str18,	0x0093},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str18,	0x0093},
       {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str21,	0x0016},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str21,	0x0016},
       {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str24,	0x000E},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str24,	0x000E},
       {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str26,	0x0003},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str27,	0x000A},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str28,	0x0002},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str26,	0x0003},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str27,	0x000A},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str28,	0x0002},
       {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str30,	0x001F},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str31,	0x0006},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str32,	0x001D},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str33,	0x008F},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str30,	0x001F},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str31,	0x0006},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str32,	0x001D},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str33,	0x008F},
       {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str35,	0x001E},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str36,	0x008E},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str35,	0x001E},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str36,	0x008E},
       {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str38,	0x000F},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str39,	0x000A},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str40,	0x0087},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str41,	0x0010},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str42,	0x008D},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str43,	0x0083},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str44,	0x0097},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str45,	0x0017},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str46,	0x0096},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str47,	0x000D},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str48,	0x0011},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str49,	0x009D},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str50,	0x0013},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str51,	0x001C},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str38,	0x000F},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str39,	0x000A},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str40,	0x0087},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str41,	0x0010},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str42,	0x008D},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str43,	0x0083},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str44,	0x0097},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str45,	0x0017},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str46,	0x0096},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str47,	0x000D},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str48,	0x0011},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str49,	0x009D},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str50,	0x0013},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str51,	0x001C},
       {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str53,	0x0012},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str54,	0x0004},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str55,	0x0015},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str56,	0x0018},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str57,	0x009C},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str58,	0x0085},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str59,	0x0000},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str60,	0x008B},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str61,	0x0001},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str62,	0x009A},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str63,	0x0019},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str64,	0x008A},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str65,	0x000D},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str53,	0x0012},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str54,	0x0004},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str55,	0x0015},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str56,	0x0018},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str57,	0x009C},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str58,	0x0085},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str59,	0x0000},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str60,	0x008B},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str61,	0x0001},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str62,	0x009A},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str63,	0x0019},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str64,	0x008A},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str65,	0x000D},
       {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str67,	0x0086},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str67,	0x0086},
       {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str69,	0x0014},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str70,	0x0085},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str69,	0x0014},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str70,	0x0085},
       {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str72,	0x009F},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str72,	0x009F},
       {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str75,	0x000B},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str76,	0x0094},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str75,	0x000B},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str76,	0x0094},
       {-1, 0}, {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str80,	0x0091},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str80,	0x0091},
       {-1, 0}, {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str84,	0x0008},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str85,	0x0098},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str84,	0x0008},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str85,	0x0098},
       {-1, 0}, {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str89,	0x0088},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str90,	0x009E},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str91,	0x0090},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str89,	0x0088},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str90,	0x009E},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str91,	0x0090},
       {-1, 0}, {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str95,	0x0082},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str95,	0x0082},
       {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str100,	0x0009},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str100,	0x0009},
       {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str102,	0x009B},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str102,	0x009B},
       {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str104,	0x0007},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str105,	0x0092},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str104,	0x0007},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str105,	0x0092},
       {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0},
       {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str119,	0x0089},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str119,	0x0089},
       {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0},
       {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0}, {-1, 0},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str135,	0x0095},
-      {(int)(long)&((struct stringpool_t *)0)->stringpool_str136,	0x008C}
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str135,	0x0095},
+      {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str136,	0x008C}
     };
+#if (defined __GNUC__ && __GNUC__ + (__GNUC_MINOR__ >= 6) > 4) \
+    || (defined __clang__ && __clang_major__ >= 3)
+#  pragma GCC diagnostic pop
+#endif
 
   if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
     {
-      int key = Parrot_namealias_hash(str, len);
+      unsigned int key = Parrot_namealias_hash(str, len);
 
-      if (key <= MAX_HASH_VALUE && key >= 0)
+      if (key <= MAX_HASH_VALUE)
         {
           int o = wordlist[key].name;
           if (o >= 0)
@@ -405,7 +423,7 @@ Parrot_namealias_lookup(const char *str, unsigned int len)
             }
         }
     }
-  return 0;
+  return (struct Parrot_namealias *) 0;
 }
 
 
