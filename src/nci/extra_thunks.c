@@ -1138,7 +1138,7 @@ pcf_ptr_ptr_cstr_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void *(* func_t)(void *, char *, int);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     PMC  * t_0; void * v_0;
@@ -1198,7 +1198,7 @@ pcf_ptr_cstr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void *(* func_t)(char *);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     PMC  * t_0; void * v_0;
