@@ -27,11 +27,16 @@ called by C<Parrot_x_exit()> when the interpreter exits.
 
 #ifndef MEMORY_DEBUG
 #  define MEMORY_DEBUG_DETAIL_2(s, a1, a2)
+#  define MEMORY_DEBUG_DETAIL_3(s, a1, a2, a3)
 #else
-#  define MEMORY_DEBUG_DETAIL_2(s, a1, a2)                              \
-    if (Interp_debug_TEST(interp,                                       \
-                PARROT_MEM_STAT_DEBUG_FLAG | PARROT_MEM_DETAIL_DEBUG_FLAG)) \
+#  define MEMORY_DEBUG_DETAIL_2(s, a1, a2)                                 \
+    if (Interp_debug_TEST(interp,                                          \
+                PARROT_MEM_STAT_DEBUG_FLAG | PARROT_MEM_DETAIL_DEBUG_FLAG))\
         fprintf(stderr, (s), (a1), (a2))
+#  define MEMORY_DEBUG_DETAIL_3(s, a1, a2, a3)                             \
+    if (Interp_debug_TEST(interp,                                          \
+                PARROT_MEM_STAT_DEBUG_FLAG | PARROT_MEM_DETAIL_DEBUG_FLAG))\
+        fprintf(stderr, (s), (a1), (a2), (a3))
 #endif
 
 /*
@@ -140,7 +145,8 @@ Parrot_x_execute_on_exit_handlers(PARROT_INTERP, int status)
 
     while (node) {
         handler_node_t * const next = node->next;
-        MEMORY_DEBUG_DETAIL_2("Run exit handler %p for %p\n", node, node->function);
+        MEMORY_DEBUG_DETAIL_3("Run exit handler %p for function %p with arg %p\n",
+                              node, node->function, node->arg);
 
         (node->function)(interp, status, node->arg);
         mem_internal_free(node);
