@@ -60,11 +60,11 @@ Generated hash table with name and key.
 
 =over 4
 
-=item C<static unsigned int Parrot_namealias_hash(register const char *str,
-register unsigned int len)>
+=item C<static unsigned int Parrot_namealias_hash(const char *str,
+unsigned int len)>
 
-=item C<const struct Parrot_namealias * Parrot_namealias_lookup(register const
-char *str, register unsigned int len)>
+=item C<const struct Parrot_namealias * Parrot_namealias_lookup(const
+char *str, unsigned int len)>
 
 Generated lookup function used by the C<find_codepoint> op for name aliases not found
 by some ICU versions.
@@ -83,7 +83,7 @@ by some ICU versions.
 /* HEADERIZER STOP */
 
 const struct Parrot_namealias *
-Parrot_namealias_lookup(register const char *str, register unsigned int len);
+Parrot_namealias_lookup(const char *str, unsigned int len);
 struct Parrot_namealias { int name; const INTVAL codepoint; };
 
 #define TOTAL_KEYWORDS 65
@@ -95,7 +95,7 @@ struct Parrot_namealias { int name; const INTVAL codepoint; };
 
 
 static unsigned int
-Parrot_namealias_hash(register const char *str, register unsigned int len)
+Parrot_namealias_hash(const char *str, unsigned int len)
 {
   static const unsigned char asso_values[] =
     {
@@ -126,7 +126,7 @@ Parrot_namealias_hash(register const char *str, register unsigned int len)
       137, 137, 137, 137, 137, 137, 137, 137, 137, 137,
       137, 137, 137, 137, 137, 137
     };
-  register int hval = len;
+  int hval = len;
 
   switch (hval)
     {
@@ -291,7 +291,7 @@ static const struct stringpool_t stringpool_contents =
 #define stringpool ((const char *) &stringpool_contents)
 
 const struct Parrot_namealias *
-Parrot_namealias_lookup(register const char *str, register unsigned int len)
+Parrot_namealias_lookup(const char *str, unsigned int len)
 {
   static const struct Parrot_namealias wordlist[] =
     {
@@ -391,14 +391,14 @@ Parrot_namealias_lookup(register const char *str, register unsigned int len)
 
   if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
     {
-      register int key = Parrot_namealias_hash(str, len);
+      int key = Parrot_namealias_hash(str, len);
 
       if (key <= MAX_HASH_VALUE && key >= 0)
         {
-          register int o = wordlist[key].name;
+          int o = wordlist[key].name;
           if (o >= 0)
             {
-              register const char *s = o + stringpool;
+              const char *s = o + stringpool;
 
               if (*str == *s && !strcmp(str + 1, s + 1))
                 return &wordlist[key];
