@@ -683,6 +683,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
 
                   default:
                     info.phase = PHASE_TERM;
+                    /* fall through */
                 }
 
 
@@ -904,6 +905,7 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                         VTABLE_push_string(interp, targ, ts);
                         break;
                     }
+                    /* fall through */
 
                   case 's':
                   CASE_s:

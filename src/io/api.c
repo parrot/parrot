@@ -319,7 +319,7 @@ Parrot_io_open(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *path),
     const IO_VTABLE * vtable;
 
     /* If a handle is not provided, create a new FileHandle */
-    if (PMC_IS_NULL(pmc))
+    if (PMCARG_IS_NULL(pmc))
         handle = io_get_new_filehandle(interp);
     else
         handle = pmc;
@@ -327,12 +327,12 @@ Parrot_io_open(PARROT_INTERP, ARGIN(PMC *pmc), ARGIN(STRING *path),
     vtable = IO_GET_VTABLE(interp, handle);
 
     /* Unless flagged otherwise, a path is required for open */
-    if ((vtable->flags & PIO_VF_PATH_NOT_REQUIRED) == 0 && STRING_IS_NULL(path))
+    if ((vtable->flags & PIO_VF_PATH_NOT_REQUIRED) == 0 && STRINGARG_IS_NULL(path))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
                         "Cannot open %s, no path", vtable->name);
 
     /* If not specified, default to read mode */
-    if (STRING_IS_NULL(mode))
+    if (STRINGARG_IS_NULL(mode))
         mode = CONST_STRING(interp, "r");
 
     {
@@ -478,7 +478,7 @@ Parrot_io_fdopen_flags(PARROT_INTERP, ARGMOD(PMC *filehandle), PIOHANDLE fd,
     /* fdopened files are always shared */
     flags |= PIO_F_SHARED;
 
-    if (PMC_IS_NULL(filehandle))
+    if (PMCARG_IS_NULL(filehandle))
         filehandle = io_get_new_filehandle(interp);
 
     {
@@ -547,7 +547,7 @@ INTVAL
 Parrot_io_close(PARROT_INTERP, ARGMOD(PMC *handle), INTVAL autoflush)
 {
     ASSERT_ARGS(Parrot_io_close)
-    if (PMC_IS_NULL(handle))
+    if (PMCARG_IS_NULL(handle))
         return 0;
     else {
         const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
@@ -587,7 +587,7 @@ Parrot_io_is_closed(PARROT_INTERP, ARGIN(PMC *pmc))
 {
     ASSERT_ARGS(Parrot_io_is_closed)
 
-    if (PMC_IS_NULL(pmc))
+    if (PMCARG_IS_NULL(pmc))
         return 1;
 
     else {
@@ -627,7 +627,7 @@ Parrot_io_flush(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(Parrot_io_flush)
 
-    if (PMC_IS_NULL(handle))
+    if (PMCARG_IS_NULL(handle))
         return 0;
 
     if (Parrot_io_is_closed(interp, handle))
@@ -690,7 +690,7 @@ Parrot_io_read_s(PARROT_INTERP, ARGMOD(PMC *handle), size_t length)
 {
     ASSERT_ARGS(Parrot_io_read_s)
 
-    if (PMC_IS_NULL(handle))
+    if (PMCARG_IS_NULL(handle))
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_PIO_ERROR,
             "Attempt to read from null or invalid PMC");
 
@@ -755,7 +755,7 @@ Parrot_io_readall_s(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(Parrot_io_readall_s)
     const IO_VTABLE * vtable;
-    if (PMC_IS_NULL(handle))
+    if (PMCARG_IS_NULL(handle))
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_PIO_ERROR,
             "Attempt to read from null or invalid PMC");
 
@@ -828,7 +828,7 @@ Parrot_io_read_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC *handle),
 {
     ASSERT_ARGS(Parrot_io_read_byte_buffer_pmc)
 
-    if (PMC_IS_NULL(handle))
+    if (PMCARG_IS_NULL(handle))
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_PIO_ERROR,
             "Attempt to read bytes from a null or invalid PMC");
 
@@ -885,7 +885,7 @@ Parrot_io_write_byte_buffer_pmc(PARROT_INTERP, ARGMOD(PMC * handle),
 {
     ASSERT_ARGS(Parrot_io_write_byte_buffer_pmc)
 
-    if (PMC_IS_NULL(buffer))
+    if (PMCARG_IS_NULL(buffer))
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_PIO_ERROR,
             "Attempt to read bytes from a null or invalid ByteBuffer");
 
@@ -946,11 +946,11 @@ Parrot_io_readline_s(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(STRING * terminat
 {
     ASSERT_ARGS(Parrot_io_readline_s)
 
-    if (PMC_IS_NULL(handle))
+    if (PMCARG_IS_NULL(handle))
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_PIO_ERROR,
             "Attempt to read bytes from a null or invalid PMC");
 
-    if (STRING_IS_NULL(terminator) || STRING_length(terminator) == 0)
+    if (STRINGARG_IS_NULL(terminator) || STRING_NN_length(terminator) == 0)
         terminator = CONST_STRING(interp, "\n");
 
     {
@@ -1004,7 +1004,7 @@ Parrot_io_write_b(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(const void *buffer),
 {
     ASSERT_ARGS(Parrot_io_write_b)
 
-    if (PMC_IS_NULL(handle))
+    if (PMCARG_IS_NULL(handle))
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_PIO_ERROR,
             "Attempt to write bytes to a null or invalid PMC");
 
@@ -1053,11 +1053,11 @@ Parrot_io_write_s(PARROT_INTERP, ARGMOD(PMC *handle), ARGIN(const STRING * const
 {
     ASSERT_ARGS(Parrot_io_write_s)
 
-    if (PMC_IS_NULL(handle))
+    if (PMCARG_IS_NULL(handle))
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_PIO_ERROR,
             "Attempt to write a string to a null or invalid PMC");
 
-    if (STRING_IS_NULL(s) || STRING_length(s) == 0)
+    if (STRINGARG_IS_NULL(s) || STRING_NN_length(s) == 0)
         return 0;
 
     {
@@ -1220,7 +1220,7 @@ Parrot_io_peek(PARROT_INTERP, ARGMOD(PMC *handle))
 {
     ASSERT_ARGS(Parrot_io_peek)
 
-    if (PMC_IS_NULL(handle) || Parrot_io_is_closed(interp, handle))
+    if (PMCARG_IS_NULL(handle) || Parrot_io_is_closed(interp, handle))
         return STRINGNULL;
     {
         const IO_VTABLE * const vtable = IO_GET_VTABLE(interp, handle);
@@ -1260,7 +1260,7 @@ Parrot_io_eof(PARROT_INTERP, ARGIN(const PMC * const handle))
     /* io could be null here, but rather than return a negative error
      * we just fake EOF since eof test is usually in a boolean context.
      */
-    if (PMC_IS_NULL(handle))
+    if (PMCARG_IS_NULL(handle))
         return 1;
     if (Parrot_io_is_closed(interp, (PMC*)handle))
         return 1;
@@ -1397,7 +1397,13 @@ Parrot_io_printf(PARROT_INTERP, ARGIN_FORMAT(const char *s), ...)
 
     va_start(args, s);
 
-    if (interp) {
+    if
+#ifndef HAVE_NONNULL
+      (interp)
+#else
+      (1)
+#endif
+    {
         STRING * const str = Parrot_vsprintf_c(interp, s, args);
         ret = Parrot_io_write_s(interp, _PIO_STDOUT(interp), str);
     }
@@ -1740,7 +1746,7 @@ Parrot_io_socket_connect(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
     if (Parrot_io_is_closed(interp, pmc))
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_PIO_ERROR,
                 "Can't connect closed socket");
-    if (PMC_IS_NULL(address))
+    if (PMCARG_IS_NULL(address))
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_PIO_ERROR,
                 "Address is null");
 
@@ -1801,7 +1807,7 @@ Parrot_io_socket_bind(PARROT_INTERP, ARGMOD(PMC *pmc), ARGMOD(PMC *address))
     if (Parrot_io_is_closed(interp, pmc))
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_PIO_ERROR,
                 "Can't bind closed socket");
-    if (PMC_IS_NULL(address))
+    if (PMCARG_IS_NULL(address))
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_PIO_ERROR,
                 "Address is null");
 
@@ -1943,7 +1949,7 @@ INTVAL
 Parrot_io_get_flags(PARROT_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(Parrot_io_get_flags)
-    if (PMC_IS_NULL(handle))
+    if (PMCARG_IS_NULL(handle))
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_PIO_ERROR,
             "Cannot get flags for null or invalid PMC");
     {
@@ -1956,7 +1962,7 @@ void
 Parrot_io_set_flags(PARROT_INTERP, ARGIN(PMC *handle), INTVAL flags)
 {
     ASSERT_ARGS(Parrot_io_set_flags)
-    if (PMC_IS_NULL(handle))
+    if (PMCARG_IS_NULL(handle))
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_PIO_ERROR,
             "Cannot set flags for null or invalid PMC");
     {
@@ -1980,7 +1986,7 @@ PIOHANDLE
 Parrot_io_get_os_handle(PARROT_INTERP, ARGIN(PMC *handle))
 {
     ASSERT_ARGS(Parrot_io_get_os_handle)
-    if (PMC_IS_NULL(handle))
+    if (PMCARG_IS_NULL(handle))
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_PIO_ERROR,
             "Cannot get a PIOHANDLE from a NULL or invalid PMC");
     {
@@ -2104,10 +2110,10 @@ Parrot_io_reencode_string_for_handle(PARROT_INTERP, ARGIN(PMC *handle), ARGIN_NU
 {
     ASSERT_ARGS(Parrot_io_reencode_string_for_handle)
 
-    if (PMC_IS_NULL(handle))
+    if (PMCARG_IS_NULL(handle))
         Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_PIO_ERROR,
             "Handle may not be null");
-    if (STRING_IS_NULL(str))
+    if (STRINGARG_IS_NULL(str))
         return STRINGNULL;
 
     {

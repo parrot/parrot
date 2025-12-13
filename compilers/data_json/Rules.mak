@@ -25,7 +25,7 @@ compilers/data_json/data_json/grammar.pir : $(PARROT) \
 compilers/data_json/data_json/pge2pir.pir : $(PARROT) \
     compilers/data_json/data_json/pge2pir.tg \
     compilers/tge/tgc.pbc
-	$(PARROT) compilers/tge/tgc.pbc --output=$@ compilers/data_json/data_json/pge2pir.tg
+	$(NO_MEMLEAK)$(PARROT) compilers/tge/tgc.pbc --output=$@ compilers/data_json/data_json/pge2pir.tg
 
 # Local variables:
 #   mode: makefile

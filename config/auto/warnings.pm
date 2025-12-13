@@ -133,7 +133,6 @@ sub _init {
         -Wimplicit
         -Wimport
         -Winit-self
-        -Winline
         -Winvalid-pch
         -Wjump-misses-init
         -Wlogical-op
@@ -155,7 +154,6 @@ sub _init {
         -Wno-unused
         -Wvariadic-macros
         -Wwrite-strings
-        -Wstack-usage=500
     );
 
     # gcc-only warnings that would break g++
@@ -238,6 +236,15 @@ sub _init {
         ) ],
         '-Wcast-qual' => [ qw(
             compilers/imcc/imcparser.c
+            src/gc/string_gc.c
+            src/io/api.c
+            src/io/filehandle.c
+            src/io/pipe.c
+            src/io/socket.c
+            src/io/stringhandle.c
+            src/io/utilities.c
+            src/platform/generic/io.c
+            src/runcore/trace.c
         ) ],
         '-Wsign-compare' => [ qw(
             compilers/imcc/imclexer.c
@@ -335,6 +342,12 @@ sub runstep {
         $conf->debug("We do not (yet) probe for warnings for your compiler\n");
         $self->set_result('skipped');
         return 1;
+    }
+
+    if (!$conf->data->get('TEMP_asan') and !$conf->options->get('debugging')
+        and $compiler =~ /^(gcc|clang|g\+\+)$/ ) {
+        push @{$self->{'warnings'}{$compiler}{'basic'}}, '-Wstack-usage=500';
+        push @{$self->{'warnings'}{$compiler}{'basic'}}, '-Winline';
     }
 
     if (

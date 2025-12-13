@@ -246,7 +246,11 @@ void
 imcc_set_optimization_level(ARGMOD(imc_info_t *imcc), ARGIN(const char *opts))
 {
     ASSERT_ARGS(imcc_set_optimization_level)
-    if (!opts || !*opts || opts[0] == '0')
+    if (
+#ifndef HAVE_NONNULL
+        !opts ||
+#endif
+        !*opts || opts[0] == '0')
         return;
     if (strchr(opts, 'p'))
         imcc->optimizer_level |= OPT_PASM;
@@ -302,7 +306,7 @@ imcc_preprocess(ARGMOD(imc_info_t *imcc), ARGIN(STRING * const sourcefile))
 
     /* TODO: THIS! */
     /* Figure out what kind of source file we have -- if we have one */
-    if (!STRING_length(sourcefile))
+    if (!STRING_NN_length(sourcefile))
         IMCC_fatal_standalone(imcc, 1, "main: No source file specified.\n");
     else {
         PIOHANDLE in_file = determine_input_file_type(imcc, sourcefile);

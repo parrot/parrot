@@ -98,7 +98,7 @@ Parrot_make_cb(PARROT_INTERP, ARGMOD(PMC* sub), ARGIN(PMC* user_data),
     sc = CONST_STRING(interp, "_sub");
     Parrot_pmc_setprop(interp, user_data, sc, sub);
     /* only ASCII signatures are supported */
-    if (STRING_length(cb_signature) == 3) {
+    if (STRING_NN_length(cb_signature) == 3) {
         /* Callback return type ignored */
 
         if (STRING_ord(interp, cb_signature, 1) == 'U') {

@@ -401,7 +401,7 @@ INS(ARGMOD(imc_info_t * imcc), ARGMOD(IMC_Unit *unit), ARGIN(const char *name),
             switch (op->dirs[i]) {
               case PARROT_ARGDIR_INOUT:
                 dirs |= 1 << (16 + i);
-                /* go on */
+                /* fall through */
               case PARROT_ARGDIR_IN:
                 dirs |= 1 << i ;
                 break;
@@ -701,8 +701,8 @@ imcc_string_ends_with(ARGMOD(imc_info_t * imcc), ARGIN(const STRING *str),
     ASSERT_ARGS(imcc_string_ends_with)
     STRING *ext_str = Parrot_str_new(imcc->interp, ext, 0);
     STRING *substr;
-    INTVAL  ext_len = STRING_length(ext_str);
-    INTVAL  len     = STRING_length(str);
+    INTVAL  ext_len = STRING_NN_length(ext_str);
+    INTVAL  len     = STRING_NN_length(str);
 
     if (ext_len >= len)
         return 0;

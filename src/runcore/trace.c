@@ -99,8 +99,11 @@ static Interp *
 debugger_or_interp(PARROT_INTERP)
 {
     ASSERT_ARGS(debugger_or_interp)
-
-    return interp && interp->pdb && interp->pdb->debugger
+    return
+#ifndef HAVE_NONNULL
+        interp &&
+#endif
+        interp->pdb && interp->pdb->debugger
             ? interp->pdb->debugger
             : interp;
 }

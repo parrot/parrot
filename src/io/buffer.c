@@ -688,7 +688,7 @@ io_buffer_find_string_marker(PARROT_INTERP, ARGMOD(IO_BUFFER *buffer),
     ASSERT_ARGS(io_buffer_find_string_marker)
     INTVAL bytes_needed = 0;
 
-    const size_t delim_bytelen = STRING_byte_length(delim);
+    const size_t delim_bytelen = STRING_NN_byte_length(delim);
     const size_t bytes_available = BUFFER_USED_SIZE(buffer);
 
     *have_delim = 0;

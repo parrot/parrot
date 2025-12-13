@@ -6,6 +6,7 @@ use warnings;
 use lib qw( lib );
 
 use Getopt::Std;
+use Parrot::Config;
 
 # need runtests from T::H, but avoid running all our parrot invocations with -w
 use Test::Harness ();
@@ -56,6 +57,11 @@ else {
         ? @ARGV
         : get_common_tests( $longopts )
     );
+}
+# GH #1256
+if ($PConfig_Temp{TEMP_asan}) {
+    @tests = grep { $_ !~ m{^\Qt/compilers/opsc/02-parse-all-ops.t\E} } @tests;
+    # $ENV{TEST_PROG} = $PConfig_Temp{TEMP_memleak} . $ENV{TEST_PROG};
 }
 
 my $harness;

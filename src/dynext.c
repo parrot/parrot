@@ -181,7 +181,7 @@ store_lib_pmc(PARROT_INTERP, ARGIN(PMC *lib_pmc), ARGIN(STRING *path),
     set_cstring_prop(interp, lib_pmc, "_filename", path);
     set_cstring_prop(interp, lib_pmc, "_type", type);
 
-    if (!STRING_IS_NULL(lib_name))
+    if (!STRINGARG_IS_NULL(lib_name))
         set_cstring_prop(interp, lib_pmc, "_lib_name", lib_name);
 
     VTABLE_set_pmc_keyed_str(interp, dyn_libs, path, lib_pmc);
@@ -484,7 +484,7 @@ run_init_lib(PARROT_INTERP, ARGIN(void *handle), ARGIN(STRING *lib_name), ARGIN(
     Parrot_pcc_set_namespace(interp, context,
             Parrot_hll_get_HLL_namespace(interp, parrot_hll_id));
 
-    if (!STRING_IS_NULL(lib_name)) {
+    if (!STRINGARG_IS_NULL(lib_name)) {
         STRING * const load_name       = Parrot_sprintf_c(interp,
                                         "Parrot_lib_%Ss_load", lib_name);
         STRING * const init_func_name  = Parrot_sprintf_c(interp,

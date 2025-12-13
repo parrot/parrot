@@ -95,7 +95,7 @@ Parrot_set_config_hash_pmc(PARROT_INTERP, ARGIN(PMC *config))
 {
     ASSERT_ARGS(Parrot_set_config_hash_pmc)
     parrot_config_hash_global = config;
-    if (!PMC_IS_NULL(config))
+    if (!PMCARG_IS_NULL(config))
         Parrot_gbl_set_config_hash_interpreter(interp);
 }
 

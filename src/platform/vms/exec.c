@@ -292,7 +292,7 @@ void cma$tis_errno_set_value(int __value);  /* missing in some errno.h */
 /* Handy way to vet calls to VMS system services and RTL routines. */
 #define _ckvmssts(call)                                            \
     do {                                                           \
-        register unsigned long int __ckvms_sts;                    \
+        unsigned long int __ckvms_sts;                    \
         if (!((__ckvms_sts = (call))&1)) {                         \
             SETERRNO(EVMSERR, __ckvms_sts);                        \
             fprintf(stderr, "Fatal VMS error (status=%d) at %s, line %d", \
@@ -2279,10 +2279,10 @@ setup_cmddsc(const char *incmd, int check_img, int *suggest_quote,
     struct dsc$descriptor_s *vmscmd;
     struct dsc$descriptor_s imgdsc = {0, DSC$K_DTYPE_T, DSC$K_CLASS_S, 0};
     unsigned int cxt = 0, flags = 1, retsts = SS$_NORMAL;
-    register char *s, *rest, *cp, *wordbreak;
+    char *s, *rest, *cp, *wordbreak;
     char * cmd;
     int cmdlen;
-    register int isdcl;
+    int isdcl;
 
     vmscmd = malloc(sizeof (struct dsc$descriptor_s));
     if (vmscmd == NULL) _ckvmssts(SS$_INSFMEM);
@@ -2384,7 +2384,7 @@ setup_cmddsc(const char *incmd, int check_img, int *suggest_quote,
         if (suggest_quote) *suggest_quote = 1;
     }
     else {
-        register char *filespec = strpbrk(s, ":<[.;");
+        char *filespec = strpbrk(s, ":<[.;");
         rest = wordbreak = strpbrk(s, " \"\t/");
         if (!wordbreak) wordbreak = s + strlen(s);
         if (*s == '$') check_img = 0;
