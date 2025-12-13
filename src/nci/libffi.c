@@ -519,9 +519,9 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
 
     PMC *call_object = Parrot_pcc_get_signature(interp, CURRENT_CONTEXT(interp));
 
-    parrot_var_t  *pcc_arg;     /* values of pcc arguments */
-    nci_var_t     *nci_val;     /* values of nci arguments */
-    void         **nci_arg;     /* pointers for pass-by-ref arguments */
+    parrot_var_t  *pcc_arg;        /* values of pcc arguments */
+    nci_var_t     *nci_val = NULL; /* values of nci arguments */
+    void         **nci_arg = NULL; /* pointers for pass-by-ref arguments */
     void         **nci_arg_ptr = NULL; /* pointers to arguments for libffi */
 
     void *return_data; /* Holds return data from FFI call */

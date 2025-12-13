@@ -118,7 +118,7 @@ remove_handle_entry(ARGIN_NULLOK(void *handle))
             free(p);
         }
         else {
-            struct handle_entry *cur, *prev;
+            struct handle_entry *cur, *prev = NULL;
             for (cur = handle_list; cur; prev = cur, cur = cur->next) {
                 if (cur->handle == handle) {
                     prev->next = cur->next;
