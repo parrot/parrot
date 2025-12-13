@@ -133,7 +133,6 @@ sub _init {
         -Wimplicit
         -Wimport
         -Winit-self
-        -Winline
         -Winvalid-pch
         -Wjump-misses-init
         -Wlogical-op
@@ -345,9 +344,12 @@ sub runstep {
         return 1;
     }
 
-    if (!$conf->data->get('TEMP_asan') and !$conf->options->get('debugging')) {
+    if (!$conf->data->get('TEMP_asan') and !$conf->options->get('debugging')
+        and $compiler =~ /^(gcc|clang|g\+\+)$/ ) {
         push @{$self->{'warnings'}{$compiler}{'basic'}}, '-Wstack-usage=500';
+        push @{$self->{'warnings'}{$compiler}{'basic'}}, '-Winline';
     }
+
     if (
         ( $compiler eq 'gcc' or $compiler eq 'g++' ) and
         ( $conf->data->get('gccversion') >= 4.0    )
