@@ -29,11 +29,10 @@ Generated hash table with name and key.
 
 =over 4
 
-=item C<static unsigned int Parrot_namealias_hash(const char *str,
-unsigned int len)>
+=item C<static unsigned int Parrot_namealias_hash(const char *str, size_t len)>
 
 =item C<const struct Parrot_namealias * Parrot_namealias_lookup(const
-char *str, unsigned int len)>
+char *str, size_t len)>
 
 Generated lookup function used by the C<find_codepoint> op for name aliases not found
 by some ICU versions.
@@ -50,9 +49,8 @@ by some ICU versions.
 
 /* HEADERIZER HFILE: include/parrot/namealias.h */
 /* HEADERIZER STOP */
-
 const struct Parrot_namealias *
-Parrot_namealias_lookup(const char *str, unsigned int len);
+Parrot_namealias_lookup(const char *str, size_t len);
 %}
 %language=ANSI-C
 %struct-type

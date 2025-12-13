@@ -90,7 +90,7 @@ sub check_parens {
         my @lines = split( /\n/, $buf );
         for my $line (@lines) {
             # skip #defines and typedefs
-            next if $line =~ m{(?:(#\s*define|^\s*typedef))};
+            next if $line =~ m{(?:(#\s*define|#\s*elif|^\s*typedef))};
             if ( $line =~ m{ ( (?<!\w) (?:$keywords) (?: \( ) ) }xo ) {
                 my $paren = $1;
 
