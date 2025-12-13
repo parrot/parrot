@@ -45,13 +45,20 @@ sub gc_test {
     is($exit_code, 0, $msg);
 }
 
-# involving lots of strings and rpa's
-# This times out at travis >10min
-gc_test("$parrot -D1 --gc-debug --gc-nursery-size=0.01 -- parrot-nqp.pbc --target=pir $JSONnqp",
+SKIP: {
+  skip("GC stress tests fail with asan GH #1256", 2)
+    if $PConfig_Temp{TEMP_asan};
+
+  # involving lots of strings and rpa's
+  # This times out at travis >10min
+  # null read in Parrot_ResizablePMCArray_set_pmc_keyed_int src/pmc/resizablepmcarray.pmc:451 (empty self)
+  gc_test("$parrot -D1 --gc-debug --gc-nursery-size=0.01 -- parrot-nqp.pbc --target=pir $JSONnqp",
         "GC CallContext - GH #1159");
 
-gc_test("$parrot -D1 --gc-debug --gc-nursery-size=0.01 -- parrot-nqp.pbc $opsc_03past",
+  # nullptr write in set_call_from_varargs src/call/args.c:591
+  gc_test("$parrot -D1 --gc-debug --gc-nursery-size=0.01 -- parrot-nqp.pbc $opsc_03past",
         "GC opsc/03-past.t");
+}
 
 # Local Variables:
 #   mode: cperl
