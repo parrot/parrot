@@ -49,5 +49,7 @@ jobs:
     - run: make -j -s
     - if: ${{ matrix.CONFIGURE_ARGS != '--optimize' && !contains(matrix.CONFIGURE_ARGS, '-fsanitize=address') }}
       run: make -j -s test
+    - if: ${{ contains(matrix.CONFIGURE_ARGS, '-fsanitize=address') }}
+      run: env ASAN_OPTIONS=detect_leaks=0 make -j -s test
     - if: ${{ matrix.CONFIGURE_ARGS == '--optimize' }}
       run: make -j -s fulltest
