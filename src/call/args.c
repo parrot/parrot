@@ -200,7 +200,7 @@ static PMC** pmc_param_from_op(PARROT_INTERP,
         __attribute__nonnull__(2);
 
 static void set_call_from_varargs(PARROT_INTERP,
-    ARGIN(PMC *signature),
+    ARGIN(PMC *call_object),
     ARGIN(const char *sig),
     ARGMOD(va_list *args))
         __attribute__nonnull__(1)
@@ -296,7 +296,7 @@ static STRING** string_param_from_op(PARROT_INTERP,
     , PARROT_ASSERT_ARG(raw_params))
 #define ASSERT_ARGS_set_call_from_varargs __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
-    , PARROT_ASSERT_ARG(signature) \
+    , PARROT_ASSERT_ARG(call_object) \
     , PARROT_ASSERT_ARG(sig) \
     , PARROT_ASSERT_ARG(args))
 #define ASSERT_ARGS_string_constant_from_op __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
@@ -569,7 +569,7 @@ Parrot_pcc_build_call_from_c_args(PARROT_INTERP,
 
 /*
 
-=item C<static void set_call_from_varargs(PARROT_INTERP, PMC *signature, const
+=item C<static void set_call_from_varargs(PARROT_INTERP, PMC *call_object, const
 char *sig, va_list *args)>
 
 Helper for C<Parrot_pcc_build_call_from_varargs> and C<Parrot_pcc_set_call_from_varargs>.
@@ -580,17 +580,18 @@ Helper for C<Parrot_pcc_build_call_from_varargs> and C<Parrot_pcc_set_call_from_
 
 static void
 set_call_from_varargs(PARROT_INTERP,
-        ARGIN(PMC *signature), ARGIN(const char *sig),
+        ARGIN(PMC *call_object), ARGIN(const char *sig),
         ARGMOD(va_list *args))
 {
     ASSERT_ARGS(set_call_from_varargs)
     PMC         *arg_flags    = PMCNULL;
     INTVAL       i            = 0;
 
-    PARROT_ASSERT(PMC_data(signature));
-    PARROT_ASSERT(signature->vtable->base_type == enum_class_CallContext);
+    PARROT_ASSERT(PARROT_CALLCONTEXT(call_object));
+    PARROT_ASSERT(call_object->vtable->base_type == enum_class_CallContext);
     parse_signature_string(interp, sig, &arg_flags);
-    SETATTR_CallContext_arg_flags(interp, signature, arg_flags);
+    PARROT_ASSERT(PARROT_CALLCONTEXT(call_object) > 0x1000);
+    SETATTR_CallContext_arg_flags(interp, call_object, arg_flags);
 
     /* Process the varargs list */
     for (; sig[i] != '\0'; ++i) {
@@ -603,7 +604,7 @@ set_call_from_varargs(PARROT_INTERP,
                 const INTVAL type_lookahead = sig[i+1];
                 PMC * const pmc_arg = va_arg(*args, PMC *);
                 if (type_lookahead == 'f') {
-                    dissect_aggregate_arg(interp, signature, pmc_arg);
+                    dissect_aggregate_arg(interp, call_object, pmc_arg);
                     ++i; /* skip 'f' */
                 }
                 else if (type_lookahead == 'i') {
@@ -612,22 +613,22 @@ set_call_from_varargs(PARROT_INTERP,
                             EXCEPTION_INVALID_OPERATION,
                             "Dispatch: only the first argument can be an invocant");
                     else {
-                        Parrot_CallContext_push_pmc(interp, signature, pmc_arg);
+                        Parrot_CallContext_push_pmc(interp, call_object, pmc_arg);
                         ++i; /* skip 'i' */
                     }
                 }
                 else
-                    Parrot_CallContext_push_pmc(interp, signature, pmc_arg);
+                    Parrot_CallContext_push_pmc(interp, call_object, pmc_arg);
                 break;
             }
           case 'S':
-            Parrot_CallContext_push_string(interp, signature, va_arg(*args, STRING *));
+            Parrot_CallContext_push_string(interp, call_object, va_arg(*args, STRING *));
             break;
           case 'I':
-            Parrot_CallContext_push_integer(interp, signature, va_arg(*args, INTVAL));
+            Parrot_CallContext_push_integer(interp, call_object, va_arg(*args, INTVAL));
             break;
           case 'N':
-            Parrot_CallContext_push_float(interp, signature, va_arg(*args, FLOATVAL));
+            Parrot_CallContext_push_float(interp, call_object, va_arg(*args, FLOATVAL));
             break;
           case '-':
             return;
@@ -642,7 +643,7 @@ set_call_from_varargs(PARROT_INTERP,
 
 /*
 
-=item C<void Parrot_pcc_set_call_from_varargs(PARROT_INTERP, PMC *signature,
+=item C<void Parrot_pcc_set_call_from_varargs(PARROT_INTERP, PMC *call_object,
 const char *sig, va_list *args)>
 
 Converts a varargs list into an existent CallContext PMC.
@@ -656,18 +657,18 @@ integer types to pass on to the multiple dispatch search.
 PARROT_EXPORT
 void
 Parrot_pcc_set_call_from_varargs(PARROT_INTERP,
-        ARGIN(PMC *signature), ARGIN(const char *sig),
+        ARGIN(PMC *call_object), ARGIN(const char *sig),
         ARGMOD(va_list *args))
 {
     ASSERT_ARGS(Parrot_pcc_set_call_from_varargs)
-    PARROT_ASSERT(PMCNULL != signature);
-    Parrot_CallContext_morph(interp, signature, PMCNULL);
-    set_call_from_varargs(interp, signature, sig, args);
+    PARROT_ASSERT(PMCNULL != call_object);
+    Parrot_CallContext_morph(interp, call_object, PMCNULL);
+    set_call_from_varargs(interp, call_object, sig, args);
 }
 
 /*
 
-=item C<PMC* Parrot_pcc_build_call_from_varargs(PARROT_INTERP, PMC *signature,
+=item C<PMC* Parrot_pcc_build_call_from_varargs(PARROT_INTERP, PMC *call_object,
 const char *sig, va_list *args)>
 
 Converts a varargs list into a CallContext PMC, creating a new one if needed.
@@ -683,22 +684,22 @@ PARROT_WARN_UNUSED_RESULT
 PARROT_CANNOT_RETURN_NULL
 PMC*
 Parrot_pcc_build_call_from_varargs(PARROT_INTERP,
-        ARGIN_NULLOK(PMC *signature), ARGIN(const char *sig),
+        ARGIN_NULLOK(PMC *call_object), ARGIN(const char *sig),
         ARGMOD(va_list *args))
 {
     ASSERT_ARGS(Parrot_pcc_build_call_from_varargs)
-    PMC         *call_object;
+    PMC         *new_call_object;
 
-    if (PMC_IS_NULL(signature))
-        call_object = Parrot_pmc_new(interp, enum_class_CallContext);
+    if (PMC_IS_NULL(call_object))
+        new_call_object = Parrot_pmc_new(interp, enum_class_CallContext);
     else {
-        call_object = signature;
+        new_call_object = call_object;
         Parrot_CallContext_morph(interp, call_object, PMCNULL);
     }
 
-    set_call_from_varargs(interp, call_object, sig, args);
+    set_call_from_varargs(interp, new_call_object, sig, args);
 
-    return call_object;
+    return new_call_object;
 }
 
 /*

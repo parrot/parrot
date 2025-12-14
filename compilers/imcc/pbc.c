@@ -199,9 +199,11 @@ static int get_old_size(
         FUNC_MODIFIES(* imcc)
         FUNC_MODIFIES(*ins_line);
 
-static void imcc_globals_destroy(PARROT_INTERP, int ex, ARGMOD(void *param))
+static void imcc_globals_destroy(PARROT_INTERP,
+    int exit_status,
+    ARGMOD(void *_imcc))
         __attribute__nonnull__(3)
-        FUNC_MODIFIES(*param);
+        FUNC_MODIFIES(*_imcc);
 
 static void init_fixedintegerarray_from_string(
     ARGMOD(imc_info_t * imcc),
