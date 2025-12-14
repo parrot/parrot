@@ -194,6 +194,7 @@ the old chunk (if needed).
 
 */
 
+PARROT_NO_ADDRESS_SAFETY_ANALYSIS
 static void
 ensure_positionals_storage_ap(PARROT_INTERP,
                               ARGIN(PMC *self), INTVAL size, INTVAL allocated_positionals)
@@ -201,6 +202,9 @@ ensure_positionals_storage_ap(PARROT_INTERP,
     ASSERT_ARGS(ensure_positionals_storage_ap)
     INTVAL num_positionals;
     Pcc_cell *array, *new_array;
+
+    PARROT_ASSERT(PARROT_CALLCONTEXT(self));
+    GETATTR_CallContext_positionals(interp, self, array);
 
     if (size < 8)
         size = 8;
@@ -211,8 +215,6 @@ ensure_positionals_storage_ap(PARROT_INTERP,
     else
         new_array = (Pcc_cell *)Parrot_gc_allocate_fixed_size_storage(interp,
                 size * sizeof (Pcc_cell));
-
-    GETATTR_CallContext_positionals(interp, self, array);
 
     if (array) {
         GETATTR_CallContext_num_positionals(interp, self, num_positionals);

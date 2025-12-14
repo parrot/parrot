@@ -169,6 +169,7 @@ Parrot_pcc_invoke_method_from_c_args(PARROT_INTERP, ARGIN(PMC* pmc),
 
     va_start(args, signature);
     call_obj = Parrot_pcc_build_call_from_varargs(interp, PMCNULL, arg_sig, &args);
+    PARROT_ASSERT(PMC_data(call_obj));
 
     /* inlined version of pcc_add_invocant */
     arg_flags = PARROT_CALLCONTEXT(call_obj)->arg_flags;
