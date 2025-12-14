@@ -56,6 +56,7 @@ pmclass Handle provides Handle manual_attrs {
 
     VTABLE void *get_pointer_keyed_int(INTVAL key) :no_wb {
         void * ptr;
+        PARROT_ASSERT(PMC_data(SELF));
         switch (key) {
             case IO_PTR_IDX_VTABLE:
                 GET_ATTR_io_vtable(INTERP, SELF, ptr);

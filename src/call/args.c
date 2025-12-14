@@ -587,6 +587,8 @@ set_call_from_varargs(PARROT_INTERP,
     PMC         *arg_flags    = PMCNULL;
     INTVAL       i            = 0;
 
+    PARROT_ASSERT(PMC_data(signature));
+    PARROT_ASSERT(signature->vtable->base_type == enum_class_CallContext);
     parse_signature_string(interp, sig, &arg_flags);
     SETATTR_CallContext_arg_flags(interp, signature, arg_flags);
 
