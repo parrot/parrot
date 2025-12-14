@@ -591,6 +591,9 @@ set_call_from_varargs(PARROT_INTERP,
     PARROT_ASSERT(call_object->vtable->base_type == enum_class_CallContext);
     parse_signature_string(interp, sig, &arg_flags);
     PARROT_ASSERT(PARROT_CALLCONTEXT(call_object) > 0x1000);
+    if (!PMC_data(call_object))
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_PARROT_POINTER_ERROR,
+            "Empty signature CallContext");
     SETATTR_CallContext_arg_flags(interp, call_object, arg_flags);
 
     /* Process the varargs list */

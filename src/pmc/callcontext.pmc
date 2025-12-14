@@ -212,6 +212,9 @@ ensure_positionals_storage_ap(PARROT_INTERP,
         new_array = (Pcc_cell *)Parrot_gc_allocate_fixed_size_storage(interp,
                 size * sizeof (Pcc_cell));
 
+    if (PMC_IS_NULL(self))
+        Parrot_ex_throw_from_c_noargs(interp, EXCEPTION_PARROT_POINTER_ERROR,
+            "Empty CallContext");
     GETATTR_CallContext_positionals(interp, self, array);
 
     if (array) {
