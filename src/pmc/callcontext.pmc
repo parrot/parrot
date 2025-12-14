@@ -188,7 +188,7 @@ INTVAL size, INTVAL allocated_positionals)>
 
 Allocate a new chunk of memory that can contain C<allocated_positionals>
 entries, either from the fixed size allocator or from system memory, and free
-the the old chunk (if needed).
+the old chunk (if needed).
 
 =cut
 
