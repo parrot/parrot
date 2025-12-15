@@ -595,7 +595,9 @@ Initializes a newly created CallContext object.
         SET_ATTR_positionals(INTERP, SELF, NULL);
         SET_ATTR_num_positionals(INTERP, SELF, 0);
 
+        /* disabled. they should survive gc-stress a bit longer. GH #1256
         PObj_custom_mark_destroy_SETALL(SELF);
+        */
     }
 
 /*

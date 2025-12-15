@@ -237,7 +237,9 @@ surboutine is fully constructed but not attached to interpreter.
 
         /* C<ctx> not handled here, and shouldn't be, because of run-time nature.  */
 
+        /* disabled. they should survive gc-stress a bit longer. GH #1256
         PObj_custom_mark_destroy_SETALL(SELF);
+        */
     }
 
 
