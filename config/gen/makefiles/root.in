@@ -955,7 +955,7 @@ $(DEV_TOOLS_DIR)/pbc_to_exe.pir: $(DEV_TOOLS_DIR)/pbc_to_exe.winxed $(PARROT) $(
 
 $(PBC_TO_EXE) : $(DEV_TOOLS_DIR)/pbc_to_exe.pir $(LIBRARY_DIR)/config.pir $(PARROT) $(DYNEXT_DIR)/file$(LOAD_EXT)
 	$(PARROT) -o pbc_to_exe.pbc $(DEV_TOOLS_DIR)/pbc_to_exe.pir
-	$(NO_MEMLEAK)$(PARROT) pbc_to_exe.pbc pbc_to_exe.pbc
+	$(PARROT) pbc_to_exe.pbc pbc_to_exe.pbc
 
 parrot_nci_thunk_gen.pbc : \
   $(DEV_TOOLS_DIR)/nci_thunk_gen.pir \
@@ -973,7 +973,7 @@ parrot-prove.pbc : runtime/parrot/bin/prove.pir $(PARROT)
 	$(PARROT) -o parrot-prove.pbc runtime/parrot/bin/prove.pir
 
 $(PARROT_PROVE) : parrot-prove.pbc $(PARROT) $(PBC_TO_EXE)
-	$(PBC_TO_EXE) parrot-prove.pbc
+	$(NO_MEMLEAK)$(PBC_TO_EXE) parrot-prove.pbc
 
 $(PARROT_CONFIG) : $(DEV_TOOLS_DIR)/parrot-config.pir $(PARROT) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc $(DEV_TOOLS_DIR)/parrot-config.pir
@@ -1193,19 +1193,19 @@ $(INSTALLABLELIBPARROT) : $(O_FILES)
 
 $(INSTALLABLECONFIG) : src/install_config$(O) $(PARROT_CONFIG) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc $(DEV_TOOLS_DIR)/parrot-config.pir
-	$(PBC_TO_EXE) parrot_config.pbc --install
+	$(NO_MEMLEAK)$(PBC_TO_EXE) parrot_config.pbc --install
 	$(ADDGENERATED) "$@" "[main]" bin
 
 $(INSTALLABLEPBCTOEXE) : $(PBC_TO_EXE) src/install_config$(O)
-	$(PBC_TO_EXE) pbc_to_exe.pbc --install
+	$(NO_MEMLEAK)$(PBC_TO_EXE) pbc_to_exe.pbc --install
 	$(ADDGENERATED) "$@" "[main]" bin
 
 $(INSTALLABLENCITHUNKGEN) : parrot_nci_thunk_gen.pbc $(PBC_TO_EXE) src/install_config$(O)
-	$(PBC_TO_EXE) parrot_nci_thunk_gen.pbc --install
+	$(NO_MEMLEAK)$(PBC_TO_EXE) parrot_nci_thunk_gen.pbc --install
 	$(ADDGENERATED) "$@" "[main]" bin
 
 $(INSTALLABLEPARROT_PROVE) : parrot-prove.pbc $(PBC_TO_EXE) src/install_config$(O)
-	$(PBC_TO_EXE) parrot-prove.pbc --install
+	$(NO_MEMLEAK)$(PBC_TO_EXE) parrot-prove.pbc --install
 	$(ADDGENERATED) "$@" "[main]" bin
 #
 # Parrot Debugger
@@ -1496,7 +1496,7 @@ examples/pasm/hello.pbc: examples/pasm/hello.pasm
 #examples/pasm/hello$(EXE): examples/pasm/hello$(O)
 #	$(MAKE_C) . EXEC=examples/pasm/hello exec
 examples/pasm/hello$(EXE): examples/pasm/hello.pbc $(PBC_TO_EXE)
-	$(PBC_TO_EXE) examples/pasm/hello.pbc
+	$(NO_MEMLEAK)$(PBC_TO_EXE) examples/pasm/hello.pbc
 
 
 ###############################################################################

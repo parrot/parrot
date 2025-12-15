@@ -20,7 +20,7 @@ $(LIBRARY_DIR)/nqp-rx.pbc: $(NQP_STAGE0_DIR)/NQP-s0.pir $(PARROT)
 
 ## eventually nqp should be able to generate .pbc files directly
 $(LIBRARY_DIR)/nqp-setting.pbc: $(NQP_STAGE0_DIR)/nqp-setting.nqp $(LIBRARY_DIR)/nqp-rx.pbc $(NQPRX_LIB_PBCS)
-	$(PARROT) $(LIBRARY_DIR)/nqp-rx.pbc --target=pir -o $(NQP_STAGE0_DIR)/nqp-setting.pir $(NQP_STAGE0_DIR)/nqp-setting.nqp
+	$(NO_MEMLEAK)$(PARROT) $(LIBRARY_DIR)/nqp-rx.pbc --target=pir -o $(NQP_STAGE0_DIR)/nqp-setting.pir $(NQP_STAGE0_DIR)/nqp-setting.nqp
 	$(PARROT) -o $@ $(NQP_STAGE0_DIR)/nqp-setting.pir
 	@$(ADDGENERATED) "$@" "[nqp]"
 
