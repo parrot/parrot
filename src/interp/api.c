@@ -615,8 +615,10 @@ Parrot_interp_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg)
      * pending exception. */
     if (! (interp->parent_interpreter)
         || (Interp_flags_TEST(interp, PARROT_DESTROY_FLAG)
-            && !PMC_IS_NULL(interp->final_exception)))
+            && !PMC_IS_NULL(interp->final_exception))) {
+        destroy_object_cache(interp);
         return;
+    }
 
     if (interp->parent_interpreter)
         Parrot_gc_destroy_child_interp(interp->parent_interpreter, interp);
@@ -643,23 +645,13 @@ Parrot_interp_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg)
         /* get rid of ops */
         if (interp->op_hash)
             Parrot_hash_destroy(interp, interp->op_hash);
-
-        /* free vtables */
-        Parrot_vtbl_free_vtables(interp);
-
-        /* Finalize GC */
-        Parrot_gc_finalize(interp);
-
-        mem_internal_free(interp);
     }
 
-    else {
-        Parrot_vtbl_free_vtables(interp);
+    Parrot_vtbl_free_vtables(interp);
 
-        /* Finalize GC */
-        Parrot_gc_finalize(interp);
-        mem_internal_free(interp);
-    }
+    /* Finalize GC */
+    Parrot_gc_finalize(interp);
+    mem_internal_free(interp);
 }
 
 
