@@ -1074,7 +1074,7 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
 #else
 
     Caches           *mc;
-    Meth_cache_entry *e;
+    Meth_cache_entry *e, *head;
     UINTVAL type, bits;
 
     if (! PObj_constant_TEST(method_name))
@@ -1100,6 +1100,7 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
                 TBL_SIZE, Meth_cache_entry *);
 
     e = mc->idx[type][bits];
+    head = e;
 
     while (e && e->strstart != Buffer_bufstart(method_name))
         e = e->next;
@@ -1108,13 +1109,23 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
         /* Linked list when here no or no correct entry was at [bits] */
         /* Use zeroed allocation because find_method_direct can trigger GC */
         e = mem_gc_allocate_zeroed_typed(interp, Meth_cache_entry);
-        mc->idx[type][bits] = e;
 
         e->pmc      = Parrot_find_method_direct(interp, _class, method_name);
         e->next     = NULL;
         e->strstart = Buffer_bufstart(method_name);
         MEMORY_DEBUG_DETAIL_4("Allocate method cache entry[%u] %s of type %u: %p\n",
                               bits, e->strstart, type, e);
+        if (!head) {
+            mc->idx[type][bits] = e;
+            return e->pmc;
+        }
+        else {
+            /* Add to the end of to list. GH #1264 */
+            Meth_cache_entry *last = head;
+            while (last->next)
+                last = last->next;
+            last->next = e;
+        }
     }
 
     return e->pmc;
