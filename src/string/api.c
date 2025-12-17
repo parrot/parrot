@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2014, Parrot Foundation.
+Copyright (C) 2001-2025, Parrot Foundation.
 
 =head1 NAME
 
@@ -1497,9 +1497,25 @@ STRING *s2)>
 Performs a bitwise C<AND> on two Parrot strings, performing type and encoding
 conversions if necessary. Returns the result as a new string.
 
+Same encodings are compared bitwise.  Different two-byte encodings are first
+converted down to latin1, and if that fails upgraded to ucs2 and if that
+fails to ucs4.
+
 =cut
 
 */
+
+#define BITWISE_UPGRADE_BOTH(s1, s2)                                    \
+    STRING * e_s1 = str_internal_trans_to_ucs2(interp, (s1));           \
+    STRING * e_s2 = str_internal_trans_to_ucs2(interp, (s2));           \
+    if (e_s1 && e_s2) {                                                 \
+        s1 = e_s1;                                                      \
+        s2 = e_s2;                                                      \
+    }                                                                   \
+    else {                                                              \
+        s1 = str_internal_trans_to_ucs4(interp, (s1));                  \
+        s2 = str_internal_trans_to_ucs4(interp, (s2));                  \
+    }
 
 PARROT_EXPORT
 PARROT_CANNOT_RETURN_NULL
@@ -1510,17 +1526,7 @@ Parrot_str_bitwise_and(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
     ASSERT_ARGS(Parrot_str_bitwise_and)
     STRING *res;
     size_t  minlen;
-
-    /* we could also trans_encoding to iso-8859-1 */
-    if (s1 && STRING_max_bytes_per_codepoint(s1) != 1)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
-            "string bitwise_and (%s/%s) unsupported",
-            s1->encoding->name, nonnull_encoding_name(s2));
-
-    if (s2 && STRING_max_bytes_per_codepoint(s2) != 1)
-        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
-            "string bitwise_and (%s/%s) unsupported",
-            nonnull_encoding_name(s1), s2->encoding->name);
+    int     b1, b2;
 
     /* think about case of dest string is one of the operands */
     if (!STRING_IS_NULL(s1) && !STRING_IS_NULL(s2))
@@ -1536,6 +1542,62 @@ Parrot_str_bitwise_and(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
         res->strlen  = 0;
 
         return res;
+    }
+
+    b1 = STRING_max_bytes_per_codepoint(s1);
+    b2 = STRING_max_bytes_per_codepoint(s2);
+
+    if (minlen && b1 != 1 && b2 != 1) {
+        const STR_VTABLE * enc1 = s1->encoding;
+        const STR_VTABLE * enc2 = s2->encoding;
+        if (enc1 == enc2) {
+            ;
+        }
+        /* GH 848: trans_encode down to latin1 or up to ucs2 or ucs4 */
+        else if (b1 == 2 && b2 == 1) {
+            STRING * e_down = str_internal_trans_to_fixed8(interp, s1);
+            if (e_down)
+                s1 = e_down;
+            else {
+                BITWISE_UPGRADE_BOTH(s1, s2);
+            }
+        }
+        else if (b1 == 1 && b2 == 2) {
+            STRING * e_down = str_internal_trans_to_fixed8(interp, s2);
+            if (e_down)
+                s2 = e_down;
+            else {
+                BITWISE_UPGRADE_BOTH(s1, s2);
+            }
+        }
+        else if (b1 == 2 && b2 == 2) {
+            STRING * e_down1 = str_internal_trans_to_fixed8(interp, s1);
+            STRING * e_down2 = str_internal_trans_to_fixed8(interp, s2);
+            if (e_down1 && e_down2) {
+                s1 = e_down1;
+                s2 = e_down2;
+            }
+            else {
+                BITWISE_UPGRADE_BOTH(s1, s2);
+            }
+        }
+        else if (b1 == 4 && b2 == 4) {
+            STRING * e_down1 = str_internal_trans_to_fixed8(interp, s1);
+            STRING * e_down2 = str_internal_trans_to_fixed8(interp, s2);
+            if (e_down1 && e_down2) {
+                s1 = e_down1;
+                s2 = e_down2;
+            }
+            else {
+                BITWISE_UPGRADE_BOTH(s1, s2);
+            }
+        }
+        else {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
+                                        "string bitwise_and (%s/%s) unsupported",
+                                        s1->encoding->name, s2->encoding->name);
+        }
+        minlen = s1->strlen > s2->strlen ? s2->strlen : s1->strlen;
     }
 
 #if ! DISABLE_GC_DEBUG
@@ -1642,6 +1704,10 @@ STRING *s2)>
 Performs a bitwise C<OR> on two Parrot strings, performing type and encoding
 conversions if necessary.  Returns the result as a new string.
 
+Same encodings are compared bitwise.  Different two-byte encodings are first
+converted down to latin1, and if that fails upgraded to ucs2 and if that
+fails to ucs4.
+
 =cut
 
 */
@@ -1655,27 +1721,9 @@ Parrot_str_bitwise_or(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
     ASSERT_ARGS(Parrot_str_bitwise_or)
     STRING *res;
     size_t  maxlen = 0;
+    int     b1, b2;
 
-    if (!STRING_IS_NULL(s1)) {
-        if (STRING_max_bytes_per_codepoint(s1) != 1)
-            Parrot_ex_throw_from_c_args(interp, NULL,
-                EXCEPTION_INVALID_ENCODING,
-                "string bitwise_or (%s/%s) unsupported",
-                s1->encoding->name, nonnull_encoding_name(s2));
-
-        maxlen = s1->bufused;
-    }
-
-    if (!STRING_IS_NULL(s2)) {
-        if (STRING_max_bytes_per_codepoint(s2) != 1)
-            Parrot_ex_throw_from_c_args(interp, NULL,
-                EXCEPTION_INVALID_ENCODING,
-                "string bitwise_or (%s/%s) unsupported",
-                nonnull_encoding_name(s1), s2->encoding->name);
-
-        if (s2->bufused > maxlen)
-            maxlen = s2->bufused;
-    }
+    maxlen = s1->bufused > s2->bufused ? s1->bufused : s2->bufused;
 
     res = Parrot_str_new_init(interp, NULL, maxlen,
             Parrot_binary_encoding_ptr, 0);
@@ -1684,6 +1732,62 @@ Parrot_str_bitwise_or(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
         res->bufused = 0;
         res->strlen  = 0;
         return res;
+    }
+
+    b1 = STRING_max_bytes_per_codepoint(s1);
+    b2 = STRING_max_bytes_per_codepoint(s2);
+
+    if (b1 != 1 && b2 != 1) {
+        const STR_VTABLE * enc1 = s1->encoding;
+        const STR_VTABLE * enc2 = s2->encoding;
+        if (enc1 == enc2) {
+            ;
+        }
+        /* GH 848: trans_encode down to latin1 or up to ucs2 or ucs4 */
+        else if (b1 == 2 && b2 == 1) {
+            STRING * e_down = str_internal_trans_to_fixed8(interp, s1);
+            if (e_down)
+                s1 = e_down;
+            else {
+                BITWISE_UPGRADE_BOTH(s1, s2);
+            }
+        }
+        else if (b1 == 1 && b2 == 2) {
+            STRING * e_down = str_internal_trans_to_fixed8(interp, s2);
+            if (e_down)
+                s2 = e_down;
+            else {
+                BITWISE_UPGRADE_BOTH(s1, s2);
+            }
+        }
+        else if (b1 == 2 && b2 == 2) {
+            STRING * e_down1 = str_internal_trans_to_fixed8(interp, s1);
+            STRING * e_down2 = str_internal_trans_to_fixed8(interp, s2);
+            if (e_down1 && e_down2) {
+                s1 = e_down1;
+                s2 = e_down2;
+            }
+            else {
+                BITWISE_UPGRADE_BOTH(s1, s2);
+            }
+        }
+        else if (b1 == 4 && b2 == 4) {
+            STRING * e_down1 = str_internal_trans_to_fixed8(interp, s1);
+            STRING * e_down2 = str_internal_trans_to_fixed8(interp, s2);
+            if (e_down1 && e_down2) {
+                s1 = e_down1;
+                s2 = e_down2;
+            }
+            else {
+                BITWISE_UPGRADE_BOTH(s1, s2);
+            }
+        }
+        else {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
+                                        "string bitwise_or (%s/%s) unsupported",
+                                        s1->encoding->name, s2->encoding->name);
+        }
+        maxlen = s1->bufused > s2->bufused ? s1->bufused : s2->bufused;
     }
 
 #if ! DISABLE_GC_DEBUG
@@ -1726,26 +1830,9 @@ Parrot_str_bitwise_xor(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
     STRING *res;
     size_t  maxlen = 0;
 
-    if (!STRING_IS_NULL(s1)) {
-        if (STRING_max_bytes_per_codepoint(s1) != 1)
-            Parrot_ex_throw_from_c_args(interp, NULL,
-                EXCEPTION_INVALID_ENCODING,
-                "string bitwise_xor (%s/%s) unsupported",
-                s1->encoding->name, nonnull_encoding_name(s2));
+    int     b1, b2;
 
-        maxlen = s1->bufused;
-    }
-
-    if (!STRING_IS_NULL(s2)) {
-        if (STRING_max_bytes_per_codepoint(s2) != 1)
-            Parrot_ex_throw_from_c_args(interp, NULL,
-                EXCEPTION_INVALID_ENCODING,
-                "string bitwise_xor (%s/%s) unsupported",
-                nonnull_encoding_name(s1), s2->encoding->name);
-
-        if (s2->bufused > maxlen)
-            maxlen = s2->bufused;
-    }
+    maxlen = s1->bufused > s2->bufused ? s1->bufused : s2->bufused;
 
     res = Parrot_str_new_init(interp, NULL, maxlen,
             Parrot_binary_encoding_ptr, 0);
@@ -1754,6 +1841,61 @@ Parrot_str_bitwise_xor(PARROT_INTERP, ARGIN_NULLOK(const STRING *s1),
         res->bufused = 0;
         res->strlen  = 0;
         return res;
+    }
+
+    b1 = STRING_max_bytes_per_codepoint(s1);
+    b2 = STRING_max_bytes_per_codepoint(s2);
+
+    if (b1 != 1 && b2 != 1) {
+        const STR_VTABLE * enc1 = s1->encoding;
+        const STR_VTABLE * enc2 = s2->encoding;
+        if (enc1 == enc2) {
+            maxlen = s1->strlen > s2->strlen ? s1->strlen : s2->strlen;
+        }
+        /* GH 848: trans_encode down to latin1 or up to ucs2 or ucs4 */
+        else if (b1 == 2 && b2 == 1) {
+            STRING * e_down = str_internal_trans_to_fixed8(interp, s1);
+            if (e_down)
+                s1 = e_down;
+            else {
+                BITWISE_UPGRADE_BOTH(s1, s2);
+            }
+        }
+        else if (b1 == 1 && b2 == 2) {
+            STRING * e_down = str_internal_trans_to_fixed8(interp, s2);
+            if (e_down)
+                s2 = e_down;
+            else {
+                BITWISE_UPGRADE_BOTH(s1, s2);
+            }
+        }
+        else if (b1 == 2 && b2 == 2) {
+            STRING * e_down1 = str_internal_trans_to_fixed8(interp, s1);
+            STRING * e_down2 = str_internal_trans_to_fixed8(interp, s2);
+            if (e_down1 && e_down2) {
+                s1 = e_down1;
+                s2 = e_down2;
+            }
+            else {
+                BITWISE_UPGRADE_BOTH(s1, s2);
+            }
+        }
+        else if (b1 == 4 && b2 == 4) {
+            STRING * e_down1 = str_internal_trans_to_fixed8(interp, s1);
+            STRING * e_down2 = str_internal_trans_to_fixed8(interp, s2);
+            if (e_down1 && e_down2) {
+                s1 = e_down1;
+                s2 = e_down2;
+            }
+            else {
+                BITWISE_UPGRADE_BOTH(s1, s2);
+            }
+        }
+        else {
+            Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_ENCODING,
+                                        "string bitwise_xor (%s/%s) unsupported",
+                                        s1->encoding->name, s2->encoding->name);
+        }
     }
 
 #if ! DISABLE_GC_DEBUG
@@ -1794,6 +1936,8 @@ do { \
 Performs a bitwise C<NOT> on a Parrot string.  Returns the result as a new
 string.
 
+Multi-byte encoded strings are handled binary.
+
 =cut
 
 */
@@ -1807,15 +1951,8 @@ Parrot_str_bitwise_not(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
     STRING *res;
     size_t  len;
 
-    if (!STRING_IS_NULL(s)) {
-        if (STRING_max_bytes_per_codepoint(s) != 1)
-            Parrot_ex_throw_from_c_args(interp, NULL,
-                EXCEPTION_INVALID_ENCODING,
-                "string bitwise_not (%s) unsupported",
-                s->encoding->name);
-
+    if (!STRING_IS_NULL(s))
         len = s->bufused;
-    }
     else
         len = 0;
 
@@ -1844,6 +1981,8 @@ Parrot_str_bitwise_not(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 
     return res;
 }
+
+#undef UPGRADE_BOTH
 
 
 /*

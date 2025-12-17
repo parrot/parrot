@@ -7,6 +7,7 @@
           We traced all pointers by +1 and not by +4 or +8.
         + Fixed some memory leaks in the imcc compiler, but it still leaks globals
           with multiple PBC's.
+	+ Support unicode strings for bitwise ops. GH #848
     - Build
         + Fix most modern compiler warnings (gcc and clang)
         + Updated bootstrap-namealias to work with latest gperf 3.2

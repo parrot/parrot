@@ -1,5 +1,5 @@
 #!./parrot
-# Copyright (C) 2010, Parrot Foundation.
+# Copyright (C) 2010-2012, Parrot Foundation.
 
 =head1 NAME
 
@@ -11,8 +11,8 @@ t/dynoplibs/bit.t - Bitwise Dynops
 
 =head1 DESCRIPTION
 
-Tests basic arithmetic on various combinations of Parrot integer and
-number types.
+Tests basic arithmetic on various combinations of Parrot integer
+and string types.
 
 =cut
 
@@ -21,7 +21,7 @@ number types.
 .sub main :main
     .include 'test_more.pir'
 
-    plan(139)
+    plan(148)
 
     bnot_p_p_creates_destination()
     band_1()
@@ -30,12 +30,14 @@ number types.
     bands_3()
     bands_4()
     bands_cow()
+    bands_u()
     bor_1()
     bor_2()
     bors_null_string()
     bors_2()
     bors_3()
     bors_cow()
+    bors_u()
     shl_1()
     shl_2()
     shl_3()
@@ -47,8 +49,9 @@ number types.
     bxors_2()
     bxors_3()
     bxors_cow()
+    bxors_u()
     bnots_null_string()
-    bnots_2()
+    bnots_u()
     bnots_cow()
     bnot_1()
     rot_1()
@@ -172,6 +175,23 @@ number types.
     substr $S2, $S1, 0, 3
     $S1 = bands $S1, "bar"
     is( $S2, "foo", 'bands COW' )
+.end
+
+.sub bands_u
+    $P0 = box iso-8859-1:"hello"
+    $P1 = new ['String']
+    $S1 = "oaooo"
+    bands $P1, $P0, $S1
+    is( $P1, "hallo", 'bands iso-8859-1' )
+
+    $P0 = box utf8:"hello"
+    $P1 = bands $P0, $S1
+    is( $P1, "hallo", 'bands utf8')
+
+    $S0 = utf16:"hello"
+    $S1 = ucs4:"oaooo"
+    $S1 = bands $S0, $S1
+    is( $S1, "hallo", 'bands ucs4')
 .end
 
 .sub bor_1
@@ -316,6 +336,22 @@ number types.
     substr $S2, $S1, 0, 3
     $S1 = bors $S1, "bar"
     is( $S2, "foo", 'bors COW' )
+.end
+
+.sub bors_u
+    $P0 = box iso-8859-1:"hello"
+    $P1 = new ['String']
+    $S1 = "oaooo"
+    bors $P1, $P0, $S1
+    is( $P1, "oeooo", 'bors iso-8859-1' )
+
+    $P0 = box utf8:"hello"
+    $P1 = bors $P0, $S1
+    is( $P1, "oeooo", 'bors utf8')
+
+    $P0 = box ucs4:"hello"
+    $P1 = bors $P0, $S1
+    is( $P1, "oaooo\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0", 'bors ucs4')
 .end
 
 .sub shl_1
@@ -565,6 +601,23 @@ number types.
     is( $S2, "foo", 'bxors COW' )
 .end
 
+.sub bxors_u
+    $P0 = box iso-8859-1:"a2c"
+    $P1 = new ['String']
+    $S1 = "Dw"
+    bxors $P1, $P0, $S1
+    is( $P1, "%Ec", 'bxors iso-8859-1' )
+
+    $P0 = box utf8:"a2c"
+    $P1 = bxors $P0, $S1
+    is( $P1, "%Ec", 'bxors utf8')
+
+    $P0 = box ucs4:"\u002c"
+    $P1 = new ['String']
+    $P1 = bxors $P1, $S1
+    is( $P1, "Dw", 'bxors ucs4')
+.end
+
 .sub bnot_1
     $I0 = 10
     bnot $I0
@@ -597,20 +650,21 @@ number types.
 .end
 
 # This was the previous test used for t/native_pbc/string.t
-.sub bnots_2
-    skip( 4, "No unicode yet" )
-    # getstdout $P0
-    # push $P0, "utf8"
-    # set $S1, "a2c"
-    # bnots $S2, $S1
-    # is( $S1, "a2c", 'bnots 2' )
-    # is( $S2, "\xC2\x9E\xC3\x8D\xC2\x9C", 'bnots 2' )
-    #
-    # bnots $S1, $S1
-    # is( $S1, "\xC2\x9E\xC3\x8D\xC2\x9C", 'bnots 2' )
-    #
-    # bnots $S1, $S1
-    # is( $S1, "a2c", 'bnots 2' )
+.sub bnots_u
+    #skip( 4, "No push_string for FileHandle yet" )
+    #getstdout $P0
+    #push $P0, "utf8"
+    set $S1, "a2c"
+    bnots $S2, $S1
+    is( $S1, "a2c", 'bnots 2' )
+    ## \x61\x32\x63 -> ??? TODO
+    is( $S2, ucs2:"\x8D\xC2\x9C", '#TODO bnots ucs2' )
+
+    bnots $S1, $S1
+    is( $S1, ucs2:"\x8D\xC2\x9C", '#TODO bnots ucs2' )
+
+    bnots $S1, $S1
+    is( $S1, "a2c", 'bnots u' )
 .end
 
 .sub bnots_cow
