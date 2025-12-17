@@ -2078,8 +2078,12 @@ gc_gms_free_memory_chunk(PARROT_INTERP, ARGFREE(void *data))
     ASSERT_ARGS(gc_gms_free_memory_chunk)
     MEMORY_DEBUG_UNUSED(interp)
     MEMORY_DEBUG_DETAIL_2("Freed %p%s\n", data, "");
-    if (data)
+    if (data) {
         free(data);
+#ifdef MEMORY_DEBUG
+        data = NULL;
+#endif
+    }
 }
 
 /*

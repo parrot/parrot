@@ -26,6 +26,20 @@ Handles class and object manipulation.
 
 #include "oo.str"
 
+#ifndef MEMORY_DEBUG
+#  define MEMORY_DEBUG_DETAIL_2(s, a1, a2)
+#  define MEMORY_DEBUG_DETAIL_4(s, a1, a2, a3, a4)
+#else
+#  define MEMORY_DEBUG_DETAIL_2(s, a1, a2)                                  \
+    if (Interp_debug_TEST(interp,                                           \
+                PARROT_MEM_STAT_DEBUG_FLAG | PARROT_MEM_DETAIL_DEBUG_FLAG)) \
+        fprintf(stderr, (s), (a1), (a2))
+#  define MEMORY_DEBUG_DETAIL_4(s, a1, a2, a3, a4)                          \
+    if (Interp_debug_TEST(interp,                                           \
+                PARROT_MEM_STAT_DEBUG_FLAG | PARROT_MEM_DETAIL_DEBUG_FLAG)) \
+        fprintf(stderr, (s), (a1), (a2), (a3), (a4))
+#endif
+
 /* HEADERIZER HFILE: include/parrot/oo.h */
 
 /* HEADERIZER BEGIN: static */
@@ -847,10 +861,14 @@ invalidate_type_caches(PARROT_INTERP, UINTVAL type)
     if (type >= mc->mc_size || !mc->idx[type])
         return;
 
+    MEMORY_DEBUG_DETAIL_2("Free method cache max. %u entries of type %u\n",
+                          TBL_SIZE, type);
     for (i = 0; i < TBL_SIZE; ++i) {
         Meth_cache_entry *e = mc->idx[type][i];
-        while (e) {
+        while (e) { /* FIXME: next chains not followed */
             Meth_cache_entry * const next = e->next;
+            MEMORY_DEBUG_DETAIL_4("Free method cache entry[%u] %s of type %u: %p\n",
+                                  i, e->strstart, type, e);
             mem_gc_free(interp, e);
             e = next;
         }
@@ -1087,15 +1105,16 @@ Parrot_find_method_with_cache(PARROT_INTERP, ARGIN(PMC *_class), ARGIN(STRING *m
         e = e->next;
 
     if (!e) {
-        /* when here no or no correct entry was at [bits] */
+        /* Linked list when here no or no correct entry was at [bits] */
         /* Use zeroed allocation because find_method_direct can trigger GC */
         e = mem_gc_allocate_zeroed_typed(interp, Meth_cache_entry);
-
         mc->idx[type][bits] = e;
 
         e->pmc      = Parrot_find_method_direct(interp, _class, method_name);
         e->next     = NULL;
         e->strstart = Buffer_bufstart(method_name);
+        MEMORY_DEBUG_DETAIL_4("Allocate method cache entry[%u] %s of type %u: %p\n",
+                              bits, e->strstart, type, e);
     }
 
     return e->pmc;
