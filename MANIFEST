@@ -68,7 +68,7 @@ compilers/imcc/symreg.h                                     [imcc]
 compilers/imcc/unit.h                                       [imcc]
 compilers/opsc/Defines.mak                                  [opsc]
 compilers/opsc/README.pod                                   []doc
-compilers/opsc/Rules.mak                                    [opsc]
+compilers/opsc/Rules.in                                     [opsc]
 compilers/opsc/TODO                                         [opsc]
 compilers/opsc/gen/Ops/Compiler/IGNOREME                    [opsc]
 compilers/opsc/gen/Ops/Trans/IGNOREME                       [opsc]

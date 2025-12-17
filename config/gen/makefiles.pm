@@ -32,6 +32,9 @@ sub _init {
         'compilers/imcc/Rules.mak' => {
              SOURCE => 'compilers/imcc/Rules.in',
         },
+        'compilers/opsc/Rules.mak' => {
+             SOURCE => 'compilers/opsc/Rules.in',
+        },
         'src/dynoplibs/Rules.mak' => {
              SOURCE => 'src/dynoplibs/Rules.in',
         },

@@ -23,7 +23,8 @@ $(OPSC_DIR)/gen/Ops/Op.pir: $(OPSC_DIR)/src/Ops/Op.pm $(NQP_RX) $(LIBRARY_DIR)/d
 	$(NO_MEMLEAK)$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/src/Ops/Op.pm
 
 $(OPSC_DIR)/gen/Ops/OpLib.pir: $(OPSC_DIR)/src/Ops/OpLib.pm $(NQP_RX) $(LIBRARY_DIR)/dumper.pbc
-	$(NO_MEMLEAK)$(NQP_RX) --target=pir --output=$@  $(OPSC_DIR)/src/Ops/OpLib.pm
+#UNLESS(TEMP_asan):	$(NO_MEMLEAK)$(NQP_RX) --target=pir --output=$@  $(OPSC_DIR)/src/Ops/OpLib.pm
+#ELSE:	$(NO_MEMLEAK)$(PARROT) $(LIBRARY_DIR)/nqp-rx.pbc --target=pir --output=$@ $(OPSC_DIR)/src/Ops/Op.pm
 
 $(OPSC_DIR)/gen/Ops/Trans.pir: $(OPSC_DIR)/src/Ops/Trans.pm $(NQP_RX)
 	$(NO_MEMLEAK)$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/src/Ops/Trans.pm
