@@ -500,11 +500,9 @@ Print the string to the socket.
 Set a single socket option via setsockopt() by a bitmasked value of
 level, option_name and option_value.
 
-x bits for level,
-x bits for option_name,
+9 bits for level (max 272),
+14 bits for option_name,
 the rest 24-56 bits for the option_value.
-
-Unimplemented.
 
 =item C<METHOD setsockopt(INTVAL level, INTVAL option, INTVAL value)>
 

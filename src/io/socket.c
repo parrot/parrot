@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2001-2015, Parrot Foundation.
+Copyright (C) 2001-2025, Parrot Foundation.
 
 =head1 NAME
 
@@ -464,8 +464,8 @@ flags)>
 Set a single socket option via setsockopt() by a bitmasked value of
 level, option_name and option_value.
 
-x bits for level,
-x bits for option_name,
+9 bits for level (max 272),
+14 bits for option_name,
 the rest 24-56 bits for the option_value.
 
 =item C<static INTVAL io_socket_get_flags(PARROT_INTERP, const PMC *handle)>
@@ -477,16 +477,22 @@ Return C<PIO_F_WRITE | PIO_F_READ>. Sockets are always flagged r/w.
 */
 
 static void
-io_socket_set_flags(SHIM_INTERP, ARGMOD_NULLOK(PMC *handle), SHIM(const INTVAL flags))
+io_socket_set_flags(PARROT_INTERP, ARGMOD_NULLOK(PMC *handle), const INTVAL flags)
 {
     ASSERT_ARGS(io_socket_set_flags)
     PIOHANDLE os_handle;
-    UNUSED(flags);
+    UINTVAL level, option, value;
+    INTVAL res;
     GETATTR_Socket_os_handle(interp, handle, os_handle);
-    /* dissect level, name, value */
-    Parrot_io_internal_setsockopt(interp, os_handle, 0, 0, 0);
-    Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_NOT_IMPLEMENTED,
-        "set_flags via single bitmask not available");
+    /* dissect level (9 bits), option (14 bits), value (the rest) */
+    level = flags & 0x1FF;          /* mask: (1<<9)-1 */
+    option = (flags >> 9) & 0x3FFF; /* mask: (1<<14)-1 */
+    value = flags >> 23;
+    res = Parrot_io_internal_setsockopt(interp, os_handle, (INTVAL)level,
+                                        (INTVAL)option, (INTVAL)value);
+    if (res != 0)
+        Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_PIO_ERROR,
+                                    "io_socket_set_flags error: %s", strerror(errno));
 }
 
 static INTVAL

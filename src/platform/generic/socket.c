@@ -191,6 +191,7 @@ static int pio_sock[PIO_SOCK_MAX+1] = {
 /*
  * Mapping between PIO_SOL_* constants and system-specific SOL_* option constants.
  * Uses -1 for unsupported socket level options.
+ * 26 values, needing room for 272.
  */
 
 static int pio_sol[PIO_SOL_MAX+1] = {
