@@ -168,7 +168,8 @@ sub _init {
     );
 
     $gcc->{'basic'} = [ @gcc_or_gpp_basic, @gcc_basic ];
-    $gpp->{'basic'} = [ @gcc_or_gpp_basic ];
+    $gpp->{'basic'} = [ @gcc_or_gpp_basic,
+                       '-Wno-parentheses', '-Wno-literal-suffix' ];
 
     my @gcc_or_gpp_cage = qw(
         -std=c89
