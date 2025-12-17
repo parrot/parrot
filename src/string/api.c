@@ -410,6 +410,7 @@ Parrot_str_copy(PARROT_INTERP, ARGIN_NULLOK(const STRING *s))
 
     d = Parrot_gc_new_string_header(interp,
           PObj_get_FLAGS(s) & ~PObj_constant_FLAG);
+    PARROT_ASSERT(d);
 
     /* This might set the constant flag again but it is the right thing
      * to do */

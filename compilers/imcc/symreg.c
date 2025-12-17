@@ -1116,6 +1116,7 @@ dup_sym(ARGMOD(imc_info_t * imcc), ARGIN(const SymReg *r))
 {
     ASSERT_ARGS(dup_sym)
     SymReg * const new_sym = mem_gc_allocate_zeroed_typed(imcc->interp, SymReg);
+    PARROT_ASSERT(new_sym);
     STRUCT_COPY(new_sym, r);
     if (r->name)
         new_sym->name = mem_sys_strdup(r->name);

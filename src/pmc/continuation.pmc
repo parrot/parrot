@@ -200,7 +200,8 @@ Assigns context.
 =cut
 
 */
-    VTABLE void set_pmc(PMC *src) {
+    VTABLE void set_pmc(ARGIN(PMC *src)) {
+        PARROT_ASSERT_ARG(PMC_data(src));
         STRUCT_COPY(PMC_data_typed(SELF, Parrot_Continuation_attributes *),
                     PMC_data_typed(src,  Parrot_Continuation_attributes *));
     }

@@ -60,6 +60,7 @@ Parrot_vtbl_clone_vtable(PARROT_INTERP, ARGIN(const VTABLE *base_vtable))
 {
     ASSERT_ARGS(Parrot_vtbl_clone_vtable)
     VTABLE * const new_vtable = mem_internal_allocate_typed(VTABLE);
+    PARROT_ASSERT(new_vtable);
 
     STRUCT_COPY(new_vtable, base_vtable);
 
