@@ -1,10 +1,15 @@
 2025-??-??    release 8.3.0
     - Core
         + Fix binding AF_UNIX sockets GH #1233 by Andrew Aldridge
+        + Fixed our memmem() implementation Parrot_util_byte_index() to not
+          access out of bounds bytes.
         + Fix SIGBUS in GC trace_mem_block on alignment-strict CPUs (arm), #1200.
           We traced all pointers by +1 and not by +4 or +8.
+        + Fixed some memory leaks in the imcc compiler, but it still leaks globals
+          with multiple PBC's.
     - Build
         + Fix most modern compiler warnings (gcc and clang)
+        + Updated bootstrap-namealias to work with latest gperf 3.2
 
 2016-03-15    release 8.2.0
     - Core
