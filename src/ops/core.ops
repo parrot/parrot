@@ -14,7 +14,6 @@ BEGIN_OPS_PREAMBLE
 #include "pmc/pmc_fixedintegerarray.h"
 #include "pmc/pmc_parrotlibrary.h"
 
-
 END_OPS_PREAMBLE
 
 =head1 NAME

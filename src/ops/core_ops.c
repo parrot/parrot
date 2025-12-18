@@ -46,7 +46,6 @@ extern op_lib_t core_op_lib;
 #include "pmc/pmc_parrotlibrary.h"
 
 
-
  /* Signed shift operator that is compatible with PMC shifts.  This is
   * guaranteed to produce the same result as bitwise_left_shift_internal modulo
   * word size, ignoring the fact that Parrot integers are always signed.  This
@@ -64,6 +63,7 @@ extern op_lib_t core_op_lib;
 
 
 #include "../io/io_private.h"
+#include <stdio.h>
 
 
 #include "parrot/encoding.h"

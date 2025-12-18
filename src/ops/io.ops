@@ -5,8 +5,8 @@
 
 BEGIN_OPS_PREAMBLE
 #include "../io/io_private.h"
+#include <stdio.h>
 END_OPS_PREAMBLE
-
 
 =head1 NAME
 
