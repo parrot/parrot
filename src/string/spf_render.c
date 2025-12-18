@@ -858,9 +858,9 @@ Parrot_sprintf_format(PARROT_INTERP, ARGIN(const STRING *pat), ARGMOD(SPRINTF_OB
                             /* Apply width to NaN/Inf/-Inf [GH #1100/perl6 RT#116280]
                                Don't rely on how systems print nan. */
                             if (is_special && info.width != 0) {
-                                char tc1[16];
+                                char tc1[24];
 #ifdef PARROT_HAS_SNPRINTF
-                                snprintf(tc1, 16, "%%"UINTVAL_FMT"s", info.width);
+                                snprintf(tc1, 23, "%%"UINTVAL_FMT"s", info.width);
                                 snprintf(tc, PARROT_SPRINTF_BUFFER_SIZE,
                                          tc1, tempstr);
 #else
