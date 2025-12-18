@@ -2110,8 +2110,9 @@ gc_ms_print_stats_always(PARROT_INTERP, ARGIN(const char* header))
             mem_pools->string_header_pool->num_free_objects,
             mem_pools->constant_string_header_pool->total_objects,
             mem_pools->constant_string_header_pool->num_free_objects);
-    fprintf(stderr, "     memused   %6lu, collected %6lu, block level %lu\n",
-            stats.memory_used, stats.memory_collected, mem_pools->gc_mark_block_level);
+    fprintf(stderr, "     memused   %6lu, collected %6lu, block level %u\n",
+            stats.memory_used, stats.memory_collected,
+            (unsigned)mem_pools->gc_mark_block_level);
 
     if (interp->parent_interpreter) {
         fprintf(stderr, "parent: 0x%lx, tid: %3d\n",
