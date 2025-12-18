@@ -20,7 +20,7 @@ $(LIBRARY_DIR)/nqp-rx.pbc: $(NQP_STAGE0_DIR)/NQP-s0.pir $(PARROT)
 
 ## eventually nqp should be able to generate .pbc files directly
 $(LIBRARY_DIR)/nqp-setting.pbc: $(NQP_STAGE0_DIR)/nqp-setting.nqp $(LIBRARY_DIR)/nqp-rx.pbc $(NQPRX_LIB_PBCS)
-	$(NO_MEMLEAK)$(PARROT) $(LIBRARY_DIR)/nqp-rx.pbc --target=pir -o $(NQP_STAGE0_DIR)/nqp-setting.pir $(NQP_STAGE0_DIR)/nqp-setting.nqp
+	$(PARROT) $(LIBRARY_DIR)/nqp-rx.pbc --target=pir -o $(NQP_STAGE0_DIR)/nqp-setting.pir $(NQP_STAGE0_DIR)/nqp-setting.nqp
 	$(PARROT) -o $@ $(NQP_STAGE0_DIR)/nqp-setting.pir
 	@$(ADDGENERATED) "$@" "[nqp]"
 
@@ -29,10 +29,10 @@ parrot-nqp.pbc : $(LIBRARY_DIR)/nqp-rx.pbc
 	$(CP) $(LIBRARY_DIR)/nqp-rx.pbc $@
 
 $(NQP_RX) : $(NQPRX_LIB_PBCS) $(PBC_TO_EXE) parrot-nqp.pbc
-	$(NO_MEMLEAK)$(PBC_TO_EXE) parrot-nqp.pbc
+	$(PBC_TO_EXE) parrot-nqp.pbc
 
 $(INSTALLABLENQP) : $(NQPRX_LIB_PBCS) src/install_config$(O) $(PBC_TO_EXE) parrot-nqp.pbc
-	$(NO_MEMLEAK)$(PBC_TO_EXE) parrot-nqp.pbc --install
+	$(PBC_TO_EXE) parrot-nqp.pbc --install
 	@$(ADDGENERATED) "$@" "[main]" bin
 
 # Local variables:

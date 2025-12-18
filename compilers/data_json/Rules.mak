@@ -4,7 +4,7 @@ runtime/parrot/languages/data_json/data_json.pbc: compilers/data_json/data_json.
 
 runtime/parrot/languages/JSON/JSON.pir: compilers/data_json/JSON.nqp $(NQP_RX)
 	$(MKPATH) runtime/parrot/languages/JSON
-	$(NO_MEMLEAK)$(NQP_RX) --target=pir compilers/data_json/JSON.nqp > $@
+	$(NQP_RX) --target=pir compilers/data_json/JSON.nqp > $@
 	@$(ADDGENERATED) "$@" "[data_json]"
 
 compilers/data_json/data_json.pbc : \
@@ -25,7 +25,7 @@ compilers/data_json/data_json/grammar.pir : $(PARROT) \
 compilers/data_json/data_json/pge2pir.pir : $(PARROT) \
     compilers/data_json/data_json/pge2pir.tg \
     compilers/tge/tgc.pbc
-	$(NO_MEMLEAK)$(PARROT) compilers/tge/tgc.pbc --output=$@ compilers/data_json/data_json/pge2pir.tg
+	$(PARROT) compilers/tge/tgc.pbc --output=$@ compilers/data_json/data_json/pge2pir.tg
 
 # Local variables:
 #   mode: makefile

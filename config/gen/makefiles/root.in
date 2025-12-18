@@ -973,11 +973,11 @@ parrot-prove.pbc : runtime/parrot/bin/prove.pir $(PARROT)
 	$(PARROT) -o parrot-prove.pbc runtime/parrot/bin/prove.pir
 
 $(PARROT_PROVE) : parrot-prove.pbc $(PARROT) $(PBC_TO_EXE)
-	$(NO_MEMLEAK)$(PBC_TO_EXE) parrot-prove.pbc
+	$(PBC_TO_EXE) parrot-prove.pbc
 
 $(PARROT_CONFIG) : $(DEV_TOOLS_DIR)/parrot-config.pir $(PARROT) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc $(DEV_TOOLS_DIR)/parrot-config.pir
-	$(NO_MEMLEAK)$(PARROT) pbc_to_exe.pbc parrot_config.pbc
+	$(PARROT) pbc_to_exe.pbc parrot_config.pbc
 
 $(MINIPARROT) : $(FRP_DIR)/main$(O) $(INC_DIR)/api.h $(INC_DIR)/longopt.h $(LIBPARROT) \
   src/null_config$(O)
@@ -1197,19 +1197,19 @@ $(INSTALLABLELIBPARROT) : $(O_FILES)
 
 $(INSTALLABLECONFIG) : src/install_config$(O) $(PARROT_CONFIG) $(PBC_TO_EXE)
 	$(PARROT) -o parrot_config.pbc $(DEV_TOOLS_DIR)/parrot-config.pir
-	$(NO_MEMLEAK)$(PBC_TO_EXE) parrot_config.pbc --install
+	$(PBC_TO_EXE) parrot_config.pbc --install
 	$(ADDGENERATED) "$@" "[main]" bin
 
 $(INSTALLABLEPBCTOEXE) : $(PBC_TO_EXE) src/install_config$(O)
-	$(NO_MEMLEAK)$(PBC_TO_EXE) pbc_to_exe.pbc --install
+	$(PBC_TO_EXE) pbc_to_exe.pbc --install
 	$(ADDGENERATED) "$@" "[main]" bin
 
 $(INSTALLABLENCITHUNKGEN) : parrot_nci_thunk_gen.pbc $(PBC_TO_EXE) src/install_config$(O)
-	$(NO_MEMLEAK)$(PBC_TO_EXE) parrot_nci_thunk_gen.pbc --install
+	$(PBC_TO_EXE) parrot_nci_thunk_gen.pbc --install
 	$(ADDGENERATED) "$@" "[main]" bin
 
 $(INSTALLABLEPARROT_PROVE) : parrot-prove.pbc $(PBC_TO_EXE) src/install_config$(O)
-	$(NO_MEMLEAK)$(PBC_TO_EXE) parrot-prove.pbc --install
+	$(PBC_TO_EXE) parrot-prove.pbc --install
 	$(ADDGENERATED) "$@" "[main]" bin
 #
 # Parrot Debugger
@@ -1330,7 +1330,7 @@ $(LIBRARY_DIR)/ProfTest/PIRProfile.pbc: $(LIBRARY_DIR)/ProfTest/PIRProfile.pir
 	$(ADDGENERATED) "$@" "[main]"
 
 $(LIBRARY_DIR)/ProfTest/PIRProfile.pir: $(LIBRARY_DIR)/ProfTest/PIRProfile.nqp $(NQP_RX)
-	$(NO_MEMLEAK)$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/PIRProfile.nqp > $@
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/PIRProfile.nqp > $@
 	$(ADDGENERATED) "$@" "[main]"
 
 $(LIBRARY_DIR)/ProfTest/NQPProfile.pbc: $(LIBRARY_DIR)/ProfTest/NQPProfile.pir
@@ -1338,7 +1338,7 @@ $(LIBRARY_DIR)/ProfTest/NQPProfile.pbc: $(LIBRARY_DIR)/ProfTest/NQPProfile.pir
 	$(ADDGENERATED) "$@" "[main]"
 
 $(LIBRARY_DIR)/ProfTest/NQPProfile.pir: $(LIBRARY_DIR)/ProfTest/NQPProfile.nqp $(NQP_RX)
-	$(NO_MEMLEAK)$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/NQPProfile.nqp > $@
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/NQPProfile.nqp > $@
 	$(ADDGENERATED) "$@" "[main]"
 
 $(LIBRARY_DIR)/ProfTest/Want.pbc: $(LIBRARY_DIR)/ProfTest/Want.pir
@@ -1346,7 +1346,7 @@ $(LIBRARY_DIR)/ProfTest/Want.pbc: $(LIBRARY_DIR)/ProfTest/Want.pir
 	$(ADDGENERATED) "$@" "[main]"
 
 $(LIBRARY_DIR)/ProfTest/Want.pir: $(LIBRARY_DIR)/ProfTest/Want.nqp $(NQP_RX)
-	$(NO_MEMLEAK)$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/Want.nqp > $@
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/Want.nqp > $@
 	$(ADDGENERATED) "$@" "[main]"
 
 $(LIBRARY_DIR)/ProfTest/Matcher.pbc: $(LIBRARY_DIR)/ProfTest/Matcher.pir
@@ -1354,7 +1354,7 @@ $(LIBRARY_DIR)/ProfTest/Matcher.pbc: $(LIBRARY_DIR)/ProfTest/Matcher.pir
 	$(ADDGENERATED) "$@" "[main]"
 
 $(LIBRARY_DIR)/ProfTest/Matcher.pir: $(LIBRARY_DIR)/ProfTest/Matcher.nqp $(NQP_RX)
-	$(NO_MEMLEAK)$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/Matcher.nqp > $@
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/ProfTest/Matcher.nqp > $@
 	$(ADDGENERATED) "$@" "[main]"
 
 #
@@ -1362,7 +1362,7 @@ $(LIBRARY_DIR)/ProfTest/Matcher.pir: $(LIBRARY_DIR)/ProfTest/Matcher.nqp $(NQP_R
 #
 
 $(LIBRARY_DIR)/YAML/Tiny.pir: $(LIBRARY_DIR)/YAML/Tiny.pm $(NQP_RX)
-	$(NO_MEMLEAK)$(NQP_RX) --target=pir $(LIBRARY_DIR)/YAML/Tiny.pm > $@
+	$(NQP_RX) --target=pir $(LIBRARY_DIR)/YAML/Tiny.pm > $@
 
 $(LIBRARY_DIR)/YAML/Tiny.pbc: $(LIBRARY_DIR)/YAML/Tiny.pir
 	$(PARROT) -o $@ $(LIBRARY_DIR)/YAML/Tiny.pir
@@ -1500,7 +1500,7 @@ examples/pasm/hello.pbc: examples/pasm/hello.pasm
 #examples/pasm/hello$(EXE): examples/pasm/hello$(O)
 #	$(MAKE_C) . EXEC=examples/pasm/hello exec
 examples/pasm/hello$(EXE): examples/pasm/hello.pbc $(PBC_TO_EXE)
-	$(NO_MEMLEAK)$(PBC_TO_EXE) examples/pasm/hello.pbc
+	$(PBC_TO_EXE) examples/pasm/hello.pbc
 
 
 ###############################################################################

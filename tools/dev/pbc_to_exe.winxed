@@ -122,9 +122,11 @@ const string C_MAIN = <<:MAIN
                   Parrot_set_config_hash(interp) &&
                   Parrot_api_set_executable_name(interp, execname) &&
                   Parrot_api_set_runcore(interp, RUNCORE, TRACE))) {
+                free(initargs);
                 fprintf(stderr, "PARROT VM: Could not initialize new interpreter\n");
                 show_last_error_and_exit(interp);
             }
+            free(initargs);
 
             setup_pir_compregs(interp);
 

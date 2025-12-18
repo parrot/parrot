@@ -3,44 +3,44 @@ $(LIBRARY_DIR)/opsc.pbc: $(NQP_RX) $(OPSC_SOURCES) $(NQPRX_LIB_SETTING)
 	@$(ADDGENERATED) "$@" "[main]"
 
 $(OPSC_DIR)/gen/Ops/Compiler.pir: $(OPSC_DIR)/src/Ops/Compiler.pm $(NQP_RX)
-	$(NO_MEMLEAK)$(NQP_RX) --target=pir --output=$@  $(OPSC_DIR)/src/Ops/Compiler.pm
+	$(NQP_RX) --target=pir --output=$@  $(OPSC_DIR)/src/Ops/Compiler.pm
 
 $(OPSC_DIR)/gen/Ops/Compiler/Actions.pir: $(OPSC_DIR)/src/Ops/Compiler/Actions.pm $(NQP_RX) \
   $(LIBRARY_DIR)/nqp-setting.pbc
-	$(NO_MEMLEAK)$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/src/Ops/Compiler/Actions.pm
+	$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/src/Ops/Compiler/Actions.pm
 
 $(OPSC_DIR)/gen/Ops/Compiler/Grammar.pir: $(OPSC_DIR)/src/Ops/Compiler/Grammar.pm $(NQP_RX) \
   $(LIBRARY_DIR)/HLL.pbc
-	$(NO_MEMLEAK)$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/src/Ops/Compiler/Grammar.pm
+	$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/src/Ops/Compiler/Grammar.pm
 
 $(OPSC_DIR)/gen/Ops/Emitter.pir: $(OPSC_DIR)/src/Ops/Emitter.pm $(NQP_RX)
-	$(NO_MEMLEAK)$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/src/Ops/Emitter.pm
+	$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/src/Ops/Emitter.pm
 
 $(OPSC_DIR)/gen/Ops/File.pir: $(OPSC_DIR)/src/Ops/File.pm $(NQP_RX) $(LIBRARY_DIR)/config.pbc
-	$(NO_MEMLEAK)$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/src/Ops/File.pm
+	$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/src/Ops/File.pm
 
 $(OPSC_DIR)/gen/Ops/Op.pir: $(OPSC_DIR)/src/Ops/Op.pm $(NQP_RX) $(LIBRARY_DIR)/dumper.pbc
-	$(NO_MEMLEAK)$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/src/Ops/Op.pm
+	$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/src/Ops/Op.pm
 
 $(OPSC_DIR)/gen/Ops/OpLib.pir: $(OPSC_DIR)/src/Ops/OpLib.pm $(NQP_RX) $(LIBRARY_DIR)/dumper.pbc
-	$(NO_MEMLEAK)$(NQP_RX) --target=pir --output=$@  $(OPSC_DIR)/src/Ops/OpLib.pm
+	$(NQP_RX) --target=pir --output=$@  $(OPSC_DIR)/src/Ops/OpLib.pm
 
 $(OPSC_DIR)/gen/Ops/Trans.pir: $(OPSC_DIR)/src/Ops/Trans.pm $(NQP_RX)
-	$(NO_MEMLEAK)$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/src/Ops/Trans.pm
+	$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/src/Ops/Trans.pm
 
 $(OPSC_DIR)/gen/Ops/Trans/C.pir: $(OPSC_DIR)/src/Ops/Trans/C.pm $(NQP_RX)
-	$(NO_MEMLEAK)$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/src/Ops/Trans/C.pm
+	$(NQP_RX) --target=pir --output=$@ $(OPSC_DIR)/src/Ops/Trans/C.pm
 
 # Target to force rebuild opsc from main Makefile
 $(OPSC_DIR)/ops2c.nqp: $(LIBRARY_DIR)/opsc.pbc
 
 $(OPS2C): $(OPSC_DIR)/ops2c.nqp $(LIBRARY_DIR)/opsc.pbc $(NQP_RX) $(PBC_TO_EXE)
-	$(NO_MEMLEAK)$(NQP_RX) --target=pir $(OPSC_DIR)/ops2c.nqp >parrot-ops2c.pir
+	$(NQP_RX) --target=pir $(OPSC_DIR)/ops2c.nqp >parrot-ops2c.pir
 	$(PARROT) -o parrot-ops2c.pbc parrot-ops2c.pir
-	$(NO_MEMLEAK)$(PBC_TO_EXE) parrot-ops2c.pbc
+	$(PBC_TO_EXE) parrot-ops2c.pbc
 
 $(INSTALLABLEOPS2C): $(OPS2C) src/install_config$(O)
-	$(NO_MEMLEAK)$(PBC_TO_EXE) parrot-ops2c.pbc --install
+	$(PBC_TO_EXE) parrot-ops2c.pbc --install
 	@$(ADDGENERATED) "$@" "[main]" bin
 
 opsc: $(LIBRARY_DIR)/opsc.pbc

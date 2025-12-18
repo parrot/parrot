@@ -140,9 +140,11 @@ main(int argc, const char *argv[])
     if (!(Parrot_api_make_interpreter(NULL, 0, initargs, &interp)
         && Parrot_api_set_executable_name(interp, argv[0]))) {
 
+        free(initargs);
         fprintf(stderr, "PARROT VM: Could not initialize new interpreter\n");
         show_last_error_and_exit(interp);
     }
+    free(initargs);
 
     argc -= opt.opt_index;
     argv += opt.opt_index;

@@ -9,10 +9,10 @@ winxed.pbc: ext/winxed/driver.pir $(PARROT)
 	$(PARROT) -o $@ ext/winxed/driver.pir
 
 $(WINXED) : winxed.pbc $(PBC_TO_EXE) $(WINXED_LANG)
-	$(NO_MEMLEAK)$(PBC_TO_EXE) winxed.pbc
+	$(PBC_TO_EXE) winxed.pbc
 
 $(INSTALLABLEWINXED) : winxed.pbc src/install_config$(O) $(PBC_TO_EXE)
-	$(NO_MEMLEAK)$(PBC_TO_EXE) winxed.pbc --install
+	$(PBC_TO_EXE) winxed.pbc --install
 	@$(ADDGENERATED) "$@" "[main]" bin
 
 # Local variables:

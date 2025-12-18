@@ -182,6 +182,7 @@ main(int argc, const char *argv[])
 
     if (!Parrot_api_make_interpreter(NULL, 0, initargs, &interp)) {
         fprintf(stderr, "PARROT VM: Could not allocate new interpreter\n");
+        free(initargs);
         if (interp != NULL)
             show_last_error_and_exit(interp);
         else
