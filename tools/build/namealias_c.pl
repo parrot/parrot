@@ -55,7 +55,7 @@ while (<$IN>) {
      (__cplusplus >= 201703L || \\
       (__cplusplus >= 201103L && \\
        defined __clang__ && __clang_major__ + (__clang_minor__ >= 9) > 3))) \\
-    || (__STDC_VERSION__ >= 202000L && \\
+    || (defined __STDC_VERSION__ && __STDC_VERSION__ >= 202000L && \\
         ((defined __GNUC__ && __GNUC__ >= 10) || \\
          (defined __clang__ && __clang_major__ >= 9)))\n/m;
     s/^\Q#elif (defined __GNUC__ && __GNUC__ >= 7) || (defined __clang__ && __clang_major__ >= 10)\E\n/#elif (defined __GNUC__ && __GNUC__ >= 7) || \\
@@ -77,7 +77,7 @@ while (<$IN>) {
     s/{-1},/{-1, 0},/g;
 
     # skip inline. we use it twice in core_ops.c. Note that on windows this regex fails.
-    s/\Q#if (defined (__STDC_VERSION__) && __STDC_VERSION__ >= 199901L) || defined(__cplusplus) || defined(__GNUC_STDC_INLINE__)
+    s/\Q#if (defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L) || defined(__cplusplus) || defined(__GNUC_STDC_INLINE__)
 inline
 #elif defined(__GNUC__)
 __inline

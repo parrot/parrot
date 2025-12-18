@@ -134,7 +134,7 @@ Parrot_namealias_hash(const char *str, size_t len)
      (__cplusplus >= 201703L || \
       (__cplusplus >= 201103L && \
        defined __clang__ && __clang_major__ + (__clang_minor__ >= 9) > 3))) \
-    || (__STDC_VERSION__ >= 202000L && \
+    || (defined __STDC_VERSION__ && __STDC_VERSION__ >= 202000L && \
         ((defined __GNUC__ && __GNUC__ >= 10) || \
          (defined __clang__ && __clang_major__ >= 9)))
       [[fallthrough]];
