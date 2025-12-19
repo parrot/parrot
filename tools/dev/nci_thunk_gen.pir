@@ -757,7 +757,7 @@ TEMPLATE
     var_decls = 'sprintf'(<<'TEMPLATE', ret_csig, params_csig, params_tdecl)
     typedef %s(* func_t)(%s);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     %s;

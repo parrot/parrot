@@ -40,7 +40,7 @@ pcf_char(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef char(* func_t)(void);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     INTVAL t_0; char v_0;
@@ -57,7 +57,7 @@ pcf_char_short_char(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef char(* func_t)(short, char);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     INTVAL t_0; char v_0;
@@ -77,7 +77,7 @@ pcf_double(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef double(* func_t)(void);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     FLOATVAL t_0; double v_0;
@@ -94,7 +94,7 @@ pcf_double_double(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef double(* func_t)(double);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     FLOATVAL t_0; double v_0;
@@ -112,7 +112,7 @@ pcf_float(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef float(* func_t)(void);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     FLOATVAL t_0; float v_0;
@@ -129,7 +129,7 @@ pcf_float_float_float(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef float(* func_t)(float, float);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     FLOATVAL t_0; float v_0;
@@ -149,7 +149,7 @@ pcf_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef int(* func_t)(void);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     INTVAL t_0; int v_0;
@@ -166,7 +166,7 @@ pcf_int_int_int_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef int(* func_t)(int, int, int);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     INTVAL t_0; int v_0;
@@ -188,7 +188,7 @@ pcf_int_ptr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef int(* func_t)(void *);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     INTVAL t_0; int v_0;
@@ -206,7 +206,7 @@ pcf_int_ptr_ptr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef int(* func_t)(void *, void *);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     INTVAL t_0; int v_0;
@@ -226,7 +226,7 @@ pcf_int_short_char(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef int(* func_t)(short, char);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     INTVAL t_0; int v_0;
@@ -246,7 +246,7 @@ pcf_int_cstr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef int(* func_t)(char *);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     INTVAL t_0; int v_0;
@@ -265,7 +265,7 @@ pcf_long(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef long(* func_t)(void);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     INTVAL t_0; long v_0;
@@ -282,7 +282,7 @@ pcf_ptr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void *(* func_t)(void);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     PMC  * t_0; void * v_0;
@@ -305,7 +305,7 @@ pcf_ptr_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void *(* func_t)(int);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     PMC  * t_0; void * v_0;
@@ -329,7 +329,7 @@ pcf_ptr_int_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void *(* func_t)(int, int);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     PMC  * t_0; void * v_0;
@@ -355,7 +355,7 @@ pcf_ptr_int_int_int_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void *(* func_t)(int, int, int, int);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     PMC  * t_0; void * v_0;
@@ -385,7 +385,7 @@ pcf_ptr_int_ptr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void *(* func_t)(int, void *);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     PMC  * t_0; void * v_0;
@@ -411,7 +411,7 @@ pcf_ptr_ptr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void *(* func_t)(void *);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     PMC  * t_0; void * v_0;
@@ -435,7 +435,7 @@ pcf_ptr_ptr_STRING(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void *(* func_t)(void *, STRING *);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     PMC  * t_0; void * v_0;
@@ -461,7 +461,7 @@ pcf_short(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef short(* func_t)(void);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     INTVAL t_0; short v_0;
@@ -478,7 +478,7 @@ pcf_short_short_char(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef short(* func_t)(short, char);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     INTVAL t_0; short v_0;
@@ -498,7 +498,7 @@ pcf_cstr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef char *(* func_t)(void);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     STRING * t_0; char * v_0;
@@ -515,7 +515,7 @@ pcf_cstr_cstr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef char *(* func_t)(char *);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     STRING * t_0; char * v_0;
@@ -534,7 +534,7 @@ pcf_cstr_cstr_cstr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef char *(* func_t)(char *, char *);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     STRING * t_0; char * v_0;
@@ -556,7 +556,7 @@ pcf_void(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void(* func_t)(void);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     ;
@@ -572,7 +572,7 @@ pcf_void_float_float_float(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void(* func_t)(float, float, float);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     FLOATVAL t_1; float v_1;
@@ -592,7 +592,7 @@ pcf_void_ptr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void(* func_t)(void *);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     PMC  * t_1; void * v_1;
@@ -608,7 +608,7 @@ pcf_void_PMC(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void(* func_t)(PMC *);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     PMC * t_1; PMC * v_1;
@@ -624,7 +624,7 @@ pcf_void_ptr_int_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void(* func_t)(void *, int, int);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     PMC  * t_1; void * v_1;
@@ -644,7 +644,7 @@ pcf_void_ptr_PMC(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
 {
     typedef void(* func_t)(void *, PMC *);
     func_t fn_pointer;
-    void *orig_func;
+    void *orig_func         = NULL;
     PMC * const ctx         = CURRENT_CONTEXT(interp);
     PMC * const call_object = Parrot_pcc_get_signature(interp, ctx);
     PMC  * t_1; void * v_1;
