@@ -186,8 +186,7 @@ SP              [ ]
             imcc->heredoc_end = NULL;
 
             imcc->frames->buffer = YY_CURRENT_BUFFER;
-            valp->s                           =
-                imcc->heredoc_content;
+            valp->s = imcc->heredoc_content;
 
             yy_pop_state(yyscanner);
             yy_scan_string(imcc->frames->heredoc_rest, yyscanner);
@@ -716,6 +715,7 @@ int yywrap(void* yyscanner) {
         fprintf(stderr, "Argh, interp not found\n");
         exit(1);
     }
+    imcc->yyscanner = yyscanner;
 
     yy_delete_buffer(YY_CURRENT_BUFFER, yyscanner);
 

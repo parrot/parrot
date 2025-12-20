@@ -145,6 +145,10 @@ imc_cleanup(ARGMOD(imc_info_t * imcc), ARGIN_NULLOK(void *yyscanner))
     mem_sys_free(imcc->ghash.data);
     imcc->ghash.data = NULL;
 
+    if (imcc->yyscanner) {
+        MEMORY_DEBUG_DETAIL_2("Freed %s at %p\n", "yyscanner", yyscanner);
+        free(yyscanner);
+    }
     if (imcc->state)
         imcc->state->file = STRINGNULL;
     imcc->last_unit = NULL;

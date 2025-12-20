@@ -435,6 +435,7 @@ typedef struct _imcc_globals_t {
 struct _imc_info_t {
     Parrot_Interp          interp;
     struct _imc_info_t    *prev;
+    yyscan_t              *yyscanner;
     IMC_Unit              *imc_units;
     IMC_Unit              *last_unit;
     IMC_Unit              *cur_unit;

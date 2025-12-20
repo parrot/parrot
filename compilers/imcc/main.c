@@ -654,6 +654,7 @@ imcc_destroy(ARGFREE(imc_info_t * imcc))
         imcc->globals = NULL;
     }
 
+    imc_cleanup(imcc, NULL);
     mem_sys_free(imcc);
 }
 

@@ -70,8 +70,8 @@ runops(PARROT_INTERP, size_t offs)
     interp->current_runloop_id = our_runloop_id;
 
 #if RUNLOOP_TRACE
-    fprintf(stderr, "[entering loop %d, level %d]\n",
-            interp->current_runloop_id, our_runloop_level);
+    fprintf(stderr, "[entering loop %d, level %d] interp: %p\n",
+            interp->current_runloop_id, our_runloop_level, interp);
 #endif
 
     /*
@@ -128,8 +128,8 @@ runops(PARROT_INTERP, size_t offs)
         Parrot_runloop_free_jump_point(interp);
 
 #if RUNLOOP_TRACE
-    fprintf(stderr, "[exiting loop %d, level %d]\n",
-            our_runloop_id, our_runloop_level);
+    fprintf(stderr, "[exiting loop %d, level %d] interp: %p\n",
+            our_runloop_id, our_runloop_level, interp);
 #endif
 }
 

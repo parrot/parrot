@@ -4474,6 +4474,7 @@ int yywrap(void* yyscanner) {
         fprintf(stderr, "Argh, interp not found\n");
         exit(1);
     }
+    imcc->yyscanner = yyscanner;
 
     yy_delete_buffer(YY_CURRENT_BUFFER,yyscanner);
 

@@ -1,4 +1,3 @@
-
 #ifndef PARROT_OPLIB_OPS_H_GUARD
 #define PARROT_OPLIB_OPS_H_GUARD
 
