@@ -330,6 +330,14 @@ sub runstep {
 
     $conf->debug("\n");
 
+    # rcc is gcc compatible, but does not know the gcc warnings. It ignores
+    # unknown options with a warning, so do not pass any.
+    if ($conf->data->get('rcc')) {
+        $conf->debug("rcc does not support the gcc warnings\n");
+        $self->set_result('skipped');
+        return 1;
+    }
+
     my $compiler = '';
     if ( defined $conf->data->get('gccversion') ) {
         $compiler = $conf->data->get('g++') ? 'g++' :

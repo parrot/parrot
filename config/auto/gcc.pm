@@ -159,10 +159,15 @@ sub _evaluate_gcc {
         $conf->data->set('cc' => $cc.' -x c++');
     }
 
+    # rcc, a fast C compiler, is gcc compatible (defines __GNUC__) but knows
+    # none of the gcc warning options.
+    my $rcc = $cc =~ m{(?:^|/)rcc(?:\s|$)} ? 1 : 0;
+
     $conf->data->set(
         gccversion => $gccversion,
         'g++'      => $gpp,
-        clang      => $clang
+        clang      => $clang,
+        rcc        => $rcc
     );
     return 1;
 }

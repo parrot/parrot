@@ -117,6 +117,11 @@ and linker to use.  For example:
 I<See> 'perl Configure.pl --help' for more options and 'docs/configuration.pod'
 for more details.
 
+To compile Parrot much faster you can use the gcc compatible C<rcc> compiler.
+It is detected as gcc, but gets none of the gcc warning options:
+
+    perl Configure.pl --cc=rcc --link=gcc --ld=gcc
+
 For systems like HPUX that don't have inet_pton please run
 
     perl Configure.pl --define=inet_aton

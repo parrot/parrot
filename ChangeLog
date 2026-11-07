@@ -16,6 +16,8 @@
     - Build
         + Fix most modern compiler warnings (gcc and clang)
         + Updated bootstrap-namealias to work with latest gperf 3.2
+        + Added support for the rcc compiler, which is gcc compatible but does
+          not get the gcc warnings.
         + asan builds (-fsanitize=address) now get -fno-omit-frame-pointer, so
           that leak stacks are complete. The known, deliberate leaks are listed
           in tools/dev/lsan.supp, use LSAN_OPTIONS=suppressions=tools/dev/lsan.supp.
