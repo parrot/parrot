@@ -147,6 +147,8 @@ imcc_reset(ARGMOD(imc_info_t *imcc))
     ASSERT_ARGS(imcc_reset)
     Interp * interp = imcc->interp;
     Hash * macros = imcc->macros;
+    imcc_free_compile_state(imcc);
+    imcc_free_globals(imcc);
     memset(imcc, 0, sizeof (imc_info_t));
     imcc->interp = interp;
     imcc->macros = macros;
@@ -532,6 +534,8 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
     PMC      * const packfilepmc = Parrot_pf_get_packfile_pmc(imcc->interp, pf_raw, pf_path);
     INTVAL           success = 0;
 
+    imcc->yyscanner = yyscanner;
+
     /* TODO: Don't set current packfile in the interpreter. Leave the
              interpreter alone */
 
@@ -550,7 +554,7 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
     success = imcc_compile_buffer_safe(imcc, yyscanner, source, is_file, is_pasm);
 
     if (imcc->error_code) {
-        yylex_destroy(yyscanner);
+        imcc_free_compile_state(imcc);
 
         /* XXX Parrot_pf_get_packfile_pmc registers PMC */
         Parrot_pmc_gc_unregister(imcc->interp, packfilepmc);
@@ -559,7 +563,7 @@ imcc_run_compilation_internal(ARGMOD(imc_info_t *imcc), ARGIN(STRING *source),
         return PMCNULL;
     }
 
-    yylex_destroy(yyscanner);
+    imcc_free_compile_state(imcc);
     imc_cleanup(imcc, NULL);
 
     IMCC_info(imcc, 1, "%ld lines compiled.\n", imcc->line);
@@ -619,11 +623,7 @@ exit_reentrant_compile(ARGIN(imc_info_t *imcc), ARGMOD_NULLOK(struct _imc_info_t
     if (new_info && new_info->prev == imcc) {
         PARROT_ASSERT(imcc == new_info->prev);
         imc_cleanup(new_info, NULL);
-        if (new_info->globals) {
-            mem_sys_free(new_info->globals);
-            MEMORY_DEBUG_DETAIL_2("Freed %s at %p\n", "new_info->globals", new_info->globals);
-            new_info->globals = NULL;
-        }
+        imcc_free_globals(new_info);
         mem_sys_free(new_info);
     }
     return imcc;
@@ -648,11 +648,8 @@ imcc_destroy(ARGFREE(imc_info_t * imcc))
     if (macros)
         Parrot_hash_chash_destroy_values(imcc->interp, macros, imcc_destroy_macro_values);
 
-    if (imcc->globals) {
-        mem_sys_free(imcc->globals);
-        MEMORY_DEBUG_DETAIL_2("Freed %s at %p\n", "imcc->globals", imcc->globals);
-        imcc->globals = NULL;
-    }
+    imcc_free_compile_state(imcc);
+    imcc_free_globals(imcc);
 
     imc_cleanup(imcc, NULL);
     mem_sys_free(imcc);

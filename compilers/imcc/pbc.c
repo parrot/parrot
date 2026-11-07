@@ -373,22 +373,19 @@ static void verify_signature(
 
 /*
 
-=item C<static void imcc_globals_destroy(PARROT_INTERP, int exit_status, void
-*_imcc)>
+=item C<void imcc_free_globals(imc_info_t * imcc)>
 
-Frees memory allocated for IMCC globals for one particular compilation unit.
-This is called by the exit handlers registered with Parrot_x_on_exit().
-exit_status is the argument to exit(), but is unused here.
+Frees the IMCC globals: all code segments, their subs and cached key
+constants. Safe to call when there are no globals.
 
 =cut
 
 */
 
-static void
-imcc_globals_destroy(SHIM_INTERP, SHIM(int exit_status), ARGMOD(void *_imcc))
+void
+imcc_free_globals(ARGMOD(imc_info_t * imcc))
 {
-    ASSERT_ARGS(imcc_globals_destroy)
-    imc_info_t * const imcc = (imc_info_t*)_imcc;
+    ASSERT_ARGS(imcc_free_globals)
 
     /* In an exit within :immediate there will no globals. See TT #629 */
     if (imcc->globals) {
@@ -412,16 +409,30 @@ imcc_globals_destroy(SHIM_INTERP, SHIM(int exit_status), ARGMOD(void *_imcc))
             MEMORY_DEBUG_DETAIL_2("Freed %s at %p\n", "cs", cs);
             cs = prev_cs;
         }
-        /* double-free. apparently all ok here
-        if (imcc->globals->first) {
-            mem_sys_free(imcc->globals->first);
-            imcc->globals->cs = NULL;
-        }
-        */
         mem_sys_free(imcc->globals);
         MEMORY_DEBUG_DETAIL_2("Freed %s at %p\n", "imcc->globals", imcc->globals);
         imcc->globals = NULL;
     }
+}
+
+/*
+
+=item C<static void imcc_globals_destroy(PARROT_INTERP, int exit_status, void
+*_imcc)>
+
+Frees memory allocated for IMCC globals for one particular compilation unit.
+This is called by the exit handlers registered with Parrot_x_on_exit().
+exit_status is the argument to exit(), but is unused here.
+
+=cut
+
+*/
+
+static void
+imcc_globals_destroy(SHIM_INTERP, SHIM(int exit_status), ARGMOD(void *_imcc))
+{
+    ASSERT_ARGS(imcc_globals_destroy)
+    imcc_free_globals((imc_info_t*)_imcc);
 }
 
 
@@ -486,12 +497,14 @@ e_pbc_open(ARGMOD(imc_info_t * imcc))
     if (!imcc->globals) {
         imcc->globals = mem_gc_allocate_zeroed_typed(imcc->interp, imcc_globals);
         MEMORY_DEBUG_DETAIL_2("Allocated %s at %p\n", "imcc->globals", imcc->globals);
+        /* push cleanup code for the globals. A reentrant imcc is freed by
+           exit_reentrant_compile, which frees its globals itself. */
+        if (!imcc->prev)
+            Parrot_x_on_exit(imcc->interp, imcc_globals_destroy, imcc);
     }
 
     if (imcc->globals->cs)
         clear_sym_hash(&imcc->globals->cs->key_consts);
-    /* push cleanup code for the globals */
-    Parrot_x_on_exit(imcc->interp, imcc_globals_destroy, imcc);
 
     /* free previous cached key constants if any */
     create_symhash(imcc, &cs->key_consts);
@@ -2303,9 +2316,13 @@ e_pbc_end_sub(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(IMC_Unit *unit
     if (pragma & P_IMMEDIATE && (pragma & P_ANON)) {
         /* clear global symbols temporarily -- TT #1324, for example */
         imcc_globals *g = imcc->globals;
+        yyscan_t yyscanner = imcc->yyscanner;
+        char    *source_c  = imcc->source_c;
         SymHash ghash;
 
-        imcc->globals = NULL;
+        imcc->globals   = NULL;
+        imcc->yyscanner = NULL;
+        imcc->source_c  = NULL;
 
         memmove(&ghash, &imcc->ghash, sizeof (SymHash));
         memset(&imcc->ghash, 0, sizeof (SymHash));
@@ -2315,7 +2332,12 @@ e_pbc_end_sub(ARGMOD(imc_info_t * imcc), SHIM(void *param), ARGIN(IMC_Unit *unit
            to find a better mechanism to do this. */
         Parrot_pf_fixup_subs(imcc->interp, PBC_IMMEDIATE, NULL);
 
-        imcc->globals  = g;
+        /* free what a nested compile left behind, then restore ours */
+        imcc_free_compile_state(imcc);
+        imcc_free_globals(imcc);
+        imcc->yyscanner = yyscanner;
+        imcc->source_c  = source_c;
+        imcc->globals   = g;
         memmove(&imcc->ghash, &ghash, sizeof (SymHash));
     }
 }

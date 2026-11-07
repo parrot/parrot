@@ -4474,7 +4474,6 @@ int yywrap(void* yyscanner) {
         fprintf(stderr, "Argh, interp not found\n");
         exit(1);
     }
-    imcc->yyscanner = yyscanner;
 
     yy_delete_buffer(YY_CURRENT_BUFFER,yyscanner);
 
@@ -4945,10 +4944,10 @@ static void
 include_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *file_name), void *yyscanner)
 {
     yyguts_t      * const yyg   = (yyguts_t *)yyscanner;
-    macro_frame_t * const frame = new_frame(imcc);
-    STRING *s = Parrot_locate_runtime_file_str(imcc->interp,
+    STRING        *s = Parrot_locate_runtime_file_str(imcc->interp,
                                     file_name, PARROT_RUNTIME_FT_INCLUDE);
-    PIOHANDLE  file;
+    macro_frame_t *frame;
+    PIOHANDLE      file;
 
     if (STRING_IS_NULL(s)
     ||  (file = Parrot_io_internal_open(imcc->interp, s, PIO_F_READ)) == PIO_INVALID_HANDLE) {
@@ -4956,6 +4955,7 @@ include_file(ARGMOD(imc_info_t *imcc), ARGIN(STRING *file_name), void *yyscanner
             "No such file or directory '%Ss'", file_name);
     }
 
+    frame           = new_frame(imcc);
     frame->s.file   = file_name;
     frame->s.handle = file;
 
@@ -5035,6 +5035,27 @@ IMCC_pop_parser_state(ARGMOD(imc_info_t *imcc), void *yyscanner)
     pop_parser_state(imcc, yyscanner);
 }
 
+/* Frees the lexer and the C copy of the source of a compilation which was
+   aborted by a Parrot exception, which skips the regular cleanup. Also used
+   by the regular cleanup. */
+void
+imcc_free_compile_state(ARGMOD(imc_info_t *imcc))
+{
+    void * const yyscanner = imcc->yyscanner;
+
+    if (yyscanner) {
+        /* pop all frames while the scanner is alive, they switch buffers */
+        while (imcc->frames)
+            pop_parser_state(imcc, yyscanner);
+        yylex_destroy(yyscanner);
+        imcc->yyscanner = NULL;
+    }
+    if (imcc->source_c) {
+        Parrot_str_free_cstring(imcc->source_c);
+        imcc->source_c = NULL;
+    }
+}
+
 PIOHANDLE
 determine_input_file_type(ARGMOD(imc_info_t * imcc), ARGIN(STRING *sourcefile))
 {
@@ -5104,6 +5125,7 @@ imcc_cleanup_input(ARGMOD(imc_info_t * imcc), PIOHANDLE file,
         Parrot_io_internal_close(imcc->interp, file);
 
     Parrot_str_free_cstring(source_c);
+    imcc->source_c = NULL;
 }
 
 INTVAL
@@ -5116,6 +5138,7 @@ imcc_compile_buffer_safe(ARGMOD(imc_info_t *imcc), yyscan_t yyscanner,
     PIOHANDLE file;
     INTVAL success = 0;
 
+    imcc->source_c = source_c;
     imcc->frames->s.next = NULL;
     buffer = YY_CURRENT_BUFFER;
 

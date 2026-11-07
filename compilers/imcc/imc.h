@@ -401,6 +401,7 @@ typedef enum _AsmState {
 void IMCC_push_parser_state(imc_info_t *info, STRING *filename, int is_file,
         int is_pasm);
 void IMCC_pop_parser_state(imc_info_t *info, void *yyscanner);
+void imcc_free_compile_state(imc_info_t *info);
 
 typedef struct subs_t {
     IMC_Unit      *unit;
@@ -435,7 +436,8 @@ typedef struct _imcc_globals_t {
 struct _imc_info_t {
     Parrot_Interp          interp;
     struct _imc_info_t    *prev;
-    yyscan_t              *yyscanner;
+    yyscan_t               yyscanner;       /* live lexer, while compiling */
+    char                  *source_c;        /* live C source copy, while compiling */
     IMC_Unit              *imc_units;
     IMC_Unit              *last_unit;
     IMC_Unit              *cur_unit;

@@ -20,7 +20,7 @@ compilers/data_json/data_json/grammar.pir : $(PARROT) \
     compilers/data_json/data_json/grammar.pg \
     $(LIBRARY_DIR)/PGE/Perl6Grammar.pbc \
     $(LIBRARY_DIR)/PCT/HLLCompiler.pbc
-	$(NO_MEMLEAK)$(PARROT) $(LIBRARY_DIR)/PGE/Perl6Grammar.pbc --output=$@ compilers/data_json/data_json/grammar.pg
+	$(PARROT) $(LIBRARY_DIR)/PGE/Perl6Grammar.pbc --output=$@ compilers/data_json/data_json/grammar.pg
 
 compilers/data_json/data_json/pge2pir.pir : $(PARROT) \
     compilers/data_json/data_json/pge2pir.tg \

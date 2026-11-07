@@ -3791,6 +3791,8 @@ yyreduce:
     {
            IdList * const l = (yyvsp[0].idlist);
            (void)mk_ident(imcc, l->id, (yyvsp[-1].t), VTIDENTIFIER);
+           mem_sys_free(l->id);
+           mem_sys_free(l);
            imcc->is_def = 0;
            (yyval.sr) = 0;
          }
@@ -3999,6 +4001,7 @@ yyreduce:
     {
             SymReg * const name = mk_const(imcc, (yyvsp[-2].s), 'S');
             add_pcc_named_return(imcc, imcc->sr_return, name, (yyvsp[0].sr));
+            mem_sys_free((yyvsp[-2].s));
          }
 #line 3993 "compilers/imcc/imcparser.c" /* yacc.c:1646  */
     break;
@@ -4022,6 +4025,7 @@ yyreduce:
     {
            SymReg * const name = mk_const(imcc, (yyvsp[-2].s), 'S');
            add_pcc_named_return(imcc, imcc->sr_return, name, (yyvsp[0].sr));
+           mem_sys_free((yyvsp[-2].s));
          }
 #line 4016 "compilers/imcc/imcparser.c" /* yacc.c:1646  */
     break;

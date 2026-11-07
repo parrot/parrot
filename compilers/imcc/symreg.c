@@ -1233,6 +1233,7 @@ free_pcc_sub(ARGMOD(pcc_sub_t *sub))
     ASSERT_ARGS(free_pcc_sub)
 
     mem_sys_free(sub->multi);
+    mem_sys_free(sub->flags);
     mem_sys_free(sub->args);
     mem_sys_free(sub->arg_flags);
     mem_sys_free(sub->ret);

@@ -1706,6 +1706,8 @@ pcc_result:
          {
            IdList * const l = $4;
            (void)mk_ident(imcc, l->id, $3, VTIDENTIFIER);
+           mem_sys_free(l->id);
+           mem_sys_free(l);
            imcc->is_def = 0;
            $$ = 0;
          }
@@ -1812,8 +1814,9 @@ var_returns:
          }
    | STRINGC ADV_ARROW var
          {
-            SymReg * const name = mk_const(imcc, $1, 'S');
-            add_pcc_named_return(imcc, imcc->sr_return, name, $3);
+           SymReg * const name = mk_const(imcc, $1, 'S');
+           add_pcc_named_return(imcc, imcc->sr_return, name, $3);
+           mem_sys_free($1);
          }
    | var_returns COMMA arg
          {
@@ -1829,6 +1832,7 @@ var_returns:
          {
            SymReg * const name = mk_const(imcc, $3, 'S');
            add_pcc_named_return(imcc, imcc->sr_return, name, $5);
+           mem_sys_free($3);
          }
    ;
 

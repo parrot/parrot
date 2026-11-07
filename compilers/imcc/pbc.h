@@ -42,6 +42,10 @@ int e_pbc_open(ARGMOD(imc_info_t * imcc))
         __attribute__nonnull__(1)
         FUNC_MODIFIES(* imcc);
 
+void imcc_free_globals(ARGMOD(imc_info_t * imcc))
+        __attribute__nonnull__(1)
+        FUNC_MODIFIES(* imcc);
+
 PARROT_WARN_UNUSED_RESULT
 INTVAL IMCC_int_from_reg(ARGMOD(imc_info_t * imcc), ARGIN(const SymReg *r))
         __attribute__nonnull__(1)
@@ -84,6 +88,8 @@ STRING * IMCC_string_from_reg(
        PARROT_ASSERT_ARG(imcc) \
     , PARROT_ASSERT_ARG(unit))
 #define ASSERT_ARGS_e_pbc_open __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(imcc))
+#define ASSERT_ARGS_imcc_free_globals __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc))
 #define ASSERT_ARGS_IMCC_int_from_reg __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(imcc) \
