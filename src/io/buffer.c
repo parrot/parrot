@@ -226,8 +226,18 @@ Parrot_io_buffer_resize(SHIM_INTERP, ARGMOD(IO_BUFFER *buffer), size_t new_size)
     if (buffer->buffer_size >= new_size)
         return new_size;
 
-    buffer->buffer_ptr = (char *)mem_sys_realloc(buffer->buffer_ptr, new_size);
-    buffer->buffer_size = new_size;
+    {
+        /* realloc may move the block: keep the data offsets, not the pointers */
+        const size_t start_off = buffer->buffer_start - buffer->buffer_ptr;
+        const size_t end_off   = buffer->buffer_end   - buffer->buffer_ptr;
+
+        buffer->buffer_ptr   = (char *)mem_sys_realloc(buffer->buffer_ptr, new_size);
+        buffer->buffer_start = buffer->buffer_ptr + start_off;
+        buffer->buffer_end   = buffer->buffer_ptr + end_off;
+        buffer->buffer_size  = new_size;
+        /* an empty-sized buffer owned no memory before */
+        buffer->flags       |= PIO_BF_MALLOC;
+    }
     return new_size;
 }
 
