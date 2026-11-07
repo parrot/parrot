@@ -122,7 +122,6 @@ END
     close $OUT or die "Can't close $gen_pm: $!";
 
     $conf->data->clean('TEMP_asan');
-    $conf->data->clean('TEMP_memleak');
     $template = $self->{templates}->{config_lib};
     open( $IN,  "<", $template ) or die "Can't open '$template': $!";
     my $c_l_pir = q{config_lib.pir};

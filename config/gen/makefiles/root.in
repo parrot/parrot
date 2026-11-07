@@ -118,8 +118,6 @@ RPATH_BLIB       = @rpath_blib@
 PODEXTRACT       = $(PERL) $(BUILD_TOOLS_DIR)/podextract.pl
 ADDGENERATED     = $(PERL) $(BUILD_TOOLS_DIR)/addgenerated.pl
 #IF(darwin):export MACOSX_DEPLOYMENT_TARGET = @osx_version@
-#IF(TEMP_asan):NO_MEMLEAK       = @TEMP_memleak@
-#ELSE:NO_MEMLEAK       =
 
 ###############################################################################
 #
@@ -1760,6 +1758,7 @@ src/interp/api$(O) : $(PARROT_H_HEADERS) \
 	include/imcc/embed.h \
 	include/imcc/yyscanner.h \
 	$(INC_DIR)/runcore_api.h \
+	$(INC_DIR)/alarm.h \
 	$(INC_PMC_DIR)/pmc_parrotinterpreter.h \
 	$(INC_DIR)/oplib/core_ops.h \
 	src/gc/gc_private.h \

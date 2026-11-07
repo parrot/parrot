@@ -18,6 +18,7 @@ Functions related to managing the Parrot interpreter
 */
 
 #include "parrot/parrot.h"
+#include "parrot/alarm.h"
 #include "parrot/runcore_api.h"
 #include "parrot/oplib/core_ops.h"
 #include "pmc/pmc_callcontext.h"
@@ -598,6 +599,10 @@ Parrot_interp_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg)
     /* deinit runcores and dynamic op_libs */
     if (!interp->parent_interpreter)
         Parrot_runcore_destroy(interp);
+
+    /* stop the alarm thread, it must not outlive the master interpreter */
+    if (!interp->parent_interpreter)
+        Parrot_alarm_destroy();
 
     /*
      * now all objects that need timely destruction should be finalized

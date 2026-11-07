@@ -1160,6 +1160,7 @@ pcf_ptr_ptr_cstr_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
            t_0 = PMCNULL;
        };
     t_2 = Parrot_str_new(interp, v_2, 0);
+    Parrot_str_free_cstring(v_2);
     Parrot_pcc_set_call_from_c_args(interp, call_object, "PS", t_0, t_2);
 }
 static void
@@ -1191,6 +1192,7 @@ pcf_ptr_ptr_cstr_int_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
            t_0 = PMCNULL;
        };
     t_2 = Parrot_str_new(interp, v_2, 0);
+    Parrot_str_free_cstring(v_2);
     Parrot_pcc_set_call_from_c_args(interp, call_object, "PS", t_0, t_2);
 }
 static void
@@ -1216,6 +1218,7 @@ pcf_ptr_cstr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
            t_0 = PMCNULL;
        };
     t_1 = Parrot_str_new(interp, v_1, 0);
+    Parrot_str_free_cstring(v_1);
     Parrot_pcc_set_call_from_c_args(interp, call_object, "PS", t_0, t_1);
 }
 static void
@@ -1243,6 +1246,7 @@ pcf_ptr_cstr_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
            t_0 = PMCNULL;
        };
     t_1 = Parrot_str_new(interp, v_1, 0);
+    Parrot_str_free_cstring(v_1);
     Parrot_pcc_set_call_from_c_args(interp, call_object, "PS", t_0, t_1);
 }
 static void
@@ -2032,6 +2036,7 @@ pcf_int_int_int_cstr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     v_0 =  (*fn_pointer)(v_1, v_2, v_3);
     t_0 = (INTVAL)v_0;
     t_3 = Parrot_str_new(interp, v_3, 0);
+    Parrot_str_free_cstring(v_3);
     Parrot_pcc_set_call_from_c_args(interp, call_object, "IS", t_0, t_3);
 }
 static void
@@ -2057,6 +2062,7 @@ pcf_int_int_int_cstr_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     v_0 =  (*fn_pointer)(v_1, v_2, v_3, v_4);
     t_0 = (INTVAL)v_0;
     t_3 = Parrot_str_new(interp, v_3, 0);
+    Parrot_str_free_cstring(v_3);
     Parrot_pcc_set_call_from_c_args(interp, call_object, "IS", t_0, t_3);
 }
 static void
@@ -2104,6 +2110,7 @@ pcf_int_int_cstr_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     v_0 =  (*fn_pointer)(v_1, v_2, v_3);
     t_0 = (INTVAL)v_0;
     t_2 = Parrot_str_new(interp, v_2, 0);
+    Parrot_str_free_cstring(v_2);
     Parrot_pcc_set_call_from_c_args(interp, call_object, "IS", t_0, t_2);
 }
 static void
@@ -2343,6 +2350,7 @@ pcf_int_ptr_int_int_cstr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     v_0 =  (*fn_pointer)(v_1, v_2, v_3, v_4);
     t_0 = (INTVAL)v_0;
     t_4 = Parrot_str_new(interp, v_4, 0);
+    Parrot_str_free_cstring(v_4);
     Parrot_pcc_set_call_from_c_args(interp, call_object, "IS", t_0, t_4);
 }
 static void
@@ -2370,6 +2378,7 @@ pcf_int_ptr_int_int_cstr_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     v_0 =  (*fn_pointer)(v_1, v_2, v_3, v_4, v_5);
     t_0 = (INTVAL)v_0;
     t_4 = Parrot_str_new(interp, v_4, 0);
+    Parrot_str_free_cstring(v_4);
     Parrot_pcc_set_call_from_c_args(interp, call_object, "IS", t_0, t_4);
 }
 static void
@@ -2419,6 +2428,7 @@ pcf_int_ptr_int_cstr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     v_0 =  (*fn_pointer)(v_1, v_2, v_3);
     t_0 = (INTVAL)v_0;
     t_3 = Parrot_str_new(interp, v_3, 0);
+    Parrot_str_free_cstring(v_3);
     Parrot_pcc_set_call_from_c_args(interp, call_object, "IS", t_0, t_3);
 }
 static void
@@ -2642,6 +2652,7 @@ pcf_int_ptr_cstr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     v_0 =  (*fn_pointer)(v_1, v_2);
     t_0 = (INTVAL)v_0;
     t_2 = Parrot_str_new(interp, v_2, 0);
+    Parrot_str_free_cstring(v_2);
     Parrot_pcc_set_call_from_c_args(interp, call_object, "IS", t_0, t_2);
 }
 static void
@@ -2665,6 +2676,7 @@ pcf_int_ptr_cstr_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     v_0 =  (*fn_pointer)(v_1, v_2, v_3);
     t_0 = (INTVAL)v_0;
     t_2 = Parrot_str_new(interp, v_2, 0);
+    Parrot_str_free_cstring(v_2);
     Parrot_pcc_set_call_from_c_args(interp, call_object, "IS", t_0, t_2);
 }
 static void
@@ -2768,6 +2780,7 @@ pcf_int_cstr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     v_0 =  (*fn_pointer)(v_1);
     t_0 = (INTVAL)v_0;
     t_1 = Parrot_str_new(interp, v_1, 0);
+    Parrot_str_free_cstring(v_1);
     Parrot_pcc_set_call_from_c_args(interp, call_object, "IS", t_0, t_1);
 }
 static void
@@ -2789,6 +2802,7 @@ pcf_int_cstr_int(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     v_0 =  (*fn_pointer)(v_1, v_2);
     t_0 = (INTVAL)v_0;
     t_1 = Parrot_str_new(interp, v_1, 0);
+    Parrot_str_free_cstring(v_1);
     Parrot_pcc_set_call_from_c_args(interp, call_object, "IS", t_0, t_1);
 }
 static void
@@ -3053,6 +3067,7 @@ pcf_ptr_cstr_ptr_ptr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
            t_0 = PMCNULL;
        };
     t_1 = Parrot_str_new(interp, v_1, 0);
+    Parrot_str_free_cstring(v_1);
     Parrot_pcc_set_call_from_c_args(interp, call_object, "PS", t_0, t_1);
 }
 static void
@@ -3147,6 +3162,7 @@ pcf_cstr_cstr(PARROT_INTERP, PMC *nci, SHIM(PMC *self))
     v_0 =  (*fn_pointer)(v_1);
     t_0 = Parrot_str_new(interp, v_0, 0);
     t_1 = Parrot_str_new(interp, v_1, 0);
+    Parrot_str_free_cstring(v_1);
     Parrot_pcc_set_call_from_c_args(interp, call_object, "SS", t_0, t_1);
 }
 static void

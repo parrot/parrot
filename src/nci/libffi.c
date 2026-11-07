@@ -769,6 +769,13 @@ call_ffi_thunk(PARROT_INTERP, ARGMOD(PMC *nci_pmc), ARGMOD(PMC *self))
     }
 
     if (nci->arity) {
+        /* the C strings made by Parrot_str_to_cstring for cstr args are ours */
+        for (i = 0; i < nci->arity; i++) {
+            const PARROT_DATA_TYPE t = (PARROT_DATA_TYPE)
+                VTABLE_get_integer_keyed_int(interp, nci->signature, i + 1);
+            if ((t & ~enum_type_ref_flag) == enum_type_cstr && nci_val[i].t)
+                Parrot_str_free_cstring(nci_val[i].t);
+        }
         mem_gc_free(interp, nci_val);
         mem_gc_free(interp, nci_arg);
         mem_gc_free(interp, nci_arg_ptr);

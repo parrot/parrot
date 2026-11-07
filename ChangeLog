@@ -5,12 +5,21 @@
           access out of bounds bytes.
         + Fix SIGBUS in GC trace_mem_block on alignment-strict CPUs (arm), #1200.
           We traced all pointers by +1 and not by +4 or +8.
-        + Fixed some memory leaks in the imcc compiler, but it still leaks globals
-          with multiple PBC's.
+        + Fixed memory leaks in the imcc compiler (globals, lexer state, error
+          paths, named returns), the io buffers, the NCI cstring arguments, the
+          alarm thread (now stopped and joined with the master interpreter),
+          and in the bignum, complex, bytebuffer, packfile and gziphandle PMCs.
+          Fixed Parrot_io_buffer_resize leaving buffer_start and buffer_end
+          dangling. Still leaking by design: the PackFile of
+          Packfile.set_string_native and the master interpreter on exit.
 	+ Support unicode strings for bitwise ops. GH #848
     - Build
         + Fix most modern compiler warnings (gcc and clang)
         + Updated bootstrap-namealias to work with latest gperf 3.2
+        + asan builds (-fsanitize=address) now get -fno-omit-frame-pointer, so
+          that leak stacks are complete. The known, deliberate leaks are listed
+          in tools/dev/lsan.supp, use LSAN_OPTIONS=suppressions=tools/dev/lsan.supp.
+          Removed the unused NO_MEMLEAK and TEMP_memleak settings.
 
 2016-03-15    release 8.2.0
     - Core

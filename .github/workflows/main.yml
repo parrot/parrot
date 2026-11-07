@@ -30,6 +30,11 @@ jobs:
   linux:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      # Known, documented leaks, see the file for the reasons. The suppressions
+      # match on the caller frames, so the asan build keeps frame pointers
+      # (Configure.pl adds -fno-omit-frame-pointer for -fsanitize=address).
+      LSAN_OPTIONS: suppressions=${{ github.workspace }}/tools/dev/lsan.supp
     strategy:
       fail-fast: false
       matrix:

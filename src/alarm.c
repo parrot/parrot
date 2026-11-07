@@ -41,8 +41,9 @@ static void* Parrot_alarm_runloop(void *arg);
 
 =item C<void Parrot_alarm_init(void)>
 
-Initialize the alarm queue. This function should only be called from the initial
-pthread. Any other pthreads should make sure to mask out SIGALRM.
+Initialize the alarm queue and start the alarm thread. This function should
+only be called from the initial pthread. Any other pthreads should make sure to
+mask out SIGALRM. Calls nest: the thread is started by the first call only.
 
 =cut
 
@@ -50,15 +51,68 @@ pthread. Any other pthreads should make sure to mask out SIGALRM.
 
 static Parrot_mutex alarm_lock;
 static Parrot_cond sleep_cond;
+static Parrot_thread alarm_thread;
+static volatile int alarm_stop = 0;
+static volatile int alarm_ready = 0;
+static int alarm_users = 0;
+static int alarm_primitives_inited = 0;
 
 void
 Parrot_alarm_init(void)
 {
     ASSERT_ARGS(Parrot_alarm_init)
-    Parrot_thread thread;
-    MUTEX_INIT(alarm_lock);
-    COND_INIT(sleep_cond);
-    THREAD_CREATE_JOINABLE(thread, Parrot_alarm_runloop, NULL);
+    if (alarm_users++)
+        return;
+    /* the lock and cond stay valid after the thread is gone, other
+       interpreters may still set alarms */
+    if (!alarm_primitives_inited) {
+        MUTEX_INIT(alarm_lock);
+        COND_INIT(sleep_cond);
+        alarm_primitives_inited = 1;
+    }
+    alarm_stop  = 0;
+    alarm_ready = 0;
+    THREAD_CREATE_JOINABLE(alarm_thread, Parrot_alarm_runloop, NULL);
+
+#ifdef PARROT_HAS_THREADS
+    /* Do not return before the thread is fully started. A process which exits
+       right away would otherwise tear down a half-started thread. */
+    LOCK(alarm_lock);
+    while (!alarm_ready)
+        COND_WAIT(sleep_cond, alarm_lock);
+    UNLOCK(alarm_lock);
+#endif
+}
+
+/*
+
+=item C<void Parrot_alarm_destroy(void)>
+
+Undo one C<Parrot_alarm_init>. The last call stops the alarm thread and waits
+for it to finish, so that it does not outlive the master interpreter.
+
+=cut
+
+*/
+
+void
+Parrot_alarm_destroy(void)
+{
+    ASSERT_ARGS(Parrot_alarm_destroy)
+    void *ret = NULL;
+
+    if (!alarm_users || --alarm_users)
+        return;
+
+    LOCK(alarm_lock);
+    alarm_stop   = 1;
+    alarm_set_to = 0.0;
+    COND_SIGNAL(sleep_cond);
+    UNLOCK(alarm_lock);
+
+    JOIN(alarm_thread, ret);
+    UNUSED(ret)
+    current_alarm = 0.0;
 }
 
 /*
@@ -79,6 +133,12 @@ Parrot_alarm_runloop(SHIM(void *arg))
 {
     ASSERT_ARGS(Parrot_alarm_runloop)
 
+    /* tell Parrot_alarm_init that the thread is up and running */
+    LOCK(alarm_lock);
+    alarm_ready = 1;
+    COND_SIGNAL(sleep_cond);
+    UNLOCK(alarm_lock);
+
     while (1) {
         int rc = 0;
         INTVAL notify = 0;
@@ -93,13 +153,18 @@ Parrot_alarm_runloop(SHIM(void *arg))
             current_alarm = alarm_set_to;
             alarm_set_to = 0;
             rc = 0;
-            while (alarm_set_to == 0 && rc == 0)
+            while (alarm_set_to == 0 && rc == 0 && !alarm_stop)
                 COND_TIMED_WAIT(sleep_cond, alarm_lock, &ts, rc);
         }
         else {
             /* no alarms set, just wait for new alarms */
-            while (alarm_set_to == 0)
+            while (alarm_set_to == 0 && !alarm_stop)
                 COND_WAIT(sleep_cond, alarm_lock);
+        }
+
+        if (alarm_stop) {
+            UNLOCK(alarm_lock);
+            break;
         }
 
         /* Check if we need to notify threads. We need to notify threads if

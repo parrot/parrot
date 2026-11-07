@@ -61,7 +61,6 @@ else {
 # GH #1256
 if ($PConfig_Temp{TEMP_asan}) {
     @tests = grep { $_ !~ m{^\Qt/compilers/opsc/02-parse-all-ops.t\E} } @tests;
-    # $ENV{TEST_PROG} = $PConfig_Temp{TEMP_memleak} . $ENV{TEST_PROG};
 }
 
 my $harness;

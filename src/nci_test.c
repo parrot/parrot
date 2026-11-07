@@ -1052,7 +1052,12 @@ PARROT_DYNEXT_EXPORT
 char *
 nci_ttt(ARGIN(const char *s1), ARGIN(const char *s2))
 {
-    char* s = (char*) malloc((2 * strlen(s2)) + strlen(s1) + 5);
+    /* The caller does not free the result of an NCI function, so keep it in
+       a buffer which is reused by the next call. */
+    static char *s = NULL;
+    const size_t len = (2 * strlen(s2)) + strlen(s1) + 5;
+
+    s = (char*) realloc(s, len);
     sprintf(s, "%s, %s, %s", s2, s2, s1);
     printf("%s\n", s);
     return s;

@@ -102,16 +102,13 @@ sub _get_programs {
     $conf->data->set('TEMP_asan' => $asan);
     if ($asan) {
         $conf->debug("AddressSanitizer enabled\n");
-        if ($ENV{ASAN_OPTIONS} and $ENV{ASAN_OPTIONS} =~ /detect_leaks=0/) {
-            $conf->debug("ASAN_OPTIONS already has detect_leaks=0\n");
-        }
-        else {
-            if ($conf->data->get('OSNAME_provisional') =~ /VMS|MSWin/) {
-                $conf->data->set('TEMP_memleak' => "set ASAN_OPTIONS=detect_leaks=0 & ");
-            }
-            else {
-                $conf->data->set('TEMP_memleak' => "env ASAN_OPTIONS=detect_leaks=0 ");
-            }
+        # Leak reports and the LeakSanitizer suppressions (tools/dev/lsan.supp)
+        # need the caller frames. The fast unwinder only finds them with frame
+        # pointers, without them stacks are cut after 2 frames.
+        if ($ccflags !~ /-fno-omit-frame-pointer/) {
+            $ccflags .= ' -fno-omit-frame-pointer';
+            $conf->data->set( ccflags => $ccflags );
+            $conf->debug("ccflags: $ccflags\n");
         }
     }
 

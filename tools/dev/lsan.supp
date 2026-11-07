@@ -1,0 +1,17 @@
+# LeakSanitizer suppressions for known, deliberate leaks.
+#
+# Use with:
+#   LSAN_OPTIONS=suppressions=tools/dev/lsan.supp make test
+#
+# Every entry needs a reason. Do not add entries to hide new leaks, fix them.
+
+# Packfile.set_string_native deserializes a PackFile and must not destroy it,
+# because the PMCs created from its segments (e.g. sub->seg) still point into
+# it. See the "XXX memory leak" comment in src/pmc/packfile.pmc. Needs
+# reference counting of PackFile segments to be fixed properly.
+leak:Parrot_Packfile_set_string_native
+
+# PackfileBytecodeSegment.get_pointer builds a fresh PackFile_ByteCode on each
+# call. When reached through PackfileDirectory the PackFile owns and frees it,
+# but the get_addr op on a bare PackfileBytecodeSegment has no way to free it.
+leak:Parrot_PackfileBytecodeSegment_get_pointer

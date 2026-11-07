@@ -104,6 +104,7 @@ Parrot_api_string_export_wchar(ARGIN(Parrot_PMC interp_pmc), ARGIN(Parrot_String
         mbstowcs(wstrout, cstr, len);
         wstrout[len] = L'\0';
 
+        Parrot_str_free_cstring(cstr);
         *strout = wstrout;
     }
     else

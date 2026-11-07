@@ -724,7 +724,7 @@ CODE
 Result is 300.
 OUTPUT
 
-c_output_is( <<'CODE', <<'OUTPUT', 'multiple Parrot_interp_new/Parrot_x_exit cycles');
+c_output_is( <<'CODE', <<'OUTPUT', 'multiple Parrot_interp_new/Parrot_x_exit cycles', todo => ($PConfig{ccflags} =~ /-fsanitize=address/ ? "#765 master interp is not freed" : undef));
 
 #include <stdio.h>
 #include "parrot/parrot.h"

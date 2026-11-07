@@ -42,6 +42,7 @@ int main(int argc, char* argv[])
 
     GET_INIT_STRUCT(initargs);
     Parrot_api_make_interpreter(NULL, 0, initargs, &interpmc);
+    free(initargs);
 
     Parrot_api_string_import_ascii(interpmc, "I am a string.", &s_teststr);
     Parrot_api_pmc_box_string(interpmc, s_teststr, &p_str);
@@ -50,6 +51,7 @@ int main(int argc, char* argv[])
     Parrot_api_pmc_get_string(interpmc, p_keyedstr, &s_outstr);
     Parrot_api_string_export_ascii(interpmc, s_outstr, &c_outstr);
     printf("%s\n", c_outstr);
+    Parrot_api_string_free_exported_ascii(interpmc, c_outstr);
 
 
     Parrot_api_string_import_ascii(interpmc, "i", &s_teststr);
@@ -59,6 +61,7 @@ int main(int argc, char* argv[])
     Parrot_api_pmc_get_string(interpmc, p_str, &s_outstr);
     Parrot_api_string_export_ascii(interpmc, s_outstr, &c_outstr);
     printf("%s\n", c_outstr);
+    Parrot_api_string_free_exported_ascii(interpmc, c_outstr);
         return 0;
 }
 
@@ -85,6 +88,7 @@ int main(int argc, char* argv[])
 
     GET_INIT_STRUCT(initargs);
     Parrot_api_make_interpreter(NULL, 0, initargs, &interpmc);
+    free(initargs);
 
     Parrot_api_string_import_ascii(interpmc, "3.14159", &s_numstr);
 
@@ -130,6 +134,7 @@ int main(int argc, char* argv[])
 
     GET_INIT_STRUCT(initargs);
     Parrot_api_make_interpreter(NULL, 0, initargs, &interp_pmc);
+    free(initargs);
 
     Parrot_api_string_import_ascii(interp_pmc, "Hash", &name_hash);
     Parrot_api_pmc_box_string(interp_pmc, name_hash, &name_hash_pmc);
@@ -146,6 +151,7 @@ int main(int argc, char* argv[])
     Parrot_api_string_export_ascii(interp_pmc, str_out, &str_out_c);
 
     printf("%s\n", str_out_c);
+    Parrot_api_string_free_exported_ascii(interp_pmc, str_out_c);
 
     return 0;
 }
@@ -171,6 +177,7 @@ int main(int argc, char* argv[])
 
     GET_INIT_STRUCT(initargs);
     Parrot_api_make_interpreter(NULL, 0, initargs, &interpmc);
+    free(initargs);
 
     Parrot_api_string_import_ascii(interpmc, "I am a string.", &s_teststr);
     Parrot_api_pmc_box_string(interpmc, s_teststr, &p_pmc);
@@ -181,6 +188,7 @@ int main(int argc, char* argv[])
     Parrot_api_pmc_get_string(interpmc, p_keyedstr, &s_outstr);
     Parrot_api_string_export_ascii(interpmc, s_outstr, &c_out);
     printf("%s\n", c_out);
+    Parrot_api_string_free_exported_ascii(interpmc, c_out);
 
 
     Parrot_api_string_import_ascii(interpmc, "n", &s_teststr);
@@ -191,6 +199,7 @@ int main(int argc, char* argv[])
     Parrot_api_pmc_get_string(interpmc, p_pmc, &s_outstr);
     Parrot_api_string_export_ascii(interpmc, s_outstr, &c_out);
     printf("%s\n", c_out);
+    Parrot_api_string_free_exported_ascii(interpmc, c_out);
 
     return 0;
 }
@@ -217,6 +226,7 @@ int main(int argc, char* argv[])
 
     GET_INIT_STRUCT(initargs);
     Parrot_api_make_interpreter(NULL, 0, initargs, &interpmc);
+    free(initargs);
 
     Parrot_api_pmc_wrap_string_array(interpmc, 1, string_class, &p_key);
 
@@ -228,6 +238,7 @@ int main(int argc, char* argv[])
     Parrot_api_pmc_get_string(interpmc, p_pmc, &s_str2);
     Parrot_api_string_export_ascii(interpmc, s_str2, &c_out);
     printf("%s\n", c_out);
+    Parrot_api_string_free_exported_ascii(interpmc, c_out);
 
     Parrot_api_pmc_wrap_string_array(interpmc, 1, float_class, &p_key);
 
@@ -238,6 +249,7 @@ int main(int argc, char* argv[])
     Parrot_api_pmc_get_string(interpmc, p_pmc, &s_str2);
     Parrot_api_string_export_ascii(interpmc, s_str2, &c_out);
     printf("%s\n", c_out);
+    Parrot_api_string_free_exported_ascii(interpmc, c_out);
 
     return 0;
 }
@@ -265,6 +277,7 @@ int main(int argc, char* argv[])
 
     GET_INIT_STRUCT(initargs);
     Parrot_api_make_interpreter(NULL, 0, initargs, &interpmc);
+    free(initargs);
 
     Parrot_api_string_import_ascii(interpmc, "I love Vanilla!", &s_teststr);
     Parrot_api_pmc_box_string(interpmc, s_teststr, &p_pmc);
@@ -293,6 +306,7 @@ int main(int argc, char* argv[])
         Parrot_api_pmc_get_string(interpmc, p_pmc, &s_outstr);
         Parrot_api_string_export_ascii(interpmc, s_outstr, &c_out);
         printf("%s\n", c_out);
+        Parrot_api_string_free_exported_ascii(interpmc, c_out);
     }
     else printf("error\n");
 
@@ -357,6 +371,7 @@ int main(int argc, char* argv[])
 
     GET_INIT_STRUCT(initargs);
     Parrot_api_make_interpreter(NULL, 0, initargs, &interpmc);
+    free(initargs);
 
     Parrot_api_string_import_ascii(interpmc, "I love Vanilla!", &s_teststr);
     Parrot_api_pmc_box_string(interpmc, s_teststr, &p_pmc);
@@ -377,6 +392,7 @@ int main(int argc, char* argv[])
         Parrot_api_pmc_get_string(interpmc, p_pmc, &s_outstr);
         Parrot_api_string_export_ascii(interpmc, s_outstr, &c_out);
         printf("%s\n", c_out);
+        Parrot_api_string_free_exported_ascii(interpmc, c_out);
     }
     else printf("error\n");
 
@@ -404,6 +420,7 @@ int main(int argc, char* argv[])
 
     GET_INIT_STRUCT(initargs);
     Parrot_api_make_interpreter(NULL, 0, initargs, &interpmc);
+    free(initargs);
 
     Parrot_api_string_import_ascii(interpmc, "I am a string.", &s_teststr);
     Parrot_api_pmc_box_string(interpmc, s_teststr, &p_str);
@@ -412,14 +429,17 @@ int main(int argc, char* argv[])
     Parrot_api_string_byte_length(interpmc, s_frozen, &len);
     Parrot_api_string_export_ascii(interpmc, s_frozen, &c_outstr);
     Parrot_api_pmc_deserialize_bytes(interpmc, (const unsigned char *)c_outstr, len, &p_str_thawed);
+    Parrot_api_string_free_exported_ascii(interpmc, c_outstr);
 
     Parrot_api_pmc_get_string(interpmc, p_str_thawed, &s_outstr);
     Parrot_api_string_export_ascii(interpmc, s_outstr, &c_outstr);
     printf("Frozen and thawed: %s\n", c_outstr);
+    Parrot_api_string_free_exported_ascii(interpmc, c_outstr);
 
     Parrot_api_pmc_get_string(interpmc, p_str, &s_outstr);
     Parrot_api_string_export_ascii(interpmc, s_outstr, &c_outstr);
     printf("%s\n", c_outstr);
+    Parrot_api_string_free_exported_ascii(interpmc, c_outstr);
 
     return 0;
 }
@@ -447,12 +467,14 @@ int main(int argc, char* argv[])
 
     GET_INIT_STRUCT(initargs);
     Parrot_api_make_interpreter(NULL, 0, initargs, &interpmc);
+    free(initargs);
 
     Parrot_api_string_import_ascii(interpmc, "The answer is", &s_teststr);
     Parrot_api_pmc_box_string(interpmc, s_teststr, &p_str);
     Parrot_api_pmc_get_string(interpmc, p_str, &s_outstr);
     Parrot_api_string_export_ascii(interpmc, s_outstr, &c_outstr);
     printf("%s ", c_outstr);
+    Parrot_api_string_free_exported_ascii(interpmc, c_outstr);
 
     Parrot_api_pmc_box_float(interpmc, 10.5, &p_float);
     Parrot_api_pmc_get_float(interpmc, p_float, &outfloat);

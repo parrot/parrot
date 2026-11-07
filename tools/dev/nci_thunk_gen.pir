@@ -596,6 +596,15 @@ CODA
         $S0 = 'fill_tmpl_int'($S0, i)
         push postamble, $S0
 
+        # free the C string made for a cstr argument. The C string returned by
+        # the function (i == 0) is owned by the callee, never free that.
+        if sig_elt != .DATATYPE_CSTR goto no_free
+        unless i goto no_free
+        $S0 = "Parrot_str_free_cstring(v_%i)"
+        $S0 = 'fill_tmpl_int'($S0, i)
+        push postamble, $S0
+      no_free:
+
         $P0 = 'map_from_sig_table'('sig_char', sig_elt)
         $S0 = $P0[0]
         $S0 = 'fill_tmpl_int'($S0, i)

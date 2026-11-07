@@ -83,6 +83,7 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
     printf("ok 5\n");
+    Parrot_pa_destroy(interp, pa);
 
     return EXIT_SUCCESS;
 }
@@ -197,6 +198,7 @@ int main(int argc, char* argv[])
         printf("Wrong number of used cells: %d", pa->chunks[0]->next_free);
 
     printf("ok 7\n");
+    Parrot_pa_destroy(interp, pa);
 
     return EXIT_SUCCESS;
 }

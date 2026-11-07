@@ -107,6 +107,7 @@ int main(int argc, const char **argv)
 
     GET_INIT_STRUCT(initargs);
     Parrot_api_make_interpreter(NULL, 0, initargs, &interpmc);
+    free(initargs);
 
     Parrot_api_string_import_ascii(interpmc, "PIR", &s_teststr);
     Parrot_api_load_language(interpmc, s_teststr);
@@ -166,6 +167,7 @@ int main(void) {
     file = fopen("$temp_pbc", "w");
     fwrite(pbc_c, length, 1, file);
     fclose(file);
+    Parrot_api_string_free_exported_ascii(interp, pbc_c);
 
     /* Step 2: Now load in the PIR and execute it */
     Parrot_api_string_import(interp, "$temp_pbc", &filename);
