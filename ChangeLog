@@ -11,7 +11,15 @@
           and in the bignum, complex, bytebuffer, packfile and gziphandle PMCs.
           Fixed Parrot_io_buffer_resize leaving buffer_start and buffer_end
           dangling. Still leaking by design: the PackFile of
-          Packfile.set_string_native and the master interpreter on exit.
+          Packfile.set_string_native.
+        + --leak-test really destroys the master interpreter at exit now.
+          Parrot_interp_really_destroy only skipped it since 2012, so the
+          PARROT_DESTROY_FLAG was dead (GH #765): Parrot_x_execute_on_exit_handlers
+          no longer touches the interpreter after a handler freed it, and the
+          GMS GC destroys its objects at the finish run and is finalized.
+          Heap-loaded packfile files are now owned by the PackFile
+          (owns_src) and freed, IMCCompiler.destroy is called (it missed the
+          custom_destroy flag), and the IO vtables are freed at the very end.
 	+ Support unicode strings for bitwise ops. GH #848
     - Build
         + Fix most modern compiler warnings (gcc and clang)
@@ -20,7 +28,10 @@
           not get the gcc warnings.
         + asan builds (-fsanitize=address) now get -fno-omit-frame-pointer, so
           that leak stacks are complete. The known, deliberate leaks are listed
-          in tools/dev/lsan.supp, use LSAN_OPTIONS=suppressions=tools/dev/lsan.supp.
+          in tools/dev/lsan.supp, use
+          LSAN_OPTIONS=suppressions=tools/dev/lsan.supp:print_suppressions=0.
+          make test disables the asan fake stack (detect_stack_use_after_return=0),
+          which hid objects from the conservative GC and crashed randomly.
           Removed the unused NO_MEMLEAK and TEMP_memleak settings.
 
 2016-03-15    release 8.2.0

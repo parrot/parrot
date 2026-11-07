@@ -304,8 +304,19 @@ static size_t gc_gms_count_used_string_memory(PARROT_INTERP,
         __attribute__nonnull__(1)
         __attribute__nonnull__(2);
 
+static void gc_gms_destroy_all_objects(PARROT_INTERP,
+    ARGMOD(MarkSweep_GC *self))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*self);
+
 static void gc_gms_finalize(PARROT_INTERP)
         __attribute__nonnull__(1);
+
+static void gc_gms_finish_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
+        __attribute__nonnull__(1)
+        __attribute__nonnull__(2)
+        FUNC_MODIFIES(*pmc);
 
 static void gc_gms_free_buffer_header(PARROT_INTERP,
     ARGFREE(Parrot_Buffer *s),
@@ -530,8 +541,14 @@ static int gen2flags(int gen);
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(list))
+#define ASSERT_ARGS_gc_gms_destroy_all_objects __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(self))
 #define ASSERT_ARGS_gc_gms_finalize __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_gc_gms_finish_pmc __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp) \
+    , PARROT_ASSERT_ARG(pmc))
 #define ASSERT_ARGS_gc_gms_free_buffer_header __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_gc_gms_free_fixed_size_storage \
@@ -683,7 +700,7 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
                         : GC_DEFAULT_NURSERY_SIZE;
 
     /* We have to transfer ownership of memory to parent interp in threaded parrot */
-    interp->gc_sys->finalize_gc_system = NULL; /* gc_gms_finalize; */
+    interp->gc_sys->finalize_gc_system = gc_gms_finalize;
 
     interp->gc_sys->maybe_gc_mark               = gc_gms_maybe_mark_and_sweep;
     interp->gc_sys->do_gc_mark                  = gc_gms_mark_and_sweep;
@@ -794,6 +811,62 @@ Parrot_gc_gms_init(PARROT_INTERP, ARGIN(Parrot_GC_Init_Args *args))
 
 }
 
+/*
+
+=item C<static void gc_gms_destroy_all_objects(PARROT_INTERP, MarkSweep_GC
+*self)>
+
+Destroys every PMC of every generation and the dirty list: calls the destroy
+vtable if needed and frees the attributes. Used for the finish run of the
+master interpreter.
+
+=cut
+
+*/
+
+static void
+gc_gms_destroy_all_objects(PARROT_INTERP, ARGMOD(MarkSweep_GC *self))
+{
+    ASSERT_ARGS(gc_gms_destroy_all_objects)
+    size_t i;
+
+    for (i = 0; i < GC_MAX_GENERATIONS; i++) {
+        POINTER_ARRAY_ITER(self->objects[i],
+            PMC * const pmc = &(((pmc_alloc_struct *)ptr)->pmc);
+            gc_gms_finish_pmc(interp, pmc););
+    }
+
+    POINTER_ARRAY_ITER(self->dirty_list,
+        PMC * const pmc = &(((pmc_alloc_struct *)ptr)->pmc);
+        gc_gms_finish_pmc(interp, pmc););
+}
+
+/*
+
+=item C<static void gc_gms_finish_pmc(PARROT_INTERP, PMC *pmc)>
+
+Destroys one PMC for the finish run: calls its destroy vtable if it needs
+destruction and frees the attributes.
+
+=cut
+
+*/
+
+static void
+gc_gms_finish_pmc(PARROT_INTERP, ARGMOD(PMC *pmc))
+{
+    ASSERT_ARGS(gc_gms_finish_pmc)
+
+    if (PObj_custom_destroy_TEST(pmc)) {
+        PObj_custom_destroy_CLEAR(pmc);
+        VTABLE_destroy(interp, pmc);
+    }
+
+    if (pmc->vtable->attr_size && PMC_data(pmc))
+        gc_gms_free_pmc_attributes(interp, pmc);
+    PMC_data(pmc) = NULL;
+}
+
 static void
 gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
 {
@@ -805,9 +878,15 @@ gc_gms_mark_and_sweep(PARROT_INTERP, UINTVAL flags)
     if (self->gc_mark_block_level || self->gc_mark_block_level_locked)
         goto DONE;
 
-    /* Ignore it. Will cleanup in gc_gms_finalize */
-    if (flags & GC_finish_FLAG)
+    /* The master interpreter has to destroy all its objects now, including
+       constants and the live ones, so that custom destroy vtables run and
+       the attributes are freed. The memory itself is freed in
+       gc_gms_finalize. Children give their objects to the parent. */
+    if (flags & GC_finish_FLAG) {
+        if (!interp->parent_interpreter)
+            gc_gms_destroy_all_objects(interp, self);
         goto DONE;
+    }
 
     /* Ignore calls from String GC. We know better when to trigger GC */
     if (flags & GC_strings_cb_FLAG)
@@ -1507,9 +1586,14 @@ gc_gms_finalize(PARROT_INTERP)
         Parrot_pa_destroy(interp, self->strings[i]);
     }
 
+    Parrot_pa_destroy(interp, self->dirty_list);
+
     Parrot_gc_pool_destroy(interp, self->pmc_allocator);
     Parrot_gc_pool_destroy(interp, self->string_allocator);
     Parrot_gc_fixed_allocator_destroy(interp, self->fixed_size_allocator);
+
+    mem_internal_free(self);
+    interp->gc_sys->gc_private = NULL;
 }
 
 /*

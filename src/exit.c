@@ -111,8 +111,14 @@ void
 Parrot_x_exit(PARROT_INTERP, int status)
 {
     ASSERT_ARGS(Parrot_x_exit)
+    /* The exit handlers can free the interpreter, so get the jump buffer first */
+    Parrot_jump_buff * const env = interp->api_jmp_buf;
+
     Parrot_x_execute_on_exit_handlers(interp, status);
-    Parrot_x_jump_out(interp, status);
+    if (env)
+        longjmp(*env, 1);
+    else
+        PARROT_FORCE_EXIT(status);
 }
 
 /*
@@ -127,16 +133,16 @@ the interpreter is destroyed.
 */
 
 PARROT_COLD
-PARROT_NO_ADDRESS_SAFETY_ANALYSIS
 void
 Parrot_x_execute_on_exit_handlers(PARROT_INTERP, int status)
 {
     ASSERT_ARGS(Parrot_x_execute_on_exit_handlers)
 
     /* call all the exit handlers */
-    handler_node_t *node;
+    handler_node_t *node = interp->exit_handler_list;
 
-    node = interp->exit_handler_list;
+    /* Detach the list, the interpreter might be gone after the last handler */
+    interp->exit_handler_list = NULL;
 
     /* Block GC. We don't want any shenanigans while we are executing our
        callbacks */
@@ -145,16 +151,29 @@ Parrot_x_execute_on_exit_handlers(PARROT_INTERP, int status)
 
     while (node) {
         handler_node_t * const next = node->next;
+        /* Parrot_interp_really_destroy frees the interpreter, see issue 765.
+           Decide before the call, we must not look at the interpreter after
+           it. It is registered first, so it runs last. */
+        const int freed = node->function == Parrot_interp_really_destroy
+                       && Parrot_interp_frees_itself(interp);
+
         MEMORY_DEBUG_DETAIL_3("Run exit handler %p for function %p with arg %p\n",
                               node, node->function, node->arg);
 
         (node->function)(interp, status, node->arg);
         mem_internal_free(node);
         node = next;
+
+        if (freed) {
+            while (node) {
+                handler_node_t * const rest = node->next;
+                mem_internal_free(node);
+                node = rest;
+            }
+            return;
+        }
     }
 
-    /* It could be that the interpreter already is destroyed. See issue 765 */
-    interp->exit_handler_list = NULL;
     interp->final_exception = NULL;
 
     /* Re-enable GC, which we will want if GC finalizes */

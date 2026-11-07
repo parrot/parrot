@@ -236,6 +236,10 @@ INTVAL Parrot_io_eof(PARROT_INTERP, ARGIN(const PMC * const handle))
         __attribute__nonnull__(2);
 
 PARROT_EXPORT
+void Parrot_io_destroy(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
+PARROT_EXPORT
 PARROT_IGNORABLE_RESULT
 INTVAL /*@alt void@*/
 Parrot_io_eprintf(
@@ -728,6 +732,8 @@ INTVAL Parrot_io_write_byte_buffer_pmc(PARROT_INTERP,
 #define ASSERT_ARGS_Parrot_io_close_handle __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(pmc))
+#define ASSERT_ARGS_Parrot_io_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
 #define ASSERT_ARGS_Parrot_io_eof __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp) \
     , PARROT_ASSERT_ARG(handle))

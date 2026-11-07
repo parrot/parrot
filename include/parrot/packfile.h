@@ -281,6 +281,7 @@ typedef struct PackFile {
     const opcode_t      *src;         /* possible mmap()ed start of the PF */
     size_t               size;        /* size in bytes */
     INTVAL               is_mmap_ped; /* don't free it, munmap it at destroy */
+    INTVAL               owns_src;    /* src is a heap buffer, free it at destroy */
 
     PackFile_Header     *header;
 

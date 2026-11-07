@@ -202,9 +202,29 @@ Parrot_io_finish(PARROT_INTERP)
     Parrot_io_flush(interp, _PIO_STDOUT(interp));
     mem_gc_free(interp, interp->piodata->table);
     interp->piodata->table = NULL;
-    mem_gc_free(interp, interp->piodata);
-    interp->piodata = NULL;
+}
 
+/*
+
+=item C<void Parrot_io_destroy(PARROT_INTERP)>
+
+Frees the IO data and the IO vtables. Called during the interpreter
+destruction, after all FileHandles are destroyed, as they point to the vtables.
+
+=cut
+
+*/
+
+PARROT_EXPORT
+void
+Parrot_io_destroy(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_io_destroy)
+    if (interp->piodata) {
+        mem_gc_free(interp, interp->piodata->vtables);
+        mem_gc_free(interp, interp->piodata);
+        interp->piodata = NULL;
+    }
 }
 
 /*

@@ -561,6 +561,10 @@ void Parrot_interp_clear_emergency_interpreter(void);
 PARROT_CAN_RETURN_NULL
 Interp* Parrot_interp_get_emergency_interpreter(void);
 
+PARROT_WARN_UNUSED_RESULT
+int Parrot_interp_frees_itself(PARROT_INTERP)
+        __attribute__nonnull__(1);
+
 void Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, void *arg)
         __attribute__nonnull__(1);
 
@@ -652,6 +656,8 @@ void Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, void *arg)
 #define ASSERT_ARGS_Parrot_interp_get_emergency_interpreter \
      __attribute__unused__ int _ASSERT_ARGS_CHECK = (0)
 #define ASSERT_ARGS_Parrot_interp_really_destroy __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
+       PARROT_ASSERT_ARG(interp))
+#define ASSERT_ARGS_Parrot_interp_frees_itself __attribute__unused__ int _ASSERT_ARGS_CHECK = (\
        PARROT_ASSERT_ARG(interp))
 /* Don't modify between HEADERIZER BEGIN / HEADERIZER END.  Your changes will be lost. */
 /* HEADERIZER END: src/interp/api.c */

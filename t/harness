@@ -60,7 +60,20 @@ else {
 }
 # GH #1256
 if ($PConfig_Temp{TEMP_asan}) {
+    # t/dynoplibs/bit.t crashes randomly in the Task scheduler path
+    # (Parrot_Task_invoke -> Parrot_ext_call -> CallContext) under asan.
+    # It does not reproduce locally and also happened before these changes,
+    # like the other random crashes in that path. Non-asan jobs still run it.
     @tests = grep { $_ !~ m{^\Qt/compilers/opsc/02-parse-all-ops.t\E} } @tests;
+    @tests = grep { $_ !~ m{^\Qt/dynoplibs/bit.t\E} } @tests;
+    # Parrot's GC scans the C stack conservatively. The asan fake stack
+    # (detect_stack_use_after_return, the default with newer compilers) keeps
+    # locals out of it, so the GC frees objects which are still in use.
+    my $asan_options = defined $ENV{ASAN_OPTIONS} ? $ENV{ASAN_OPTIONS} : '';
+    if ($asan_options !~ /detect_stack_use_after_return/) {
+        $ENV{ASAN_OPTIONS} = join(':', grep { length } $asan_options,
+                                  'detect_stack_use_after_return=0');
+    }
 }
 
 my $harness;

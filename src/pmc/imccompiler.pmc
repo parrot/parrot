@@ -71,6 +71,8 @@ pmclass IMCCompiler auto_attrs provides HLLCompiler provide invokable {
         attrs->is_pasm = is_pasm;
         attrs->imcc_info = (void*) imcc_new(INTERP);
         attrs->current_eval = 0;
+        /* only now, destroy needs the imcc_info */
+        PObj_custom_destroy_SET(SELF);
     }
 
     /* provided to emulate the current NCI compreg */

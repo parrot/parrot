@@ -1,7 +1,8 @@
 # LeakSanitizer suppressions for known, deliberate leaks.
 #
-# Use with:
-#   LSAN_OPTIONS=suppressions=tools/dev/lsan.supp make test
+# Use with (print_suppressions=0, else the summary on stderr breaks the tests
+# which compare the output):
+#   LSAN_OPTIONS=suppressions=tools/dev/lsan.supp:print_suppressions=0 make test
 #
 # Every entry needs a reason. Do not add entries to hide new leaks, fix them.
 
@@ -15,3 +16,11 @@ leak:Parrot_Packfile_set_string_native
 # call. When reached through PackfileDirectory the PackFile owns and frees it,
 # but the get_addr op on a bare PackfileBytecodeSegment has no way to free it.
 leak:Parrot_PackfileBytecodeSegment_get_pointer
+
+# Master interpreters are only destroyed with --leak-test
+# (PARROT_DESTROY_FLAG), programs using the old raw API (Parrot_interp_new)
+# never free them. Whether such a leftover interpreter is still "reachable"
+# at exit depends on leftover stack and register contents, so the report is
+# compiler dependent. Everything only reachable from such an interpreter is
+# suppressed with it.
+leak:Parrot_interp_make_interpreter

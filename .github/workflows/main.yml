@@ -34,7 +34,7 @@ jobs:
       # Known, documented leaks, see the file for the reasons. The suppressions
       # match on the caller frames, so the asan build keeps frame pointers
       # (Configure.pl adds -fno-omit-frame-pointer for -fsanitize=address).
-      LSAN_OPTIONS: suppressions=${{ github.workspace }}/tools/dev/lsan.supp
+      LSAN_OPTIONS: suppressions=${{ github.workspace }}/tools/dev/lsan.supp:print_suppressions=0
     strategy:
       fail-fast: false
       matrix:

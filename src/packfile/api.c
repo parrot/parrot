@@ -251,10 +251,11 @@ void
 Parrot_pf_destroy(PARROT_INTERP, ARGMOD(PackFile *pf))
 {
     ASSERT_ARGS(Parrot_pf_destroy)
+    DECL_CONST_CAST;
+    opcode_t *owned_src;
 
 #ifdef PARROT_HAS_HEADER_SYSMMAN
     if (pf->is_mmap_ped) {
-        DECL_CONST_CAST;
         /* Cast the result to void to avoid a warning with
          * some not-so-standard mmap headers
          */
@@ -266,7 +267,14 @@ Parrot_pf_destroy(PARROT_INTERP, ARGMOD(PackFile *pf))
     pf->header = NULL;
     mem_gc_free(interp, pf->dirp);
     pf->dirp   = NULL;
+    /* destroying the directory segment frees the PackFile itself, so take the
+       buffer which we own before */
+    owned_src = pf->owns_src ? PARROT_const_cast(opcode_t *, pf->src) : NULL;
+
     Parrot_pf_destroy_segment(interp, &pf->directory.base);
+
+    if (owned_src)
+        mem_gc_free(interp, owned_src);
     return;
 }
 
@@ -2690,6 +2698,11 @@ read_pbc_file_packfile_handle(PARROT_INTERP, ARGIN(STRING * const fullname),
     PackFile * const pf = Parrot_pf_new(interp, 0);
     pf->options = 0;
 
+    /* the buffer is ours, Parrot_pf_destroy frees it. No segment points into
+       it, only the mmap()ed packfiles do. */
+    pf->src      = (const opcode_t *)program_code;
+    pf->owns_src = 1;
+
     /* XXX -Wcast-align Need to check alignment for RISC, or memcpy */
     if (!Parrot_pf_unpack(interp, pf, (opcode_t *)program_code, (size_t)program_size))
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
@@ -2770,10 +2783,8 @@ read_pbc_file_packfile(PARROT_INTERP, ARGIN(STRING * const fullname),
         Parrot_ex_throw_from_c_args(interp, NULL, EXCEPTION_INVALID_OPERATION,
                 "Can't open %Ss, code %i", fullname, errno);
 
-    /* TODO: Who frees program_code? We don't do it here (And don't need to
-             if we've mmapped it. Figure out where this is handled and
-             document it here.
-    */
+    /* program_code is freed by Parrot_pf_destroy, if we read it (owns_src).
+       If we have mmapped it, Parrot_pf_destroy unmaps it. */
 
 #ifndef PARROT_HAS_HEADER_SYSMAN
 
@@ -2799,6 +2810,9 @@ read_pbc_file_packfile(PARROT_INTERP, ARGIN(STRING * const fullname),
 
     pf = Parrot_pf_new(interp, is_mapped);
     pf->options = 0;
+    /* A buffer we read is freed by Parrot_pf_destroy, an mmap()ed one is
+       unmapped. Unpack sets pf->src to it. */
+    pf->owns_src = !is_mapped;
 
     /* XXX -Wcast-align Need to check alignment for RISC, or memcpy */
     if (!Parrot_pf_unpack(interp, pf, (opcode_t *)program_code, (size_t)program_size))

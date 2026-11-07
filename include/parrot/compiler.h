@@ -253,7 +253,7 @@
 #define ARGFREE_NOTNULL(x)                  /*@only@*/ /*@out@*/ /*@notnull@*/ x
 
 #ifdef HASATTRIBUTE_NO_ADDRESS_SAFETY_ANALYSIS
-/* We violate ASAN in Parrot_x_execute_on_exit_handlers() and trace_mem_block() */
+/* We violate ASAN in the conservative GC stack scan: trace_mem_block() */
 #  define __attribute__no_address_safety_analysis__ __attribute__((no_address_safety_analysis))
 #else
 #  define __attribute__no_address_safety_analysis__

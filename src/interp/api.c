@@ -545,6 +545,30 @@ Parrot_interp_destroy(PARROT_INTERP)
 
 /*
 
+=item C<int Parrot_interp_frees_itself(PARROT_INTERP)>
+
+Returns true if C<Parrot_interp_really_destroy> will free this interpreter.
+That is the case for all child interpreters, and for the master interpreter
+with the C<--leak-test> flag, if it has no pending exception. The caller of an
+exit handler must not touch the interpreter afterwards then.
+
+=cut
+
+*/
+
+PARROT_WARN_UNUSED_RESULT
+int
+Parrot_interp_frees_itself(PARROT_INTERP)
+{
+    ASSERT_ARGS(Parrot_interp_frees_itself)
+
+    return interp->parent_interpreter
+        || (Interp_flags_TEST(interp, PARROT_DESTROY_FLAG)
+            && PMC_IS_NULL(interp->final_exception));
+}
+
+/*
+
 =item C<void Parrot_interp_really_destroy(PARROT_INTERP, int exit_code, void
 *arg)>
 
@@ -593,7 +617,7 @@ Parrot_interp_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg)
      *      many constant PMCs we'll create
      */
 
-    /* Now the PIOData gets also cleared */
+    /* Now the table of the std handles gets also cleared */
     Parrot_io_finish(interp);
 
     /* deinit runcores and dynamic op_libs */
@@ -615,12 +639,9 @@ Parrot_interp_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg)
     }
 #endif
 
-    /* we destroy all child interpreters and the last one too,
-     * if the --leak-test commandline was given, and there is no
-     * pending exception. */
-    if (! (interp->parent_interpreter)
-        || (Interp_flags_TEST(interp, PARROT_DESTROY_FLAG)
-            && !PMC_IS_NULL(interp->final_exception))) {
+    /* We destroy all child interpreters, and the master one only if the
+     * --leak-test commandline was given and there is no pending exception. */
+    if (!Parrot_interp_frees_itself(interp)) {
         destroy_object_cache(interp);
         return;
     }
@@ -653,6 +674,10 @@ Parrot_interp_really_destroy(PARROT_INTERP, SHIM(int exit_code), SHIM(void *arg)
     }
 
     Parrot_vtbl_free_vtables(interp);
+
+    /* The FileHandles of the finish run point into the IO vtables, so the IO
+       data can only be freed now. */
+    Parrot_io_destroy(interp);
 
     /* Finalize GC */
     Parrot_gc_finalize(interp);
