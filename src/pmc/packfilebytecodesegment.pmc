@@ -122,7 +122,8 @@ Return a pointer to a PackFile_ByteCode* built from this PMC's data.
         /* Construct mappings */
         mapping = (PackFile_ByteCode_OpMapping *)VTABLE_get_pointer(INTERP, op_map);
         memcpy(&bc->op_mapping, mapping, sizeof (PackFile_ByteCode_OpMapping));
-        /* Don't free "mapping". Caller will do it */
+        /* bc owns the libs array now, only the outer struct is ours to free */
+        mem_gc_free(INTERP, mapping);
 
         return bc;
     }

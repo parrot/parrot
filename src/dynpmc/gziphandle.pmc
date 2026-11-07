@@ -360,6 +360,7 @@ Returns a string with the zlib version.
         srcLen  = Parrot_str_byte_length(INTERP, str);
 
         crc = crc32(crc, (const Bytef *)src, srcLen);
+        Parrot_str_free_cstring(src);
         RETURN(INTVAL crc);
     }
 }

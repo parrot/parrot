@@ -186,6 +186,7 @@ complex_parse_string(PARROT_INTERP,
             /* verify that the string ends properly */
             if ((*t != 'i' && *t != 'j') || (*(t+1) != 0)) {
                 /* imaginary part does not end in 'i' or 'j' */
+                Parrot_str_free_cstring(str);
                 Parrot_ex_throw_from_c_noargs(interp,
                     EXCEPTION_INVALID_STRING_REPRESENTATION,
                     "Complex: malformed string");

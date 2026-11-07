@@ -87,15 +87,18 @@ Free the buffer when destroying.
     }
 
     VTABLE void init_int(INTVAL initial_size) {
-        unsigned char *content;
         if (initial_size < 0)
             Parrot_ex_throw_from_c_noargs(INTERP, EXCEPTION_OUT_OF_BOUNDS,
                                         "illegal argument");
         STATICSELF.init();
         SET_ATTR_size(INTERP, SELF, initial_size);
         SET_ATTR_allocated_size(INTERP, SELF, initial_size);
-        content = (unsigned char *)Parrot_gc_allocate_memory_chunk(INTERP, initial_size);
-        SET_ATTR_content(INTERP, SELF, content);
+        /* an empty buffer owns no memory, allocated_size == 0 means that */
+        if (initial_size) {
+            unsigned char * const content = (unsigned char *)
+                Parrot_gc_allocate_memory_chunk(INTERP, initial_size);
+            SET_ATTR_content(INTERP, SELF, content);
+        }
     }
 
     VTABLE void mark() :no_wb {

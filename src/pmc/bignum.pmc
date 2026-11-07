@@ -848,6 +848,7 @@ bignum_sub_bignum_float(PARROT_INTERP, ARGIN(PMC *self), FLOATVAL value, ARGMOD(
     GETATTR_BigNum_bn(interp, dest, bn_dest);
     mpf_set_d(t, (double)value);
     mpf_sub(bn_dest->b, bn_self->b, t);
+    mpf_clear(t);
 }
 
 static void
@@ -886,6 +887,7 @@ bignum_mul_bignum_float(PARROT_INTERP, ARGIN(PMC *self), FLOATVAL value, ARGMOD(
     GETATTR_BigNum_bn(interp, dest, bn_dest);
     mpf_set_d(t, value);
     mpf_mul(bn_dest->b, bn_self->b, t);
+    mpf_clear(t);
 }
 
 static void
