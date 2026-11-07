@@ -128,7 +128,7 @@ Parrot_io_buffer_free(PARROT_INTERP, ARGFREE(IO_BUFFER *buffer))
     ASSERT_ARGS(Parrot_io_buffer_free)
     if (buffer->buffer_size) {
         if (buffer->flags & PIO_BF_MALLOC)  {
-            mem_sys_free(buffer->buffer_start);
+            mem_sys_free(buffer->buffer_ptr);
         }
         else if (buffer->flags & PIO_BF_MMAP) {
             /* TODO */
@@ -178,7 +178,7 @@ Parrot_io_buffer_add_to_handle(PARROT_INTERP, ARGMOD(PMC *handle), const INTVAL 
             VTABLE_set_pointer_keyed_int(interp, handle, idx, buffer);
         }
         if (flags != BUFFER_FLAGS_ANY)
-            buffer->flags = flags;
+            buffer->flags = (buffer->flags & (PIO_BF_MALLOC | PIO_BF_MMAP)) | flags;
     }
 }
 

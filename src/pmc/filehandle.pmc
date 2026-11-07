@@ -163,6 +163,8 @@ Flushes the buffer and handle and closes the handle.
 */
     VTABLE void destroy() :no_wb {
         Parrot_io_close(INTERP, SELF, 1);
+        Parrot_io_buffer_remove_from_handle(INTERP, SELF, IO_PTR_IDX_READ_BUFFER);
+        Parrot_io_buffer_remove_from_handle(INTERP, SELF, IO_PTR_IDX_WRITE_BUFFER);
     }
 
 
